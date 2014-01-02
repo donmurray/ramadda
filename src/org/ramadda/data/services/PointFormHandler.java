@@ -49,6 +49,7 @@ import org.ramadda.repository.output.*;
 
 import org.ramadda.util.ColorTable;
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Json;
 import org.ramadda.util.Utils;
 import org.ramadda.util.grid.*;
 
@@ -1230,130 +1231,69 @@ public class PointFormHandler extends RecordFormHandler {
     public Result outputEntryChart(Request request, OutputType outputType,
                                    PointEntry pointEntry)
             throws Exception {
+        StringBuffer sb = new StringBuffer();
+        getEntryChart(request, pointEntry, sb);
 
-        long         numRecords = pointEntry.getNumRecords();
-        Entry        entry      = pointEntry.getEntry();
-        int numPointsToPlot = request.get(ARG_NUMPOINTS, TIMESERIES_POINTS);
-        StringBuffer sb         = new StringBuffer();
-        String       chartDivId = HtmlUtils.getUniqueId("chartdiv");
+        return new Result("", sb);
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param pointEntry _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    public void getEntryChart(Request request, PointEntry pointEntry,
+                              StringBuffer sb)
+            throws Exception {
+
+        long   numRecords      = pointEntry.getNumRecords();
+        Entry  entry           = pointEntry.getEntry();
+        int    numPointsToPlot = request.get(ARG_NUMPOINTS,
+                                             TIMESERIES_POINTS);
+        String chartDivId      = HtmlUtils.getUniqueId("chartdiv");
+
+        sb.append(HtmlUtils.comment("Chart div"));
         sb.append(HtmlUtils.div("", HtmlUtils.id(chartDivId)));
+        sb.append(HtmlUtils.comment("Import js libs"));
         sb.append(HtmlUtils.importJS("https://www.google.com/jsapi"));
         sb.append(
             HtmlUtils.script(
                 "google.load(\"visualization\", \"1\", {packages:[\"corechart\"]});\n"));
-
-
-
-        sb.append(HtmlUtils.comment("Import js libs"));
         sb.append(HtmlUtils.importJS(fileUrl("/point/selectform.js")));
         sb.append(HtmlUtils.importJS(fileUrl("/pointdata.js")));
         sb.append(HtmlUtils.importJS(fileUrl("/ramaddachart.js")));
-
-        final List<RecordField> fields =
-            pointEntry.getRecordFile().getChartableFields();
-
-        final StringBuffer js    = new StringBuffer();
-        int                index = 0;
-        for (RecordField attr : fields) {
-            if (js.length() == 0) {
-                js.append("var recordFields =  [");
-            } else {
-                js.append(",");
-            }
-            String unit = attr.getUnit();
-            if (Utils.stringDefined(unit)) {
-                unit = HtmlUtils.quote(unit);
-            } else {
-                unit = "null";
-            }
-
-            js.append("new RecordField(" + index + ", "
-                      + HtmlUtils.quote(attr.getName()) + ", "
-                      + HtmlUtils.quote(attr.getLabel()) + ","
-                      + HtmlUtils.quote("double") + ","
-                      + attr.getMissingValue() + "," + unit + ")");
-            index++;
-        }
-        if (fields.size() > 0) {
-            js.append("];\n");
-        }
-        js.append("var data =  [");
-        final int[]   cnt     = { 0 };
-
-
-        RecordVisitor visitor = new BridgeRecordVisitor(getOutputHandler()) {
-            public boolean doVisitRecord(RecordFile file,
-                                         VisitInfo visitInfo, Record record) {
-
-                if (cnt[0] > 0) {
-                    js.append(",\n");
-                }
-                PointRecord pointRecord = (PointRecord) record;
-                js.append("new Record(");
-                js.append(pointRecord.getLatitude());
-                js.append(",");
-                js.append(pointRecord.getLongitude());
-                js.append(",");
-                js.append(pointRecord.getAltitude());
-                js.append(",");
-                if (pointRecord.hasRecordTime()) {
-                    //                    js.append(formatDate(new Date(pointRecord.getRecordTime())));
-                    js.append("new Date(");
-                    js.append(pointRecord.getRecordTime());
-                    js.append(")");
-                } else {
-                    js.append("null");
-                }
-
-                js.append(",[");
-
-                for (int fieldCnt = 0; fieldCnt < fields.size(); fieldCnt++) {
-                    RecordField field = fields.get(fieldCnt);
-                    double      value = record.getValue(field.getParamId());
-                    if (fieldCnt > 0) {
-                        js.append(",");
-                    }
-                    js.append(value);
-                }
-                js.append("])");
-                cnt[0]++;
-                //In case 
-                if (cnt[0] > TIMESERIES_MAXPOINTS) {
-                    return false;
-                }
-
-                return true;
-            }
-        };
-
-
-        int skip = (int) (numRecords / numPointsToPlot);
-        //        System.err.println("skip:" + skip + " " + numRecords);
-        //        getRecordJobManager().visitSequential(request, pointEntry, visitor,
-        //                new VisitInfo(skip));
-        //        System.err.println("Final cnt:" + cnt[0]);
-        js.append("];\n");
-
-        StringBuffer js2 = new StringBuffer();
-
+        StringBuffer js = new StringBuffer();
         String url =
             request.entryUrl(
                 getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
                 getPointOutputHandler().OUTPUT_PRODUCT.getId(), ARG_PRODUCT,
                 getPointOutputHandler().OUTPUT_JSON.toString()) + "&"
                     + RecordFormHandler.ARG_NUMPOINTS + "=500";
-        System.err.println(url);
-        js2.append("var pointData = new  PointData("
-                   + HtmlUtils.quote(entry.getName()) + ",  null,null,"
-                   + HtmlUtils.quote(url) + ");\n");
-        js2.append("var chart = new  RamaddaLineChart("
-                   + HtmlUtils.quote(chartDivId) + " , pointData);\n");
+        System.err.println("JSON URL:" + url);
+        js.append("var pointData = new  PointData("
+                  + HtmlUtils.quote(entry.getName()) + ",  null,null,"
+                  + HtmlUtils.quote(url) + ");\n");
+        List<String> props = new ArrayList<String>();
+        props.add("width");
+        props.add(Json.quote(request.getString(ARG_WIDTH, "900px")));
+        props.add("height");
+        props.add(Json.quote(request.getString(ARG_HEIGHT, "300px")));
+        String fields = request.getString("fields", null);
+        if (fields != null) {
+            props.add("fields");
+            props.add(Json.list(StringUtil.split(fields, ",", true, true),
+                                true));
+        }
+        js.append("var chart = new  RamaddaLineChart("
+                  + HtmlUtils.quote(chartDivId) + " , pointData,"
+                  + Json.map(props, false) + ");\n");
         sb.append(HtmlUtils.comment("time series data"));
-        sb.append(HtmlUtils.script(js2.toString()));
-
-        return new Result("", sb);
+        sb.append(HtmlUtils.script(js.toString()));
     }
-
 
 
     /**

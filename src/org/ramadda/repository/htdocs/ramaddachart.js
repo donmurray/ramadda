@@ -102,7 +102,7 @@ function init_RamaddaLineChart(theChart) {
     theChart.createHtml = function() {
         var headerDiv =  "<div id=\"" + this.headerDivId +"\" class=chart-header></div>";
         var fieldsDiv =  "<div id=\"" + this.fieldsDivId +"\" class=chart-fields></div>";
-        var chartDiv =  "<div id=\"" + this.chartDivId +"\" style=\"width: " + this.getProperty("width","900px") +"; height: " + this.getProperty("height","300px") +";\"></div>\n";
+        var chartDiv =  "<div id=\"" + this.chartDivId +"\" style=\"width: " + this.getProperty("width","100px") +"; height: " + this.getProperty("height","100px") +";\"></div>\n";
 
         var html = "";
         html += headerDiv;
@@ -122,8 +122,12 @@ function init_RamaddaLineChart(theChart) {
             $("#" + this.fieldsDivId).html("No fields selected");
             return;
         }
+        if(this.getProperty("fields",null)!=null) {
+            return;
+        }
+
         $("#" + this.headerDivId).html(pointData.getTitle());
-        var html = "";
+        var html =  "<div class=chart-fields-inner>";
         var fields = this.pointData.getChartableFields();
         this.displayedFields = [fields[0]];
         var checkboxClass = this.id +"_checkbox";
@@ -141,6 +145,7 @@ function init_RamaddaLineChart(theChart) {
             html += field.label;
             html+= "<br>";
         }
+        html+= "</div>";
         $("#" + this.fieldsDivId).html(html);
         //Listen for changes to the checkboxes
         $("." + checkboxClass).change(function() {
@@ -152,6 +157,22 @@ function init_RamaddaLineChart(theChart) {
     theChart.setDisplayedFields = function() {
         this.displayedFields = [];
         var fields = this.pointData.getChartableFields();
+
+
+        var fixedFields = this.getProperty("fields");
+        if(fixedFields !=null) {
+            for(i=0;i<fields.length;i++) { 
+                var field = fields[i];
+                if(fixedFields.indexOf(field.getId())>=0) {
+                    this.displayedFields.push(field);
+                }
+            }
+
+            return;
+        }
+
+
+
         for(i=0;i<fields.length;i++) { 
             var field = fields[i];
             if($("#" + field.checkboxId).is(':checked')) {

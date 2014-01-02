@@ -25,11 +25,13 @@ import org.ramadda.repository.*;
 import org.ramadda.repository.auth.*;
 import org.ramadda.repository.map.*;
 
+
 import org.ramadda.repository.metadata.*;
 import org.ramadda.repository.search.*;
 import org.ramadda.repository.type.*;
 import org.ramadda.repository.util.DateArgument;
 import org.ramadda.repository.util.ServerInfo;
+import org.ramadda.data.services.*;
 import org.ramadda.util.BufferMapList;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Utils;
@@ -314,6 +316,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
     /** wiki group property */
     public static final String WIKI_PROP_GROUP = "wiki.group";
+
+    public static final String WIKI_PROP_CHART = "chart";
 
     /** wiki import */
     public static final String WIKI_PROP_IMPORT = "import";
@@ -1444,6 +1448,23 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                     getCalendarOutputHandler().makeCalendarEntries(request,
                         children), sb, doDay);
 
+            return sb.toString();
+        } else if (theTag.equals(WIKI_PROP_CHART)) {
+            PointTypeHandler pth = (PointTypeHandler) getRepository().getTypeHandler("type_point");
+            PointOutputHandler poh = (PointOutputHandler)pth.getRecordOutputHandler();
+            PointFormHandler pfh = poh.getPointFormHandler();
+            Request myRequest = request.cloneMe();
+            String tmp;
+            if((tmp=Misc.getProperty(props, ATTR_WIDTH, (String)null))!=null) {
+                myRequest.put(ARG_WIDTH, tmp);
+            } 
+            if((tmp=Misc.getProperty(props, ATTR_HEIGHT,  (String)null))!=null) {
+                myRequest.put(ARG_HEIGHT, tmp);
+            }
+            if((tmp=Misc.getProperty(props, "fields",  (String)null))!=null) {
+                myRequest.put("fields", tmp);
+            }
+            pfh.getEntryChart(myRequest,  (PointEntry)poh.doMakeEntry(request, entry), sb);
             return sb.toString();
         } else if (theTag.equals(WIKI_PROP_GRAPH)) {
             int width  = Misc.getProperty(props, ATTR_WIDTH, 400);

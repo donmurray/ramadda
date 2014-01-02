@@ -52,7 +52,7 @@ public class Json {
      *
      * @return  the map object { key1:value1, key2:value2 }
      */
-    public static String map(String[] values) {
+    public static String map(String... values) {
         return map(values, DFLT_QUOTE);
     }
 
@@ -276,9 +276,19 @@ public class Json {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param d _more_
+     *
+     * @return _more_
+     */
     public static String formatNumber(double d) {
-        if(Double.isNaN(d)) return "null";
-        return ""+d;
+        if (Double.isNaN(d)) {
+            return "null";
+        }
+
+        return "" + d;
     }
 
 
