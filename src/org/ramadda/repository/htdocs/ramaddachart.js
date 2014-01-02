@@ -142,7 +142,7 @@ function init_RamaddaLineChart(theChart) {
                 html+= " checked ";
             }
             html += "/>&nbsp;";
-            html += field.label;
+            html += "<span title=\"" + field.getId() +"\">" + field.label+"</span>";
             html+= "<br>";
         }
         html+= "</div>";
