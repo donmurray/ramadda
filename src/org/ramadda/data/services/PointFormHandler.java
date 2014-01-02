@@ -1287,7 +1287,7 @@ public class PointFormHandler extends RecordFormHandler {
             List<String> toks = StringUtil.split(fields, ",", true, true);
             if(toks.size()>0){
                 props.add("fields");
-                props.add(Json.list(toks));
+                props.add(Json.list(toks,true));
             }
         }
         js.append("var chart = new  RamaddaLineChart("
