@@ -616,7 +616,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
              attrs(ATTR_TITLE, "Upload file", ATTR_INCLUDEICON, "false")),
         WIKI_PROP_ROOT,
         prop(WIKI_PROP_CHART,
-             attrs(ATTR_WIDTH, "800px", ATTR_HEIGHT="400px", "fields", "")),
+             attrs(ATTR_WIDTH, "800px", ATTR_HEIGHT,"400px", "fields", "")),
     };
     //j+
 
