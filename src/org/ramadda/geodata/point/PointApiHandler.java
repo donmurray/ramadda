@@ -85,6 +85,9 @@ public class PointApiHandler extends RepositoryManager {
         PointOutputHandler poh   = getPointOutputHandler();
         Entry              entry = getEntryManager().getEntry(request);
         request.getHttpServletResponse().setContentType("test/json");
+        //Set a default of 500 for num points
+        request.put(RecordFormHandler.ARG_NUMPOINTS, request.getString(RecordFormHandler.ARG_NUMPOINTS, "500"));
+
         request.put(ARG_OUTPUT, poh.OUTPUT_PRODUCT.getId());
         request.put(ARG_PRODUCT, poh.OUTPUT_JSON.toString());
         request.put(RecordConstants.ARG_ASYNCH, "false");
