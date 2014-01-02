@@ -8,11 +8,12 @@ index.html
 
 
 >title:Miscellaneous
->>datamodel.html
 >>tools.html
+>>datamodel.html
 >>textdata.html
 >>pointreaders.html
 >>api.html
+>>json.html
 
 >>record.html
 

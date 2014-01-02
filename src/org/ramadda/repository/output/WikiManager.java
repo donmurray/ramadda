@@ -614,7 +614,9 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                    "false", SpecialSearch.ATTR_TABS, SpecialSearch.TAB_LIST)),
         prop(WIKI_PROP_UPLOAD,
              attrs(ATTR_TITLE, "Upload file", ATTR_INCLUDEICON, "false")),
-        WIKI_PROP_ROOT
+        WIKI_PROP_ROOT,
+        prop(WIKI_PROP_CHART,
+             attrs(ATTR_WIDTH, "800px", ATTR_HEIGHT="400px", "fields", "")),
     };
     //j+
 
