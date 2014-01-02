@@ -224,6 +224,10 @@ public class RecordField {
     public void addJson(StringBuffer sb, int index)  {
         String dataType = type;
         if(type.equals(TYPE_NUMERIC)) dataType = "double";
+        String props = Json.map(new String[]{
+                "chartable",""+getChartable(),
+                "searchable",""+getSearchable(),
+            });
         sb.append(Json.map(new String[]{
                     "index", ""+index,
                     "id", HtmlUtils.quote(name),
@@ -231,6 +235,7 @@ public class RecordField {
                     "type", HtmlUtils.quote(dataType),
                     //                    "missing",""+missingValue,
                     "unit", Utils.stringDefined(unit)?HtmlUtils.quote(unit):"null",
+                    "properties", props,
                 }, false));
 
         /*

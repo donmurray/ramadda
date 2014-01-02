@@ -22,6 +22,8 @@
 /*
 This package supports charting and mapping of georeferenced time series data
 
+It is used  in conjunction with the ramaddachart.js package
+
 Use:
 <div id="example"></div>
 ...
@@ -39,15 +41,25 @@ name - the name of this data
 recordFields - array of RecordField objects that define the metadata
 data - array of Record objects holding the data
 */
-function PointData(name, recordFields, data, url) {
+function PointData(name, recordFields, data, url, properties) {
     this.name = name;
     this.recordFields = recordFields;
     this.data = data;
     this.url = url;
+    this.properties = properties;
 
     this.hasData = function() {
         return this.data!=null;
     }
+    this.getProperty = function(key, dflt) {
+        if(typeof this.properties == 'undefined') {
+            return dflt;
+        }
+        var value = this.properties[key];
+        if(value == null) return dflt;
+        return value;
+    }
+
     this.getRecordFields = function() {
         return this.recordFields;
     }
@@ -61,20 +73,20 @@ function PointData(name, recordFields, data, url) {
     }
     this.getChartableFields = function() {
         var numericFields = [];
+        var skip = /(LATITUDE|LONGITUDE|ELEVATION)/g;
         for(var i=0;i<this.recordFields.length;i++) {
             var field = this.recordFields[i];
-            if(!field.isNumeric) {
+            if(!field.isNumeric || !field.isChartable()) {
                 continue;
             }
             var ID = field.getId().toUpperCase() ;
-            if(ID === "LATITUDE" || ID === "LONGITUDE" || ID === "ELEVATION") {
+            if(ID.match(skip)) {
                 continue;
             }
             numericFields.push(field);
         }
         return numericFields;
     }
-
 
     this.getData = function() {
         return this.data;
@@ -105,14 +117,14 @@ missing - the missing value forthis field. Probably not needed and isn't used
 as I think RAMADDA passes in NaN
 unit - the unit of the value
  */
-function RecordField(index, id, label, type, missing, unit) {
+function RecordField(index, id, label, type, missing, unit, properties) {
     this.index = index;
     this.id = id;
     this.label = label;
     this.type = type;
     this.missing = missing;
     this.unit = unit;
-
+    this.properties = properties;
     init_RecordField(this);
 }
 
@@ -123,6 +135,20 @@ function init_RecordField(recordField) {
     recordField.getIndex = function() {
         return this.index;
     }
+
+    recordField.getProperty = function(key, dflt) {
+        if(typeof this.properties == 'undefined') {
+            return dflt;
+        }
+        var value = this.properties[key];
+        if(value == null) return dflt;
+        return value;
+    }
+
+    recordField.isChartable = function() {
+        return this.getProperty("chartable",false);
+    }
+
     recordField.getId = function() {
         return this.id;
     }

@@ -39,12 +39,14 @@ Create a chart
 id - the id of this chart. Has to correspond to a div tag id 
 pointData - A PointData object (see below)
  */
-function RamaddaLineChart(id, pointDataArg) {
+function RamaddaLineChart(id, pointDataArg, properties) {
     var theChart  = this;
     this.id = id;
     this.pointData  = null;
+    this.properties = properties;
     this.fieldsDivId =id +"_fields";
     this.chartDivId =id +"_chart";
+    this.chartHeaderId =id +"_header";
     //Init methods
     init_RamaddaLineChart(this);
     this.createHtml();
@@ -59,6 +61,13 @@ function init_RamaddaLineChart(theChart) {
 
     theChart.getId = function() {
         return this.id;
+    }
+
+    theChart.getProperty = function(key, dflt) {
+        if(typeof this.properties == 'undefined') return dflt;
+        var value = this.properties[key];
+        if(value == null) return dflt;
+        return value;
     }
 
     theChart.loadJson = function(url) {
@@ -91,10 +100,12 @@ function init_RamaddaLineChart(theChart) {
 
 
     theChart.createHtml = function() {
-        var fieldsDiv =  "<div id=\"" + this.fieldsDivId +"\" class=chart-fields>";
-        var chartDiv =  "<div id=\"" + this.chartDivId +"\" style=\"width: 900px; height: 500px;\"></div>\n";
+        var headerDiv =  "<div id=\"" + this.headerDivId +"\" class=chart-header></div>";
+        var fieldsDiv =  "<div id=\"" + this.fieldsDivId +"\" class=chart-fields></div>";
+        var chartDiv =  "<div id=\"" + this.chartDivId +"\" style=\"width: " + this.getProperty("width","900px") +"; height: " + this.getProperty("height","300px") +";\"></div>\n";
 
         var html = "";
+        html += headerDiv;
         html += "<table width=100%>";
         html += "<tr valign=top><td>";
         html += fieldsDiv;
@@ -107,9 +118,11 @@ function init_RamaddaLineChart(theChart) {
 
     theChart.addFields = function() {
         if(!this.hasData()) {
+            //            $("#" + this.headerDivId).html("");
             $("#" + this.fieldsDivId).html("No fields selected");
             return;
         }
+        $("#" + this.headerDivId).html(pointData.getTitle());
         var html = "";
         var fields = this.pointData.getChartableFields();
         this.displayedFields = [fields[0]];
@@ -124,7 +137,7 @@ function init_RamaddaLineChart(theChart) {
             if(this.displayedFields.indexOf(field)>=0) {
                 html+= " checked ";
             }
-            html += "/> ";
+            html += "/>&nbsp;";
             html += field.label;
             html+= "<br>";
         }
@@ -230,7 +243,7 @@ function init_RamaddaLineChart(theChart) {
         {targetAxisIndex:0},
                      ],
             title: this.pointData.getTitle(),
-            chartArea:{xxleft:20,xxtop:0,height:"85%"}
+            chartArea:{left:30,top:30,height:"75%"}
         };
         this.chart.draw(dataTable, options);
     }
