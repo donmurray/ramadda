@@ -40,6 +40,7 @@ import java.io.*;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -82,11 +83,12 @@ public class PointJobManager extends RecordJobManager {
         dummy.remove("Boxes");
         List<String> products = (List<String>) dummy.get(ARG_PRODUCT,
                                     new ArrayList<String>());
-        //If its just csv then get rid of the grid parameters
-        if ((products.size() == 1) && (products.get(0).equals(
-                getPointOutputHandler().OUTPUT_CSV.getId()) || products.get(
-                0).equals(
-                getPointOutputHandler().OUTPUT_LATLONALTCSV.getId()))) {
+
+        HashSet<String> formats = new HashSet<String>();
+        formats.addAll(products);
+
+        //if no grid products then get rid of the grid parameters
+        if ( !getPointOutputHandler().anyGriddedFormats(formats)) {
             for (String gridArg : new String[] {
                 ARG_WIDTH, ARG_HEIGHT, ARG_COLORTABLE, ARG_GRID_RADIUS_CELLS,
                 ARG_GRID_RADIUS_DEGREES, ARG_HILLSHADE_AZIMUTH,

@@ -1043,10 +1043,7 @@ public class PointOutputHandler extends RecordOutputHandler {
 
 
         //Check if we need to make a grid
-        if (formats.contains(OUTPUT_ASC.getId())
-                || formats.contains(OUTPUT_IMAGE.getId())
-                || formats.contains(OUTPUT_KMZ.getId())
-                || formats.contains(OUTPUT_HILLSHADE.getId())) {
+        if (anyGriddedFormats(formats)) {
             visitors.add(makeGridVisitor(request, pointEntries,
                                          getBounds(request, pointEntries)));
         }
@@ -1054,6 +1051,25 @@ public class PointOutputHandler extends RecordOutputHandler {
         return null;
     }
 
+
+    /**
+     * _more_
+     *
+     * @param formats _more_
+     *
+     * @return _more_
+     */
+    public boolean anyGriddedFormats(HashSet<String> formats) {
+        if (formats.contains(OUTPUT_ASC.getId())
+                || formats.contains(OUTPUT_IMAGE.getId())
+                || formats.contains(OUTPUT_KMZ.getId())
+                || formats.contains(OUTPUT_HILLSHADE.getId())) {
+            return true;
+
+        }
+
+        return false;
+    }
 
 
     /**
@@ -1139,21 +1155,23 @@ public class PointOutputHandler extends RecordOutputHandler {
 
         RecordVisitor visitor = new BridgeRecordVisitor(this, request, jobId,
                                     mainEntry, ".json") {
+
             private int               cnt = 0;
             private List<RecordField> fields;
             private PrintWriter       pw;
             public boolean doVisitRecord(RecordFile file,
                                          VisitInfo visitInfo, Record record)
                     throws Exception {
+
                 if ( !jobOK(jobId)) {
                     return false;
                 }
-                PointRecord pointRecord =  (PointRecord) record;
+                PointRecord pointRecord = (PointRecord) record;
                 if (fields == null) {
                     pw     = getThePrintWriter();
                     fields = record.getFields();
                     List<String> fieldStrings = new ArrayList<String>();
-                    int headerCnt = 0;
+                    int          headerCnt    = 0;
                     for (RecordField field : fields) {
                         if (field.getSynthetic()) {
                             continue;
@@ -1167,7 +1185,7 @@ public class PointOutputHandler extends RecordOutputHandler {
                         headerCnt++;
                     }
                     pw.append("{");
-                    pw.append(Json.attr("name", mainEntry.getName(),true));
+                    pw.append(Json.attr("name", mainEntry.getName(), true));
                     pw.append(",");
 
                     pw.append("\"fields\":\n");
@@ -1176,28 +1194,35 @@ public class PointOutputHandler extends RecordOutputHandler {
                 }
 
                 int fieldCnt = 0;
-                if(cnt>0) {
+                if (cnt > 0) {
                     pw.append(",\n");
                 }
 
                 pw.append("{");
-                if(pointRecord.isValidPosition()) {
-                    pw.append(Json.attr("latitude",""+ pointRecord.getLatitude(), false));
+                if (pointRecord.isValidPosition()) {
+                    pw.append(Json.attr("latitude",
+                                        "" + pointRecord.getLatitude(),
+                                        false));
                     pw.append(",");
-                    pw.append(Json.attr("longitude",""+ pointRecord.getLongitude(), false));
-                }  else {
-                    pw.append(Json.attr("latitude","null", false));
+                    pw.append(Json.attr("longitude",
+                                        "" + pointRecord.getLongitude(),
+                                        false));
+                } else {
+                    pw.append(Json.attr("latitude", "null", false));
                     pw.append(",");
-                    pw.append(Json.attr("longitude","null", false));
+                    pw.append(Json.attr("longitude", "null", false));
                 }
                 pw.append(",");
-                pw.append(Json.attr("elevation","" + pointRecord.getAltitude(), false));
+                pw.append(Json.attr("elevation",
+                                    "" + pointRecord.getAltitude(), false));
 
                 pw.append(",");
-                if(pointRecord.hasRecordTime()) {
-                    pw.append(Json.attr("date",""+ pointRecord.getRecordTime(), false));
+                if (pointRecord.hasRecordTime()) {
+                    pw.append(Json.attr("date",
+                                        "" + pointRecord.getRecordTime(),
+                                        false));
                 } else {
-                    pw.append(Json.attr("date","null", false));
+                    pw.append(Json.attr("date", "null", false));
                 }
 
                 pw.append(",");
@@ -1239,7 +1264,9 @@ public class PointOutputHandler extends RecordOutputHandler {
                 }
                 pw.append("]}\n");
                 cnt++;
+
                 return true;
+
             }
 
             @Override
@@ -1249,6 +1276,7 @@ public class PointOutputHandler extends RecordOutputHandler {
                     pw.append("\n]}\n");
                 }
             }
+
         };
 
         return visitor;
