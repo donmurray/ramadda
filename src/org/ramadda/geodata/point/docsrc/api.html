@@ -1,9 +1,9 @@
-[ht::head {NLAS Data Access API}]
+[ht::head {Point Data Access API}]
 <%nochildlist%>
 
-The same <a href="access.html">LiDAR data access</a> functionality that is available to an end user through the 
+The same <a href="access.html">point data access</a> functionality that is available to an end user through the 
 web forms is also available to external clients (e.g., <a href="http://www.opentopography.org/">Open Topography</a>
-via the NLAS Data Access API.
+via the Point Data Access API.
 <p>
 
 There are 3 major service areas provided by the API:
@@ -12,23 +12,20 @@ There are 3 major service areas provided by the API:
 <a href="#status">Job status</a>.
 
 
-<subhead intoc="false" id="collection">LiDAR Collection Queries</subhead>
-NLAS/RAMADDA supports querying on the LiDAR collections it holds and returning the
+<subhead intoc="false" id="collection">Point Collection Queries</subhead>
+RAMADDA supports querying on the point collections it holds and returning the
 results as  an <a href="http://en.wikipedia.org/wiki/Atom_%28standard%29">ATOM</a> xml
 document.
 
-
+<!-- todo: change thos to the point 
 The URL to the ATOM feed is:<pre>
-http//&lt;hostname&gt;/repository/nlas/capability.xml
-</pre>e.g.:
-<pre>
-<a href="https://nlas.unavco.org/repository/nlas/capability.xml">https://nlas.unavco.org/repository/nlas/capability.xml</a>
+http//&lt;hostname&gt;/repository/search/type/point_collection?output=atom
+or
+http//&lt;hostname&gt;/repository/search/type/lidar_collection?output=atom
 </pre>
 
-<div class="note">
-Note: The examples used here point to the nlas.unavco.org machine which is set up to always be accessed through https not http.
-Normally, one would access these URLs through http.
-</div>
+<a href="http://ramadda.org/repository/search/type/lidar_collection?max=50&type=lidar_collection&output=atom">e.g.</a>
+
 <p>
 
 The URL above returns the results as an Atom xml document that lists each of the matched LiDAR Collection

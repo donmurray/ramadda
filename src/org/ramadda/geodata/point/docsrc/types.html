@@ -1,8 +1,8 @@
-[ht::head {Managing LiDAR Data in NLAS/RAMADDA}]
+[ht::head {Managing point data in RAMADDA}]
 
-There are two main types of LiDAR related entries you can create. 
-The first is the LiDAR Data type. Entries of this type refer to a 
-single LiDAR data file.  
+There are two main types of Point related entries you can create. 
+The first is the Point Data type. Entries of this type refer to a 
+single Point data file.  
 <p>
 You can upload a file directly to RAMADDA:
 <ol>
@@ -10,7 +10,7 @@ You can upload a file directly to RAMADDA:
 Navigate to the Folder you want to upload the file to
 <li>
 From the File menu select "New Entry".
-<li> Select an appropriate LiDAR Data type:
+<li> Select an appropriate Point Data type:
 <p>
 <img src="images/lidarentries.png">
 <p>
@@ -30,25 +30,18 @@ to find out how to automate this process.
 
 </ol>
 
-A LiDAR Data type in RAMADDA provides a number of services (viewing, data access, etc)
-The LiDAR Collection type is used for aggregating a set of LiDAR Data entries
-and providing the NLAS data access services (conversion, subset, etc) to the whole
+A Point Data type in RAMADDA provides a number of services (viewing, data access, etc)
+The Point Collection type is used for aggregating a set of Point Data entries
+and providing the POINT data access services (conversion, subset, etc) to the whole
 collection.
-Furthermore, the LiDAR Data entries are not accessed directly 
-from queries through the NLAS API from external portals (e.g., Open Topography).
-The LiDAR Collection entries are what is accessed by external portals and through
-the top-level NLAS search UI.
+Furthermore, the Point Data entries are not accessed directly 
+from queries through the POINT API from external portals (e.g., Open Topography).
+The Point Collection entries are what is accessed by external portals and through
+the top-level POINT search UI.
 <p>
 So, if you want to make data collections available to OpenTopography 
-then create a LiDAR Collection folder and add the LiDAR Data to it.
+then create a Point Collection folder and add the Point Data to it.
 
-<div class="note">
-Note: When a LiDAR data file is ingested into RAMADDA its spatial bounds is extracted and also an 
-concave bounding polygon  is determined. The polygon is stored as a metadata element associated with the
-entry. If you want to copy the polygon metadata from the LiDAR data entry to its parent LiDAR collection
-then go to the [ht::menu Edit {Edit Properties}] menu of the data file entry. Check on the polygon property and 
-select "Add selected to parent folder"
-</div>
 
 [ht::foot]
 

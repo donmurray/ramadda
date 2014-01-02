@@ -1,14 +1,14 @@
 [ht::head {Data Subsetting and Conversion}]
 <%nochildlist%>
 
-NLAS/RAMADDA provides an interactive service for LiDAR data subsetting, 
+RAMADDA provides an interactive service for point data subsetting, 
 converting and product generation.
-This facility is available through the [ht::menu {LiDAR Data} {Subset and Products}] menu, e.g.:
-<a href="https://nlas.unavco.org/repository/entry/show/NLAS+Repository/Data/LVIS+Costa+Rica/LVIS_CR_2005_WAVE_20060518_West_Slope.lgw?entryid=a26ea477-f085-4585-8cab-0cd917d6655a&output=points.form">LVIS/Costa Rica</a>.
+This facility is available through the [ht::menu {Data} {Subset and Products}] menu, e.g.:
+<a href="http://ramadda.org/repository/entry/show/Home/RAMADDA+Examples/Science+Data/Point+Data/LiDAR+Data/LVIS+Arenal?entryid=ca0703ff-0333-4ac8-8ce4-262d630a7266&output=points.form">LVIS/Costa Rica</a>.
 
 <p>
-This facility is available for both individual LiDAR data entries as well
-as LiDAR collections. For collections certain products are not supported.
+This facility is available for both individual point data entries as well
+as Point collections. For collections certain products are not supported.
 
 <p>
 The subset and product form is composed of a number of 
@@ -30,8 +30,8 @@ original data contains (e.g., rgb, intensity, time, etc).
 
 There are 2 forms of Comma Separate Values (CSV) provided: "all fields" and
 "Lat/Lon/Alt".
-All fields  will include all of the LiDAR observation parameters.
-If the LiDAR file has waveforms then you can also include the
+All fields  will include all of the Point observation parameters.
+If the Point file has waveforms then you can also include the
 waveform values in the CSV by checking the checkbox under
 the [ht::menu {Advanced Settings} Points {Include waveforms}]
 section.
@@ -61,7 +61,7 @@ There are a number of processing options you can select under Advanced Settings:
 [ht::cimg images/access_advanced.png {Advanced Settings} {border=0}]
 
 If you chose the IDW average grid product then you can specify
-a radius of influence for each LiDAR point. The radius can either be
+a radius of influence for each Point point. The radius can either be
 in terms of degrees or number of grid cells.
 <p>
 If "Fill missing points" is checked on then grid cells that had no value
@@ -87,18 +87,6 @@ If you specified an email address then RAMADDA will send you an email
 notification when your processing request is completed.
 
 
-<subhead intoc="false" id="metric">Metrics</subhead>
-NLAS/RAMADDA tracks information about processing jobs including IP address of the user,
-which collection the job was run on, how many LiDAR points were processed, etc.
-If you are a registered user of RAMADDA then there will be
-a <a href="https://nlas.unavco.org/repository/nlas/jobs">My Jobs</a>
-link shown in the 
-<a href="https://nlas.unavco.org/repository/nlas/search">main NLAS page</a>.
-There will also be a <a href="https://nlas.unavco.org/repository/nlas/metrics">Processing Summary</a>
-page that shows summary statistics for each collection.
-<p>
-If you are a site administrator there will also be links to show all of the jobs as HTML and also
-as CSV for download.
 
 
 
