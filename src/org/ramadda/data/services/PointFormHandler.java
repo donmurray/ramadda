@@ -746,7 +746,7 @@ public class PointFormHandler extends RecordFormHandler {
         sb.append("</td><td></td></tr>");
         sb.append(
             HtmlUtils.hidden(
-                ARG_OUTPUT, getPointOutputHandler().OUTPUT_PRODUCT.getId()));
+                             ARG_OUTPUT, getPointOutputHandler().OUTPUT_PRODUCT.getId()));
 
 
         StringBuffer    productSB      = new StringBuffer();
@@ -1329,17 +1329,29 @@ public class PointFormHandler extends RecordFormHandler {
 
         int skip = (int) (numRecords / numPointsToPlot);
         //        System.err.println("skip:" + skip + " " + numRecords);
-        getRecordJobManager().visitSequential(request, pointEntry, visitor,
-                new VisitInfo(skip));
+        //        getRecordJobManager().visitSequential(request, pointEntry, visitor,
+        //                new VisitInfo(skip));
         //        System.err.println("Final cnt:" + cnt[0]);
         js.append("];\n");
-        js.append("var pointData = new  PointData("
+
+        StringBuffer js2    = new StringBuffer();
+
+        String url =
+            request.entryUrl(
+                getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
+                getPointOutputHandler().OUTPUT_PRODUCT.getId(),
+                ARG_PRODUCT,
+                getPointOutputHandler().OUTPUT_JSON.toString()) + "&" + RecordFormHandler.ARG_NUMPOINTS+"=500";
+        System.err.println(url);
+        js2.append("var pointData = new  PointData("
                   + HtmlUtils.quote(entry.getName())
-                  + ",  recordFields, data);\n");
-        js.append("var chart = new  RamaddaLineChart("
+                  + ",  null,null," +
+                   HtmlUtils.quote(url) +
+                   ");\n");
+        js2.append("var chart = new  RamaddaLineChart("
                   + HtmlUtils.quote(chartDivId) + " , pointData);\n");
         sb.append(HtmlUtils.comment("time series data"));
-        sb.append(HtmlUtils.script(js.toString()));
+        sb.append(HtmlUtils.script(js2.toString()));
 
         return new Result("", sb);
     }

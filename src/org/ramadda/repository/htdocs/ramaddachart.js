@@ -50,8 +50,8 @@ function RamaddaLineChart(id, pointDataArg) {
     this.createHtml();
     this.chart = new google.visualization.LineChart(document.getElementById(this.chartDivId));
     this.pointData  = null;
-
-    pointDataArg = new PointData("Test",null,null,"/repository/testpoint.json");
+    //Uncomment to test using test.json
+    //    pointDataArg = new PointData("Test",null,null,"/repository/test.json");
     this.setPointData(pointDataArg, true);
 }
 
@@ -83,7 +83,6 @@ function init_RamaddaLineChart(theChart) {
             this.loadData();
         } else if(checkUrl) {
             var jsonUrl = pointData.getUrl();
-
             if(jsonUrl!=null) {
                 this.loadJson(jsonUrl);
             }
@@ -112,11 +111,14 @@ function init_RamaddaLineChart(theChart) {
             return;
         }
         var html = "";
-        var fields = this.pointData.getRecordFields();
+        var fields = this.pointData.getChartableFields();
         this.displayedFields = [fields[0]];
         var checkboxClass = this.id +"_checkbox";
         for(i=0;i<fields.length;i++) { 
             var field = fields[i];
+            if(!field.isNumeric) {
+                continue;
+            }
             field.checkboxId  = this.id +"_cbx" + i;
             html += "<input id=\"" + field.checkboxId +"\" class=\""  + checkboxClass +"\"  type=checkbox value=true ";
             if(this.displayedFields.indexOf(field)>=0) {
@@ -136,7 +138,7 @@ function init_RamaddaLineChart(theChart) {
 
     theChart.setDisplayedFields = function() {
         this.displayedFields = [];
-        var fields = this.pointData.getRecordFields();
+        var fields = this.pointData.getChartableFields();
         for(i=0;i<fields.length;i++) { 
             var field = fields[i];
             if($("#" + field.checkboxId).is(':checked')) {
@@ -145,7 +147,6 @@ function init_RamaddaLineChart(theChart) {
         }
 
         if(this.displayedFields.length==0) {
-            var fields = this.pointData.getRecordFields();
             if(fields.length==0) return;
             this.displayedFields.push(fields[0]);
         }
@@ -172,6 +173,11 @@ function init_RamaddaLineChart(theChart) {
         var fieldNames = ["domain"];
         for(i=0;i<this.displayedFields.length;i++) { 
             var field = this.displayedFields[i];
+            if(!field.isNumeric) {
+                console.log("skipping:" + field.label + " " + field.type);
+                continue;
+            }
+            //            console.log("using:" + field.label + " " + field.type);
             var name  = field.getLabel();
             if(field.getUnit()!=null) {
                 name += " (" + field.getUnit()+")";
@@ -181,6 +187,7 @@ function init_RamaddaLineChart(theChart) {
         dataList.push(fieldNames);
 
         //These are Record objects
+
         var records = this.pointData.getData();
         for(j=0;j<records.length;j++) { 
             var record = records[j];
@@ -188,17 +195,26 @@ function init_RamaddaLineChart(theChart) {
             var date = record.getDate();
             //Add the date or index field
             if(date!=null) {
-                values.push(j);
-                //                values.push(date);
+                values.push(date);
             } else {
                 values.push(j);
             }
             //            values.push(record.getElevation());
+            var allNull  = true;
             for(var i=0;i<this.displayedFields.length;i++) { 
                 var field = this.displayedFields[i];
+                if(!field.isNumeric) {
+                    //                    console.log("skipping:" + field.label + " " + field.type);
+                    continue;
+                }
                 var value = record.getValue(field.getIndex());
+                //                console.log(j+" value:" + value);
+                if(value!=null) {
+                    allNull = false;
+                }
                 values.push(value);
             }
+            //TODO: when its all null values we get some errors
             dataList.push(values);
         }
 
@@ -213,7 +229,7 @@ function init_RamaddaLineChart(theChart) {
         {targetAxisIndex:1},
         {targetAxisIndex:0},
                      ],
-            title: this.pointData.getName(),
+            title: this.pointData.getTitle(),
             chartArea:{xxleft:20,xxtop:0,height:"85%"}
         };
         this.chart.draw(dataTable, options);

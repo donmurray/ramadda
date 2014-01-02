@@ -610,13 +610,9 @@ public class PointOutputHandler extends RecordOutputHandler {
                 return result;
             }
 
-
-
-
             if ( !jobOK(jobId)) {
                 return result;
             }
-
 
             //Run through the visitors
             if (visitors.size() > 0) {
@@ -1152,12 +1148,11 @@ public class PointOutputHandler extends RecordOutputHandler {
                 if ( !jobOK(jobId)) {
                     return false;
                 }
+                PointRecord pointRecord =  (PointRecord) record;
                 if (fields == null) {
-                    fields = record.getFields();
                     pw     = getThePrintWriter();
-                    pw.append("[");
-
-                    pw.append("[");
+                    fields = record.getFields();
+                    List<String> fieldStrings = new ArrayList<String>();
                     int headerCnt = 0;
                     for (RecordField field : fields) {
                         if (field.getSynthetic()) {
@@ -1166,19 +1161,47 @@ public class PointOutputHandler extends RecordOutputHandler {
                         if (field.getArity() > 1) {
                             continue;
                         }
-                        if (headerCnt > 0) {
-                            pw.append(",");
-                        }
+                        StringBuffer fieldSB = new StringBuffer();
+                        field.addJson(fieldSB, headerCnt);
+                        fieldStrings.add(fieldSB.toString());
                         headerCnt++;
-                        pw.append(HtmlUtils.quote(field.getName()));
                     }
-                    pw.append("],\n");
+                    pw.append("{");
+                    pw.append(Json.attr("name", mainEntry.getName(),true));
+                    pw.append(",");
 
-                } else {
+                    pw.append("\"fields\":\n");
+                    pw.append(Json.list(fieldStrings));
+                    pw.append(",\"data\": [\n");
+                }
+
+                int fieldCnt = 0;
+                if(cnt>0) {
                     pw.append(",\n");
                 }
-                pw.append("[");
-                int fieldCnt = 0;
+
+                pw.append("{");
+                if(pointRecord.isValidPosition()) {
+                    pw.append(Json.attr("latitude",""+ pointRecord.getLatitude(), false));
+                    pw.append(",");
+                    pw.append(Json.attr("longitude",""+ pointRecord.getLongitude(), false));
+                }  else {
+                    pw.append(Json.attr("latitude","null", false));
+                    pw.append(",");
+                    pw.append(Json.attr("longitude","null", false));
+                }
+                pw.append(",");
+                pw.append(Json.attr("elevation","" + pointRecord.getAltitude(), false));
+
+                pw.append(",");
+                if(pointRecord.hasRecordTime()) {
+                    pw.append(Json.attr("date",""+ pointRecord.getRecordTime(), false));
+                } else {
+                    pw.append(Json.attr("date","null", false));
+                }
+
+                pw.append(",");
+                pw.append("\"values\":[");
                 for (RecordField field : fields) {
                     if (field.getSynthetic()) {
                         continue;
@@ -1214,9 +1237,8 @@ public class PointOutputHandler extends RecordOutputHandler {
                     pw.append(svalue);
                     fieldCnt++;
                 }
-                pw.append("]");
+                pw.append("]}\n");
                 cnt++;
-
                 return true;
             }
 
@@ -1224,7 +1246,7 @@ public class PointOutputHandler extends RecordOutputHandler {
             public void finished(RecordFile file, VisitInfo visitInfo) {
                 super.finished(file, visitInfo);
                 if (pw != null) {
-                    pw.append("]");
+                    pw.append("\n]}\n");
                 }
             }
         };

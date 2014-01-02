@@ -51,6 +51,31 @@ function PointData(name, recordFields, data, url) {
     this.getRecordFields = function() {
         return this.recordFields;
     }
+    this.getNumericFields = function() {
+        var numericFields = [];
+        for(var i=0;i<this.recordFields.length;i++) {
+            var field = this.recordFields[i];
+            if(field.isNumeric) numericFields.push(field);
+        }
+        return numericFields;
+    }
+    this.getChartableFields = function() {
+        var numericFields = [];
+        for(var i=0;i<this.recordFields.length;i++) {
+            var field = this.recordFields[i];
+            if(!field.isNumeric) {
+                continue;
+            }
+            var ID = field.getId().toUpperCase() ;
+            if(ID === "LATITUDE" || ID === "LONGITUDE" || ID === "ELEVATION") {
+                continue;
+            }
+            numericFields.push(field);
+        }
+        return numericFields;
+    }
+
+
     this.getData = function() {
         return this.data;
     }
@@ -58,6 +83,12 @@ function PointData(name, recordFields, data, url) {
         return this.url;
     }
     this.getName = function() {
+        return this.name;
+    }
+
+    this.getTitle = function() {
+        if(this.data !=null && this.data.length>0)
+            return this.name +" - " + this.data.length +" points";
         return this.name;
     }
 
@@ -81,10 +112,14 @@ function RecordField(index, id, label, type, missing, unit) {
     this.type = type;
     this.missing = missing;
     this.unit = unit;
+
     init_RecordField(this);
 }
 
 function init_RecordField(recordField) {
+    recordField.isNumeric = recordField.type == "double";
+    //    console.log(recordField.label+" type:" + recordField.type+": " + recordField.isNumeric);
+
     recordField.getIndex = function() {
         return this.index;
     }
@@ -143,6 +178,7 @@ function init_Record(record) {
 }
 
 
+
 function makePointData(json) {
     var fields = [];
     for(var i=0;i<json.fields.length;i++) {
@@ -155,10 +191,20 @@ function makePointData(json) {
     for(var i=0;i<json.data.length;i++) {
         var tuple = json.data[i];
         //lat,lon,alt,time,data values
-        data.push(new Record(tuple.latitude, tuple.longitude,tuple.elevation,tuple.date, tuple.values));
+        var date  = tuple.date;
+        if(date>0) {
+            date = new Date(date);
+        }
+        data.push(new Record(tuple.latitude, tuple.longitude,tuple.elevation,date, tuple.values));
     }
 
-    return new  PointData("Test point data",  fields, data);
+    
+    var name = data.name;
+
+    if ((typeof name === 'undefined')) {
+        name =  "Point Data";
+    }
+    return new  PointData(name,  fields, data);
 }
 
 
