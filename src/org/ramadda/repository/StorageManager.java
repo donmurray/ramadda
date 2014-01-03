@@ -307,7 +307,7 @@ public class StorageManager extends RepositoryManager {
      *
      * @return _more_
      */
-    public String getDiskUsage() {
+    private String getDiskUsage() {
         //Note: this will break on systems without du
         List<String> commands = new ArrayList<String>();
         commands.add("du");
@@ -320,7 +320,7 @@ public class StorageManager extends RepositoryManager {
 
             return results[0];
         } catch (Exception exc) {
-            return ("Error getting disk usage:" + exc);
+            return null;
         }
     }
 
@@ -427,7 +427,10 @@ public class StorageManager extends RepositoryManager {
                                       getRepositoryDir().toString()));
         sb.append(HtmlUtils.formEntry("Storage Directory:",
                                       getStorageDir().toString()));
-        sb.append(HtmlUtils.formEntry("Disk Usage:", getDiskUsage()));
+        String usage = getDiskUsage();
+        if(usage!=null) {
+            sb.append(HtmlUtils.formEntry("Disk Usage:", usage));
+        }
 
     }
 
