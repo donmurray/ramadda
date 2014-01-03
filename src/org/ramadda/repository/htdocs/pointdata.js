@@ -214,6 +214,7 @@ function makePointData(json) {
     }
 
     var data =[];
+
     for(var i=0;i<json.data.length;i++) {
         var tuple = json.data[i];
         //lat,lon,alt,time,data values
@@ -298,6 +299,7 @@ function loadPointJson(url, theChart) {
                 var err = textStatus + ", " + error;
                 alert("Error:" + err);
                 console.log(err);
+                console.log(textStatus);
             });
 }
 

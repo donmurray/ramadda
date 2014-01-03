@@ -700,10 +700,12 @@ public class WikiUtil {
         }
 
         return s;
-
-
     }
 
+
+    public String getWikiVariable(String key) {
+        return (String) myVars.get(key);
+    }
 
     /**
      * _more_

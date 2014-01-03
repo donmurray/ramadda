@@ -210,6 +210,15 @@ function HtmlUtil() {
      this.attr = function(name, value) {
       return " " + name +"=" + this.qt(value) +" ";
     }
+     this.checkbox = function(id,cbxclass,checked) {
+         var html = "<input id=\"" + id +"\" class=\""  + cbxclass +"\"  type=checkbox value=true ";
+         if(checked) {
+             html+= " checked ";
+         }
+         html += "/>";
+         return html;
+     }
+
     this.input =   function(name, value, attrs) {
        if(!attrs) attrs = "";
        return "<input " + attrs + this.attr("name", name) + this.attr("value",value) +"/>";
