@@ -95,7 +95,7 @@ public class RecordVisitorGroup extends RecordVisitor {
      * @param visitInfo _more_
      */
     @Override
-    public void finished(RecordFile file, VisitInfo visitInfo) {
+    public void finished(RecordFile file, VisitInfo visitInfo) throws Exception {
         super.finished(file, visitInfo);
         for (RecordVisitor visitor : visitors) {
             visitor.finished(file, visitInfo);

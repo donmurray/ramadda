@@ -968,7 +968,7 @@ public abstract class RecordFile {
      * @param visitor _more_
      * @param visitInfo _more_
      */
-    public void visitorFinished(RecordVisitor visitor, VisitInfo visitInfo) {
+    public void visitorFinished(RecordVisitor visitor, VisitInfo visitInfo) throws Exception{
         visitor.finished(this, visitInfo);
     }
 

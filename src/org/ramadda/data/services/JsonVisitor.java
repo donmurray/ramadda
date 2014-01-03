@@ -94,6 +94,9 @@ import java.util.zip.*;
 public class JsonVisitor extends BridgeRecordVisitor {
 
     /** _more_ */
+    private static final String COMMA = ",\n";
+
+    /** _more_ */
     private int cnt = 0;
 
     /** _more_ */
@@ -139,60 +142,31 @@ public class JsonVisitor extends BridgeRecordVisitor {
         if (fields == null) {
             pw     = getThePrintWriter();
             fields = record.getFields();
-            List<String> fieldStrings = new ArrayList<String>();
-            int          headerCnt    = 0;
-            for (RecordField field : fields) {
-                if (field.getSynthetic()) {
-                    continue;
-                }
-                if (field.getArity() > 1) {
-                    continue;
-                }
-                StringBuffer fieldSB = new StringBuffer();
-                field.addJson(fieldSB, headerCnt);
-                fieldStrings.add(fieldSB.toString());
-                headerCnt++;
-            }
-            pw.append("{");
-            pw.append(Json.attr("name", mainEntry.getName(), true));
-            pw.append(",");
-
-            pw.append("\"fields\":\n");
-            pw.append(Json.list(fieldStrings));
-            pw.append(",\"data\": [\n");
+            RecordField.addJsonHeader(pw, mainEntry.getName(), fields);
         }
 
         int fieldCnt = 0;
         if (cnt > 0) {
-            pw.append(",\n");
+            pw.append(COMMA);
         }
 
-        pw.append("{");
+        pw.append(Json.mapOpen());
         if (pointRecord.isValidPosition()) {
-            pw.append(Json.attr("latitude", "" + pointRecord.getLatitude(),
-                                false));
-            pw.append(",");
-            pw.append(Json.attr("longitude", "" + pointRecord.getLongitude(),
-                                false));
-        } else {
-            pw.append(Json.attr("latitude", "null", false));
-            pw.append(",");
-            pw.append(Json.attr("longitude", "null", false));
+            Json.addGeolocation(pw, pointRecord.getLatitude(),
+                                pointRecord.getLongitude(),
+                                pointRecord.getAltitude());
         }
-        pw.append(",");
-        pw.append(Json.attr("elevation", "" + pointRecord.getAltitude(),
-                            false));
-
-        pw.append(",");
+        pw.append(COMMA);
         if (pointRecord.hasRecordTime()) {
-            pw.append(Json.attr("date", "" + pointRecord.getRecordTime(),
-                                false));
+            pw.append(Json.attr(Json.FIELD_DATE,
+                                pointRecord.getRecordTime()));
         } else {
-            pw.append(Json.attr("date", "null", false));
+            pw.append(Json.attr(Json.FIELD_DATE, Json.NULL, false));
         }
+        pw.append(COMMA);
 
-        pw.append(",");
-        pw.append("\"values\":[");
+        pw.append(Json.mapKey(Json.FIELD_VALUES));
+        pw.append(Json.listOpen());
         for (RecordField field : fields) {
             if (field.getSynthetic()) {
                 continue;
@@ -220,16 +194,16 @@ public class JsonVisitor extends BridgeRecordVisitor {
                 }
             }
             if (fieldCnt > 0) {
-                pw.append(",");
+                pw.append(COMMA);
             }
             pw.append(svalue);
             fieldCnt++;
         }
-        pw.append("]}\n");
+        pw.append(Json.listClose());
+        pw.append(Json.mapClose());
         cnt++;
 
         return true;
-
     }
 
     /**
@@ -237,12 +211,15 @@ public class JsonVisitor extends BridgeRecordVisitor {
      *
      * @param file _more_
      * @param visitInfo _more_
+     *
+     * @throws Exception _more_
      */
     @Override
-    public void finished(RecordFile file, VisitInfo visitInfo) {
+    public void finished(RecordFile file, VisitInfo visitInfo)
+            throws Exception {
         super.finished(file, visitInfo);
         if (pw != null) {
-            pw.append("\n]}\n");
+            RecordField.addJsonFooter(pw);
         }
     }
 

@@ -54,7 +54,7 @@ public abstract class RecordVisitor {
      * @param file file we just visited
      * @param visitInfo visit info
      */
-    public void finished(RecordFile file, VisitInfo visitInfo) {}
+    public void finished(RecordFile file, VisitInfo visitInfo) throws Exception {}
 
     /**
      * _more_

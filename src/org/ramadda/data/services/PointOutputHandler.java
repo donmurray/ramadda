@@ -1433,7 +1433,7 @@ public class PointOutputHandler extends RecordOutputHandler {
                 }
             }
 
-            public void finished(RecordFile file, VisitInfo visitInfo) {
+            public void finished(RecordFile file, VisitInfo visitInfo) throws Exception {
                 write(getBuffer(file));
                 super.finished(file, visitInfo);
             }
@@ -1486,7 +1486,7 @@ public class PointOutputHandler extends RecordOutputHandler {
                     throw new RuntimeException(exc);
                 }
             }
-            public void finished(RecordFile file, VisitInfo visitInfo) {
+            public void finished(RecordFile file, VisitInfo visitInfo) throws Exception  {
                 super.finished(file, visitInfo);
                 try {
                     //                      if(writer!=null) {
@@ -1912,7 +1912,7 @@ public class PointOutputHandler extends RecordOutputHandler {
 
                     return true;
                 }
-                public void finished(RecordFile file, VisitInfo visitInfo) {
+                public void finished(RecordFile file, VisitInfo visitInfo) throws Exception {
                     super.finished(file, visitInfo);
                 }
             };

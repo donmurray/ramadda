@@ -220,6 +220,42 @@ public class RecordField {
 
 
 
+    public static void addJsonHeader(Appendable pw, String name, List<RecordField> fields) throws Exception {
+        pw.append(Json.mapOpen());
+        pw.append(Json.attr(Json.FIELD_NAME, name, true));
+        pw.append(",\n");
+        pw.append(Json.attr(Json.FIELD_FIELDS,
+                            RecordField.getJson(fields)));
+        pw.append(",\n");
+        pw.append(Json.mapKey(Json.FIELD_DATA));
+        pw.append(Json.listOpen());
+    }
+
+    public static void addJsonFooter(Appendable pw) throws Exception {
+        pw.append(Json.listClose());
+        pw.append(Json.mapClose());
+    }
+
+    public static String getJson(List<RecordField> fields) throws Exception {
+        Appendable sb = new StringBuffer();
+        List<String> fieldStrings = new ArrayList<String>();
+        int          headerCnt    = 0;
+        for (RecordField field : fields) {
+            if (field.getSynthetic()) {
+                continue;
+            }
+            if (field.getArity() > 1) {
+                continue;
+            }
+            StringBuffer fieldSB = new StringBuffer();
+            field.addJson(fieldSB, headerCnt);
+            fieldStrings.add(fieldSB.toString());
+            headerCnt++;
+        }
+        return Json.list(fieldStrings);
+    }
+
+
 
     public void addJson(StringBuffer sb, int index)  {
         String dataType = type;

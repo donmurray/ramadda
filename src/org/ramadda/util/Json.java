@@ -45,6 +45,56 @@ public class Json {
     /** default quote value */
     public static final boolean DFLT_QUOTE = false;
 
+    /** _more_          */
+    public static final String FIELD_NAME = "name";
+
+    /** _more_          */
+    public static final String FIELD_FIELDS = "fields";
+
+    /** _more_          */
+    public static final String FIELD_DATA = "data";
+
+    /** _more_          */
+    public static final String FIELD_VALUES = "values";
+
+    /** _more_          */
+    public static final String FIELD_LATITUDE = "latitude";
+
+    /** _more_          */
+    public static final String FIELD_LONGITUDE = "longitude";
+
+    /** _more_          */
+    public static final String FIELD_ELEVATION = "elevation";
+
+    /** _more_          */
+    public static final String FIELD_DATE = "date";
+
+
+
+    /**
+     * _more_
+     *
+     * @param pw _more_
+     * @param lat _more_
+     * @param lon _more_
+     * @param elevation _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void addGeolocation(Appendable pw, double lat, double lon,
+                                      double elevation)
+            throws Exception {
+
+        pw.append(attr(FIELD_LATITUDE, lat));
+        pw.append(",\n");
+        pw.append(attr(FIELD_LONGITUDE, lon));
+        pw.append(",\n");
+        pw.append(attr(FIELD_ELEVATION, elevation));
+    }
+
+
+
+
     /**
      * Create a JSON map
      *
@@ -89,7 +139,7 @@ public class Json {
      */
     public static String map(List<String> values, boolean quoteValue) {
         StringBuffer row = new StringBuffer();
-        row.append("{");
+        row.append(mapOpen());
         for (int i = 0; i < values.size(); i += 2) {
             if (i > 0) {
                 row.append(",\n");
@@ -98,7 +148,7 @@ public class Json {
             String value = values.get(i + 1);
             row.append(attr(name, value, quoteValue));
         }
-        row.append("}");
+        row.append(mapClose());
 
         return row.toString();
     }
@@ -126,6 +176,53 @@ public class Json {
     }
 
     /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
+    public static String mapKey(String key) {
+        return "\"" + key + "\":";
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public static String mapOpen() {
+        return "{";
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public static String mapClose() {
+        return "}";
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public static String listOpen() {
+        return "[";
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public static String listClose() {
+        return "]";
+    }
+
+    /**
      * Create a JSON list from the array of strings
      *
      * @param values  list of values [ value1,value2,value3,value4 ]
@@ -135,7 +232,7 @@ public class Json {
      */
     public static String list(List values, boolean quoteValue) {
         StringBuffer row = new StringBuffer();
-        row.append("[");
+        row.append(listOpen());
         for (int i = 0; i < values.size(); i++) {
             if (i > 0) {
                 row.append(",\n");
@@ -146,7 +243,7 @@ public class Json {
                 row.append(values.get(i).toString());
             }
         }
-        row.append("]");
+        row.append(listClose());
 
         return row.toString();
     }
@@ -226,6 +323,19 @@ public class Json {
 
 
     /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
+    public static String attr(String name, double value) {
+        return attr(name, "" + value, false);
+    }
+
+
+    /**
      * Create a JSON object attribute
      *
      * @param name  the attribute name
@@ -247,7 +357,7 @@ public class Json {
      * @return  the attribute as name:value
      */
     public static String attr(String name, String value, boolean quoteValue) {
-        return quote(name) + ":" + getString(value, quoteValue);
+        return mapKey(name) + getString(value, quoteValue);
     }
 
     /**

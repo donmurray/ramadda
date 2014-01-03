@@ -84,20 +84,6 @@ public class IdvPointFile extends CsvFile {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param visitor _more_
-     * @param visitInfo _more_
-     */
-    public void visitorFinished(RecordVisitor visitor, VisitInfo visitInfo) {
-        super.visitorFinished(visitor, visitInfo);
-        System.err.println("visitorFinished: " + visitor);
-        if (visitor instanceof PointMetadataHarvester) {
-            //            ((PointMetadataHarvester)visitor).putProperty("","");
-        }
-    }
-
 
 
     /**
