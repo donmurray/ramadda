@@ -47,18 +47,15 @@ function RamaddaLineChart(id, pointDataArg, properties) {
     this.fieldsDivId =id +"_fields";
     this.chartDivId =id +"_chart";
     this.chartHeaderId =id +"_header";
-    //Init methods
     init_RamaddaLineChart(this);
     this.createHtml();
     this.chart = new google.visualization.LineChart(document.getElementById(this.chartDivId));
-    this.pointData  = null;
     //Uncomment to test using test.json
     //    pointDataArg = new PointData("Test",null,null,"/repository/test.json");
     this.setPointData(pointDataArg, true);
 }
 
-function init_RamaddaLineChart(theChart) {
-
+function init_RamaddaChart(theChart) {
     theChart.getId = function() {
         return this.id;
     }
@@ -70,34 +67,26 @@ function init_RamaddaLineChart(theChart) {
         return value;
     }
 
-    theChart.loadJson = function(url) {
-        var theChart = this;
-        var jqxhr = $.getJSON( url, function(data) {
-                theChart.setPointData(makePointData(data),false);
-            })
-        .fail(function(jqxhr, textStatus, error) {
-                var err = textStatus + ", " + error;
-                alert("Error:" + err);
-                console.log(err);
-            });
-
-
+    theChart.hasData = function() {
+        return this.pointData!=null && this.pointData.hasData();
     }
 
     theChart.setPointData = function(pointData, checkUrl) {
-        var theChart = this;
         this.pointData = pointData;
         if(this.hasData()) {
-            this.addFields();
             this.loadData();
         } else if(checkUrl) {
             var jsonUrl = pointData.getUrl();
             if(jsonUrl!=null) {
-                this.loadJson(jsonUrl);
+                loadPointJson(jsonUrl, this);
             }
         }
     }
+}
 
+
+function init_RamaddaLineChart(theChart) {
+    init_RamaddaChart(theChart);
 
     theChart.createHtml = function() {
         var headerDiv =  "<div id=\"" + this.headerDivId +"\" class=chart-header></div>";
@@ -118,14 +107,12 @@ function init_RamaddaLineChart(theChart) {
 
     theChart.addFields = function() {
         if(!this.hasData()) {
-            //            $("#" + this.headerDivId).html("");
             $("#" + this.fieldsDivId).html("No fields selected");
             return;
         }
         if(this.getProperty("fields",null)!=null) {
             return;
         }
-
         $("#" + this.headerDivId).html(pointData.getTitle());
         var html =  "<div class=chart-fields-inner>";
         var fields = this.pointData.getChartableFields();
@@ -147,18 +134,16 @@ function init_RamaddaLineChart(theChart) {
         }
         html+= "</div>";
         $("#" + this.fieldsDivId).html(html);
-        //Listen for changes to the checkboxes
-        $("." + checkboxClass).change(function() {
-                theChart.loadData();
-            });
 
+        //Listen for changes to the checkboxes
+        $("." + checkboxClass).click(function() {
+                theChart.loadData();
+          });
     }
 
     theChart.setDisplayedFields = function() {
         this.displayedFields = [];
         var fields = this.pointData.getChartableFields();
-
-
         var fixedFields = this.getProperty("fields");
         if(fixedFields !=null) {
             for(i=0;i<fields.length;i++) { 
@@ -167,11 +152,8 @@ function init_RamaddaLineChart(theChart) {
                     this.displayedFields.push(field);
                 }
             }
-
             return;
         }
-
-
 
         for(i=0;i<fields.length;i++) { 
             var field = fields[i];
@@ -188,6 +170,7 @@ function init_RamaddaLineChart(theChart) {
 
 
     theChart.loadData = function() {
+        this.addFields();
         if(!this.hasData()) {
             this.chart.clearChart();
             return;
@@ -211,7 +194,6 @@ function init_RamaddaLineChart(theChart) {
                 console.log("skipping:" + field.label + " " + field.type);
                 continue;
             }
-            //            console.log("using:" + field.label + " " + field.type);
             var name  = field.getLabel();
             if(field.getUnit()!=null) {
                 name += " (" + field.getUnit()+")";
@@ -221,7 +203,6 @@ function init_RamaddaLineChart(theChart) {
         dataList.push(fieldNames);
 
         //These are Record objects
-
         var records = this.pointData.getData();
         for(j=0;j<records.length;j++) { 
             var record = records[j];
@@ -269,8 +250,6 @@ function init_RamaddaLineChart(theChart) {
         this.chart.draw(dataTable, options);
     }
 
-    theChart.hasData = function() {
-        return this.pointData!=null && this.pointData.hasData();
-    }
+
 }
 

@@ -290,6 +290,19 @@ function getRanges(fields,data) {
 }
 
 
+function loadPointJson(url, theChart) {
+    var jqxhr = $.getJSON( url, function(data) {
+            theChart.setPointData(makePointData(data),false);
+        })
+        .fail(function(jqxhr, textStatus, error) {
+                var err = textStatus + ", " + error;
+                alert("Error:" + err);
+                console.log(err);
+            });
+}
+
+
+
 
 /*
 function InteractiveDataWidget (theChart) {
