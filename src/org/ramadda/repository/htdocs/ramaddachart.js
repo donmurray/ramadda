@@ -40,8 +40,13 @@ function init_RamaddaLineChart(theChart) {
     theChart.dataCollection = new DataCollection();
     init_RamaddaChart(theChart);
     theChart.createHtml = function() {
+        var theChart = this;
         var html = "";
+        this.latFieldId = this.getId() +"_latfield";
+        this.lonFieldId = this.getId() +"_lonfield";
+        var reloadId = this.getId() +"_reload";
         html += this.getHeaderDiv();
+        html+= "<form><input type=submit value=\"Reload\" id=\"" + reloadId +"\"> <input id=\"" + this.latFieldId +"\"> <input id=\"" +  this.lonFieldId+"\"></form><div id=\"mapdiv\" style=\"border:1px #888888 solid; background-color:#7391ad; width: 400px; height:200px;\"></div>"
         html += "<table width=100%>";
         html += "<tr valign=top><td>";
         html += this.getFieldsDiv();
@@ -49,6 +54,16 @@ function init_RamaddaLineChart(theChart) {
         html += this.getChartDiv();
         html += "</td></tr></table>";
         this.setHtml(html);
+
+        $("#" + reloadId).button().click(function(event) {
+                event.preventDefault();
+                theChart.reload();
+            });
+        var mapProps = {"foo":"bar"};
+        this.map = new RepositoryMap("mapdiv", mapProps);
+
+        this.map.initMap(false);
+        this.map.addClickHandler( this.lonFieldId, this.latFieldId);
     }
 
     theChart.addFieldsLegend = function() {
@@ -70,10 +85,11 @@ function init_RamaddaLineChart(theChart) {
             for(i=0;i<fields.length;i++) { 
                 var field = fields[i];
                 field.checkboxId  = this.id +"_cbx_" + collectionIdx +"_" +i;
+                html += "<span title=\"" + field.getId() +"\">";
                 html += htmlUtil.checkbox(field.checkboxId, checkboxClass,
                                           field ==fields[0]);
-                html += "&nbsp;<span title=\"" + field.getId() +"\">" + field.label+"</span><br>";
-            }
+                html += field.label+"</span><br>";
+             }
         }
         html+= "</div>";
         $("#" + this.fieldsDivId).html(html);
@@ -212,6 +228,16 @@ function init_RamaddaChart(theChart) {
     }
 
 
+    theChart.reload = function() {
+        var dataList =  this.dataCollection.getData();
+        this.dataCollection = new DataCollection();
+        for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
+            var pointData = dataList[collectionIdx];
+            pointData.clear();
+            this.addOrLoadData(pointData);
+        }
+    }
+
     theChart.addOrLoadData = function(pointData) {
         if(pointData.hasData()) {
             this.addData(pointData);
@@ -228,12 +254,20 @@ function init_RamaddaChart(theChart) {
             if(toDate!=null) {
                 jsonUrl += "&todate=" + toDate;
             }
-            if(hasGeoMacro) {
-                jsonUrl = jsonUrl.replace("${latitude}","40.0");
-                jsonUrl = jsonUrl.replace("${longitude}","-107.0");
+            if(hasGeoMacro !=null) {
+                var lat = "40.0";
+                var lon = "-107";
+                if(this.map!=null && this.latFieldId!=null) {
+                    lat = $("#" + this.latFieldId).val();
+                    lon = $("#" + this.lonFieldId).val();
+                }
+                if(lat!=null && lat.length>0)
+                    jsonUrl = jsonUrl.replace("${latitude}",lat);
+                if(lon!=null && lon.length>0)
+                    jsonUrl = jsonUrl.replace("${longitude}",lon);
             }
             if(jsonUrl!=null) {
-                loadPointJson(jsonUrl, this);
+                loadPointJson(jsonUrl, this, pointData);
             }
         }
     }

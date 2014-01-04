@@ -311,8 +311,9 @@ public class CdmDataOutputHandler extends OutputHandler {
     /** Grid as point form Output Type */
     public static final OutputType OUTPUT_GRIDASPOINT_FORM =
         new OutputType("Extract Time Series", "data.gridaspoint.form",
-                       OutputType.TYPE_OTHER, OutputType.SUFFIX_NONE,
-                       "/cdmdata/chart_line.png", GROUP_DATA);
+                       OutputType.TYPE_OTHER | OutputType.TYPE_IMPORTANT,
+                       OutputType.SUFFIX_NONE, "/cdmdata/chart_line.png",
+                       GROUP_DATA);
 
     /** Grid as point Output Type */
     public static final OutputType OUTPUT_GRIDASPOINT =
@@ -733,6 +734,10 @@ public class CdmDataOutputHandler extends OutputHandler {
                 request.getLatOrLonValue(ARG_LOCATION_LONGITUDE, deflon));
             System.err.println("llp:" + llp);
         }
+        if (llp == null) {
+            llp = new LatLonPointImpl(deflat, deflon);
+        }
+
         double             levelVal   = request.get(ARG_LEVEL, Double.NaN);
 
         int                timeStride = 1;
@@ -1095,6 +1100,9 @@ public class CdmDataOutputHandler extends OutputHandler {
         addTimeWidget(request, dates, sb);
 
         List<TwoFacedObject> formats = new ArrayList<TwoFacedObject>();
+        formats.add(new TwoFacedObject("Interactive Time Series",
+                                       FORMAT_TIMESERIES_CHART));
+
         formats.add(new TwoFacedObject("JSON", FORMAT_JSON));
         formats.add(
             new TwoFacedObject(
@@ -1114,19 +1122,14 @@ public class CdmDataOutputHandler extends OutputHandler {
                                        FORMAT_TIMESERIES));
         formats.add(new TwoFacedObject("XML",
                                        SupportedFormat.XML.getFormatName()));
-        // Comment out until it works better to handled dates
-        formats.add(new TwoFacedObject("Interactive Time Series",
-                                       FORMAT_TIMESERIES_CHART));
 
-        String format =
-            request.getString(ARG_FORMAT,
-                              SupportedFormat.NETCDF3.getFormatName());
+
+        String format = request.getString(ARG_FORMAT,
+                                          FORMAT_TIMESERIES_CHART);
 
         sb.append(HtmlUtils.formEntry(msgLabel("Format"),
                                       HtmlUtils.select(ARG_FORMAT, formats,
                                           format)));
-
-
         addPublishWidget(request, entry, sb,
                          msg("Select a folder to publish the results to"));
         sb.append(HtmlUtils.formTableClose());

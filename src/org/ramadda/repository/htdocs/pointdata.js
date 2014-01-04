@@ -65,12 +65,22 @@ function PointData(name, recordFields, data, url, properties) {
     this.name = name;
     this.recordFields = recordFields;
     this.data = data;
-    this.url = url;
+    this.xurl = url;
     this.properties = properties;
+
+
+    this.initWith = function(thatPointData) {
+        this.recordFields = thatPointData.recordFields;
+        this.data = thatPointData.data;
+    }
 
     this.hasData = function() {
         return this.data!=null;
     }
+    this.clear= function() {
+        this.data = null;
+    }
+
     this.getProperty = function(key, dflt) {
         if(typeof this.properties == 'undefined') {
             return dflt;
@@ -112,7 +122,7 @@ function PointData(name, recordFields, data, url, properties) {
         return this.data;
     }
     this.getUrl = function() {
-        return this.url;
+        return this.xurl;
     }
     this.getName = function() {
         return this.name;
@@ -311,10 +321,12 @@ function getRanges(fields,data) {
 }
 
 
-function loadPointJson(url, theChart) {
+function loadPointJson(url, theChart, pointData) {
     console.log("json url:" + url);
     var jqxhr = $.getJSON( url, function(data) {
-            theChart.pointDataLoaded(makePointData(data));
+            var newPointData =    makePointData(data);
+            pointData.initWith(newPointData);
+            theChart.pointDataLoaded(pointData);
         })
         .fail(function(jqxhr, textStatus, error) {
                 var err = textStatus + ", " + error;

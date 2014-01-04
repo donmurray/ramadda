@@ -4168,6 +4168,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                 "google.load(\"visualization\", \"1\", {packages:[\"corechart\"]});\n"));
         sb.append(HtmlUtils.importJS(fileUrl("/point/selectform.js")));
         sb.append(HtmlUtils.importJS(fileUrl("/pointdata.js")));
+        sb.append(getMapManager().getHtmlImports());
         sb.append(HtmlUtils.importJS(fileUrl("/ramaddachart.js")));
         StringBuffer js = new StringBuffer();
         System.err.println("JSON URL:" + url);
