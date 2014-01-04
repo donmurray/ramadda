@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -21,6 +21,9 @@
 package org.ramadda.repository.output;
 
 
+import org.ramadda.data.services.*;
+
+
 import org.ramadda.repository.*;
 import org.ramadda.repository.auth.*;
 import org.ramadda.repository.map.*;
@@ -31,9 +34,9 @@ import org.ramadda.repository.search.*;
 import org.ramadda.repository.type.*;
 import org.ramadda.repository.util.DateArgument;
 import org.ramadda.repository.util.ServerInfo;
-import org.ramadda.data.services.*;
 import org.ramadda.util.BufferMapList;
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Json;
 import org.ramadda.util.Utils;
 import org.ramadda.util.WikiUtil;
 
@@ -317,6 +320,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
     /** wiki group property */
     public static final String WIKI_PROP_GROUP = "wiki.group";
 
+    /** _more_ */
     public static final String WIKI_PROP_CHART = "chart";
 
     /** wiki import */
@@ -616,7 +620,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
              attrs(ATTR_TITLE, "Upload file", ATTR_INCLUDEICON, "false")),
         WIKI_PROP_ROOT,
         prop(WIKI_PROP_CHART,
-             attrs(ATTR_WIDTH, "800px", ATTR_HEIGHT,"400px", "fields", "")),
+             attrs(ATTR_WIDTH, "800px", ATTR_HEIGHT, "400px", "fields", "")),
     };
     //j+
 
@@ -1452,21 +1456,30 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
             return sb.toString();
         } else if (theTag.equals(WIKI_PROP_CHART)) {
-            PointTypeHandler pth = (PointTypeHandler) getRepository().getTypeHandler("type_point");
-            PointOutputHandler poh = (PointOutputHandler)pth.getRecordOutputHandler();
-            PointFormHandler pfh = poh.getPointFormHandler();
-            Request myRequest = request.cloneMe();
-            String tmp;
-            if((tmp=Misc.getProperty(props, ATTR_WIDTH, (String)null))!=null) {
+            PointTypeHandler pth =
+                (PointTypeHandler) getRepository().getTypeHandler(
+                    "type_point");
+            PointOutputHandler poh =
+                (PointOutputHandler) pth.getRecordOutputHandler();
+            PointFormHandler pfh       = poh.getPointFormHandler();
+            Request          myRequest = request.cloneMe();
+            String           tmp;
+            if ((tmp = Misc.getProperty(props, ATTR_WIDTH, (String) null))
+                    != null) {
                 myRequest.put(ARG_WIDTH, tmp);
-            } 
-            if((tmp=Misc.getProperty(props, ATTR_HEIGHT,  (String)null))!=null) {
+            }
+            if ((tmp = Misc.getProperty(props, ATTR_HEIGHT, (String) null))
+                    != null) {
                 myRequest.put(ARG_HEIGHT, tmp);
             }
-            if((tmp=Misc.getProperty(props, "fields",  (String)null))!=null) {
+            if ((tmp = Misc.getProperty(props, "fields", (String) null))
+                    != null) {
                 myRequest.put("fields", tmp);
             }
-            pfh.getEntryChart(myRequest,  (PointEntry)poh.doMakeEntry(request, entry), sb);
+            pfh.getEntryChart(myRequest,
+                              (PointEntry) poh.doMakeEntry(request, entry),
+                              sb);
+
             return sb.toString();
         } else if (theTag.equals(WIKI_PROP_GRAPH)) {
             int width  = Misc.getProperty(props, ATTR_WIDTH, 400);
@@ -2053,11 +2066,9 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
             return sb.toString();
         } else if (theTag.equals(WIKI_PROP_TABLE)) {
-            List<Entry> entries = getEntries(request,
-                                             originalEntry, entry,
+            List<Entry> entries = getEntries(request, originalEntry, entry,
                                              props);
-            getHtmlOutputHandler().makeTable(request,
-                                             entries, sb);
+            getHtmlOutputHandler().makeTable(request, entries, sb);
 
             return sb.toString();
         } else if (theTag.equals(WIKI_PROP_RECENT)) {
@@ -2273,9 +2284,10 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
             return StringUtil.join(separator, links);
         } else {
-            String fromTypeHandler = entry.getTypeHandler().getWikiInclude(wikiUtil, request,
-                                                                           originalEntry, entry, theTag, props);
-            if(fromTypeHandler!=null) {
+            String fromTypeHandler =
+                entry.getTypeHandler().getWikiInclude(wikiUtil, request,
+                    originalEntry, entry, theTag, props);
+            if (fromTypeHandler != null) {
                 return fromTypeHandler;
             }
 
@@ -4117,6 +4129,55 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         content = HtmlUtils.div(content, HtmlUtils.cssClass("entry-simple"));
 
         return content;
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param name _more_
+     * @param url _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    public void getEntryChart(Request request, String name, String url,
+                              StringBuffer sb)
+            throws Exception {
+
+        String chartDivId = HtmlUtils.getUniqueId("chartdiv");
+        sb.append(HtmlUtils.comment("Chart div"));
+        sb.append(HtmlUtils.div("", HtmlUtils.id(chartDivId)));
+        sb.append(HtmlUtils.comment("Import js libs"));
+        sb.append(HtmlUtils.importJS("https://www.google.com/jsapi"));
+        sb.append(
+            HtmlUtils.script(
+                "google.load(\"visualization\", \"1\", {packages:[\"corechart\"]});\n"));
+        sb.append(HtmlUtils.importJS(fileUrl("/point/selectform.js")));
+        sb.append(HtmlUtils.importJS(fileUrl("/pointdata.js")));
+        sb.append(HtmlUtils.importJS(fileUrl("/ramaddachart.js")));
+        StringBuffer js = new StringBuffer();
+        System.err.println("JSON URL:" + url);
+        js.append("var pointData = new  PointData(" + HtmlUtils.quote(name)
+                  + ",  null,null," + HtmlUtils.quote(url) + ");\n");
+        List<String> props = new ArrayList<String>();
+        props.add("width");
+        props.add(Json.quote(request.getString(ARG_WIDTH, "900px")));
+        props.add("height");
+        props.add(Json.quote(request.getString(ARG_HEIGHT, "300px")));
+        String fields = request.getString("fields", null);
+        if (fields != null) {
+            List<String> toks = StringUtil.split(fields, ",", true, true);
+            if (toks.size() > 0) {
+                props.add("fields");
+                props.add(Json.list(toks, true));
+            }
+        }
+        js.append("var chart = new  RamaddaLineChart("
+                  + HtmlUtils.quote(chartDivId) + " , pointData,"
+                  + Json.map(props, false) + ");\n");
+        sb.append(HtmlUtils.comment("time series data"));
+        sb.append(HtmlUtils.script(js.toString()));
     }
 
 

@@ -292,14 +292,14 @@ function getRanges(fields,data) {
 
 
 function loadPointJson(url, theChart) {
+    console.log("json url:" + url);
     var jqxhr = $.getJSON( url, function(data) {
             theChart.setPointData(makePointData(data),false);
         })
         .fail(function(jqxhr, textStatus, error) {
                 var err = textStatus + ", " + error;
-                alert("Error:" + err);
-                console.log(err);
-                console.log(textStatus);
+                alert("JSON error:" + err);
+                console.log("JSON error:" +err);
             });
 }
 

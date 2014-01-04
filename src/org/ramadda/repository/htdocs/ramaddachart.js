@@ -25,8 +25,14 @@ function RamaddaLineChart(id, pointDataArg, properties) {
     this.properties = properties;
     init_RamaddaLineChart(this);
     this.createHtml();
+    var testUrl = null;
     //Uncomment to test using test.json
-    //    pointDataArg = new PointData("Test",null,null,"/repository/test.json");
+    //testUrl = "/repository/test.json";
+    //    testUrl = "http://localhost:8080/repository/entry/show/gfs80_point?output=data.gridaspoint&entryid=633bc909-079f-429a-b873-5744a3b04770&location.latitude=34.6&location.longitude=-101.1&calendar=gregorian&fromdate=&todate=&format=json&level=-1&variable.Temperature=true"
+
+    if(testUrl!=null) {
+        pointDataArg = new PointData("Test",null,null,testUrl);
+    }
     this.setPointData(pointDataArg, true);
 }
 
@@ -73,32 +79,35 @@ function init_RamaddaLineChart(theChart) {
           });
     }
 
+
     theChart.getDisplayedFields = function() {
-        var displayedFields = [];
+        var df = [];
         var fields = this.pointData.getChartableFields();
         var fixedFields = this.getProperty("fields");
         if(fixedFields !=null) {
             for(i=0;i<fields.length;i++) { 
                 var field = fields[i];
                 if(fixedFields.indexOf(field.getId())>=0) {
-                    displayedFields.push(field);
+                    df.push(field);
                 }
             }
-            return displayedFields;
+            return df;
         }
 
         for(i=0;i<fields.length;i++) { 
             var field = fields[i];
             if($("#" + field.checkboxId).is(':checked')) {
-                displayedFields.push(field);
+                df.push(field);
             }
         }
 
-        if(displayedFields.length==0) {
-            if(fields.length==0) return;
-            displayedFields.push(fields[0]);
+        if(df.length==0) {
+            if(fields.length==0) {
+                return df;
+            }
+            df.push(fields[0]);
         }
-        return displayedFields;
+        return df;
     }
 
 
@@ -109,6 +118,7 @@ function init_RamaddaLineChart(theChart) {
             }
             return;
         }
+
         var displayedFields = this.getDisplayedFields();
         if(displayedFields.length==0) {
             $("#" + this.chartDivId).html("No fields selected");

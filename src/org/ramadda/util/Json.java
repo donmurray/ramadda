@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -45,28 +45,28 @@ public class Json {
     /** default quote value */
     public static final boolean DFLT_QUOTE = false;
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIELD_NAME = "name";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIELD_FIELDS = "fields";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIELD_DATA = "data";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIELD_VALUES = "values";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIELD_LATITUDE = "latitude";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIELD_LONGITUDE = "longitude";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIELD_ELEVATION = "elevation";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FIELD_DATE = "date";
 
 
@@ -322,6 +322,7 @@ public class Json {
     }
 
 
+
     /**
      * _more_
      *
@@ -331,6 +332,18 @@ public class Json {
      * @return _more_
      */
     public static String attr(String name, double value) {
+        return attr(name, formatNumber(value), false);
+    }
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
+    public static String attr(String name, long value) {
         return attr(name, "" + value, false);
     }
 

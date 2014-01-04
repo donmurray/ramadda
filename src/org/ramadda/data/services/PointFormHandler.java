@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -1250,52 +1250,19 @@ public class PointFormHandler extends RecordFormHandler {
                               StringBuffer sb)
             throws Exception {
 
-        long   numRecords      = pointEntry.getNumRecords();
-        Entry  entry           = pointEntry.getEntry();
-        int    numPointsToPlot = request.get(ARG_NUMPOINTS,
-                                             TIMESERIES_POINTS);
-        String chartDivId      = HtmlUtils.getUniqueId("chartdiv");
-
-        sb.append(HtmlUtils.comment("Chart div"));
-        sb.append(HtmlUtils.div("", HtmlUtils.id(chartDivId)));
-        sb.append(HtmlUtils.comment("Import js libs"));
-        sb.append(HtmlUtils.importJS("https://www.google.com/jsapi"));
-        sb.append(
-            HtmlUtils.script(
-                "google.load(\"visualization\", \"1\", {packages:[\"corechart\"]});\n"));
-        sb.append(HtmlUtils.importJS(fileUrl("/point/selectform.js")));
-        sb.append(HtmlUtils.importJS(fileUrl("/pointdata.js")));
-        sb.append(HtmlUtils.importJS(fileUrl("/ramaddachart.js")));
-        StringBuffer js = new StringBuffer();
-        String url =
+        Entry entry = pointEntry.getEntry();
+        String jsonUrl =
             request.entryUrl(
                 getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
                 getPointOutputHandler().OUTPUT_PRODUCT.getId(), ARG_PRODUCT,
                 getPointOutputHandler().OUTPUT_JSON.toString()) + "&"
                     + RecordFormHandler.ARG_NUMPOINTS + "=500";
-        System.err.println("JSON URL:" + url);
-        js.append("var pointData = new  PointData("
-                  + HtmlUtils.quote(entry.getName()) + ",  null,null,"
-                  + HtmlUtils.quote(url) + ");\n");
-        List<String> props = new ArrayList<String>();
-        props.add("width");
-        props.add(Json.quote(request.getString(ARG_WIDTH, "900px")));
-        props.add("height");
-        props.add(Json.quote(request.getString(ARG_HEIGHT, "300px")));
-        String fields = request.getString("fields", null);
-        if (fields != null) {
-            List<String> toks = StringUtil.split(fields, ",", true, true);
-            if(toks.size()>0){
-                props.add("fields");
-                props.add(Json.list(toks,true));
-            }
-        }
-        js.append("var chart = new  RamaddaLineChart("
-                  + HtmlUtils.quote(chartDivId) + " , pointData,"
-                  + Json.map(props, false) + ");\n");
-        sb.append(HtmlUtils.comment("time series data"));
-        sb.append(HtmlUtils.script(js.toString()));
+
+        String name = entry.getName();
+        getPointOutputHandler().getWikiManager().getEntryChart(request, name,
+                jsonUrl, sb);
     }
+
 
 
     /**
