@@ -1220,7 +1220,6 @@ public abstract class RecordFile {
      * @param skip _more_
      */
     public void setDefaultSkip(int skip) {
-        System.err.println("RecordFile:" + skip);
         defaultSkip = skip;
     }
 
