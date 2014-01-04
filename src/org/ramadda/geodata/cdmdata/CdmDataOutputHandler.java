@@ -160,7 +160,7 @@ public class CdmDataOutputHandler extends OutputHandler {
     /** NCML format */
     public static final String FORMAT_NCML = "ncml";
 
-    /** _more_          */
+    /** _more_ */
     public static final String FORMAT_JSON = "json";
 
     /** NCML suffix */
@@ -178,7 +178,7 @@ public class CdmDataOutputHandler extends OutputHandler {
     /** CSV suffix */
     public static final String SUFFIX_CSV = ".csv";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SUFFIX_JSON = ".json";
 
     /** CSV suffix */
@@ -727,11 +727,11 @@ public class CdmDataOutputHandler extends OutputHandler {
         }
         LatLonPointImpl llp = null;
 
-        if (request.get(ARG_LOCATION, true)) {
+        if (request.defined(ARG_LOCATION_LATITUDE)) {
             llp = new LatLonPointImpl(
-                request.getLatOrLonValue(ARG_LOCATION + ".latitude", deflat),
-                request.getLatOrLonValue(
-                    ARG_LOCATION + ".longitude", deflon));
+                request.getLatOrLonValue(ARG_LOCATION_LATITUDE, deflat),
+                request.getLatOrLonValue(ARG_LOCATION_LONGITUDE, deflon));
+            System.err.println("llp:" + llp);
         }
         double             levelVal   = request.get(ARG_LEVEL, Double.NaN);
 
@@ -833,8 +833,12 @@ public class CdmDataOutputHandler extends OutputHandler {
                 StringBuffer html  = new StringBuffer();
                 String       title = entry.getName();
                 request.put(ARG_FORMAT, FORMAT_JSON);
+                request.put(ARG_LOCATION_LATITUDE, "_LATITUDEMACRO_");
+                request.put(ARG_LOCATION_LONGITUDE, "_LONGITUDEMACRO_");
                 String jsonUrl = request.getRequestPath() + "/" + baseName
                                  + suffix + "?" + request.getUrlArgs();
+                jsonUrl = jsonUrl.replace("_LATITUDEMACRO_", "${latitude}");
+                jsonUrl = jsonUrl.replace("_LONGITUDEMACRO_", "${longitude}");
                 getWikiManager().getEntryChart(request, entry.getName(),
                         jsonUrl, html);
 

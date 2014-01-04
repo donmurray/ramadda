@@ -21,7 +21,6 @@ pointData - A PointData object (see below)
  */
 function RamaddaLineChart(id, pointDataArg, properties) {
     this.id = id;
-    this.pointData  = null;
     this.properties = properties;
     init_RamaddaLineChart(this);
     this.createHtml();
@@ -33,11 +32,12 @@ function RamaddaLineChart(id, pointDataArg, properties) {
     if(testUrl!=null) {
         pointDataArg = new PointData("Test",null,null,testUrl);
     }
-    this.setPointData(pointDataArg, true);
+    this.addOrLoadData(pointDataArg);
 }
 
 
 function init_RamaddaLineChart(theChart) {
+    theChart.dataCollection = new DataCollection();
     init_RamaddaChart(theChart);
     theChart.createHtml = function() {
         var html = "";
@@ -59,59 +59,76 @@ function init_RamaddaLineChart(theChart) {
         if(this.getProperty("fields",null)!=null) {
             return;
         }
-        this.setTitle(pointData.getTitle());
+        //        this.setTitle(this.getTitle());
         var html =  "<div class=chart-fields-inner>";
-        var fields = this.pointData.getChartableFields();
         var checkboxClass = this.id +"_checkbox";
-        for(i=0;i<fields.length;i++) { 
-            var field = fields[i];
-            field.checkboxId  = this.id +"_cbx" + i;
-            html += htmlUtil.checkbox(field.checkboxId, checkboxClass,
-                                      field ==fields[0]);
-            html += "&nbsp;<span title=\"" + field.getId() +"\">" + field.label+"</span><br>";
+        var dataList =  this.dataCollection.getData();
+        for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
+            var pointData = dataList[collectionIdx];
+            var fields =pointData.getChartableFields();
+            html+= "<b>" + pointData.getName() + "</b><br>";
+            for(i=0;i<fields.length;i++) { 
+                var field = fields[i];
+                field.checkboxId  = this.id +"_cbx_" + collectionIdx +"_" +i;
+                html += htmlUtil.checkbox(field.checkboxId, checkboxClass,
+                                          field ==fields[0]);
+                html += "&nbsp;<span title=\"" + field.getId() +"\">" + field.label+"</span><br>";
+            }
         }
         html+= "</div>";
         $("#" + this.fieldsDivId).html(html);
 
         //Listen for changes to the checkboxes
         $("." + checkboxClass).click(function() {
-                theChart.loadData();
+                theChart.displayData();
           });
     }
 
 
-    theChart.getDisplayedFields = function() {
+    theChart.getSelectedFields = function() {
         var df = [];
-        var fields = this.pointData.getChartableFields();
+        var dataList =  this.dataCollection.getData();
         var fixedFields = this.getProperty("fields");
-        if(fixedFields !=null) {
-            for(i=0;i<fields.length;i++) { 
-                var field = fields[i];
-                if(fixedFields.indexOf(field.getId())>=0) {
-                    df.push(field);
+        for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
+            var pointData = dataList[collectionIdx];
+            var fields = pointData.getChartableFields();
+            if(fixedFields !=null) {
+                for(i=0;i<fields.length;i++) { 
+                    var field = fields[i];
+                    if(fixedFields.indexOf(field.getId())>=0) {
+                        df.push(field);
+                    }
                 }
             }
+        }
+
+        if(fixedFields !=null) {
             return df;
         }
 
-        for(i=0;i<fields.length;i++) { 
-            var field = fields[i];
-            if($("#" + field.checkboxId).is(':checked')) {
-                df.push(field);
+        var firstField = null;
+        for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
+            var pointData = dataList[collectionIdx];
+            var fields = pointData.getChartableFields();
+            for(i=0;i<fields.length;i++) { 
+                var field = fields[i];
+                if(firstField==null) firstField = field;
+                var cbxId =  this.id +"_cbx_" + collectionIdx +"_" +i;
+                if($("#" + cbxId).is(':checked')) {
+                    df.push(field);
+                }
             }
         }
 
-        if(df.length==0) {
-            if(fields.length==0) {
-                return df;
-            }
-            df.push(fields[0]);
+        if(df.length==0 && firstField!=null) {
+            df.push(firstField);
         }
+
         return df;
     }
 
 
-    theChart.loadData = function() {
+    theChart.displayData = function() {
         if(!this.hasData()) {
             if(this.chart !=null) {
                 this.chart.clearChart();
@@ -119,13 +136,13 @@ function init_RamaddaLineChart(theChart) {
             return;
         }
 
-        var displayedFields = this.getDisplayedFields();
-        if(displayedFields.length==0) {
+        var selectedFields = this.getSelectedFields();
+        if(selectedFields.length==0) {
             $("#" + this.chartDivId).html("No fields selected");
             return;
         }
 
-        var dataList = this.getStandardData(displayedFields);
+        var dataList = this.getStandardData(selectedFields);
 
         var dataTable = google.visualization.arrayToDataTable(dataList);
         var options = {
@@ -133,7 +150,7 @@ function init_RamaddaLineChart(theChart) {
         {targetAxisIndex:0},
         {targetAxisIndex:1},
                      ],
-            title: this.pointData.getTitle(),
+            title: this.getTitle(),
             chartArea:{left:30,top:30,height:"75%"}
         };
         this.chart = new google.visualization.LineChart(document.getElementById(this.chartDivId));
@@ -158,6 +175,17 @@ function init_RamaddaChart(theChart) {
         $("#" + this.chartHeaderId).html(title);
     }
 
+    theChart.getTitle = function () {
+        var title = "";
+        var dataList =  this.dataCollection.getData();
+        for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
+            var pointData = dataList[collectionIdx];
+            if(collectionIdx>0) title+="/";
+            title += pointData.getName();
+        }
+        return title;
+    }
+
     theChart.getId = function() {
         return this.id;
     }
@@ -170,15 +198,26 @@ function init_RamaddaChart(theChart) {
     }
 
     theChart.hasData = function() {
-        return this.pointData!=null && this.pointData.hasData();
+        return this.dataCollection.hasData();
     }
 
-    theChart.setPointData = function(pointData, checkUrl) {
-        this.pointData = pointData;
-        if(this.hasData()) {
+    theChart.addData= function(pointData) { 
+       this.dataCollection.addData(pointData);
+    }
+
+    theChart.pointDataLoaded = function(pointData) {
+        this.addData(pointData);
+        this.addFieldsLegend();
+        this.displayData();
+    }
+
+
+    theChart.addOrLoadData = function(pointData) {
+        if(pointData.hasData()) {
+            this.addData(pointData);
             this.addFieldsLegend();
-            this.loadData();
-        } else if(checkUrl) {
+            this.displayData();
+        } else {
             var jsonUrl = pointData.getUrl();
             if(jsonUrl!=null) {
                 loadPointJson(jsonUrl, this);
@@ -213,13 +252,17 @@ function init_RamaddaChart(theChart) {
         dataList.push(fieldNames);
 
         //These are Record objects 
-        var records = this.pointData.getData();
+        //TODO: handle multiple data sources
+        var pointData = this.dataCollection.getData()[0];
+
+        var records = pointData.getData();
         for(j=0;j<records.length;j++) { 
             var record = records[j];
             var values = [];
             var date = record.getDate();
             //Add the date or index field
             if(date!=null) {
+                date = new Date(date);
                 values.push(date);
             } else {
                 values.push(j);
@@ -234,8 +277,10 @@ function init_RamaddaChart(theChart) {
                 }
                 values.push(value);
             }
+
             //TODO: when its all null values we get some errors
             dataList.push(values);
+
         }
         return dataList;
     }

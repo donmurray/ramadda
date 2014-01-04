@@ -35,6 +35,26 @@ var chart = new  RamaddaChart("example" , pointData);
 */
 
 
+function DataCollection() {
+    this.data = [];
+
+    this.hasData = function() {
+        for(var i=0;i<this.data.length;i++) {
+            if(this.data[i].hasData()) return true;
+        }
+        return false;
+    }
+
+    this.getData = function() {
+        return this.data;
+    }
+
+    this.addData = function(data) {
+        this.data.push(data);
+    }
+
+}
+
 /*
 This encapsulates some instance of point data. 
 name - the name of this data
@@ -292,9 +312,16 @@ function getRanges(fields,data) {
 
 
 function loadPointJson(url, theChart) {
+    var hasGeoMacro = url.match(/(\${latitude})/g);
+    if(hasGeoMacro) {
+        //TODO: let a map drive this
+        url = url.replace("${latitude}","40.0");
+        url = url.replace("${longitude}","-107.0");
+    }
+
     console.log("json url:" + url);
     var jqxhr = $.getJSON( url, function(data) {
-            theChart.setPointData(makePointData(data),false);
+            theChart.pointDataLoaded(makePointData(data));
         })
         .fail(function(jqxhr, textStatus, error) {
                 var err = textStatus + ", " + error;
