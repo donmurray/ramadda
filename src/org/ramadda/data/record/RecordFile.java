@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -208,9 +208,10 @@ public abstract class RecordFile {
      * @return _more_
      *
      * @throws CloneNotSupportedException On badness
+     * @throws Exception _more_
      */
     public RecordFile cloneMe(String filename, Hashtable properties)
-        throws CloneNotSupportedException, Exception {
+            throws CloneNotSupportedException, Exception {
         RecordFile that = cloneMe();
         that.initAfterClone();
         that.setFilename(filename);
@@ -249,6 +250,8 @@ public abstract class RecordFile {
      * @param files _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
     public static Hashtable getProperties(File[] files) throws Exception {
         Hashtable p = new Hashtable();
@@ -265,10 +268,16 @@ public abstract class RecordFile {
 
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public static Hashtable getProperties(String s) {
         Hashtable p = new Hashtable();
-        for (String line :
-                 StringUtil.split(s, "\n", true, true)) {
+        for (String line : StringUtil.split(s, "\n", true, true)) {
             if (line.startsWith("#")) {
                 continue;
             }
@@ -279,6 +288,7 @@ public abstract class RecordFile {
                 p.put(toks.get(0), "");
             }
         }
+
         return p;
     }
 
@@ -291,9 +301,12 @@ public abstract class RecordFile {
      * @param defaultCommonFile _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
     public static Hashtable getPropertiesForFile(String file,
-            String defaultCommonFile) throws Exception {
+            String defaultCommonFile)
+            throws Exception {
         File   f      = new File(file);
         File   parent = f.getParentFile();
         String commonFile;
@@ -967,8 +980,11 @@ public abstract class RecordFile {
      *
      * @param visitor _more_
      * @param visitInfo _more_
+     *
+     * @throws Exception _more_
      */
-    public void visitorFinished(RecordVisitor visitor, VisitInfo visitInfo) throws Exception{
+    public void visitorFinished(RecordVisitor visitor, VisitInfo visitInfo)
+            throws Exception {
         visitor.finished(this, visitInfo);
     }
 
@@ -1204,6 +1220,7 @@ public abstract class RecordFile {
      * @param skip _more_
      */
     public void setDefaultSkip(int skip) {
+        System.err.println("RecordFile:" + skip);
         defaultSkip = skip;
     }
 

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -1433,7 +1433,8 @@ public class PointOutputHandler extends RecordOutputHandler {
                 }
             }
 
-            public void finished(RecordFile file, VisitInfo visitInfo) throws Exception {
+            public void finished(RecordFile file, VisitInfo visitInfo)
+                    throws Exception {
                 write(getBuffer(file));
                 super.finished(file, visitInfo);
             }
@@ -1486,7 +1487,8 @@ public class PointOutputHandler extends RecordOutputHandler {
                     throw new RuntimeException(exc);
                 }
             }
-            public void finished(RecordFile file, VisitInfo visitInfo) throws Exception  {
+            public void finished(RecordFile file, VisitInfo visitInfo)
+                    throws Exception {
                 super.finished(file, visitInfo);
                 try {
                     //                      if(writer!=null) {
@@ -1912,12 +1914,15 @@ public class PointOutputHandler extends RecordOutputHandler {
 
                     return true;
                 }
-                public void finished(RecordFile file, VisitInfo visitInfo) throws Exception {
+                public void finished(RecordFile file, VisitInfo visitInfo)
+                        throws Exception {
                     super.finished(file, visitInfo);
                 }
             };
             long numRecords = pointEntry.getNumRecords();
             int  skip       = (int) (numRecords / 1000);
+            //            System.err.println("SKIP:" + skip + " " + numRecords);
+
             getRecordJobManager().visitSequential(request, pointEntry,
                     visitor, new VisitInfo(VisitInfo.QUICKSCAN_YES, skip));
 
@@ -2384,13 +2389,17 @@ public class PointOutputHandler extends RecordOutputHandler {
         if (numRecords < 0) {
             numRecords = recordFile.getNumRecords();
         }
+
+
+
         if (request.defined(ARG_RECORD_SKIP)) {
             int skip = getSkip(request, 1000);
             recordFile.setDefaultSkip(skip);
         } else if (request.defined(RecordFormHandler.ARG_NUMPOINTS)) {
-            recordFile.setDefaultSkip(
-                (int) (numRecords
-                       / request.get(RecordFormHandler.ARG_NUMPOINTS, 1000)));
+            int numPoints = request.get(RecordFormHandler.ARG_NUMPOINTS,
+                                        1000);
+            System.err.println("numPoints:" + numRecords + " " + numPoints);
+            recordFile.setDefaultSkip((int) (numRecords / numPoints));
         } else if (numRecords < 10000) {
             recordFile.setDefaultSkip(0);
         } else {

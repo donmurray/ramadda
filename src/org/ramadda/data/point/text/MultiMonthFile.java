@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -56,6 +56,9 @@ public class MultiMonthFile extends CsvFile {
         super(filename);
     }
 
+
+
+
     /**
      * _more_
      *
@@ -82,6 +85,25 @@ public class MultiMonthFile extends CsvFile {
         record.setFirstDataLine(firstDataLine);
 
         return record;
+    }
+
+    /**
+     * _more_
+     *
+     * @param visitInfo _more_
+     * @param record _more_
+     * @param howMany _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    @Override
+    public boolean skip(VisitInfo visitInfo, Record record, int howMany)
+            throws Exception {
+        MultiMonthRecord mmr = (MultiMonthRecord) record;
+
+        return mmr.skip(visitInfo, record, howMany);
     }
 
     /**

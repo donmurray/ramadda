@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -133,6 +133,30 @@ public class MultiMonthRecord extends TextRecord {
     /**
      * _more_
      *
+     * @param visitInfo _more_
+     * @param record _more_
+     * @param howMany _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public boolean skip(VisitInfo visitInfo, Record record, int howMany)
+            throws Exception {
+        RecordIO recordIO = visitInfo.getRecordIO();
+        while (howMany-- > 0) {
+            ReadStatus status = read(recordIO);
+            if (status != ReadStatus.OK) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * _more_
+     *
      * @param recordIO _more_
      *
      * @return _more_
@@ -158,7 +182,6 @@ public class MultiMonthRecord extends TextRecord {
         }
         try {
             Date dttm = sdf.parse(toks.get(0) + "-" + (currentMonth + 1));
-            // Matias: Changed to 0 because the method setValue needs a double I wasn't able to compile (ask jeff)
             setValue(1, dttm);
             double value = Double.parseDouble(toks.get(currentMonth + 1));
             if (value == missingValue) {
