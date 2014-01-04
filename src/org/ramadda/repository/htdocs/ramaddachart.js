@@ -40,13 +40,16 @@ function init_RamaddaLineChart(theChart) {
     theChart.dataCollection = new DataCollection();
     init_RamaddaChart(theChart);
     theChart.createHtml = function() {
+        var mapEnabled = this.getProperty("mapenabled",null);
         var theChart = this;
         var html = "";
         this.latFieldId = this.getId() +"_latfield";
         this.lonFieldId = this.getId() +"_lonfield";
         var reloadId = this.getId() +"_reload";
         html += this.getHeaderDiv();
-        html+= "<form><input type=submit value=\"Reload\" id=\"" + reloadId +"\"> <input id=\"" + this.latFieldId +"\"> <input id=\"" +  this.lonFieldId+"\"></form><div id=\"mapdiv\" style=\"border:1px #888888 solid; background-color:#7391ad; width: 400px; height:200px;\"></div>"
+        if (mapEnabled) {
+            html+= "<form><input type=submit value=\"Reload\" id=\"" + reloadId +"\"> <input id=\"" + this.latFieldId +"\"> <input id=\"" +  this.lonFieldId+"\"></form><div id=\"mapdiv\" style=\"border:1px #888888 solid; background-color:#7391ad; width: 400px; height:200px;\"></div>";
+        }
         html += "<table width=100%>";
         html += "<tr valign=top><td>";
         html += this.getFieldsDiv();
@@ -261,10 +264,16 @@ function init_RamaddaChart(theChart) {
                     lat = $("#" + this.latFieldId).val();
                     lon = $("#" + this.lonFieldId).val();
                 }
-                if(lat!=null && lat.length>0)
+                if(lat!=null && lat.length>0) {
                     jsonUrl = jsonUrl.replace("${latitude}",lat);
-                if(lon!=null && lon.length>0)
+                } else {
+                    jsonUrl = jsonUrl.replace("${latitude}","40.0");
+                }
+                if(lon!=null && lon.length>0) {
                     jsonUrl = jsonUrl.replace("${longitude}",lon);
+                } else {
+                    jsonUrl = jsonUrl.replace("${longitude}","-107.0");
+                }
             }
             if(jsonUrl!=null) {
                 loadPointJson(jsonUrl, this, pointData);
@@ -324,11 +333,10 @@ function init_RamaddaChart(theChart) {
                 }
                 values.push(value);
             }
-
             //TODO: when its all null values we get some errors
             dataList.push(values);
-
         }
+        //var js = "values[1] = 33;if(values[1]<360) ok= 'valuesxxx'; else ok= 'zzz';"
         return dataList;
     }
 }

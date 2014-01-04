@@ -844,8 +844,11 @@ public class CdmDataOutputHandler extends OutputHandler {
                                  + suffix + "?" + request.getUrlArgs();
                 jsonUrl = jsonUrl.replace("_LATITUDEMACRO_", "${latitude}");
                 jsonUrl = jsonUrl.replace("_LONGITUDEMACRO_", "${longitude}");
+                List<String> props    = new ArrayList<String>();
+                props.add("mapenabled");
+                props.add("true");
                 getWikiManager().getEntryChart(request, entry.getName(),
-                        jsonUrl, html);
+                                               jsonUrl, html, props);
 
                 return new Result("Point As Grid Time Series", html);
             }

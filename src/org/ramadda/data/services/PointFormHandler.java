@@ -1260,7 +1260,7 @@ public class PointFormHandler extends RecordFormHandler {
 
         String name = entry.getName();
         getPointOutputHandler().getWikiManager().getEntryChart(request, name,
-                jsonUrl, sb);
+                                                               jsonUrl, sb, new ArrayList<String>());
     }
 
 

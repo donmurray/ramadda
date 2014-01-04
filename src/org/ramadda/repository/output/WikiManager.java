@@ -1488,7 +1488,6 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                 myRequest.put(ARG_TODATE, tmp);
             }
 
-
             pfh.getEntryChart(myRequest,
                               (PointEntry) poh.doMakeEntry(request, entry),
                               sb);
@@ -4155,8 +4154,9 @@ public class WikiManager extends RepositoryManager implements WikiUtil
      * @throws Exception _more_
      */
     public void getEntryChart(Request request, String name, String url,
-                              StringBuffer sb)
+                              StringBuffer sb, List<String> props)
             throws Exception {
+
 
         String chartDivId = HtmlUtils.getUniqueId("chartdiv");
         sb.append(HtmlUtils.comment("Chart div"));
@@ -4168,13 +4168,16 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                 "google.load(\"visualization\", \"1\", {packages:[\"corechart\"]});\n"));
         sb.append(HtmlUtils.importJS(fileUrl("/point/selectform.js")));
         sb.append(HtmlUtils.importJS(fileUrl("/pointdata.js")));
-        sb.append(getMapManager().getHtmlImports());
+        if (request.getExtraProperty("initmap") == null) {
+            sb.append(getMapManager().getHtmlImports());
+            request.putExtraProperty("initmap", "");
+        }
         sb.append(HtmlUtils.importJS(fileUrl("/ramaddachart.js")));
         StringBuffer js = new StringBuffer();
         System.err.println("JSON URL:" + url);
         js.append("var pointData = new  PointData(" + HtmlUtils.quote(name)
                   + ",  null,null," + HtmlUtils.quote(url) + ");\n");
-        List<String> props    = new ArrayList<String>();
+        
 
         String       fromDate = request.getString(ARG_FROMDATE,
                                     (String) null);
