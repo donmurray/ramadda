@@ -312,13 +312,6 @@ function getRanges(fields,data) {
 
 
 function loadPointJson(url, theChart) {
-    var hasGeoMacro = url.match(/(\${latitude})/g);
-    if(hasGeoMacro) {
-        //TODO: let a map drive this
-        url = url.replace("${latitude}","40.0");
-        url = url.replace("${longitude}","-107.0");
-    }
-
     console.log("json url:" + url);
     var jqxhr = $.getJSON( url, function(data) {
             theChart.pointDataLoaded(makePointData(data));

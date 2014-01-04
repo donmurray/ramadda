@@ -620,7 +620,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
              attrs(ATTR_TITLE, "Upload file", ATTR_INCLUDEICON, "false")),
         WIKI_PROP_ROOT,
         prop(WIKI_PROP_CHART,
-             attrs(ATTR_WIDTH, "800px", ATTR_HEIGHT, "400px", "fields", "")),
+             attrs(ATTR_WIDTH, "800px", ATTR_HEIGHT, "400px", "fields", "",
+                   ARG_FROMDATE, "", ARG_TODATE, "")),
     };
     //j+
 
@@ -1476,6 +1477,18 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                     != null) {
                 myRequest.put("fields", tmp);
             }
+
+            if ((tmp = Misc.getProperty(props, ARG_FROMDATE, (String) null))
+                    != null) {
+                myRequest.put(ARG_FROMDATE, tmp);
+            }
+
+            if ((tmp = Misc.getProperty(props, ARG_TODATE, (String) null))
+                    != null) {
+                myRequest.put(ARG_TODATE, tmp);
+            }
+
+
             pfh.getEntryChart(myRequest,
                               (PointEntry) poh.doMakeEntry(request, entry),
                               sb);
@@ -4160,7 +4173,21 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         System.err.println("JSON URL:" + url);
         js.append("var pointData = new  PointData(" + HtmlUtils.quote(name)
                   + ",  null,null," + HtmlUtils.quote(url) + ");\n");
-        List<String> props = new ArrayList<String>();
+        List<String> props    = new ArrayList<String>();
+
+        String       fromDate = request.getString(ARG_FROMDATE,
+                                    (String) null);
+        String       toDate   = request.getString(ARG_TODATE, (String) null);
+
+        if (fromDate != null) {
+            props.add(ARG_FROMDATE);
+            props.add(Json.quote(fromDate));
+        }
+        if (toDate != null) {
+            props.add(ARG_TODATE);
+            props.add(Json.quote(toDate));
+        }
+
         props.add("width");
         props.add(Json.quote(request.getString(ARG_WIDTH, "900px")));
         props.add("height");

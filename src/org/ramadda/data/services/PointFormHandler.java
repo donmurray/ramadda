@@ -1256,7 +1256,7 @@ public class PointFormHandler extends RecordFormHandler {
                 getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
                 getPointOutputHandler().OUTPUT_PRODUCT.getId(), ARG_PRODUCT,
                 getPointOutputHandler().OUTPUT_JSON.toString()) + "&"
-                    + RecordFormHandler.ARG_NUMPOINTS + "=500";
+                    + RecordFormHandler.ARG_NUMPOINTS + "=1000";
 
         String name = entry.getName();
         getPointOutputHandler().getWikiManager().getEntryChart(request, name,

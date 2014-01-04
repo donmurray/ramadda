@@ -219,6 +219,19 @@ function init_RamaddaChart(theChart) {
             this.displayData();
         } else {
             var jsonUrl = pointData.getUrl();
+            var hasGeoMacro = jsonUrl.match(/(\${latitude})/g);
+            var fromDate  = this.getProperty("fromdate");
+            if(fromDate!=null) {
+                jsonUrl += "&fromdate=" + fromDate;
+            }
+            var toDate  = this.getProperty("todate");
+            if(toDate!=null) {
+                jsonUrl += "&todate=" + toDate;
+            }
+            if(hasGeoMacro) {
+                jsonUrl = jsonUrl.replace("${latitude}","40.0");
+                jsonUrl = jsonUrl.replace("${longitude}","-107.0");
+            }
             if(jsonUrl!=null) {
                 loadPointJson(jsonUrl, this);
             }
