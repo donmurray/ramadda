@@ -15,21 +15,42 @@ var chart = new  RamaddaChart("example" , pointData);
 
 
 function ChartManager(id) {
+    var theChart = this;
     this.id = id;
     this.charts = [];
+    this.data = [];
     this.cnt = 0;
     init_ChartManager(this);
     var html = "<h2>My Charts</h2>";
+    html += "<span id=\"" + this.id + "_new\">New Chart</span>";
+    html+="<br>";
     for(var i=0;i<10;i++)  {
         var chartId = this.id +"_chart_" + i;
         html+= "<div id=\"" + chartId +"\"/>";
     }
     $("#"+ this.getId()).html(html);
+    $("#" + this.id +"_new").button().click(function(event) {
+            theChart.doNew();
+        });
 }
+
+
 
 function init_ChartManager(chartManager) {
     chartManager.getId = function() {
         return this.id;
+    }
+
+
+    chartManager.doNew = function() {
+        this.addPointData(this.data[0]);
+    }
+
+    chartManager.addPointData = function(pointData) {
+        var chartId = this.id +"_chart_" + (this.cnt++);
+        var chart  = new RamaddaLineChart(chartId, pointData, pointData.getProperties());
+        this.data.push(pointData);
+        this.charts.push(chart);
     }
 
     chartManager.addLineChart = function(pointDataArg, properties) {
@@ -77,10 +98,14 @@ function init_RamaddaLineChart(theChart) {
         if (mapEnabled) {
             html+= "<form><input type=submit value=\"Reload\" id=\"" + reloadId +"\"> <input id=\"" + this.latFieldId +"\"> <input id=\"" +  this.lonFieldId+"\"></form><div id=\"mapdiv\" style=\"border:1px #888888 solid; background-color:#7391ad; width: 400px; height:200px;\"></div>";
         }
-        html += "<table width=100%>";
-        html += "<tr valign=top><td>";
-        html += this.getFieldsDiv();
-        html += "</td><td>";
+        html += "<table width=100% border=0>";
+        html += "<tr valign=top>";
+        if(this.getProperty("fields",null)==null) {
+            html += "<td width=200>";
+            html += this.getFieldsDiv();
+            html += "</td>";
+        }
+        html += "<td>";
         html += this.getChartDiv();
         html += "</td></tr></table>";
         this.setHtml(html);
@@ -105,6 +130,8 @@ function init_RamaddaLineChart(theChart) {
             return;
         }
         //        this.setTitle(this.getTitle());
+
+
         var html =  "<div class=chart-fields-inner>";
         var checkboxClass = this.id +"_checkbox";
         var dataList =  this.dataCollection.getData();
@@ -312,7 +339,10 @@ function init_RamaddaChart(theChart) {
         return   "<div id=\"" + this.chartHeaderId +"\" class=chart-header></div>";
     }
     theChart.getFieldsDiv = function() {
-        return   "<div id=\"" + this.fieldsDivId +"\" class=chart-fields></div>";
+        var height = this.getProperty("height","400");
+        var style = " style=\"  overflow-y: auto;    max-height:" + height +"px;\" ";
+        var div = "<div id=\"" + this.fieldsDivId +"\" class=\"chart-fields\" " + style +"></div>";
+        return   div;
     }
     theChart.getChartDiv = function() {
         return   "<div id=\"" + this.chartDivId +"\" style=\"width: " + this.getProperty("width","400px") +"; height: " + this.getProperty("height","400px") +";\"></div>\n";

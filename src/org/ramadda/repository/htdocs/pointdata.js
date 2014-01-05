@@ -81,6 +81,11 @@ function PointData(name, recordFields, data, url, properties) {
         this.data = null;
     }
 
+    this.getProperties = function() {
+        return this.properties;
+    }
+
+
     this.getProperty = function(key, dflt) {
         if(typeof this.properties == 'undefined') {
             return dflt;

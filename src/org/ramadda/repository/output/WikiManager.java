@@ -620,7 +620,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
              attrs(ATTR_TITLE, "Upload file", ATTR_INCLUDEICON, "false")),
         WIKI_PROP_ROOT,
         prop(WIKI_PROP_CHART,
-             attrs(ATTR_WIDTH, "800px", ATTR_HEIGHT, "400px", "fields", "",
+             attrs(ATTR_WIDTH, "800", ATTR_HEIGHT, "400", "fields", "",
                    ARG_FROMDATE, "", ARG_TODATE, "")),
     };
     //j+
@@ -4150,6 +4150,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
      * @param name _more_
      * @param url _more_
      * @param sb _more_
+     * @param props _more_
      *
      * @throws Exception _more_
      */
@@ -4173,16 +4174,9 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             request.putExtraProperty("initmap", "");
         }
         sb.append(HtmlUtils.importJS(fileUrl("/ramaddachart.js")));
-        StringBuffer js = new StringBuffer();
-        System.err.println("JSON URL:" + url);
-        js.append("var pointData = new  PointData(" + HtmlUtils.quote(name)
-                  + ",  null,null," + HtmlUtils.quote(url) + ");\n");
 
-        
-
-        String       fromDate = request.getString(ARG_FROMDATE,
-                                    (String) null);
-        String       toDate   = request.getString(ARG_TODATE, (String) null);
+        String fromDate = request.getString(ARG_FROMDATE, (String) null);
+        String toDate   = request.getString(ARG_TODATE, (String) null);
 
         if (fromDate != null) {
             props.add(ARG_FROMDATE);
@@ -4194,9 +4188,9 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         }
 
         props.add("width");
-        props.add(Json.quote(request.getString(ARG_WIDTH, "900px")));
+        props.add(Json.quote(request.getString(ARG_WIDTH, "800")));
         props.add("height");
-        props.add(Json.quote(request.getString(ARG_HEIGHT, "300px")));
+        props.add(Json.quote(request.getString(ARG_HEIGHT, "400")));
         String fields = request.getString("fields", null);
         if (fields != null) {
             List<String> toks = StringUtil.split(fields, ",", true, true);
@@ -4205,15 +4199,18 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                 props.add(Json.list(toks, true));
             }
         }
-        js.append("var chartManager = new  ChartManager(" + HtmlUtils.quote(chartDivId)+");\n");
+
+        StringBuffer js = new StringBuffer();
+        System.err.println("JSON URL:" + url);
 
 
-        //        js.append("var chart = new  RamaddaLineChart("
-        //                  + HtmlUtils.quote(chartDivId) + " , pointData,"
-        //                  + Json.map(props, false) + ");\n");
+        js.append("var chartManager = new  ChartManager("
+                  + HtmlUtils.quote(chartDivId) + ");\n");
 
-        js.append("var chart = chartManager.addLineChart(pointData," +
-                  Json.map(props, false) + ");\n");
+        js.append("var pointData = new  PointData(" + HtmlUtils.quote(name)
+                  + ",  null,null," + HtmlUtils.quote(url) + ","
+                  + Json.map(props, false) + ");\n");
+        js.append("chartManager.addPointData(pointData);\n");
         sb.append(HtmlUtils.comment("time series data"));
         sb.append(HtmlUtils.script(js.toString()));
     }
