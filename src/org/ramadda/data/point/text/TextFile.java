@@ -68,6 +68,8 @@ public abstract class TextFile extends PointFile implements Fields {
     /** _more_ */
     public static final String ATTR_TYPE = "type";
 
+    public static final String ATTR_LABEL = "label";
+
     /** _more_ */
     public static final String ATTR_MISSING = "missing";
 
@@ -516,6 +518,23 @@ public abstract class TextFile extends PointFile implements Fields {
         return sb.toString();
     }
 
+    public String makeFields(List<String> fields) {
+        StringBuffer sb = new StringBuffer();
+        for (int i = 0; i < fields.size(); i++) {
+            if (fields.get(i) == null) {
+                continue;
+            }
+            if (i > 0) {
+                sb.append(",");
+            }
+            sb.append(fields.get(i));
+        }
+
+        return sb.toString();
+    }
+
+
+
     /**
      * _more_
      *
@@ -630,6 +649,10 @@ public abstract class TextFile extends PointFile implements Fields {
      */
     public String attrType(String v) {
         return HtmlUtils.attr(ATTR_TYPE, v);
+    }
+
+    public String attrLabel(String v) {
+        return HtmlUtils.attr(ATTR_LABEL, v);
     }
 
     /**

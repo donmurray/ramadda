@@ -318,7 +318,7 @@ public class CsvFile extends TextFile {
                             "false").equals("true")) {
                 field.setSearchable(true);
             }
-            String label = getProperty(field, properties, "label",
+            String label = getProperty(field, properties, ATTR_LABEL,
                                        (String) null);
             if (label == null) {
                 label = getProperty(field, properties, "description",

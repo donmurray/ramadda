@@ -14,6 +14,33 @@ var chart = new  RamaddaChart("example" , pointData);
 */
 
 
+function ChartManager(id) {
+    this.id = id;
+    this.charts = [];
+    this.cnt = 0;
+    init_ChartManager(this);
+    var html = "<h2>My Charts</h2>";
+    for(var i=0;i<10;i++)  {
+        var chartId = this.id +"_chart_" + i;
+        html+= "<div id=\"" + chartId +"\"/>";
+    }
+    $("#"+ this.getId()).html(html);
+}
+
+function init_ChartManager(chartManager) {
+    chartManager.getId = function() {
+        return this.id;
+    }
+
+    chartManager.addLineChart = function(pointDataArg, properties) {
+        var chartId = this.id +"_chart_" + (this.cnt++);
+        var chart  = new RamaddaLineChart(chartId, pointDataArg, properties);
+        this.charts.add(chart);
+    }
+}
+
+
+
 /*
 Create a chart
 id - the id of this chart. Has to correspond to a div tag id 

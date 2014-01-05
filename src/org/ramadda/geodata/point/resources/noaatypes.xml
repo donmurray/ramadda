@@ -50,5 +50,10 @@ this gets it from the type_point super class
   </type>
 
 
+  <type name="type_point_ncdc_climate"  super="type_point_noaa" description="NCDC Climate Data"  handler="org.ramadda.data.services.PointTypeHandler">
+     <property name="record.file.class" value="org.ramadda.data.point.noaa.NcdcClimatePointFile"/>
+  </type>
+
+
 
 </types>

@@ -3009,5 +3009,13 @@ public class CdmDataOutputHandler extends OutputHandler {
 
     }
 
+    public Result processJsonRequest(Request request) throws Exception {
+        String  prefix   = getRepository().getUrlBase() + "/grid/json";
+        Entry entry = getCdmManager().findEntryFromPath(request, prefix);
+
+        request.put(ARG_FORMAT, FORMAT_JSON);
+        request.put(ARG_OUTPUT,OUTPUT_GRIDASPOINT.getId());
+        return  outputGridAsPoint(request, entry);
+    }
 
 }

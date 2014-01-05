@@ -171,63 +171,17 @@ public class OpendapApiHandler extends RepositoryManager implements RequestHandl
      * @throws Exception on badness
      */
     public Result processOpendapRequest(Request request) throws Exception {
-        //Find the entry path
         String  prefix   = getRepository().getUrlBase() + "/" + PATH_OPENDAP;
-        String  path     = request.getRequestPath();
-        boolean doLatest = false;
-        path = path.substring(prefix.length());
-        if (path.startsWith("/latest")) {
-            path     = path.substring("/latest".length());
-            doLatest = true;
-        }
-
-        path = IOUtil.getFileRoot(path);
-        //Check for the dodsC in the path.
-        if (path.endsWith("dodsC")) {
-            path = IOUtil.getFileRoot(path);
-        }
-        path = path.replaceAll("\\+", " ");
-        Entry entry;
-
-        if (request.exists(ARG_ENTRYID)) {
-            entry = getEntryManager().getEntry(request);
-        } else {
-            entry = getEntryManager().getEntry(request, path.substring(1));
-            if (entry == null) {
-                entry = getEntryManager().findEntryFromName(request, path,
-                        request.getUser(), false);
-            }
-        }
-
-        if (entry == null) {
-            throw new IllegalArgumentException("Could not find entry:"
-                    + path);
-        }
-
-        if (doLatest && entry.getTypeHandler().isGroup()) {
-            List<Entry> entries = getEntryManager().getChildren(request,
-                                      entry);
-            entries = getEntryUtil().sortEntriesOnDate(entries, true);
-            Entry theEntry = null;
-            for (Entry child : entries) {
-                if (getDataOutputHandler().getCdmManager().canLoadAsCdm(
-                        child)) {
-                    theEntry = child;
-
-                    break;
-                }
-            }
-            if (theEntry == null) {
-                throw new IllegalArgumentException(
-                    "Could not find any CDM child entries when doing latest");
-            }
-            entry = theEntry;
-            System.err.println("OPENDAP: using latest:" + entry.getName());
-        }
+        Entry entry = getDataOutputHandler().getCdmManager().findEntryFromPath(request, prefix);
 
         return getDataOutputHandler().outputOpendap(request, entry);
     }
 
 
+
+
+    public Result processJsonRequest(Request request) throws Exception {
+        return getDataOutputHandler().processJsonRequest(request);
+    }
 
 }

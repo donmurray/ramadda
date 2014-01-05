@@ -4177,6 +4177,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         System.err.println("JSON URL:" + url);
         js.append("var pointData = new  PointData(" + HtmlUtils.quote(name)
                   + ",  null,null," + HtmlUtils.quote(url) + ");\n");
+
         
 
         String       fromDate = request.getString(ARG_FROMDATE,
@@ -4204,9 +4205,15 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                 props.add(Json.list(toks, true));
             }
         }
-        js.append("var chart = new  RamaddaLineChart("
-                  + HtmlUtils.quote(chartDivId) + " , pointData,"
-                  + Json.map(props, false) + ");\n");
+        js.append("var chartManager = new  ChartManager(" + HtmlUtils.quote(chartDivId)+");\n");
+
+
+        //        js.append("var chart = new  RamaddaLineChart("
+        //                  + HtmlUtils.quote(chartDivId) + " , pointData,"
+        //                  + Json.map(props, false) + ");\n");
+
+        js.append("var chart = chartManager.addLineChart(pointData," +
+                  Json.map(props, false) + ");\n");
         sb.append(HtmlUtils.comment("time series data"));
         sb.append(HtmlUtils.script(js.toString()));
     }
