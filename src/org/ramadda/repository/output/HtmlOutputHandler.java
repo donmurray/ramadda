@@ -548,11 +548,18 @@ public class HtmlOutputHandler extends OutputHandler {
         String wikiTemplate = getWikiText(request, entry);
 
         String innerContent = null;
+
+
         if ((wikiTemplate != null)
                 && wikiTemplate.startsWith("<wiki_inner>")) {
             innerContent = wikiTemplate;
             wikiTemplate = null;
         }
+
+        if(innerContent == null) {
+            innerContent = entry.getTypeHandler().getWikiTemplateInner();
+        }
+
 
         if (wikiTemplate == null) {
             wikiTemplate = getPageHandler().getWikiTemplate(request, entry,

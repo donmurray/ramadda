@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -148,6 +148,9 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_WIKI = "wiki";
 
+    /** _more_          */
+    public static final String ATTR_WIKI_INNER = "wiki_inner";
+
     /** _more_ */
     public static final String ATTR_VALUE = "value";
 
@@ -242,6 +245,9 @@ public class TypeHandler extends RepositoryManager {
 
     /** the wiki tag in types.xml. If defined then use this as the default html display for entries of this type */
     private String wikiTemplate;
+
+    /** _more_          */
+    private String wikiTemplateInner;
 
     /** _more_ */
     private DecimalFormat latLonFormat = new DecimalFormat("##0.00");
@@ -338,12 +344,11 @@ public class TypeHandler extends RepositoryManager {
                     ATTR_PATTERN, (String) null);
 
 
-            wikiTemplate = XmlUtil.getAttribute(entryNode, ATTR_WIKI,
+            wikiTemplate = Utils.getAttributeOrTag(entryNode, ATTR_WIKI,
                     (String) null);
-            if (wikiTemplate == null) {
-                wikiTemplate = XmlUtil.getGrandChildText(entryNode,
-                        ATTR_WIKI, null);
-            }
+
+            wikiTemplateInner = Utils.getAttributeOrTag(entryNode,
+                    ATTR_WIKI_INNER, (String) null);
 
 
             List metadataNodes = XmlUtil.findChildren(entryNode,
@@ -452,6 +457,14 @@ public class TypeHandler extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getWikiTemplateInner() {
+        return wikiTemplateInner;
+    }
 
     /**
      * _more_
