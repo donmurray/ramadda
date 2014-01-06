@@ -370,12 +370,6 @@ function init_RamaddaChart(theChart) {
         return   "<div id=\"" + this.chartDivId +"\" style=\"width: " + this.getProperty("width","400px") +"; height: " + this.getProperty("height","400px") +";\"></div>\n";
     }
 
-    function RecordFilter() {
-        this.recordOk = function(record, values) {
-            if(values[0].getMonth()!=0) return false;
-            return true;
-        }
-    }
 
     theChart.getStandardData = function(fields) {
         var dataList = [];
@@ -397,7 +391,6 @@ function init_RamaddaChart(theChart) {
         //TODO: handle multiple data sources (or not?)
         var pointData = this.dataCollection.getData()[0];
 
-        var filter = new RecordFilter();
         var records = pointData.getData();
         for(j=0;j<records.length;j++) { 
             var record = records[j];
@@ -421,8 +414,10 @@ function init_RamaddaChart(theChart) {
                 }
                 values.push(value);
             }
-            if(filter!=null) {
-                if(!filter.recordOk(record, values)) continue;
+            if(this.filters!=null) {
+                if(!this.applyFilters(record, values)) {
+                    continue;
+                }
             }
 
 
@@ -431,5 +426,49 @@ function init_RamaddaChart(theChart) {
         }
         //var js = "values[1] = 33;if(values[1]<360) ok= 'valuesxxx'; else ok= 'zzz';"
         return dataList;
+    }
+
+    
+    theChart.applyFilters = function(record, values) {
+        for(var i=0;i<this.filters.length;i++) {
+            if(!this.filters[i].recordOk(record, values)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    theChart.filters = [];
+    var filter = theChart.getProperty("chart.filter");
+    if(filter!=null) {
+        //chart.filter="month:0-11;
+        var toks = filter.split(":");
+        var type  = toks[0];
+        if(type == "month") {
+            theChart.filters.push(new MonthFilter(toks[1]));
+        } else {
+            console.log("unknown filter:" + type);
+        }
+    }
+
+
+}
+
+
+function RecordFilter(properties) {
+    this.properties = properties;
+    if(this.properties == null) this.properties = [];
+    this.recordOk = function(record, values) {
+        if(values[0].getMonth()!=0) return false;
+        return true;
+    }
+}
+
+
+function MonthFilter(month) {
+    this.month = month;
+    this.recordOk = function(record, values) {
+        if(values[0].getMonth()!=this.month) return false;
+        return true;
     }
 }
