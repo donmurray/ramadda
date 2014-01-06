@@ -1488,6 +1488,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                 myRequest.put(ARG_TODATE, tmp);
             }
 
+            myRequest.put("chart.type",Misc.getProperty(props, "chart.type", "linechart"));
             pfh.getEntryChart(myRequest,
                               (PointEntry) poh.doMakeEntry(request, entry),
                               sb);
@@ -4186,6 +4187,9 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             props.add(ARG_TODATE);
             props.add(Json.quote(toDate));
         }
+
+        props.add("chart.type");
+        props.add(Json.quote(request.getString("chart.type", "linechart")));
 
         props.add("width");
         props.add(Json.quote(request.getString(ARG_WIDTH, "800")));

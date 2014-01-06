@@ -14,16 +14,20 @@ var chart = new  RamaddaChart("example" , pointData);
 */
 
 
-function ChartManager(id) {
+function ChartManager(id,properties) {
     var theChart = this;
     this.id = id;
+    this.properties = properties;
     this.charts = [];
     this.data = [];
     this.cnt = 0;
     init_ChartManager(this);
-    var html = "<h2>My Charts</h2>";
-    html += "<span id=\"" + this.id + "_new\">New Chart</span>";
-    html+="<br>";
+    var html = "";
+    if(this.getProperty("shownew",false)) {
+        html += "<span id=\"" + this.id + "_new\">New Chart</span>";
+        html+="<br>";
+    }
+
     for(var i=0;i<10;i++)  {
         var chartId = this.id +"_chart_" + i;
         html+= "<div id=\"" + chartId +"\"/>";
@@ -41,6 +45,13 @@ function init_ChartManager(chartManager) {
         return this.id;
     }
 
+
+    chartManager.getProperty = function(key, dflt) {
+        if(typeof this.properties == 'undefined') return dflt;
+        var value = this.properties[key];
+        if(value == null) return dflt;
+        return value;
+    }
 
     chartManager.doNew = function() {
         this.addPointData(this.data[0]);
@@ -218,16 +229,24 @@ function init_RamaddaLineChart(theChart) {
         var dataList = this.getStandardData(selectedFields);
 
         var dataTable = google.visualization.arrayToDataTable(dataList);
+
         var options = {
-            series: [
-        {targetAxisIndex:0},
-        {targetAxisIndex:1},
-                     ],
+            series: [{targetAxisIndex:0},{targetAxisIndex:1},],
             title: this.getTitle(),
             chartArea:{left:30,top:30,height:"75%"}
         };
-        this.chart = new google.visualization.LineChart(document.getElementById(this.chartDivId));
-        this.chart.draw(dataTable, options);
+
+        if(this.getProperty("chart.type","linechart") == "barchart") {
+            options.orientation =  "horizontal";
+                //            vAxis: {title: 'Year'}
+            this.chart = new google.visualization.BarChart(document.getElementById(this.chartDivId));
+            this.chart.draw(dataTable, options);
+        } else {
+            this.chart = new google.visualization.LineChart(document.getElementById(this.chartDivId));
+            this.chart.draw(dataTable, options);
+
+        }
+
     }
 }
 
