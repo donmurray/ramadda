@@ -623,13 +623,16 @@ public class AccessManager extends RepositoryManager {
             return entry;
         }
 
-        if ((entry.getResource() != null)
-                && entry.getResource().isServerSideFile()) {
-            if ( !entry.getResource().getTheFile().exists()) {
-                entry = getEntryManager().handleMissingFileEntry(request,
-                        entry);
-                if (entry == null) {
-                    return null;
+        if (entry.getResource() != null) {
+            if(entry.getResource().isServerSideFile()) {
+               System.err.println ("filterEntry:isServerSideFile");
+                if ( !entry.getResource().getTheFile().exists()) {
+                    System.err.println ("filterEntry:file not exists");
+                    entry = getEntryManager().handleMissingFileEntry(request,
+                                                                     entry);
+                    if (entry == null) {
+                        return null;
+                    }
                 }
             }
         }
