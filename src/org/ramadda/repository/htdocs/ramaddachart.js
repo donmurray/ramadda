@@ -236,11 +236,16 @@ function init_RamaddaLineChart(theChart) {
             chartArea:{left:30,top:30,height:"75%"}
         };
 
-        if(this.getProperty("chart.type","linechart") == "barchart") {
+        var chartType = this.getProperty("chart.type","linechart");
+        if(chartType == "barchart") {
             options.orientation =  "horizontal";
                 //            vAxis: {title: 'Year'}
             this.chart = new google.visualization.BarChart(document.getElementById(this.chartDivId));
             this.chart.draw(dataTable, options);
+        } else  if(chartType == "table") {
+            this.chart = new google.visualization.Table(document.getElementById(this.chartDivId));
+            this.chart.draw(dataTable, options);
+
         } else {
             this.chart = new google.visualization.LineChart(document.getElementById(this.chartDivId));
             this.chart.draw(dataTable, options);
@@ -372,7 +377,7 @@ function init_RamaddaChart(theChart) {
         //The first entry in the dataList is the array of names
         //The first field is the domain, e.g., time or index
         //        var fieldNames = ["domain","depth"];
-        var fieldNames = ["domain"];
+        var fieldNames = ["Date"];
         for(i=0;i<fields.length;i++) { 
             var field = fields[i];
             var name  = field.getLabel();
