@@ -41,6 +41,7 @@ import org.ramadda.repository.output.*;
 import org.ramadda.repository.type.*;
 
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Utils;
 import org.ramadda.util.grid.LatLonGrid;
 
 
@@ -354,7 +355,7 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
             if (p == null) {
                 p = new Hashtable();
             }
-            p.putAll(RecordFile.getProperties(typeProperties));
+            p.putAll(Utils.getProperties(typeProperties));
         }
 
 
@@ -362,7 +363,7 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
             if (p == null) {
                 p = new Hashtable();
             }
-            p.putAll(RecordFile.getProperties(propertiesString));
+            p.putAll(Utils.getProperties(propertiesString));
         }
 
         return p;
