@@ -8622,10 +8622,16 @@ public class EntryManager extends RepositoryManager {
 
         if (getProperty(PROP_DELETE_ENTRY_FILE_IS_MISSING, false)) {
             deleteEntry(request, entry);
+            System.err.println ("RAMADDA: Deleted entry with missing file: "
+                    + entry.getName() + " File:" + f);
             logInfo("RAMADDA: Deleted entry with missing file: "
                     + entry.getName() + " File:" + f);
 
             return null;
+        } else {
+            System.err.println ("RAMADDA: Not configured to delete files: "
+                                + entry.getName() + " File:" + f);
+
         }
 
         //Don't show the bad files for regular folk

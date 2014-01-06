@@ -211,7 +211,6 @@ function init_RamaddaLineChart(theChart) {
         return df;
     }
 
-
     theChart.displayData = function() {
         if(!this.hasData()) {
             if(this.chart !=null) {
@@ -228,8 +227,8 @@ function init_RamaddaLineChart(theChart) {
 
         var dataList = this.getStandardData(selectedFields);
 
+        //Keep all of the google chart specific code here
         var dataTable = google.visualization.arrayToDataTable(dataList);
-
         var options = {
             series: [{targetAxisIndex:0},{targetAxisIndex:1},],
             title: this.getTitle(),
@@ -239,7 +238,6 @@ function init_RamaddaLineChart(theChart) {
         var chartType = this.getProperty("chart.type","linechart");
         if(chartType == "barchart") {
             options.orientation =  "horizontal";
-                //            vAxis: {title: 'Year'}
             this.chart = new google.visualization.BarChart(document.getElementById(this.chartDivId));
             this.chart.draw(dataTable, options);
         } else  if(chartType == "table") {
@@ -372,6 +370,13 @@ function init_RamaddaChart(theChart) {
         return   "<div id=\"" + this.chartDivId +"\" style=\"width: " + this.getProperty("width","400px") +"; height: " + this.getProperty("height","400px") +";\"></div>\n";
     }
 
+    function RecordFilter() {
+        this.recordOk = function(record, values) {
+            if(values[0].getMonth()!=0) return false;
+            return true;
+        }
+    }
+
     theChart.getStandardData = function(fields) {
         var dataList = [];
         //The first entry in the dataList is the array of names
@@ -389,9 +394,10 @@ function init_RamaddaChart(theChart) {
         dataList.push(fieldNames);
 
         //These are Record objects 
-        //TODO: handle multiple data sources
+        //TODO: handle multiple data sources (or not?)
         var pointData = this.dataCollection.getData()[0];
 
+        var filter = new RecordFilter();
         var records = pointData.getData();
         for(j=0;j<records.length;j++) { 
             var record = records[j];
@@ -402,6 +408,7 @@ function init_RamaddaChart(theChart) {
                 date = new Date(date);
                 values.push(date);
             } else {
+                if(j==0) fieldNames[0] = "Index";
                 values.push(j);
             }
             //            values.push(record.getElevation());
@@ -414,6 +421,11 @@ function init_RamaddaChart(theChart) {
                 }
                 values.push(value);
             }
+            if(filter!=null) {
+                if(!filter.recordOk(record, values)) continue;
+            }
+
+
             //TODO: when its all null values we get some errors
             dataList.push(values);
         }
