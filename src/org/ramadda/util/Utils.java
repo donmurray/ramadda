@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -664,12 +664,46 @@ public class Utils {
     }
 
 
-    public static Hashtable<String,String> makeMap(String... args) {
-        Hashtable<String,String>  map = new  Hashtable<String,String>();
-        for(int i=0;i<args.length;i+=2) {
-            map.put(args[i],args[i+1]);
+    /**
+     * _more_
+     *
+     * @param args _more_
+     *
+     * @return _more_
+     */
+    public static Hashtable<String, String> makeMap(String... args) {
+        Hashtable<String, String> map = new Hashtable<String, String>();
+        for (int i = 0; i < args.length; i += 2) {
+            map.put(args[i], args[i + 1]);
         }
+
         return map;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    public static Hashtable getProperties(String s) {
+        Hashtable p = new Hashtable();
+        for (String line : StringUtil.split(s, "\n", true, true)) {
+            if (line.startsWith("#")) {
+                continue;
+            }
+            List<String> toks = StringUtil.splitUpTo(line, "=", 2);
+            if (toks.size() == 2) {
+                p.put(toks.get(0), toks.get(1));
+            } else if (toks.size() == 2) {
+                p.put(toks.get(0), "");
+            }
+        }
+
+        return p;
+    }
+
 
 }

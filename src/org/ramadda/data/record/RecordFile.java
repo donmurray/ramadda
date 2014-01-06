@@ -24,6 +24,9 @@ package org.ramadda.data.record;
 import org.ramadda.data.record.filter.*;
 
 
+import org.ramadda.util.Utils;
+
+
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
@@ -260,37 +263,13 @@ public abstract class RecordFile {
                 continue;
             }
             String contents = IOUtil.readContents(f);
-            p.putAll(getProperties(contents));
+            p.putAll(Utils.getProperties(contents));
         }
 
         return p;
     }
 
 
-
-    /**
-     * _more_
-     *
-     * @param s _more_
-     *
-     * @return _more_
-     */
-    public static Hashtable getProperties(String s) {
-        Hashtable p = new Hashtable();
-        for (String line : StringUtil.split(s, "\n", true, true)) {
-            if (line.startsWith("#")) {
-                continue;
-            }
-            List<String> toks = StringUtil.splitUpTo(line, "=", 2);
-            if (toks.size() == 2) {
-                p.put(toks.get(0), toks.get(1));
-            } else if (toks.size() == 2) {
-                p.put(toks.get(0), "");
-            }
-        }
-
-        return p;
-    }
 
 
 
@@ -1314,6 +1293,7 @@ public abstract class RecordFile {
      */
     public boolean isMissingValue(Record record, RecordField field,
                                   String s) {
+        //I really shouldn't be doing this here
         return s.equals("---") || s.equals("n.v.") || (s.length() == 0)
                || s.equals("null") || s.equals("nan") || s.equals("NAN")
                || s.equals("NA") || s.equals("NaN");

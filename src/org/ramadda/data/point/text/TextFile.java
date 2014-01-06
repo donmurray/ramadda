@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -68,10 +68,18 @@ public abstract class TextFile extends PointFile implements Fields {
     /** _more_ */
     public static final String ATTR_TYPE = "type";
 
+    /** _more_          */
     public static final String ATTR_LABEL = "label";
 
     /** _more_ */
     public static final String ATTR_MISSING = "missing";
+
+
+    /** _more_          */
+    public static final String ATTR_SCALE = "scale";
+
+    /** _more_          */
+    public static final String ATTR_OFFSET = "offset";
 
     /** _more_ */
     public static final String ATTR_VALUE = "value";
@@ -518,6 +526,13 @@ public abstract class TextFile extends PointFile implements Fields {
         return sb.toString();
     }
 
+    /**
+     * _more_
+     *
+     * @param fields _more_
+     *
+     * @return _more_
+     */
     public String makeFields(List<String> fields) {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < fields.size(); i++) {
@@ -651,6 +666,13 @@ public abstract class TextFile extends PointFile implements Fields {
         return HtmlUtils.attr(ATTR_TYPE, v);
     }
 
+    /**
+     * _more_
+     *
+     * @param v _more_
+     *
+     * @return _more_
+     */
     public String attrLabel(String v) {
         return HtmlUtils.attr(ATTR_LABEL, v);
     }
@@ -664,6 +686,17 @@ public abstract class TextFile extends PointFile implements Fields {
      */
     public String attrMissing(double v) {
         return HtmlUtils.attr(ATTR_MISSING, "" + v);
+    }
+
+    /**
+     * _more_
+     *
+     * @param v _more_
+     *
+     * @return _more_
+     */
+    public String attrMissing(String v) {
+        return HtmlUtils.attr(ATTR_MISSING, v);
     }
 
     /**

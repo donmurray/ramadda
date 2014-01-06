@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -195,7 +195,7 @@ public class CsvFile extends TextFile {
 
         //x[unit="m"],y[unit="m"],z[unit="m"],red[],green[],blue[],amplitude[]
         //        System.err.println ("fields:" + fieldString);
-        String defaultMissing     = getProperty("missing", (String) null);
+        String defaultMissing     = getProperty(ATTR_MISSING, (String) null);
         String[]          toks    = fieldString.split(",");
         List<RecordField> fields  = new ArrayList<RecordField>();
         int               paramId = 1;
@@ -214,9 +214,12 @@ public class CsvFile extends TextFile {
             Hashtable properties = parseAttributes(attrs);
             //            System.err.println ("props:" + properties);
             RecordField field = new RecordField(name, name, "", paramId++,
-                                    getProperty(properties, "unit", ""));
+                                    getProperty(properties, ATTR_UNIT, ""));
 
-
+            field.setScale(Double.parseDouble(getProperty(field, properties,
+                    ATTR_SCALE, "1.0")));
+            field.setOffset(Double.parseDouble(getProperty(field, properties,
+                    ATTR_OFFSET, "0.0")));
 
             field.setIsDate(getProperty(field, properties,
                                         RecordField.PROP_ISDATE,

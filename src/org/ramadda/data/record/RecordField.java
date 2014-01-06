@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -21,9 +21,11 @@
 package org.ramadda.data.record;
 
 
-import org.ramadda.util.Utils;
-import org.ramadda.util.Json;
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Json;
+
+
+import org.ramadda.util.Utils;
 
 import ucar.unidata.util.Misc;
 
@@ -102,6 +104,12 @@ public class RecordField {
 
     /** _more_ */
     private double roundingFactor = 0;
+
+    /** _more_          */
+    private double scale = 1.0;
+
+    /** _more_          */
+    private double offset = 1.0;
 
     /** _more_ */
     private String name;
@@ -220,24 +228,50 @@ public class RecordField {
 
 
 
-    public static void addJsonHeader(Appendable pw, String name, List<RecordField> fields) throws Exception {
+    /**
+     * _more_
+     *
+     * @param pw _more_
+     * @param name _more_
+     * @param fields _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void addJsonHeader(Appendable pw, String name,
+                                     List<RecordField> fields)
+            throws Exception {
         pw.append(Json.mapOpen());
         pw.append(Json.attr(Json.FIELD_NAME, name, true));
         pw.append(",\n");
-        pw.append(Json.attr(Json.FIELD_FIELDS,
-                            RecordField.getJson(fields)));
+        pw.append(Json.attr(Json.FIELD_FIELDS, RecordField.getJson(fields)));
         pw.append(",\n");
         pw.append(Json.mapKey(Json.FIELD_DATA));
         pw.append(Json.listOpen());
     }
 
+    /**
+     * _more_
+     *
+     * @param pw _more_
+     *
+     * @throws Exception _more_
+     */
     public static void addJsonFooter(Appendable pw) throws Exception {
         pw.append(Json.listClose());
         pw.append(Json.mapClose());
     }
 
+    /**
+     * _more_
+     *
+     * @param fields _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public static String getJson(List<RecordField> fields) throws Exception {
-        Appendable sb = new StringBuffer();
+        Appendable   sb           = new StringBuffer();
         List<String> fieldStrings = new ArrayList<String>();
         int          headerCnt    = 0;
         for (RecordField field : fields) {
@@ -252,35 +286,41 @@ public class RecordField {
             fieldStrings.add(fieldSB.toString());
             headerCnt++;
         }
+
         return Json.list(fieldStrings);
     }
 
 
 
-    public void addJson(StringBuffer sb, int index)  {
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     * @param index _more_
+     */
+    public void addJson(StringBuffer sb, int index) {
         String dataType = type;
-        if(type.equals(TYPE_NUMERIC)) dataType = "double";
-        String props = Json.map(new String[]{
-                "chartable",""+getChartable(),
-                "searchable",""+getSearchable(),
-            });
-        sb.append(Json.map(new String[]{
-                    "index", ""+index,
-                    "id", HtmlUtils.quote(name),
-                    "label", HtmlUtils.quote(label),
-                    "type", HtmlUtils.quote(dataType),
-                    //                    "missing",""+missingValue,
-                    "unit", Utils.stringDefined(unit)?HtmlUtils.quote(unit):"null",
-                    "properties", props,
-                }, false));
+        if (type.equals(TYPE_NUMERIC)) {
+            dataType = "double";
+        }
+        String props = Json.map(new String[] { "chartable",
+                "" + getChartable(), "searchable", "" + getSearchable(), });
+        sb.append(Json.map(new String[] {
+            "index", "" + index, "id", HtmlUtils.quote(name), "label",
+            HtmlUtils.quote(label), "type", HtmlUtils.quote(dataType),
+            //                    "missing",""+missingValue,
+            "unit", Utils.stringDefined(unit)
+                    ? HtmlUtils.quote(unit)
+                    : "null", "properties", props,
+        }, false));
 
         /*
-{index:0,
-               id:"field1",
-               label:"Field 1",
-               type:"double",
-               missing:"-999.0",
-               unit:"m"}
+          {index:0,
+          id:"field1",
+          label:"Field 1",
+          type:"double",
+          missing:"-999.0",
+          unit:"m"}
         */
     }
 
@@ -622,6 +662,57 @@ public class RecordField {
     public int getArity() {
         return arity;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param v _more_
+     *
+     * @return _more_
+     */
+    public double convertValue(double v) {
+        //TODO: or is this the other way around
+        return v * scale + offset;
+    }
+
+
+    /**
+     *  Set the Scale property.
+     *
+     *  @param value The new value for Scale
+     */
+    public void setScale(double value) {
+        scale = value;
+    }
+
+    /**
+     *  Get the Scale property.
+     *
+     *  @return The Scale
+     */
+    public double getScale() {
+        return scale;
+    }
+
+    /**
+     *  Set the Offset property.
+     *
+     *  @param value The new value for Offset
+     */
+    public void setOffset(double value) {
+        offset = value;
+    }
+
+    /**
+     *  Get the Offset property.
+     *
+     *  @return The Offset
+     */
+    public double getOffset() {
+        return offset;
+    }
+
 
 
 
