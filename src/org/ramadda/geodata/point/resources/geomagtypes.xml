@@ -6,12 +6,12 @@
 
 
   <type name="type_point_geomag_m88"  super="type_point_geomag" description="M88 Geomagnetism Data"  handler="org.ramadda.data.services.PointTypeHandler">
-     <property name="record.file.class" value="org.ramadda.data.point.geomag.M88PointFile"/>
+     <property name="record.file.class" value="org.ramadda.data.point.wsbb.M88PointFile"/>
   </type>
 
 
   <type name="type_point_geomag_iaga2002"  super="type_point_geomag" description="IAGA 2002 Geomagnetism Data"  handler="org.ramadda.data.services.PointTypeHandler">
-     <property name="record.file.class" value="org.ramadda.data.point.geomag.IAGA2002PointFile"/>
+     <property name="record.file.class" value="org.ramadda.data.point.wsbb.IAGA2002PointFile"/>
      <column  name="iaga_code"  type="enumerationplus" label="IAGA Code" cansearch="true"/>
      <column  name="station_name"  type="string" label="Station Name" cansearch="true"/>
      <column  name="source_of_data"  type="string" label="Source of data" cansearch="true"/>

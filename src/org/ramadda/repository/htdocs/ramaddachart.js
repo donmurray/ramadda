@@ -235,6 +235,13 @@ function init_RamaddaLineChart(theChart) {
             chartArea:{left:30,top:30,height:"75%"}
         };
 
+        var min = this.getProperty("chart.min","");
+        if(min!="") {
+            options.vAxis = {
+                minValue:min,
+            };
+        }
+
         var chartType = this.getProperty("chart.type","linechart");
         if(chartType == "barchart") {
             options.orientation =  "horizontal";

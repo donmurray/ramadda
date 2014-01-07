@@ -1490,6 +1490,10 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
             myRequest.put("chart.type",
                           Misc.getProperty(props, "chart.type", "linechart"));
+            String min =Misc.getProperty(props, "chart.min", (String) null);
+            if(min!=null) {
+                myRequest.put("chart.min", min);
+            }
             myRequest.put("chart.filter",
                           Misc.getProperty(props, "chart.filter", ""));
             pfh.getEntryChart(myRequest,
@@ -4196,6 +4200,10 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         if (request.defined("chart.filter")) {
             props.add("chart.filter");
             props.add(Json.quote(request.getString("chart.filter", "")));
+        }
+        if (request.defined("chart.min")) {
+            props.add("chart.min");
+            props.add(Json.quote(request.getString("chart.min", "")));
         }
 
         props.add("width");
