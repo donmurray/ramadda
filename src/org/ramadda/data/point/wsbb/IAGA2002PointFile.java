@@ -18,7 +18,7 @@
 * DEALINGS IN THE SOFTWARE.
 */
 
-package org.ramadda.data.point.geomag;
+package org.ramadda.data.point.wsbb;
 
 
 import org.ramadda.data.point.*;
