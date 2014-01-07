@@ -53,6 +53,25 @@ General CSV text formats - See below
 Tools 
 ##############################################################################
 
+The point data tools need to know what Java class should be instantiated to read the data file.
+For text point data that is defined with a data dictionary properties file then you do not
+need to specify the class.
+
+Otherwise, you need to do
+    point2csv.sh -class <full class name>
+e.g:
+    point2csv.sh -class org.ramadda.data.point.amrc.AmrcFinalQCPointFile ...
+    point2csv.sh -class org.unavco.data.lidar.glas.GlasFile
+    point2csv.sh -class org.unavco.data.lidar.las.LasFile
+
+
+You can also set an environment variable:
+
+export ramadda_point_class="org.unavco.data.lidar.glas.GlasFile"
+
+
+
+
 point2csv.sh:
 Convert a Point file to csv.
 For help do:
