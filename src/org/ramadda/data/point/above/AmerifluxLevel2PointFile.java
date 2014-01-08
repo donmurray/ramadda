@@ -42,7 +42,7 @@ import java.util.List;
 
 /**
  */
-public class AmerifluxPointFile extends SingleSiteTextFile {
+public class AmerifluxLevel2PointFile extends SingleSiteTextFile {
 
     /** _more_ */
     private SimpleDateFormat sdf = makeDateFormat("yyyy-D HHmm");
@@ -57,13 +57,9 @@ public class AmerifluxPointFile extends SingleSiteTextFile {
      *
      * @throws IOException _more_
      */
-    public AmerifluxPointFile(String filename) throws IOException {
+    public AmerifluxLevel2PointFile(String filename) throws IOException {
         super(filename);
     }
-
-
-
-
 
     /*
 Sitename: UCI 1930 Canada
@@ -229,7 +225,7 @@ YEAR, GAP, DTIME, DOY, HRMIN, m/s, deg C, deg, m/s, umol/m2/s, umol/m2/s, umol/m
      * @param args _more_
      */
     public static void main(String[] args) {
-        PointFile.test(args, AmerifluxPointFile.class);
+        PointFile.test(args, AmerifluxLevel2PointFile.class);
     }
 
 }
