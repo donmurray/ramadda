@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -27,6 +27,8 @@ import org.ramadda.data.point.text.*;
 import org.ramadda.data.record.*;
 import org.ramadda.util.Utils;
 
+import ucar.unidata.util.IOUtil;
+
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
@@ -41,17 +43,15 @@ import java.util.List;
 
 
 /**
+ * A file reader for the Level 2 Ameriflux CSV data format
  */
-public class AmerifluxLevel2PointFile extends SingleSiteTextFile {
+public class AmerifluxLevel2PointFile extends CsvFile {
 
     /** _more_ */
     private SimpleDateFormat sdf = makeDateFormat("yyyy-D HHmm");
 
-
-
     /**
      * ctor
-     *
      *
      * @param filename _more_
      *
@@ -60,30 +60,6 @@ public class AmerifluxLevel2PointFile extends SingleSiteTextFile {
     public AmerifluxLevel2PointFile(String filename) throws IOException {
         super(filename);
     }
-
-    /*
-Sitename: UCI 1930 Canada
-Location: Latitude: 55.9058  Longitude: -98.5247  Elevation (masl): 257
-Principal investigator: Michael Goulden
-Ecosystem type: ENF Evergreen Needleleaf Forest
-File creation date: 15NOV2010
-Data Policy -- The AmeriFlux data provided on this site are freely available and were furnished by individual AmeriFlux scientists who encourage their use.
-Please kindly inform in writing (or e-mail) the appropriate AmeriFlux scientist(s) of how you intend to use the data and of any publication plans.
-It is also important to contact the AmeriFlux investigator to assure you are downloading the latest revision of the data and to prevent potential misuse or misinterpretation of the data.
-Please acknowledge the data source as a citation or in the acknowledgments if no citation is available.
-If the AmeriFlux Principal Investigators (PIs) feel that they should be acknowledged or offered participation as authors they will let you know.
-And we assume that an agreement on such matters will be reached before publishing and/or use of the data for publication.
-If your work directly competes with the PIs analysis they may ask that they have the opportunity to submit a manuscript before you submit one that uses unpublished data.
-In addition when publishing please acknowledge the agency that supported the research. --
-File Origin - This file was created at Oak Ridge National Laboratory by the AmeriFlux and FLUXNET data management groups.
-These groups are supported by the U.S. Department of Energy and National Aeronautics and Space Administration.
-This standardized file is identical in format to other standardized files provided here with a goal of aiding intersite comparisons  multi-site syntheses and modeling activities.
-Questions about these standardized files should be addressed to Tom Boden (bodenta@ornl.gov) .
-YEAR, GAP, DTIME, DOY, HRMIN, UST, TA, WD, WS, NEE, FC, SFC, H, SH, LE, SLE, FG, TS1, TSdepth1, TS2, TSdepth2, PREC, RH, PRESS, CO2, VPD, SWC1, SWC2, Rn, PAR, Rg, Rgdif, PARout, RgOut, Rgl, RglOut, H2O, RE, GPP, CO2top, CO2height, APAR, PARdif, APARpct, ZL
-YEAR, GAP, DTIME, DOY, HRMIN, m/s, deg C, deg, m/s, umol/m2/s, umol/m2/s, umol/m2/s, W/m2, W/m2, W/m2, W/m2, W/m2, deg C, cm, deg C, cm, mm, %, kPa, umol/mol, kPa, %, %, W/m2, umol/m2/s, W/m2, W/m2, umol/m2/s, W/m2, W/m2, W/m2, mmol/mol, umol/m2/s, umol/m2/s, umol/mol, m, umol/m2/s, umol/m2/s, %, unitless
-100....
-    */
-
 
     /**
      *
@@ -96,15 +72,22 @@ YEAR, GAP, DTIME, DOY, HRMIN, m/s, deg C, deg, m/s, umol/m2/s, umol/m2/s, umol/m
      */
     @Override
     public VisitInfo prepareToVisit(VisitInfo visitInfo) throws Exception {
+
         putProperty(PROP_DELIMITER, ",");
         putProperty(PROP_SKIPLINES, "20");
         super.prepareToVisit(visitInfo);
+
+        //Example file at examples/AMF_USBar_2004_L2_WG_V004.example.csv
         List<String> header = getHeaderLines();
+
+        System.err.println("DESC:"
+                           + StringUtil.join("\n", header.subList(5, 16)));
+        setDescriptionFromFile(StringUtil.join("\n", header.subList(5, 16)));
+
 
         //        Sitename: UCI 1930 Canada
         List<String> toks   = StringUtil.splitUpTo(header.get(0), ":", 2);
         String       siteId = toks.get(1);
-
 
         //        Location: Latitude: 55.9058  Longitude: -98.5247  Elevation (masl): 257
         String locationLine = header.get(1);
@@ -142,35 +125,56 @@ YEAR, GAP, DTIME, DOY, HRMIN, m/s, deg C, deg, m/s, umol/m2/s, umol/m2/s, umol/m
         //LOOK: this needs to be in the same order as the aontypes.xml defines in the point plugin
         setFileMetadata(new Object[] { siteId, contact, ecosystemType });
 
-
-
-        String baseAttrs = attrChartable() + attrSearchable();
-        String fields = makeFields(new String[] {
-                            makeField(FIELD_SITE_ID, attrType(TYPE_STRING),
-                                      attrValue(siteId.trim())),
-                            makeField("Ecosystem_Type",
-                                      attrType(TYPE_STRING),
-                                      attrValue(ecosystemType)),
-                            makeField(FIELD_LATITUDE, attrValue(lat)),
-                            makeField(FIELD_LONGITUDE, attrValue(lon)),
-                            makeField(FIELD_ELEVATION,
-                                      attrValue(elevation)), });
+        StringBuffer fields = new StringBuffer(makeFields(new String[] {
+                                  makeField(FIELD_SITE_ID,
+                                            attrType(TYPE_STRING),
+                                            attrValue(siteId.trim())),
+                                  makeField("Ecosystem_Type",
+                                            attrType(TYPE_STRING),
+                                            attrValue(ecosystemType)),
+                                  makeField(FIELD_LATITUDE, attrValue(lat)),
+                                  makeField(FIELD_LONGITUDE, attrValue(lon)),
+                                  makeField(FIELD_ELEVATION,
+                                            attrValue(elevation)), }));
 
         List<String> fieldsFromFile = StringUtil.split(header.get(17), ",");
-        List<String> unitsFromFile  = StringUtil.split(header.get(18), ",");
+        List<String> unitsFromFile = StringUtil.split(header.get(18), ",");
+
+
+        Hashtable<String, String> props = getClassProperties();
+
         for (int fieldIdx = 0; fieldIdx < fieldsFromFile.size(); fieldIdx++) {
             String field = fieldsFromFile.get(fieldIdx);
-            String unit  = unitsFromFile.get(fieldIdx).trim();
-            String attr  = baseAttrs;
-            if (Utils.stringDefined(unit)) {
-                attr += attrUnit(unit);
+            String id    = cleanFieldName(field);
+            id = Misc.getProperty(props, id + ".id", id);
+
+            StringBuffer attrs = new StringBuffer();
+            String       unit  = unitsFromFile.get(fieldIdx).trim();
+            if ( !Utils.stringDefined(unit)) {
+                unit = Misc.getProperty(props, id + ".unit", unit);
             }
-            fields += "," + makeField(field, attr);
+            String label = Misc.getProperty(props, id + ".label",
+                                            StringUtil.camelCase(field));
+
+            if (Misc.getProperty(props, id + ".chartable", false)) {
+                attrs.append(attrChartable());
+            }
+            if (Misc.getProperty(props, id + ".searchable", false)) {
+                attrs.append(attrSearchable());
+            }
+
+            attrs.append(attrLabel(label));
+            if (Utils.stringDefined(unit)) {
+                attrs.append(attrUnit(unit));
+            }
+            fields.append(",");
+            fields.append(makeField(id, attrs.toString()));
         }
 
-        putProperty(PROP_FIELDS, fields);
+        putProperty(PROP_FIELDS, fields.toString());
 
         return visitInfo;
+
     }
 
 

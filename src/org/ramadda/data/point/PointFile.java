@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -26,6 +26,7 @@ import org.ramadda.data.record.*;
 import org.ramadda.data.record.filter.*;
 import org.ramadda.util.GeoUtils;
 import org.ramadda.util.Station;
+import org.ramadda.util.Utils;
 
 import ucar.unidata.geoloc.*;
 import ucar.unidata.geoloc.projection.*;
@@ -211,6 +212,24 @@ public abstract class PointFile extends RecordFile implements Cloneable {
         super(filename, properties);
     }
 
+
+
+    /**
+     * _more_
+     *
+     * @param props _more_
+     *
+     * @throws Exception _more_
+     */
+    @Override
+    public void initClassProperties(Hashtable<String, String> props)
+            throws Exception {
+        super.initClassProperties(props);
+        props.putAll(
+            Utils.getProperties(
+                IOUtil.readContents(
+                    "/org/ramadda/data/point/PointFile.properties", "")));
+    }
 
 
     /**

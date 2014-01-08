@@ -227,6 +227,45 @@ public abstract class RecordFile {
         return that;
     }
 
+    /** _more_          */
+    private Hashtable<String, String> classProperties;
+
+    /**
+     * _more_
+     *
+     * @param props _more_
+     *
+     * @throws Exception _more_
+     */
+    public void initClassProperties(Hashtable<String, String> props)
+            throws Exception {}
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Hashtable getClassProperties() throws Exception {
+        if (classProperties == null) {
+            String propertiesFile = "/"
+                                    + getClass().getName().replaceAll("\\.",
+                                        "/") + ".properties";
+
+            Hashtable<String, String> tmp = new Hashtable<String, String>();
+            initClassProperties(tmp);
+            tmp.putAll(
+                Utils.getProperties(IOUtil.readContents(propertiesFile, "")));
+            classProperties = tmp;
+        }
+
+        return classProperties;
+    }
+
+
+
     /**
      * _more_
      *
@@ -1580,7 +1619,19 @@ public abstract class RecordFile {
 
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    public String cleanFieldName(String s) {
+        s = s.toLowerCase();
+        s = s.replaceAll("\\s+", "_");
 
+        return s;
+    }
 
 
 }
