@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -76,6 +76,7 @@ public class GranuleTypeHandler extends GenericTypeHandler {
                                         Entry parent, boolean newEntry)
             throws Exception {
         super.initializeEntryFromForm(request, entry, parent, newEntry);
+        /*
         if ( !newEntry) {
             return;
         }
@@ -83,7 +84,26 @@ public class GranuleTypeHandler extends GenericTypeHandler {
             return;
         }
         initializeGranuleEntry(entry);
+        */
     }
+
+
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
+    @Override
+    public void initializeNewEntry(Entry entry) throws Exception {
+        super.initializeNewEntry(entry);
+        if ( !entry.isFile()) {
+            return;
+        }
+        initializeGranuleEntry(entry);
+    }
+
 
     /**
      * _more_
@@ -93,6 +113,7 @@ public class GranuleTypeHandler extends GenericTypeHandler {
      * @throws Exception on badness
      */
     public void initializeGranuleEntry(Entry entry) throws Exception {
+        System.err.println("initializeGranuleEntry:" + entry.getName());
         collectionId = "";
         Entry parent = entry.getParentEntry();
         while (parent != null) {
