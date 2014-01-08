@@ -70,8 +70,9 @@ public class CMIP5ModelFileHarvester extends PatternHarvester {
         try {
             if (entry.getTypeHandler()
                     instanceof CMIP5ModelFileTypeHandler) {
-                ((CMIP5ModelFileTypeHandler) entry.getTypeHandler())
-                    .initializeEntry(entry);
+                //jeffmc: comment this out. initNewEntry should be called now
+                //                ((CMIP5ModelFileTypeHandler) entry.getTypeHandler())
+                //                    .initializeEntry(entry);
             }
             return entry;
         } catch (Exception exc) {

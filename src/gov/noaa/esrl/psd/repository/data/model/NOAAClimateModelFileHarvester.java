@@ -144,8 +144,9 @@ public class NOAAClimateModelFileHarvester extends PatternHarvester {
             //    + entry.getResource());
             if (entry.getTypeHandler()
                     instanceof NOAAClimateModelFileTypeHandler) {
-                ((NOAAClimateModelFileTypeHandler) entry.getTypeHandler())
-                    .initializeEntry(entry);
+                //jeffmc: comment this out. initNewEntry should be called now
+                //                ((NOAAClimateModelFileTypeHandler) entry.getTypeHandler())
+                //                    .initializeEntry(entry);
             }
 
             //getRepository().getLogManager().logInfo(

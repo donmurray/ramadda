@@ -40,10 +40,10 @@ public class CMIP5ModelFileTypeHandler extends ClimateModelFileTypeHandler {
      *
      * @throws Exception _more_
      */
-@Override
-    public void initializeEntry(Entry entry)
+    @Override
+    public void initializeNewEntry(Entry entry)
             throws Exception {
-        super.initializeEntry(entry);
+        super.initializeNewEntry(entry);
         Object[] values = getEntryValues(entry);
         if(values[1]!=null && !values[1].toString().isEmpty()) {
             //System.err.println ("already have  values set");
