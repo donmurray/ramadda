@@ -118,9 +118,9 @@ public class PointTypeHandler extends RecordTypeHandler {
      */
     @Override
     public void initializeNewEntry(Entry entry) throws Exception {
-        System.err.println (getClass().getName()+".initNewEntry");
+        //        System.err.println (getClass().getName()+".initNewEntry");
         if (anySuperTypesOfThisType()) {
-            System.err.println ("has super");
+            //            System.err.println ("has super");
             super.initializeNewEntry(entry);
             return;
         }
@@ -147,7 +147,7 @@ public class PointTypeHandler extends RecordTypeHandler {
         pointEntries.add(pointEntry);
         PointMetadataHarvester metadataHarvester =
             ((PointTypeHandler)entry.getTypeHandler()).doMakeMetadataHarvester(pointEntry);
-        System.err.println (getClass().getName()+"  - scanning file:" + metadataHarvester.getClass().getName());
+        //        System.err.println (getClass().getName()+"  - scanning file:" + metadataHarvester.getClass().getName());
         visitorGroup.addVisitor(metadataHarvester);
         Request    request       = getRepository().getTmpRequest();
         final File quickScanFile = pointEntry.getQuickScanFile();
