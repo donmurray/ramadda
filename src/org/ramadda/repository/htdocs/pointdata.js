@@ -369,3 +369,23 @@ xxxx
         html += jsOutput;
         html += "</td></tr></table>";
 */
+
+
+
+function RecordFilter(properties) {
+    this.properties = properties;
+    if(this.properties == null) this.properties = [];
+    this.recordOk = function(record, values) {
+        if(values[0].getMonth()!=0) return false;
+        return true;
+    }
+}
+
+
+function MonthFilter(month) {
+    this.month = month;
+    this.recordOk = function(record, values) {
+        if(values[0].getMonth()!=this.month) return false;
+        return true;
+    }
+}

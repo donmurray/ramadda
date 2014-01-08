@@ -4181,6 +4181,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             sb.append(getMapManager().getHtmlImports());
             request.putExtraProperty("initmap", "");
         }
+        sb.append(HtmlUtils.importJS(fileUrl("/chartmanager.js")));
         sb.append(HtmlUtils.importJS(fileUrl("/ramaddachart.js")));
 
         String fromDate = request.getString(ARG_FROMDATE, (String) null);
