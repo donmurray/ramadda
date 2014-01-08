@@ -6,10 +6,10 @@
 
   <type name="type_point_ameriflux_level2"  
         super="type_point_ameriflux" 
-        description="Ameriflux Level CSV File"  
+        description="Ameriflux Level 2 CSV File"  
         handler="org.ramadda.data.services.PointTypeHandler">
     <property name="icon" value="/point/tower.png"/>
-    <property name="record.file.class" value="org.ramadda.data.point.above.AmerifluxPointFile"/>
+    <property name="record.file.class" value="org.ramadda.data.point.above.AmerifluxLevel2PointFile"/>
     <column  name="site_id"  type="enumerationplus" label="Site ID" cansearch="true"/>
     <column  name="contact"  type="string" label="Contact" cansearch="true"/>
     <column  name="ecosystem_type"  type="enumerationplus" label="Ecosystem Type" cansearch="true"/>
