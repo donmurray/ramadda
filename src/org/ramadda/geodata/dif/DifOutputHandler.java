@@ -67,14 +67,14 @@ public class DifOutputHandler extends OutputHandler {
     /** _more_ */
     public static final OutputType OUTPUT_DIF_XML =
         new OutputType("Dif-XML", "dif.xml",
-                       OutputType.TYPE_FEEDS | OutputType.TYPE_FORSEARCH, "",
+                       OutputType.TYPE_FEEDS, "",
                        ICON_DIF);
 
 
     /** _more_ */
     public static final OutputType OUTPUT_DIF_TEXT =
         new OutputType("Dif-Text", "dif.text",
-                       OutputType.TYPE_FEEDS | OutputType.TYPE_FORSEARCH, "",
+                       OutputType.TYPE_FEEDS, "",
                        ICON_DIF);
 
 
@@ -110,11 +110,8 @@ public class DifOutputHandler extends OutputHandler {
         }
         if (state.getEntry() != null) {
 
-            /**
-             * * For now don't add these into the Links menu
-             *    links.add(makeLink(request, state.getEntry(), OUTPUT_DIF_XML));
-             *    links.add(makeLink(request, state.getEntry(), OUTPUT_DIF_TEXT));
-             */
+            links.add(makeLink(request, state.getEntry(), OUTPUT_DIF_XML));
+            links.add(makeLink(request, state.getEntry(), OUTPUT_DIF_TEXT));
         }
     }
 
