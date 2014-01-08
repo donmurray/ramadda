@@ -1409,6 +1409,14 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
+    public void initializeEntryFromHarvester(Entry entry)
+            throws Exception {
+        if (this.parent != null) {
+            this.parent.initializeEntryFromHarvester(entry);
+        }
+    }
+
+
     /**
      * _more_
      *

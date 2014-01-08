@@ -6233,7 +6233,6 @@ public class EntryManager extends RepositoryManager {
                         dttm.getTime(), dttm.getTime(), dttm.getTime(),
                         dttm.getTime(), null);
 
-        typeHandler.initializeNewEntry(entry);
         if (initializer != null) {
             initializer.initEntry(entry);
         }
@@ -6493,6 +6492,14 @@ public class EntryManager extends RepositoryManager {
         if (entries.size() == 0) {
             return;
         }
+
+        if(isNew) {
+            System.err.println ("Calling initializeNewEntry");
+            for (Entry theNewEntry : entries) {
+                theNewEntry.getTypeHandler().initializeNewEntry(theNewEntry);
+            }
+        }
+
 
         //We have our own connection
         Connection connection = getDatabaseManager().getConnection();

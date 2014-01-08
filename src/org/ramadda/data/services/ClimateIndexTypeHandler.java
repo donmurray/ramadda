@@ -97,10 +97,10 @@ public class ClimateIndexTypeHandler extends PointTypeHandler {
     @Override
     public void initializeNewEntry(Entry entry) throws Exception {
         if (anySuperTypesOfThisType()) {
+            super.initializeNewEntry(entry);
             return;
         }
         //TODO: read the file, pull out the missing value, etc., then have the super init
-        super.initializeNewEntry(entry);
     }
 
 

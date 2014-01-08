@@ -82,7 +82,7 @@ public class GranuleTypeHandler extends GenericTypeHandler {
         if ( !entry.isFile()) {
             return;
         }
-        initializeEntry(entry);
+        initializeGranuleEntry(entry);
     }
 
     /**
@@ -92,7 +92,7 @@ public class GranuleTypeHandler extends GenericTypeHandler {
      *
      * @throws Exception on badness
      */
-    public void initializeEntry(Entry entry) throws Exception {
+    public void initializeGranuleEntry(Entry entry) throws Exception {
         collectionId = "";
         Entry parent = entry.getParentEntry();
         while (parent != null) {

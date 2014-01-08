@@ -734,7 +734,7 @@ public class CollectionTypeHandler extends ExtensibleGroupTypeHandler {
     public Result getHtmlDisplay(Request request, Entry entry,
                                  List<Entry> subGroups, List<Entry> entries)
             throws Exception {
-        //Always call this to initialize things
+        //Always call this to init things
         getGranuleTypeHandler();
 
         //Check if the user clicked on tree view, etc.

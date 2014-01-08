@@ -121,32 +121,15 @@ public class RadarTypeHandler extends GenericTypeHandler {
     }
 
 
+
     /**
      * _more_
      *
-     * @param request _more_
      * @param entry _more_
-     * @param parent _more_
-     * @param newEntry _more_
      *
      * @throws Exception _more_
      */
     @Override
-    public void initializeEntryFromForm(Request request, Entry entry,
-                                        Entry parent, boolean newEntry)
-            throws Exception {
-        initializeNewEntry(entry);
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param entry _more_
-     *
-     * @throws Exception _more_
-     */
     public void initializeNewEntry(Entry entry) throws Exception {
         Object[]   values = entry.getTypeHandler().getEntryValues(entry);
         File       f      = entry.getFile();

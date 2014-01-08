@@ -139,25 +139,6 @@ public class FitsTypeHandler extends GenericTypeHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param parent _more_
-     * @param newEntry _more_
-     *
-     * @throws Exception _more_
-     */
-    @Override
-    public void initializeEntryFromForm(Request request, Entry entry,
-                                        Entry parent, boolean newEntry)
-            throws Exception {
-        super.initializeEntryFromForm(request, entry, parent, newEntry);
-        if (newEntry) {
-            initializeNewEntry(entry);
-        }
-    }
 
     /** _more_ */
     private static SimpleDateFormat[] SDFS;

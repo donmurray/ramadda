@@ -118,9 +118,13 @@ public class PointTypeHandler extends RecordTypeHandler {
      */
     @Override
     public void initializeNewEntry(Entry entry) throws Exception {
+        System.err.println (getClass().getName()+".initNewEntry");
         if (anySuperTypesOfThisType()) {
+            System.err.println ("has super");
+            super.initializeNewEntry(entry);
             return;
         }
+
 
         log("initialize new entry:" + entry.getResource());
         File file = entry.getFile();
@@ -129,9 +133,8 @@ public class PointTypeHandler extends RecordTypeHandler {
             //            return;
         } else {
             //This finds any properties files next to the file
-            initializeEntry(entry, file);
+            initializeRecordEntry(entry, file);
         }
-
 
 
         PointOutputHandler outputHandler =
@@ -143,7 +146,8 @@ public class PointTypeHandler extends RecordTypeHandler {
         List<PointEntry> pointEntries = new ArrayList<PointEntry>();
         pointEntries.add(pointEntry);
         PointMetadataHarvester metadataHarvester =
-            doMakeMetadataHarvester(pointEntry);
+            ((PointTypeHandler)entry.getTypeHandler()).doMakeMetadataHarvester(pointEntry);
+        System.err.println (getClass().getName()+"  - scanning file:" + metadataHarvester.getClass().getName());
         visitorGroup.addVisitor(metadataHarvester);
         Request    request       = getRepository().getTmpRequest();
         final File quickScanFile = pointEntry.getQuickScanFile();
@@ -162,7 +166,7 @@ public class PointTypeHandler extends RecordTypeHandler {
                         null);
         dos.close();
         log("initialize new entry: count=" + metadataHarvester.getCount());
-        handleHarvestedMetadata(pointEntry, metadataHarvester);
+        ((PointTypeHandler)entry.getTypeHandler()).handleHarvestedMetadata(pointEntry, metadataHarvester);
         log("initialize new entry: done");
 
     }
@@ -187,7 +191,6 @@ public class PointTypeHandler extends RecordTypeHandler {
 
             return;
         }
-
 
         //Check for an uploaded properties file and set the ARG_PROPERTIES 
         String propertyFileName =

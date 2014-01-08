@@ -838,6 +838,7 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @throws Exception on badness
      */
+    @Override
     public void initializeEntryFromDatabase(Entry entry) throws Exception {
         //Always call getEntryValues here so we get create the correct size array
         Object[] values = getEntryValues(entry);

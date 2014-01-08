@@ -183,55 +183,12 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
     /**
      * _more_
      *
-     * @param request _more_
-     * @param entry _more_
-     * @param node _more_
-     *
-     * @throws Exception _more_
-     */
-    public void initializeEntryFromXml(Request request, Entry entry,
-                                       Element node)
-            throws Exception {
-        super.initializeEntryFromXml(request, entry, node);
-        initializeNewEntry(entry);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param parent _more_
-     * @param newEntry _more_
-     *
-     * @throws Exception On badness
-     */
-    @Override
-    public void initializeEntryFromForm(Request request, Entry entry,
-                                        Entry parent, boolean newEntry)
-            throws Exception {
-        super.initializeEntryFromForm(request, entry, parent, newEntry);
-        if (anySuperTypesOfThisType()) {
-            //Don't call the super because this calls the parent.init method so
-            //we end up initializing twice
-            return;
-        }
-        if (newEntry) {
-            initializeNewEntry(entry);
-        }
-    }
-
-
-    /**
-     * _more_
-     *
      * @param entry _more_
      * @param originalFile _more_
      *
      * @throws Exception _more_
      */
-    public void initializeEntry(Entry entry, File originalFile)
+    public void initializeRecordEntry(Entry entry, File originalFile)
             throws Exception {
 
         if (anySuperTypesOfThisType()) {
@@ -292,18 +249,6 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
     }
 
 
-
-    /**
-     * _more_
-     *
-     * @param entry _more_
-     *
-     * @throws Exception On badness
-     */
-    @Override
-    public void initializeNewEntry(Entry entry) throws Exception {}
-
-
     /**
      * _more_
      *
@@ -323,6 +268,7 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
      *
      * @throws Exception On badness
      */
+@Override
     public void initializeCopiedEntry(Entry entry, Entry originalEntry)
             throws Exception {
         super.initializeCopiedEntry(entry, originalEntry);

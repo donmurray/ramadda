@@ -936,7 +936,7 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
                 return;
             }
             try {
-                newEntry.getTypeHandler().initializeNewEntry(newEntry);
+                newEntry.getTypeHandler().initializeEntryFromHarvester(newEntry);
             } catch (Exception exc) {
                 logHarvesterInfo("Error initializing:"
                                  + newEntry.getResource().getPath());

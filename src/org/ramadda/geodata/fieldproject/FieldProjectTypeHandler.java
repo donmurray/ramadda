@@ -51,35 +51,4 @@ public class FieldProjectTypeHandler extends ExtensibleGroupTypeHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param parent _more_
-     * @param newEntry _more_
-     *
-     * @throws Exception On badness
-     */
-    @Override
-    public void initializeEntryFromForm(Request request, Entry entry,
-                                        Entry parent, boolean newEntry)
-            throws Exception {
-        super.initializeEntryFromForm(request, entry, parent, newEntry);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param entry _more_
-     *
-     * @throws Exception On badness
-     */
-    @Override
-    public void initializeNewEntry(Entry entry) throws Exception {
-        super.initializeNewEntry(entry);
-    }
-
-
 }

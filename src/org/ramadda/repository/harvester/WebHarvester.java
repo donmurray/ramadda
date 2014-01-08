@@ -656,7 +656,7 @@ public class WebHarvester extends Harvester {
             }
 
         }
-        getTypeHandler().initializeNewEntry(entry);
+        getTypeHandler().initializeEntryFromHarvester(entry);
 
         return entry;
 

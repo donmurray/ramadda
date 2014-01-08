@@ -166,7 +166,7 @@ public class TestGenerator extends Harvester {
                                     createDate.getTime(),
                                     createDate.getTime(), null);
                     entries.add(entry);
-                    getTypeHandler().initializeNewEntry(entry);
+                    getTypeHandler().initializeEntryFromHarvester(entry);
                     cnt++;
                     if ( !canContinueRunning(timestamp)) {
                         return;
