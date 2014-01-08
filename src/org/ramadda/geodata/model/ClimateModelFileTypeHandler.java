@@ -78,12 +78,11 @@ public class ClimateModelFileTypeHandler extends GranuleTypeHandler {
      * @throws Exception  problems during initialization
      */
     @Override
-    public void initializeEntry(Entry entry) throws Exception {
-        super.initializeEntry(entry);
+    public void initializeNewEntry(Entry entry) throws Exception {
+        super.initializeNewEntry(entry);
         Object[] values = getEntryValues(entry);
         if ((values[1] != null) && !values[1].toString().isEmpty()) {
             //System.err.println("already have  values set");
-
             return;
         }
         //System.err.println("no values set");
@@ -93,7 +92,6 @@ public class ClimateModelFileTypeHandler extends GranuleTypeHandler {
         Matcher m = pattern.matcher(filename);
         if ( !m.find()) {
             System.err.println("no match");
-
             return;
         }
         String var        = m.group(1);
