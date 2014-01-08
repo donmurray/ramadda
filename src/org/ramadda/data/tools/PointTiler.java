@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -398,32 +398,26 @@ public class PointTiler extends RecordTool {
      *
      * @param args cmd line args
      *
+     * @param argArray _more_
+     *
      * @throws Exception On badness
      */
-    private void parseArgs(String[] args) throws Exception {
-        List<String> argList = processArgs(args);
+    private void parseArgs(String[] argArray) throws Exception {
+        List<String> argList = processArgs(argArray);
+        System.err.println("ARGS:" + argList);
         for (int i = 0; i < argList.size(); i++) {
             String arg = argList.get(i);
             if (arg.equals("-help")) {
                 usage("");
             }
-            if (arg.equals("-class")) {
-                if (i == args.length - 1) {
-                    usage("Need " + arg + " argument");
-                }
-                setRecordFileClass(args[++i]);
-
-                continue;
-            }
-
             if (arg.equals("-bounds")) {
-                if (i + 4 >= args.length) {
+                if (i + 4 >= argList.size()) {
                     usage("Need " + arg + " argument");
                 }
-                north = Double.parseDouble(args[++i]);
-                west  = Double.parseDouble(args[++i]);
-                south = Double.parseDouble(args[++i]);
-                east  = Double.parseDouble(args[++i]);
+                north = Double.parseDouble(argList.get(++i));
+                west  = Double.parseDouble(argList.get(++i));
+                south = Double.parseDouble(argList.get(++i));
+                east  = Double.parseDouble(argList.get(++i));
 
                 continue;
             } else if (arg.equals("-calcbounds")) {
@@ -431,45 +425,45 @@ public class PointTiler extends RecordTool {
 
                 continue;
             } else if (arg.equals("-skip")) {
-                if (i + 1 >= args.length) {
+                if (i + 1 >= argList.size()) {
                     usage("Need " + arg + " argument");
                 }
-                skip = Integer.parseInt(args[++i]);
+                skip = Integer.parseInt(argList.get(++i));
             } else if (arg.equals("-width")) {
-                if (i + 1 >= args.length) {
+                if (i + 1 >= argList.size()) {
                     usage("Need " + arg + " argument");
                 }
-                width = Integer.parseInt(args[++i]);
+                width = Integer.parseInt(argList.get(++i));
             } else if (arg.equals("-size")) {
-                if (i + 1 >= args.length) {
+                if (i + 1 >= argList.size()) {
                     usage("Need " + arg + " argument");
                 }
-                size = Integer.parseInt(args[++i]);
+                size = Integer.parseInt(argList.get(++i));
             } else if (arg.equals("-height")) {
-                if (i + 1 >= args.length) {
+                if (i + 1 >= argList.size()) {
                     usage("Need " + arg + " argument");
                 }
-                height = Integer.parseInt(args[++i]);
+                height = Integer.parseInt(argList.get(++i));
             } else if (arg.startsWith("-dest")) {
-                if (i + 1 >= args.length) {
+                if (i + 1 >= argList.size()) {
                     usage("Need " + arg + " argument");
                 }
-                destinationDir = args[++i];
+                destinationDir = argList.get(++i);
                 if ( !new File(destinationDir).exists()) {
                     usage("Destination directory does not exist:"
                           + destinationDir);
                 }
 
             } else if (arg.startsWith("-suffix")) {
-                if (i + 1 >= args.length) {
+                if (i + 1 >= argList.size()) {
                     usage("Need " + arg + " argument");
                 }
-                suffix = args[++i];
+                suffix = argList.get(++i);
             } else if (arg.startsWith("-prefix")) {
-                if (i + 1 >= args.length) {
+                if (i + 1 >= argList.size()) {
                     usage("Need " + arg + " argument");
                 }
-                prefix = args[++i];
+                prefix = argList.get(++i);
             } else if (arg.startsWith("-")) {
                 usage("Unknown argument:" + arg);
             } else {
