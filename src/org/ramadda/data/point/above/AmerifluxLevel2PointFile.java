@@ -156,7 +156,7 @@ public class AmerifluxLevel2PointFile extends CsvFile {
             String label = Misc.getProperty(props, id + ".label",
                                             StringUtil.camelCase(field));
 
-            if (Misc.getProperty(props, id + ".chartable", false)) {
+            if (Misc.getProperty(props, id + ".chartable", true)) {
                 attrs.append(attrChartable());
             }
             if (Misc.getProperty(props, id + ".searchable", false)) {
