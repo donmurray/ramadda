@@ -622,15 +622,16 @@ public class AccessManager extends RepositoryManager {
         if (entry.getIsRemoteEntry()) {
             return entry;
         }
-
         if (entry.getResource() != null) {
+            System.err.println ("filterEntry:" + entry.getName());
             if(entry.getResource().isServerSideFile()) {
-                //               System.err.println ("filterEntry:isServerSideFile");
+                System.err.println ("filterEntry:isServerSideFile");
                 if ( !entry.getResource().getTheFile().exists()) {
-                    //                    System.err.println ("filterEntry:file not exists");
+                    System.err.println ("filterEntry:file not exists");
                     entry = getEntryManager().handleMissingFileEntry(request,
                                                                      entry);
                     if (entry == null) {
+                        System.err.println ("filterEntry: missing entry got deleted");
                         return null;
                     }
                 }
