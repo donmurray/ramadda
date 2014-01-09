@@ -1383,7 +1383,7 @@ public class CdmDataOutputHandler extends OutputHandler {
         String fileName = IOUtil.stripExtension(entry.getName())
                           + "_subset.nc";
 
-        sb.append(HtmlUtils.form(formUrl + "/" + fileName));
+        sb.append(HtmlUtils.formPost(formUrl + "/" + fileName));
         sb.append(HtmlUtils.br());
 
         sb.append(HtmlUtils.submit("Subset Grid", ARG_SUBMIT));
