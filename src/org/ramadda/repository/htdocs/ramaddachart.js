@@ -24,7 +24,7 @@ function RamaddaLineChart(id, pointDataArg, properties) {
     this.id = id;
     this.properties = properties;
     init_RamaddaLineChart(this);
-    this.createHtml();
+    //    this.createHtml();
     var testUrl = null;
     //Uncomment to test using test.json
     //testUrl = "/repository/test.json";
@@ -40,7 +40,23 @@ function RamaddaLineChart(id, pointDataArg, properties) {
 function init_RamaddaLineChart(theChart) {
     theChart.dataCollection = new DataCollection();
     init_RamaddaChart(theChart);
-    theChart.createHtml = function() {
+    theChart.initDisplay = function() {
+        var theChart = this;
+        var reloadId = this.getId() +"_reload";
+        $("#" + reloadId).button().click(function(event) {
+                event.preventDefault();
+                theChart.reload();
+            });
+        var mapProps = {"foo":"bar"};
+        this.map = new RepositoryMap("mapdiv", mapProps);
+        this.map.initMap(false);
+        this.map.addClickHandler( this.lonFieldId, this.latFieldId);
+        this.addFieldsLegend();
+        this.displayData();
+    }
+
+
+    theChart.getDisplay = function() {
         var mapEnabled = this.getProperty("mapenabled",null);
         var theChart = this;
         var html = "";
@@ -51,6 +67,8 @@ function init_RamaddaLineChart(theChart) {
         if (mapEnabled) {
             html+= "<form><input type=submit value=\"Reload\" id=\"" + reloadId +"\"> <input id=\"" + this.latFieldId +"\"> <input id=\"" +  this.lonFieldId+"\"></form><div id=\"mapdiv\" style=\"border:1px #888888 solid; background-color:#7391ad; width: 400px; height:200px;\"></div>";
         }
+        var menuButton =  "<a class=chart-menu-button id=\"" + theChart.getId() +"_menu_button\"></a>";
+
         html += "<table width=100% border=0>";
         html += "<tr valign=top>";
         if(this.getProperty("fields",null)==null) {
@@ -61,21 +79,12 @@ function init_RamaddaLineChart(theChart) {
         html += "<td>";
         html += this.getChartDiv();
         html += "</td></tr></table>";
-        this.setHtml(html);
-
-        $("#" + reloadId).button().click(function(event) {
-                event.preventDefault();
-                theChart.reload();
-            });
-        var mapProps = {"foo":"bar"};
-        this.map = new RepositoryMap("mapdiv", mapProps);
-        this.map.initMap(false);
-        this.map.addClickHandler( this.lonFieldId, this.latFieldId);
+        return html;
     }
 
     theChart.addFieldsLegend = function() {
         if(!this.hasData()) {
-            $("#" + this.fieldsDivId).html("No fields selected");
+            $("#" + this.fieldsDivId).html("No data");
             return;
         }
         if(this.getProperty("fields",null)!=null) {
@@ -250,8 +259,8 @@ function init_RamaddaChart(theChart) {
 
     theChart.pointDataLoaded = function(pointData) {
         this.addData(pointData);
-        this.addFieldsLegend();
         this.displayData();
+        this.addFieldsLegend();
     }
 
 
@@ -268,8 +277,6 @@ function init_RamaddaChart(theChart) {
     theChart.addOrLoadData = function(pointData) {
         if(pointData.hasData()) {
             this.addData(pointData);
-            this.addFieldsLegend();
-            this.displayData();
         } else {
             var jsonUrl = pointData.getUrl();
             var hasGeoMacro = jsonUrl.match(/(\${latitude})/g);

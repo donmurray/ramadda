@@ -1126,7 +1126,7 @@ function checkToHidePopup() {
     }
 }
 
-function showPopup(event, srcId, popupId, alignLeft) {
+function showPopup(event, srcId, popupId, alignLeft, myalign, atalign) {
     if(popupSrcId == srcId) {
         if(checkToHidePopup()) {
             hidePopupObject();
@@ -1142,8 +1142,10 @@ function showPopup(event, srcId, popupId, alignLeft) {
     popupObject = popup;
     popupSrcId = srcId;
 
-    var myalign = 'left top';
-    var atalign = 'left top';
+    if(!myalign)
+        myalign = 'left top';
+    if(!atalign)
+        atalign = 'left top';
     if(alignLeft) {
         myalign = 'right top';
         atalign =  'left top';

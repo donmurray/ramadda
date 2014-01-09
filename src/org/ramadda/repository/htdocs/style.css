@@ -117,6 +117,72 @@ input, password, fileinput,textarea,select {
 
 
 
+
+.sf-menu   {
+ margin:0px;
+       padding:0px;
+}
+
+.sf-menu  li {
+    background: #eee;
+    padding:0px;
+    margin:0px;
+}
+
+.sf-menu ul li {
+   background: #eee;
+   padding:0px;
+}
+
+
+.sf-menu  ul ul li {
+  background: #eee;
+  padding:0px;
+}
+
+.sf-menu a {
+   color: #000;
+}
+
+
+.chart-container {
+   margin:10px;
+}
+
+
+.chart-menu-button {
+    min-height :16px;
+}
+
+.chart-menu {
+  position: absolute;
+  width: auto;
+  height: auto;
+  display: none;
+  background-color: white;
+  z-index: 1;
+  box-shadow: 0px 5px 5px #999;
+  -moz-box-shadow: 0px 5px 5px #999;
+  -webkit-box-shadow: 0px 5px 5px #999;
+}
+
+
+.chart-submenu
+{
+  padding: 5px;
+}
+
+.chart-submenu li
+{
+  list-style: none;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.chart-submenu li:hover
+{
+  background-color: #fcf7bd;
+}
 .chart-header {
    margin-left:10px;
    margin-top:10px;

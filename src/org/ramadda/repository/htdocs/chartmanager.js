@@ -1,4 +1,16 @@
 
+var globalChartManagers = {'foo':'bar'};
+
+function addChartManager(chartManager) {
+    globalChartManagers[chartManager.getId()] = chartManager;
+}
+
+
+function getChartManager(id) {
+    return globalChartManagers[id];
+}
+
+
 function ChartManager(id,properties) {
     var theChart = this;
     this.id = id;
@@ -6,23 +18,33 @@ function ChartManager(id,properties) {
     this.charts = [];
     this.data = [];
     this.cnt = 0;
+    this.layout="table";
+    this.columns=2;
     init_ChartManager(this);
-    var html = "";
-    if(this.getProperty("shownew",true)) {
-        html += "<span id=\"" + this.id + "_new\">New Chart</span>";
-        html+="<br>";
-    }
+    addChartManager(this);
+    var get = "getChartManager('" + id +"')";
+    var html = "<div class=\"chart-container\">";
+    var new1= "<a onclick=\"" + get +".newTimeseries()\">Timeseries</a>";
+    var new2= "<a onclick=\"" + get +".newBarchart()\">Barchart</a>";
+    var layout = "<li><a onclick=\"" + get +".setLayout('table',1)\">Table - 1 column</a></li><li><a onclick=\"" + get +".setLayout('table',2)\">Table - 2 column</a></li><li><a onclick=\"" + get +".setLayout('tabs')\">Tabs</a></li>"
+    var menu = "<div class=ramadda-popup id=" + this.id+"_menu_popup><ul id=sample-menu class=sf-menu><li><a>New</a><ul><li>" + new1 +"</li><li>" + new2 +"</li></ul></li><li><a>Layout</a><ul>" + layout +"</ul></li></ul></div>";
 
-    for(var i=0;i<10;i++)  {
-        var chartId = this.id +"_chart_" + i;
-        html+= "<div id=\"" + chartId +"\"/>";
-    }
+    html+= menu;
+    html += "<a class=chart-menu-button id=\"" + this.id +"_menu_button\"></a><br>";
+
+    html+= "<div id=\"" + this.id +"_charts\"></div>";
     $("#"+ this.getId()).html(html);
-    $("#" + this.id +"_new").button().click(function(event) {
-            theChart.doNew();
+
+
+    $("#"+this.id +"_menu_button").button({ icons: { primary: "ui-icon-gear", secondary: "ui-icon-triangle-1-s"}}).click(function(event) {
+            var id =theChart.getId()+"_menu_popup"; 
+            showPopup(event, theChart.id +"_menu_button", id, false,null,"left bottom");
+            $("#sample-menu").superfish({
+                    animation: {height:'show'},
+                        delay: 1200
+                        });
         });
 }
-
 
 
 function init_ChartManager(chartManager) {
@@ -37,18 +59,67 @@ function init_ChartManager(chartManager) {
         return value;
     }
 
-    chartManager.doNew = function() {
-        this.addPointData(this.data[0]);
+    chartManager.doLayout = function() {
+        var html = "";
+        var colCnt=0;
+        html+="<table width=100%><tr valign=top>"
+        for(var i=0;i<this.charts.length;i++) {
+            colCnt++;
+            if(colCnt>this.columns) {
+                html+= "</tr><tr valign=top>"
+            }
+            html+="<td><div>";
+            html+=this.charts[i].getDisplay();
+            html+="</div></td>"
+        }
+        html+= "</tr></table>";
+
+        $("#" + this.getId() +"_charts").html(html);
+        for(var i=0;i<this.charts.length;i++) {
+            this.charts[i].initDisplay();
+        }
     }
 
-    chartManager.addPointData = function(pointData) {
+
+    chartManager.setLayout = function(layout, columns) {
+        this.layout  = layout;
+        if(columns) {
+            this.columns  = columns;
+        }
+        this.doLayout();
+    }
+
+    chartManager.newTimeseries= function(data) {
+        if(data == null) {
+            data = this.data[0];
+        }
+        this.addPointData(data);
+    }
+
+    chartManager.newBarchart = function(data) {
+        if(data == null) {
+            data = this.data[0];
+        }
+        this.addPointData(data,'barchart');
+    }
+
+
+    chartManager.addPointData = function(pointData, type) {
         var chartId = this.id +"_chart_" + (this.cnt++);
         var props = pointData.getProperties();
+        var newProps = {};
+        for (var i in props) {
+            newProps[i] = props[i];
+        }
+
+        props = newProps;
         //        props.width = 400;
-        //        props.height = 200;
+        props.height = 200;
+        props["chart.type"] = type;
         var chart  = new RamaddaLineChart(chartId, pointData, props);
         this.data.push(pointData);
         this.charts.push(chart);
+        this.doLayout();
     }
 
     chartManager.addLineChart = function(pointDataArg, properties) {
