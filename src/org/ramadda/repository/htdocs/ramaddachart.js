@@ -44,6 +44,7 @@ function RamaddaLineChart(id, pointDataArg, properties) {
     //testUrl = "/repository/test.json";
     //    testUrl = "http://localhost:8080/repository/entry/show/gfs80_point?output=data.gridaspoint&entryid=633bc909-079f-429a-b873-5744a3b04770&location.latitude=34.6&location.longitude=-101.1&calendar=gregorian&fromdate=&todate=&format=json&level=-1&variable.Temperature=true"
 
+    this.title = pointDataArg.getName();
     if(testUrl!=null) {
         pointDataArg = new PointData("Test",null,null,testUrl);
     }
@@ -91,23 +92,26 @@ function init_RamaddaLineChart(theChart) {
     theChart.getDisplay = function() {
         var mapEnabled = this.getProperty("mapenabled",null);
         var theChart = this;
-        var html = "";
         this.latFieldId = this.getId() +"_latfield";
         this.lonFieldId = this.getId() +"_lonfield";
         var reloadId = this.getId() +"_reload";
-        html += this.getHeaderDiv();
-        if (mapEnabled) {
-            html+= "<form><input type=submit value=\"Reload\" id=\"" + reloadId +"\"> <input id=\"" + this.latFieldId +"\"> <input id=\"" +  this.lonFieldId+"\"></form><div id=\"mapdiv\" style=\"border:1px #888888 solid; background-color:#7391ad; width: 400px; height:200px;\"></div>";
-        }
 
+        var html = "";
+        html +=   "<div id=\"" + this.chartHeaderId +"\" class=chart-header></div>";
         var get = "getChart('" + this.id +"')";
-        var deleteMe = "<a onclick=\"removeChart('" + this.id +"')\">Remove</a>";
+        var deleteMe = "<a href=# onclick=\"removeChart('" + this.id +"')\"><img src=" + root +"/icons/close.gif></a>";
         var menuButton =  "<a class=chart-menu-button id=\"" + theChart.getId() +"_menu_button\"></a>";
-        var menu = "<div class=ramadda-popup id=" + this.id+"_menu_popup><ul id=" + this.id+"_menu_inner sample-menu class=sf-menu><li>" + deleteMe +"</li></ul>" + this.getFieldsDiv() +"</div>";
+        var menu = "<div class=ramadda-popup id=" + this.id+"_menu_popup>" + this.getFieldsDiv() +"</div>";
 
-        html+= menu;
-        html += this.getChartDiv();
+        html +="<table border=0 cellpadding=0 cellspacing=0><tr valign=bottom><td><b>" +  this.getTitle() +"</b></td><td align=right>";
         html += menuButton;
+        html += deleteMe;
+
+        html += "</td></tr>"
+        html += "<tr valign=top><td colspan=2>"
+        html += this.getChartDiv();
+        html += "</td></tr></table>"
+        html += menu;
         return html;
     }
 
@@ -210,9 +214,9 @@ function init_RamaddaLineChart(theChart) {
         var dataTable = google.visualization.arrayToDataTable(dataList);
         var options = {
             series: [{targetAxisIndex:0},{targetAxisIndex:1},],
-            title: this.getTitle(),
-           legend: { position: 'bottom' },
-           chartArea:{left:30,top:30,height:"75%"}
+            //            title: this.getTitle(),
+            legend: { position: 'bottom' },
+            chartArea:{left:0,top:0,height:"75%",width:"100%"}
         };
 
         var min = this.getProperty("chart.min","");
@@ -270,6 +274,7 @@ function init_RamaddaChart(theChart) {
     }
 
     theChart.getTitle = function () {
+        if(this.title!=null) return this.title;
         var title = "";
         var dataList =  this.dataCollection.getData();
         for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
@@ -354,9 +359,9 @@ function init_RamaddaChart(theChart) {
         }
     }
 
-    theChart.getHeaderDiv = function() {
-        return   "<div id=\"" + this.chartHeaderId +"\" class=chart-header></div>";
-    }
+
+
+
     theChart.getFieldsDiv = function() {
         var height = this.getProperty("height","400");
         var style = " style=\"  overflow-y: auto;    max-height:" + height +"px;\" ";
@@ -364,7 +369,7 @@ function init_RamaddaChart(theChart) {
         return   div;
     }
     theChart.getChartDiv = function() {
-        return   "<div id=\"" + this.chartDivId +"\" style=\"width: " + this.getProperty("width","400px") +"; height: " + this.getProperty("height","400px") +";\"></div>\n";
+        return   "<div id=\"" + this.chartDivId +"\" style=\"border:0px red solid; width: " + this.getProperty("width","400px") +"; height: " + this.getProperty("height","400px") +";\"></div>\n";
     }
 
 

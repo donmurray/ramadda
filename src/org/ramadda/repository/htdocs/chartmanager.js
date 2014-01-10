@@ -98,14 +98,16 @@ function init_ChartManager(chartManager) {
         if(data == null) {
             data = this.data[0];
         }
-        this.addPointData(data);
+        var chartManager = this;
+        setTimeout(function(){chartManager.addPointData(data);},1);
     }
 
     chartManager.newBarchart = function(data) {
         if(data == null) {
             data = this.data[0];
         }
-        this.addPointData(data,'barchart');
+        var chartManager = this;
+        setTimeout(function(){chartManager.addPointData(data,'barchart');},1);
     }
 
 
@@ -132,7 +134,8 @@ function init_ChartManager(chartManager) {
         if(index >= 0) { 
             this.charts.splice(index, 1);
         }   
-        this.doLayout();
+        var chartmanager = this;
+        setTimeout(function(){chartManager.doLayout();},1);
     }
 
 

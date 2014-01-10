@@ -4208,7 +4208,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         }
 
         props.add("width");
-        props.add(Json.quote(request.getString(ARG_WIDTH, "800")));
+        props.add(Json.quote(request.getString(ARG_WIDTH, "600")));
         props.add("height");
         props.add(Json.quote(request.getString(ARG_HEIGHT, "400")));
         String fields = request.getString("fields", null);
