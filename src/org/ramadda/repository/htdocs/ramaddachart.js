@@ -15,6 +15,19 @@ var chart = new  RamaddaChart("example" , pointData);
 
 
 
+var globalCharts = {'foo':'bar'};
+
+function addChart(chart) {
+    globalCharts[chart.id] = chart;
+}
+
+
+function getChart(id) {
+    return globalCharts[id];
+}
+
+
+
 /*
 Create a chart
 id - the id of this chart. Has to correspond to a div tag id 
@@ -24,6 +37,7 @@ function RamaddaLineChart(id, pointDataArg, properties) {
     this.id = id;
     this.properties = properties;
     init_RamaddaLineChart(this);
+    addChart(this);
     //    this.createHtml();
     var testUrl = null;
     //Uncomment to test using test.json
@@ -37,6 +51,14 @@ function RamaddaLineChart(id, pointDataArg, properties) {
 }
 
 
+function removeChart(id) {
+    var chart =getChart(id);
+    if(chart) {
+        chart.removeChart();
+    }
+}
+
+
 function init_RamaddaLineChart(theChart) {
     theChart.dataCollection = new DataCollection();
     init_RamaddaChart(theChart);
@@ -47,6 +69,16 @@ function init_RamaddaLineChart(theChart) {
                 event.preventDefault();
                 theChart.reload();
             });
+
+        $("#"+this.id +"_menu_button").button({ icons: { primary:  "ui-icon-triangle-1-s"}}).click(function(event) {
+                var id =theChart.getId()+"_menu_popup"; 
+                showPopup(event, theChart.id +"_menu_button", id, false,null,"left bottom");
+                $("#"+  this.id+"_menu_inner").superfish({
+                        animation: {height:'show'},
+                            delay: 1200
+                            });
+            });
+
         var mapProps = {"foo":"bar"};
         this.map = new RepositoryMap("mapdiv", mapProps);
         this.map.initMap(false);
@@ -67,18 +99,15 @@ function init_RamaddaLineChart(theChart) {
         if (mapEnabled) {
             html+= "<form><input type=submit value=\"Reload\" id=\"" + reloadId +"\"> <input id=\"" + this.latFieldId +"\"> <input id=\"" +  this.lonFieldId+"\"></form><div id=\"mapdiv\" style=\"border:1px #888888 solid; background-color:#7391ad; width: 400px; height:200px;\"></div>";
         }
-        var menuButton =  "<a class=chart-menu-button id=\"" + theChart.getId() +"_menu_button\"></a>";
 
-        html += "<table width=100% border=0>";
-        html += "<tr valign=top>";
-        if(this.getProperty("fields",null)==null) {
-            html += "<td width=200>";
-            html += this.getFieldsDiv();
-            html += "</td>";
-        }
-        html += "<td>";
+        var get = "getChart('" + this.id +"')";
+        var deleteMe = "<a onclick=\"removeChart('" + this.id +"')\">Remove</a>";
+        var menuButton =  "<a class=chart-menu-button id=\"" + theChart.getId() +"_menu_button\"></a>";
+        var menu = "<div class=ramadda-popup id=" + this.id+"_menu_popup><ul id=" + this.id+"_menu_inner sample-menu class=sf-menu><li>" + deleteMe +"</li></ul>" + this.getFieldsDiv() +"</div>";
+
+        html+= menu;
         html += this.getChartDiv();
-        html += "</td></tr></table>";
+        html += menuButton;
         return html;
     }
 
@@ -182,7 +211,8 @@ function init_RamaddaLineChart(theChart) {
         var options = {
             series: [{targetAxisIndex:0},{targetAxisIndex:1},],
             title: this.getTitle(),
-            chartArea:{left:30,top:30,height:"75%"}
+           legend: { position: 'bottom' },
+           chartArea:{left:30,top:30,height:"75%"}
         };
 
         var min = this.getProperty("chart.min","");
@@ -217,6 +247,18 @@ function init_RamaddaChart(theChart) {
     theChart.chartHeaderId =theChart.id +"_header";
     theChart.fieldsDivId =theChart.id +"_fields";
     theChart.chartDivId =theChart.id +"_chart";
+
+
+    theChart.chartManager = null;
+    
+    theChart.setChartManager = function(cm) {
+        this.chartManager = cm;
+
+    }
+
+    theChart.removeChart = function() {
+        this.chartManager.removeChart(this);
+    }
 
 
     theChart.setHtml = function(html) {
