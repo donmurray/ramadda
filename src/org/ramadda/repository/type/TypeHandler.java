@@ -2274,7 +2274,7 @@ public class TypeHandler extends RepositoryManager {
             Resource resource      = entry.getResource();
             String   resourceLink  = resource.getPath();
 
-            String   resourceLabel = msgLabel("Resource");
+            String   resourceLabel = msgLabel("Resource (" + resource.getType() +")");
             if (resourceLink.length() > 0) {
                 if (entry.getResource().isUrl()) {
                     resourceLink = getResourcePath(request, entry);
