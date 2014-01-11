@@ -1490,8 +1490,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
             myRequest.put("chart.type",
                           Misc.getProperty(props, "chart.type", "linechart"));
-            String min =Misc.getProperty(props, "chart.min", (String) null);
-            if(min!=null) {
+            String min = Misc.getProperty(props, "chart.min", (String) null);
+            if (min != null) {
                 myRequest.put("chart.min", min);
             }
             myRequest.put("chart.filter",
@@ -4223,8 +4223,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         StringBuffer js = new StringBuffer();
         System.err.println("JSON URL:" + url);
 
-
-        js.append("var chartManager = new  ChartManager("
+        js.append("var chartManager = getOrCreateChartManager("
                   + HtmlUtils.quote(chartDivId) + ");\n");
 
         js.append("var pointData = new  PointData(" + HtmlUtils.quote(name)

@@ -64,4 +64,67 @@ function init_Entry (theEntry) {
 
 }
 
+function EntryList(jsonUrl, listener) {
+    var entryList = this;
+
+    entryList.haveLoaded = false;
+    entryList.divId = null;
+    entryList.entries =[];
+    entryList.listener = listener;
+
+    entryList.getEntries = function() {
+        return this.entries;
+    }
+
+    entryList.setHtml = function(html) {
+        if(this.divId == null) return;
+        $("#" + this.divId).html(html);
+    }
+
+    entryList.initDisplay = function(divId) {
+        var html;
+        this.divId = divId;
+        if(this.entries.length==0)  {
+            if(entryList.haveLoaded) {
+                html = "No entries";
+            } else {
+                html = "Loading...";
+            }
+        } else {
+            html = getHtml();
+        }
+        this.setHtml(html);
+    }
+
+    entryList.getHtml = function() {
+        var html = "";
+        for(var i=0;i<this.entries.length;i++) {
+            var entry = this.entries[i];
+            html += "<div class=entry-list-entry>";
+            html+= entry.getName();
+            html += "</div>";
+        }
+        return html;
+    }
+
+    entryList.createEntries = function(data) {
+        this.entries =         createEntriesFromJson(data);
+        if(this.listener) {
+            this.listener.entryListChanged(this);
+        }
+    }
+
+
+    var jqxhr = $.getJSON( jsonUrl, function(data) {
+            entryList.haveLoaded = true;
+            entryList.createEntries(data);
+        })
+        .fail(function(jqxhr, textStatus, error) {
+                var err = textStatus + ", " + error;
+                alert("JSON error:" + err);
+                console.log("JSON error:" +err);
+            });
+}
+
+
 

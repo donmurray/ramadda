@@ -80,10 +80,6 @@ function init_RamaddaLineChart(theChart) {
                             });
             });
 
-        var mapProps = {"foo":"bar"};
-        this.map = new RepositoryMap("mapdiv", mapProps);
-        this.map.initMap(false);
-        this.map.addClickHandler( this.lonFieldId, this.latFieldId);
         this.addFieldsLegend();
         this.displayData();
     }
@@ -216,7 +212,7 @@ function init_RamaddaLineChart(theChart) {
             series: [{targetAxisIndex:0},{targetAxisIndex:1},],
             //            title: this.getTitle(),
             legend: { position: 'bottom' },
-            chartArea:{left:0,top:0,height:"75%",width:"100%"}
+            chartArea:{left:0,top:0,height:"75%",width:"85%"}
         };
 
         var min = this.getProperty("chart.min","");
@@ -326,33 +322,7 @@ function init_RamaddaChart(theChart) {
             this.addData(pointData);
         } else {
             var jsonUrl = pointData.getUrl();
-            var hasGeoMacro = jsonUrl.match(/(\${latitude})/g);
-            var fromDate  = this.getProperty("fromdate");
-            if(fromDate!=null) {
-                jsonUrl += "&fromdate=" + fromDate;
-            }
-            var toDate  = this.getProperty("todate");
-            if(toDate!=null) {
-                jsonUrl += "&todate=" + toDate;
-            }
-            if(hasGeoMacro !=null) {
-                var lat = "40.0";
-                var lon = "-107";
-                if(this.map!=null && this.latFieldId!=null) {
-                    lat = $("#" + this.latFieldId).val();
-                    lon = $("#" + this.lonFieldId).val();
-                }
-                if(lat!=null && lat.length>0) {
-                    jsonUrl = jsonUrl.replace("${latitude}",lat);
-                } else {
-                    jsonUrl = jsonUrl.replace("${latitude}","40.0");
-                }
-                if(lon!=null && lon.length>0) {
-                    jsonUrl = jsonUrl.replace("${longitude}",lon);
-                } else {
-                    jsonUrl = jsonUrl.replace("${longitude}","-107.0");
-                }
-            }
+
             if(jsonUrl!=null) {
                 loadPointJson(jsonUrl, this, pointData);
             }

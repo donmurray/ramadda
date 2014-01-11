@@ -195,6 +195,28 @@ input, password, fileinput,textarea,select {
 }
 
 
+.chart-entry-list-wrapper { 
+
+}
+
+.entry-list-entry {
+   border-bottom: 1px #ccc solid;
+}
+
+.chart-entry-list-wrapper {
+   max-width: 200px;
+   background: red;
+}
+
+.chart-entry-list {
+   padding: 5px;
+   overflow-x: auto;
+   overflow-y: auto;
+   max-height: 600px;
+   border: 1px #000 solid;
+}
+
+
 .search-list {
 }
 

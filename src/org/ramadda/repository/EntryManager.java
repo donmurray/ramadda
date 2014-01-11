@@ -6494,7 +6494,6 @@ public class EntryManager extends RepositoryManager {
         }
 
         if(isNew) {
-            System.err.println ("Calling initializeNewEntry");
             for (Entry theNewEntry : entries) {
                 theNewEntry.getTypeHandler().initializeNewEntry(theNewEntry);
             }
@@ -8618,7 +8617,7 @@ public class EntryManager extends RepositoryManager {
             throws Exception {
 
         //If its not a FILE then don't do anything
-        if ( !entry.getResource().isServerSideFile()) {
+        if(!entry.getResource().isFileType()) {
             return entry;
         }
 
