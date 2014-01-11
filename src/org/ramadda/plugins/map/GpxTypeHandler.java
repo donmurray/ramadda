@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -88,17 +88,14 @@ public class GpxTypeHandler extends GenericTypeHandler {
     /**
      * _more_
      *
-     * @param request _more_
      * @param entry _more_
-     * @param parent _more_
-     * @param newEntry _more_
      *
      * @throws Exception _more_
      */
     @Override
-    public void initializeEntryFromForm(Request request, Entry entry,
-                                        Entry parent, boolean newEntry)
-            throws Exception {
+    public void initializeNewEntry(Entry entry) throws Exception {
+
+        super.initializeNewEntry(entry);
 
         Element root     = readXml(entry);
         Element metadata = XmlUtil.findChild(root, GpxUtil.TAG_METADATA);
@@ -113,7 +110,6 @@ public class GpxTypeHandler extends GenericTypeHandler {
         }
         boolean hasBounds = false;
         if (bounds != null) {
-            System.err.println("bounds:" + bounds);
             hasBounds = true;
             entry.setNorth(XmlUtil.getAttribute(bounds, GpxUtil.ATTR_MAXLAT,
                     Entry.NONGEO));
@@ -125,11 +121,23 @@ public class GpxTypeHandler extends GenericTypeHandler {
                     Entry.NONGEO));
         }
 
-        entry.setName(XmlUtil.getGrandChildText(root, GpxUtil.TAG_NAME,
-                entry.getName()));
+        String name = XmlUtil.getGrandChildText(root, GpxUtil.TAG_NAME,
+                          (String) null);
+        if ((name == null) && (metadata != null)) {
+            name = XmlUtil.getGrandChildText(metadata, GpxUtil.TAG_NAME,
+                                             entry.getName());
+
+        }
+        entry.setName(name);
         if (entry.getDescription().length() == 0) {
-            entry.setDescription(XmlUtil.getGrandChildText(root,
-                    GpxUtil.TAG_DESC, ""));
+            String desc = XmlUtil.getGrandChildText(root, GpxUtil.TAG_DESC,
+                              (String) null);
+            if ((desc == null) && (metadata != null)) {
+                desc = XmlUtil.getGrandChildText(metadata, GpxUtil.TAG_DESC,
+                        "");
+
+            }
+            entry.setDescription(desc);
         }
 
         String keywords = XmlUtil.getGrandChildText(root,
@@ -302,6 +310,7 @@ public class GpxTypeHandler extends GenericTypeHandler {
 
 
 
+
     }
 
 
@@ -453,6 +462,7 @@ public class GpxTypeHandler extends GenericTypeHandler {
         try {
             Element root = readXml(entry);
             int     cnt  = 0;
+
             for (Element child :
                     ((List<Element>) XmlUtil.findChildren(root,
                         GpxUtil.TAG_WPT))) {

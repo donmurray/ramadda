@@ -20,7 +20,7 @@
      <property name="icon" value="/map/tracklog.gif"/>
 <wiki>
 <![CDATA[
-{{map width="800" height="450"}}
+{{map width="800" height="450" details="true"}}
 {{information}}
 ]]>
 </wiki>
