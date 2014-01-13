@@ -4167,6 +4167,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             throws Exception {
 
 
+        List<String> topProps = new ArrayList<String>();
         String chartDivId = HtmlUtils.getUniqueId("chartdiv");
         sb.append(HtmlUtils.comment("Chart div"));
         sb.append(HtmlUtils.div("", HtmlUtils.id(chartDivId)));
@@ -4223,8 +4224,11 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         StringBuffer js = new StringBuffer();
         System.err.println("JSON URL:" + url);
 
+        topProps.add("mapenabled");
+        topProps.add("true");
+
         js.append("var chartManager = getOrCreateChartManager("
-                  + HtmlUtils.quote(chartDivId) + ");\n");
+                  + HtmlUtils.quote(chartDivId) +"," + Json.map(topProps, false) + ");\n");
 
         js.append("var pointData = new  PointData(" + HtmlUtils.quote(name)
                   + ",  null,null," + HtmlUtils.quote(url) + ","

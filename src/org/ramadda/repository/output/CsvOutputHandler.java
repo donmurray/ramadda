@@ -143,7 +143,8 @@ public class CsvOutputHandler extends OutputHandler {
         String fieldsArg =
             request.getString(
                 ARG_FIELDS,
-                "name,id,type,entry_url,north,south,east,west,url,fields");
+//                "name,id,type,entry_url,north,south,east,west,url,fields");
+                "name,id,type,entry_url,latitude,longitude,south,east,west,url,fields");
         StringBuffer sb     = new StringBuffer();
         List<String> fields = StringUtil.split(fieldsArg, ",", true, true);
         for (Entry entry : entries) {
