@@ -696,7 +696,8 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
                                        ZipOutputHandler.OUTPUT_ZIPTREE,
                                        AtomOutputHandler.OUTPUT_ATOM,
                                        JsonOutputHandler.OUTPUT_JSON,
-                                       CsvOutputHandler.OUTPUT_CSV, }) {
+                                       CsvOutputHandler.OUTPUT_CSV, 
+                                       ZipOutputHandler.OUTPUT_EXPORT}) {
                 if (outputType.getIcon() != null) {
                     links.append(
                         HtmlUtils.img(iconUrl(outputType.getIcon())));

@@ -103,6 +103,10 @@ public class ZipOutputHandler extends OutputHandler {
         new OutputType("Zip and Download Files", "zip.zipgroup",
                        OutputType.TYPE_FILE, "", ICON_ZIP);
 
+    public static final OutputType OUTPUT_EXPORT =
+        new OutputType("Export Entries", "zip.export",
+                       OutputType.TYPE_FILE, "", ICON_ZIP);
+
 
     /**
      * _more_
@@ -117,6 +121,7 @@ public class ZipOutputHandler extends OutputHandler {
         addType(OUTPUT_ZIP);
         addType(OUTPUT_ZIPGROUP);
         addType(OUTPUT_ZIPTREE);
+        addType(OUTPUT_EXPORT);
     }
 
 
@@ -246,8 +251,12 @@ public class ZipOutputHandler extends OutputHandler {
             all.addAll(subGroups);
             all.addAll(entries);
             getLogManager().logInfo("Doing zip tree");
-
             return toZip(request, group.getName(), all, true, false);
+        } if (output.equals(OUTPUT_EXPORT)) {
+            List<Entry> all = new ArrayList<Entry>();
+            all.addAll(subGroups);
+            all.addAll(entries);
+            return toZip(request, group.getName(), all, true, true);
         } else {
             return toZip(request, group.getName(), entries, false, false);
         }
