@@ -222,6 +222,7 @@ public class CdmDataOutputHandler extends OutputHandler {
     /** chart format */
     private static final String FORMAT_TIMESERIES_CHART = "timeserieschart";
 
+
     /** chart format */
     private static final String FORMAT_TIMESERIES_CHART_DATA =
         "timeserieschartdata";
@@ -836,7 +837,8 @@ public class CdmDataOutputHandler extends OutputHandler {
             String baseName = IOUtil.stripExtension(entry.getName());
             if (format.equalsIgnoreCase(FORMAT_TIMESERIES_CHART)) {
                 StringBuffer html  = new StringBuffer();
-                String       title = entry.getName();
+                String       title = entry.getName() + " at "
+                                     + llp.toString();
                 request.put(ARG_FORMAT, FORMAT_JSON);
                 request.put(ARG_LOCATION_LATITUDE, "_LATITUDEMACRO_");
                 request.put(ARG_LOCATION_LONGITUDE, "_LONGITUDEMACRO_");
@@ -844,11 +846,11 @@ public class CdmDataOutputHandler extends OutputHandler {
                                  + suffix + "?" + request.getUrlArgs();
                 jsonUrl = jsonUrl.replace("_LATITUDEMACRO_", "${latitude}");
                 jsonUrl = jsonUrl.replace("_LONGITUDEMACRO_", "${longitude}");
-                List<String> props    = new ArrayList<String>();
+                List<String> props = new ArrayList<String>();
                 props.add("mapenabled");
                 props.add("true");
-                getWikiManager().getEntryChart(request, entry.getName(),
-                                               jsonUrl, html, props);
+                getWikiManager().getEntryChart(request, title, jsonUrl, html,
+                        props);
 
                 return new Result("Point As Grid Time Series", html);
             }
@@ -910,7 +912,8 @@ public class CdmDataOutputHandler extends OutputHandler {
                         bw.append(Json.mapOpen());
                         List<String> toks = StringUtil.split(line, ",", true,
                                                 true);
-                        //                        2009-11-10T00:00:00Z,34.6,-101.1,100.0,207.89999389648438
+                        //       date            lat   lon   alt     value(s)
+                        // 2009-11-10T00:00:00Z,34.6,-101.1,100.0,207.89999389648438
                         CalendarDate date =
                             CalendarDate.parseISOformat(toks.get(0),
                                 toks.get(0));
@@ -2486,82 +2489,6 @@ public class CdmDataOutputHandler extends OutputHandler {
      */
     public String getPath(Request request, Entry entry) throws Exception {
         return getCdmManager().getPath(request, entry);
-        /*
-        String location;
-        if (entry.getType().equals(OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
-            Resource resource = entry.getResource();
-            location = resource.getPath();
-            String ext = IOUtil.getFileExtension(location).toLowerCase();
-            if (ext.equals(".html") || ext.equals(".das")
-                    || ext.equals(".dds")) {
-                location = IOUtil.stripExtension(location);
-            }
-        } else if (getCdmManager().isAggregation(entry)) {
-            GridAggregationTypeHandler gridAggregation =
-                (GridAggregationTypeHandler) entry.getTypeHandler();
-            long[] timestamp = { 0 };
-            location = gridAggregation.getNcmlFile(request, entry,
-                    timestamp).toString();
-            // Something must be fixed to check if its empty
-        } else {
-            location = getStorageManager().getFastResourcePath(entry);
-        }
-        getStorageManager().checkPath(location);
-
-        List<Metadata> metadataList =
-            getMetadataManager().findMetadata(request, entry,
-                ContentMetadataHandler.TYPE_ATTACHMENT, true);
-        //        System.err.println("getPath");
-        if (metadataList == null) {
-            return location;
-        }
-        //        System.err.println("nd:" + metadataList);
-        for (Metadata metadata : metadataList) {
-            String  fileAttachment = metadata.getAttr1();
-            boolean isNcml         = fileAttachment.endsWith(SUFFIX_NCML);
-            boolean isCtl          = fileAttachment.endsWith(SUFFIX_CTL);
-            if (isNcml || isCtl) {
-                File templateNcmlFile =
-                    new File(
-                        IOUtil.joinDir(
-                            getRepository().getStorageManager().getEntryDir(
-                                metadata.getEntryId(),
-                                false), metadata.getAttr1()));
-                String ncml =
-                    getStorageManager().readSystemResource(templateNcmlFile);
-                if (isNcml) {
-                    ncml = ncml.replace("${location}", location);
-                } else {  // CTL
-                    int dsetIdx = ncml.indexOf("${location}");
-                    if (dsetIdx >= 0) {
-                        ncml = ncml.replace("${location}", location);
-                    } else {
-                        //ncml = ncml.replaceAll("(dset|DSET).*\n",
-                        //        "nDSET " + location + "\n");
-                        ncml = Pattern.compile(
-                            "^dset.*$",
-                            Pattern.MULTILINE
-                            | Pattern.CASE_INSENSITIVE).matcher(
-                                ncml).replaceAll("DSET " + location);
-                    }
-                }
-                //                System.err.println("ncml:" + ncml);
-                //Use the last modified time of the ncml file so we pick up any updated file
-                String dttm     = templateNcmlFile.lastModified() + "";
-                String fileName = dttm + "_" + entry.getId() + "_"
-                                  + metadata.getId() + (isNcml
-                        ? SUFFIX_NCML
-                        : SUFFIX_CTL);
-                File ncmlFile = getStorageManager().getScratchFile(fileName);
-                IOUtil.writeBytes(ncmlFile, ncml.getBytes());
-                location = ncmlFile.toString();
-
-                break;
-            }
-        }
-
-        return location;
-        */
     }
 
 
@@ -3009,13 +2936,23 @@ public class CdmDataOutputHandler extends OutputHandler {
 
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processJsonRequest(Request request) throws Exception {
-        String  prefix   = getRepository().getUrlBase() + "/grid/json";
-        Entry entry = getCdmManager().findEntryFromPath(request, prefix);
+        String prefix = getRepository().getUrlBase() + "/grid/json";
+        Entry  entry  = getCdmManager().findEntryFromPath(request, prefix);
 
         request.put(ARG_FORMAT, FORMAT_JSON);
-        request.put(ARG_OUTPUT,OUTPUT_GRIDASPOINT.getId());
-        return  outputGridAsPoint(request, entry);
+        request.put(ARG_OUTPUT, OUTPUT_GRIDASPOINT.getId());
+
+        return outputGridAsPoint(request, entry);
     }
 
 }
