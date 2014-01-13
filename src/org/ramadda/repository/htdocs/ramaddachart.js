@@ -212,7 +212,8 @@ function init_RamaddaLineChart(theChart) {
             series: [{targetAxisIndex:0},{targetAxisIndex:1},],
             //            title: this.getTitle(),
             legend: { position: 'bottom' },
-            chartArea:{left:0,top:0,height:"75%",width:"85%"}
+            //chartArea:{left:0,top:0,height:"75%",width:"85%"}
+            chartArea:{left:50,top:10,height:"75%",width:"85%"}
         };
 
         var min = this.getProperty("chart.min","");
