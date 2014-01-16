@@ -411,6 +411,11 @@ public class Json {
             return "null";
         }
 
+        if (d == Double.NEGATIVE_INFINITY || d == Double.POSITIVE_INFINITY) {
+            return "null";
+
+        }
+
         return "" + d;
     }
 

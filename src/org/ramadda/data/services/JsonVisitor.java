@@ -163,8 +163,10 @@ public class JsonVisitor extends BridgeRecordVisitor {
         } else {
             pw.append(Json.attr(Json.FIELD_DATE, Json.NULL, false));
         }
-        pw.append(COMMA);
 
+
+
+        pw.append(COMMA);
         pw.append(Json.mapKey(Json.FIELD_VALUES));
         pw.append(Json.listOpen());
         for (RecordField field : fields) {
@@ -178,16 +180,19 @@ public class JsonVisitor extends BridgeRecordVisitor {
             ValueGetter getter = field.getValueGetter();
             if (getter == null) {
                 if (field.isTypeString()) {
-                    svalue = HtmlUtils.quote(
-                        record.getStringValue(field.getParamId()));
+                    svalue = record.getStringValue(field.getParamId());
+                    svalue = svalue.replaceAll("\"","'");
+                    svalue = HtmlUtils.quote(svalue);
                 } else {
                     double value = record.getValue(field.getParamId());
                     svalue = Json.formatNumber(value);
                 }
             } else {
                 if (field.isTypeString()) {
-                    svalue = HtmlUtils.quote(getter.getStringValue(record,
-                            field, visitInfo));
+                    svalue = getter.getStringValue(record,
+                                                   field, visitInfo);
+                    svalue = svalue.replaceAll("\"","'");
+                    svalue = HtmlUtils.quote(svalue);
                 } else {
                     svalue = Json.formatNumber(getter.getValue(record, field,
                             visitInfo));
@@ -199,10 +204,10 @@ public class JsonVisitor extends BridgeRecordVisitor {
             pw.append(svalue);
             fieldCnt++;
         }
+
         pw.append(Json.listClose());
         pw.append(Json.mapClose());
         cnt++;
-
         return true;
     }
 

@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2010-2012 Jeff McWhirter, Don Murray & ramadda.org
  */
@@ -867,13 +868,12 @@ function RepositoryMap(mapId, params) {
         for (i in points) {
             points[i].transform(this.displayProjection, this.sourceProjection);
         }
-
         return this.addPolygon(id, points, attrs);
     }
 
     this.addLine = function(id, lat1, lon1, lat2, lon2, attrs) {
         var points = [ new OpenLayers.Geometry.Point(lon1, lat1),
-                new OpenLayers.Geometry.Point(lon2, lat2) ];
+                       new OpenLayers.Geometry.Point(lon2, lat2) ];
         for (i in points) {
             points[i].transform(this.displayProjection, this.sourceProjection);
         }
@@ -881,6 +881,9 @@ function RepositoryMap(mapId, params) {
     }
 
     this.addPolygon = function(id, points, attrs) {
+
+
+
         var base_style = OpenLayers.Util.extend( {},
                 OpenLayers.Feature.Vector.style['default']);
         var style = OpenLayers.Util.extend( {}, base_style);

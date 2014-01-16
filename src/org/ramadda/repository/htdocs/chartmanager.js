@@ -78,11 +78,20 @@ function ChartManager(id,properties) {
     html+= "<div id=\"" + this.id +"_charts\"></div>";
     html+="</td>";
 
+    html+="<td width=300>";
     if(this.mapEnabled) {
-        html+="<td width=300>";
+        html+= "<h3>Map</h3><form><input id=\"" + this.latFieldId +"\"> <input id=\"" +  this.lonFieldId+"\"></form>"
         html+="<div style=\"width:400px; height:400px;\" class=chart-map id=" + this.id+"_map></div>";
-        html+="</td>";
     }
+
+
+    html+= "<h3>Selection</h3>";
+    html+="<form>"
+
+    html+=" Put selection form here"
+    html+="</form>"
+    html+="</td>";
+
 
     html+="</table>";
 
@@ -94,6 +103,7 @@ function ChartManager(id,properties) {
         console.log("map id:" + this.id+"_map");
         this.map = new RepositoryMap(this.id+"_map", params);
         this.map.initMap(false);
+        this.map.addClickHandler( this.lonFieldId, this.latFieldId);
         //        this.map.addLine('0e9d5f64-823a-4bdf-813b-bb3f4d80f6e2_polygon', 59.772422500000005, -151.10694375000003, 59.7614675, -151.14459375);
     }
 
