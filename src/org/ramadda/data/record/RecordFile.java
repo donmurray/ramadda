@@ -1175,7 +1175,11 @@ public abstract class RecordFile {
                 break;
             }
             try {
-                record.readNextRecord(recordInput);
+                Record.ReadStatus status = record.readNextRecord(recordInput);
+                if (status != Record.ReadStatus.OK) {
+                    break;
+                }
+
                 record.index = index;
                 if ((filter == null)
                         || filter.isRecordOk(record, visitInfo)) {

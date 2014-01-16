@@ -248,7 +248,7 @@ public class TextRecord extends DataRecord {
                 currentLine = recordIO.readLine();
             }
             if (currentLine == null) {
-                return currentLine;
+                return null;
             }
             currentLine = currentLine.trim();
             if ( !lineOk(currentLine)) {
