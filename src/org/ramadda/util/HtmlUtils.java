@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -162,7 +162,7 @@ public class HtmlUtils {
     /** _more_ */
     public static final String TAG_DIV = "div";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_EMBED = "embed";
 
     /** _more_ */
@@ -230,7 +230,7 @@ public class HtmlUtils {
     /** _more_ */
     public static final String TAG_TD = "td";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_TH = "th";
 
     /** _more_ */
@@ -812,6 +812,13 @@ public class HtmlUtils {
         return sb.toString();
     }
 
+    /**
+     * _more_
+     *
+     * @param args _more_
+     *
+     * @return _more_
+     */
     public static String buttons(List<String> args) {
         StringBuffer sb = new StringBuffer();
         for (int i = 0; i < args.size(); i++) {
@@ -2631,12 +2638,22 @@ public class HtmlUtils {
      * @return _more_
      */
     public static String table(String contents) {
-        return table(contents, 0,0);
+        return table(contents, 0, 0);
     }
 
+    /**
+     * _more_
+     *
+     * @param contents _more_
+     * @param padding _more_
+     * @param spacing _more_
+     *
+     * @return _more_
+     */
     public static String table(String contents, int padding, int spacing) {
         return table(contents,
-                     attrs(ATTR_CELLPADDING, "" +padding, ATTR_CELLSPACING, "" +spacing));
+                     attrs(ATTR_CELLPADDING, "" + padding, ATTR_CELLSPACING,
+                           "" + spacing));
     }
 
     /**
@@ -3675,66 +3692,15 @@ public class HtmlUtils {
      */
     public static void main(String[] args) throws Exception {
         for (String a : args) {
-            System.err.println(a + ":"
-                               + java.net.URLDecoder.decode(a, "UTF-8"));
-        }
-        if (true) {
-            return;
-        }
-
-        for (String a : args) {
-            System.err.println(a + ":" + entityEncode(a));
-            System.err.println(a + ":" + urlEncode(a));
-        }
-        if (true) {
-            return;
-        }
-
-
-        System.err.println(java.net.URLEncoder.encode("&", "UTF-8"));
-        System.err.println(java.net.URLEncoder.encode("?", "UTF-8"));
-        if (true) {
-            return;
-        }
-
-
-        Class        c  = HtmlUtils.class;
-        StringBuffer sb = new StringBuffer();
-        sb.append(
-            "//j-\n/** Do not change!!! This has been generated from HtmlUtil **/\n");
-        Method[] methods = c.getDeclaredMethods();
-        for (int i = 0; i < methods.length; i++) {
-            Method m = methods[i];
-            //            if(!Modifier.isStatic(m.getModifiers())) continue;
-            if ( !m.getReturnType().equals(String.class)) {
-                continue;
+            byte[]       chars = a.getBytes();
+            StringBuffer sb    = new StringBuffer();
+            for (byte c : chars) {
+                sb.append("\\x");
+                sb.append(c);
             }
-            sb.append("public void " + m.getName() + "(");
-            Class[]      params = m.getParameterTypes();
-            StringBuffer implSb = new StringBuffer();
-            for (int paramIdx = 0; paramIdx < params.length; paramIdx++) {
-                if (paramIdx > 0) {
-                    sb.append(", ");
-                    implSb.append(", ");
-                }
-                implSb.append("param" + paramIdx);
-                String type = params[paramIdx].getName();
-                if (params[paramIdx].isArray()) {
-                    type = params[paramIdx].getComponentType().getName()
-                           + " []";
-                }
-                type = type.replace("java.lang.", "");
-                sb.append(type + " param" + paramIdx);
-
-            }
-
-            sb.append(") {\n");
-            sb.append("sb.append(HtmlUtils." + m.getName() + "(" + implSb
-                      + "));\n");
-            sb.append("}\n");
+            System.err.println(a + ":" + sb);
         }
-        sb.append("//j+\n");
-        //        System.out.println (sb);
+
 
     }
 

@@ -705,5 +705,23 @@ public class Utils {
         return p;
     }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    public static String hexEncode(String s) {
+        byte[]       chars = s.getBytes();
+        StringBuffer sb    = new StringBuffer();
+        for (byte c : chars) {
+            sb.append("\\x");
+            sb.append(c);
+        }
+
+        return sb.toString();
+
+    }
 
 }
