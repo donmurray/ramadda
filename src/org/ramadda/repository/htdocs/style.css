@@ -154,6 +154,12 @@ input, password, fileinput,textarea,select {
     min-height :16px;
 }
 
+.chart-map {
+//  border:1px #888888 solid; 
+//  background-color:#7391ad; 
+//  width:400px; height:400px;
+}
+
 .chart-menu {
   position: absolute;
   width: auto;

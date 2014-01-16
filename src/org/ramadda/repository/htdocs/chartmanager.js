@@ -37,29 +37,65 @@ function ChartManager(id,properties) {
     var entryUrl = "/repository/search/type/type_point_noaa_carbon?type=type_point_noaa_carbon&search.type_point_noaa_carbon.site_id=MLO&datadate.mode=overlaps&output=json&max=3";
     this.entryList = new  EntryList(entryUrl, this);
     init_ChartManager(this);
+
+    this.mapEnabled = this.getProperty("mapenabled",null);
+    this.mapBoundsSet  = false;
+
+
+    if(this.mapEnabled) {
+        this.latFieldId = this.getId() +"_latfield";
+        this.lonFieldId = this.getId() +"_lonfield";
+    }
+
+
     addChartManager(this);
     //How else do I refer to this object in the html that I add 
     var get = "getChartManager('" + id +"')";
     var html = "<div class=\"chart-container\">";
-    var new1= "<a onclick=\"" + get +".newTimeseries()\">Timeseries</a>";
-    var new2= "<a onclick=\"" + get +".newBarchart()\">Barchart</a>";
+    var wider = "<a onclick=\"" + get +".changeChartWidth(1)\">+ Chart width</a>";
+    var narrower = "<a onclick=\"" + get +".changeChartWidth(-1)\">- Chart width</a>";
+
+    var chartNames = ["Time Series","Bar Chart","Scatter Plot", "Table"];
+    var chartCalls = ["newTimeseries();","newBarchart();","newScatterPlot();", "newTable();"];
+
+
+    var newMenu = "";
+    for(var i=0;i<chartNames.length;i++) {
+        newMenu+= "<a onclick=\"" + get+"." + chartCalls[i]+"\">" + chartNames[i] +"</a>";
+    }
+
     var layout = "<li><a onclick=\"" + get +".setLayout('table',1)\">Table - 1 column</a></li><li><a onclick=\"" + get +".setLayout('table',2)\">Table - 2 column</a><li><a onclick=\"" + get +".setLayout('table',3)\">Table - 3 column</a></li><li><a onclick=\"" + get +".setLayout('tabs')\">Tabs</a></li>"
-    var menu = "<div class=ramadda-popup id=" + this.id+"_menu_popup><ul id=" + this.id+"_menu_inner sample-menu class=sf-menu><li><a>New</a><ul><li>" + new1 +"</li><li>" + new2 +"</li></ul></li><li><a>Layout</a><ul>" + layout +"</ul></li></ul></div>";
+    var menu = "<div class=ramadda-popup id=" + this.id+"_menu_popup><ul id=" + this.id+"_menu_inner sample-menu class=sf-menu><li><a>New</a><ul>" + newMenu +"</ul></li><li><a>Layout</a><ul>" + layout +"</ul></li></ul></div>";
 
     html+= menu;
     html += "<a class=chart-menu-button id=\"" + this.id +"_menu_button\"></a><br>";
-
-    html+= "<table width=100%><tr valign=top>";
+    html+= "<table width=100% border=1><tr valign=top>";
     //    html+="<td>";
     //    html+="<b>Entries</b>";
     //    html+="<div class=chart-entry-list-wrapper><div id=" + this.id+"_entries class=chart-entry-list></div></div>";
     //    html+="</td>";
     html+="<td>";
     html+= "<div id=\"" + this.id +"_charts\"></div>";
+    html+="</td>";
 
-    html+="<td width=300>";
+    if(this.mapEnabled) {
+        html+="<td width=300>";
+        html+="<div style=\"width:400px; height:400px;\" class=chart-map id=" + this.id+"_map></div>";
+        html+="</td>";
+    }
+
+    html+="</table>";
 
     $("#"+ this.getId()).html(html);
+
+    this.mapCentered = false;
+    if(this.mapEnabled) {
+        var params = {};
+        console.log("map id:" + this.id+"_map");
+        this.map = new RepositoryMap(this.id+"_map", params);
+        this.map.initMap(false);
+        //        this.map.addLine('0e9d5f64-823a-4bdf-813b-bb3f4d80f6e2_polygon', 59.772422500000005, -151.10694375000003, 59.7614675, -151.14459375);
+    }
 
     if(this.entryList) {
         //this.entryList.initDisplay(this.id+"_entries");
@@ -78,8 +114,17 @@ function ChartManager(id,properties) {
 
 
 function init_ChartManager(chartManager) {
+
     chartManager.getId = function() {
         return this.id;
+    }
+
+    chartManager.setMapBounds = function(north, west, south, east) {
+        if(!this.map) return;
+        if(this.mapBoundsSet) return;
+        this.mapBoundsSet = true;
+        var bounds = new OpenLayers.Bounds(west,south,east, north);
+        this.map.centerOnMarkers(bounds);
     }
 
     chartManager.getPosition = function() {
@@ -88,12 +133,6 @@ function init_ChartManager(chartManager) {
         return [lat,lon];
     }
     
-    /*
-        var mapProps = {"foo":"bar"};
-        this.map = new RepositoryMap("mapdiv", mapProps);
-        this.map.initMap(false);
-        this.map.addClickHandler( this.lonFieldId, this.latFieldId);
-    */
 
 
     chartManager.getJsonUrl = function(jsonUrl, chart) {
@@ -139,6 +178,10 @@ function init_ChartManager(chartManager) {
         return value;
     }
 
+    chartManager.changeChartWidth = function(w) {
+        
+    }
+
     chartManager.doLayout = function() {
         var html = "";
         var colCnt=100;
@@ -166,6 +209,9 @@ function init_ChartManager(chartManager) {
         for(var i=0;i<this.charts.length;i++) {
             this.charts[i].initDisplay();
         }
+
+
+
     }
 
 
@@ -193,8 +239,24 @@ function init_ChartManager(chartManager) {
         setTimeout(function(){chartManager.addPointData(data,'barchart');},1);
     }
 
+    chartManager.newScatterPlot = function(data) {
+        if(data == null) {
+            data = this.data[0];
+        }
+        var chartManager = this;
+        setTimeout(function(){chartManager.addPointData(data,'scatterplot');},1);
+    }
 
-    chartManager.addPointData = function(pointData, type) {
+    chartManager.newTable = function(data) {
+        if(data == null) {
+            data = this.data[0];
+        }
+        var chartManager = this;
+        setTimeout(function(){chartManager.addPointData(data,'table');},1);
+    }
+
+
+    chartManager.addPointData = function(pointData, chartType) {
         var chartId = this.id +"_chart_" + (this.cnt++);
         var props = pointData.getProperties();
         var newProps = {};
@@ -204,7 +266,7 @@ function init_ChartManager(chartManager) {
         props = newProps;
         //        props.width = 400;
         props.height = 200;
-        props["chart.type"] = type;
+        props["chart.type"] = chartType;
         var chart  = new RamaddaLineChart(chartId, pointData, props);
         chart.setChartManager(this);
         this.data.push(pointData);

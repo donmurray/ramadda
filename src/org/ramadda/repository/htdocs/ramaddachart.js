@@ -15,6 +15,7 @@ var chart = new  RamaddaChart("example" , pointData);
 
 
 
+//some globals
 var globalCharts = {'foo':'bar'};
 
 function addChart(chart) {
@@ -25,6 +26,15 @@ function addChart(chart) {
 function getChart(id) {
     return globalCharts[id];
 }
+
+
+function removeChart(id) {
+    var chart =getChart(id);
+    if(chart) {
+        chart.removeChart();
+    }
+}
+
 
 
 
@@ -38,12 +48,9 @@ function RamaddaLineChart(id, pointDataArg, properties) {
     this.properties = properties;
     init_RamaddaLineChart(this);
     addChart(this);
-    //    this.createHtml();
     var testUrl = null;
     //Uncomment to test using test.json
     //testUrl = "/repository/test.json";
-    //    testUrl = "http://localhost:8080/repository/entry/show/gfs80_point?output=data.gridaspoint&entryid=633bc909-079f-429a-b873-5744a3b04770&location.latitude=34.6&location.longitude=-101.1&calendar=gregorian&fromdate=&todate=&format=json&level=-1&variable.Temperature=true"
-
     this.title = pointDataArg.getName();
     if(testUrl!=null) {
         pointDataArg = new PointData("Test",null,null,testUrl);
@@ -52,12 +59,6 @@ function RamaddaLineChart(id, pointDataArg, properties) {
 }
 
 
-function removeChart(id) {
-    var chart =getChart(id);
-    if(chart) {
-        chart.removeChart();
-    }
-}
 
 
 function init_RamaddaLineChart(theChart) {
@@ -85,31 +86,6 @@ function init_RamaddaLineChart(theChart) {
     }
 
 
-    theChart.getDisplay = function() {
-        var mapEnabled = this.getProperty("mapenabled",null);
-        var theChart = this;
-        this.latFieldId = this.getId() +"_latfield";
-        this.lonFieldId = this.getId() +"_lonfield";
-        var reloadId = this.getId() +"_reload";
-
-        var html = "";
-        html +=   "<div id=\"" + this.chartHeaderId +"\" class=chart-header></div>";
-        var get = "getChart('" + this.id +"')";
-        var deleteMe = "<a href=# onclick=\"removeChart('" + this.id +"')\"><img src=" + root +"/icons/close.gif></a>";
-        var menuButton =  "<a class=chart-menu-button id=\"" + theChart.getId() +"_menu_button\"></a>";
-        var menu = "<div class=ramadda-popup id=" + this.id+"_menu_popup>" + this.getFieldsDiv() +"</div>";
-
-        html +="<table border=0 cellpadding=0 cellspacing=0><tr valign=bottom><td><b>" +  this.getTitle() +"</b></td><td align=right>";
-        html += menuButton;
-        html += deleteMe;
-
-        html += "</td></tr>"
-        html += "<tr valign=top><td colspan=2>"
-        html += this.getChartDiv();
-        html += "</td></tr></table>"
-        html += menu;
-        return html;
-    }
 
     theChart.addFieldsLegend = function() {
         if(!this.hasData()) {
@@ -207,6 +183,10 @@ function init_RamaddaLineChart(theChart) {
         var dataList = this.getStandardData(selectedFields);
 
         //Keep all of the google chart specific code here
+        if(typeof google == 'undefined') {
+            return;
+        }
+
         var dataTable = google.visualization.arrayToDataTable(dataList);
         var options = {
             series: [{targetAxisIndex:0},{targetAxisIndex:1},],
@@ -233,11 +213,174 @@ function init_RamaddaLineChart(theChart) {
             this.chart.draw(dataTable, options);
 
         } else {
-            this.chart = new google.visualization.LineChart(document.getElementById(this.chartDivId));
+            if(this.hasDate) {
+                this.chart = new google.visualization.AnnotatedTimeLine(document.getElementById(this.chartDivId));
+            } else {
+                this.chart = new google.visualization.LineChart(document.getElementById(this.chartDivId));
+            }
+
             this.chart.draw(dataTable, options);
 
         }
 
+    }
+}
+
+
+
+
+/*
+Create a chart
+id - the id of this chart. Has to correspond to a div tag id 
+pointData - A PointData object (see below)
+ */
+function RamaddaScatterChart(id, pointDataArg, properties) {
+    this.id = id;
+    this.properties = properties;
+    init_RamaddaScatterChart(this);
+    addChart(this);
+    this.title = pointDataArg.getName();
+    this.addOrLoadData(pointDataArg);
+}
+
+
+
+function init_RamaddaScatterChart(theChart) {
+    theChart.dataCollection = new DataCollection();
+    init_RamaddaChart(theChart);
+    theChart.initDisplay = function() {
+        var theChart = this;
+        var reloadId = this.getId() +"_reload";
+        $("#" + reloadId).button().click(function(event) {
+                event.preventDefault();
+                theChart.reload();
+            });
+
+        $("#"+this.id +"_menu_button").button({ icons: { primary:  "ui-icon-triangle-1-s"}}).click(function(event) {
+                var id =theChart.getId()+"_menu_popup"; 
+                showPopup(event, theChart.id +"_menu_button", id, false,null,"left bottom");
+                $("#"+  this.id+"_menu_inner").superfish({
+                        animation: {height:'show'},
+                            delay: 1200
+                            });
+            });
+
+        this.addFieldsLegend();
+        this.displayData();
+    }
+
+
+
+    theChart.addFieldsLegend = function() {
+        if(!this.hasData()) {
+            $("#" + this.fieldsDivId).html("No data");
+            return;
+        }
+        if(this.getProperty("fields",null)!=null) {
+            return;
+        }
+        //        this.setTitle(this.getTitle());
+
+
+        var html =  "<div class=chart-fields-inner>";
+        var checkboxClass = this.id +"_checkbox";
+        var dataList =  this.dataCollection.getData();
+        for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
+            var pointData = dataList[collectionIdx];
+            var fields =pointData.getChartableFields();
+            html+= "<b>" + pointData.getName() + "</b><br>";
+            for(i=0;i<fields.length;i++) { 
+                var field = fields[i];
+                field.checkboxId  = this.id +"_cbx_" + collectionIdx +"_" +i;
+                html += "<span title=\"" + field.getId() +"\">";
+                html += htmlUtil.checkbox(field.checkboxId, checkboxClass,
+                                          field ==fields[0]);
+                html += field.label+"</span><br>";
+             }
+        }
+        html+= "</div>";
+        $("#" + this.fieldsDivId).html(html);
+
+        //Listen for changes to the checkboxes
+        $("." + checkboxClass).click(function() {
+                theChart.displayData();
+          });
+    }
+
+
+    theChart.getSelectedFields = function() {
+        var df = [];
+        var dataList =  this.dataCollection.getData();
+        var fixedFields = this.getProperty("fields");
+        for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
+            var pointData = dataList[collectionIdx];
+            var fields = pointData.getChartableFields();
+            if(fixedFields !=null) {
+                for(i=0;i<fields.length;i++) { 
+                    var field = fields[i];
+                    if(fixedFields.indexOf(field.getId())>=0) {
+                        df.push(field);
+                    }
+                }
+            }
+        }
+
+        if(fixedFields !=null) {
+            return df;
+        }
+
+        var firstField = null;
+        for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
+            var pointData = dataList[collectionIdx];
+            var fields = pointData.getChartableFields();
+            for(i=0;i<fields.length;i++) { 
+                var field = fields[i];
+                if(firstField==null) firstField = field;
+                var cbxId =  this.id +"_cbx_" + collectionIdx +"_" +i;
+                if($("#" + cbxId).is(':checked')) {
+                    df.push(field);
+                }
+            }
+        }
+
+        if(df.length==0 && firstField!=null) {
+            df.push(firstField);
+        }
+
+        return df;
+    }
+
+    theChart.displayData = function() {
+        if(!this.hasData()) {
+            if(this.chart !=null) {
+                this.chart.clearChart();
+            }
+            return;
+        }
+
+        var selectedFields = this.getSelectedFields();
+        if(selectedFields.length==0) {
+            $("#" + this.chartDivId).html("No fields selected");
+            return;
+        }
+
+        var dataList = this.getStandardData(selectedFields);
+
+        //Keep all of the google chart specific code here
+        if(typeof google == 'undefined') {
+            return;
+        }
+
+        var dataTable = google.visualization.arrayToDataTable(dataList);
+        var options = {
+            series: [{targetAxisIndex:0},{targetAxisIndex:1},],
+            legend: { position: 'bottom' },
+            chartArea:{left:0,top:0,height:"75%",width:"85%"}
+        };
+
+
+        //this.chart = new google.visualization.BarChart(document.getElementById(this.chartDivId));
+        //this.chart.draw(dataTable, options);
     }
 }
 
@@ -252,6 +395,30 @@ function init_RamaddaChart(theChart) {
 
     theChart.chartManager = null;
     
+    theChart.getDisplay = function() {
+        var theChart = this;
+        var reloadId = this.getId() +"_reload";
+
+        var html = "";
+        html +=   "<div id=\"" + this.chartHeaderId +"\" class=chart-header></div>";
+        var get = "getChart('" + this.id +"')";
+        var deleteMe = "<a href=# onclick=\"removeChart('" + this.id +"')\"><img src=" + root +"/icons/close.gif></a>";
+        var menuButton =  "<a class=chart-menu-button id=\"" + theChart.getId() +"_menu_button\"></a>";
+        var menu = "<div class=ramadda-popup id=" + this.id+"_menu_popup>" + this.getFieldsDiv() +"</div>";
+
+        html +="<table border=0 cellpadding=0 cellspacing=0><tr valign=bottom><td><b>" +  this.getTitle() +"</b></td><td align=right>";
+        html += menuButton;
+        html += deleteMe;
+
+        html += "</td></tr>"
+        html += "<tr valign=top><td colspan=2>"
+        html += this.getChartDiv();
+        html += "</td></tr></table>"
+        html += menu;
+        return html;
+    }
+
+
     theChart.setChartManager = function(cm) {
         this.chartManager = cm;
 
@@ -363,18 +530,39 @@ function init_RamaddaChart(theChart) {
         //These are Record objects 
         //TODO: handle multiple data sources (or not?)
         var pointData = this.dataCollection.getData()[0];
+        this.hasDate = true;
+
+        var north=NaN,west=NaN,south=NaN,east=NaN;
+        //        var bounds = new OpenLayers.Bounds(-151.827, 59.3397, -151.074, 59.7779);
+        //        this.map.centerOnMarkers(bounds);
 
         var records = pointData.getData();
         for(j=0;j<records.length;j++) { 
             var record = records[j];
             var values = [];
             var date = record.getDate();
+           if(!isNaN(record.getLatitude())) { 
+                if(j == 0) {
+                    north  =  record.getLatitude();
+                    south  = record.getLatitude();
+                    west  =  record.getLongitude();
+                    east  = record.getLongitude();
+                } else {
+                    north  = Math.max(north, record.getLatitude());
+                    south  = Math.min(south, record.getLatitude());
+                    west  = Math.min(west, record.getLongitude());
+                    east  = Math.min(east, record.getLongitude());
+                }
+            }
             //Add the date or index field
             if(date!=null) {
                 date = new Date(date);
                 values.push(date);
             } else {
-                if(j==0) fieldNames[0] = "Index";
+                if(j==0) {
+                    this.hasDate = false;
+                    fieldNames[0] = "Index";
+                }
                 values.push(j);
             }
             //            values.push(record.getElevation());
@@ -398,6 +586,10 @@ function init_RamaddaChart(theChart) {
             dataList.push(values);
         }
         //var js = "values[1] = 33;if(values[1]<360) ok= 'valuesxxx'; else ok= 'zzz';"
+        if(!isNaN(north)) {
+            this.chartManager.setMapBounds(north, west, south, east);
+        }
+
         return dataList;
     }
 

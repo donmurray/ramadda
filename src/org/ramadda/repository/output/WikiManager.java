@@ -4175,7 +4175,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         sb.append(HtmlUtils.importJS("https://www.google.com/jsapi"));
         sb.append(
             HtmlUtils.script(
-                "google.load(\"visualization\", \"1\", {packages:[\"corechart\",\"table\"]});\n"));
+                "google.load(\"visualization\", \"1\", {packages:['corechart','table','annotatedtimeline']});\n"));
         sb.append(HtmlUtils.importJS(fileUrl("/point/selectform.js")));
         sb.append(HtmlUtils.importJS(fileUrl("/pointdata.js")));
         if (request.getExtraProperty("initmap") == null) {

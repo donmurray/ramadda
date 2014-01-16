@@ -257,6 +257,15 @@ function makePointData(json) {
         if(date>0) {
             date = new Date(date);
         }
+        if ((typeof tuple.latitude === 'undefined')) {
+            tuple.latitude = NaN;
+            tuple.longitude = NaN;
+        }
+
+        if ((typeof tuple.elevation === 'undefined')) {
+            tuple.elevation = NaN;
+        }
+
         data.push(new Record(tuple.latitude, tuple.longitude,tuple.elevation,date, tuple.values));
     }
 

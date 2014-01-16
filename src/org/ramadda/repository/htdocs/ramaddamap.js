@@ -280,7 +280,7 @@ function RepositoryMap(mapId, params) {
             
         };
         
-        
+
         this.map = new OpenLayers.Map(this.mapDivId,options);
         this.addBaseLayers();
 
