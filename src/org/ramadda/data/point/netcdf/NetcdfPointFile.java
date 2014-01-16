@@ -105,6 +105,11 @@ public class NetcdfPointFile extends PointFile {
             fields.add(new RecordField("longitude", "Longitude", "Longitude",
                                        cnt++, "degrees"));
 
+            RecordField dateField = new RecordField("date", "Date", "Date",
+                                       cnt++, "");
+            dateField.setType(dateField.TYPE_DATE);
+            fields.add(dateField);
+
             FeatureDatasetPoint pod  = getDataset(getFilename());
             List                vars = pod.getDataVariables();
             for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {

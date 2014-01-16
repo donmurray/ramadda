@@ -42,6 +42,7 @@ import ucar.unidata.util.StringUtil;
 import java.io.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -76,7 +77,7 @@ public class NetcdfRecord extends DataRecord {
         super(file, fields);
         this.iterator = iterator;
         initFields(fields);
-        for (int i = 2; i < fields.size(); i++) {
+        for (int i = 3; i < fields.size(); i++) {
             dataFields.add(fields.get(i));
         }
     }
@@ -107,13 +108,17 @@ public class NetcdfRecord extends DataRecord {
         ucar.unidata.geoloc.EarthLocation el        = po.getLocation();
         if (el == null) {
             System.err.println("skipping");
-
             return ReadStatus.SKIP;
         }
         setLocation(el.getLongitude(), el.getLatitude(), el.getAltitude());
         int cnt = 0;
         values[cnt++] = el.getLongitude();
         values[cnt++] = el.getLatitude();
+        Date dttm = po.getNominalTimeAsDate();
+        objectValues[cnt++] = dttm;
+        setRecordTime(dttm.getTime());
+
+
         //TODO: Time
         //        System.err.println ("reading:" +el);
 
