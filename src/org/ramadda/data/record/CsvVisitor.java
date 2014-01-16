@@ -23,6 +23,7 @@ package org.ramadda.data.record;
 
 import org.ramadda.data.record.filter.*;
 import org.ramadda.util.IsoUtil;
+import org.ramadda.util.Utils;
 
 import java.io.*;
 
@@ -171,6 +172,7 @@ public class CsvVisitor extends RecordVisitor {
             property(PROP_MISSING, MISSING);
             comment("Here comes the data");
         }
+        String encodedDelimiter = Utils.hexEncode(COLUMN_DELIMITER);
         cnt = 0;
         for (RecordField field : fields) {
 
@@ -191,13 +193,16 @@ public class CsvVisitor extends RecordVisitor {
             if (getter == null) {
                 if (field.isTypeString()) {
                     String svalue = record.getStringValue(field.getParamId());
+                    svalue = svalue.replaceAll(COLUMN_DELIMITER, encodedDelimiter);
                     pw.append(svalue);
                 } else {
                     double value = record.getValue(field.getParamId());
                     pw.append("" + value);
                 }
             } else {
-                pw.append(getter.getStringValue(record, field, visitInfo));
+                String svalue = getter.getStringValue(record, field, visitInfo);
+                svalue = svalue.replaceAll(COLUMN_DELIMITER, encodedDelimiter);
+                pw.append(svalue);
             }
         }
         pw.append("\n");
