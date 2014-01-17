@@ -116,9 +116,10 @@ function init_RamaddaLineChart(theChart, properties) {
             for(i=0;i<fields.length;i++) { 
                 var field = fields[i];
                 field.checkboxId  = this.id +"_cbx_" + collectionIdx +"_" +i;
-                html += htmlUtil.tag("span", ["title", field.getId()],
+                html += htmlUtil.tag("div", ["title", field.getId()],
                                      htmlUtil.checkbox(field.checkboxId, checkboxClass,
-                                                       field ==fields[0]));
+                                                       field ==fields[0]) +" " +field.getLabel()
+);
              }
         }
         html+= htmlUtil.closeTag("div");
@@ -623,6 +624,9 @@ function init_RamaddaChart(theChart, properties) {
                 values.push(value);
            } else {
                if(date!=null) {
+                   if(j==0) {
+                       console.log("using date");
+                   }
                    date = new Date(date);
                    values.push(date);
                } else {
