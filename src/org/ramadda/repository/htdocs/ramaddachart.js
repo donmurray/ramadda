@@ -624,9 +624,6 @@ function init_RamaddaChart(theChart, properties) {
                 values.push(value);
            } else {
                if(date!=null) {
-                   if(j==0) {
-                       console.log("using date");
-                   }
                    date = new Date(date);
                    values.push(date);
                } else {

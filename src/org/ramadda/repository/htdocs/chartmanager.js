@@ -61,11 +61,11 @@ function ChartManager(id,properties) {
 
     init_ChartManager(this);
 
-    this.mapEnabled = this.getProperty("mapenabled",null);
+    this.showmap = this.getProperty("show.map",null);
     this.mapBoundsSet  = false;
 
 
-    if(this.mapEnabled) {
+    if(this.showmap) {
         this.latFieldId = this.getDomId("latfield");
         this.lonFieldId = this.getDomId("lonfield");
     }
@@ -85,7 +85,6 @@ function ChartManager(id,properties) {
     //
 
 
-
     html += htmlUtil.openTag("table",["width","100%","border","0"]);
     html += htmlUtil.openTag("tr", ["valign","top"]);
 
@@ -101,7 +100,7 @@ function ChartManager(id,properties) {
     html+=htmlUtil.openTag("td", ["width", "300"]);
 
     //Add the map
-    if(this.mapEnabled) {
+    if(this.showmap) {
         html+= htmlUtil.tag("h3",[],"Map");
         html+= htmlUtil.openTag("form");
         html+= "Latitude: " + htmlUtil.input(this.latFieldId, "", ["size","10","id",  this.latFieldId]);
@@ -126,7 +125,7 @@ function ChartManager(id,properties) {
     $("#"+ this.getId()).html(html);
 
     this.mapCentered = false;
-    if(this.mapEnabled) {
+    if(this.showmap) {
         var params = {};
         this.map = new RepositoryMap(this.getDomId("map"), params);
         this.map.initMap(false);
@@ -269,7 +268,6 @@ function init_ChartManager(chartManager) {
     }
 
     chartManager.changeChartWidth = function(w) {
-        
     }
 
     chartManager.getChartsToLayout = function() {

@@ -1477,7 +1477,6 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                     != null) {
                 myRequest.put("fields", tmp);
             }
-
             if ((tmp = Misc.getProperty(props, ARG_FROMDATE, (String) null))
                     != null) {
                 myRequest.put(ARG_FROMDATE, tmp);
@@ -1490,6 +1489,13 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
             myRequest.put("chart.type",
                           Misc.getProperty(props, "chart.type", "linechart"));
+
+            myRequest.put("chart.showmap",
+                          Misc.getProperty(props, "chart.showmap", "false"));
+
+            myRequest.put("chart.showmenu",
+                          Misc.getProperty(props, "chart.showmenu", "false"));
+
             String min = Misc.getProperty(props, "chart.min", (String) null);
             if (min != null) {
                 myRequest.put("chart.min", min);
@@ -4182,8 +4188,11 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             sb.append(getMapManager().getHtmlImports());
             request.putExtraProperty("initmap", "");
         }
-        sb.append(HtmlUtils.importJS(fileUrl("/chartmanager.js")));
-        sb.append(HtmlUtils.importJS(fileUrl("/ramaddachart.js")));
+        if (request.getExtraProperty("initchart") == null) {
+            sb.append(HtmlUtils.importJS(fileUrl("/chartmanager.js")));
+            sb.append(HtmlUtils.importJS(fileUrl("/ramaddachart.js")));
+            request.putExtraProperty("initchart", "");
+        }
 
         String fromDate = request.getString(ARG_FROMDATE, (String) null);
         String toDate   = request.getString(ARG_TODATE, (String) null);
@@ -4199,6 +4208,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
         props.add("chart.type");
         props.add(Json.quote(request.getString("chart.type", "linechart")));
+
         if (request.defined("chart.filter")) {
             props.add("chart.filter");
             props.add(Json.quote(request.getString("chart.filter", "")));
@@ -4224,8 +4234,11 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         StringBuffer js = new StringBuffer();
         System.err.println("JSON URL:" + url);
 
-        topProps.add("mapenabled");
-        topProps.add("true");
+
+        topProps.add("show.map");
+        topProps.add(Json.quote(request.getString("chart.showmap", "true")));
+        topProps.add("show.menu");
+        topProps.add(Json.quote(request.getString("chart.menu", "true")));
 
         js.append("var chartManager = getOrCreateChartManager("
                   + HtmlUtils.quote(chartDivId) +"," + Json.map(topProps, false) + ");\n");
