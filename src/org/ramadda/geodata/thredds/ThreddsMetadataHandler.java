@@ -46,10 +46,19 @@ import ucar.nc2.Variable;
 
 import ucar.nc2.VariableSimpleIF;
 import ucar.nc2.constants.AxisType;
+import ucar.nc2.constants.CDM;
+import ucar.nc2.constants.CF;
 import ucar.nc2.dataset.CoordinateAxis;
+import ucar.nc2.dataset.CoordinateAxis1D;
 
 import ucar.nc2.dataset.CoordinateSystem;
 import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.dataset.conv.CF1Convention;
+import ucar.nc2.dataset.conv.COARDSConvention;
+import ucar.nc2.time.Calendar;
+import ucar.nc2.time.CalendarDate;
+import ucar.nc2.time.CalendarDateRange;
+import ucar.nc2.time.CalendarDateUnit;
 
 
 import ucar.unidata.geoloc.LatLonRect;
@@ -302,23 +311,44 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      */
     public static List<Date> getDates(VariableSimpleIF var, CoordinateAxis ca)
             throws Exception {
-        Unit fromUnit = parseUnit(var.getUnitsString(), var.getUnitsString());
-        Unit          toUnit = visad.CommonUnit.secondsSinceTheEpoch;
+        
+        CalendarDateUnit dateUnit = getCalendarDateUnit(ca);
         List<Date>    dates  = new ArrayList<Date>();
         Array         a      = ca.read();
-        IndexIterator iter   = a.getIndexIteratorFast();
+        IndexIterator iter   = a.getIndexIterator();
         while (iter.hasNext()) {
             double val = iter.getDoubleNext();
             if (val != val) {
                 continue;
             }
-            dates.add(new Date((long) (1000 * toUnit.toThis(val, fromUnit))));
-
+            CalendarDate cDate = dateUnit.makeCalendarDate(val);
+            dates.add(makeDate(cDate));
         }
 
         return dates;
     }
 
+    /**
+     * Get a CalendarDateUnit for the given axis
+     * 
+     * @param timeAxis the axis
+     * @return the CalendarDateUnit
+     */
+    private static CalendarDateUnit getCalendarDateUnit(CoordinateAxis timeAxis) {
+        Attribute cattr = timeAxis.findAttribute(CF.CALENDAR);
+        String s = (cattr == null) ? null : cattr.getStringValue();
+        Calendar cal = null;
+        if (s == null) {
+            cal = Calendar.gregorian;
+        } else {
+            cal =  ucar.nc2.time.Calendar.get(s);
+        }
+        CalendarDateUnit dateUnit = 
+            // this will throw exception on failure
+            CalendarDateUnit.withCalendar(cal, timeAxis.getUnitsString()); 
+        return dateUnit;
+    }
+    
     /**
      * _more_
      *
@@ -360,14 +390,41 @@ public class ThreddsMetadataHandler extends MetadataHandler {
     public static Date[] getMinMaxDates(VariableSimpleIF var,
                                         CoordinateAxis ca)
             throws Exception {
-        double[] minmax = getRange(var, ca.read(),
+        Date[] mmDate = null;
+        if (ca instanceof CoordinateAxis1D) {
+            CalendarDateUnit dateUnit = getCalendarDateUnit(ca);
+            MAMath.MinMax minmax = MAMath.getMinMax(ca.read());
+            CalendarDate minDate = dateUnit.makeCalendarDate(minmax.min);
+            CalendarDate maxDate = dateUnit.makeCalendarDate(minmax.max);
+            mmDate = new Date[] { makeDate(minDate), makeDate(maxDate) };
+            
+        } else {  // old way - doesn't work for non-standard (e.g. no leap) calendars
+            double[] minmax = getRange(var, ca.read(),
                                    visad.CommonUnit.secondsSinceTheEpoch);
 
-        return new Date[] { new Date((long) minmax[0] * 1000),
+            mmDate = new Date[] { new Date((long) minmax[0] * 1000),
                             new Date((long) minmax[1] * 1000) };
+        }
+        return mmDate;
     }
 
 
+    /**
+     * Make a date from a calendar date.  This should probably be in a utility
+     * class.
+     * 
+     * @param cd  the CalendarDate
+     * @return the corresponding date.
+     */
+    private static Date makeDate(CalendarDate cd) {
+       Date d = null;
+       try {
+           d = DateUtil.parse(cd.toString());
+       } catch (Exception e) {
+           d = cd.toDate(); // not correct for non-standard calendars
+       }
+       return d;
+    }
 
 
 
