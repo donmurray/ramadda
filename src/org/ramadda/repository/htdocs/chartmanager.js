@@ -78,6 +78,14 @@ function ChartManager(id,properties) {
     html += this.makeMainMenu();
 
 
+    //
+    //Main layout is defined here
+    // Right now it is a table:
+    // | charts div |  map & settings form | 
+    //
+
+
+
     html += htmlUtil.openTag("table",["width","100%","border","0"]);
     html += htmlUtil.openTag("tr", ["valign","top"]);
 
@@ -92,6 +100,7 @@ function ChartManager(id,properties) {
 
     html+=htmlUtil.openTag("td", ["width", "300"]);
 
+    //Add the map
     if(this.mapEnabled) {
         html+= htmlUtil.tag("h3",[],"Map");
         html+= htmlUtil.openTag("form");
