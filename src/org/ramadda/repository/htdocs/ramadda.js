@@ -35,9 +35,9 @@ var icon_blank = "${urlroot}/icons/blank.gif";
 
 
 function Util () {
-    this.loadXML = function (url, callback,arg) {
-        var req = false;
-        if(window.XMLHttpRequest) {
+ this.loadXML = function (url, callback,arg) {
+ var req = false;
+ if(window.XMLHttpRequest) {
             try {
                 req = new XMLHttpRequest();
             } catch(e) {
@@ -212,6 +212,18 @@ function HtmlUtil() {
          return this.tag("div", attrs, inner);
      }
 
+     this.tr = function(attrs, inner) {
+         return this.tag("tr", attrs, inner);
+     }
+
+     this.b = function(inner) {
+         return this.tag("b", [], inner);
+     }
+
+     this.td = function(attrs, inner) {
+         return this.tag("td", attrs, inner);
+     }
+
      this.tag = function(tagName, attrs, inner) {
          var html = "<" + tagName +" " + this.attrs(attrs) +">";
          if(inner!=null) {
@@ -256,6 +268,10 @@ function HtmlUtil() {
      }
 
 
+     this.onClick = function(call, html) {
+         return this.tag("a", ["onclick", call], html);
+     }
+
      this.checkbox = function(id,cbxclass,checked) {
          var html = "<input id=\"" + id +"\" class=\""  + cbxclass +"\"  type=checkbox value=true ";
          if(checked) {
@@ -266,8 +282,7 @@ function HtmlUtil() {
      }
 
     this.input =   function(name, value, attrs) {
-       if(!attrs) attrs = "";
-       return "<input " + attrs + this.attr("name", name) + this.attr("value",value) +"/>";
+        return "<input " + this.attrs(attrs) + this.attrs(["name", name, "value",value]) +"/>";
     }
 
   }

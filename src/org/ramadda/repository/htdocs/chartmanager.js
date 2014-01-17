@@ -86,30 +86,33 @@ function ChartManager(id,properties) {
     //    html+="<div class=chart-entry-list-wrapper><div id=" + this.getDomId("entries") +"  class=chart-entry-list></div></div>";
     //    html+="</td>";
 
-    html+="<td>";
-    html+= htmlUtil.div(["id", this.getDomId("charts")]);
-    html+="</td>";
+
+    //this is the div where the charts go
+    html+=htmlUtil.tag("td", [],  htmlUtil.div(["id", this.getDomId("charts")]));
 
     html+=htmlUtil.openTag("td", ["width", "300"]);
 
     if(this.mapEnabled) {
         html+= htmlUtil.tag("h3",[],"Map");
-        html+= "<form>Latitude: <input size=10 id=\"" + this.latFieldId +"\"> Longitude: <input size=10 id=\"" +  this.lonFieldId+"\"></form>";
+        html+= htmlUtil.openTag("form");
+        html+= "Latitude: " + htmlUtil.input(this.latFieldId, "", ["size","10","id",  this.latFieldId]);
+        html+= "  ";
+        html+= "Longitude: " + htmlUtil.input(this.lonFieldId, "", ["size","10","id",  this.lonFieldId]);
+        html+= htmlUtil.closeTag("form");
         html+=htmlUtil.div(["style", "width:400px; height:400px;",
                             "class", "chart-map",
                             "id", this.getDomId("map")]);
     }
 
 
+    //This is where we can put time selectors, etc
     html+= htmlUtil.tag("h3",[],"Selection");
+    html+=htmlUtil.openTag("form");
+    html+=" Put selection form here";
+    html+=htmlUtil.closeTag("form");
 
-    html+="<form>"
-        html+=" Put selection form here"
-        html+="</form>"
-        html+="</td>";
-
-
-    html+="</table>";
+    html+=htmlUtil.closeTag("td");
+    html+=htmlUtil.closeTag("table");
 
     $("#"+ this.getId()).html(html);
 
@@ -153,14 +156,24 @@ function init_ChartManager(chartManager) {
         var chartCalls = ["newTimeseries();","newBarchart();","newScatterPlot();", "newTable();"];
         var newMenu = "";
         for(var i=0;i<chartNames.length;i++) {
-            newMenu+= "<li><a onclick=\"" + get+"." + chartCalls[i]+"\">" + chartNames[i] +"</a></li>";
+            newMenu+= htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick", get+"." + chartCalls[i]], chartNames[i]));
         }
 
-        var layoutMenu = "<li><a onclick=\"" + get +".setLayout('table',1)\">Table - 1 column</a></li><li><a onclick=\"" + get +".setLayout('table',2)\">Table - 2 column</a><li><a onclick=\"" + get +".setLayout('table',3)\">Table - 3 column</a></li><li><a onclick=\"" + get +".setLayout('tabs')\">Tabs</a></li>"
-        var menu = "<div class=ramadda-popup id=" + this.getDomId("menu_popup") + "><ul id=" + this.getDomId("menu_inner") +" sample-menu class=sf-menu><li><a>New</a><ul>" + newMenu +"</ul></li><li><a>Layout</a><ul>" + layoutMenu +"</ul></li></ul></div>";
+        var layoutMenu = 
+        htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick",  get +".setLayout('table',1)"], "Table - 1 column")) +
+        htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick",  get +".setLayout('table',2)"], "Table - 2 column")) +
+        htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick",  get +".setLayout('table',3)"], "Table - 3 column")) +
+        htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick",  get +".setLayout('tabs')"], "Tabs"));
+
+        var menu = htmlUtil.div(["class","ramadda-popup", "id", this.getDomId("menu_popup")], 
+                                htmlUtil.tag("ul", ["id", this.getDomId("menu_inner"),"class", "sf-menu"], 
+                                        htmlUtil.tag("li",[],"<a>New</a>" + htmlUtil.tag("ul",[], newMenu)) +
+                                        htmlUtil.tag("li",[],"<a>Layout</a>" + htmlUtil.tag("ul", [], layoutMenu))));
 
         html += menu;
-        html += "<a class=chart-menu-button id=\"" + this.getDomId("menu_button") + "\"></a><br>";
+        html += htmlUtil.tag("a", ["class", "chart-menu-button", "id", this.getDomId("menu_button")]);
+        html+="<br>";
+
         return html;
     }
 
@@ -265,21 +278,20 @@ function init_ChartManager(chartManager) {
         var colCnt=100;
         var chartsToLayout = this.getChartsToLayout();
         if(this.layout == "table") {
-            html+="<table width=100% cellpadding=5 cellspacing=5>";
+            html+=htmlUtil.openTag("table", ["width", "100%", "cellpadding", "5",  "cellspacing", "5"]);
             for(var i=0;i<chartsToLayout.length;i++) {
                 colCnt++;
                 if(colCnt>=this.columns) {
                     if(i>0) {
-                        html+= "</tr>";
+                        html+= htmlUtil.closeTag("tr");
                     }
-                    html+= "<tr valign=top>";
+                    html+= htmlUtil.openTag("tr",["valign", "top"]);
                     colCnt=0;
                 }
-                html+="<td><div>";
-                html+=chartsToLayout[i].getDisplay();
-                html+="</div></td>";
+                html+=htmlUtil.tag("td", [], htmlUtil.div([], chartsToLayout[i].getDisplay()));
             }
-            html+= "</tr></table>";
+            html+= htmlUtil.closeTag("tr");
+            html+= htmlUtil.closeTag("table");
         } else if(this.layout=="tabs") {
         } else {
             html+="Unknown layout:" + this.layout;

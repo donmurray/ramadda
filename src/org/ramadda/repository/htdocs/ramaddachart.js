@@ -16,15 +16,21 @@ var chart = new  RamaddaChart("example" , pointData);
 
 
 //some globals
-var globalCharts = {'foo':'bar'};
+
 
 function addChart(chart) {
-    globalCharts[chart.id] = chart;
+    if(window.globalCharts == null) {
+        window.globalCharts = {'foo':'bar'};
+    }
+    window.globalCharts[chart.id] = chart;
 }
 
 
 function getChart(id) {
-    return globalCharts[id];
+    if(window.globalCharts == null) {
+        return null;
+    }
+    return window.globalCharts[id];
 }
 
 
@@ -99,23 +105,24 @@ function init_RamaddaLineChart(theChart, properties) {
         //        this.setTitle(this.getTitle());
 
 
-        var html =  "<div class=chart-fields-inner>";
+        var html =  htmlUtil.openTag("div", ["class", "chart-fields-inner"]);
         var checkboxClass = this.id +"_checkbox";
         var dataList =  this.dataCollection.getData();
         for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
             var pointData = dataList[collectionIdx];
             var fields =pointData.getChartableFields();
-            html+= "<b>" + pointData.getName() + "</b><br>";
+            html+= htmlUtil.tag("b", [],  pointData.getName());
+            html+= "<br>";
             for(i=0;i<fields.length;i++) { 
                 var field = fields[i];
                 field.checkboxId  = this.id +"_cbx_" + collectionIdx +"_" +i;
-                html += "<span title=\"" + field.getId() +"\">";
-                html += htmlUtil.checkbox(field.checkboxId, checkboxClass,
-                                          field ==fields[0]);
-                html += field.label+"</span><br>";
+                html += htmlUtil.tag("span", ["title", field.getId()],
+                                     htmlUtil.checkbox(field.checkboxId, checkboxClass,
+                                                       field ==fields[0]));
              }
         }
-        html+= "</div>";
+        html+= htmlUtil.closeTag("div");
+
         $("#" + this.fieldsDivId).html(html);
 
         //Listen for changes to the checkboxes
@@ -256,12 +263,9 @@ function init_RamaddaLineChart(theChart, properties) {
              });
 
             this.chart.draw(dataTable, options);
-
         }
-
     }
 }
-
 
 
 
@@ -317,7 +321,7 @@ function init_RamaddaScatterChart(theChart, properties) {
         //        this.setTitle(this.getTitle());
 
 
-        var html =  "<div class=chart-fields-inner>";
+        var html =  htmlUtil.openTag("div", ["class", "chart-fields-inner"]);
         var checkboxClass = this.id +"_checkbox";
         var dataList =  this.dataCollection.getData();
         for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
@@ -327,13 +331,13 @@ function init_RamaddaScatterChart(theChart, properties) {
             for(i=0;i<fields.length;i++) { 
                 var field = fields[i];
                 field.checkboxId  = this.id +"_cbx_" + collectionIdx +"_" +i;
-                html += "<span title=\"" + field.getId() +"\">";
-                html += htmlUtil.checkbox(field.checkboxId, checkboxClass,
-                                          field ==fields[0]);
-                html += field.label+"</span><br>";
+                html += htmlUtil.tag("span", ["title",  field.getId()], 
+                                     htmlUtil.checkbox(field.checkboxId, checkboxClass,
+                                                       field ==fields[0]));
+                html += "<br>";
              }
         }
-        html+= "</div>";
+        html+= htmlUtil.closeTag("div");
         $("#" + this.fieldsDivId).html(html);
 
         //Listen for changes to the checkboxes
@@ -440,20 +444,22 @@ function init_RamaddaChart(theChart, properties) {
         var reloadId = this.getId() +"_reload";
 
         var html = "";
-        html +=   "<div id=\"" + this.chartHeaderId +"\" class=chart-header></div>";
+        html +=   htmlUtil.div(["id", this.chartHeaderId,"class", "chart-header"]);
         var get = "getChart('" + this.id +"')";
-        var deleteMe = "<a href=# onclick=\"removeChart('" + this.id +"')\"><img src=" + root +"/icons/close.gif></a>";
-        var menuButton =  "<a class=chart-menu-button id=\"" + theChart.getId() +"_menu_button\"></a>";
-        var menu = "<div class=ramadda-popup id=" + this.id+"_menu_popup>" + this.getFieldsDiv() +"</div>";
+        var deleteMe = htmlUtil.onClick("removeChart('" + this.id +"')", "<img src=" + root +"/icons/close.gif>");
+        var menuButton =  htmlUtil.tag("a", ["class", "chart-menu-button", "id",  theChart.getId() +"_menu_button"]);
+        var menu = htmlUtil.div(["class", "ramadda-popup", "id", this.id+"_menu_popup"], this.getFieldsDiv());
 
-        html +="<table border=0 cellpadding=0 cellspacing=0><tr valign=bottom><td><b>" +  this.getTitle() +"</b></td><td align=right>";
-        html += menuButton;
-        html += deleteMe;
+        html += htmlUtil.openTag("table", ["border", "0", "cellpadding","0", "cellspacing","0"]);
+        html += htmlUtil.openTag("tr", ["valign", "bottom"]);
+        html += htmlUtil.td([], htmlUtil.b(this.getTitle()));
+        html += htmlUtil.td(["align", "right"],
+                           menuButton +
+                           deleteMe);
+        html += htmlUtil.closeTag("tr");
 
-        html += "</td></tr>"
-        html += "<tr valign=top><td colspan=2>"
-        html += this.getChartDiv();
-        html += "</td></tr></table>"
+        html += htmlUtil.tr(["valign", "top"], htmlUtil.td(["colspan", "2"], this.getChartDiv()));
+        html += htmlUtil.closeTag("table")
         html += menu;
         return html;
     }
@@ -549,12 +555,11 @@ function init_RamaddaChart(theChart, properties) {
 
     theChart.getFieldsDiv = function() {
         var height = this.getProperty("height","400");
-        var style = " style=\"  overflow-y: auto;    max-height:" + height +"px;\" ";
-        var div = "<div id=\"" + this.fieldsDivId +"\" class=\"chart-fields\" " + style +"></div>";
-        return   div;
+        return htmlUtil.div(["id",  this.fieldsDivId,"class", "chart-fields","style","overflow-y: auto;    max-height:" + height +"px;"]);
     }
+
     theChart.getChartDiv = function() {
-        return   "<div id=\"" + this.chartDivId +"\" style=\"border:0px red solid; width: " + this.getProperty("width","400px") +"; height: " + this.getProperty("height","400px") +";\"></div>\n";
+        return   htmlUtil.div(["id", this.chartDivId,"style", "border:0px red solid; width: " + this.getProperty("width","400px") +"; height: " + this.getProperty("height","400px") +";"]);
     }
 
 
