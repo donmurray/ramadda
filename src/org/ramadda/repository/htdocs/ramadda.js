@@ -207,9 +207,55 @@ function HtmlUtil() {
      this.qt = function (value) {
         return "'" + value +"'";
      }
+
+     this.div = function(attrs, inner) {
+         return this.tag("div", attrs, inner);
+     }
+
+     this.tag = function(tagName, attrs, inner) {
+         var html = "<" + tagName +" " + this.attrs(attrs) +">";
+         if(inner!=null) {
+             html += inner;
+         }
+         html += "</" + tagName +">\n";
+         return html;
+     }
+
+     this.openTag = function(tagName, attrs) {
+         var html = "<" + tagName +" " + this.attrs(attrs) +">";
+         return html;
+     }
+
+     this.closeTag = function(tagName) {
+         return  "</" + tagName +">\n";
+     }
+
      this.attr = function(name, value) {
-      return " " + name +"=" + this.qt(value) +" ";
-    }
+         return " " + name +"=" + this.qt(value) +" ";
+     }
+
+     this.attrs = function(list) {
+         var html = "";
+         if(list == null) return html;
+         for(var i=0;i<list.length;i+=2) {
+             html += this.attr(list[i],list[i+1]);
+         }
+         return html;
+     }
+
+     this.styleAttr = function(s) {
+         return this.attr("style", s);
+     }
+
+     this.classAttr = function(s) {
+         return this.attr("class", s);
+     }
+
+     this.idAttr = function(s) {
+         return this.attr("id", s);
+     }
+
+
      this.checkbox = function(id,cbxclass,checked) {
          var html = "<input id=\"" + id +"\" class=\""  + cbxclass +"\"  type=checkbox value=true ";
          if(checked) {
@@ -225,6 +271,7 @@ function HtmlUtil() {
     }
 
   }
+
   var htmlUtil = new HtmlUtil();
 
 

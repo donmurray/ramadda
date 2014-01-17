@@ -1,41 +1,64 @@
 
-var globalChartManagers = {'foo':'bar'};
-var globalChartManager = null;
 
+//
+//adds the chartmanager to the list of global chartmanagers
+//
 function addChartManager(chartManager) {
-    globalChartManagers[chartManager.getId()] = chartManager;
-    globalChartManager = chartManager;
+    if(window.globalChartManagers == null) {
+        window.globalChartManagers =  {'foo':'bar'};
+        window.globalChartManager = null;
+    }
+    window.globalChartManagers[chartManager.getId()] = chartManager;
+    window.globalChartManager = chartManager;
 }
 
 
+//
+//This will get the currently created global chartmanager or will create a new one
+//
 function getOrCreateChartManager(id, properties) {
     var chartManager = getChartManager(id);
     if(chartManager != null) {
         return chartManager;
     }
-    if(globalChartManager!=null) {
-        return globalChartManager;
+    if(window.globalChartManager!=null) {
+        return window.globalChartManager;
     }
-    globalChartManager =  new ChartManager(id, properties);
-    return globalChartManager;
+    window.globalChartManager =  new ChartManager(id, properties);
+    return window.globalChartManager;
 }
 
+//
+//return one the global chart manager with the given id
+//
 function getChartManager(id) {
-    return globalChartManagers[id];
+    if(window.globalChartManagers==null) {
+        return null;
+    }
+    return window.globalChartManagers[id];
 }
 
 
+//
+//ChartManager constructor
+//
 function ChartManager(id,properties) {
     var theChart = this;
     this.id = id;
     this.properties = properties;
+    if(this.properties == null) {
+        this.properties == {'':''};
+    }
     this.charts = [];
     this.data = [];
     this.cnt = 0;
     this.layout="table";
     this.columns=1;
+
+    //This is test for listing a set of entries
     var entryUrl = "/repository/search/type/type_point_noaa_carbon?type=type_point_noaa_carbon&search.type_point_noaa_carbon.site_id=MLO&datadate.mode=overlaps&output=json&max=3";
     this.entryList = new  EntryList(entryUrl, this);
+
     init_ChartManager(this);
 
     this.mapEnabled = this.getProperty("mapenabled",null);
@@ -43,54 +66,47 @@ function ChartManager(id,properties) {
 
 
     if(this.mapEnabled) {
-        this.latFieldId = this.getId() +"_latfield";
-        this.lonFieldId = this.getId() +"_lonfield";
+        this.latFieldId = this.getDomId("latfield");
+        this.lonFieldId = this.getDomId("lonfield");
     }
 
 
     addChartManager(this);
-    //How else do I refer to this object in the html that I add 
-    var get = "getChartManager('" + id +"')";
-    var html = "<div class=\"chart-container\">";
-    var wider = "<a onclick=\"" + get +".changeChartWidth(1)\">+ Chart width</a>";
-    var narrower = "<a onclick=\"" + get +".changeChartWidth(-1)\">- Chart width</a>";
 
-    var chartNames = ["Time Series","Bar Chart","Scatter Plot", "Table"];
-    var chartCalls = ["newTimeseries();","newBarchart();","newScatterPlot();", "newTable();"];
+    var html = htmlUtil.openTag("div", ["class","chart-container"]);
+
+    html += this.makeMainMenu();
 
 
-    var newMenu = "";
-    for(var i=0;i<chartNames.length;i++) {
-        newMenu+= "<a onclick=\"" + get+"." + chartCalls[i]+"\">" + chartNames[i] +"</a>";
-    }
+    html += htmlUtil.openTag("table",["width","100%","border","0"]);
+    html += htmlUtil.openTag("tr", ["valign","top"]);
 
-    var layout = "<li><a onclick=\"" + get +".setLayout('table',1)\">Table - 1 column</a></li><li><a onclick=\"" + get +".setLayout('table',2)\">Table - 2 column</a><li><a onclick=\"" + get +".setLayout('table',3)\">Table - 3 column</a></li><li><a onclick=\"" + get +".setLayout('tabs')\">Tabs</a></li>"
-    var menu = "<div class=ramadda-popup id=" + this.id+"_menu_popup><ul id=" + this.id+"_menu_inner sample-menu class=sf-menu><li><a>New</a><ul>" + newMenu +"</ul></li><li><a>Layout</a><ul>" + layout +"</ul></li></ul></div>";
-
-    html+= menu;
-    html += "<a class=chart-menu-button id=\"" + this.id +"_menu_button\"></a><br>";
-    html+= "<table width=100% border=1><tr valign=top>";
     //    html+="<td>";
     //    html+="<b>Entries</b>";
-    //    html+="<div class=chart-entry-list-wrapper><div id=" + this.id+"_entries class=chart-entry-list></div></div>";
+    //    html+="<div class=chart-entry-list-wrapper><div id=" + this.getDomId("entries") +"  class=chart-entry-list></div></div>";
     //    html+="</td>";
+
     html+="<td>";
-    html+= "<div id=\"" + this.id +"_charts\"></div>";
+    html+= htmlUtil.div(["id", this.getDomId("charts")]);
     html+="</td>";
 
-    html+="<td width=300>";
+    html+=htmlUtil.openTag("td", ["width", "300"]);
+
     if(this.mapEnabled) {
-        html+= "<h3>Map</h3><form><input id=\"" + this.latFieldId +"\"> <input id=\"" +  this.lonFieldId+"\"></form>"
-        html+="<div style=\"width:400px; height:400px;\" class=chart-map id=" + this.id+"_map></div>";
+        html+= htmlUtil.tag("h3",[],"Map");
+        html+= "<form>Latitude: <input size=10 id=\"" + this.latFieldId +"\"> Longitude: <input size=10 id=\"" +  this.lonFieldId+"\"></form>";
+        html+=htmlUtil.div(["style", "width:400px; height:400px;",
+                            "class", "chart-map",
+                            "id", this.getDomId("map")]);
     }
 
 
-    html+= "<h3>Selection</h3>";
-    html+="<form>"
+    html+= htmlUtil.tag("h3",[],"Selection");
 
-    html+=" Put selection form here"
-    html+="</form>"
-    html+="</td>";
+    html+="<form>"
+        html+=" Put selection form here"
+        html+="</form>"
+        html+="</td>";
 
 
     html+="</table>";
@@ -100,22 +116,21 @@ function ChartManager(id,properties) {
     this.mapCentered = false;
     if(this.mapEnabled) {
         var params = {};
-        console.log("map id:" + this.id+"_map");
-        this.map = new RepositoryMap(this.id+"_map", params);
+        this.map = new RepositoryMap(this.getDomId("map"), params);
         this.map.initMap(false);
         this.map.addClickHandler( this.lonFieldId, this.latFieldId);
         //        this.map.addLine('0e9d5f64-823a-4bdf-813b-bb3f4d80f6e2_polygon', 59.772422500000005, -151.10694375000003, 59.7614675, -151.14459375);
     }
 
     if(this.entryList) {
-        //this.entryList.initDisplay(this.id+"_entries");
+        //this.entryList.initDisplay(this.getDomId("entries"));
     }
 
 
-    $("#"+this.id +"_menu_button").button({ icons: { primary: "ui-icon-gear", secondary: "ui-icon-triangle-1-s"}}).click(function(event) {
-            var id =theChart.getId()+"_menu_popup"; 
-            showPopup(event, theChart.id +"_menu_button", id, false,null,"left bottom");
-            $("#"+  this.id+"_menu_inner").superfish({
+    $("#"+this.getDomId("menu_button")).button({ icons: { primary: "ui-icon-gear", secondary: "ui-icon-triangle-1-s"}}).click(function(event) {
+            var id =theChart.getDomId("menu_popup"); 
+            showPopup(event, theChart.getDomId("menu_button"), id, false,null,"left bottom");
+            $("#"+  theChart.getDomId("menu_inner")).superfish({
                     animation: {height:'show'},
                         delay: 1200
                         });
@@ -125,9 +140,52 @@ function ChartManager(id,properties) {
 
 function init_ChartManager(chartManager) {
 
+    chartManager.makeMainMenu = function() {
+        if(!this.getProperty("show.menu", true))  {
+            return "";
+        }
+        //How else do I refer to this object in the html that I add 
+        var get = "getChartManager('" + this.getId() +"')";
+        var html = "";
+        var wider = "<a onclick=\"" + get +".changeChartWidth(1)\">+ Chart width</a>";
+        var narrower = "<a onclick=\"" + get +".changeChartWidth(-1)\">- Chart width</a>";
+        var chartNames = ["Time Series","Bar Chart","Scatter Plot", "Table"];
+        var chartCalls = ["newTimeseries();","newBarchart();","newScatterPlot();", "newTable();"];
+        var newMenu = "";
+        for(var i=0;i<chartNames.length;i++) {
+            newMenu+= "<li><a onclick=\"" + get+"." + chartCalls[i]+"\">" + chartNames[i] +"</a></li>";
+        }
+
+        var layoutMenu = "<li><a onclick=\"" + get +".setLayout('table',1)\">Table - 1 column</a></li><li><a onclick=\"" + get +".setLayout('table',2)\">Table - 2 column</a><li><a onclick=\"" + get +".setLayout('table',3)\">Table - 3 column</a></li><li><a onclick=\"" + get +".setLayout('tabs')\">Tabs</a></li>"
+        var menu = "<div class=ramadda-popup id=" + this.getDomId("menu_popup") + "><ul id=" + this.getDomId("menu_inner") +" sample-menu class=sf-menu><li><a>New</a><ul>" + newMenu +"</ul></li><li><a>Layout</a><ul>" + layoutMenu +"</ul></li></ul></div>";
+
+        html += menu;
+        html += "<a class=chart-menu-button id=\"" + this.getDomId("menu_button") + "\"></a><br>";
+        return html;
+    }
+
     chartManager.getId = function() {
         return this.id;
     }
+
+
+    chartManager.getDomId = function(suffix) {
+        return this.getId() +"_" + suffix;
+    }
+
+
+
+
+    chartManager.hasMap = function() {
+        return this.map!=null;
+    }
+
+
+    chartManager.addPolygon = function(id, points, props) {
+        if(!this.map) return;
+        this.map.addPolygon(id, points, props);
+    }
+
 
     chartManager.setMapBounds = function(north, west, south, east) {
         if(!this.map) return;
@@ -192,12 +250,23 @@ function init_ChartManager(chartManager) {
         
     }
 
+    chartManager.getChartsToLayout = function() {
+        var result = [];
+        for(var i=0;i<this.charts.length;i++) {
+            if(this.charts[i].getIsLayoutFixed()) continue;
+            result.push(this.charts[i]);
+        }
+        return result;
+    }
+
+
     chartManager.doLayout = function() {
         var html = "";
         var colCnt=100;
+        var chartsToLayout = this.getChartsToLayout();
         if(this.layout == "table") {
             html+="<table width=100% cellpadding=5 cellspacing=5>";
-            for(var i=0;i<this.charts.length;i++) {
+            for(var i=0;i<chartsToLayout.length;i++) {
                 colCnt++;
                 if(colCnt>=this.columns) {
                     if(i>0) {
@@ -207,7 +276,7 @@ function init_ChartManager(chartManager) {
                     colCnt=0;
                 }
                 html+="<td><div>";
-                html+=this.charts[i].getDisplay();
+                html+=chartsToLayout[i].getDisplay();
                 html+="</div></td>";
             }
             html+= "</tr></table>";
@@ -215,12 +284,11 @@ function init_ChartManager(chartManager) {
         } else {
             html+="Unknown layout:" + this.layout;
         }
-        $("#" + this.getId() +"_charts").html(html);
+        $("#" + this.getDomId("charts")).html(html);
+
         for(var i=0;i<this.charts.length;i++) {
             this.charts[i].initDisplay();
         }
-
-
 
     }
 
@@ -301,5 +369,4 @@ function init_ChartManager(chartManager) {
         this.charts.add(chart);
     }
 }
-
 

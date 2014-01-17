@@ -45,8 +45,7 @@ pointData - A PointData object (see below)
  */
 function RamaddaLineChart(id, pointDataArg, properties) {
     this.id = id;
-    this.properties = properties;
-    init_RamaddaLineChart(this);
+    init_RamaddaLineChart(this, properties);
     addChart(this);
     var testUrl = null;
     //Uncomment to test using test.json
@@ -61,9 +60,11 @@ function RamaddaLineChart(id, pointDataArg, properties) {
 
 
 
-function init_RamaddaLineChart(theChart) {
+function init_RamaddaLineChart(theChart, properties) {
     theChart.dataCollection = new DataCollection();
-    init_RamaddaChart(theChart);
+    theChart.indexField = -1;
+
+    init_RamaddaChart(theChart, properties);
     theChart.initDisplay = function() {
         var theChart = this;
         var reloadId = this.getId() +"_reload";
@@ -167,12 +168,15 @@ function init_RamaddaLineChart(theChart) {
     }
 
     theChart.displayData = function() {
+        var theChart = this;
         if(!this.hasData()) {
             if(this.chart !=null) {
                 this.chart.clearChart();
             }
             return;
         }
+
+        this.allFields =  this.dataCollection.getData()[0].getRecordFields();
 
         var selectedFields = this.getSelectedFields();
         if(selectedFields.length==0) {
@@ -213,11 +217,43 @@ function init_RamaddaLineChart(theChart) {
             this.chart.draw(dataTable, options);
 
         } else {
-            if(this.hasDate) {
+            if(false && this.hasDate) {
                 this.chart = new google.visualization.AnnotatedTimeLine(document.getElementById(this.chartDivId));
             } else {
                 this.chart = new google.visualization.LineChart(document.getElementById(this.chartDivId));
             }
+            google.visualization.events.addListener(this.chart, 'select', function() {
+                    var item = theChart.chart.getSelection()[0];
+                    var index = item.row;
+                    var records = pointData.getData();
+                    var dataList =  theChart.dataCollection.getData()[0].getData();
+                    var fields =  theChart.dataCollection.getData()[0].getRecordFields();
+                    if(index>=0 && index<records.length) {
+                        var record = records[index];
+                        var values = "<table>";
+                        if(!record.hasLocation()) return;
+                        
+                        var latitude = record.getLatitude();
+                        var longitude = record.getLongitude();
+                        values+= "<tr><td align=right><b>Latitude:</b></td><td>" + latitude + "</td></tr>";
+                        values+= "<tr><td align=right><b>Longitude:</b></td><td>" + longitude + "</td></tr>";
+                        if(record.hasElevation()) {
+                            values+= "<tr><td  align=right><b>Elevation:</b></td><td>" + record.getElevation() + "</td></tr>";
+                        }
+                        for(var i=0;i<record.getData().length;i++) {
+                            var label = fields[i].getLabel();
+                            values+= "<tr><td align=right><b>" + label +":</b></td><td>" + record.getValue(i) + "</td></tr>";
+                        }
+                        values += "</table>";
+                        var point = new OpenLayers.LonLat(longitude, latitude);
+                        if(theChart.lastMarker!=null) {
+                            theChart.chartManager.map.removeMarker(theChart.lastMarker);
+                        }
+                        //                        theChart.chartManager.map.setCenter(point);
+                        theChart.lastMarker =  theChart.chartManager.map.addMarker(theChart.getId(), point, null,values);
+                    }
+
+             });
 
             this.chart.draw(dataTable, options);
 
@@ -236,8 +272,7 @@ pointData - A PointData object (see below)
  */
 function RamaddaScatterChart(id, pointDataArg, properties) {
     this.id = id;
-    this.properties = properties;
-    init_RamaddaScatterChart(this);
+    init_RamaddaScatterChart(this, properties);
     addChart(this);
     this.title = pointDataArg.getName();
     this.addOrLoadData(pointDataArg);
@@ -245,9 +280,9 @@ function RamaddaScatterChart(id, pointDataArg, properties) {
 
 
 
-function init_RamaddaScatterChart(theChart) {
+function init_RamaddaScatterChart(theChart, properties) {
     theChart.dataCollection = new DataCollection();
-    init_RamaddaChart(theChart);
+    init_RamaddaChart(theChart,properties);
     theChart.initDisplay = function() {
         var theChart = this;
         var reloadId = this.getId() +"_reload";
@@ -387,7 +422,12 @@ function init_RamaddaScatterChart(theChart) {
 
 
 
-function init_RamaddaChart(theChart) {
+function init_RamaddaChart(theChart, properties) {
+    theChart.properties = properties;
+    if(theChart.properties == null) {
+        theChart.properties == {'':''};
+    }
+    
     theChart.chartHeaderId =theChart.id +"_header";
     theChart.fieldsDivId =theChart.id +"_fields";
     theChart.chartDivId =theChart.id +"_chart";
@@ -426,6 +466,9 @@ function init_RamaddaChart(theChart) {
 
     theChart.removeChart = function() {
         this.chartManager.removeChart(this);
+        if(theChart.lastMarker!=null) {
+            this.chartManager.map.removeMarker(theChart.lastMarker);
+        }
     }
 
 
@@ -453,8 +496,12 @@ function init_RamaddaChart(theChart) {
         return this.id;
     }
 
+    theChart.getIsLayoutFixed = function() {
+        return this.getProperty("layout.fixed",false);
+    }
+
+
     theChart.getProperty = function(key, dflt) {
-        if(typeof this.properties == 'undefined') return dflt;
         var value = this.properties[key];
         if(value == null) return dflt;
         return value;
@@ -532,10 +579,14 @@ function init_RamaddaChart(theChart) {
         var pointData = this.dataCollection.getData()[0];
         this.hasDate = true;
 
+        var indexField = this.indexField;
+        var allFields = this.allFields;
+
         var north=NaN,west=NaN,south=NaN,east=NaN;
         //        var bounds = new OpenLayers.Bounds(-151.827, 59.3397, -151.074, 59.7779);
         //        this.map.centerOnMarkers(bounds);
 
+        var points =[];
         var records = pointData.getData();
         for(j=0;j<records.length;j++) { 
             var record = records[j];
@@ -553,18 +604,31 @@ function init_RamaddaChart(theChart) {
                     west  = Math.min(west, record.getLongitude());
                     east  = Math.min(east, record.getLongitude());
                 }
+                points.push(new OpenLayers.Geometry.Point(record.getLongitude(),record.getLatitude()));
             }
             //Add the date or index field
-            if(date!=null) {
-                date = new Date(date);
-                values.push(date);
-            } else {
+           
+           if(indexField>=0) {
+               var field = allFields[indexField];
+               var value = record.getValue(indexField);
                 if(j==0) {
-                    this.hasDate = false;
-                    fieldNames[0] = "Index";
+                    console.log("index field:" +  field.getLabel() + " ex:" + value);
+                    fieldNames[0] = field.getLabel();
                 }
-                values.push(j);
-            }
+                values.push(value);
+           } else {
+               if(date!=null) {
+                   date = new Date(date);
+                   values.push(date);
+               } else {
+                   if(j==0) {
+                       this.hasDate = false;
+                       fieldNames[0] = "Index";
+                   }
+                   values.push(j);
+               }
+           }
+
             //            values.push(record.getElevation());
             var allNull  = true;
             for(var i=0;i<fields.length;i++) { 
@@ -588,6 +652,9 @@ function init_RamaddaChart(theChart) {
         //var js = "values[1] = 33;if(values[1]<360) ok= 'valuesxxx'; else ok= 'zzz';"
         if(!isNaN(north)) {
             this.chartManager.setMapBounds(north, west, south, east);
+            if(points.length>1) {
+                this.chartManager.addPolygon("id",points, null);
+            }
         }
 
         return dataList;

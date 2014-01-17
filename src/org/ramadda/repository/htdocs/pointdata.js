@@ -223,6 +223,14 @@ function init_Record(record) {
     record.getValue = function(index) {
         return this.data[index];
     }
+    record.hasLocation = function() {
+        return ! isNaN(this.latitude);
+    }
+
+    record.hasElevation = function() {
+        return ! isNaN(this.elevation);
+    }
+
     record.getLatitude = function() {
         return this.latitude;
     }

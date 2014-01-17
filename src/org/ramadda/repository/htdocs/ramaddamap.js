@@ -738,6 +738,12 @@ function RepositoryMap(mapId, params) {
         this.map.zoomToExtent(projBounds);
     }
 
+    this.setCenter = function(latLonPoint) {
+        var projPoint =  this.transformLLPoint(latLonPoint);
+        this.map.setCenter(projPoint);
+    }
+
+
     this.zoomToMarkers = function() {
         if (!this.markers)
             return;
@@ -754,8 +760,6 @@ function RepositoryMap(mapId, params) {
 
     this.addMarker = function(id, location, iconUrl, text) {
         var offset = 0.2;
-
-
 
         if (!this.markers) {
             this.markers = new OpenLayers.Layer.Markers("Markers");
@@ -786,6 +790,8 @@ function RepositoryMap(mapId, params) {
         marker.id = id;
         marker.text = text;
         marker.location = location;
+
+
         var theMap = this;
         marker.events.register('click', marker, function(evt) {
             theMap.showMarkerPopup(marker);
@@ -793,11 +799,8 @@ function RepositoryMap(mapId, params) {
         });
         this.markers.addMarker(marker);
         return marker;
+    
     }
-
-    //        this.addLine(id,location.lat-offset,location.lon,location.lat+offset,location.lon,"");
-    //        this.addLine(id,location.lat,location.lon-offset,location.lat,location.lon+offset,"");
-
 
     this.initBoxes = function(theBoxes) {
         if (!this.map) {
@@ -864,23 +867,19 @@ function RepositoryMap(mapId, params) {
                 new OpenLayers.Geometry.Point(east, south),
                 new OpenLayers.Geometry.Point(east, north),
                 new OpenLayers.Geometry.Point(west, north) ];
-
-        for (i in points) {
-            points[i].transform(this.displayProjection, this.sourceProjection);
-        }
         return this.addPolygon(id, points, attrs);
     }
 
     this.addLine = function(id, lat1, lon1, lat2, lon2, attrs) {
         var points = [ new OpenLayers.Geometry.Point(lon1, lat1),
                        new OpenLayers.Geometry.Point(lon2, lat2) ];
-        for (i in points) {
-            points[i].transform(this.displayProjection, this.sourceProjection);
-        }
         return this.addPolygon(id, points, attrs);
     }
 
     this.addPolygon = function(id, points, attrs) {
+        for (i in points) {
+            points[i].transform(this.displayProjection, this.sourceProjection);
+        }
 
 
 
