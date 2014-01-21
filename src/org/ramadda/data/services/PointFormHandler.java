@@ -1217,51 +1217,6 @@ public class PointFormHandler extends RecordFormHandler {
 
 
 
-    /**
-     * make the map page
-     *
-     * @param request the request
-     * @param outputType otuput type
-     * @param pointEntry The entry
-     *
-     * @return ramadda result
-     *
-     * @throws Exception on badness
-     */
-    public Result outputEntryChart(Request request, OutputType outputType,
-                                   PointEntry pointEntry)
-            throws Exception {
-        StringBuffer sb = new StringBuffer();
-        getEntryChart(request, pointEntry, sb);
-
-        return new Result("", sb);
-    }
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param pointEntry _more_
-     * @param sb _more_
-     *
-     * @throws Exception _more_
-     */
-    public void getEntryChart(Request request, PointEntry pointEntry,
-                              StringBuffer sb)
-            throws Exception {
-
-        Entry entry = pointEntry.getEntry();
-        String jsonUrl =
-            request.entryUrl(
-                getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
-                getPointOutputHandler().OUTPUT_PRODUCT.getId(), ARG_PRODUCT,
-                getPointOutputHandler().OUTPUT_JSON.toString()) + "&"
-                    + RecordFormHandler.ARG_NUMPOINTS + "=1000";
-
-        String name = entry.getName();
-        getPointOutputHandler().getWikiManager().getEntryChart(request, name,
-                                                               jsonUrl, sb, new ArrayList<String>());
-    }
 
 
 

@@ -751,8 +751,8 @@ public class PointOutputHandler extends RecordOutputHandler {
         }
 
         if (outputType.equals(OUTPUT_CHART)) {
-            return getPointFormHandler().outputEntryChart(request,
-                    outputType, (PointEntry) doMakeEntry(request, entry));
+            return outputEntryChart(request,
+                                    outputType, entry);
         }
 
         if (outputType.equals(OUTPUT_WAVEFORM)) {
@@ -804,6 +804,52 @@ public class PointOutputHandler extends RecordOutputHandler {
 
         //        return null;
     }
+
+
+    /**
+     * make the map page
+     *
+     * @param request the request
+     * @param outputType otuput type
+     * @param pointEntry The entry
+     *
+     * @return ramadda result
+     *
+     * @throws Exception on badness
+     */
+    public Result outputEntryChart(Request request, OutputType outputType,
+                                   Entry entry)
+            throws Exception {
+        StringBuffer sb = new StringBuffer();
+        String url = getJsonUrl(request, entry);
+        String name = entry.getName();
+        getWikiManager().getEntryChart(request, name,
+                                       url, sb, new Hashtable());
+        return new Result("", sb);
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param pointEntry _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    public String getJsonUrl(Request request, Entry entry)
+            throws Exception {
+
+        return
+            request.entryUrl(
+                getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
+                OUTPUT_PRODUCT.getId(), ARG_PRODUCT,
+                OUTPUT_JSON.toString()) + "&"
+                    + RecordFormHandler.ARG_NUMPOINTS + "=1000";
+
+    }
+
+
 
 
     /**

@@ -846,9 +846,9 @@ public class CdmDataOutputHandler extends OutputHandler {
                                  + suffix + "?" + request.getUrlArgs();
                 jsonUrl = jsonUrl.replace("_LATITUDEMACRO_", "${latitude}");
                 jsonUrl = jsonUrl.replace("_LONGITUDEMACRO_", "${longitude}");
-                List<String> props = new ArrayList<String>();
-                props.add("mapenabled");
-                props.add("true");
+
+                Hashtable  props = new Hashtable();
+                props.put("mapenabled", "true");
                 getWikiManager().getEntryChart(request, title, jsonUrl, html,
                         props);
 
