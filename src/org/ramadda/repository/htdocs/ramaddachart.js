@@ -18,6 +18,29 @@ var chart = new  RamaddaChart("example" , pointData);
 //some globals
 
 
+var ID_FIELDS = "fields";
+var ID_HEADER = "header";
+var ID_CHART = "chart";
+var ID_MENU_BUTTON = "menu_button";
+var ID_MENU_POPUP = "menu_popup";
+var ID_MENU_INNER = "menu_inner";
+var ID_RELOAD = "reload";
+
+var PROP_CHART_FILTER = "chart.filter";
+var PROP_CHART_MIN = "chart.min";
+var PROP_CHART_MAX = "chart.max";
+var PROP_CHART_TYPE = "chart.type";
+var PROP_DIVID = "divid";
+var PROP_FIELDS = "fields";
+var PROP_HEIGHT  = "height";
+var PROP_LAYOUT_FIXED = "layout.fixed";
+var PROP_WIDTH  = "width";
+
+
+var CHART_LINECHART = "linechart";
+var CHART_BARCHART = "barchart";
+var CHART_TABLE = "table";
+
 function addChart(chart) {
     if(window.globalCharts == null) {
         window.globalCharts = {'foo':'bar'};
@@ -72,17 +95,28 @@ function init_RamaddaLineChart(theChart, properties) {
 
     init_RamaddaChart(theChart, properties);
     theChart.initDisplay = function() {
+        //If we are a fixed layout then there should be a div id property
+        if(this.getIsLayoutFixed()) {
+            var divid = this.getProperty(PROP_DIVID);
+            if(divid!=null) {
+                var html = this.getDisplay();
+                $("#" + divid).html(html);
+            }
+        }
+
+
+
         var theChart = this;
-        var reloadId = this.getId() +"_reload";
+        var reloadId = this.getDomId(ID_RELOAD);
         $("#" + reloadId).button().click(function(event) {
                 event.preventDefault();
                 theChart.reload();
             });
 
-        $("#"+this.id +"_menu_button").button({ icons: { primary:  "ui-icon-triangle-1-s"}}).click(function(event) {
-                var id =theChart.getId()+"_menu_popup"; 
-                showPopup(event, theChart.id +"_menu_button", id, false,null,"left bottom");
-                $("#"+  this.id+"_menu_inner").superfish({
+        $("#"+this.getDomId(ID_MENU_BUTTON)).button({ icons: { primary:  "ui-icon-triangle-1-s"}}).click(function(event) {
+                var id =theChart.getDomId(ID_MENU_POPUP); 
+                showPopup(event, theChart.getDomId(ID_MENU_BUTTON), id, false,null,"left bottom");
+                $("#"+  theChart.getDomId(ID_MENU_INNER)).superfish({
                         animation: {height:'show'},
                             delay: 1200
                             });
@@ -96,10 +130,10 @@ function init_RamaddaLineChart(theChart, properties) {
 
     theChart.addFieldsLegend = function() {
         if(!this.hasData()) {
-            $("#" + this.fieldsDivId).html("No data");
+            $("#" + this.getDomId(ID_FIELDS)).html("No data");
             return;
         }
-        if(this.getProperty("fields",null)!=null) {
+        if(this.getProperty(PROP_FIELDS,null)!=null) {
             return;
         }
         //        this.setTitle(this.getTitle());
@@ -115,7 +149,7 @@ function init_RamaddaLineChart(theChart, properties) {
             html+= "<br>";
             for(i=0;i<fields.length;i++) { 
                 var field = fields[i];
-                field.checkboxId  = this.id +"_cbx_" + collectionIdx +"_" +i;
+                field.checkboxId  = this.getDomId("cbx_" + collectionIdx +"_" +i);
                 html += htmlUtil.tag("div", ["title", field.getId()],
                                      htmlUtil.checkbox(field.checkboxId, checkboxClass,
                                                        field ==fields[0]) +" " +field.getLabel()
@@ -124,7 +158,7 @@ function init_RamaddaLineChart(theChart, properties) {
         }
         html+= htmlUtil.closeTag("div");
 
-        $("#" + this.fieldsDivId).html(html);
+        $("#" + this.getDomId(ID_FIELDS)).html(html);
 
         //Listen for changes to the checkboxes
         $("." + checkboxClass).click(function() {
@@ -136,7 +170,7 @@ function init_RamaddaLineChart(theChart, properties) {
     theChart.getSelectedFields = function() {
         var df = [];
         var dataList =  this.dataCollection.getData();
-        var fixedFields = this.getProperty("fields");
+        var fixedFields = this.getProperty(PROP_FIELDS);
         for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
             var pointData = dataList[collectionIdx];
             var fields = pointData.getChartableFields();
@@ -161,7 +195,7 @@ function init_RamaddaLineChart(theChart, properties) {
             for(i=0;i<fields.length;i++) { 
                 var field = fields[i];
                 if(firstField==null) firstField = field;
-                var cbxId =  this.id +"_cbx_" + collectionIdx +"_" +i;
+                var cbxId =  this.getDomId("cbx_" + collectionIdx +"_" +i);
                 if($("#" + cbxId).is(':checked')) {
                     df.push(field);
                 }
@@ -188,7 +222,7 @@ function init_RamaddaLineChart(theChart, properties) {
 
         var selectedFields = this.getSelectedFields();
         if(selectedFields.length==0) {
-            $("#" + this.chartDivId).html("No fields selected");
+            $("#" + this.getDomId(ID_CHART)).html("No fields selected");
             return;
         }
 
@@ -196,6 +230,7 @@ function init_RamaddaLineChart(theChart, properties) {
 
         //Keep all of the google chart specific code here
         if(typeof google == 'undefined') {
+            $("#"+this.getDomId(ID_CHART)).html("No google");
             return;
         }
 
@@ -208,27 +243,29 @@ function init_RamaddaLineChart(theChart, properties) {
             chartArea:{left:50,top:10,height:"75%",width:"85%"}
         };
 
-        var min = this.getProperty("chart.min","");
+
+        var min = this.getProperty(PROP_CHART_MIN,"");
         if(min!="") {
             options.vAxis = {
                 minValue:min,
             };
         }
 
-        var chartType = this.getProperty("chart.type","linechart");
-        if(chartType == "barchart") {
+
+        var chartType = this.getProperty(PROP_CHART_TYPE,CHART_LINECHART);
+        if(chartType == CHART_BARCHART) {
             options.orientation =  "horizontal";
-            this.chart = new google.visualization.BarChart(document.getElementById(this.chartDivId));
+            this.chart = new google.visualization.BarChart(document.getElementById(this.getDomId(ID_CHART)));
             this.chart.draw(dataTable, options);
-        } else  if(chartType == "table") {
-            this.chart = new google.visualization.Table(document.getElementById(this.chartDivId));
+        } else  if(chartType == CHART_TABLE) {
+            this.chart = new google.visualization.Table(document.getElementById(this.getDomId(ID_CHART)));
             this.chart.draw(dataTable, options);
 
         } else {
             if(false && this.hasDate) {
-                this.chart = new google.visualization.AnnotatedTimeLine(document.getElementById(this.chartDivId));
+                this.chart = new google.visualization.AnnotatedTimeLine(document.getElementById(this.getDomId(ID_CHART)));
             } else {
-                this.chart = new google.visualization.LineChart(document.getElementById(this.chartDivId));
+                this.chart = new google.visualization.LineChart(document.getElementById(this.getDomId(ID_CHART)));
             }
             google.visualization.events.addListener(this.chart, 'select', function() {
                     var item = theChart.chart.getSelection()[0];
@@ -290,16 +327,16 @@ function init_RamaddaScatterChart(theChart, properties) {
     init_RamaddaChart(theChart,properties);
     theChart.initDisplay = function() {
         var theChart = this;
-        var reloadId = this.getId() +"_reload";
+        var reloadId = this.getDomId(ID_RELOAD);
         $("#" + reloadId).button().click(function(event) {
                 event.preventDefault();
                 theChart.reload();
             });
 
-        $("#"+this.id +"_menu_button").button({ icons: { primary:  "ui-icon-triangle-1-s"}}).click(function(event) {
-                var id =theChart.getId()+"_menu_popup"; 
-                showPopup(event, theChart.id +"_menu_button", id, false,null,"left bottom");
-                $("#"+  this.id+"_menu_inner").superfish({
+        $("#"+this.getDomId(ID_MENU_BUTTON)).button({ icons: { primary:  "ui-icon-triangle-1-s"}}).click(function(event) {
+                var id =this.getDomId(ID_MENU_POPUP); 
+                showPopup(event, this.getDomId(ID_MENU_BUTTON), id, false,null,"left bottom");
+                $("#"+  this.getDomId(ID_MENU_INNER)).superfish({
                         animation: {height:'show'},
                             delay: 1200
                             });
@@ -313,10 +350,10 @@ function init_RamaddaScatterChart(theChart, properties) {
 
     theChart.addFieldsLegend = function() {
         if(!this.hasData()) {
-            $("#" + this.fieldsDivId).html("No data");
+            $("#" + this.getDomId(ID_FIELDS)).html("No data");
             return;
         }
-        if(this.getProperty("fields",null)!=null) {
+        if(this.getProperty(PROP_FIELDS,null)!=null) {
             return;
         }
         //        this.setTitle(this.getTitle());
@@ -331,7 +368,7 @@ function init_RamaddaScatterChart(theChart, properties) {
             html+= "<b>" + pointData.getName() + "</b><br>";
             for(i=0;i<fields.length;i++) { 
                 var field = fields[i];
-                field.checkboxId  = this.id +"_cbx_" + collectionIdx +"_" +i;
+                field.checkboxId  = this.getDomId("cbx_" + collectionIdx +"_" +i);
                 html += htmlUtil.tag("span", ["title",  field.getId()], 
                                      htmlUtil.checkbox(field.checkboxId, checkboxClass,
                                                        field ==fields[0]));
@@ -339,7 +376,7 @@ function init_RamaddaScatterChart(theChart, properties) {
              }
         }
         html+= htmlUtil.closeTag("div");
-        $("#" + this.fieldsDivId).html(html);
+        $("#" + this.getDomId(ID_FIELDS)).html(html);
 
         //Listen for changes to the checkboxes
         $("." + checkboxClass).click(function() {
@@ -351,7 +388,7 @@ function init_RamaddaScatterChart(theChart, properties) {
     theChart.getSelectedFields = function() {
         var df = [];
         var dataList =  this.dataCollection.getData();
-        var fixedFields = this.getProperty("fields");
+        var fixedFields = this.getProperty(PROP_FIELDS);
         for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
             var pointData = dataList[collectionIdx];
             var fields = pointData.getChartableFields();
@@ -376,7 +413,7 @@ function init_RamaddaScatterChart(theChart, properties) {
             for(i=0;i<fields.length;i++) { 
                 var field = fields[i];
                 if(firstField==null) firstField = field;
-                var cbxId =  this.id +"_cbx_" + collectionIdx +"_" +i;
+                var cbxId =  this.getDomId("_cbx_" + collectionIdx +"_" +i);
                 if($("#" + cbxId).is(':checked')) {
                     df.push(field);
                 }
@@ -400,7 +437,7 @@ function init_RamaddaScatterChart(theChart, properties) {
 
         var selectedFields = this.getSelectedFields();
         if(selectedFields.length==0) {
-            $("#" + this.chartDivId).html("No fields selected");
+            $("#" + this.getDomId(ID_CHART)).html("No fields selected");
             return;
         }
 
@@ -419,7 +456,7 @@ function init_RamaddaScatterChart(theChart, properties) {
         };
 
 
-        //this.chart = new google.visualization.BarChart(document.getElementById(this.chartDivId));
+        //this.chart = new google.visualization.BarChart(document.getElementById(this.getDomId(ID_CHART)));
         //this.chart.draw(dataTable, options);
     }
 }
@@ -427,267 +464,233 @@ function init_RamaddaScatterChart(theChart, properties) {
 
 
 
-function init_RamaddaChart(theChart, properties) {
-    theChart.properties = properties;
-    if(theChart.properties == null) {
-        theChart.properties == {'':''};
+function init_RamaddaChart(theChart, propertiesArg) {
+    if(propertiesArg == null) {
+       propertiesArg = {'':''};
     }
-    
-    theChart.chartHeaderId =theChart.id +"_header";
-    theChart.fieldsDivId =theChart.id +"_fields";
-    theChart.chartDivId =theChart.id +"_chart";
+    $.extend(theChart, {
+            properties: propertiesArg,
+            chartManager:null,
+                });
+    init_ChartThing(theChart);
 
+    $.extend(theChart, {
+            filters: [],
+                setChartManager: function(cm) {
+                this.chartManager = cm;
+            },
+                getDisplay: function() {
+                var theChart = this;
+                var reloadId = this.getDomId(ID_RELOAD);
+                var html = "";
+                html +=   htmlUtil.div(["id", this.getDomId(ID_HEADER),"class", "chart-header"]);
+                var get = "getChart('" + this.id +"')";
+                var deleteMe = htmlUtil.onClick("removeChart('" + this.id +"')", "<img src=" + root +"/icons/close.gif>");
+                var menuButton =  htmlUtil.tag("a", ["class", "chart-menu-button", "id",  this.getDomId(ID_MENU_BUTTON)]);
+                var menu = htmlUtil.div(["class", "ramadda-popup", "id", this.getDomId(ID_MENU_POPUP)], this.getFieldsDiv());
 
-    theChart.chartManager = null;
-    
-    theChart.getDisplay = function() {
-        var theChart = this;
-        var reloadId = this.getId() +"_reload";
+                html += htmlUtil.openTag("table", ["border", "0", "cellpadding","0", "cellspacing","0"]);
+                html += htmlUtil.openTag("tr", ["valign", "bottom"]);
+                html += htmlUtil.td([], htmlUtil.b(this.getTitle()));
+                html += htmlUtil.td(["align", "right"],
+                                    menuButton +
+                                    deleteMe);
+                html += htmlUtil.closeTag("tr");
 
-        var html = "";
-        html +=   htmlUtil.div(["id", this.chartHeaderId,"class", "chart-header"]);
-        var get = "getChart('" + this.id +"')";
-        var deleteMe = htmlUtil.onClick("removeChart('" + this.id +"')", "<img src=" + root +"/icons/close.gif>");
-        var menuButton =  htmlUtil.tag("a", ["class", "chart-menu-button", "id",  theChart.getId() +"_menu_button"]);
-        var menu = htmlUtil.div(["class", "ramadda-popup", "id", this.id+"_menu_popup"], this.getFieldsDiv());
-
-        html += htmlUtil.openTag("table", ["border", "0", "cellpadding","0", "cellspacing","0"]);
-        html += htmlUtil.openTag("tr", ["valign", "bottom"]);
-        html += htmlUtil.td([], htmlUtil.b(this.getTitle()));
-        html += htmlUtil.td(["align", "right"],
-                           menuButton +
-                           deleteMe);
-        html += htmlUtil.closeTag("tr");
-
-        html += htmlUtil.tr(["valign", "top"], htmlUtil.td(["colspan", "2"], this.getChartDiv()));
-        html += htmlUtil.closeTag("table")
-        html += menu;
-        return html;
-    }
-
-
-    theChart.setChartManager = function(cm) {
-        this.chartManager = cm;
-
-    }
-
-    theChart.removeChart = function() {
-        this.chartManager.removeChart(this);
-        if(theChart.lastMarker!=null) {
-            this.chartManager.map.removeMarker(theChart.lastMarker);
-        }
-    }
-
-
-    theChart.setHtml = function(html) {
-        $("#" + this.id).html(html);
-    }
-
-    theChart.setTitle  = function(title) {
-        $("#" + this.chartHeaderId).html(title);
-    }
-
-    theChart.getTitle = function () {
-        if(this.title!=null) return this.title;
-        var title = "";
-        var dataList =  this.dataCollection.getData();
-        for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
-            var pointData = dataList[collectionIdx];
-            if(collectionIdx>0) title+="/";
-            title += pointData.getName();
-        }
-        return title;
-    }
-
-    theChart.getId = function() {
-        return this.id;
-    }
-
-    theChart.getIsLayoutFixed = function() {
-        return this.getProperty("layout.fixed",false);
-    }
-
-
-    theChart.getProperty = function(key, dflt) {
-        var value = this.properties[key];
-        if(value == null) return dflt;
-        return value;
-    }
-
-    theChart.hasData = function() {
-        return this.dataCollection.hasData();
-    }
-
-    theChart.addData= function(pointData) { 
-       this.dataCollection.addData(pointData);
-    }
-
-    theChart.pointDataLoaded = function(pointData) {
-        this.addData(pointData);
-        this.displayData();
-        this.addFieldsLegend();
-    }
-
-
-    theChart.reload = function() {
-        var dataList =  this.dataCollection.getData();
-        this.dataCollection = new DataCollection();
-        for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
-            var pointData = dataList[collectionIdx];
-            pointData.clear();
-            this.addOrLoadData(pointData);
-        }
-    }
-
-    theChart.addOrLoadData = function(pointData) {
-        if(pointData.hasData()) {
-            this.addData(pointData);
-        } else {
-            var jsonUrl = pointData.getUrl();
-
-            if(jsonUrl!=null) {
-                loadPointJson(jsonUrl, this, pointData);
-            }
-        }
-    }
-
-
-
-
-    theChart.getFieldsDiv = function() {
-        var height = this.getProperty("height","400");
-        return htmlUtil.div(["id",  this.fieldsDivId,"class", "chart-fields","style","overflow-y: auto;    max-height:" + height +"px;"]);
-    }
-
-    theChart.getChartDiv = function() {
-        return   htmlUtil.div(["id", this.chartDivId,"style", "border:0px red solid; width: " + this.getProperty("width","400px") +"; height: " + this.getProperty("height","400px") +";"]);
-    }
-
-
-    theChart.getStandardData = function(fields) {
-        var dataList = [];
-        //The first entry in the dataList is the array of names
-        //The first field is the domain, e.g., time or index
-        //        var fieldNames = ["domain","depth"];
-        var fieldNames = ["Date"];
-        for(i=0;i<fields.length;i++) { 
-            var field = fields[i];
-            var name  = field.getLabel();
-            if(field.getUnit()!=null) {
-                name += " (" + field.getUnit()+")";
-            }
-            fieldNames.push(name);
-        }
-        dataList.push(fieldNames);
-
-        //These are Record objects 
-        //TODO: handle multiple data sources (or not?)
-        var pointData = this.dataCollection.getData()[0];
-        this.hasDate = true;
-
-        var indexField = this.indexField;
-        var allFields = this.allFields;
-
-        var north=NaN,west=NaN,south=NaN,east=NaN;
-        //        var bounds = new OpenLayers.Bounds(-151.827, 59.3397, -151.074, 59.7779);
-        //        this.map.centerOnMarkers(bounds);
-
-        var points =[];
-        var records = pointData.getData();
-        for(j=0;j<records.length;j++) { 
-            var record = records[j];
-            var values = [];
-            var date = record.getDate();
-           if(!isNaN(record.getLatitude())) { 
-                if(j == 0) {
-                    north  =  record.getLatitude();
-                    south  = record.getLatitude();
-                    west  =  record.getLongitude();
-                    east  = record.getLongitude();
+                html += htmlUtil.tr(["valign", "top"], htmlUtil.td(["colspan", "2","id"],htmlUtil.div(["id",this.getDomId(ID_CHART)],"")));
+                html += htmlUtil.closeTag("table")
+                    html += menu;
+                return html;
+            },
+                removeChart: function() {
+                this.chartManager.removeChart(this);
+                if(theChart.lastMarker!=null) {
+                    this.chartManager.map.removeMarker(theChart.lastMarker);
+                }
+            },
+                setHtml: function(html) {
+                $("#" + this.id).html(html);
+            },
+                setTitle: function(title) {
+                $("#" +  this.getDomId(ID_HEADER)).html(title);
+            },
+                getTitle: function () {
+                if(this.title!=null) return this.title;
+                var title = "";
+                var dataList =  this.dataCollection.getData();
+                for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
+                    var pointData = dataList[collectionIdx];
+                    if(collectionIdx>0) title+="/";
+                    title += pointData.getName();
+                }
+                return title;
+            },
+                getIsLayoutFixed: function() {
+                return this.getProperty(PROP_LAYOUT_FIXED,false);
+            },
+                hasData: function() {
+                return this.dataCollection.hasData();
+            },
+                addData: function(pointData) { 
+                this.dataCollection.addData(pointData);
+            },
+                pointDataLoaded: function(pointData) {
+                this.addData(pointData);
+                this.displayData();
+                this.addFieldsLegend();
+            },
+                reload: function() {
+                var dataList =  this.dataCollection.getData();
+                this.dataCollection = new DataCollection();
+                for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
+                    var pointData = dataList[collectionIdx];
+                    pointData.clear();
+                    this.addOrLoadData(pointData);
+                }
+            },
+                addOrLoadData: function(pointData) {
+                if(pointData.hasData()) {
+                    this.addData(pointData);
                 } else {
-                    north  = Math.max(north, record.getLatitude());
-                    south  = Math.min(south, record.getLatitude());
-                    west  = Math.min(west, record.getLongitude());
-                    east  = Math.min(east, record.getLongitude());
+                    var jsonUrl = pointData.getUrl();
+                         
+                    if(jsonUrl!=null) {
+                        loadPointJson(jsonUrl, this, pointData);
+                    }
                 }
-                points.push(new OpenLayers.Geometry.Point(record.getLongitude(),record.getLatitude()));
-            }
-            //Add the date or index field
+            },
+                getFieldsDiv: function() {
+                var height = this.getProperty(PROP_HEIGHT,"400");
+                return htmlUtil.div(["id",  this.getDomId(ID_FIELDS),"class", "chart-fields","style","overflow-y: auto;    max-height:" + height +"px;"]);
+            },
+                getChartDiv: function() {
+                return   htmlUtil.div(["id", this.getDomId(ID_CHART),"style", "border:0px red solid; width: " + this.getProperty(PROP_WIDTH,"400px") +"; height: " + this.getProperty(PROP_HEIGHT,"400px") +";"]);
+            },
+                getStandardData : function(fields) {
+                var dataList = [];
+                //The first entry in the dataList is the array of names
+                //The first field is the domain, e.g., time or index
+                //        var fieldNames = ["domain","depth"];
+                var fieldNames = ["Date"];
+                for(i=0;i<fields.length;i++) { 
+                    var field = fields[i];
+                    var name  = field.getLabel();
+                    if(field.getUnit()!=null) {
+                        name += " (" + field.getUnit()+")";
+                    }
+                    fieldNames.push(name);
+                }
+                dataList.push(fieldNames);
+
+                //These are Record objects 
+                //TODO: handle multiple data sources (or not?)
+                var pointData = this.dataCollection.getData()[0];
+                this.hasDate = true;
+
+                var indexField = this.indexField;
+                var allFields = this.allFields;
+
+                var north=NaN,west=NaN,south=NaN,east=NaN;
+                //        var bounds = new OpenLayers.Bounds(-151.827, 59.3397, -151.074, 59.7779);
+                //        this.map.centerOnMarkers(bounds);
+
+                var points =[];
+                var records = pointData.getData();
+                for(j=0;j<records.length;j++) { 
+                    var record = records[j];
+                    var values = [];
+                    var date = record.getDate();
+                    if(!isNaN(record.getLatitude())) { 
+                        if(j == 0) {
+                            north  =  record.getLatitude();
+                            south  = record.getLatitude();
+                            west  =  record.getLongitude();
+                            east  = record.getLongitude();
+                        } else {
+                            north  = Math.max(north, record.getLatitude());
+                            south  = Math.min(south, record.getLatitude());
+                            west  = Math.min(west, record.getLongitude());
+                            east  = Math.min(east, record.getLongitude());
+                        }
+                        points.push(new OpenLayers.Geometry.Point(record.getLongitude(),record.getLatitude()));
+                    }
+                    //Add the date or index field
            
-           if(indexField>=0) {
-               var field = allFields[indexField];
-               var value = record.getValue(indexField);
-                if(j==0) {
-                    console.log("index field:" +  field.getLabel() + " ex:" + value);
-                    fieldNames[0] = field.getLabel();
+                    if(indexField>=0) {
+                        var field = allFields[indexField];
+                        var value = record.getValue(indexField);
+                        if(j==0) {
+                            console.log("index field:" +  field.getLabel() + " ex:" + value);
+                            fieldNames[0] = field.getLabel();
+                        }
+                        values.push(value);
+                    } else {
+                        if(date!=null) {
+                            date = new Date(date);
+                            values.push(date);
+                        } else {
+                            if(j==0) {
+                                this.hasDate = false;
+                                fieldNames[0] = "Index";
+                            }
+                            values.push(j);
+                        }
+                    }
+
+                    //            values.push(record.getElevation());
+                    var allNull  = true;
+                    for(var i=0;i<fields.length;i++) { 
+                        var field = fields[i];
+                        var value = record.getValue(field.getIndex());
+                        if(value!=null) {
+                            allNull = false;
+                        }
+                        values.push(value);
+                    }
+                    if(this.filters!=null) {
+                        if(!this.applyFilters(record, values)) {
+                            continue;
+                        }
+                    }
+
+
+                    //TODO: when its all null values we get some errors
+                    dataList.push(values);
                 }
-                values.push(value);
-           } else {
-               if(date!=null) {
-                   date = new Date(date);
-                   values.push(date);
-               } else {
-                   if(j==0) {
-                       this.hasDate = false;
-                       fieldNames[0] = "Index";
-                   }
-                   values.push(j);
-               }
-           }
-
-            //            values.push(record.getElevation());
-            var allNull  = true;
-            for(var i=0;i<fields.length;i++) { 
-                var field = fields[i];
-                var value = record.getValue(field.getIndex());
-                if(value!=null) {
-                    allNull = false;
+                //var js = "values[1] = 33;if(values[1]<360) ok= 'valuesxxx'; else ok= 'zzz';"
+                if(!isNaN(north)) {
+                    this.chartManager.setInitMapBounds(north, west, south, east);
+                    if(points.length>1) {
+                        this.chartManager.addPolygon("id",points, null);
+                    }
                 }
-                values.push(value);
-            }
-            if(this.filters!=null) {
-                if(!this.applyFilters(record, values)) {
-                    continue;
+
+                return dataList;
+            },
+                applyFilters: function(record, values) {
+                for(var i=0;i<this.filters.length;i++) {
+                    if(!this.filters[i].recordOk(record, values)) {
+                        return false;
+                    }
                 }
-            }
-
-
-            //TODO: when its all null values we get some errors
-            dataList.push(values);
-        }
-        //var js = "values[1] = 33;if(values[1]<360) ok= 'valuesxxx'; else ok= 'zzz';"
-        if(!isNaN(north)) {
-            this.chartManager.setMapBounds(north, west, south, east);
-            if(points.length>1) {
-                this.chartManager.addPolygon("id",points, null);
+                return true;
             }
         }
+        );
 
-        return dataList;
-    }
 
-    
-    theChart.applyFilters = function(record, values) {
-        for(var i=0;i<this.filters.length;i++) {
-            if(!this.filters[i].recordOk(record, values)) {
-                return false;
+
+        var filter = theChart.getProperty(PROP_CHART_FILTER);
+        if(filter!=null) {
+            //chart.filter="month:0-11;
+            var toks = filter.split(":");
+            var type  = toks[0];
+            if(type == "month") {
+                theChart.filters.push(new MonthFilter(toks[1]));
+            } else {
+                console.log("unknown filter:" + type);
             }
         }
-        return true;
-    }
-
-    theChart.filters = [];
-    var filter = theChart.getProperty("chart.filter");
-    if(filter!=null) {
-        //chart.filter="month:0-11;
-        var toks = filter.split(":");
-        var type  = toks[0];
-        if(type == "month") {
-            theChart.filters.push(new MonthFilter(toks[1]));
-        } else {
-            console.log("unknown filter:" + type);
-        }
-    }
 
 
 }

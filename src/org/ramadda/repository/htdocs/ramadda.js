@@ -205,7 +205,7 @@ ramaddaUtil = new Util();
 
 function HtmlUtil() {
      this.qt = function (value) {
-        return "'" + value +"'";
+        return "\"" + value +"\"";
      }
 
      this.div = function(attrs, inner) {
