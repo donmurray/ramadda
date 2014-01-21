@@ -115,20 +115,21 @@ function ChartManager(id,properties) {
 
     //Add the map
     if(this.showmap) {
-        html+= htmlUtil.tag("h3",[],"Map");
-        html+= htmlUtil.openTag("form");
-        html+= "Latitude: " + htmlUtil.input(this.getDomId(ID_LATFIELD), "", ["size","10","id",  this.getDomId(ID_LATFIELD)]);
-        html+= "  ";
-        html+= "Longitude: " + htmlUtil.input(this.getDomId(ID_LONFIELD), "", ["size","10","id",  this.getDomId(ID_LONFIELD)]);
-        html+= htmlUtil.closeTag("form");
-        html+=htmlUtil.div(["style", "width:400px; height:400px;",
+        html+=htmlUtil.div(["style", "width:300px; height:300px;",
                             "class", "chart-map",
                             "id", this.getDomId(ID_MAP)]);
+        html+= htmlUtil.openTag("form");
+        html+= "Latitude: " + htmlUtil.input(this.getDomId(ID_LATFIELD), "", ["size","7","id",  this.getDomId(ID_LATFIELD)]);
+        html+= "  ";
+        html+= "Longitude: " + htmlUtil.input(this.getDomId(ID_LONFIELD), "", ["size","7","id",  this.getDomId(ID_LONFIELD)]);
+        html+= htmlUtil.closeTag("form");
+
     }
 
 
     //This is where we can put time selectors, etc
-    html+= htmlUtil.tag("h3",[],"Selection");
+    html+= "<br>";
+    html+= htmlUtil.tag("b",[],"Selection");
     html+=htmlUtil.openTag("form");
     html+=" Put selection form here";
     html+=htmlUtil.closeTag("form");
