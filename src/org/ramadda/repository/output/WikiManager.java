@@ -3233,7 +3233,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             String extra = "";
             if (width > 0) {
                 extra = extra
-                        + HtmlUtils.attr(HtmlUtils.ATTR_WIDTH, "" + width);
+                        + HtmlUtils.attr(HtmlUtils.ATTR_WIDTH,"" + width);
             }
             String name = getEntryDisplayName(child);
             if ((name != null) && !name.isEmpty()) {
@@ -3286,7 +3286,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
             buff.append("</div>");
         }
-        sb.append("<table cellspacing=4>");
+        // Fill all the space 
+        sb.append("<table cellspacing=4 width='100%'>");
         sb.append("<tr valign=\"top\">");
         for (StringBuffer buff : colsSB) {
             sb.append("<td>");

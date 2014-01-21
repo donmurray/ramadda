@@ -59,8 +59,17 @@ public class RecordField {
 
     /** _more_ */
     public static final String PROP_ISTIME = "istime";
-
-
+    
+    /** Latitude-Longitude-altitude properties **/
+    public static final String PROP_ISLATITUDE = "islatitude";
+    
+    public static final String PROP_ISLONGITUDE = "islongitude";
+    
+    public static final String PROP_ISALTITUDE = "isaltitude";
+    
+    /* For depth sometimes is reversed. 0 is the surface and goes on instead of -1 */
+    public static final String PROP_ISALTITUDEREVERSE = "isaltitudereverse";
+    
 
     /** _more_ */
     public static final String PROP_SEARCH_SUFFIX = "search.suffix";
@@ -95,6 +104,10 @@ public class RecordField {
 
     /** _more_ */
     private boolean isTime = false;
+    private boolean isLatitude = false;
+    private boolean isLongitude = false;
+    private boolean isAltitude = false;
+    private boolean isAltitudeReverse = false;
 
     /** _more_ */
     private SimpleDateFormat dateFormat;
@@ -1008,6 +1021,36 @@ public class RecordField {
         return isTime;
     }
 
-
+    /* Adding other dimensions latitude longitude */
+    public void setIsLatitude(boolean value){
+    	isLatitude=value;
+    }
+    public void setIsLongitude(boolean value){
+    	isLongitude=value;
+    }
+    
+    public void setIsAltitude(boolean value){
+    	isAltitude = value;
+    }
+    
+    public void setIsAltitudeReverse(boolean value){
+    	isAltitudeReverse = value;
+    }
+    
+    public boolean getIsLatitude(){
+    	return isLatitude;
+    }
+    
+    public boolean getIsLongitude(){
+    	return isLongitude;
+    }
+    
+    public boolean getIsAltitude(){
+    	return isAltitude;
+    }
+    
+    public boolean getIsAltitudeReverse(){
+    	return isAltitudeReverse;
+    }
 
 }
