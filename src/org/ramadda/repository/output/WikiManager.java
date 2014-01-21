@@ -323,6 +323,9 @@ public class WikiManager extends RepositoryManager implements WikiUtil
     /** _more_ */
     public static final String WIKI_PROP_CHART = "chart";
 
+    public static final String WIKI_PROP_CHARTGROUP = "chartgroup";
+
+
     /** wiki import */
     public static final String WIKI_PROP_IMPORT = "import";
 
@@ -620,6 +623,9 @@ public class WikiManager extends RepositoryManager implements WikiUtil
              attrs(ATTR_TITLE, "Upload file", ATTR_INCLUDEICON, "false")),
         WIKI_PROP_ROOT,
         prop(WIKI_PROP_CHART,
+             attrs(ATTR_WIDTH, "800", ATTR_HEIGHT, "400", "fields", "",
+                   ARG_FROMDATE, "", ARG_TODATE, "")),
+        prop(WIKI_PROP_CHARTGROUP,
              attrs(ATTR_WIDTH, "800", ATTR_HEIGHT, "400", "fields", "",
                    ARG_FROMDATE, "", ARG_TODATE, "")),
     };
@@ -1457,55 +1463,19 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
             return sb.toString();
         } else if (theTag.equals(WIKI_PROP_CHART)) {
+            //TODO: don't hard code the class
+            //TODO: handle grids
             PointTypeHandler pth =
                 (PointTypeHandler) getRepository().getTypeHandler(
                     "type_point");
             PointOutputHandler poh =
                 (PointOutputHandler) pth.getRecordOutputHandler();
-            PointFormHandler pfh       = poh.getPointFormHandler();
-            Request          myRequest = request.cloneMe();
-            String           tmp;
-            if ((tmp = Misc.getProperty(props, ATTR_WIDTH, (String) null))
-                    != null) {
-                myRequest.put(ARG_WIDTH, tmp);
-            }
-            if ((tmp = Misc.getProperty(props, ATTR_HEIGHT, (String) null))
-                    != null) {
-                myRequest.put(ARG_HEIGHT, tmp);
-            }
-            if ((tmp = Misc.getProperty(props, "fields", (String) null))
-                    != null) {
-                myRequest.put("fields", tmp);
-            }
-            if ((tmp = Misc.getProperty(props, ARG_FROMDATE, (String) null))
-                    != null) {
-                myRequest.put(ARG_FROMDATE, tmp);
-            }
 
-            if ((tmp = Misc.getProperty(props, ARG_TODATE, (String) null))
-                    != null) {
-                myRequest.put(ARG_TODATE, tmp);
-            }
-
-            myRequest.put("chart.type",
-                          Misc.getProperty(props, "chart.type", "linechart"));
-
-            myRequest.put("chart.showmap",
-                          Misc.getProperty(props, "chart.showmap", "false"));
-
-            myRequest.put("chart.showmenu",
-                          Misc.getProperty(props, "chart.showmenu", "false"));
-
-            String min = Misc.getProperty(props, "chart.min", (String) null);
-            if (min != null) {
-                myRequest.put("chart.min", min);
-            }
-            myRequest.put("chart.filter",
-                          Misc.getProperty(props, "chart.filter", ""));
-            pfh.getEntryChart(myRequest,
-                              (PointEntry) poh.doMakeEntry(request, entry),
-                              sb);
-
+            String jsonUrl = poh.getJsonUrl(request, entry);
+            getEntryChart(request, entry.getName(), jsonUrl, sb, props);
+            return sb.toString();
+        } else if (theTag.equals(WIKI_PROP_CHARTGROUP)) {
+            getEntryChart(request, entry.getName(), null, sb, props);
             return sb.toString();
         } else if (theTag.equals(WIKI_PROP_GRAPH)) {
             int width  = Misc.getProperty(props, ATTR_WIDTH, 400);
@@ -3233,7 +3203,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             String extra = "";
             if (width > 0) {
                 extra = extra
-                        + HtmlUtils.attr(HtmlUtils.ATTR_WIDTH,"" + width);
+                        + HtmlUtils.attr(HtmlUtils.ATTR_WIDTH, "" + width);
             }
             String name = getEntryDisplayName(child);
             if ((name != null) && !name.isEmpty()) {
@@ -3286,7 +3256,6 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
             buff.append("</div>");
         }
-        // Fill all the space 
         sb.append("<table cellspacing=4 width='100%'>");
         sb.append("<tr valign=\"top\">");
         for (StringBuffer buff : colsSB) {
@@ -4170,85 +4139,122 @@ public class WikiManager extends RepositoryManager implements WikiUtil
      * @throws Exception _more_
      */
     public void getEntryChart(Request request, String name, String url,
-                              StringBuffer sb, List<String> props)
+                              StringBuffer sb, Hashtable props)
             throws Exception {
 
+        List<String> topProps   = new ArrayList<String>();
 
-        List<String> topProps = new ArrayList<String>();
-        String chartDivId = HtmlUtils.getUniqueId("chartdiv");
-        sb.append(HtmlUtils.comment("Chart div"));
+        String       chartDivId = HtmlUtils.getUniqueId("chartdiv");
         sb.append(HtmlUtils.div("", HtmlUtils.id(chartDivId)));
-        sb.append(HtmlUtils.comment("Import js libs"));
-        sb.append(HtmlUtils.importJS("https://www.google.com/jsapi"));
-        sb.append(
-            HtmlUtils.script(
-                "google.load(\"visualization\", \"1\", {packages:['corechart','table','annotatedtimeline']});\n"));
-        sb.append(HtmlUtils.importJS(fileUrl("/point/selectform.js")));
-        sb.append(HtmlUtils.importJS(fileUrl("/pointdata.js")));
+
         if (request.getExtraProperty("initmap") == null) {
             sb.append(getMapManager().getHtmlImports());
             request.putExtraProperty("initmap", "");
         }
+
         if (request.getExtraProperty("initchart") == null) {
+            request.putExtraProperty("initchart", "");
+            sb.append(HtmlUtils.importJS("https://www.google.com/jsapi"));
+            sb.append(
+                HtmlUtils.script(
+                    "google.load(\"visualization\", \"1\", {packages:['corechart','table','annotatedtimeline']});\n"));
+            sb.append(HtmlUtils.importJS(fileUrl("/point/selectform.js")));
+            sb.append(HtmlUtils.importJS(fileUrl("/pointdata.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/chartmanager.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/ramaddachart.js")));
-            request.putExtraProperty("initchart", "");
         }
 
-        String fromDate = request.getString(ARG_FROMDATE, (String) null);
-        String toDate   = request.getString(ARG_TODATE, (String) null);
+
+        String fromDate = Misc.getProperty(props, ARG_FROMDATE,
+                                           (String) null);
+        String toDate = Misc.getProperty(props, ARG_TODATE, (String) null);
+
+        List<String> propList = new ArrayList<String>();
 
         if (fromDate != null) {
-            props.add(ARG_FROMDATE);
-            props.add(Json.quote(fromDate));
+            propList.add(ARG_FROMDATE);
+            propList.add(Json.quote(fromDate));
         }
         if (toDate != null) {
-            props.add(ARG_TODATE);
-            props.add(Json.quote(toDate));
-        }
-
-        props.add("chart.type");
-        props.add(Json.quote(request.getString("chart.type", "linechart")));
-
-        if (request.defined("chart.filter")) {
-            props.add("chart.filter");
-            props.add(Json.quote(request.getString("chart.filter", "")));
-        }
-        if (request.defined("chart.min")) {
-            props.add("chart.min");
-            props.add(Json.quote(request.getString("chart.min", "")));
-        }
-
-        props.add("width");
-        props.add(Json.quote(request.getString(ARG_WIDTH, "600")));
-        props.add("height");
-        props.add(Json.quote(request.getString(ARG_HEIGHT, "400")));
-        String fields = request.getString("fields", null);
-        if (fields != null) {
-            List<String> toks = StringUtil.split(fields, ",", true, true);
-            if (toks.size() > 0) {
-                props.add("fields");
-                props.add(Json.list(toks, true));
-            }
+            propList.add(ARG_TODATE);
+            propList.add(Json.quote(toDate));
         }
 
         StringBuffer js = new StringBuffer();
-        System.err.println("JSON URL:" + url);
 
 
         topProps.add("show.map");
-        topProps.add(Json.quote(request.getString("chart.showmap", "true")));
+        topProps.add(""+Misc.getProperty(props, "chart.showmap",
+                                      false));
+
+        topProps.add("layout.type");
+        topProps.add(Json.quote(Misc.getProperty(props, "layout.type",
+                                                 "table")));
+        topProps.add("layout.columns");
+        topProps.add(Misc.getProperty(props, "layout.columns",
+                                         "1"));
         topProps.add("show.menu");
-        topProps.add(Json.quote(request.getString("chart.menu", "true")));
+        topProps.add(""+Misc.getProperty(props, "chart.showmenu",
+                                      false));
 
-        js.append("var chartManager = getOrCreateChartManager("
-                  + HtmlUtils.quote(chartDivId) +"," + Json.map(topProps, false) + ");\n");
 
-        js.append("var pointData = new  PointData(" + HtmlUtils.quote(name)
-                  + ",  null,null," + HtmlUtils.quote(url) + ","
-                  + Json.map(props, false) + ");\n");
-        js.append("chartManager.addPointData(pointData);\n");
-        sb.append(HtmlUtils.comment("time series data"));
+        //If no json url then just add the chartmanager
+        if(url == null) {
+            js.append("var chartManager = getOrCreateChartManager("
+                      + HtmlUtils.quote(chartDivId) + ","
+                      + Json.map(topProps, false) + ",true);\n");
+        } else {
+        propList.add("chart.type");
+        propList.add(Json.quote(Misc.getProperty(props, "chart.type",
+                "linechart")));
+
+        if (props.containsKey("chart.filter")) {
+            propList.add("chart.filter");
+            propList.add(Json.quote(Misc.getProperty(props, "chart.filter",
+                    "")));
+        }
+        if (props.containsKey("chart.min")) {
+            propList.add("chart.min");
+            propList.add(Json.quote(Misc.getProperty(props, "chart.min",
+                    "")));
+        }
+
+        propList.add("width");
+        propList.add(Misc.getProperty(props, ARG_WIDTH, "600"));
+
+        propList.add("height");
+        propList.add(Misc.getProperty(props, ARG_HEIGHT, "400"));
+
+        String fields = Misc.getProperty(props, "fields", (String) null);
+        if (fields != null) {
+            List<String> toks = StringUtil.split(fields, ",", true, true);
+            if (toks.size() > 0) {
+                propList.add("fields");
+                propList.add(Json.list(toks, true));
+            }
+        }
+
+        boolean fixedLayout = Misc.getProperty(props, "layout.fixed",
+                                               true);
+
+        if(fixedLayout) {
+            propList.add("layout.fixed");
+            propList.add("true");
+            String       anotherDiv = HtmlUtils.getUniqueId("chartdiv");
+            sb.append(HtmlUtils.div("", HtmlUtils.id(anotherDiv)));
+            propList.add("divid");
+            propList.add(Json.quote(anotherDiv));
+        }
+
+            js.append("var chartManager = getOrCreateChartManager("
+                      + HtmlUtils.quote(chartDivId) + ","
+                      + Json.map(topProps, false) + ");\n");
+            js.append("var pointData = new  PointData(" + HtmlUtils.quote(name)
+                      + ",  null,null," + HtmlUtils.quote(url) + ","
+                      + Json.map(propList, false) + ");\n");
+            js.append("chartManager.addPointData(pointData);\n");
+        }
+
         sb.append(HtmlUtils.script(js.toString()));
     }
 
