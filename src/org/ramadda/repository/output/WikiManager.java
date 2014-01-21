@@ -4154,16 +4154,19 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
         if (request.getExtraProperty("initchart") == null) {
             request.putExtraProperty("initchart", "");
+            sb.append(HtmlUtils.comment("google chart imports"));
             sb.append(HtmlUtils.importJS("https://www.google.com/jsapi"));
             sb.append(
                 HtmlUtils.script(
                     "google.load(\"visualization\", \"1\", {packages:['corechart','table','annotatedtimeline']});\n"));
             sb.append(HtmlUtils.importJS(fileUrl("/point/selectform.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/pointdata.js")));
+            sb.append(HtmlUtils.comment("chart imports"));
             sb.append(HtmlUtils.importJS(fileUrl("/chartmanager.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/ramaddachart.js")));
         }
 
+        sb.append(HtmlUtils.comment("start chart"));
 
         String fromDate = Misc.getProperty(props, ARG_FROMDATE,
                                            (String) null);
@@ -4203,27 +4206,30 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             js.append("var chartManager = getOrCreateChartManager("
                       + HtmlUtils.quote(chartDivId) + ","
                       + Json.map(topProps, false) + ",true);\n");
-        } else {
+            sb.append(HtmlUtils.script(js.toString()));
+            return;
+        }
+
         propList.add("chart.type");
         propList.add(Json.quote(Misc.getProperty(props, "chart.type",
-                "linechart")));
+                                                 "linechart")));
 
         if (props.containsKey("chart.filter")) {
             propList.add("chart.filter");
             propList.add(Json.quote(Misc.getProperty(props, "chart.filter",
-                    "")));
+                                                     "")));
         }
         if (props.containsKey("chart.min")) {
             propList.add("chart.min");
             propList.add(Json.quote(Misc.getProperty(props, "chart.min",
-                    "")));
+                                                     "")));
         }
 
-        propList.add("width");
+        propList.add(ARG_WIDTH);
         propList.add(Misc.getProperty(props, ARG_WIDTH, "600"));
 
-        propList.add("height");
-        propList.add(Misc.getProperty(props, ARG_HEIGHT, "400"));
+        propList.add(ARG_HEIGHT);
+        propList.add(Misc.getProperty(props, ARG_HEIGHT, "200"));
 
         String fields = Misc.getProperty(props, "fields", (String) null);
         if (fields != null) {
@@ -4246,14 +4252,13 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             propList.add(Json.quote(anotherDiv));
         }
 
-            js.append("var chartManager = getOrCreateChartManager("
-                      + HtmlUtils.quote(chartDivId) + ","
-                      + Json.map(topProps, false) + ");\n");
-            js.append("var pointData = new  PointData(" + HtmlUtils.quote(name)
-                      + ",  null,null," + HtmlUtils.quote(url) + ","
-                      + Json.map(propList, false) + ");\n");
-            js.append("chartManager.addPointData(pointData);\n");
-        }
+        js.append("var chartManager = getOrCreateChartManager("
+                  + HtmlUtils.quote(chartDivId) + ","
+                  + Json.map(topProps, false) + ");\n");
+        js.append("var pointData = new  PointData(" + HtmlUtils.quote(name)
+                  + ",  null,null," + HtmlUtils.quote(url)+");\n");
+        js.append("chartManager.createChart(pointData, CHART_LINECHART," +
+                  Json.map(propList,false) +");\n");
 
         sb.append(HtmlUtils.script(js.toString()));
     }

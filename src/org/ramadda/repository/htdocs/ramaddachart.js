@@ -32,10 +32,12 @@ var PROP_CHART_MAX = "chart.max";
 var PROP_CHART_TYPE = "chart.type";
 var PROP_DIVID = "divid";
 var PROP_FIELDS = "fields";
-var PROP_HEIGHT  = "height";
 var PROP_LAYOUT_FIXED = "layout.fixed";
+var PROP_HEIGHT  = "height";
 var PROP_WIDTH  = "width";
 
+var DFLT_WIDTH = "600px";
+var DFLT_HEIGHT = "200px";
 
 var CHART_LINECHART = "linechart";
 var CHART_BARCHART = "barchart";
@@ -92,7 +94,6 @@ function RamaddaLineChart(id, pointDataArg, properties) {
 function init_RamaddaLineChart(theChart, properties) {
     theChart.dataCollection = new DataCollection();
     theChart.indexField = -1;
-
     init_RamaddaChart(theChart, properties);
     theChart.initDisplay = function() {
         //If we are a fixed layout then there should be a div id property
@@ -134,10 +135,9 @@ function init_RamaddaLineChart(theChart, properties) {
             return;
         }
         if(this.getProperty(PROP_FIELDS,null)!=null) {
-            return;
+            //            return;
         }
         //        this.setTitle(this.getTitle());
-
 
         var html =  htmlUtil.openTag("div", ["class", "chart-fields-inner"]);
         var checkboxClass = this.id +"_checkbox";
@@ -145,7 +145,7 @@ function init_RamaddaLineChart(theChart, properties) {
         for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
             var pointData = dataList[collectionIdx];
             var fields =pointData.getChartableFields();
-            html+= htmlUtil.tag("b", [],  pointData.getName());
+            html+= htmlUtil.tag("b", [],  "Fields");
             html+= "<br>";
             for(i=0;i<fields.length;i++) { 
                 var field = fields[i];
@@ -161,7 +161,7 @@ function init_RamaddaLineChart(theChart, properties) {
         $("#" + this.getDomId(ID_FIELDS)).html(html);
 
         //Listen for changes to the checkboxes
-        $("." + checkboxClass).click(function() {
+        $("." + checkboxClass).click(function(event) {
                 theChart.displayData();
           });
     }
@@ -170,7 +170,15 @@ function init_RamaddaLineChart(theChart, properties) {
     theChart.getSelectedFields = function() {
         var df = [];
         var dataList =  this.dataCollection.getData();
+
+        //If we have fixed fields then clear them after the first time
         var fixedFields = this.getProperty(PROP_FIELDS);
+        if(fixedFields!=null) {
+            this.removeProperty(PROP_FIELDS);
+            if(fixedFields.length==0) {
+                fixedFields = null;
+            } 
+        }
         for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
             var pointData = dataList[collectionIdx];
             var fields = pointData.getChartableFields();
@@ -251,7 +259,6 @@ function init_RamaddaLineChart(theChart, properties) {
             };
         }
 
-
         var chartType = this.getProperty(PROP_CHART_TYPE,CHART_LINECHART);
         if(chartType == CHART_BARCHART) {
             options.orientation =  "horizontal";
@@ -290,12 +297,14 @@ function init_RamaddaLineChart(theChart, properties) {
                             values+= "<tr><td align=right><b>" + label +":</b></td><td>" + record.getValue(i) + "</td></tr>";
                         }
                         values += "</table>";
-                        var point = new OpenLayers.LonLat(longitude, latitude);
-                        if(theChart.lastMarker!=null) {
-                            theChart.chartManager.map.removeMarker(theChart.lastMarker);
+                        if(theChart.chartManager.hasMap()) {
+                            var point = new OpenLayers.LonLat(longitude, latitude);
+                            if(theChart.lastMarker!=null) {
+                                theChart.chartManager.map.removeMarker(theChart.lastMarker);
+                            }
+                            //                        theChart.chartManager.map.setCenter(point);
+                            theChart.lastMarker =  theChart.chartManager.map.addMarker(theChart.getId(), point, null,values);
                         }
-                        //                        theChart.chartManager.map.setCenter(point);
-                        theChart.lastMarker =  theChart.chartManager.map.addMarker(theChart.getId(), point, null,values);
                     }
 
              });
@@ -389,6 +398,8 @@ function init_RamaddaScatterChart(theChart, properties) {
         var df = [];
         var dataList =  this.dataCollection.getData();
         var fixedFields = this.getProperty(PROP_FIELDS);
+
+
         for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
             var pointData = dataList[collectionIdx];
             var fields = pointData.getChartableFields();
@@ -476,45 +487,47 @@ function init_RamaddaChart(theChart, propertiesArg) {
 
     $.extend(theChart, {
             filters: [],
-                setChartManager: function(cm) {
+           setChartManager: function(cm) {
                 this.chartManager = cm;
+                this.setParent(cm);
             },
-                getDisplay: function() {
+            getDisplay: function() {
                 var theChart = this;
                 var reloadId = this.getDomId(ID_RELOAD);
                 var html = "";
                 html +=   htmlUtil.div(["id", this.getDomId(ID_HEADER),"class", "chart-header"]);
                 var get = "getChart('" + this.id +"')";
-                var deleteMe = htmlUtil.onClick("removeChart('" + this.id +"')", "<img src=" + root +"/icons/close.gif>");
+                var deleteMe = htmlUtil.onClick("removeChart('" + this.id +"')", "<img src=" + root +"/icons/close.gif> Remove Chart");
                 var menuButton =  htmlUtil.tag("a", ["class", "chart-menu-button", "id",  this.getDomId(ID_MENU_BUTTON)]);
-                var menu = htmlUtil.div(["class", "ramadda-popup", "id", this.getDomId(ID_MENU_POPUP)], this.getFieldsDiv());
+                var menu = htmlUtil.div(["class", "ramadda-popup", "id", this.getDomId(ID_MENU_POPUP)], this.getFieldsDiv()+"<hr>" + deleteMe);
 
                 html += htmlUtil.openTag("table", ["border", "0", "cellpadding","0", "cellspacing","0"]);
                 html += htmlUtil.openTag("tr", ["valign", "bottom"]);
                 html += htmlUtil.td([], htmlUtil.b(this.getTitle()));
                 html += htmlUtil.td(["align", "right"],
-                                    menuButton +
-                                    deleteMe);
+                                    menuButton);
                 html += htmlUtil.closeTag("tr");
 
-                html += htmlUtil.tr(["valign", "top"], htmlUtil.td(["colspan", "2","id"],htmlUtil.div(["id",this.getDomId(ID_CHART)],"")));
+                var chartDiv = htmlUtil.div(["id", this.getDomId(ID_CHART),"style", "border:0px red solid; width: " + this.getProperty(PROP_WIDTH,DFLT_WIDTH) +"; height: " + this.getProperty(PROP_HEIGHT,DFLT_HEIGHT) +";"]);
+
+                html += htmlUtil.tr(["valign", "top"], htmlUtil.td(["colspan", "2","id"],chartDiv));
                 html += htmlUtil.closeTag("table")
-                    html += menu;
+                html += menu;
                 return html;
             },
-                removeChart: function() {
+            removeChart: function() {
                 this.chartManager.removeChart(this);
                 if(theChart.lastMarker!=null) {
                     this.chartManager.map.removeMarker(theChart.lastMarker);
                 }
             },
-                setHtml: function(html) {
+            setHtml: function(html) {
                 $("#" + this.id).html(html);
             },
-                setTitle: function(title) {
+            setTitle: function(title) {
                 $("#" +  this.getDomId(ID_HEADER)).html(title);
             },
-                getTitle: function () {
+            getTitle: function () {
                 if(this.title!=null) return this.title;
                 var title = "";
                 var dataList =  this.dataCollection.getData();
@@ -525,21 +538,21 @@ function init_RamaddaChart(theChart, propertiesArg) {
                 }
                 return title;
             },
-                getIsLayoutFixed: function() {
+            getIsLayoutFixed: function() {
                 return this.getProperty(PROP_LAYOUT_FIXED,false);
             },
-                hasData: function() {
+            hasData: function() {
                 return this.dataCollection.hasData();
             },
-                addData: function(pointData) { 
+            addData: function(pointData) { 
                 this.dataCollection.addData(pointData);
             },
-                pointDataLoaded: function(pointData) {
+            pointDataLoaded: function(pointData) {
                 this.addData(pointData);
                 this.displayData();
                 this.addFieldsLegend();
             },
-                reload: function() {
+            reload: function() {
                 var dataList =  this.dataCollection.getData();
                 this.dataCollection = new DataCollection();
                 for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
@@ -548,7 +561,7 @@ function init_RamaddaChart(theChart, propertiesArg) {
                     this.addOrLoadData(pointData);
                 }
             },
-                addOrLoadData: function(pointData) {
+            addOrLoadData: function(pointData) {
                 if(pointData.hasData()) {
                     this.addData(pointData);
                 } else {
@@ -559,14 +572,11 @@ function init_RamaddaChart(theChart, propertiesArg) {
                     }
                 }
             },
-                getFieldsDiv: function() {
+           getFieldsDiv: function() {
                 var height = this.getProperty(PROP_HEIGHT,"400");
                 return htmlUtil.div(["id",  this.getDomId(ID_FIELDS),"class", "chart-fields","style","overflow-y: auto;    max-height:" + height +"px;"]);
             },
-                getChartDiv: function() {
-                return   htmlUtil.div(["id", this.getDomId(ID_CHART),"style", "border:0px red solid; width: " + this.getProperty(PROP_WIDTH,"400px") +"; height: " + this.getProperty(PROP_HEIGHT,"400px") +";"]);
-            },
-                getStandardData : function(fields) {
+            getStandardData : function(fields) {
                 var dataList = [];
                 //The first entry in the dataList is the array of names
                 //The first field is the domain, e.g., time or index
@@ -667,7 +677,7 @@ function init_RamaddaChart(theChart, propertiesArg) {
 
                 return dataList;
             },
-                applyFilters: function(record, values) {
+            applyFilters: function(record, values) {
                 for(var i=0;i<this.filters.length;i++) {
                     if(!this.filters[i].recordOk(record, values)) {
                         return false;

@@ -269,7 +269,7 @@ function HtmlUtil() {
 
 
      this.onClick = function(call, html) {
-         return this.tag("a", ["onclick", call], html);
+         return this.tag("a", ["onclick", call, "style","xtext-decoration:none;color:black;"], html);
      }
 
      this.checkbox = function(id,cbxclass,checked) {

@@ -108,7 +108,7 @@ function PointData(name, recordFields, data, url, properties) {
     }
     this.getChartableFields = function() {
         var numericFields = [];
-        var skip = /(LATITUDE|LONGITUDE|ELEVATION)/g;
+        var skip = /(TIME|HOUR|MINUTE|SECOND|YEAR|MONTH|DAY|LATITUDE|LONGITUDE|ELEVATION)/g;
         for(var i=0;i<this.recordFields.length;i++) {
             var field = this.recordFields[i];
             if(!field.isNumeric || !field.isChartable()) {

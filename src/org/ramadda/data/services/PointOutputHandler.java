@@ -823,8 +823,12 @@ public class PointOutputHandler extends RecordOutputHandler {
         StringBuffer sb = new StringBuffer();
         String url = getJsonUrl(request, entry);
         String name = entry.getName();
+        Hashtable props = new Hashtable();
+        props.put("layout.fixed","false");
+        props.put("chart.showmenu","true");
+        props.put("chart.showmap",""+ entry.isGeoreferenced());
         getWikiManager().getEntryChart(request, name,
-                                       url, sb, new Hashtable());
+                                       url, sb, props);
         return new Result("", sb);
     }
 
