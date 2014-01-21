@@ -172,10 +172,10 @@ function RepositoryMap(mapId, params) {
                 continue;
             }
             if (mapLayer == map_google_terrain) {
-                this.map.addLayer(new OpenLayers.Layer.Google("Google Terrain",
+            	this.map.addLayer(new OpenLayers.Layer.Google("Google Hybrid",
                         {
-                	 		numZoomLevels : zoomLevelsDefault,
-                            'type' : google.maps.MapTypeId.TERRAIN,
+                            'type' : google.maps.MapTypeId.HYBRID,
+                            numZoomLevels : zoomLevelsDefault,
                             sphericalMercator : sphericalMercatorDefault,
                             wrapDateLine : wrapDatelineDefault
                         }));
@@ -187,10 +187,11 @@ function RepositoryMap(mapId, params) {
                             wrapDateLine : wrapDatelineDefault
                         }));
             } else if (mapLayer == map_google_hybrid) {
-                this.map.addLayer(new OpenLayers.Layer.Google("Google Hybrid",
+                
+                this.map.addLayer(new OpenLayers.Layer.Google("Google Terrain",
                         {
-                            'type' : google.maps.MapTypeId.HYBRID,
-                            numZoomLevels : zoomLevelsDefault,
+                	 		numZoomLevels : zoomLevelsDefault,
+                            'type' : google.maps.MapTypeId.TERRAIN,
                             sphericalMercator : sphericalMercatorDefault,
                             wrapDateLine : wrapDatelineDefault
                         }));
