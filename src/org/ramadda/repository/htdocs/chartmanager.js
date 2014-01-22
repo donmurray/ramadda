@@ -133,12 +133,14 @@ function ChartManager(id,properties) {
         this.addChartEventListener(new TextListener(this.getDomId("text")));
     }
 
-    //This is where we can put time selectors, etc
-    html+= "<br>";
-    html+= htmlUtil.tag("b",[],"Selection");
-    html+=htmlUtil.openTag("form");
-    html+=" Put selection form here";
-    html+=htmlUtil.closeTag("form");
+    if(this.getProperty(PROP_SHOW_MENU, true))  {
+        //This is where we can put time selectors, etc
+        html+= "<br>";
+        html+= htmlUtil.tag("b",[],"Selection");
+        html+=htmlUtil.openTag("form");
+        html+=" Put selection form here";
+        html+=htmlUtil.closeTag("form");
+    }
 
     html+=htmlUtil.closeTag("td");
     html+=htmlUtil.closeTag("table");
@@ -215,7 +217,7 @@ function init_ChartManager(chartManager) {
             },
             makeMainMenu: function() {
                 if(!this.getProperty(PROP_SHOW_MENU, true))  {
-                    return "NO MENU";
+                    return "";
                 }
                 //How else do I refer to this object in the html that I add 
                 var get = "getChartManager('" + this.getId() +"')";
