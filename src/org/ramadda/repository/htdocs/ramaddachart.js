@@ -99,6 +99,9 @@ function init_RamaddaLineChart(theChart, properties) {
     theChart.dataCollection = new DataCollection();
     theChart.indexField = -1;
     init_RamaddaChart(theChart, properties);
+
+
+
     theChart.initDisplay = function() {
         //If we are a fixed layout then there should be a div id property
         if(this.getIsLayoutFixed()) {
@@ -222,11 +225,14 @@ function init_RamaddaLineChart(theChart, properties) {
     }
 
     $.extend(theChart, {
-            handleRecordSelection: function(source, record, html) {
+            handleRecordSelection: function(source, index, record, html) {
+                if(source==theChart) return;
                 var chartType = theChart.getProperty(PROP_CHART_TYPE,CHART_LINECHART);
                 if(chartType == CHART_TEXT) {
                     this.lastHtml = html;
                     $("#" + this.getDomId(ID_CHART)).html(htmlUtil.div(["class","chart-text"], html));
+                } else  if(theChart.chart!=null) {
+                    theChart.chart.setSelection([{row:index, column:null}]);
                 }
             }});
 
@@ -251,7 +257,18 @@ function init_RamaddaLineChart(theChart, properties) {
 
         var dataList = this.getStandardData(selectedFields);
 
+        var chartType = this.getProperty(PROP_CHART_TYPE,CHART_LINECHART);
+        if(chartType == CHART_TEXT) {
+            if(this.lastHtml!=null) {
+                $("#" + this.getDomId(ID_CHART)).html(this.lastHtml);
+            }
+            return;
+        }
+
+
+        //
         //Keep all of the google chart specific code here
+        //
         if(typeof google == 'undefined') {
             $("#"+this.getDomId(ID_CHART)).html("No google");
             return;
@@ -260,12 +277,9 @@ function init_RamaddaLineChart(theChart, properties) {
         var dataTable = google.visualization.arrayToDataTable(dataList);
         var options = {
             series: [{targetAxisIndex:0},{targetAxisIndex:1},],
-            //            title: this.getTitle(),
             legend: { position: 'bottom' },
-            //chartArea:{left:0,top:0,height:"75%",width:"85%"}
             chartArea:{left:50,top:10,height:"75%",width:"85%"}
         };
-
 
         var min = this.getProperty(PROP_CHART_MIN,"");
         if(min!="") {
@@ -274,35 +288,21 @@ function init_RamaddaLineChart(theChart, properties) {
             };
         }
 
-        var chartType = this.getProperty(PROP_CHART_TYPE,CHART_LINECHART);
-        if(chartType == CHART_TEXT) {
-            if(this.lastHtml!=null) {
-                $("#" + this.getDomId(ID_CHART)).html(this.lastHtml);
-            }
-
-        } else if(chartType == CHART_BARCHART) {
+       if(chartType == CHART_BARCHART) {
             options.orientation =  "horizontal";
             this.chart = new google.visualization.BarChart(document.getElementById(this.getDomId(ID_CHART)));
-            this.chart.draw(dataTable, options);
         } else  if(chartType == CHART_TABLE) {
             this.chart = new google.visualization.Table(document.getElementById(this.getDomId(ID_CHART)));
-            this.chart.draw(dataTable, options);
-
         } else {
-            if(false && this.hasDate) {
-                this.chart = new google.visualization.AnnotatedTimeLine(document.getElementById(this.getDomId(ID_CHART)));
-            } else {
-                this.chart = new google.visualization.LineChart(document.getElementById(this.getDomId(ID_CHART)));
-            }
-            google.visualization.events.addListener(this.chart, 'select', function() {
-
-                    var item = theChart.chart.getSelection()[0];
-                    var index = item.row;
-                    theChart.chartManager.handleRecordSelection(theChart, 
-                                                                theChart.dataCollection.getData()[0], index);
-                    return;
-                });
+            this.chart = new google.visualization.LineChart(document.getElementById(this.getDomId(ID_CHART)));
+        }
+        if(this.chart!=null) {
             this.chart.draw(dataTable, options);
+            google.visualization.events.addListener(this.chart, 'select', function() {
+                 var index = theChart.chart.getSelection()[0].row
+                 theChart.chartManager.handleRecordSelection(theChart, 
+                                                             theChart.dataCollection.getData()[0], index);
+                });
         }
 
     }
@@ -542,6 +542,7 @@ function init_RamaddaChart(theChart, propertiesArg) {
                 this.addData(pointData);
                 this.displayData();
                 this.addFieldsLegend();
+                this.chartManager.pointDataLoaded(pointData);
             },
             reload: function() {
                 var dataList =  this.dataCollection.getData();
@@ -591,32 +592,13 @@ function init_RamaddaChart(theChart, propertiesArg) {
                 var indexField = this.indexField;
                 var allFields = this.allFields;
 
-                var north=NaN,west=NaN,south=NaN,east=NaN;
-                //        var bounds = new OpenLayers.Bounds(-151.827, 59.3397, -151.074, 59.7779);
-                //        this.map.centerOnMarkers(bounds);
 
-                var points =[];
+
                 var records = pointData.getData();
                 for(j=0;j<records.length;j++) { 
                     var record = records[j];
                     var values = [];
                     var date = record.getDate();
-                    if(!isNaN(record.getLatitude())) { 
-                        if(j == 0) {
-                            north  =  record.getLatitude();
-                            south  = record.getLatitude();
-                            west  =  record.getLongitude();
-                            east  = record.getLongitude();
-                        } else {
-                            north  = Math.max(north, record.getLatitude());
-                            south  = Math.min(south, record.getLatitude());
-                            west  = Math.min(west, record.getLongitude());
-                            east  = Math.min(east, record.getLongitude());
-                        }
-                        points.push(new OpenLayers.Geometry.Point(record.getLongitude(),record.getLatitude()));
-                    }
-                    //Add the date or index field
-           
                     if(indexField>=0) {
                         var field = allFields[indexField];
                         var value = record.getValue(indexField);
@@ -653,19 +635,9 @@ function init_RamaddaChart(theChart, propertiesArg) {
                             continue;
                         }
                     }
-
-
                     //TODO: when its all null values we get some errors
                     dataList.push(values);
                 }
-                //var js = "values[1] = 33;if(values[1]<360) ok= 'valuesxxx'; else ok= 'zzz';"
-                if(!isNaN(north)) {
-                    this.chartManager.setInitMapBounds(north, west, south, east);
-                    if(points.length>1) {
-                        this.chartManager.addPolygon("id",points, null);
-                    }
-                }
-
                 return dataList;
             },
             applyFilters: function(record, values) {

@@ -149,8 +149,7 @@ function ChartManager(id,properties) {
     if(this.showmap) {
         var params = {};
         this.map = new RepositoryMap(this.getDomId(ID_MAP), params);
-
-        this.addChartEventListener(new MapListener(this.map));
+        this.addChartEventListener(new MapListener(this));
         this.map.initMap(false);
         this.map.addClickHandler(this.getDomId(ID_LONFIELD), this.getDomId(ID_LATFIELD));
         //        this.map.addLine('0e9d5f64-823a-4bdf-813b-bb3f4d80f6e2_polygon', 59.772422500000005, -151.10694375000003, 59.7614675, -151.14459375);
@@ -182,6 +181,7 @@ function init_ChartManager(chartManager) {
           addChartEventListener: function(listener) {
                 this.eventListeners.push(listener);
             },
+
             handleRecordSelection: function(source, pointData, index) {
                 var fields =  pointData.getRecordFields();
                 var records = pointData.getData();
@@ -210,7 +210,7 @@ function init_ChartManager(chartManager) {
 
                 for(var i=0;i< this.eventListeners.length;i++) {
                     eventListener = this.eventListeners[i];
-                    eventListener.handleRecordSelection(source, record, values);
+                    eventListener.handleRecordSelection(source, index, record, values);
                 }
             },
             makeMainMenu: function() {
@@ -407,6 +407,15 @@ function init_ChartManager(chartManager) {
                 var chartmanager = this;
                 setTimeout(function(){chartManager.doLayout();},1);
             },
+            pointDataLoaded: function(pointData) {
+                for(var i=0;i< this.eventListeners.length;i++) {
+                    eventListener = this.eventListeners[i];
+                    if(eventListener.handleChartData!=null) {
+                        eventListener.handleChartData(pointData);
+                    }
+                }
+
+            },
             addLineChart: function(pointDataArg, properties) {
                 var chartId = this.id +"_chart_" + (this.cnt++);
                 var chart  = new RamaddaLineChart(chartId, pointDataArg, properties);
@@ -446,26 +455,55 @@ function init_ChartThing(chartThing) {
 }
 
 
-function MapListener(theMap) {
-    this.map = theMap;
+function MapListener(chartManager) {
+    this.chartManager  = chartManager;
     $.extend(this, {
             markers: {'foo':'bar'},
+            handleChartData: function(pointData) {
+                var points =[];
+                var records = pointData.getData();
+                var north=NaN,west=NaN,south=NaN,east=NaN;
+                for(j=0;j<records.length;j++) { 
+                    var record = records[j];
+                    if(!isNaN(record.getLatitude())) { 
+                        if(j == 0) {
+                            north  =  record.getLatitude();
+                            south  = record.getLatitude();
+                            west  =  record.getLongitude();
+                            east  = record.getLongitude();
+                        } else {
+                            north  = Math.max(north, record.getLatitude());
+                            south  = Math.min(south, record.getLatitude());
+                            west  = Math.min(west, record.getLongitude());
+                            east  = Math.min(east, record.getLongitude());
+                        }
+                        points.push(new OpenLayers.Geometry.Point(record.getLongitude(),record.getLatitude()));
+                    }
+                }
+                if(!isNaN(north)) {
+                    this.chartManager.setInitMapBounds(north, west, south, east);
+                    if(points.length>1) {
+                        this.chartManager.addPolygon("id",points, null);
+                    }
+                }
+
+            },
             handleChartDelete: function(source) {
                 var marker  = this.markers[source];
                 if(marker!=null) {
-                    this.map.removeMarker(marker);
+                    this.chartManager.map.removeMarker(marker);
                 }
             },
-            handleRecordSelection: function(source, record, html) {
+                handleRecordSelection: function(source, index, record, html) {
                 if(record.hasLocation()) {
                     var latitude = record.getLatitude();
                     var longitude = record.getLongitude();
                     var point = new OpenLayers.LonLat(longitude, latitude);
                     var marker  = this.markers[source];
                     if(marker!=null) {
-                        this.map.removeMarker(marker);
+                        this.chartManager.map.removeMarker(marker);
                     }
-                    this.markers[source] =  this.map.addMarker(source.getId(), point, null,html);
+                    this.markers[source] =  this.chartManager.map.addMarker(source.getId(), point, null,html);
                 }}
         });
 }
@@ -474,7 +512,7 @@ function MapListener(theMap) {
 function TextListener(domId) {
     this.domId = domId;
     $.extend(this, {
-            handleRecordSelection: function(source, record, html) {
+            handleRecordSelection: function(source, index, record, html) {
                 $("#"+this.domId).html(html);
             }});
 }
