@@ -121,7 +121,7 @@ function DisplayManager(id,properties) {
     //Add the map
     if(this.showmap) {
         html+=htmlUtil.div(["style", "width:300px; height:300px;",
-                            "class", "chart-map",
+                            "class", "display-map",
                             "id", this.getDomId(ID_MAP)]);
         html+= htmlUtil.openTag("form");
         html+= "Latitude: " + htmlUtil.input(this.getDomId(ID_LATFIELD), "", ["size","7","id",  this.getDomId(ID_LATFIELD)]);
@@ -357,34 +357,29 @@ function init_DisplayManager(displayManager) {
                 if(data == null) {
                     data = this.data[0];
                 }
-                var displayManager = this;
-                setTimeout(function(){displayManager.createChart(data,CHART_LINECHART);},1);
+                this.createChart(data,CHART_LINECHART);
             },
              newBarchart:function(data) {
                 if(data == null) {
                     data = this.data[0];
                 }
-                var displayManager = this;
-                setTimeout(function(){displayManager.createChart(data,CHART_BARCHART);},1);
+                this.createChart(data,CHART_BARCHART);
             },
             newScatterPlot:function(data) {
                 if(data == null) {
                     data = this.data[0];
                 }
-                var displayManager = this;
-                setTimeout(function(){displayManager.createChart(data,'scatterplot');},1);
+                this.createChart(data,'scatterplot');
             },
            newTable: function(data) {
                 if(data == null) {
                     data = this.data[0];
                 }
-                var displayManager = this;
-                setTimeout(function(){displayManager.createChart(data,CHART_TABLE);},1);
+                this.createChart(data,CHART_TABLE);
             },
            newText: function(data) {
                 this.createChart(data,CHART_TEXT);
             },
-
             createChart:function(pointData, chartType, props) {
                 var chartId = this.id +"_chart_" + (this.cnt++);
                 var myProps = {

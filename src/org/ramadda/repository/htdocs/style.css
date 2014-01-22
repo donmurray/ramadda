@@ -145,12 +145,12 @@ input, password, fileinput,textarea,select {
 }
 
 
-.chart-container {
+.display-container {
    margin:10px;
 }
 
 
-.chart-menu-button {
+.display-menu-button {
     min-height :16px;
 }
 
@@ -159,7 +159,7 @@ input, password, fileinput,textarea,select {
    max-height: 300px;
 }
 
-.chart-map {
+.display-map {
 //  border:1px #888888 solid; 
 //  background-color:#7391ad; 
 //  width:400px; height:400px;
