@@ -44,29 +44,29 @@ var CHART_BARCHART = "barchart";
 var CHART_TABLE = "table";
 var CHART_TEXT = "text";
 
-function addChart(chart) {
-    if(window.globalCharts == null) {
-        window.globalCharts = {'foo':'bar'};
+
+function addRamaddaDisplay(display) {
+    if(window.globalDisplays == null) {
+        window.globalDisplays = {'foo':'bar'};
     }
-    window.globalCharts[chart.id] = chart;
+    window.globalDisplays[display.id] = display;
 }
 
 
-function getChart(id) {
-    if(window.globalCharts == null) {
+function getRamaddaDisplay(id) {
+    if(window.globalDisplays == null) {
         return null;
     }
-    return window.globalCharts[id];
+    return window.globalDisplays[id];
 }
 
 
-function removeChart(id) {
-    var chart =getChart(id);
-    if(chart) {
-        chart.removeChart();
+function removeRamaddaDisplay(id) {
+    var display =getRamaddaDisplay(id);
+    if(display) {
+        display.removeDisplay();
     }
 }
-
 
 
 
@@ -75,10 +75,10 @@ Create a chart
 id - the id of this chart. Has to correspond to a div tag id 
 pointData - A PointData object (see below)
  */
-function RamaddaLineChart(id, pointDataArg, properties) {
+function RamaddaMultiChart(id, pointDataArg, properties) {
     this.id = id;
-    init_RamaddaLineChart(this, properties);
-    addChart(this);
+    init_RamaddaMultiChart(this, properties);
+    addRamaddaDisplay(this);
     var testUrl = null;
     //Uncomment to test using test.json
     //testUrl = "/repository/test.json";
@@ -95,12 +95,10 @@ function RamaddaLineChart(id, pointDataArg, properties) {
 
 
 
-function init_RamaddaLineChart(theChart, properties) {
+function init_RamaddaMultiChart(theChart, properties) {
     theChart.dataCollection = new DataCollection();
     theChart.indexField = -1;
-    init_RamaddaChart(theChart, properties);
-
-
+    init_RamaddaDisplay(theChart, properties);
 
     theChart.initDisplay = function() {
         //If we are a fixed layout then there should be a div id property
@@ -300,7 +298,7 @@ function init_RamaddaLineChart(theChart, properties) {
             this.chart.draw(dataTable, options);
             google.visualization.events.addListener(this.chart, 'select', function() {
                  var index = theChart.chart.getSelection()[0].row
-                 theChart.chartManager.handleRecordSelection(theChart, 
+                 theChart.displayManager.handleRecordSelection(theChart, 
                                                              theChart.dataCollection.getData()[0], index);
                 });
         }
@@ -318,7 +316,7 @@ pointData - A PointData object (see below)
 function RamaddaScatterChart(id, pointDataArg, properties) {
     this.id = id;
     init_RamaddaScatterChart(this, properties);
-    addChart(this);
+    addRamaddaDisplay(this);
     this.title = pointDataArg.getName();
     this.addOrLoadData(pointDataArg);
 }
@@ -327,7 +325,7 @@ function RamaddaScatterChart(id, pointDataArg, properties) {
 
 function init_RamaddaScatterChart(theChart, properties) {
     theChart.dataCollection = new DataCollection();
-    init_RamaddaChart(theChart,properties);
+    init_RamaddaDisplay(theChart,properties);
     theChart.initDisplay = function() {
         var theChart = this;
         var reloadId = this.getDomId(ID_RELOAD);
@@ -467,22 +465,20 @@ function init_RamaddaScatterChart(theChart, properties) {
 }
 
 
-
-
-function init_RamaddaChart(theChart, propertiesArg) {
+function init_RamaddaDisplay(theChart, propertiesArg) {
     if(propertiesArg == null) {
        propertiesArg = {'':''};
     }
     $.extend(theChart, {
             properties: propertiesArg,
-            chartManager:null,
+            displayManager:null,
                 });
-    init_ChartThing(theChart);
+    init_DisplayThing(theChart);
 
     $.extend(theChart, {
             filters: [],
-           setChartManager: function(cm) {
-                this.chartManager = cm;
+           setDisplayManager: function(cm) {
+                this.displayManager = cm;
                 this.setParent(cm);
             },
             getDisplay: function() {
@@ -490,8 +486,8 @@ function init_RamaddaChart(theChart, propertiesArg) {
                 var reloadId = this.getDomId(ID_RELOAD);
                 var html = "";
                 html +=   htmlUtil.div(["id", this.getDomId(ID_HEADER),"class", "chart-header"]);
-                var get = "getChart('" + this.id +"')";
-                var deleteMe = htmlUtil.onClick("removeChart('" + this.id +"')", "<img src=" + root +"/icons/close.gif> Remove Chart");
+                var get = "getRamaddaDisplay('" + this.id +"')";
+                var deleteMe = htmlUtil.onClick("removeRamaddaDisplay('" + this.id +"')", "<img src=" + root +"/icons/close.gif> Remove Chart");
                 var menuButton =  htmlUtil.tag("a", ["class", "chart-menu-button", "id",  this.getDomId(ID_MENU_BUTTON)]);
                 var menu = htmlUtil.div(["class", "ramadda-popup", "id", this.getDomId(ID_MENU_POPUP)], this.getFieldsDiv()+"<hr>" + deleteMe);
 
@@ -509,8 +505,8 @@ function init_RamaddaChart(theChart, propertiesArg) {
                 html += menu;
                 return html;
             },
-            removeChart: function() {
-                this.chartManager.removeChart(this);
+            removeDisplay: function() {
+                this.displayManager.removeDisplay(this);
             },
             setHtml: function(html) {
                 $("#" + this.id).html(html);
@@ -542,7 +538,7 @@ function init_RamaddaChart(theChart, propertiesArg) {
                 this.addData(pointData);
                 this.displayData();
                 this.addFieldsLegend();
-                this.chartManager.pointDataLoaded(pointData);
+                this.displayManager.pointDataLoaded(pointData);
             },
             reload: function() {
                 var dataList =  this.dataCollection.getData();
@@ -566,7 +562,7 @@ function init_RamaddaChart(theChart, propertiesArg) {
             },
            getFieldsDiv: function() {
                 var height = this.getProperty(PROP_HEIGHT,"400");
-                return htmlUtil.div(["id",  this.getDomId(ID_FIELDS),"class", "chart-fields","style","overflow-y: auto;    max-height:" + height +"px;"]);
+                return htmlUtil.div(["id",  this.getDomId(ID_FIELDS),"class", "display-fields","style","overflow-y: auto;    max-height:" + height +"px;"]);
             },
             getStandardData : function(fields) {
                 var dataList = [];
@@ -655,7 +651,7 @@ function init_RamaddaChart(theChart, propertiesArg) {
 
         var filter = theChart.getProperty(PROP_CHART_FILTER);
         if(filter!=null) {
-            //chart.filter="month:0-11;
+            //display.filter="month:0-11;
             var toks = filter.split(":");
             var type  = toks[0];
             if(type == "month") {

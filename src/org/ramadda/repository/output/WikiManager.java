@@ -622,10 +622,10 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         prop(WIKI_PROP_UPLOAD,
              attrs(ATTR_TITLE, "Upload file", ATTR_INCLUDEICON, "false")),
         WIKI_PROP_ROOT,
-        prop(WIKI_PROP_CHART,
-             attrs(ATTR_WIDTH, "800", ATTR_HEIGHT, "400", "fields", "",
-                   ARG_FROMDATE, "", ARG_TODATE, "")),
         prop(WIKI_PROP_CHARTGROUP,
+             attrs(ATTR_WIDTH, "800", ATTR_HEIGHT, "400", "fields", "",
+                   ARG_FROMDATE, "", ARG_TODATE, "","showmenu","false","showtext","false","layout.type","table","layout.columns","1")),
+        prop(WIKI_PROP_CHART,
              attrs(ATTR_WIDTH, "800", ATTR_HEIGHT, "400", "fields", "",
                    ARG_FROMDATE, "", ARG_TODATE, "")),
     };
@@ -4144,8 +4144,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
         List<String> topProps   = new ArrayList<String>();
 
-        String       chartDivId = HtmlUtils.getUniqueId("chartdiv");
-        sb.append(HtmlUtils.div("", HtmlUtils.id(chartDivId)));
+        String       displayDivId = HtmlUtils.getUniqueId("displaydiv");
+        sb.append(HtmlUtils.div("", HtmlUtils.id(displayDivId)));
 
         if (request.getExtraProperty("initmap") == null) {
             sb.append(getMapManager().getHtmlImports());
@@ -4186,13 +4186,11 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         StringBuffer js = new StringBuffer();
 
 
-        topProps.add("show.map");
-        topProps.add(""+Misc.getProperty(props, "chart.showmap",
-                                      false));
-
-        topProps.add("show.text");
-        topProps.add(""+Misc.getProperty(props, "chart.showtext",
-                                      false));
+        for(String showArg:new String[]{"showmap","showtext","showmenu"}) {
+            topProps.add(showArg);
+            topProps.add(""+Misc.getProperty(props, "chart." + showArg,
+                                             false));
+        }
 
         topProps.add("layout.type");
         topProps.add(Json.quote(Misc.getProperty(props, "layout.type",
@@ -4200,15 +4198,11 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         topProps.add("layout.columns");
         topProps.add(Misc.getProperty(props, "layout.columns",
                                          "1"));
-        topProps.add("show.menu");
-        topProps.add(""+Misc.getProperty(props, "chart.showmenu",
-                                      false));
-
 
         //If no json url then just add the chartmanager
         if(url == null) {
-            js.append("var chartManager = getOrCreateChartManager("
-                      + HtmlUtils.quote(chartDivId) + ","
+            js.append("var displayManager = getOrCreateDisplayManager("
+                      + HtmlUtils.quote(displayDivId) + ","
                       + Json.map(topProps, false) + ",true);\n");
             sb.append(HtmlUtils.script(js.toString()));
             return;
@@ -4250,18 +4244,18 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         if(fixedLayout) {
             propList.add("layout.fixed");
             propList.add("true");
-            String       anotherDiv = HtmlUtils.getUniqueId("chartdiv");
+            String       anotherDiv = HtmlUtils.getUniqueId("displaydiv");
             sb.append(HtmlUtils.div("", HtmlUtils.id(anotherDiv)));
             propList.add("divid");
             propList.add(Json.quote(anotherDiv));
         }
 
-        js.append("var chartManager = getOrCreateChartManager("
-                  + HtmlUtils.quote(chartDivId) + ","
+        js.append("var displayManager = getOrCreateDisplayManager("
+                  + HtmlUtils.quote(displayDivId) + ","
                   + Json.map(topProps, false) + ");\n");
         js.append("var pointData = new  PointData(" + HtmlUtils.quote(name)
                   + ",  null,null," + HtmlUtils.quote(url)+");\n");
-        js.append("chartManager.createChart(pointData, CHART_LINECHART," +
+        js.append("displayManager.createChart(pointData, CHART_LINECHART," +
                   Json.map(propList,false) +");\n");
 
         sb.append(HtmlUtils.script(js.toString()));
