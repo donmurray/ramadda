@@ -50,10 +50,6 @@ fields=date[type="string" isdate="true"] time[type="string" istime="true"],LATIT
 put wiki text here
 ]]>
 </wiki>
-
-
-</wiki>
-
   </type>	
 
 
