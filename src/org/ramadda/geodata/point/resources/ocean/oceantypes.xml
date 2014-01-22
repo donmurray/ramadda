@@ -46,6 +46,14 @@ dateformat=yyyy-MM-dd HH:mm:ss
 fields=date[type="string" isdate="true"] time[type="string" istime="true"],LATITUDE[isLatitude="true"],LONGITUDE[isLongitude="true"],CURRENT_DIRECTION[searchable="true" chartable="true"],CURRENT_SPEED[searchable="true" chartable="true"],X[searchable="true" chartable="true"],Y[searchable="true" chartable="true"],QC[searchable="true" chartable="true"],HDOP[searchable="true" chartable="true"],VDOP[searchable="true" chartable="true"],PDOP[searchable="true" chartable="true"],RSSI[searchable="true" chartable="true"],SATELLITES[searchable="true" chartable="true"]
      </property>
 
+ <wiki><![CDATA[
+put wiki text here
+]]>
+</wiki>
+
+
+</wiki>
+
   </type>	
 
 
