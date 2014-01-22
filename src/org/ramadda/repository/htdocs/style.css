@@ -154,6 +154,11 @@ input, password, fileinput,textarea,select {
     min-height :16px;
 }
 
+.chart-text {
+   overflow-y: auto;
+   max-height: 300px;
+}
+
 .chart-map {
 //  border:1px #888888 solid; 
 //  background-color:#7391ad; 

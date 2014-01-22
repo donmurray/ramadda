@@ -16,6 +16,7 @@ var PROP_LAYOUT_TYPE = "layout.type";
 var PROP_LAYOUT_COLUMNS = "layout.columns";
 var PROP_SHOW_MAP = "show.map";
 var PROP_SHOW_MENU  = "show.menu";
+var PROP_SHOW_TEXT = "show.text";
 var PROP_FROMDATE = "fromdate";
 var PROP_TODATE = "todate";
 
@@ -84,6 +85,7 @@ function ChartManager(id,properties) {
     this.layout=this.getProperty(PROP_LAYOUT_TYPE, LAYOUT_TABLE);
     this.columns=this.getProperty(PROP_LAYOUT_COLUMNS, 1);
     this.showmap = this.getProperty(PROP_SHOW_MAP,null);
+    this.showtext = this.getProperty(PROP_SHOW_TEXT,null);
     this.mapBoundsSet  = false;
     addChartManager(this);
 
@@ -126,6 +128,10 @@ function ChartManager(id,properties) {
 
     }
 
+    if(this.showtext) {
+        html+= htmlUtil.div(["id", this.getDomId("text")],"");
+        this.addChartEventListener(new TextListener(this.getDomId("text")));
+    }
 
     //This is where we can put time selectors, etc
     html+= "<br>";
@@ -143,6 +149,8 @@ function ChartManager(id,properties) {
     if(this.showmap) {
         var params = {};
         this.map = new RepositoryMap(this.getDomId(ID_MAP), params);
+
+        this.addChartEventListener(new MapListener(this.map));
         this.map.initMap(false);
         this.map.addClickHandler(this.getDomId(ID_LONFIELD), this.getDomId(ID_LATFIELD));
         //        this.map.addLine('0e9d5f64-823a-4bdf-813b-bb3f4d80f6e2_polygon', 59.772422500000005, -151.10694375000003, 59.7614675, -151.14459375);
@@ -170,6 +178,41 @@ function init_ChartManager(chartManager) {
     init_ChartThing(chartManager);
 
     $.extend(chartManager, {
+          eventListeners: [],
+          addChartEventListener: function(listener) {
+                this.eventListeners.push(listener);
+            },
+            handleRecordSelection: function(source, pointData, index) {
+                var fields =  pointData.getRecordFields();
+                var records = pointData.getData();
+                if(index<0 || index>= records.length) {
+                    console.log("handleRecordSelection: bad index= " + index);
+                    return;
+                 }
+                var record = records[index];
+                var values = "<table>";
+                if(record.hasLocation()) {
+                    var latitude = record.getLatitude();
+                    var longitude = record.getLongitude();
+                    values+= "<tr><td align=right><b>Latitude:</b></td><td>" + latitude + "</td></tr>";
+                    values+= "<tr><td align=right><b>Longitude:</b></td><td>" + longitude + "</td></tr>";
+                }
+                if(record.hasElevation()) {
+                    values+= "<tr><td  align=right><b>Elevation:</b></td><td>" + record.getElevation() + "</td></tr>";
+                }
+                for(var i=0;i<record.getData().length;i++) {
+                    var label = fields[i].getLabel();
+                    values+= "<tr><td align=right><b>" + label +":</b></td><td>" + record.getValue(i) + "</td></tr>";
+                }
+                values += "</table>";
+
+
+
+                for(var i=0;i< this.eventListeners.length;i++) {
+                    eventListener = this.eventListeners[i];
+                    eventListener.handleRecordSelection(source, record, values);
+                }
+            },
             makeMainMenu: function() {
                 if(!this.getProperty(PROP_SHOW_MENU, true))  {
                     return "NO MENU";
@@ -179,8 +222,8 @@ function init_ChartManager(chartManager) {
                 var html = "";
                 var wider = htmlUtil.onClick(get +".changeChartWidth(1);","Chart width");
                 var narrower = htmlUtil.onClick(get +".changeChartWidth(-1);","Chart width");
-                var chartNames = ["Time Series","Bar Chart","Scatter Plot", "Table"];
-                var chartCalls = ["newTimeseries();","newBarchart();","newScatterPlot();", "newTable();"];
+                var chartNames = ["Time Series","Bar Chart","Scatter Plot", "Table", "Text"];
+                var chartCalls = ["newTimeseries();","newBarchart();","newScatterPlot();", "newTable();","newText();"];
                 var newMenu = "";
                 for(var i=0;i<chartNames.length;i++) {
                     newMenu+= htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick", get+"." + chartCalls[i]], chartNames[i]));
@@ -329,6 +372,10 @@ function init_ChartManager(chartManager) {
                 var chartManager = this;
                 setTimeout(function(){chartManager.createChart(data,CHART_TABLE);},1);
             },
+           newText: function(data) {
+                this.createChart(data,CHART_TEXT);
+            },
+
             createChart:function(pointData, chartType, props) {
                 var chartId = this.id +"_chart_" + (this.cnt++);
                 var myProps = {
@@ -337,17 +384,26 @@ function init_ChartManager(chartManager) {
                     PROP_CHART_TYPE: chartType};
                 myProps[PROP_CHART_TYPE] = chartType;
                 $.extend(myProps, props);
-                var chart  = new RamaddaLineChart(chartId, pointData, myProps);
+                var chart =  new RamaddaLineChart(chartId, pointData, myProps);
                 chart.setChartManager(this);
                 this.data.push(pointData);
                 this.charts.push(chart);
+                this.addChartEventListener(chart);
                 this.doLayout();
             },
-                removeChart:function(chart) {
+            removeChart:function(chart) {
                 var index = this.charts.indexOf(chart);
                 if(index >= 0) { 
                     this.charts.splice(index, 1);
                 }   
+
+                for(var i=0;i< this.eventListeners.length;i++) {
+                    eventListener = this.eventListeners[i];
+                    if(eventListener.handleChartDelete!=null) {
+                        eventListener.handleChartDelete(chart);
+                    }
+                }
+
                 var chartmanager = this;
                 setTimeout(function(){chartManager.doLayout();},1);
             },
@@ -387,4 +443,38 @@ function init_ChartThing(chartThing) {
                 return dflt;
             }
         });
+}
+
+
+function MapListener(theMap) {
+    this.map = theMap;
+    $.extend(this, {
+            markers: {'foo':'bar'},
+            handleChartDelete: function(source) {
+                var marker  = this.markers[source];
+                if(marker!=null) {
+                    this.map.removeMarker(marker);
+                }
+            },
+            handleRecordSelection: function(source, record, html) {
+                if(record.hasLocation()) {
+                    var latitude = record.getLatitude();
+                    var longitude = record.getLongitude();
+                    var point = new OpenLayers.LonLat(longitude, latitude);
+                    var marker  = this.markers[source];
+                    if(marker!=null) {
+                        this.map.removeMarker(marker);
+                    }
+                    this.markers[source] =  this.map.addMarker(source.getId(), point, null,html);
+                }}
+        });
+}
+
+
+function TextListener(domId) {
+    this.domId = domId;
+    $.extend(this, {
+            handleRecordSelection: function(source, record, html) {
+                $("#"+this.domId).html(html);
+            }});
 }

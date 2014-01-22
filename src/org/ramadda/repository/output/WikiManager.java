@@ -4190,6 +4190,10 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         topProps.add(""+Misc.getProperty(props, "chart.showmap",
                                       false));
 
+        topProps.add("show.text");
+        topProps.add(""+Misc.getProperty(props, "chart.showtext",
+                                      false));
+
         topProps.add("layout.type");
         topProps.add(Json.quote(Misc.getProperty(props, "layout.type",
                                                  "table")));
