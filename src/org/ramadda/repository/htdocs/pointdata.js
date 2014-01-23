@@ -184,6 +184,10 @@ function init_RecordField(recordField) {
         return this.getProperty("chartable",false);
     }
 
+    recordField.getSortOrder = function() {
+        return this.getProperty("sortorder",0);
+    }
+
     recordField.getId = function() {
         return this.id;
     }
@@ -405,4 +409,15 @@ function MonthFilter(month) {
         if(values[0].getMonth()!=this.month) return false;
         return true;
     }
+}
+
+
+function RecordFieldSort(fields) {
+    fields = fields.slice(0);
+    fields.sort(function(a,b){
+            var s1 = a.getSortOrder();
+            var s2 = b.getSortOrder();
+            return s1<s2;
+        });
+    return fields;
 }

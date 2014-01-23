@@ -59,17 +59,24 @@ public class RecordField {
 
     /** _more_ */
     public static final String PROP_ISTIME = "istime";
-    
-    /** Latitude-Longitude-altitude properties **/
+
+    public static final String PROP_SORTORDER = "sortorder";
+
+
+    /** Latitude-Longitude-altitude properties */
     public static final String PROP_ISLATITUDE = "islatitude";
-    
+
+    /** _more_          */
     public static final String PROP_ISLONGITUDE = "islongitude";
-    
+
+    /** _more_          */
     public static final String PROP_ISALTITUDE = "isaltitude";
-    
+
     /* For depth sometimes is reversed. 0 is the surface and goes on instead of -1 */
+
+    /** _more_          */
     public static final String PROP_ISALTITUDEREVERSE = "isaltitudereverse";
-    
+
 
     /** _more_ */
     public static final String PROP_SEARCH_SUFFIX = "search.suffix";
@@ -102,11 +109,23 @@ public class RecordField {
     /** _more_ */
     private boolean isDate = false;
 
+
+    /** _more_          */
+    private int sortOrder = 0;
+
     /** _more_ */
     private boolean isTime = false;
+
+    /** _more_          */
     private boolean isLatitude = false;
+
+    /** _more_          */
     private boolean isLongitude = false;
+
+    /** _more_          */
     private boolean isAltitude = false;
+
+    /** _more_          */
     private boolean isAltitudeReverse = false;
 
     /** _more_ */
@@ -118,10 +137,10 @@ public class RecordField {
     /** _more_ */
     private double roundingFactor = 0;
 
-    /** _more_          */
+    /** _more_ */
     private double scale = 1.0;
 
-    /** _more_          */
+    /** _more_ */
     private double offset = 1.0;
 
     /** _more_ */
@@ -317,7 +336,7 @@ public class RecordField {
             dataType = "double";
         }
         String props = Json.map(new String[] { "chartable",
-                "" + getChartable(), "searchable", "" + getSearchable(), });
+                                               "" + getChartable(), "sortorder", ""+sortOrder, "searchable", "" + getSearchable(), });
         sb.append(Json.map(new String[] {
             "index", "" + index, "id", HtmlUtils.quote(name), "label",
             HtmlUtils.quote(label), "type", HtmlUtils.quote(dataType),
@@ -1022,35 +1041,99 @@ public class RecordField {
     }
 
     /* Adding other dimensions latitude longitude */
-    public void setIsLatitude(boolean value){
-    	isLatitude=value;
+
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
+    public void setIsLatitude(boolean value) {
+        isLatitude = value;
     }
-    public void setIsLongitude(boolean value){
-    	isLongitude=value;
+
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
+    public void setIsLongitude(boolean value) {
+        isLongitude = value;
     }
-    
-    public void setIsAltitude(boolean value){
-    	isAltitude = value;
+
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
+    public void setIsAltitude(boolean value) {
+        isAltitude = value;
     }
-    
-    public void setIsAltitudeReverse(boolean value){
-    	isAltitudeReverse = value;
+
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
+    public void setIsAltitudeReverse(boolean value) {
+        isAltitudeReverse = value;
     }
-    
-    public boolean getIsLatitude(){
-    	return isLatitude;
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIsLatitude() {
+        return isLatitude;
     }
-    
-    public boolean getIsLongitude(){
-    	return isLongitude;
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIsLongitude() {
+        return isLongitude;
     }
-    
-    public boolean getIsAltitude(){
-    	return isAltitude;
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIsAltitude() {
+        return isAltitude;
     }
-    
-    public boolean getIsAltitudeReverse(){
-    	return isAltitudeReverse;
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIsAltitudeReverse() {
+        return isAltitudeReverse;
     }
+
+
+    /**
+     * Set the SortOrder property.
+     *
+     * @param value The new value for SortOrder
+     */
+    public void setSortOrder(int value) {
+        sortOrder = value;
+    }
+
+    /**
+     * Get the SortOrder property.
+     *
+     * @return The SortOrder
+     */
+    public int getSortOrder() {
+        return sortOrder;
+    }
+
+
+
 
 }

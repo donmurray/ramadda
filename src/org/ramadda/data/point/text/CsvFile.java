@@ -227,23 +227,25 @@ public class CsvFile extends TextFile {
             field.setIsTime(getProperty(field, properties,
                                         RecordField.PROP_ISTIME,
                                         "false").equals("true"));
-            
+
             field.setIsLatitude(getProperty(field, properties,
-                                        RecordField.PROP_ISLATITUDE,
-                                        "false").equals("true"));
+                                            RecordField.PROP_ISLATITUDE,
+                                            "false").equals("true"));
+            field.setSortOrder(Integer.parseInt(getProperty(field,
+                    properties, RecordField.PROP_SORTORDER, "0")));
 
             field.setIsLongitude(getProperty(field, properties,
-                    RecordField.PROP_ISLONGITUDE,
-                    "false").equals("true"));
-            
+                                             RecordField.PROP_ISLONGITUDE,
+                                             "false").equals("true"));
+
             field.setIsAltitude(getProperty(field, properties,
-                    RecordField.PROP_ISALTITUDE,
-                    "false").equals("true"));
-            
+                                            RecordField.PROP_ISALTITUDE,
+                                            "false").equals("true"));
+
             field.setIsAltitudeReverse(getProperty(field, properties,
                     RecordField.PROP_ISALTITUDEREVERSE,
                     "false").equals("true"));
-            
+
             String utcoffset = getProperty(field, properties, PROP_UTCOFFSET,
                                            (String) null);
             if (utcoffset != null) {
@@ -299,12 +301,12 @@ public class CsvFile extends TextFile {
 
                     if (name.equalsIgnoreCase(FIELD_LATITUDE)
                             || name.equalsIgnoreCase(FIELD_LONGITUDE)
-                            || field.getIsLatitude() 
+                            || field.getIsLatitude()
                             || field.getIsLongitude()) {
                         value = "" + decodeLatLon(patternMatch);
-                    // I need to think about the implications of elevation reverse
+                        // I need to think about the implications of elevation reverse
                     } else if (name.equalsIgnoreCase(FIELD_ELEVATION)
-                    		|| field.getIsAltitude()) {
+                               || field.getIsAltitude()) {
                         value = "" + decodeElevation(patternMatch);
                     } else {
                         value = patternMatch;

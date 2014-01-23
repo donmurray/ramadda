@@ -150,6 +150,8 @@ function init_RamaddaMultiChart(theChart, properties) {
         for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
             var pointData = dataList[collectionIdx];
             var fields =pointData.getChartableFields();
+
+            fields = RecordFieldSort(fields);
             html+= htmlUtil.tag("b", [],  "Fields");
             html+= "<br>";
             for(i=0;i<fields.length;i++) { 

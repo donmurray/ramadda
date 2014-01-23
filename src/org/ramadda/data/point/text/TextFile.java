@@ -68,7 +68,7 @@ public abstract class TextFile extends PointFile implements Fields {
     /** _more_ */
     public static final String ATTR_TYPE = "type";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LABEL = "label";
 
     /** _more_ */
@@ -76,9 +76,12 @@ public abstract class TextFile extends PointFile implements Fields {
 
 
     /** _more_          */
+    public static final String ATTR_SORTORDER = "sortorder";
+
+    /** _more_ */
     public static final String ATTR_SCALE = "scale";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_OFFSET = "offset";
 
     /** _more_ */
@@ -617,6 +620,16 @@ public abstract class TextFile extends PointFile implements Fields {
         return attrValue("" + d);
     }
 
+    /**
+     * _more_
+     *
+     * @param d _more_
+     *
+     * @return _more_
+     */
+    public String attrSortOrder(int d) {
+        return HtmlUtils.attr(ATTR_SORTORDER, "" + d);
+    }
 
 
     /**
