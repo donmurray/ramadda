@@ -825,8 +825,10 @@ public class PointOutputHandler extends RecordOutputHandler {
         String name = entry.getName();
         Hashtable props = new Hashtable();
         props.put("layout.fixed","false");
-        props.put("chart.showmenu","true");
-        props.put("chart.showmap",""+ entry.isGeoreferenced());
+        props.put("layout.type","table");
+        props.put("layout.columns","2");
+        props.put("showmenu","true");
+        props.put("showmap",""+ entry.isGeoreferenced());
         getWikiManager().getEntryChart(request, name,
                                        url, sb, props);
         return new Result("", sb);

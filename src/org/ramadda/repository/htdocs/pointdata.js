@@ -428,21 +428,23 @@ function RecordFieldSort(fields) {
 function RecordGetPoints(records, bounds) {
     var points =[];
     var north=NaN,west=NaN,south=NaN,east=NaN;
-    for(j=0;j<records.length;j++) { 
-        var record = records[j];
-        if(!isNaN(record.getLatitude())) { 
-            if(j == 0) {
-                north  =  record.getLatitude();
-                south  = record.getLatitude();
-                west  =  record.getLongitude();
-                east  = record.getLongitude();
-            } else {
-                north  = Math.max(north, record.getLatitude());
-                south  = Math.min(south, record.getLatitude());
-                west  = Math.min(west, record.getLongitude());
-                east  = Math.min(east, record.getLongitude());
+    if(records!=null) {
+        for(j=0;j<records.length;j++) { 
+            var record = records[j];
+            if(!isNaN(record.getLatitude())) { 
+                if(j == 0) {
+                    north  =  record.getLatitude();
+                    south  = record.getLatitude();
+                    west  =  record.getLongitude();
+                    east  = record.getLongitude();
+                } else {
+                    north  = Math.max(north, record.getLatitude());
+                    south  = Math.min(south, record.getLatitude());
+                    west  = Math.min(west, record.getLongitude());
+                    east  = Math.min(east, record.getLongitude());
+                }
+                points.push(new OpenLayers.Geometry.Point(record.getLongitude(),record.getLatitude()));
             }
-            points.push(new OpenLayers.Geometry.Point(record.getLongitude(),record.getLatitude()));
         }
     }
     bounds[0] = north;

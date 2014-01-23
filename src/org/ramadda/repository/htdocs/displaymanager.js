@@ -8,6 +8,7 @@ var ID_MENU_INNER =  "menu_inner";
 
 var LAYOUT_TABLE = "table";
 var LAYOUT_TABS = "tabs";
+var LAYOUT_COLUMNS = "columns";
 
 var PROP_LAYOUT_TYPE = "layout.type";
 var PROP_LAYOUT_COLUMNS = "layout.columns";
@@ -62,107 +63,30 @@ function getDisplayManager(id) {
 //DisplayManager constructor
 //
 function DisplayManager(id,properties) {
-    var theDisplay = this;
-    this.id = id;
-    this.properties = properties;
-    if(this.properties == null) {
-        this.properties == {'':''};
+    var theDisplayManager = this;
+    if(properties == null) {
+       properties == {};
     }
-    this.displays = [];
-    this.data = [];
-    this.cnt = 0;
-
-    //This is test for listing a set of entries
-    //    var entryUrl = "/repository/search/type/type_point_noaa_carbon?type=type_point_noaa_carbon&search.type_point_noaa_carbon.site_id=MLO&datadate.mode=overlaps&output=json&max=3";
-    //    this.entryList = new  EntryList(entryUrl, this);
-
-    init_DisplayManager(this);
-
-    this.layout=this.getProperty(PROP_LAYOUT_TYPE, LAYOUT_TABLE);
-    this.columns=this.getProperty(PROP_LAYOUT_COLUMNS, 1);
-    this.showmap = this.getProperty(PROP_SHOW_MAP,null);
-
-
-    this.initMapBounds = null;
-    this.initMapPoints = null;
-    this.setMapState = function(points, bounds) {
-        this.initMapPoints = points;
-        this.initMapBounds = bounds;
-    }
-    addDisplayManager(this);
-
-    var html = htmlUtil.openTag("div", ["class","display-container"]);
-    html += this.makeMainMenu();
-
-    //
-    //Main layout is defined here
-    // Right now it is a table:
-    // menu
-    // | displays div |  map & settings form | 
-    //
-
-
-    //    html += htmlUtil.openTag("table",["cellspacing","0","cellpadding","0","width","100%","border","0"]);
-    //    html += htmlUtil.openTag("tr", ["valign","top"]);
-
-    //    html+="<td>";
-    //    html+="<b>Entries</b>";
-    //    html+="<div class=chart-entry-list-wrapper><div id=" + this.getDomId(ID_ENTRIES) +"  class=chart-entry-list></div></div>";
-    //    html+="</td>";
-
-
-    var theDiv =  htmlUtil.div(["id", this.getDomId(ID_DISPLAYS)]);
-    html += theDiv;
-
-    /*
-    html+=htmlUtil.tag("td", [], theDiv);
-    html+=htmlUtil.openTag("td", ["width", "300"]);
-    if(this.getProperty(PROP_SHOW_MENU, true))  {
-        //This is where we can put time selectors, etc
-        html+= "<br>";
-        html+= htmlUtil.tag("b",[],"Selection");
-        html+=htmlUtil.openTag("form");
-        html+=" Put selection form here";
-        html+=htmlUtil.closeTag("form");
-    }
-
-    html+=htmlUtil.closeTag("td");
-    html+=htmlUtil.closeTag("table");
-    */
-
-    $("#"+ this.getId()).html(html);
-
-    if(this.showmap) {
-        this.createMapDisplay(null);
-    }
-
-    if(this.entryList) {
-        //this.entryList.initDisplay(this.getDomId(ID_ENTRIES));
-    }
-
-
-    $("#"+this.getDomId(ID_MENU_BUTTON)).button({ icons: { primary: "ui-icon-gear", secondary: "ui-icon-triangle-1-s"}}).click(function(event) {
-
-            var id =theDisplay.getDomId(ID_MENU_POPUP); 
-            showPopup(event, theDisplay.getDomId(ID_MENU_BUTTON), id, false,null,"left bottom");
-            $("#"+  theDisplay.getDomId(ID_MENU_INNER)).superfish({
-                    animation: {height:'show'},
-                        delay: 1200
-                        });
-        });
-}
-
-
-function init_DisplayManager(displayManager) {
-
-    init_DisplayThing(displayManager);
-
-    $.extend(displayManager, {
-          eventListeners: [],
-          addDisplayEventListener: function(listener) {
-                this.eventListeners.push(listener);
+    $.extend(this, new DisplayThing(properties));
+    $.extend(this, {
+            id: id,
+                displays : [],
+                data : [],
+                cnt : 0,
+                eventListeners: [],
+                layout:this.getProperty(PROP_LAYOUT_TYPE, LAYOUT_TABLE),
+                columns:this.getProperty(PROP_LAYOUT_COLUMNS, 1),
+                showmap : this.getProperty(PROP_SHOW_MAP,null),
+                initMapBounds : null,
+                initMapPoints : null,
+                setMapState : function(points, bounds) {
+                this.initMapPoints = points;
+                this.initMapBounds = bounds;
             },
 
+                addDisplayEventListener: function(listener) {
+                this.eventListeners.push(listener);
+            },
             handleRecordSelection: function(source, pointData, index) {
                 var fields =  pointData.getRecordFields();
                 var records = pointData.getData();
@@ -187,10 +111,14 @@ function init_DisplayManager(displayManager) {
                 }
                 values += "</table>";
 
-
-
                 for(var i=0;i< this.eventListeners.length;i++) {
                     eventListener = this.eventListeners[i];
+                    var eventSource  = eventListener.getSource();
+                    if(eventSource!=null) {
+                        if(eventSource!= source.getId() && eventSource!= source.getName()) {
+                            continue;
+                        }
+                    }
                     eventListener.handleRecordSelection(source, index, record, values);
                 }
             },
@@ -209,9 +137,6 @@ function init_DisplayManager(displayManager) {
                 for(var i=0;i<chartNames.length;i++) {
                     newMenu+= htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick", get+"." + chartCalls[i]], chartNames[i]));
                 }
-
-
-
 
                 var layoutMenu = 
                     htmlUtil.tag("li",[], htmlUtil.onClick(get +".setLayout('table',1);", "Table - 1 column")) +"\n" +
@@ -305,6 +230,23 @@ function init_DisplayManager(displayManager) {
                     }
                 } else if(this.layout==LAYOUT_TABS) {
                     //TODO
+                } else if(this.layout==LAYOUT_COLUMNS) {
+                    var cols = [];
+                    for(var i=0;i<displaysToLayout.length;i++) {
+                        var display =displaysToLayout[i];
+                        var column = display.getProperty("column",0);
+                        while(cols.length<=column) {
+                            cols.push("");
+                        }
+                        cols[column] += display.getDisplay();
+                    }
+                    html+=htmlUtil.openTag("table", ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "0"]);
+                    html+=htmlUtil.openTag("tr", ["valign","top"]);
+                    for(var i=0;i<cols.length;i++) {
+                        html+=htmlUtil.tag("td", ["valign","top"], cols[i]);
+                    }
+                    html+= htmlUtil.closeTag("tr");
+                    html+= htmlUtil.closeTag("table");
                 } else {
                     html+="Unknown layout:" + this.layout;
                 }
@@ -329,7 +271,7 @@ function init_DisplayManager(displayManager) {
                 }
                 if(type == DISPLAY_TEXT) {
                     this.data.push(data);
-                    return createTextDisplay(props);
+                    return this.createTextDisplay(props);
                 }
                 return this.createChart(data,type, props);
             },
@@ -351,14 +293,11 @@ function init_DisplayManager(displayManager) {
                 }
                 this.createChart(data,'scatterplot');
             },
-           createTableDisplay: function(data) {
+            createTableDisplay: function(data) {
                 if(data == null) {
                     data = this.data[0];
                 }
                 this.createChart(data,DISPLAY_TABLE);
-            },
-           createTextDisplay: function(data) {
-                this.createTextDisplay();
             },
             createChart:function(pointData, chartType, props) {
                 var chartId = this.id +"_chart_" + (this.cnt++);
@@ -374,9 +313,9 @@ function init_DisplayManager(displayManager) {
                 this.addDisplayEventListener(chart);
                 this.doLayout();
             },
-            createTextDisplay:function() {
+            createTextDisplay:function(props) {
                 var displayId = this.id +"_display_" + (this.cnt++);
-                var display =  new RamaddaTextDisplay(this, displayId);
+                var display =  new RamaddaTextDisplay(this, displayId, props);
                 this.displays.push(display);
                 this.addDisplayEventListener(display);
                 this.doLayout();
@@ -441,14 +380,71 @@ function init_DisplayManager(displayManager) {
                 var chartId = this.id +"_chart_" + (this.cnt++);
                 var chart  = new RamaddaMultiChart(chartId, pointDataArg, properties);
                 display.setDisplayManager(this);
-                this.displays.add(chart);
-            }
+                this.displays.add(chart); 
+           }
         });
+
+    addDisplayManager(this);
+
+    var html = htmlUtil.openTag("div", ["class","display-container"]);
+    html += this.makeMainMenu();
+
+    //
+    //Main layout is defined here
+    // Right now it is a table:
+    // menu
+    // | displays div |  map & settings form | 
+    //
+
+
+    //    html += htmlUtil.openTag("table",["cellspacing","0","cellpadding","0","width","100%","border","0"]);
+    //    html += htmlUtil.openTag("tr", ["valign","top"]);
+
+    //    html+="<td>";
+    //    html+="<b>Entries</b>";
+    //    html+="<div class=chart-entry-list-wrapper><div id=" + this.getDomId(ID_ENTRIES) +"  class=chart-entry-list></div></div>";
+    //    html+="</td>";
+
+
+    var theDiv =  htmlUtil.div(["id", this.getDomId(ID_DISPLAYS)]);
+    html += theDiv;
+
+    /*
+    html+=htmlUtil.tag("td", [], theDiv);
+    html+=htmlUtil.openTag("td", ["width", "300"]);
+    if(this.getProperty(PROP_SHOW_MENU, true))  {
+        //This is where we can put time selectors, etc
+        html+= "<br>";
+        html+= htmlUtil.tag("b",[],"Selection");
+        html+=htmlUtil.openTag("form");
+        html+=" Put selection form here";
+        html+=htmlUtil.closeTag("form");
+    }
+
+    html+=htmlUtil.closeTag("td");
+    html+=htmlUtil.closeTag("table");
+    */
+
+    $("#"+ this.getId()).html(html);
+
+    if(this.showmap) {
+        this.createMapDisplay(null);
+    }
+
+    if(this.entryList) {
+        //this.entryList.initDisplay(this.getDomId(ID_ENTRIES));
+    }
+
+
+    $("#"+this.getDomId(ID_MENU_BUTTON)).button({ icons: { primary: "ui-icon-gear", secondary: "ui-icon-triangle-1-s"}}).click(function(event) {
+            var id =theDisplayManager.getDomId(ID_MENU_POPUP); 
+            showPopup(event, theDisplayManager.getDomId(ID_MENU_BUTTON), id, false,null,"left bottom");
+            $("#"+  theDisplayManager.getDomId(ID_MENU_INNER)).superfish({
+                    animation: {height:'show'},
+                        delay: 1200
+                        });
+        });
+
 }
-
-
-
-
-
 
 

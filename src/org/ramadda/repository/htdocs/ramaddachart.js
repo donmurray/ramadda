@@ -13,11 +13,7 @@ var pointData = new  PointData("Example data set",  recordFields, data);
 var chart = new  RamaddaChart("example" , pointData);
 */
 
-
-
-//some globals
-
-
+//Ids of DOM components
 var ID_FIELDS = "fields";
 var ID_HEADER = "header";
 var ID_DISPLAY_CONTENTS = "contents";
@@ -49,7 +45,7 @@ var DISPLAY_TEXT = "text";
 
 function addRamaddaDisplay(display) {
     if(window.globalDisplays == null) {
-        window.globalDisplays = {'foo':'bar'};
+        window.globalDisplays = {};
     }
     window.globalDisplays[display.id] = display;
 }
@@ -71,25 +67,32 @@ function removeRamaddaDisplay(id) {
 }
 
 
-function init_DisplayThing(displayThing) {
-    $.extend(displayThing, {
+function DisplayThing(properties) {
+    $.extend(this, {
+            properties:properties,
             parent: null,
-        getId: function() {
+            getId: function() {
             return this.id;
         },
-        getDomId:function(suffix) {
+       getDomId:function(suffix) {
                 return this.getId() +"_" + suffix;
-        },
+       },
+       getName: function() {
+            return this.getProperty("name", this.getId());
+       },
+       getSource: function() {
+            return this.getProperty("source",null);
+       },
        setParent:  function (parent) {
                 this.parent = parent;
-            },
+       },
        removeProperty: function(key) {
                 this.properties[key] = null;
-        },
-        getProperty: function(key, dflt) {
-                var value = this.properties[key];
-                if(value != null) return value;
-                if(this.parent!=null) {
+       },
+       getProperty: function(key, dflt) {
+            var value = this.properties[key];
+            if(value != null) return value;
+            if(this.parent!=null) {
                     return this.parent.getProperty(key, dflt);
                 }
                 return dflt;
@@ -100,22 +103,29 @@ function init_DisplayThing(displayThing) {
 
 
 
-function init_RamaddaDisplay(displayManager, theDisplay, propertiesArg) {
-    addRamaddaDisplay(theDisplay);
-    if(propertiesArg == null) {
-       propertiesArg = {'':''};
-    }
-    $.extend(theDisplay, {
-            properties: propertiesArg,
-            displayManager:displayManager,
-                });
-    init_DisplayThing(theDisplay);
 
-    $.extend(theDisplay, {
+function RamaddaDisplay(displayManager, id, propertiesArg) {
+    if(propertiesArg == null) {
+       propertiesArg = {};
+    }
+    $.extend(this, new DisplayThing(propertiesArg));
+    $.extend(this, {
+            id:id,
+            source: null,
+            displayManager:displayManager,
             filters: [],
             setDisplayManager: function(cm) {
                 this.displayManager = cm;
                 this.setParent(cm);
+            },
+           checkFixedLayout: function() {
+                if(this.getIsLayoutFixed()) {
+                    var divid = this.getProperty(PROP_DIVID);
+                    if(divid!=null) {
+                        var html = this.getDisplay();
+                        $("#" + divid).html(html);
+                    }
+                }
             },
             getDisplayMenuContents: function() {
                 var get = "getRamaddaDisplay('" + this.id +"')";
@@ -150,7 +160,12 @@ function init_RamaddaDisplay(displayManager, theDisplay, propertiesArg) {
                 var menuButton =  htmlUtil.tag("a", ["class", "chart-menu-button", "id",  this.getDomId(ID_MENU_BUTTON)]);
                 var menu = htmlUtil.div(["class", "ramadda-popup", "id", this.getDomId(ID_MENU_POPUP)], this.getMenuContents());
 
-                html += htmlUtil.openTag("table", ["width","100%", "cellpadding","0", "cellspacing","0"]);
+                var width = this.getProperty("width",-1);
+                var tableWidth = "100%";
+                if(width>0) {
+                    tableWidth = width+"px";
+                }
+                html += htmlUtil.openTag("table", ["width",tableWidth, "cellpadding","0", "cellspacing","0"]);
                 html += htmlUtil.openTag("tr", ["valign", "bottom"]);
                 html += htmlUtil.td([], htmlUtil.b(this.getTitle()));
                 html += htmlUtil.td(["align", "right"],
@@ -217,7 +232,6 @@ function init_RamaddaDisplay(displayManager, theDisplay, propertiesArg) {
                     this.addData(pointData);
                 } else {
                     var jsonUrl = pointData.getUrl();
-                         
                     if(jsonUrl!=null) {
                         loadPointJson(jsonUrl, this, pointData);
                     }
@@ -312,7 +326,7 @@ function init_RamaddaDisplay(displayManager, theDisplay, propertiesArg) {
 
 
 
-        var filter = theDisplay.getProperty(PROP_CHART_FILTER);
+        var filter = this.getProperty(PROP_CHART_FILTER);
         if(filter!=null) {
             //display.filter="month:0-11;
             var toks = filter.split(":");
@@ -332,45 +346,30 @@ id - the id of this chart. Has to correspond to a div tag id
 pointData - A PointData object (see below)
  */
 function RamaddaMultiChart(displayManager, id, pointDataArg, properties) {
-    this.id = id;
-    init_RamaddaMultiChart(displayManager, this, properties);
-    var testUrl = null;
-    //Uncomment to test using test.json
-    //testUrl = "/repository/test.json";
-    this.title = "";
-    if(pointDataArg!=null) {
-        this.title = pointDataArg.getName();
-        if(testUrl!=null) {
-            pointDataArg = new PointData("Test",null,null,testUrl);
-        }
-        this.addOrLoadData(pointDataArg);
-    }
-}
-
-
-
-
-function init_RamaddaMultiChart(displayManager, theChart, properties) {
-    init_RamaddaDisplay(displayManager, theChart, properties);
-    $.extend(theChart, {
+    $.extend(this, new RamaddaDisplay(displayManager, id, properties));
+    addRamaddaDisplay(this);
+    $.extend(this, {
+            title: "",
             dataCollection: new DataCollection(),
             indexField: -1,
             getMenuContents: function() {
                 return this.getFieldsDiv()+"<hr>" +  this.getDisplayMenuContents();
             },
             getDisplayContents: function() {
-                //return htmlUtil.div(["id", this.getDomId(ID_DISPLAY_CONTENTS),"style", "width: " + this.getProperty(PROP_WIDTH,DFLT_WIDTH) +"; height: " + this.getProperty(PROP_HEIGHT,DFLT_HEIGHT) +";"],"");
-                return htmlUtil.div(["id", this.getDomId(ID_DISPLAY_CONTENTS)],"");
+                var extraStyle = "";
+                var width = this.getProperty("width",-1);
+                if(width>0) {
+                    extraStyle += "width:" + width +"px; ";
+                }
+                var height = this.getProperty("height",-1);
+                if(height>0) {
+                    extraStyle += " height:" + height +"px; ";
+                }
+                return htmlUtil.div(["style", extraStyle, "id", this.getDomId(ID_DISPLAY_CONTENTS)],"");
             },
             initDisplay:function() {
                 //If we are a fixed layout then there should be a div id property
-                if(this.getIsLayoutFixed()) {
-                    var divid = this.getProperty(PROP_DIVID);
-                    if(divid!=null) {
-                        var html = this.getDisplay();
-                        $("#" + divid).html(html);
-                    }
-                }
+                this.checkFixedLayout();
                 var theChart = this;
                 var reloadId = this.getDomId(ID_RELOAD);
                 $("#" + reloadId).button().click(function(event) {
@@ -415,6 +414,7 @@ function init_RamaddaMultiChart(displayManager, theChart, properties) {
 
                 $("#" + this.getDomId(ID_FIELDS)).html(html);
 
+                var theChart = this;
                 //Listen for changes to the checkboxes
                 $("." + checkboxClass).click(function(event) {
                         theChart.displayData();
@@ -470,13 +470,13 @@ function init_RamaddaMultiChart(displayManager, theChart, properties) {
                 return df;
             },
             handleRecordSelection: function(source, index, record, html) {
-                if(source==theChart) return;
-                var chartType = theChart.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
-                if(theChart.chart!=null) {
-                    theChart.chart.setSelection([{row:index, column:null}]);
+                if(source==this) return;
+                var chartType = this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
+                if(this.chart!=null) {
+                    this.chart.setSelection([{row:index, column:null}]);
                 }
             },
-                displayData: function() {
+            displayData: function() {
                 var theChart = this;
                 if(!this.hasData()) {
                     if(this.chart !=null) {
@@ -529,7 +529,7 @@ function init_RamaddaMultiChart(displayManager, theChart, properties) {
                 if(this.chart!=null) {
                     this.chart.draw(dataTable, options);
                     google.visualization.events.addListener(this.chart, 'select', function() {
-                            var index = theChart.chart.getSelection()[0].row
+                           var index = theChart.chart.getSelection()[0].row
                                 theChart.displayManager.handleRecordSelection(theChart, 
                                                                               theChart.dataCollection.getData()[0], index);
                         });
@@ -537,16 +537,26 @@ function init_RamaddaMultiChart(displayManager, theChart, properties) {
 
             }
         });
+    var testUrl = null;
+    //Uncomment to test using  "/repository/test.json";
+    if(pointDataArg!=null) {
+        this.title = pointDataArg.getName();
+        if(testUrl!=null) {
+            pointDataArg = new PointData("Test",null,null,testUrl);
+        }
+        this.addOrLoadData(pointDataArg);
+    }
 }
 
 
 
 function RamaddaTextDisplay(displayManager, id, properties) {
-    this.id = id;
-    this.html = "<p>&nbsp;&nbsp;&nbsp;Nothing selected&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<p>";
-    init_RamaddaDisplay(displayManager, this, properties);
+    $.extend(this, new RamaddaDisplay(displayManager, id, properties));
+    addRamaddaDisplay(this);
     $.extend(this, {
+            html: "<p>&nbsp;&nbsp;&nbsp;Nothing selected&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<p>",
             initDisplay: function() {
+                this.checkFixedLayout();
                 this.initMenu();
                 $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(htmlUtil.div(["class","display-text"], this.html));
             },
@@ -559,21 +569,22 @@ function RamaddaTextDisplay(displayManager, id, properties) {
 
 
 
-var ID_LATFIELD  = "latfield";
-var ID_LONFIELD  = "lonfield";
-var ID_MAP = "map";
 
 function RamaddaMapDisplay(displayManager, id, properties) {
-    this.id = id;
-    this.initBounds = displayManager.initMapBounds;
-    this.initPoints = displayManager.initMapPoints;
-    this.mapBoundsSet  = false;
+    var ID_LATFIELD  = "latfield";
+    var ID_LONFIELD  = "lonfield";
+    var ID_MAP = "map";
 
-    init_RamaddaDisplay(displayManager, this, properties);
+    $.extend(this, new RamaddaDisplay(displayManager, id, properties));
+    addRamaddaDisplay(this);
     $.extend(this, {
+            initBounds:displayManager.initMapBounds,
+            initPoints:displayManager.initMapPoints,
+            mapBoundsSet:false,
             polygons:[],
             markers: {},
             initDisplay: function() {
+                this.checkFixedLayout();
                 var currentPolygons = this.polygons;
                 this.polygons = [];
                 var params = {};
@@ -600,7 +611,17 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             },
             getDisplayContents: function() {
                 var html = "";
-                html+=htmlUtil.div(["style", "min-width:200px; min-height:200px;",
+                var extraStyle = "";
+                var width = this.getProperty("width",-1);
+                if(width>0) {
+                    extraStyle += "width:" + width +"px; ";
+                }
+                var height = this.getProperty("height",-1);
+                if(height>0) {
+                    extraStyle += " height:" + height +"px; ";
+                }
+
+                html+=htmlUtil.div(["style", "min-width:200px; min-height:200px; " + extraStyle,
                                     "class", "display-map",
                                     "id", this.getDomId(ID_MAP)]);
 

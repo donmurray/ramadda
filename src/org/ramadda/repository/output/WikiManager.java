@@ -624,7 +624,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         WIKI_PROP_ROOT,
         prop(WIKI_PROP_CHARTGROUP,
              attrs(ATTR_WIDTH, "800", ATTR_HEIGHT, "400", "fields", "",
-                   ARG_FROMDATE, "", ARG_TODATE, "","showmenu","false","showtext","false","layout.type","table","layout.columns","1")),
+                   ARG_FROMDATE, "", ARG_TODATE, "","showmap", "true", "showmenu","false","layout.type","table","layout.columns","1")),
         prop(WIKI_PROP_CHART,
              attrs(ATTR_WIDTH, "800", ATTR_HEIGHT, "400", "fields", "",
                    ARG_FROMDATE, "", ARG_TODATE, "")),
@@ -4186,11 +4186,19 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         StringBuffer js = new StringBuffer();
 
 
-        for(String showArg:new String[]{"showmap","showtext","showmenu"}) {
+        for(String showArg:new String[]{"showmap","showmenu"}) {
             topProps.add(showArg);
-            topProps.add(""+Misc.getProperty(props, "chart." + showArg,
+            topProps.add(""+Misc.getProperty(props, showArg,
                                              false));
         }
+
+        propList.add("column");
+        propList.add(Misc.getProperty(props, "layout.column",
+                                                 "0"));
+
+        propList.add("row");
+        propList.add(Misc.getProperty(props, "layout.row",
+                                      "0"));
 
         topProps.add("layout.type");
         topProps.add(Json.quote(Misc.getProperty(props, "layout.type",
@@ -4225,6 +4233,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         propList.add(ARG_HEIGHT);
         propList.add(Misc.getProperty(props, ARG_HEIGHT, "200"));
 
+
+
         String fields = Misc.getProperty(props, "fields", (String) null);
         if (fields != null) {
             List<String> toks = StringUtil.split(fields, ",", true, true);
@@ -4245,6 +4255,20 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             propList.add("divid");
             propList.add(Json.quote(anotherDiv));
         }
+
+        String sourceId = Misc.getProperty(props,"source", (String) null);
+        if(sourceId!=null) {
+            propList.add("source");
+            propList.add(Json.quote(sourceId));
+        }
+
+        String chartName = Misc.getProperty(props,"name", (String) null);
+        if(chartName!=null) {
+            propList.add("name");
+            propList.add(Json.quote(chartName));
+        }
+
+
 
         String displayType = Misc.getProperty(props, "chart.type","linechart");
 
