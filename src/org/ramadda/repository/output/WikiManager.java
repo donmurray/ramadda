@@ -4208,10 +4208,6 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             return;
         }
 
-        propList.add("chart.type");
-        propList.add(Json.quote(Misc.getProperty(props, "chart.type",
-                                                 "linechart")));
-
         if (props.containsKey("chart.filter")) {
             propList.add("chart.filter");
             propList.add(Json.quote(Misc.getProperty(props, "chart.filter",
@@ -4250,12 +4246,14 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             propList.add(Json.quote(anotherDiv));
         }
 
+        String displayType = Misc.getProperty(props, "chart.type","linechart");
+
         js.append("var displayManager = getOrCreateDisplayManager("
                   + HtmlUtils.quote(displayDivId) + ","
                   + Json.map(topProps, false) + ");\n");
         js.append("var pointData = new  PointData(" + HtmlUtils.quote(name)
                   + ",  null,null," + HtmlUtils.quote(url)+");\n");
-        js.append("displayManager.createChart(pointData, CHART_LINECHART," +
+        js.append("displayManager.createDisplay(pointData, " + HtmlUtils.quote(displayType) +"," +
                   Json.map(propList,false) +");\n");
 
         sb.append(HtmlUtils.script(js.toString()));

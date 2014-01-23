@@ -322,17 +322,28 @@ function init_DisplayManager(displayManager) {
                 }
                 this.doLayout();
             },
+            createDisplay: function(data, type, props) {
+                if(type == DISPLAY_MAP) {
+                    this.data.push(data);
+                    return this.createMapDisplay(props);
+                }
+                if(type == DISPLAY_TEXT) {
+                    this.data.push(data);
+                    return createTextDisplay(props);
+                }
+                return this.createChart(data,type, props);
+            },
             createTimeseries: function(data) {
                 if(data == null) {
                     data = this.data[0];
                 }
-                this.createChart(data,CHART_LINECHART);
+                this.createChart(data,DISPLAY_LINECHART);
             },
-             createBarchart:function(data) {
+            createBarchart:function(data) {
                 if(data == null) {
                     data = this.data[0];
                 }
-                this.createChart(data,CHART_BARCHART);
+                this.createChart(data,DISPLAY_BARCHART);
             },
             createScatterPlot:function(data) {
                 if(data == null) {
@@ -344,7 +355,7 @@ function init_DisplayManager(displayManager) {
                 if(data == null) {
                     data = this.data[0];
                 }
-                this.createChart(data,CHART_TABLE);
+                this.createChart(data,DISPLAY_TABLE);
             },
            createTextDisplay: function(data) {
                 this.createTextDisplay();

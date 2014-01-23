@@ -39,9 +39,12 @@ var PROP_WIDTH  = "width";
 var DFLT_WIDTH = "600px";
 var DFLT_HEIGHT = "200px";
 
-var CHART_LINECHART = "linechart";
-var CHART_BARCHART = "barchart";
-var CHART_TABLE = "table";
+
+var DISPLAY_LINECHART = "linechart";
+var DISPLAY_BARCHART = "barchart";
+var DISPLAY_TABLE = "table";
+var DISPLAY_MAP = "map";
+var DISPLAY_TEXT = "text";
 
 
 function addRamaddaDisplay(display) {
@@ -468,7 +471,7 @@ function init_RamaddaMultiChart(displayManager, theChart, properties) {
             },
             handleRecordSelection: function(source, index, record, html) {
                 if(source==theChart) return;
-                var chartType = theChart.getProperty(PROP_CHART_TYPE,CHART_LINECHART);
+                var chartType = theChart.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
                 if(theChart.chart!=null) {
                     theChart.chart.setSelection([{row:index, column:null}]);
                 }
@@ -492,7 +495,7 @@ function init_RamaddaMultiChart(displayManager, theChart, properties) {
 
                 var dataList = this.getStandardData(selectedFields);
 
-                var chartType = this.getProperty(PROP_CHART_TYPE,CHART_LINECHART);
+                var chartType = this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
                 //
                 //Keep all of the google chart specific code here
                 //
@@ -515,10 +518,10 @@ function init_RamaddaMultiChart(displayManager, theChart, properties) {
                     };
                 }
 
-                if(chartType == CHART_BARCHART) {
+                if(chartType == DISPLAY_BARCHART) {
                     options.orientation =  "horizontal";
                     this.chart = new google.visualization.BarChart(document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
-                } else  if(chartType == CHART_TABLE) {
+                } else  if(chartType == DISPLAY_TABLE) {
                     this.chart = new google.visualization.Table(document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
                 } else {
                     this.chart = new google.visualization.LineChart(document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
