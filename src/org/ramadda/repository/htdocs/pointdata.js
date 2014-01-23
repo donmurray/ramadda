@@ -412,6 +412,8 @@ function MonthFilter(month) {
 }
 
 
+//TODO: use a namespace for these global functions
+
 function RecordFieldSort(fields) {
     fields = fields.slice(0);
     fields.sort(function(a,b){
@@ -420,4 +422,41 @@ function RecordFieldSort(fields) {
             return s1<s2;
         });
     return fields;
+}
+
+
+function RecordGetPoints(records, bounds) {
+    var points =[];
+    var north=NaN,west=NaN,south=NaN,east=NaN;
+    for(j=0;j<records.length;j++) { 
+        var record = records[j];
+        if(!isNaN(record.getLatitude())) { 
+            if(j == 0) {
+                north  =  record.getLatitude();
+                south  = record.getLatitude();
+                west  =  record.getLongitude();
+                east  = record.getLongitude();
+            } else {
+                north  = Math.max(north, record.getLatitude());
+                south  = Math.min(south, record.getLatitude());
+                west  = Math.min(west, record.getLongitude());
+                east  = Math.min(east, record.getLongitude());
+            }
+            points.push(new OpenLayers.Geometry.Point(record.getLongitude(),record.getLatitude()));
+        }
+    }
+    bounds[0] = north;
+    bounds[1] = west;
+    bounds[2] = south;
+    bounds[3] = east;
+    return points;
+}
+
+function clonePoints(points) {
+    var result = [];
+    for(var i=0;i<points.length;i++) {
+        var point = points[i];
+        result.push(new OpenLayers.Geometry.Point(point.x,point.y));
+    }
+    return result;
 }

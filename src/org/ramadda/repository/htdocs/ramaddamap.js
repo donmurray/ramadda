@@ -74,8 +74,6 @@ function RepositoryMap(mapId, params) {
             }
      });
 
-
-
     this.mapDivId = mapId;
     ramaddaAddMap(this);
     if (!this.mapDivId) {
@@ -881,8 +879,6 @@ function RepositoryMap(mapId, params) {
         for (i in points) {
             points[i].transform(this.displayProjection, this.sourceProjection);
         }
-
-
 
         var base_style = OpenLayers.Util.extend( {},
                 OpenLayers.Feature.Vector.style['default']);

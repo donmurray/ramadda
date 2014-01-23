@@ -154,9 +154,10 @@ input, password, fileinput,textarea,select {
     min-height :16px;
 }
 
-.chart-text {
+.display-text {
    overflow-y: auto;
    max-height: 300px;
+   border:1px #888888 solid; 
 }
 
 .display-map {
@@ -639,6 +640,7 @@ padding-right-rtl-source: physical;
    text-decoration: none;
    border : 1px #aaa solid;
    background-color : #FFFFFF;
+   background-color : #E6E6E6;
    position:absolute;
    left:-10000px; 
    z-index: 10000;

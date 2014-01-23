@@ -2,9 +2,6 @@
 //There are the DOM IDs for various components of the UI
 var ID_ENTRIES = "entries";
 var ID_DISPLAYS = "displays";
-var ID_LATFIELD  = "latfield";
-var ID_LONFIELD  = "lonfield";
-var ID_MAP = "map";
 var ID_MENU_BUTTON = "menu_button";
 var ID_MENU_POPUP =  "menu_popup";
 var ID_MENU_INNER =  "menu_inner";
@@ -16,7 +13,6 @@ var PROP_LAYOUT_TYPE = "layout.type";
 var PROP_LAYOUT_COLUMNS = "layout.columns";
 var PROP_SHOW_MAP = "showmap";
 var PROP_SHOW_MENU  = "showmenu";
-var PROP_SHOW_TEXT = "showtext";
 var PROP_FROMDATE = "fromdate";
 var PROP_TODATE = "todate";
 
@@ -80,18 +76,19 @@ function DisplayManager(id,properties) {
     //    var entryUrl = "/repository/search/type/type_point_noaa_carbon?type=type_point_noaa_carbon&search.type_point_noaa_carbon.site_id=MLO&datadate.mode=overlaps&output=json&max=3";
     //    this.entryList = new  EntryList(entryUrl, this);
 
-
-
     init_DisplayManager(this);
-
 
     this.layout=this.getProperty(PROP_LAYOUT_TYPE, LAYOUT_TABLE);
     this.columns=this.getProperty(PROP_LAYOUT_COLUMNS, 1);
     this.showmap = this.getProperty(PROP_SHOW_MAP,null);
-    this.showtext = this.getProperty(PROP_SHOW_TEXT,null);
-    this.mapBoundsSet  = false;
 
 
+    this.initMapBounds = null;
+    this.initMapPoints = null;
+    this.setMapState = function(points, bounds) {
+        this.initMapPoints = points;
+        this.initMapBounds = bounds;
+    }
     addDisplayManager(this);
 
     var html = htmlUtil.openTag("div", ["class","display-container"]);
@@ -105,8 +102,8 @@ function DisplayManager(id,properties) {
     //
 
 
-    html += htmlUtil.openTag("table",["cellspacing","0","cellpadding","0","width","100%","border","0"]);
-    html += htmlUtil.openTag("tr", ["valign","top"]);
+    //    html += htmlUtil.openTag("table",["cellspacing","0","cellpadding","0","width","100%","border","0"]);
+    //    html += htmlUtil.openTag("tr", ["valign","top"]);
 
     //    html+="<td>";
     //    html+="<b>Entries</b>";
@@ -115,27 +112,11 @@ function DisplayManager(id,properties) {
 
 
     var theDiv =  htmlUtil.div(["id", this.getDomId(ID_DISPLAYS)]);
+    html += theDiv;
+
+    /*
     html+=htmlUtil.tag("td", [], theDiv);
-
     html+=htmlUtil.openTag("td", ["width", "300"]);
-    //Add the map
-    if(this.showmap) {
-        html+=htmlUtil.div(["style", "width:300px; height:300px;",
-                            "class", "display-map",
-                            "id", this.getDomId(ID_MAP)]);
-        html+= htmlUtil.openTag("form");
-        html+= "Latitude: " + htmlUtil.input(this.getDomId(ID_LATFIELD), "", ["size","7","id",  this.getDomId(ID_LATFIELD)]);
-        html+= "  ";
-        html+= "Longitude: " + htmlUtil.input(this.getDomId(ID_LONFIELD), "", ["size","7","id",  this.getDomId(ID_LONFIELD)]);
-        html+= htmlUtil.closeTag("form");
-    }
-
-    if(this.showtext) {
-        html+= htmlUtil.div(["id", this.getDomId("text")],"");
-        this.addDisplayEventListener(new TextListener(this.getDomId("text")));
-    }
-
-
     if(this.getProperty(PROP_SHOW_MENU, true))  {
         //This is where we can put time selectors, etc
         html+= "<br>";
@@ -147,17 +128,12 @@ function DisplayManager(id,properties) {
 
     html+=htmlUtil.closeTag("td");
     html+=htmlUtil.closeTag("table");
+    */
 
     $("#"+ this.getId()).html(html);
 
-    this.mapCentered = false;
     if(this.showmap) {
-        var params = {};
-        this.map = new RepositoryMap(this.getDomId(ID_MAP), params);
-        this.addDisplayEventListener(new MapListener(this));
-        this.map.initMap(false);
-        this.map.addClickHandler(this.getDomId(ID_LONFIELD), this.getDomId(ID_LATFIELD));
-        //        this.map.addLine('0e9d5f64-823a-4bdf-813b-bb3f4d80f6e2_polygon', 59.772422500000005, -151.10694375000003, 59.7614675, -151.14459375);
+        this.createMapDisplay(null);
     }
 
     if(this.entryList) {
@@ -227,8 +203,8 @@ function init_DisplayManager(displayManager) {
                 var html = "";
                 var wider = htmlUtil.onClick(get +".changeChartWidth(1);","Chart width");
                 var narrower = htmlUtil.onClick(get +".changeChartWidth(-1);","Chart width");
-                var chartNames = ["Time Series","Bar Chart","Scatter Plot", "Table", "Text"];
-                var chartCalls = ["newTimeseries();","newBarchart();","newScatterPlot();", "newTable();","newText();"];
+                var chartNames = ["Map", "Time Series","Bar Chart","Scatter Plot", "Table", "Text"];
+                var chartCalls = ["createMapDisplay();", "createTimeseries();","createBarchart();","createScatterPlot();", "createTableDisplay();","createTextDisplay();"];
                 var newMenu = "";
                 for(var i=0;i<chartNames.length;i++) {
                     newMenu+= htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick", get+"." + chartCalls[i]], chartNames[i]));
@@ -257,27 +233,15 @@ function init_DisplayManager(displayManager) {
 
                 return html;
             },
-                hasMap: function() {
-                return this.map!=null;
-            },
-            addPolygon:function(id, points, props) {
-                if(!this.map) return;
-                this.map.addPolygon(id, points, props);
-            },
-                setInitMapBounds: function(north, west, south, east) {
-                if(!this.map) return;
-                if(this.mapBoundsSet) return;
-                this.mapBoundsSet = true;
-                var bounds = new OpenLayers.Bounds(west,south,east, north);
-                this.map.centerOnMarkers(bounds);
-            },
            getPosition:function() {
-                var lat = $("#" + this.getDomId(ID_LATFIELD)).val();
-                var lon = $("#" + this.getDomId(ID_LONFIELD)).val();
-                if(lat == null) return null;
-                return [lat,lon];
+                for(var i=0;i<this.displays.length;i++) {
+                    var display  = this.displays[i];
+                    if(display.getPosition) {
+                        return display.getPosition();
+                    }
+                }
             },
-                getJsonUrl:function(jsonUrl, display) {
+            getJsonUrl:function(jsonUrl, display) {
                 var hasGeoMacro = jsonUrl.match(/(\${latitude})/g);
                 var fromDate  = display.getProperty(PROP_FROMDATE);
                 if(fromDate!=null) {
@@ -302,7 +266,7 @@ function init_DisplayManager(displayManager) {
                 }
                 return jsonUrl;
             },
-                entryListChanged:function(entryList) {
+           entryListChanged:function(entryList) {
                 entryList.setHtml(entryList.getHtml());
             },
             changeChartWidth:function(w) {
@@ -315,25 +279,30 @@ function init_DisplayManager(displayManager) {
                 }
                 return result;
             },
-                doLayout:function() {
+            doLayout:function() {
                 var html = "";
                 var colCnt=100;
                 var displaysToLayout = this.getDisplaysToLayout();
                 if(this.layout == LAYOUT_TABLE) {
-                    html+=htmlUtil.openTag("table", ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "5"]);
-                    for(var i=0;i<displaysToLayout.length;i++) {
-                        colCnt++;
-                        if(colCnt>=this.columns) {
-                            if(i>0) {
-                                html+= htmlUtil.closeTag("tr");
+                    if(displaysToLayout.length == 1) {
+                        html+= displaysToLayout[0].getDisplay();
+                    } else {
+                        var width = Math.round(100/this.columns)+"%";
+                        html+=htmlUtil.openTag("table", ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "0"]);
+                        for(var i=0;i<displaysToLayout.length;i++) {
+                            colCnt++;
+                            if(colCnt>=this.columns) {
+                                if(i>0) {
+                                    html+= htmlUtil.closeTag("tr");
+                                }
+                                html+= htmlUtil.openTag("tr",["valign", "top"]);
+                                colCnt=0;
                             }
-                            html+= htmlUtil.openTag("tr",["valign", "top"]);
-                            colCnt=0;
+                            html+=htmlUtil.tag("td", ["width", width], htmlUtil.div([], displaysToLayout[i].getDisplay()));
                         }
-                        html+=htmlUtil.tag("td", [], htmlUtil.div([], displaysToLayout[i].getDisplay()));
+                        html+= htmlUtil.closeTag("tr");
+                        html+= htmlUtil.closeTag("table");
                     }
-                    html+= htmlUtil.closeTag("tr");
-                    html+= htmlUtil.closeTag("table");
                 } else if(this.layout==LAYOUT_TABS) {
                     //TODO
                 } else {
@@ -346,39 +315,39 @@ function init_DisplayManager(displayManager) {
                 }
 
             },
-                setLayout:function(layout, columns) {
+            setLayout:function(layout, columns) {
                 this.layout  = layout;
                 if(columns) {
                     this.columns  = columns;
                 }
                 this.doLayout();
             },
-            newTimeseries: function(data) {
+            createTimeseries: function(data) {
                 if(data == null) {
                     data = this.data[0];
                 }
                 this.createChart(data,CHART_LINECHART);
             },
-             newBarchart:function(data) {
+             createBarchart:function(data) {
                 if(data == null) {
                     data = this.data[0];
                 }
                 this.createChart(data,CHART_BARCHART);
             },
-            newScatterPlot:function(data) {
+            createScatterPlot:function(data) {
                 if(data == null) {
                     data = this.data[0];
                 }
                 this.createChart(data,'scatterplot');
             },
-           newTable: function(data) {
+           createTableDisplay: function(data) {
                 if(data == null) {
                     data = this.data[0];
                 }
                 this.createChart(data,CHART_TABLE);
             },
-           newText: function(data) {
-                this.createChart(data,CHART_TEXT);
+           createTextDisplay: function(data) {
+                this.createTextDisplay();
             },
             createChart:function(pointData, chartType, props) {
                 var chartId = this.id +"_chart_" + (this.cnt++);
@@ -388,13 +357,50 @@ function init_DisplayManager(displayManager) {
                     PROP_CHART_TYPE: chartType};
                 myProps[PROP_CHART_TYPE] = chartType;
                 $.extend(myProps, props);
-                var chart =  new RamaddaMultiChart(chartId, pointData, myProps);
-                chart.setDisplayManager(this);
+                var chart =  new RamaddaMultiChart(this, chartId, pointData, myProps);
                 this.data.push(pointData);
                 this.displays.push(chart);
                 this.addDisplayEventListener(chart);
                 this.doLayout();
             },
+            createTextDisplay:function() {
+                var displayId = this.id +"_display_" + (this.cnt++);
+                var display =  new RamaddaTextDisplay(this, displayId);
+                this.displays.push(display);
+                this.addDisplayEventListener(display);
+                this.doLayout();
+            },
+            createMapDisplay:function(props) {
+                var displayId = this.id +"_display_" + (this.cnt++);
+                var myProps = {};
+                $.extend(myProps, props);
+                var display =  new RamaddaMapDisplay(this, displayId, props);
+                this.displays.push(display);
+                this.addDisplayEventListener(display);
+                if(this.data.length>0) {
+                    var data = this.data[0];
+                    display.handlePointDataLoaded(pointData);
+                }
+                this.doLayout();
+            },
+            moveDisplayUp: function(display) {
+                var index = this.displays.indexOf(display);
+                if(index <= 0) { 
+                    return;
+                }
+                this.displays.splice(index, 1);
+                this.displays.splice(index-1, 0,display);
+                this.doLayout();
+            },
+            moveDisplayDown: function(display) {
+                var index = this.displays.indexOf(display);
+                if(index >=this.displays.length) { 
+                    return;
+                }
+                this.displays.splice(index, 1);
+                this.displays.splice(index+1, 0,display);
+                this.doLayout();
+           },
             removeDisplay:function(display) {
                 var index = this.displays.indexOf(display);
                 if(index >= 0) { 
@@ -414,8 +420,8 @@ function init_DisplayManager(displayManager) {
             pointDataLoaded: function(pointData) {
                 for(var i=0;i< this.eventListeners.length;i++) {
                     eventListener = this.eventListeners[i];
-                    if(eventListener.handleDisplayData!=null) {
-                        eventListener.handleDisplayData(pointData);
+                    if(eventListener.handlePointDataLoaded!=null) {
+                        eventListener.handlePointDataLoaded(pointData);
                     }
                 }
 
@@ -431,91 +437,7 @@ function init_DisplayManager(displayManager) {
 
 
 
-function init_DisplayThing(displayThing) {
-    $.extend(displayThing, {
-            parent: null,
-        getId: function() {
-            return this.id;
-        },
-        getDomId:function(suffix) {
-                return this.getId() +"_" + suffix;
-        },
-       setParent:  function (parent) {
-                this.parent = parent;
-            },
-       removeProperty: function(key) {
-                this.properties[key] = null;
-        },
-        getProperty: function(key, dflt) {
-                var value = this.properties[key];
-                if(value != null) return value;
-                if(this.parent!=null) {
-                    return this.parent.getProperty(key, dflt);
-                }
-                return dflt;
-            }
-        });
-}
 
 
-function MapListener(displayManager) {
-    this.displayManager  = displayManager;
-    $.extend(this, {
-            markers: {'foo':'bar'},
-            handleDisplayData: function(pointData) {
-                var points =[];
-                var records = pointData.getData();
-                var north=NaN,west=NaN,south=NaN,east=NaN;
-                for(j=0;j<records.length;j++) { 
-                    var record = records[j];
-                    if(!isNaN(record.getLatitude())) { 
-                        if(j == 0) {
-                            north  =  record.getLatitude();
-                            south  = record.getLatitude();
-                            west  =  record.getLongitude();
-                            east  = record.getLongitude();
-                        } else {
-                            north  = Math.max(north, record.getLatitude());
-                            south  = Math.min(south, record.getLatitude());
-                            west  = Math.min(west, record.getLongitude());
-                            east  = Math.min(east, record.getLongitude());
-                        }
-                        points.push(new OpenLayers.Geometry.Point(record.getLongitude(),record.getLatitude()));
-                    }
-                }
-                if(!isNaN(north)) {
-                    this.displayManager.setInitMapBounds(north, west, south, east);
-                    if(points.length>1) {
-                        this.displayManager.addPolygon("id",points, null);
-                    }
-                }
-
-            },
-            handleDisplayDelete: function(source) {
-                var marker  = this.markers[source];
-                if(marker!=null) {
-                    this.displayManager.map.removeMarker(marker);
-                }
-            },
-                handleRecordSelection: function(source, index, record, html) {
-                if(record.hasLocation()) {
-                    var latitude = record.getLatitude();
-                    var longitude = record.getLongitude();
-                    var point = new OpenLayers.LonLat(longitude, latitude);
-                    var marker  = this.markers[source];
-                    if(marker!=null) {
-                        this.displayManager.map.removeMarker(marker);
-                    }
-                    this.markers[source] =  this.displayManager.map.addMarker(source.getId(), point, null,html);
-                }}
-        });
-}
 
 
-function TextListener(domId) {
-    this.domId = domId;
-    $.extend(this, {
-            handleRecordSelection: function(source, index, record, html) {
-                $("#"+this.domId).html(html);
-            }});
-}
