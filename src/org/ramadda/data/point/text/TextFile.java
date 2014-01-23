@@ -52,7 +52,7 @@ import javax.swing.*;
 /**
  *
  */
-public abstract class TextFile extends PointFile implements Fields {
+public abstract class TextFile extends PointFile  {
 
     /** _more_ */
     static int cnt = 0;
@@ -65,42 +65,6 @@ public abstract class TextFile extends PointFile implements Fields {
 
 
 
-    /** _more_ */
-    public static final String ATTR_TYPE = "type";
-
-    /** _more_ */
-    public static final String ATTR_LABEL = "label";
-
-    /** _more_ */
-    public static final String ATTR_MISSING = "missing";
-
-
-    /** _more_          */
-    public static final String ATTR_SORTORDER = "sortorder";
-
-    /** _more_ */
-    public static final String ATTR_SCALE = "scale";
-
-    /** _more_ */
-    public static final String ATTR_OFFSET = "offset";
-
-    /** _more_ */
-    public static final String ATTR_VALUE = "value";
-
-    /** _more_ */
-    public static final String ATTR_FORMAT = "format";
-
-    /** _more_ */
-    public static final String ATTR_UNIT = "unit";
-
-    /** _more_ */
-    public static final String ATTR_SEARCHABLE = "searchable";
-
-    /** _more_ */
-    public static final String ATTR_CHARTABLE = "chartable";
-
-    /** _more_ */
-    public static final String ATTR_PATTERN = "pattern";
 
 
     /** _more_ */
@@ -466,6 +430,7 @@ public abstract class TextFile extends PointFile implements Fields {
      *
      * @return _more_
      */
+    @Override
     public String getTextHeader() {
         StringBuffer textHeader = new StringBuffer();
         for (String line : getHeaderLines()) {

@@ -347,6 +347,8 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
             throws Exception {
         String recordFileClass = getProperty("record.file.class",
                                              (String) null);
+
+
         if (recordFileClass != null) {
             return doMakeRecordFile(entry, recordFileClass, properties);
         }
@@ -373,7 +375,7 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
             throws Exception {
         Class c = Misc.findClass(className);
         Constructor ctor = Misc.findConstructor(c, new Class[] { String.class,
-                Hashtable.class });
+                                                                 Hashtable.class });
         if (ctor != null) {
             return (RecordFile) ctor.newInstance(new Object[] {
                 entry.getFile().toString(),

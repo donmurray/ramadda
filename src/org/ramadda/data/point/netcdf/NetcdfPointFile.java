@@ -46,12 +46,7 @@ import ucar.unidata.util.StringUtil;
 import java.io.*;
 
 import java.util.ArrayList;
-
-
-
-
-
-
+import java.util.Hashtable;
 import java.util.Formatter;
 import java.util.List;
 
@@ -90,6 +85,17 @@ public class NetcdfPointFile extends PointFile {
     }
 
 
+    /**
+     * ctor
+     *
+     * @param filename _more_
+     * @throws IOException On badness
+     */
+    public NetcdfPointFile(String filename, Hashtable properties) throws IOException {
+        super(filename, properties);
+    }
+
+
 
     /**
      * _more_
@@ -97,6 +103,19 @@ public class NetcdfPointFile extends PointFile {
      * @return _more_
      */
     public List<RecordField> doMakeFields() {
+        
+        Hashtable<String,RecordField> dfltFields = new Hashtable<String,RecordField>();
+        String fieldsProperty = getProperty("fields","NONE");
+        boolean defaultChartable = getProperty("chartable", "true").equals("true");
+        if(fieldsProperty!=null) {
+            List<RecordField> fields = doMakeFields(fieldsProperty);
+            for(RecordField field: fields) {
+                if(field.getChartable())  {
+                    defaultChartable = false;
+                }
+                dfltFields.put(field.getName(), field);
+            }
+        }
         List<RecordField> fields = new ArrayList<RecordField>();
         try {
             int cnt = 1;
@@ -118,14 +137,19 @@ public class NetcdfPointFile extends PointFile {
                     label = var.getShortName();
                 }
                 String unit = var.getUnitsString();
-                RecordField field = new RecordField(var.getShortName(),
-                                        label, label, cnt++, unit);
-                if ((var.getDataType() == DataType.STRING)
+                RecordField field = dfltFields.get(var.getShortName());
+                if(field == null) {
+                    field = new RecordField(var.getShortName(),
+                                            label, label, cnt++, unit);
+                    if ((var.getDataType() == DataType.STRING)
                         || (var.getDataType() == DataType.CHAR)) {
-                    field.setType(field.TYPE_STRING);
+                        field.setType(field.TYPE_STRING);
+                    } else {
+                        field.setChartable(defaultChartable);
+                        field.setSearchable(true);
+                    }
                 } else {
-                    field.setChartable(true);
-                    field.setSearchable(true);
+                    //                    System.err.println ("got default: " + field);
                 }
                 fields.add(field);
             }
