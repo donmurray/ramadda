@@ -389,13 +389,14 @@ function RepositoryMap(mapId, params) {
         // alert(feature);
     }
 
-    this.addClickHandler = function(lonfld, latfld, zoomfld) {
+    this.listeners = [];
+    this.addClickHandler = function(lonfld, latfld, zoomfld, object) {
         if (this.clickHandler)
             return;
         if (!this.map)
             return;
         this.clickHandler = new OpenLayers.Control.Click();
-        this.clickHandler.setLatLonZoomFld(lonfld, latfld, zoomfld);
+        this.clickHandler.setLatLonZoomFld(lonfld, latfld, zoomfld, object);
         this.clickHandler.setTheMap(this);
         this.map.addControl(this.clickHandler);
         this.clickHandler.activate();
@@ -974,11 +975,11 @@ OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
             'click' : this.trigger
         }, this.handlerOptions);
     },
-
-    setLatLonZoomFld : function(lonFld, latFld, zoomFld) {
+    setLatLonZoomFld : function(lonFld, latFld, zoomFld, listener) {
         this.lonFldId = lonFld;
         this.latFldId = latFld;
         this.zoomFldId = zoomFld;
+        this.clickListener = listener;
     },
 
     setTheMap : function(map) {
@@ -1004,6 +1005,12 @@ OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
             zoomFld.obj.value = this.theMap.getMap().getZoom();
         }
         this.theMap.setSelectionMarker(lonlat.lon, lonlat.lat);
+
+        if(this.clickListener!=null) {
+            this.clickListener.handleClick(this, lonlat.lon,lonlat.lat);
+        }
+
+
     }
     
 });

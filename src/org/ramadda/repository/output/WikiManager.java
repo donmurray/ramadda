@@ -320,11 +320,10 @@ public class WikiManager extends RepositoryManager implements WikiUtil
     /** wiki group property */
     public static final String WIKI_PROP_GROUP = "wiki.group";
 
+    public static final String WIKI_PROP_DISPLAYGROUP = "displaygroup";
+
     /** _more_ */
-    public static final String WIKI_PROP_CHART = "chart";
-
-    public static final String WIKI_PROP_CHARTGROUP = "chartgroup";
-
+    public static final String WIKI_PROP_DISPLAY = "display";
 
     /** wiki import */
     public static final String WIKI_PROP_IMPORT = "import";
@@ -622,12 +621,11 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         prop(WIKI_PROP_UPLOAD,
              attrs(ATTR_TITLE, "Upload file", ATTR_INCLUDEICON, "false")),
         WIKI_PROP_ROOT,
-        prop(WIKI_PROP_CHARTGROUP,
+        prop(WIKI_PROP_DISPLAYGROUP,
+             attrs("showmap", "true", "showmenu","false","layout.type","table","layout.columns","1")),
+        prop(WIKI_PROP_DISPLAY,
              attrs(ATTR_WIDTH, "800", ATTR_HEIGHT, "400", "fields", "",
-                   ARG_FROMDATE, "", ARG_TODATE, "","showmap", "true", "showmenu","false","layout.type","table","layout.columns","1")),
-        prop(WIKI_PROP_CHART,
-             attrs(ATTR_WIDTH, "800", ATTR_HEIGHT, "400", "fields", "",
-                   ARG_FROMDATE, "", ARG_TODATE, "")),
+                   "type", "linechart",  "name", "", "eventsource", "", "column","0", ARG_FROMDATE, "", ARG_TODATE, "")),
     };
     //j+
 
@@ -1462,7 +1460,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                         children), sb, doDay);
 
             return sb.toString();
-        } else if (theTag.equals(WIKI_PROP_CHART)) {
+        } else if (theTag.equals(WIKI_PROP_DISPLAY) || theTag.equals("chart")) {
             //TODO: don't hard code the class
             //TODO: handle grids
             PointTypeHandler pth =
@@ -1474,7 +1472,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             String jsonUrl = poh.getJsonUrl(request, entry);
             getEntryChart(request, entry.getName(), jsonUrl, sb, props);
             return sb.toString();
-        } else if (theTag.equals(WIKI_PROP_CHARTGROUP)) {
+        } else if (theTag.equals(WIKI_PROP_DISPLAYGROUP)) {
             getEntryChart(request, entry.getName(), null, sb, props);
             return sb.toString();
         } else if (theTag.equals(WIKI_PROP_GRAPH)) {
@@ -4167,21 +4165,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         }
 
         sb.append(HtmlUtils.comment("start chart"));
-
-        String fromDate = Misc.getProperty(props, ARG_FROMDATE,
-                                           (String) null);
-        String toDate = Misc.getProperty(props, ARG_TODATE, (String) null);
-
         List<String> propList = new ArrayList<String>();
 
-        if (fromDate != null) {
-            propList.add(ARG_FROMDATE);
-            propList.add(Json.quote(fromDate));
-        }
-        if (toDate != null) {
-            propList.add(ARG_TODATE);
-            propList.add(Json.quote(toDate));
-        }
 
         StringBuffer js = new StringBuffer();
 
@@ -4207,13 +4192,28 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         topProps.add(Misc.getProperty(props, "layout.columns",
                                          "1"));
 
-        //If no json url then just add the chartmanager
+        //If no json url then just add the displaymanager
         if(url == null) {
             js.append("var displayManager = getOrCreateDisplayManager("
                       + HtmlUtils.quote(displayDivId) + ","
                       + Json.map(topProps, false) + ",true);\n");
             sb.append(HtmlUtils.script(js.toString()));
             return;
+        }
+
+
+        String fromDate = Misc.getProperty(props, ARG_FROMDATE,
+                                           (String) null);
+        String toDate = Misc.getProperty(props, ARG_TODATE, (String) null);
+
+
+        if (fromDate != null) {
+            propList.add(ARG_FROMDATE);
+            propList.add(Json.quote(fromDate));
+        }
+        if (toDate != null) {
+            propList.add(ARG_TODATE);
+            propList.add(Json.quote(toDate));
         }
 
         if (props.containsKey("chart.filter")) {
@@ -4256,21 +4256,20 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             propList.add(Json.quote(anotherDiv));
         }
 
-        String sourceId = Misc.getProperty(props,"source", (String) null);
+        String sourceId = Misc.getProperty(props,"eventsource", (String) null);
         if(sourceId!=null) {
-            propList.add("source");
+            propList.add("eventsource");
             propList.add(Json.quote(sourceId));
         }
 
-        String chartName = Misc.getProperty(props,"name", (String) null);
-        if(chartName!=null) {
+        String displayName = Misc.getProperty(props,"name", (String) null);
+        if(displayName!=null) {
             propList.add("name");
-            propList.add(Json.quote(chartName));
+            propList.add(Json.quote(displayName));
         }
 
 
-
-        String displayType = Misc.getProperty(props, "chart.type","linechart");
+        String displayType = Misc.getProperty(props, "type","linechart");
 
         js.append("var displayManager = getOrCreateDisplayManager("
                   + HtmlUtils.quote(displayDivId) + ","

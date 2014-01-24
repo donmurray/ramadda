@@ -2,15 +2,7 @@
 Copyright 2008-2014 Geode Systems LLC
 
 This package supports charting and mapping of georeferenced time series data
-It requires pointdata.js
-
-Use:
-<div id="example"></div>
-...
-var recordFields  = [new RecordField(...), ... see below]
-var data  = [new Record(...), ...]
-var pointData = new  PointData("Example data set",  recordFields, data);
-var chart = new  RamaddaChart("example" , pointData);
+It requires displaymanager.js pointdata.js
 */
 
 //Ids of DOM components
@@ -67,8 +59,12 @@ function removeRamaddaDisplay(id) {
 }
 
 
-function DisplayThing(properties) {
+function DisplayThing(id, properties) {
+    if(properties == null) {
+       properties = {};
+    }
     $.extend(this, {
+            id: id,
             properties:properties,
             parent: null,
             getId: function() {
@@ -80,8 +76,8 @@ function DisplayThing(properties) {
        getName: function() {
             return this.getProperty("name", this.getId());
        },
-       getSource: function() {
-            return this.getProperty("source",null);
+       getEventSource: function() {
+            return this.getProperty("eventsource",null);
        },
        setParent:  function (parent) {
                 this.parent = parent;
@@ -89,6 +85,9 @@ function DisplayThing(properties) {
        removeProperty: function(key) {
                 this.properties[key] = null;
        },
+       setProperty: function(key, value) {
+           this.properties[key] = value;
+        },
        getProperty: function(key, dflt) {
             var value = this.properties[key];
             if(value != null) return value;
@@ -105,13 +104,8 @@ function DisplayThing(properties) {
 
 
 function RamaddaDisplay(displayManager, id, propertiesArg) {
-    if(propertiesArg == null) {
-       propertiesArg = {};
-    }
-    $.extend(this, new DisplayThing(propertiesArg));
+    $.extend(this, new DisplayThing(id, propertiesArg));
     $.extend(this, {
-            id:id,
-            source: null,
             displayManager:displayManager,
             filters: [],
             setDisplayManager: function(cm) {
@@ -129,11 +123,20 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
             },
             getDisplayMenuContents: function() {
                 var get = "getRamaddaDisplay('" + this.id +"')";
+                var moveRight = htmlUtil.onClick(get +".deltaColumn(1);", "Move right ");
+                var moveLeft = htmlUtil.onClick(get +".deltaColumn(-1);", "Move left ");
                 var moveUp = htmlUtil.onClick(get +".moveDisplayUp();", "Move up ");
                 var moveDown = htmlUtil.onClick(get +".moveDisplayDown();", "Move down ");
                 var deleteMe = htmlUtil.onClick("removeRamaddaDisplay('" + this.id +"')", "<img src=" + root +"/icons/close.gif> Remove Display ");
-                return moveUp +"<br>" +  moveDown +"<br>"+ deleteMe;
+                return moveUp +"<br>" +  moveDown +"<br>"+ moveRight +"<br>" + moveLeft +"<br>" + deleteMe;
              },
+             deltaColumn: function(delta) {
+                var column = this.getProperty("column",0);
+                column += delta;
+                if(column<0) column = 0;
+                this.setProperty("column",column);
+                this.displayManager.doLayout();
+            },
             moveDisplayUp: function() {
                 this.displayManager.moveDisplayUp(this);
             },
@@ -276,7 +279,6 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                         var field = allFields[indexField];
                         var value = record.getValue(indexField);
                         if(j==0) {
-                            console.log("index field:" +  field.getLabel() + " ex:" + value);
                             fieldNames[0] = field.getLabel();
                         }
                         values.push(value);
@@ -365,7 +367,8 @@ function RamaddaMultiChart(displayManager, id, pointDataArg, properties) {
                 if(height>0) {
                     extraStyle += " height:" + height +"px; ";
                 }
-                return htmlUtil.div(["style", extraStyle, "id", this.getDomId(ID_DISPLAY_CONTENTS)],"");
+                var html =  htmlUtil.div(["style", extraStyle, "id", this.getDomId(ID_DISPLAY_CONTENTS)],"");
+                return html;
             },
             initDisplay:function() {
                 //If we are a fixed layout then there should be a div id property
@@ -591,7 +594,7 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 this.initMenu();
                 this.map = new RepositoryMap(this.getDomId(ID_MAP), params);
                 this.map.initMap(false);
-                this.map.addClickHandler(this.getDomId(ID_LONFIELD), this.getDomId(ID_LATFIELD));
+                this.map.addClickHandler(this.getDomId(ID_LONFIELD), this.getDomId(ID_LATFIELD), null, this);
                 if(this.initBounds!=null) {
                     var b  = this.initBounds;
                     this.setInitMapBounds(b[0],b[1],b[2],b[3]);
@@ -631,6 +634,10 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 html+= "Longitude: " + htmlUtil.input(this.getDomId(ID_LONFIELD), "", ["size","7","id",  this.getDomId(ID_LONFIELD)]);
                 html+= htmlUtil.closeTag("form");
                 return html;
+            },
+            handleClick: function (theMap, lon,lat) {
+                this.displayManager.handleMapClick(this, lon, lat);
+                //                console.log("click: " + lon  +" " + lat);
             },
            getPosition:function() {
                 var lat = $("#" + this.getDomId(ID_LATFIELD)).val();

@@ -10,6 +10,7 @@ var LAYOUT_TABLE = "table";
 var LAYOUT_TABS = "tabs";
 var LAYOUT_COLUMNS = "columns";
 
+var PROP_CHART_TYPE = "chart.type";
 var PROP_LAYOUT_TYPE = "layout.type";
 var PROP_LAYOUT_COLUMNS = "layout.columns";
 var PROP_SHOW_MAP = "showmap";
@@ -67,9 +68,8 @@ function DisplayManager(id,properties) {
     if(properties == null) {
        properties == {};
     }
-    $.extend(this, new DisplayThing(properties));
+    $.extend(this, new DisplayThing(id, properties));
     $.extend(this, {
-            id: id,
                 displays : [],
                 data : [],
                 cnt : 0,
@@ -86,6 +86,20 @@ function DisplayManager(id,properties) {
 
                 addDisplayEventListener: function(listener) {
                 this.eventListeners.push(listener);
+            },
+            handleMapClick: function (mapDisplay, lon, lat) {
+                var indexObj = [];
+                var records = null;
+                for(var i=0;i<this.data.length;i++) {
+                    var pointData = this.data[i];
+                    records = pointData.getData();
+                    if(records!=null) break;
+                }
+                var indexObj = [];
+                var closest =  RecordFindClosest(records, lon, lat, indexObj);
+                if(closest!=null) {
+                    this.handleRecordSelection(mapDisplay, pointData, indexObj.index);
+                }
             },
             handleRecordSelection: function(source, pointData, index) {
                 var fields =  pointData.getRecordFields();
@@ -113,7 +127,7 @@ function DisplayManager(id,properties) {
 
                 for(var i=0;i< this.eventListeners.length;i++) {
                     eventListener = this.eventListeners[i];
-                    var eventSource  = eventListener.getSource();
+                    var eventSource  = eventListener.getEventSource();
                     if(eventSource!=null) {
                         if(eventSource!= source.getId() && eventSource!= source.getName()) {
                             continue;
@@ -142,6 +156,7 @@ function DisplayManager(id,properties) {
                     htmlUtil.tag("li",[], htmlUtil.onClick(get +".setLayout('table',1);", "Table - 1 column")) +"\n" +
                     htmlUtil.tag("li",[], htmlUtil.onClick(get +".setLayout('table',2);", "Table - 2 column")) +"\n" +
                     htmlUtil.tag("li",[], htmlUtil.onClick(get +".setLayout('table',3);", "Table - 3 column")) +"\n" +
+                    htmlUtil.tag("li",[], htmlUtil.onClick(get +".setLayout('columns');", "Columns")) +"\n" +
                     htmlUtil.tag("li",[], htmlUtil.onClick(get +".setLayout('tabs');", "Tabs"));
 
 
@@ -302,8 +317,8 @@ function DisplayManager(id,properties) {
             createChart:function(pointData, chartType, props) {
                 var chartId = this.id +"_chart_" + (this.cnt++);
                 var myProps = {
-                    PROP_WIDTH:600,
-                    PROP_HEIGHT:200,
+                    "width":600,
+                    "height":200,
                     PROP_CHART_TYPE: chartType};
                 myProps[PROP_CHART_TYPE] = chartType;
                 $.extend(myProps, props);

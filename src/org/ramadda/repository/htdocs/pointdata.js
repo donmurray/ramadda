@@ -454,6 +454,30 @@ function RecordGetPoints(records, bounds) {
     return points;
 }
 
+function RecordFindClosest(records, lon, lat, indexObj) {
+    if(records == null) return null;
+    var closestRecord = null;
+    var minDistance = 1000000000;
+    var index = -1;
+    for(j=0;j<records.length;j++) { 
+        var record = records[j];
+        if(isNaN(record.getLatitude())) { 
+            continue;
+        }
+        var distance = Math.sqrt((lon-record.getLongitude())*(lon-record.getLongitude()) + (lat-record.getLatitude())*(lat-record.getLatitude()));
+        if(distance<minDistance) {
+            minDistance = distance;
+            closestRecord = record;
+            index = j;
+        }
+    }
+    if(indexObj!=null) {
+        indexObj.index = index;
+    }
+    return closestRecord;
+}
+
+
 function clonePoints(points) {
     var result = [];
     for(var i=0;i<points.length;i++) {
@@ -462,3 +486,4 @@ function clonePoints(points) {
     }
     return result;
 }
+
