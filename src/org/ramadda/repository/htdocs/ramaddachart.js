@@ -123,12 +123,14 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
             },
             getDisplayMenuContents: function() {
                 var get = "getRamaddaDisplay('" + this.id +"')";
-                var moveRight = htmlUtil.onClick(get +".deltaColumn(1);", "Move right ");
-                var moveLeft = htmlUtil.onClick(get +".deltaColumn(-1);", "Move left ");
+                var moveRight = htmlUtil.onClick(get +".moveDisplayRight();", "Move right ");
+                var moveLeft = htmlUtil.onClick(get +".moveDisplayLeft();", "Move left ");
                 var moveUp = htmlUtil.onClick(get +".moveDisplayUp();", "Move up ");
                 var moveDown = htmlUtil.onClick(get +".moveDisplayDown();", "Move down ");
-                var deleteMe = htmlUtil.onClick("removeRamaddaDisplay('" + this.id +"')", "<img src=" + root +"/icons/close.gif> Remove Display ");
-                return moveUp +"<br>" +  moveDown +"<br>"+ moveRight +"<br>" + moveLeft +"<br>" + deleteMe;
+                var deleteMe = htmlUtil.onClick("removeRamaddaDisplay('" + this.id +"')", "Remove Display");
+
+                return htmlUtil.div(["class","display-fields"],
+                                    moveUp +"<br>" +  moveDown +"<br>"+ moveRight +"<br>" + moveLeft +"<br>" + deleteMe);
              },
              deltaColumn: function(delta) {
                 var column = this.getProperty("column",0);
@@ -136,6 +138,20 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                 if(column<0) column = 0;
                 this.setProperty("column",column);
                 this.displayManager.doLayout();
+            },
+            moveDisplayRight: function() {
+                if(this.displayManager.layout == LAYOUT_COLUMNS) {
+                    this.deltaColumn(1);
+                } else {
+                    this.moveDisplayUp();
+                }
+            },
+            moveDisplayLeft: function() {
+                if(this.displayManager.layout == LAYOUT_COLUMNS) {
+                    this.deltaColumn(-1);
+                } else {
+                    this.moveDisplayDown();
+                }
             },
             moveDisplayUp: function() {
                 this.displayManager.moveDisplayUp(this);
@@ -150,7 +166,9 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                 var theDisplay = this;
                 $("#"+this.getDomId(ID_MENU_BUTTON)).button({ icons: { primary:  "ui-icon-triangle-1-s"}}).click(function(event) {
                         var id =theDisplay.getDomId(ID_MENU_POPUP); 
-                        showPopup(event, theDisplay.getDomId(ID_MENU_BUTTON), id, false,null,"left bottom");
+                        //function showStickyPopup(event, srcId, popupId, alignLeft) {
+                        //                        showPopup(event, theDisplay.getDomId(ID_MENU_BUTTON), id, false,null,"left bottom");
+                        showStickyPopup(event, theDisplay.getDomId(ID_MENU_BUTTON), id, false);
                         $("#"+  theDisplay.getDomId(ID_MENU_INNER)).superfish({
                                 animation: {height:'show'},
                                     delay: 1200
@@ -161,7 +179,14 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                 var html = "";
                 html +=   htmlUtil.div(["id", this.getDomId(ID_HEADER),"class", "chart-header"]);
                 var menuButton =  htmlUtil.tag("a", ["class", "chart-menu-button", "id",  this.getDomId(ID_MENU_BUTTON)]);
-                var menu = htmlUtil.div(["class", "ramadda-popup", "id", this.getDomId(ID_MENU_POPUP)], this.getMenuContents());
+
+
+
+                var close = htmlUtil.onClick("$('#" +this.getDomId(ID_MENU_POPUP) +"').hide();","<table width=100%><tr><td class=display-menu-close align=right><img src=" + root +"/icons/close.gif></td></tr></table>");
+
+                var menuContents = this.getMenuContents();
+                menuContents  = close + menuContents;
+                var menu = htmlUtil.div(["class", "ramadda-popup", "id", this.getDomId(ID_MENU_POPUP)], menuContents);
 
                 var width = this.getProperty("width",-1);
                 var tableWidth = "100%";
@@ -357,7 +382,7 @@ function RamaddaMultiChart(displayManager, id, pointDataArg, properties) {
             dataCollection: new DataCollection(),
             indexField: -1,
             getMenuContents: function() {
-                return this.getFieldsDiv()+"<hr>" +  this.getDisplayMenuContents();
+                return this.getFieldsDiv()+ this.getDisplayMenuContents();
             },
             getDisplayContents: function() {
                 var extraStyle = "";

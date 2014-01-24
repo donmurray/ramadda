@@ -201,9 +201,19 @@ input, password, fileinput,textarea,select {
    font-weight: bold; 
 }
 
-.chart-fields {
+.display-menu-close {
+   cursor:pointer;
+}
+
+.display-fields {
+   padding-right:4px;
+   padding-left:4px;
+   padding-top:4px;
+   padding-bottom:4px;
    min-width: 250px; 
    max-width: 400px; 
+   border-top: 1px #ccc solid;
+   border-bottom: 1px #ccc solid;
 }
 
 
