@@ -845,7 +845,6 @@ public class PointOutputHandler extends RecordOutputHandler {
      */
     public String getJsonUrl(Request request, Entry entry)
             throws Exception {
-
         return
             request.entryUrl(
                 getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,

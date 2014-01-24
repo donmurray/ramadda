@@ -236,6 +236,7 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                 } else {
                     var jsonUrl = pointData.getUrl();
                     if(jsonUrl!=null) {
+                        jsonUrl = this.displayManager.getJsonUrl(jsonUrl, this);
                         loadPointJson(jsonUrl, this, pointData);
                     }
                 }
@@ -267,9 +268,6 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
 
                 var indexField = this.indexField;
                 var allFields = this.allFields;
-
-
-
                 var records = pointData.getData();
                 for(j=0;j<records.length;j++) { 
                     var record = records[j];
@@ -317,7 +315,7 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
             },
             applyFilters: function(record, values) {
                 for(var i=0;i<this.filters.length;i++) {
-                    if(!this.filters[i].recordOk(record, values)) {
+                    if(!this.filters[i].recordOk(this, record, values)) {
                         return false;
                     }
                 }
@@ -326,17 +324,21 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
         }
         );
 
-
-
         var filter = this.getProperty(PROP_CHART_FILTER);
         if(filter!=null) {
+            //semi-colon delimited list of filter definitions
+            //display.filter="filtertype:params;filtertype:params;
             //display.filter="month:0-11;
-            var toks = filter.split(":");
-            var type  = toks[0];
-            if(type == "month") {
-                theDisplay.filters.push(new MonthFilter(toks[1]));
-            } else {
-                console.log("unknown filter:" + type);
+            var filters = filter.split(";");
+            for(i in filters) {
+                filter = filters[i];
+                var toks = filter.split(":");
+                var type  = toks[0];
+                if(type == "month") {
+                    this.filters.push(new MonthFilter(toks[1]));
+                } else {
+                    console.log("unknown filter:" + type);
+                }
             }
         }
 }

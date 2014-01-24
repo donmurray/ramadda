@@ -394,21 +394,30 @@ xxxx
 
 
 function RecordFilter(properties) {
-    this.properties = properties;
-    if(this.properties == null) this.properties = [];
-    this.recordOk = function(record, values) {
-        if(values[0].getMonth()!=0) return false;
-        return true;
-    }
+    if(properties == null) properties = {};
+    $.extend(this, {
+            properties: properties,
+            recordOk:function(display, record, values) {
+                return true;
+            }
+        });
 }
 
 
-function MonthFilter(month) {
-    this.month = month;
-    this.recordOk = function(record, values) {
-        if(values[0].getMonth()!=this.month) return false;
-        return true;
-    }
+function MonthFilter(param) {
+    $.extend(this,new RecordFilter());
+    $.extend(this,{
+            months: param.split(","),
+            recordOk: function(display, record, values) {
+                for(i in this.months) {
+                    var month = this.months[i];
+                    var date = record.getDate();
+                    if(date == null) return false;
+                    if(date.getMonth()==month) return true;
+                }
+                return false;
+            }
+        });
 }
 
 
