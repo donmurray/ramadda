@@ -201,6 +201,10 @@ input, password, fileinput,textarea,select {
    font-weight: bold; 
 }
 
+.display-menu-entry {
+                    padding-top:5px;
+}
+
 .display-menu-close {
    cursor:pointer;
 }

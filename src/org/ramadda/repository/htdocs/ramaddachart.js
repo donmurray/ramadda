@@ -123,16 +123,16 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
             },
             getDisplayMenuContents: function() {
                 var get = "getRamaddaDisplay('" + this.id +"')";
-                var moveRight = htmlUtil.onClick(get +".moveDisplayRight();", "Move right ");
-                var moveLeft = htmlUtil.onClick(get +".moveDisplayLeft();", "Move left ");
-                var moveUp = htmlUtil.onClick(get +".moveDisplayUp();", "Move up ");
-                var moveDown = htmlUtil.onClick(get +".moveDisplayDown();", "Move down ");
+                var moveRight = htmlUtil.onClick(get +".moveDisplayRight();", "Right");
+                var moveLeft = htmlUtil.onClick(get +".moveDisplayLeft();", "Left");
+                var moveUp = htmlUtil.onClick(get +".moveDisplayUp();", "Up");
+                var moveDown = htmlUtil.onClick(get +".moveDisplayDown();", "Down");
                 var deleteMe = htmlUtil.onClick("removeRamaddaDisplay('" + this.id +"')", "Remove Display");
-
                 return htmlUtil.div(["class","display-fields"],
-                                    moveUp +"<br>" +  moveDown +"<br>"+ moveRight +"<br>" + moveLeft +"<br>" + deleteMe);
-             },
-             deltaColumn: function(delta) {
+                                    htmlUtil.div(["class","display-menu-entry"], "Move: " + moveUp + " " +moveDown+  " " +moveRight+ " " + moveLeft) +
+                                    htmlUtil.div(["class","display-menu-entry"], deleteMe));
+            },
+            deltaColumn: function(delta) {
                 var column = this.getProperty("column",0);
                 column += delta;
                 if(column<0) column = 0;
