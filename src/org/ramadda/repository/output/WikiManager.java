@@ -4227,11 +4227,15 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                                                      "")));
         }
 
-        propList.add(ARG_WIDTH);
-        propList.add(Json.quote(Misc.getProperty(props, ARG_WIDTH, "600")));
+        if (props.containsKey(ARG_WIDTH)) {
+            propList.add(ARG_WIDTH);
+            propList.add(Json.quote(Misc.getProperty(props, ARG_WIDTH, "600")));
+        }
 
-        propList.add(ARG_HEIGHT);
-        propList.add(Json.quote(Misc.getProperty(props, ARG_HEIGHT, "200")));
+        if (props.containsKey(ARG_HEIGHT)) {
+            propList.add(ARG_HEIGHT);
+            propList.add(Json.quote(Misc.getProperty(props, ARG_HEIGHT, "200")));
+        }
 
 
 

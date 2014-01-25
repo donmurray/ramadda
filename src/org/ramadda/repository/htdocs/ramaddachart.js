@@ -73,11 +73,25 @@ function DisplayThing(id, properties) {
        getDomId:function(suffix) {
                 return this.getId() +"_" + suffix;
        },
+       getFormValue: function(what, dflt) {
+           var fromForm = $("#" + this.getDomId(what)).val();
+           if(fromForm!=null) {
+               if(fromForm.length>0) {
+                   this.setProperty(what,fromForm);
+               }
+               if(fromForm == "none") {
+                   this.setProperty(what,null);
+               }
+               return fromForm;
+           }
+             return this.getProperty(what,dflt);
+        },
+
        getName: function() {
-            return this.getProperty("name", this.getId());
+         return this.getFormValue("name",this.getId());
        },
        getEventSource: function() {
-            return this.getProperty("eventsource",null);
+         return this.getFormValue("eventsource",this.getId());
        },
        setParent:  function (parent) {
                 this.parent = parent;
@@ -128,9 +142,20 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                 var moveUp = htmlUtil.onClick(get +".moveDisplayUp();", "Up");
                 var moveDown = htmlUtil.onClick(get +".moveDisplayDown();", "Down");
                 var deleteMe = htmlUtil.onClick("removeRamaddaDisplay('" + this.id +"')", "Remove Display");
-                return htmlUtil.div(["class","display-fields"],
-                                    htmlUtil.div(["class","display-menu-entry"], "Move: " + moveUp + " " +moveDown+  " " +moveRight+ " " + moveLeft) +
-                                    htmlUtil.div(["class","display-menu-entry"], deleteMe));
+                var form = "<form><table>" +
+                    "<tr><td align=right><b>Move:</b></td><td>" + moveUp + " " +moveDown+  " " +moveRight+ " " + moveLeft +"</td></tr>"  +
+                    "<tr><td align=right><b>Name:</b></td><td> " + htmlUtil.input("", this.getProperty("name",""), ["size","7","id",  this.getDomId("name")]) + "</td></tr>" +
+                    "<tr><td align=right><b>Source:</b></td><td>"  + 
+                    htmlUtil.input("", this.getProperty("eventsource",""), ["size","7","id",  this.getDomId("eventsource")]) +
+                    "</td></tr>" +
+                    "<tr><td align=right><b>Width:</b></td><td> " + htmlUtil.input("", this.getProperty("width",""), ["size","7","id",  this.getDomId("width")]) + "</td></tr>" +
+                    "<tr><td align=right><b>Height:</b></td><td> " + htmlUtil.input("", this.getProperty("height",""), ["size","7","id",  this.getDomId("height")]) + "</td></tr>" +
+                    "<tr><td align=right><b>Row:</b></td><td> " + htmlUtil.input("", this.getProperty("row",""), ["size","7","id",  this.getDomId("row")]) + "</td></tr>" +
+                    "<tr><td align=right><b>Column:</b></td><td> " + htmlUtil.input("", this.getProperty("column",""), ["size","7","id",  this.getDomId("column")]) + "</td></tr>" +
+                    "<tr><td align=right></td><td> " + deleteMe+ "</td></tr>" +
+                    "</table>" +
+                    "</form>";
+                return htmlUtil.div(["class","display-fields"], form);
             },
             deltaColumn: function(delta) {
                 var column = this.getProperty("column",0);
@@ -188,7 +213,7 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                 menuContents  = close + menuContents;
                 var menu = htmlUtil.div(["class", "ramadda-popup", "id", this.getDomId(ID_MENU_POPUP)], menuContents);
 
-                var width = this.getProperty("width",-1);
+                var width = this.getWidth();
                 var tableWidth = "100%";
                 if(width>0) {
                     tableWidth = width+"px";
@@ -213,6 +238,23 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
             },
             setHtml: function(html) {
                 $("#" + this.id).html(html);
+            },
+            prepareToLayout:function() {
+                this.getColumn();
+                this.getWidth();
+                this.getHeight();
+            },
+            getColumn: function() {
+                return this.getFormValue("column",0);
+            },
+            getRow: function() {
+                return this.getFormValue("row",0);
+            },
+            getWidth: function() {
+                return this.getFormValue("width",0);
+            },
+            getHeight: function() {
+                return this.getFormValue("height",0);
             },
             setTitle: function(title) {
                 $("#" +  this.getDomId(ID_HEADER)).html(title);
@@ -386,7 +428,7 @@ function RamaddaMultiChart(displayManager, id, pointDataArg, properties) {
             },
             getDisplayContents: function() {
                 var extraStyle = "";
-                var width = this.getProperty("width",-1);
+                var width = this.getWidth();
                 if(width>0) {
                     extraStyle += "width:" + width +"px; ";
                 }
@@ -642,7 +684,7 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             getDisplayContents: function() {
                 var html = "";
                 var extraStyle = "";
-                var width = this.getProperty("width",-1);
+                var width = this.getWidth();
                 if(width>0) {
                     extraStyle += "width:" + width +"px; ";
                 }

@@ -9,6 +9,7 @@ var ID_MENU_INNER =  "menu_inner";
 var LAYOUT_TABLE = "table";
 var LAYOUT_TABS = "tabs";
 var LAYOUT_COLUMNS = "columns";
+var LAYOUT_ROWS = "rows";
 
 var PROP_CHART_TYPE = "chart.type";
 var PROP_LAYOUT_TYPE = "layout.type";
@@ -128,7 +129,7 @@ function DisplayManager(id,properties) {
                 for(var i=0;i< this.eventListeners.length;i++) {
                     eventListener = this.eventListeners[i];
                     var eventSource  = eventListener.getEventSource();
-                    if(eventSource!=null) {
+                    if(eventSource!=null && eventSource.length>0) {
                         if(eventSource!= source.getId() && eventSource!= source.getName()) {
                             continue;
                         }
@@ -156,6 +157,7 @@ function DisplayManager(id,properties) {
                     htmlUtil.tag("li",[], htmlUtil.onClick(get +".setLayout('table',1);", "Table - 1 column")) +"\n" +
                     htmlUtil.tag("li",[], htmlUtil.onClick(get +".setLayout('table',2);", "Table - 2 column")) +"\n" +
                     htmlUtil.tag("li",[], htmlUtil.onClick(get +".setLayout('table',3);", "Table - 3 column")) +"\n" +
+                    htmlUtil.tag("li",[], htmlUtil.onClick(get +".setLayout('rows');", "Rows")) +"\n" +
                     htmlUtil.tag("li",[], htmlUtil.onClick(get +".setLayout('columns');", "Columns")) +"\n" +
                     htmlUtil.tag("li",[], htmlUtil.onClick(get +".setLayout('tabs');", "Tabs"));
 
@@ -223,6 +225,16 @@ function DisplayManager(id,properties) {
                 var html = "";
                 var colCnt=100;
                 var displaysToLayout = this.getDisplaysToLayout();
+
+                for(var i=0;i<displaysToLayout.length;i++) {
+                    var display = displaysToLayout[i];
+                    if(display.prepareToLayout!=null) {
+                        display.prepareToLayout();
+                    }
+                }
+
+
+
                 if(this.layout == LAYOUT_TABLE) {
                     if(displaysToLayout.length == 1) {
                         html+= displaysToLayout[0].getDisplay();
@@ -245,11 +257,30 @@ function DisplayManager(id,properties) {
                     }
                 } else if(this.layout==LAYOUT_TABS) {
                     //TODO
+                } else if(this.layout==LAYOUT_ROWS) {
+                    var rows = [];
+                    for(var i=0;i<displaysToLayout.length;i++) {
+                        var display =displaysToLayout[i];
+                        var row = display.getRow();
+                        if((""+row).length==0) row = 0;
+                        while(rows.length<=row) {
+                            rows.push("");
+                        }
+                        rows[row] += "<td>" + display.getDisplay() +"</td>";
+                    }
+                    for(var i=0;i<rows.length;i++) {
+                        html+=htmlUtil.openTag("table", ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "0"]);
+                        html+=htmlUtil.openTag("tr", ["valign","top"]);
+                        html+=rows[i];
+                        html+= htmlUtil.closeTag("tr");
+                        html+= htmlUtil.closeTag("table");
+                    }
                 } else if(this.layout==LAYOUT_COLUMNS) {
                     var cols = [];
                     for(var i=0;i<displaysToLayout.length;i++) {
                         var display =displaysToLayout[i];
-                        var column = display.getProperty("column",0);
+                        var column = display.getColumn();
+                        if((""+column).length==0) column = 0;
                         while(cols.length<=column) {
                             cols.push("");
                         }
@@ -317,8 +348,8 @@ function DisplayManager(id,properties) {
             createChart:function(pointData, chartType, props) {
                 var chartId = this.id +"_chart_" + (this.cnt++);
                 var myProps = {
-                    "width":600,
-                    "height":200,
+                    "xwidth":600,
+                    "xheight":200,
                     PROP_CHART_TYPE: chartType};
                 myProps[PROP_CHART_TYPE] = chartType;
                 $.extend(myProps, props);
