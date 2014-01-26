@@ -16,6 +16,41 @@ this gets it from the type_point super class
      <column  name="reference_frame"  type="enumerationplus" label="Reference Frame" cansearch="true"/>
      <column  name="format_version"  type="enumerationplus" label="Format Version" cansearch="true"/>
      <column  name="processing_center"  type="enumerationplus" label="Processing Center" cansearch="true"/>
+<wiki>
+<![CDATA[
+<div class="wiki-h2"> Station: {{field name="station_name"}} -- {{name}} </div>
+
+<table width=100% cellpadding=5>
+<tr valign=top>
+<td>
+{{information  details="false"  }}
+
+</td>
+<td>
+
+
+
+{{displaygroup layout.type="columns"}}
+
+{{display type="map" xwidth="300"  xheight="350"  listentries="false"  details="false"   layout.column="1" layout.fixed="false" }}
+
+{{display layout.row="0" fields="North" title="North" width="400" height="100" layout.column="0" layout.fixed="false"}}
+
+{{display layout.row="0" fields="East" title="East" width="400" height="100" layout.column="0" layout.fixed="false"}}
+
+{{display layout.row="0" fields="Vertical" title="Vertical" width="400" height="100" layout.column="0" layout.fixed="false"}}
+
+{{display type="text" layout.column="1" layout.fixed="true" }}
+
+
+</td>
+</tr></table>
+
+
+]]>
+
+</wiki>
+
   </type>
 
 </types>
