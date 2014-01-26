@@ -3,7 +3,6 @@
  * Copyright 2010-2012 Jeff McWhirter, Don Murray & ramadda.org
  */
 
-var mapLayers = null;
 
 // google maps
 var map_google_terrain = "google.terrain";
@@ -25,7 +24,7 @@ var map_wms_topographic = "wms:Topo Maps,http://terraservice.net/ogcmap.ashx,DRG
 var map_ol_openstreetmap = "ol.openstreetmap";
 
 var defaultLocation = new OpenLayers.LonLat(-0, 0);
-var defaultZoomLevel = 1;
+var defaultZoomLevel = 2;
 var sphericalMercatorDefault = true;
 
 var maxExtent = new OpenLayers.Bounds(-20037508, -20037508, 20037508, 20037508);
@@ -54,50 +53,42 @@ function ramaddaAddMap(map) {
 }
 
 function RepositoryMap(mapId, params) {
-    var map;
-    var layer;
-    var markers;
-    var boxes;
-    var lines;
-    var selectorBox;
-    var selectorMarker;
-
-    this.sourceProjection = sphericalMercatorCS;
-    //    this.sourceProjection = earthCS;
-    this.displayProjection = earthCS;
-
-
+    ramaddaAddMap(this);
     var theMap = this;
+    if (mapId == null) {
+        mapId = "map";
+    }
+
+
+    $.extend(this, {
+            sourceProjection:sphericalMercatorCS,
+            //sourceProjection: earthCS,
+                displayProjection: earthCS,
+                mapDivId: mapId,
+                showScaleLine : true,
+                showLayerSwitcher : true,
+                showZoomPanControl : true,
+                showZoomOnlyControl : false,
+                initialLocation : defaultLocation,
+                initialZoom : defaultZoomLevel,
+                latlonReadout : latlonReadoutID,
+                map: null,
+                defaultLayer: map_google_terrain,
+                layer: null,
+                markers: null,
+                boxes: null,
+                lines: null,
+                selectorBox: null,
+                selectorMarker: null,
+                listeners: [],
+                });
+    $.extend(this, params);
+
     jQuery(document).ready(function($) {
             if(theMap.map) {
                 theMap.map.updateSize();
             }
      });
-
-    this.mapDivId = mapId;
-    ramaddaAddMap(this);
-    if (!this.mapDivId) {
-        this.mapDivId = "map";
-    }
-    // set some defaults
-    this.showScaleLine = true;
-    this.showLayerSwitcher = true;
-    this.showZoomPanControl = true;
-    this.showZoomOnlyControl = false;
-
-    for ( var key in params) {
-        this[key] = params[key];
-    }
-
-    if (!this.initialLocation) {
-        this.initialLocation = defaultLocation;
-    }
-    if (!this.initialZoom) {
-        this.initialZoom = defaultZoomLevel;
-    }
-    if (!this.latlonReadout) {
-        this.latlonReadout = latlonReadoutID;
-    }
 
 
     this.addImageLayer = function(name, url, north,west,south,east, width,height) {
@@ -162,14 +153,22 @@ function RepositoryMap(mapId, params) {
             ];
         }
 
-        //        this.mapLayers = [map_wms_openlayers,];
+        if(this.defaultLayer) {
+            var index = this.mapLayers.indexOf(this.defaultLayer);
+            if(index >= 0) { 
+                this.mapLayers.splice(index, 1);
+                this.mapLayers.splice(0, 0,this.defaultLayer);
+            }
+        }
+
+
 
         for (i = 0; i < this.mapLayers.length; i++) {
             mapLayer = this.mapLayers[i];
             if(mapLayer == null) {
                 continue;
             }
-            if (mapLayer == map_google_terrain) {
+            if (mapLayer == map_google_hybrid) {
             	this.map.addLayer(new OpenLayers.Layer.Google("Google Hybrid",
                         {
                             'type' : google.maps.MapTypeId.HYBRID,
@@ -184,11 +183,10 @@ function RepositoryMap(mapId, params) {
                             sphericalMercator : sphericalMercatorDefault,
                             wrapDateLine : wrapDatelineDefault
                         }));
-            } else if (mapLayer == map_google_hybrid) {
-                
+            } else if (mapLayer == map_google_terrain) {
                 this.map.addLayer(new OpenLayers.Layer.Google("Google Terrain",
                         {
-                	 		numZoomLevels : zoomLevelsDefault,
+        	 		numZoomLevels : zoomLevelsDefault,
                             'type' : google.maps.MapTypeId.TERRAIN,
                             sphericalMercator : sphericalMercatorDefault,
                             wrapDateLine : wrapDatelineDefault
@@ -255,14 +253,15 @@ function RepositoryMap(mapId, params) {
         return;
     }
 
-    this.getMap = function() {
-        return this.map;
-    }
+
 
     this.setLatLonReadout = function(llr) {
         this.latlonReadout = llr;
     }
 
+    this.getMap = function() {
+        return this.map;
+    }
     this.initMap = function(doRegion) {
         if (this.inited)
             return;
@@ -332,8 +331,9 @@ function RepositoryMap(mapId, params) {
                         prefix: "Position: "
                     }));
         }
+
         this.map.setCenter(this.transformLLPoint(this.initialLocation),
-                this.initialZoom);
+                           this.initialZoom);
 
         if (this.initialBoxes) {
             this.initBoxes(this.initialBoxes);
@@ -389,7 +389,7 @@ function RepositoryMap(mapId, params) {
         // alert(feature);
     }
 
-    this.listeners = [];
+
     this.addClickHandler = function(lonfld, latfld, zoomfld, object) {
         if (this.clickHandler)
             return;
@@ -713,29 +713,28 @@ function RepositoryMap(mapId, params) {
         // bounds = this.boxes.getDataExtent();
         if (!bounds) {
             if (!this.markers) {
-
                 return;
             }
             // markers are in projection coordinates
             var dataBounds = this.markers.getDataExtent();
             bounds = this.transformProjBounds(dataBounds);
         }
-        //        alert(bounds);
         if (!this.map) {
             this.initialBounds = bounds;
             return;
         }
-
-
-        //        alert(bounds.getHeight());
         if(bounds.getHeight()>160) {
             bounds.top = 80;
             bounds.bottom=-80;
-            //            alert("map centerOn:" + bounds);
         }
         projBounds = this.transformLLBounds(bounds);
         this.map.setCenter(projBounds.getCenterLonLat());
-        this.map.zoomToExtent(projBounds);
+
+        if(projBounds.getWidth() ==0) {
+            this.map.zoomTo(8);
+        } else {
+            this.map.zoomToExtent(projBounds);
+        }
     }
 
     this.setCenter = function(latLonPoint) {

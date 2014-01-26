@@ -130,6 +130,9 @@ public class WikiManager extends RepositoryManager implements WikiUtil
     /** listentries attribute */
     public static final String ATTR_LISTENTRIES = "listentries";
 
+    /** _more_          */
+    public static final String ATTR_LAYER = "layer";
+
     /** listwidth attribute */
     public static final String ATTR_LISTWIDTH = "listwidth";
 
@@ -320,6 +323,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
     /** wiki group property */
     public static final String WIKI_PROP_GROUP = "wiki.group";
 
+    /** _more_          */
     public static final String WIKI_PROP_DISPLAYGROUP = "displaygroup";
 
     /** _more_ */
@@ -622,10 +626,12 @@ public class WikiManager extends RepositoryManager implements WikiUtil
              attrs(ATTR_TITLE, "Upload file", ATTR_INCLUDEICON, "false")),
         WIKI_PROP_ROOT,
         prop(WIKI_PROP_DISPLAYGROUP,
-             attrs("showmap", "true", "showmenu","false","layout.type","table","layout.columns","1")),
+             attrs("showmap", "true", "showmenu", "false", "layout.type",
+                   "table", "layout.columns", "1")),
         prop(WIKI_PROP_DISPLAY,
              attrs(ATTR_WIDTH, "800", ATTR_HEIGHT, "400", "fields", "",
-                   "type", "linechart",  "name", "", "eventsource", "", "column","0", ARG_FROMDATE, "", ARG_TODATE, "")),
+                   "type", "linechart", "name", "", "eventsource", "",
+                   "column", "0", ARG_FROMDATE, "", ARG_TODATE, "")),
     };
     //j+
 
@@ -1460,7 +1466,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                         children), sb, doDay);
 
             return sb.toString();
-        } else if (theTag.equals(WIKI_PROP_DISPLAY) || theTag.equals("chart")) {
+        } else if (theTag.equals(WIKI_PROP_DISPLAY)
+                   || theTag.equals("chart")) {
             //TODO: don't hard code the class
             //TODO: handle grids
             PointTypeHandler pth =
@@ -1471,9 +1478,11 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
             String jsonUrl = poh.getJsonUrl(request, entry);
             getEntryChart(request, entry.getName(), jsonUrl, sb, props);
+
             return sb.toString();
         } else if (theTag.equals(WIKI_PROP_DISPLAYGROUP)) {
             getEntryChart(request, entry.getName(), null, sb, props);
+
             return sb.toString();
         } else if (theTag.equals(WIKI_PROP_GRAPH)) {
             int width  = Misc.getProperty(props, ATTR_WIDTH, 400);
@@ -1566,6 +1575,9 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                                       false);
                 String icon = Misc.getProperty(props, ATTR_ICON,
                                   (String) null);
+
+                String layer = Misc.getProperty(props, ATTR_LAYER,
+                                   (String) null);
 
                 if ((icon != null) && icon.startsWith("#")) {
                     icon = null;
@@ -4140,7 +4152,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                               StringBuffer sb, Hashtable props)
             throws Exception {
 
-        List<String> topProps   = new ArrayList<String>();
+        List<String> topProps     = new ArrayList<String>();
 
         String       displayDivId = HtmlUtils.getUniqueId("displaydiv");
         sb.append(HtmlUtils.div("", HtmlUtils.id(displayDivId)));
@@ -4168,36 +4180,39 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         List<String> propList = new ArrayList<String>();
 
 
-        StringBuffer js = new StringBuffer();
+        StringBuffer js       = new StringBuffer();
 
 
-        for(String showArg:new String[]{"showmap","showmenu"}) {
+        for (String showArg : new String[] { "showmap", "showmenu" }) {
             topProps.add(showArg);
-            topProps.add(""+Misc.getProperty(props, showArg,
-                                             false));
+            topProps.add("" + Misc.getProperty(props, showArg, false));
         }
 
         propList.add("column");
-        propList.add(Misc.getProperty(props, "layout.column",
-                                                 "0"));
+        propList.add(Misc.getProperty(props, "layout.column", "0"));
 
         propList.add("row");
-        propList.add(Misc.getProperty(props, "layout.row",
-                                      "0"));
+        propList.add(Misc.getProperty(props, "layout.row", "0"));
 
+
+        String title = Misc.getProperty(props, ATTR_TITLE, (String) null);
+        if (title != null) {
+            propList.add("title");
+            propList.add(Json.quote(title));
+        }
         topProps.add("layout.type");
         topProps.add(Json.quote(Misc.getProperty(props, "layout.type",
-                                                 "table")));
+                "table")));
         topProps.add("layout.columns");
-        topProps.add(Misc.getProperty(props, "layout.columns",
-                                         "1"));
+        topProps.add(Misc.getProperty(props, "layout.columns", "1"));
 
         //If no json url then just add the displaymanager
-        if(url == null) {
+        if (url == null) {
             js.append("var displayManager = getOrCreateDisplayManager("
                       + HtmlUtils.quote(displayDivId) + ","
                       + Json.map(topProps, false) + ",true);\n");
             sb.append(HtmlUtils.script(js.toString()));
+
             return;
         }
 
@@ -4219,22 +4234,24 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         if (props.containsKey("chart.filter")) {
             propList.add("chart.filter");
             propList.add(Json.quote(Misc.getProperty(props, "chart.filter",
-                                                     "")));
+                    "")));
         }
         if (props.containsKey("chart.min")) {
             propList.add("chart.min");
             propList.add(Json.quote(Misc.getProperty(props, "chart.min",
-                                                     "")));
+                    "")));
         }
 
         if (props.containsKey(ARG_WIDTH)) {
             propList.add(ARG_WIDTH);
-            propList.add(Json.quote(Misc.getProperty(props, ARG_WIDTH, "600")));
+            propList.add(Json.quote(Misc.getProperty(props, ARG_WIDTH,
+                    "600")));
         }
 
         if (props.containsKey(ARG_HEIGHT)) {
             propList.add(ARG_HEIGHT);
-            propList.add(Json.quote(Misc.getProperty(props, ARG_HEIGHT, "200")));
+            propList.add(Json.quote(Misc.getProperty(props, ARG_HEIGHT,
+                    "200")));
         }
 
 
@@ -4248,40 +4265,41 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             }
         }
 
-        boolean fixedLayout = Misc.getProperty(props, "layout.fixed",
-                                               true);
+        boolean fixedLayout = Misc.getProperty(props, "layout.fixed", true);
 
-        if(fixedLayout) {
+        if (fixedLayout) {
             propList.add("layout.fixed");
             propList.add("true");
-            String       anotherDiv = HtmlUtils.getUniqueId("displaydiv");
+            String anotherDiv = HtmlUtils.getUniqueId("displaydiv");
             sb.append(HtmlUtils.div("", HtmlUtils.id(anotherDiv)));
             propList.add("divid");
             propList.add(Json.quote(anotherDiv));
         }
 
-        String sourceId = Misc.getProperty(props,"eventsource", (String) null);
-        if(sourceId!=null) {
+        String sourceId = Misc.getProperty(props, "eventsource",
+                                           (String) null);
+        if (sourceId != null) {
             propList.add("eventsource");
             propList.add(Json.quote(sourceId));
         }
 
-        String displayName = Misc.getProperty(props,"name", (String) null);
-        if(displayName!=null) {
+        String displayName = Misc.getProperty(props, "name", (String) null);
+        if (displayName != null) {
             propList.add("name");
             propList.add(Json.quote(displayName));
         }
 
 
-        String displayType = Misc.getProperty(props, "type","linechart");
+        String displayType = Misc.getProperty(props, "type", "linechart");
 
         js.append("var displayManager = getOrCreateDisplayManager("
                   + HtmlUtils.quote(displayDivId) + ","
                   + Json.map(topProps, false) + ");\n");
         js.append("var pointData = new  PointData(" + HtmlUtils.quote(name)
-                  + ",  null,null," + HtmlUtils.quote(url)+");\n");
-        js.append("displayManager.createDisplay(pointData, " + HtmlUtils.quote(displayType) +"," +
-                  Json.map(propList,false) +");\n");
+                  + ",  null,null," + HtmlUtils.quote(url) + ");\n");
+        js.append("displayManager.createDisplay(pointData, "
+                  + HtmlUtils.quote(displayType) + ","
+                  + Json.map(propList, false) + ");\n");
 
         sb.append(HtmlUtils.script(js.toString()));
     }

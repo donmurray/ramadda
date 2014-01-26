@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -32,6 +32,7 @@ import org.ramadda.repository.output.KmlOutputHandler;
 import org.ramadda.repository.output.OutputHandler;
 import org.ramadda.repository.output.WikiManager;
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Json;
 import org.ramadda.util.Utils;
 
 import ucar.unidata.geoloc.Bearing;
@@ -131,6 +132,11 @@ public class MapManager extends RepositoryManager {
 
         MapInfo mapInfo = new MapInfo(request, getRepository(), width,
                                       height, forSelection);
+
+        mapInfo.addProperty(
+            "defaultLayer",
+            Json.quote(
+                getProperty("ramadda.map.defaultlayer", "google.terrain")));
 
         if ( !showMaps()) {
             return mapInfo;

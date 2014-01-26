@@ -260,10 +260,11 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                 $("#" +  this.getDomId(ID_HEADER)).html(title);
             },
             getTitle: function () {
-                if(this.title!=null) return this.title;
-                var title = "";
+                var title = this.getProperty("title");
+                if(title!=null) return title;
+                title = "";
                 if(this.dataCollection == null) {
-                    return title;
+                    return "";
                 }
                 var dataList =  this.dataCollection.getData();
                 for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
@@ -420,7 +421,6 @@ function RamaddaMultiChart(displayManager, id, pointDataArg, properties) {
     $.extend(this, new RamaddaDisplay(displayManager, id, properties));
     addRamaddaDisplay(this);
     $.extend(this, {
-            title: "",
             dataCollection: new DataCollection(),
             indexField: -1,
             getMenuContents: function() {
@@ -659,7 +659,9 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 this.checkFixedLayout();
                 var currentPolygons = this.polygons;
                 this.polygons = [];
-                var params = {};
+                var params = {
+                    "defaultLayer": "google.streets"
+                };
                 this.initMenu();
                 this.map = new RepositoryMap(this.getDomId(ID_MAP), params);
                 this.map.initMap(false);
