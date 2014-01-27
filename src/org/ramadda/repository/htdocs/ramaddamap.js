@@ -10,6 +10,10 @@ var map_google_streets = "google.streets";
 var map_google_hybrid = "google.hybrid";
 var map_google_satellite = "google.satellite";
 
+var map_default_layer =  map_google_terrain;
+
+
+
 // Microsoft maps - only work for -180 to 180
 var map_ms_shaded = "ms.shaded";
 var map_ms_hybrid = "ms.hybrid";
@@ -73,7 +77,7 @@ function RepositoryMap(mapId, params) {
                 initialZoom : defaultZoomLevel,
                 latlonReadout : latlonReadoutID,
                 map: null,
-                defaultLayer: map_google_terrain,
+                defaultMapLayer: map_default_layer,
                 layer: null,
                 markers: null,
                 boxes: null,
@@ -153,11 +157,11 @@ function RepositoryMap(mapId, params) {
             ];
         }
 
-        if(this.defaultLayer) {
-            var index = this.mapLayers.indexOf(this.defaultLayer);
+        if(this.defaultMapLayer) {
+            var index = this.mapLayers.indexOf(this.defaultMapLayer);
             if(index >= 0) { 
                 this.mapLayers.splice(index, 1);
-                this.mapLayers.splice(0, 0,this.defaultLayer);
+                this.mapLayers.splice(0, 0,this.defaultMapLayer);
             }
         }
 

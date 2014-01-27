@@ -11,14 +11,14 @@ var LAYOUT_TABS = "tabs";
 var LAYOUT_COLUMNS = "columns";
 var LAYOUT_ROWS = "rows";
 
-var PROP_CHART_TYPE = "chart.type";
-var PROP_LAYOUT_TYPE = "layout.type";
-var PROP_LAYOUT_COLUMNS = "layout.columns";
-var PROP_SHOW_MAP = "showmap";
-var PROP_SHOW_MENU  = "showmenu";
-var PROP_SHOW_TITLE  = "showtitle";
-var PROP_FROMDATE = "fromdate";
-var PROP_TODATE = "todate";
+var PROP_CHART_TYPE = "chartType";
+var PROP_LAYOUT_TYPE = "layoutType";
+var PROP_LAYOUT_COLUMNS = "layoutColumns";
+var PROP_SHOW_MAP = "showMap";
+var PROP_SHOW_MENU  = "showMenu";
+var PROP_SHOW_TITLE  = "showTitle";
+var PROP_FROMDATE = "fromDate";
+var PROP_TODATE = "toDate";
 
 //
 //adds the display manager to the list of global display managers
@@ -146,11 +146,11 @@ function DisplayManager(id,properties) {
                 var html = "";
                 var wider = htmlUtil.onClick(get +".changeChartWidth(1);","Chart width");
                 var narrower = htmlUtil.onClick(get +".changeChartWidth(-1);","Chart width");
-                var chartNames = ["Map", "Line Chart","Bar Chart", "Table", "Text","Filter", "Scatter Plot"];
-                var chartCalls = ["createDisplay('map');", "createDisplay('linechart');","createDisplay('barchart');", "createDisplay('table');","createDisplay('text');createDisplay('RamaddaFilterDisplay');", "createDisplay('scatterplot');"];
+                var displayNames = ["Map", "Line Chart","Bar Chart", "Table", "Text","Filter", "Scatter Plot"];
+                var displayCalls = ["createDisplay('map');", "createDisplay('linechart');","createDisplay('barchart');", "createDisplay('table');","createDisplay('text');createDisplay('RamaddaFilterDisplay');", "createDisplay('scatterplot');"];
                 var newMenu = "";
-                for(var i=0;i<chartNames.length;i++) {
-                    newMenu+= htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick", get+"." + chartCalls[i]], chartNames[i]));
+                for(var i=0;i<displayNames.length;i++) {
+                    newMenu+= htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick", get+"." + displayCalls[i]], displayNames[i]));
                 }
 
                 var layoutMenu = 
@@ -319,7 +319,7 @@ function DisplayManager(id,properties) {
                 if(props.data!=null) {
                     this.data.push(props.data);
                 }
-                //                console.log("CreateDisplay:" + type);
+
 
                 var proc = type.substring(0,1).toUpperCase() + type.substring(1);
                 var classname = null;
@@ -374,51 +374,6 @@ function DisplayManager(id,properties) {
                 this.addDisplayEventListener(chart);
                 this.doLayout();
             },
-            createTimeseries: function(data) {
-                if(data == null) {
-                    data = this.data[0];
-                }
-                this.createChart(data,DISPLAY_LINECHART);
-            },
-            createBarchart:function(data) {
-                if(data == null) {
-                    data = this.data[0];
-                }
-                this.createChart(data,DISPLAY_BARCHART);
-            },
-            createScatterPlot:function(data) {
-                if(data == null) {
-                    data = this.data[0];
-                }
-                this.createChart(data,'scatterplot');
-            },
-            createTableDisplay: function(data) {
-                if(data == null) {
-                    data = this.data[0];
-                }
-                this.createChart(data,DISPLAY_TABLE);
-            },
-
-            createTextDisplay:function(props) {
-                var displayId = this.id +"_display_" + (this.cnt++);
-                var display =  new RamaddaTextDisplay(this, displayId, props);
-                this.displays.push(display);
-                this.addDisplayEventListener(display);
-                this.doLayout();
-            },
-            createMapDisplay:function(props) {
-                var displayId = this.id +"_display_" + (this.cnt++);
-                var myProps = {};
-                $.extend(myProps, props);
-                var display =  new RamaddaMapDisplay(this, displayId, props);
-                this.displays.push(display);
-                this.addDisplayEventListener(display);
-                if(this.data.length>0) {
-                    var data = this.data[0];
-                    display.handlePointDataLoaded(pointData);
-                }
-                this.doLayout();
-            },
             moveDisplayUp: function(display) {
                 var index = this.displays.indexOf(display);
                 if(index <= 0) { 
@@ -462,12 +417,6 @@ function DisplayManager(id,properties) {
                 }
 
             },
-            addLineChart: function(pointDataArg, properties) {
-                var chartId = this.id +"_chart_" + (this.cnt++);
-                var chart  = new RamaddaMultiChart(chartId, pointDataArg, properties);
-                display.setDisplayManager(this);
-                this.displays.add(chart); 
-           }
         });
 
     addDisplayManager(this);

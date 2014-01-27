@@ -3133,7 +3133,7 @@ public class HtmlUtils {
      * @return  the script enclosed in a tag
      */
     public static String script(String s) {
-        s = be.belgampaul.tools.javascript.JsBeautify.jsBeautify(s, 2);
+        s = "\n" + be.belgampaul.tools.javascript.JsBeautify.jsBeautify(s, 2);
         String js = tag(TAG_SCRIPT, attrs(ATTR_TYPE, "text/JavaScript"), s);
 
         return js;

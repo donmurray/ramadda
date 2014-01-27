@@ -134,7 +134,7 @@ public class MapManager extends RepositoryManager {
                                       height, forSelection);
 
         mapInfo.addProperty(
-            "defaultLayer",
+            "defaultMapLayer",
             Json.quote(
                 getProperty("ramadda.map.defaultlayer", "google.terrain")));
 

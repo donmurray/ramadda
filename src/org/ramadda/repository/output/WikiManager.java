@@ -145,6 +145,15 @@ public class WikiManager extends RepositoryManager implements WikiUtil
     /** attribute in the tabs tag */
     public static final String ATTR_SHOWLINK = "showlink";
 
+    /** _more_          */
+    public static final String ATTR_SHOWTITLE = "showTitle";
+
+    /** _more_          */
+    public static final String ATTR_SHOWMAP = "showMap";
+
+    /** _more_          */
+    public static final String ATTR_SHOWMENU = "showMenu";
+
     /** src attribute */
     public static final String ATTR_SRC = "src";
 
@@ -626,13 +635,14 @@ public class WikiManager extends RepositoryManager implements WikiUtil
              attrs(ATTR_TITLE, "Upload file", ATTR_INCLUDEICON, "false")),
         WIKI_PROP_ROOT,
         prop(WIKI_PROP_DISPLAYGROUP,
-             attrs("showmap", "true", "showmenu", "false", "layout.type",
-                   "table", "layout.columns", "1")),
+             attrs(ATTR_SHOWTITLE, "true", ATTR_SHOWMENU, "false",
+                   "layoutType", "table", "layoutColumns", "1")),
         prop(WIKI_PROP_DISPLAY,
              attrs(ATTR_WIDTH, "800", ATTR_HEIGHT, "400", "fields", "",
-                   "type", "linechart", "name", "", "eventsource", "",
-                   "showmenu", "true", "showtitle","true",
-                   "column", "0", ARG_FROMDATE, "", ARG_TODATE, "")),
+                   "type", "linechart", "name", "", "eventSource", "",
+                   "layoutFixed", "true", ATTR_SHOWMENU, "true",
+                   ATTR_SHOWTITLE, "true", "row", "0", "column", "0",
+                   ARG_FROMDATE, "", ARG_TODATE, "")),
     };
     //j+
 
@@ -4184,28 +4194,23 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         StringBuffer js       = new StringBuffer();
 
 
-        for (String showArg : new String[] { "showmap", "showmenu"}) {
+        for (String showArg : new String[] { ATTR_SHOWMAP, ATTR_SHOWMENU }) {
             topProps.add(showArg);
             topProps.add("" + Misc.getProperty(props, showArg, false));
         }
 
-        propList.add("column");
-        propList.add(Misc.getProperty(props, "layout.column", "0"));
 
-        propList.add("row");
-        propList.add(Misc.getProperty(props, "layout.row", "0"));
 
-        
-        if(props.get("showmenu")!=null) {
-            propList.add("showmenu");
-            propList.add(Misc.getProperty(props, "showmenu", "true"));
+        if (props.get(ATTR_SHOWMENU) != null) {
+            propList.add(ATTR_SHOWMENU);
+            propList.add(Misc.getProperty(props, ATTR_SHOWMENU, "true"));
         }
 
-        if(props.get("showtitle")!=null) {
-            propList.add("showtitle");
-            propList.add(Misc.getProperty(props, "showtitle", "true"));
-            topProps.add("showtitle");
-            topProps.add(Misc.getProperty(props, "showtitle", "true"));
+        if (props.get(ATTR_SHOWTITLE) != null) {
+            propList.add(ATTR_SHOWTITLE);
+            propList.add(Misc.getProperty(props, ATTR_SHOWTITLE, "true"));
+            topProps.add(ATTR_SHOWTITLE);
+            topProps.add(Misc.getProperty(props, ATTR_SHOWTITLE, "true"));
         }
 
 
@@ -4214,11 +4219,20 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             propList.add("title");
             propList.add(Json.quote(title));
         }
-        topProps.add("layout.type");
-        topProps.add(Json.quote(Misc.getProperty(props, "layout.type",
+        topProps.add("layoutType");
+        topProps.add(Json.quote(Misc.getProperty(props, "layoutType",
                 "table")));
-        topProps.add("layout.columns");
-        topProps.add(Misc.getProperty(props, "layout.columns", "1"));
+        topProps.add("layoutColumns");
+        topProps.add(Misc.getProperty(props, "layoutColumns", "1"));
+
+        //Always add the default map layer to the displaymanager properties so any new maps pick it up
+        String defaultLayer = Misc.getProperty(props, "defaultMapLayer",
+                                  getProperty("ramadda.map.defaultlayer",
+                                      "google.terrain"));
+
+        topProps.add("defaultMapLayer");
+        topProps.add(Json.quote(defaultLayer));
+
 
         //If no json url then just add the displaymanager
         if (url == null) {
@@ -4231,43 +4245,6 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         }
 
 
-        String fromDate = Misc.getProperty(props, ARG_FROMDATE,
-                                           (String) null);
-        String toDate = Misc.getProperty(props, ARG_TODATE, (String) null);
-
-
-        if (fromDate != null) {
-            propList.add(ARG_FROMDATE);
-            propList.add(Json.quote(fromDate));
-        }
-        if (toDate != null) {
-            propList.add(ARG_TODATE);
-            propList.add(Json.quote(toDate));
-        }
-
-        if (props.containsKey("chart.filter")) {
-            propList.add("chart.filter");
-            propList.add(Json.quote(Misc.getProperty(props, "chart.filter",
-                    "")));
-        }
-        if (props.containsKey("chart.min")) {
-            propList.add("chart.min");
-            propList.add(Json.quote(Misc.getProperty(props, "chart.min",
-                    "")));
-        }
-
-        if (props.containsKey(ARG_WIDTH)) {
-            propList.add(ARG_WIDTH);
-            propList.add(Json.quote(Misc.getProperty(props, ARG_WIDTH,
-                    "600")));
-        }
-
-        if (props.containsKey(ARG_HEIGHT)) {
-            propList.add(ARG_HEIGHT);
-            propList.add(Json.quote(Misc.getProperty(props, ARG_HEIGHT,
-                    "200")));
-        }
-
 
 
         String fields = Misc.getProperty(props, "fields", (String) null);
@@ -4279,10 +4256,10 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             }
         }
 
-        boolean fixedLayout = Misc.getProperty(props, "layout.fixed", true);
+        boolean fixedLayout = Misc.getProperty(props, "layoutFixed", true);
 
         if (fixedLayout) {
-            propList.add("layout.fixed");
+            propList.add("layoutFixed");
             propList.add("true");
             String anotherDiv = HtmlUtils.getUniqueId("displaydiv");
             sb.append(HtmlUtils.div("", HtmlUtils.id(anotherDiv)));
@@ -4290,18 +4267,26 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             propList.add(Json.quote(anotherDiv));
         }
 
-        String sourceId = Misc.getProperty(props, "eventsource",
-                                           (String) null);
-        if (sourceId != null) {
-            propList.add("eventsource");
-            propList.add(Json.quote(sourceId));
+
+        for (String arg : new String[] {
+            "eventSource", "name", "chartFilter", "chartMin", ARG_WIDTH,
+            ARG_HEIGHT, ARG_FROMDATE, ARG_TODATE, "column", "row"
+        }) {
+            String value = Misc.getProperty(props, arg, (String) null);
+            if (value != null) {
+                propList.add(arg);
+                propList.add(Json.quote(value));
+            }
         }
 
-        String displayName = Misc.getProperty(props, "name", (String) null);
-        if (displayName != null) {
-            propList.add("name");
-            propList.add(Json.quote(displayName));
+
+        //Only add the default layer to the display if its been specified
+        defaultLayer = Misc.getProperty(props, "defaultLayer", (String) null);
+        if (defaultLayer != null) {
+            propList.add("defaultMapLayer");
+            propList.add(Json.quote(defaultLayer));
         }
+
 
 
         String displayType = Misc.getProperty(props, "type", "linechart");

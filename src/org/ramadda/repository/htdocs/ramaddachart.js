@@ -15,13 +15,13 @@ var ID_MENU_POPUP = "menu_popup";
 var ID_MENU_INNER = "menu_inner";
 var ID_RELOAD = "reload";
 
-var PROP_CHART_FILTER = "chart.filter";
-var PROP_CHART_MIN = "chart.min";
-var PROP_CHART_MAX = "chart.max";
-var PROP_CHART_TYPE = "chart.type";
+var PROP_CHART_FILTER = "chartFilter";
+var PROP_CHART_MIN = "chartMin";
+var PROP_CHART_MAX = "chartMax";
+var PROP_CHART_TYPE = "chartType";
 var PROP_DIVID = "divid";
 var PROP_FIELDS = "fields";
-var PROP_LAYOUT_FIXED = "layout.fixed";
+var PROP_LAYOUT_FIXED = "layoutFixed";
 var PROP_HEIGHT  = "height";
 var PROP_WIDTH  = "width";
 
@@ -92,10 +92,13 @@ function DisplayThing(id, properties) {
          return this.getFormValue("name",this.getId());
        },
        getEventSource: function() {
-         return this.getFormValue("eventsource",this.getId());
+         return this.getFormValue("eventSource",this.getId());
        },
        setDisplayParent:  function (parent) {
              this.displayParent = parent;
+       },
+       getDisplayParent:  function () {
+                return this.displayParent;
        },
        removeProperty: function(key) {
                 this.properties[key] = null;
@@ -644,20 +647,20 @@ function RamaddaMultiChart(displayManager, id, properties) {
 
 
 function LinechartDisplay(displayManager, id, properties) {
-    properties = $.extend({"chart.type": DISPLAY_LINECHART}, properties);
+    properties = $.extend({"chartType": DISPLAY_LINECHART}, properties);
     RamaddaSuper(this, new RamaddaMultiChart(displayManager, id, properties));
     addRamaddaDisplay(this);
 }
 
 function BarchartDisplay(displayManager, id, properties) {
-    properties = $.extend({"chart.type": DISPLAY_BARCHART}, properties);
+    properties = $.extend({"chartType": DISPLAY_BARCHART}, properties);
     RamaddaSuper(this, new RamaddaMultiChart(displayManager, id, properties));
     addRamaddaDisplay(this);
 }
 
 
 function TableDisplay(displayManager, id, properties) {
-    properties = $.extend({"chart.type": DISPLAY_TABLE}, properties);
+    properties = $.extend({"chartType": DISPLAY_TABLE}, properties);
     RamaddaSuper(this, new RamaddaMultiChart(displayManager, id, properties));
     addRamaddaDisplay(this);
 }
@@ -701,7 +704,7 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 var currentPolygons = this.polygons;
                 this.polygons = [];
                 var params = {
-                    "defaultLayer": "google.streets"
+                    "defaultMapLayer": this.getProperty("defaultMapLayer", map_default_layer)
                 };
                 this.initMenu();
                 this.map = new RepositoryMap(this.getDomId(ID_MAP), params);
@@ -749,7 +752,6 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             },
             handleClick: function (theMap, lon,lat) {
                 this.displayManager.handleMapClick(this, lon, lat);
-                //                console.log("click: " + lon  +" " + lat);
             },
            getPosition:function() {
                 var lat = $("#" + this.getDomId(ID_LATFIELD)).val();
@@ -759,8 +761,6 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             },
            setInitMapBounds: function(north, west, south, east) {
                 if(!this.map) return;
-                //                if(this.mapBoundsSet) return;
-                //                this.mapBoundsSet = true;
                 this.map.centerOnMarkers(new OpenLayers.Bounds(west,south,east, north));
             },
             handlePointDataLoaded: function(pointData) {
