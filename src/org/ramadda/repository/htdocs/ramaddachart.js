@@ -92,7 +92,7 @@ function DisplayThing(id, properties) {
          return this.getFormValue("name",this.getId());
        },
        getEventSource: function() {
-         return this.getFormValue("eventSource",this.getId());
+            return this.getFormValue("eventSource","");
        },
        setDisplayParent:  function (parent) {
              this.displayParent = parent;
@@ -623,10 +623,11 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 }
                 if(this.chart!=null) {
                     this.chart.draw(dataTable, options);
+                    var theDisplay = this;
                     google.visualization.events.addListener(this.chart, 'select', function() {
-                           var index = theChart.chart.getSelection()[0].row
-                                theChart.displayManager.handleRecordSelection(theChart, 
-                                                                              theChart.dataCollection.getData()[0], index);
+                            var index = theDisplay.chart.getSelection()[0].row;
+                            theDisplay.displayManager.handleRecordSelection(theDisplay, 
+                                                                            theDisplay.dataCollection.getData()[0], index);
                         });
                 }
 

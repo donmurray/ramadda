@@ -126,11 +126,13 @@ function DisplayManager(id,properties) {
                 }
                 values += "</table>";
 
+
                 for(var i=0;i< this.eventListeners.length;i++) {
                     eventListener = this.eventListeners[i];
                     var eventSource  = eventListener.getEventSource();
                     if(eventSource!=null && eventSource.length>0) {
                         if(eventSource!= source.getId() && eventSource!= source.getName()) {
+                            console.log("skipping:" + eventSource);
                             continue;
                         }
                     }
