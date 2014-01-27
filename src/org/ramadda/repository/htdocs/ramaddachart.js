@@ -258,6 +258,7 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                 $("#" + this.id).html(html);
             },
             prepareToLayout:function() {
+                //Force setting the property from the input dom (which is about to go away)
                 this.getColumn();
                 this.getWidth();
                 this.getHeight();
@@ -799,3 +800,58 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 }}
         });
 }
+
+
+function RamaddaAnimationDisplay(displayManager, id, properties) {
+    var ID_START = "start";
+    var ID_STOP = "stop";
+    var ID_TIME = "time";
+    $.extend(this, new RamaddaDisplay(displayManager, id, properties));
+    addRamaddaDisplay(this);
+    $.extend(this, {
+            running: false,
+            timestamp: 0,
+            index: 0,              
+            toggle: function() {
+                if(this.running) {
+                    this.stop();
+                } else {
+                    this.start();
+                }
+            },
+            tick: function() {
+                if(!this.running) return;
+                this.index++;
+                $("#" + this.getDomId(ID_TIME)).html("Index:" + this.index);
+                this.displayManager.handleRecordSelection(this, null, this.index);
+                var theAnimation = this;
+                setTimeout(function() {theAnimation.tick();}, 2000);
+            },
+            start: function() {
+                if(this.running) return;
+                this.running = true;
+                this.timestamp++;
+                $("#"+this.getDomId(ID_START)).attr("src",root+"/icons/control_stop_blue.png");
+                this.tick();
+            },
+            stop: function() {
+                if(!this.running) return;
+                this.running = false;
+                this.timestamp++;
+                $("#"+this.getDomId(ID_START)).attr("src",root+"/icons/control_play_blue.png");
+            },
+            initDisplay: function() {
+                this.checkFixedLayout();
+                this.initMenu();
+                var html =  htmlUtil.div(["class","wiki-h2"],"Animation");
+                var get = "getRamaddaDisplay('" + this.id +"')";
+                html+=  htmlUtil.onClick(get +".toggle();", htmlUtil.image(root+"/icons/control_play_blue.png",["width","32", "id", this.getDomId(ID_START)]));
+                html += "<br>";
+                html+=  htmlUtil.div(["id", this.getDomId(ID_TIME)],"&nbsp;");
+                $("#" + this.getDomId(ID_TITLE)).html(this.getTitle());
+                $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(htmlUtil.div(["class","display-text"], html));
+            },
+        });
+}
+
+

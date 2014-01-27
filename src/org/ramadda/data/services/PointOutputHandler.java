@@ -824,11 +824,11 @@ public class PointOutputHandler extends RecordOutputHandler {
         String url = getJsonUrl(request, entry);
         String name = entry.getName();
         Hashtable props = new Hashtable();
-        props.put("layout.fixed","false");
-        props.put("layout.type","table");
-        props.put("layout.columns","2");
-        props.put("showmenu","true");
-        props.put("showmap",""+ entry.isGeoreferenced());
+        props.put("layoutFixed","false");
+        props.put("layoutType","table");
+        props.put("layoutColumns","2");
+        props.put("showMenu","true");
+        props.put("showMap",""+ entry.isGeoreferenced());
         getWikiManager().getEntryChart(request, name,
                                        url, sb, props);
         return new Result("", sb);

@@ -211,6 +211,9 @@ function HtmlUtil() {
      this.div = function(attrs, inner) {
          return this.tag("div", attrs, inner);
      }
+     this.image = function(path, attrs) {
+         return  "<img " + this.attrs(["src", path,"border","0"]) +" " + this.attrs(attrs) +">";
+     }
 
      this.tr = function(attrs, inner) {
          return this.tag("tr", attrs, inner);

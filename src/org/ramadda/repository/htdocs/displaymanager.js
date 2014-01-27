@@ -103,6 +103,9 @@ function DisplayManager(id,properties) {
                 }
             },
             handleRecordSelection: function(source, pointData, index) {
+                if(pointData ==null && this.data.length>0) {
+                    pointData = this.data[0];
+                }
                 var fields =  pointData.getRecordFields();
                 var records = pointData.getData();
                 if(index<0 || index>= records.length) {
@@ -136,7 +139,9 @@ function DisplayManager(id,properties) {
                             continue;
                         }
                     }
-                    eventListener.handleRecordSelection(source, index, record, values);
+                    if(eventListener.handleRecordSelection) {
+                        eventListener.handleRecordSelection(source, index, record, values);
+                    }
                 }
             },
             makeMainMenu: function() {
@@ -148,8 +153,10 @@ function DisplayManager(id,properties) {
                 var html = "";
                 var wider = htmlUtil.onClick(get +".changeChartWidth(1);","Chart width");
                 var narrower = htmlUtil.onClick(get +".changeChartWidth(-1);","Chart width");
-                var displayNames = ["Map", "Line Chart","Bar Chart", "Table", "Text","Filter", "Scatter Plot"];
-                var displayCalls = ["createDisplay('map');", "createDisplay('linechart');","createDisplay('barchart');", "createDisplay('table');","createDisplay('text');createDisplay('RamaddaFilterDisplay');", "createDisplay('scatterplot');"];
+                //The ids (.e.g., 'linechart' have to match up with some class function with the name 
+                //as defined in the createDisplay method
+                var displayNames = ["Map", "Line Chart","Bar Chart", "Table", "Text","Animation", "Filter", "Scatter Plot"];
+                var displayCalls = ["createDisplay('map');", "createDisplay('linechart');","createDisplay('barchart');", "createDisplay('table');","createDisplay('text');","createDisplay('animation');","createDisplay('RamaddaFilterDisplay');", "createDisplay('scatterplot');"];
                 var newMenu = "";
                 for(var i=0;i<displayNames.length;i++) {
                     newMenu+= htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick", get+"." + displayCalls[i]], displayNames[i]));
@@ -235,8 +242,6 @@ function DisplayManager(id,properties) {
                     }
                 }
 
-
-
                 if(this.layout == LAYOUT_TABLE) {
                     if(displaysToLayout.length == 1) {
                         html+= displaysToLayout[0].getDisplay();
@@ -321,9 +326,11 @@ function DisplayManager(id,properties) {
                 if(props.data!=null) {
                     this.data.push(props.data);
                 }
-
-
+                //Upper case the type name, e.g., linechart->Linechart
                 var proc = type.substring(0,1).toUpperCase() + type.substring(1);
+
+                //Look for global functions  Ramadda<Type>Display, <Type>Display, <Type> 
+                //e.g. - RamaddaLinechartDisplay, LinechartDisplay, Linechart 
                 var classname = null;
                 var names = ["Ramadda" +proc + "Display",
                             proc +"Display",
@@ -465,7 +472,7 @@ function DisplayManager(id,properties) {
     $("#"+ this.getId()).html(html);
 
     if(this.showmap) {
-        this.createMapDisplay(null);
+        this.createDisplay('map');
     }
 
     if(this.entryList) {
