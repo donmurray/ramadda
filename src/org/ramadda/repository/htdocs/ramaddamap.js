@@ -149,8 +149,8 @@ function RepositoryMap(mapId, params) {
     this.addBaseLayers = function() {
         if (!this.mapLayers) {
             this.mapLayers = [ 
-                              map_google_terrain, 
                               map_google_streets, 
+                              map_google_terrain,
                               map_google_satellite,
                               map_google_hybrid,
                               map_wms_openlayers,
