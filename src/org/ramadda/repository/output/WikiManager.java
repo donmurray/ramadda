@@ -130,7 +130,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
     /** listentries attribute */
     public static final String ATTR_LISTENTRIES = "listentries";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LAYER = "layer";
 
     /** listwidth attribute */
@@ -323,7 +323,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
     /** wiki group property */
     public static final String WIKI_PROP_GROUP = "wiki.group";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKI_PROP_DISPLAYGROUP = "displaygroup";
 
     /** _more_ */
@@ -631,6 +631,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         prop(WIKI_PROP_DISPLAY,
              attrs(ATTR_WIDTH, "800", ATTR_HEIGHT, "400", "fields", "",
                    "type", "linechart", "name", "", "eventsource", "",
+                   "showmenu", "true", "showtitle","true",
                    "column", "0", ARG_FROMDATE, "", ARG_TODATE, "")),
     };
     //j+
@@ -4183,7 +4184,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         StringBuffer js       = new StringBuffer();
 
 
-        for (String showArg : new String[] { "showmap", "showmenu" }) {
+        for (String showArg : new String[] { "showmap", "showmenu"}) {
             topProps.add(showArg);
             topProps.add("" + Misc.getProperty(props, showArg, false));
         }
@@ -4193,6 +4194,19 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
         propList.add("row");
         propList.add(Misc.getProperty(props, "layout.row", "0"));
+
+        
+        if(props.get("showmenu")!=null) {
+            propList.add("showmenu");
+            propList.add(Misc.getProperty(props, "showmenu", "true"));
+        }
+
+        if(props.get("showtitle")!=null) {
+            propList.add("showtitle");
+            propList.add(Misc.getProperty(props, "showtitle", "true"));
+            topProps.add("showtitle");
+            topProps.add(Misc.getProperty(props, "showtitle", "true"));
+        }
 
 
         String title = Misc.getProperty(props, ATTR_TITLE, (String) null);
@@ -4295,9 +4309,10 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         js.append("var displayManager = getOrCreateDisplayManager("
                   + HtmlUtils.quote(displayDivId) + ","
                   + Json.map(topProps, false) + ");\n");
-        js.append("var pointData = new  PointData(" + HtmlUtils.quote(name)
-                  + ",  null,null," + HtmlUtils.quote(url) + ");\n");
-        js.append("displayManager.createDisplay(pointData, "
+        propList.add("data");
+        propList.add("new  PointData(" + HtmlUtils.quote(name)
+                     + ",  null,null," + HtmlUtils.quote(url) + ")");
+        js.append("displayManager.createDisplay("
                   + HtmlUtils.quote(displayType) + ","
                   + Json.map(propList, false) + ");\n");
 

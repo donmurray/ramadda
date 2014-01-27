@@ -3,65 +3,58 @@ function createEntriesFromJson(data) {
     var entries = new Array();
     for(var i=0;i<data.length;i++)  {
         var entry = data[i];
-        entries.push(createEntryFromJson(entry));
+        entries.push(new Entry(entry));
     }
     return entries;
 }
 
 
-function createEntryFromJson(data) {
-    init_Entry(data);
-    return data;
-}
+function Entry (props) {
+    $.extend(this, props);
+    $.extend(this, {
+            getId : function () {
+                return  this.id;
+            },
+            getIconImage : function () {
+                if(this.icon==null)
+                    return "<img src=\"${urlroot}/icons/help.png\">";
+                return "<img src=\"" + this.icon +"\">";
+            },
+            getColumnValue : function (name) {
+                var value = this["column." + name];
+                return value;
+            },
+            getColumnNames : function () {
+                var names =  this.columnNames;
+                if (!names) names = new Array();
+                return names;
+            },
 
-function Entry () {
-    init_Entry(this);
-}
+            getColumnLabels : function () {
+                var names =  this.columnLabels;
+                if (!names) names = new Array();
+                return names;
+            },
 
-function init_Entry (theEntry) {
-
-    theEntry.getId = function () {
-        return  this.id;
-    }
-    theEntry.getIconImage = function () {
-        return "<img src=\"" + this.icon +"\">";
-    }
-    theEntry.getColumnValue = function (name) {
-        var value = this["column." + name];
-        return value;
-    }
-
-    theEntry.getColumnNames = function () {
-        var names =  this.columnNames;
-        if (!names) names = new Array();
-        return names;
-    }
-
-    theEntry.getColumnLabels = function () {
-        var names =  this.columnLabels;
-        if (!names) names = new Array();
-        return names;
-    }
-
-    theEntry.getName = function () {
-        if(this.name ==null || this.name == "") {
-            return "no name";
-        }
-        return this.name;
-    }
-    theEntry.getFilesize = function () {
-        var size =  parseInt(this.filesize);
-        if(size == size) return size;
-        return 0;
-    }
-    theEntry.getFormattedFilesize = function () {
-        return size_format(this.getFilesize());
-    }
-    theEntry.getLink = function (label) {
-        if(!label) label = this.getName();
-        return  "<a href=\"${urlroot}/entry/show?entryid=" + this.id +"\">" + label +"</a>";
-    }
-
+           getName : function () {
+                if(this.name ==null || this.name == "") {
+                    return "no name";
+                }
+                return this.name;
+            },
+            getFilesize : function () {
+                var size =  parseInt(this.filesize);
+                if(size == size) return size;
+                return 0;
+            },
+           getFormattedFilesize : function () {
+                return size_format(this.getFilesize());
+            },
+            getLink : function (label) {
+                if(!label) label = this.getName();
+                return  "<a href=\"${urlroot}/entry/show?entryid=" + this.id +"\">" + label +"</a>";
+            }
+        });
 }
 
 function EntryList(jsonUrl, listener) {
