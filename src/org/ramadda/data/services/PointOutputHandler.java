@@ -2405,9 +2405,9 @@ public class PointOutputHandler extends RecordOutputHandler {
             return;
         }
 
-        if ( !state.entry.isFile()) {
-            return;
-        }
+        //if ( !state.entry.isFile()) {
+        //    return;
+        //}
 
         if ( !getRepository().getAccessManager().canAccessFile(request,
                 state.entry)) {
