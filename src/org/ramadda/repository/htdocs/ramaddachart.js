@@ -626,7 +626,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 }
                 if(chartType == DISPLAY_BARCHART) {
                     options.orientation =  "horizontal";
-                    this.chart = new google.visualization.BarChart(document.getElementById(this.getDomId(ID_DSIPLAY_CONTENTS)));
+                    this.chart = new google.visualization.BarChart(document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
                 } else  if(chartType == DISPLAY_TABLE) {
                     this.chart = new google.visualization.Table(document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
                 } else {
