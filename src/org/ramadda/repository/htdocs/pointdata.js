@@ -21,17 +21,6 @@
 
 /*
 This package supports charting and mapping of georeferenced time series data
-
-It is used  in conjunction with the ramaddachart.js package
-
-Use:
-<div id="example"></div>
-...
-var recordFields  = [new RecordField(...), ... see below]
-var data  = [new Record(...), ...]
-var pointData = new  PointData("Example data set",  recordFields, data);
-var chart = new  RamaddaChart("example" , pointData);
-
 */
 
 
@@ -172,7 +161,6 @@ function RecordField(index, id, label, type, missing, unit, properties) {
 
 function init_RecordField(recordField) {
     recordField.isNumeric = recordField.type == "double";
-    //    console.log(recordField.label+" type:" + recordField.type+": " + recordField.isNumeric);
 
     recordField.getIndex = function() {
         return this.index;
@@ -217,44 +205,38 @@ function init_RecordField(recordField) {
 The main data record. This holds a lat/lon/elevation, time and an array of data
 The data array corresponds to the RecordField fields
  */
-function Record(lat, lon, elevation, time, data) {
-    this.latitude = lat;
-    this.longitude = lon;
-    this.elevation = elevation;
-    this.time = time;
-    this.data = data;
-    init_Record(this);
-}
-
-//Add the Record class functions to the object
-function init_Record(record) {
-    record.getData = function() {
-        return this.data;
-    }
-    record.getValue = function(index) {
-        return this.data[index];
-    }
-    record.hasLocation = function() {
-        return ! isNaN(this.latitude);
-    }
-
-    record.hasElevation = function() {
-        return ! isNaN(this.elevation);
-    }
-
-    record.getLatitude = function() {
-        return this.latitude;
-    }
-    record.getLongitude = function() {
-        return this.longitude;
-    }
-    record.getElevation = function() {
-        return this.elevation;
-    }
-    record.getDate = function() {
-        return this.time;
-    }
-    return record;
+function PointRecord(lat, lon, elevation, time, data) {
+    $.extend(this, {
+            latitude : lat,
+            longitude : lon,
+            elevation : elevation,
+            recordTime : time,
+            data : data,
+            getData : function() {
+                return this.data;
+            }, 
+            getValue : function(index) {
+                return this.data[index];
+            }, 
+            hasLocation : function() {
+                return ! isNaN(this.latitude);
+            }, 
+            hasElevation : function() {
+                return ! isNaN(this.elevation);
+            }, 
+            getLatitude : function() {
+                return this.latitude;
+            }, 
+            getLongitude : function() {
+                return this.longitude;
+            }, 
+            getElevation : function() {
+                return this.elevation;
+            }, 
+            getDate : function() {
+                return this.recordTime;
+            }
+        });
 }
 
 
@@ -273,7 +255,7 @@ function makePointData(json) {
         var tuple = json.data[i];
         //lat,lon,alt,time,data values
         var date  = tuple.date;
-        if(date>0) {
+        if(date!=0) {
             date = new Date(date);
         }
         if ((typeof tuple.latitude === 'undefined')) {
@@ -284,13 +266,11 @@ function makePointData(json) {
         if ((typeof tuple.elevation === 'undefined')) {
             tuple.elevation = NaN;
         }
-
-        data.push(new Record(tuple.latitude, tuple.longitude,tuple.elevation,date, tuple.values));
+        var record = new PointRecord(tuple.latitude, tuple.longitude,tuple.elevation, date, tuple.values);
+        data.push(record);
     }
 
-    
     var name = data.name;
-
     if ((typeof name === 'undefined')) {
         name =  "Point Data";
     }
@@ -420,6 +400,10 @@ function MonthFilter(param) {
                     var month = this.months[i];
                     var date = record.getDate();
                     if(date == null) return false;
+                    if(date.getMonth == null) {
+                        //console.log("bad date:" + date);
+                        return false;
+                    }
                     if(date.getMonth()==month) return true;
                 }
                 return false;
