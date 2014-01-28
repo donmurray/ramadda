@@ -294,12 +294,14 @@ function DisplayManager(id,properties) {
                     }
                 } else if(this.layout==LAYOUT_COLUMNS) {
                     var cols = [];
+                    var weights = [];
                     for(var i=0;i<displaysToLayout.length;i++) {
                         var display =displaysToLayout[i];
                         var column = display.getColumn();
                         if((""+column).length==0) column = 0;
                         while(cols.length<=column) {
                             cols.push([]);
+                            weights.push(0);
                         }
                         cols[column].push(display.getDisplay());
                     }

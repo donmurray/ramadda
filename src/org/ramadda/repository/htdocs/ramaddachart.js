@@ -683,7 +683,7 @@ function RamaddaTextDisplay(displayManager, id, properties) {
     $.extend(this, new RamaddaDisplay(displayManager, id, properties));
     addRamaddaDisplay(this);
     $.extend(this, {
-            html: "<p>&nbsp;&nbsp;&nbsp;Nothing selected&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<p>",
+            html: "<p>&nbsp;&nbsp;&nbsp;Selection&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<p>&nbsp;<p> ",
             initDisplay: function() {
                 this.checkFixedLayout();
                 this.initMenu();
