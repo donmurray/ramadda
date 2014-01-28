@@ -880,7 +880,7 @@ public class CollectionTypeHandler extends ExtensibleGroupTypeHandler {
      */
     public String openForm(Request request, Entry entry, StringBuffer sb,
                            StringBuffer js) {
-        //sb.append(HtmlUtils.importJS(fileUrl("/selectform.js")));
+        sb.append(HtmlUtils.importJS(fileUrl("/selectform.js")));
         String formId = "selectform" + HtmlUtils.blockCnt++;
         sb.append(
             HtmlUtils.form(
