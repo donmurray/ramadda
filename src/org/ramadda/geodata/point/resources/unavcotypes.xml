@@ -32,9 +32,9 @@ this gets it from the type_point super class
 <td width="70%">
 {{displaygroup layoutType="columns"}}
 {{display type="map"  height="350"  column="1" layoutFixed="false" }}
-{{display row="0" fields="North" title="North"  height="100" column="0" layoutFixed="false"}}
-{{display row="0" fields="East" title="East"  height="100" column="0" layoutFixed="false"}}
-{{display row="0" fields="Vertical" title="Vertical"  height="100" column="0" layoutFixed="false"}}
+{{display row="0" fields="North,dN" title="North"  height="100" column="0" layoutFixed="false"}}
+{{display row="0" fields="East,dE" title="East"  height="100" column="0" layoutFixed="false"}}
+{{display row="0" fields="Vertical,du" title="Vertical"  height="100" column="0" layoutFixed="false"}}
 {{display type="text" column="1" layoutFixed="true" }}
 </td>
 </tr></table>
