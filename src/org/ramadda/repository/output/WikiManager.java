@@ -4182,7 +4182,6 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             sb.append(
                 HtmlUtils.script(
                     "google.load(\"visualization\", \"1\", {packages:['corechart','table','annotatedtimeline']});\n"));
-            sb.append(HtmlUtils.importJS(fileUrl("/point/selectform.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/pointdata.js")));
             sb.append(HtmlUtils.comment("chart imports"));
             sb.append(HtmlUtils.importJS(fileUrl("/displaymanager.js")));

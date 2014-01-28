@@ -1241,9 +1241,6 @@ public class PointFormHandler extends RecordFormHandler {
         int numPointsToPlot = request.get(ARG_NUMPOINTS, TIMESERIES_POINTS);
 
         StringBuffer sb         = new StringBuffer();
-        sb.append(HtmlUtils.comment("Import js libs"));
-        sb.append(HtmlUtils.importJS(fileUrl("/point/selectform.js")));
-
         final List<RecordField> fields =
             pointEntry.getRecordFile().getChartableFields();
 
