@@ -157,17 +157,16 @@ input, password, fileinput,textarea,select {
 .display-text {
    overflow-y: auto;
    max-height: 300px;
-   border:1px #888888 solid; 
+   border:1px #ccc solid; 
 }
 
 .display-map {
 //  border:1px #888888 solid; 
-//  background-color:#7391ad; 
 //  width:400px; height:400px;
 }
 
 .display-multichart {
-    border: 1px #888888 solid;
+    border: 1px #ccc solid;
 }
 
 
