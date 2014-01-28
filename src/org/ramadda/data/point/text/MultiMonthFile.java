@@ -42,9 +42,10 @@ import java.util.List;
  */
 public class MultiMonthFile extends CsvFile {
 
-    /** _more_ */
-    private SimpleDateFormat sdf = makeDateFormat("yyyy-MM-dd HHmm");
-
+    String varName = null;
+    String varDesc = null;
+    double missing = -99.9;
+    String unit = "";
 
     /**
      * The constructor
@@ -53,11 +54,22 @@ public class MultiMonthFile extends CsvFile {
      * @throws IOException On badness
      */
     public MultiMonthFile(String filename) throws IOException {
-        super(filename);
+        this(filename, "index", "Index", "", -99.9);
     }
 
-
-
+    /**
+     * The constructor
+     *
+     * @param filename file
+     * @throws IOException On badness
+     */
+    public MultiMonthFile(String filename, String varName, String varDesc, String unit, double missing) throws IOException {
+        super(filename);
+        this.varName = varName;
+        this.varDesc = varDesc;
+        this.unit = unit;
+        this.missing = missing;
+    }
 
     /**
      * _more_
@@ -65,8 +77,8 @@ public class MultiMonthFile extends CsvFile {
      * @return _more_
      */
     public List<RecordField> doMakeFields() {
-        MultiMonthRecord record = new MultiMonthRecord(this, "temperature",
-                                      "Temperature", "deg C", -99.9);
+        MultiMonthRecord record = new MultiMonthRecord(this, varName,
+                                      varDesc, unit, missing);
 
         return record.getFields();
     }
@@ -80,8 +92,8 @@ public class MultiMonthFile extends CsvFile {
      * @return _more_
      */
     public Record doMakeRecord(VisitInfo visitInfo) {
-        MultiMonthRecord record = new MultiMonthRecord(this, "temperature",
-                                      "Temperature", "deg C", -99.9);
+        MultiMonthRecord record = new MultiMonthRecord(this, varName,
+                                      varDesc, unit, missing);
         record.setFirstDataLine(firstDataLine);
 
         return record;
