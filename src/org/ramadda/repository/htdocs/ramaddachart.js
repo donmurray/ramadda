@@ -374,6 +374,8 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                 var pointData = this.dataCollection.getData()[0];
                 this.hasDate = true;
 
+                var nonNullRecords = 0;
+
                 var indexField = this.indexField;
                 var allFields = this.allFields;
                 var records = pointData.getData();
@@ -417,7 +419,15 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                         }
                     }
                     //TODO: when its all null values we get some errors
+                    //                    console.log("values:" + values);
                     dataList.push(values);
+                    if(!allNull) {
+                        nonNullRecords++;
+                    }
+                }
+                if(nonNullRecords==0) {
+                    //                    console.log("Num non null:" + nonNullRecords);
+                    return [];
                 }
                 return dataList;
             },
@@ -614,6 +624,12 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 }
 
                 var dataList = this.getStandardData(selectedFields);
+
+                if(dataList.length==0) {
+                    $("#"+this.getDomId(ID_DISPLAY_CONTENTS)).html(htmlUtil.div(["class","display-message"],
+                                                                                "No data available"));
+                    return;
+                }
 
                 var chartType = this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
                 //

@@ -14,6 +14,30 @@ this gets it from the type_point super class
      <column  name="site_id"  type="enumerationplus" label="Site ID" cansearch="true"/>
      <column  name="site_name"  type="string" label="Site Name" cansearch="true"/>
      <column  name="argos_id"  type="enumerationplus" label="Argos ID" cansearch="true"/>
+<wiki_inner>
+<![CDATA[
+
+<table width="100%">
+
+<tr valign=top>
+<td width="50%">
+{{description}}
+{{information details="true"}}
+</td>
+<td wdith="50%">
+
+{{displaygroup  layoutType="columns"}}
+
+{{display type="linechart" fields="Temperature" title="Temperature"}}
+
+{{display type="linechart" fields="Pressure" title="Pressure"}}
+
+</td>
+</tr></table>
+]]>
+</wiki_inner>
+
+
   </type>
 
 

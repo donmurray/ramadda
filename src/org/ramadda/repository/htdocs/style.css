@@ -159,6 +159,11 @@ input, password, fileinput,textarea,select {
 }
 
 
+.display-message {
+     margin: 10px;
+}
+
+
 .display-text {
 }
 
