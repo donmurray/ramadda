@@ -15,7 +15,8 @@ var ID_MENU_POPUP = "menu_popup";
 var ID_MENU_INNER = "menu_inner";
 var ID_RELOAD = "reload";
 
-var PROP_CHART_FILTER = "chartFilter";
+var PROP_DISPLAY_FILTER = "displayFilter";
+
 var PROP_CHART_MIN = "chartMin";
 var PROP_CHART_MAX = "chartMax";
 var PROP_CHART_TYPE = "chartType";
@@ -417,7 +418,7 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
         }
         );
 
-        var filter = this.getProperty(PROP_CHART_FILTER);
+        var filter = this.getProperty(PROP_DISPLAY_FILTER);
         if(filter!=null) {
             //semi-colon delimited list of filter definitions
             //display.filter="filtertype:params;filtertype:params;

@@ -4270,7 +4270,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
 
         for (String arg : new String[] {
-            "eventSource", "name", "chartFilter", "chartMin", ARG_WIDTH,
+            "eventSource", "name", "displayFilter", "chartMin", ARG_WIDTH,
             ARG_HEIGHT, ARG_FROMDATE, ARG_TODATE, "column", "row"
         }) {
             String value = Misc.getProperty(props, arg, (String) null);
