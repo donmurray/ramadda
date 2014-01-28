@@ -22,31 +22,22 @@ this gets it from the type_point super class
 
 <table width=100% cellpadding=5>
 <tr valign=top>
-<td>
+<td width="30%">
+
 {{information  details="false"  }}
 
+{{list includeicon="true" details="false" entries="siblings,links"  message="" box.maxheight="200" box.class="entry-sidebox" prefix="====Related===="}}
+
 </td>
-<td>
-
-
-
-{{displaygroup layout.type="columns"}}
-
-{{display type="map" xwidth="300"  xheight="350"  listentries="false"  details="false"   layout.column="1" layout.fixed="false" }}
-
-{{display layout.row="0" fields="North" title="North" width="400" height="100" layout.column="0" layout.fixed="false"}}
-
-{{display layout.row="0" fields="East" title="East" width="400" height="100" layout.column="0" layout.fixed="false"}}
-
-{{display layout.row="0" fields="Vertical" title="Vertical" width="400" height="100" layout.column="0" layout.fixed="false"}}
-
-{{display type="text" layout.column="1" layout.fixed="true" }}
-
-
+<td width="70%">
+{{displaygroup layoutType="columns"}}
+{{display type="map"  height="350"  column="1" layoutFixed="false" }}
+{{display row="0" fields="North" title="North"  height="100" column="0" layoutFixed="false"}}
+{{display row="0" fields="East" title="East"  height="100" column="0" layoutFixed="false"}}
+{{display row="0" fields="Vertical" title="Vertical"  height="100" column="0" layoutFixed="false"}}
+{{display type="text" column="1" layoutFixed="true" }}
 </td>
 </tr></table>
-
-
 ]]>
 
 </wiki>
