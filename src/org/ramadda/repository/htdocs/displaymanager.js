@@ -73,7 +73,7 @@ function DisplayManager(id,properties) {
     $.extend(this, new DisplayThing(id, properties));
     $.extend(this, {
                 displays : [],
-                data : [],
+                dataList : [],
                 cnt : 0,
                 eventListeners: [],
                 layout:this.getProperty(PROP_LAYOUT_TYPE, LAYOUT_TABLE),
@@ -85,14 +85,17 @@ function DisplayManager(id,properties) {
                 this.initMapPoints = points;
                 this.initMapBounds = bounds;
             },
+            getData: function() {
+                return this.dataList;
+            },
            addDisplayEventListener: function(listener) {
                 this.eventListeners.push(listener);
             },
             handleMapClick: function (mapDisplay, lon, lat) {
                 var indexObj = [];
                 var records = null;
-                for(var i=0;i<this.data.length;i++) {
-                    var pointData = this.data[i];
+                for(var i=0;i<this.dataList.length;i++) {
+                    var pointData = this.dataList[i];
                     records = pointData.getData();
                     if(records!=null) break;
                 }
@@ -103,8 +106,8 @@ function DisplayManager(id,properties) {
                 }
             },
             handleRecordSelection: function(source, pointData, index) {
-                if(pointData ==null && this.data.length>0) {
-                    pointData = this.data[0];
+                if(pointData ==null && this.dataList.length>0) {
+                    pointData = this.dataList[0];
                 }
                 var fields =  pointData.getRecordFields();
                 var records = pointData.getData();
@@ -132,15 +135,18 @@ function DisplayManager(id,properties) {
 
                 for(var i=0;i< this.eventListeners.length;i++) {
                     eventListener = this.eventListeners[i];
+                    if(eventListener == source) continue;
                     var eventSource  = eventListener.getEventSource();
                     if(eventSource!=null && eventSource.length>0) {
                         if(eventSource!= source.getId() && eventSource!= source.getName()) {
-                            console.log("skipping:" + eventSource);
+                            //                            console.log("skipping:" + eventSource);
                             continue;
                         }
                     }
                     if(eventListener.handleRecordSelection) {
                         eventListener.handleRecordSelection(source, index, record, values);
+                    } else {
+                        //                        console.log("no handle func : " + eventListener.getId());
                     }
                 }
             },
@@ -293,14 +299,20 @@ function DisplayManager(id,properties) {
                         var column = display.getColumn();
                         if((""+column).length==0) column = 0;
                         while(cols.length<=column) {
-                            cols.push("");
+                            cols.push([]);
                         }
-                        cols[column] += display.getDisplay();
+                        cols[column].push(display.getDisplay());
                     }
                     html+=htmlUtil.openTag("table", ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "0"]);
                     html+=htmlUtil.openTag("tr", ["valign","top"]);
+                    var width = Math.round(100/cols.length)+"%";
                     for(var i=0;i<cols.length;i++) {
-                        html+=htmlUtil.tag("td", ["valign","top"], cols[i]);
+                        var rows = cols[i];
+                        var contents = "";
+                        for(var j=0;j<rows.length;j++) {
+                            contents+= rows[j];
+                        }
+                        html+=htmlUtil.tag("td", ["width", width, "valign","top"], contents);
                     }
                     html+= htmlUtil.closeTag("tr");
                     html+= htmlUtil.closeTag("table");
@@ -321,11 +333,31 @@ function DisplayManager(id,properties) {
                 }
                 this.doLayout();
             },
+            getDefaultData: function() {
+                if(this.dataList.length>0) {
+                    return  this.dataList[0];
+                }
+                return null;
+            },
+
             createDisplay: function(type, props) {
                 if(props == null) props ={};
+
                 if(props.data!=null) {
-                    this.data.push(props.data);
+                    var haveItAlready = false;
+                    for(var i=0;i<this.dataList.length;i++) {
+                        var existingData = this.dataList[i];
+                        if(existingData.equals(props.data)) {
+                            props.data = existingData;
+                            haveItAlready = true;
+                            break;
+                        }
+                    }
+                    if(!haveItAlready) {
+                        this.dataList.push(props.data);
+                    }
                 }
+
                 //Upper case the type name, e.g., linechart->Linechart
                 var proc = type.substring(0,1).toUpperCase() + type.substring(1);
 
@@ -353,11 +385,12 @@ function DisplayManager(id,properties) {
                 var myProps = {};
                 $.extend(myProps, props);
 
-                if(props.data==null && this.data.length>0) {
-                    props.data =  this.data[0];
+                if(props.data==null && this.dataList.length>0) {
+                    props.data =  this.dataList[0];
                 }
                 //                console.log("Calling:" + funcName);
                 var display =  eval(" new " + funcName+"(this, displayId, props);");
+                display.loadInitialData();
                 if(display == null) {
                     console.log("Error: could not create display using:" + funcName);
                     alert("Error: could not create display using:" + funcName);
@@ -367,20 +400,6 @@ function DisplayManager(id,properties) {
                 display.setDisplayManager(this);
                 this.addDisplayEventListener(display);
                 //                        display.handlePointDataLoaded(data);
-                this.doLayout();
-            },
-           createChart:function(pointData, chartType, props) {
-                var chartId = this.id +"_chart_" + (this.cnt++);
-                var myProps = {
-                    "xwidth":600,
-                    "xheight":200,
-                    PROP_CHART_TYPE: chartType};
-                myProps[PROP_CHART_TYPE] = chartType;
-                $.extend(myProps, props);
-                var chart =  new RamaddaMultiChart(this, chartId, myProps);
-                this.data.push(pointData);
-                this.displays.push(chart);
-                this.addDisplayEventListener(chart);
                 this.doLayout();
             },
             moveDisplayUp: function(display) {

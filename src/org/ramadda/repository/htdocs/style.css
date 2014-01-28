@@ -166,6 +166,11 @@ input, password, fileinput,textarea,select {
 //  width:400px; height:400px;
 }
 
+.display-multichart {
+    border: 1px #888888 solid;
+}
+
+
 .chart-menu {
   position: absolute;
   width: auto;

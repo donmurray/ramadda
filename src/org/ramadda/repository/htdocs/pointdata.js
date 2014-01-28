@@ -55,6 +55,9 @@ function DataCollection() {
 
 }
 
+
+var PointDataCnt = 0;
+
 /*
 This encapsulates some instance of point data. 
 name - the name of this data
@@ -68,6 +71,10 @@ function PointData(name, recordFields, data, url, properties) {
     this.xurl = url;
     this.properties = properties;
 
+
+    this.equals = function(that) {
+        return this.xurl == that.xurl;
+    }
 
     this.initWith = function(thatPointData) {
         this.recordFields = thatPointData.recordFields;

@@ -162,6 +162,8 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                     "</form>";
                 return htmlUtil.div(["class","display-fields"], form);
             },
+            loadInitialData: function() {
+            },
             getShowMenu: function() {
                 return this.getProperty(PROP_SHOW_MENU, true);
             },
@@ -277,6 +279,8 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
             },
             setTitle: function(title) {
                 $("#" +  this.getDomId(ID_HEADER)).html(title);
+            },
+            getType: function () {
             },
             getTitle: function () {
                 var title = this.getProperty("title");
@@ -444,6 +448,9 @@ function RamaddaMultiChart(displayManager, id, properties) {
     $.extend(this, {
             dataCollection: new DataCollection(),
             indexField: -1,
+            getType: function () {
+                return this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
+            },
             getMenuContents: function() {
                 return this.getFieldsDiv()+ this.getDisplayMenuContents();
             },
@@ -457,7 +464,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 if(height>0) {
                     extraStyle += " height:" + height +"px; ";
                 }
-                var html =  htmlUtil.div(["style", extraStyle, "id", this.getDomId(ID_DISPLAY_CONTENTS)],"");
+                var html =  htmlUtil.div(["class","display-multichart", "style", extraStyle, "id", this.getDomId(ID_DISPLAY_CONTENTS)],"");
                 return html;
             },
             initDisplay:function() {
@@ -559,21 +566,23 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 if(df.length==0 && firstField!=null) {
                     df.push(firstField);
                 }
-
                 return df;
             },
             handleRecordSelection: function(source, index, record, html) {
-                if(source==this) return;
                 var chartType = this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
+                if(source==this) {
+                    return;
+                }
                 if(this.chart!=null) {
-                    this.chart.setSelection([{row:index, column:null}]);
+                    this.chart.setSelection([{row:index, column:null}]); 
+                } else {
+                    //                    console.log(" no chart");
                 }
             },
             displayData: function() {
                 if(this.getShowTitle()) {
                     $("#" + this.getDomId(ID_TITLE)).html(this.getTitle());
                 }
-                var theChart = this;
                 if(!this.hasData()) {
                     if(this.chart !=null) {
                         this.chart.clearChart();
@@ -602,9 +611,11 @@ function RamaddaMultiChart(displayManager, id, properties) {
 
                 var dataTable = google.visualization.arrayToDataTable(dataList);
                 var options = {
+                    explorer: {},
                     series: [{targetAxisIndex:0},{targetAxisIndex:1},],
                     legend: { position: 'bottom' },
-                    chartArea:{left:50,top:10,height:"75%",width:"85%"}
+                    xchartArea:{left:50,top:10,height:"75%",width:"85%"},
+                    chartArea:{left:50,top:10,height:"60%",width:"85%"}
                 };
 
                 var min = this.getProperty(PROP_CHART_MIN,"");
@@ -613,10 +624,9 @@ function RamaddaMultiChart(displayManager, id, properties) {
                         minValue:min,
                     };
                 }
-
                 if(chartType == DISPLAY_BARCHART) {
                     options.orientation =  "horizontal";
-                    this.chart = new google.visualization.BarChart(document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
+                    this.chart = new google.visualization.BarChart(document.getElementById(this.getDomId(ID_DSIPLAY_CONTENTS)));
                 } else  if(chartType == DISPLAY_TABLE) {
                     this.chart = new google.visualization.Table(document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
                 } else {
@@ -631,21 +641,20 @@ function RamaddaMultiChart(displayManager, id, properties) {
                                                                             theDisplay.dataCollection.getData()[0], index);
                         });
                 }
-
-            }
-        });
-
-
-    var testUrl = null;
-    //Uncomment to test using  "/repository/test.json";
-    if(properties.data!=null) {
-        this.title = properties.data.getName();
-        if(testUrl!=null) {
-            properties.data = new PointData("Test",null,null,testUrl);
-        }
-        this.addOrLoadData(properties.data);
-    }
+            },
+            loadInitialData: function() {
+                var testUrl = null;
+                //Uncomment to test using  "/repository/test.json";
+                if(this.properties.data!=null) {
+                    this.title = this.properties.data.getName();
+                    if(testUrl!=null) {
+                        this.properties.data = new PointData("Test",null,null,testUrl);
+                    }
+                    this.addOrLoadData(this.properties.data);
+                }
+            }});
 }
+
 
 
 function LinechartDisplay(displayManager, id, properties) {
@@ -812,6 +821,7 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
             running: false,
             timestamp: 0,
             index: 0,              
+            sleepTime: 500,
             toggle: function() {
                 if(this.running) {
                     this.stop();
@@ -822,10 +832,27 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
             tick: function() {
                 if(!this.running) return;
                 this.index++;
-                $("#" + this.getDomId(ID_TIME)).html("Index:" + this.index);
+                var data = this.displayManager.getDefaultData();
+                if(data == null) return;
+                var records = data.getData();
+                if(records == null) {
+                    $("#" + this.getDomId(ID_TIME)).html("no records");
+                    return;
+                }
+                if(this.index>=records.length) {
+                    this.index = 0;
+                }
+                var record = records[this.index];
+                var label = "";
+                if(record.getDate()!=null) {
+                    label += htmlUtil.b("Date:") + " "  + record.getDate();
+                } else {
+                    label += htmlUtil.b("Index:") +" " + this.index;
+                }
+                $("#" + this.getDomId(ID_TIME)).html(label);
                 this.displayManager.handleRecordSelection(this, null, this.index);
                 var theAnimation = this;
-                setTimeout(function() {theAnimation.tick();}, 2000);
+                setTimeout(function() {theAnimation.tick();}, this.sleepTime);
             },
             start: function() {
                 if(this.running) return;
@@ -846,7 +873,7 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
                 var html =  htmlUtil.div(["class","wiki-h2"],"Animation");
                 var get = "getRamaddaDisplay('" + this.id +"')";
                 html+=  htmlUtil.onClick(get +".toggle();", htmlUtil.image(root+"/icons/control_play_blue.png",["width","32", "id", this.getDomId(ID_START)]));
-                html += "<br>";
+                html += "<p>";
                 html+=  htmlUtil.div(["id", this.getDomId(ID_TIME)],"&nbsp;");
                 $("#" + this.getDomId(ID_TITLE)).html(this.getTitle());
                 $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(htmlUtil.div(["class","display-text"], html));
