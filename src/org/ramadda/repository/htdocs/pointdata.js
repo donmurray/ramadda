@@ -53,87 +53,95 @@ name - the name of this data
 recordFields - array of RecordField objects that define the metadata
 data - array of Record objects holding the data
 */
+
 function PointData(name, recordFields, data, url, properties) {
-    this.name = name;
-    this.recordFields = recordFields;
-    this.data = data;
-    this.xurl = url;
-    this.properties = properties;
+    $.extend(this, {
+            mycnt: PointDataCnt++,
+            name : name,
+            recordFields : recordFields,
+            data : data,
+            url : url,
+            properties : properties,
+            loadingCnt: 0,
+            initWith : function(thatPointData) {
+                this.recordFields = thatPointData.recordFields;
+                this.data = thatPointData.data;
+            },
+            equals : function(that) {
+                return this.url == that.url;
+            },
+            hasData : function() {
+                return this.data!=null;
+            },
+            getIsLoading: function() {
+                return this.loadingCnt>0;
+            },
+            startLoading: function() {
+                this.loadingCnt++;
+            },
+            stopLoading: function() {
+                this.loadingCnt--;
+            },
+            clear: function() {
+                this.data = null;
+            },
+            getProperties : function() {
+                return this.properties;
+            },
+            getProperty : function(key, dflt) {
+                if(typeof this.properties == 'undefined') {
+                    return dflt;
+                }
+                var value = this.properties[key];
+                if(value == null) return dflt;
+                return value;
+            },
 
+                getRecordFields : function() {
+                return this.recordFields;
+            },
+                getNumericFields : function() {
+                var numericFields = [];
+                for(var i=0;i<this.recordFields.length;i++) {
+                    var field = this.recordFields[i];
+                    if(field.isNumeric) numericFields.push(field);
+                }
+                return numericFields;
+            },
+                getChartableFields : function() {
+                var numericFields = [];
+                var skip = /(TIME|HOUR|MINUTE|SECOND|YEAR|MONTH|DAY|LATITUDE|LONGITUDE|ELEVATION)/g;
+                for(var i=0;i<this.recordFields.length;i++) {
+                    var field = this.recordFields[i];
+                    if(!field.isNumeric || !field.isChartable()) {
+                        continue;
+                    }
+                    var ID = field.getId().toUpperCase() ;
+                    if(ID.match(skip)) {
+                        continue;
+                    }
+                    numericFields.push(field);
+                }
+                return numericFields;
+            },
 
-    this.equals = function(that) {
-        return this.xurl == that.xurl;
-    }
+                getData : function() {
+                return this.data;
+            },
+                getUrl : function() {
+                return this.url;
+            },
+                getName : function() {
+                return this.name;
+            },
 
-    this.initWith = function(thatPointData) {
-        this.recordFields = thatPointData.recordFields;
-        this.data = thatPointData.data;
-    }
-
-    this.hasData = function() {
-        return this.data!=null;
-    }
-    this.clear= function() {
-        this.data = null;
-    }
-
-    this.getProperties = function() {
-        return this.properties;
-    }
-
-
-    this.getProperty = function(key, dflt) {
-        if(typeof this.properties == 'undefined') {
-            return dflt;
-        }
-        var value = this.properties[key];
-        if(value == null) return dflt;
-        return value;
-    }
-
-    this.getRecordFields = function() {
-        return this.recordFields;
-    }
-    this.getNumericFields = function() {
-        var numericFields = [];
-        for(var i=0;i<this.recordFields.length;i++) {
-            var field = this.recordFields[i];
-            if(field.isNumeric) numericFields.push(field);
-        }
-        return numericFields;
-    }
-    this.getChartableFields = function() {
-        var numericFields = [];
-        var skip = /(TIME|HOUR|MINUTE|SECOND|YEAR|MONTH|DAY|LATITUDE|LONGITUDE|ELEVATION)/g;
-        for(var i=0;i<this.recordFields.length;i++) {
-            var field = this.recordFields[i];
-            if(!field.isNumeric || !field.isChartable()) {
-                continue;
+                getTitle : function() {
+                if(this.data !=null && this.data.length>0)
+                    return this.name +" - " + this.data.length +" points";
+                return this.name;
             }
-            var ID = field.getId().toUpperCase() ;
-            if(ID.match(skip)) {
-                continue;
-            }
-            numericFields.push(field);
-        }
-        return numericFields;
-    }
+        });
 
-    this.getData = function() {
-        return this.data;
-    }
-    this.getUrl = function() {
-        return this.xurl;
-    }
-    this.getName = function() {
-        return this.name;
-    }
-
-    this.getTitle = function() {
-        if(this.data !=null && this.data.length>0)
-            return this.name +" - " + this.data.length +" points";
-        return this.name;
-    }
 
 }
 
@@ -334,17 +342,23 @@ function getRanges(fields,data) {
 }
 
 
+var cnt =0;
 function loadPointJson(url, theChart, pointData) {
-    console.log("json url:" + url);
+    var timestamp = cnt++;
+    console.log("loadPointJson url:" + url);
+    pointData.startLoading();
     var jqxhr = $.getJSON( url, function(data) {
             var newPointData =    makePointData(data);
             pointData.initWith(newPointData);
             theChart.pointDataLoaded(pointData);
+            pointData.stopLoading();
+            console.log("loadPointJson: id: " + pointData.mycnt +" done");
         })
         .fail(function(jqxhr, textStatus, error) {
                 var err = textStatus + ", " + error;
                 alert("JSON error:" + err);
                 console.log("JSON error:" +err);
+                pointData.stopLoading();
             });
 }
 

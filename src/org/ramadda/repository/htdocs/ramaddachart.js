@@ -235,7 +235,7 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                 html += htmlUtil.openTag("table", ["width",tableWidth, "cellpadding","0", "cellspacing","0"]);
                 html += htmlUtil.openTag("tr", ["valign", "bottom"]);
                 if(this.getShowTitle()) {
-                    html += htmlUtil.td(["id",this.getDomId(ID_TITLE)], htmlUtil.b(this.getTitle()));
+                    html += htmlUtil.td([], htmlUtil.div(["class","display-title","id",this.getDomId(ID_TITLE)], this.getTitle()));
                 } else {
                     html += htmlUtil.td([], "");
                 }
@@ -324,16 +324,30 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                     this.addOrLoadData(pointData);
                 }
             },
-            addOrLoadData: function(pointData) {
+            addOrLoadData: function(pointData, secondTime) {
+                /**** For caching but not right now
+                var theDisplay = this;
+                var firstTime = !secondTime;
+                console.log("addOrLoadData first call=" + firstTime);
+                if(firstTime && pointData.getIsLoading()) {
+                    console.log("waiting on point data to load");
+                    setTimeout(function() {theDisplay.addOrLoadData(pointData, true);}, 5000);
+                    return;
+                }
+                */
+
                 if(pointData.hasData()) {
                     this.addData(pointData);
-                } else {
-                    var jsonUrl = pointData.getUrl();
-                    if(jsonUrl!=null) {
-                        jsonUrl = this.displayManager.getJsonUrl(jsonUrl, this);
-                        loadPointJson(jsonUrl, this, pointData);
-                    }
+                    return;
+                } 
+
+
+                var jsonUrl = pointData.getUrl();
+                if(jsonUrl!=null) {
+                    jsonUrl = this.displayManager.getJsonUrl(jsonUrl, this);
+                    loadPointJson(jsonUrl, this, pointData);
                 }
+
             },
            getFieldsDiv: function() {
                 var height = this.getProperty(PROP_HEIGHT,"400");
@@ -683,15 +697,21 @@ function RamaddaTextDisplay(displayManager, id, properties) {
     $.extend(this, new RamaddaDisplay(displayManager, id, properties));
     addRamaddaDisplay(this);
     $.extend(this, {
-            html: "<p>&nbsp;&nbsp;&nbsp;Selection&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<p>&nbsp;<p> ",
+            html: "<p>&nbsp;<p>&nbsp;<p>",
             initDisplay: function() {
                 this.checkFixedLayout();
                 this.initMenu();
-                $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(htmlUtil.div(["class","display-text"], this.html));
+                this.setContents(htmlUtil.div(["class","display-text-inner"], this.html));
             },
             handleRecordSelection: function(source, index, record, html) {
                 this.html  = html;
-                $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(htmlUtil.div(["class","display-text"], this.html));
+                this.setContents(htmlUtil.div(["class","display-text-inner"], html));
+            },
+            setContents: function(contents) {
+                var html =  htmlUtil.div(["class","display-title"],"Text Readout");
+                html += contents;
+                $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(htmlUtil.div(["class","display-text"], html));
+                
             }
         });
 }

@@ -154,10 +154,18 @@ input, password, fileinput,textarea,select {
     min-height :16px;
 }
 
+.display-title {
+   font-weight: bold; 
+}
+
+
 .display-text {
+}
+
+.display-text-inner {
+   border:1px #ccc solid; 
    overflow-y: auto;
    max-height: 300px;
-   border:1px #ccc solid; 
 }
 
 .display-map {
