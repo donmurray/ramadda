@@ -64,14 +64,20 @@ public class NoaaPsdMonthlyClimateIndexTypeHandler extends PointTypeHandler {
         if (description == null || description.isEmpty()) {
             description = name;
         }
-        Object[] values = entry.getValues();
+        String units = "";
+        Double missing = -99.9;
         /* Values are:
          *    0 - number of points
          *    1 - properties string
          *    2 - missing value
          *    3 - units
          */
-        RecordFile myRF = new MultiMonthFile(loc, name, description, (String) values[3], (Double) values[2]);
+        Object[] values = entry.getValues();
+        if (values != null)  {
+            if (values[3] != null) units =  (String) values[3];
+            if (values[2] != null) missing =  (Double) values[2];
+        }
+        RecordFile myRF = new MultiMonthFile(loc, name, description, units, missing);
         return myRF;
     }
     

@@ -59,7 +59,7 @@ this gets it from the type_point super class
      <property name="icon" value="/point/noaa.gif"/>
      <property name="record.file.class" value="org.ramadda.data.point.text.MultiMonthFile"/>
      <column  name="missing_value"  type="double" label="Missing Value" cansearch="false"/>
-     <column  name="unit"  type="string" label="Unit" cansearch="false"/>
+     <column  name="units"  type="string" label="Units" cansearch="true"/>
   </type>
 
 
