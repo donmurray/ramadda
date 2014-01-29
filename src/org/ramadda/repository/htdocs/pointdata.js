@@ -195,6 +195,7 @@ function init_RecordField(recordField) {
         return this.id;
     }
     recordField.getLabel = function() {
+        if(this.label == null || this.label.length==0) return this.id;
         return this.label;
     }
     recordField.getType = function() {
