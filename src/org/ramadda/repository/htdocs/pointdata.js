@@ -352,7 +352,7 @@ function loadPointJson(url, theChart, pointData) {
             pointData.initWith(newPointData);
             theChart.pointDataLoaded(pointData);
             pointData.stopLoading();
-            console.log("loadPointJson: id: " + pointData.mycnt +" done");
+            //            console.log("loadPointJson: id: " + pointData.mycnt +" done");
         })
         .fail(function(jqxhr, textStatus, error) {
                 var err = textStatus + ", " + error;

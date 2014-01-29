@@ -161,7 +161,7 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                     "<tr><td align=right></td><td> " + deleteMe+ "</td></tr>" +
                     "</table>" +
                     "</form>";
-                return htmlUtil.div(["class","display-fields"], form);
+                return htmlUtil.div([], form);
             },
             loadInitialData: function() {
             },
@@ -171,32 +171,51 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
             getShowTitle: function() {
                 return this.getProperty(PROP_SHOW_TITLE, true);
             },
+            setDisplayProperty: function(key,value) {
+                this.setProperty(key, value);
+                $("#" + this.getDomId(key)).val(value);
+            },
             deltaColumn: function(delta) {
-                var column = this.getProperty("column",0);
+                var column = parseInt(this.getProperty("column",0));
                 column += delta;
                 if(column<0) column = 0;
-                this.setProperty("column",column);
+                this.setDisplayProperty("column",column);
+                this.displayManager.doLayout();
+            },
+            deltaRow: function(delta) {
+                var row = parseInt(this.getProperty("row",0));
+                row += delta;
+                if(row<0) row = 0;
+                this.setDisplayProperty("row",row);
                 this.displayManager.doLayout();
             },
             moveDisplayRight: function() {
                 if(this.displayManager.layout == LAYOUT_COLUMNS) {
                     this.deltaColumn(1);
                 } else {
-                    this.moveDisplayUp();
+                    this.displayManager.moveDisplayDown(this);
                 }
             },
             moveDisplayLeft: function() {
                 if(this.displayManager.layout == LAYOUT_COLUMNS) {
                     this.deltaColumn(-1);
                 } else {
-                    this.moveDisplayDown();
+                    this.displayManager.moveDisplayUp(this);
                 }
             },
             moveDisplayUp: function() {
-                this.displayManager.moveDisplayUp(this);
+                if(this.displayManager.layout == LAYOUT_ROWS) {
+                    this.deltaRow(-1);
+                } else {
+                    this.displayManager.moveDisplayUp(this);
+                }
             },
             moveDisplayDown: function() {
-                this.displayManager.moveDisplayDown(this);
+                if(this.displayManager.layout == LAYOUT_ROWS) {
+                    this.deltaRow(1);
+                } else {
+                    this.displayManager.moveDisplayDown(this);
+                }
             },
             getMenuContents: function() {
                 return this.getDisplayMenuContents();
@@ -265,6 +284,8 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                 this.getColumn();
                 this.getWidth();
                 this.getHeight();
+                this.getName();
+                this.getEventSource();
             },
             getColumn: function() {
                 return this.getFormValue("column",0);
@@ -532,16 +553,21 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 }
                 //        this.setTitle(this.getTitle());
 
-                var html =  htmlUtil.openTag("div", ["class", "chart-fields-inner"]);
+                var html =  null;
                 var checkboxClass = this.id +"_checkbox";
                 var dataList =  this.dataCollection.getData();
                 for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
                     var pointData = dataList[collectionIdx];
                     var fields =pointData.getChartableFields();
-
                     fields = RecordFieldSort(fields);
-                    html+= htmlUtil.tag("b", [],  "Fields");
-                    html+= "<br>";
+                    if(html == null) {
+                        html = htmlUtil.tag("b", [],  "Fields");
+                        html += htmlUtil.openTag("div", ["class", "display-fields"]);
+                    } else {
+                        html+= "<br>";
+                    }
+
+
                     for(i=0;i<fields.length;i++) { 
                         var field = fields[i];
                         field.checkboxId  = this.getDomId("cbx_" + collectionIdx +"_" +i);
@@ -551,7 +577,11 @@ function RamaddaMultiChart(displayManager, id, properties) {
                                              );
                     }
                 }
-                html+= htmlUtil.closeTag("div");
+                if(html == null) {
+                    html = "";
+                } else {
+                    html+= htmlUtil.closeTag("div");
+                }
 
                 $("#" + this.getDomId(ID_FIELDS)).html(html);
 
@@ -639,7 +669,22 @@ function RamaddaMultiChart(displayManager, id, properties) {
                     return;
                 }
 
+                var min = this.getProperty(PROP_CHART_MIN,"");
+
+                var chartOptions = {};
+                chartOptions.vAxes = {};
                 var dataList = this.getStandardData(selectedFields);
+
+                for(var i in selectedFields) {
+                    var field = selectedFields[i];
+                    chartOptions.vAxes[i] = {};
+                    if(min!="") {
+                        chartOptions.vAxes[i].minValue = min;
+                    }
+                    //chartOptions.vAxes[i].format =  i + ' #,###';
+                }
+
+
 
                 if(dataList.length==0) {
                     $("#"+this.getDomId(ID_DISPLAY_CONTENTS)).html(htmlUtil.div(["class","display-message"],
@@ -657,22 +702,23 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 }
 
                 var dataTable = google.visualization.arrayToDataTable(dataList);
-                var options = {
+                //                chartOptions = {};
+                var width = "95%";
+                if(selectedFields.length>1) {
+                    width = "80%";
+                }
+                $.extend(chartOptions, {
                     explorer: {},
                     series: [{targetAxisIndex:0},{targetAxisIndex:1},],
                     legend: { position: 'bottom' },
-                    xchartArea:{left:50,top:10,height:"75%",width:"85%"},
-                    chartArea:{left:50,top:10,height:"60%",width:"85%"}
-                };
+                    chartArea:{left:75,top:10,height:"60%",width:width}
+                    });
 
-                var min = this.getProperty(PROP_CHART_MIN,"");
-                if(min!="") {
-                    options.vAxis = {
-                        minValue:min,
-                    };
-                }
+
+                
+
                 if(chartType == DISPLAY_BARCHART) {
-                    options.orientation =  "horizontal";
+                    chartOptions.orientation =  "horizontal";
                     this.chart = new google.visualization.BarChart(document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
                 } else  if(chartType == DISPLAY_TABLE) {
                     this.chart = new google.visualization.Table(document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
@@ -680,7 +726,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                     this.chart = new google.visualization.LineChart(document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
                 }
                 if(this.chart!=null) {
-                    this.chart.draw(dataTable, options);
+                    this.chart.draw(dataTable, chartOptions);
                     var theDisplay = this;
                     google.visualization.events.addListener(this.chart, 'select', function() {
                             var index = theDisplay.chart.getSelection()[0].row;
@@ -729,20 +775,17 @@ function RamaddaTextDisplay(displayManager, id, properties) {
     $.extend(this, new RamaddaDisplay(displayManager, id, properties));
     addRamaddaDisplay(this);
     $.extend(this, {
-            html: "<p>&nbsp;<p>&nbsp;<p>",
             initDisplay: function() {
                 this.checkFixedLayout();
                 this.initMenu();
-                this.setContents(htmlUtil.div(["class","display-text-inner"], this.html));
+                this.setInnerContents("<p>&nbsp;<p>&nbsp;<p>");
             },
             handleRecordSelection: function(source, index, record, html) {
-                this.html  = html;
-                this.setContents(htmlUtil.div(["class","display-text-inner"], html));
+                this.setInnerContents(html);
             },
-            setContents: function(contents) {
-                var html =  htmlUtil.div(["class","display-title"],"Text Readout");
-                html += contents;
-                $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(htmlUtil.div(["class","display-text"], html));
+            setInnerContents: function(contents) {
+                contents = htmlUtil.div(["class","display-text-inner"], contents);
+                $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(htmlUtil.div(["class","display-text"], contents));
                 
             }
         });
@@ -754,9 +797,8 @@ function RamaddaMapDisplay(displayManager, id, properties) {
     var ID_LATFIELD  = "latfield";
     var ID_LONFIELD  = "lonfield";
     var ID_MAP = "map";
-    addRamaddaDisplay(this);
-
     $.extend(this, new RamaddaDisplay(displayManager, id, properties));
+    addRamaddaDisplay(this);
     $.extend(this, {
             initBounds:displayManager.initMapBounds,
             initPoints:displayManager.initMapPoints,
@@ -907,6 +949,13 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
                 var theAnimation = this;
                 setTimeout(function() {theAnimation.tick();}, this.sleepTime);
             },
+            faster: function() {
+                this.sleepTime = this.sleepTime/2;
+                if(this.sleepTime==0) this.sleepTime  = 100;
+            },
+            slower: function() {
+                this.sleepTime = this.sleepTime*1.5;
+            },
             start: function() {
                 if(this.running) return;
                 this.running = true;
@@ -921,11 +970,15 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
                 $("#"+this.getDomId(ID_START)).attr("src",root+"/icons/control_play_blue.png");
             },
             initDisplay: function() {
+                this.stop();
                 this.checkFixedLayout();
                 this.initMenu();
                 var html =  htmlUtil.div(["class","wiki-h2"],"Animation");
                 var get = "getRamaddaDisplay('" + this.id +"')";
                 html+=  htmlUtil.onClick(get +".toggle();", htmlUtil.image(root+"/icons/control_play_blue.png",["width","32", "id", this.getDomId(ID_START)]));
+                html+=  htmlUtil.onClick(get +".faster();", "faster");
+                html +="  ";
+                html+=  htmlUtil.onClick(get +".slower();", "slower");
                 html += "<p>";
                 html+=  htmlUtil.div(["id", this.getDomId(ID_TIME)],"&nbsp;");
                 $("#" + this.getDomId(ID_TITLE)).html(this.getTitle());
