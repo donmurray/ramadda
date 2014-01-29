@@ -356,7 +356,7 @@ function loadPointJson(url, theChart, pointData) {
         })
         .fail(function(jqxhr, textStatus, error) {
                 var err = textStatus + ", " + error;
-                alert("JSON error:" + err);
+                //                alert("JSON error:" + err);
                 console.log("JSON error:" +err);
                 pointData.stopLoading();
             });

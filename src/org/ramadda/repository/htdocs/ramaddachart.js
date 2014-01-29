@@ -372,13 +372,30 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                 //These are Record objects 
                 //TODO: handle multiple data sources (or not?)
                 var pointData = this.dataCollection.getData()[0];
-                this.hasDate = true;
-
                 var nonNullRecords = 0;
-
                 var indexField = this.indexField;
                 var allFields = this.allFields;
                 var records = pointData.getData();
+
+                //Check if there are dates and if they are different
+                this.hasDate = false;
+                var lastDate = null;
+                for(j=0;j<records.length;j++) { 
+                    var record = records[j];
+                    var date = record.getDate();
+                    if(date==null) {
+                        continue;
+                    }
+                    if(lastDate!=null && lastDate.getTime()!=date.getTime()) {
+                        this.hasDate = true;
+                        break
+                    }
+                    lastDate = date;
+                }
+
+
+
+
                 for(j=0;j<records.length;j++) { 
                     var record = records[j];
                     var values = [];
@@ -391,12 +408,11 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                         }
                         values.push(value);
                     } else {
-                        if(date!=null) {
+                        if(this.hasDate) {
                             date = new Date(date);
                             values.push(date);
                         } else {
                             if(j==0) {
-                                this.hasDate = false;
                                 fieldNames[0] = "Index";
                             }
                             values.push(j);
