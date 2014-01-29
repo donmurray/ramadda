@@ -22,6 +22,31 @@ public class NoaaPsdMonthlyClimateIndexTypeHandler extends PointTypeHandler {
         // TODO Auto-generated constructor stub
     }
     
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @throws Exception On badness
+     */
+    @Override
+    public void initializeNewEntry(Entry entry) throws Exception {
+        super.initializeNewEntry(entry);
+        // override to set the missing value from the file/url
+        String loc = entry.getResource().getPath();
+        Object[] values = entry.getValues();
+        /* Values are:
+         *    0 - number of points
+         *    1 - properties string
+         *    2 - missing value
+         *    3 - units
+         */
+        double missingValue = readMissingValue(loc);
+        if (!Double.isNaN(missingValue)) {
+            values[2] = new Double(missingValue);
+            entry.setValues(values);
+        }
+    }
     
     /**
      * _more_
@@ -35,7 +60,6 @@ public class NoaaPsdMonthlyClimateIndexTypeHandler extends PointTypeHandler {
     public RecordFile doMakeRecordFile(Entry entry) throws Exception {
         String name = entry.getName();
         String loc = entry.getResource().getPath();
-        String loc2 = entry.getFile().toString();
         String description = entry.getDescription();
         if (description == null || description.isEmpty()) {
             description = name;
@@ -45,17 +69,14 @@ public class NoaaPsdMonthlyClimateIndexTypeHandler extends PointTypeHandler {
          *    0 - number of points
          *    1 - properties string
          *    2 - missing value
+         *    3 - units
          */
-        double missingValue = readMissingValue(loc);
-        values[2] = new Double(missingValue);
-        entry.setValues(values);
-        //return super.doMakeRecordFile(entry);
-        RecordFile myRF = new MultiMonthFile(loc, name, description, "", missingValue);
+        RecordFile myRF = new MultiMonthFile(loc, name, description, (String) values[3], (Double) values[2]);
         return myRF;
     }
     
     private double readMissingValue(String loc) throws Exception {
-        double missing = -99.9;
+        double missing = Double.NaN;
         String contents = IOUtil.readContents(loc);
         List<String> lines = StringUtil.split(contents,"\n",true,true);
         Iterator<String> iter = lines.iterator();
