@@ -4187,7 +4187,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             sb.append(HtmlUtils.importJS(fileUrl("/pointdata.js")));
             sb.append(HtmlUtils.comment("chart imports"));
             sb.append(HtmlUtils.importJS(fileUrl("/displaymanager.js")));
-            sb.append(HtmlUtils.importJS(fileUrl("/ramaddachart.js")));
+            sb.append(HtmlUtils.importJS(fileUrl("/display.js")));
+            sb.append(HtmlUtils.importJS(fileUrl("/displayext.js")));
         }
 
         sb.append(HtmlUtils.comment("start chart"));

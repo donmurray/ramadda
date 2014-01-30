@@ -35,6 +35,8 @@ var DISPLAY_BARCHART = "barchart";
 var DISPLAY_TABLE = "table";
 var DISPLAY_MAP = "map";
 var DISPLAY_TEXT = "text";
+var DISPLAY_ANIMATION = "animation";
+var DISPLAY_OPERANDS = "operands";
 
 
 function addRamaddaDisplay(display) {
@@ -124,9 +126,10 @@ function DisplayThing(id, properties) {
 
 
 
-function RamaddaDisplay(displayManager, id, propertiesArg) {
+function RamaddaDisplay(displayManager, id, type, propertiesArg) {
     $.extend(this, new DisplayThing(id, propertiesArg));
     $.extend(this, {
+            type: type,
             displayManager:displayManager,
             filters: [],
             setDisplayManager: function(cm) {
@@ -510,7 +513,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 vAxisMinValue:NaN,
                 vAxisMaxValue:NaN
                 });
-    var parent = new RamaddaDisplay(displayManager, id, properties);
+    var parent = new RamaddaDisplay(displayManager, id, getType(), properties);
     RamaddaSuper(this, parent);
     $.extend(this, {
             dataCollection: new DataCollection(),
@@ -789,7 +792,7 @@ function TableDisplay(displayManager, id, properties) {
 
 
 function RamaddaTextDisplay(displayManager, id, properties) {
-    $.extend(this, new RamaddaDisplay(displayManager, id, properties));
+    $.extend(this, new RamaddaDisplay(displayManager, id, DISPLAY_TEXT, properties));
     addRamaddaDisplay(this);
     $.extend(this, {
             initDisplay: function() {
@@ -814,7 +817,7 @@ function RamaddaMapDisplay(displayManager, id, properties) {
     var ID_LATFIELD  = "latfield";
     var ID_LONFIELD  = "lonfield";
     var ID_MAP = "map";
-    $.extend(this, new RamaddaDisplay(displayManager, id, properties));
+    $.extend(this, new RamaddaDisplay(displayManager, id, DISPLAY_MAP, properties));
     addRamaddaDisplay(this);
     $.extend(this, {
             initBounds:displayManager.initMapBounds,
@@ -927,7 +930,7 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
     var ID_START = "start";
     var ID_STOP = "stop";
     var ID_TIME = "time";
-    $.extend(this, new RamaddaDisplay(displayManager, id, properties));
+    $.extend(this, new RamaddaDisplay(displayManager, id, DISPLAY_ANIMATION, properties));
     addRamaddaDisplay(this);
     $.extend(this, {
             running: false,
@@ -1044,7 +1047,7 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
     $.extend(this, {
             entryType: null,
                 entryParent: null});
-    $.extend(this, new RamaddaDisplay(displayManager, id, properties));
+    $.extend(this, new RamaddaDisplay(displayManager, id, DISPLAY_OPERANDS, properties));
     addRamaddaDisplay(this);
     $.extend(this, {
             initDisplay: function() {
