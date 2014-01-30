@@ -212,22 +212,40 @@ function DerivedPointData(displayManager, name, pointDataList, operation) {
             combineData: function(pointData1, pointData2) {
                 var records1 = pointData1.getRecords();
                 var records2 = pointData2.getRecords();
-                var newRecords;
+                var newRecords = [];
                 var newRecordFields;
 
-                //TODO:  combine the 2 record arrays
-                //The operation is set from the operands display ramaddachart.js 
+                //TODO:  we really need visad here to sample
+
+                if(records1.length!=records2.length) {
+                    console.log("bad records:" + records1.length +" " + records2.length);
+                }
 
                 if(this.operation == "average") {
+                    for(var recordIdx=0;recordIdx<records1.length;recordIdx++) {
+                        var record1 = records1[recordIdx];
+                        var record2 = records2[recordIdx];
+                        if(record1.getDate()!=record2.getDate()) {
+                            console.log("Bad record date:" + record1.getDate() + " " + record2.getDate());
+                            break;
+                        }
+                        var newRecord = $.extend(true, {}, record1);
+                        var data1 = newRecord.getData();
+                        var data2 = record2.getData();
+                        for(var colIdx=0;colIdx<data1.length;colIdx++) {
+                            data1[colIdx]= (data1[colIdx]+data2[colIdx])/2;
+                        }
+                        newRecords.push(newRecord);
+                    }
+                    newRecordFields = pointData1.getRecordFields();
                 } else  if(this.operation == "other func") {
                 }
 
-
-                //for now just use the first operand
-                newRecords = records1;
-                newRecordFields = pointData1.getRecordFields();
-
-
+                if(newRecordFields==null) {
+                    //for now just use the first operand
+                    newRecords = records1;
+                    newRecordFields = pointData1.getRecordFields();
+                }
                 return {records: newRecords,
                         recordFields: newRecordFields};
             },
