@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -60,6 +60,9 @@ public class BitmaskRecordFilter implements RecordFilter {
         mask        = 1 << bitNumber;
         this.value  = value;
         this.attrId = attrId;
+        System.err.println("BitmaskRecordFilter: bitNumber:" + bitNumber
+                           + " " + value + " attrId:" + attrId + " mask= "
+                           + mask);
     }
 
 
@@ -72,14 +75,22 @@ public class BitmaskRecordFilter implements RecordFilter {
      * @return _more_
      */
     public boolean isRecordOk(Record record, VisitInfo visitInfo) {
-        int v = (int) record.getValue(attrId);
-        if ((v & mask) == 0) {
-            return value;
+        int     v        = (int) record.getValue(attrId);
+        boolean bitSet   = (v & mask) != 0;
+        boolean recordOk = false;
+        if (bitSet) {
+            recordOk = value;
+        } else {
+            recordOk = !value;
         }
 
-        return !value;
+        //        if(pcnt++<50) {
+        //            System.err.println ("BitmaskRecordFilter.isRecordOk: bit set: " + bitSet +" " + value +" value=" + v +" record:" + record.getValue(attrId-1) +"  OK:" + recordOk);
+        //        }
+        return recordOk;
     }
 
-
+    /** _more_          */
+    int pcnt = 0;
 
 }

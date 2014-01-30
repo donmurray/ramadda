@@ -638,8 +638,12 @@ public class PointOutputHandler extends RecordOutputHandler {
                 info.setCurrentStatus("Staging request...");
 
                 memoryCheck("POINT: memory before:");
+                VisitInfo visitInfo = new VisitInfo(VisitInfo.QUICKSCAN_NO);
+                if (request.exists(ARG_MAX)) {
+                    visitInfo.setMax(request.get(ARG_MAX, 1000));
+                }
                 getRecordJobManager().visitSequential(request, pointEntries,
-                        groupVisitor, new VisitInfo(VisitInfo.QUICKSCAN_NO));
+                        groupVisitor, visitInfo);
                 if ( !jobOK(jobId)) {
                     return result;
                 }
@@ -751,8 +755,7 @@ public class PointOutputHandler extends RecordOutputHandler {
         }
 
         if (outputType.equals(OUTPUT_CHART)) {
-            return outputEntryChart(request,
-                                    outputType, entry);
+            return outputEntryChart(request, outputType, entry);
         }
 
         if (outputType.equals(OUTPUT_WAVEFORM)) {
@@ -811,7 +814,7 @@ public class PointOutputHandler extends RecordOutputHandler {
      *
      * @param request the request
      * @param outputType otuput type
-     * @param pointEntry The entry
+     * @param entry _more_
      *
      * @return ramadda result
      *
@@ -820,17 +823,17 @@ public class PointOutputHandler extends RecordOutputHandler {
     public Result outputEntryChart(Request request, OutputType outputType,
                                    Entry entry)
             throws Exception {
-        StringBuffer sb = new StringBuffer();
-        String url = getJsonUrl(request, entry);
-        String name = entry.getName();
-        Hashtable props = new Hashtable();
-        props.put("layoutFixed","false");
-        props.put("layoutType","table");
-        props.put("layoutColumns","2");
-        props.put("showMenu","true");
-        props.put("showMap",""+ entry.isGeoreferenced());
-        getWikiManager().getEntryChart(request, name,
-                                       url, sb, props);
+        StringBuffer sb    = new StringBuffer();
+        String       url   = getJsonUrl(request, entry);
+        String       name  = entry.getName();
+        Hashtable    props = new Hashtable();
+        props.put("layoutFixed", "false");
+        props.put("layoutType", "table");
+        props.put("layoutColumns", "2");
+        props.put("showMenu", "true");
+        props.put("showMap", "" + entry.isGeoreferenced());
+        getWikiManager().getEntryChart(request, name, url, sb, props);
+
         return new Result("", sb);
     }
 
@@ -838,19 +841,18 @@ public class PointOutputHandler extends RecordOutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param pointEntry _more_
-     * @param sb _more_
+     * @param entry _more_
      *
+     *
+     * @return _more_
      * @throws Exception _more_
      */
-    public String getJsonUrl(Request request, Entry entry)
-            throws Exception {
-        return
-            request.entryUrl(
-                getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
-                OUTPUT_PRODUCT.getId(), ARG_PRODUCT,
-                OUTPUT_JSON.toString()) + "&"
-                    + RecordFormHandler.ARG_NUMPOINTS + "=1000";
+    public String getJsonUrl(Request request, Entry entry) throws Exception {
+        return request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
+                                ARG_OUTPUT, OUTPUT_PRODUCT.getId(),
+                                ARG_PRODUCT, OUTPUT_JSON.toString()) + "&"
+                                    + RecordFormHandler.ARG_NUMPOINTS
+                                    + "=1000";
 
     }
 

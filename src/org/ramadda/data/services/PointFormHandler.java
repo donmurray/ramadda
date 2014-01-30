@@ -879,6 +879,10 @@ public class PointFormHandler extends RecordFormHandler {
                                           null, null, showTime)));
             }
 
+            subsetSB.append(HtmlUtils.formEntry(msgLabel("Max"),
+                    HtmlUtils.input(ARG_MAX, request.getString(ARG_MAX, ""),
+                                    4)));
+
             if (recordEntry.isCapable(PointFile.ACTION_DECIMATE)) {
                 subsetSB.append(HtmlUtils.formEntry(msgLabel("Decimate"),
                         msgLabel("Skip every") + " "

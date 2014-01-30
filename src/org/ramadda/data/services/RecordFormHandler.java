@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -391,6 +391,9 @@ public class RecordFormHandler extends RepositoryManager implements RecordConsta
                         }
                         if (field.isBitField()) {
                             String[] bitFields = field.getBitFields();
+                            sb.append("<td align=center " + style + ">");
+                            sb.append(field.getName());
+                            sb.append("</td>");
                             for (int i = 0; i < bitFields.length; i++) {
                                 sb.append("<td align=center " + style + ">");
                                 sb.append(HtmlUtils.b("Bit #" + i + "<br>"
@@ -444,6 +447,9 @@ public class RecordFormHandler extends RepositoryManager implements RecordConsta
                     if (field.isBitField()) {
                         String[] bitFields = field.getBitFields();
                         int value = (int) record.getValue(field.getParamId());
+                        sb.append("<td align=right>");
+                        sb.append(value);
+                        sb.append("</td>");
                         for (int i = 0; i < bitFields.length; i++) {
                             sb.append("<td align=right>");
                             if ((value & 1 << i) != 0) {
