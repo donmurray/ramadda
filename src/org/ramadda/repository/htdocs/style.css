@@ -189,6 +189,7 @@ input, password, fileinput,textarea,select {
    border:1px #ccc solid; 
    overflow-y: auto;
    max-height: 300px;
+   margin: 4px;
 }
 
 .display-entrylist-entry {
@@ -202,6 +203,15 @@ input, password, fileinput,textarea,select {
 
 }
 
+
+
+.display-operands {
+}
+
+.display-operands-inner {
+   border:1px #ccc solid; 
+   padding: 10px;
+}
 
 .display-map {
 //  border:1px #888888 solid; 

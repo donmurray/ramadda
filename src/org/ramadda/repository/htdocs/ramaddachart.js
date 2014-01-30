@@ -1040,11 +1040,12 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
 }
 
 
-function RamaddaEntrylistDisplay(displayManager, id, properties) {
+function RamaddaOperandsDisplay(displayManager, id, properties) {
     var ID_SELECT = "select";
     var ID_SELECT1 = "select1";
     var ID_SELECT2 = "select2";
     var ID_NEWDISPLAY = "newdisplay";
+    var ID_CHARTTYPE = "charttype";
 
     $.extend(this, {
             entryType: null,
@@ -1069,27 +1070,39 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
             entryListChanged: function(entryList) {
                 var html = "<form>";
                 html += "<p>";
+                html += htmlUtil.openTag("table",["class","formtable","cellspacing","0","cellspacing","0"]);
                 var entries = this.entryList.getEntries();
                 var get = "getRamaddaDisplay('" + this.id +"')";
-                for(var j=1;j<=1;j++) {
-                    html += htmlUtil.openTag("select",["id", this.getDomId(ID_SELECT +j)]);
-                    html += htmlUtil.tag("option",["title","","value",""],
+                for(var j=1;j<=2;j++) {
+                    var select= htmlUtil.openTag("select",["id", this.getDomId(ID_SELECT +j)]);
+                    select += htmlUtil.tag("option",["title","","value",""],
                                          "-- Select data --");
                     for(var i=0;i<entries.length;i++) {
                         var entry = entries[i];
                         var label = entry.getIconImage() +" " + entry.getName();
-                        html += htmlUtil.tag("option",["title",entry.getName(),"value",entry.getId()],
+                        select += htmlUtil.tag("option",["title",entry.getName(),"value",entry.getId()],
                                              entry.getName());
                         
                     }
-                    html += htmlUtil.closeTag("select");
-                    html += "<p>";
+                    select += htmlUtil.closeTag("select");
+                    html += htmlUtil.formEntry("Data:",select);
                 }
+
+
+                var select  = htmlUtil.openTag("select",["id", this.getDomId(ID_CHARTTYPE)]);
+                select += htmlUtil.tag("option",["title","","value","linechart"],
+                                     "Line chart");
+                select += htmlUtil.tag("option",["title","","value","barchart"],
+                                     "Bar chart");
+                select += htmlUtil.closeTag("select");
+                html += htmlUtil.formEntry("Chart Type:",select);
+
+                html += htmlUtil.closeTag("table");
                 html += "<p>";
                 html +=  htmlUtil.tag("div", ["class", "display-button", "id",  this.getDomId(ID_NEWDISPLAY)],"New Chart");
                 html += "<p>";
                 html += "</form>";
-                this.setInnerContents(htmlUtil.div(["class","display-entrylist-inner"], html));
+                this.setInnerContents(htmlUtil.div(["class","display-operands-inner"], html));
                 var theDisplay = this;
                 $("#"+this.getDomId(ID_NEWDISPLAY)).button().click(function(event) {
                        theDisplay.createDisplay();
@@ -1102,14 +1115,16 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     alert("No data selected");
                     return;
                 }
+                //TODO: how to handle multiple operands
                 var pointData = new PointData(entry1.getName(), null, null, root +"/entry/show?&output=points.product&product=points.json&numpoints=1000&entryid=" +entry1.getId());
-                displayManager.createDisplay("linechart", {
+                var chartType = $("#" + this.getDomId(ID_CHARTTYPE)).val();
+                displayManager.createDisplay(chartType, {
                         "layoutFixed": false,
                         "data": pointData
                    });
             },
             setInnerContents: function(contents) {
-                contents = htmlUtil.div(["class","display-entrylist"], contents);
+                contents = htmlUtil.div(["class","display-operands"], contents);
                 $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(contents);
             }
         });

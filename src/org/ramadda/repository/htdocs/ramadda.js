@@ -219,6 +219,15 @@ function HtmlUtil() {
          return this.tag("tr", attrs, inner);
      }
 
+     this.formEntry = function(label, value) {
+         return this.tag("tr", ["valign","top"],
+                         this.tag("td",["class","formlabel","align","right"],
+                                  label) +
+                         this.tag("td",[],
+                                  value));
+
+     }
+
      this.b = function(inner) {
          return this.tag("b", [], inner);
      }
