@@ -132,15 +132,23 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
             type: type,
             displayManager:displayManager,
             filters: [],
+            getType: function() {
+                return this.type;
+            },
             setDisplayManager: function(cm) {
                 this.displayManager = cm;
                 this.setDisplayParent(cm);
+            },
+            setInnerContents: function(contents) {
+                
+                contents = htmlUtil.div(["class","display-" + this.type +"-inner"], contents);
+                $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(htmlUtil.div(["class","display-" +this.type], contents));
             },
            checkFixedLayout: function() {
                 if(this.getIsLayoutFixed()) {
                     var divid = this.getProperty(PROP_DIVID);
                     if(divid!=null) {
-                        var html = this.getDisplay();
+                        var html = this.getHtml();
                         $("#" + divid).html(html);
                     }
                 }
@@ -237,13 +245,28 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                                     });
                     });
             },
-            getDisplay: function() {
+            initDisplay:function() {
+                //If we are a fixed layout then there should be a div id property
+                this.checkFixedLayout();
+                this.initMenu();
+                this.setInnerContents("<p>default html<p>");
+            },
+
+            /*
+              This creates the default layout for a display
+              Its a table:
+              <td>title id=ID_HEADER</td><td>align-right popup menu</td>
+              <td colspan=2>this.getDisplayContents();</td>
+              the getDisplayContents method by default returns:
+              <div id=ID_DISPLAY_CONTENTS></div>
+              but can be overwritten by sub classes
+              After getHtml is called the DisplayManager will add the html to the DOM then call
+              initDisplay
+            */
+            getHtml: function() {
                 var html = "";
                 html +=   htmlUtil.div(["id", this.getDomId(ID_HEADER),"class", "chart-header"]);
-                var menuButton =  htmlUtil.tag("a", ["class", "chart-menu-button", "id",  this.getDomId(ID_MENU_BUTTON)]);
-
-
-
+                var menuButton =  htmlUtil.tag("a", ["class", "display-menu-button", "id",  this.getDomId(ID_MENU_BUTTON)]);
                 var close = htmlUtil.onClick("$('#" +this.getDomId(ID_MENU_POPUP) +"').hide();","<table width=100%><tr><td class=display-menu-close align=right><img src=" + root +"/icons/close.gif></td></tr></table>");
 
                 var menuContents = this.getMenuContents();
@@ -305,8 +328,6 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
             },
             setTitle: function(title) {
                 $("#" +  this.getDomId(ID_HEADER)).html(title);
-            },
-            getType: function () {
             },
             getTitle: function () {
                 var title = this.getProperty("title");
@@ -513,7 +534,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 vAxisMinValue:NaN,
                 vAxisMaxValue:NaN
                 });
-    var parent = new RamaddaDisplay(displayManager, id, getType(), properties);
+    var parent = new RamaddaDisplay(displayManager, id, properties.chartType, properties);
     RamaddaSuper(this, parent);
     $.extend(this, {
             dataCollection: new DataCollection(),
@@ -539,13 +560,6 @@ function RamaddaMultiChart(displayManager, id, properties) {
             initDisplay:function() {
                 //If we are a fixed layout then there should be a div id property
                 this.checkFixedLayout();
-                var theChart = this;
-                var reloadId = this.getDomId(ID_RELOAD);
-                $("#" + reloadId).button().click(function(event) {
-                        event.preventDefault();
-                        theChart.reload();
-                    });
-
                 this.initMenu();
                 this.addFieldsLegend();
                 this.displayData();
@@ -795,18 +809,15 @@ function RamaddaTextDisplay(displayManager, id, properties) {
     $.extend(this, new RamaddaDisplay(displayManager, id, DISPLAY_TEXT, properties));
     addRamaddaDisplay(this);
     $.extend(this, {
+            lastHtml:"<p>&nbsp;<p>&nbsp;<p>",
             initDisplay: function() {
                 this.checkFixedLayout();
                 this.initMenu();
-                this.setInnerContents("<p>&nbsp;<p>&nbsp;<p>");
+                this.setInnerContents(this.lastHtml);
             },
             handleRecordSelection: function(source, index, record, html) {
+                this.lastHtml = html;
                 this.setInnerContents(html);
-            },
-            setInnerContents: function(contents) {
-                contents = htmlUtil.div(["class","display-text-inner"], contents);
-                $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(htmlUtil.div(["class","display-text"], contents));
-                
             }
         });
 }
@@ -1051,7 +1062,7 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
     addRamaddaDisplay(this);
     $.extend(this, {
             initDisplay: function() {
-             this.checkFixedLayout();
+                this.checkFixedLayout();
                 this.initMenu();
                 var jsonUrl = null;
                 if(this.entryType!=null) {

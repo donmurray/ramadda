@@ -250,7 +250,7 @@ function DisplayManager(id,properties) {
 
                 if(this.layout == LAYOUT_TABLE) {
                     if(displaysToLayout.length == 1) {
-                        html+= displaysToLayout[0].getDisplay();
+                        html+= displaysToLayout[0].getHtml();
                     } else {
                         var width = Math.round(100/this.columns)+"%";
                         html+=htmlUtil.openTag("table", ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "0"]);
@@ -263,7 +263,7 @@ function DisplayManager(id,properties) {
                                 html+= htmlUtil.openTag("tr",["valign", "top"]);
                                 colCnt=0;
                             }
-                            html+=htmlUtil.tag("td", ["width", width], htmlUtil.div([], displaysToLayout[i].getDisplay()));
+                            html+=htmlUtil.tag("td", ["width", width], htmlUtil.div([], displaysToLayout[i].getHtml()));
                         }
                         html+= htmlUtil.closeTag("tr");
                         html+= htmlUtil.closeTag("table");
@@ -279,7 +279,7 @@ function DisplayManager(id,properties) {
                         while(rows.length<=row) {
                             rows.push([]);
                         }
-                        rows[row].push(display.getDisplay());
+                        rows[row].push(display.getHtml());
                     }
                     for(var i=0;i<rows.length;i++) {
                         var cols = rows[i];
@@ -303,7 +303,7 @@ function DisplayManager(id,properties) {
                             cols.push([]);
                             weights.push(0);
                         }
-                        cols[column].push(display.getDisplay());
+                        cols[column].push(display.getHtml());
                     }
                     html+=htmlUtil.openTag("table", ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "0"]);
                     html+=htmlUtil.openTag("tr", ["valign","top"]);
