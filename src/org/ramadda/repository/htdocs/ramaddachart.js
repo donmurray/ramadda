@@ -65,6 +65,7 @@ function DisplayThing(id, properties) {
     if(properties == null) {
        properties = {};
     }
+    $.extend(this, properties);
     $.extend(this, {
             id: id,
             properties:properties,
@@ -506,10 +507,20 @@ id - the id of this chart. Has to correspond to a div tag id
 pointData - A PointData object (see below)
  */
 function RamaddaMultiChart(displayManager, id, properties) {
-    RamaddaSuper(this, new RamaddaDisplay(displayManager, id, properties));
+    //Init the defaults first
     $.extend(this, {
             dataCollection: new DataCollection(),
             indexField: -1,
+                colors: ['red','blue','green'],
+                curveType: 'none',
+                fontSize: 0,
+                vAxisMinValue:NaN,
+                vAxisMaxValue:NaN
+                });
+    var parent = new RamaddaDisplay(displayManager, id, properties);
+    RamaddaSuper(this, parent);
+    $.extend(this, {
+            dataCollection: new DataCollection(),
             getType: function () {
                 return this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
             },
@@ -703,6 +714,18 @@ function RamaddaMultiChart(displayManager, id, properties) {
 
                 var dataTable = google.visualization.arrayToDataTable(dataList);
                 //                chartOptions = {};
+                chartOptions.colors = this.colors;
+                chartOptions.curveType = this.curveType;
+                if(this.fontSize>0) {
+                    chartOptions.fontSize = this.fontSize;
+                }
+                chartOptions.vAxis = {};
+                if(!isNaN(this.vAxisMinValue)) {
+                    chartOptions.vAxis.minValue =parseFloat(this.vAxisMinValue);
+                }
+                if(!isNaN(this.vAxisMaxValue)) {
+                    chartOptions.vAxis.maxValue =parseFloat(this.vAxisMaxValue);
+                }
                 var width = "95%";
                 if(selectedFields.length>1) {
                     width = "80%";
@@ -1017,3 +1040,77 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
 }
 
 
+function RamaddaEntrylistDisplay(displayManager, id, properties) {
+    var ID_SELECT = "select";
+    var ID_SELECT1 = "select1";
+    var ID_SELECT2 = "select2";
+    var ID_NEWDISPLAY = "newdisplay";
+
+    $.extend(this, {
+            entryType: null,
+                entryParent: null});
+    $.extend(this, new RamaddaDisplay(displayManager, id, properties));
+    addRamaddaDisplay(this);
+    $.extend(this, {
+            initDisplay: function() {
+             this.checkFixedLayout();
+                this.initMenu();
+                var jsonUrl = null;
+                if(this.entryType!=null) {
+                    jsonUrl = root +"/search/type/" + this.entryType +"?max=50&output=json&type=" + this.entryType;
+                }
+                if(jsonUrl == null) {
+                    this.setInnerContents("<p>No entry type given");
+                    return;
+                }
+                this.entryList = new EntryList(jsonUrl, this);
+                this.setInnerContents("<p>Loading<p>");
+            },
+            entryListChanged: function(entryList) {
+                var html = "<form>";
+                html += "<p>";
+                var entries = this.entryList.getEntries();
+                var get = "getRamaddaDisplay('" + this.id +"')";
+                for(var j=1;j<=1;j++) {
+                    html += htmlUtil.openTag("select",["id", this.getDomId(ID_SELECT +j)]);
+                    html += htmlUtil.tag("option",["title","","value",""],
+                                         "-- Select data --");
+                    for(var i=0;i<entries.length;i++) {
+                        var entry = entries[i];
+                        var label = entry.getIconImage() +" " + entry.getName();
+                        html += htmlUtil.tag("option",["title",entry.getName(),"value",entry.getId()],
+                                             entry.getName());
+                        
+                    }
+                    html += htmlUtil.closeTag("select");
+                    html += "<p>";
+                }
+                html += "<p>";
+                html +=  htmlUtil.tag("div", ["class", "display-button", "id",  this.getDomId(ID_NEWDISPLAY)],"New Chart");
+                html += "<p>";
+                html += "</form>";
+                this.setInnerContents(htmlUtil.div(["class","display-entrylist-inner"], html));
+                var theDisplay = this;
+                $("#"+this.getDomId(ID_NEWDISPLAY)).button().click(function(event) {
+                       theDisplay.createDisplay();
+                   });
+            },
+            createDisplay: function() {
+                var entry1 = this.entryList.getEntry($("#" + this.getDomId(ID_SELECT1)).val());
+                var entry2 = this.entryList.getEntry($("#" + this.getDomId(ID_SELECT2)).val());
+                if(entry1 == null) {
+                    alert("No data selected");
+                    return;
+                }
+                var pointData = new PointData(entry1.getName(), null, null, root +"/entry/show?&output=points.product&product=points.json&numpoints=1000&entryid=" +entry1.getId());
+                displayManager.createDisplay("linechart", {
+                        "layoutFixed": false,
+                        "data": pointData
+                   });
+            },
+            setInnerContents: function(contents) {
+                contents = htmlUtil.div(["class","display-entrylist"], contents);
+                $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(contents);
+            }
+        });
+}

@@ -182,6 +182,27 @@ input, password, fileinput,textarea,select {
    max-height: 300px;
 }
 
+.display-entrylist {
+}
+
+.display-entrylist-inner {
+   border:1px #ccc solid; 
+   overflow-y: auto;
+   max-height: 300px;
+}
+
+.display-entrylist-entry {
+   padding: 5px;
+   border-bottom: 1px #ccc solid;
+   cursor:pointer;
+}
+
+.display-entrylist-entry:hover {
+   background-color: #efefef;
+
+}
+
+
 .display-map {
 //  border:1px #888888 solid; 
 //  width:400px; height:400px;

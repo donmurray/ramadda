@@ -58,54 +58,59 @@ function Entry (props) {
 }
 
 function EntryList(jsonUrl, listener) {
+
     var entryList = this;
-
-    entryList.haveLoaded = false;
-    entryList.divId = null;
-    entryList.entries =[];
-    entryList.listener = listener;
-
-    entryList.getEntries = function() {
-        return this.entries;
-    }
-
-    entryList.setHtml = function(html) {
-        if(this.divId == null) return;
-        $("#" + this.divId).html(html);
-    }
-
-    entryList.initDisplay = function(divId) {
-        var html;
-        this.divId = divId;
-        if(this.entries.length==0)  {
-            if(entryList.haveLoaded) {
-                html = "No entries";
-            } else {
-                html = "Loading...";
+    $.extend(this, {
+            haveLoaded : false,
+            divId : null,
+            entries :[],
+            map: {},
+            listener : listener,
+            getEntry : function(id) {
+                return this.map[id];
+            },
+            getEntries : function() {
+                return this.entries;
+            },
+            setHtml: function(html) {
+                if(this.divId == null) return;
+                $("#" + this.divId).html(html);
+            },
+            initDisplay: function(divId) {
+                var html;
+                this.divId = divId;
+                if(this.entries.length==0)  {
+                    if(entryList.haveLoaded) {
+                        html = "No entries";
+                    } else {
+                        html = "Loading...";
+                    }
+                } else {
+                    html = getHtml();
+                }
+                this.setHtml(html);
+            },
+            getHtml: function() {
+                var html = "";
+                for(var i=0;i<this.entries.length;i++) {
+                    var entry = this.entries[i];
+                    html += "<div class=entry-list-entry>";
+                    html+= entry.getName();
+                    html += "</div>";
+                }
+                return html;
+            },
+            createEntries: function(data) {
+                this.entries =         createEntriesFromJson(data);
+                for(var i in this.entries) {
+                    var entry = this.entries[i];
+                    this.map[entry.getId()] = entry;
+                }
+                if(this.listener) {
+                    this.listener.entryListChanged(this);
+                }
             }
-        } else {
-            html = getHtml();
-        }
-        this.setHtml(html);
-    }
-
-    entryList.getHtml = function() {
-        var html = "";
-        for(var i=0;i<this.entries.length;i++) {
-            var entry = this.entries[i];
-            html += "<div class=entry-list-entry>";
-            html+= entry.getName();
-            html += "</div>";
-        }
-        return html;
-    }
-
-    entryList.createEntries = function(data) {
-        this.entries =         createEntriesFromJson(data);
-        if(this.listener) {
-            this.listener.entryListChanged(this);
-        }
-    }
+            });
 
 
     var jqxhr = $.getJSON( jsonUrl, function(data) {
