@@ -362,14 +362,7 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                     this.addData(pointData);
                     return;
                 } 
-
-
-                var jsonUrl = pointData.getUrl();
-                if(jsonUrl!=null) {
-                    jsonUrl = this.displayManager.getJsonUrl(jsonUrl, this);
-                    loadPointJson(jsonUrl, this, pointData);
-                }
-
+                pointData.loadData(this);
             },
            getFieldsDiv: function() {
                 var height = this.getProperty(PROP_HEIGHT,"400");
@@ -397,7 +390,7 @@ function RamaddaDisplay(displayManager, id, propertiesArg) {
                 var nonNullRecords = 0;
                 var indexField = this.indexField;
                 var allFields = this.allFields;
-                var records = pointData.getData();
+                var records = pointData.getRecords();
 
                 //Check if there are dates and if they are different
                 this.hasDate = false;
@@ -764,7 +757,8 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 if(this.properties.data!=null) {
                     this.title = this.properties.data.getName();
                     if(testUrl!=null) {
-                        this.properties.data = new PointData("Test",null,null,testUrl);
+                        var pointData = new PointData("Test",null,null,testUrl);
+                        this.properties.data = pointData;
                     }
                     this.addOrLoadData(this.properties.data);
                 }
@@ -894,7 +888,7 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             },
             handlePointDataLoaded: function(pointData) {
                 var bounds = [NaN,NaN,NaN,NaN];
-                var records = pointData.getData();
+                var records = pointData.getRecords();
                 var points =RecordGetPoints(records, bounds);
                 if(!isNaN(bounds[0])) {
                     this.initBounds = bounds;
@@ -974,7 +968,7 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
            applyStep: function() {
                 var data = this.displayManager.getDefaultData();
                 if(data == null) return;
-                var records = data.getData();
+                var records = data.getRecords();
                 if(records == null) {
                     $("#" + this.getDomId(ID_TIME)).html("no records");
                     return;
@@ -1088,7 +1082,6 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
                     html += htmlUtil.formEntry("Data:",select);
                 }
 
-
                 var select  = htmlUtil.openTag("select",["id", this.getDomId(ID_CHARTTYPE)]);
                 select += htmlUtil.tag("option",["title","","value","linechart"],
                                      "Line chart");
@@ -1115,8 +1108,17 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
                     alert("No data selected");
                     return;
                 }
-                //TODO: how to handle multiple operands
-                var pointData = new PointData(entry1.getName(), null, null, root +"/entry/show?&output=points.product&product=points.json&numpoints=1000&entryid=" +entry1.getId());
+                var pointDataList = [];
+
+                pointDataList.push(new PointData(entry1.getName(), null, null, root +"/entry/show?&output=points.product&product=points.json&numpoints=1000&entryid=" +entry1.getId()));
+                if(entry2!=null) {
+                    pointDataList.push(new PointData(entry2.getName(), null, null, root +"/entry/show?&output=points.product&product=points.json&numpoints=1000&entryid=" +entry2.getId()));
+                }
+
+                //Make up some functions
+                var operation = "average";
+                var derivedData = new  DerivedPointData(this.displayManager, "Derived Data", pointDataList,operation);
+                var pointData = derivedData;
                 var chartType = $("#" + this.getDomId(ID_CHARTTYPE)).val();
                 displayManager.createDisplay(chartType, {
                         "layoutFixed": false,
