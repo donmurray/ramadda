@@ -231,7 +231,7 @@
 
 
      <column label="Description" group="Facilities" name="facilities_description"  size="1000" rows="5"   canexport="false"  showlabel="false"/>
-     <column label="Facilities Subjective Score" group="Facilities" name="facilities_score" type="enumeration" values="0:na,1,2,3,4,5"/>
+     <column label="Research Logistics" group="Facilities" name="facilities_score" type="enumeration" values="0:na,1,2,3,4,5"/>
 
      <column label="Lodging" group="Facilities" name="lodging" rows="3"    xxxcanexport="false"  size="500" changetype="true" />
      <column label="Communications" group="Facilities" name="communications" rows="3"    xxxcanexport="false"  size="500" changetype="true"  />
@@ -243,15 +243,15 @@
 
 
      <column group="Accessibility"  name="access_description" label="Description" size="1000"  rows="5"   xxxcanexport="false"   showlabel="false"/>
-     <column label="Accessibility Subjective Score" group="Accessibility" name="access_score" type="enumeration" values="0:na,1,2,3,4,5"/>
+     <column label="Transportation" group="Accessibility" name="access_score" type="enumeration" values="0:na,1,2,3,4,5"/>
      <column label="URLs" group="Accessibility" name="access_url" rows="3" size="500" changetype="true"   type="url"   xxxcanexport="false" />
 
      <column group="Research Record"  name="research_description" label="Description" size="1000"  rows="5"   xxxcanexport="false"   showlabel="false"/>
-     <column label="Research Subjective Score" group="Research Record" name="research_score" type="enumeration" values="0:na,1,2,3,4,5"/>
+     <column label="Observatory" group="Research Record" name="research_score" type="enumeration" values="0:na,1,2,3,4,5"/>
      <column label="URLs" group="Research Record" name="research_url" rows="3" size="500" changetype="true"   type="url"   xxxcanexport="false"   />
 
      <column group="Data Availability"  name="data_description" label="Description" size="1000" rows="5"   xxxcanexport="false"   showlabel="false"/>
-     <column label="Data Subjective Score" group="Data Availability" name="data_score" type="enumeration" values="0:na,1,2,3,4,5"/>
+     <column label="Data Access" group="Data Availability" name="data_score" type="enumeration" values="0:na,1,2,3,4,5"/>
      <column label="URLs" group="Data Availability" name="data_url" rows="3" size="500" changetype="true"   type="url"   xxxcanexport="false" />
 
 
