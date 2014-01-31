@@ -313,6 +313,7 @@ function DisplayManager(id,properties) {
                         var contents = "";
                         for(var j=0;j<rows.length;j++) {
                             contents+= rows[j];
+                            contents+= "<br>";
                         }
                         html+=htmlUtil.tag("td", ["width", width, "valign","top"], contents);
                     }

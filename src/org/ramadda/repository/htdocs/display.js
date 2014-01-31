@@ -266,7 +266,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
             */
             getHtml: function() {
                 var html = "";
-                html +=   htmlUtil.div(["id", this.getDomId(ID_HEADER),"class", "chart-header"]);
+                html +=   htmlUtil.div(["id", this.getDomId(ID_HEADER),"class", "display-header"]);
                 var menuButton =  htmlUtil.tag("a", ["class", "display-menu-button", "id",  this.getDomId(ID_MENU_BUTTON)]);
                 var close = htmlUtil.onClick("$('#" +this.getDomId(ID_MENU_POPUP) +"').hide();","<table width=100%><tr><td class=display-menu-close align=right><img src=" + root +"/icons/close.gif></td></tr></table>");
 
@@ -278,7 +278,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 if(width>0) {
                     tableWidth = width+"px";
                 }
-                html += htmlUtil.openTag("table", ["width",tableWidth, "cellpadding","0", "cellspacing","0"]);
+                html += htmlUtil.openTag("table", ["border","0", "width",tableWidth, "cellpadding","0", "cellspacing","0"]);
                 html += htmlUtil.openTag("tr", ["valign", "bottom"]);
                 if(this.getShowTitle()) {
                     html += htmlUtil.td([], htmlUtil.div(["class","display-title","id",this.getDomId(ID_TITLE)], this.getTitle()));
@@ -292,6 +292,13 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 }
                 html += htmlUtil.closeTag("tr");
 
+                var contents = this.getContentsDiv();
+                html += htmlUtil.tr([], htmlUtil.td(["colspan", "2"],contents));
+                html += htmlUtil.closeTag("table")
+                html += menu;
+                return html;
+            },
+            getContentsDiv: function() {
                 var extraStyle = "";
                 var width = this.getWidth();
                 if(width>0) {
@@ -301,11 +308,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 if(height>0) {
                     extraStyle += " height:" + height +"px; ";
                 }
-                var contents =  htmlUtil.div(["class","display-contents", "style", extraStyle, "id", this.getDomId(ID_DISPLAY_CONTENTS)],"");
-                html += htmlUtil.tr([], htmlUtil.td(["colspan", "2"],contents));
-                html += htmlUtil.closeTag("table")
-                html += menu;
-                return html;
+                return  htmlUtil.div(["class","display-contents", "style", extraStyle, "id", this.getDomId(ID_DISPLAY_CONTENTS)],"");
             },
             removeDisplay: function() {
                 this.displayManager.removeDisplay(this);
@@ -817,7 +820,7 @@ function RamaddaMapDisplay(displayManager, id, properties) {
     var ID_LATFIELD  = "latfield";
     var ID_LONFIELD  = "lonfield";
     var ID_MAP = "map";
-    $.extend(this, new RamaddaDisplay(displayManager, id, DISPLAY_MAP, properties));
+    RamaddaSuper(this, new RamaddaDisplay(displayManager, id, DISPLAY_MAP, properties));
     addRamaddaDisplay(this);
     $.extend(this, {
             initBounds:displayManager.initMapBounds,
@@ -828,13 +831,26 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             initDisplay: function() {
                 this.initUI();
                 var html = "";
-                html+=htmlUtil.div(["style", "min-width:200px; min-height:200px; ",
-                                    "id", this.getDomId(ID_MAP)]);
+                var extraStyle = "";
+                var width = this.getWidth();
+                var height = this.getProperty("height",300);
+                if(width>0) {
+                    extraStyle += "width:" + width +"px; ";
+                }
+                var height = this.getProperty("height",-1);
+                if(height>0) {
+                    extraStyle += " height:" + height +"px; ";
+                }
+
+                html+=htmlUtil.div(["class", "display-map-map", "style",extraStyle, "id", this.getDomId(ID_MAP)]);
+                html+="<br>";
+                html+= htmlUtil.openTag("div",["class","display-map-latlon"]);
                 html+= htmlUtil.openTag("form");
                 html+= "Latitude: " + htmlUtil.input(this.getDomId(ID_LATFIELD), "", ["size","7","id",  this.getDomId(ID_LATFIELD)]);
                 html+= "  ";
                 html+= "Longitude: " + htmlUtil.input(this.getDomId(ID_LONFIELD), "", ["size","7","id",  this.getDomId(ID_LONFIELD)]);
                 html+= htmlUtil.closeTag("form");
+                html+= htmlUtil.closeTag("div");
                 this.setContents(html);
 
 
@@ -862,6 +878,9 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                         this.map.addPolygon("basemap", clonePoints(currentPolygons[i]), null);
                     }
                 }
+            },
+            getContentsDiv: function() {
+                return  htmlUtil.div(["class","display-contents", "id", this.getDomId(ID_DISPLAY_CONTENTS)],"");
             },
             handleClick: function (theMap, lon,lat) {
                 this.displayManager.handleMapClick(this, lon, lat);
@@ -1014,10 +1033,9 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
                 html+=  htmlUtil.onClick(get +".faster();", htmlUtil.image(this.iconFaster,["class", "display-animation-button", "title","faster", "xwidth","32"]));
                 html +="  ";
                 html+=  htmlUtil.onClick(get +".slower();", htmlUtil.image(this.iconSlower,["class", "display-animation-button", "title","slower", "xwidth","32"]));
-                html += "<p>";
                 html+=  htmlUtil.div(["id", this.getDomId(ID_TIME)],"&nbsp;");
                 $("#" + this.getDomId(ID_TITLE)).html(this.getTitle());
-                this.setContents(htmlUtil.div(["class","display-text"], html));
+                this.setContents(html);
             },
         });
 }
