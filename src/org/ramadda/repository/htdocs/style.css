@@ -182,6 +182,15 @@ input, password, fileinput,textarea,select {
    max-height: 300px;
 }
 
+.display-example {
+}
+
+.display-example-inner {
+   border:1px #ccc solid; 
+   overflow-y: auto;
+   max-height: 300px;
+}
+
 .display-entrylist {
 }
 

@@ -139,9 +139,8 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 this.displayManager = cm;
                 this.setDisplayParent(cm);
             },
-            setInnerContents: function(contents) {
-                
-                contents = htmlUtil.div(["class","display-" + this.type +"-inner"], contents);
+            setContents: function(contents) {
+                contents = htmlUtil.div(["class","display-" + this.getType() +"-inner"], contents);
                 $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(htmlUtil.div(["class","display-" +this.type], contents));
             },
            checkFixedLayout: function() {
@@ -238,30 +237,32 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                         var id =theDisplay.getDomId(ID_MENU_POPUP); 
                         //function showStickyPopup(event, srcId, popupId, alignLeft) {
                         //                        showPopup(event, theDisplay.getDomId(ID_MENU_BUTTON), id, false,null,"left bottom");
-                        showStickyPopup(event, theDisplay.getDomId(ID_MENU_BUTTON), id, false);
+                        showStickyPopup(event, theDisplay.getDomId(ID_MENU_BUTTON), id, true);
                         $("#"+  theDisplay.getDomId(ID_MENU_INNER)).superfish({
                                 animation: {height:'show'},
                                     delay: 1200
                                     });
                     });
             },
-            initDisplay:function() {
-                //If we are a fixed layout then there should be a div id property
+            initUI:function() {
                 this.checkFixedLayout();
                 this.initMenu();
-                this.setInnerContents("<p>default html<p>");
             },
-
+            initDisplay:function() {
+                this.initUI();
+                this.setContents("<p>default html<p>");
+            },
             /*
               This creates the default layout for a display
               Its a table:
               <td>title id=ID_HEADER</td><td>align-right popup menu</td>
-              <td colspan=2>this.getDisplayContents();</td>
+              <td colspan=2><div id=ID_DISPLAY_CONTENTS></div></td>
               the getDisplayContents method by default returns:
               <div id=ID_DISPLAY_CONTENTS></div>
               but can be overwritten by sub classes
               After getHtml is called the DisplayManager will add the html to the DOM then call
               initDisplay
+              That needs to call setContents with the html contents of the display
             */
             getHtml: function() {
                 var html = "";
@@ -272,7 +273,6 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 var menuContents = this.getMenuContents();
                 menuContents  = close + menuContents;
                 var menu = htmlUtil.div(["class", "ramadda-popup", "id", this.getDomId(ID_MENU_POPUP)], menuContents);
-
                 var width = this.getWidth();
                 var tableWidth = "100%";
                 if(width>0) {
@@ -291,21 +291,26 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                     html += htmlUtil.td(["align", "right"], "");
                 }
                 html += htmlUtil.closeTag("tr");
-                var contents = this.getDisplayContents();
-                html += htmlUtil.tr(["valign", "top"], htmlUtil.td(["colspan", "2","id"],contents));
+
+                var extraStyle = "";
+                var width = this.getWidth();
+                if(width>0) {
+                    extraStyle += "width:" + width +"px; ";
+                }
+                var height = this.getProperty("height",-1);
+                if(height>0) {
+                    extraStyle += " height:" + height +"px; ";
+                }
+                var contents =  htmlUtil.div(["class","display-contents", "style", extraStyle, "id", this.getDomId(ID_DISPLAY_CONTENTS)],"");
+                html += htmlUtil.tr([], htmlUtil.td(["colspan", "2"],contents));
                 html += htmlUtil.closeTag("table")
                 html += menu;
                 return html;
             },
-            getDisplayContents: function() {
-                return htmlUtil.div(["id", this.getDomId(ID_DISPLAY_CONTENTS)]);
-            },
             removeDisplay: function() {
                 this.displayManager.removeDisplay(this);
             },
-            setHtml: function(html) {
-                $("#" + this.id).html(html);
-            },
+            //Gets called before the displays are laid out
             prepareToLayout:function() {
                 //Force setting the property from the input dom (which is about to go away)
                 this.getColumn();
@@ -337,7 +342,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 if(this.dataCollection == null) {
                     return "";
                 }
-                var dataList =  this.dataCollection.getData();
+                var dataList =  this.dataCollection.getList();
                 title = "";
                 for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
                     var pointData = dataList[collectionIdx];
@@ -362,7 +367,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 this.displayManager.pointDataLoaded(pointData);
             },
             reload: function() {
-                var dataList =  this.dataCollection.getData();
+                var dataList =  this.dataCollection.getList();
                 this.dataCollection = new DataCollection();
                 for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
                     var pointData = dataList[collectionIdx];
@@ -388,10 +393,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 } 
                 pointData.loadData(this);
             },
-           getFieldsDiv: function() {
-                var height = this.getProperty(PROP_HEIGHT,"400");
-                return htmlUtil.div(["id",  this.getDomId(ID_FIELDS),"class", "display-fields","style","overflow-y: auto;    max-height:" + height +"px;"]);
-            },
+            //get an array of arrays of data 
             getStandardData : function(fields) {
                 var dataList = [];
                 //The first entry in the dataList is the array of names
@@ -410,7 +412,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
 
                 //These are Record objects 
                 //TODO: handle multiple data sources (or not?)
-                var pointData = this.dataCollection.getData()[0];
+                var pointData = this.dataCollection.getList()[0];
                 var nonNullRecords = 0;
                 var indexField = this.indexField;
                 var allFields = this.allFields;
@@ -528,39 +530,27 @@ function RamaddaMultiChart(displayManager, id, properties) {
     $.extend(this, {
             dataCollection: new DataCollection(),
             indexField: -1,
-                colors: ['red','blue','green'],
-                curveType: 'none',
-                fontSize: 0,
-                vAxisMinValue:NaN,
-                vAxisMaxValue:NaN
-                });
-    var parent = new RamaddaDisplay(displayManager, id, properties.chartType, properties);
-    RamaddaSuper(this, parent);
+            colors: ['blue','red', 'green'],
+            curveType: 'none',
+            fontSize: 0,
+            vAxisMinValue:NaN,
+            vAxisMaxValue:NaN
+           });
+    RamaddaSuper(this, new RamaddaDisplay(displayManager, id, properties.chartType, properties));
+
     $.extend(this, {
-            dataCollection: new DataCollection(),
             getType: function () {
                 return this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
             },
             getMenuContents: function() {
                 return this.getFieldsDiv()+ this.getDisplayMenuContents();
             },
-            getDisplayContents: function() {
-                var extraStyle = "";
-                var width = this.getWidth();
-                if(width>0) {
-                    extraStyle += "width:" + width +"px; ";
-                }
-                var height = this.getProperty("height",-1);
-                if(height>0) {
-                    extraStyle += " height:" + height +"px; ";
-                }
-                var html =  htmlUtil.div(["class","display-multichart", "style", extraStyle, "id", this.getDomId(ID_DISPLAY_CONTENTS)],"");
-                return html;
+            getFieldsDiv: function() {
+                var height = this.getProperty(PROP_HEIGHT,"400");
+                return htmlUtil.div(["id",  this.getDomId(ID_FIELDS),"class", "display-fields","style","overflow-y: auto;    max-height:" + height +"px;"]);
             },
             initDisplay:function() {
-                //If we are a fixed layout then there should be a div id property
-                this.checkFixedLayout();
-                this.initMenu();
+                this.initUI();
                 this.addFieldsLegend();
                 this.displayData();
             },
@@ -576,7 +566,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
 
                 var html =  null;
                 var checkboxClass = this.id +"_checkbox";
-                var dataList =  this.dataCollection.getData();
+                var dataList =  this.dataCollection.getList();
                 for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
                     var pointData = dataList[collectionIdx];
                     var fields =pointData.getChartableFields();
@@ -614,7 +604,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
             },
             getSelectedFields:function() {
                 var df = [];
-                var dataList =  this.dataCollection.getData();
+                var dataList =  this.dataCollection.getList();
 
                 //If we have fixed fields then clear them after the first time
                 var fixedFields = this.getProperty(PROP_FIELDS);
@@ -682,11 +672,11 @@ function RamaddaMultiChart(displayManager, id, properties) {
                     return;
                 }
 
-                this.allFields =  this.dataCollection.getData()[0].getRecordFields();
+                this.allFields =  this.dataCollection.getList()[0].getRecordFields();
 
                 var selectedFields = this.getSelectedFields();
                 if(selectedFields.length==0) {
-                    $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html("No fields selected");
+                    this.setContents("No fields selected");
                     return;
                 }
 
@@ -708,8 +698,8 @@ function RamaddaMultiChart(displayManager, id, properties) {
 
 
                 if(dataList.length==0) {
-                    $("#"+this.getDomId(ID_DISPLAY_CONTENTS)).html(htmlUtil.div(["class","display-message"],
-                                                                                "No data available"));
+                    this.setContents(htmlUtil.div(["class","display-message"],
+                                                  "No data available"));
                     return;
                 }
 
@@ -718,7 +708,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 //Keep all of the google chart specific code here
                 //
                 if(typeof google == 'undefined') {
-                    $("#"+this.getDomId(ID_DISPLAY_CONTENTS)).html("No google");
+                    this.setContents("No google");
                     return;
                 }
 
@@ -764,7 +754,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                     google.visualization.events.addListener(this.chart, 'select', function() {
                             var index = theDisplay.chart.getSelection()[0].row;
                             theDisplay.displayManager.handleRecordSelection(theDisplay, 
-                                                                            theDisplay.dataCollection.getData()[0], index);
+                                                                            theDisplay.dataCollection.getList()[0], index);
                         });
                 }
             },
@@ -811,13 +801,12 @@ function RamaddaTextDisplay(displayManager, id, properties) {
     $.extend(this, {
             lastHtml:"<p>&nbsp;<p>&nbsp;<p>",
             initDisplay: function() {
-                this.checkFixedLayout();
-                this.initMenu();
-                this.setInnerContents(this.lastHtml);
+                this.initUI();
+                this.setContents(this.lastHtml);
             },
             handleRecordSelection: function(source, index, record, html) {
                 this.lastHtml = html;
-                this.setInnerContents(html);
+                this.setContents(html);
             }
         });
 }
@@ -837,13 +826,23 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             polygons:[],
             markers: {},
             initDisplay: function() {
-                this.checkFixedLayout();
+                this.initUI();
+                var html = "";
+                html+=htmlUtil.div(["style", "min-width:200px; min-height:200px; ",
+                                    "id", this.getDomId(ID_MAP)]);
+                html+= htmlUtil.openTag("form");
+                html+= "Latitude: " + htmlUtil.input(this.getDomId(ID_LATFIELD), "", ["size","7","id",  this.getDomId(ID_LATFIELD)]);
+                html+= "  ";
+                html+= "Longitude: " + htmlUtil.input(this.getDomId(ID_LONFIELD), "", ["size","7","id",  this.getDomId(ID_LONFIELD)]);
+                html+= htmlUtil.closeTag("form");
+                this.setContents(html);
+
+
                 var currentPolygons = this.polygons;
                 this.polygons = [];
                 var params = {
                     "defaultMapLayer": this.getProperty("defaultMapLayer", map_default_layer)
                 };
-                this.initMenu();
                 this.map = new RepositoryMap(this.getDomId(ID_MAP), params);
                 this.map.initMap(false);
                 this.map.addClickHandler(this.getDomId(ID_LONFIELD), this.getDomId(ID_LATFIELD), null, this);
@@ -864,33 +863,10 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                     }
                 }
             },
-            getDisplayContents: function() {
-                var html = "";
-                var extraStyle = "";
-                var width = this.getWidth();
-                if(width>0) {
-                    extraStyle += "width:" + width +"px; ";
-                }
-                var height = this.getProperty("height",-1);
-                if(height>0) {
-                    extraStyle += " height:" + height +"px; ";
-                }
-
-                html+=htmlUtil.div(["style", "min-width:200px; min-height:200px; " + extraStyle,
-                                    "class", "display-map",
-                                    "id", this.getDomId(ID_MAP)]);
-
-                html+= htmlUtil.openTag("form");
-                html+= "Latitude: " + htmlUtil.input(this.getDomId(ID_LATFIELD), "", ["size","7","id",  this.getDomId(ID_LATFIELD)]);
-                html+= "  ";
-                html+= "Longitude: " + htmlUtil.input(this.getDomId(ID_LONFIELD), "", ["size","7","id",  this.getDomId(ID_LONFIELD)]);
-                html+= htmlUtil.closeTag("form");
-                return html;
-            },
             handleClick: function (theMap, lon,lat) {
                 this.displayManager.handleMapClick(this, lon, lat);
             },
-           getPosition:function() {
+            getPosition:function() {
                 var lat = $("#" + this.getDomId(ID_LATFIELD)).val();
                 var lon = $("#" + this.getDomId(ID_LONFIELD)).val();
                 if(lat == null) return null;
@@ -1021,9 +997,8 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
                 $("#"+this.getDomId(ID_START)).attr("src",this.iconStart);
             },
             initDisplay: function() {
+                this.initUI();
                 this.stop();
-                this.checkFixedLayout();
-                this.initMenu();
                 var html =  htmlUtil.div(["class","wiki-h2"],"Animation");
                 var get = "getRamaddaDisplay('" + this.id +"')";
 
@@ -1042,7 +1017,7 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
                 html += "<p>";
                 html+=  htmlUtil.div(["id", this.getDomId(ID_TIME)],"&nbsp;");
                 $("#" + this.getDomId(ID_TITLE)).html(this.getTitle());
-                $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(htmlUtil.div(["class","display-text"], html));
+                this.setContents(htmlUtil.div(["class","display-text"], html));
             },
         });
 }
@@ -1062,18 +1037,17 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
     addRamaddaDisplay(this);
     $.extend(this, {
             initDisplay: function() {
-                this.checkFixedLayout();
-                this.initMenu();
+                this.initUI();
                 var jsonUrl = null;
                 if(this.entryType!=null) {
                     jsonUrl = root +"/search/type/" + this.entryType +"?max=50&output=json&type=" + this.entryType;
                 }
                 if(jsonUrl == null) {
-                    this.setInnerContents("<p>No entry type given");
+                    this.setContents("<p>No entry type given");
                     return;
                 }
                 this.entryList = new EntryList(jsonUrl, this);
-                this.setInnerContents("<p>Loading<p>");
+                this.setContents("<p>Loading<p>");
             },
             entryListChanged: function(entryList) {
                 var html = "<form>";
@@ -1109,7 +1083,7 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
                 html +=  htmlUtil.tag("div", ["class", "display-button", "id",  this.getDomId(ID_NEWDISPLAY)],"New Chart");
                 html += "<p>";
                 html += "</form>";
-                this.setInnerContents(htmlUtil.div(["class","display-operands-inner"], html));
+                this.setContents(html);
                 var theDisplay = this;
                 $("#"+this.getDomId(ID_NEWDISPLAY)).button().click(function(event) {
                        theDisplay.createDisplay();
@@ -1138,10 +1112,7 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
                         "layoutFixed": false,
                         "data": pointData
                    });
-            },
-            setInnerContents: function(contents) {
-                contents = htmlUtil.div(["class","display-operands"], contents);
-                $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(contents);
             }
+
         });
 }

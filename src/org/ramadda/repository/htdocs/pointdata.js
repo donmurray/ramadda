@@ -34,7 +34,7 @@ function DataCollection() {
         return false;
     }
 
-    this.getData = function() {
+    this.getList = function() {
         return this.data;
     }
 
@@ -480,9 +480,6 @@ function InteractiveDataWidget (theChart) {
         var jsInput = "<textarea rows=10 cols=80 id=\"" + this.jsTextArea +"\"/><br><input value=\"Try it out\" type=submit id=\"" + this.jsSubmit +"\">";
 
         var jsOutput = "<div id=\"" + this.jsOutputId +"\"/>";
-
-
-xxxx
         $("#" + this.jsSubmit).button().click(function(event){
                 var js = "var chart = ramaddaGlobalChart;\n";
                 js += "var data = chart.pointData.getData();\n";

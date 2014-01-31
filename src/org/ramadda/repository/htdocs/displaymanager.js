@@ -161,8 +161,8 @@ function DisplayManager(id,properties) {
                 var narrower = htmlUtil.onClick(get +".changeChartWidth(-1);","Chart width");
                 //The ids (.e.g., 'linechart' have to match up with some class function with the name 
                 //as defined in the createDisplay method
-                var displayNames = ["Map", "Line Chart","Bar Chart", "Table", "Text","Animation", "Filter", "Scatter Plot"];
-                var displayCalls = ["createDisplay('map');", "createDisplay('linechart');","createDisplay('barchart');", "createDisplay('table');","createDisplay('text');","createDisplay('animation');","createDisplay('RamaddaFilterDisplay');", "createDisplay('scatterplot');"];
+                var displayNames = ["Map", "Line Chart","Bar Chart", "Table", "Text","Animation", "Filter", "Scatter Plot","Example"];
+                var displayCalls = ["createDisplay('map');", "createDisplay('linechart');","createDisplay('barchart');", "createDisplay('table');","createDisplay('text');","createDisplay('animation');","createDisplay('RamaddaFilterDisplay');", "createDisplay('scatterplot');","createDisplay('example');"];
                 var newMenu = "";
                 for(var i=0;i<displayNames.length;i++) {
                     newMenu+= htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick", get+"." + displayCalls[i]], displayNames[i]));
@@ -400,7 +400,7 @@ function DisplayManager(id,properties) {
                 this.displays.push(display);
                 display.setDisplayManager(this);
                 this.addDisplayEventListener(display);
-                //                        display.handlePointDataLoaded(data);
+                //                display.handlePointDataLoaded(data);
                 this.doLayout();
             },
             moveDisplayUp: function(display) {
@@ -520,12 +520,12 @@ function RamaddaFilterDisplay(displayManager, id, properties) {
     $.extend(this, {
             html: "<p>&nbsp;&nbsp;&nbsp;Nothing selected&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<p>",
             initDisplay: function() {
-                this.checkFixedLayout();
-                this.initMenu();
-                $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(htmlUtil.div(["class","display-text"], this.html));
+                this.initUI();
+                this.setContents(this.html);
             },
         });
 }
+
 
 function RamaddaSuper(object, parent) {
     $.extend(object, parent);

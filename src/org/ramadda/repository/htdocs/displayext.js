@@ -8,6 +8,11 @@ Copyright 2008-2014 Geode Systems LLC
   This gets created by the displayManager.createDisplay('example')
  */
 function RamaddaExampleDisplay(displayManager, id, properties) {
+
+    //Dom id for example
+    //The displays use display.getDomId(ID_CLICK) to get a unique (based on the display id) id
+    var ID_CLICK = "click";
+
     //Create the base class
     $.extend(this, new RamaddaDisplay(displayManager, id, "example", properties));
 
@@ -16,21 +21,27 @@ function RamaddaExampleDisplay(displayManager, id, properties) {
 
     //Define my methods
     $.extend(this, {
+
             //gets called by displaymanager after the displays are layed out
             initDisplay: function() {
-                this.checkFixedLayout();
-                this.initMenu();
-                this.setInnerContents("<p>the example html display<p>");
+                //Call base class to init menu, etc
+                this.initUI();
+
+                //I've been calling back to this display with the following
+                var get = "getRamaddaDisplay('" + this.id +"')";
+                var html =  "<p>";
+                html +=htmlUtil.onClick(get +".click();", htmlUtil.div(["id", this.getDomId(ID_CLICK)], "Click me"));
+                html +=  "<p>";
+
+                //Set the contents
+                this.setContents(html);
             },
-           //I've been calling back to this display with the following
-            var get = "getRamaddaDisplay('" + this.id +"')";
-
-                html+=  "&nbsp;&nbsp;";
-                html+=  htmlUtil.onClick(get +".setIndex(0);", htmlUtil.image(this.iconBegin,["title","beginning", "class", "display-animation-button", "xwidth","32"]));
-
+            click: function() {
+                $("#"+this.getDomId(ID_CLICK)).html("Click again");
+            },
+            //this gets called when an event source has selected a record
             handleRecordSelection: function(source, index, record, html) {
-                //this gets called when an event source has selected a record
-                //this.setInnerContents(html);
+                //this.setContents(html);
             },
         });
 }
