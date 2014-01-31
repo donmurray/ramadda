@@ -96,7 +96,7 @@ function DisplayManager(id,properties) {
                 var records = null;
                 for(var i=0;i<this.dataList.length;i++) {
                     var pointData = this.dataList[i];
-                    records = pointData.getData();
+                    records = pointData.getRecords();
                     if(records!=null) break;
                 }
                 var indexObj = [];
@@ -110,7 +110,7 @@ function DisplayManager(id,properties) {
                     pointData = this.dataList[0];
                 }
                 var fields =  pointData.getRecordFields();
-                var records = pointData.getData();
+                var records = pointData.getRecords();
                 if(index<0 || index>= records.length) {
                     console.log("handleRecordSelection: bad index= " + index);
                     return;
