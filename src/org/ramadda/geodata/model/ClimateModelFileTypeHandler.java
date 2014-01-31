@@ -44,14 +44,19 @@ import javax.mail.internet.MimeMessage;
  */
 public class ClimateModelFileTypeHandler extends GranuleTypeHandler {
 
-    //var _ model _ experiment _ member
-
-    /** the file regex */
+    /** the default file regex */
     public static final String FILE_REGEX =
         "([^_]+)_([^_]+)_(.*)_(ens..|mean|sprd|clim)(_([^_]+))?.nc";
+    
+    /** local regex */
+    private String myRegex = FILE_REGEX;
+    
+    /** the regex property */
+    public static final String PROP_FILE_PATTERN = "filepattern";
 
-    /** _more_ */
-    public static final Pattern pattern = Pattern.compile(FILE_REGEX);
+    /** pattern for file names*/
+    //public static final Pattern pattern = Pattern.compile(FILE_REGEX);
+    protected Pattern pattern = null;
 
     /** ClimateModelFile type */
     public static final String TYPE_CLIMATE_MODELFILE = "climate_modelfile";
@@ -67,7 +72,27 @@ public class ClimateModelFileTypeHandler extends GranuleTypeHandler {
     public ClimateModelFileTypeHandler(Repository repository,
                                        Element entryNode)
             throws Exception {
+        this(repository, entryNode, null);
+    }
+
+    /**
+     * Create a ClimateModelFileTypeHandler with the given pattern
+     *
+     * @param repository  the repository
+     * @param entryNode   the node
+     * @param regex_pattern   the pattern for file names
+     *
+     * @throws Exception  the pattern
+     */
+    public ClimateModelFileTypeHandler(Repository repository,
+                                       Element entryNode,
+                                       String regex_pattern)
+            throws Exception {
         super(repository, entryNode);
+        if (regex_pattern == null) {
+            myRegex = getProperty(PROP_FILE_PATTERN, FILE_REGEX);
+        }
+        pattern = Pattern.compile(myRegex);
     }
 
     /**
@@ -124,7 +149,6 @@ public class ClimateModelFileTypeHandler extends GranuleTypeHandler {
      * Test it
      *
      * @param args  the arguments
-     */
     public static void main(String[] args) {
         for (String arg : args) {
             Matcher m = pattern.matcher(arg);
@@ -137,6 +161,7 @@ public class ClimateModelFileTypeHandler extends GranuleTypeHandler {
             }
         }
     }
+     */
 
 
 }

@@ -21,7 +21,6 @@
 package org.ramadda.geodata.model;
 
 
-import org.ramadda.data.process.DataProcess;
 import org.ramadda.data.process.DataProcessInput;
 import org.ramadda.data.process.DataProcessOperand;
 import org.ramadda.data.process.DataProcessOutput;
@@ -30,12 +29,8 @@ import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
 import org.ramadda.repository.Request;
 import org.ramadda.repository.Resource;
-import org.ramadda.repository.database.Tables;
-import org.ramadda.repository.type.CollectionTypeHandler;
-import org.ramadda.repository.type.Column;
 import org.ramadda.repository.type.GranuleTypeHandler;
 import org.ramadda.repository.type.TypeHandler;
-import org.ramadda.sql.Clause;
 import org.ramadda.util.HtmlUtils;
 
 import ucar.nc2.dt.grid.GridDataset;
@@ -53,7 +48,6 @@ import java.io.File;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -62,19 +56,8 @@ import java.util.TreeSet;
 /**
  * DataProcess for area statistics using CDO
  */
-public class CDOArealStatisticsProcess extends DataProcess {
+public class CDOArealStatisticsProcess extends CDODataProcess {
 
-    /** the type handler associated with this */
-    CDOOutputHandler typeHandler;
-
-    /** the associated repository */
-    Repository repository;
-
-    /** months */
-    private static final String[] MONTHS = {
-        "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
-        "Nov", "Dec"
-    };
 
     /**
      * Area statistics DataProcess
@@ -84,9 +67,7 @@ public class CDOArealStatisticsProcess extends DataProcess {
      * @throws Exception  problems
      */
     public CDOArealStatisticsProcess(Repository repository) throws Exception {
-        super("CDO_AREA_STATS", "Area Statistics");
-        this.repository = repository;
-        typeHandler     = new CDOOutputHandler(repository);
+        super(repository, "CDO_AREA_STATS", "Area Statistics");
     }
 
     /**
@@ -121,13 +102,13 @@ public class CDOArealStatisticsProcess extends DataProcess {
         Entry first = input.getOperands().get(0).getEntries().get(0);
 
         CdmDataOutputHandler dataOutputHandler =
-            typeHandler.getDataOutputHandler();
+            getOutputHandler().getDataOutputHandler();
         GridDataset dataset =
             dataOutputHandler.getCdmManager().getGridDataset(first,
                 first.getResource().getPath());
 
         if (dataset != null) {
-            typeHandler.addVarLevelWidget(request, sb, dataset,
+            getOutputHandler().addVarLevelWidget(request, sb, dataset,
                                           CdmDataOutputHandler.ARG_LEVEL);
         }
 
@@ -142,7 +123,7 @@ public class CDOArealStatisticsProcess extends DataProcess {
             llr = new LatLonRect(new LatLonPointImpl(90.0, -180.0),
                                  new LatLonPointImpl(-90.0, 180.0));
         }
-        typeHandler.addMapWidget(request, sb, llr, false);
+        getOutputHandler().addMapWidget(request, sb, llr, false);
     }
 
     /**
@@ -216,7 +197,7 @@ public class CDOArealStatisticsProcess extends DataProcess {
             throws Exception {
 
         Entry        oneOfThem = op.getEntries().get(0);
-        String tail = typeHandler.getStorageManager().getFileTail(oneOfThem);
+        String tail = getOutputHandler().getStorageManager().getFileTail(oneOfThem);
         String       id        = getRepository().getGUID();
         String       newName = IOUtil.stripExtension(tail) + "_" + id + ".nc";
         File outFile = new File(IOUtil.joinDir(dpi.getProcessDir(), newName));
@@ -244,11 +225,11 @@ public class CDOArealStatisticsProcess extends DataProcess {
         //   - region
         //   - month range
         //   - year or time range
-        typeHandler.addStatCommands(request, oneOfThem, commands);
-        typeHandler.addLevelSelectCommands(request, oneOfThem, commands,
+        getOutputHandler().addStatCommands(request, oneOfThem, commands);
+        getOutputHandler().addLevelSelectCommands(request, oneOfThem, commands,
                                            CdmDataOutputHandler.ARG_LEVEL);
-        typeHandler.addAreaSelectCommands(request, oneOfThem, commands);
-        typeHandler.addDateSelectCommands(request, oneOfThem, commands,
+        getOutputHandler().addAreaSelectCommands(request, oneOfThem, commands);
+        getOutputHandler().addDateSelectCommands(request, oneOfThem, commands,
                                           opNum);
 
         //System.err.println("cmds:" + commands);
@@ -268,11 +249,11 @@ public class CDOArealStatisticsProcess extends DataProcess {
             //   - level
             //   - region
             //   - month range
-            typeHandler.addStatCommands(request, climEntry, commands);
-            typeHandler.addLevelSelectCommands(request, climEntry, commands,
+            getOutputHandler().addStatCommands(request, climEntry, commands);
+            getOutputHandler().addLevelSelectCommands(request, climEntry, commands,
                     CdmDataOutputHandler.ARG_LEVEL);
-            typeHandler.addAreaSelectCommands(request, climEntry, commands);
-            typeHandler.addMonthSelectCommands(request, climEntry, commands);
+            getOutputHandler().addAreaSelectCommands(request, climEntry, commands);
+            getOutputHandler().addMonthSelectCommands(request, climEntry, commands);
 
             //System.err.println("clim cmds:" + commands);
 
@@ -363,20 +344,11 @@ public class CDOArealStatisticsProcess extends DataProcess {
 
         Resource resource    = new Resource(outFile,
                                             Resource.TYPE_LOCAL_FILE);
-        Entry    outputEntry = new Entry(new TypeHandler(repository), true);
+        Entry    outputEntry = new Entry(new TypeHandler(getRepository()), true);
         outputEntry.setResource(resource);
 
         //return new DataProcessOperand(outputEntry.getName(), outputEntry);
         return new DataProcessOperand(outputName.toString(), outputEntry);
-    }
-
-    /**
-     * Is this enabled?
-     *
-     * @return true if it is
-     */
-    public boolean isEnabled() {
-        return typeHandler.isEnabled();
     }
 
     /**
@@ -387,7 +359,7 @@ public class CDOArealStatisticsProcess extends DataProcess {
      * @return true if we can, otherwise false
      */
     public boolean canHandle(DataProcessInput input) {
-        if ( !typeHandler.isEnabled()) {
+        if ( !getOutputHandler().isEnabled()) {
             return false;
         }
         for (DataProcessOperand op : input.getOperands()) {
@@ -405,114 +377,6 @@ public class CDOArealStatisticsProcess extends DataProcess {
 
         return true;
     }
-
-    /**
-     * Initialize the CDO command list
-     *
-     * @return  the initial list of CDO commands
-     */
-    private List<String> initCDOCommand() {
-        List<String> newCommands = new ArrayList<String>();
-        newCommands.add(typeHandler.getCDOPath());
-        newCommands.add("-L");
-        newCommands.add("-s");
-        newCommands.add("-O");
-
-        return newCommands;
-    }
-
-    /**
-     * Run the process
-     *
-     * @param commands  the list of commands to run
-     * @param processDir  the processing directory
-     * @param outFile     the outfile
-     *
-     * @throws Exception problem running commands
-     */
-    private void runProcess(List<String> commands, File processDir,
-                            File outFile)
-            throws Exception {
-
-        String[] results = getRepository().executeCommand(commands, null,
-                               processDir, 60);
-        String errorMsg = results[1];
-        String outMsg   = results[0];
-        if ( !outFile.exists()) {
-            if (outMsg.length() > 0) {
-                throw new IllegalArgumentException(outMsg);
-            }
-            if (errorMsg.length() > 0) {
-                throw new IllegalArgumentException(errorMsg);
-            }
-            if ( !outFile.exists()) {
-                throw new IllegalArgumentException(
-                    "Humm, the CDO processing failed for some reason");
-            }
-        }
-    }
-
-    /**
-     * Find the associated climatology for the input
-     *
-     * @param request  the Request
-     * @param granule  the entry
-     *
-     * @return the climatology entry or null
-     *
-     * @throws Exception  problems
-     */
-    private List<Entry> findClimatology(Request request, Entry granule)
-            throws Exception {
-        if ( !(granule.getTypeHandler()
-                instanceof ClimateModelFileTypeHandler)) {
-            return null;
-        }
-        Entry collection = GranuleTypeHandler.getCollectionEntry(request,
-                               granule);
-        CollectionTypeHandler ctypeHandler =
-            (CollectionTypeHandler) collection.getTypeHandler();
-        List<Clause>    clauses   = new ArrayList<Clause>();
-        List<Column>    columns   = ctypeHandler.getGranuleColumns();
-        HashSet<String> seenTable = new HashSet<String>();
-        Object[]        values    = granule.getValues();
-        for (int colIdx = 0; colIdx < columns.size(); colIdx++) {
-            Column column = columns.get(colIdx);
-            // first column is the collection ID
-            int    valIdx      = colIdx + 1;
-            String dbTableName = column.getTableName();
-            if ( !seenTable.contains(dbTableName)) {
-                clauses.add(Clause.eq(ctypeHandler.getCollectionIdColumn(),
-                                      collection.getId()));
-                clauses.add(Clause.join(Tables.ENTRIES.COL_ID,
-                                        dbTableName + ".id"));
-                seenTable.add(dbTableName);
-            }
-            String v = values[valIdx].toString();
-            if (column.getName().equals("ensemble")) {
-                clauses.add(Clause.eq(column.getName(), "clim"));
-            } else {
-                if (v.length() > 0) {
-                    clauses.add(Clause.eq(column.getName(), v));
-                }
-            }
-
-        }
-        List[] pair = typeHandler.getEntryManager().getEntries(request,
-                          clauses, ctypeHandler.getGranuleTypeHandler());
-
-        return pair[1];
-    }
-
-    /**
-     * Get the repository
-     *
-     * @return the repository
-     */
-    private Repository getRepository() {
-        return repository;
-    }
-
 
     /**
      * Add the statitics widget
@@ -548,7 +412,7 @@ public class CDOArealStatisticsProcess extends DataProcess {
         for (DataProcessOperand op : input.getOperands()) {
             Entry first = op.getEntries().get(0);
             CdmDataOutputHandler dataOutputHandler =
-                typeHandler.getDataOutputHandler();
+                getOutputHandler().getDataOutputHandler();
             GridDataset dataset =
                 dataOutputHandler.getCdmManager().getGridDataset(first,
                     first.getResource().getPath());
