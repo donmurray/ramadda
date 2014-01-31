@@ -406,7 +406,7 @@ public class WikiUtil {
                 name = name.substring(0, idx);
                 String ahref =
                     "<a title=\"" + name
-                    + "\" class=\"wiki-link-external\" target=\"externalpage\" href=\""
+                    + "\" class=\"wiki-link-external\" target=\"_blank\" href=\""
                     + name + "\">";
                 s = s.substring(0, start) + ahref + label + "</a>"
                     + s.substring(end);
@@ -414,7 +414,7 @@ public class WikiUtil {
                 cnt++;
                 String ahref =
                     "<a title=\"" + name
-                    + "\" class=\"wiki-link-external\" target=\"externalpage\" href=\""
+                    + "\" class=\"wiki-link-external\" target=\"_blank\" href=\""
                     + name + "\">";
                 s = s.substring(0, start) + ahref + "_BRACKETOPEN_" + cnt
                     + "_BRACKETCLOSE_</a>" + s.substring(end);
