@@ -1492,11 +1492,11 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                 (PointOutputHandler) pth.getRecordOutputHandler();
 
             String jsonUrl = poh.getJsonUrl(request, entry);
-            getEntryChart(request, entry.getName(), jsonUrl, sb, props);
+            getEntryDisplay(request, entry.getName(), jsonUrl, sb, props);
 
             return sb.toString();
         } else if (theTag.equals(WIKI_PROP_DISPLAYGROUP)) {
-            getEntryChart(request, entry.getName(), null, sb, props);
+            getEntryDisplay(request, entry.getName(), null, sb, props);
 
             return sb.toString();
         } else if (theTag.equals(WIKI_PROP_GRAPH)) {
@@ -4163,36 +4163,15 @@ public class WikiManager extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    public void getEntryChart(Request request, String name, String url,
+    public void getEntryDisplay(Request request, String name, String url,
                               StringBuffer sb, Hashtable props)
             throws Exception {
 
+        this.addDisplayImports(request,  sb);
         List<String> topProps     = new ArrayList<String>();
-
         String       displayDivId = HtmlUtils.getUniqueId("displaydiv");
-        sb.append(HtmlUtils.div("", HtmlUtils.id(displayDivId)));
-
-        if (request.getExtraProperty("initmap") == null) {
-            sb.append(getMapManager().getHtmlImports());
-            request.putExtraProperty("initmap", "");
-        }
-
-        if (request.getExtraProperty("initchart") == null) {
-            request.putExtraProperty("initchart", "");
-            sb.append(HtmlUtils.comment("google chart imports"));
-            sb.append(HtmlUtils.importJS("https://www.google.com/jsapi"));
-            sb.append(
-                HtmlUtils.script(
-                    "google.load(\"visualization\", \"1\", {packages:['corechart','table','annotatedtimeline']});\n"));
-            sb.append(HtmlUtils.importJS(fileUrl("/pointdata.js")));
-            sb.append(HtmlUtils.comment("chart imports"));
-            sb.append(HtmlUtils.importJS(fileUrl("/displaymanager.js")));
-            sb.append(HtmlUtils.importJS(fileUrl("/display.js")));
-            sb.append(HtmlUtils.importJS(fileUrl("/displayext.js")));
-            sb.append(HtmlUtils.importJS(fileUrl("/lib/d3/d3.v3.min.js")));
-        }
-
         sb.append(HtmlUtils.comment("start chart"));
+        sb.append(HtmlUtils.div("", HtmlUtils.id(displayDivId)));
         List<String> propList = new ArrayList<String>();
 
 
@@ -4332,5 +4311,27 @@ public class WikiManager extends RepositoryManager implements WikiUtil
     }
 
 
+    public void addDisplayImports(Request request, StringBuffer sb)
+        throws Exception {
+
+        if (request.getExtraProperty("initmap") == null) {
+            sb.append(getMapManager().getHtmlImports());
+            request.putExtraProperty("initmap", "");
+        }
+
+        if (request.getExtraProperty("initchart") == null) {
+            request.putExtraProperty("initchart", "");
+            sb.append(HtmlUtils.comment("chart imports"));
+            sb.append(HtmlUtils.importJS("https://www.google.com/jsapi"));
+            sb.append(
+                HtmlUtils.script(
+                    "google.load(\"visualization\", \"1\", {packages:['corechart','table']});\n"));
+            sb.append(HtmlUtils.importJS(fileUrl("/lib/d3/d3.v3.min.js")));
+            sb.append(HtmlUtils.importJS(fileUrl("/pointdata.js")));
+            sb.append(HtmlUtils.importJS(fileUrl("/displaymanager.js")));
+            sb.append(HtmlUtils.importJS(fileUrl("/display.js")));
+            sb.append(HtmlUtils.importJS(fileUrl("/displayext.js")));
+        }
+    }
 
 }

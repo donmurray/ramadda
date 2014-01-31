@@ -230,8 +230,7 @@ input, password, fileinput,textarea,select {
      min-height:200px; 
 }
 .display-map-latlon {
-     margin-top: 5px;
-     margin-bottom: 5px;
+//    margin-top: 3px;
 }
 
 .display-multichart {

@@ -849,7 +849,7 @@ public class CdmDataOutputHandler extends OutputHandler {
 
                 Hashtable  props = new Hashtable();
                 props.put("mapenabled", "true");
-                getWikiManager().getEntryChart(request, title, jsonUrl, html,
+                getWikiManager().getEntryDisplay(request, title, jsonUrl, html,
                         props);
 
                 return new Result("Point As Grid Time Series", html);

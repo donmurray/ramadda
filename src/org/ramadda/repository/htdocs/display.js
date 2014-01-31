@@ -335,7 +335,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 return this.getFormValue("height",0);
             },
             setTitle: function(title) {
-                $("#" +  this.getDomId(ID_HEADER)).html(title);
+                $("#" + this.getDomId(ID_TITLE)).html(title);
             },
             getTitle: function () {
                 var title = this.getProperty("title");
@@ -545,17 +545,17 @@ function RamaddaMultiChart(displayManager, id, properties) {
             getType: function () {
                 return this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
             },
+            initDisplay:function() {
+                this.initUI();
+                this.addFieldsLegend();
+                this.displayData();
+            },
             getMenuContents: function() {
                 return this.getFieldsDiv()+ this.getDisplayMenuContents();
             },
             getFieldsDiv: function() {
                 var height = this.getProperty(PROP_HEIGHT,"400");
                 return htmlUtil.div(["id",  this.getDomId(ID_FIELDS),"class", "display-fields","style","overflow-y: auto;    max-height:" + height +"px;"]);
-            },
-            initDisplay:function() {
-                this.initUI();
-                this.addFieldsLegend();
-                this.displayData();
             },
             addFieldsLegend: function() {
                 if(!this.hasData()) {
@@ -658,20 +658,26 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 if(source==this) {
                     return;
                 }
-                if(this.chart!=null) {
-                    this.chart.setSelection([{row:index, column:null}]); 
-                } else {
-                    //                    console.log(" no chart");
+                this.setChartSelection(index);
+            },
+            loadInitialData: function() {
+                var testUrl = null;
+                //Uncomment to test using  "/repository/test.json";
+                if(this.properties.data!=null) {
+                    this.title = this.properties.data.getName();
+                    if(testUrl!=null) {
+                        var pointData = new PointData("Test",null,null,testUrl);
+                        this.properties.data = pointData;
+                    }
+                    this.addOrLoadData(this.properties.data);
                 }
             },
             displayData: function() {
                 if(this.getShowTitle()) {
-                    $("#" + this.getDomId(ID_TITLE)).html(this.getTitle());
+                    this.setTitle(this.getTitle());
                 }
                 if(!this.hasData()) {
-                    if(this.chart !=null) {
-                        this.chart.clearChart();
-                    }
+                    this.clearChart();
                     return;
                 }
 
@@ -682,24 +688,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                     this.setContents("No fields selected");
                     return;
                 }
-
-                var min = this.getProperty(PROP_CHART_MIN,"");
-
-                var chartOptions = {};
-                chartOptions.vAxes = {};
                 var dataList = this.getStandardData(selectedFields);
-
-                for(var i in selectedFields) {
-                    var field = selectedFields[i];
-                    chartOptions.vAxes[i] = {};
-                    if(min!="") {
-                        chartOptions.vAxes[i].minValue = min;
-                    }
-                    //chartOptions.vAxes[i].format =  i + ' #,###';
-                }
-
-
-
                 if(dataList.length==0) {
                     this.setContents(htmlUtil.div(["class","display-message"],
                                                   "No data available"));
@@ -707,22 +696,33 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 }
 
                 var chartType = this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
-                //
-                //Keep all of the google chart specific code here
-                //
+                this.makeChart(chartType, dataList, selectedFields);
+            },
+            clearChart: function() {
+                if(this.chart !=null) {
+                    this.chart.clearChart();
+                }
+            },
+            setChartSelection: function(index) {
+                if(this.chart!=null) {
+                    this.chart.setSelection([{row:index, column:null}]); 
+                }
+            },
+
+            makeGoogleChart: function(chartType, dataList, selectedFields) {
                 if(typeof google == 'undefined') {
                     this.setContents("No google");
                     return;
                 }
-
                 var dataTable = google.visualization.arrayToDataTable(dataList);
-                //                chartOptions = {};
-                chartOptions.colors = this.colors;
-                chartOptions.curveType = this.curveType;
+                var   chartOptions = {};
+                $.extend(chartOptions, {
+                        colors: this.colors,
+                            curveType:this.curveType,
+                            vAxis: {}});
                 if(this.fontSize>0) {
                     chartOptions.fontSize = this.fontSize;
                 }
-                chartOptions.vAxis = {};
                 if(!isNaN(this.vAxisMinValue)) {
                     chartOptions.vAxis.minValue =parseFloat(this.vAxisMinValue);
                 }
@@ -734,15 +734,10 @@ function RamaddaMultiChart(displayManager, id, properties) {
                     width = "80%";
                 }
                 $.extend(chartOptions, {
-                    explorer: {},
                     series: [{targetAxisIndex:0},{targetAxisIndex:1},],
                     legend: { position: 'bottom' },
                     chartArea:{left:75,top:10,height:"60%",width:width}
-                    });
-
-
-                
-
+                 });
                 if(chartType == DISPLAY_BARCHART) {
                     chartOptions.orientation =  "horizontal";
                     this.chart = new google.visualization.BarChart(document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
@@ -760,19 +755,10 @@ function RamaddaMultiChart(displayManager, id, properties) {
                                                                             theDisplay.dataCollection.getList()[0], index);
                         });
                 }
-            },
-            loadInitialData: function() {
-                var testUrl = null;
-                //Uncomment to test using  "/repository/test.json";
-                if(this.properties.data!=null) {
-                    this.title = this.properties.data.getName();
-                    if(testUrl!=null) {
-                        var pointData = new PointData("Test",null,null,testUrl);
-                        this.properties.data = pointData;
-                    }
-                    this.addOrLoadData(this.properties.data);
-                }
-            }});
+            }
+        });
+
+    this.makeChart = this.makeGoogleChart;
 }
 
 
@@ -831,18 +817,19 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             initDisplay: function() {
                 this.initUI();
                 var html = "";
-                var extraStyle = "";
+                var extraStyle = "min-height:200px;";
                 var width = this.getWidth();
-                var height = this.getProperty("height",300);
                 if(width>0) {
                     extraStyle += "width:" + width +"px; ";
                 }
-                var height = this.getProperty("height",-1);
+                var height = this.getProperty("height",300);
+                //                var height = this.getProperty("height",-1);
                 if(height>0) {
                     extraStyle += " height:" + height +"px; ";
                 }
 
                 html+=htmlUtil.div(["class", "display-map-map", "style",extraStyle, "id", this.getDomId(ID_MAP)]);
+                console.log(html);
                 html+="<br>";
                 html+= htmlUtil.openTag("div",["class","display-map-latlon"]);
                 html+= htmlUtil.openTag("form");
@@ -1034,7 +1021,7 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
                 html +="  ";
                 html+=  htmlUtil.onClick(get +".slower();", htmlUtil.image(this.iconSlower,["class", "display-animation-button", "title","slower", "xwidth","32"]));
                 html+=  htmlUtil.div(["id", this.getDomId(ID_TIME)],"&nbsp;");
-                $("#" + this.getDomId(ID_TITLE)).html(this.getTitle());
+                this.setTitle(this.getTitle());
                 this.setContents(html);
             },
         });
