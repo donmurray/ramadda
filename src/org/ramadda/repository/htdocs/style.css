@@ -887,8 +887,8 @@ label {
 }
 
 .ramadda-user-link:hover {
-   background-color: #eee;
-   /* text-decoration: underline;*/
+   background-color: #ccc;
+  /* text-decoration: underline;*/
    cursor:pointer;
 }
 

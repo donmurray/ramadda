@@ -400,7 +400,6 @@ function DisplayManager(id,properties) {
                 this.displays.push(display);
                 display.setDisplayManager(this);
                 this.addDisplayEventListener(display);
-
                 display.loadInitialData();
                 this.doLayout();
             },
@@ -438,11 +437,11 @@ function DisplayManager(id,properties) {
                 var displaymanager = this;
                 setTimeout(function(){displayManager.doLayout();},1);
             },
-            pointDataLoaded: function(pointData) {
+            pointDataLoaded: function(source, pointData) {
                 for(var i=0;i< this.eventListeners.length;i++) {
                     eventListener = this.eventListeners[i];
                     if(eventListener.handlePointDataLoaded!=null) {
-                        eventListener.handlePointDataLoaded(pointData);
+                        eventListener.handlePointDataLoaded(source, pointData);
                     }
                 }
 
