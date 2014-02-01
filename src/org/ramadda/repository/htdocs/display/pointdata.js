@@ -446,8 +446,7 @@ function makeTestPointData() {
 
 
 
-function getRanges(fields,data) {
-    var ranges = [];
+function RecordGetRanges(fields,records) {
     var maxValues = [];
     var minValues = [];
     for(var i=0;i<fields.length;i++) {
@@ -455,16 +454,45 @@ function getRanges(fields,data) {
         minValues.push(NaN);
     }
 
-    for(var row=0;row<data.length;row++) {
+    for(var row=0;row<records.length;row++) {
         for(var col=0;col<fields.length;col++) {
-            var value  = data[row].getValue(col);
+            var value  = records[row].getValue(col);
             if(isNaN(value)) continue;    
             maxValues[col] = (isNaN(maxValues[col])?value:Math.max(value, maxValues[col]));
             minValues[col] = (isNaN(minValues[col])?value:Math.min(value, minValues[col]));
         }
     }
-    var tuple =[minValues,maxValues];
-    return tuple;
+
+    var ranges = [];
+    for(var col=0;col<fields.length;col++) {
+        ranges.push([minValues[col],maxValues[col]]);
+    }
+    return ranges;
+}
+
+
+
+function RecordGetElevationRange(fields,records) {
+    var maxValue =NaN;
+    var minValue = NaN;
+
+    for(var row=0;row<records.length;row++) {
+        if(records[row].hasElevation()) { 
+            var value = records[row].getElevation();
+            maxValue = (isNaN(maxValue)?value:Math.max(value, maxValue));
+            minValue = (isNaN(minValue)?value:Math.min(value, minValue));
+        }
+    }
+    return [minValue,maxValue];
+}
+
+
+function RecordSlice(records,index) {
+    var values = [];
+    for(var row=0;row<records.length;row++) {
+        values.push(records[row].getValue(index));
+    }
+    return values;
 }
 
 

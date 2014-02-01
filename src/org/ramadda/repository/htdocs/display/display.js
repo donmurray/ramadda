@@ -132,6 +132,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
             displayManager:displayManager,
             filters: [],
             dataCollection: new DataCollection(),
+            selectedCbx: [],
             getType: function() {
                 return this.type;
             },
@@ -151,6 +152,114 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                         $("#" + divid).html(html);
                     }
                 }
+            },
+            addFieldsCheckboxes: function() {
+                if(!this.hasData()) {
+                    $("#" + this.getDomId(ID_FIELDS)).html("No data");
+                    return;
+                }
+                if(this.getProperty(PROP_FIELDS,null)!=null) {
+                    //            return;
+                }
+                var html =  null;
+                var checkboxClass = this.id +"_checkbox";
+                var dataList =  this.dataCollection.getList();
+                for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
+                    var pointData = dataList[collectionIdx];
+                    var fields =pointData.getChartableFields();
+                    fields = RecordFieldSort(fields);
+                    if(html == null) {
+                        html = htmlUtil.tag("b", [],  "Fields");
+                        html += htmlUtil.openTag("div", ["class", "display-fields"]);
+                    } else {
+                        html+= "<br>";
+                    }
+
+
+
+                    for(i=0;i<fields.length;i++) { 
+                        var field = fields[i];
+                        var idBase = "cbx_" + collectionIdx +"_" +i;
+                        field.checkboxId  = this.getDomId(idBase);
+                        var on = false;
+                        if(this.selectedCbx.indexOf(idBase)>=0) {
+                            on = true;
+                        }  else if(this.selectedCbx.length==0) {
+                            on = (i==0);
+                        }
+                        html += htmlUtil.tag("div", ["title", field.getId()],
+                                             htmlUtil.checkbox(field.checkboxId, checkboxClass,
+                                                               on) +" " +field.getLabel()
+                                             );
+                    }
+                }
+                if(html == null) {
+                    html = "";
+                } else {
+                    html+= htmlUtil.closeTag("div");
+                }
+
+                $("#" + this.getDomId(ID_FIELDS)).html(html);
+
+                var theChart = this;
+                //Listen for changes to the checkboxes
+                $("." + checkboxClass).click(function(event) {
+                        theChart.fieldSelectionChanged();
+                    });
+            },
+            fieldSelectionChanged: function() {
+            },
+            getSelectedFields:function() {
+
+                var df = [];
+                var dataList =  this.dataCollection.getList();
+                //If we have fixed fields then clear them after the first time
+                var fixedFields = this.getProperty(PROP_FIELDS);
+                if(fixedFields!=null) {
+                    this.removeProperty(PROP_FIELDS);
+                    if(fixedFields.length==0) {
+                        fixedFields = null;
+                    } 
+                }
+                for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
+                    var pointData = dataList[collectionIdx];
+                    var fields = pointData.getChartableFields();
+                    if(fixedFields !=null) {
+                        for(i=0;i<fields.length;i++) { 
+                            var field = fields[i];
+                            if(fixedFields.indexOf(field.getId())>=0) {
+                                df.push(field);
+                            }
+                        }
+                    }
+                }
+
+                if(fixedFields !=null) {
+                    return df;
+                }
+
+                var firstField = null;
+                this.selectedCbx = [];
+                for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
+                    var pointData = dataList[collectionIdx];
+                    var fields = pointData.getChartableFields();
+                    for(i=0;i<fields.length;i++) { 
+                        var field = fields[i];
+                        if(firstField==null) firstField = field;
+
+                        var idBase = "cbx_" + collectionIdx +"_" +i;
+                        var cbxId =  this.getDomId(idBase)
+                        if($("#" + cbxId).is(':checked')) {
+                            this.selectedCbx.push(idBase);
+                            df.push(field);
+                        }
+                    }
+                }
+
+                if(df.length==0 && firstField!=null) {
+                    df.push(firstField);
+                }
+                return df;
             },
             getDisplayMenuContents: function() {
                 var get = "getRamaddaDisplay('" + this.id +"')";
@@ -549,7 +658,6 @@ function RamaddaMultiChart(displayManager, id, properties) {
     $.extend(this, {
             indexField: -1,
             colors: ['blue', 'red', 'green'],
-            selectedCbx: [],
             curveType: 'none',
             fontSize: 0,
             vAxisMinValue:NaN,
@@ -570,7 +678,10 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 this.updateUI();
             },
             updateUI: function() {
-                this.addFieldsLegend();
+                this.addFieldsCheckboxes();
+                this.displayData();
+            },
+            fieldSelectionChanged: function() {
                 this.displayData();
             },
             getMenuContents: function() {
@@ -578,113 +689,6 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 var html  =  htmlUtil.div(["id",  this.getDomId(ID_FIELDS),"class", "display-fields","style","overflow-y: auto;    max-height:" + height +"px;"]);
                 html +=  this.getDisplayMenuContents();
                 return html;
-            },
-            addFieldsLegend: function() {
-                if(!this.hasData()) {
-                    $("#" + this.getDomId(ID_FIELDS)).html("No data");
-                    return;
-                }
-                if(this.getProperty(PROP_FIELDS,null)!=null) {
-                    //            return;
-                }
-                //        this.setTitle(this.getTitle());
-
-                var html =  null;
-                var checkboxClass = this.id +"_checkbox";
-                var dataList =  this.dataCollection.getList();
-                for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
-                    var pointData = dataList[collectionIdx];
-                    var fields =pointData.getChartableFields();
-                    fields = RecordFieldSort(fields);
-                    if(html == null) {
-                        html = htmlUtil.tag("b", [],  "Fields");
-                        html += htmlUtil.openTag("div", ["class", "display-fields"]);
-                    } else {
-                        html+= "<br>";
-                    }
-
-
-
-                    for(i=0;i<fields.length;i++) { 
-                        var field = fields[i];
-                        var idBase = "cbx_" + collectionIdx +"_" +i;
-                        field.checkboxId  = this.getDomId(idBase);
-                        var on = false;
-                        if(this.selectedCbx.indexOf(idBase)>=0) {
-                            on = true;
-                        }  else if(this.selectedCbx.length==0) {
-                            on = (i==0);
-                        }
-                        html += htmlUtil.tag("div", ["title", field.getId()],
-                                             htmlUtil.checkbox(field.checkboxId, checkboxClass,
-                                                               on) +" " +field.getLabel()
-                                             );
-                    }
-                }
-                if(html == null) {
-                    html = "";
-                } else {
-                    html+= htmlUtil.closeTag("div");
-                }
-
-                $("#" + this.getDomId(ID_FIELDS)).html(html);
-
-                var theChart = this;
-                //Listen for changes to the checkboxes
-                $("." + checkboxClass).click(function(event) {
-                        theChart.displayData();
-                    });
-            },
-            getSelectedFields:function() {
-                var df = [];
-                var dataList =  this.dataCollection.getList();
-                //If we have fixed fields then clear them after the first time
-                var fixedFields = this.getProperty(PROP_FIELDS);
-                if(fixedFields!=null) {
-                    this.removeProperty(PROP_FIELDS);
-                    if(fixedFields.length==0) {
-                        fixedFields = null;
-                    } 
-                }
-                for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
-                    var pointData = dataList[collectionIdx];
-                    var fields = pointData.getChartableFields();
-                    if(fixedFields !=null) {
-                        for(i=0;i<fields.length;i++) { 
-                            var field = fields[i];
-                            if(fixedFields.indexOf(field.getId())>=0) {
-                                df.push(field);
-                            }
-                        }
-                    }
-                }
-
-                if(fixedFields !=null) {
-                    return df;
-                }
-
-                var firstField = null;
-                this.selectedCbx = [];
-                for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
-                    var pointData = dataList[collectionIdx];
-                    var fields = pointData.getChartableFields();
-                    for(i=0;i<fields.length;i++) { 
-                        var field = fields[i];
-                        if(firstField==null) firstField = field;
-
-                        var idBase = "cbx_" + collectionIdx +"_" +i;
-                        var cbxId =  this.getDomId(idBase)
-                        if($("#" + cbxId).is(':checked')) {
-                            this.selectedCbx.push(idBase);
-                            df.push(field);
-                        }
-                    }
-                }
-
-                if(df.length==0 && firstField!=null) {
-                    df.push(firstField);
-                }
-                return df;
             },
             handleRecordSelection: function(source, index, record, html) {
                 var chartType = this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);

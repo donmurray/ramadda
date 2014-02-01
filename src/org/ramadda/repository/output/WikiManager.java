@@ -4326,13 +4326,17 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             sb.append(
                 HtmlUtils.script(
                     "google.load(\"visualization\", \"1\", {packages:['corechart','table']});\n"));
-
-            //            sb.append(HtmlUtils.importJS(fileUrl("/chart/dygraph-combined.js")));
-            sb.append(HtmlUtils.importJS(fileUrl("/lib/d3/d3.v3.min.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/pointdata.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/displaymanager.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/display.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/displayext.js")));
+
+            String includes =getProperty("ramadda.display.includes", (String) null);
+            if (includes!= null) {
+                for(String include: StringUtil.split(includes, ",", true, true)) {
+                    sb.append(HtmlUtils.importJS(fileUrl(include)));
+                }
+            }
         }
     }
 
