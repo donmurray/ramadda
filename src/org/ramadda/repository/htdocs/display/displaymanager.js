@@ -1,17 +1,18 @@
 
 //There are the DOM IDs for various components of the UI
-var ID_ENTRIES = "entries";
 var ID_DISPLAYS = "displays";
 var ID_MENU_BUTTON = "menu_button";
 var ID_MENU_POPUP =  "menu_popup";
 var ID_MENU_INNER =  "menu_inner";
 
+//Layout types
 var LAYOUT_TABLE = "table";
 var LAYOUT_TABS = "tabs";
 var LAYOUT_COLUMNS = "columns";
 var LAYOUT_ROWS = "rows";
 
-var PROP_CHART_TYPE = "chartType";
+
+//Properties
 var PROP_LAYOUT_TYPE = "layoutType";
 var PROP_LAYOUT_COLUMNS = "layoutColumns";
 var PROP_SHOW_MAP = "showMap";
@@ -25,13 +26,20 @@ var PROP_TODATE = "toDate";
 //
 function addDisplayManager(displayManager) {
     if(window.globalDisplayManagers == null) {
-        window.globalDisplayManagers =  {'foo':'bar'};
+        window.globalDisplayManagers =  {};
         window.globalDisplayManager = null;
     }
     window.globalDisplayManagers[displayManager.getId()] = displayManager;
     window.globalDisplayManager = displayManager;
 }
 
+
+function addGlobalDisplayType(type) {
+    if(window.globalDisplayTypes == null) {
+        window.globalDisplayTypes=  [];
+    }
+    window.globalDisplayTypes.push(type);
+}
 
 //
 //This will get the currently created global displaymanager or will create a new one
@@ -64,23 +72,48 @@ function getDisplayManager(id) {
 
 //
 //DisplayManager constructor
-//
+//id should correspond to a DOM element id
 function DisplayManager(id,properties) {
     var theDisplayManager = this;
     if(properties == null) {
        properties == {};
     }
+
+
     $.extend(this, new DisplayThing(id, properties));
     $.extend(this, {
                 displays : [],
                 dataList : [],
+                displayTypes: [
+                               {type: "map", label:"Map"},
+                               {type: "linechart",label:"Line Chart"},
+                               {type: "barchart", label:"Bar Chart"},
+                               {type: "table",label:"Table"},
+                               {type: "text",label:"Record Text"},
+                               {type: "animation",label:"Animation"},
+                               {type: "filter", label:"Test Filter"}
+                               ],
                 cnt : 0,
                 eventListeners: [],
                 layout:this.getProperty(PROP_LAYOUT_TYPE, LAYOUT_TABLE),
                 columns:this.getProperty(PROP_LAYOUT_COLUMNS, 1),
                 showmap : this.getProperty(PROP_SHOW_MAP,null),
                 initMapBounds : null,
-                initMapPoints : null,
+                initMapPoints : null});
+
+
+    if(window.globalDisplayTypes!=null) {
+        for(var i=0;i<window.globalDisplayTypes.length;i++) {
+            this.displayTypes.push(window.globalDisplayTypes[i]);
+        }
+    }
+
+    $.extend(this, {
+                addDisplayType: function(type,label) {
+                    this.displayTypes.push({type:label});
+                },
+
+
                 setMapState : function(points, bounds) {
                    this.initMapPoints = points;
                    this.initMapBounds = bounds;
@@ -159,13 +192,12 @@ function DisplayManager(id,properties) {
                 var html = "";
                 var wider = htmlUtil.onClick(get +".changeChartWidth(1);","Chart width");
                 var narrower = htmlUtil.onClick(get +".changeChartWidth(-1);","Chart width");
-                //The ids (.e.g., 'linechart' have to match up with some class function with the name 
-                //as defined in the createDisplay method
-                var displayNames = ["Map", "Line Chart","Bar Chart", "Table", "Text","Animation", "Filter", "Scatter Plot","Example"];
-                var displayCalls = ["createDisplay('map');", "createDisplay('linechart');","createDisplay('barchart');", "createDisplay('table');","createDisplay('text');","createDisplay('animation');","createDisplay('RamaddaFilterDisplay');", "createDisplay('scatterplot');","createDisplay('example');"];
+
                 var newMenu = "";
-                for(var i=0;i<displayNames.length;i++) {
-                    newMenu+= htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick", get+"." + displayCalls[i]], displayNames[i]));
+                for(var i=0;i<this.displayTypes.length;i++) {
+                    //The ids (.e.g., 'linechart' have to match up with some class function with the name 
+                    var type = this.displayTypes[i];
+                    newMenu+= htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick", get+".createDisplay('" + type.type+"');"], type.label));
                 }
 
                 var layoutMenu = 
@@ -222,9 +254,6 @@ function DisplayManager(id,properties) {
                     jsonUrl = jsonUrl.replace("${longitude}","-107.0");
                 }
                 return jsonUrl;
-            },
-           entryListChanged:function(entryList) {
-                entryList.setHtml(entryList.getHtml());
             },
             changeChartWidth:function(w) {
             },
@@ -453,50 +482,14 @@ function DisplayManager(id,properties) {
     var html = htmlUtil.openTag("div", ["class","display-container"]);
     html += this.makeMainMenu();
 
-    //
-    //Main layout is defined here
-    // Right now it is a table:
-    // menu
-    // | displays div |  map & settings form | 
-    //
-
-
-    //    html += htmlUtil.openTag("table",["cellspacing","0","cellpadding","0","width","100%","border","0"]);
-    //    html += htmlUtil.openTag("tr", ["valign","top"]);
-
-    //    html+="<td>";
-    //    html+="<b>Entries</b>";
-    //    html+="<div class=chart-entry-list-wrapper><div id=" + this.getDomId(ID_ENTRIES) +"  class=chart-entry-list></div></div>";
-    //    html+="</td>";
-
 
     var theDiv =  htmlUtil.div(["id", this.getDomId(ID_DISPLAYS)]);
     html += theDiv;
-
-    /*
-    html+=htmlUtil.tag("td", [], theDiv);
-    html+=htmlUtil.openTag("td", ["width", "300"]);
-    if(this.getProperty(PROP_SHOW_MENU, true))  {
-        //This is where we can put time selectors, etc
-        html+= "<br>";
-        html+= htmlUtil.tag("b",[],"Selection");
-        html+=htmlUtil.openTag("form");
-        html+=" Put selection form here";
-        html+=htmlUtil.closeTag("form");
-    }
-
-    html+=htmlUtil.closeTag("td");
-    html+=htmlUtil.closeTag("table");
-    */
 
     $("#"+ this.getId()).html(html);
 
     if(this.showmap) {
         this.createDisplay('map');
-    }
-
-    if(this.entryList) {
-        //this.entryList.initDisplay(this.getDomId(ID_ENTRIES));
     }
 
 

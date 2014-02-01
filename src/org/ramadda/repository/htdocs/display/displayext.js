@@ -65,3 +65,6 @@ function RamaddaExampleDisplay(displayManager, id, properties) {
         });
 }
 
+
+//Add this type to the global list
+addGlobalDisplayType({type: "example", label:"Example"});
