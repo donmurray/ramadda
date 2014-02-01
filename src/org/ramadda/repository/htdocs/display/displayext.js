@@ -37,6 +37,8 @@ function RamaddaExampleDisplay(displayManager, id, properties) {
 
                 //Set the contents
                 this.setContents(html);
+
+                //Add the data
                 this.updateUI();
             },
             //this tells the base display class to loadInitialData
