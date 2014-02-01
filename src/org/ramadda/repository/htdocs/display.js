@@ -533,12 +533,13 @@ function RamaddaMultiChart(displayManager, id, properties) {
     $.extend(this, {
             dataCollection: new DataCollection(),
             indexField: -1,
-            colors: ['blue','red', 'green'],
+            colors: ['blue', 'red', 'green'],
             curveType: 'none',
             fontSize: 0,
             vAxisMinValue:NaN,
             vAxisMaxValue:NaN
            });
+
     RamaddaSuper(this, new RamaddaDisplay(displayManager, id, properties.chartType, properties));
 
     $.extend(this, {
@@ -718,8 +719,10 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 var   chartOptions = {};
                 $.extend(chartOptions, {
                         colors: this.colors,
-                            curveType:this.curveType,
-                            vAxis: {}});
+                        curveType:this.curveType,
+                        vAxis: {}});
+
+
                 if(this.fontSize>0) {
                     chartOptions.fontSize = this.fontSize;
                 }
@@ -744,6 +747,8 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 } else  if(chartType == DISPLAY_TABLE) {
                     this.chart = new google.visualization.Table(document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
                 } else {
+                    //                    this.chart =  new Dygraph.GVizChart(
+                    //                    document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
                     this.chart = new google.visualization.LineChart(document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
                 }
                 if(this.chart!=null) {
@@ -757,6 +762,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 }
             }
         });
+
 
     this.makeChart = this.makeGoogleChart;
 }
@@ -829,7 +835,6 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 }
 
                 html+=htmlUtil.div(["class", "display-map-map", "style",extraStyle, "id", this.getDomId(ID_MAP)]);
-                console.log(html);
                 html+="<br>";
                 html+= htmlUtil.openTag("div",["class","display-map-latlon"]);
                 html+= htmlUtil.openTag("form");
@@ -841,18 +846,23 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 this.setContents(html);
 
 
+
                 var currentPolygons = this.polygons;
                 this.polygons = [];
+
+
                 var params = {
                     "defaultMapLayer": this.getProperty("defaultMapLayer", map_default_layer)
                 };
                 this.map = new RepositoryMap(this.getDomId(ID_MAP), params);
                 this.map.initMap(false);
                 this.map.addClickHandler(this.getDomId(ID_LONFIELD), this.getDomId(ID_LATFIELD), null, this);
+                console.log("initBounds " +  this.initBounds);
                 if(this.initBounds!=null) {
                     var b  = this.initBounds;
                     this.setInitMapBounds(b[0],b[1],b[2],b[3]);
                 }
+
 
                 if(this.initPoints!=null && this.initPoints.length>1) {
                     this.polygons.push(this.initPoints);
@@ -864,6 +874,12 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                         this.polygons.push(currentPolygons[i]);
                         this.map.addPolygon("basemap", clonePoints(currentPolygons[i]), null);
                     }
+                }
+            },
+            loadInitialData: function() {
+                console.log("loading init data");
+                if(this.displayManager.getData().length>0) {
+                    this.handlePointDataLoaded(this.displayManager.getData()[0]);
                 }
             },
             getContentsDiv: function() {

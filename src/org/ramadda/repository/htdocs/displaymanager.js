@@ -82,9 +82,9 @@ function DisplayManager(id,properties) {
                 initMapBounds : null,
                 initMapPoints : null,
                 setMapState : function(points, bounds) {
-                this.initMapPoints = points;
-                this.initMapBounds = bounds;
-            },
+                   this.initMapPoints = points;
+                   this.initMapBounds = bounds;
+                },
             getData: function() {
                 return this.dataList;
             },
@@ -392,7 +392,6 @@ function DisplayManager(id,properties) {
                 }
                 //                console.log("Calling:" + funcName);
                 var display =  eval(" new " + funcName+"(this, displayId, props);");
-                display.loadInitialData();
                 if(display == null) {
                     console.log("Error: could not create display using:" + funcName);
                     alert("Error: could not create display using:" + funcName);
@@ -401,7 +400,8 @@ function DisplayManager(id,properties) {
                 this.displays.push(display);
                 display.setDisplayManager(this);
                 this.addDisplayEventListener(display);
-                //                display.handlePointDataLoaded(data);
+
+                display.loadInitialData();
                 this.doLayout();
             },
             moveDisplayUp: function(display) {

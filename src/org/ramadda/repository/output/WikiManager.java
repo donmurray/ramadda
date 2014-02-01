@@ -4326,6 +4326,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             sb.append(
                 HtmlUtils.script(
                     "google.load(\"visualization\", \"1\", {packages:['corechart','table']});\n"));
+
+            //            sb.append(HtmlUtils.importJS(fileUrl("/chart/dygraph-combined.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/lib/d3/d3.v3.min.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/pointdata.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/displaymanager.js")));
