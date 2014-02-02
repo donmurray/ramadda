@@ -277,8 +277,8 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                     "<tr><td align=right><b>Height:</b></td><td> " + htmlUtil.input("", this.getProperty("height",""), ["size","7","id",  this.getDomId("height")]) + "</td></tr>" +
                     "<tr><td align=right><b>Row:</b></td><td> " + htmlUtil.input("", this.getProperty("row",""), ["size","7","id",  this.getDomId("row")]) + "</td></tr>" +
                     "<tr><td align=right><b>Column:</b></td><td> " + htmlUtil.input("", this.getProperty("column",""), ["size","7","id",  this.getDomId("column")]) + "</td></tr>" +
-                    "<tr style=\"border-top:1px #ccc solid;\"><td align=right></td><td> " + deleteMe+ "</td></tr>" +
                     "</table>" +
+                    htmlUtil.div(["style","padding-top:2px; border-top: 1px #888 solid;"], deleteMe) +
                     "</form>";
                 return htmlUtil.div([], form);
             },
@@ -686,7 +686,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
             },
             getMenuContents: function() {
                 var height = this.getProperty(PROP_HEIGHT,"400");
-                var html  =  htmlUtil.div(["id",  this.getDomId(ID_FIELDS),"class", "display-fields","style","overflow-y: auto;    max-height:" + height +"px;"]);
+                var html  =  htmlUtil.div(["id",  this.getDomId(ID_FIELDS),"style","overflow-y: auto;    max-height:" + height +"px;"]);
                 html +=  this.getDisplayMenuContents();
                 return html;
             },

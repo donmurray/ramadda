@@ -331,14 +331,13 @@ input, password, fileinput,textarea,select {
 }
 
 .display-fields {
-   padding-right:4px;
-   padding-left:4px;
+//   padding-right:4px;
+//   padding-left:4px;
    padding-top:0px;
    padding-bottom:0px;
    min-width: 250px; 
    max-width: 400px; 
-   border-top: 1px #ccc solid;
-   border-bottom: 1px #ccc solid;
+   border-bottom: 1px #888 solid;
    overflow-y: auto;
    max-height: 100px;
 }
