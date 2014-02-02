@@ -145,17 +145,74 @@ input, password, fileinput,textarea,select {
 }
 
 
+.display-dialog {
+   display: none;
+   text-decoration: none;
+   border : 1px #aaa solid;
+   background-color : #Eee;
+   position:absolute;
+   left:-10000px; 
+   z-index: 10000;
+  -webkit-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+  -moz-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+  /* IE */
+  filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=5, OffY=5, Color='gray');
+  /* slightly different syntax for IE8 */
+  -ms-filter:"progid:DXImageTransform.Microsoft.dropshadow(OffX=5, OffY=5, Color='gray')";
+}
+
+
+
 .display-container {
    margin:10px;
 }
 
 
-.display-menu-button {
-    min-height :16px;
+.display-dialog-button {
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 3px;
+    padding-bottom: 2px;
+    margin-bottom:1px;
+    border:1px #ccc solid; 
+    background-color: #efefef;
 }
+
+.display-dialog-button:hover {
+    border:1px #aaa solid; 
+    background-color: #e0e0e0;
+}
+
+.display-dialog-header {
+   padding:2px;
+   border-bottom:1px #888 solid; 
+}
+
+.display-dialog-contents {
+   padding:4px;
+}
+
+.display-dialog-header:hover {
+    background-color: #e4e4e4;
+}
+
+
+.display-dialog-close {
+   padding:2px;
+   cursor:pointer;
+}
+
+
+
 
 .display-title {
    font-weight: bold; 
+}
+
+.display-animation {
+   border-top:1px #ccc solid; 
+   padding:5px;
 }
 
 .display-animation-button {
@@ -262,6 +319,8 @@ input, password, fileinput,textarea,select {
 {
   background-color: #fcf7bd;
 }
+
+
 
 .display-menu-entry {
                     padding-top:5px;

@@ -10,9 +10,8 @@ var ID_FIELDS = "fields";
 var ID_HEADER = "header";
 var ID_TITLE = "title";
 var ID_DISPLAY_CONTENTS = "contents";
-var ID_MENU_BUTTON = "menu_button";
-var ID_MENU_POPUP = "menu_popup";
-var ID_MENU_INNER = "menu_inner";
+var ID_DIALOG = "dialog";
+var ID_DIALOG_BUTTON = "dialog_button";
 
 var PROP_DISPLAY_FILTER = "displayFilter";
 
@@ -278,7 +277,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                     "<tr><td align=right><b>Height:</b></td><td> " + htmlUtil.input("", this.getProperty("height",""), ["size","7","id",  this.getDomId("height")]) + "</td></tr>" +
                     "<tr><td align=right><b>Row:</b></td><td> " + htmlUtil.input("", this.getProperty("row",""), ["size","7","id",  this.getDomId("row")]) + "</td></tr>" +
                     "<tr><td align=right><b>Column:</b></td><td> " + htmlUtil.input("", this.getProperty("column",""), ["size","7","id",  this.getDomId("column")]) + "</td></tr>" +
-                    "<tr><td align=right></td><td> " + deleteMe+ "</td></tr>" +
+                    "<tr style=\"border-top:1px #ccc solid;\"><td align=right></td><td> " + deleteMe+ "</td></tr>" +
                     "</table>" +
                     "</form>";
                 return htmlUtil.div([], form);
@@ -359,20 +358,9 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
             getMenuContents: function() {
                 return this.getDisplayMenuContents();
              },
-             initMenu: function() {
-                var theDisplay = this;
-                $("#"+this.getDomId(ID_MENU_BUTTON)).button({ icons: { primary:  "ui-icon-triangle-1-s"}}).click(function(event) {
-                        var id =theDisplay.getDomId(ID_MENU_POPUP); 
-                        //function showStickyPopup(event, srcId, popupId, alignLeft) {
-                        //                        showPopup(event, theDisplay.getDomId(ID_MENU_BUTTON), id, false,null,"left bottom");
-                        theDisplay.showPopup(event, theDisplay.getDomId(ID_MENU_BUTTON), id, true);
-                        $("#"+  theDisplay.getDomId(ID_MENU_INNER)).superfish({
-                                animation: {height:'show'},
-                                    delay: 1200
-                                    });
-                    });
-            },
-           showPopup: function(event, srcId, popupId) {
+           initMenu: function() {
+           },
+           popup: function(srcId, popupId) {
                 var popup = ramaddaUtil.getDomObject(popupId);
                 var srcObj = ramaddaUtil.getDomObject(srcId);
                 if(!popup || !srcObj) return;
@@ -392,6 +380,8 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                             at: atalign,
                             collision: "none none"
                             });
+
+                $("#" + popupId).draggable();
             },
             initUI:function() {
                 this.checkFixedLayout();
@@ -419,12 +409,16 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
             getHtml: function() {
                 var html = "";
                 html +=   htmlUtil.div(["id", this.getDomId(ID_HEADER),"class", "display-header"]);
-                var menuButton =  htmlUtil.tag("a", ["class", "display-menu-button", "id",  this.getDomId(ID_MENU_BUTTON)]);
-                var close = htmlUtil.onClick("$('#" +this.getDomId(ID_MENU_POPUP) +"').hide();","<table width=100%><tr><td class=display-menu-close align=right><img src=" + root +"/icons/close.gif></td></tr></table>");
+                var get = "getRamaddaDisplay('" + this.id +"')";
+                var menuButton = htmlUtil.onClick(get+".showDialog();", 
+                                                  htmlUtil.image(root+"/icons/downdart.png", 
+                                                                 ["class", "display-dialog-button", "id",  this.getDomId(ID_DIALOG_BUTTON)]));
 
-                var menuContents = this.getMenuContents();
-                menuContents  = close + menuContents;
-                var menu = htmlUtil.div(["class", "ramadda-popup", "id", this.getDomId(ID_MENU_POPUP)], menuContents);
+                var header = htmlUtil.div(["class","display-dialog-header"], htmlUtil.onClick("$('#" +this.getDomId(ID_DIALOG) +"').hide();",htmlUtil.image(root +"/icons/close.gif",["class","display-dialog-close"])));
+
+                var menuContents = htmlUtil.div(["class", "display-dialog-contents"], this.getMenuContents());
+                menuContents  = header + menuContents;
+                var menu = htmlUtil.div(["class", "display-dialog", "id", this.getDomId(ID_DIALOG)], menuContents);
                 var width = this.getWidth();
                 var tableWidth = "100%";
                 if(width>0) {
@@ -450,6 +444,11 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 html += menu;
                 return html;
             },
+            showDialog: function() {
+                var dialog =this.getDomId(ID_DIALOG); 
+                this.popup(this.getDomId(ID_DIALOG_BUTTON), dialog);
+            },
+
             getContentsDiv: function() {
                 var extraStyle = "";
                 var width = this.getWidth();
@@ -487,6 +486,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 return this.getFormValue("height",0);
             },
             setTitle: function(title) {
+                console.log("settitle:" + title);
                 $("#" + this.getDomId(ID_TITLE)).html(title);
             },
             getTitle: function () {
@@ -1046,10 +1046,9 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
             initDisplay: function() {
                 this.initUI();
                 this.stop();
-                var html =  htmlUtil.div(["class","wiki-h2"],"Animation");
-                var get = "getRamaddaDisplay('" + this.id +"')";
 
-                html+=  "&nbsp;&nbsp;";
+                var get = "getRamaddaDisplay('" + this.id +"')";
+                var html =  "";
                 html+=  htmlUtil.onClick(get +".setIndex(0);", htmlUtil.image(this.iconBegin,["title","beginning", "class", "display-animation-button", "xwidth","32"]));
                 html +="  ";
                 html+=  htmlUtil.onClick(get +".deltaIndex(-1);", htmlUtil.image(this.iconBack,["title","back 1", "class", "display-animation-button", "xwidth","32"]));
@@ -1062,7 +1061,7 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
                 html +="  ";
                 html+=  htmlUtil.onClick(get +".slower();", htmlUtil.image(this.iconSlower,["class", "display-animation-button", "title","slower", "xwidth","32"]));
                 html+=  htmlUtil.div(["id", this.getDomId(ID_TIME)],"&nbsp;");
-                this.setTitle(this.getTitle());
+                this.setTitle("Animation");
                 this.setContents(html);
             },
         });
