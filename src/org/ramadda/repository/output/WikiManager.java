@@ -4330,6 +4330,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             sb.append(HtmlUtils.importJS(fileUrl("/display/displaymanager.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/display.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/displayext.js")));
+            sb.append(HtmlUtils.importJS(fileUrl("/lib/d3/d3.min.js")));
 
             String includes =getProperty("ramadda.display.includes", (String) null);
             if (includes!= null) {
