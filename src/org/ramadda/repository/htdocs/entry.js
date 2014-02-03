@@ -1,4 +1,51 @@
 
+function EntryManager(repositoryRoot) {
+    if(repositoryRoot == null) {
+        repositoryRoot = root;
+    }
+    $.extend(this, {
+            repositoryRoot:repositoryRoot,
+            entryCache: {},
+             getJsonUrl: function(entryId) {
+                return this.repositoryRoot + "/entry/show?entryid=" + id +"&output=json";
+            },
+            getEntry: function(id, callback) {
+                var entry = entryCache[id];
+                if(entry!=null)  {
+                    return entry;
+                }
+                if(callback==null) {
+                    return null;
+                }
+                var jsonUrl = this.getJsonUrl(id);
+                var jqxhr = $.getJSON( jsonUrl, function(data) {
+                        var entryList =  createEntriesFromJson(data);
+                        console.log("got entry:" + entryList);
+                        callback.call(data);
+                    })
+                    .fail(function(jqxhr, textStatus, error) {
+                            var err = textStatus + ", " + error;
+                            alert("JSON error:" + err);
+                            console.log("JSON error:" +err);
+                        });
+                return null;
+            }
+        });
+
+}
+
+function getEntryManager() {
+    if(window.globalEntryManager == null) {
+        window.globalEntryManager = new EntryManager();
+    }
+    return window.globalEntryManager;
+}
+
+
+
+
+
+
 function createEntriesFromJson(data) {
     var entries = new Array();
     for(var i=0;i<data.length;i++)  {
@@ -50,12 +97,17 @@ function Entry (props) {
            getFormattedFilesize : function () {
                 return size_format(this.getFilesize());
             },
+            toString: function() {
+                return "entry:" + this.getName();
+            },
             getLink : function (label) {
                 if(!label) label = this.getName();
                 return  "<a href=\"${urlroot}/entry/show?entryid=" + this.id +"\">" + label +"</a>";
             }
         });
 }
+
+
 
 function EntryList(jsonUrl, listener) {
 
@@ -111,7 +163,6 @@ function EntryList(jsonUrl, listener) {
                 }
             }
             });
-
 
     var jqxhr = $.getJSON( jsonUrl, function(data) {
             entryList.haveLoaded = true;

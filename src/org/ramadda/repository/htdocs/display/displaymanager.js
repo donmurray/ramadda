@@ -1,3 +1,6 @@
+/**
+Copyright 2008-2014 Geode Systems LLC
+*/
 
 //There are the DOM IDs for various components of the UI
 var ID_DISPLAYS = "displays";
@@ -84,15 +87,7 @@ function DisplayManager(id,properties) {
     $.extend(this, {
                 displays : [],
                 dataList : [],
-                displayTypes: [
-                               {type: "map", label:"Map"},
-                               {type: "linechart",label:"Line Chart"},
-                               {type: "barchart", label:"Bar Chart"},
-                               {type: "table",label:"Table"},
-                               {type: "text",label:"Record Text"},
-                               {type: "animation",label:"Animation"},
-                               {type: "filter", label:"Test Filter"}
-                               ],
+                displayTypes: [],
                 cnt : 0,
                 eventListeners: [],
                 layout:this.getProperty(PROP_LAYOUT_TYPE, LAYOUT_TABLE),
@@ -506,17 +501,6 @@ function DisplayManager(id,properties) {
 
 
 
-function RamaddaFilterDisplay(displayManager, id, properties) {
-    $.extend(this, new RamaddaDisplay(displayManager, id, properties));
-    addRamaddaDisplay(this);
-    $.extend(this, {
-            html: "<p>&nbsp;&nbsp;&nbsp;Nothing selected&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<p>",
-            initDisplay: function() {
-                this.initUI();
-                this.setContents(this.html);
-            },
-        });
-}
 
 
 function RamaddaSuper(object, parent) {

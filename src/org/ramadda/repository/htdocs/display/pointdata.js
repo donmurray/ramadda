@@ -124,7 +124,6 @@ name - the name of this data
 recordFields - array of RecordField objects that define the metadata
 data - array of Record objects holding the data
 */
-
 function PointData(name, recordFields, records, url, properties) {
     $.extend(this, new  BasePointData(name, properties));
     $.extend(this, {

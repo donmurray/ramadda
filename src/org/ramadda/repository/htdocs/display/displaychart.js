@@ -1,0 +1,214 @@
+/**
+Copyright 2008-2014 Geode Systems LLC
+
+This package supports charting and mapping of georeferenced time series data
+It requires displaymanager.js pointdata.js
+*/
+
+var DISPLAY_LINECHART = "linechart";
+var DISPLAY_BARCHART = "barchart";
+var DISPLAY_TABLE = "table";
+var DISPLAY_TEXT = "text";
+
+
+
+addGlobalDisplayType({type: DISPLAY_LINECHART, label:"Line chart"});
+addGlobalDisplayType({type:DISPLAY_BARCHART,label: "Bar chart"});
+addGlobalDisplayType({type:DISPLAY_TABLE , label: "Table"});
+addGlobalDisplayType({type:DISPLAY_TEXT , label: "Text Readout"});
+
+
+
+
+var PROP_CHART_MIN = "chartMin";
+var PROP_CHART_MAX = "chartMax";
+var PROP_CHART_TYPE = "chartType";
+var DFLT_WIDTH = "600px";
+var DFLT_HEIGHT = "200px";
+
+
+
+
+/*
+Create a chart
+id - the id of this chart. Has to correspond to a div tag id 
+pointData - A PointData object (see below)
+ */
+function RamaddaMultiChart(displayManager, id, properties) {
+    //Init the defaults first
+    $.extend(this, {
+            indexField: -1,
+            colors: ['blue', 'red', 'green'],
+            curveType: 'none',
+            fontSize: 0,
+            vAxisMinValue:NaN,
+            vAxisMaxValue:NaN
+           });
+
+    RamaddaSuper(this, new RamaddaDisplay(displayManager, id, properties.chartType, properties));
+
+    $.extend(this, {
+            getType: function () {
+                return this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
+            },
+            needsData: function() {
+                return true;
+            },
+            initDisplay:function() {
+                this.initUI();
+                this.updateUI();
+            },
+            updateUI: function() {
+                this.addFieldsCheckboxes();
+                this.displayData();
+            },
+            fieldSelectionChanged: function() {
+                this.displayData();
+            },
+            getMenuContents: function() {
+                var height = this.getProperty(PROP_HEIGHT,"400");
+                var html  =  htmlUtil.div(["id",  this.getDomId(ID_FIELDS),"style","overflow-y: auto;    max-height:" + height +"px;"]);
+                html +=  this.getDisplayMenuContents();
+                return html;
+            },
+            handleRecordSelection: function(source, index, record, html) {
+                var chartType = this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
+                if(source==this) {
+                    return;
+                }
+                this.setChartSelection(index);
+            },
+            displayData: function() {
+                if(this.getShowTitle()) {
+                    this.setTitle(this.getTitle());
+                }
+                if(!this.hasData()) {
+                    this.clearChart();
+                    return;
+                }
+
+                this.allFields =  this.dataCollection.getList()[0].getRecordFields();
+
+                var selectedFields = this.getSelectedFields();
+                if(selectedFields.length==0) {
+                    this.setContents("No fields selected");
+                    return;
+                }
+                var dataList = this.getStandardData(selectedFields);
+                if(dataList.length==0) {
+                    this.setContents(htmlUtil.div(["class","display-message"],
+                                                  "No data available"));
+                    return;
+                }
+
+                var chartType = this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
+                this.makeChart(chartType, dataList, selectedFields);
+            },
+            clearChart: function() {
+                if(this.chart !=null) {
+                    this.chart.clearChart();
+                }
+            },
+            setChartSelection: function(index) {
+                if(this.chart!=null) {
+                    this.chart.setSelection([{row:index, column:null}]); 
+                }
+            },
+
+            makeGoogleChart: function(chartType, dataList, selectedFields) {
+                if(typeof google == 'undefined') {
+                    this.setContents("No google");
+                    return;
+                }
+                var dataTable = google.visualization.arrayToDataTable(dataList);
+                var   chartOptions = {};
+                $.extend(chartOptions, {
+                        lineWidth: 1,
+                        colors: this.colors,
+                        curveType:this.curveType,
+                        vAxis: {}});
+
+
+                if(this.fontSize>0) {
+                    chartOptions.fontSize = this.fontSize;
+                }
+                if(!isNaN(this.vAxisMinValue)) {
+                    chartOptions.vAxis.minValue =parseFloat(this.vAxisMinValue);
+                }
+                if(!isNaN(this.vAxisMaxValue)) {
+                    chartOptions.vAxis.maxValue =parseFloat(this.vAxisMaxValue);
+                }
+                var width = "95%";
+                if(selectedFields.length>1) {
+                    width = "80%";
+                }
+                $.extend(chartOptions, {
+                    series: [{targetAxisIndex:0},{targetAxisIndex:1},],
+                    legend: { position: 'bottom' },
+                    chartArea:{left:75,top:10,height:"60%",width:width}
+                 });
+                if(chartType == DISPLAY_BARCHART) {
+                    chartOptions.orientation =  "horizontal";
+                    this.chart = new google.visualization.BarChart(document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
+                } else  if(chartType == DISPLAY_TABLE) {
+                    this.chart = new google.visualization.Table(document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
+                } else {
+                    //                    this.chart =  new Dygraph.GVizChart(
+                    //                    document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
+                    this.chart = new google.visualization.LineChart(document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
+                }
+                if(this.chart!=null) {
+                    this.chart.draw(dataTable, chartOptions);
+                    var theDisplay = this;
+                    google.visualization.events.addListener(this.chart, 'select', function() {
+                            var index = theDisplay.chart.getSelection()[0].row;
+                            theDisplay.displayManager.handleRecordSelection(theDisplay, 
+                                                                            theDisplay.dataCollection.getList()[0], index);
+                        });
+                }
+            }
+        });
+
+
+    this.makeChart = this.makeGoogleChart;
+}
+
+
+
+function LinechartDisplay(displayManager, id, properties) {
+    properties = $.extend({"chartType": DISPLAY_LINECHART}, properties);
+    RamaddaSuper(this, new RamaddaMultiChart(displayManager, id, properties));
+    addRamaddaDisplay(this);
+}
+
+function BarchartDisplay(displayManager, id, properties) {
+    properties = $.extend({"chartType": DISPLAY_BARCHART}, properties);
+    RamaddaSuper(this, new RamaddaMultiChart(displayManager, id, properties));
+    addRamaddaDisplay(this);
+}
+
+
+function TableDisplay(displayManager, id, properties) {
+    properties = $.extend({"chartType": DISPLAY_TABLE}, properties);
+    RamaddaSuper(this, new RamaddaMultiChart(displayManager, id, properties));
+    addRamaddaDisplay(this);
+}
+
+
+function RamaddaTextDisplay(displayManager, id, properties) {
+    $.extend(this, new RamaddaDisplay(displayManager, id, DISPLAY_TEXT, properties));
+    addRamaddaDisplay(this);
+    $.extend(this, {
+            lastHtml:"<p>&nbsp;<p>&nbsp;<p>",
+            initDisplay: function() {
+                this.initUI();
+                this.setContents(this.lastHtml);
+            },
+            handleRecordSelection: function(source, index, record, html) {
+                this.lastHtml = html;
+                this.setContents(html);
+            }
+        });
+}
+
+
