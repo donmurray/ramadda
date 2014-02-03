@@ -4326,12 +4326,14 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             sb.append(
                 HtmlUtils.script(
                     "google.load(\"visualization\", \"1\", {packages:['corechart','table']});\n"));
+            sb.append(HtmlUtils.importJS(fileUrl("/lib/d3/d3.min.js")));
+            sb.append(HtmlUtils.importJS(fileUrl("/db/dom-drag.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/pointdata.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/displaymanager.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/display.js")));
+            sb.append(HtmlUtils.importJS(fileUrl("/display/displayd3.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/displayext.js")));
-            sb.append(HtmlUtils.importJS(fileUrl("/lib/d3/d3.min.js")));
-            sb.append(HtmlUtils.importJS(fileUrl("/db/dom-drag.js")));
+
 
 
 
