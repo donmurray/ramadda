@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -129,7 +129,6 @@ public class CsvOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
-     * @param groups _more_
      * @param entries _more_
      *
      * @return _more_
@@ -140,21 +139,54 @@ public class CsvOutputHandler extends OutputHandler {
             throws Exception {
 
         String delimiter = request.getString(ARG_DELIMITER, ",");
-        String fieldsArg =
-            request.getString(
-                ARG_FIELDS,
-//                "name,id,type,entry_url,north,south,east,west,url,fields");
-                "name,id,type,entry_url,latitude,longitude,south,east,west,url,fields");
-        StringBuffer sb     = new StringBuffer();
+        String fieldsArg = request.getString(ARG_FIELDS,
+        //                "name,id,type,entry_url,north,south,east,west,url,fields");
+        "name,id,type,entry_url,latitude,longitude,south,east,west,url,fields");
+        StringBuffer sb            = new StringBuffer();
         List<String> fields = StringUtil.split(fieldsArg, ",", true, true);
+        int[]        maxStringSize = null;
+        for (Entry entry : entries) {
+            List<Column> columns = entry.getTypeHandler().getColumns();
+            if (columns == null) {
+                continue;
+            }
+            if (maxStringSize == null) {
+                maxStringSize = new int[columns.size()];
+                for (int i = 0; i < maxStringSize.length; i++) {
+                    maxStringSize[i] = 0;
+                }
+            }
+            Object[] values = entry.getTypeHandler().getEntryValues(entry);
+            for (int col = 0; col < columns.size(); col++) {
+                Column column = columns.get(col);
+                if ( !column.getCanExport()) {
+                    continue;
+                }
+                if (column.isString()) {
+                    String s = sanitize(column.getString(values));
+                    maxStringSize[col] = Math.max(maxStringSize[col],
+                            s.length());
+                }
+            }
+        }
+
+        if (maxStringSize != null) {
+            for (int i = 0; i < maxStringSize.length; i++) {
+                System.err.println("i:" + i + " " + maxStringSize[i]);
+            }
+        }
+
         for (Entry entry : entries) {
             if (sb.length() == 0) {
                 if (fields.contains("fields")) {
                     List<Column> columns =
                         entry.getTypeHandler().getColumns();
+
                     if (columns != null) {
                         String tmp = null;
-                        for (Column column : columns) {
+                        int    cnt = 0;
+                        for (int col = 0; col < columns.size(); col++) {
+                            Column column = columns.get(col);
                             if ( !column.getCanExport()) {
                                 continue;
                             }
@@ -163,7 +195,10 @@ public class CsvOutputHandler extends OutputHandler {
                             } else {
                                 tmp += ",";
                             }
-                            tmp += column.getName();
+                            tmp += column.getName()
+                                   + ((maxStringSize[col] > 0)
+                                      ? "(max:" + maxStringSize[col] + ")"
+                                      : "");
                         }
                         fieldsArg = fieldsArg.replace(",fields", tmp);
                     }
@@ -190,8 +225,6 @@ public class CsvOutputHandler extends OutputHandler {
                 } else if (field.equals("entry_url")) {
                     String url = request.url(repository.URL_ENTRY_SHOW,
                                              ARG_ENTRYID, entry.getId());
-
-
                     url = request.getAbsoluteUrl(url);
                     sb.append(url);
                 } else if (field.equals("url")) {
@@ -225,16 +258,24 @@ public class CsvOutputHandler extends OutputHandler {
                         Object[] values =
                             entry.getTypeHandler().getEntryValues(entry);
                         int cnt = 0;
-                        for (Column column : columns) {
+                        for (int col = 0; col < columns.size(); col++) {
+                            Column column = columns.get(col);
                             if ( !column.getCanExport()) {
                                 continue;
                             }
                             if (cnt > 0) {
                                 sb.append(delimiter);
                             }
-                            cnt++;
                             String s = sanitize(column.getString(values));
                             sb.append(s);
+                            if (column.isString()) {
+                                int length = s.length();
+                                while (length < maxStringSize[col]) {
+                                    sb.append(' ');
+                                    length++;
+                                }
+                            }
+                            cnt++;
                         }
                     }
                 } else {
