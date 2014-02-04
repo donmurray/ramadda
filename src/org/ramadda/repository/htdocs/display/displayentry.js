@@ -32,13 +32,15 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
     var NONE = "-- None --";
 
     var ID_ENTRIES = "entries";
-    var ID_BOTTOM = "bottom";
+    var ID_FOOTER = "footer";
     var ID_TEXT_FIELD = "textfield";
     var ID_TYPE_FIELD = "typefield";
     var ID_SEARCH = "search";
     var ID_FORM = "form";
     var ID_DATE_START = "date_start";
     var ID_DATE_END = "date_end";
+    var baseTypeStyle = "padding-bottom:3px; min-height: 16px; margin-left:10px;  padding-left: 26px;";
+
     $.extend(this, {
             showForm: true,            
             showEntries: true,
@@ -58,9 +60,6 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
             getSelectedEntries: function() {return this.selectedEntries;},
             initDisplay: function() {
                 this.initUI();
-                var jsonUrl = getEntryManager().getSearchUrl("json",this.settings);
-                console.log("json:" + jsonUrl);
-                this.entryList = new EntryList(jsonUrl, this);
                 var html = "";
                 console.log("UI form:" + this.showForm);
                 if(this.showForm) {
@@ -69,7 +68,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 if(this.showEntries) {
                     html += htmlUtil.div(["id",this.getDomId(ID_ENTRIES),"class","display-entrylist-entries"], this.getLoadingMessage());
                 }
-                html += htmlUtil.div(["id",this.getDomId(ID_BOTTOM)], "");
+                html += htmlUtil.div(["id",this.getDomId(ID_FOOTER),"class","display-entrylist-footer"], "");
                 this.setContents(html);
                 var theDisplay  = this;
                 $("#" + this.getDomId(ID_SEARCH)).button().click(function(event) {
@@ -84,6 +83,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
                 this.addTypes();
 
+                this.submitSearchForm();
             },
             getMessage: function(msg) {
                 return "<p>" + msg +"<p>";
@@ -94,12 +94,12 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
             submitSearchForm: function() {
                 this.settings.text =  $("#" + this.getDomId(ID_TEXT_FIELD)).val();
                 this.settings.clearAndAddType($("#" + this.getDomId(ID_TYPE_FIELD)).val());
-                var bottom = "";
+                var footer = "Search as: ";
                 var outputs = getEntryManager().getSearchLinks(this.settings);
                 for(var i in outputs) {
-                    bottom += i +"<br>";
+                    footer += outputs[i] +" ";
                 }
-                $("#"  +this.getDomId(ID_BOTTOM)).html(bottom);
+                $("#"  +this.getDomId(ID_FOOTER)).html(footer);
                 var jsonUrl = getEntryManager().getSearchUrl(this.settings, OUTPUT_JSON);
                 console.log("json:" + jsonUrl);
                 this.entryList = new EntryList(jsonUrl, this);
@@ -109,8 +109,10 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 var html = htmlUtil.openTag("form",["class","formtable","id", this.getDomId(ID_FORM)]);
                 html+= htmlUtil.openTag("table",["cellpadding","0","cellpadding","0"]);
                 html+= htmlUtil.formEntry("Text:", 
-                                          htmlUtil.input("", this.getProperty("entryText",""), ["size","15","id",  this.getDomId(ID_TEXT_FIELD)]));
-                var typeSelect= htmlUtil.tag("select",["id", this.getDomId(ID_TYPE_FIELD)],
+                                          htmlUtil.input("", this.getProperty("entryText",""), ["class","input", "size","15","id",  this.getDomId(ID_TEXT_FIELD)]));
+                var typeSelect= htmlUtil.tag("select",["id", this.getDomId(ID_TYPE_FIELD),
+                                             "style",""],
+
                                              htmlUtil.tag("option",["title","","value",""],
                                                           NONE));
 
@@ -136,7 +138,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 for(var i in types) {
                     var type = types[i];
                     var map = catMap[type.category];
-                    var style = "min-height: 18px; margin-left:10px; padding-left: 20px; background: URL(" + type.icon +") no-repeat;";
+                    var style = baseTypeStyle +" background: URL(" + type.icon +") no-repeat;";
                     
                     var optionAttrs  = ["title",type.label,"value",type.type,"style", style]
                     var selected =  this.settings.hasType(type.type);
@@ -281,7 +283,7 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
     $.extend(this, {
             initDisplay: function() {
                 this.initUI();
-                var jsonUrl = getEntryManager().getSearchUrl("json",this.settings);
+                var jsonUrl = getEntryManager().getSearchUrl(this.settings, OUTPUT_JSON);
                 this.entryList = new EntryList(jsonUrl, this);
                 var html = "";
                 html += htmlUtil.div(["id",this.getDomId(ID_ENTRIES),"class","display-entrylist-entries"], "");

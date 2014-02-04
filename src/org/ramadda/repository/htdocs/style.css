@@ -251,6 +251,12 @@ input, password, fileinput,textarea,select {
 .display-entrylist {
 }
 
+.display-entrylist-footer {
+   font-weight: bold; 
+   font-size: 80%; 
+   text-align: right;
+}
+
 
 .display-entrylist-list  { 
 //   cursor:pointer;
@@ -264,15 +270,6 @@ input, password, fileinput,textarea,select {
 }
 
 .display-entrylist-list { list-style-type: none; margin: 0; padding: 0; }
-
-.ui-button-text-only .ui-button-text  {
-   padding:0px;
-   margin-top:3px;
-   margin-bottom:2px;
-   margin-left:8px;
-   margin-right:8px;
-}
-
 
 .display-entrylist-list li { 
        margin: 0px; 
@@ -1072,6 +1069,7 @@ a.ramadda-heading-2-link:visited {
    margin-left: auto;
    margin-right: auto;
    text-align:center;
+   font-size:90%;
 }
 
 .ramadda-smalllink {

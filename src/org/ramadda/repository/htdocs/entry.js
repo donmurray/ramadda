@@ -6,10 +6,10 @@ var OUTPUT_ZIP = "zip.tree";
 var OUTPUT_EXPORT = "zip.export";
 
 var OUTPUTS = [
-               {id: OUTPUT_JSON, name:  "json"},
-               {id: OUTPUT_CSV, name:  "default.csv"},
-               {id: OUTPUT_ZIP, name:  "zip.tree"},
-               {id: OUTPUT_EXPORT, name:  "zip.export"}];
+               {id: OUTPUT_JSON, name:  "JSON"},
+               {id: OUTPUT_CSV, name:  "CSV"},
+               {id: OUTPUT_ZIP, name:  "Zip Tree"},
+               {id: OUTPUT_EXPORT, name:  "Export"}];
 
 function EntryManager(repositoryRoot) {
     if(repositoryRoot == null) {
