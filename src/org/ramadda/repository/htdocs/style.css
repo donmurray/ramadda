@@ -266,10 +266,18 @@ input, password, fileinput,textarea,select {
 
 .display-entrylist-list { list-style-type: none; margin: 0; padding: 0; }
 
+.ui-button-text-only .ui-button-text  {
+   padding:0px;
+   margin-top:3px;
+   margin-bottom:2px;
+   margin-left:8px;
+   margin-right:8px;
+}
+
 .display-entrylist-list li { 
        margin: 1px; 
-       padding:1px; 
-       padding-left:4px; 
+       padding:3px; 
+       padding-left:6px; 
        border-top: 1px #fff solid;
        border-bottom: 1px #fff solid;
 }
@@ -280,12 +288,16 @@ input, password, fileinput,textarea,select {
 }
 
 .display-entrylist-inner {
+}
+
+.display-entrylist-entries {
    border-top:1px #ccc solid; 
    border-bottom:1px #ccc solid; 
    overflow-y: auto;
    max-height: 300px;
    margin: 4px;
 }
+
 
 .display-entrylist-entry {
    padding: 5px;
@@ -2074,7 +2086,7 @@ a.toggleblocklabellink:visited {
 }
 
 .formtable td {
-      padding-top: 6px;
+      padding-top: 4px;
       padding-bottom: 4px;
       padding-left: 4px;
       padding-right: 4px;

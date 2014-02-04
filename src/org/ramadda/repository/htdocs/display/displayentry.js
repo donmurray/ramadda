@@ -12,29 +12,82 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
              settings: new EntrySearchSettings({
                      type: properties.entryType,
                      parent: properties.entryParent,
+                     text: properties.entryText,
              }),
              entryList: null,
              entryMap: {},
              getSettings: function() {
                  return this.settings;
-             },
-            initDisplay: function() {
-                this.initUI();
-                var jsonUrl = getEntryManager().getSearchUrl("json",this.settings);
-                console.log("json:" + jsonUrl);
-                this.entryList = new EntryList(jsonUrl, this);
-                this.setContents("<p>Loading...<p>");
-            }
+             }
         });
 }
 
 
 function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
+    var ID_ENTRIES = "entries";
+    var ID_TEXT_FIELD = "textfield";
+    var ID_TYPE_FIELD = "typefield";
+    var ID_SEARCH = "search";
+    var ID_FORM = "form";
+    var ID_DATE_START = "date_start";
+    var ID_DATE_END = "date_end";
+
+
     $.extend(this, new RamaddaEntryDisplay(displayManager, id, DISPLAY_ENTRYLIST, properties));
     addRamaddaDisplay(this);
     $.extend(this, {
             selectedEntries: [],            
+            initDisplay: function() {
+                this.initUI();
+                var jsonUrl = getEntryManager().getSearchUrl("json",this.settings);
+                console.log("json:" + jsonUrl);
+                this.entryList = new EntryList(jsonUrl, this);
+                var html = "";
+                html += this.makeSearchForm();
+                html += htmlUtil.div(["id",this.getDomId(ID_ENTRIES),"class","display-entrylist-entries"], this.getLoadingMessage());
+                this.setContents(html);
+                var theDisplay  = this;
+                console.log("form:" +  $( "#" + this.getDomId(ID_FORM)).size());
+                $("#" + this.getDomId(ID_SEARCH)).button().click(function(event) {
+                        theDisplay.submitSearchForm();
+                        event.preventDefault();
+                    });
+
+                $( "#" + this.getDomId(ID_FORM)).submit(function( event ) {
+                        theDisplay.submitSearchForm();
+                        event.preventDefault();
+                    });
+            },
+            getMessage: function(msg) {
+                return "<p>" + msg +"<p>";
+            },
+            getLoadingMessage: function() {
+                return this.getMessage("Loading...");
+            },
+            submitSearchForm: function() {
+                this.settings.text =  $("#" + this.getDomId(ID_TEXT_FIELD)).val();
+                this.settings.type = $("#" + this.getDomId(ID_TYPE_FIELD)).val();
+                var jsonUrl = getEntryManager().getSearchUrl("json",this.settings);
+                console.log("json:" + jsonUrl);
+                this.entryList = new EntryList(jsonUrl, this);
+                $("#"+this.getDomId(ID_ENTRIES)).html(this.getLoadingMessage());
+            },
+            makeSearchForm: function() {
+                var html = htmlUtil.openTag("form",["class","formtable","id", this.getDomId(ID_FORM)]);
+                html+= htmlUtil.openTag("table",["cellpadding","0","cellpadding","0"]);
+                html+= htmlUtil.formEntry("Text:", 
+                                          htmlUtil.input("", this.getProperty("entryText",""), ["size","15","id",  this.getDomId(ID_TEXT_FIELD)]));
+                html+= htmlUtil.formEntry("Type:", 
+                                          htmlUtil.input("", this.getProperty("entryType",""), ["size","15","id",  this.getDomId(ID_TYPE_FIELD)]));
+                html+= htmlUtil.formEntry("", 
+
+                                          htmlUtil.div(["id", this.getDomId(ID_SEARCH)],"Search"));
+                html+= "<input type=\"submit\" style=\"position:absolute;left:-9999px;width:1px;height:1px;\"/>";
+                html+= htmlUtil.closeTag("table");
+                html += htmlUtil.closeTag("form");
+                return html;
+            },
             handleEntrySelection: function(source, entry, selected) {
                 var changed  = false;
                 if(selected) {
@@ -56,10 +109,15 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
             },
             entryListChanged: function(entryList) {
                 this.entryList = entryList;
+                var entries = this.entryList.getEntries();
                 var html = "";
+                if(entries.length==0) {
+                    $("#" + this.getDomId(ID_ENTRIES)).html(this.getMessage("Nothing found"));
+                    return;
+                }
+
                 html += htmlUtil.openTag("ol",["class","display-entrylist-list", "id",this.getDomId("list")]);
                 html  += "\n";
-                var entries = this.entryList.getEntries();
                 for(var i=0;i<entries.length;i++) {
                     var entry = entries[i];
                     var label = entry.getIconImage() +" " + entry.getName();
@@ -76,7 +134,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     html  += "\n";
                 }
                 html += htmlUtil.closeTag("ol");
-                this.setContents(html);
+                $("#"+this.getDomId(ID_ENTRIES)).html(html);
                 var theDisplay   =this;
                 $("#" + this.getDomId("list")).selectable({
                         selected: function( event, ui ) {
@@ -119,7 +177,9 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
                 this.initUI();
                 var jsonUrl = getEntryManager().getSearchUrl("json",this.settings);
                 this.entryList = new EntryList(jsonUrl, this);
-                this.setContents("<p>Loading<p>");
+                var html = "";
+                html += htmlUtil.div(["id",this.getDomId(ID_ENTRIES),"class","display-entrylist-entries"], "");
+                this.setContents(html);
             },
             entryListChanged: function(entryList) {
                 var html = "<form>";
@@ -155,7 +215,7 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
                 html +=  htmlUtil.tag("div", ["class", "display-button", "id",  this.getDomId(ID_NEWDISPLAY)],"New Chart");
                 html += "<p>";
                 html += "</form>";
-                this.setContents(html);
+                $("#"+this.getDomId(ID_ENTRIES)).html(html);
                 var theDisplay = this;
                 $("#"+this.getDomId(ID_NEWDISPLAY)).button().click(function(event) {
                        theDisplay.createDisplay();

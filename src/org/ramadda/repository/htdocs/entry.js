@@ -11,10 +11,13 @@ function EntryManager(repositoryRoot) {
             },
             getSearchUrl: function(output, searchSettings) {
                 var url =  this.repositoryRoot +"/search/do?output=" +output;
-                if(searchSettings.type!=null) 
+                if(searchSettings.type!=null && searchSettings.type.length!=0) 
                     url += "&type=" + searchSettings.type;
-                if(searchSettings.parent!=null) 
+                if(searchSettings.parent!=null&& searchSettings.parent.length>0) 
                     url += "&group=" + searchSettings.parent;
+                if(searchSettings.text!=null&& searchSettings.text.length>0) 
+                    url += "&text=" + searchSettings.text;
+                url += "&max=" + searchSettings.max;
                 return url;
             },
 
@@ -50,6 +53,7 @@ function EntrySearchSettings(props) {
     $.extend(this, {
             type: null,
             parent: null,
+            max: 50,
      });
     if(props!=null) {
         $.extend(this,props);
