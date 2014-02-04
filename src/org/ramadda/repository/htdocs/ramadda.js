@@ -293,7 +293,9 @@ function HtmlUtil() {
      this.idAttr = function(s) {
          return this.attr("id", s);
      }
-
+     this.href= function(url, label) {
+         return this.tag("a", ["href", url], label);
+     }
 
      this.onClick = function(call, html) {
          return this.tag("a", ["onclick", call, "style","xtext-decoration:none;color:black;"], html);

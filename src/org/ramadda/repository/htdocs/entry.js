@@ -1,4 +1,16 @@
 
+
+var OUTPUT_JSON = "json";
+var OUTPUT_CSV = "default.csv";
+var OUTPUT_ZIP = "zip.tree";
+var OUTPUT_EXPORT = "zip.export";
+
+var OUTPUTS = [
+               {id: OUTPUT_JSON, name:  "json"},
+               {id: OUTPUT_CSV, name:  "default.csv"},
+               {id: OUTPUT_ZIP, name:  "zip.tree"},
+               {id: OUTPUT_EXPORT, name:  "zip.export"}];
+
 function EntryManager(repositoryRoot) {
     if(repositoryRoot == null) {
         repositoryRoot = root;
@@ -19,7 +31,15 @@ function EntryManager(repositoryRoot) {
                 }
                 return this.entryTypes;
             },
-            getSearchUrl: function(output, searchSettings) {
+            getSearchLinks: function(searchSettings) {
+                var urls = [];
+                for(var i in OUTPUTS) {
+                    urls.push(htmlUtil.href(this.getSearchUrl(searchSettings, OUTPUTS[i].id),
+                                            OUTPUTS[i].name));
+                }
+                return urls;
+            },
+            getSearchUrl: function(searchSettings, output) {
                 var url =  this.repositoryRoot +"/search/do?output=" +output;
                 for(var i in searchSettings.types) {
                     var type = searchSettings.types[i];
