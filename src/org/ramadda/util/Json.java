@@ -117,6 +117,10 @@ public class Json {
         return map(values, DFLT_QUOTE);
     }
 
+    public static String mapAndQuote(List<String> values) {
+        return map(values, true);
+    }
+
     /**
      * Create a JSON map
      *

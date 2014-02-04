@@ -43,6 +43,7 @@ import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.repository.type.TypeInsertInfo;
 import org.ramadda.sql.Clause;
 import org.ramadda.sql.SqlUtil;
+import org.ramadda.util.Json;
 import org.ramadda.util.FormInfo;
 import org.ramadda.util.HtmlTemplate;
 import org.ramadda.util.HtmlUtils;
@@ -664,6 +665,46 @@ public class EntryManager extends RepositoryManager {
 
         return addEntryHeader(request, entry, result);
     }
+
+
+    public Result processEntryTypes(Request request) throws Exception {
+        String output = request.getString(ARG_OUTPUT,"");
+        List<String> types  =new ArrayList<String>();
+        List<TypeHandler> typeHandlers = getRepository().getTypeHandlers();
+        boolean checkCnt = request.get("checkcount", true);
+        for (TypeHandler typeHandler : typeHandlers) {
+            if ( !typeHandler.getForUser()) {
+                continue;
+            }
+            if(checkCnt) {
+                int cnt = getEntryUtil().getEntryCount(typeHandler);
+                if (cnt == 0) {
+                    continue;
+                }
+            }
+            List<String> items = new ArrayList<String>();
+
+            items.add("type");
+            items.add(Json.quote(typeHandler.getType()));
+            items.add("label");
+            items.add(Json.quote(typeHandler.getLabel()));
+            items.add("isgroup");
+            items.add("" + typeHandler.isGroup());
+
+            String icon = typeHandler.iconUrl(typeHandler.getProperty("icon", (String) ICON_FOLDER_CLOSED));
+            items.add("icon");
+            items.add(Json.quote(icon));
+            items.add("category");
+            items.add(Json.quote(typeHandler.getCategory()));
+            types.add(Json.map(items));
+
+
+        }
+                
+        StringBuffer sb = new StringBuffer(Json.list(types));
+        return new Result("", sb, "application/json");
+    }
+
 
 
     /**
@@ -3400,12 +3441,13 @@ public class EntryManager extends RepositoryManager {
         HashSet<String> exclude = new HashSet<String>();
         //        exclude.add(TYPE_FILE);
         //        exclude.add(TYPE_GROUP);
-        List<TypeHandler> typeHandlers = getRepository().getTypeHandlers();
+
 
         List<String> sessionTypes =
             (List<String>) getSessionManager().getSessionProperty(request,
                 ARG_TYPE);
 
+        List<TypeHandler> typeHandlers = getRepository().getTypeHandlers();
         for (TypeHandler typeHandler : typeHandlers) {
             if ( !typeHandler.getForUser()) {
                 continue;
@@ -3427,7 +3469,8 @@ public class EntryManager extends RepositoryManager {
                                     HtmlUtils.attr(HtmlUtils.ATTR_WIDTH,
                                         "16"));
             } else {
-                img = HtmlUtils.img(typeHandler.iconUrl(icon));
+                img = HtmlUtils.img(typeHandler.iconUrl(icon)
+);
             }
 
 

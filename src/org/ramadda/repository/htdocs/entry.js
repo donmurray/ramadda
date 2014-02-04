@@ -6,8 +6,18 @@ function EntryManager(repositoryRoot) {
     $.extend(this, {
             repositoryRoot:repositoryRoot,
             entryCache: {},
+            entryTypes: null,
             getJsonUrl: function(entryId) {
                 return this.repositoryRoot + "/entry/show?entryid=" + id +"&output=json";
+            },
+            getEntryTypes: function(callback) {
+                if(this.entryTypes == null) {
+                    var jqxhr = $.getJSON(root +"/entry/types", function(data) {
+                            this.entryTypes  =data;
+                            callback(this.entryTypes);
+                        });
+                }
+                return this.entryTypes;
             },
             getSearchUrl: function(output, searchSettings) {
                 var url =  this.repositoryRoot +"/search/do?output=" +output;
@@ -152,9 +162,12 @@ function Entry (props) {
             toString: function() {
                 return "entry:" + this.getName();
             },
+            getEntryUrl : function () {
+                return  root + "/entry/show?entryid=" + this.id;
+            },
             getLink : function (label) {
                 if(!label) label = this.getName();
-                return  "<a href=\"${urlroot}/entry/show?entryid=" + this.id +"\">" + label +"</a>";
+                return  htmlUtil.tag("a",["href", this.getEntryUrl()],label);
             },
             toString: function() {
                 return "entry:" + this.getName();

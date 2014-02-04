@@ -257,11 +257,10 @@ input, password, fileinput,textarea,select {
 }
 
 
-//.display-entrylist-list  .ui-selecting { background: #aaa; border-collapse:collapse;}
+
 .display-entrylist-list  .ui-selected { 
      background: #eee; 
-//     border-bottom: 1px #888 solid;
-//     border-top: 1px #888 solid;
+     background: #e0f0ff; 
 }
 
 .display-entrylist-list { list-style-type: none; margin: 0; padding: 0; }
@@ -274,25 +273,24 @@ input, password, fileinput,textarea,select {
    margin-right:8px;
 }
 
+
 .display-entrylist-list li { 
-       margin: 1px; 
+       margin: 0px; 
        padding:3px; 
        padding-left:6px; 
-       border-top: 1px #fff solid;
-       border-bottom: 1px #fff solid;
+       border-bottom:1px #f8f8f8 solid; 
+
 }
 
 .display-entrylist-list li:hover { 
-     border-top: 1px #aaa solid;
-     border-bottom: 1px #aaa solid;
+     background: #f0f0f0; 
 }
 
 .display-entrylist-inner {
 }
 
 .display-entrylist-entries {
-   border-top:1px #ccc solid; 
-   border-bottom:1px #ccc solid; 
+   border:1px #ccc solid; 
    overflow-y: auto;
    max-height: 300px;
    margin: 4px;
@@ -301,6 +299,7 @@ input, password, fileinput,textarea,select {
 
 .display-entrylist-entry {
    padding: 5px;
+   margin: 0px;
    border-bottom: 1px #ccc solid;
    cursor:pointer;
 }
