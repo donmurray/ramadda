@@ -177,6 +177,7 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
                 this.updateUI();
             },
             updateUI: function() {
+				
                 var displayHeight = this.getProperty("height",300);
                 var displayWidth = this.getProperty("width",600);
                 var margin = {top: 20, left: 50, bottom: 20, right: 20};
@@ -190,8 +191,8 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
                     return;
                 }
                 this.addFieldsCheckboxes();
-                var pointData = this.getData();
-                if(pointData == null) {
+                pointData = this.getData();
+				if(pointData == null) {
                     $("#" + this.getDomId(ID_SVG)).html("No data");
                     console.log("no data");
                     return;
@@ -205,34 +206,32 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
                 }
 				
 				var fields = pointData.getNumericFields();
-                records = pointData.getRecords();
+                var records = pointData.getRecords();
                 var ranges =  RecordGetRanges(fields,records);
                 var elevationRange =  RecordGetElevationRange(fields,records);
                 var offset = (elevationRange[1] - elevationRange[0])*0.05;
 
+				
+				// 100 pixels for the legend... lets see if we keep it
 				var x = d3.time.scale()
-					.range([0, displayWidth]);
+					.range([0, displayWidth-100]);
 
 				var y = d3.scale.linear()
 					.range([displayHeight, 0]);
 
+			    /*var zoom = d3.behavior.zoom()
+							.x(x)
+							.y(y)
+							.on("zoom", this.zoomBehaviours);*/
+							
 				var xAxis = d3.svg.axis()
 					.scale(x)
 					.orient("bottom");
+					//.ticks(5);
 
 				var yAxis = d3.svg.axis()
 					.scale(y)
 					.orient("left");
-
-				/*for(var fieldIdx=0;fieldIdx<selectedFields.length;fieldIdx++) {
-                    var dataIndex = selectedFields[fieldIdx].getIndex();
-                    var range = ranges[dataIndex];*/
-				// Now we plot the thirds variable only
-				var dataIndex=3;
-				
-				var line = d3.svg.line()
-					.x(function(d) { return x(new Date(d.getData()[0])); })
-					.y(function(d) { return y(d.getData()[dataIndex]); });
 
 				var svg = d3.select("#" + this.getDomId(ID_SVG)).append("svg")
 							.attr("width", displayWidth + margin.left + margin.right)
@@ -240,39 +239,79 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
 						  .append("g")
 							.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-				x.domain(d3.extent(records, function(d) { return new Date(d.getData()[0]); }));
-				y.domain(d3.extent(records, function(d) { return d.getData()[dataIndex]; }));
-
+				x.domain(d3.extent(records, function(d) { return new Date(d.getDate()); }));
+				// the y domain depends on the first selected element I have to think about it.
+				y.domain(d3.extent(records, function(d) { return d.getData()[selectedFields[0].getIndex()]; }));
+				
+				
+				
 				svg.append("g")
 				  .attr("class", "x axis")
 				  .attr("transform", "translate(0," + displayHeight + ")")
+				  .attr("fill","none")
+				  .attr("stroke","#555555")
+				  .attr("shape-rendering","crispEdges")
 				  .call(xAxis);
+				  
 
 				svg.append("g")
 				  .attr("class", "y axis")
 				  .call(yAxis)
-				.append("text")
-				  .attr("transform", "rotate(-90)")
-				  .attr("y", 6)
-				  .attr("dy", ".71em")
-				  .style("text-anchor", "end")
-				  .text("Price ($)");
-
-				svg.append("path")
-				  .datum(records)
-				  .attr("class", "area")
-				  .attr("d", line);
+				  .attr("fill","none")
+				  .attr("stroke","#555555")
+				  .attr("shape-rendering","crispEdges");
+				  // This will be the label text
+				  /*.append("text")
+					  .attr("transform", "rotate(-90)")
+					  .attr("y", 6)
+					  .attr("dy", ".71em")
+					  .style("text-anchor", "end")
+					  .text(selectedFields[0].getLabel()); // again lets see the Y axis 
+				  */
 				
-				svg.selectAll(".dot")
-					.data(records)
-				  .enter().append("circle")
-					.attr("class", "dot")
-					.attr("cx", line.x())
-					.attr("cy", line.y())
-					.attr("r", 3.5);
-					  
+				//svg.call(zoom);
+				
+				color = d3.scale.category20();
+				
+				for(var fieldIdx=0;fieldIdx<selectedFields.length;fieldIdx++) {
+                    /*var dataIndex = selectedFields[fieldIdx].getIndex();
+                    var range = ranges[dataIndex];
+					*/
+					var line = d3.svg.line()
+						.x(function(d) { return x(new Date(d.getDate())); })
+						.y(function(d) { return y(d.getData()[selectedFields[fieldIdx].getIndex()]); });
+						
+					svg.append("path")
+					  .datum(records)
+					  .attr("class", "line")
+					  .attr("d", line)
+					  .attr("fill","none")
+					  .attr("stroke",function(d){return color(fieldIdx);})
+					  .attr("stroke-width","1.5px");
+					
+					// Legend element
+				    svg.append("svg:rect")
+					   .attr("x", displayWidth-100)
+					   .attr("y", (50+50*fieldIdx))
+					   .attr("stroke", function(d){return color(fieldIdx);})
+					   .attr("height", 2)
+					   .attr("width", 40);
+					   
+					svg.append("svg:text")
+						   .attr("x", displayWidth-100+40+10) // position+color rect+padding
+						   .attr("y", (55+55*fieldIdx))
+						   .attr("stroke", function(d){return color(fieldIdx);})
+						   .text(selectedFields[fieldIdx].getLabel());
+				}
+				test=this;
 
             },
+			zoomBehaviour: function(){
+				// I think we will have to do this nightmare...
+				console.log(d3.event.translate);
+				console.log(d3.event.scale);
+				
+			},
             //this gets called when an event source has selected a record
             handleRecordSelection: function(source, index, record, html) {
                 //                  this.setContents(html);

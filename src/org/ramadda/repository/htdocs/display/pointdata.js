@@ -363,6 +363,9 @@ function PointRecord(lat, lon, elevation, time, data) {
             getLongitude : function() {
                 return this.longitude;
             }, 
+            getTime : function() {
+            	return this.time;
+            }
             getElevation : function() {
                 return this.elevation;
             }, 
