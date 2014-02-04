@@ -30,7 +30,7 @@ var PROP_TODATE = "toDate";
 function addDisplayManager(displayManager) {
     if(window.globalDisplayManagers == null) {
         window.globalDisplayManagers =  {};
-        window.globalDisplayManager = null;
+        // window.globalDisplayManager = null;
     }
     window.globalDisplayManagers[displayManager.getId()] = displayManager;
     window.globalDisplayManager = displayManager;
