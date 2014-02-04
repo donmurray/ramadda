@@ -270,7 +270,14 @@ function HtmlUtil() {
          var html = "";
          if(list == null) return html;
          for(var i=0;i<list.length;i+=2) {
-             html += this.attr(list[i],list[i+1]);
+             var name = list[i];
+             var value = list[i+1];
+             if(value == null) {
+                 html += name;
+             } else {
+                 html += this.attr(name,value);
+             }
+
          }
          return html;
      }

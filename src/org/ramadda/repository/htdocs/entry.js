@@ -21,8 +21,10 @@ function EntryManager(repositoryRoot) {
             },
             getSearchUrl: function(output, searchSettings) {
                 var url =  this.repositoryRoot +"/search/do?output=" +output;
-                if(searchSettings.type!=null && searchSettings.type.length!=0) 
-                    url += "&type=" + searchSettings.type;
+                for(var i in searchSettings.types) {
+                    var type = searchSettings.types[i];
+                    url += "&type=" + type;
+                }
                 if(searchSettings.parent!=null&& searchSettings.parent.length>0) 
                     url += "&group=" + searchSettings.parent;
                 if(searchSettings.text!=null&& searchSettings.text.length>0) 
@@ -61,9 +63,23 @@ function EntryManager(repositoryRoot) {
 
 function EntrySearchSettings(props) {
     $.extend(this, {
-            type: null,
+            types: [],
             parent: null,
             max: 50,
+            hasType:function(type) {
+                return this.types.indexOf(type)>=0;
+            },
+            clearAndAddType:function(type) {
+                this.types = [];
+                this.addType(type);
+                return this;
+            },
+            addType:function(type) {
+                if(type == null || type.length ==0) return;
+                if(this.hasType(type)) return;
+                this.types.push(type);
+                return this;
+            }
      });
     if(props!=null) {
         $.extend(this,props);
@@ -126,8 +142,8 @@ function Entry (props) {
                     return root + "/icons/page.png";
                 return this.icon;
             },
-            getIconImage : function () {
-                return htmlUtil.image(this.getIconUrl());
+            getIconImage : function (attrs) {
+                return htmlUtil.image(this.getIconUrl(),attrs);
             },
             getColumnValue : function (name) {
                 var value = this["column." + name];
@@ -144,19 +160,22 @@ function Entry (props) {
                 if (!names) names = new Array();
                 return names;
             },
-
            getName : function () {
                 if(this.name ==null || this.name == "") {
                     return "no name";
                 }
                 return this.name;
             },
+            getDescription : function (dflt) {
+                if(this.description == null) return dflt;
+                return this.description;
+            },
             getFilesize : function () {
                 var size =  parseInt(this.filesize);
                 if(size == size) return size;
                 return 0;
             },
-           getFormattedFilesize : function () {
+            getFormattedFilesize : function () {
                 return size_format(this.getFilesize());
             },
             toString: function() {

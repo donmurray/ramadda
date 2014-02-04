@@ -801,7 +801,7 @@ function RepositoryMap(mapId, params) {
             OpenLayers.Event.stop(evt);
         });
 
-        console.log("add marker:" + marker.id);
+        //        console.log("add marker:" + marker.id);
 
         this.markers.addMarker(marker);
         return marker;
@@ -954,7 +954,7 @@ function RepositoryMap(mapId, params) {
 
     this.removeMarker = function(marker) {
         if (this.markers) {
-            console.log("remove marker:" + marker.id);
+            //            console.log("remove marker:" + marker.id);
             this.markers.removeMarker(marker);
         }
     }

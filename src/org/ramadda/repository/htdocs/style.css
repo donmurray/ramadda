@@ -253,7 +253,7 @@ input, password, fileinput,textarea,select {
 
 
 .display-entrylist-list  { 
-   cursor:pointer;
+//   cursor:pointer;
 }
 
 
@@ -301,7 +301,7 @@ input, password, fileinput,textarea,select {
    padding: 5px;
    margin: 0px;
    border-bottom: 1px #ccc solid;
-   cursor:pointer;
+//   cursor:pointer;
 }
 
 .display-entrylist-entry:hover {
