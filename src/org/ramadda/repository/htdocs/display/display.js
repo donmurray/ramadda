@@ -115,6 +115,9 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
             filters: [],
             dataCollection: new DataCollection(),
             selectedCbx: [],
+            getDisplayManager: function() {
+               return this.displayManager;
+            },
             getType: function() {
                 return this.type;
             },

@@ -6,15 +6,102 @@ var DISPLAY_OPERANDS = "operands";
 addGlobalDisplayType({type: DISPLAY_ENTRYLIST, label:"Entry List"});
 addGlobalDisplayType({type: DISPLAY_OPERANDS, label:"Operands"});
 
-function RamaddaEntrylistDisplay(displayManager, id, properties) {
-    $.extend(this, new RamaddaDisplay(displayManager, id, DISPLAY_ENTRYLIST, properties));
-    addRamaddaDisplay(this);
-    $.extend(this, {
-            html: "<p>&nbsp;&nbsp;&nbsp;Nothing selected&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<p>",
+function RamaddaEntryDisplay(displayManager, id, type, properties) {
+     $.extend(this, new RamaddaDisplay(displayManager, id, type, properties));
+     $.extend(this, {
+             settings: new EntrySearchSettings({
+                     type: properties.entryType,
+                     parent: properties.entryParent,
+             }),
+             entryList: null,
+             entryMap: {},
+             getSettings: function() {
+                 return this.settings;
+             },
             initDisplay: function() {
                 this.initUI();
-                this.setContents(this.html);
+                var jsonUrl = getEntryManager().getSearchUrl("json",this.settings);
+                console.log("json:" + jsonUrl);
+                this.entryList = new EntryList(jsonUrl, this);
+                this.setContents("<p>Loading...<p>");
+            }
+        });
+}
+
+
+function RamaddaEntrylistDisplay(displayManager, id, properties) {
+
+    $.extend(this, new RamaddaEntryDisplay(displayManager, id, DISPLAY_ENTRYLIST, properties));
+    addRamaddaDisplay(this);
+    $.extend(this, {
+            selectedEntries: [],            
+            handleEntrySelection: function(source, entry, selected) {
+                var changed  = false;
+                if(selected) {
+                    $("#"+ this.getDomId("entry_" + entry.getId())).addClass("ui-selected");
+                    var index = this.selectedEntries.indexOf(entry);
+                    if (index < 0) {
+                        this.selectedEntries.push(entry);
+                        changed = true;
+                    }
+                } else {
+                    $("#"+ this.getDomId("entry_" + entry.getId())).removeClass("ui-selected");
+                    var index = this.selectedEntries.indexOf(entry);
+                    if (index >= 0) {
+                        this.selectedEntries.splice(index, 1);
+                        changed = true;
+                    }
+                }
+                //todo: what to do on a change?
             },
+            entryListChanged: function(entryList) {
+                this.entryList = entryList;
+                var html = "";
+                html += htmlUtil.openTag("ol",["class","display-entrylist-list", "id",this.getDomId("list")]);
+                html  += "\n";
+                var entries = this.entryList.getEntries();
+                for(var i=0;i<entries.length;i++) {
+                    var entry = entries[i];
+                    var label = entry.getIconImage() +" " + entry.getName();
+                    var right ="";
+                    var hasLocation = entry.hasLocation();
+                    if(hasLocation) {
+                        right += htmlUtil.image(root+"/icons/map.png",["title","Location:" +entry.getLocationLabel()]);
+                    }
+
+                    var line = htmlUtil.leftRight(label,right);
+                    html  += htmlUtil.tag("li",["id",
+                                                this.getDomId("entry_" + entry.getId()),
+                                                "entryid",entry.getId(), "class","ui-widget-content"], line);
+                    html  += "\n";
+                }
+                html += htmlUtil.closeTag("ol");
+                this.setContents(html);
+                var theDisplay   =this;
+                $("#" + this.getDomId("list")).selectable({
+                        selected: function( event, ui ) {
+                            var entryId = ui.selected.getAttribute('entryid');
+                            var entry = theDisplay.entryList.getEntry(entryId);
+                            //                            console.log("selected:" +  entry);
+                            if(entry!=null) {
+                                theDisplay.selectedEntries.push(entry);
+                                theDisplay.getDisplayManager().handleEntrySelection(theDisplay, entry, true);
+                            }
+                        },
+                        unselected: function( event, ui ) {
+                            var entryId = ui.unselected.getAttribute('entryid');
+                            var entry = theDisplay.entryList.getEntry(entryId);
+                            var index = theDisplay.selectedEntries.indexOf(entry);
+                            //                            console.log("remove:" +  index + " " + theDisplay.selectedEntries);
+                            if (index > -1) {
+                                theDisplay.selectedEntries.splice(index, 1);
+                                theDisplay.getDisplayManager().handleEntrySelection(theDisplay, entry, false);
+                            }
+                        },
+
+                    });
+
+            }
         });
 }
 
@@ -23,24 +110,14 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
     var ID_SELECT1 = "select1";
     var ID_SELECT2 = "select2";
     var ID_NEWDISPLAY = "newdisplay";
-    var ID_CHARTTYPE = "charttype";
 
-    $.extend(this, {
-            entryType: null,
-                entryParent: null});
-    $.extend(this, new RamaddaDisplay(displayManager, id, DISPLAY_OPERANDS, properties));
+
+    $.extend(this, new RamaddaEntryDisplay(displayManager, id, DISPLAY_OPERANDS, properties));
     addRamaddaDisplay(this);
     $.extend(this, {
             initDisplay: function() {
                 this.initUI();
-                var jsonUrl = null;
-                if(this.entryType!=null) {
-                    jsonUrl = root +"/search/type/" + this.entryType +"?max=50&output=json&type=" + this.entryType;
-                }
-                if(jsonUrl == null) {
-                    this.setContents("<p>No entry type given");
-                    return;
-                }
+                var jsonUrl = getEntryManager().getSearchUrl("json",this.settings);
                 this.entryList = new EntryList(jsonUrl, this);
                 this.setContents("<p>Loading<p>");
             },

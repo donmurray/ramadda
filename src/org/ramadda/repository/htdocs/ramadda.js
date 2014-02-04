@@ -208,6 +208,13 @@ function HtmlUtil() {
         return "\"" + value +"\"";
      }
 
+     this.leftRight = function(left,right) {
+         return this.tag("table",["width","100%","cellspacing","0","cellpadding","0"],
+                         this.tr(["valign","top"],
+                                 this.td(["align","left"],left) +
+                                 this.td(["align","right"],right)));
+     }
+
      this.div = function(attrs, inner) {
          return this.tag("div", attrs, inner);
      }

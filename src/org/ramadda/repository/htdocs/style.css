@@ -251,8 +251,37 @@ input, password, fileinput,textarea,select {
 .display-entrylist {
 }
 
+
+.display-entrylist-list  { 
+   cursor:pointer;
+}
+
+
+//.display-entrylist-list  .ui-selecting { background: #aaa; border-collapse:collapse;}
+.display-entrylist-list  .ui-selected { 
+     background: #eee; 
+//     border-bottom: 1px #888 solid;
+//     border-top: 1px #888 solid;
+}
+
+.display-entrylist-list { list-style-type: none; margin: 0; padding: 0; }
+
+.display-entrylist-list li { 
+       margin: 1px; 
+       padding:1px; 
+       padding-left:4px; 
+       border-top: 1px #fff solid;
+       border-bottom: 1px #fff solid;
+}
+
+.display-entrylist-list li:hover { 
+     border-top: 1px #aaa solid;
+     border-bottom: 1px #aaa solid;
+}
+
 .display-entrylist-inner {
-   border:1px #ccc solid; 
+   border-top:1px #ccc solid; 
+   border-bottom:1px #ccc solid; 
    overflow-y: auto;
    max-height: 300px;
    margin: 4px;

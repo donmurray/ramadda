@@ -178,6 +178,23 @@ function DisplayManager(id,properties) {
                     }
                 }
             },
+            handleEntrySelection: function(source, entry, selected) {
+                for(var i=0;i< this.eventListeners.length;i++) {
+                    eventListener = this.eventListeners[i];
+                    if(eventListener == source) {
+                        continue;
+                    }
+                    var eventSource  = eventListener.getEventSource();
+                    if(eventSource!=null && eventSource.length>0) {
+                        if(eventSource!= source.getId() && eventSource!= source.getName()) {
+                            continue;
+                        }
+                    }
+                    if(eventListener.handleEntrySelection) {
+                        eventListener.handleEntrySelection(source, entry, selected);
+                    } 
+                }
+            },
             makeMainMenu: function() {
                 if(!this.getProperty(PROP_SHOW_MENU, true))  {
                     return "";

@@ -6,11 +6,23 @@ function EntryManager(repositoryRoot) {
     $.extend(this, {
             repositoryRoot:repositoryRoot,
             entryCache: {},
-             getJsonUrl: function(entryId) {
+            getJsonUrl: function(entryId) {
                 return this.repositoryRoot + "/entry/show?entryid=" + id +"&output=json";
             },
+            getSearchUrl: function(output, searchSettings) {
+                var url =  this.repositoryRoot +"/search/do?output=" +output;
+                if(searchSettings.type!=null) 
+                    url += "&type=" + searchSettings.type;
+                if(searchSettings.parent!=null) 
+                    url += "&group=" + searchSettings.parent;
+                return url;
+            },
+
+            addEntry: function(entry) {
+                this.entryCache[entry.getId()] = entry;
+            },
             getEntry: function(id, callback) {
-                var entry = entryCache[id];
+                var entry = this.entryCache[id];
                 if(entry!=null)  {
                     return entry;
                 }
@@ -34,6 +46,17 @@ function EntryManager(repositoryRoot) {
 
 }
 
+function EntrySearchSettings(props) {
+    $.extend(this, {
+            type: null,
+            parent: null,
+     });
+    if(props!=null) {
+        $.extend(this,props);
+    }
+}
+
+
 function getEntryManager() {
     if(window.globalEntryManager == null) {
         window.globalEntryManager = new EntryManager();
@@ -44,28 +67,53 @@ function getEntryManager() {
 
 
 
-
-
 function createEntriesFromJson(data) {
     var entries = new Array();
     for(var i=0;i<data.length;i++)  {
-        var entry = data[i];
-        entries.push(new Entry(entry));
+        var entryData = data[i];
+        var entry = new Entry(entryData);
+        getEntryManager().addEntry(entry);
+        entries.push(entry);
     }
     return entries;
 }
 
 
 function Entry (props) {
+    var NONGEO = -9999;
+    $.extend(this, {
+            latitude: NaN,
+            longitude: NaN,
+            north: NaN,
+            west: NaN,
+            south: NaN,
+            east: NaN,
+        });
+
     $.extend(this, props);
     $.extend(this, {
             getId : function () {
                 return  this.id;
             },
-            getIconImage : function () {
+            getLocationLabel: function() {
+                return "n: " + this.north + " w:" + this.west + " s:" + this.south +" e:" + this.east;
+            },
+            hasLocation: function() {
+                return !isNaN(this.north) && this.north != NONGEO;
+            },
+            getLatitude: function() {
+                return this.north;
+            },
+            getLongitude: function() {
+                return this.west;
+            },
+            getIconUrl : function () {
                 if(this.icon==null)
-                    return "<img src=\"${urlroot}/icons/help.png\">";
-                return "<img src=\"" + this.icon +"\">";
+                    return root + "/icons/page.png";
+                return this.icon;
+            },
+            getIconImage : function () {
+                return htmlUtil.image(this.getIconUrl());
             },
             getColumnValue : function (name) {
                 var value = this["column." + name];
@@ -103,6 +151,9 @@ function Entry (props) {
             getLink : function (label) {
                 if(!label) label = this.getName();
                 return  "<a href=\"${urlroot}/entry/show?entryid=" + this.id +"\">" + label +"</a>";
+            },
+            toString: function() {
+                return "entry:" + this.getName();
             }
         });
 }
@@ -110,7 +161,6 @@ function Entry (props) {
 
 
 function EntryList(jsonUrl, listener) {
-
     var entryList = this;
     $.extend(this, {
             haveLoaded : false,

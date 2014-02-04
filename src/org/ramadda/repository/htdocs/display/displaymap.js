@@ -101,6 +101,30 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 this.map.centerOnMarkers(new OpenLayers.Bounds(west,south,east, north));
             },
 
+            handleEntrySelection: function(source, entry, selected) {
+                if(!entry.hasLocation()) {
+                    return;
+                }
+                var id = source.getId() +"_" + entry.getId();
+                var marker  = this.markers[id];
+                if(!selected) {
+                    if(marker!=null) {
+                        this.map.removeMarker(marker);
+                        this.markers[id] = null;
+                    }  
+                } else {
+                    if(marker==null) {
+                        var latitude = entry.getLatitude();
+                        var longitude = entry.getLongitude();
+                        var point = new OpenLayers.LonLat(longitude, latitude);
+                        marker =  this.map.addMarker(id, point, entry.getIconUrl(),entry.getName());
+                        this.markers[id] = marker;
+                        //this.map.zoomToMarkers();
+                    }  else {
+                        //                        console.log("already have marker");
+                    }
+                }
+            },
             handlePointDataLoaded: function(source, pointData) {
                 var bounds = [NaN,NaN,NaN,NaN];
                 var records = pointData.getRecords();
