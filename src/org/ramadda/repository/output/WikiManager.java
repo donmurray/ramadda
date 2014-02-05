@@ -644,7 +644,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         prop(WIKI_PROP_DISPLAY,
              attrs(ATTR_WIDTH, "800", ATTR_HEIGHT, "400", "fields", "",
                    "type", "linechart", "name", "", "eventSource", "",
-                   "layoutFixed", "true", ATTR_SHOWMENU, "true",
+                   "layoutHere", "true", ATTR_SHOWMENU, "true",
                    ATTR_SHOWTITLE, "true", "row", "0", "column", "0",
                    ARG_FROMDATE, "", ARG_TODATE, "")),
     };
@@ -4172,9 +4172,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
         this.addDisplayImports(request,  sb);
         List<String> topProps     = new ArrayList<String>();
-        String       displayDivId = HtmlUtils.getUniqueId("displaydiv");
-        sb.append(HtmlUtils.comment("start chart"));
-        sb.append(HtmlUtils.div("", HtmlUtils.id(displayDivId)));
+
+
         List<String> propList = new ArrayList<String>();
 
 
@@ -4239,8 +4238,14 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         topProps.add(Json.quote(defaultLayer));
 
 
+
+
+
+
+        String  displayDivId =  HtmlUtils.getUniqueId("displaydiv");
         //If no json url then just add the displaymanager
         if (url == null) {
+            sb.append(HtmlUtils.div("", HtmlUtils.id(displayDivId)));
             js.append("var displayManager = getOrCreateDisplayManager("
                       + HtmlUtils.quote(displayDivId) + ","
                       + Json.map(topProps, false) + ",true);\n");
@@ -4248,7 +4253,6 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
             return;
         }
-
 
 
 
@@ -4262,17 +4266,20 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             props.remove("fields");
         }
 
-        boolean fixedLayout = Misc.getProperty(props, "layoutFixed", true);
+        String anotherDivId = (String)props.get("displayDiv");
+        boolean layoutHere = Misc.getProperty(props, "layoutHere", true);
 
-        if (fixedLayout) {
-            propList.add("layoutFixed");
+        if (anotherDivId!=null || layoutHere) {
+            propList.add("layoutHere");
             propList.add("true");
-            String anotherDiv = HtmlUtils.getUniqueId("displaydiv");
-            sb.append(HtmlUtils.div("", HtmlUtils.id(anotherDiv)));
+            if(anotherDivId == null) {
+                anotherDivId = HtmlUtils.getUniqueId("displaydiv");
+            }
+            sb.append(HtmlUtils.div("", HtmlUtils.id(anotherDivId)));
             propList.add("divid");
-            propList.add(Json.quote(anotherDiv));
+            propList.add(Json.quote(anotherDivId));
         }
-        props.remove("layoutFixed");
+        props.remove("layoutHere");
 
 
         for (String arg : new String[] {

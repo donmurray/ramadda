@@ -14,7 +14,7 @@ var PROP_DISPLAY_FILTER = "displayFilter";
 
 var PROP_DIVID = "divid";
 var PROP_FIELDS = "fields";
-var PROP_LAYOUT_FIXED = "layoutFixed";
+var PROP_LAYOUT_HERE = "layoutHere";
 var PROP_HEIGHT  = "height";
 var PROP_WIDTH  = "width";
 
@@ -518,7 +518,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 return title;
             },
             getIsLayoutFixed: function() {
-                return this.getProperty(PROP_LAYOUT_FIXED,false);
+                return this.getProperty(PROP_LAYOUT_HERE,false);
             },
             hasData: function() {
                 return this.dataCollection.hasData();
