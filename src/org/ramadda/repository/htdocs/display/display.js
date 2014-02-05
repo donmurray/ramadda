@@ -246,16 +246,36 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 }
                 return df;
             },
+
             getDisplayMenuContents: function() {
+                var get = "getRamaddaDisplay('" + this.id +"')";
+                var copyMe = htmlUtil.onClick(get+".copyDisplay();", "Copy Display");
+                var deleteMe = htmlUtil.onClick("removeRamaddaDisplay('" + this.id +"')", "Remove Display");
+                var menuItems = [];
+                this.getMenuItems(menuItems);
+                menuItems.push(copyMe);
+                menuItems.push(deleteMe);
+
+                var form = "<form>";
+
+                form += this.getDisplayMenuSettings();
+                for(var i in menuItems) {
+                    form += htmlUtil.div(["class","display-menu-item"], menuItems[i]);
+                }
+                form += "</form>";
+                return htmlUtil.div([], form);
+            },
+            getMenuItems: function(menuItems) {
+            },
+            getDisplayMenuSettings: function() {
                 var get = "getRamaddaDisplay('" + this.id +"')";
                 var moveRight = htmlUtil.onClick(get +".moveDisplayRight();", "Right");
                 var moveLeft = htmlUtil.onClick(get +".moveDisplayLeft();", "Left");
                 var moveUp = htmlUtil.onClick(get +".moveDisplayUp();", "Up");
                 var moveDown = htmlUtil.onClick(get +".moveDisplayDown();", "Down");
-                var copyMe = htmlUtil.onClick(get+".copyDisplay();", "Copy Display");
-                var deleteMe = htmlUtil.onClick("removeRamaddaDisplay('" + this.id +"')", "Remove Display");
-                var form = "<form><table>" +
-                    "<tr><td align=right><b>Move:</b></td><td>" + moveUp + " " +moveDown+  " " +moveRight+ " " + moveLeft +"</td></tr>"  +
+
+                var menu =  "<table>" +
+                    "<tr style=\"border:1px #000 solid;\"><td align=right><b>Move:</b></td><td>" + moveUp + " " +moveDown+  " " +moveRight+ " " + moveLeft +"</td></tr>"  +
                     "<tr><td align=right><b>Name:</b></td><td> " + htmlUtil.input("", this.getProperty("name",""), ["size","7","id",  this.getDomId("name")]) + "</td></tr>" +
                     "<tr><td align=right><b>Source:</b></td><td>"  + 
                     htmlUtil.input("", this.getProperty("eventsource",""), ["size","7","id",  this.getDomId("eventsource")]) +
@@ -264,11 +284,8 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                     "<tr><td align=right><b>Height:</b></td><td> " + htmlUtil.input("", this.getProperty("height",""), ["size","7","id",  this.getDomId("height")]) + "</td></tr>" +
                     "<tr><td align=right><b>Row:</b></td><td> " + htmlUtil.input("", this.getProperty("row",""), ["size","7","id",  this.getDomId("row")]) + "</td></tr>" +
                     "<tr><td align=right><b>Column:</b></td><td> " + htmlUtil.input("", this.getProperty("column",""), ["size","7","id",  this.getDomId("column")]) + "</td></tr>" +
-                    "</table>" +
-                    htmlUtil.div(["class","display-menu-item"], copyMe) +
-                    htmlUtil.div(["class","display-menu-item"], deleteMe) +
-                    "</form>";
-                return htmlUtil.div([], form);
+                    "</table>";
+                return menu;
             },
             loadInitialData: function() {
                 if(!this.needsData() || this.properties.data==null) {

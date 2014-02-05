@@ -202,6 +202,14 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 }
                 //todo: what to do on a change?
             },
+            test: function(entryId) {
+                var url = root + "/entry/show?entryid=" + entryId +"&output=points.product&product=points.json&numpoints=1000";
+                displayManager.createDisplay("linechart", {
+                        "showMenu": true,
+                            "showMap": "false",
+                            "data": new PointData("test", null, null, url)
+                            });
+            },
             entryListChanged: function(entryList) {
                 this.entryList = entryList;
                 var rowClass = "entryrow_" + this.getId()
@@ -214,6 +222,8 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
                 html += htmlUtil.openTag("ol",["class","display-entrylist-list", "id",this.getDomId("list")]);
                 html  += "\n";
+                var get = "getRamaddaDisplay('" + this.id +"')";
+
                 for(var i=0;i<entries.length;i++) {
                     var entry = entries[i];
                     var right ="";
@@ -221,6 +231,8 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     if(hasLocation) {
                         right += htmlUtil.image(root+"/icons/map.png",["title","Location:" +entry.getLocationLabel()]);
                     }
+                    right += htmlUtil.onClick(get+".test('" + entry.getId() +"');",
+                                              "test");
 
                     var icon = entry.getIconImage(["title","View entry"]);
                     var link  =  htmlUtil.tag("a",["href", entry.getEntryUrl()],icon);
@@ -241,6 +253,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 $("#" + this.getDomId("list")).selectable({
                         cancel: 'a',
                         selected: function( event, ui ) {
+                            //                            console.log("i:" + event.shiftKey);
                             var entryId = ui.selected.getAttribute('entryid');
                             var entry = theDisplay.entryList.getEntry(entryId);
                             //                            console.log("selected:" +  entry);

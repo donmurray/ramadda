@@ -832,7 +832,7 @@ public class PointOutputHandler extends RecordOutputHandler {
         props.put("layoutColumns", "2");
         props.put("showMenu", "true");
         props.put("showMap", "" + entry.isGeoreferenced());
-        getWikiManager().getEntryDisplay(request, name, url, sb, props);
+        getWikiManager().getEntryDisplay(request, entry, name, url, sb, props);
 
         return new Result("", sb);
     }

@@ -139,6 +139,9 @@ function DisplayManager(id,properties) {
                 }
                 var fields =  pointData.getRecordFields();
                 var records = pointData.getRecords();
+                if(records == null) {
+                    return;
+                }
                 if(index<0 || index>= records.length) {
                     console.log("handleRecordSelection: bad index= " + index);
                     return;
@@ -377,8 +380,15 @@ function DisplayManager(id,properties) {
                 this.doLayout();
             },
             getDefaultData: function() {
+                for(var i in this.dataList) {
+                    var data = this.dataList[i];
+                    var records = data.getRecords();
+                    if(records!=null) {
+                        return data;
+                    }
+                }
                 if(this.dataList.length>0) {
-                    return  this.dataList[0];
+                    return this.dataList[0];
                 }
                 return null;
             },

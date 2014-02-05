@@ -795,56 +795,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             String    entryId = (String) props.get(ATTR_ENTRY);
 
             if (entryId != null) {
-                theEntry = null;
-                int barIndex = entryId.indexOf("|");
-
-                if (barIndex >= 0) {
-                    entryId = entryId.substring(0, barIndex);
-                }
-                if (entryId.equals(ID_THIS)) {
-                    theEntry = entry;
-                }
-                if (entryId.equals(ID_ROOT)) {
-                    theEntry = getEntryManager().getTopGroup();
-                }
-                if (theEntry == null) {
-                    if (entryId.equals(ID_PARENT)) {
-                        theEntry = getEntryManager().getEntry(request,
-                                entry.getParentEntryId());
-                    }
-                }
-
-                if (theEntry == null) {
-                    if (entryId.equals(ID_GRANDPARENT)) {
-                        theEntry = getEntryManager().getEntry(request,
-                                entry.getParentEntryId());
-                        if (theEntry != null) {
-                            theEntry = getEntryManager().getEntry(request,
-                                    theEntry.getParentEntryId());
-                        }
-                    }
-                }
-                if (theEntry == null) {
-                    theEntry = getEntryManager().getEntry(request, entryId);
-                }
-                if (theEntry == null) {
-                    theEntry = findWikiEntry(request, wikiUtil, entryId,
-                                             entry);
-                }
-
-                //Ugghh - I really have to unify the EntryManager find entry methods
-                //Look for file path based entry id
-                if ((theEntry == null) && entryId.startsWith("/")) {
-                    theEntry = getEntryManager().findEntryFromName(request,
-                            entryId, request.getUser(), false);
-                }
-
-                //Look for relative to the current entry
-                if (theEntry == null) {
-                    theEntry = getEntryManager().findEntryFromPath(request,
-                            entry, entryId);
-                }
-
+                theEntry = findEntryFromId(request, entry, wikiUtil, entryId);
                 if (theEntry == null) {
                     return getMessage(props, "Unknown entry:" + entryId);
                 }
@@ -878,6 +829,58 @@ public class WikiManager extends RepositoryManager implements WikiUtil
     }
 
 
+    private Entry findEntryFromId(Request request, Entry entry, WikiUtil wikiUtil, String entryId) throws Exception {
+        Entry theEntry = null;
+        int barIndex = entryId.indexOf("|");
+
+        if (barIndex >= 0) {
+            entryId = entryId.substring(0, barIndex);
+        }
+        if (entryId.equals(ID_THIS)) {
+            theEntry = entry;
+        }
+        if (entryId.equals(ID_ROOT)) {
+            theEntry = getEntryManager().getTopGroup();
+        }
+        if (theEntry == null) {
+            if (entryId.equals(ID_PARENT)) {
+                theEntry = getEntryManager().getEntry(request,
+                                                      entry.getParentEntryId());
+            }
+        }
+
+        if (theEntry == null) {
+            if (entryId.equals(ID_GRANDPARENT)) {
+                theEntry = getEntryManager().getEntry(request,
+                                                      entry.getParentEntryId());
+                if (theEntry != null) {
+                    theEntry = getEntryManager().getEntry(request,
+                                                          theEntry.getParentEntryId());
+                }
+            }
+        }
+        if (theEntry == null) {
+            theEntry = getEntryManager().getEntry(request, entryId);
+        }
+        if (theEntry == null) {
+            theEntry = findWikiEntry(request, wikiUtil, entryId,
+                                     entry);
+        }
+
+        //Ugghh - I really have to unify the EntryManager find entry methods
+        //Look for file path based entry id
+        if ((theEntry == null) && entryId.startsWith("/")) {
+            theEntry = getEntryManager().findEntryFromName(request,
+                                                           entryId, request.getUser(), false);
+        }
+
+        //Look for relative to the current entry
+        if (theEntry == null) {
+            theEntry = getEntryManager().findEntryFromPath(request,
+                                                           entry, entryId);
+        }
+        return theEntry;
+    }
 
     /**
      * Get a wiki image link
@@ -1492,11 +1495,11 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                 (PointOutputHandler) pth.getRecordOutputHandler();
 
             String jsonUrl = poh.getJsonUrl(request, entry);
-            getEntryDisplay(request, entry.getName(), jsonUrl, sb, props);
+            getEntryDisplay(request, entry, entry.getName(), jsonUrl, sb, props);
 
             return sb.toString();
         } else if (theTag.equals(WIKI_PROP_DISPLAYGROUP)) {
-            getEntryDisplay(request, entry.getName(), null, sb, props);
+            getEntryDisplay(request, entry, entry.getName(), null, sb, props);
 
             return sb.toString();
         } else if (theTag.equals(WIKI_PROP_GRAPH)) {
@@ -4163,7 +4166,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    public void getEntryDisplay(Request request, String name, String url,
+    public void getEntryDisplay(Request request, Entry entry, String name, String url,
                               StringBuffer sb, Hashtable props)
             throws Exception {
 
@@ -4188,6 +4191,15 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             propList.add(Misc.getProperty(props, ATTR_SHOWMENU, "true"));
             props.remove(ATTR_SHOWMENU);
         }
+
+        String entryParent = (String)props.get("entryParent");
+        if(entryParent!=null) {
+            Entry theEntry = findEntryFromId(request, entry, null, entryParent);
+            if(theEntry!=null) {
+                props.put("entryParent",theEntry.getId());
+            }
+        }
+
 
         String colors = (String)props.get(ATTR_COLORS);
         if(colors!=null) {
