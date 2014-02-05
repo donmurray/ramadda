@@ -5,7 +5,7 @@ Copyright 2008-2014 Geode Systems LLC
 //There are the DOM IDs for various components of the UI
 var ID_DISPLAYS = "displays";
 var ID_MENU_BUTTON = "menu_button";
-var ID_MENU_POPUP =  "menu_popup";
+var ID_MENU_OUTER =  "menu_outer";
 var ID_MENU_INNER =  "menu_inner";
 
 //Layout types
@@ -224,7 +224,7 @@ function DisplayManager(id,properties) {
                     htmlUtil.tag("li",[], htmlUtil.onClick(get +".setLayout('tabs');", "Tabs"));
 
 
-                var menu = htmlUtil.div(["class","ramadda-popup", "id", this.getDomId(ID_MENU_POPUP)], 
+                var menu = htmlUtil.div(["class","ramadda-popup", "id", this.getDomId(ID_MENU_OUTER)], 
                                         htmlUtil.tag("ul", ["id", this.getDomId(ID_MENU_INNER),"class", "sf-menu"], 
                                                      htmlUtil.tag("li",[],"<a>New</a>" + htmlUtil.tag("ul",[], newMenu)) +
                                                      htmlUtil.tag("li",[],"<a>Layout</a>" + htmlUtil.tag("ul", [], layoutMenu))));
@@ -448,6 +448,7 @@ function DisplayManager(id,properties) {
                     return;
                 }
                 this.addNewDisplay(display);
+                return display;
             },
             addNewDisplay: function(display) {
                 this.displays.push(display);
@@ -518,7 +519,7 @@ function DisplayManager(id,properties) {
 
 
     $("#"+this.getDomId(ID_MENU_BUTTON)).button({ icons: { primary: "ui-icon-gear", secondary: "ui-icon-triangle-1-s"}}).click(function(event) {
-            var id =theDisplayManager.getDomId(ID_MENU_POPUP); 
+            var id =theDisplayManager.getDomId(ID_MENU_OUTER); 
             showPopup(event, theDisplayManager.getDomId(ID_MENU_BUTTON), id, false,null,"left bottom");
             $("#"+  theDisplayManager.getDomId(ID_MENU_INNER)).superfish({
                     animation: {height:'show'},

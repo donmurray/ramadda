@@ -6,8 +6,8 @@ Copyright 2008-2014 Geode Systems LLC
 var DISPLAY_FILTER = "filter";
 var DISPLAY_ANIMATION = "animation";
 
-addGlobalDisplayType({type:DISPLAY_FILTER , label: "Filter"});
-addGlobalDisplayType({type:DISPLAY_ANIMATION , label: "Animation"});
+addGlobalDisplayType({type:DISPLAY_FILTER , label: "Filter",requiresData:false});
+addGlobalDisplayType({type:DISPLAY_ANIMATION , label: "Animation",requiresData:false});
 
 function RamaddaFilterDisplay(displayManager, id, properties) {
     $.extend(this, new RamaddaDisplay(displayManager, id, properties));

@@ -4,9 +4,9 @@ var DISPLAY_ENTRYDISPLAY = "entrydisplay";
 var DISPLAY_OPERANDS = "operands";
 
 
-addGlobalDisplayType({type: DISPLAY_ENTRYLIST, label:"Entry List"});
-addGlobalDisplayType({type: DISPLAY_ENTRYDISPLAY, label:"Entry Display"});
-addGlobalDisplayType({type: DISPLAY_OPERANDS, label:"Operands"});
+addGlobalDisplayType({type: DISPLAY_ENTRYLIST, label:"Entry List",requiresData:false});
+addGlobalDisplayType({type: DISPLAY_ENTRYDISPLAY, label:"Entry Display",requiresData:false});
+addGlobalDisplayType({type: DISPLAY_OPERANDS, label:"Operands",requiresData:false});
 
 function RamaddaEntryDisplay(displayManager, id, type, properties) {
      $.extend(this, new RamaddaDisplay(displayManager, id, type, properties));
@@ -34,12 +34,22 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
     var ID_ENTRIES = "entries";
     var ID_FOOTER = "footer";
+    var ID_FOOTER_LEFT = "footer_left";
+    var ID_FOOTER_RIGHT = "footer_right";
+
+
     var ID_TEXT_FIELD = "textfield";
     var ID_TYPE_FIELD = "typefield";
     var ID_SEARCH = "search";
     var ID_FORM = "form";
     var ID_DATE_START = "date_start";
     var ID_DATE_END = "date_end";
+    var ID_MENU_BUTTON = "menu_button";
+    var ID_MENU_OUTER =  "menu_outer";
+    var ID_MENU_INNER =  "menu_inner";
+
+
+
     var baseTypeStyle = "padding-bottom:3px; min-height: 16px; margin-left:10px;  padding-left: 26px;";
 
     $.extend(this, {
@@ -70,7 +80,9 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 if(this.showEntries) {
                     html += htmlUtil.div(["id",this.getDomId(ID_ENTRIES),"class","display-entrylist-entries"], this.getLoadingMessage());
                 }
-                html += htmlUtil.div(["id",this.getDomId(ID_FOOTER),"class","display-entrylist-footer"], "");
+                html += htmlUtil.div(["id",this.getDomId(ID_FOOTER),"class","display-entrylist-footer"], 
+                                     htmlUtil.leftRight(htmlUtil.div(["id",this.getDomId(ID_FOOTER_LEFT)],""),
+                                                        htmlUtil.div(["id",this.getDomId(ID_FOOTER_RIGHT)],"")));
                 this.setContents(html);
                 var theDisplay  = this;
                 $("#" + this.getDomId(ID_SEARCH)).button().click(function(event) {
@@ -119,7 +131,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                         footer += " - ";
                     footer += outputs[i];
                 }
-                $("#"  +this.getDomId(ID_FOOTER)).html(footer);
+                $("#"  +this.getDomId(ID_FOOTER_RIGHT)).html(footer);
 
                 var jsonUrl = getEntryManager().getSearchUrl(this.settings, OUTPUT_JSON);
                 console.log("json:" + jsonUrl);
@@ -202,13 +214,26 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 }
                 //todo: what to do on a change?
             },
-            test: function(entryId) {
+             createDisplay: function(entryId, displayType) {
+                var entry = this.entryList.getEntry(entryId);
+                if(entry == null) {
+                    console.log("No entry:" + entryId);
+                    return;
+                }
                 var url = root + "/entry/show?entryid=" + entryId +"&output=points.product&product=points.json&numpoints=1000";
-                displayManager.createDisplay("linechart", {
+                var props = {
                         "showMenu": true,
-                            "showMap": "false",
-                            "data": new PointData("test", null, null, url)
-                            });
+                        "showMap": "false",
+                        "data": new PointData(entry.getName(), null, null, url)
+                };
+                if(this.lastDisplay!=null) {
+                    props.column = this.lastDisplay.getColumn();
+                    props.row = this.lastDisplay.getRow();
+                } else {
+                    props.column = this.getProperty("newColumn",this.getColumn());
+                    props.row = this.getProperty("newRow",this.getRow());
+                }
+                this.lastDisplay = displayManager.createDisplay(displayType, props);
             },
             entryListChanged: function(entryList) {
                 this.entryList = entryList;
@@ -217,6 +242,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 var html = "";
                 if(entries.length==0) {
                     $("#" + this.getDomId(ID_ENTRIES)).html(this.getMessage("Nothing found"));
+                    $("#"  +this.getDomId(ID_FOOTER_LEFT)).html("");
                     return;
                 }
 
@@ -224,6 +250,8 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 html  += "\n";
                 var get = "getRamaddaDisplay('" + this.id +"')";
 
+                $("#"  +this.getDomId(ID_FOOTER_LEFT)).html("#" + entries.length);
+                html+= htmlUtil.div(["class","ramadda-popup", "id", this.getDomId(ID_MENU_OUTER)], "");
                 for(var i=0;i<entries.length;i++) {
                     var entry = entries[i];
                     var right ="";
@@ -231,8 +259,15 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     if(hasLocation) {
                         right += htmlUtil.image(root+"/icons/map.png",["title","Location:" +entry.getLocationLabel()]);
                     }
-                    right += htmlUtil.onClick(get+".test('" + entry.getId() +"');",
-                                              "test");
+                    var menuButton = htmlUtil.onClick(get+".showEntryMenu(event, '" + entry.getId() +"');", 
+                                                  htmlUtil.image(root+"/icons/downdart.png", 
+                                                                 ["class", "display-dialog-button", "id",  this.getDomId(ID_MENU_BUTTON + entry.getId())]));
+
+                    right += menuButton;
+                    var newMenu = "";
+
+
+
 
                     var icon = entry.getIconImage(["title","View entry"]);
                     var link  =  htmlUtil.tag("a",["href", entry.getEntryUrl()],icon);
@@ -248,6 +283,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     html  += "\n";
                 }
                 html += htmlUtil.closeTag("ol");
+
                 $("#"+this.getDomId(ID_ENTRIES)).html(html);
                 var theDisplay   =this;
                 $("#" + this.getDomId("list")).selectable({
@@ -279,6 +315,29 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 //                var mouseEnter = function(event,ui) {console.log("in " +ui);};
                 //                var mouseExit = function(event) {console.log("out " + event.ui);};
                 //                $("." + rowClass ).mouseenter( mouseEnter).mouseleave( mouseExit );
+            },
+
+
+            showEntryMenu: function(event, entryId) {
+                var entry = this.entryList.getEntry(entryId);
+                var newMenu = "";
+                var get = "getRamaddaDisplay('" + this.id +"')";
+                for(var i=0;i<this.displayManager.displayTypes.length;i++) {
+                    var type = this.displayManager.displayTypes[i];
+                    if(!type.requiresData) continue;
+                    newMenu+= htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick", get+".createDisplay('" + entry.getId() +"','" + type.type+"');"], type.label));
+                }
+
+                var menu = htmlUtil.tag("ul", ["id", this.getDomId(ID_MENU_INNER+entry.getId()),"class", "sf-menu"], 
+                                        htmlUtil.tag("li",[],"<a>New</a>" + htmlUtil.tag("ul",[], newMenu)));
+                                        
+
+                $("#" + this.getDomId(ID_MENU_OUTER)).html(menu);
+                showPopup(event, this.getDomId(ID_MENU_BUTTON+entry.getId()), this.getDomId(ID_MENU_OUTER), false,null,"left bottom");
+                $("#"+  this.getDomId(ID_MENU_INNER+entry.getId())).superfish({
+                        animation: {height:'show'},
+                            delay: 1200
+                            });
             }
         });
 }

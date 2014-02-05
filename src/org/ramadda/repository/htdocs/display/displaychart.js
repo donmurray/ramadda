@@ -12,10 +12,11 @@ var DISPLAY_TEXT = "text";
 
 
 
-addGlobalDisplayType({type: DISPLAY_LINECHART, label:"Line chart"});
-addGlobalDisplayType({type:DISPLAY_BARCHART,label: "Bar chart"});
-addGlobalDisplayType({type:DISPLAY_TABLE , label: "Table"});
-addGlobalDisplayType({type:DISPLAY_TEXT , label: "Text Readout"});
+addGlobalDisplayType({type: DISPLAY_LINECHART, label:"Line chart",requiresData:true});
+addGlobalDisplayType({type:DISPLAY_BARCHART,label: "Bar chart",requiresData:true});
+addGlobalDisplayType({type:DISPLAY_TABLE , label: "Table",requiresData:true});
+
+addGlobalDisplayType({type:DISPLAY_TEXT , label: "Text Readout",requiresData:false});
 
 
 
