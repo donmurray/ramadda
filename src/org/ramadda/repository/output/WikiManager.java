@@ -4242,7 +4242,9 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
 
 
-        String  displayDivId =  HtmlUtils.getUniqueId("displaydiv");
+        String  displayDivId = (String) props.get("mainDiv");
+        if(displayDivId==null)
+            displayDivId =  HtmlUtils.getUniqueId("displaydiv");
         //If no json url then just add the displaymanager
         if (url == null) {
             sb.append(HtmlUtils.div("", HtmlUtils.id(displayDivId)));
@@ -4268,7 +4270,6 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
         String anotherDivId = (String)props.get("displayDiv");
         boolean layoutHere = Misc.getProperty(props, "layoutHere", true);
-
         if (anotherDivId!=null || layoutHere) {
             propList.add("layoutHere");
             propList.add("true");
