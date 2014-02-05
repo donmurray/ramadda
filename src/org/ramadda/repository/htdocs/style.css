@@ -81,8 +81,8 @@ input, password, fileinput,textarea,select {
 
 .entry-link {
 //   border: 1px red solid;
-   max-width: 200px;
-   overflow-x:hidden;
+     max-width: 200px;
+      overflow-x:hidden;
 }
 
 
@@ -190,7 +190,7 @@ input, password, fileinput,textarea,select {
 }
 
 .display-dialog-contents {
-   padding:4px;
+   padding:0px;
 }
 
 .display-dialog-header:hover {
@@ -203,6 +203,17 @@ input, password, fileinput,textarea,select {
    cursor:pointer;
 }
 
+.display-menu {
+}
+
+.display-menu-entry {
+     padding-top:5px;
+}
+
+.display-menu-item {
+     border-top: 1px #aaa solid;
+     padding:5px;
+}
 
 
 
@@ -331,8 +342,6 @@ input, password, fileinput,textarea,select {
     border: 1px #ccc solid;
 }
 
-.display-menu {
-}
 
 .display-header {
    margin-left:10px;
@@ -359,13 +368,7 @@ input, password, fileinput,textarea,select {
 
 
 
-.display-menu-entry {
-                    padding-top:5px;
-}
 
-.display-menu-close {
-   cursor:pointer;
-}
 
 .display-fields {
 //   padding-right:4px;

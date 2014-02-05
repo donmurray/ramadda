@@ -437,6 +437,9 @@ function DisplayManager(id,properties) {
                     alert("Error: could not create display using:" + funcName);
                     return;
                 }
+                this.addNewDisplay(display);
+            },
+            addNewDisplay: function(display) {
                 this.displays.push(display);
                 display.setDisplayManager(this);
                 this.addDisplayEventListener(display);

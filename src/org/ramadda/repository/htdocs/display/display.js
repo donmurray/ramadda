@@ -252,6 +252,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 var moveLeft = htmlUtil.onClick(get +".moveDisplayLeft();", "Left");
                 var moveUp = htmlUtil.onClick(get +".moveDisplayUp();", "Up");
                 var moveDown = htmlUtil.onClick(get +".moveDisplayDown();", "Down");
+                var copyMe = htmlUtil.onClick(get+".copyDisplay();", "Copy Display");
                 var deleteMe = htmlUtil.onClick("removeRamaddaDisplay('" + this.id +"')", "Remove Display");
                 var form = "<form><table>" +
                     "<tr><td align=right><b>Move:</b></td><td>" + moveUp + " " +moveDown+  " " +moveRight+ " " + moveLeft +"</td></tr>"  +
@@ -264,7 +265,8 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                     "<tr><td align=right><b>Row:</b></td><td> " + htmlUtil.input("", this.getProperty("row",""), ["size","7","id",  this.getDomId("row")]) + "</td></tr>" +
                     "<tr><td align=right><b>Column:</b></td><td> " + htmlUtil.input("", this.getProperty("column",""), ["size","7","id",  this.getDomId("column")]) + "</td></tr>" +
                     "</table>" +
-                    htmlUtil.div(["style","padding-top:2px; border-top: 1px #888 solid;"], deleteMe) +
+                    htmlUtil.div(["class","display-menu-item"], copyMe) +
+                    htmlUtil.div(["class","display-menu-item"], deleteMe) +
                     "</form>";
                 return htmlUtil.div([], form);
             },
@@ -446,6 +448,13 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                     extraStyle += " height:" + height +"px; ";
                 }
                 return  htmlUtil.div(["class","display-contents", "style", extraStyle, "id", this.getDomId(ID_DISPLAY_CONTENTS)],"");
+            },
+            copyDisplay: function() {
+                var newOne = {};
+                $.extend(true, newOne, this);
+                newOne.id =   newOne.id +"_display_" + (this.displayManager.cnt++);
+                addRamaddaDisplay(newOne);
+                this.displayManager.addNewDisplay(newOne);
             },
             removeDisplay: function() {
                 this.displayManager.removeDisplay(this);
