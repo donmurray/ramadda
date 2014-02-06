@@ -129,8 +129,8 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 this.setDisplayParent(cm);
             },
             setContents: function(contents) {
-                contents = htmlUtil.div(["class","display-" + this.getType() +"-inner"], contents);
-                $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(htmlUtil.div(["class","display-" +this.type], contents));
+                contents = htmlUtil.div(["class","display-contents-inner display-" + this.getType() +"-inner"], contents);
+                $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(contents);
             },
             getLoadingMessage: function() {
                 return this.getMessage("&nbsp;Loading...");
@@ -477,9 +477,9 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 }
                 var height = this.getProperty("height",-1);
                 if(height>0) {
-                    extraStyle += " height:" + height +"px; ";
+                    extraStyle += " height:" + height +"px; " + " max-height:" + height +"px; overflow-y: auto;";
                 }
-                return  htmlUtil.div(["class","display-contents", "style", extraStyle, "id", this.getDomId(ID_DISPLAY_CONTENTS)],"");
+                return  htmlUtil.div(["class","display-contents-inner display-" +this.type, "style", extraStyle, "id", this.getDomId(ID_DISPLAY_CONTENTS)],"");
             },
             copyDisplay: function() {
                 var newOne = {};

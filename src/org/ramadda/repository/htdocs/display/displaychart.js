@@ -36,6 +36,7 @@ id - the id of this chart. Has to correspond to a div tag id
 pointData - A PointData object (see below)
  */
 function RamaddaMultiChart(displayManager, id, properties) {
+    var ID_CHART = "chart";
     //Init the defaults first
     $.extend(this, {
             indexField: -1,
@@ -85,6 +86,8 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 }
                 if(!this.hasData()) {
                     this.clearChart();
+                    this.setContents(htmlUtil.div(["class","display-message"],
+                                                  this.getLoadingMessage()));
                     return;
                 }
 
@@ -115,7 +118,6 @@ function RamaddaMultiChart(displayManager, id, properties) {
                     this.chart.setSelection([{row:index, column:null}]); 
                 }
             },
-
             makeGoogleChart: function(chartType, dataList, selectedFields) {
                 if(typeof google == 'undefined') {
                     this.setContents("No google");
@@ -148,15 +150,18 @@ function RamaddaMultiChart(displayManager, id, properties) {
                     legend: { position: 'bottom' },
                     chartArea:{left:75,top:10,height:"60%",width:width}
                  });
+                var chartId = this.getDomId(ID_CHART);
+                this.setContents(htmlUtil.div(["id", chartId],""));
+
                 if(chartType == DISPLAY_BARCHART) {
                     chartOptions.orientation =  "horizontal";
-                    this.chart = new google.visualization.BarChart(document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
+                    this.chart = new google.visualization.BarChart(document.getElementById(chartId));
                 } else  if(chartType == DISPLAY_TABLE) {
-                    this.chart = new google.visualization.Table(document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
+                    this.chart = new google.visualization.Table(document.getElementById(chartId));
                 } else {
                     //                    this.chart =  new Dygraph.GVizChart(
-                    //                    document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
-                    this.chart = new google.visualization.LineChart(document.getElementById(this.getDomId(ID_DISPLAY_CONTENTS)));
+                    //                    document.getElementById(chartId));
+                    this.chart = new google.visualization.LineChart(document.getElementById(chartId));
                 }
                 if(this.chart!=null) {
                     this.chart.draw(dataTable, chartOptions);

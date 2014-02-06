@@ -103,6 +103,13 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 var footer =  htmlUtil.div(["id",this.getDomId(ID_FOOTER),"class","display-entrylist-footer"], 
                                            htmlUtil.leftRight(htmlUtil.div(["id",this.getDomId(ID_FOOTER_LEFT),"class","display-entrylist-footer-left"],""),
                                                               htmlUtil.div(["id",this.getDomId(ID_FOOTER_RIGHT),"class","display-entrylist-footer-right"],"")));
+                var entriesDivAttrs = ["id",this.getDomId(ID_ENTRIES),"class","display-entrylist-entries"];
+                var innerHeight = this.getProperty("innerHeight",null);
+                if(innerHeight!=null) {
+                    entriesDivAttrs.push("style");
+                    entriesDivAttrs.push("margin: 0px; padding: 0px;  min-height:" + innerHeight +"px; max-height:" + innerHeight +"px; overflow-y: none;");
+                }
+                var entriesDiv = htmlUtil.div(entriesDivAttrs, this.getLoadingMessage());
                 
                 if(horizontal) {
                     html+= htmlUtil.openTag("table",["border","0", "width","100%", "cellpadding","0","cellpadding","5"]);
@@ -111,7 +118,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                         html += htmlUtil.tag("td",[],this.makeSearchForm());
                     }
                     if(this.showEntries) {
-                        html += htmlUtil.tag("td",[],htmlUtil.div(["id",this.getDomId(ID_ENTRIES),"class","display-entrylist-entries"], this.getLoadingMessage()));
+                        html += htmlUtil.tag("td",[],entriesDiv);
                     }
                     html += htmlUtil.closeTag("tr");
 
@@ -122,7 +129,6 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     if(this.showEntries) {
                         html += htmlUtil.tag("td",[],footer);
                     }
- 
                     html += htmlUtil.closeTag("tr");
                     html += htmlUtil.closeTag("table");
                 } else {
@@ -130,7 +136,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                         html += this.makeSearchForm();
                     }
                     if(this.showEntries) {
-                        html += htmlUtil.div(["id",this.getDomId(ID_ENTRIES),"class","display-entrylist-entries"], this.getLoadingMessage());
+                        html += entriesDiv;
                         html += footer;
                     }
                 }
@@ -383,7 +389,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
                 var results = "Found: " + entries.length +" " ;
                 if(entries.length == this.settings.getMax()) {
-                    results += "more";
+                    results += " todo: add next/prev link";
                 } else {
 
                 }
@@ -513,7 +519,7 @@ function RamaddaEntrydisplayDisplay(displayManager, id, properties) {
             },
             addEntryHtml: function(entry) {
                 if(entry==null) {
-                    this.setContents("");
+                    this.setContents("&nbsp;");
                     return;
                 }
 
