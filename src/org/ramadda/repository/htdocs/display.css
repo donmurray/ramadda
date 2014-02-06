@@ -1,0 +1,332 @@
+
+
+.display-dialog {
+   display: none;
+   text-decoration: none;
+   border : 1px #aaa solid;
+   background-color : #Eee;
+   position:absolute;
+   left:-10000px; 
+   z-index: 10000;
+  -webkit-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+  -moz-box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+  box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.25);
+  /* IE */
+  filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=5, OffY=5, Color='gray');
+  /* slightly different syntax for IE8 */
+  -ms-filter:"progid:DXImageTransform.Microsoft.dropshadow(OffX=5, OffY=5, Color='gray')";
+}
+
+
+.display-dialog-button {
+    padding-left: 6px;
+    padding-right: 6px;
+    padding-top: 3px;
+    padding-bottom: 2px;
+    margin-bottom:1px;
+    border:1px #ccc solid; 
+    background-color: #efefef;
+}
+
+.display-dialog-button:hover {
+    border:1px #aaa solid; 
+    background-color: #e0e0e0;
+}
+
+.display-dialog-header {
+   padding:2px;
+   border-bottom:1px #888 solid; 
+}
+
+.display-dialog-contents {
+   padding:0px;
+}
+
+.display-dialog-header:hover {
+    background-color: #e4e4e4;
+}
+
+
+.display-dialog-close {
+   padding:2px;
+   cursor:pointer;
+}
+
+
+
+
+.display-metadata-item {
+    max-width: 200px;
+}
+
+.display-container {
+   margin:10px;
+}
+
+
+.display-message {
+    margin:10px;
+}
+
+
+.display-typelist {
+    padding: 0px;
+    margin: 0px;
+}
+
+.display-typelist-category {
+   font-weight: bold;
+   padding-bottom:3px; 
+   padding-top:3px; 
+}
+
+.display-typelist-type {
+   padding-bottom:3px; 
+   padding-top:3px; 
+ //   min-height: 16px; 
+   margin-left:10px;  
+   padding-left: 20px;
+}
+
+.display-menu {
+}
+
+.display-menu-entry {
+     padding-top:5px;
+}
+
+.display-menu-item {
+     border-top: 1px #aaa solid;
+     padding:5px;
+}
+
+
+
+.display-title {
+   font-weight: bold; 
+}
+
+.display-animation {
+   border-top:1px #ccc solid; 
+   padding:5px;
+}
+
+.display-animation-button {
+    background-color:  #fff;
+    margin: 1px;
+}
+
+.display-animation-button:hover {
+    background-color:  #ccc;
+}
+
+
+.display-message {
+     margin: 10px;
+}
+
+
+
+
+//Each of the below are of the form:
+//.display-<display type> {
+//}
+//.display-<display type>-inner {
+//}
+
+.display-contents {
+   border-top:1px #ccc solid; 
+   border-bottom:1px #ccc solid; 
+}
+
+
+.display-contents-inner {
+}
+
+
+.display-text {
+}
+
+.display-text-inner {
+   border:1px #ccc solid; 
+   overflow-y: auto;
+   max-height: 300px;
+}
+
+.display-example {
+}
+
+.display-example-inner {
+   border:1px #ccc solid; 
+   overflow-y: auto;
+   max-height: 300px;
+}
+
+
+.display-entrydisplay {
+   border:0px;
+   border-top:1px #ccc solid; 
+   border-bottom:1px #ccc solid; 
+   padding:5px;
+}
+
+.display-entrylist {
+
+}
+
+.display-entrylist-results {
+}
+
+.display-entrylist-footer {
+   padding: 4px;
+   padding-top: 0px;
+}
+
+.display-entrylist-footer-left {
+   font-size: 80%; 
+}
+
+.display-entrylist-footer-right {
+   min-width: 200px;
+   font-weight: bold; 
+   font-size: 80%; 
+}
+
+
+.display-entrylist-list  .ui-selected { 
+     background: #eee; 
+     background: #e0f0ff; 
+}
+
+.display-entrylist-list { list-style-type: none; margin: 0; padding: 0; }
+
+.display-entrylist-list li { 
+       margin: 0px; 
+       padding:3px; 
+       padding-left:6px; 
+       border-bottom:1px #f8f8f8 solid; 
+
+}
+
+.display-entrylist-list li:hover { 
+     background: #f0f0f0; 
+}
+
+.display-entrylist-inner {
+}
+
+.display-entrylist-entries   { 
+   min-width: 250px;
+   min-height: 200px;
+   border:1px #ccc solid; 
+   overflow-y: auto;
+   max-height: 300px;
+   margin: 4px;
+}
+
+
+.display-entrylist-entry {
+   padding: 5px;
+   margin: 0px;
+   border-bottom: 1px #ccc solid;
+   cursor:pointer;
+}
+
+.display-entrylist-entry:hover {
+   background-color: #efefef;
+
+}
+
+
+
+.display-operands {
+}
+
+.display-operands-inner {
+   border:1px #ccc solid; 
+   padding: 10px;
+}
+
+.display-map {
+}
+
+.display-map-map {
+     min-width:200px; 
+     min-height:200px; 
+}
+.display-map-latlon {
+//    margin-top: 3px;
+}
+
+.display-linechart .display-barchart   {
+    border: 1px #ccc solid;
+//    min-height:150px;
+}
+
+.display-linechart-inner .display-barchart-inner  {
+//    min-height:150px;
+}
+
+
+
+.display-header {
+   margin-left:10px;
+   margin-top:10px;
+   font-weight: bold; 
+}
+
+.chart-submenu
+{
+  padding: 5px;
+}
+
+.chart-submenu li
+{
+  list-style: none;
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+.chart-submenu li:hover
+{
+  background-color: #fcf7bd;
+}
+
+
+
+
+
+.display-fields {
+//   padding-right:4px;
+//   padding-left:4px;
+   padding-top:0px;
+   padding-bottom:0px;
+   min-width: 250px; 
+   max-width: 400px; 
+   border-bottom: 1px #888 solid;
+   overflow-y: auto;
+   max-height: 100px;
+}
+
+
+.chart-entry-list-wrapper { 
+
+}
+
+.entry-list-entry {
+   border-bottom: 1px #ccc solid;
+}
+
+.chart-entry-list-wrapper {
+   max-width: 200px;
+   background: red;
+}
+
+.chart-entry-list {
+   padding: 5px;
+   overflow-x: auto;
+   overflow-y: auto;
+   max-height: 600px;
+   border: 1px #000 solid;
+}
+
