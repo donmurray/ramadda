@@ -120,22 +120,6 @@ function RamaddaD3Display(displayManager, id, properties) {
                             });
                 }
 
-                /*
-                var xAxis = d3.svg.axis();
-                xAxis.scale(xScale);
-                xAxis.orient("bottom");
-                svg.append("g")
-                    .call(xAxis);
-
-                //The axis isn't working right now
-                var yAxis = d3.svg.axis()
-                    .scale(yScale)
-                    .orient("left");
-                svg.append("g")
-                    .attr("class", "axis")
-                    .call(yAxis);
-                */
-
             },
             //this gets called when an event source has selected a record
             handleRecordSelection: function(source, index, record, html) {
@@ -219,10 +203,7 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
 				var y = d3.scale.linear()
 					.range([displayHeight, 0]);
 
-			    /*var zoom = d3.behavior.zoom()
-							.x(x)
-							.y(y)
-							.on("zoom", this.zoomBehaviours);*/
+			    
 							
 				var xAxis = d3.svg.axis()
 					.scale(x)
@@ -260,7 +241,8 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
 				  .attr("fill","none")
 				  .attr("stroke","#555555")
 				  .attr("shape-rendering","crispEdges");
-				  // This will be the label text
+				 
+				 // This will be the label text
 				  /*.append("text")
 					  .attr("transform", "rotate(-90)")
 					  .attr("y", 6)
@@ -271,23 +253,48 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
 				
 				//svg.call(zoom);
 				
-				color = d3.scale.category20();
+				color = d3.scale.category10();
 				
 				for(var fieldIdx=0;fieldIdx<selectedFields.length;fieldIdx++) {
                     /*var dataIndex = selectedFields[fieldIdx].getIndex();
                     var range = ranges[dataIndex];
 					*/
+					
+					// Plot line for the values
 					var line = d3.svg.line()
 						.x(function(d) { return x(new Date(d.getDate())); })
 						.y(function(d) { return y(d.getData()[selectedFields[fieldIdx].getIndex()]); });
-						
+					
 					svg.append("path")
 					  .datum(records)
 					  .attr("class", "line")
 					  .attr("d", line)
 					  .attr("fill","none")
 					  .attr("stroke",function(d){return color(fieldIdx);})
-					  .attr("stroke-width","1.5px");
+					  .attr("stroke-width","0.5px");
+					
+					
+					// Plot moving average Line
+					var movingAverageLine = d3.svg.line()
+							.x(function(d) { return x(new Date(d.getDate())); })
+							.y(function(d,i) {
+								if (i == 0) {
+									return _movingSum = 0;
+								} else {
+									_movingSum += d.getData()[selectedFields[fieldIdx].getIndex()];
+								}
+								return y(_movingSum / i);
+							})
+							.interpolate("basis");
+					
+					svg.append("path")
+					  .attr("class", "line")
+					  .attr("d", movingAverageLine(records))
+					  .attr("fill","none")
+					  .attr("stroke",function(d){return color(fieldIdx);})
+					  .attr("stroke-width","1.5px")
+					  .style("stroke-dasharray", ("3, 3"));
+					  
 					
 					// Legend element
 				    svg.append("svg:rect")
@@ -301,6 +308,7 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
 						   .attr("x", displayWidth-100+40+10) // position+color rect+padding
 						   .attr("y", (55+55*fieldIdx))
 						   .attr("stroke", function(d){return color(fieldIdx);})
+						   .attr("style","font-size:8px")
 						   .text(selectedFields[fieldIdx].getLabel());
 				}
 				test=this;
