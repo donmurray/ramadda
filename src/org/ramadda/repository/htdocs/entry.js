@@ -54,7 +54,7 @@ function EntryManager(repositoryRoot) {
                     url += "&group=" + searchSettings.parent;
                 if(searchSettings.text!=null&& searchSettings.text.length>0) 
                     url += "&text=" + searchSettings.text;
-                url += "&max=" + searchSettings.max;
+                url += "&max=" + searchSettings.getMax();
                 return url;
             },
 
@@ -290,6 +290,9 @@ function EntrySearchSettings(props) {
             types: [],
             parent: null,
             max: 50,
+            getMax: function() {
+                return this.max;
+            },
             hasType:function(type) {
                 return this.types.indexOf(type)>=0;
             },

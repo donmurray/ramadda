@@ -205,16 +205,12 @@ ramaddaUtil = new Util();
 
 function HtmlUtil() {
 
-    $("foo");
-
-
-
     $.extend(this, {
             qt : function (value) {
                 return "\"" + value +"\"";
             },
 
-                leftRight : function(left,right) {
+            leftRight : function(left,right) {
                 return this.tag("table",["width","100%","cellspacing","0","cellpadding","0"],
                                 this.tr(["valign","top"],
                                         this.td(["align","left"],left) +

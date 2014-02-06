@@ -169,6 +169,10 @@ input, password, fileinput,textarea,select {
 }
 
 
+.display-message {
+    margin:10px;
+}
+
 .display-dialog-button {
     padding-left: 6px;
     padding-right: 6px;
@@ -281,9 +285,10 @@ input, password, fileinput,textarea,select {
 .display-entrylist {
 }
 
+.display-entrylist-results {
+}
+
 .display-entrylist-footer {
-   font-weight: bold; 
-   font-size: 80%; 
    padding: 4px;
    padding-top: 0px;
 }

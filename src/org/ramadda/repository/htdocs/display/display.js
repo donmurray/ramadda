@@ -132,6 +132,12 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 contents = htmlUtil.div(["class","display-" + this.getType() +"-inner"], contents);
                 $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(htmlUtil.div(["class","display-" +this.type], contents));
             },
+            getLoadingMessage: function() {
+                return this.getMessage("&nbsp;Loading...");
+            },
+            getMessage: function(msg) {
+                return htmlUtil.div(["class","display-message"], msg);
+            },
            checkFixedLayout: function() {
                 if(this.getIsLayoutFixed()) {
                     var divid = this.getProperty(PROP_DIVID);
@@ -250,8 +256,11 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 return df;
             },
 
+            getGet: function() {
+                return  "getRamaddaDisplay('" + this.id +"')";
+            },
             getDisplayMenuContents: function() {
-                var get = "getRamaddaDisplay('" + this.id +"')";
+                var get = this.getGet();
                 var copyMe = htmlUtil.onClick(get+".copyDisplay();", "Copy Display");
                 var deleteMe = htmlUtil.onClick("removeRamaddaDisplay('" + this.id +"')", "Remove Display");
                 var menuItems = [];
