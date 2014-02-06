@@ -131,7 +131,8 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                         footer += " - ";
                     footer += outputs[i];
                 }
-                $("#"  +this.getDomId(ID_FOOTER_RIGHT)).html(footer);
+                this.footerRight  = footer;
+                $("#"  +this.getDomId(ID_FOOTER_RIGHT)).html(this.footerRight);
 
                 var jsonUrl = getEntryManager().getSearchUrl(this.settings, OUTPUT_JSON);
                 console.log("json:" + jsonUrl);
@@ -251,6 +252,9 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 var get = "getRamaddaDisplay('" + this.id +"')";
 
                 $("#"  +this.getDomId(ID_FOOTER_LEFT)).html("#" + entries.length);
+                if(this.footerRight!=null) {
+                    $("#"  +this.getDomId(ID_FOOTER_RIGHT)).html(this.footerRight);
+                }
                 html+= htmlUtil.div(["class","ramadda-popup", "id", this.getDomId(ID_MENU_OUTER)], "");
                 for(var i=0;i<entries.length;i++) {
                     var entry = entries[i];

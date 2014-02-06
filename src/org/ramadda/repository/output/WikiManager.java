@@ -4238,18 +4238,17 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         topProps.add(Json.quote(defaultLayer));
 
 
+        String  mainDivId = (String) props.get("divid");
+        if(mainDivId==null)
+            mainDivId =  HtmlUtils.getUniqueId("displaydiv");
 
 
 
-
-        String  displayDivId = (String) props.get("mainDiv");
-        if(displayDivId==null)
-            displayDivId =  HtmlUtils.getUniqueId("displaydiv");
         //If no json url then just add the displaymanager
         if (url == null) {
-            sb.append(HtmlUtils.div("", HtmlUtils.id(displayDivId)));
+            sb.append(HtmlUtils.div("", HtmlUtils.id(mainDivId)));
             js.append("var displayManager = getOrCreateDisplayManager("
-                      + HtmlUtils.quote(displayDivId) + ","
+                      + HtmlUtils.quote(mainDivId) + ","
                       + Json.map(topProps, false) + ",true);\n");
             sb.append(HtmlUtils.script(js.toString()));
 
@@ -4268,7 +4267,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             props.remove("fields");
         }
 
-        String anotherDivId = (String)props.get("displayDiv");
+        String anotherDivId = (String)props.get("divid");
         boolean layoutHere = Misc.getProperty(props, "layoutHere", true);
         if (anotherDivId!=null || layoutHere) {
             propList.add("layoutHere");
@@ -4282,6 +4281,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         }
         props.remove("layoutHere");
 
+        //Put the main div after the display div
+        sb.append(HtmlUtils.div("", HtmlUtils.id(mainDivId)));
 
         for (String arg : new String[] {
             "eventSource", "name", "displayFilter", "chartMin", ARG_WIDTH,
@@ -4317,7 +4318,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
 
         js.append("var displayManager = getOrCreateDisplayManager("
-                  + HtmlUtils.quote(displayDivId) + ","
+                  + HtmlUtils.quote(mainDivId) + ","
                   + Json.map(topProps, false) + ");\n");
 
         propList.add("data");
