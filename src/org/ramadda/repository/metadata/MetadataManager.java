@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -34,6 +34,7 @@ import org.ramadda.sql.Clause;
 import org.ramadda.sql.SqlUtil;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.JQuery;
+import org.ramadda.util.Json;
 
 
 
@@ -1056,9 +1057,9 @@ public class MetadataManager extends RepositoryManager {
      */
     public Result processMetadataList(Request request) throws Exception {
 
+
         boolean doCloud = request.getString(ARG_TYPE, "list").equals("cloud");
-        StringBuffer sb = new StringBuffer();
-        String       header;
+        String  header;
         if (doCloud) {
             request.put(ARG_TYPE, "list");
             header = HtmlUtils.href(request.getUrl(), msg("List"))
@@ -1080,12 +1081,15 @@ public class MetadataManager extends RepositoryManager {
         MetadataHandler handler = findMetadataHandler(metadataType);
         MetadataType    type    = handler.findType(metadataType);
 
-        sb.append(header);
-        sb.append(HtmlUtils.hr());
-
-
-
+        StringBuffer    sb      = new StringBuffer();
+        if ( !request.responseInJson()) {
+            sb.append(header);
+            sb.append(HtmlUtils.hr());
+        }
         doMakeTagCloudOrList(request, metadataType, sb, doCloud, 0);
+        if (request.responseInJson()) {
+            return new Result("", sb, Json.MIMETYPE);
+        }
 
         return getSearchManager().makeResult(request,
                                              msg(type.getLabel() + " Cloud"),
@@ -1108,6 +1112,7 @@ public class MetadataManager extends RepositoryManager {
                                      StringBuffer sb, boolean doCloud,
                                      int threshold)
             throws Exception {
+        boolean         doJson  = request.responseInJson();
         MetadataHandler handler = findMetadataHandler(metadataType);
         MetadataType    type    = handler.findType(metadataType);
         String[]        values  = getDistinctValues(request, handler, type);
@@ -1145,20 +1150,33 @@ public class MetadataManager extends RepositoryManager {
                 }
             }
             tuples = Misc.sortTuples(tuples, false);
-            sb.append(HtmlUtils.formTable());
-            sb.append(HtmlUtils.row(HtmlUtils.cols(HtmlUtils.b("Count"),
-                    HtmlUtils.b(type.getLabel()))));
-            for (int i = 0; i < tuples.size(); i++) {
-                Object[] tuple = (Object[]) tuples.get(i);
-                sb.append("<tr><td width=\"1%\" align=right>");
-                sb.append(tuple[0]);
-                sb.append("</td><td>");
-                String value = (String) tuple[1];
-                sb.append(HtmlUtils.href(handler.getSearchUrl(request, type,
-                        value), value));
-                sb.append("</td></tr>");
+
+            if (doJson) {
+                List<String> maps = new ArrayList<String>();
+                for (int i = 0; i < tuples.size(); i++) {
+                    Object[] tuple = (Object[]) tuples.get(i);
+                    String   value = (String) tuple[1];
+                    maps.add(Json.map("count", tuple[0].toString(), "value",
+                                      Json.quote(value)));
+                }
+                sb.append(Json.list(maps));
+            } else {
+                sb.append(HtmlUtils.formTable());
+                sb.append(HtmlUtils.row(HtmlUtils.cols(HtmlUtils.b("Count"),
+                        HtmlUtils.b(type.getLabel()))));
+                for (int i = 0; i < tuples.size(); i++) {
+                    Object[] tuple = (Object[]) tuples.get(i);
+                    sb.append("<tr><td width=\"1%\" align=right>");
+                    sb.append(tuple[0]);
+                    sb.append("</td><td>");
+                    String value = (String) tuple[1];
+                    sb.append(HtmlUtils.href(handler.getSearchUrl(request,
+                            type, value), value));
+                    sb.append("</td></tr>");
+                }
+                sb.append(HtmlUtils.formTableClose());
             }
-            sb.append(HtmlUtils.formTableClose());
+
         } else {
             for (int i = 0; i < values.length; i++) {
                 if (cnt[i] <= threshold) {

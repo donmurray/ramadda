@@ -40,6 +40,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
     var ID_TEXT_FIELD = "textfield";
     var ID_TYPE_FIELD = "typefield";
+    var ID_METADATA_FIELD = "metadatafield";
     var ID_SEARCH = "search";
     var ID_RESULTS = "results";
     var ID_FORM = "form";
@@ -55,10 +56,12 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
     $.extend(this, {
             showForm: true,            
-            showTypes: true,           
+            showType: true,           
             fullForm: true,            
             showEntries: true,
-            share: true
+            showMetadata: true,
+                share: true,
+            metadataTypes: [],
     });            
 
     $.extend(this, new RamaddaEntryDisplay(displayManager, id, DISPLAY_ENTRYLIST, properties));
@@ -66,14 +69,30 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
     this.showForm = (""+this.showForm) =="true";
     this.showEntries = (""+this.showEntries) == "true";
     this.share = (""+this.share) == "true";
-    this.showTypes = (""+this.showTypes) == "true";
+    this.showType = (""+this.showType) == "true";
     this.fullForm = (""+this.fullForm) == "true";
+    this.showMetadata = (""+this.showMetadata) == "true";
 
+    var metadataTypesAttr= this.getProperty("metadataTypes","enum_tag:Tag");
+    var toks  = metadataTypesAttr.split(",");
+    for(var i in toks) {
+        var type = toks[i];
+        var label = type;
+        var subToks  = type.split(":");
+        if(subToks.length>1) {
+            type = subToks[0];
+            label  = subToks[1];
+        }
+        this.metadataTypes.push(new MetadataType(type, label));
+    }
+    
 
     addRamaddaDisplay(this);
     $.extend(this, {
             haveSearched: false,
             haveTypes: false,
+            metadata: {},
+            metadataLoading: {},
             selectedEntries: [],            
             getSelectedEntries: function() {return this.selectedEntries;},
             initDisplay: function() {
@@ -119,7 +138,6 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 this.setContents(html);
 
 
-
                 var theDisplay  = this;
                 $("#" + this.getDomId(ID_SEARCH)).button().click(function(event) {
                         theDisplay.submitSearchForm();
@@ -137,12 +155,16 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     this.entryListChanged(this.entryList);
                 }
                 this.addTypes();
+                for(var i in this.metadataTypes) {
+                    var type  = this.metadataTypes[i];
+                    this.addMetadata(type, null);
+                }
                 if(!this.haveSearched) {
                     this.submitSearchForm();
                 }
             },
             getFieldValue: function(id, dflt) {
-                var jq = $("#" + this.getDomId(id));
+                var jq = $("#" + id);
                 if(jq.size()>0) {
                     return jq.val();
                 } 
@@ -150,12 +172,21 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
             },
             submitSearchForm: function() {
                 this.haveSearched = true;
-                this.settings.text = this.getFieldValue(ID_TEXT_FIELD, this.settings.text);
+                this.settings.text = this.getFieldValue(this.getDomId(ID_TEXT_FIELD), this.settings.text);
                 if(this.haveTypes) {
-                    this.settings.entryType  = this.getFieldValue(ID_TYPE_FIELD, this.settings.entryType);
+                    this.settings.entryType  = this.getFieldValue(this.getDomId(ID_TYPE_FIELD), this.settings.entryType);
                 }
                 this.settings.clearAndAddType(this.settings.entryType);
                 
+                this.settings.metadata = [];
+                for(var i in this.metadataTypes) {
+                    var metadataType  = this.metadataTypes[i];
+                    var metadata = this.getFieldValue(this.getMetadataFieldId(metadataType), null);
+                    if(metadata!=null) {
+                        this.settings.metadata.push({type:metadataType.getType(),value:metadata});
+                    }
+                }
+
                 var footer = "Links: ";
                 var outputs = getEntryManager().getSearchLinks(this.settings);
                 for(var i in outputs) {
@@ -171,15 +202,29 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 this.entryList = new EntryList(jsonUrl, this);
                 $("#"+this.getDomId(ID_ENTRIES)).html(this.getLoadingMessage());
             },
+
             makeSearchForm: function() {
                 var html = "";
+                //localhost:8080/repository/metadata/list?metadata.type=enum_tag&response=json
+
                 html += htmlUtil.openTag("form",["id",this.getDomId(ID_FORM),"action","#"]);
                 html += htmlUtil.formTable();
                 var text = this.settings.text;
                 if(text == null) text = "";
                 html+= htmlUtil.formEntry("Text:", 
                                           htmlUtil.input("", text, ["class","input", "size","15","id",  this.getDomId(ID_TEXT_FIELD)]));
-                if(this.showTypes) {
+                if(this.showMetadata) {
+                    for(var i in this.metadataTypes) {
+                        var type  = this.metadataTypes[i];
+                        var metadataSelect= htmlUtil.tag("select",["id", this.getMetadataFieldId(type),
+                                                                   "class","display-metadatalist"],
+                                                         htmlUtil.tag("option",["title","","value",""],
+                                                                      NONE));
+                        html+= htmlUtil.formEntry(type.getLabel() +":", metadataSelect);
+                    }
+                }
+
+                if(this.showType) {
                     var typeSelect= htmlUtil.tag("select",["id", this.getDomId(ID_TYPE_FIELD),
                                                            "class","display-typelist"],
 
@@ -192,7 +237,6 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 if(this.fullForm) {
                 }
 
-
                 html+= htmlUtil.formEntry("", 
                                           htmlUtil.div(["id", this.getDomId(ID_SEARCH)],"Search"));
                 html+= htmlUtil.formEntry("", htmlUtil.div(["class","display-entrylist-results", "id",this.getDomId(ID_RESULTS)],"&nbsp;"));
@@ -204,6 +248,46 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 html += htmlUtil.closeTag("form");
                 return html;
             },
+            addMetadata: function(metadataType, metadata) {
+                if(metadata == null) {
+                    metadata = this.metadata[metadataType.getType()];
+                }
+                if(metadata == null) {
+                    var theDisplay = this;
+                    if(!this.metadataLoading[metadataType.getType()]) {
+                        this.metadataLoading[metadataType.getType()] = true;
+                        metadata = getEntryManager().getMetadataCount(metadataType, function(metadataType, metadata) {theDisplay.addMetadata(metadataType, metadata);});
+                    }
+                }
+                if(metadata == null) {
+                    return;
+                }
+
+                this.metadata[metadataType.getType()] = metadata;
+
+
+                var select = htmlUtil.tag("option",["title","","value",""],NONE);
+                for(var i in metadata) {
+                    var count = metadata[i].count;
+                    var value = metadata[i].value;
+                    var optionAttrs  = ["value",value,"class", "display-metadata-item"];
+                    var selected =  false;
+                    if(selected) {
+                        optionAttrs.push("selected");
+                        optionAttrs.push(null);
+                    }
+                    select +=  htmlUtil.tag("option",optionAttrs, value +" (" + count +")");
+                }
+                $("#" + this.getMetadataFieldId(metadataType)).html(select);
+            },
+                
+                
+            getMetadataFieldId: function(metadataType) {
+                var id = metadataType.getType();
+                id = id.replace(".","_");
+                return this.getDomId(ID_METADATA_FIELD +id);
+            },
+
             addTypes: function(types) {
                 if(types == null) {
                     var theDisplay = this;
@@ -214,7 +298,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 }
                 this.haveTypes = true;
                 var cats =[];
-                var catMap = {};
+                var catMap = {}; 
                 var select = htmlUtil.tag("option",["title","","value",""],NONE);
                 for(var i in types) {
                     var type = types[i];
@@ -240,7 +324,9 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     select += catMap[cats[i]];
                 }
                 $("#" + this.getDomId(ID_TYPE_FIELD)).html(select);
-            },
+
+
+           },
             handleEntrySelection: function(source, entry, selected) {
                 this.selectEntry(entry, selected);
             },

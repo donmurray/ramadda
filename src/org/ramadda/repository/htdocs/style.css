@@ -164,6 +164,11 @@ input, password, fileinput,textarea,select {
 
 
 
+
+.display-metadata-item {
+    max-width: 200px;
+}
+
 .display-container {
    margin:10px;
 }

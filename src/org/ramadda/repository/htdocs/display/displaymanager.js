@@ -367,6 +367,7 @@ function DisplayManager(id,properties) {
                 }
                 $("#" + this.getDomId(ID_DISPLAYS)).html(html);
 
+
                 for(var i=0;i<this.displays.length;i++) {
                     this.displays[i].initDisplay();
                 }

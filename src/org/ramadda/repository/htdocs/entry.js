@@ -36,6 +36,14 @@ function EntryManager(repositoryRoot) {
                 }
                 return this.entryTypes;
             },
+            getMetadataCount: function(type, callback) {
+                var url  = this.repositoryRoot +"/metadata/list?metadata.type=" + type.getType() +"&response=json";
+                //                console.log("getMetadata:" + type.getType() + " URL:" + url);
+                var jqxhr = $.getJSON(url, function(data) {
+                        callback(type, data);
+                    });
+                    return null;
+            },
             getSearchLinks: function(searchSettings) {
                 var urls = [];
                 for(var i in OUTPUTS) {
@@ -44,7 +52,7 @@ function EntryManager(repositoryRoot) {
                 }
                 return urls;
             },
-            getSearchUrl: function(searchSettings, output) {
+           getSearchUrl: function(searchSettings, output) {
                 var url =  this.repositoryRoot +"/search/do?output=" +output;
                 for(var i in searchSettings.types) {
                     var type = searchSettings.types[i];
@@ -54,6 +62,11 @@ function EntryManager(repositoryRoot) {
                     url += "&group=" + searchSettings.parent;
                 if(searchSettings.text!=null&& searchSettings.text.length>0) 
                     url += "&text=" + searchSettings.text;
+
+                for(var i in searchSettings.metadata) {
+                    var metadata = searchSettings.metadata[i];
+                    url += "&metadata.attr1." + metadata.type + "=" + metadata.value;
+                }
                 url += "&max=" + searchSettings.getMax();
                 return url;
             },
@@ -108,6 +121,15 @@ function createEntriesFromJson(data) {
         entries.push(entry);
     }
     return entries;
+}
+
+
+function MetadataType(type, label) {
+    $.extend(this, {type:type,label:label});
+    $.extend(this, {
+            getType: function() {return this.type;},
+            getLabel: function() {if(this.label!=null) return this.label; return this.type;}
+        });
 }
 
 
@@ -290,6 +312,7 @@ function EntrySearchSettings(props) {
             types: [],
             parent: null,
             max: 50,
+            metadata: [],
             getMax: function() {
                 return this.max;
             },
