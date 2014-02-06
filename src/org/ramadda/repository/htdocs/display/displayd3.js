@@ -8,6 +8,7 @@ Copyright 2008-2014 Geode Systems LLC
 function RamaddaD3Display(displayManager, id, properties) {
 
     var ID_SVG = "svg";
+	
     $.extend(this, new RamaddaDisplay(displayManager, id, "d3", properties));
     addRamaddaDisplay(this);
 
@@ -142,12 +143,71 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
     var ID_SVG = "svg";
     $.extend(this, new RamaddaDisplay(displayManager, id, "d3", properties));
     addRamaddaDisplay(this);
-
     $.extend(this, {
-
             initDisplay: function() {
                 this.initUI();
                 this.setTitle("D3 LineChart");
+				
+				var height = this.getProperty("height",300);
+				var margin = {top: 20, left: 50, bottom: 20, right: 20};
+				
+                var html = htmlUtil.div(["id", this.getDomId(ID_SVG),"style","height:" + height +"px;"],"");
+                this.setContents(html);
+
+				// To create dinamic size of the div
+				var displayHeight = parseInt((d3.select("#"+this.getDomId(ID_SVG)).style("height")).split("px")[0])-margin.top-margin.bottom;//this.getProperty("height",300);//d3.select("#"+this.getDomId(ID_SVG)).style("height");//
+                var displayWidth  = parseInt((d3.select("#"+this.getDomId(ID_SVG)).style("width")).split("px")[0])-margin.left-margin.right;//this.getProperty("width",600);//d3.select("#"+this.getDomId(ID_SVG)).style("width");//
+                
+                // 100 pixels for the legend... lets see if we keep it
+				this.x = d3.time.scale()
+					.range([0, displayWidth-100]);
+
+				this.y = d3.scale.linear()
+					.range([displayHeight, 0]);
+
+			    
+							
+				this.xAxis = d3.svg.axis()
+					.scale(this.x)
+					.orient("bottom");
+					//.ticks(5);
+
+				this.yAxis = d3.svg.axis()
+					.scale(this.y)
+					.orient("left");
+
+				this.svg = d3.select("#" + this.getDomId(ID_SVG)).append("svg")
+							.attr("width", displayWidth + margin.left + margin.right)
+							.attr("height", displayHeight + margin.top + margin.bottom)
+						  .append("g")
+							.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+				 
+				 // This will be the label text
+				  /*.append("text")
+					  .attr("transform", "rotate(-90)")
+					  .attr("y", 6)
+					  .attr("dy", ".71em")
+					  .style("text-anchor", "end")
+					  .text(selectedFields[0].getLabel()); // again lets see the Y axis 
+				  */
+				
+				
+				// To solve the problem with the classess within the class
+				var myThis = this;
+				this.svg.append("svg:rect")
+					.attr("class", "pane")
+					.attr("width", displayWidth)
+					.attr("height", displayHeight)
+					.attr("id","rect_"+this.getDomId(ID_SVG))
+					.call(d3.behavior.zoom().on("zoom", function(){myThis.zoomBehaviour()}))
+					.on("click", function(event){myThis.click(event);});;
+					
+				
+				this.displayWidth=displayWidth;
+				this.displayHeight=displayHeight;
+				this.color = d3.scale.category10();
+				
                 this.updateUI();
             },
             needsData: function() {return true;},
@@ -161,18 +221,13 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
                 this.updateUI();
             },
             updateUI: function() {
+			
+				// To be used inside a function we can use this.x inside them so we extract as variables. 
+				var x = this.x;
+				var y = this.y;
+				var color = this.color;
 				
-				var height = this.getProperty("height",300);
-				var margin = {top: 20, left: 50, bottom: 20, right: 20};
-				
-                var html = htmlUtil.div(["id", this.getDomId(ID_SVG),"style","height:" + height +"px;"],"");
-                this.setContents(html);
-
-				// To create dinamic size of the div
-				var displayHeight = parseInt((d3.select("#"+this.getDomId(ID_SVG)).style("height")).split("px")[0])-margin.top-margin.bottom;//this.getProperty("height",300);//d3.select("#"+this.getDomId(ID_SVG)).style("height");//
-                var displayWidth  = parseInt((d3.select("#"+this.getDomId(ID_SVG)).style("width")).split("px")[0])-margin.left-margin.right;//this.getProperty("width",600);//d3.select("#"+this.getDomId(ID_SVG)).style("width");//
-                
-                var selectedFields = this.getSelectedFields();
+				var selectedFields = this.getSelectedFields();
                 if(selectedFields.length==0) {
                     $("#" + this.getDomId(ID_SVG)).html("No fields");
                     return;
@@ -184,13 +239,7 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
                     console.log("no data");
                     return;
                 }
-
-                var svg = d3.select("#" + this.getDomId(ID_SVG));
-				this.svg = svg;
-                if(svg == null) {
-                    console.log("no svg");
-                    return;
-                }
+				
 				
 				var fields = pointData.getNumericFields();
                 var records = pointData.getRecords();
@@ -198,66 +247,26 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
                 var elevationRange =  RecordGetElevationRange(fields,records);
                 var offset = (elevationRange[1] - elevationRange[0])*0.05;
 
-				
-				// 100 pixels for the legend... lets see if we keep it
-				var x = d3.time.scale()
-					.range([0, displayWidth-100]);
-
-				var y = d3.scale.linear()
-					.range([displayHeight, 0]);
-
-			    
-							
-				var xAxis = d3.svg.axis()
-					.scale(x)
-					.orient("bottom");
-					//.ticks(5);
-
-				var yAxis = d3.svg.axis()
-					.scale(y)
-					.orient("left");
-
-				var svg = d3.select("#" + this.getDomId(ID_SVG)).append("svg")
-							.attr("width", displayWidth + margin.left + margin.right)
-							.attr("height", displayHeight + margin.top + margin.bottom)
-						  .append("g")
-							.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-				x.domain(d3.extent(records, function(d) { return new Date(d.getDate()); }));
+				this.x.domain(d3.extent(records, function(d) { return new Date(d.getDate()); }));
 				// the y domain depends on the first selected element I have to think about it.
-				y.domain(d3.extent(records, function(d) { return d.getData()[selectedFields[0].getIndex()]; }));
+				this.y.domain(d3.extent(records, function(d) { return d.getData()[selectedFields[0].getIndex()]; }));
 				
-				
-				
-				svg.append("g")
+				this.svg.append("g")
 				  .attr("class", "x axis")
-				  .attr("transform", "translate(0," + displayHeight + ")")
+				  .attr("transform", "translate(0," + this.displayHeight + ")")
 				  .attr("fill","none")
 				  .attr("stroke","#555555")
 				  .attr("shape-rendering","crispEdges")
-				  .call(xAxis);
+				  .call(this.xAxis);
 				  
 
-				svg.append("g")
+				this.svg.append("g")
 				  .attr("class", "y axis")
-				  .call(yAxis)
+				  .call(this.yAxis)
 				  .attr("fill","none")
 				  .attr("stroke","#555555")
 				  .attr("shape-rendering","crispEdges");
-				 
-				 // This will be the label text
-				  /*.append("text")
-					  .attr("transform", "rotate(-90)")
-					  .attr("y", 6)
-					  .attr("dy", ".71em")
-					  .style("text-anchor", "end")
-					  .text(selectedFields[0].getLabel()); // again lets see the Y axis 
-				  */
-				
-				//svg.call(zoom);
-				
-				color = d3.scale.category10();
-				
+					
 				for(var fieldIdx=0;fieldIdx<selectedFields.length;fieldIdx++) {
                     /*var dataIndex = selectedFields[fieldIdx].getIndex();
                     var range = ranges[dataIndex];
@@ -268,7 +277,7 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
 						.x(function(d) { return x(new Date(d.getDate())); })
 						.y(function(d) { return y(d.getData()[selectedFields[fieldIdx].getIndex()]); });
 					
-					svg.append("path")
+					this.svg.append("path")
 					  .datum(records)
 					  .attr("class", "line")
 					  .attr("d", line)
@@ -290,7 +299,7 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
 							})
 							.interpolate("basis");
 					
-					svg.append("path")
+					this.svg.append("path")
 					  .attr("class", "line")
 					  .attr("d", movingAverageLine(records))
 					  .attr("fill","none")
@@ -300,23 +309,21 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
 					  
 					
 					// Legend element Maybe create a function or see how we implement the legend
-				    svg.append("svg:rect")
-					   .attr("x", displayWidth-100)
+				    this.svg.append("svg:rect")
+					   .attr("x", this.displayWidth-100)
 					   .attr("y", (50+50*fieldIdx))
 					   .attr("stroke", function(d){return color(fieldIdx);})
 					   .attr("height", 2)
 					   .attr("width", 40);
 					   
-					svg.append("svg:text")
-						   .attr("x", displayWidth-100+40+10) // position+color rect+padding
+					this.svg.append("svg:text")
+						   .attr("x", this.displayWidth-100+40+10) // position+color rect+padding
 						   .attr("y", (55+55*fieldIdx))
 						   .attr("stroke", function(d){return color(fieldIdx);})
 						   .attr("style","font-size:8px")
 						   .text(selectedFields[fieldIdx].getLabel());
 				}
-				
-				// This is to play with the console, remove in production.
-				test=this;
+
 
             },
 			zoomBehaviour: function(){
@@ -324,14 +331,29 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
 				console.log(d3.event.translate);
 				console.log(d3.event.scale);
 				
+				// This will zoom the entire graph I will keep it here for other visualizations
+				this.svg.attr("transform",
+					  "translate(" + d3.event.translate + ")"
+					  + " scale(" + d3.event.scale + ")");
+				
+				testing=this;
+				/*this.svg.select("g.x.axis").call(this.xAxis);
+			    this.svg.select("g.y.axis").call(this.yAxis);*/
+				
+				this.updateUI();
+				
 			},
             //this gets called when an event source has selected a record
             handleRecordSelection: function(source, index, record, html) {
                 //                  this.setContents(html);
             },
-            click: function() {
-                $("#"+this.getDomId(ID_CLICK)).html("Click again");
-            }
+            click: function(event) {
+                console.log("Clicked");
+				console.log(event);
+            },
+			getSVG: function() {
+				return this.svg;
+			}
         });
 }
 
