@@ -108,6 +108,9 @@ function DisplayThing(id, properties) {
 
 
 function RamaddaDisplay(displayManager, id, type, propertiesArg) {
+    $.extend(this, {
+            orientation: "horizontal",
+        });
     $.extend(this, new DisplayThing(id, propertiesArg));
     $.extend(this, {
             type: type,
@@ -286,6 +289,9 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                     "<tr><td align=right><b>Column:</b></td><td> " + htmlUtil.input("", this.getProperty("column",""), ["size","7","id",  this.getDomId("column")]) + "</td></tr>" +
                     "</table>";
                 return menu;
+           },
+           isLayoutHorizontal: function(){ 
+                return this.orientation == "horizontal";
             },
             loadInitialData: function() {
                 if(!this.needsData() || this.properties.data==null) {

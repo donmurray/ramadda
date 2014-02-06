@@ -4311,7 +4311,6 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         for (Enumeration keys = props.keys(); keys.hasMoreElements(); ) {
             Object key = keys.nextElement();
             Object value = props.get(key);
-            System.err.println (key +" =  " + value);
             propList.add(key.toString());
             propList.add(Json.quote(value.toString()));
         }

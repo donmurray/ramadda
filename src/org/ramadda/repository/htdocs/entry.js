@@ -24,9 +24,14 @@ function EntryManager(repositoryRoot) {
             },
             getEntryTypes: function(callback) {
                 if(this.entryTypes == null) {
-                    var jqxhr = $.getJSON(root +"/entry/types", function(data) {
-                            this.entryTypes  =data;
-                            callback(this.entryTypes);
+                    var jqxhr = $.getJSON(this.repositoryRoot +"/entry/types", function(data) {
+                            this.entryTypes = [];
+                            for(var i in data) {
+                                this.entryTypes.push(new EntryType(data[i]));
+                            }
+                            if(callback!=null) {
+                                callback(this.entryTypes);
+                            }
                         });
                 }
                 return this.entryTypes;
@@ -79,32 +84,9 @@ function EntryManager(repositoryRoot) {
             }
         });
 
+    this.getEntryTypes();
 }
 
-function EntrySearchSettings(props) {
-    $.extend(this, {
-            types: [],
-            parent: null,
-            max: 50,
-            hasType:function(type) {
-                return this.types.indexOf(type)>=0;
-            },
-            clearAndAddType:function(type) {
-                this.types = [];
-                this.addType(type);
-                return this;
-            },
-            addType:function(type) {
-                if(type == null || type.length ==0) return;
-                if(this.hasType(type)) return;
-                this.types.push(type);
-                return this;
-            }
-     });
-    if(props!=null) {
-        $.extend(this,props);
-    }
-}
 
 
 function getEntryManager() {
@@ -128,6 +110,18 @@ function createEntriesFromJson(data) {
     return entries;
 }
 
+
+function EntryType(props) {
+    $.extend(this, props);
+    $.extend(this, {
+            getIsGroup: function() {return this.isgroup;},
+            getIcon: function() {return this.icon;},
+            getLabel: function() {return this.label;},
+            getId: function() {return this.type;},
+            getCategory: function() {return this.category;},
+            getEntryCount: function() {return this.entryCount;},
+        });
+}
 
 function Entry (props) {
     var NONGEO = -9999;
@@ -204,10 +198,17 @@ function Entry (props) {
             getEntryUrl : function () {
                 return  root + "/entry/show?entryid=" + this.id;
             },
+            getFilename : function () {
+                return this.filename;
+            }, 
+            getFileUrl : function () {
+                return  root + "/entry/get?entryid=" + this.id;
+            },
             getLink : function (label) {
                 if(!label) label = this.getName();
                 return  htmlUtil.tag("a",["href", this.getEntryUrl()],label);
             },
+
             toString: function() {
                 return "entry:" + this.getName();
             }
@@ -283,3 +284,28 @@ function EntryList(jsonUrl, listener) {
 
 
 
+
+function EntrySearchSettings(props) {
+    $.extend(this, {
+            types: [],
+            parent: null,
+            max: 50,
+            hasType:function(type) {
+                return this.types.indexOf(type)>=0;
+            },
+            clearAndAddType:function(type) {
+                this.types = [];
+                this.addType(type);
+                return this;
+            },
+            addType:function(type) {
+                if(type == null || type.length ==0) return;
+                if(this.hasType(type)) return;
+                this.types.push(type);
+                return this;
+            }
+     });
+    if(props!=null) {
+        $.extend(this,props);
+    }
+}

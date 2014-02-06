@@ -204,119 +204,135 @@ ramaddaUtil = new Util();
 
 
 function HtmlUtil() {
-     this.qt = function (value) {
-        return "\"" + value +"\"";
-     }
 
-     this.leftRight = function(left,right) {
-         return this.tag("table",["width","100%","cellspacing","0","cellpadding","0"],
-                         this.tr(["valign","top"],
-                                 this.td(["align","left"],left) +
-                                 this.td(["align","right"],right)));
-     }
+    $("foo");
 
-     this.div = function(attrs, inner) {
-         return this.tag("div", attrs, inner);
-     }
-     this.span = function(attrs, inner) {
-         return this.tag("span", attrs, inner);
-     }
-     this.image = function(path, attrs) {
-         return  "<img " + this.attrs(["src", path,"border","0"]) +" " + this.attrs(attrs) +">";
-     }
-     this.tr = function(attrs, inner) {
-         return this.tag("tr", attrs, inner);
-     }
-     this.formEntry = function(label, value) {
-         return this.tag("tr", ["valign","top"],
-                         this.tag("td",["class","formlabel","align","right"],
-                                  label) +
-                         this.tag("td",[],
-                                  value));
 
-     }
 
-     this.b = function(inner) {
-         return this.tag("b", [], inner);
-     }
+    $.extend(this, {
+            qt : function (value) {
+                return "\"" + value +"\"";
+            },
 
-     this.td = function(attrs, inner) {
-         return this.tag("td", attrs, inner);
-     }
+                leftRight : function(left,right) {
+                return this.tag("table",["width","100%","cellspacing","0","cellpadding","0"],
+                                this.tr(["valign","top"],
+                                        this.td(["align","left"],left) +
+                                        this.td(["align","right"],right)));
+            },
 
-     this.tag = function(tagName, attrs, inner) {
-         var html = "<" + tagName +" " + this.attrs(attrs) +">";
-         if(inner!=null) {
-             html += inner;
-         }
-         html += "</" + tagName +">\n";
-         return html;
-     }
+                div : function(attrs, inner) {
+                return this.tag("div", attrs, inner);
+            },
+                span : function(attrs, inner) {
+                return this.tag("span", attrs, inner);
+            },
+                image : function(path, attrs) {
+                return  "<img " + this.attrs(["src", path,"border","0"]) +" " + this.attrs(attrs) +">";
+            },
+                tr : function(attrs, inner) {
+                return this.tag("tr", attrs, inner);
+            },
+                formTable : function() {
+                return  this.openTag("table",["class","formtable","cellspacing","0","cellspacing","0"]);
+            },
+            formEntryTop : function(label, value) {
+                return this.tag("tr", ["valign","top"],
+                                this.tag("td",["class","formlabel","align","right"],
+                                         label) +
+                                this.tag("td",[],
+                                         value));
 
-     this.openTag = function(tagName, attrs) {
-         var html = "<" + tagName +" " + this.attrs(attrs) +">";
-         return html;
-     }
+            },
+            formEntry : function(label, value) {
+                return this.tag("tr", [],
+                                this.tag("td",["class","formlabel","align","right"],
+                                         label) +
+                                this.tag("td",[],
+                                         value));
 
-     this.closeTag = function(tagName) {
-         return  "</" + tagName +">\n";
-     }
+            },
 
-     this.attr = function(name, value) {
-         return " " + name +"=" + this.qt(value) +" ";
-     }
+            b : function(inner) {
+                return this.tag("b", [], inner);
+            },
 
-     this.attrs = function(list) {
-         var html = "";
-         if(list == null) return html;
-         for(var i=0;i<list.length;i+=2) {
-             var name = list[i];
-             var value = list[i+1];
-             if(value == null) {
-                 html += name;
-             } else {
-                 html += this.attr(name,value);
-             }
+           td : function(attrs, inner) {
+                return this.tag("td", attrs, inner);
+            },
 
-         }
-         return html;
-     }
+           tag : function(tagName, attrs, inner) {
+                var html = "<" + tagName +" " + this.attrs(attrs) +">";
+                if(inner!=null) {
+                    html += inner;
+                }
+                html += "</" + tagName +">\n";
+                return html;
+            },
+            openTag : function(tagName, attrs) {
+                var html = "<" + tagName +" " + this.attrs(attrs) +">";
+                return html;
+            },
 
-     this.styleAttr = function(s) {
-         return this.attr("style", s);
-     }
+            closeTag : function(tagName) {
+                return  "</" + tagName +">\n";
+            },
 
-     this.classAttr = function(s) {
-         return this.attr("class", s);
-     }
+             attr : function(name, value) {
+                return " " + name +"=" + this.qt(value) +" ";
+            },
 
-     this.idAttr = function(s) {
-         return this.attr("id", s);
-     }
-     this.href= function(url, label) {
-         return this.tag("a", ["href", url], label);
-     }
+             attrs : function(list) {
+                var html = "";
+                if(list == null) return html;
+                for(var i=0;i<list.length;i+=2) {
+                    var name = list[i];
+                    var value = list[i+1];
+                    if(value == null) {
+                        html += name;
+                    } else {
+                        html += this.attr(name,value);
+                    }
 
-     this.onClick = function(call, html) {
-         return this.tag("a", ["onclick", call, "style","xtext-decoration:none;color:black;"], html);
-     }
+                }
+                return html;
+            },
+            styleAttr : function(s) {
+                return this.attr("style", s);
+            },
 
-     this.checkbox = function(id,cbxclass,checked) {
-         var html = "<input id=\"" + id +"\" class=\""  + cbxclass +"\"  type=checkbox value=true ";
-         if(checked) {
-             html+= " checked ";
-         }
-         html += "/>";
-         return html;
-     }
+            classAttr : function(s) {
+                return this.attr("class", s);
+            },
 
-    this.input =   function(name, value, attrs) {
-        return "<input " + this.attrs(attrs) + this.attrs(["name", name, "value",value]) +"/>";
-    }
+            idAttr : function(s) {
+                return this.attr("id", s);
+            },
+            href: function(url, label) {
+               return this.tag("a", ["href", url], label);
+            },
 
-  }
+            onClick : function(call, html) {
+                return this.tag("a", ["onclick", call, "style","xtext-decoration:none;color:black;"], html);
+            },
 
-  var htmlUtil = new HtmlUtil();
+            checkbox:  function(id,cbxclass,checked) {
+                var html = "<input id=\"" + id +"\" class=\""  + cbxclass +"\"  type=checkbox value=true ";
+                if(checked) {
+                    html+= " checked ";
+                }
+                html += "/>";
+                return html;
+            },
+
+                input :   function(name, value, attrs) {
+                return "<input " + this.attrs(attrs) + this.attrs(["name", name, "value",value]) +"/>";
+            }
+        });
+
+}
+
+var htmlUtil = new HtmlUtil();
 
 
 

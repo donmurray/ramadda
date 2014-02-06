@@ -676,8 +676,8 @@ public class EntryManager extends RepositoryManager {
             if ( !typeHandler.getForUser()) {
                 continue;
             }
+            int cnt = getEntryUtil().getEntryCount(typeHandler);
             if(checkCnt) {
-                int cnt = getEntryUtil().getEntryCount(typeHandler);
                 if (cnt == 0) {
                     continue;
                 }
@@ -686,6 +686,8 @@ public class EntryManager extends RepositoryManager {
 
             items.add("type");
             items.add(Json.quote(typeHandler.getType()));
+            items.add("entryCount");
+            items.add(""+cnt);
             items.add("label");
             items.add(Json.quote(typeHandler.getLabel()));
             items.add("isgroup");

@@ -50,10 +50,12 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
 
 
-    var baseTypeStyle = "padding-bottom:3px; min-height: 16px; margin-left:10px;  padding-left: 26px;";
+
 
     $.extend(this, {
             showForm: true,            
+            showTypes: true,           
+            fullForm: true,            
             showEntries: true,
             share: true
     });            
@@ -63,6 +65,8 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
     this.showForm = (""+this.showForm) =="true";
     this.showEntries = (""+this.showEntries) == "true";
     this.share = (""+this.share) == "true";
+    this.showTypes = (""+this.showTypes) == "true";
+    this.fullForm = (""+this.fullForm) == "true";
 
 
     addRamaddaDisplay(this);
@@ -74,15 +78,42 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
             initDisplay: function() {
                 this.initUI();
                 var html = "";
-                if(this.showForm) {
-                    html += this.makeSearchForm();
+                var horizontal = this.isLayoutHorizontal();
+
+                var footer =  htmlUtil.div(["id",this.getDomId(ID_FOOTER),"class","display-entrylist-footer"], 
+                                           htmlUtil.leftRight(htmlUtil.div(["id",this.getDomId(ID_FOOTER_LEFT),"class","display-entrylist-footer-left"],""),
+                                                              htmlUtil.div(["id",this.getDomId(ID_FOOTER_RIGHT),"class","display-entrylist-footer-right"],"")));
+                
+                if(horizontal) {
+                    html+= htmlUtil.openTag("table",["border","0", "width","100%", "cellpadding","0","cellpadding","5"]);
+                    html += htmlUtil.openTag("tr",["valign","top"]);
+                    if(this.showForm) {
+                        html += htmlUtil.tag("td",[],this.makeSearchForm());
+                    }
+                    if(this.showEntries) {
+                        html += htmlUtil.tag("td",[],htmlUtil.div(["id",this.getDomId(ID_ENTRIES),"class","display-entrylist-entries"], this.getLoadingMessage()));
+                    }
+                    html += htmlUtil.closeTag("tr");
+
+                    html += htmlUtil.openTag("tr",["valign","top"]);
+                    if(this.showForm) {
+                        html += htmlUtil.tag("td",[],"");
+                    }
+                    if(this.showEntries) {
+                        html += htmlUtil.tag("td",[],footer);
+                    }
+ 
+                    html += htmlUtil.closeTag("tr");
+                    html += htmlUtil.closeTag("table");
+                } else {
+                    if(this.showForm) {
+                        html += this.makeSearchForm();
+                    }
+                    if(this.showEntries) {
+                        html += htmlUtil.div(["id",this.getDomId(ID_ENTRIES),"class","display-entrylist-entries"], this.getLoadingMessage());
+                    }
                 }
-                if(this.showEntries) {
-                    html += htmlUtil.div(["id",this.getDomId(ID_ENTRIES),"class","display-entrylist-entries"], this.getLoadingMessage());
-                }
-                html += htmlUtil.div(["id",this.getDomId(ID_FOOTER),"class","display-entrylist-footer"], 
-                                     htmlUtil.leftRight(htmlUtil.div(["id",this.getDomId(ID_FOOTER_LEFT)],""),
-                                                        htmlUtil.div(["id",this.getDomId(ID_FOOTER_RIGHT)],"")));
+
                 this.setContents(html);
                 var theDisplay  = this;
                 $("#" + this.getDomId(ID_SEARCH)).button().click(function(event) {
@@ -124,7 +155,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 }
                 this.settings.clearAndAddType(this.settings.entryType);
                 
-                var footer = "Download as: ";
+                var footer = "Links: ";
                 var outputs = getEntryManager().getSearchLinks(this.settings);
                 for(var i in outputs) {
                     if(i>0)
@@ -140,19 +171,29 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 $("#"+this.getDomId(ID_ENTRIES)).html(this.getLoadingMessage());
             },
             makeSearchForm: function() {
-                var html = htmlUtil.openTag("form",["class","formtable","id", this.getDomId(ID_FORM)]);
-                html+= htmlUtil.openTag("table",["cellpadding","0","cellpadding","0"]);
+                var html = htmlUtil.formTable();
+                html+= htmlUtil.formTable();
                 var text = this.settings.text;
                 if(text == null) text = "";
                 html+= htmlUtil.formEntry("Text:", 
                                           htmlUtil.input("", text, ["class","input", "size","15","id",  this.getDomId(ID_TEXT_FIELD)]));
-                var typeSelect= htmlUtil.tag("select",["id", this.getDomId(ID_TYPE_FIELD),
-                                             "style",""],
+                if(this.showTypes) {
+                    var typeSelect= htmlUtil.tag("select",["id", this.getDomId(ID_TYPE_FIELD),
+                                                           "class","display-typelist"],
 
-                                             htmlUtil.tag("option",["title","","value",""],
-                                                          NONE));
+                                                 htmlUtil.tag("option",["title","","value",""],
+                                                              NONE));
 
-                html+= htmlUtil.formEntry("Type:", typeSelect);
+                    html+= htmlUtil.formEntry("Type:", typeSelect);
+                }
+
+                if(this.fullForm) {
+                    
+
+
+                }
+
+
                 html+= htmlUtil.formEntry("", 
                                           htmlUtil.div(["id", this.getDomId(ID_SEARCH)],"Search"));
                 html+= "<input type=\"submit\" style=\"position:absolute;left:-9999px;width:1px;height:1px;\"/>";
@@ -174,21 +215,22 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 var select = htmlUtil.tag("option",["title","","value",""],NONE);
                 for(var i in types) {
                     var type = types[i];
-                    var map = catMap[type.category];
-                    var style = baseTypeStyle +" background: URL(" + type.icon +") no-repeat;";
+                    var map = catMap[type.getCategory()];
+                    var style = " background: URL(" + type.getIcon() +") no-repeat;";
                     
-                    var optionAttrs  = ["title",type.label,"value",type.type,"style", style]
-                    var selected =  this.settings.hasType(type.type);
+                    var optionAttrs  = ["title",type.getLabel(),"value",type.getId(),"class", "display-typelist-type",
+                                        "style", style];
+                    var selected =  this.settings.hasType(type.getId());
                     if(selected) {
                         optionAttrs.push("selected");
                         optionAttrs.push(null);
                     }
-                    var option = htmlUtil.tag("option",optionAttrs, type.label);
+                    var option = htmlUtil.tag("option",optionAttrs, type.getLabel() +" (" + type.getEntryCount() +")");
                     if(map == null) {
-                        catMap[type.category] = htmlUtil.tag("option",["style",    "padding-top:4px;font-weight: bold;", "title","","value",""],type.category);
-                        cats.push(type.category);
+                        catMap[type.getCategory()] = htmlUtil.tag("option",["class", "display-typelist-category", "title","","value",""],type.getCategory());
+                        cats.push(type.getCategory());
                     }
-                    catMap[type.category] += option;
+                    catMap[type.getCategory()] += option;
 
                 }
                 for(var i in cats) {
@@ -261,7 +303,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     var right ="";
                     var hasLocation = entry.hasLocation();
                     if(hasLocation) {
-                        right += htmlUtil.image(root+"/icons/map.png",["title","Location:" +entry.getLocationLabel()]);
+                        //                        right += htmlUtil.image(root+"/icons/map.png",["title","Location:" +entry.getLocationLabel()]);
                     }
                     var menuButton = htmlUtil.onClick(get+".showEntryMenu(event, '" + entry.getId() +"');", 
                                                   htmlUtil.image(root+"/icons/downdart.png", 
@@ -283,7 +325,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     var line = htmlUtil.leftRight(left,right);
                     html  += htmlUtil.tag("li",["id",
                                                 this.getDomId("entry_" + entry.getId()),
-                                                "entryid",entry.getId(), "class","ui-widget-content " + rowClass], line);
+                                                "entryid",entry.getId(), "class","display-entrylist-entry ui-widget-content " + rowClass], line);
                     html  += "\n";
                 }
                 html += htmlUtil.closeTag("ol");
@@ -370,6 +412,22 @@ function RamaddaEntrydisplayDisplay(displayManager, id, properties) {
                 var html = "";
                 html += htmlUtil.div(["class", "wiki-h2"], entry.getLink(entry.getIconImage() +" " + entry.getName()));
                 html+= entry.getDescription();
+                html += htmlUtil.formTable();
+                var columnNames = entry.getColumnNames();
+                var columnLabels = entry.getColumnLabels();
+                if(entry.getFilesize()>0) {
+                    html+= htmlUtil.formEntry("File:", entry.getFilename() +" " +
+                                              htmlUtil.href(entry.getFileUrl(), htmlUtil.image(root +"/icons/download.png")) + " " +
+                                              entry.getFormattedFilesize());
+                }
+                for(var i in columnNames) {
+                    var columnName = columnNames[i];
+                    var columnLabel = columnLabels[i];
+                    var columnValue = entry.getColumnValue(columnName);
+                    html+= htmlUtil.formEntry(columnLabel+":", columnValue);
+                }
+
+                html += htmlUtil.closeTag("table");
                 this.setContents(html);
             },
         });
