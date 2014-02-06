@@ -183,27 +183,18 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
 							.attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 				 
-				 // This will be the label text
-				  /*.append("text")
-					  .attr("transform", "rotate(-90)")
-					  .attr("y", 6)
-					  .attr("dy", ".71em")
-					  .style("text-anchor", "end")
-					  .text(selectedFields[0].getLabel()); // again lets see the Y axis 
-				  */
 				
 				
 				// To solve the problem with the classess within the class
 				var myThis = this;
+				// This will be the event handler. In this case the zoom will be only inside the graph area nor the axis
 				this.svg.append("svg:rect")
-					.attr("class", "pane")
 					.attr("width", displayWidth)
 					.attr("height", displayHeight)
 					.attr("id","rect_"+this.getDomId(ID_SVG))
 					.call(d3.behavior.zoom().on("zoom", function(){myThis.zoomBehaviour()}))
-					.on("click", function(event){myThis.click(event);});;
+					.on("click", function(){myThis.click(event)});
 					
-				
 				this.displayWidth=displayWidth;
 				this.displayHeight=displayHeight;
 				this.color = d3.scale.category10();
