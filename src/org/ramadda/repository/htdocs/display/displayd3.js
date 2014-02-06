@@ -153,7 +153,7 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
             needsData: function() {return true;},
             getMenuContents: function() {
                 var height = this.getProperty(PROP_HEIGHT,"400");
-                var html  =  htmlUtil.div(["id",  this.getDomId(ID_FIELDS),"class", "display-fields","style","overflow-y: auto;    max-height:" + height +"px;"]);
+                var html  =  htmlUtil.div(["id",  this.getDomId(ID_FIELDS),"class", "display-fields",]);
                 html +=  this.getDisplayMenuContents();
                 return html;
             },
@@ -162,13 +162,16 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
             },
             updateUI: function() {
 				
-                var displayHeight = this.getProperty("height",300);
-                var displayWidth = this.getProperty("width",600);
-                var margin = {top: 20, left: 50, bottom: 20, right: 20};
-
-                var html = htmlUtil.div(["id", this.getDomId(ID_SVG),"style","border:1px #000 solid; min-height:" + displayHeight +"px;"], "");
+				var height = this.getProperty("height",300);
+				var margin = {top: 20, left: 50, bottom: 20, right: 20};
+				
+                var html = htmlUtil.div(["id", this.getDomId(ID_SVG),"style","height:" + height +"px;"],"");
                 this.setContents(html);
 
+				// To create dinamic size of the div
+				var displayHeight = parseInt((d3.select("#"+this.getDomId(ID_SVG)).style("height")).split("px")[0])-margin.top-margin.bottom;//this.getProperty("height",300);//d3.select("#"+this.getDomId(ID_SVG)).style("height");//
+                var displayWidth  = parseInt((d3.select("#"+this.getDomId(ID_SVG)).style("width")).split("px")[0])-margin.left-margin.right;//this.getProperty("width",600);//d3.select("#"+this.getDomId(ID_SVG)).style("width");//
+                
                 var selectedFields = this.getSelectedFields();
                 if(selectedFields.length==0) {
                     $("#" + this.getDomId(ID_SVG)).html("No fields");
@@ -296,7 +299,7 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
 					  .style("stroke-dasharray", ("3, 3"));
 					  
 					
-					// Legend element
+					// Legend element Maybe create a function or see how we implement the legend
 				    svg.append("svg:rect")
 					   .attr("x", displayWidth-100)
 					   .attr("y", (50+50*fieldIdx))
@@ -311,6 +314,8 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
 						   .attr("style","font-size:8px")
 						   .text(selectedFields[fieldIdx].getLabel());
 				}
+				
+				// This is to play with the console, remove in production.
 				test=this;
 
             },
