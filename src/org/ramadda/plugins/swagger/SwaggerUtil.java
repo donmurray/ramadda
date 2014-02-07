@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -21,22 +21,114 @@
 package org.ramadda.plugins.swagger;
 
 
+import org.ramadda.util.Json;
+
 
 /**
  */
 public class SwaggerUtil {
 
-    public static final String VERSION_API = "0.2";
 
+    /** _more_          */
+    public static final String VERSION_API = "1.0.0";
+
+    /** _more_          */
     public static final String VERSION_SWAGGER = "1.2";
 
+    /** _more_          */
     public static final String ATTR_API_VERSION = "apiVersion";
+
+    /** _more_          */
     public static final String ATTR_SWAGGER_VERSION = "swaggerVersion";
 
 
+    /** _more_          */
     public static final String ATTR_PATH = "path";
+
+    /** _more_          */
+    public static final String ATTR_BASEPATH = "basePath";
+
+    /** _more_          */
+    public static final String ATTR_RESOURCEPATH = "resourcePath";
+
+    /** _more_          */
     public static final String ATTR_DESCRIPTION = "description";
+
+    /** _more_          */
+    public static final String ATTR_SUMMARY = "summary";
+
+    /** _more_          */
+    public static final String ATTR_AUTHORIZATIONS = "authorizations";
+
+    /** _more_          */
+    public static final String ATTR_NOTES = "notes";
+
+    /** _more_          */
     public static final String ATTR_APIS = "apis";
+
+    /** _more_          */
+    public static final String ATTR_OPERATIONS = "operations";
+
+    /** _more_          */
+    public static final String ATTR_METHOD = "method";
+
+    /** _more_          */
+    public static final String ATTR_NICKNAME = "nickname";
+
+    /** _more_          */
+    public static final String ATTR_PARAMETERS = "parameters";
+
+    /** _more_          */
+    public static final String ATTR_ = "";
+
+
+    /** _more_          */
+    public static final String ATTR_NAME = "name";
+
+    /** _more_          */
+    public static final String ATTR_REQUIRED = "required";
+
+    /** _more_          */
+    public static final String ATTR_TYPE = "type";
+
+    /** _more_          */
+    public static final String ATTR_PARAMTYPE = "paramType";
+
+    /** _more_          */
+    public static final String ATTR_RESPONSEMESSAGES = "responseMessages";
+
+    /** _more_          */
+    public static final String ATTR_CODE = "code";
+
+    /** _more_          */
+    public static final String ATTR_MESSAGE = "message";
+
+    /** _more_          */
+    public static final String ATTR_DEPRECATED = "deprecated";
+
+    /** _more_          */
+    public static final String ATTR_PRODUCES = "produces";
+
+    public static String getParameter(String name, String description) {
+        return getParameter(name, description, false);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param description _more_
+     * @param required _more_
+     *
+     * @return _more_
+     */
+    public static String getParameter(String name, String description,
+                                      boolean required) {
+        return Json.map(ATTR_NAME, name, ATTR_DESCRIPTION, description,
+                        ATTR_REQUIRED, "" + required, ATTR_TYPE, "string",
+                        ATTR_PARAMTYPE, "query");
+    }
 
 
 }

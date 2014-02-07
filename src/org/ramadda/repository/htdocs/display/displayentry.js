@@ -60,8 +60,8 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
             fullForm: true,            
             showEntries: true,
             showMetadata: true,
-                share: true,
-            metadataTypes: [],
+            share: true,
+            metadataTypeList: [],
     });            
 
     $.extend(this, new RamaddaEntryDisplay(displayManager, id, DISPLAY_ENTRYLIST, properties));
@@ -83,7 +83,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
             type = subToks[0];
             label  = subToks[1];
         }
-        this.metadataTypes.push(new MetadataType(type, label));
+        this.metadataTypeList.push(new MetadataType(type, label));
     }
     
 
@@ -161,8 +161,8 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     this.entryListChanged(this.entryList);
                 }
                 this.addTypes();
-                for(var i in this.metadataTypes) {
-                    var type  = this.metadataTypes[i];
+                for(var i in this.metadataTypeList) {
+                    var type  = this.metadataTypeList[i];
                     this.addMetadata(type, null);
                 }
                 if(!this.haveSearched) {
@@ -185,8 +185,8 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 this.settings.clearAndAddType(this.settings.entryType);
                 
                 this.settings.metadata = [];
-                for(var i in this.metadataTypes) {
-                    var metadataType  = this.metadataTypes[i];
+                for(var i in this.metadataTypeList) {
+                    var metadataType  = this.metadataTypeList[i];
                     var metadata = this.getFieldValue(this.getMetadataFieldId(metadataType), null);
                     if(metadata!=null) {
                         this.settings.metadata.push({type:metadataType.getType(),value:metadata});
@@ -220,8 +220,8 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 html+= htmlUtil.formEntry("Text:", 
                                           htmlUtil.input("", text, ["class","input", "size","15","id",  this.getDomId(ID_TEXT_FIELD)]));
                 if(this.showMetadata) {
-                    for(var i in this.metadataTypes) {
-                        var type  = this.metadataTypes[i];
+                    for(var i in this.metadataTypeList) {
+                        var type  = this.metadataTypeList[i];
                         var metadataSelect= htmlUtil.tag("select",["id", this.getMetadataFieldId(type),
                                                                    "class","display-metadatalist"],
                                                          htmlUtil.tag("option",["title","","value",""],
