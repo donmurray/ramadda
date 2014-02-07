@@ -76,6 +76,15 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         mapItems.add(Json.quote(SU.VERSION_SWAGGER));
     }
 
+    private Result returnJson(Request request, StringBuffer json) throws Exception {
+        //        request.setResultFilename("ramaddaswagger.json");
+        Result result = new Result("",json, Json.MIMETYPE);
+        result.addHttpHeader("Access-Control-Allow-Methods","POST, GET, OPTIONS , PUT");
+        result.addHttpHeader("Access-Control-Allow-Origin","*");
+        return result;
+    }
+
+
     /**
      * _more_
      *
@@ -96,20 +105,21 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                 continue;
             }
 
-            String url = getRepository().getUrlBase() + BASE_PATH +"/" + typeHandler.getType();
+            //            String url = getRepository().getUrlBase() + BASE_PATH +"/" + typeHandler.getType();
+            String url = "/type/" + typeHandler.getType();
             String api = Json.map(SU.ATTR_PATH, Json.quote(url),
                                   SU.ATTR_DESCRIPTION,
                                   Json.quote("Search for "
                                              + typeHandler.getLabel()));
             apis.add(api);
-            if(cnt++>4) break;
+            //            if(cnt++>4) break;
         }
         mapItems.add(SU.ATTR_APIS);
         mapItems.add(Json.list(apis));
         StringBuffer sb = new StringBuffer();
         sb.append(Json.map(mapItems));
 
-        return new Result("", sb, Json.MIMETYPE);
+        return returnJson(request, sb);
     }
 
 
@@ -135,6 +145,9 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         mapItems.add(Json.quote(request.getAbsoluteUrl("")));
         mapItems.add(SU.ATTR_RESOURCEPATH);
         mapItems.add(Json.quote("/search/type/" + type));
+        mapItems.add(SU.ATTR_PRODUCES);
+        mapItems.add(Json.map(new String[]{"application/json","application/xml","text/plain","text/html"}, true));
+
 
         //         "path":"/pet/findByTags",
         List<String> apis = new ArrayList<String>();
@@ -146,7 +159,7 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         StringBuffer sb = new StringBuffer();
         sb.append(Json.map(mapItems));
 
-        return new Result("", sb, Json.MIMETYPE);
+        return returnJson(request, sb);
     }
 
     /**
@@ -182,8 +195,12 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                                  + typeHandler.getLabel()));
         operation.add(SU.ATTR_AUTHORIZATIONS);
         operation.add(Json.map());
+        operation.add(SU.ATTR_NICKNAME);
+        operation.add(Json.quote("search_"+  typeHandler.getType()));
+
         operation.add(SU.ATTR_PARAMETERS);
         operation.add(Json.list(parameters));
+
 
         operation.add(SU.ATTR_RESPONSEMESSAGES);
         operation.add(Json.list(responseMessages));
@@ -222,7 +239,7 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
     public Result processUIRequest(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
 
-        return new Result("", sb);
+        return returnJson(request, sb);
     }
 
 

@@ -125,9 +125,9 @@ public class SwaggerUtil {
      */
     public static String getParameter(String name, String description,
                                       boolean required) {
-        return Json.map(ATTR_NAME, name, ATTR_DESCRIPTION, description,
-                        ATTR_REQUIRED, "" + required, ATTR_TYPE, "string",
-                        ATTR_PARAMTYPE, "query");
+        return Json.map(ATTR_NAME, Json.quote(name), ATTR_DESCRIPTION, Json.quote(description),
+                        ATTR_REQUIRED, "" + required, ATTR_TYPE, Json.quote("string"),
+                        ATTR_PARAMTYPE, Json.quote("query"));
     }
 
 
