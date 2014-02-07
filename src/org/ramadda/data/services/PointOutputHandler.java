@@ -827,7 +827,7 @@ public class PointOutputHandler extends RecordOutputHandler {
         String       url   = getJsonUrl(request, entry);
         String       name  = entry.getName();
         Hashtable    props = new Hashtable();
-        props.put("layoutFixed", "false");
+        props.put("layoutHere", "false");
         props.put("layoutType", "table");
         props.put("layoutColumns", "2");
         props.put("showMenu", "true");
