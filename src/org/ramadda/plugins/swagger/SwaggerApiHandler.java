@@ -22,8 +22,8 @@ package org.ramadda.plugins.swagger;
 
 
 import org.ramadda.repository.*;
-import org.ramadda.repository.util.DateArgument;
 import org.ramadda.repository.type.*;
+import org.ramadda.repository.util.DateArgument;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Json;
 import org.ramadda.util.Utils;
@@ -44,9 +44,11 @@ import java.util.List;
 public class SwaggerApiHandler extends RepositoryManager implements RequestHandler {
 
 
+    /** _more_          */
     private static final SwaggerUtil SU = null;
 
-    public static final String BASE_PATH =  "/swagger/api-docs";
+    /** _more_          */
+    public static final String BASE_PATH = "/swagger/api-docs";
 
 
     /**
@@ -77,11 +79,24 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         mapItems.add(Json.quote(SU.VERSION_SWAGGER));
     }
 
-    private Result returnJson(Request request, StringBuffer json) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param json _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Result returnJson(Request request, StringBuffer json)
+            throws Exception {
         //        request.setResultFilename("ramaddaswagger.json");
-        Result result = new Result("",json, Json.MIMETYPE);
-        result.addHttpHeader("Access-Control-Allow-Methods","POST, GET, OPTIONS , PUT");
-        result.addHttpHeader("Access-Control-Allow-Origin","*");
+        Result result = new Result("", json, Json.MIMETYPE);
+        result.addHttpHeader("Access-Control-Allow-Methods",
+                             "POST, GET, OPTIONS , PUT");
+        result.addHttpHeader("Access-Control-Allow-Origin", "*");
+
         return result;
     }
 
@@ -100,20 +115,17 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         initVersionItems(mapItems);
 
         List<String> apis = new ArrayList<String>();
-        int cnt = 0;
+        int          cnt  = 0;
         for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
             if ( !typeHandler.getForUser()) {
                 continue;
             }
-
-            //            String url = getRepository().getUrlBase() + BASE_PATH +"/" + typeHandler.getType();
             String url = "/type/" + typeHandler.getType();
             String api = Json.map(SU.ATTR_PATH, Json.quote(url),
                                   SU.ATTR_DESCRIPTION,
                                   Json.quote("Search for "
                                              + typeHandler.getLabel()));
             apis.add(api);
-            //            if(cnt++>4) break;
         }
         mapItems.add(SU.ATTR_APIS);
         mapItems.add(Json.list(apis));
@@ -147,7 +159,9 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         mapItems.add(SU.ATTR_RESOURCEPATH);
         mapItems.add(Json.quote("/search/type/" + type));
         mapItems.add(SU.ATTR_PRODUCES);
-        mapItems.add(Json.map(new String[]{"application/json","application/xml","text/plain","text/html"}, true));
+        mapItems.add(Json.map(new String[] { "application/json",
+                                             "application/xml", "text/plain",
+                                             "text/html" }, true));
 
 
         //         "path":"/pet/findByTags",
@@ -197,7 +211,29 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         operation.add(SU.ATTR_AUTHORIZATIONS);
         operation.add(Json.map());
         operation.add(SU.ATTR_NICKNAME);
-        operation.add(Json.quote("search_"+  typeHandler.getType()));
+        operation.add(Json.quote("search_" + typeHandler.getType()));
+
+        List<Column> columns = typeHandler.getColumns();
+        if (columns != null) {
+            for (Column column : columns) {
+                if ( !column.getCanSearch()) {
+                    continue;
+                }
+                String type = SU.TYPE_STRING;
+                if (column.isEnumeration()) {
+                    //TODO: list the enums
+                } else if (column.isBoolean()) {
+                    type = SU.TYPE_BOOLEAN;
+                } else if (column.isDouble()) {
+                    type = SU.TYPE_DOUBLE;
+                } else if (column.isNumeric()) {
+                    type = SU.TYPE_INTEGER;
+                }
+                parameters.add(SU.getParameter(column.getSearchArg(),
+                        column.getLabel(), false, type));
+            }
+        }
+
 
         operation.add(SU.ATTR_PARAMETERS);
         operation.add(Json.list(parameters));
@@ -217,32 +253,59 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         return Json.map(api);
     }
 
-    private void    addBaseSearchParameters(Request request, List<String> parameters) throws Exception  {
-        parameters.add(SU.getParameter(ARG_TEXT,"Search text"));
-        parameters.add(SU.getParameter(ARG_NAME,"Search name"));
-        parameters.add(SU.getParameter(ARG_DESCRIPTION,"Search description"));
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param parameters _more_
+     *
+     * @throws Exception _more_
+     */
+    private void addBaseSearchParameters(Request request,
+                                         List<String> parameters)
+            throws Exception {
+        parameters.add(SU.getParameter(ARG_TEXT, "Search text"));
+        parameters.add(SU.getParameter(ARG_NAME, "Search name"));
+        parameters.add(SU.getParameter(ARG_DESCRIPTION,
+                                       "Search description"));
 
-        parameters.add(SU.getParameter(ARG_FROMDATE,"From date",false, SU.TYPE_DATETIME));
-        parameters.add(SU.getParameter(ARG_TODATE,"To date",false, SU.TYPE_DATETIME));
+        parameters.add(SU.getParameter(ARG_FROMDATE, "From date", false,
+                                       SU.TYPE_DATETIME));
+        parameters.add(SU.getParameter(ARG_TODATE, "To date", false,
+                                       SU.TYPE_DATETIME));
 
-        parameters.add(SU.getParameter(DateArgument.ARG_CREATE.getFromArg(),"Archive create date from",false, SU.TYPE_DATETIME));
-        parameters.add(SU.getParameter(DateArgument.ARG_CREATE.getToArg(),"Archive create date to",false, SU.TYPE_DATETIME));
+        parameters.add(SU.getParameter(DateArgument.ARG_CREATE.getFromArg(),
+                                       "Archive create date from", false,
+                                       SU.TYPE_DATETIME));
+        parameters.add(SU.getParameter(DateArgument.ARG_CREATE.getToArg(),
+                                       "Archive create date to", false,
+                                       SU.TYPE_DATETIME));
 
-        parameters.add(SU.getParameter(DateArgument.ARG_CHANGE.getFromArg(),"Archive change date from",false, SU.TYPE_DATETIME));
-        parameters.add(SU.getParameter(DateArgument.ARG_CHANGE.getToArg(),"Archive change date to",false, SU.TYPE_DATETIME));
+        parameters.add(SU.getParameter(DateArgument.ARG_CHANGE.getFromArg(),
+                                       "Archive change date from", false,
+                                       SU.TYPE_DATETIME));
+        parameters.add(SU.getParameter(DateArgument.ARG_CHANGE.getToArg(),
+                                       "Archive change date to", false,
+                                       SU.TYPE_DATETIME));
 
 
-        parameters.add(SU.getParameter(ARG_GROUP,"Parent entry"));
-        parameters.add(SU.getParameter(ARG_FILESUFFIX,"File suffix"));
+        parameters.add(SU.getParameter(ARG_GROUP, "Parent entry"));
+        parameters.add(SU.getParameter(ARG_FILESUFFIX, "File suffix"));
 
 
-        parameters.add(SU.getParameter(ARG_AREA_NORTH,"Northern bounds of search"));
-        parameters.add(SU.getParameter(ARG_AREA_WEST,"Western bounds of search"));
-        parameters.add(SU.getParameter(ARG_AREA_SOUTH,"Southern bounds of search"));
-        parameters.add(SU.getParameter(ARG_AREA_EAST,"Eastern bounds of search"));
+        parameters.add(SU.getParameter(ARG_AREA_NORTH,
+                                       "Northern bounds of search"));
+        parameters.add(SU.getParameter(ARG_AREA_WEST,
+                                       "Western bounds of search"));
+        parameters.add(SU.getParameter(ARG_AREA_SOUTH,
+                                       "Southern bounds of search"));
+        parameters.add(SU.getParameter(ARG_AREA_EAST,
+                                       "Eastern bounds of search"));
 
-        parameters.add(SU.getParameter(ARG_MAX,"Max number of results", false, SU.TYPE_INTEGER));
-        parameters.add(SU.getParameter(ARG_SKIP,"Number to skip", false, SU.TYPE_INTEGER));
+        parameters.add(SU.getParameter(ARG_MAX, "Max number of results",
+                                       false, SU.TYPE_INTEGER));
+        parameters.add(SU.getParameter(ARG_SKIP, "Number to skip", false,
+                                       SU.TYPE_INTEGER));
     }
 
     /**
