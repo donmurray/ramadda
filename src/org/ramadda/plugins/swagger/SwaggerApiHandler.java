@@ -22,6 +22,7 @@ package org.ramadda.plugins.swagger;
 
 
 import org.ramadda.repository.*;
+import org.ramadda.repository.util.DateArgument;
 import org.ramadda.repository.type.*;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Json;
@@ -218,13 +219,30 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
 
     private void    addBaseSearchParameters(Request request, List<String> parameters) throws Exception  {
         parameters.add(SU.getParameter(ARG_TEXT,"Search text"));
-        parameters.add(SU.getParameter(ARG_FROMDATE,"From date"));
-        parameters.add(SU.getParameter(ARG_TODATE,"To date"));
+        parameters.add(SU.getParameter(ARG_NAME,"Search name"));
+        parameters.add(SU.getParameter(ARG_DESCRIPTION,"Search description"));
+
+        parameters.add(SU.getParameter(ARG_FROMDATE,"From date",false, SU.TYPE_DATETIME));
+        parameters.add(SU.getParameter(ARG_TODATE,"To date",false, SU.TYPE_DATETIME));
+
+        parameters.add(SU.getParameter(DateArgument.ARG_CREATE.getFromArg(),"Archive create date from",false, SU.TYPE_DATETIME));
+        parameters.add(SU.getParameter(DateArgument.ARG_CREATE.getToArg(),"Archive create date to",false, SU.TYPE_DATETIME));
+
+        parameters.add(SU.getParameter(DateArgument.ARG_CHANGE.getFromArg(),"Archive change date from",false, SU.TYPE_DATETIME));
+        parameters.add(SU.getParameter(DateArgument.ARG_CHANGE.getToArg(),"Archive change date to",false, SU.TYPE_DATETIME));
+
+
+        parameters.add(SU.getParameter(ARG_GROUP,"Parent entry"));
+        parameters.add(SU.getParameter(ARG_FILESUFFIX,"File suffix"));
+
+
         parameters.add(SU.getParameter(ARG_AREA_NORTH,"Northern bounds of search"));
         parameters.add(SU.getParameter(ARG_AREA_WEST,"Western bounds of search"));
         parameters.add(SU.getParameter(ARG_AREA_SOUTH,"Southern bounds of search"));
         parameters.add(SU.getParameter(ARG_AREA_EAST,"Eastern bounds of search"));
 
+        parameters.add(SU.getParameter(ARG_MAX,"Max number of results", false, SU.TYPE_INTEGER));
+        parameters.add(SU.getParameter(ARG_SKIP,"Number to skip", false, SU.TYPE_INTEGER));
     }
 
     /**

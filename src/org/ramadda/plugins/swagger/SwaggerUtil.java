@@ -109,6 +109,20 @@ public class SwaggerUtil {
     /** _more_          */
     public static final String ATTR_PRODUCES = "produces";
 
+
+
+    public static final String TYPE_INTEGER = "integer";
+    public static final String TYPE_LONG = "long";
+    public static final String TYPE_FLOAT = "float";
+    public static final String TYPE_DOUBLE = "double";
+    public static final String TYPE_STRING = "string";
+    public static final String TYPE_BYTE = "byte";
+    public static final String TYPE_BOOLEAN = "boolean";
+    public static final String TYPE_DATE = "date";
+    public static final String TYPE_DATETIME = "dateTime";
+
+
+
     public static String getParameter(String name, String description) {
         return getParameter(name, description, false);
     }
@@ -125,8 +139,13 @@ public class SwaggerUtil {
      */
     public static String getParameter(String name, String description,
                                       boolean required) {
+        return getParameter(name, description, required, TYPE_STRING);
+    }
+
+    public static String getParameter(String name, String description,
+                                      boolean required, String type) {
         return Json.map(ATTR_NAME, Json.quote(name), ATTR_DESCRIPTION, Json.quote(description),
-                        ATTR_REQUIRED, "" + required, ATTR_TYPE, Json.quote("string"),
+                        ATTR_REQUIRED, "" + required, ATTR_TYPE, Json.quote(type),
                         ATTR_PARAMTYPE, Json.quote("query"));
     }
 
