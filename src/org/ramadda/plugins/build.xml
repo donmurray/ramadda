@@ -26,6 +26,7 @@
 
     <target name="plugins" depends="init">
       <echo message="Building RAMADDA plugins"/>
+      <ant antfile="${src_dir}/org/ramadda/plugins/apis/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/beforeafter/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/biblio/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/blog/build.xml" inheritAll="false"/>
@@ -46,7 +47,6 @@
       <ant antfile="${src_dir}/org/ramadda/plugins/ontology/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/pasteit/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/poll/build.xml" inheritAll="false"/>
-      <ant antfile="${src_dir}/org/ramadda/plugins/swagger/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/twittersearch/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/userguide/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/workshop/build.xml" inheritAll="false"/>
