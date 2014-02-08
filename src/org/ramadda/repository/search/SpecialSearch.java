@@ -303,6 +303,8 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
      * @throws Exception _more_
      */
     public Result processSearchRequest(Request request) throws Exception {
+
+
         StringBuffer sb     = new StringBuffer();
         Result       result = processSearchRequest(request, sb);
         if (result != null) {
@@ -330,6 +332,7 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
      */
     public Result processSearchRequest(Request request, StringBuffer sb)
             throws Exception {
+
 
         int contentsWidth  = 750;
         int contentsHeight = 450;
@@ -391,11 +394,7 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
         }
 
 
-
-
-
-
-        if (request.defined(ARG_OUTPUT)) {
+        if (request.isOutputDefined()) {
             OutputHandler outputHandler =
                 getRepository().getOutputHandler(request);
 

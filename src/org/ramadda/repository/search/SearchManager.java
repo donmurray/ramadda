@@ -831,7 +831,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
 
             StringBuffer outputForm = new StringBuffer(HtmlUtils.formTable());
             /* Humm, we probably don't want to include this as it screws up setting the output in the form
-            if (request.defined(ARG_OUTPUT)) {
+            if (request.isOutputDefined(ARG_OUTPUT)) {
 
                 OutputType output = request.getOutput(BLANK);
                 outputForm.append(HtmlUtils.hidden(ARG_OUTPUT,
