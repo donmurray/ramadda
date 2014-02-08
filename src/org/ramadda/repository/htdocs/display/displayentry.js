@@ -351,27 +351,6 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     }
                 }
             },
-            createDisplay: function(entryId, displayType) {
-                var entry = this.entryList.getEntry(entryId);
-                if(entry == null) {
-                    console.log("No entry:" + entryId);
-                    return;
-                }
-                var url = root + "/entry/show?entryid=" + entryId +"&output=points.product&product=points.json&numpoints=1000";
-                var props = {
-                        "showMenu": true,
-                        "showMap": "false",
-                        "data": new PointData(entry.getName(), null, null, url)
-                };
-                if(this.lastDisplay!=null) {
-                    props.column = this.lastDisplay.getColumn();
-                    props.row = this.lastDisplay.getRow();
-                } else {
-                    props.column = this.getProperty("newColumn",this.getColumn());
-                    props.row = this.getProperty("newRow",this.getRow());
-                }
-                this.lastDisplay = displayManager.createDisplay(displayType, props);
-            },
             entryListChanged: function(entryList) {
                 this.entryList = entryList;
                 var rowClass = "entryrow_" + this.getId()

@@ -30,6 +30,7 @@ function addRamaddaDisplay(display) {
     if(window.globalDisplays == null) {
         window.globalDisplays = {};
     }
+    //    console.log("new display:" + display.id);
     window.globalDisplays[display.id] = display;
 }
 
@@ -38,6 +39,7 @@ function getRamaddaDisplay(id) {
     if(window.globalDisplays == null) {
         return null;
     }
+    //    console.log("get display:" + id);
     return window.globalDisplays[id];
 }
 
@@ -281,6 +283,27 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 }
                 return entry;
             },
+            createDisplay: function(entryId, displayType) {
+                var entry = this.getEntry(entryId);
+                if(entry == null) {
+                    console.log("No entry:" + entryId);
+                    return null;
+                }
+                var url = root + "/entry/show?entryid=" + entryId +"&output=points.product&product=points.json&numpoints=1000";
+                var props = {
+                        "showMenu": true,
+                        "showMap": "false",
+                        "data": new PointData(entry.getName(), null, null, url)
+                };
+                if(this.lastDisplay!=null) {
+                    props.column = this.lastDisplay.getColumn();
+                    props.row = this.lastDisplay.getRow();
+                } else {
+                    props.column = this.getProperty("newColumn",this.getColumn());
+                    props.row = this.getProperty("newRow",this.getRow());
+                }
+                this.lastDisplay = displayManager.createDisplay(displayType, props);
+            },
             getEntryMenu: function(entryId) {
                 var entry = this.getEntry(entryId);
                 if(entry == null) {
@@ -304,6 +327,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                     for(var i=0;i<this.displayManager.displayTypes.length;i++) {
                         var type = this.displayManager.displayTypes[i];
                         if(!type.requiresData) continue;
+                        
                         newMenu+= htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick", get+".createDisplay('" + entry.getId() +"','" + type.type+"');"], type.label));
                     }
                     menus.push("<a>New Chart</a>" + htmlUtil.tag("ul",[], newMenu));
