@@ -83,7 +83,7 @@ video {
   margin: 0;
   padding: 0;
   border: 0;
-  font-size: 100%;
+//  font-size: 100%;
 //  font: inherit;
   vertical-align: baseline;
 }
@@ -171,7 +171,7 @@ table {
 }
 .swagger-ui-wrap table thead tr th {
   padding: 5px;
-  font-size: 0.9em;
+//  font-size: 0.9em;
   color: #666666;
   border-bottom: 1px solid #999999;
 }
@@ -183,7 +183,7 @@ table {
 }
 .swagger-ui-wrap table tbody tr td {
   padding: 6px;
-  font-size: 0.9em;
+//  font-size: 0.9em;
   border-bottom: 1px solid #cccccc;
   vertical-align: top;
   line-height: 1.3em;
@@ -195,7 +195,7 @@ table {
 }
 .swagger-ui-wrap ol li {
   padding: 5px 0px;
-  font-size: 0.9em;
+//  font-size: 0.9em;
   color: #333333;
 }
 .swagger-ui-wrap ol,
@@ -260,12 +260,12 @@ table {
   clear: both;
   display: block;
   color: #0F6AB4;
-  font-size: 1.1em;
+//  font-size: 1.1em;
   margin: 0;
   padding: 15px 0 5px;
 }
 .swagger-ui-wrap .content pre {
-  font-size: 12px;
+//  font-size: 12px;
   margin-top: 5px;
   padding: 5px;
 }
@@ -275,11 +275,11 @@ table {
 .swagger-ui-wrap .info_title {
   padding-bottom: 10px;
   font-weight: bold;
-  font-size: 25px;
+//  font-size: 25px;
 }
 .swagger-ui-wrap p.big,
 .swagger-ui-wrap div.big p {
-  font-size: 1em;
+//  font-size: 1em;
   margin-bottom: 10px;
 }
 .swagger-ui-wrap form.fullwidth ol li.string input,
@@ -302,7 +302,7 @@ table {
 }
 .swagger-ui-wrap .info_description {
   padding-bottom: 10px;
-  font-size: 15px;
+//  font-size: 15px;
 }
 .swagger-ui-wrap .markdown ol li,
 .swagger-ui-wrap .markdown ul li {

@@ -44,10 +44,10 @@ import java.util.List;
 public class SwaggerApiHandler extends RepositoryManager implements RequestHandler {
 
 
-    /** _more_          */
+    /** _more_ */
     private static final SwaggerUtil SU = null;
 
-    /** _more_          */
+    /** _more_ */
     public static final String BASE_PATH = "/swagger/api-docs";
 
 
@@ -123,14 +123,15 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
             int entryCnt = getEntryUtil().getEntryCount(typeHandler);
 
             //Only show the types we have ??
-            if(entryCnt == 0) {
+            if (entryCnt == 0) {
                 continue;
             }
             String url = "/type/" + typeHandler.getType();
             String api = Json.map(SU.ATTR_PATH, Json.quote(url),
                                   SU.ATTR_DESCRIPTION,
-                                  Json.quote("Search for "
-                                             + typeHandler.getLabel()));
+                                  Json.quote("Search API for '"
+                                             + typeHandler.getLabel()
+                                             + "' entry type"));
             apis.add(api);
         }
         mapItems.add(SU.ATTR_APIS);
@@ -163,7 +164,8 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         mapItems.add(SU.ATTR_BASEPATH);
         mapItems.add(Json.quote(request.getAbsoluteUrl("")));
         mapItems.add(SU.ATTR_RESOURCEPATH);
-        mapItems.add(Json.quote(getRepository().getUrlBase() +"/search/type/" + type));
+        mapItems.add(Json.quote(getRepository().getUrlBase()
+                                + "/search/type/" + type));
         mapItems.add(SU.ATTR_PRODUCES);
         mapItems.add(Json.map(new String[] { "application/json",
                                              "application/xml", "text/plain",
@@ -210,7 +212,8 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         operation.add(SU.ATTR_METHOD);
         operation.add(Json.quote("GET"));
         operation.add(SU.ATTR_SUMMARY);
-        operation.add(Json.quote("Search for " + typeHandler.getLabel()));
+        operation.add(Json.quote("Search API for '" + typeHandler.getLabel()
+                                 + "' entry type"));
         operation.add(SU.ATTR_NOTES);
         operation.add(Json.quote("API to search for entries of type "
                                  + typeHandler.getLabel()));
@@ -252,7 +255,8 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
 
 
         api.add(SU.ATTR_PATH);
-        api.add(Json.quote(getRepository().getUrlBase() +"/search/type/" + typeHandler.getType()));
+        api.add(Json.quote(getRepository().getUrlBase() + "/search/type/"
+                           + typeHandler.getType()));
         api.add(SU.ATTR_OPERATIONS);
         api.add(Json.list(operations));
 
