@@ -120,6 +120,12 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
             if ( !typeHandler.getForUser()) {
                 continue;
             }
+            int entryCnt = getEntryUtil().getEntryCount(typeHandler);
+
+            //Only show the types we have ??
+            if(entryCnt == 0) {
+                continue;
+            }
             String url = "/type/" + typeHandler.getType();
             String api = Json.map(SU.ATTR_PATH, Json.quote(url),
                                   SU.ATTR_DESCRIPTION,
@@ -157,7 +163,7 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         mapItems.add(SU.ATTR_BASEPATH);
         mapItems.add(Json.quote(request.getAbsoluteUrl("")));
         mapItems.add(SU.ATTR_RESOURCEPATH);
-        mapItems.add(Json.quote("/search/type/" + type));
+        mapItems.add(Json.quote(getRepository().getUrlBase() +"/search/type/" + type));
         mapItems.add(SU.ATTR_PRODUCES);
         mapItems.add(Json.map(new String[] { "application/json",
                                              "application/xml", "text/plain",
@@ -246,7 +252,7 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
 
 
         api.add(SU.ATTR_PATH);
-        api.add(Json.quote("/search/type/" + typeHandler.getType()));
+        api.add(Json.quote(getRepository().getUrlBase() +"/search/type/" + typeHandler.getType()));
         api.add(SU.ATTR_OPERATIONS);
         api.add(Json.list(operations));
 
