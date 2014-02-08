@@ -1,8 +1,6 @@
 
 <api handler="org.ramadda.plugins.swagger.SwaggerApiHandler" id="swagger">
-     <api request="/swagger/api-docs"           method="processApiRequest"  admin="false"/>
-     <api request="/swagger/api-docs/type/*"           method="processTypeRequest"  admin="false"/>
-     <api request="/swagger/ui"           method="processUIRequest"  admin="false"/>
-
-
+     <api request="/swagger/apis.html"           method="processApisRequest"  admin="false"/>
+     <api request="/swagger/api-docs"           method="processSwaggerApiRequest"  admin="false"/>
+     <api request="/swagger/api-docs/type/*"           method="processSwaggerTypeRequest"  admin="false"/>
 </api>

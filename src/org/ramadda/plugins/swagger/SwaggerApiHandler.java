@@ -110,7 +110,22 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
      *
      * @throws Exception _more_
      */
-    public Result processApiRequest(Request request) throws Exception {
+    public Result processApisRequest(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        return new Result("", sb);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result processSwaggerApiRequest(Request request) throws Exception {
         List<String> mapItems = new ArrayList<String>();
         initVersionItems(mapItems);
 
@@ -152,7 +167,7 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
      *
      * @throws Exception _more_
      */
-    public Result processTypeRequest(Request request) throws Exception {
+    public Result processSwaggerTypeRequest(Request request) throws Exception {
         List<String> toks = StringUtil.split(request.getRequestPath(), "/",
                                              true, true);
         String       type        = toks.get(toks.size() - 1);
@@ -318,20 +333,6 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                                        SU.TYPE_INTEGER));
     }
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processUIRequest(Request request) throws Exception {
-        StringBuffer sb = new StringBuffer();
-
-        return returnJson(request, sb);
-    }
 
 
 
