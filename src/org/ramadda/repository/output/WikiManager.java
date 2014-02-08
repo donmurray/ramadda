@@ -638,6 +638,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         prop(WIKI_PROP_UPLOAD,
              attrs(ATTR_TITLE, "Upload file", ATTR_INCLUDEICON, "false")),
         WIKI_PROP_ROOT,
+        WIKI_PROP_GROUP + "Display",
         prop(WIKI_PROP_DISPLAYGROUP,
              attrs(ATTR_SHOWTITLE, "true", ATTR_SHOWMENU, "false",
                    "layoutType", "table", "layoutColumns", "1")),

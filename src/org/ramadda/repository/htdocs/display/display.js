@@ -566,7 +566,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 var extraStyle = "";
                 var width = this.getWidth();
                 if(width>0) {
-                    extraStyle += "width:" + width +"px; ";
+                    extraStyle += "width:" + width +"px; overflow-x: auto;";
                 }
                 var height = this.getProperty("height",-1);
                 if(height>0) {

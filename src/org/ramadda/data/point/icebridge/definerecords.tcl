@@ -222,7 +222,7 @@ generateRecordClass org.ramadda.data.point.icebridge.ParisRecord -makefile 1 -fi
         return lon;
     }
     public double getAltitude() {
-        return 0;
+        return aircraftAltitude;
     }
 
 }
