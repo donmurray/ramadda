@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -26,12 +26,12 @@ import org.ramadda.repository.*;
 
 
 import org.ramadda.repository.*;
-
-import org.ramadda.repository.util.DateArgument;
 import org.ramadda.repository.map.*;
 import org.ramadda.repository.metadata.*;
 import org.ramadda.repository.output.*;
 import org.ramadda.repository.type.*;
+
+import org.ramadda.repository.util.DateArgument;
 import org.ramadda.sql.Clause;
 
 import org.ramadda.util.HtmlUtils;
@@ -60,7 +60,7 @@ import java.util.List;
  */
 public class SpecialSearch extends RepositoryManager implements RequestHandler {
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TABS = "tabs";
 
     /** _more_ */
@@ -106,7 +106,10 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
     /** _more_ */
     private boolean showText = true;
 
+    /** _more_          */
     private boolean showName = false;
+
+    /** _more_          */
     private boolean showDesc = false;
 
     /** _more_ */
@@ -199,9 +202,9 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
         showText = typeHandler.getProperty("search.form.text.show",
                                            "true").equals("true");
         showName = typeHandler.getProperty("search.form.name.show",
-                                           showName+"").equals("true");
+                                           showName + "").equals("true");
         showDesc = typeHandler.getProperty("search.form.description.show",
-                                           showDesc+"").equals("true");
+                                           showDesc + "").equals("true");
         showArea = typeHandler.getProperty("search.form.area.show",
                                            "true").equals("true");
         showDate = typeHandler.getProperty("search.form.date.show",
@@ -244,8 +247,8 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
         searchOpen        = Misc.getProperty(props, "searchopen", true);
         doSearchInitially = Misc.getProperty(props, "initsearch", true);
         showText          = Misc.getProperty(props, "form.text.show", true);
-        showName          = Misc.getProperty(props, "form.name.show", showName);
-        showDesc          = Misc.getProperty(props, "form.description.show", showDesc);
+        showName = Misc.getProperty(props, "form.name.show", showName);
+        showDesc = Misc.getProperty(props, "form.description.show", showDesc);
         showArea          = Misc.getProperty(props, "form.area.show", true);
         showDate          = Misc.getProperty(props, "form.date.show", true);
         searchUrl         = (String) props.get("searchurl");
@@ -690,13 +693,11 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
             StringBuffer links = new StringBuffer();
 
 
-            for (OutputType outputType :
-                    new OutputType[] { KmlOutputHandler.OUTPUT_KML,
-                                       ZipOutputHandler.OUTPUT_ZIPTREE,
-                                       AtomOutputHandler.OUTPUT_ATOM,
-                                       JsonOutputHandler.OUTPUT_JSON,
-                                       CsvOutputHandler.OUTPUT_CSV, 
-                                       ZipOutputHandler.OUTPUT_EXPORT}) {
+            for (OutputType outputType : new OutputType[] {
+                KmlOutputHandler.OUTPUT_KML, ZipOutputHandler.OUTPUT_ZIPTREE,
+                AtomOutputHandler.OUTPUT_ATOM, JsonOutputHandler.OUTPUT_JSON,
+                CsvOutputHandler.OUTPUT_CSV, ZipOutputHandler.OUTPUT_EXPORT
+            }) {
                 if (outputType.getIcon() != null) {
                     links.append(
                         HtmlUtils.img(iconUrl(outputType.getIcon())));

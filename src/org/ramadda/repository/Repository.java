@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -3194,7 +3194,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
                     inputStream = new ByteArrayInputStream(js.getBytes());
                 } else if (path.endsWith(".html") && decorate) {
                     String html = IOUtil.readInputStream(inputStream);
-                    html   = html.replace("${urlroot}", urlBase);
+                    html = html.replace("${urlroot}", urlBase);
+
                     return getEntryManager().addHeaderToAncillaryPage(
                         request, new Result(BLANK, new StringBuffer(html)));
                 }
@@ -3217,7 +3218,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
                 inputStream = new ByteArrayInputStream(js.getBytes());
             } else if (path.endsWith(".html")) {
                 String html = IOUtil.readInputStream(inputStream);
-                html   = html.replace("${urlroot}", urlBase);
+                html = html.replace("${urlroot}", urlBase);
+
                 return getEntryManager().addHeaderToAncillaryPage(request,
                         new Result(BLANK, new StringBuffer(html)));
             }
