@@ -18,7 +18,7 @@
 * DEALINGS IN THE SOFTWARE.
 */
 
-package org.ramadda.plugins.swagger;
+package org.ramadda.plugins.apis;
 
 
 import org.ramadda.repository.*;
