@@ -3186,8 +3186,13 @@ public class HtmlUtils {
      * @return _more_
      */
     public static String importJS(String jsUrl) {
-        return tag(TAG_SCRIPT,
-                   attrs(ATTR_SRC, jsUrl, ATTR_TYPE, "text/JavaScript"), "");
+        StringBuffer sb = new StringBuffer("\n");
+        sb.append(tag(TAG_SCRIPT,
+                      attrs(ATTR_SRC, jsUrl, ATTR_TYPE, "text/JavaScript"),
+                      ""));
+        sb.append("\n");
+
+        return sb.toString();
     }
 
 
