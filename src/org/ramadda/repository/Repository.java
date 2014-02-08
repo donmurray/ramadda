@@ -3194,7 +3194,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
                     inputStream = new ByteArrayInputStream(js.getBytes());
                 } else if (path.endsWith(".html") && decorate) {
                     String html = IOUtil.readInputStream(inputStream);
-
+                    html   = html.replace("${urlroot}", urlBase);
                     return getEntryManager().addHeaderToAncillaryPage(
                         request, new Result(BLANK, new StringBuffer(html)));
                 }
@@ -3217,7 +3217,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
                 inputStream = new ByteArrayInputStream(js.getBytes());
             } else if (path.endsWith(".html")) {
                 String html = IOUtil.readInputStream(inputStream);
-
+                html   = html.replace("${urlroot}", urlBase);
                 return getEntryManager().addHeaderToAncillaryPage(request,
                         new Result(BLANK, new StringBuffer(html)));
             }
@@ -3920,6 +3920,11 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @throws Exception _more_
      */
     public OutputHandler getOutputHandler(Request request) throws Exception {
+
+        //Do this for now as it forces the setting of the output
+        //from the Accept http arg
+        request.isOutputDefined();
+
         OutputHandler handler = getOutputHandler(request.getOutput());
         if (handler != null) {
             return handler;

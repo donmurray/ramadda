@@ -206,12 +206,20 @@ ramaddaUtil = new Util();
 function HtmlUtil() {
 
     $.extend(this, {
+            join : function (items,separator) {
+                var html = "";
+                for(var i in items) {
+                    if(i>0 & separator!=null) html+= separator;
+                    html += items[i];
+                }
+                return html;
+            },
             qt : function (value) {
                 return "\"" + value +"\"";
             },
 
             leftRight : function(left,right) {
-                return this.tag("table",["width","100%","cellspacing","0","cellpadding","0"],
+                return this.tag("table",["border","0", "width","100%","cellspacing","0","cellpadding","0"],
                                 this.tr(["valign","top"],
                                         this.td(["align","left"],left) +
                                         this.td(["align","right"],right)));

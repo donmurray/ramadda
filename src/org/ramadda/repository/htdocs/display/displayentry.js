@@ -46,9 +46,6 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
     var ID_FORM = "form";
     var ID_DATE_START = "date_start";
     var ID_DATE_END = "date_end";
-    var ID_MENU_BUTTON = "menu_button";
-    var ID_MENU_OUTER =  "menu_outer";
-    var ID_MENU_INNER =  "menu_inner";
 
 
 
@@ -403,24 +400,11 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 if(this.footerRight!=null) {
                     $("#"  +this.getDomId(ID_FOOTER_RIGHT)).html(this.footerRight);
                 }
-                html+= htmlUtil.div(["class","ramadda-popup", "id", this.getDomId(ID_MENU_OUTER)], "");
+
+
                 for(var i=0;i<entries.length;i++) {
                     var entry = entries[i];
-                    var right ="";
-                    var hasLocation = entry.hasLocation();
-                    if(hasLocation) {
-                        //                        right += htmlUtil.image(root+"/icons/map.png",["title","Location:" +entry.getLocationLabel()]);
-                    }
-                    var menuButton = htmlUtil.onClick(get+".showEntryMenu(event, '" + entry.getId() +"');", 
-                                                  htmlUtil.image(root+"/icons/downdart.png", 
-                                                                 ["class", "display-dialog-button", "id",  this.getDomId(ID_MENU_BUTTON + entry.getId())]));
-
-                    right += menuButton;
-                    var newMenu = "";
-
-
-
-
+                    var right = this.getEntryMenuButton(entry);
                     var icon = entry.getIconImage(["title","View entry"]);
                     var link  =  htmlUtil.tag("a",["href", entry.getEntryUrl()],icon);
                     var entryName = entry.getName();
@@ -462,34 +446,6 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                         },
 
                     });
-
-
-                //                var mouseEnter = function(event,ui) {console.log("in " +ui);};
-                //                var mouseExit = function(event) {console.log("out " + event.ui);};
-                //                $("." + rowClass ).mouseenter( mouseEnter).mouseleave( mouseExit );
-            },
-
-
-            showEntryMenu: function(event, entryId) {
-                var entry = this.entryList.getEntry(entryId);
-                var newMenu = "";
-                var get = this.getGet();
-                for(var i=0;i<this.displayManager.displayTypes.length;i++) {
-                    var type = this.displayManager.displayTypes[i];
-                    if(!type.requiresData) continue;
-                    newMenu+= htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick", get+".createDisplay('" + entry.getId() +"','" + type.type+"');"], type.label));
-                }
-
-                var menu = htmlUtil.tag("ul", ["id", this.getDomId(ID_MENU_INNER+entry.getId()),"class", "sf-menu"], 
-                                        htmlUtil.tag("li",[],"<a>New</a>" + htmlUtil.tag("ul",[], newMenu)));
-                                        
-
-                $("#" + this.getDomId(ID_MENU_OUTER)).html(menu);
-                showPopup(event, this.getDomId(ID_MENU_BUTTON+entry.getId()), this.getDomId(ID_MENU_OUTER), false,null,"left bottom");
-                $("#"+  this.getDomId(ID_MENU_INNER+entry.getId())).superfish({
-                        animation: {height:'show'},
-                            delay: 1200
-                            });
             }
         });
 }
@@ -523,9 +479,11 @@ function RamaddaEntrydisplayDisplay(displayManager, id, properties) {
                     return;
                 }
 
+                var menu = this.getEntryMenuButton(entry);
                 var html = "";
-                html += htmlUtil.div(["class", "wiki-h2"], entry.getLink(entry.getIconImage() +" " + entry.getName()));
-                html+= entry.getDescription();
+                html += menu +" " + entry.getLink(entry.getIconImage() +" " + entry.getName());
+                html += "<hr>";
+                html += entry.getDescription();
                 html += htmlUtil.formTable();
                 var columnNames = entry.getColumnNames();
                 var columnLabels = entry.getColumnLabels();

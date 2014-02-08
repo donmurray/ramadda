@@ -10,6 +10,12 @@ var ID_DISPLAY_CONTENTS = "contents";
 var ID_DIALOG = "dialog";
 var ID_DIALOG_BUTTON = "dialog_button";
 
+
+var ID_MENU_BUTTON = "menu_button";
+var ID_MENU_OUTER =  "menu_outer";
+var ID_MENU_INNER =  "menu_inner";
+
+
 var PROP_DISPLAY_FILTER = "displayFilter";
 
 var PROP_DIVID = "divid";
@@ -259,6 +265,68 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
             getGet: function() {
                 return  "getRamaddaDisplay('" + this.id +"')";
             },
+            getEntryMenuButton: function(entry) {
+                var menuButton = htmlUtil.onClick(this.getGet()+".showEntryMenu(event, '" + entry.getId() +"');", 
+                                                  htmlUtil.image(root+"/icons/downdart.png", 
+                                                                 ["class", "display-dialog-button", "id",  this.getDomId(ID_MENU_BUTTON + entry.getId())]));
+                return menuButton;
+            },
+            getEntry: function(entryId) {
+                var entry = null;
+                if(this.entryList!=null) {
+                    entry = this.entryList.getEntry(entryId);
+                }
+                if(entry == null) {
+                    entry = getEntryManager().getEntry(entryId);
+                }
+                return entry;
+            },
+            getEntryMenu: function(entryId) {
+                var entry = this.getEntry(entryId);
+                if(entry == null) {
+                    return "null entry";
+                }
+                var get = this.getGet();
+                var menus = [];
+                var fileMenuItems = [];
+                var viewMenuItems = [];
+                viewMenuItems.push(htmlUtil.tag("li",[], htmlUtil.tag("a", ["href", entry.getEntryUrl()], "View Entry")));
+                if(entry.getFilesize()>0) {
+                    fileMenuItems.push(htmlUtil.tag("li",[], htmlUtil.tag("a", ["href", entry.getFileUrl()], "Download " + entry.getFilename() + " (" + entry.getFormattedFilesize() +")")));
+                }
+
+                menus.push("<a>File</a>" + htmlUtil.tag("ul",[], htmlUtil.join(fileMenuItems)));
+                menus.push("<a>View</a>" + htmlUtil.tag("ul",[], htmlUtil.join(viewMenuItems)));
+
+                //check if it has point data
+                if(entry.getService("points.latlonaltcsv")) {
+                    var newMenu = "";
+                    for(var i=0;i<this.displayManager.displayTypes.length;i++) {
+                        var type = this.displayManager.displayTypes[i];
+                        if(!type.requiresData) continue;
+                        newMenu+= htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick", get+".createDisplay('" + entry.getId() +"','" + type.type+"');"], type.label));
+                    }
+                    menus.push("<a>New Chart</a>" + htmlUtil.tag("ul",[], newMenu));
+                }
+
+                var topMenus = "";
+                for(var i in menus) {
+                    topMenus += htmlUtil.tag("li",[], menus[i]);
+                }
+
+                var menu = htmlUtil.tag("ul", ["id", this.getDomId(ID_MENU_INNER+entry.getId()),"class", "sf-menu"], 
+                                        topMenus);
+                return menu;
+            },
+            showEntryMenu: function(event, entryId) {
+                var menu = this.getEntryMenu(entryId);               
+                $("#" + this.getDomId(ID_MENU_OUTER)).html(menu);
+                showPopup(event, this.getDomId(ID_MENU_BUTTON+entryId), this.getDomId(ID_MENU_OUTER), false,null,"left bottom");
+                $("#"+  this.getDomId(ID_MENU_INNER+entryId)).superfish({
+                        animation: {height:'show'},
+                            delay: 1200
+                            });
+            },
             getDisplayMenuContents: function() {
                 var get = this.getGet();
                 var copyMe = htmlUtil.onClick(get+".copyDisplay();", "Copy Display");
@@ -429,6 +497,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
             getHtml: function() {
                 var html = "";
                 html +=   htmlUtil.div(["id", this.getDomId(ID_HEADER),"class", "display-header"]);
+                html+= htmlUtil.div(["class","ramadda-popup", "id", this.getDomId(ID_MENU_OUTER)], "");
                 var get = "getRamaddaDisplay('" + this.id +"')";
                 var menuButton = htmlUtil.onClick(get+".showDialog();", 
                                                   htmlUtil.image(root+"/icons/downdart.png", 

@@ -1732,6 +1732,30 @@ public class Request implements Constants, Cloneable {
     /**
      * _more_
      *
+     * @return _more_
+     */
+    public boolean isOutputDefined() {
+        if (defined(ARG_OUTPUT)) {
+            return true;
+        }
+        String accept = getHeaderArg("Accept");
+        if (accept != null) {
+            System.err.println("accept:" + accept);
+            //TODO: iterate through the handlers
+            if (accept.equals("application/json")) {
+                put(ARG_OUTPUT, "json");
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    /**
+     * _more_
+     *
      * @param dflt _more_
      *
      * @return _more_

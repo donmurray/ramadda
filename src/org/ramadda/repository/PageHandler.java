@@ -389,11 +389,7 @@ public class PageHandler extends RepositoryManager {
                 HtmlUtils.cssClass("ramadda-system-message")) + content;
         }
 
-        String head =
-            "<script type=\"text/javascript\" src=\"${root}/shadowbox/adapter/shadowbox-base.js\"></script>\n<script type=\"text/javascript\" src=\"${root}/shadowbox/shadowbox.js\"></script>\n<script type=\"text/javascript\">\nShadowbox.loadSkin('classic', '${root}/shadowbox/skin'); \nShadowbox.loadLanguage('en', '${root}/shadowbox/lang');\nShadowbox.loadPlayer(['img', 'qt'], '${root}/shadowbox/player'); \nwindow.onload = Shadowbox.init;\n</script>";
-
-        //Skip the shadowbox for now
-        head = (String) result.getProperty(PROP_HTML_HEAD);
+        String head = (String) result.getProperty(PROP_HTML_HEAD);
         if (head == null) {
             head = (String) request.getExtraProperty(PROP_HTML_HEAD);
         }
@@ -469,10 +465,6 @@ public class PageHandler extends RepositoryManager {
 
 
         StringBuffer bottom = new StringBuffer(result.getBottomHtml());
-
-
-
-
 
         String[]     macros = new String[] {
             MACRO_LOGO_URL, logoUrl, MACRO_LOGO_IMAGE, logoImage,

@@ -154,6 +154,7 @@ function Entry (props) {
             west: NaN,
             south: NaN,
             east: NaN,
+            services: [],
         });
 
     $.extend(this, props);
@@ -163,6 +164,15 @@ function Entry (props) {
             },
             getLocationLabel: function() {
                 return "n: " + this.north + " w:" + this.west + " s:" + this.south +" e:" + this.east;
+            },
+            getServices: function() {
+                return this.services;
+            },
+            getService: function(relType) {
+                for(var i in this.services) {
+                    if(this.services[i].relType == relType) return this.services[i];
+                }
+                return null;
             },
             hasLocation: function() {
                 return !isNaN(this.north) && this.north != NONGEO;
