@@ -96,4 +96,14 @@ public class PointApiHandler extends RepositoryManager {
         return poh.outputEntry(request, poh.OUTPUT_PRODUCT, entry);
     }
 
+
+    public Result processDataRequest(Request request) throws Exception {
+        PointOutputHandler poh   = getPointOutputHandler();
+        Entry              entry = getEntryManager().getEntry(request);
+        request.put(ARG_OUTPUT, poh.OUTPUT_PRODUCT.getId());
+        request.put(ARG_PRODUCT, poh.OUTPUT_JSON.toString());
+        request.put(RecordConstants.ARG_ASYNCH, "false");
+        return poh.outputEntry(request, poh.OUTPUT_PRODUCT, entry);
+    }
+
 }

@@ -22,6 +22,8 @@ package org.ramadda.plugins.swagger;
 
 
 import org.ramadda.repository.*;
+
+import org.ramadda.data.services.RecordConstants;
 import org.ramadda.repository.type.*;
 import org.ramadda.repository.util.DateArgument;
 import org.ramadda.util.HtmlUtils;
@@ -30,7 +32,9 @@ import org.ramadda.util.Utils;
 
 import org.w3c.dom.Element;
 
+
 import ucar.unidata.util.StringUtil;
+
 
 import java.util.ArrayList;
 import java.util.Hashtable;
@@ -67,17 +71,6 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
     }
 
 
-    /**
-     * _more_
-     *
-     * @param mapItems _more_
-     */
-    private void initVersionItems(List<String> mapItems) {
-        mapItems.add(SU.ATTR_API_VERSION);
-        mapItems.add(Json.quote(SU.VERSION_API));
-        mapItems.add(SU.ATTR_SWAGGER_VERSION);
-        mapItems.add(Json.quote(SU.VERSION_SWAGGER));
-    }
 
     /**
      * _more_
@@ -112,6 +105,7 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
      */
     public Result processApisRequest(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
+
         return new Result("", sb);
     }
 
@@ -127,10 +121,13 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
      */
     public Result processSwaggerApiRequest(Request request) throws Exception {
         List<String> mapItems = new ArrayList<String>();
-        initVersionItems(mapItems);
+        SU.initVersionItems(mapItems);
 
         List<String> apis = new ArrayList<String>();
         int          cnt  = 0;
+        apis.add(Json.map(SU.ATTR_PATH, Json.quote("/point"),
+                          SU.ATTR_DESCRIPTION, Json.quote("Point data API")));
+
         for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
             if ( !typeHandler.getForUser()) {
                 continue;
@@ -142,12 +139,11 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                 continue;
             }
             String url = "/type/" + typeHandler.getType();
-            String api = Json.map(SU.ATTR_PATH, Json.quote(url),
-                                  SU.ATTR_DESCRIPTION,
-                                  Json.quote("Search API for '"
-                                             + typeHandler.getLabel()
-                                             + "' entry type"));
-            apis.add(api);
+            apis.add(Json.map(SU.ATTR_PATH, Json.quote(url),
+                              SU.ATTR_DESCRIPTION,
+                              Json.quote("Search API for '"
+                                         + typeHandler.getLabel()
+                                         + "' entry type")));
         }
         mapItems.add(SU.ATTR_APIS);
         mapItems.add(Json.list(apis));
@@ -167,37 +163,25 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
      *
      * @throws Exception _more_
      */
-    public Result processSwaggerTypeRequest(Request request) throws Exception {
+    public Result processSwaggerTypeRequest(Request request)
+            throws Exception {
         List<String> toks = StringUtil.split(request.getRequestPath(), "/",
                                              true, true);
         String       type        = toks.get(toks.size() - 1);
         TypeHandler  typeHandler = getRepository().getTypeHandler(type);
 
-        List<String> mapItems    = new ArrayList<String>();
-        initVersionItems(mapItems);
-
-        mapItems.add(SU.ATTR_BASEPATH);
-        mapItems.add(Json.quote(request.getAbsoluteUrl("")));
-        mapItems.add(SU.ATTR_RESOURCEPATH);
-        mapItems.add(Json.quote(getRepository().getUrlBase()
-                                + "/search/type/" + type));
-        mapItems.add(SU.ATTR_PRODUCES);
-        mapItems.add(Json.map(new String[] { "application/json",
-                                             "application/xml", "text/plain",
-                                             "text/html" }, true));
 
 
-        //         "path":"/pet/findByTags",
-        List<String> apis = new ArrayList<String>();
+        List<String> apis        = new ArrayList<String>();
         apis.add(getSearchApi(request, typeHandler));
-        mapItems.add(SU.ATTR_APIS);
-        mapItems.add(Json.list(apis));
 
+        List<String> doc =
+            SU.createDocument(request.getAbsoluteUrl(""),
+                              getRepository().getUrlBase() + "/search/type/"
+                              + type, new String[] { "application/json",
+                "application/xml", "text/plain", "text/html" }, apis);
 
-        StringBuffer sb = new StringBuffer();
-        sb.append(Json.map(mapItems));
-
-        return returnJson(request, sb);
+        return returnJson(request, new StringBuffer(Json.map(doc)));
     }
 
     /**
@@ -212,31 +196,8 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
      */
     private String getSearchApi(Request request, TypeHandler typeHandler)
             throws Exception {
-
-        List<String> api              = new ArrayList<String>();
-        List<String> operations       = new ArrayList<String>();
-
-        List<String> operation        = new ArrayList<String>();
-        List<String> parameters       = new ArrayList<String>();
-        List<String> responseMessages = new ArrayList<String>();
-
-
+        List<String> parameters = new ArrayList<String>();
         addBaseSearchParameters(request, parameters);
-
-
-        operation.add(SU.ATTR_METHOD);
-        operation.add(Json.quote("GET"));
-        operation.add(SU.ATTR_SUMMARY);
-        operation.add(Json.quote("Search API for '" + typeHandler.getLabel()
-                                 + "' entry type"));
-        operation.add(SU.ATTR_NOTES);
-        operation.add(Json.quote("API to search for entries of type "
-                                 + typeHandler.getLabel()));
-        operation.add(SU.ATTR_AUTHORIZATIONS);
-        operation.add(Json.map());
-        operation.add(SU.ATTR_NICKNAME);
-        operation.add(Json.quote("search_" + typeHandler.getType()));
-
         List<Column> columns = typeHandler.getColumns();
         if (columns != null) {
             for (Column column : columns) {
@@ -258,25 +219,22 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
             }
         }
 
+        List<String> operations = new ArrayList<String>();
+        operations
+            .add(Json
+                .map(SU.createOperation("Search API for '"
+                    + typeHandler.getLabel()
+                        + "' entry type", "API to search for entries of type "
+                            + typeHandler.getLabel(), "search_"
+                                + typeHandler
+                                    .getType(), parameters, new ArrayList<String>())));
 
-        operation.add(SU.ATTR_PARAMETERS);
-        operation.add(Json.list(parameters));
-
-
-        operation.add(SU.ATTR_RESPONSEMESSAGES);
-        operation.add(Json.list(responseMessages));
-
-        operations.add(Json.map(operation));
-
-
-        api.add(SU.ATTR_PATH);
-        api.add(Json.quote(getRepository().getUrlBase() + "/search/type/"
-                           + typeHandler.getType()));
-        api.add(SU.ATTR_OPERATIONS);
-        api.add(Json.list(operations));
-
-        return Json.map(api);
+        return Json.map(SU.createApi(getRepository().getUrlBase()
+                                     + "/search/type/"
+                                     + typeHandler.getType(), operations));
     }
+
+
 
     /**
      * _more_
@@ -332,6 +290,81 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         parameters.add(SU.getParameter(ARG_SKIP, "Number to skip", false,
                                        SU.TYPE_INTEGER));
     }
+
+
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private String getPointApi(Request request) throws Exception {
+        List<String> parameters = new ArrayList<String>();
+
+        parameters.add(SU.getParameter(ARG_ENTRYID, "Entry ID", true));
+
+        parameters.add(SU.getParameter(RecordConstants.ARG_PRODUCT,
+                                       "Product type", true));
+
+        parameters.add(SU.getParameter(RecordConstants.ARG_ASYNCH,
+                                       "Asynchronous", false,
+                                       SU.TYPE_BOOLEAN));
+
+
+        parameters.add(SU.getParameter(RecordConstants.ARG_SKIP,
+                                       "Skip factor", false,
+                                       SU.TYPE_INTEGER));
+
+
+        parameters.add(SU.getParameter(ARG_AREA_NORTH,
+                                       "Northern bounds of search"));
+        parameters.add(SU.getParameter(ARG_AREA_WEST,
+                                       "Western bounds of search"));
+        parameters.add(SU.getParameter(ARG_AREA_SOUTH,
+                                       "Southern bounds of search"));
+        parameters.add(SU.getParameter(ARG_AREA_EAST,
+                                       "Eastern bounds of search"));
+
+        List<String> operations = new ArrayList<String>();
+        operations.add(Json.map(SU.createOperation("Point data API",
+                "API to access point data", "pointdata", parameters,
+                new ArrayList<String>())));
+
+        return Json.map(SU.createApi(getRepository().getUrlBase()
+                                     + "/point/data", operations));
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result processSwaggerPointRequest(Request request)
+            throws Exception {
+        List<String> apis = new ArrayList<String>();
+        apis.add(getPointApi(request));
+        List<String> doc = SU.createDocument(request.getAbsoluteUrl(""),
+                                             getRepository().getUrlBase()
+                                             + "/point/data", new String[] {
+                                                 "application/json",
+                "text/csv" }, apis);
+
+        return returnJson(request, new StringBuffer(Json.map(doc)));
+    }
+
+
 
 
 

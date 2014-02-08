@@ -24,6 +24,12 @@ package org.ramadda.plugins.swagger;
 import org.ramadda.util.Json;
 
 
+import ucar.unidata.util.Misc;
+
+import java.util.ArrayList;
+import java.util.List;
+
+
 /**
  */
 public class SwaggerUtil {
@@ -150,6 +156,128 @@ public class SwaggerUtil {
     public static String getParameter(String name, String description) {
         return getParameter(name, description, false);
     }
+
+
+
+    /**
+     * _more_
+     *
+     * @param mapItems _more_
+     */
+    public static void initVersionItems(List<String> mapItems) {
+        mapItems.add(ATTR_API_VERSION);
+        mapItems.add(Json.quote(VERSION_API));
+        mapItems.add(ATTR_SWAGGER_VERSION);
+        mapItems.add(Json.quote(VERSION_SWAGGER));
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param basePath _more_
+     * @param resourcePath _more_
+     * @param produces _more_
+     * @param apis _more_
+     *
+     * @return _more_
+     */
+    public static List<String> createDocument(String basePath,
+            String resourcePath, String[] produces, List<String> apis) {
+        List<String> doc = new ArrayList<String>();
+        doc.add(ATTR_BASEPATH);
+        doc.add(Json.quote(basePath));
+        doc.add(ATTR_RESOURCEPATH);
+        doc.add(Json.quote(resourcePath));
+        doc.add(ATTR_PRODUCES);
+        doc.add(Json.list(Misc.toList(produces), true));
+        doc.add(ATTR_APIS);
+        doc.add(Json.list(apis));
+
+        return doc;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param path _more_
+     * @param operations _more_
+     *
+     * @return _more_
+     */
+    public static List<String> createApi(String path,
+                                         List<String> operations) {
+        List<String> api = new ArrayList<String>();
+        api.add(ATTR_PATH);
+        api.add(Json.quote(path));
+        api.add(ATTR_OPERATIONS);
+        api.add(Json.list(operations));
+
+        return api;
+    }
+
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param summary _more_
+     * @param notes _more_
+     * @param nickname _more_
+     * @param parameters _more_
+     * @param responseMessages _more_
+     *
+     * @return _more_
+     */
+    public static List<String> createOperation(String summary, String notes,
+            String nickname, List<String> parameters,
+            List<String> responseMessages) {
+        List<String> operation = new ArrayList<String>();
+        initOperation(operation, summary, notes, nickname);
+        operation.add(ATTR_RESPONSEMESSAGES);
+        operation.add(Json.list(responseMessages));
+        operation.add(ATTR_PARAMETERS);
+        operation.add(Json.list(parameters));
+
+
+        return operation;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param operation _more_
+     * @param summary _more_
+     * @param notes _more_
+     * @param nickname _more_
+     *
+     * @return _more_
+     */
+    public static List<String> initOperation(List<String> operation,
+                                             String summary, String notes,
+                                             String nickname) {
+        operation.add(ATTR_METHOD);
+        operation.add(Json.quote("GET"));
+        operation.add(ATTR_SUMMARY);
+        operation.add(Json.quote(summary));
+        operation.add(ATTR_NOTES);
+        operation.add(Json.quote(notes));
+        operation.add(ATTR_NICKNAME);
+        operation.add(Json.quote(nickname));
+
+        //Add dummy auths
+        operation.add(ATTR_AUTHORIZATIONS);
+        operation.add(Json.map());
+
+        return operation;
+    }
+
+
 
 
     /**
