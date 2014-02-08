@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -27,6 +27,7 @@ import org.ramadda.repository.*;
 import org.ramadda.repository.auth.*;
 import org.ramadda.repository.metadata.Metadata;
 import org.ramadda.repository.type.Column;
+import org.ramadda.repository.type.TypeHandler;
 
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Json;
@@ -287,13 +288,26 @@ public class JsonOutputHandler extends OutputHandler {
         }
 
 
+        TypeHandler   typeHandler = entry.getTypeHandler();
+        List<Service> services    = new ArrayList<Service>();
+        typeHandler.getServices(request, entry, services);
+        List<String> jsonServices = new ArrayList<String>();
+        for (Service service : services) {
+            jsonServices.add(Json.map("url", Json.quote(service.getUrl()),
+                                      "relType",
+                                      Json.quote(service.getType()), "name",
+                                      Json.quote(service.getName()),
+                                      "mimeType",
+                                      Json.quote(service.getMimeType())));
+        }
+
+        items.add("services");
+        items.add(Json.list(jsonServices));
+        System.err.println("services:" + Json.list(jsonServices));
 
         Resource resource = entry.getResource();
-
-        //TODO: add services
         if (resource != null) {
             if (resource.isUrl()) {
-
                 String temp = Json.cleanString(resource.getPath());
                 if (temp == null) {
                     Json.quoteAttr(items, "filename", "");
