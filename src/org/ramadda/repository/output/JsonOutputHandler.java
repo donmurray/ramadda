@@ -303,7 +303,7 @@ public class JsonOutputHandler extends OutputHandler {
 
         items.add("services");
         items.add(Json.list(jsonServices));
-        System.err.println("services:" + Json.list(jsonServices));
+        //        System.err.println("services:" + Json.list(jsonServices));
 
         Resource resource = entry.getResource();
         if (resource != null) {
