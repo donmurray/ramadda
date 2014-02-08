@@ -1740,11 +1740,9 @@ public class Request implements Constants, Cloneable {
         }
         String accept = getHeaderArg("Accept");
         if (accept != null) {
-            System.err.println("accept:" + accept);
             //TODO: iterate through the handlers
             if (accept.equals("application/json")) {
                 put(ARG_OUTPUT, "json");
-
                 return true;
             }
         }
