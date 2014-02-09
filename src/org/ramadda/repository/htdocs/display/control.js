@@ -10,9 +10,9 @@ addGlobalDisplayType({type:DISPLAY_FILTER , label: "Filter",requiresData:false})
 addGlobalDisplayType({type:DISPLAY_ANIMATION , label: "Animation",requiresData:false});
 
 function RamaddaFilterDisplay(displayManager, id, properties) {
-    $.extend(this, new RamaddaDisplay(displayManager, id, properties));
+    RamaddaUtil.inherit(this, new RamaddaDisplay(displayManager, id, properties));
     addRamaddaDisplay(this);
-    $.extend(this, {
+    RamaddaUtil.defineMembers(this, {
             html: "<p>&nbsp;&nbsp;&nbsp;Nothing selected&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<p>",
             initDisplay: function() {
                 this.initUI();
@@ -26,9 +26,9 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
     var ID_START = "start";
     var ID_STOP = "stop";
     var ID_TIME = "time";
-    $.extend(this, new RamaddaDisplay(displayManager, id, DISPLAY_ANIMATION, properties));
+    RamaddaUtil.inherit(this, new RamaddaDisplay(displayManager, id, DISPLAY_ANIMATION, properties));
     addRamaddaDisplay(this);
-    $.extend(this, {
+    RamaddaUtil.defineMembers(this, {
             running: false,
             timestamp: 0,
             index: 0,              

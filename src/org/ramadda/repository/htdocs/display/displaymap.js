@@ -14,9 +14,9 @@ function RamaddaMapDisplay(displayManager, id, properties) {
     var ID_LATFIELD  = "latfield";
     var ID_LONFIELD  = "lonfield";
     var ID_MAP = "map";
-    RamaddaSuper(this, new RamaddaDisplay(displayManager, id, DISPLAY_MAP, properties));
+    RamaddaUtil.inherit(this, new RamaddaDisplay(displayManager, id, DISPLAY_MAP, properties));
     addRamaddaDisplay(this);
-    $.extend(this, {
+    RamaddaUtil.defineMembers(this, {
             initBounds:displayManager.initMapBounds,
             initPoints:displayManager.initMapPoints,
             mapBoundsSet:false,

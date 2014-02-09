@@ -535,7 +535,20 @@ function DisplayManager(id,properties) {
 
 
 
-function RamaddaSuper(object, parent) {
-    $.extend(object, parent);
-    return object;
+RamaddaUtil = {
+    //applies extend to the given object
+    //and sets a super member to the original object
+    //you can call original super class methods with:
+    //this.super.<method>.call(this,...);
+    inherit: function(object, parent) {
+        $.extend(object, parent);
+        object.super = parent;
+        return object;
+    },
+    //Just a wrapper around extend. We use this so it is easy to find 
+    //class definitions
+    defineMembers: function(object, members) {
+        $.extend(object, members);
+        return object;
+    }
 }

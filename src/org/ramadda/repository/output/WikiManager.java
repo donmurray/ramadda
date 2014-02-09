@@ -333,6 +333,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
     /** wiki group property */
     public static final String WIKI_PROP_GROUP = "wiki.group";
+    public static final String WIKI_PROP_GROUP_NOBR = "wiki.group.nobr";
 
     /** _more_ */
     public static final String WIKI_PROP_DISPLAYGROUP = "displaygroup";
@@ -613,7 +614,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         prop(WIKI_PROP_EARTH,
              attrs(ATTR_WIDTH, "400", ATTR_HEIGHT, "400", ATTR_LISTENTRIES,
                    "false")),
-        WIKI_PROP_GROUP + "Images",
+        WIKI_PROP_GROUP_NOBR + "Images",
         prop(WIKI_PROP_IMAGE,
              attrs(ATTR_SRC, "", ATTR_ALIGN, "left|center|right")),
         prop(WIKI_PROP_GALLERY,
@@ -3582,6 +3583,15 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         for (int i = 0; i < WIKIPROPS.length; i++) {
             String prop = WIKIPROPS[i];
 
+            if (prop.startsWith(WIKI_PROP_GROUP_NOBR)) {
+                String group = prop.substring(WIKI_PROP_GROUP_NOBR.length());
+                importMenu.append(HtmlUtils.b(group));
+                importMenu.append(HtmlUtils.br());
+                importMenu.append("\n");
+                continue;
+            }
+
+
             if (prop.startsWith(WIKI_PROP_GROUP)) {
                 cnt++;
                 if (cnt > 1) {
@@ -3596,6 +3606,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
                 continue;
             }
+
+
             String textToInsert = prop;
             int    colonIdx     = prop.indexOf(PROP_DELIM);
             if (colonIdx >= 0) {

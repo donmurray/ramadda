@@ -47,9 +47,9 @@ function RamaddaMultiChart(displayManager, id, properties) {
             vAxisMaxValue:NaN
            });
 
-    RamaddaSuper(this, new RamaddaDisplay(displayManager, id, properties.chartType, properties));
+    RamaddaUtil.inherit(this, new RamaddaDisplay(displayManager, id, properties.chartType, properties));
 
-    $.extend(this, {
+    RamaddaUtil.defineMembers(this, {
             getType: function () {
                 return this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
             },
@@ -183,20 +183,20 @@ function RamaddaMultiChart(displayManager, id, properties) {
 
 function LinechartDisplay(displayManager, id, properties) {
     properties = $.extend({"chartType": DISPLAY_LINECHART}, properties);
-    RamaddaSuper(this, new RamaddaMultiChart(displayManager, id, properties));
+    RamaddaUtil.inherit(this, new RamaddaMultiChart(displayManager, id, properties));
     addRamaddaDisplay(this);
 }
 
 function BarchartDisplay(displayManager, id, properties) {
     properties = $.extend({"chartType": DISPLAY_BARCHART}, properties);
-    RamaddaSuper(this, new RamaddaMultiChart(displayManager, id, properties));
+    RamaddaUtil.inherit(this, new RamaddaMultiChart(displayManager, id, properties));
     addRamaddaDisplay(this);
 }
 
 
 function TableDisplay(displayManager, id, properties) {
     properties = $.extend({"chartType": DISPLAY_TABLE}, properties);
-    RamaddaSuper(this, new RamaddaMultiChart(displayManager, id, properties));
+    RamaddaUtil.inherit(this, new RamaddaMultiChart(displayManager, id, properties));
     addRamaddaDisplay(this);
 }
 
@@ -204,7 +204,7 @@ function TableDisplay(displayManager, id, properties) {
 function RamaddaTextDisplay(displayManager, id, properties) {
     $.extend(this, new RamaddaDisplay(displayManager, id, DISPLAY_TEXT, properties));
     addRamaddaDisplay(this);
-    $.extend(this, {
+    RamaddaUtil.defineMembers(this, {
             lastHtml:"<p>&nbsp;<p>&nbsp;<p>",
             initDisplay: function() {
                 this.initUI();

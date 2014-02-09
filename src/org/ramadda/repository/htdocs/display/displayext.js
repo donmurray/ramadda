@@ -16,13 +16,13 @@ function RamaddaExampleDisplay(displayManager, id, properties) {
     var ID_DATA = "data";
 
     //Create the base class
-    $.extend(this, new RamaddaDisplay(displayManager, id, "example", properties));
+    RamaddaUtil.inherit(this, new RamaddaDisplay(displayManager, id, "example", properties));
 
     //Add this display to the list of global displays
     addRamaddaDisplay(this);
 
     //Define the methods
-    $.extend(this, {
+    RamaddaUtil.defineMembers(this, {
             //gets called by displaymanager after the displays are layed out
             initDisplay: function() {
                 //Call base class to init menu, etc

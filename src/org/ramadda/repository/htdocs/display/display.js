@@ -57,13 +57,19 @@ function DisplayThing(id, properties) {
        properties = {};
     }
     $.extend(this, properties);
-    $.extend(this, {
+
+    $.extend(this, {testFunction: function(){console.log("Parent Class:" + this.toString());}});
+
+    RamaddaUtil.defineMembers(this, {
             id: id,
             properties:properties,
             displayParent: null,
             getId: function() {
             return this.id;
         },
+        toString: function() {
+                return "DisplayThing:" + this.getId();
+         },
        getDomId:function(suffix) {
                 return this.getId() +"_" + suffix;
        },
@@ -119,8 +125,13 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
     $.extend(this, {
             orientation: "horizontal",
         });
-    $.extend(this, new DisplayThing(id, propertiesArg));
-    $.extend(this, {
+
+    RamaddaUtil.inherit(this,new DisplayThing(id, propertiesArg));
+
+    $.extend(this, {testFunction: function(){console.log("Child Class:" + this.toString());}});
+
+
+    RamaddaUtil.defineMembers(this, {
             type: type,
             displayManager:displayManager,
             filters: [],
@@ -129,6 +140,9 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
             getDisplayManager: function() {
                return this.displayManager;
             },
+            toString: function() {
+                 return "RamaddaDisplay:" + this.getId();
+             },
             getType: function() {
                 return this.type;
             },
@@ -284,6 +298,8 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 return entry;
             },
             createDisplay: function(entryId, displayType) {
+             
+
                 var entry = this.getEntry(entryId);
                 if(entry == null) {
                     console.log("No entry:" + entryId);
@@ -519,6 +535,12 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
               That needs to call setContents with the html contents of the display
             */
             getHtml: function() {
+
+                //                console.log("getHtml:" + this.getId());
+                //                this.testFunction();
+                //                this.super.testFunction();
+                //                this.super.testFunction.call(this);
+
                 var html = "";
                 html +=   htmlUtil.div(["id", this.getDomId(ID_HEADER),"class", "display-header"]);
                 html+= htmlUtil.div(["class","ramadda-popup", "id", this.getDomId(ID_MENU_OUTER)], "");
