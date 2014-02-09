@@ -275,7 +275,7 @@ function DisplayManager(id,properties) {
                     if(records!=null) break;
                 }
                 var indexObj = [];
-                var closest =  RecordFindClosest(records, lon, lat, indexObj);
+                var closest =  RecordUtil.findClosest(records, lon, lat, indexObj);
                 if(closest!=null) {
                     this.handleRecordSelection(mapDisplay, pointData, indexObj.index);
                 }

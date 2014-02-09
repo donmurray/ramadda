@@ -57,8 +57,8 @@ function RamaddaD3Display(displayManager, id, properties) {
 
                 var fields = pointData.getNumericFields();
                 var records = pointData.getRecords();
-                var ranges =  RecordGetRanges(fields,records);
-                var elevationRange =  RecordGetElevationRange(fields,records);
+                var ranges =  RecordUtil.getRanges(fields,records);
+                var elevationRange =  RecordUtil.getElevationRange(fields,records);
                 var offset = (elevationRange[1] - elevationRange[0])*0.05;
 
 
@@ -234,8 +234,8 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
 				
 				var fields = pointData.getNumericFields();
                 var records = pointData.getRecords();
-                var ranges =  RecordGetRanges(fields,records);
-                var elevationRange =  RecordGetElevationRange(fields,records);
+                var ranges =  RecordUtil.getRanges(fields,records);
+                var elevationRange =  RecordUtil.getElevationRange(fields,records);
                 var offset = (elevationRange[1] - elevationRange[0])*0.05;
 
 				this.x.domain(d3.extent(records, function(d) { return new Date(d.getDate()); }));

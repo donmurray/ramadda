@@ -217,7 +217,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
                     var pointData = dataList[collectionIdx];
                     var fields =pointData.getChartableFields();
-                    fields = RecordFieldSort(fields);
+                    fields = RecordUtil.sort(fields);
                     if(html == null) {
                         html = HtmlUtil.tag("b", [],  "Fields");
                         html += HtmlUtil.openTag("div", ["class", "display-fields"]);

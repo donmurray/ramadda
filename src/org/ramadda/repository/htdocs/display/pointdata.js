@@ -187,8 +187,8 @@ function PointData(name, recordFields, records, url, properties) {
 
 
 function DerivedPointData(displayManager, name, pointDataList, operation) {
-    $.extend(this, new  BasePointData(name));
-    $.extend(this, {
+    RamaddaUtil.inherit(this, new  BasePointData(name));
+    RamaddaUtil.defineMembers(this, {
             displayManager: displayManager,
             operation: operation,
             pointDataList: pointDataList,
@@ -353,7 +353,7 @@ The main data record. This holds a lat/lon/elevation, time and an array of data
 The data array corresponds to the RecordField fields
  */
 function PointRecord(lat, lon, elevation, time, data) {
-    $.extend(this, {
+    RamaddaUtil.defineMembers(this, {
             latitude : lat,
             longitude : lon,
             elevation : elevation,
@@ -462,54 +462,6 @@ function makeTestPointData() {
 
 
 
-function RecordGetRanges(fields,records) {
-    var maxValues = [];
-    var minValues = [];
-    for(var i=0;i<fields.length;i++) {
-        maxValues.push(NaN);
-        minValues.push(NaN);
-    }
-
-    for(var row=0;row<records.length;row++) {
-        for(var col=0;col<fields.length;col++) {
-            var value  = records[row].getValue(col);
-            if(isNaN(value)) continue;    
-            maxValues[col] = (isNaN(maxValues[col])?value:Math.max(value, maxValues[col]));
-            minValues[col] = (isNaN(minValues[col])?value:Math.min(value, minValues[col]));
-        }
-    }
-
-    var ranges = [];
-    for(var col=0;col<fields.length;col++) {
-        ranges.push([minValues[col],maxValues[col]]);
-    }
-    return ranges;
-}
-
-
-
-function RecordGetElevationRange(fields,records) {
-    var maxValue =NaN;
-    var minValue = NaN;
-
-    for(var row=0;row<records.length;row++) {
-        if(records[row].hasElevation()) { 
-            var value = records[row].getElevation();
-            maxValue = (isNaN(maxValue)?value:Math.max(value, maxValue));
-            minValue = (isNaN(minValue)?value:Math.min(value, minValue));
-        }
-    }
-    return [minValue,maxValue];
-}
-
-
-function RecordSlice(records,index) {
-    var values = [];
-    for(var row=0;row<records.length;row++) {
-        values.push(records[row].getValue(index));
-    }
-    return values;
-}
 
 
 
@@ -544,7 +496,7 @@ function InteractiveDataWidget (theChart) {
 
 function RecordFilter(properties) {
     if(properties == null) properties = {};
-    $.extend(this, {
+    RamaddaUtil.defineMembers(this, {
             properties: properties,
             recordOk:function(display, record, values) {
                 return true;
@@ -554,8 +506,8 @@ function RecordFilter(properties) {
 
 
 function MonthFilter(param) {
-    $.extend(this,new RecordFilter());
-    $.extend(this,{
+    RamaddaUtil.inherit(this,new RecordFilter());
+    RamaddaUtil.defineMembers(this,{
             months: param.split(","),
             recordOk: function(display, record, values) {
                 for(i in this.months) {
@@ -574,78 +526,123 @@ function MonthFilter(param) {
 }
 
 
-//TODO: use a namespace for these global functions
+var RecordUtil = {
+    getRanges: function(fields,records) {
+        var maxValues = [];
+        var minValues = [];
+        for(var i=0;i<fields.length;i++) {
+            maxValues.push(NaN);
+            minValues.push(NaN);
+        }
 
-function RecordFieldSort(fields) {
-    fields = fields.slice(0);
-    fields.sort(function(a,b){
-            var s1 = a.getSortOrder();
-            var s2 = b.getSortOrder();
-            return s1<s2;
-        });
-    return fields;
-}
-
-
-function RecordGetPoints(records, bounds) {
-    var points =[];
-    var north=NaN,west=NaN,south=NaN,east=NaN;
-    if(records!=null) {
-        for(j=0;j<records.length;j++) { 
-            var record = records[j];
-            if(!isNaN(record.getLatitude())) { 
-                if(j == 0) {
-                    north  =  record.getLatitude();
-                    south  = record.getLatitude();
-                    west  =  record.getLongitude();
-                    east  = record.getLongitude();
-                } else {
-                    north  = Math.max(north, record.getLatitude());
-                    south  = Math.min(south, record.getLatitude());
-                    west  = Math.min(west, record.getLongitude());
-                    east  = Math.min(east, record.getLongitude());
-                }
-                points.push(new OpenLayers.Geometry.Point(record.getLongitude(),record.getLatitude()));
+        for(var row=0;row<records.length;row++) {
+            for(var col=0;col<fields.length;col++) {
+                var value  = records[row].getValue(col);
+                if(isNaN(value)) continue;    
+                maxValues[col] = (isNaN(maxValues[col])?value:Math.max(value, maxValues[col]));
+                minValues[col] = (isNaN(minValues[col])?value:Math.min(value, minValues[col]));
             }
         }
-    }
-    bounds[0] = north;
-    bounds[1] = west;
-    bounds[2] = south;
-    bounds[3] = east;
-    return points;
-}
 
-function RecordFindClosest(records, lon, lat, indexObj) {
-    if(records == null) return null;
-    var closestRecord = null;
-    var minDistance = 1000000000;
-    var index = -1;
-    for(j=0;j<records.length;j++) { 
-        var record = records[j];
-        if(isNaN(record.getLatitude())) { 
-            continue;
+        var ranges = [];
+        for(var col=0;col<fields.length;col++) {
+            ranges.push([minValues[col],maxValues[col]]);
         }
-        var distance = Math.sqrt((lon-record.getLongitude())*(lon-record.getLongitude()) + (lat-record.getLatitude())*(lat-record.getLatitude()));
-        if(distance<minDistance) {
-            minDistance = distance;
-            closestRecord = record;
-            index = j;
+        return ranges;
+    },
+
+
+
+    getElevationRange: function(fields,records) {
+        var maxValue =NaN;
+        var minValue = NaN;
+
+        for(var row=0;row<records.length;row++) {
+            if(records[row].hasElevation()) { 
+                var value = records[row].getElevation();
+                maxValue = (isNaN(maxValue)?value:Math.max(value, maxValue));
+                minValue = (isNaN(minValue)?value:Math.min(value, minValue));
+            }
         }
-    }
-    if(indexObj!=null) {
-        indexObj.index = index;
-    }
-    return closestRecord;
-}
+        return [minValue,maxValue];
+    },
 
 
-function clonePoints(points) {
-    var result = [];
-    for(var i=0;i<points.length;i++) {
-        var point = points[i];
-        result.push(new OpenLayers.Geometry.Point(point.x,point.y));
+    slice: function(records,index) {
+        var values = [];
+        for(var row=0;row<records.length;row++) {
+            values.push(records[row].getValue(index));
+        }
+        return values;
+    },
+
+
+    sort : function(fields) {
+        fields = fields.slice(0);
+        fields.sort(function(a,b){
+                var s1 = a.getSortOrder();
+                var s2 = b.getSortOrder();
+                return s1<s2;
+            });
+        return fields;
+    },
+    getPoints: function (records, bounds) {
+        var points =[];
+        var north=NaN,west=NaN,south=NaN,east=NaN;
+        if(records!=null) {
+            for(j=0;j<records.length;j++) { 
+                var record = records[j];
+                if(!isNaN(record.getLatitude())) { 
+                    if(j == 0) {
+                        north  =  record.getLatitude();
+                        south  = record.getLatitude();
+                        west  =  record.getLongitude();
+                        east  = record.getLongitude();
+                    } else {
+                        north  = Math.max(north, record.getLatitude());
+                        south  = Math.min(south, record.getLatitude());
+                        west  = Math.min(west, record.getLongitude());
+                        east  = Math.min(east, record.getLongitude());
+                    }
+                    points.push(new OpenLayers.Geometry.Point(record.getLongitude(),record.getLatitude()));
+                }
+            }
+        }
+        bounds[0] = north;
+        bounds[1] = west;
+        bounds[2] = south;
+        bounds[3] = east;
+        return points;
+    },
+    findClosest: function(records, lon, lat, indexObj) {
+        if(records == null) return null;
+        var closestRecord = null;
+        var minDistance = 1000000000;
+        var index = -1;
+        for(j=0;j<records.length;j++) { 
+            var record = records[j];
+            if(isNaN(record.getLatitude())) { 
+                continue;
+            }
+            var distance = Math.sqrt((lon-record.getLongitude())*(lon-record.getLongitude()) + (lat-record.getLatitude())*(lat-record.getLatitude()));
+            if(distance<minDistance) {
+                minDistance = distance;
+                closestRecord = record;
+                index = j;
+            }
+        }
+        if(indexObj!=null) {
+            indexObj.index = index;
+        }
+        return closestRecord;
+    },
+    clonePoints: function(points) {
+        var result = [];
+        for(var i=0;i<points.length;i++) {
+            var point = points[i];
+            result.push(new OpenLayers.Geometry.Point(point.x,point.y));
+        }
+        return result;
     }
-    return result;
-}
+};
 

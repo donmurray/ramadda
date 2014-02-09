@@ -78,7 +78,7 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             },
             addFeature: function(feature) {
                 this.features.push(feature);
-                feature.line = this.map.addPolygon("lines_" + feature.source.getId(), clonePoints(feature.points), null);
+                feature.line = this.map.addPolygon("lines_" + feature.source.getId(), RecordUtil.clonePoints(feature.points), null);
             },
             loadInitialData: function() {
                 if(this.displayManager.getData().length>0) {
@@ -139,7 +139,7 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             handlePointDataLoaded: function(source, pointData) {
                 var bounds = [NaN,NaN,NaN,NaN];
                 var records = pointData.getRecords();
-                var points =RecordGetPoints(records, bounds);
+                var points =RecordUtil.getPoints(records, bounds);
                 if(!isNaN(bounds[0])) {
                     this.initBounds  = bounds;
                     this.setInitMapBounds(bounds[0],bounds[1],bounds[2], bounds[3]);
