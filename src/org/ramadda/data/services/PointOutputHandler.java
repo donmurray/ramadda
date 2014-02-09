@@ -829,7 +829,10 @@ public class PointOutputHandler extends RecordOutputHandler {
         StringBuffer wiki = new StringBuffer();
 
         Hashtable    props = new Hashtable();
+
+        /*
         wiki.append(props.put("layoutHere", "false");
+        */
         props.put("layoutType", "table");
         props.put("layoutColumns", "2");
         props.put("showMenu", "true");

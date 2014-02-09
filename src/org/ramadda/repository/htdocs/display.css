@@ -229,6 +229,8 @@
 }
 
 
+
+
 .display-entrylist-entry {
    padding: 5px;
    margin: 0px;
@@ -236,9 +238,17 @@
    cursor:pointer;
 }
 
+
+
 .display-entrylist-entry:hover {
    background-color: #efefef;
 
+}
+
+.display-entrylist-highlight {
+//   font-weight: bold; 
+//   color:red;
+//   background-color: red;
 }
 
 

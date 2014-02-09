@@ -119,8 +119,13 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                         var longitude = entry.getLongitude();
                         var point = new OpenLayers.LonLat(longitude, latitude);
                         marker =  this.map.addMarker(id, point, entry.getIconUrl(),entry.getName());
+
+                        var numMarkers = this.markers.length;
                         this.markers[id] = marker;
-                        //this.map.zoomToMarkers();
+                        if(this.handledMarkers == null) {
+                            this.map.centerToMarkers();
+                            this.handledMarkers = true;
+                        }
                     }  else {
                         //                        console.log("already have marker");
                     }
@@ -142,7 +147,7 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 }
 
             },
-             handleDisplayDelete: function(source) {
+            handleDisplayDelete: function(source) {
                 var marker  = this.markers[source];
                 if(marker!=null) {
                     this.map.removeMarker(marker);

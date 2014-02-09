@@ -755,6 +755,13 @@ function RepositoryMap(mapId, params) {
         this.map.zoomToExtent(bounds);
     }
 
+    this.centerToMarkers = function() {
+        if (!this.markers)
+            return;
+        bounds = this.markers.getDataExtent();
+        this.map.setCenter(bounds.getCenterLonLat());
+    }
+
     this.setInitialCenterAndZoom = function(lon, lat, zoomLevel) {
         this.initialLocation = new OpenLayers.LonLat(lon, lat);
         this.initialZoom = zoomLevel;

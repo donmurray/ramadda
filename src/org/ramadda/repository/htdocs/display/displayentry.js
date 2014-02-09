@@ -9,8 +9,8 @@ addGlobalDisplayType({type: DISPLAY_ENTRYDISPLAY, label:"Entry Display",requires
 addGlobalDisplayType({type: DISPLAY_OPERANDS, label:"Operands",requiresData:false});
 
 function RamaddaEntryDisplay(displayManager, id, type, properties) {
-     $.extend(this, new RamaddaDisplay(displayManager, id, type, properties));
-     $.extend(this, {
+     RamaddaUtil.inherit(this, new RamaddaDisplay(displayManager, id, type, properties));
+     RamaddaUtil.defineMembers(this, {
              settings: new EntrySearchSettings({
                      parent: properties.entryParent,
                      text: properties.entryText,
@@ -61,7 +61,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
             metadataTypeList: [],
     });            
 
-    $.extend(this, new RamaddaEntryDisplay(displayManager, id, DISPLAY_ENTRYLIST, properties));
+    RamaddaUtil.inherit(this, new RamaddaEntryDisplay(displayManager, id, DISPLAY_ENTRYLIST, properties));
     //hack to bool
     this.showForm = (""+this.showForm) =="true";
     this.showEntries = (""+this.showEntries) == "true";
@@ -85,7 +85,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
     
 
     addRamaddaDisplay(this);
-    $.extend(this, {
+    RamaddaUtil.defineMembers(this, {
             haveSearched: false,
             haveTypes: false,
             metadata: {},
@@ -330,6 +330,9 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
 
            },
+           highlightEntry: function(entry) {
+                $("#"+this.getDomId("entryinner_" + entry.getId())).addClass("display-entrylist-highlight");
+            },
             handleEntrySelection: function(source, entry, selected) {
                 this.selectEntry(entry, selected);
             },
@@ -350,6 +353,9 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                         changed = true;
                     }
                 }
+            },
+            getEntries: function() {
+                return  this.entryList.getEntries();
             },
             entryListChanged: function(entryList) {
                 this.entryList = entryList;
@@ -391,7 +397,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                         entryName = entryName.substring(0,99)+"...";
                     }
                     var left =  htmlUtil.div(["style"," white-space: nowrap;  overflow-x:none; max-width:300px;"],link +" " +  entryName);
-                    var line = htmlUtil.leftRight(left,right);
+                    var line = htmlUtil.div(["id",this.getDomId("entryinner_" + entry.getId())], htmlUtil.leftRight(left,right));
                     html  += htmlUtil.tag("li",["id",
                                                 this.getDomId("entry_" + entry.getId()),
                                                 "entryid",entry.getId(), "class","display-entrylist-entry ui-widget-content " + rowClass], line);

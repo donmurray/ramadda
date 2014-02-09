@@ -158,8 +158,21 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
             addEntry: function(entry) {
                 this.entries.push(entry);
             },
+            handleRecordSelection: function(source, index, record, html) {
+                if(!source.getEntries) {
+                    return;
+                }
+                for(var i in source.getEntries()) {
+                    var entry = source.getEntries()[i];
+                    var containsEntry = this.getEntries().indexOf(entry) >=0;
+                    if(containsEntry) {
+                        this.highlightEntry(entry);
+                        break;
+                    }
+                }
+            },
             handleEntrySelection: function(source, entry, selected) {
-                var containsEntry = this.entries.indexOf(entry) >=0;
+                var containsEntry = this.getEntries().indexOf(entry) >=0;
                 if(!containsEntry) {
                     return;
                 }
@@ -168,6 +181,9 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 } else {
                     $("#" + this.getDomId(ID_TITLE)).removeClass("display-title-select");
                 }
+            },
+            highlightEntry: function(entry) {
+                $("#" + this.getDomId(ID_TITLE)).addClass("display-title-select");
             },
             getEntries: function() {
                 return this.entries;
@@ -353,7 +369,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 var menus = [];
                 var fileMenuItems = [];
                 var viewMenuItems = [];
-                viewMenuItems.push(htmlUtil.tag("li",[], htmlUtil.tag("a", ["href", entry.getEntryUrl()], "View Entry")));
+                viewMenuItems.push(htmlUtil.tag("li",[], htmlUtil.tag("a", ["href", entry.getEntryUrl(),"target","_"], "View Entry")));
                 if(entry.getFilesize()>0) {
                     fileMenuItems.push(htmlUtil.tag("li",[], htmlUtil.tag("a", ["href", entry.getFileUrl()], "Download " + entry.getFilename() + " (" + entry.getFormattedFilesize() +")")));
                 }
