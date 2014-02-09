@@ -139,8 +139,9 @@ public class TextRecord extends DataRecord {
      */
     public void setDelimiter(String value) {
         delimiter = value;
-        if ( !delimiter.equals("\t") && (delimiter.trim().length() == 0)) {
+        if ((!delimiter.equals("\t") && (delimiter.trim().length() == 0)) || delimiter.equals("space")) {
             delimiterIsSpace = true;
+            delimiter = " ";
         } else {
             delimiterIsSpace = false;
         }
@@ -553,7 +554,7 @@ public class TextRecord extends DataRecord {
             if ((badCnt > 5) || (numTokensRead != 1)) {
                 System.err.println("bad token cnt: expected:" + tokens.length
                                    + " read:" + numTokensRead + " delimiter:"
-                                   + delimiter + " is space:"
+                                   + delimiter + ": is space:"
                                    + delimiterIsSpace + "\nLine:"
                                    + currentLine);
 
