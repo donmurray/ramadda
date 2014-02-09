@@ -22,7 +22,7 @@ function RamaddaD3Display(displayManager, id, properties) {
             needsData: function() {return true;},
             getMenuContents: function() {
                 var height = this.getProperty(PROP_HEIGHT,"400");
-                var html  =  htmlUtil.div(["id",  this.getDomId(ID_FIELDS),"class", "display-fields","style","overflow-y: auto;    max-height:" + height +"px;"]);
+                var html  =  HtmlUtil.div(["id",  this.getDomId(ID_FIELDS),"class", "display-fields","style","overflow-y: auto;    max-height:" + height +"px;"]);
                 html +=  this.getDisplayMenuContents();
                 return html;
             },
@@ -32,7 +32,7 @@ function RamaddaD3Display(displayManager, id, properties) {
             updateUI: function() {
                 var displayHeight = this.getProperty("height",300);
                 var displayWidth = this.getProperty("width",300);
-                var html = htmlUtil.div(["id", this.getDomId(ID_SVG),"style","border:1px #000 solid; min-height:" + displayHeight +"px;"], "");
+                var html = HtmlUtil.div(["id", this.getDomId(ID_SVG),"style","border:1px #000 solid; min-height:" + displayHeight +"px;"], "");
                 this.setContents(html);
 
                 var selectedFields = this.getSelectedFields();
@@ -151,7 +151,7 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
 				var height = this.getProperty("height",300);
 				var margin = {top: 20, left: 50, bottom: 20, right: 20};
 				
-                var html = htmlUtil.div(["id", this.getDomId(ID_SVG),"style","height:" + height +"px;"],"");
+                var html = HtmlUtil.div(["id", this.getDomId(ID_SVG),"style","height:" + height +"px;"],"");
                 this.setContents(html);
 
 				// To create dinamic size of the div
@@ -204,7 +204,7 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
             needsData: function() {return true;},
             getMenuContents: function() {
                 var height = this.getProperty(PROP_HEIGHT,"400");
-                var html  =  htmlUtil.div(["id",  this.getDomId(ID_FIELDS),"class", "display-fields",]);
+                var html  =  HtmlUtil.div(["id",  this.getDomId(ID_FIELDS),"class", "display-fields",]);
                 html +=  this.getDisplayMenuContents();
                 return html;
             },

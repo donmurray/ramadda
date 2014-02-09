@@ -203,140 +203,135 @@ function Util () {
 ramaddaUtil = new Util();
 
 
-function HtmlUtil() {
+var HtmlUtil =  {
+    join : function (items,separator) {
+        var html = "";
+        for(var i in items) {
+            if(i>0 & separator!=null) html+= separator;
+            html += items[i];
+        }
+        return html;
+    },
+    qt : function (value) {
+        return "\"" + value +"\"";
+    },
+    leftRight : function(left,right) {
+        return this.tag("table",["border","0", "width","100%","cellspacing","0","cellpadding","0"],
+                        this.tr(["valign","top"],
+                                this.td(["align","left"],left) +
+                                this.td(["align","right"],right)));
+    },
+    div : function(attrs, inner) {
+        return this.tag("div", attrs, inner);
+    },
+    span : function(attrs, inner) {
+        return this.tag("span", attrs, inner);
+    },
+    image : function(path, attrs) {
+        return  "<img " + this.attrs(["src", path,"border","0"]) +" " + this.attrs(attrs) +">";
+    },
+    tr : function(attrs, inner) {
+        return this.tag("tr", attrs, inner);
+    },
+    formTable : function() {
+        return  this.openTag("table",["class","formtable","cellspacing","0","cellspacing","0"]);
+    },
+    formEntryTop : function(label, value) {
+        return this.tag("tr", ["valign","top"],
+                        this.tag("td",["class","formlabel","align","right"],
+                                 label) +
+                        this.tag("td",[],
+                                 value));
 
-    $.extend(this, {
-            join : function (items,separator) {
-                var html = "";
-                for(var i in items) {
-                    if(i>0 & separator!=null) html+= separator;
-                    html += items[i];
-                }
-                return html;
-            },
-            qt : function (value) {
-                return "\"" + value +"\"";
-            },
+    },
+    formEntry : function(label, value) {
+        return this.tag("tr", [],
+                        this.tag("td",["class","formlabel","align","right"],
+                                 label) +
+                        this.tag("td",[],
+                                 value));
 
-            leftRight : function(left,right) {
-                return this.tag("table",["border","0", "width","100%","cellspacing","0","cellpadding","0"],
-                                this.tr(["valign","top"],
-                                        this.td(["align","left"],left) +
-                                        this.td(["align","right"],right)));
-            },
+    },
 
-                div : function(attrs, inner) {
-                return this.tag("div", attrs, inner);
-            },
-                span : function(attrs, inner) {
-                return this.tag("span", attrs, inner);
-            },
-                image : function(path, attrs) {
-                return  "<img " + this.attrs(["src", path,"border","0"]) +" " + this.attrs(attrs) +">";
-            },
-                tr : function(attrs, inner) {
-                return this.tag("tr", attrs, inner);
-            },
-                formTable : function() {
-                return  this.openTag("table",["class","formtable","cellspacing","0","cellspacing","0"]);
-            },
-            formEntryTop : function(label, value) {
-                return this.tag("tr", ["valign","top"],
-                                this.tag("td",["class","formlabel","align","right"],
-                                         label) +
-                                this.tag("td",[],
-                                         value));
+    b : function(inner) {
+        return this.tag("b", [], inner);
+    },
 
-            },
-            formEntry : function(label, value) {
-                return this.tag("tr", [],
-                                this.tag("td",["class","formlabel","align","right"],
-                                         label) +
-                                this.tag("td",[],
-                                         value));
+    td : function(attrs, inner) {
+        return this.tag("td", attrs, inner);
+    },
 
-            },
+    tag : function(tagName, attrs, inner) {
+        var html = "<" + tagName +" " + this.attrs(attrs) +">";
+        if(inner!=null) {
+            html += inner;
+        }
+        html += "</" + tagName +">\n";
+        return html;
+    },
+    openTag : function(tagName, attrs) {
+        var html = "<" + tagName +" " + this.attrs(attrs) +">";
+        return html;
+    },
 
-            b : function(inner) {
-                return this.tag("b", [], inner);
-            },
+    closeTag : function(tagName) {
+        return  "</" + tagName +">\n";
+    },
 
-           td : function(attrs, inner) {
-                return this.tag("td", attrs, inner);
-            },
+    attr : function(name, value) {
+        return " " + name +"=" + this.qt(value) +" ";
+    },
 
-           tag : function(tagName, attrs, inner) {
-                var html = "<" + tagName +" " + this.attrs(attrs) +">";
-                if(inner!=null) {
-                    html += inner;
-                }
-                html += "</" + tagName +">\n";
-                return html;
-            },
-            openTag : function(tagName, attrs) {
-                var html = "<" + tagName +" " + this.attrs(attrs) +">";
-                return html;
-            },
-
-            closeTag : function(tagName) {
-                return  "</" + tagName +">\n";
-            },
-
-             attr : function(name, value) {
-                return " " + name +"=" + this.qt(value) +" ";
-            },
-
-             attrs : function(list) {
-                var html = "";
-                if(list == null) return html;
-                for(var i=0;i<list.length;i+=2) {
-                    var name = list[i];
-                    var value = list[i+1];
-                    if(value == null) {
-                        html += name;
-                    } else {
-                        html += this.attr(name,value);
-                    }
-
-                }
-                return html;
-            },
-            styleAttr : function(s) {
-                return this.attr("style", s);
-            },
-
-            classAttr : function(s) {
-                return this.attr("class", s);
-            },
-
-            idAttr : function(s) {
-                return this.attr("id", s);
-            },
-            href: function(url, label) {
-               return this.tag("a", ["href", url], label);
-            },
-
-            onClick : function(call, html) {
-                return this.tag("a", ["onclick", call, "style","xtext-decoration:none;color:black;"], html);
-            },
-
-            checkbox:  function(id,cbxclass,checked) {
-                var html = "<input id=\"" + id +"\" class=\""  + cbxclass +"\"  type=checkbox value=true ";
-                if(checked) {
-                    html+= " checked ";
-                }
-                html += "/>";
-                return html;
-            },
-
-                input :   function(name, value, attrs) {
-                return "<input " + this.attrs(attrs) + this.attrs(["name", name, "value",value]) +"/>";
+    attrs : function(list) {
+        var html = "";
+        if(list == null) return html;
+        for(var i=0;i<list.length;i+=2) {
+            var name = list[i];
+            var value = list[i+1];
+            if(value == null) {
+                html += name;
+            } else {
+                html += this.attr(name,value);
             }
-        });
 
+        }
+        return html;
+    },
+    styleAttr : function(s) {
+        return this.attr("style", s);
+    },
+
+    classAttr : function(s) {
+        return this.attr("class", s);
+    },
+
+    idAttr : function(s) {
+        return this.attr("id", s);
+    },
+    href: function(url, label) {
+        return this.tag("a", ["href", url], label);
+    },
+
+    onClick : function(call, html) {
+        return this.tag("a", ["onclick", call, "style","xtext-decoration:none;color:black;"], html);
+    },
+
+    checkbox:  function(id,cbxclass,checked) {
+        var html = "<input id=\"" + id +"\" class=\""  + cbxclass +"\"  type=checkbox value=true ";
+        if(checked) {
+            html+= " checked ";
+        }
+        html += "/>";
+        return html;
+    },
+
+    input :   function(name, value, attrs) {
+        return "<input " + this.attrs(attrs) + this.attrs(["name", name, "value",value]) +"/>";
+    }
 }
 
-var htmlUtil = new HtmlUtil();
+
+var htmlUtil = HtmlUtil;
 
 
 
@@ -1485,14 +1480,31 @@ function inputIsRequired(domId) {
     return true;
 }
 
-
-
-
-
 function setFormValue(id, v) {
     $("#" +id).val(v);
 }
 
 function setHtml(id, v) {
     $("#" +id).html(v);
+}
+
+
+
+
+RamaddaUtil = {
+    //applies extend to the given object
+    //and sets a super member to the original object
+    //you can call original super class methods with:
+    //this.super.<method>.call(this,...);
+    inherit: function(object, parent) {
+        $.extend(object, parent);
+        object.super = parent;
+        return object;
+    },
+    //Just a wrapper around extend. We use this so it is easy to find 
+    //class definitions
+    defineMembers: function(object, members) {
+        $.extend(object, members);
+        return object;
+    }
 }

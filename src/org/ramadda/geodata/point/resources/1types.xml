@@ -7,6 +7,35 @@
      <property name="form.datatype.show" value="false"/>
      <property name="form.date.show" value="false"/>
      <property name="form.altitude.show" value="false"/>
+
+<wiki_inner>
+<![CDATA[
+<table width=100% border=0>
+<tr valign=top>
+<td width=50%>
+<div id=listdiv></div>
+<div id=textdiv></div>
+</td>
+<td width=50%>
+<div id=maindiv></div>
+</td>
+</tr>
+</table>
+
+{{displaygroup  showTitle="true"  showMenu="true"  layoutType="table"  layoutColumns="1" divid="maindiv" }}
+
+{{display  type="entrylist"   layoutHere="true"   showForm="false" divid="listdiv"  entryParent="this" title="Data Files"  }}
+
+{{display     type="text"   layoutHere="true"   divid="textdiv" title="Readout"  }}
+
+{{display    height="200"  fields=""  type="map"   layoutHere="false"  showTitle="true"  }}
+
+
+]]>
+
+</wiki_inner>
+
+
    </type>
 
 

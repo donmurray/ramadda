@@ -69,7 +69,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
             },
             getMenuContents: function() {
                 var height = this.getProperty(PROP_HEIGHT,"400");
-                var html  =  htmlUtil.div(["id",  this.getDomId(ID_FIELDS),"style","overflow-y: auto;    max-height:" + height +"px;"]);
+                var html  =  HtmlUtil.div(["id",  this.getDomId(ID_FIELDS),"style","overflow-y: auto;    max-height:" + height +"px;"]);
                 html +=  this.getDisplayMenuContents();
                 return html;
             },
@@ -86,7 +86,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 }
                 if(!this.hasData()) {
                     this.clearChart();
-                    this.setContents(htmlUtil.div(["class","display-message"],
+                    this.setContents(HtmlUtil.div(["class","display-message"],
                                                   this.getLoadingMessage()));
                     return;
                 }
@@ -100,7 +100,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 }
                 var dataList = this.getStandardData(selectedFields);
                 if(dataList.length==0) {
-                    this.setContents(htmlUtil.div(["class","display-message"],
+                    this.setContents(HtmlUtil.div(["class","display-message"],
                                                   "No data available"));
                     return;
                 }
@@ -151,7 +151,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                     chartArea:{left:75,top:10,height:"60%",width:width}
                  });
                 var chartId = this.getDomId(ID_CHART);
-                this.setContents(htmlUtil.div(["id", chartId],""));
+                this.setContents(HtmlUtil.div(["id", chartId],""));
 
                 if(chartType == DISPLAY_BARCHART) {
                     chartOptions.orientation =  "horizontal";

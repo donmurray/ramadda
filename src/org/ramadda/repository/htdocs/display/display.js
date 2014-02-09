@@ -58,8 +58,6 @@ function DisplayThing(id, properties) {
     }
     $.extend(this, properties);
 
-    $.extend(this, {testFunction: function(){console.log("Parent Class:" + this.toString());}});
-
     RamaddaUtil.defineMembers(this, {
             id: id,
             properties:properties,
@@ -128,7 +126,6 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
 
     RamaddaUtil.inherit(this,new DisplayThing(id, propertiesArg));
 
-    $.extend(this, {testFunction: function(){console.log("Child Class:" + this.toString());}});
 
 
     RamaddaUtil.defineMembers(this, {
@@ -152,7 +149,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 this.setDisplayParent(cm);
             },
             setContents: function(contents) {
-                contents = htmlUtil.div(["class","display-contents-inner display-" + this.getType() +"-inner"], contents);
+                contents = HtmlUtil.div(["class","display-contents-inner display-" + this.getType() +"-inner"], contents);
                 $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(contents);
             },
             addEntry: function(entry) {
@@ -195,7 +192,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 return this.getMessage("&nbsp;Loading...");
             },
             getMessage: function(msg) {
-                return htmlUtil.div(["class","display-message"], msg);
+                return HtmlUtil.div(["class","display-message"], msg);
             },
            checkFixedLayout: function() {
                 if(this.getIsLayoutFixed()) {
@@ -222,8 +219,8 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                     var fields =pointData.getChartableFields();
                     fields = RecordFieldSort(fields);
                     if(html == null) {
-                        html = htmlUtil.tag("b", [],  "Fields");
-                        html += htmlUtil.openTag("div", ["class", "display-fields"]);
+                        html = HtmlUtil.tag("b", [],  "Fields");
+                        html += HtmlUtil.openTag("div", ["class", "display-fields"]);
                     } else {
                         html+= "<br>";
                     }
@@ -240,8 +237,8 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                         }  else if(this.selectedCbx.length==0) {
                             on = (i==0);
                         }
-                        html += htmlUtil.tag("div", ["title", field.getId()],
-                                             htmlUtil.checkbox(field.checkboxId, checkboxClass,
+                        html += HtmlUtil.tag("div", ["title", field.getId()],
+                                             HtmlUtil.checkbox(field.checkboxId, checkboxClass,
                                                                on) +" " +field.getLabel()
                                              );
                     }
@@ -249,7 +246,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 if(html == null) {
                     html = "";
                 } else {
-                    html+= htmlUtil.closeTag("div");
+                    html+= HtmlUtil.closeTag("div");
                 }
 
                 $("#" + this.getDomId(ID_FIELDS)).html(html);
@@ -319,8 +316,8 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 return  "getRamaddaDisplay('" + this.id +"')";
             },
             getEntryMenuButton: function(entry) {
-                var menuButton = htmlUtil.onClick(this.getGet()+".showEntryMenu(event, '" + entry.getId() +"');", 
-                                                  htmlUtil.image(root+"/icons/downdart.png", 
+                var menuButton = HtmlUtil.onClick(this.getGet()+".showEntryMenu(event, '" + entry.getId() +"');", 
+                                                  HtmlUtil.image(root+"/icons/downdart.png", 
                                                                  ["class", "display-dialog-button", "id",  this.getDomId(ID_MENU_BUTTON + entry.getId())]));
                 return menuButton;
             },
@@ -369,13 +366,13 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 var menus = [];
                 var fileMenuItems = [];
                 var viewMenuItems = [];
-                viewMenuItems.push(htmlUtil.tag("li",[], htmlUtil.tag("a", ["href", entry.getEntryUrl(),"target","_"], "View Entry")));
+                viewMenuItems.push(HtmlUtil.tag("li",[], HtmlUtil.tag("a", ["href", entry.getEntryUrl(),"target","_"], "View Entry")));
                 if(entry.getFilesize()>0) {
-                    fileMenuItems.push(htmlUtil.tag("li",[], htmlUtil.tag("a", ["href", entry.getFileUrl()], "Download " + entry.getFilename() + " (" + entry.getFormattedFilesize() +")")));
+                    fileMenuItems.push(HtmlUtil.tag("li",[], HtmlUtil.tag("a", ["href", entry.getFileUrl()], "Download " + entry.getFilename() + " (" + entry.getFormattedFilesize() +")")));
                 }
 
-                menus.push("<a>File</a>" + htmlUtil.tag("ul",[], htmlUtil.join(fileMenuItems)));
-                menus.push("<a>View</a>" + htmlUtil.tag("ul",[], htmlUtil.join(viewMenuItems)));
+                menus.push("<a>File</a>" + HtmlUtil.tag("ul",[], HtmlUtil.join(fileMenuItems)));
+                menus.push("<a>View</a>" + HtmlUtil.tag("ul",[], HtmlUtil.join(viewMenuItems)));
 
                 //check if it has point data
                 if(entry.getService("points.latlonaltcsv")) {
@@ -384,17 +381,17 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                         var type = this.displayManager.displayTypes[i];
                         if(!type.requiresData) continue;
                         
-                        newMenu+= htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick", get+".createDisplay('" + entry.getId() +"','" + type.type+"');"], type.label));
+                        newMenu+= HtmlUtil.tag("li",[], HtmlUtil.tag("a", ["onclick", get+".createDisplay('" + entry.getId() +"','" + type.type+"');"], type.label));
                     }
-                    menus.push("<a>New Chart</a>" + htmlUtil.tag("ul",[], newMenu));
+                    menus.push("<a>New Chart</a>" + HtmlUtil.tag("ul",[], newMenu));
                 }
 
                 var topMenus = "";
                 for(var i in menus) {
-                    topMenus += htmlUtil.tag("li",[], menus[i]);
+                    topMenus += HtmlUtil.tag("li",[], menus[i]);
                 }
 
-                var menu = htmlUtil.tag("ul", ["id", this.getDomId(ID_MENU_INNER+entry.getId()),"class", "sf-menu"], 
+                var menu = HtmlUtil.tag("ul", ["id", this.getDomId(ID_MENU_INNER+entry.getId()),"class", "sf-menu"], 
                                         topMenus);
                 return menu;
             },
@@ -409,8 +406,8 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
             },
             getDisplayMenuContents: function() {
                 var get = this.getGet();
-                var copyMe = htmlUtil.onClick(get+".copyDisplay();", "Copy Display");
-                var deleteMe = htmlUtil.onClick("removeRamaddaDisplay('" + this.id +"')", "Remove Display");
+                var copyMe = HtmlUtil.onClick(get+".copyDisplay();", "Copy Display");
+                var deleteMe = HtmlUtil.onClick("removeRamaddaDisplay('" + this.id +"')", "Remove Display");
                 var menuItems = [];
                 this.getMenuItems(menuItems);
                 menuItems.push(copyMe);
@@ -420,30 +417,30 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
 
                 form += this.getDisplayMenuSettings();
                 for(var i in menuItems) {
-                    form += htmlUtil.div(["class","display-menu-item"], menuItems[i]);
+                    form += HtmlUtil.div(["class","display-menu-item"], menuItems[i]);
                 }
                 form += "</form>";
-                return htmlUtil.div([], form);
+                return HtmlUtil.div([], form);
             },
             getMenuItems: function(menuItems) {
             },
             getDisplayMenuSettings: function() {
                 var get = "getRamaddaDisplay('" + this.id +"')";
-                var moveRight = htmlUtil.onClick(get +".moveDisplayRight();", "Right");
-                var moveLeft = htmlUtil.onClick(get +".moveDisplayLeft();", "Left");
-                var moveUp = htmlUtil.onClick(get +".moveDisplayUp();", "Up");
-                var moveDown = htmlUtil.onClick(get +".moveDisplayDown();", "Down");
+                var moveRight = HtmlUtil.onClick(get +".moveDisplayRight();", "Right");
+                var moveLeft = HtmlUtil.onClick(get +".moveDisplayLeft();", "Left");
+                var moveUp = HtmlUtil.onClick(get +".moveDisplayUp();", "Up");
+                var moveDown = HtmlUtil.onClick(get +".moveDisplayDown();", "Down");
 
                 var menu =  "<table>" +
                     "<tr style=\"border:1px #000 solid;\"><td align=right><b>Move:</b></td><td>" + moveUp + " " +moveDown+  " " +moveRight+ " " + moveLeft +"</td></tr>"  +
-                    "<tr><td align=right><b>Name:</b></td><td> " + htmlUtil.input("", this.getProperty("name",""), ["size","7","id",  this.getDomId("name")]) + "</td></tr>" +
+                    "<tr><td align=right><b>Name:</b></td><td> " + HtmlUtil.input("", this.getProperty("name",""), ["size","7","id",  this.getDomId("name")]) + "</td></tr>" +
                     "<tr><td align=right><b>Source:</b></td><td>"  + 
-                    htmlUtil.input("", this.getProperty("eventsource",""), ["size","7","id",  this.getDomId("eventsource")]) +
+                    HtmlUtil.input("", this.getProperty("eventsource",""), ["size","7","id",  this.getDomId("eventsource")]) +
                     "</td></tr>" +
-                    "<tr><td align=right><b>Width:</b></td><td> " + htmlUtil.input("", this.getProperty("width",""), ["size","7","id",  this.getDomId("width")]) + "</td></tr>" +
-                    "<tr><td align=right><b>Height:</b></td><td> " + htmlUtil.input("", this.getProperty("height",""), ["size","7","id",  this.getDomId("height")]) + "</td></tr>" +
-                    "<tr><td align=right><b>Row:</b></td><td> " + htmlUtil.input("", this.getProperty("row",""), ["size","7","id",  this.getDomId("row")]) + "</td></tr>" +
-                    "<tr><td align=right><b>Column:</b></td><td> " + htmlUtil.input("", this.getProperty("column",""), ["size","7","id",  this.getDomId("column")]) + "</td></tr>" +
+                    "<tr><td align=right><b>Width:</b></td><td> " + HtmlUtil.input("", this.getProperty("width",""), ["size","7","id",  this.getDomId("width")]) + "</td></tr>" +
+                    "<tr><td align=right><b>Height:</b></td><td> " + HtmlUtil.input("", this.getProperty("height",""), ["size","7","id",  this.getDomId("height")]) + "</td></tr>" +
+                    "<tr><td align=right><b>Row:</b></td><td> " + HtmlUtil.input("", this.getProperty("row",""), ["size","7","id",  this.getDomId("row")]) + "</td></tr>" +
+                    "<tr><td align=right><b>Column:</b></td><td> " + HtmlUtil.input("", this.getProperty("column",""), ["size","7","id",  this.getDomId("column")]) + "</td></tr>" +
                     "</table>";
                 return menu;
            },
@@ -582,40 +579,40 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 //                this.super.testFunction.call(this);
 
                 var html = "";
-                html +=   htmlUtil.div(["id", this.getDomId(ID_HEADER),"class", "display-header"]);
-                html+= htmlUtil.div(["class","ramadda-popup", "id", this.getDomId(ID_MENU_OUTER)], "");
+                html +=   HtmlUtil.div(["id", this.getDomId(ID_HEADER),"class", "display-header"]);
+                html+= HtmlUtil.div(["class","ramadda-popup", "id", this.getDomId(ID_MENU_OUTER)], "");
                 var get = "getRamaddaDisplay('" + this.id +"')";
-                var menuButton = htmlUtil.onClick(get+".showDialog();", 
-                                                  htmlUtil.image(root+"/icons/downdart.png", 
+                var menuButton = HtmlUtil.onClick(get+".showDialog();", 
+                                                  HtmlUtil.image(root+"/icons/downdart.png", 
                                                                  ["class", "display-dialog-button", "id",  this.getDomId(ID_DIALOG_BUTTON)]));
 
-                var header = htmlUtil.div(["class","display-dialog-header"], htmlUtil.onClick("$('#" +this.getDomId(ID_DIALOG) +"').hide();",htmlUtil.image(root +"/icons/close.gif",["class","display-dialog-close"])));
+                var header = HtmlUtil.div(["class","display-dialog-header"], HtmlUtil.onClick("$('#" +this.getDomId(ID_DIALOG) +"').hide();",HtmlUtil.image(root +"/icons/close.gif",["class","display-dialog-close"])));
 
-                var menuContents = htmlUtil.div(["class", "display-dialog-contents"], this.getMenuContents());
+                var menuContents = HtmlUtil.div(["class", "display-dialog-contents"], this.getMenuContents());
                 menuContents  = header + menuContents;
-                var menu = htmlUtil.div(["class", "display-dialog", "id", this.getDomId(ID_DIALOG)], menuContents);
+                var menu = HtmlUtil.div(["class", "display-dialog", "id", this.getDomId(ID_DIALOG)], menuContents);
                 var width = this.getWidth();
                 var tableWidth = "100%";
                 if(width>0) {
                     tableWidth = width+"px";
                 }
-                html += htmlUtil.openTag("table", ["border","0", "width",tableWidth, "cellpadding","0", "cellspacing","0"]);
-                html += htmlUtil.openTag("tr", ["valign", "bottom"]);
+                html += HtmlUtil.openTag("table", ["border","0", "width",tableWidth, "cellpadding","0", "cellspacing","0"]);
+                html += HtmlUtil.openTag("tr", ["valign", "bottom"]);
                 if(this.getShowTitle()) {
-                    html += htmlUtil.td([], htmlUtil.div(["class","display-title","id",this.getDomId(ID_TITLE)], this.getTitle()));
+                    html += HtmlUtil.td([], HtmlUtil.div(["class","display-title","id",this.getDomId(ID_TITLE)], this.getTitle()));
                 } else {
-                    html += htmlUtil.td([], "");
+                    html += HtmlUtil.td([], "");
                 }
                 if(this.getShowMenu()) {
-                    html += htmlUtil.td(["align", "right"], menuButton);
+                    html += HtmlUtil.td(["align", "right"], menuButton);
                 } else {
-                    html += htmlUtil.td(["align", "right"], "");
+                    html += HtmlUtil.td(["align", "right"], "");
                 }
-                html += htmlUtil.closeTag("tr");
+                html += HtmlUtil.closeTag("tr");
 
                 var contents = this.getContentsDiv();
-                html += htmlUtil.tr([], htmlUtil.td(["colspan", "2"],contents));
-                html += htmlUtil.closeTag("table")
+                html += HtmlUtil.tr([], HtmlUtil.td(["colspan", "2"],contents));
+                html += HtmlUtil.closeTag("table")
                 html += menu;
                 return html;
             },
@@ -634,7 +631,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 if(height>0) {
                     extraStyle += " height:" + height +"px; " + " max-height:" + height +"px; overflow-y: auto;";
                 }
-                return  htmlUtil.div(["class","display-contents-inner display-" +this.type, "style", extraStyle, "id", this.getDomId(ID_DISPLAY_CONTENTS)],"");
+                return  HtmlUtil.div(["class","display-contents-inner display-" +this.type, "style", extraStyle, "id", this.getDomId(ID_DISPLAY_CONTENTS)],"");
             },
             copyDisplay: function() {
                 var newOne = {};

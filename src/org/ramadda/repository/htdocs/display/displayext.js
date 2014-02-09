@@ -31,9 +31,9 @@ function RamaddaExampleDisplay(displayManager, id, properties) {
                 //I've been calling back to this display with the following
                 var get = "getRamaddaDisplay('" + this.id +"')";
                 var html =  "<p>";
-                html +=htmlUtil.onClick(get +".click();", htmlUtil.div(["id", this.getDomId(ID_CLICK)], "Click me"));
+                html +=HtmlUtil.onClick(get +".click();", HtmlUtil.div(["id", this.getDomId(ID_CLICK)], "Click me"));
                 html +=  "<p>";
-                html += htmlUtil.div(["id", this.getDomId(ID_DATA)], "");
+                html += HtmlUtil.div(["id", this.getDomId(ID_DATA)], "");
 
                 //Set the contents
                 this.setContents(html);

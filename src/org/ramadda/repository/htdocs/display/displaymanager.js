@@ -8,11 +8,6 @@ var ID_MENU_BUTTON = "menu_button";
 var ID_MENU_OUTER =  "menu_outer";
 var ID_MENU_INNER =  "menu_inner";
 
-//Layout types
-var LAYOUT_TABLE = "table";
-var LAYOUT_TABS = "tabs";
-var LAYOUT_COLUMNS = "columns";
-var LAYOUT_ROWS = "rows";
 
 
 //Properties
@@ -72,30 +67,188 @@ function getDisplayManager(id) {
     return manager;
 }
 
+function DisplayGroup(id,properties) {
+    var LAYOUT_TABLE = "table";
+    var LAYOUT_TABS = "tabs";
+    var LAYOUT_COLUMNS = "columns";
+    var LAYOUT_ROWS = "rows";
+
+    RamaddaUtil.inherit(this, new DisplayThing(id, properties));
+    RamaddaUtil.defineMembers(this, {
+            displays : [],
+            layout:this.getProperty(PROP_LAYOUT_TYPE, LAYOUT_TABLE),
+            columns:this.getProperty(PROP_LAYOUT_COLUMNS, 1),
+            getPosition:function() {
+                for(var i=0;i<this.displays.length;i++) {
+                    var display  = this.displays[i];
+                    if(display.getPosition) {
+                        return display.getPosition();
+                    }
+                }
+            },
+            getDisplaysToLayout:function() {
+                var result = [];
+                for(var i=0;i<this.displays.length;i++) {
+                    if(this.displays[i].getIsLayoutFixed()) continue;
+                    result.push(this.displays[i]);
+                }
+                return result;
+            },
+            addNewDisplay: function(display) {
+//                display.setDisplayManager(this);
+//                this.addDisplayEventListener(display);
+//                display.loadInitialData();
+                this.displays.push(display);
+                this.doLayout();
+            },
+            removeDisplay:function(display) {
+                var index = this.displays.indexOf(display);
+                if(index >= 0) { 
+                    this.displays.splice(index, 1);
+                }   
+                this.doLayout();
+            },
+            doLayout:function() {
+                var html = "";
+                var colCnt=100;
+                var displaysToLayout = this.getDisplaysToLayout();
+
+                for(var i=0;i<displaysToLayout.length;i++) {
+                    var display = displaysToLayout[i];
+                    if(display.prepareToLayout!=null) {
+                        display.prepareToLayout();
+                    }
+                }
+
+                if(this.layout == LAYOUT_TABLE) {
+                    if(displaysToLayout.length == 1) {
+                        html+= displaysToLayout[0].getHtml();
+                    } else {
+                        var width = Math.round(100/this.columns)+"%";
+                        html+=HtmlUtil.openTag("table", ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "0"]);
+                        for(var i=0;i<displaysToLayout.length;i++) {
+                            colCnt++;
+                            if(colCnt>=this.columns) {
+                                if(i>0) {
+                                    html+= HtmlUtil.closeTag("tr");
+                                }
+                                html+= HtmlUtil.openTag("tr",["valign", "top"]);
+                                colCnt=0;
+                            }
+                            html+=HtmlUtil.tag("td", ["width", width], HtmlUtil.div([], displaysToLayout[i].getHtml()));
+                        }
+                        html+= HtmlUtil.closeTag("tr");
+                        html+= HtmlUtil.closeTag("table");
+                    }
+                } else if(this.layout==LAYOUT_TABS) {
+                    //TODO
+                } else if(this.layout==LAYOUT_ROWS) {
+                    var rows = [];
+                    for(var i=0;i<displaysToLayout.length;i++) {
+                        var display =displaysToLayout[i];
+                        var row = display.getRow();
+                        if((""+row).length==0) row = 0;
+                        while(rows.length<=row) {
+                            rows.push([]);
+                        }
+                        rows[row].push(display.getHtml());
+                    }
+                    for(var i=0;i<rows.length;i++) {
+                        var cols = rows[i];
+                        var width = Math.round(100/cols.length)+"%";
+                        html+=HtmlUtil.openTag("table", ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "0"]);
+                        html+=HtmlUtil.openTag("tr", ["valign","top"]);
+                        for(var col=0;col<cols.length;col++) {
+                            html+=HtmlUtil.tag("td",["width", width], cols[col]);
+                        }
+                        html+= HtmlUtil.closeTag("tr");
+                        html+= HtmlUtil.closeTag("table");
+                    }
+                } else if(this.layout==LAYOUT_COLUMNS) {
+                    var cols = [];
+                    var weights = [];
+                    for(var i=0;i<displaysToLayout.length;i++) {
+                        var display =displaysToLayout[i];
+                        var column = display.getColumn();
+                        if((""+column).length==0) column = 0;
+                        while(cols.length<=column) {
+                            cols.push([]);
+                            weights.push(0);
+                        }
+                        cols[column].push(display.getHtml());
+                    }
+                    html+=HtmlUtil.openTag("table", ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "0"]);
+                    html+=HtmlUtil.openTag("tr", ["valign","top"]);
+                    var width = Math.round(100/cols.length)+"%";
+                    for(var i=0;i<cols.length;i++) {
+                        var rows = cols[i];
+                        var contents = "";
+                        for(var j=0;j<rows.length;j++) {
+                            contents+= rows[j];
+                        }
+                        html+=HtmlUtil.tag("td", ["width", width, "valign","top"], contents);
+                    }
+                    html+= HtmlUtil.closeTag("tr");
+                    html+= HtmlUtil.closeTag("table");
+                } else {
+                    html+="Unknown layout:" + this.layout;
+                }
+                $("#" + this.getDomId(ID_DISPLAYS)).html(html);
+
+
+                this.initDisplay();
+
+            },
+            initDisplay: function() {
+                for(var i=0;i<this.displays.length;i++) {
+                    this.displays[i].initDisplay();
+                }
+            },
+            setLayout:function(layout, columns) {
+                this.layout  = layout;
+                if(columns) {
+                    this.columns  = columns;
+                }
+                this.doLayout();
+            },
+            moveDisplayUp: function(display) {
+                var index = this.displays.indexOf(display);
+                if(index <= 0) { 
+                    return;
+                }
+                this.displays.splice(index, 1);
+                this.displays.splice(index-1, 0,display);
+                this.doLayout();
+            },
+            moveDisplayDown: function(display) {
+                var index = this.displays.indexOf(display);
+                if(index >=this.displays.length) { 
+                    return;
+                }
+                this.displays.splice(index, 1);
+                this.displays.splice(index+1, 0,display);
+                this.doLayout();
+           },
+
+
+        });
+}
+
 
 //
 //DisplayManager constructor
 //id should correspond to a DOM element id
+
 function DisplayManager(id,properties) {
-    var theDisplayManager = this;
-    if(properties == null) {
-       properties == {};
-    }
-
-
-    $.extend(this, new DisplayThing(id, properties));
-    $.extend(this, {
-                displays : [],
+    RamaddaUtil.inherit(this, new DisplayGroup(id, properties));
+    RamaddaUtil.defineMembers(this, {
                 dataList : [],
                 displayTypes: [],
                 cnt : 0,
                 eventListeners: [],
-                layout:this.getProperty(PROP_LAYOUT_TYPE, LAYOUT_TABLE),
-                columns:this.getProperty(PROP_LAYOUT_COLUMNS, 1),
                 showmap : this.getProperty(PROP_SHOW_MAP,null),
                 initMapBounds : null,
-                initMapPoints : null});
-
+                });
 
     if(window.globalDisplayTypes!=null) {
         for(var i=0;i<window.globalDisplayTypes.length;i++) {
@@ -103,23 +256,17 @@ function DisplayManager(id,properties) {
         }
     }
 
-    $.extend(this, {
-                addDisplayType: function(type,label) {
-                    this.displayTypes.push({type:label});
-                },
-
-
-                setMapState : function(points, bounds) {
-                   this.initMapPoints = points;
-                   this.initMapBounds = bounds;
-                },
-            getData: function() {
-                return this.dataList;
-            },
+   RamaddaUtil.defineMembers(this, {
+           addDisplayType: function(type,label) {
+               this.displayTypes.push({type:label});
+           },
+           getData: function() {
+               return this.dataList;
+           },
            addDisplayEventListener: function(listener) {
-                this.eventListeners.push(listener);
-            },
-            handleMapClick: function (mapDisplay, lon, lat) {
+               this.eventListeners.push(listener);
+           },
+           handleMapClick: function (mapDisplay, lon, lat) {
                 var indexObj = [];
                 var records = null;
                 for(var i=0;i<this.dataList.length;i++) {
@@ -205,45 +352,34 @@ function DisplayManager(id,properties) {
                 //How else do I refer to this object in the html that I add 
                 var get = "getDisplayManager('" + this.getId() +"')";
                 var html = "";
-                var wider = htmlUtil.onClick(get +".changeChartWidth(1);","Chart width");
-                var narrower = htmlUtil.onClick(get +".changeChartWidth(-1);","Chart width");
-
                 var newMenu = "";
                 for(var i=0;i<this.displayTypes.length;i++) {
                     //The ids (.e.g., 'linechart' have to match up with some class function with the name 
                     var type = this.displayTypes[i];
-                    newMenu+= htmlUtil.tag("li",[], htmlUtil.tag("a", ["onclick", get+".createDisplay('" + type.type+"');"], type.label));
+                    newMenu+= HtmlUtil.tag("li",[], HtmlUtil.tag("a", ["onclick", get+".createDisplay('" + type.type+"');"], type.label));
                 }
 
                 var layoutMenu = 
-                    htmlUtil.tag("li",[], htmlUtil.onClick(get +".setLayout('table',1);", "Table - 1 column")) +"\n" +
-                    htmlUtil.tag("li",[], htmlUtil.onClick(get +".setLayout('table',2);", "Table - 2 column")) +"\n" +
-                    htmlUtil.tag("li",[], htmlUtil.onClick(get +".setLayout('table',3);", "Table - 3 column")) +"\n" +
-                    htmlUtil.tag("li",[], htmlUtil.onClick(get +".setLayout('rows');", "Rows")) +"\n" +
-                    htmlUtil.tag("li",[], htmlUtil.onClick(get +".setLayout('columns');", "Columns")) +"\n" +
-                    htmlUtil.tag("li",[], htmlUtil.onClick(get +".setLayout('tabs');", "Tabs"));
+                    HtmlUtil.tag("li",[], HtmlUtil.onClick(get +".setLayout('table',1);", "Table - 1 column")) +"\n" +
+                    HtmlUtil.tag("li",[], HtmlUtil.onClick(get +".setLayout('table',2);", "Table - 2 column")) +"\n" +
+                    HtmlUtil.tag("li",[], HtmlUtil.onClick(get +".setLayout('table',3);", "Table - 3 column")) +"\n" +
+                    HtmlUtil.tag("li",[], HtmlUtil.onClick(get +".setLayout('rows');", "Rows")) +"\n" +
+                    HtmlUtil.tag("li",[], HtmlUtil.onClick(get +".setLayout('columns');", "Columns")) +"\n" +
+                    HtmlUtil.tag("li",[], HtmlUtil.onClick(get +".setLayout('tabs');", "Tabs"));
 
 
-                var menu = htmlUtil.div(["class","ramadda-popup", "id", this.getDomId(ID_MENU_OUTER)], 
-                                        htmlUtil.tag("ul", ["id", this.getDomId(ID_MENU_INNER),"class", "sf-menu"], 
-                                                     htmlUtil.tag("li",[],"<a>New</a>" + htmlUtil.tag("ul",[], newMenu)) +
-                                                     htmlUtil.tag("li",[],"<a>Layout</a>" + htmlUtil.tag("ul", [], layoutMenu))));
+                var menu = HtmlUtil.div(["class","ramadda-popup", "id", this.getDomId(ID_MENU_OUTER)], 
+                                        HtmlUtil.tag("ul", ["id", this.getDomId(ID_MENU_INNER),"class", "sf-menu"], 
+                                                     HtmlUtil.tag("li",[],"<a>New</a>" + HtmlUtil.tag("ul",[], newMenu)) +
+                                                     HtmlUtil.tag("li",[],"<a>Layout</a>" + HtmlUtil.tag("ul", [], layoutMenu))));
 
 
 
                 html += menu;
-                html += htmlUtil.tag("a", ["class", "display-menu-button", "id", this.getDomId(ID_MENU_BUTTON)]);
+                html += HtmlUtil.tag("a", ["class", "display-menu-button", "id", this.getDomId(ID_MENU_BUTTON)]);
                 html+="<br>";
 
                 return html;
-            },
-           getPosition:function() {
-                for(var i=0;i<this.displays.length;i++) {
-                    var display  = this.displays[i];
-                    if(display.getPosition) {
-                        return display.getPosition();
-                    }
-                }
             },
             getJsonUrl:function(jsonUrl, display) {
                 var hasGeoMacro = jsonUrl.match(/(\${latitude})/g);
@@ -270,116 +406,6 @@ function DisplayManager(id,properties) {
                 }
                 return jsonUrl;
             },
-            changeChartWidth:function(w) {
-            },
-            getDisplaysToLayout:function() {
-                var result = [];
-                for(var i=0;i<this.displays.length;i++) {
-                    if(this.displays[i].getIsLayoutFixed()) continue;
-                    result.push(this.displays[i]);
-                }
-                return result;
-            },
-            doLayout:function() {
-                var html = "";
-                var colCnt=100;
-                var displaysToLayout = this.getDisplaysToLayout();
-
-                for(var i=0;i<displaysToLayout.length;i++) {
-                    var display = displaysToLayout[i];
-                    if(display.prepareToLayout!=null) {
-                        display.prepareToLayout();
-                    }
-                }
-
-                if(this.layout == LAYOUT_TABLE) {
-                    if(displaysToLayout.length == 1) {
-                        html+= displaysToLayout[0].getHtml();
-                    } else {
-                        var width = Math.round(100/this.columns)+"%";
-                        html+=htmlUtil.openTag("table", ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "0"]);
-                        for(var i=0;i<displaysToLayout.length;i++) {
-                            colCnt++;
-                            if(colCnt>=this.columns) {
-                                if(i>0) {
-                                    html+= htmlUtil.closeTag("tr");
-                                }
-                                html+= htmlUtil.openTag("tr",["valign", "top"]);
-                                colCnt=0;
-                            }
-                            html+=htmlUtil.tag("td", ["width", width], htmlUtil.div([], displaysToLayout[i].getHtml()));
-                        }
-                        html+= htmlUtil.closeTag("tr");
-                        html+= htmlUtil.closeTag("table");
-                    }
-                } else if(this.layout==LAYOUT_TABS) {
-                    //TODO
-                } else if(this.layout==LAYOUT_ROWS) {
-                    var rows = [];
-                    for(var i=0;i<displaysToLayout.length;i++) {
-                        var display =displaysToLayout[i];
-                        var row = display.getRow();
-                        if((""+row).length==0) row = 0;
-                        while(rows.length<=row) {
-                            rows.push([]);
-                        }
-                        rows[row].push(display.getHtml());
-                    }
-                    for(var i=0;i<rows.length;i++) {
-                        var cols = rows[i];
-                        var width = Math.round(100/cols.length)+"%";
-                        html+=htmlUtil.openTag("table", ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "0"]);
-                        html+=htmlUtil.openTag("tr", ["valign","top"]);
-                        for(var col=0;col<cols.length;col++) {
-                            html+=htmlUtil.tag("td",["width", width], cols[col]);
-                        }
-                        html+= htmlUtil.closeTag("tr");
-                        html+= htmlUtil.closeTag("table");
-                    }
-                } else if(this.layout==LAYOUT_COLUMNS) {
-                    var cols = [];
-                    var weights = [];
-                    for(var i=0;i<displaysToLayout.length;i++) {
-                        var display =displaysToLayout[i];
-                        var column = display.getColumn();
-                        if((""+column).length==0) column = 0;
-                        while(cols.length<=column) {
-                            cols.push([]);
-                            weights.push(0);
-                        }
-                        cols[column].push(display.getHtml());
-                    }
-                    html+=htmlUtil.openTag("table", ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "0"]);
-                    html+=htmlUtil.openTag("tr", ["valign","top"]);
-                    var width = Math.round(100/cols.length)+"%";
-                    for(var i=0;i<cols.length;i++) {
-                        var rows = cols[i];
-                        var contents = "";
-                        for(var j=0;j<rows.length;j++) {
-                            contents+= rows[j];
-                        }
-                        html+=htmlUtil.tag("td", ["width", width, "valign","top"], contents);
-                    }
-                    html+= htmlUtil.closeTag("tr");
-                    html+= htmlUtil.closeTag("table");
-                } else {
-                    html+="Unknown layout:" + this.layout;
-                }
-                $("#" + this.getDomId(ID_DISPLAYS)).html(html);
-
-
-                for(var i=0;i<this.displays.length;i++) {
-                    this.displays[i].initDisplay();
-                }
-
-            },
-            setLayout:function(layout, columns) {
-                this.layout  = layout;
-                if(columns) {
-                    this.columns  = columns;
-                }
-                this.doLayout();
-            },
             getDefaultData: function() {
                 for(var i in this.dataList) {
                     var data = this.dataList[i];
@@ -393,7 +419,6 @@ function DisplayManager(id,properties) {
                 }
                 return null;
             },
-
             createDisplay: function(type, props) {
                 if(props == null) props ={};
                 if(props.data!=null) {
@@ -435,13 +460,10 @@ function DisplayManager(id,properties) {
                     return;
                 }
                 var displayId = this.id +"_display_" + (this.cnt++);
-                var myProps = {};
-                $.extend(myProps, props);
 
                 if(props.data==null && this.dataList.length>0) {
                     props.data =  this.dataList[0];
                 }
-                //                console.log("Calling:" + funcName);
                 var display =  eval(" new " + funcName+"(this, displayId, props);");
                 if(display == null) {
                     console.log("Error: could not create display using:" + funcName);
@@ -452,45 +474,19 @@ function DisplayManager(id,properties) {
                 return display;
             },
             addNewDisplay: function(display) {
-                this.displays.push(display);
                 display.setDisplayManager(this);
                 this.addDisplayEventListener(display);
                 display.loadInitialData();
-                this.doLayout();
+                this.super.addNewDisplay.apply(this, [display]);
             },
-            moveDisplayUp: function(display) {
-                var index = this.displays.indexOf(display);
-                if(index <= 0) { 
-                    return;
-                }
-                this.displays.splice(index, 1);
-                this.displays.splice(index-1, 0,display);
-                this.doLayout();
-            },
-            moveDisplayDown: function(display) {
-                var index = this.displays.indexOf(display);
-                if(index >=this.displays.length) { 
-                    return;
-                }
-                this.displays.splice(index, 1);
-                this.displays.splice(index+1, 0,display);
-                this.doLayout();
-           },
             removeDisplay:function(display) {
-                var index = this.displays.indexOf(display);
-                if(index >= 0) { 
-                    this.displays.splice(index, 1);
-                }   
-
                 for(var i=0;i< this.eventListeners.length;i++) {
                     eventListener = this.eventListeners[i];
                     if(eventListener.handleDisplayDelete!=null) {
                         eventListener.handleDisplayDelete(display);
                     }
                 }
-
-                var displaymanager = this;
-                setTimeout(function(){displayManager.doLayout();},1);
+                this.super.removeDisplay.apply(this,[display]);
             },
             pointDataLoaded: function(source, pointData) {
                 for(var i=0;i< this.eventListeners.length;i++) {
@@ -505,19 +501,15 @@ function DisplayManager(id,properties) {
 
     addDisplayManager(this);
 
-    var html = htmlUtil.openTag("div", ["class","display-container"]);
+    var html = "";
+    html += HtmlUtil.openTag("div", ["class","display-container"]);
     html += this.makeMainMenu();
-
-
-    var theDiv =  htmlUtil.div(["id", this.getDomId(ID_DISPLAYS)]);
-    html += theDiv;
-
-    $("#"+ this.getId()).html(html);
-
+    html +=  HtmlUtil.div(["id", this.getDomId(ID_DISPLAYS)]);
+    $("#"+ this.getId()).html(html)
     if(this.showmap) {
         this.createDisplay('map');
     }
-
+    var theDisplayManager = this;
 
     $("#"+this.getDomId(ID_MENU_BUTTON)).button({ icons: { primary: "ui-icon-gear", secondary: "ui-icon-triangle-1-s"}}).click(function(event) {
             var id =theDisplayManager.getDomId(ID_MENU_OUTER); 
@@ -531,24 +523,3 @@ function DisplayManager(id,properties) {
 }
 
 
-
-
-
-
-RamaddaUtil = {
-    //applies extend to the given object
-    //and sets a super member to the original object
-    //you can call original super class methods with:
-    //this.super.<method>.call(this,...);
-    inherit: function(object, parent) {
-        $.extend(object, parent);
-        object.super = parent;
-        return object;
-    },
-    //Just a wrapper around extend. We use this so it is easy to find 
-    //class definitions
-    defineMembers: function(object, members) {
-        $.extend(object, members);
-        return object;
-    }
-}

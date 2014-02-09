@@ -78,9 +78,9 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
                 var record = records[this.index];
                 var label = "";
                 if(record.getDate()!=null) {
-                    label += htmlUtil.b("Date:") + " "  + record.getDate();
+                    label += HtmlUtil.b("Date:") + " "  + record.getDate();
                 } else {
-                    label += htmlUtil.b("Index:") +" " + this.index;
+                    label += HtmlUtil.b("Index:") +" " + this.index;
                 }
                 $("#" + this.getDomId(ID_TIME)).html(label);
                 this.displayManager.handleRecordSelection(this, null, this.index);
@@ -111,18 +111,18 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
 
                 var get = "getRamaddaDisplay('" + this.id +"')";
                 var html =  "";
-                html+=  htmlUtil.onClick(get +".setIndex(0);", htmlUtil.image(this.iconBegin,["title","beginning", "class", "display-animation-button", "xwidth","32"]));
+                html+=  HtmlUtil.onClick(get +".setIndex(0);", HtmlUtil.image(this.iconBegin,["title","beginning", "class", "display-animation-button", "xwidth","32"]));
                 html +="  ";
-                html+=  htmlUtil.onClick(get +".deltaIndex(-1);", htmlUtil.image(this.iconBack,["title","back 1", "class", "display-animation-button", "xwidth","32"]));
+                html+=  HtmlUtil.onClick(get +".deltaIndex(-1);", HtmlUtil.image(this.iconBack,["title","back 1", "class", "display-animation-button", "xwidth","32"]));
                 html +="  ";
-                html+=  htmlUtil.onClick(get +".toggle();", htmlUtil.image(this.iconStart,["title","play/stop", "class", "display-animation-button", "xwidth","32", "id", this.getDomId(ID_START)]));
+                html+=  HtmlUtil.onClick(get +".toggle();", HtmlUtil.image(this.iconStart,["title","play/stop", "class", "display-animation-button", "xwidth","32", "id", this.getDomId(ID_START)]));
                 html +="  ";
-                html+=  htmlUtil.onClick(get +".deltaIndex(1);", htmlUtil.image(this.iconForward,["title","forward 1", "class", "display-animation-button", "xwidth","32"]));
+                html+=  HtmlUtil.onClick(get +".deltaIndex(1);", HtmlUtil.image(this.iconForward,["title","forward 1", "class", "display-animation-button", "xwidth","32"]));
                 html +="  ";
-                html+=  htmlUtil.onClick(get +".faster();", htmlUtil.image(this.iconFaster,["class", "display-animation-button", "title","faster", "xwidth","32"]));
+                html+=  HtmlUtil.onClick(get +".faster();", HtmlUtil.image(this.iconFaster,["class", "display-animation-button", "title","faster", "xwidth","32"]));
                 html +="  ";
-                html+=  htmlUtil.onClick(get +".slower();", htmlUtil.image(this.iconSlower,["class", "display-animation-button", "title","slower", "xwidth","32"]));
-                html+=  htmlUtil.div(["id", this.getDomId(ID_TIME)],"&nbsp;");
+                html+=  HtmlUtil.onClick(get +".slower();", HtmlUtil.image(this.iconSlower,["class", "display-animation-button", "title","slower", "xwidth","32"]));
+                html+=  HtmlUtil.div(["id", this.getDomId(ID_TIME)],"&nbsp;");
                 this.setTitle("Animation");
                 this.setContents(html);
             },

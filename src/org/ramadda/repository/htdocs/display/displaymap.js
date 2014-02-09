@@ -44,15 +44,15 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                     extraStyle += " height:" + height +"px; ";
                 }
 
-                html+=htmlUtil.div(["class", "display-map-map", "style",extraStyle, "id", this.getDomId(ID_MAP)]);
+                html+=HtmlUtil.div(["class", "display-map-map", "style",extraStyle, "id", this.getDomId(ID_MAP)]);
                 html+="<br>";
-                html+= htmlUtil.openTag("div",["class","display-map-latlon"]);
-                html+= htmlUtil.openTag("form");
-                html+= "Latitude: " + htmlUtil.input(this.getDomId(ID_LATFIELD), "", ["size","7","id",  this.getDomId(ID_LATFIELD)]);
+                html+= HtmlUtil.openTag("div",["class","display-map-latlon"]);
+                html+= HtmlUtil.openTag("form");
+                html+= "Latitude: " + HtmlUtil.input(this.getDomId(ID_LATFIELD), "", ["size","7","id",  this.getDomId(ID_LATFIELD)]);
                 html+= "  ";
-                html+= "Longitude: " + htmlUtil.input(this.getDomId(ID_LONFIELD), "", ["size","7","id",  this.getDomId(ID_LONFIELD)]);
-                html+= htmlUtil.closeTag("form");
-                html+= htmlUtil.closeTag("div");
+                html+= "Longitude: " + HtmlUtil.input(this.getDomId(ID_LONFIELD), "", ["size","7","id",  this.getDomId(ID_LONFIELD)]);
+                html+= HtmlUtil.closeTag("form");
+                html+= HtmlUtil.closeTag("div");
                 this.setContents(html);
 
 
@@ -87,7 +87,7 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             },
 
             getContentsDiv: function() {
-                return  htmlUtil.div(["class","display-contents", "id", this.getDomId(ID_DISPLAY_CONTENTS)],"");
+                return  HtmlUtil.div(["class","display-contents", "id", this.getDomId(ID_DISPLAY_CONTENTS)],"");
             },
 
             handleClick: function (theMap, lon,lat) {
