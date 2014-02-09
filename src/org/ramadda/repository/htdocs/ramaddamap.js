@@ -889,6 +889,11 @@ function RepositoryMap(mapId, params) {
         return this.addPolygon(id, points, attrs);
     }
 
+    this.removePolygon = function(line) {
+        this.lines.removeAllFeatures();
+        this.lines.removeFeatures([line]);
+    }
+
     this.addPolygon = function(id, points, attrs) {
         for (i in points) {
             points[i].transform(this.displayProjection, this.sourceProjection);
@@ -929,7 +934,7 @@ function RepositoryMap(mapId, params) {
          * line.events.register("click", line, function (e) { alert("box
          * click"); theMap.showMarkerPopup(box); OpenLayers.Event.stop(evt); });
          */
-
+        
         this.lines.addFeatures( [ line ]);
         line.id = id;
         return line;

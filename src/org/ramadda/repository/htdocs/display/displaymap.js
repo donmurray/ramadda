@@ -10,6 +10,13 @@ var DISPLAY_MAP = "map";
 
 addGlobalDisplayType({type: DISPLAY_MAP, label:"Map"});
 
+function MapFeature(source, points) {
+    this.source = source;
+    this.points = points;
+}
+
+
+
 function RamaddaMapDisplay(displayManager, id, properties) {
     var ID_LATFIELD  = "latfield";
     var ID_LONFIELD  = "lonfield";
@@ -18,10 +25,11 @@ function RamaddaMapDisplay(displayManager, id, properties) {
     addRamaddaDisplay(this);
     RamaddaUtil.defineMembers(this, {
             initBounds:displayManager.initMapBounds,
-            initPoints:displayManager.initMapPoints,
             mapBoundsSet:false,
-            polygons:[],
+            features: [],
             markers: {},
+            sourceToLine: {},
+            sourceToPoints: {},
             initDisplay: function() {
                 this.initUI();
                 var html = "";
@@ -47,13 +55,13 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 html+= htmlUtil.closeTag("div");
                 this.setContents(html);
 
-                var currentPolygons = this.polygons;
-                this.polygons = [];
+
 
 
                 var params = {
                     "defaultMapLayer": this.getProperty("defaultMapLayer", map_default_layer)
                 };
+
                 this.map = new RepositoryMap(this.getDomId(ID_MAP), params);
                 this.map.initMap(false);
                 this.map.addClickHandler(this.getDomId(ID_LONFIELD), this.getDomId(ID_LATFIELD), null, this);
@@ -62,18 +70,15 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                     this.setInitMapBounds(b[0],b[1],b[2],b[3]);
                 }
 
-
-                if(this.initPoints!=null && this.initPoints.length>1) {
-                    this.polygons.push(this.initPoints);
-                    this.map.addPolygon("basemap", clonePoints(this.initPoints), null);
+                var currentFeatures = this.features;
+                this.features = [];
+                for(var i=0;i<currentFeatures.length;i++)  {
+                    this.addFeature(currentFeatures[i]);
                 }
-                
-                if(currentPolygons!=null) {
-                    for(var i=0;i<currentPolygons.length;i++)  {
-                        this.polygons.push(currentPolygons[i]);
-                        this.map.addPolygon("basemap", clonePoints(currentPolygons[i]), null);
-                    }
-                }
+            },
+            addFeature: function(feature) {
+                this.features.push(feature);
+                feature.line = this.map.addPolygon("lines_" + feature.source.getId(), clonePoints(feature.points), null);
             },
             loadInitialData: function() {
                 if(this.displayManager.getData().length>0) {
@@ -136,23 +141,38 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 var records = pointData.getRecords();
                 var points =RecordGetPoints(records, bounds);
                 if(!isNaN(bounds[0])) {
-                    this.initBounds = bounds;
-                    this.initPoints = points;
-                    this.displayManager.setMapState(points, bounds);
+                    this.initBounds  = bounds;
                     this.setInitMapBounds(bounds[0],bounds[1],bounds[2], bounds[3]);
                     if(this.map!=null && points.length>1) {
-                        this.polygons.push(points);
-                        this.map.addPolygon("basemap", clonePoints(points), null);
+                        this.addFeature(new MapFeature(source, points));
                     }
                 }
-
             },
             handleDisplayDelete: function(source) {
                 var marker  = this.markers[source];
                 if(marker!=null) {
                     this.map.removeMarker(marker);
                 }
+                var feature = this.findFeature(source, true);
+                if(feature!=null) {
+                    if(feature.line!=null) {
+                        this.map.removePolygon(feature.line);
+                    }
+                }
             },
+            findFeature: function(source, andDelete) {
+                for(var i in this.features) {
+                    var feature = this.features[i];
+                    if(feature.source == source) {
+                        if(andDelete) {
+                            this.features.splice(i,1);
+                        }
+                        return feature;
+                    }
+                }
+                return null;
+            },
+
             handleRecordSelection: function(source, index, record, html) {
                 if(record.hasLocation()) {
                     var latitude = record.getLatitude();
