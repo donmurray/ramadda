@@ -633,6 +633,7 @@ public class MetametaDictionaryTypeHandler extends MetametaDictionaryTypeHandler
      * @throws Exception _more_
      */
     public boolean isPoint(Request request, Entry entry) throws Exception {
+        if(entry == null) return false;
         String type = (String) getEntryValue(entry, INDEX_DICTIONARY_TYPE);
 
         return Misc.equals(type, "datafile");
@@ -649,6 +650,7 @@ public class MetametaDictionaryTypeHandler extends MetametaDictionaryTypeHandler
      * @throws Exception _more_
      */
     public boolean isDatabase(Request request, Entry entry) throws Exception {
+        if(entry == null) return false;
         String type = (String) getEntryValue(entry, INDEX_DICTIONARY_TYPE);
 
         return Misc.equals(type, "database");
@@ -665,6 +667,7 @@ public class MetametaDictionaryTypeHandler extends MetametaDictionaryTypeHandler
      * @throws Exception _more_
      */
     public boolean isEntry(Request request, Entry entry) throws Exception {
+        if(entry == null) return false;
         String type = (String) getEntryValue(entry, INDEX_DICTIONARY_TYPE);
 
         return Misc.equals(type, "entry");
