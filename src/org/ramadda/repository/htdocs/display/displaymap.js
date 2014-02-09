@@ -102,6 +102,7 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             },
 
             handleEntrySelection: function(source, entry, selected) {
+                //                this.super.handleEntrySelection.apply(this, [source,entry,selected]);
                 if(!entry.hasLocation()) {
                     return;
                 }

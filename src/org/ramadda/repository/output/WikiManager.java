@@ -4333,9 +4333,11 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                   + HtmlUtils.quote(mainDivId) + ","
                   + Json.map(topProps, false) + ");\n");
 
+        js.append("var pointDataProps = {entryId:'" + entry.getId() +"'};\n");
+
         propList.add("data");
         propList.add("new  PointData(" + HtmlUtils.quote(name)
-                     + ",  null,null," + HtmlUtils.quote(url) + ")");
+                     + ",  null,null," + HtmlUtils.quote(url) + ",pointDataProps)");
         js.append("displayManager.createDisplay("
                   + HtmlUtils.quote(displayType) + ","
                   + Json.map(propList, false) + ");\n");

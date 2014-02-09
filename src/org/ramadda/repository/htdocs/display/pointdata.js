@@ -46,14 +46,28 @@ function DataCollection() {
 
 function BasePointData(name, properties) {
     if(properties == null) properties = {};
-    $.extend(this, {
-            name : name,
+
+    RamaddaUtil.defineMembers(this, {
             recordFields : null,
-            records : null,
+                records : null,
+                entryId: null,
+                entry: null});
+
+    $.extend(this, properties);
+
+    RamaddaUtil.defineMembers(this, {
+            name : name,
             properties : properties,
             initWith : function(thatPointData) {
                 this.recordFields = thatPointData.recordFields;
                 this.records = thatPointData.records;
+            },
+            getEntry: function() {
+                if(this.entry!=null) {
+                    return this.entry;
+                }
+                this.entry = getEntryManager().getEntry(this.entryId);
+                return this.entry;
             },
             hasData : function() {
                 return this.records!=null;
@@ -125,8 +139,8 @@ recordFields - array of RecordField objects that define the metadata
 data - array of Record objects holding the data
 */
 function PointData(name, recordFields, records, url, properties) {
-    $.extend(this, new  BasePointData(name, properties));
-    $.extend(this, {
+    RamaddaUtil.inherit(this, new  BasePointData(name, properties));
+    RamaddaUtil.defineMembers(this, {
             recordFields : recordFields,
             records : records,
             url : url,

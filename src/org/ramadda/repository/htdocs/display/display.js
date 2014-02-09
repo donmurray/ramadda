@@ -137,6 +137,7 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
             filters: [],
             dataCollection: new DataCollection(),
             selectedCbx: [],
+            entries: [],
             getDisplayManager: function() {
                return this.displayManager;
             },
@@ -153,6 +154,26 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
             setContents: function(contents) {
                 contents = htmlUtil.div(["class","display-contents-inner display-" + this.getType() +"-inner"], contents);
                 $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(contents);
+            },
+            addEntry: function(entry) {
+                this.entries.push(entry);
+            },
+            handleEntrySelection: function(source, entry, selected) {
+                var containsEntry = this.entries.indexOf(entry) >=0;
+                if(!containsEntry) {
+                    return;
+                }
+                if(selected) {
+                    $("#" + this.getDomId(ID_TITLE)).addClass("display-title-select");
+                } else {
+                    $("#" + this.getDomId(ID_TITLE)).removeClass("display-title-select");
+                }
+            },
+            getEntries: function() {
+                return this.entries;
+            },
+            hasEntries: function() {
+                return this.entries.length>0;
             },
             getLoadingMessage: function() {
                 return this.getMessage("&nbsp;Loading...");
@@ -298,18 +319,21 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 return entry;
             },
             createDisplay: function(entryId, displayType) {
-             
-
                 var entry = this.getEntry(entryId);
                 if(entry == null) {
                     console.log("No entry:" + entryId);
                     return null;
                 }
+                //TODO: check for grids, etc
                 var url = root + "/entry/show?entryid=" + entryId +"&output=points.product&product=points.json&numpoints=1000";
+                var pointDataProps = {
+                    entry: entry,
+                    entryId: entry.getId()
+                };
                 var props = {
                         "showMenu": true,
                         "showMap": "false",
-                        "data": new PointData(entry.getName(), null, null, url)
+                        "data": new PointData(entry.getName(), null, null, url,pointDataProps)
                 };
                 if(this.lastDisplay!=null) {
                     props.column = this.lastDisplay.getColumn();
@@ -631,12 +655,16 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                 $("#" + this.getDomId(ID_TITLE)).html(title);
             },
             getTitle: function () {
+                var prefix  = "";
+                if(this.hasEntries()) {
+                    prefix = this.getEntryMenuButton(this.getEntries()[0])+" ";
+                }
                 var title = this.getProperty("title");
                 if(title!=null) {
-                    return title;
+                    return prefix +title;
                 }
                 if(this.dataCollection == null) {
-                    return "";
+                    return prefix;
                 }
                 var dataList =  this.dataCollection.getList();
                 title = "";
@@ -645,7 +673,8 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
                     if(collectionIdx>0) title+="/";
                     title += pointData.getName();
                 }
-                return title;
+
+                return prefix+title;
             },
             getIsLayoutFixed: function() {
                 return this.getProperty(PROP_LAYOUT_HERE,false);
@@ -655,6 +684,12 @@ function RamaddaDisplay(displayManager, id, type, propertiesArg) {
             },
             addData: function(pointData) { 
                 this.dataCollection.addData(pointData);
+                var entry = pointData.getEntry();
+                if(entry!=null) {
+                    this.addEntry(entry);
+                } else {
+                    //console.log("no entry:" + pointData.entryId);
+                }
             },
             //callback from the pointData.loadData call
             pointDataLoaded: function(pointData) {
