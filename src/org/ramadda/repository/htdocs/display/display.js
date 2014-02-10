@@ -137,6 +137,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
     RamaddaUtil.inherit(this,new DisplayThing(argId, argProperties));
 
 
+
     RamaddaUtil.defineMembers(this, {
             type: argType,
             displayManager:argDisplayManager,
@@ -852,7 +853,11 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
     var LAYOUT_COLUMNS = "columns";
     var LAYOUT_ROWS = "rows";
 
-    RamaddaUtil.inherit(this, new RamaddaDisplay(argDisplayManager, argId, argProperties));
+
+    RamaddaUtil.inherit(this, new RamaddaDisplay(argDisplayManager, argId, "group", argProperties));
+
+    RamaddaUtil.defineMembers(this, {
+            layout:this.getProperty(PROP_LAYOUT_TYPE, LAYOUT_TABLE)});
 
 
     RamaddaUtil.defineMembers(this, {
@@ -1015,6 +1020,8 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
 
 
         });
+
+
 }
 
 
