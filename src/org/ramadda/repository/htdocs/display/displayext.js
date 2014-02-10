@@ -29,7 +29,8 @@ function RamaddaExampleDisplay(displayManager, id, properties) {
                 this.initUI();
 
                 //I've been calling back to this display with the following
-                var get = "getRamaddaDisplay('" + this.id +"')";
+                //this returns "getRamaddaDisplay('" + this.getId() +"')";
+                var get = this.getGet();
                 var html =  "<p>";
                 html +=HtmlUtil.onClick(get +".click();", HtmlUtil.div(["id", this.getDomId(ID_CLICK)], "Click me"));
                 html +=  "<p>";

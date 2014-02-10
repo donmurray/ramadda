@@ -109,7 +109,7 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
                 this.initUI();
                 this.stop();
 
-                var get = "getRamaddaDisplay('" + this.id +"')";
+                var get = this.getGet();
                 var html =  "";
                 html+=  HtmlUtil.onClick(get +".setIndex(0);", HtmlUtil.image(this.iconBegin,["title","beginning", "class", "display-animation-button", "xwidth","32"]));
                 html +="  ";

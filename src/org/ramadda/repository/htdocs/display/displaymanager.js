@@ -67,185 +67,21 @@ function getDisplayManager(id) {
     return manager;
 }
 
-function DisplayGroup(id,properties) {
-    var LAYOUT_TABLE = "table";
-    var LAYOUT_TABS = "tabs";
-    var LAYOUT_COLUMNS = "columns";
-    var LAYOUT_ROWS = "rows";
 
-    RamaddaUtil.inherit(this, new DisplayThing(id, properties));
-    RamaddaUtil.defineMembers(this, {
-            displays : [],
-            layout:this.getProperty(PROP_LAYOUT_TYPE, LAYOUT_TABLE),
-            columns:this.getProperty(PROP_LAYOUT_COLUMNS, 1),
-            getPosition:function() {
-                for(var i=0;i<this.displays.length;i++) {
-                    var display  = this.displays[i];
-                    if(display.getPosition) {
-                        return display.getPosition();
-                    }
-                }
-            },
-            getDisplaysToLayout:function() {
-                var result = [];
-                for(var i=0;i<this.displays.length;i++) {
-                    if(this.displays[i].getIsLayoutFixed()) continue;
-                    result.push(this.displays[i]);
-                }
-                return result;
-            },
-            addNewDisplay: function(display) {
-//                display.setDisplayManager(this);
-//                this.addDisplayEventListener(display);
-//                display.loadInitialData();
-                this.displays.push(display);
-                this.doLayout();
-            },
-            removeDisplay:function(display) {
-                var index = this.displays.indexOf(display);
-                if(index >= 0) { 
-                    this.displays.splice(index, 1);
-                }   
-                this.doLayout();
-            },
-            doLayout:function() {
-                var html = "";
-                var colCnt=100;
-                var displaysToLayout = this.getDisplaysToLayout();
-
-                for(var i=0;i<displaysToLayout.length;i++) {
-                    var display = displaysToLayout[i];
-                    if(display.prepareToLayout!=null) {
-                        display.prepareToLayout();
-                    }
-                }
-
-                if(this.layout == LAYOUT_TABLE) {
-                    if(displaysToLayout.length == 1) {
-                        html+= displaysToLayout[0].getHtml();
-                    } else {
-                        var width = Math.round(100/this.columns)+"%";
-                        html+=HtmlUtil.openTag("table", ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "0"]);
-                        for(var i=0;i<displaysToLayout.length;i++) {
-                            colCnt++;
-                            if(colCnt>=this.columns) {
-                                if(i>0) {
-                                    html+= HtmlUtil.closeTag("tr");
-                                }
-                                html+= HtmlUtil.openTag("tr",["valign", "top"]);
-                                colCnt=0;
-                            }
-                            html+=HtmlUtil.tag("td", ["width", width], HtmlUtil.div([], displaysToLayout[i].getHtml()));
-                        }
-                        html+= HtmlUtil.closeTag("tr");
-                        html+= HtmlUtil.closeTag("table");
-                    }
-                } else if(this.layout==LAYOUT_TABS) {
-                    //TODO
-                } else if(this.layout==LAYOUT_ROWS) {
-                    var rows = [];
-                    for(var i=0;i<displaysToLayout.length;i++) {
-                        var display =displaysToLayout[i];
-                        var row = display.getRow();
-                        if((""+row).length==0) row = 0;
-                        while(rows.length<=row) {
-                            rows.push([]);
-                        }
-                        rows[row].push(display.getHtml());
-                    }
-                    for(var i=0;i<rows.length;i++) {
-                        var cols = rows[i];
-                        var width = Math.round(100/cols.length)+"%";
-                        html+=HtmlUtil.openTag("table", ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "0"]);
-                        html+=HtmlUtil.openTag("tr", ["valign","top"]);
-                        for(var col=0;col<cols.length;col++) {
-                            html+=HtmlUtil.tag("td",["width", width], cols[col]);
-                        }
-                        html+= HtmlUtil.closeTag("tr");
-                        html+= HtmlUtil.closeTag("table");
-                    }
-                } else if(this.layout==LAYOUT_COLUMNS) {
-                    var cols = [];
-                    var weights = [];
-                    for(var i=0;i<displaysToLayout.length;i++) {
-                        var display =displaysToLayout[i];
-                        var column = display.getColumn();
-                        if((""+column).length==0) column = 0;
-                        while(cols.length<=column) {
-                            cols.push([]);
-                            weights.push(0);
-                        }
-                        cols[column].push(display.getHtml());
-                    }
-                    html+=HtmlUtil.openTag("table", ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "0"]);
-                    html+=HtmlUtil.openTag("tr", ["valign","top"]);
-                    var width = Math.round(100/cols.length)+"%";
-                    for(var i=0;i<cols.length;i++) {
-                        var rows = cols[i];
-                        var contents = "";
-                        for(var j=0;j<rows.length;j++) {
-                            contents+= rows[j];
-                        }
-                        html+=HtmlUtil.tag("td", ["width", width, "valign","top"], contents);
-                    }
-                    html+= HtmlUtil.closeTag("tr");
-                    html+= HtmlUtil.closeTag("table");
-                } else {
-                    html+="Unknown layout:" + this.layout;
-                }
-                $("#" + this.getDomId(ID_DISPLAYS)).html(html);
-
-
-                this.initDisplay();
-
-            },
-            initDisplay: function() {
-                for(var i=0;i<this.displays.length;i++) {
-                    this.displays[i].initDisplay();
-                }
-            },
-            setLayout:function(layout, columns) {
-                this.layout  = layout;
-                if(columns) {
-                    this.columns  = columns;
-                }
-                this.doLayout();
-            },
-            moveDisplayUp: function(display) {
-                var index = this.displays.indexOf(display);
-                if(index <= 0) { 
-                    return;
-                }
-                this.displays.splice(index, 1);
-                this.displays.splice(index-1, 0,display);
-                this.doLayout();
-            },
-            moveDisplayDown: function(display) {
-                var index = this.displays.indexOf(display);
-                if(index >=this.displays.length) { 
-                    return;
-                }
-                this.displays.splice(index, 1);
-                this.displays.splice(index+1, 0,display);
-                this.doLayout();
-           },
-
-
-        });
-}
 
 
 //
 //DisplayManager constructor
 //id should correspond to a DOM element id
+//
 
-function DisplayManager(id,properties) {
-    RamaddaUtil.inherit(this, new DisplayGroup(id, properties));
+function DisplayManager(argId,argProperties) {
+    RamaddaUtil.inherit(this, new DisplayThing(argId, argProperties));
     RamaddaUtil.defineMembers(this, {
                 dataList : [],
                 displayTypes: [],
-                cnt : 0,
                 eventListeners: [],
+                group: new DisplayGroup(this, argId),
                 showmap : this.getProperty(PROP_SHOW_MAP,null),
                 initMapBounds : null,
                 });
@@ -259,6 +95,9 @@ function DisplayManager(id,properties) {
    RamaddaUtil.defineMembers(this, {
            addDisplayType: function(type,label) {
                this.displayTypes.push({type:label});
+           },
+           getLayoutManager: function () {
+               return this.group;
            },
            getData: function() {
                return this.dataList;
@@ -351,6 +190,7 @@ function DisplayManager(id,properties) {
                 }
                 //How else do I refer to this object in the html that I add 
                 var get = "getDisplayManager('" + this.getId() +"')";
+                var layout = "getDisplayManager('" + this.getId() +"').getLayoutManager()";
                 var html = "";
                 var newMenu = "";
                 for(var i=0;i<this.displayTypes.length;i++) {
@@ -360,12 +200,12 @@ function DisplayManager(id,properties) {
                 }
 
                 var layoutMenu = 
-                    HtmlUtil.tag("li",[], HtmlUtil.onClick(get +".setLayout('table',1);", "Table - 1 column")) +"\n" +
-                    HtmlUtil.tag("li",[], HtmlUtil.onClick(get +".setLayout('table',2);", "Table - 2 column")) +"\n" +
-                    HtmlUtil.tag("li",[], HtmlUtil.onClick(get +".setLayout('table',3);", "Table - 3 column")) +"\n" +
-                    HtmlUtil.tag("li",[], HtmlUtil.onClick(get +".setLayout('rows');", "Rows")) +"\n" +
-                    HtmlUtil.tag("li",[], HtmlUtil.onClick(get +".setLayout('columns');", "Columns")) +"\n" +
-                    HtmlUtil.tag("li",[], HtmlUtil.onClick(get +".setLayout('tabs');", "Tabs"));
+                    HtmlUtil.tag("li",[], HtmlUtil.onClick(layout +".setLayout('table',1);", "Table - 1 column")) +"\n" +
+                    HtmlUtil.tag("li",[], HtmlUtil.onClick(layout +".setLayout('table',2);", "Table - 2 column")) +"\n" +
+                    HtmlUtil.tag("li",[], HtmlUtil.onClick(layout +".setLayout('table',3);", "Table - 3 column")) +"\n" +
+                    HtmlUtil.tag("li",[], HtmlUtil.onClick(layout +".setLayout('rows');", "Rows")) +"\n" +
+                    HtmlUtil.tag("li",[], HtmlUtil.onClick(layout +".setLayout('columns');", "Columns")) +"\n" +
+                    HtmlUtil.tag("li",[], HtmlUtil.onClick(layout +".setLayout('tabs');", "Tabs"));
 
 
                 var menu = HtmlUtil.div(["class","ramadda-popup", "id", this.getDomId(ID_MENU_OUTER)], 
@@ -419,7 +259,10 @@ function DisplayManager(id,properties) {
                 }
                 return null;
             },
-            createDisplay: function(type, props) {
+           layoutChanged: function(display) {
+               this.doLayout();
+           },
+           createDisplay: function(type, props) {
                 if(props == null) props ={};
                 if(props.data!=null) {
                     var haveItAlready = false;
@@ -459,8 +302,7 @@ function DisplayManager(id,properties) {
                     alert("Error: could not find display function:" + type);
                     return;
                 }
-                var displayId = this.id +"_display_" + (this.cnt++);
-
+                var displayId = this.getUniqueId("display");
                 if(props.data==null && this.dataList.length>0) {
                     props.data =  this.dataList[0];
                 }
@@ -470,14 +312,14 @@ function DisplayManager(id,properties) {
                     alert("Error: could not create display using:" + funcName);
                     return;
                 }
-                this.addNewDisplay(display);
+                this.addDisplay(display);
                 return display;
             },
-            addNewDisplay: function(display) {
+            addDisplay: function(display) {
                 display.setDisplayManager(this);
                 this.addDisplayEventListener(display);
                 display.loadInitialData();
-                this.super.addNewDisplay.apply(this, [display]);
+                this.getLayoutManager().addDisplay(display);
             },
             removeDisplay:function(display) {
                 for(var i=0;i< this.eventListeners.length;i++) {
@@ -486,7 +328,7 @@ function DisplayManager(id,properties) {
                         eventListener.handleDisplayDelete(display);
                     }
                 }
-                this.super.removeDisplay.apply(this,[display]);
+                this.getLayoutManager().removeDisplay(display);
             },
             pointDataLoaded: function(source, pointData) {
                 for(var i=0;i< this.eventListeners.length;i++) {
