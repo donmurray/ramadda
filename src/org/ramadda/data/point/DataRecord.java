@@ -188,8 +188,8 @@ public class DataRecord extends PointRecord {
 
                 continue;
             }
-            String casedName = field.getName();
-            String name      = casedName.toLowerCase();
+            String name = field.getName();
+            String lowerCaseName      = name.toLowerCase();
 
             if (field.getIsDate()) {
                 dateIndex = fieldIdx + 1;
@@ -201,7 +201,7 @@ public class DataRecord extends PointRecord {
             for (int timeIdx = 0; timeIdx < timeFields.length; timeIdx++) {
                 boolean gotOne = false;
                 for (String timeFieldName : timeFields[timeIdx]) {
-                    if (casedName.equals(timeFieldName)) {
+                    if (lowerCaseName.equals(timeFieldName)) {
                         gotDateFields          = true;
                         ymdhmsIndices[timeIdx] = fieldIdx + 1;
                         gotOne                 = true;
@@ -213,40 +213,40 @@ public class DataRecord extends PointRecord {
                     break;
                 }
             }
-            if ((latField != null) && latField.equalsIgnoreCase(name)) {
+            if ((latField != null) && latField.equalsIgnoreCase(lowerCaseName)) {
                 idxY = fieldIdx;
 
                 continue;
             }
-            if ((lonField != null) && lonField.equalsIgnoreCase(name)) {
+            if ((lonField != null) && lonField.equalsIgnoreCase(lowerCaseName)) {
                 idxX = fieldIdx;
 
                 continue;
             }
 
-            if (name.equals("x")) {
+            if (lowerCaseName.equals("x")) {
                 if (idxX == -1) {
                     idxX = fieldIdx;
                 }
-            } else if (name.equals("longitude") || name.equals("long")
-                       || name.equals("lon")) {
+            } else if (lowerCaseName.equals("longitude") || lowerCaseName.equals("long")
+                       || lowerCaseName.equals("lon")) {
                 if ( !seenLon) {
                     idxX    = fieldIdx;
                     seenLon = true;
                 }
-            } else if (name.equals("y")) {
+            } else if (lowerCaseName.equals("y")) {
                 if (idxY == -1) {
                     idxY = fieldIdx;
                 }
 
-            } else if (name.equals("latitude") || name.equals("lat")) {
+            } else if (lowerCaseName.equals("latitude") || lowerCaseName.equals("lat")) {
                 if ( !seenLat) {
                     idxY    = fieldIdx;
                     seenLat = true;
                 }
-            } else if (name.equals("z") || name.equals("altitude")
-                       || name.equals("elevation") || name.equals("elev")
-                       || name.equals("alt")) {
+            } else if (lowerCaseName.equals("z") || lowerCaseName.equals("altitude")
+                       || lowerCaseName.equals("elevation") || lowerCaseName.equals("elev")
+                       || lowerCaseName.equals("alt")) {
                 if (idxZ == -1) {
                     idxZ = fieldIdx;
                 }
