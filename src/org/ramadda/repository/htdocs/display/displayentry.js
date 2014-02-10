@@ -71,18 +71,24 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
     this.showMetadata = (""+this.showMetadata) == "true";
 
     var metadataTypesAttr= this.getProperty("metadataTypes","enum_tag:Tag");
+    //look for type:value:label, or type:label,
     var toks  = metadataTypesAttr.split(",");
     for(var i in toks) {
         var type = toks[i];
         var label = type;
+        var value = null;
         var subToks  = type.split(":");
         if(subToks.length>1) {
             type = subToks[0];
-            label  = subToks[1];
+            if(subToks.length>=3) {
+                value = subToks[1];
+                label  = subToks[2];
+            } else {
+                label  = subToks[1];
+            }
         }
-        this.metadataTypeList.push(new MetadataType(type, label));
+        this.metadataTypeList.push(new MetadataType(type, label,value));
     }
-    
 
     addRamaddaDisplay(this);
     RamaddaUtil.defineMembers(this, {
@@ -184,9 +190,12 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 this.settings.metadata = [];
                 for(var i in this.metadataTypeList) {
                     var metadataType  = this.metadataTypeList[i];
-                    var metadata = this.getFieldValue(this.getMetadataFieldId(metadataType), null);
-                    if(metadata!=null) {
-                        this.settings.metadata.push({type:metadataType.getType(),value:metadata});
+                    var value = metadataType.getValue();
+                    if(value == null) {
+                        value = this.getFieldValue(this.getMetadataFieldId(metadataType), null);
+                    }
+                    if(value!=null) {
+                        this.settings.metadata.push({type:metadataType.getType(),value:value});
                     }
                 }
 
@@ -219,10 +228,16 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 if(this.showMetadata) {
                     for(var i in this.metadataTypeList) {
                         var type  = this.metadataTypeList[i];
-                        var metadataSelect= HtmlUtil.tag("select",["id", this.getMetadataFieldId(type),
+                        var value = type.getValue();
+                        var metadataSelect;
+                        if(value!=null) {
+                            metadataSelect= value;
+                        } else {
+                            metadataSelect= HtmlUtil.tag("select",["id", this.getMetadataFieldId(type),
                                                                    "class","display-metadatalist"],
                                                          HtmlUtil.tag("option",["title","","value",""],
                                                                       NONE));
+                        }
                         html+= HtmlUtil.formEntry(type.getLabel() +":", metadataSelect);
                     }
                 }
@@ -429,7 +444,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                                 theDisplay.getDisplayManager().handleEntrySelection(theDisplay, entry, false);
                             }
                         },
-
+                            
                     });
             }
         });

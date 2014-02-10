@@ -81,7 +81,7 @@ function DisplayManager(argId,argProperties) {
                 dataList : [],
                 displayTypes: [],
                 eventListeners: [],
-                group: new DisplayGroup(this, argId),
+                group: new DisplayGroup(this, argId,argProperties),
                 showmap : this.getProperty(PROP_SHOW_MAP,null),
                 initMapBounds : null,
                 });

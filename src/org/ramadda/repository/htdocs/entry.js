@@ -125,11 +125,12 @@ function createEntriesFromJson(data) {
 }
 
 
-function MetadataType(type, label) {
-    $.extend(this, {type:type,label:label});
+function MetadataType(type, label,value) {
+    $.extend(this, {type:type,label:label,value:value});
     $.extend(this, {
             getType: function() {return this.type;},
-            getLabel: function() {if(this.label!=null) return this.label; return this.type;}
+            getLabel: function() {if(this.label!=null) return this.label; return this.type;},
+            getValue: function() {return this.value;},
         });
 }
 
