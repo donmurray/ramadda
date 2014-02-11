@@ -167,7 +167,13 @@ public class CsvFile extends TextFile {
         if (fieldString == null) {
             doQuickVisit();
             fieldString = getProperty(PROP_FIELDS, null);
+        } else {
+            //Read the header because there are properties
+            if(getProperty(PROP_HEADER_STANDARD, false)) {
+                doQuickVisit();
+            }
         }
+
 
         if (fieldString == null) {
             setIsHeaderStandard(true);

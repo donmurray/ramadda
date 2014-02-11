@@ -444,6 +444,11 @@ public abstract class RecordFile {
     }
 
 
+    public boolean getProperty(String prop, boolean dflt) {
+        return getProperty(prop, ""+dflt).equals("true");
+    }
+
+
     /**
      * _more_
      *

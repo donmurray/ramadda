@@ -983,8 +983,8 @@ public abstract class PointFile extends RecordFile implements Cloneable,  Fields
                                               pattern);
                     if (patternMatch == null) {
                         throw new IllegalArgumentException(
-                            "No match. pattern=" + pattern + " field="
-                            + field);
+                            "No match.\nPattern:" + pattern + "\nField:"
+                            + field+"\nHeader:" + header);
                     }
 
                     if (name.equalsIgnoreCase(FIELD_LATITUDE)

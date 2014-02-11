@@ -85,6 +85,8 @@ public abstract class TextFile extends PointFile  {
     /** _more_ */
     public static final String PROP_HEADER_DELIMITER = "header.delimiter";
 
+    public static final String PROP_HEADER_STANDARD = "header.standard";
+
     /** _more_ */
     public static final String PROP_DELIMITER = "delimiter";
 
@@ -348,6 +350,9 @@ public abstract class TextFile extends PointFile  {
 
         boolean haveReadHeader  = headerLines.size() > 0;
         String  headerDelimiter = getHeaderDelimiter();
+        boolean isStandard = getProperty(PROP_HEADER_STANDARD, false);
+
+
         if (headerDelimiter != null) {
             boolean starts = headerDelimiter.startsWith("starts:");
             if (starts) {
@@ -375,7 +380,7 @@ public abstract class TextFile extends PointFile  {
                         "Reading way too many header lines");
                 }
             }
-        } else if (isHeaderStandard()) {
+        } else if (isStandard || isHeaderStandard()) {
             while (true) {
                 String line = visitInfo.getRecordIO().readLine();
                 if (line == null) {
@@ -385,14 +390,10 @@ public abstract class TextFile extends PointFile  {
                 if (line.length() == 0) {
                     break;
                 }
-
                 if ( !isHeaderLine(line)) {
                     firstDataLine = line;
-
                     break;
                 }
-
-
                 if ( !haveReadHeader) {
                     headerLines.add(line);
                     line = line.substring(1);

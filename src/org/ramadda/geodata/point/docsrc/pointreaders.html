@@ -38,6 +38,24 @@ The point data plugin is in:
 
 
 
+<h2>PBO H20</h2>
+
+
+The <a href=" http://xenon.colorado.edu/portal">PBO H2O Data Portal</a> 
+provides a model load CSV file.
+
+[importcsv data/vert_gldas.csv]
+
+This can be ingested without just the following properties file.
+The data file has latitude, longitude and elevation in the header. To use these 
+we define a "pattern" attribute for these fields.
+
+
+[importcsv data/vert_gldas.csv.properties]
+
+
+
+
 <h2>AMRC Text Files</h2>
 We're going to look at meteorological data from 
 the Antarctic Meteorology Research Center (AMRC). 
