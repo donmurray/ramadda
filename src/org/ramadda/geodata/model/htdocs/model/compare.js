@@ -1,9 +1,10 @@
 
 
-function CollectionForm(formId) {
+function CollectionForm(formId, type) {
     //Look at the bottom of this ctor for the init call
     this.formId = formId;
-    this.analysisUrl = "${urlroot}/model/compare?";
+    var api = "/model/"+type;
+    this.analysisUrl = "${urlroot}"+api+"?";
 
     //We'll call this at the bottom
     this.init = function() {
@@ -27,7 +28,7 @@ function CollectionForm(formId) {
         var collectionId  =  t.val();
         
         //If they had one selected 
-        if(collectionId!="") {
+        if(collectionId != null && collectionId !== "") {
             //            alert("updating fields:" + collectionId);
             this.updateFields(collection,  collectionId, 0, true);
         }

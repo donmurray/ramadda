@@ -67,7 +67,7 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
                                           CdmDataOutputHandler.ARG_LEVEL);
         }
 
-        //addStatsWidget(request, sb);
+        addStatsWidget(request, sb);
 
         getOutputHandler().addTimeWidget(request, sb, dataset, true);
 
@@ -123,14 +123,13 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
      * @param sb       the HTML
      */
     public void addStatsWidget(Request request, StringBuffer sb) {
-        sb.append(HtmlUtils.hidden(CDOOutputHandler.ARG_CDO_PERIOD,
-                                   CDOOutputHandler.PERIOD_YEAR));
         sb.append(
             HtmlUtils.formEntry(
                 Repository.msgLabel("Statistic"),
-                HtmlUtils.select(
-                    CDOOutputHandler.ARG_CDO_STAT,
-                    CDOOutputHandler.STAT_TYPES)));
+                HtmlUtils.radio( CDOOutputHandler.ARG_CDO_STAT,
+                    CDOOutputHandler.STAT_MEAN, true)+Repository.msg("Mean")+HtmlUtils.space(2)+
+                    HtmlUtils.radio(CDOOutputHandler.ARG_CDO_STAT, CDOOutputHandler.STAT_ANOM, false)
+                    +Repository.msg("Anomaly")));
     }
 
     /**

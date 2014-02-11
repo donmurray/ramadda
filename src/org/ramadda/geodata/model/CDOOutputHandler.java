@@ -103,11 +103,14 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
     /** end month identifier */
     public static final String ARG_CDO_ENDMONTH = ARG_CDO_PREFIX + "endmonth";
 
-    /** start month identifier */
+    /** end month identifier */
+    public static final String ARG_CDO_MONTHS = ARG_CDO_PREFIX + "months";
+
+    /** start year identifier */
     public static final String ARG_CDO_STARTYEAR = ARG_CDO_PREFIX
                                                    + "startyear";
 
-    /** end month identifier */
+    /** end year identifier */
     public static final String ARG_CDO_ENDYEAR = ARG_CDO_PREFIX + "endyear";
 
     /** variable identifier */
@@ -725,9 +728,13 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
         sb.append(
             HtmlUtils.formEntry(
                 msgLabel("Months"),
+                HtmlUtils.radio(ARG_CDO_MONTHS, "all", true)+msg("All")+
+                HtmlUtils.space(2)+
+                HtmlUtils.radio(ARG_CDO_MONTHS, "", false)+msg("Season")+
+                HtmlUtils.space(2)+
                 msgLabel("Start")
                 + HtmlUtils.select(ARG_CDO_STARTMONTH, MONTHS)
-                + HtmlUtils.space(3) + msgLabel("End")
+                + HtmlUtils.space(1) + msgLabel("End")
                 + HtmlUtils.select(
                     ARG_CDO_ENDMONTH, MONTHS,
                     MONTHS.get(MONTHS.size() - 1).getId().toString())));
@@ -766,9 +773,9 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
             HtmlUtils.formEntry(
                 msgLabel("Years"),
                 msgLabel("Start")
-                + HtmlUtils.select(ARG_CDO_STARTYEAR, years)
+                + HtmlUtils.select(ARG_CDO_STARTYEAR, years, years.get(0))
                 + HtmlUtils.space(3) + msgLabel("End")
-                + HtmlUtils.select(ARG_CDO_ENDYEAR, years)));
+                + HtmlUtils.select(ARG_CDO_ENDYEAR, years, years.get(years.size()-1))));
     }
 
     /**
@@ -1062,6 +1069,10 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
                                        List<String> commands)
             throws Exception {
 
+        if (request.defined(ARG_CDO_MONTHS) && 
+                request.getString(ARG_CDO_MONTHS).equalsIgnoreCase("all")) { 
+            return;
+        }
         if (request.defined(ARG_CDO_STARTMONTH)
                 || request.defined(ARG_CDO_ENDMONTH)) {
             int          startMonth = request.defined(ARG_CDO_STARTMONTH)

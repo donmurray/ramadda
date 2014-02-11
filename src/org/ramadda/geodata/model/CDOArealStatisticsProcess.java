@@ -300,14 +300,19 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         String yearNum = (opNum == 0)
                          ? ""
                          : String.valueOf(opNum + 1);
-
-        int startMonth = request.defined(CDOOutputHandler.ARG_CDO_STARTMONTH)
+        int startMonth, endMonth;
+        if (request.getString(CDOOutputHandler.ARG_CDO_MONTHS).equalsIgnoreCase("all")) {
+            startMonth = 1;
+            endMonth=12;
+        } else {
+            startMonth = request.defined(CDOOutputHandler.ARG_CDO_STARTMONTH)
                          ? request.get(CDOOutputHandler.ARG_CDO_STARTMONTH, 1)
                          : 1;
-        int endMonth = request.defined(CDOOutputHandler.ARG_CDO_ENDMONTH)
+            endMonth = request.defined(CDOOutputHandler.ARG_CDO_ENDMONTH)
                        ? request.get(CDOOutputHandler.ARG_CDO_ENDMONTH,
                                      startMonth)
                        : startMonth;
+        }
         if (startMonth == endMonth) {
             outputName.append(MONTHS[startMonth - 1]);
         } else {

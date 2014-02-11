@@ -261,8 +261,9 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         return new Result(entryUrl);
     }
+    
     /**
-     * Do the compare
+     * Make the time series
      *
      * @param request  the Request
      * @param dpi   the input
@@ -275,7 +276,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             throws Exception {
 
         //This finds the selected processes
-        List<DataProcess> processesToRun = getDataProcesses(request, ARG_ACTION_COMPARE);
+        List<DataProcess> processesToRun = getDataProcesses(request, ARG_ACTION_TIMESERIES);
 
         //This is the dir under <home>/process
         File processDir = null;
@@ -379,6 +380,31 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         return new Result(entryUrl);
     }
 
+    /**
+     * handle the plot comparison request
+     *
+     * @param request request
+     *
+     * @return result
+     *
+     * @throws Exception on badness
+     */
+    public Result processCompareRequest(Request request) throws Exception {
+        return handleRequest(request, ARG_ACTION_COMPARE);
+    }
+
+    /**
+     * handle the time series request
+     *
+     * @param request request
+     *
+     * @return result
+     *
+     * @throws Exception on badness
+     */
+    public Result processTimeSeriesRequest(Request request) throws Exception {
+        return handleRequest(request, ARG_ACTION_TIMESERIES);
+    }
 
     /**
      * handle the request
@@ -389,9 +415,9 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
      *
      * @throws Exception on badness
      */
-    public Result processCompareRequest(Request request) throws Exception {
+    public Result handleRequest(Request request, String type) throws Exception {
 
-        if (getDataProcesses(request, ARG_ACTION_COMPARE).isEmpty()) {
+        if (getDataProcesses(request, type).isEmpty()) {
             throw new RuntimeException(
                 "Data processes for model comparison are not configured.");
         }
@@ -424,7 +450,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         //If we are searching or comparing then find the selected entries
         if (request.exists(ARG_ACTION_SEARCH)
-                || request.exists(ARG_ACTION_COMPARE)) {
+                || request.exists(type)) {
             int collectionCnt = 0;
             for (String collection : new String[] { ARG_COLLECTION1,
                     ARG_COLLECTION2 }) {
@@ -493,10 +519,14 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         StringBuffer     sb  = new StringBuffer();
         DataProcessInput dpi = new DataProcessInput(processDir, operands);
 
-        if (request.exists(ARG_ACTION_COMPARE)) {
+        if (request.exists(type)) {
             if (hasOperands) {
                 try {
-                    return doCompare(request, dpi);
+                    if (type.equals(ARG_ACTION_COMPARE)) {
+                       return doCompare(request, dpi);
+                    } else {
+                       return makeTimeSeries(request, dpi);
+                    }
                 } catch (Exception exc) {
                     sb.append(
                         getPageHandler().showDialogError(
@@ -525,7 +555,11 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         sb.append(HtmlUtils.importJS(fileUrl("/model/compare.js")));
 
-        sb.append(HtmlUtils.form(getCompareUrlPath()));
+        if (type.equals(ARG_ACTION_COMPARE)) {
+            sb.append(HtmlUtils.form(getCompareUrlPath()));
+        } else {
+            sb.append(HtmlUtils.form(getTimeSeriesUrlPath()));
+        }
 
         List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
         tfos.add(new TwoFacedObject("Select Climate Collection", ""));
@@ -538,10 +572,16 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             new StringBuffer("\n//collection form initialization\n");
         js.append("var " + formId + " = new "
                   + HtmlUtils.call("CollectionForm",
-                                   HtmlUtils.squote(formId)));
-        sb.append(HtmlUtils.h2("Climate Model Comparison"));
-        sb.append(
+                                   HtmlUtils.squote(formId), HtmlUtils.squote("compare")));
+        if (type.equals(ARG_ACTION_COMPARE)) {
+            sb.append(HtmlUtils.h2("Climate Model Comparison"));
+            sb.append(
             "Plot monthly maps from different climate model datasets as well as differences between datasets.");
+        } else {
+            sb.append(HtmlUtils.h2("Climate Model Time Series"));
+            sb.append(
+            "Plot monthly time series from different climate model datasets.");
+        }
 
         if (fixedCollection != null) {
             sb.append(HtmlUtils.p());
@@ -664,7 +704,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             List<String>      processTitles = new ArrayList<String>();
 
             boolean           first         = true;
-            List<DataProcess> processes     = getDataProcesses(request, ARG_ACTION_COMPARE);
+            List<DataProcess> processes     = getDataProcesses(request, type);
             for (DataProcess process : processes) {
                 StringBuffer tmpSB = new StringBuffer();
                 if (processes.size() > 1) {
@@ -707,334 +747,19 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 sb.append("</div> <!-- shadow-box -->");
             }
             sb.append(HtmlUtils.p());
-            sb.append(HtmlUtils.submit("Make Plot", ARG_ACTION_COMPARE,
-                                       HtmlUtils.id(formId + ".submit")
-                                       + makeButtonSubmitDialog(sb,
-                                           msg("Making Plot, Please Wait")
-                                           + "...")));
-
-            sb.append("</td>");
-        }
-        sb.append("\n</tr></table>");
-
-
-        sb.append("\n");
-        sb.append(HtmlUtils.script(js.toString()));
-        sb.append("\n");
-
-        sb.append(HtmlUtils.formClose());
-
-
-
-
-
-        return new Result("Climate Model Comparison", sb);
-
-
-    }
-
-    /**
-     * handle the request
-     *
-     * @param request request
-     *
-     * @return result
-     *
-     * @throws Exception on badness
-     */
-    public Result processTimeSeriesRequest(Request request) throws Exception {
-
-        if (getDataProcesses(request, ARG_ACTION_TIMESERIES).isEmpty()) {
-            throw new RuntimeException(
-                "Data processes for model comparison are not configured.");
-        }
-
-        String fixedCollectionId = request.getString(ARG_COLLECTION,
-                                       (String) null);
-        Entry fixedCollection = null;
-
-        if (fixedCollectionId != null) {
-            //            System.err.println ("Have fixed collection:" + fixedCollectionId);
-        }
-
-        if (fixedCollectionId != null) {
-            request.put(ARG_COLLECTION1, fixedCollectionId);
-        }
-
-
-        String json = request.getString("json", (String) null);
-        if (json != null) {
-            return processJsonRequest(request, json);
-        }
-
-        Hashtable<String, StringBuffer> extra = new Hashtable<String,
-                                                    StringBuffer>();
-        List<DataProcessOperand> operands =
-            new ArrayList<DataProcessOperand>();
-
-        File processDir = getStorageManager().createProcessDir();
-        String collection = ARG_COLLECTION1;
-
-        //If we are searching or comparing then find the selected entries
-        if (request.exists(ARG_ACTION_SEARCH)
-                || request.exists(ARG_ACTION_TIMESERIES)) {
-                StringBuffer tmp = new StringBuffer();
-                extra.put(collection, tmp);
-                String selectArg = getCollectionSelectArg(collection);
-                Entry collectionEntry = getEntryManager().getEntry(request,
-                                            request.getString(selectArg, ""));
-                //                System.err.println("collectionEntry:" + collectionEntry+" select: " +
-                //                                    request.getString(selectArg,""));
-
-                if (collectionEntry == null) {
-                    tmp.append("No collection");
-                }
-                List<Entry> entries = findEntries(request, collection,
-                                          collectionEntry, 0);
-                if (entries.isEmpty()) {
-                    if (operands.isEmpty()) {
-                        tmp.append(
-                            getPageHandler().showDialogError(
-                                "You need to select all fields"));
-                    }
-
-                }
-                operands.add(new DataProcessOperand(entries.get(0).getName(),
-                        entries));
-
-                tmp.append(
-                    "<div style=\" margin-bottom:2px;  margin-top:2px; max-height: 150px; overflow-y: auto\">");
-                if ( !request.defined(ARG_COLLECTION)) {
-                    tmp.append(getEntryManager().getEntryLink(request,
-                            collectionEntry));
-                }
-                tmp.append("<ul>");
-                for (Entry granule : entries) {
-                    tmp.append("<li>");
-                    tmp.append(getEntryManager().getEntryLink(request,
-                            granule));
-                }
-                tmp.append("</ul>");
-                tmp.append("</div>");
-        }
-
-
-        //Check to see if we at least 1 operand 
-        boolean hasOperands = false;
-        if (operands.size() >= 1) {
-            hasOperands = (operands.get(0).getEntries().size() > 0)
-                          || (operands.get(1).getEntries().size() > 0);
-        }
-
-        if ((fixedCollectionId != null) && (fixedCollection == null)) {
-            fixedCollection = getEntryManager().getEntry(request,
-                    fixedCollectionId);
-            //            System.err.println("got it:" + fixedCollection);
-        }
-
-
-
-        StringBuffer     sb  = new StringBuffer();
-        DataProcessInput dpi = new DataProcessInput(processDir, operands);
-
-        if (request.exists(ARG_ACTION_TIMESERIES)) {
-            if (hasOperands) {
-                try {
-                    return makeTimeSeries(request, dpi);
-                } catch (Exception exc) {
-                    sb.append(
-                        getPageHandler().showDialogError(
-                            "An error occurred:<br>" + exc.getMessage()));
-                }
+            if (type.equals(ARG_ACTION_COMPARE)) {
+                sb.append(HtmlUtils.submit("Make Plot", ARG_ACTION_COMPARE,
+                                           HtmlUtils.id(formId + ".submit")
+                                           + makeButtonSubmitDialog(sb,
+                                               msg("Making Plot, Please Wait")
+                                               + "...")));
             } else {
-                sb.append(
-                    getPageHandler().showDialogWarning("No fields selected"));
+                sb.append(HtmlUtils.submit("Make Time Series", ARG_ACTION_TIMESERIES,
+                                           HtmlUtils.id(formId + ".submit")
+                                           + makeButtonSubmitDialog(sb,
+                                               msg("Making Time Series, Please Wait")
+                                               + "...")));
             }
-        }
-
-
-
-        ClimateCollectionTypeHandler typeHandler = getTypeHandler();
-        List<Entry>                  collections = getCollections(request);
-        if (collections.size() == 0) {
-            return new Result(
-                "Climate Model Time Series",
-                new StringBuffer(
-                    getPageHandler().showDialogWarning(
-                        msg("No climate collections found"))));
-        }
-
-        String formId = "selectform" + HtmlUtils.blockCnt++;
-        sb.append(HtmlUtils.comment("collection form"));
-
-        sb.append(HtmlUtils.importJS(fileUrl("/model/compare.js")));
-
-        sb.append(HtmlUtils.form(getCompareUrlPath()));
-
-        List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
-        tfos.add(new TwoFacedObject("Select Climate Collection", ""));
-        for (Entry collect : collections) {
-            tfos.add(new TwoFacedObject(collect.getLabel(),
-                                        collect.getId()));
-        }
-
-        StringBuffer js =
-            new StringBuffer("\n//collection form initialization\n");
-        js.append("var " + formId + " = new "
-                  + HtmlUtils.call("CollectionForm",
-                                   HtmlUtils.squote(formId)));
-        sb.append(HtmlUtils.h2("Climate Model Time Series"));
-        sb.append(
-            "Plot time series from different climate model datasets.");
-
-        if (fixedCollection != null) {
-            sb.append(HtmlUtils.p());
-            sb.append(HtmlUtils.h2(msg("Collection: "
-                                       + fixedCollection.getName())));
-            sb.append(HtmlUtils.hidden(ARG_COLLECTION,
-                                       fixedCollection.getId()));
-        }
-
-        sb.append(
-            "<table width=\"810px\"><tr valign=\"top\" align=\"left\">\n");
-        sb.append(HtmlUtils.open("td", "width=\"400px\"") + "\n");
-        sb.append(header(msg("Select Data")));
-
-        int          collectionNumber = 0;
-
-
-
-        List<String> datasets         = new ArrayList<String>(2);
-        List<String> datasetTitles    = new ArrayList<String>(2);
-        
-        StringBuffer dsb = new StringBuffer();
-        dsb.append(HtmlUtils.formTable());
-        datasetTitles.add("Dataset 1");
-        String arg = getCollectionSelectArg(collection);
-        String id  = getCollectionSelectId(formId, collection);
-        if (fixedCollection != null) {
-            dsb.append("\n");
-            dsb.append(HtmlUtils.hidden(arg, fixedCollection.getId(),
-                                        HtmlUtils.id(id)));
-            dsb.append(HtmlUtils.comment("test test"));
-        } else {
-            String collectionWidget = HtmlUtils.select(arg, tfos,
-                                          request.getString(arg, ""),
-                                          HtmlUtils.id(id));
-            dsb.append(HtmlUtils.formEntry(msgLabel("Collection"),
-                    collectionWidget));
-        }
-
-        Entry        entry   = collections.get(0);
-        List<Column> columns = typeHandler.getGranuleColumns();
-        for (int fieldIdx = 0; fieldIdx < columns.size(); fieldIdx++) {
-            Column column = columns.get(fieldIdx);
-            //String key = "values::" + entry.getId()+"::" +column.getName();
-            List values = new ArrayList();
-            values.add(new TwoFacedObject("--", ""));
-            arg = getFieldSelectArg(collection, fieldIdx);
-            String selectedValue = request.getString(arg, "");
-            if (Utils.stringDefined(selectedValue)) {
-                values.add(selectedValue);
-            }
-            dsb.append("\n");
-            String selectBox =
-                HtmlUtils.select(
-                    arg, values, selectedValue,
-                    " style=\"max-width:250px;min-width:250px;\" "
-                    + HtmlUtils.attr(
-                        "id",
-                        getFieldSelectId(
-                            formId, collection, fieldIdx)));
-            dsb.append(
-                HtmlUtils.formEntry(
-                    msgLabel(column.getLabel()), selectBox));
-            dsb.append("\n");
-            dsb.append(HtmlUtils.formTableClose());
-
-            StringBuffer results = extra.get(collection);
-            if (results != null) {
-                dsb.append(results.toString());
-            }
-
-
-            datasets.add(dsb.toString());
-        }
-
-        sb.append(OutputHandler.makeTabs(datasetTitles, datasets, true,
-                                         false));
-        sb.append(HtmlUtils.p());
-
-
-        if ( !hasOperands) {
-            sb.append(HtmlUtils.submit("Select Data", ARG_ACTION_SEARCH,
-                                       HtmlUtils.id(formId + ".submit")
-                                       + makeButtonSubmitDialog(sb,
-                                           msg("Searching for data")
-                                           + "...")));
-            sb.append("</td>\n");
-            // add an empty cell to keep the other in line
-            sb.append("<td width=\"400px\">&nbsp;</td>");
-        } else {
-            sb.append(HtmlUtils.submit("Select Again", ARG_ACTION_SEARCH,
-                                       HtmlUtils.id(formId + ".submit")
-                                       + makeButtonSubmitDialog(sb,
-                                           msg("Searching for new data")
-                                           + "...")));
-            sb.append("</td>\n");
-            sb.append("<td width=\"400px\">\n");
-            List<String>      processTabs   = new ArrayList<String>();
-            List<String>      processTitles = new ArrayList<String>();
-
-            boolean           first         = true;
-            List<DataProcess> processes     = getDataProcesses(request, ARG_ACTION_TIMESERIES);
-            for (DataProcess process : processes) {
-                StringBuffer tmpSB = new StringBuffer();
-                if (processes.size() > 1) {
-                    /*
-                tmpSB.append(
-                    HtmlUtils.radio(
-                        ClimateCollectionTypeHandler.ARG_DATA_PROCESS_ID,
-                        process.getDataProcessId(), first));
-                tmpSB.append(HtmlUtils.space(1));
-                tmpSB.append(msg("Select"));
-                tmpSB.append(HtmlUtils.br());
-                */
-                } else {
-                    tmpSB.append(
-                        HtmlUtils.hidden(
-                            ClimateCollectionTypeHandler.ARG_DATA_PROCESS_ID,
-                            process.getDataProcessId()));
-                }
-                if (process.canHandle(dpi)) {
-                    process.addToForm(request, dpi, tmpSB);
-                    processTabs.add(tmpSB.toString());
-                    processTitles.add(process.getDataProcessLabel());
-                    first = false;
-                }
-            }
-
-
-            sb.append(header(msg("Process Data")));
-            for (int i = 0; i < processTitles.size(); i++) {
-                sb.append(
-                    "<div style=\"border:1px #ccc solid;margin: 0 0 .5em 0;\">");
-                sb.append(
-                    "<div style=\"border: none; padding: 0.3em; "
-                    + "background: #88FFFF; font-weight: bold; margin: 0 0 0 0;\">\n");
-                sb.append(processTitles.get(i));
-                sb.append("</div>\n");
-                sb.append("<div style=\"padding:0.2em;\">\n");
-                sb.append(processTabs.get(i));
-                sb.append("</div>\n");
-                sb.append("</div> <!-- shadow-box -->");
-            }
-            sb.append(HtmlUtils.p());
-            sb.append(HtmlUtils.submit("Make Plot", ARG_ACTION_COMPARE,
-                                       HtmlUtils.id(formId + ".submit")
-                                       + makeButtonSubmitDialog(sb,
-                                           msg("Making Plot, Please Wait")
-                                           + "...")));
 
             sb.append("</td>");
         }
@@ -1055,6 +780,8 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
 
     }
+    
+
 
     /**
      * Find the entries
@@ -1235,6 +962,16 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
     private String getCompareUrlPath() {
         //Use the collection type in the path. This is defined in the api.xml file
         return getRepository().getUrlBase() + "/model/compare";
+    }
+
+    /**
+     *  return the main entry point URL
+     *
+     * @return  the main entry point
+     */
+    private String getTimeSeriesUrlPath() {
+        //Use the collection type in the path. This is defined in the api.xml file
+        return getRepository().getUrlBase() + "/model/timeseries";
     }
 
 
