@@ -21,17 +21,25 @@
 package org.ramadda.repository.output;
 
 
-import org.ramadda.data.services.*;
-
-
-import org.ramadda.repository.*;
-import org.ramadda.repository.auth.*;
-import org.ramadda.repository.map.*;
-
-
-import org.ramadda.repository.metadata.*;
-import org.ramadda.repository.search.*;
-import org.ramadda.repository.type.*;
+import org.ramadda.data.services.PointOutputHandler;
+import org.ramadda.data.services.PointTypeHandler;
+import org.ramadda.repository.Association;
+import org.ramadda.repository.Entry;
+import org.ramadda.repository.EntryManager;
+import org.ramadda.repository.Link;
+import org.ramadda.repository.PageDecorator;
+import org.ramadda.repository.Repository;
+import org.ramadda.repository.RepositoryBase;
+import org.ramadda.repository.RepositoryManager;
+import org.ramadda.repository.RepositoryUtil;
+import org.ramadda.repository.Request;
+import org.ramadda.repository.Result;
+import org.ramadda.repository.map.MapInfo;
+import org.ramadda.repository.metadata.Metadata;
+import org.ramadda.repository.metadata.MetadataType;
+import org.ramadda.repository.search.SpecialSearch;
+import org.ramadda.repository.type.LocalFileTypeHandler;
+import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.repository.util.DateArgument;
 import org.ramadda.repository.util.ServerInfo;
 import org.ramadda.util.BufferMapList;
@@ -41,28 +49,21 @@ import org.ramadda.util.Utils;
 import org.ramadda.util.WikiUtil;
 
 import ucar.unidata.util.Misc;
-
-
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
-import java.io.*;
 
-import java.net.*;
+import java.net.URL;
 
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
-
 import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
-
-import java.util.regex.*;
 
 
 /**
@@ -115,6 +116,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
     /** border color */
     public static final String ATTR_BORDERCOLOR = "bordercolor";
 
+    /** _more_ */
     public static final String ATTR_COLORS = "colors";
 
     /** show the details attribute */
@@ -147,13 +149,13 @@ public class WikiManager extends RepositoryManager implements WikiUtil
     /** attribute in the tabs tag */
     public static final String ATTR_SHOWLINK = "showlink";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SHOWTITLE = "showTitle";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SHOWMAP = "showMap";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SHOWMENU = "showMenu";
 
     /** src attribute */
@@ -333,6 +335,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
     /** wiki group property */
     public static final String WIKI_PROP_GROUP = "wiki.group";
+
+    /** _more_ */
     public static final String WIKI_PROP_GROUP_NOBR = "wiki.group.nobr";
 
     /** _more_ */
@@ -581,8 +585,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         WIKI_PROP_DATE_FROM, WIKI_PROP_DATE_TO, WIKI_PROP_LINK,
         WIKI_PROP_HTML,
         prop(WIKI_PROP_SIMPLE, attrs(ATTR_TEXTPOSITION, POS_LEFT)),
-        WIKI_PROP_IMPORT, 
-        prop(WIKI_PROP_FIELD,attrs("name","")),
+        WIKI_PROP_IMPORT, prop(WIKI_PROP_FIELD, attrs("name", "")),
         WIKI_PROP_GROUP + "Layout",
         prop(WIKI_PROP_LINKS,
              attrs(ATTR_LINKRESOURCE, "true", ATTR_SEPARATOR, " | ",
@@ -630,16 +633,15 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         prop(WIKI_PROP_GRAPH, attrs(ATTR_WIDTH, "400", ATTR_HEIGHT, "400")),
         WIKI_PROP_COMMENTS,
         prop(WIKI_PROP_TAGCLOUD, attrs("type", "", "threshold", "0")),
-        WIKI_PROP_PROPERTIES, WIKI_PROP_BREADCRUMBS, 
-        WIKI_PROP_TOOLS, WIKI_PROP_TOOLBAR, WIKI_PROP_LAYOUT, WIKI_PROP_MENU,
+        WIKI_PROP_PROPERTIES, WIKI_PROP_BREADCRUMBS, WIKI_PROP_TOOLS,
+        WIKI_PROP_TOOLBAR, WIKI_PROP_LAYOUT, WIKI_PROP_MENU,
         WIKI_PROP_ENTRYID,
         prop(WIKI_PROP_SEARCH,
              attrs(ATTR_TYPE, "", ARG_MAX, "10", ARG_SEARCH_SHOWFORM,
                    "false", SpecialSearch.ATTR_TABS, SpecialSearch.TAB_LIST)),
         prop(WIKI_PROP_UPLOAD,
              attrs(ATTR_TITLE, "Upload file", ATTR_INCLUDEICON, "false")),
-        WIKI_PROP_ROOT,
-        WIKI_PROP_GROUP + "Display",
+        WIKI_PROP_ROOT, WIKI_PROP_GROUP + "Display",
         prop(WIKI_PROP_DISPLAYGROUP,
              attrs(ATTR_SHOWTITLE, "true", ATTR_SHOWMENU, "false",
                    "layoutType", "table", "layoutColumns", "1")),
@@ -831,9 +833,23 @@ public class WikiManager extends RepositoryManager implements WikiUtil
     }
 
 
-    private Entry findEntryFromId(Request request, Entry entry, WikiUtil wikiUtil, String entryId) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param wikiUtil _more_
+     * @param entryId _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Entry findEntryFromId(Request request, Entry entry,
+                                  WikiUtil wikiUtil, String entryId)
+            throws Exception {
         Entry theEntry = null;
-        int barIndex = entryId.indexOf("|");
+        int   barIndex = entryId.indexOf("|");
 
         if (barIndex >= 0) {
             entryId = entryId.substring(0, barIndex);
@@ -847,17 +863,17 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         if (theEntry == null) {
             if (entryId.equals(ID_PARENT)) {
                 theEntry = getEntryManager().getEntry(request,
-                                                      entry.getParentEntryId());
+                        entry.getParentEntryId());
             }
         }
 
         if (theEntry == null) {
             if (entryId.equals(ID_GRANDPARENT)) {
                 theEntry = getEntryManager().getEntry(request,
-                                                      entry.getParentEntryId());
+                        entry.getParentEntryId());
                 if (theEntry != null) {
                     theEntry = getEntryManager().getEntry(request,
-                                                          theEntry.getParentEntryId());
+                            theEntry.getParentEntryId());
                 }
             }
         }
@@ -865,22 +881,22 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             theEntry = getEntryManager().getEntry(request, entryId);
         }
         if (theEntry == null) {
-            theEntry = findWikiEntry(request, wikiUtil, entryId,
-                                     entry);
+            theEntry = findWikiEntry(request, wikiUtil, entryId, entry);
         }
 
         //Ugghh - I really have to unify the EntryManager find entry methods
         //Look for file path based entry id
         if ((theEntry == null) && entryId.startsWith("/")) {
-            theEntry = getEntryManager().findEntryFromName(request,
-                                                           entryId, request.getUser(), false);
+            theEntry = getEntryManager().findEntryFromName(request, entryId,
+                    request.getUser(), false);
         }
 
         //Look for relative to the current entry
         if (theEntry == null) {
-            theEntry = getEntryManager().findEntryFromPath(request,
-                                                           entry, entryId);
+            theEntry = getEntryManager().findEntryFromPath(request, entry,
+                    entryId);
         }
+
         return theEntry;
     }
 
@@ -1497,7 +1513,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                 (PointOutputHandler) pth.getRecordOutputHandler();
 
             String jsonUrl = poh.getJsonUrl(request, entry);
-            getEntryDisplay(request, entry, entry.getName(), jsonUrl, sb, props);
+            getEntryDisplay(request, entry, entry.getName(), jsonUrl, sb,
+                            props);
 
             return sb.toString();
         } else if (theTag.equals(WIKI_PROP_DISPLAYGROUP)) {
@@ -3286,7 +3303,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
             buff.append("</div>");
         }
-        sb.append("<table cellspacing=4 width='100%'>");
+        sb.append("<table cellspacing=4 align='center'>");
         sb.append("<tr valign=\"top\">");
         for (StringBuffer buff : colsSB) {
             sb.append("<td>");
@@ -3588,6 +3605,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                 importMenu.append(HtmlUtils.b(group));
                 importMenu.append(HtmlUtils.br());
                 importMenu.append("\n");
+
                 continue;
             }
 
@@ -4172,6 +4190,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
      * _more_
      *
      * @param request _more_
+     * @param entry _more_
      * @param name _more_
      * @param url _more_
      * @param sb _more_
@@ -4179,12 +4198,12 @@ public class WikiManager extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    public void getEntryDisplay(Request request, Entry entry, String name, String url,
-                              StringBuffer sb, Hashtable props)
+    public void getEntryDisplay(Request request, Entry entry, String name,
+                                String url, StringBuffer sb, Hashtable props)
             throws Exception {
 
-        this.addDisplayImports(request,  sb);
-        List<String> topProps     = new ArrayList<String>();
+        this.addDisplayImports(request, sb);
+        List<String> topProps = new ArrayList<String>();
 
 
         List<String> propList = new ArrayList<String>();
@@ -4204,19 +4223,20 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             props.remove(ATTR_SHOWMENU);
         }
 
-        String entryParent = (String)props.get("entryParent");
-        if(entryParent!=null) {
-            Entry theEntry = findEntryFromId(request, entry, null, entryParent);
-            if(theEntry!=null) {
-                props.put("entryParent",theEntry.getId());
+        String entryParent = (String) props.get("entryParent");
+        if (entryParent != null) {
+            Entry theEntry = findEntryFromId(request, entry, null,
+                                             entryParent);
+            if (theEntry != null) {
+                props.put("entryParent", theEntry.getId());
             }
         }
 
 
-        String colors = (String)props.get(ATTR_COLORS);
-        if(colors!=null) {
+        String colors = (String) props.get(ATTR_COLORS);
+        if (colors != null) {
             propList.add(ATTR_COLORS);
-            propList.add(Json.list(StringUtil.split(colors,","),true));
+            propList.add(Json.list(StringUtil.split(colors, ","), true));
             props.remove(ATTR_COLORS);
         }
 
@@ -4251,9 +4271,10 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         topProps.add(Json.quote(defaultLayer));
 
 
-        String  mainDivId = (String) props.get("divid");
-        if(mainDivId==null)
-            mainDivId =  HtmlUtils.getUniqueId("displaydiv");
+        String mainDivId = (String) props.get("divid");
+        if (mainDivId == null) {
+            mainDivId = HtmlUtils.getUniqueId("displaydiv");
+        }
 
 
 
@@ -4280,12 +4301,12 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             props.remove("fields");
         }
 
-        String anotherDivId = (String)props.get("divid");
-        boolean layoutHere = Misc.getProperty(props, "layoutHere", true);
-        if (anotherDivId!=null || layoutHere) {
+        String  anotherDivId = (String) props.get("divid");
+        boolean layoutHere   = Misc.getProperty(props, "layoutHere", true);
+        if ((anotherDivId != null) || layoutHere) {
             propList.add("layoutHere");
             propList.add("true");
-            if(anotherDivId == null) {
+            if (anotherDivId == null) {
                 anotherDivId = HtmlUtils.getUniqueId("displaydiv");
             }
             sb.append(HtmlUtils.div("", HtmlUtils.id(anotherDivId)));
@@ -4322,7 +4343,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         props.remove("type");
 
         for (Enumeration keys = props.keys(); keys.hasMoreElements(); ) {
-            Object key = keys.nextElement();
+            Object key   = keys.nextElement();
             Object value = props.get(key);
             propList.add(key.toString());
             propList.add(Json.quote(value.toString()));
@@ -4333,11 +4354,13 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                   + HtmlUtils.quote(mainDivId) + ","
                   + Json.map(topProps, false) + ");\n");
 
-        js.append("var pointDataProps = {entryId:'" + entry.getId() +"'};\n");
+        js.append("var pointDataProps = {entryId:'" + entry.getId()
+                  + "'};\n");
 
         propList.add("data");
         propList.add("new  PointData(" + HtmlUtils.quote(name)
-                     + ",  null,null," + HtmlUtils.quote(url) + ",pointDataProps)");
+                     + ",  null,null," + HtmlUtils.quote(url)
+                     + ",pointDataProps)");
         js.append("displayManager.createDisplay("
                   + HtmlUtils.quote(displayType) + ","
                   + Json.map(propList, false) + ");\n");
@@ -4346,8 +4369,16 @@ public class WikiManager extends RepositoryManager implements WikiUtil
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
     public void addDisplayImports(Request request, StringBuffer sb)
-        throws Exception {
+            throws Exception {
 
         if (request.getExtraProperty("initmap") == null) {
             sb.append(getMapManager().getHtmlImports());
@@ -4364,20 +4395,25 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             sb.append(HtmlUtils.importJS(fileUrl("/lib/d3/d3.min.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/db/dom-drag.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/pointdata.js")));
-            sb.append(HtmlUtils.importJS(fileUrl("/display/displaymanager.js")));
+            sb.append(
+                HtmlUtils.importJS(fileUrl("/display/displaymanager.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/display.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/displaymap.js")));
-            sb.append(HtmlUtils.importJS(fileUrl("/display/displaychart.js")));
-            sb.append(HtmlUtils.importJS(fileUrl("/display/displayentry.js")));
+            sb.append(
+                HtmlUtils.importJS(fileUrl("/display/displaychart.js")));
+            sb.append(
+                HtmlUtils.importJS(fileUrl("/display/displayentry.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/control.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/displayd3.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/displayext.js")));
 
 
 
-            String includes =getProperty("ramadda.display.includes", (String) null);
-            if (includes!= null) {
-                for(String include: StringUtil.split(includes, ",", true, true)) {
+            String includes = getProperty("ramadda.display.includes",
+                                          (String) null);
+            if (includes != null) {
+                for (String include :
+                        StringUtil.split(includes, ",", true, true)) {
                     sb.append(HtmlUtils.importJS(fileUrl(include)));
                 }
             }
