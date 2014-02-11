@@ -215,11 +215,13 @@ var HtmlUtil =  {
     qt : function (value) {
         return "\"" + value +"\"";
     },
-    leftRight : function(left,right) {
+    leftRight : function(left,right,leftWidth, rightWidth) {
+        if(leftWidth==null) leftWidth = "50%";
+        if(rightWidth==null) rightWidth = "50%";
         return this.tag("table",["border","0", "width","100%","cellspacing","0","cellpadding","0"],
                         this.tr(["valign","top"],
-                                this.td(["align","left"],left) +
-                                this.td(["align","right"],right)));
+                                this.td(["align","left","width",leftWidth],left) +
+                                this.td(["align","right","width", rightWidth],right)));
     },
     div : function(attrs, inner) {
         return this.tag("div", attrs, inner);

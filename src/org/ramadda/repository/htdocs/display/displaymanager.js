@@ -262,6 +262,19 @@ function DisplayManager(argId,argProperties) {
            layoutChanged: function(display) {
                this.doLayout();
            },
+           writeDisplay: function() {
+               if(this.originalLocation==null) {
+                   this.originalLocation = document.location;
+               }
+               var url = this.originalLocation+"#";
+               url += "&display0=linechart";
+               for(var attr in document) {
+                   //                   if(attr.toString().contains("location")) 
+                   //                       console.log(attr +"=" + document[attr]);
+               }
+               document.location = url;
+
+           },
            createDisplay: function(type, props) {
                 if(props == null) props ={};
                 if(props.data!=null) {

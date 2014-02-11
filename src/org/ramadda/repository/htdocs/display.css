@@ -208,12 +208,14 @@
        margin: 0px; 
        padding:3px; 
        padding-left:6px; 
-       border-bottom:1px #f8f8f8 solid; 
-
+       border-top:1px #fff solid; 
+       border-bottom:1px #efefef solid; 
 }
 
 .display-entrylist-list li:hover { 
      background: #f0f0f0; 
+     border-top:1px #aaa solid; 
+     border-bottom:1px #aaa solid; 
 }
 
 .display-entrylist-inner {
@@ -229,6 +231,20 @@
 }
 
 
+
+.hover {
+   background-color : red;
+}
+
+
+
+
+.display-entrylist-entry-toolbar {
+   display: none;
+   margin-right:10px;
+//   border : 1px #aaa solid;
+//   position:absolute;
+}
 
 
 .display-entrylist-entry {

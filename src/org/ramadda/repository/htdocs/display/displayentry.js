@@ -8,6 +8,8 @@ addGlobalDisplayType({type: DISPLAY_ENTRYLIST, label:"Entry List",requiresData:f
 addGlobalDisplayType({type: DISPLAY_ENTRYDISPLAY, label:"Entry Display",requiresData:false});
 addGlobalDisplayType({type: DISPLAY_OPERANDS, label:"Operands",requiresData:false});
 
+
+
 function RamaddaEntryDisplay(displayManager, id, type, properties) {
      RamaddaUtil.inherit(this, new RamaddaDisplay(displayManager, id, type, properties));
      RamaddaUtil.defineMembers(this, {
@@ -31,6 +33,11 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
 function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
     var NONE = "-- None --";
+
+    var ID_TOOLBAR = "toolbar";
+    var ID_TOOLBAR_INNER = "toolbarinner";
+    var ID_LIST = "list";
+
 
     var ID_ENTRIES = "entries";
     var ID_FOOTER = "footer";
@@ -390,10 +397,10 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 } else {
 
                 }
+                console.log("results:" + results);
                 $("#" + this.getDomId(ID_RESULTS)).html(results);
 
-
-                html += HtmlUtil.openTag("ol",["class","display-entrylist-list", "id",this.getDomId("list")]);
+                html += HtmlUtil.openTag("ol",["class","display-entrylist-list", "id",this.getDomId(ID_LIST)]);
                 html  += "\n";
                 var get = this.getGet();
                 $("#"  +this.getDomId(ID_FOOTER_LEFT)).html("");
@@ -404,7 +411,29 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
                 for(var i=0;i<entries.length;i++) {
                     var entry = entries[i];
-                    var right = this.getEntryMenuButton(entry);
+                    var toolbarItems = [];
+                    toolbarItems.push(HtmlUtil.tag("a", ["href", entry.getEntryUrl(),"target","_"], 
+                                                                         HtmlUtil.image(root +"/icons/application-home.png",["border",0,"title","View Entry"])));
+                    if(entry.getService("points.latlonaltcsv")) {
+                        toolbarItems.push(HtmlUtil.tag("a", ["onclick", get+".createDisplay('" + entry.getId() +"','linechart');"], 
+                                                       HtmlUtil.image(root +"/icons/chart_line_add.png",["border",0,"title","Create Chart"])));
+                    }
+                    if(entry.getFilesize()>0) {
+                        toolbarItems.push(HtmlUtil.tag("a", ["href", entry.getFileUrl()], 
+                                                       HtmlUtil.image(root +"/icons/download.png",["border",0,"title","Download (" + entry.getFormattedFilesize() +")"])));
+                        
+                    }
+                    
+
+                    var entryMenuButton = this.getEntryMenuButton(entry);
+                    toolbarItems.push(entryMenuButton);
+                    
+                    var toolbar = HtmlUtil.div(["class","display-entrylist-entry-toolbar","id",
+                                this.getDomId(ID_TOOLBAR +"_" + entry.getId())],
+                                               HtmlUtil.join(toolbarItems,"&nbsp;&nbsp;"));
+
+
+                    right = " " + toolbar;
                     var icon = entry.getIconImage(["title","View entry"]);
                     var link  =  HtmlUtil.tag("a",["href", entry.getEntryUrl()],icon);
                     var entryName = entry.getName();
@@ -412,7 +441,8 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                         entryName = entryName.substring(0,99)+"...";
                     }
                     var left =  HtmlUtil.div(["style"," white-space: nowrap;  overflow-x:none; max-width:300px;"],link +" " +  entryName);
-                    var line = HtmlUtil.div(["id",this.getDomId("entryinner_" + entry.getId())], HtmlUtil.leftRight(left,right));
+
+                    var line = HtmlUtil.div(["id",this.getDomId("entryinner_" + entry.getId())], HtmlUtil.leftRight(left,right,"60%","30%"));
                     html  += HtmlUtil.tag("li",["id",
                                                 this.getDomId("entry_" + entry.getId()),
                                                 "entryid",entry.getId(), "class","display-entrylist-entry ui-widget-content " + rowClass], line);
@@ -422,6 +452,23 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
                 $("#"+this.getDomId(ID_ENTRIES)).html(html);
                 var theDisplay   =this;
+                var toolbars = $("#" + this.getDomId(ID_LIST) +"  .display-entrylist-entry");
+                toolbars.mouseover(function(event){
+                        var entryId = $( this ).attr('entryid');
+                        var toolbarId = theDisplay.getDomId(ID_TOOLBAR +"_" + entryId);
+                        var toolbar = $("#" + toolbarId);
+                        //                        toolbar.show();
+                        toolbar.show();
+                        //                        toolbar.fadeIn('fast');
+                    });
+                toolbars.mouseout(function(event){
+                        var entryId = $( this ).attr('entryid');
+                        var toolbarId = theDisplay.getDomId(ID_TOOLBAR +"_" + entryId);
+                        var toolbar = $("#" + toolbarId);
+                        toolbar.hide();
+                    });
+
+
                 $("#" + this.getDomId("list")).selectable({
                         cancel: 'a',
                         selected: function( event, ui ) {
