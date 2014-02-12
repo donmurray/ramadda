@@ -1,8 +1,5 @@
 /**
 Copyright 2008-2014 Geode Systems LLC
-
-This package supports charting and mapping of georeferenced time series data
-It requires displaymanager.js pointdata.js
 */
 
 
@@ -111,18 +108,25 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 return [lat,lon];
             },
 
-           handleEntriesChanged: function (source, entries) {
-                var entries  = this.getDisplayManager().getEntries();
-                for(var i=0;i<entries.length;i++) {
-                    this.handleEntrySelection(this, entries[i], true);
-                }
-                this.map.zoomToMarkers();
-            },
            setInitMapBounds: function(north, west, south, east) {
                 if(!this.map) return;
                 this.map.centerOnMarkers(new OpenLayers.Bounds(west,south,east, north));
             },
 
+           sourceToEntries: {},
+           handleEntriesChanged: function (source, entries) {
+                var oldEntries = this.sourceToEntries[source.getId()];
+                if(oldEntries!=null) {
+                    for(var i=0;i<oldEntries.length;i++) {
+                        this.handleEntrySelection(source, oldEntries[i], false);
+                    }
+                }
+                this.sourceToEntries[source.getId()] = entries;
+                for(var i=0;i<entries.length;i++) {
+                    this.handleEntrySelection(source, entries[i], true);
+                }
+                this.map.zoomToMarkers();
+            },
             handleEntrySelection: function(source, entry, selected) {
                 //                this.super.handleEntrySelection.apply(this, [source,entry,selected]);
                 if(!entry.hasLocation()) {

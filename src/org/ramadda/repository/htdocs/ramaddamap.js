@@ -751,6 +751,7 @@ function RepositoryMap(mapId, params) {
         if (!this.markers)
             return;
         bounds = this.markers.getDataExtent();
+        if(bounds == null) return;
         this.map.setCenter(bounds.getCenterLonLat());
         this.map.zoomToExtent(bounds);
     }
