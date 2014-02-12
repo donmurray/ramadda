@@ -408,6 +408,12 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                     fileMenuItems.push(HtmlUtil.tag("li",[], HtmlUtil.tag("a", ["href", entry.getFileUrl()], "Download " + entry.getFilename() + " (" + entry.getFormattedFilesize() +")")));
                 }
 
+                if(this.jsonUrl!=null) {
+                    fileMenuItems.push(HtmlUtil.tag("li",[], "Data: " + HtmlUtil.onClick(get+".fetchUrl('json');", "JSON")
+                                                    + HtmlUtil.onClick(get+".fetchUrl('csv');", "CSV")));
+                }
+
+
                 menus.push("<a>File</a>" + HtmlUtil.tag("ul",[], HtmlUtil.join(fileMenuItems)));
                 menus.push("<a>View</a>" + HtmlUtil.tag("ul",[], HtmlUtil.join(viewMenuItems)));
 
@@ -444,8 +450,11 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                             delay: 1200
                             });
            },
-           fetchUrl: function(as) {
-                var url = this.jsonUrl;
+           fetchUrl: function(as, url) {
+                if(url == null) {
+                    url = this.jsonUrl;
+                }
+                url =  this.getDisplayManager().getJsonUrl(url, this);
                 if(url == null) return;
                 if(as !=null && as != "json") {
                     url = url.replace("points.json","points." + as);
