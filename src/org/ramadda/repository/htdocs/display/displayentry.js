@@ -377,6 +377,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 }
             },
             getEntries: function() {
+                if(this.entryList == null) return [];
                 return  this.entryList.getEntries();
             },
             entryListChanged: function(entryList) {

@@ -352,12 +352,12 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 html += HtmlUtil.closeTag("table");
                 return html;
         },
-            getEntryMenuButton: function(entry) {
-                var menuButton = HtmlUtil.onClick(this.getGet()+".showEntryMenu(event, '" + entry.getId() +"');", 
-                                                  HtmlUtil.image(root+"/icons/downdart.png", 
-                                                                 ["class", "display-dialog-button", "id",  this.getDomId(ID_MENU_BUTTON + entry.getId())]));
-                return menuButton;
-            },
+        getEntryMenuButton: function(entry) {
+             var menuButton = HtmlUtil.onClick(this.getGet()+".showEntryMenu(event, '" + entry.getId() +"');", 
+                                               HtmlUtil.image(root+"/icons/downdart.png", 
+                                                              ["class", "display-dialog-button", "id",  this.getDomId(ID_MENU_BUTTON + entry.getId())]));
+             return menuButton;
+         },
             getEntry: function(entryId) {
                 var entry = null;
                 if(this.entryList!=null) {
@@ -434,12 +434,24 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             },
             showEntryMenu: function(event, entryId) {
                 var menu = this.getEntryMenu(entryId);               
+                console.log($("#" + this.getDomId(ID_MENU_OUTER)).size());
                 $("#" + this.getDomId(ID_MENU_OUTER)).html(menu);
-                showPopup(event, this.getDomId(ID_MENU_BUTTON+entryId), this.getDomId(ID_MENU_OUTER), false,null,"left bottom");
+                var srcId = this.getDomId(ID_MENU_BUTTON + entryId);
+
+                showPopup(event, srcId, this.getDomId(ID_MENU_OUTER), false,null,"left bottom");
                 $("#"+  this.getDomId(ID_MENU_INNER+entryId)).superfish({
                         animation: {height:'show'},
                             delay: 1200
                             });
+           },
+           fetchUrl: function(as) {
+                var url = this.jsonUrl;
+                if(url == null) return;
+                if(as !=null && as != "json") {
+                    url = url.replace("points.json","points." + as);
+                    console.log("url:" + url);
+                }
+                window.open(url,'_blank');
             },
             getDisplayMenuContents: function() {
                 var get = this.getGet();
@@ -450,6 +462,10 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 menuItems.push(copyMe);
                 menuItems.push(deleteMe);
 
+                if(this.jsonUrl!=null) {
+                    menuItems.push("Data: " + HtmlUtil.onClick(get+".fetchUrl('json');", "JSON")
+                                   + HtmlUtil.onClick(get+".fetchUrl('csv');", "CSV"));
+                }
                 var form = "<form>";
 
                 form += this.getDisplayMenuSettings();
@@ -613,18 +629,8 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 //                this.super.testFunction.call(this);
 
                 var html = "";
-                html +=   HtmlUtil.div(["id", this.getDomId(ID_HEADER),"class", "display-header"]);
                 html+= HtmlUtil.div(["class","ramadda-popup", "id", this.getDomId(ID_MENU_OUTER)], "");
-                var get = "getRamaddaDisplay('" + this.getId() +"')";
-                var menuButton = HtmlUtil.onClick(get+".showDialog();", 
-                                                  HtmlUtil.image(root+"/icons/downdart.png", 
-                                                                 ["class", "display-dialog-button", "id",  this.getDomId(ID_DIALOG_BUTTON)]));
-
-                var header = HtmlUtil.div(["class","display-dialog-header"], HtmlUtil.onClick("$('#" +this.getDomId(ID_DIALOG) +"').hide();",HtmlUtil.image(root +"/icons/close.gif",["class","display-dialog-close"])));
-
-                var menuContents = HtmlUtil.div(["class", "display-dialog-contents"], this.getMenuContents());
-                menuContents  = header + menuContents;
-                var menu = HtmlUtil.div(["class", "display-dialog", "id", this.getDomId(ID_DIALOG)], menuContents);
+                var menu = HtmlUtil.div(["class", "display-dialog", "id", this.getDomId(ID_DIALOG)], "");
                 var width = this.getWidth();
                 var tableWidth = "100%";
                 if(width>0) {
@@ -637,7 +643,13 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 } else {
                     html += HtmlUtil.td([], "");
                 }
+
+                var get = this.getGet();
+
                 if(this.getShowMenu()) {
+                    var menuButton = HtmlUtil.onClick(get+".showDialog();", 
+                                                      HtmlUtil.image(root+"/icons/downdart.png", 
+                                                                     ["class", "display-dialog-button", "id",  this.getDomId(ID_DIALOG_BUTTON)]));
                     html += HtmlUtil.td(["align", "right"], menuButton);
                 } else {
                     html += HtmlUtil.td(["align", "right"], "");
@@ -650,11 +662,22 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 html += menu;
                 return html;
             },
+             makeDialog: function() {
+                var html = "";
+                html +=   HtmlUtil.div(["id", this.getDomId(ID_HEADER),"class", "display-header"]);
+                var get = this.getGet();
+
+                var header = HtmlUtil.div(["class","display-dialog-header"], HtmlUtil.onClick("$('#" +this.getDomId(ID_DIALOG) +"').hide();",HtmlUtil.image(root +"/icons/close.gif",["class","display-dialog-close"])));
+
+                var menuContents = HtmlUtil.div(["class", "display-dialog-contents"], this.getMenuContents());
+                menuContents  = header + menuContents;
+                return menuContents;
+            },
             showDialog: function() {
                 var dialog =this.getDomId(ID_DIALOG); 
+                $("#" + this.getDomId(ID_DIALOG)).html(this.makeDialog());
                 this.popup(this.getDomId(ID_DIALOG_BUTTON), dialog);
             },
-
             getContentsDiv: function() {
                 var extraStyle = "";
                 var width = this.getWidth();
@@ -739,10 +762,15 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 }
             },
             //callback from the pointData.loadData call
-            pointDataLoaded: function(pointData) {
+            pointDataLoaded: function(pointData, url) {
                 this.addData(pointData);
                 this.updateUI(pointData);
                 this.getDisplayManager().pointDataLoaded(this, pointData);
+                if(url!=null) {
+                    this.jsonUrl = url;
+                } else {
+                    this.jsonUrl = null;
+                }
             },
             //get an array of arrays of data 
             getStandardData : function(fields) {

@@ -172,7 +172,7 @@ function PointData(name, recordFields, records, url, properties) {
                 var jqxhr = $.getJSON( url, function(data) {
                         var newPointData =    makePointData(data);
                         pointData.initWith(newPointData);
-                        display.pointDataLoaded(pointData);
+                        display.pointDataLoaded(pointData, url);
                         pointData.stopLoading();
                     })
                     .fail(function(jqxhr, textStatus, error) {
