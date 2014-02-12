@@ -263,7 +263,8 @@ public class Json {
         if (s == null) {
             return NULL;
         }
-        s = s.replaceAll("\"","\\\"");
+        s = s.replaceAll("\"","'");
+        s = s.replaceAll("\\\\","-");
         return "\"" + s + "\"";
     }
 
