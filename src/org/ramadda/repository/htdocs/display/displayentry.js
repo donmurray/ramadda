@@ -93,11 +93,16 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
     RamaddaUtil.defineMembers(this, {
             haveSearched: false,
             haveTypes: false,
+           haveDisplayed: false,
             metadata: {},
             metadataLoading: {},
             selectedEntries: [],            
             getSelectedEntries: function() {return this.selectedEntries;},
             initDisplay: function() {
+                if(this.getIsLayoutFixed() && this.haveDisplayed) {
+                    return;
+                }
+                this.haveDisplayed =true;
                 this.initUI();
                 var html = "";
                 var horizontal = this.isLayoutHorizontal();

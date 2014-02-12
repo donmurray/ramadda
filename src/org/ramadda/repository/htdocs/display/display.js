@@ -178,7 +178,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             },
             setContents: function(contents) {
                 contents = HtmlUtil.div(["class","display-contents-inner display-" + this.getType() +"-inner"], contents);
-                $("#" + this.getDomId(ID_DISPLAY_CONTENTS)).html(contents);
+                this.writeHtml(ID_DISPLAY_CONTENTS, contents);
             },
             addEntry: function(entry) {
                 this.entries.push(entry);
@@ -455,7 +455,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             showEntryMenu: function(event, entryId) {
                 var menu = this.getEntryMenu(entryId);               
                 console.log($("#" + this.getDomId(ID_MENU_OUTER)).size());
-                $("#" + this.getDomId(ID_MENU_OUTER)).html(menu);
+                this.writeHtml(ID_MENU_OUTER, menu);
                 var srcId = this.getDomId(ID_MENU_BUTTON + entryId);
 
                 showPopup(event, srcId, this.getDomId(ID_MENU_OUTER), false,null,"left bottom");
@@ -745,7 +745,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 return this.getFormValue("height",0);
             },
             setTitle: function(title) {
-                $("#" + this.getDomId(ID_TITLE)).html(title);
+                this.writeHtml(ID_TITLE,title);
             },
             getTitle: function () {
                 var prefix  = "";
@@ -769,7 +769,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
 
                 return prefix+title;
             },
-            getIsLayoutFixed: function() {
+                getIsLayoutFixed: function() {
                 return this.getProperty(PROP_LAYOUT_HERE,false);
             },
             hasData: function() {
@@ -993,10 +993,10 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
                 var html = "";
                 var colCnt=100;
                 var displaysToLayout = this.getDisplaysToLayout();
+                var displaysToPrepare = this.displays;
 
-                //Call prepare on all of them
-                for(var i=0;i<this.displays.length;i++) {
-                    var display = this.displays[i];
+                for(var i=0;i<displaysToPrepare.length;i++) {
+                    var display = displaysToPrepare[i];
                     if(display.prepareToLayout!=null) {
                         display.prepareToLayout();
                     }
@@ -1075,7 +1075,7 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
                 } else {
                     html+="Unknown layout:" + this.layout;
                 }
-                $("#" + this.getDomId(ID_DISPLAYS)).html(html);
+                this.writeHtml(ID_DISPLAYS, html);
                 this.initDisplay();
             },
             initDisplay: function() {
