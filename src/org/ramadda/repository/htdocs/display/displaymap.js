@@ -11,8 +11,9 @@ var DISPLAY_MAP = "map";
 addGlobalDisplayType({type: DISPLAY_MAP, label:"Map"});
 
 function MapFeature(source, points) {
-    this.source = source;
-    this.points = points;
+    RamaddaUtil.defineMembers(this, {
+            source: source,
+                points: points});
 }
 
 
@@ -30,6 +31,7 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             markers: {},
             sourceToLine: {},
             sourceToPoints: {},
+            snarf:true,
             initDisplay: function() {
                 this.initUI();
                 var html = "";
@@ -75,6 +77,14 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 for(var i=0;i<currentFeatures.length;i++)  {
                     this.addFeature(currentFeatures[i]);
                 }
+
+                var entries  = this.getDisplayManager().getEntries();
+                for(var i=0;i<entries.length;i++) {
+                    this.handleEntrySelection(this, entries[i], true);
+                }
+
+
+
             },
             addFeature: function(feature) {
                 this.features.push(feature);
@@ -101,6 +111,13 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 return [lat,lon];
             },
 
+           handleEntriesChanged: function (source, entries) {
+                var entries  = this.getDisplayManager().getEntries();
+                for(var i=0;i<entries.length;i++) {
+                    this.handleEntrySelection(this, entries[i], true);
+                }
+                this.map.zoomToMarkers();
+            },
            setInitMapBounds: function(north, west, south, east) {
                 if(!this.map) return;
                 this.map.centerOnMarkers(new OpenLayers.Bounds(west,south,east, north));
@@ -123,7 +140,7 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                         var latitude = entry.getLatitude();
                         var longitude = entry.getLongitude();
                         var point = new OpenLayers.LonLat(longitude, latitude);
-                        marker =  this.map.addMarker(id, point, entry.getIconUrl(),entry.getName());
+                        marker =  this.map.addMarker(id, point, entry.getIconUrl(),this.getEntryHtml(entry));
 
                         var numMarkers = this.markers.length;
                         this.markers[id] = marker;

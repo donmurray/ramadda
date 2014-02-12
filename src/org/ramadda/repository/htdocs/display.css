@@ -21,7 +21,7 @@
 .display-dialog-button {
     padding-left: 6px;
     padding-right: 6px;
-    padding-top: 3px;
+    padding-top: 4px;
     padding-bottom: 2px;
     margin-bottom:1px;
     border:1px #ccc solid; 
@@ -198,28 +198,22 @@
 
 
 .display-entrylist-list  .ui-selected { 
-     background: #eee; 
      background: #e0f0ff; 
 }
 
 .display-entrylist-list { list-style-type: none; margin: 0; padding: 0; }
 
 .display-entrylist-list li { 
-       margin: 0px; 
-       padding:3px; 
+      vertical-align: center;
        padding-left:6px; 
-       border-top:1px #fff solid; 
-       border-bottom:1px #efefef solid; 
+//       border-bottom:1px #efefef solid; 
 }
 
 .display-entrylist-list li:hover { 
      background: #f0f0f0; 
-     border-top:1px #aaa solid; 
-     border-bottom:1px #aaa solid; 
+//     border-bottom:1px #aaa solid; 
 }
 
-.display-entrylist-inner {
-}
 
 .display-entrylist-entries   { 
    min-width: 250px;
@@ -230,22 +224,26 @@
    margin: 4px;
 }
 
-
-
-.hover {
-   background-color : red;
-}
-
-
-
-
-.display-entrylist-entry-toolbar {
+.display-entry-toolbar {
    display: none;
-   margin-right:10px;
-//   border : 1px #aaa solid;
-//   position:absolute;
+   z-index: 10000;
+   left:-10000px; 
+   position: absolute;
+   margin:0px;
+   padding:0px;
+//   margin-right:5px;
+//  border: 1px #000 solid;
 }
 
+.display-entry-toolbar img {
+   border: 1px transparent solid;
+   padding-left: 5px;
+   padding-right: 5px;
+}
+
+.display-entry-toolbar img:hover {
+   border: 1px #aaa solid;
+}
 
 .display-entrylist-entry {
    padding: 5px;
@@ -255,18 +253,13 @@
 }
 
 
-
 .display-entrylist-entry:hover {
    background-color: #efefef;
-
 }
+
 
 .display-entrylist-highlight {
-//   font-weight: bold; 
-//   color:red;
-//   background-color: red;
 }
-
 
 
 .display-operands {

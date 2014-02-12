@@ -99,11 +99,30 @@ function DisplayManager(argId,argProperties) {
            getLayoutManager: function () {
                return this.group;
            },
+           getEntries: function() {
+               var entries = this.getLayoutManager().getEntries();
+               return entries;
+           },
            getData: function() {
                return this.dataList;
            },
            addDisplayEventListener: function(listener) {
                this.eventListeners.push(listener);
+           },
+           handleEntriesChanged: function (source, entries) {
+               for(var i=0;i< this.eventListeners.length;i++) {
+                   eventListener = this.eventListeners[i];
+                   if(eventListener == source) continue;
+                   var eventSource  = eventListener.getEventSource();
+                   if(eventSource!=null && eventSource.length>0) {
+                       if(eventSource!= source.getId() && eventSource!= source.getName()) {
+                           continue;
+                        }
+                   }
+                   if(eventListener.handleEntriesChanged) {
+                       eventListener.handleEntriesChanged(source, entries);
+                   }
+               }
            },
            handleMapClick: function (mapDisplay, lon, lat) {
                 var indexObj = [];

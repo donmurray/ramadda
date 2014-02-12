@@ -428,12 +428,11 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     var entryMenuButton = this.getEntryMenuButton(entry);
                     toolbarItems.push(entryMenuButton);
                     
-                    var toolbar = HtmlUtil.div(["class","display-entrylist-entry-toolbar","id",
+                    var toolbar = HtmlUtil.div(["class","display-entry-toolbar","id",
                                 this.getDomId(ID_TOOLBAR +"_" + entry.getId())],
-                                               HtmlUtil.join(toolbarItems,"&nbsp;&nbsp;"));
+                                               HtmlUtil.join(toolbarItems,""));
 
-
-                    right = " " + toolbar;
+                    right = toolbar;
                     var icon = entry.getIconImage(["title","View entry"]);
                     var link  =  HtmlUtil.tag("a",["href", entry.getEntryUrl()],icon);
                     var entryName = entry.getName();
@@ -452,16 +451,24 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
                 $("#"+this.getDomId(ID_ENTRIES)).html(html);
                 var theDisplay   =this;
-                var toolbars = $("#" + this.getDomId(ID_LIST) +"  .display-entrylist-entry");
-                toolbars.mouseover(function(event){
+                var entryRows = $("#" + this.getDomId(ID_LIST) +"  .display-entrylist-entry");
+                entryRows.mouseover(function(event){
                         var entryId = $( this ).attr('entryid');
                         var toolbarId = theDisplay.getDomId(ID_TOOLBAR +"_" + entryId);
                         var toolbar = $("#" + toolbarId);
-                        //                        toolbar.show();
                         toolbar.show();
-                        //                        toolbar.fadeIn('fast');
+                        var myalign = 'right center';
+                        var atalign = 'right center';
+                        var srcId = theDisplay.getDomId("entry_" + entryId);
+                        toolbar.position({
+                                of: $( "#" +srcId ),
+                                    my: myalign,
+                                    at: atalign,
+                                    collision: "none none"
+                                    });
+
                     });
-                toolbars.mouseout(function(event){
+                entryRows.mouseout(function(event){
                         var entryId = $( this ).attr('entryid');
                         var toolbarId = theDisplay.getDomId(ID_TOOLBAR +"_" + entryId);
                         var toolbar = $("#" + toolbarId);
@@ -493,6 +500,9 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                         },
                             
                     });
+
+
+                this.getDisplayManager().handleEntriesChanged(this, entries);
             }
         });
 }
@@ -525,29 +535,7 @@ function RamaddaEntrydisplayDisplay(displayManager, id, properties) {
                     this.setContents("&nbsp;");
                     return;
                 }
-
-                var menu = this.getEntryMenuButton(entry);
-                var html = "";
-                html += menu +" " + entry.getLink(entry.getIconImage() +" " + entry.getName());
-                html += "<hr>";
-                html += entry.getDescription();
-                html += HtmlUtil.formTable();
-                var columnNames = entry.getColumnNames();
-                var columnLabels = entry.getColumnLabels();
-                if(entry.getFilesize()>0) {
-                    html+= HtmlUtil.formEntry("File:", entry.getFilename() +" " +
-                                              HtmlUtil.href(entry.getFileUrl(), HtmlUtil.image(root +"/icons/download.png")) + " " +
-                                              entry.getFormattedFilesize());
-                }
-                for(var i in columnNames) {
-                    var columnName = columnNames[i];
-                    var columnLabel = columnLabels[i];
-                    var columnValue = entry.getColumnValue(columnName);
-                    html+= HtmlUtil.formEntry(columnLabel+":", columnValue);
-                }
-
-                html += HtmlUtil.closeTag("table");
-                this.setContents(html);
+                this.setContents(this.getEntryHtml(entry));
             },
         });
 }

@@ -328,6 +328,30 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             getGet: function() {
                 return  "getRamaddaDisplay('" + this.getId() +"')";
             },
+            getEntryHtml: function(entry) {
+                var menu = this.getEntryMenuButton(entry);
+                var html = "";
+                html += menu +" " + entry.getLink(entry.getIconImage() +" " + entry.getName());
+                html += "<hr>";
+                html += entry.getDescription();
+                html += HtmlUtil.formTable();
+                var columnNames = entry.getColumnNames();
+                var columnLabels = entry.getColumnLabels();
+                if(entry.getFilesize()>0) {
+                    html+= HtmlUtil.formEntry("File:", entry.getFilename() +" " +
+                                              HtmlUtil.href(entry.getFileUrl(), HtmlUtil.image(root +"/icons/download.png")) + " " +
+                                              entry.getFormattedFilesize());
+                }
+                for(var i in columnNames) {
+                    var columnName = columnNames[i];
+                    var columnLabel = columnLabels[i];
+                    var columnValue = entry.getColumnValue(columnName);
+                    html+= HtmlUtil.formEntry(columnLabel+":", columnValue);
+                }
+
+                html += HtmlUtil.closeTag("table");
+                return html;
+        },
             getEntryMenuButton: function(entry) {
                 var menuButton = HtmlUtil.onClick(this.getGet()+".showEntryMenu(event, '" + entry.getId() +"');", 
                                                   HtmlUtil.image(root+"/icons/downdart.png", 
@@ -866,6 +890,22 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
             columns:this.getProperty(PROP_LAYOUT_COLUMNS, 1),
             isLayoutColumns: function() {
                 return this.layout == LAYOUT_COLUMNS;
+            },
+            getEntries: function(entries, map) {
+                if(map == null) map = {};
+                if(entries == null) entries = [];
+                for(var i=0;i<this.displays.length;i++) {
+                    var display  = this.displays[i];
+                    var displayEntries = display.getEntries();
+                    for(var entryIdx=0;entryIdx<displayEntries.length;entryIdx++) {
+                        var entry  = displayEntries[entryIdx];
+                        if(map[entry.getId()] == null) {
+                            map[entry.getId()] = entry;
+                            entries.push(entry);
+                        }
+                    }
+                }
+                return entries;
             },
             isLayoutRows: function() {
                 return this.layout == LAYOUT_ROWS;
