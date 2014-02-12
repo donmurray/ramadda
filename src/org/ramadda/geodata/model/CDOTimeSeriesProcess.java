@@ -1,11 +1,24 @@
+/*
+* Copyright 2008-2014 Geode Systems LLC
+*
+* Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+* software and associated documentation files (the "Software"), to deal in the Software 
+* without restriction, including without limitation the rights to use, copy, modify, 
+* merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
+* permit persons to whom the Software is furnished to do so, subject to the following conditions:
+* 
+* The above copyright notice and this permission notice shall be included in all copies 
+* or substantial portions of the Software.
+* 
+* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+* PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
+* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
+* OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+* DEALINGS IN THE SOFTWARE.
+*/
 package org.ramadda.geodata.model;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 import org.ramadda.data.process.DataProcess;
 import org.ramadda.data.process.DataProcessInput;
@@ -23,20 +36,55 @@ import org.ramadda.util.HtmlUtils;
 import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.time.Calendar;
 import ucar.nc2.time.CalendarDate;
+
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.util.IOUtil;
+
 import ucar.visad.data.CalendarDateTime;
 
+import java.io.File;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
+
+
+/**
+ * Class description
+ *
+ *
+ * @version        $version$, Wed, Feb 12, '14
+ * @author         Enter your name here...    
+ */
 public class CDOTimeSeriesProcess extends CDODataProcess {
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     *
+     * @throws Exception _more_
+     */
     public CDOTimeSeriesProcess(Repository repository) throws Exception {
         super(repository, "CDO_TIMESERIES", "Time Series");
     }
-    
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param input _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
     @Override
     public void addToForm(Request request, DataProcessInput input,
-            StringBuffer sb) throws Exception {
+                          StringBuffer sb)
+            throws Exception {
         sb.append(HtmlUtils.formTable());
         makeInputForm(request, input, sb);
         sb.append(HtmlUtils.formTableClose());
@@ -64,7 +112,7 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
 
         if (dataset != null) {
             getOutputHandler().addVarLevelWidget(request, sb, dataset,
-                                          CdmDataOutputHandler.ARG_LEVEL);
+                    CdmDataOutputHandler.ARG_LEVEL);
         }
 
         addStatsWidget(request, sb);
@@ -82,9 +130,20 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param input _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     @Override
     public DataProcessOutput processRequest(Request request,
-            DataProcessInput input) throws Exception {
+                                            DataProcessInput input)
+            throws Exception {
         if ( !canHandle(input)) {
             throw new Exception("Illegal data type");
         }
@@ -110,9 +169,32 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
         return new DataProcessOutput(outputEntries);
     }
 
+    /**
+     * _more_
+     *
+     * @param dpi _more_
+     *
+     * @return _more_
+     */
     @Override
     public boolean canHandle(DataProcessInput dpi) {
         // TODO Auto-generated method stub
+        if ( !getOutputHandler().isEnabled()) {
+            return false;
+        }
+        for (DataProcessOperand op : dpi.getOperands()) {
+            List<Entry> entries = op.getEntries();
+            // TODO: change this when we can handle more than one entry (e.g. daily data)
+            //if (entries.isEmpty() || (entries.size() > 1)) {
+            //    return false;
+            //}
+            Entry firstEntry = entries.get(0);
+            if ( !(firstEntry.getTypeHandler()
+                    instanceof ClimateModelFileTypeHandler)) {
+                return false;
+            }
+        }
+
         return true;
     }
 
@@ -126,117 +208,18 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
         sb.append(
             HtmlUtils.formEntry(
                 Repository.msgLabel("Statistic"),
-                HtmlUtils.radio( CDOOutputHandler.ARG_CDO_STAT,
-                    CDOOutputHandler.STAT_MEAN, true)+Repository.msg("Mean")+HtmlUtils.space(2)+
-                    HtmlUtils.radio(CDOOutputHandler.ARG_CDO_STAT, CDOOutputHandler.STAT_ANOM, false)
-                    +Repository.msg("Anomaly")));
-    }
-
-    /**
-     * Add a time widget
-     *
-     * @param request  the Request
-     * @param sb       the HTML page
-     * @param input    the input
-     *
-     * @throws Exception  problem making datasets
-     */
-    public void addTimeWidget(Request request, StringBuffer sb,
-                              DataProcessInput input)
-            throws Exception {
-
-        List<GridDataset> grids = new ArrayList<GridDataset>();
-        for (DataProcessOperand op : input.getOperands()) {
-            Entry first = op.getEntries().get(0);
-            CdmDataOutputHandler dataOutputHandler =
-                getOutputHandler().getDataOutputHandler();
-            GridDataset dataset =
-                dataOutputHandler.getCdmManager().getGridDataset(first,
-                    first.getResource().getPath());
-            if (dataset != null) {
-                grids.add(dataset);
-            }
-
-        }
-        CDOOutputHandler.makeMonthsWidget(request, sb, null);
-        makeYearsWidget(request, sb, grids);
+                HtmlUtils.radio(
+                    CDOOutputHandler.ARG_CDO_STAT,
+                    CDOOutputHandler.STAT_MEAN, true) + Repository.msg(
+                        "Mean") + HtmlUtils.space(2)
+                                + HtmlUtils.radio(
+                                    CDOOutputHandler.ARG_CDO_STAT,
+                                    CDOOutputHandler.STAT_ANOM,
+                                    false) + Repository.msg("Anomaly")));
     }
 
 
-    /**
-     * Add the year selection widget
-     *
-     * @param request  the Request
-     * @param sb       the StringBuffer to add to
-     * @param grids    list of grids to use
-     */
-    private void makeYearsWidget(Request request, StringBuffer sb,
-                                 List<GridDataset> grids) {
-        int grid = 0;
-        for (GridDataset dataset : grids) {
-            List<CalendarDate> dates =
-                CdmDataOutputHandler.getGridDates(dataset);
-            if ( !dates.isEmpty()) {
-                CalendarDate cd  = dates.get(0);
-                Calendar     cal = cd.getCalendar();
-                if (cal != null) {
-                    sb.append(
-                        HtmlUtils.hidden(
-                            CdmDataOutputHandler.ARG_CALENDAR,
-                            cal.toString()));
-                }
-            }
-            SortedSet<String> uniqueYears =
-                Collections.synchronizedSortedSet(new TreeSet<String>());
-            if ((dates != null) && !dates.isEmpty()) {
-                for (CalendarDate d : dates) {
-                    try {  // shouldn't get an exception
-                        String year =
-                            new CalendarDateTime(d).formattedString("yyyy",
-                                CalendarDateTime.DEFAULT_TIMEZONE);
-                        uniqueYears.add(year);
-                    } catch (Exception e) {}
-                }
-            }
-            List<String> years = new ArrayList<String>(uniqueYears);
-            // TODO:  make a better list of years
-            if (years.isEmpty()) {
-                for (int i = 1979; i <= 2012; i++) {
-                    years.add(String.valueOf(i));
-                }
-            }
-            String yearNum = (grid == 0)
-                             ? ""
-                             : String.valueOf(grid + 1);
-            String yrLabel = (grids.size() == 1)
-                             ? "Start"
-                             : (grid == 0)
-                               ? "First Dataset:<br>Start"
-                               : "Second Dataset:<br>Start";
-            yrLabel = Repository.msgLabel(yrLabel);
-            if (grid > 0) {
-                years.add(0, "");
-            }
-            int endIndex = (grid == 0)
-                           ? years.size() - 1
-                           : 0;
 
-            sb.append(
-                HtmlUtils.formEntry(
-                    Repository.msgLabel("Years"),
-                    yrLabel
-                    + HtmlUtils.select(
-                        CDOOutputHandler.ARG_CDO_STARTYEAR + yearNum, years,
-                        years.get(0)) + HtmlUtils.space(3)
-                                      + Repository.msgLabel("End")
-                                      + HtmlUtils.select(
-                                          CDOOutputHandler.ARG_CDO_ENDYEAR
-                                          + yearNum, years,
-                                              years.get(endIndex))));
-            grid++;
-        }
-    }
-    
     /**
      * Process the monthly request
      *
@@ -253,8 +236,9 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
             DataProcessInput dpi, DataProcessOperand op, int opNum)
             throws Exception {
 
-        Entry        oneOfThem = op.getEntries().get(0);
-        String tail = getOutputHandler().getStorageManager().getFileTail(oneOfThem);
+        Entry oneOfThem = op.getEntries().get(0);
+        String tail =
+            getOutputHandler().getStorageManager().getFileTail(oneOfThem);
         String       id        = getRepository().getGUID();
         String       newName = IOUtil.stripExtension(tail) + "_" + id + ".nc";
         File outFile = new File(IOUtil.joinDir(dpi.getProcessDir(), newName));
@@ -276,6 +260,10 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
             }
         }
 
+        commands.add("-fldavg");
+        if ( !request.defined(getOutputHandler().ARG_CDO_MONTHS)) {
+            commands.add("-yearmean");
+        }
         // Select order (left to right) - operations go right to left:
         //   - stats
         //   - level
@@ -283,11 +271,12 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
         //   - month range
         //   - year or time range
         getOutputHandler().addStatCommands(request, oneOfThem, commands);
-        getOutputHandler().addLevelSelectCommands(request, oneOfThem, commands,
-                                           CdmDataOutputHandler.ARG_LEVEL);
-        getOutputHandler().addAreaSelectCommands(request, oneOfThem, commands);
-        getOutputHandler().addDateSelectCommands(request, oneOfThem, commands,
-                                          opNum);
+        getOutputHandler().addLevelSelectCommands(request, oneOfThem,
+                commands, CdmDataOutputHandler.ARG_LEVEL);
+        getOutputHandler().addAreaSelectCommands(request, oneOfThem,
+                commands);
+        getOutputHandler().addDateSelectCommands(request, oneOfThem,
+                commands, opNum);
 
         //System.err.println("cmds:" + commands);
 
@@ -302,15 +291,18 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
                                 climName));
             commands = initCDOCommand();
 
+            commands.add("-fldavg");
             // Select order (left to right) - operations go right to left:
             //   - level
             //   - region
             //   - month range
             getOutputHandler().addStatCommands(request, climEntry, commands);
-            getOutputHandler().addLevelSelectCommands(request, climEntry, commands,
-                    CdmDataOutputHandler.ARG_LEVEL);
-            getOutputHandler().addAreaSelectCommands(request, climEntry, commands);
-            getOutputHandler().addMonthSelectCommands(request, climEntry, commands);
+            getOutputHandler().addLevelSelectCommands(request, climEntry,
+                    commands, CdmDataOutputHandler.ARG_LEVEL);
+            getOutputHandler().addAreaSelectCommands(request, climEntry,
+                    commands);
+            getOutputHandler().addMonthSelectCommands(request, climEntry,
+                    commands);
 
             //System.err.println("clim cmds:" + commands);
 
@@ -399,9 +391,8 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
         }
         //System.out.println("Name: " + outputName.toString());
 
-        Resource resource    = new Resource(outFile,
-                                            Resource.TYPE_LOCAL_FILE);
-        Entry    outputEntry = new Entry(new TypeHandler(getRepository()), true);
+        Resource resource = new Resource(outFile, Resource.TYPE_LOCAL_FILE);
+        Entry outputEntry = new Entry(new TypeHandler(getRepository()), true);
         outputEntry.setResource(resource);
 
         //return new DataProcessOperand(outputEntry.getName(), outputEntry);

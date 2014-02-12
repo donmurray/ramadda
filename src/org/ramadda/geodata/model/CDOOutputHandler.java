@@ -60,6 +60,7 @@ import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.data.CalendarDateTime;
@@ -103,7 +104,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
     /** end month identifier */
     public static final String ARG_CDO_ENDMONTH = ARG_CDO_PREFIX + "endmonth";
 
-    /** end month identifier */
+    /** months identifier */
     public static final String ARG_CDO_MONTHS = ARG_CDO_PREFIX + "months";
 
     /** start year identifier */
@@ -112,6 +113,9 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
 
     /** end year identifier */
     public static final String ARG_CDO_ENDYEAR = ARG_CDO_PREFIX + "endyear";
+
+    /** years identifier */
+    public static final String ARG_CDO_YEARS = ARG_CDO_PREFIX + "years";
 
     /** variable identifier */
     public static final String ARG_CDO_PARAM = ARG_CDO_PREFIX + "param";
@@ -1123,7 +1127,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param request the Request
      * @param entry   the associated Entry
      * @param commands list of commands
-     * @param dateCounter _more_
+     * @param dateCounter  the date counter
      *
      * @throws Exception  on badness
      */
@@ -1174,58 +1178,120 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
                         + CalendarDateFormatter.toDateTimeStringISO(dates[1]);
                 }
             }
-        } else {  // month and year
+        } else {                                // month and year
             addMonthSelectCommands(request, entry, commands);
-            String startYear =
-                request.defined(CDOOutputHandler.ARG_CDO_STARTYEAR
-                                + dateCounterString)
-                ? request.getString(CDOOutputHandler.ARG_CDO_STARTYEAR
-                                    + dateCounterString)
-                : request.defined(CDOOutputHandler.ARG_CDO_STARTYEAR)
-                  ? request.getString(CDOOutputHandler.ARG_CDO_STARTYEAR,
-                                      null)
-                  : null;
-            String endYear = request.defined(CDOOutputHandler.ARG_CDO_ENDYEAR
-                                             + dateCounterString)
-                             ? request.getString(
-                                 CDOOutputHandler.ARG_CDO_ENDYEAR
-                                 + dateCounterString)
-                             : request.defined(
-                                 CDOOutputHandler.ARG_CDO_ENDYEAR)
-                               ? request.getString(
-                                   CDOOutputHandler.ARG_CDO_ENDYEAR,
-                                   startYear)
-                               : startYear;
-            //have to have both dates
-            if ((startYear != null) && (endYear == null)) {
-                startYear = null;
-            }
-            if ((endYear != null) && (startYear == null)) {
-                endYear = null;
-            }
-            if ((startYear != null) && (endYear != null)) {
-                if (startYear.compareTo(endYear) > 0) {
-                    throw new IllegalArgumentException(
-                        "Start year is after end year");
-                    /*
-                getPageHandler().showDialogWarning(
-                    "Start year is after end year");
-                */
+            if (dateCounterString.isEmpty()) {  // first time through
+                String yearString = null;
+                if (request.defined(ARG_CDO_YEARS)) {
+                    yearString = request.getString(ARG_CDO_YEARS);
+                    yearString = verifyYearsList(yearString);
                 } else {
+                    String startYear =
+                        request.getString(CDOOutputHandler.ARG_CDO_STARTYEAR,
+                                          null);
+                    String endYear =
+                        request.getString(CDOOutputHandler.ARG_CDO_ENDYEAR,
+                                          startYear);
+                    verifyStartEndYears(startYear, endYear);
+                    yearString = startYear + "/" + endYear;
+                }
+                dateSelect = CDOOutputHandler.OP_SELYEAR + "," + yearString;
+            } else {
+                String years = request.defined(ARG_CDO_YEARS
+                                   + dateCounterString)
+                               ? request.getString(ARG_CDO_YEARS
+                                   + dateCounterString)
+                               : null;
+                if ((years == null) && request.defined(ARG_CDO_YEARS)
+                        && !(request.defined(
+                            ARG_CDO_STARTYEAR
+                            + dateCounterString) || request.defined(
+                                ARG_CDO_ENDYEAR + dateCounterString))) {
+                    years = request.getString(ARG_CDO_YEARS);
+                }
+                if (years != null) {
+                    years      = verifyYearsList(years);
+                    dateSelect = CDOOutputHandler.OP_SELYEAR + "," + years;
+                } else {
+                    String startYear =
+                        request.defined(CDOOutputHandler.ARG_CDO_STARTYEAR
+                                        + dateCounterString)
+                        ? request.getString(
+                            CDOOutputHandler.ARG_CDO_STARTYEAR
+                            + dateCounterString)
+                        : request.defined(CDOOutputHandler.ARG_CDO_STARTYEAR)
+                          ? request.getString(
+                              CDOOutputHandler.ARG_CDO_STARTYEAR, null)
+                          : null;
+                    String endYear =
+                        request.defined(CDOOutputHandler.ARG_CDO_ENDYEAR
+                                        + dateCounterString)
+                        ? request.getString(CDOOutputHandler.ARG_CDO_ENDYEAR
+                                            + dateCounterString)
+                        : request.defined(CDOOutputHandler.ARG_CDO_ENDYEAR)
+                          ? request.getString(
+                              CDOOutputHandler.ARG_CDO_ENDYEAR, startYear)
+                          : startYear;
+                    verifyStartEndYears(startYear, endYear);
                     dateSelect = CDOOutputHandler.OP_SELYEAR + ","
                                  + startYear + "/" + endYear;
                 }
             }
         }
-        // set some sort of default ?
-        /*
-        if (dateSelect == null) {
-            dateSelect = OP_SELYEAR + "," + startYear;
-        }
-        */
         if (dateSelect != null) {
             commands.add(dateSelect);
         }
+    }
+
+    /**
+     * Verify the start/end years
+     *
+     * @param startYear startYear
+     * @param endYear   endYear
+     *
+     * @throws Exception bad (or null) years
+     */
+    private void verifyStartEndYears(String startYear, String endYear)
+            throws Exception {
+        //have to have both dates
+        if ((startYear != null) && (endYear == null)) {
+            startYear = null;
+        }
+        if ((endYear != null) && (startYear == null)) {
+            endYear = null;
+        }
+        if ((startYear != null) && (endYear != null)) {
+            if (startYear.compareTo(endYear) > 0) {
+                throw new IllegalArgumentException(
+                    "Start year is after end year");
+            }
+        }
+    }
+
+    /**
+     * Verify that the list of years if valid
+     *
+     * @param years  list of comma separated years
+     *
+     * @return  the list of valid years
+     */
+    private String verifyYearsList(String years) {
+        List<String>  yearList = StringUtil.split(years, ",", true, true);
+        List<Integer> newYears = new ArrayList<Integer>();
+        // TODO: verify list of years by the data
+        for (String year : yearList) {
+            try {
+                int yearInt = Integer.parseInt(year);
+                newYears.add(yearInt);
+            } catch (NumberFormatException nfe) {
+                System.out.println("Bad year: " + year + ", omitting");
+
+                continue;
+            }
+        }
+        Collections.sort(newYears);
+
+        return StringUtil.join(",", newYears, true);
     }
 
     /**
@@ -1254,9 +1320,9 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
             } else if (period.equals(PERIOD_YMON)) {
                 commands.add("-" + PERIOD_YMON + stat);
             }
-        } else {  // ONLY FOR TESTING
-            commands.add("-" + PERIOD_TIM + STAT_MEAN);
-        }
+        } //else {  // ONLY FOR TESTING
+        //    commands.add("-" + PERIOD_TIM + STAT_MEAN);
+        //}
 
     }
 
@@ -1412,8 +1478,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
         /**
          * Can we handle this type of DataProcessInput?
          *
-         *
-         * @param dpi _more_
+         * @param dpi  the DataProcessInput to check
          * @return true if we can handle
          */
         public boolean canHandle(DataProcessInput dpi) {

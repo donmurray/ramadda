@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -109,7 +109,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
 
         if (dataset != null) {
             getOutputHandler().addVarLevelWidget(request, sb, dataset,
-                                          CdmDataOutputHandler.ARG_LEVEL);
+                    CdmDataOutputHandler.ARG_LEVEL);
         }
 
         addStatsWidget(request, sb);
@@ -196,8 +196,9 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             DataProcessInput dpi, DataProcessOperand op, int opNum)
             throws Exception {
 
-        Entry        oneOfThem = op.getEntries().get(0);
-        String tail = getOutputHandler().getStorageManager().getFileTail(oneOfThem);
+        Entry oneOfThem = op.getEntries().get(0);
+        String tail =
+            getOutputHandler().getStorageManager().getFileTail(oneOfThem);
         String       id        = getRepository().getGUID();
         String       newName = IOUtil.stripExtension(tail) + "_" + id + ".nc";
         File outFile = new File(IOUtil.joinDir(dpi.getProcessDir(), newName));
@@ -226,13 +227,14 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         //   - month range
         //   - year or time range
         getOutputHandler().addStatCommands(request, oneOfThem, commands);
-        getOutputHandler().addLevelSelectCommands(request, oneOfThem, commands,
-                                           CdmDataOutputHandler.ARG_LEVEL);
-        getOutputHandler().addAreaSelectCommands(request, oneOfThem, commands);
-        getOutputHandler().addDateSelectCommands(request, oneOfThem, commands,
-                                          opNum);
+        getOutputHandler().addLevelSelectCommands(request, oneOfThem,
+                commands, CdmDataOutputHandler.ARG_LEVEL);
+        getOutputHandler().addAreaSelectCommands(request, oneOfThem,
+                commands);
+        getOutputHandler().addDateSelectCommands(request, oneOfThem,
+                commands, opNum);
 
-        //System.err.println("cmds:" + commands);
+        System.err.println("cmds:" + commands);
 
         commands.add(oneOfThem.getResource().getPath());
         commands.add(outFile.toString());
@@ -250,10 +252,12 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             //   - region
             //   - month range
             getOutputHandler().addStatCommands(request, climEntry, commands);
-            getOutputHandler().addLevelSelectCommands(request, climEntry, commands,
-                    CdmDataOutputHandler.ARG_LEVEL);
-            getOutputHandler().addAreaSelectCommands(request, climEntry, commands);
-            getOutputHandler().addMonthSelectCommands(request, climEntry, commands);
+            getOutputHandler().addLevelSelectCommands(request, climEntry,
+                    commands, CdmDataOutputHandler.ARG_LEVEL);
+            getOutputHandler().addAreaSelectCommands(request, climEntry,
+                    commands);
+            getOutputHandler().addMonthSelectCommands(request, climEntry,
+                    commands);
 
             //System.err.println("clim cmds:" + commands);
 
@@ -300,10 +304,11 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         String yearNum = (opNum == 0)
                          ? ""
                          : String.valueOf(opNum + 1);
-        int startMonth, endMonth;
-        if (request.getString(CDOOutputHandler.ARG_CDO_MONTHS).equalsIgnoreCase("all")) {
+        int    startMonth, endMonth;
+        if (request.getString(
+                CDOOutputHandler.ARG_CDO_MONTHS).equalsIgnoreCase("all")) {
             startMonth = 1;
-            endMonth=12;
+            endMonth   = 12;
         } else {
             startMonth = request.defined(CDOOutputHandler.ARG_CDO_STARTMONTH)
                          ? request.get(CDOOutputHandler.ARG_CDO_STARTMONTH, 1)
@@ -347,9 +352,8 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         }
         //System.out.println("Name: " + outputName.toString());
 
-        Resource resource    = new Resource(outFile,
-                                            Resource.TYPE_LOCAL_FILE);
-        Entry    outputEntry = new Entry(new TypeHandler(getRepository()), true);
+        Resource resource = new Resource(outFile, Resource.TYPE_LOCAL_FILE);
+        Entry outputEntry = new Entry(new TypeHandler(getRepository()), true);
         outputEntry.setResource(resource);
 
         //return new DataProcessOperand(outputEntry.getName(), outputEntry);
@@ -491,16 +495,19 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
 
             sb.append(
                 HtmlUtils.formEntry(
-                    Repository.msgLabel("Years"),
-                    yrLabel
+                    Repository.msgLabel("Years"), yrLabel
                     + HtmlUtils.select(
-                        CDOOutputHandler.ARG_CDO_STARTYEAR + yearNum, years,
-                        years.get(0)) + HtmlUtils.space(3)
-                                      + Repository.msgLabel("End")
-                                      + HtmlUtils.select(
-                                          CDOOutputHandler.ARG_CDO_ENDYEAR
-                                          + yearNum, years,
-                                              years.get(endIndex))));
+                        CDOOutputHandler.ARG_CDO_STARTYEAR
+                        + yearNum, years, years.get(0)) + HtmlUtils.space(3)
+                            + Repository.msgLabel("End")
+                            + HtmlUtils.select(
+                                CDOOutputHandler.ARG_CDO_ENDYEAR
+                                + yearNum, years, years.get(
+                                    endIndex)) + HtmlUtils.p()
+                                        + Repository.msgLabel("or List")
+                                        + HtmlUtils.input(
+                                            CDOOutputHandler.ARG_CDO_YEARS
+                                            + yearNum, "", 20)));
             grid++;
         }
     }
