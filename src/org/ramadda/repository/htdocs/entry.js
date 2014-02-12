@@ -33,6 +33,9 @@ function EntryManager(repositoryRoot) {
                             if(callback!=null) {
                                 callback(this.entryTypes);
                             }
+                        }).fail(function(jqxhr, textStatus, error) {
+                            var err = textStatus + ", " + error;
+                            console.log("JSON error:" +err);
                         });
                 }
                 return this.entryTypes;
@@ -69,6 +72,7 @@ function EntryManager(repositoryRoot) {
                     url += "&metadata.attr1." + metadata.type + "=" + metadata.value;
                 }
                 url += "&max=" + searchSettings.getMax();
+                url += searchSettings.getExtra();
                 return url;
             },
 
@@ -135,15 +139,40 @@ function MetadataType(type, label,value) {
 }
 
 
-function EntryType(props) {
+function EntryTypeColumn(props) {
     $.extend(this, props);
-    $.extend(this, {
+    RamaddaUtil.defineMembers(this, {
+            getName: function() {return this.name;},
+            getLabel: function() {return this.label;},
+            getType: function() {return this.type;},
+            getValues: function() {return this.values;},
+            getSuffix: function() {return this.suffix;},
+            getSearchArg: function() {return "search." + this.namespace +"." + this.name;},
+            getCanSearch: function() {return this.cansearch;},
+            getCanShow: function() {return this.canshow;},
+            isEnumeration: function() {return this.getType() == "enumeration" || this.getType() == "enumerationplus";},
+        });
+}
+
+function EntryType(props) {
+    //Make the Columns
+    var columns = props.columns;
+    if(columns == null) colunms = [];
+    var myColumns = [];
+    for(var i=0;i<columns.length;i++) {
+        myColumns.push(new EntryTypeColumn(columns[i]));
+    }
+    props.columns = myColumns;
+    $.extend(this, props);
+
+    RamaddaUtil.defineMembers(this, {
             getIsGroup: function() {return this.isgroup;},
             getIcon: function() {return this.icon;},
             getLabel: function() {return this.label;},
             getId: function() {return this.type;},
             getCategory: function() {return this.category;},
             getEntryCount: function() {return this.entryCount;},
+            getColumns: function() {return this.columns;},
         });
 }
 
@@ -325,11 +354,21 @@ function EntrySearchSettings(props) {
             parent: null,
             max: 50,
             metadata: [],
+            extra:"",
             getMax: function() {
                 return this.max;
             },
+            getTypes: function() {
+                return this.types;
+            },
             hasType:function(type) {
                 return this.types.indexOf(type)>=0;
+            },
+            getExtra: function() {
+                return this.extra;
+            },
+            setExtra: function(extra) {
+                this.extra = extra;
             },
             clearAndAddType:function(type) {
                 this.types = [];

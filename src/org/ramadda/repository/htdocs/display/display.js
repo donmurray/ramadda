@@ -56,6 +56,18 @@ function DisplayThing(argId, argProperties) {
     if(argProperties == null) {
        argProperties = {};
     }
+
+    //check for booleans as strings
+    for(var i in argProperties) {
+        if(typeof  argProperties[i]  == "string") {
+            if(argProperties[i] == "true") argProperties[i] =true;
+            else if(argProperties[i] == "false") argProperties[i] =false;
+            else continue;
+            //            console.log("Changed type" + i);
+        }
+    }
+
+
     $.extend(this, argProperties);
 
 
@@ -80,6 +92,9 @@ function DisplayThing(argId, argProperties) {
          },
        getDomId:function(suffix) {
                 return this.getId() +"_" + suffix;
+       },
+       writeHtml: function(idSuffix, html) {
+                $("#" + this.getDomId(idSuffix)).html(html);
        },
        getFormValue: function(what, dflt) {
            var fromForm = $("#" + this.getDomId(what)).val();
@@ -216,9 +231,10 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                     }
                 }
             },
+            fieldsHtml:"",
             addFieldsCheckboxes: function() {
                 if(!this.hasData()) {
-                    $("#" + this.getDomId(ID_FIELDS)).html("No data");
+                    this.fieldsHtml = "No data";
                     return;
                 }
                 if(this.getProperty(PROP_FIELDS,null)!=null) {
@@ -237,8 +253,6 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                     } else {
                         html+= "<br>";
                     }
-
-
 
                     for(i=0;i<fields.length;i++) { 
                         var field = fields[i];
@@ -262,7 +276,8 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                     html+= HtmlUtil.closeTag("div");
                 }
 
-                $("#" + this.getDomId(ID_FIELDS)).html(html);
+                this.fieldsHtml = html;
+                this.writeHtml(ID_FIELDS,html);
 
                 var theDisplay = this;
                 //Listen for changes to the checkboxes
@@ -324,7 +339,6 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 }
                 return df;
             },
-
             getGet: function() {
                 return  "getRamaddaDisplay('" + this.getId() +"')";
             },
@@ -462,28 +476,6 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 }
                 window.open(url,'_blank');
             },
-            getDisplayMenuContents: function() {
-                var get = this.getGet();
-                var copyMe = HtmlUtil.onClick(get+".copyDisplay();", "Copy Display");
-                var deleteMe = HtmlUtil.onClick("removeRamaddaDisplay('" + this.getId() +"')", "Remove Display");
-                var menuItems = [];
-                this.getMenuItems(menuItems);
-                menuItems.push(copyMe);
-                menuItems.push(deleteMe);
-
-                if(this.jsonUrl!=null) {
-                    menuItems.push("Data: " + HtmlUtil.onClick(get+".fetchUrl('json');", "JSON")
-                                   + HtmlUtil.onClick(get+".fetchUrl('csv');", "CSV"));
-                }
-                var form = "<form>";
-
-                form += this.getDisplayMenuSettings();
-                for(var i in menuItems) {
-                    form += HtmlUtil.div(["class","display-menu-item"], menuItems[i]);
-                }
-                form += "</form>";
-                return HtmlUtil.div([], form);
-            },
             getMenuItems: function(menuItems) {
             },
             getDisplayMenuSettings: function() {
@@ -582,9 +574,28 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                     this.getLayoutManager().moveDisplayDown(this);
                 }
             },
-            getMenuContents: function() {
-                return this.getDisplayMenuContents();
-             },
+            getDialogContents: function() {
+                var get = this.getGet();
+                var copyMe = HtmlUtil.onClick(get+".copyDisplay();", "Copy Display");
+                var deleteMe = HtmlUtil.onClick("removeRamaddaDisplay('" + this.getId() +"')", "Remove Display");
+                var menuItems = [];
+                this.getMenuItems(menuItems);
+                menuItems.push(copyMe);
+                menuItems.push(deleteMe);
+
+                if(this.jsonUrl!=null) {
+                    menuItems.push("Data: " + HtmlUtil.onClick(get+".fetchUrl('json');", "JSON")
+                                   + HtmlUtil.onClick(get+".fetchUrl('csv');", "CSV"));
+                }
+                var form = "<form>";
+
+                form += this.getDisplayMenuSettings();
+                for(var i in menuItems) {
+                    form += HtmlUtil.div(["class","display-menu-item"], menuItems[i]);
+                }
+                form += "</form>";
+                return HtmlUtil.div([], form);
+            },
            popup: function(srcId, popupId) {
                 var popup = ramaddaUtil.getDomObject(popupId);
                 var srcObj = ramaddaUtil.getDomObject(srcId);
@@ -678,13 +689,16 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
 
                 var header = HtmlUtil.div(["class","display-dialog-header"], HtmlUtil.onClick("$('#" +this.getDomId(ID_DIALOG) +"').hide();",HtmlUtil.image(root +"/icons/close.gif",["class","display-dialog-close"])));
 
-                var menuContents = HtmlUtil.div(["class", "display-dialog-contents"], this.getMenuContents());
-                menuContents  = header + menuContents;
-                return menuContents;
+                var dialogContents = HtmlUtil.div(["class", "display-dialog-contents"], this.getDialogContents());
+                dialogContents  = header + dialogContents;
+                return dialogContents;
+            },
+            initDialog: function() {
             },
             showDialog: function() {
                 var dialog =this.getDomId(ID_DIALOG); 
-                $("#" + this.getDomId(ID_DIALOG)).html(this.makeDialog());
+                this.writeHtml(ID_DIALOG, this.makeDialog());
+                this.initDialog();
                 this.popup(this.getDomId(ID_DIALOG_BUTTON), dialog);
             },
             getContentsDiv: function() {
@@ -980,9 +994,9 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
                 var colCnt=100;
                 var displaysToLayout = this.getDisplaysToLayout();
 
-
-                for(var i=0;i<displaysToLayout.length;i++) {
-                    var display = displaysToLayout[i];
+                //Call prepare on all of them
+                for(var i=0;i<this.displays.length;i++) {
+                    var display = this.displays[i];
                     if(display.prepareToLayout!=null) {
                         display.prepareToLayout();
                     }

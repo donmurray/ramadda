@@ -693,11 +693,57 @@ public class EntryManager extends RepositoryManager {
             items.add("isgroup");
             items.add("" + typeHandler.isGroup());
 
+            List<String> cols = new ArrayList<String>();
+            List<Column> columns  = typeHandler.getColumns();
+            if(columns!=null) {
+                for(Column column: columns) {
+                    List<String>col = new ArrayList<String>();
+                    col.add("name");
+                    col.add(Json.quote(column.getName()));
+                    col.add("label");
+                    col.add(Json.quote(column.getLabel()));
+                    col.add("name");
+                    col.add(Json.quote(column.getName()));
+                    col.add("type");
+                    col.add(Json.quote(column.getType()));
+                    col.add("namespace");
+                    col.add(Json.quote(typeHandler.getTableName()));
+                    col.add("suffix");
+                    col.add(Json.quote(column.getSuffix()));
+                    col.add("canshow");
+                    col.add(""+column.getCanShow());
+                    col.add("cansearch");
+                    col.add(""+column.getCanSearch());
+                    col.add("canshow");
+                    col.add(""+column.getCanShow());
+                    col.add("canlist");
+                    col.add(""+column.getCanList());
+                    if(column.isEnumeration()) {
+                        List<String> enums   = new ArrayList<String>();
+                        List<TwoFacedObject> values = typeHandler.getEnumValues(request, column,null);
+                        if(values!=null) {
+                            for(TwoFacedObject tfo: values) {
+                                enums.add(Json.map("value",Json.quote(tfo.getId().toString()),"label", Json.quote(tfo.getLabel().toString())));
+                            }
+                        }
+                        col.add("values");
+                        col.add(Json.list(enums));
+                    }
+                    cols.add(Json.map(col));
+                }
+            }
+
+
+
+            items.add("columns");
+            items.add(Json.list(cols));
+
             String icon = typeHandler.iconUrl(typeHandler.getProperty("icon", (String) ICON_FOLDER_CLOSED));
             items.add("icon");
             items.add(Json.quote(icon));
             items.add("category");
             items.add(Json.quote(typeHandler.getCategory()));
+
             types.add(Json.map(items));
 
 

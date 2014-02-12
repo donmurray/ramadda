@@ -36,6 +36,7 @@ id - the id of this chart. Has to correspond to a div tag id
 pointData - A PointData object (see below)
  */
 function RamaddaMultiChart(displayManager, id, properties) {
+    var SUPER; 
     var ID_CHART = "chart";
     //Init the defaults first
     $.extend(this, {
@@ -47,7 +48,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
             vAxisMaxValue:NaN
            });
 
-    RamaddaUtil.inherit(this, new RamaddaDisplay(displayManager, id, properties.chartType, properties));
+    RamaddaUtil.inherit(this, SUPER = new RamaddaDisplay(displayManager, id, properties.chartType, properties));
 
     RamaddaUtil.defineMembers(this, {
             getType: function () {
@@ -67,10 +68,13 @@ function RamaddaMultiChart(displayManager, id, properties) {
             fieldSelectionChanged: function() {
                 this.displayData();
             },
-            getMenuContents: function() {
+            initDialog: function() {
+                this.addFieldsCheckboxes();
+            },
+            getDialogContents: function() {
                 var height = this.getProperty(PROP_HEIGHT,"400");
-                var html  =  HtmlUtil.div(["id",  this.getDomId(ID_FIELDS),"style","overflow-y: auto;    max-height:" + height +"px;"]);
-                html +=  this.getDisplayMenuContents();
+                var html  =  HtmlUtil.div(["id",  this.getDomId(ID_FIELDS),"style","overflow-y: auto;    max-height:" + height +"px;"],"FIELDS");
+                html +=  SUPER.getDialogContents.apply(this);
                 return html;
             },
             handleRecordSelection: function(source, index, record, html) {

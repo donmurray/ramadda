@@ -6,10 +6,11 @@ Copyright 2008-2014 Geode Systems LLC
 
 
 function RamaddaD3Display(displayManager, id, properties) {
+    var SUPER; 
 
     var ID_SVG = "svg";
 	
-    $.extend(this, new RamaddaDisplay(displayManager, id, "d3", properties));
+    $.extend(this, SUPER = new RamaddaDisplay(displayManager, id, "d3", properties));
     addRamaddaDisplay(this);
 
     $.extend(this, {
@@ -20,10 +21,10 @@ function RamaddaD3Display(displayManager, id, properties) {
                 this.updateUI();
             },
             needsData: function() {return true;},
-            getMenuContents: function() {
+            getDialogContents: function() {
                 var height = this.getProperty(PROP_HEIGHT,"400");
                 var html  =  HtmlUtil.div(["id",  this.getDomId(ID_FIELDS),"class", "display-fields","style","overflow-y: auto;    max-height:" + height +"px;"]);
-                html +=  this.getDisplayMenuContents();
+                html +=  SUPER.getDialogContents.apply(this);
                 return html;
             },
             fieldSelectionChanged: function() {
@@ -202,10 +203,10 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
                 this.updateUI();
             },
             needsData: function() {return true;},
-            getMenuContents: function() {
+            getDialogContents: function() {
                 var height = this.getProperty(PROP_HEIGHT,"400");
                 var html  =  HtmlUtil.div(["id",  this.getDomId(ID_FIELDS),"class", "display-fields",]);
-                html +=  this.getDisplayMenuContents();
+                html +=  this.getDisplayDialogContents();
                 return html;
             },
             fieldSelectionChanged: function() {

@@ -72,7 +72,6 @@ function getDisplayManager(id) {
 
 //
 //DisplayManager constructor
-//id should correspond to a DOM element id
 //
 
 function DisplayManager(argId,argProperties) {
