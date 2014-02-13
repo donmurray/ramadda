@@ -314,8 +314,15 @@ var HtmlUtil =  {
         return this.tag("a", ["href", url], label);
     },
 
-    onClick : function(call, html) {
-        return this.tag("a", ["onclick", call, "style","xtext-decoration:none;color:black;"], html);
+    onClick : function(call, html, attrs) {
+        var myAttrs = ["onclick", call, "style","color:black;"];
+        if(attrs!=null) {
+            for(var i=0;i<attrs.length;i++) {
+                console.log("attr:" + attrs[i]);
+                myAttrs.push(attrs[i]);
+            }
+        }
+        return this.tag("a", myAttrs, html);
     },
 
     checkbox:  function(id,cbxclass,checked) {

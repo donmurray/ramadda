@@ -72,6 +72,7 @@ function EntryManager(repositoryRoot) {
                     url += "&metadata.attr1." + metadata.type + "=" + metadata.value;
                 }
                 url += "&max=" + searchSettings.getMax();
+                url += "&skip=" + searchSettings.getSkip();
                 url += searchSettings.getExtra();
                 return url;
             },
@@ -282,6 +283,8 @@ function Entry (props) {
 
 function EntryList(jsonUrl, listener) {
     var entryList = this;
+
+
     $.extend(this, {
             haveLoaded : false,
             divId : null,
@@ -334,6 +337,7 @@ function EntryList(jsonUrl, listener) {
             }
             });
 
+    this.url = jsonUrl;
     var jqxhr = $.getJSON( jsonUrl, function(data) {
             entryList.haveLoaded = true;
             entryList.createEntries(data);
@@ -353,10 +357,14 @@ function EntrySearchSettings(props) {
             types: [],
             parent: null,
             max: 50,
+            skip: 0,
             metadata: [],
             extra:"",
             getMax: function() {
                 return this.max;
+            },
+            getSkip: function() {
+                return this.skip;
             },
             getTypes: function() {
                 return this.types;

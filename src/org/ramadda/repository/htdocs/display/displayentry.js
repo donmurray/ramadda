@@ -9,7 +9,6 @@ addGlobalDisplayType({type: DISPLAY_ENTRYDISPLAY, label:"Entry Display",requires
 addGlobalDisplayType({type: DISPLAY_OPERANDS, label:"Operands",requiresData:false});
 
 
-
 function RamaddaEntryDisplay(displayManager, id, type, properties) {
      var SUPER;
      RamaddaUtil.inherit(this, SUPER = new RamaddaDisplay(displayManager, id, type, properties));
@@ -219,7 +218,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 this.writeHtml(ID_ENTRIES, this.getLoadingMessage());
 
                 console.log("json:" + jsonUrl);
-                this.entryList = new EntryList(jsonUrl, this);
+                this.entryList = new EntryList(jsonUrl, this, this.entryList);
             },
             prepareToLayout:function() {
                 SUPER.prepareToLayout.apply(this);
@@ -306,6 +305,8 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 return html;
             },
             typeChanged: function() {
+                this.settings.skip=0;
+                this.settings.max=50;
                 this.settings.entryType  = this.getFieldValue(this.getDomId(ID_TYPE_FIELD), this.settings.entryType);
                 this.settings.clearAndAddType(this.settings.entryType);
                 this.addExtraForm();
@@ -485,25 +486,39 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 if(this.entryList == null) return [];
                 return  this.entryList.getEntries();
             },
+
+
+            loadNextUrl: function() {
+                this.settings.skip+= this.settings.max;
+                this.submitSearchForm();
+            },
+            loadPrevUrl: function() {
+                this.settings.skip = Math.max(0, this.settings.skip-this.settings.max);
+                this.submitSearchForm();
+            },
             entryListChanged: function(entryList) {
                 this.entryList = entryList;
                 var rowClass = "entryrow_" + this.getId()
                 var entries = this.entryList.getEntries();
                 var html = "";
                 if(entries.length==0) {
+                    this.settings.skip=0;
+                    this.settings.max=50;
                     this.writeHtml(ID_ENTRIES, this.getMessage("Nothing found"));
                     this.writeHtml(ID_FOOTER_LEFT,"");
                     this.writeHtml(ID_RESULTS,"");
                     return;
                 }
-
-                var results = "Found: " + entries.length +" " ;
-                if(entries.length == this.settings.getMax()) {
-                    results += " todo: add next/prev link";
-                } else {
-
+                var results = "Showing #" + (this.settings.skip+1) +"-" +(this.settings.skip+Math.min(this.settings.max, entries.length))+" ";
+                if(this.settings.skip>0) {
+                    results += HtmlUtil.onClick(this.getGet()+".loadPrevUrl();", "Previous",["class","display-link"]);
+                    results += " ";
                 }
-                //                console.log("results:" + results);
+                if(entries.length == this.settings.getMax()) {
+                    results += HtmlUtil.onClick(this.getGet()+".loadNextUrl();", "Next",["class","display-link"]);
+                    results += " ";
+                }
+
                 this.writeHtml(ID_RESULTS, results);
 
                 html += HtmlUtil.openTag("ol",["class","display-entrylist-list", "id",this.getDomId(ID_LIST)]);
@@ -671,10 +686,11 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
     $.extend(this, new RamaddaEntryDisplay(displayManager, id, DISPLAY_OPERANDS, properties));
     addRamaddaDisplay(this);
     $.extend(this, {
+            baseUrl: null,
             initDisplay: function() {
                 this.initUI();
-                var jsonUrl = getEntryManager().getSearchUrl(this.settings, OUTPUT_JSON);
-                this.entryList = new EntryList(jsonUrl, this);
+                this.baseUrl = getEntryManager().getSearchUrl(this.settings, OUTPUT_JSON);
+                this.entryList = new EntryList(jsonUrl, this, this.entryList);
                 var html = "";
                 html += HtmlUtil.div(["id",this.getDomId(ID_ENTRIES),"class","display-entrylist-entries"], "");
                 this.setContents(html);
