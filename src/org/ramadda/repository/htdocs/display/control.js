@@ -83,7 +83,7 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
                     label += HtmlUtil.b("Index:") +" " + this.index;
                 }
                 $("#" + this.getDomId(ID_TIME)).html(label);
-                this.displayManager.handleRecordSelection(this, null, this.index);
+                this.displayManager.handleEventRecordSelection(this, null, this.index);
             },
             faster: function() {
                 this.sleepTime = this.sleepTime/2;

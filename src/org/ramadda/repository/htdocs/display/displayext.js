@@ -57,8 +57,9 @@ function RamaddaExampleDisplay(displayManager, id, properties) {
                 $("#" + this.getDomId(ID_DATA)).html(html);
             },
             //this gets called when an event source has selected a record
-            handleRecordSelection: function(source, index, record, html) {
-                //                  this.setContents(html);
+            handleEventRecordSelection: function(source, args) {
+                //args: index, record, html
+                //this.setContents(args.html);
             },
             click: function() {
                 $("#"+this.getDomId(ID_CLICK)).html("Click again");

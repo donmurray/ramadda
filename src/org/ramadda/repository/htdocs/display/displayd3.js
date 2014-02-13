@@ -6,21 +6,21 @@ Copyright 2008-2014 Geode Systems LLC
 
 
 function RamaddaD3Display(displayManager, id, properties) {
-    var SUPER; 
-
     var ID_SVG = "svg";
-	
-    $.extend(this, SUPER = new RamaddaDisplay(displayManager, id, "d3", properties));
+    var SUPER; 
+    RamaddaUtil.inherit(this, SUPER = new RamaddaDisplay(displayManager, id, "d3", properties));
     addRamaddaDisplay(this);
 
     $.extend(this, {
-
             initDisplay: function() {
                 this.initUI();
                 this.setTitle("D3 Example");
                 this.updateUI();
             },
             needsData: function() {return true;},
+            initDialog: function() {
+                this.addFieldsCheckboxes();
+            },
             getDialogContents: function() {
                 var height = this.getProperty(PROP_HEIGHT,"400");
                 var html  =  HtmlUtil.div(["id",  this.getDomId(ID_FIELDS),"class", "display-fields","style","overflow-y: auto;    max-height:" + height +"px;"]);
@@ -124,10 +124,11 @@ function RamaddaD3Display(displayManager, id, properties) {
 
             },
             //this gets called when an event source has selected a record
-            handleRecordSelection: function(source, index, record, html) {
+            handleEventRecordSelection: function(source, args) {
+                //args: index, record, html
                 console.log(source);
-				console.log(index);
-				console.log(record);
+                console.log(index);
+                console.log(record);
             },
             click: function() {
                 $("#"+this.getDomId(ID_CLICK)).html("Click again");
@@ -140,9 +141,9 @@ function RamaddaD3Display(displayManager, id, properties) {
 addGlobalDisplayType({type: "d3", label:"D3 Example"});
 
 function RamaddaD3LineChartDisplay(displayManager, id, properties) {
-
     var ID_SVG = "svg";
-    $.extend(this, new RamaddaDisplay(displayManager, id, "d3", properties));
+    var SUPER; 
+    RamaddaUtil.inherit(this, SUPER = new RamaddaDisplay(displayManager, id, "d3", properties));
     addRamaddaDisplay(this);
     $.extend(this, {
             initDisplay: function() {
@@ -203,10 +204,13 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
                 this.updateUI();
             },
             needsData: function() {return true;},
+            initDialog: function() {
+                this.addFieldsCheckboxes();
+            },
             getDialogContents: function() {
                 var height = this.getProperty(PROP_HEIGHT,"400");
                 var html  =  HtmlUtil.div(["id",  this.getDomId(ID_FIELDS),"class", "display-fields",]);
-                html +=  this.getDisplayDialogContents();
+                html +=  SUPER.getDialogContents.apply(this);
                 return html;
             },
             fieldSelectionChanged: function() {
@@ -336,8 +340,8 @@ function RamaddaD3LineChartDisplay(displayManager, id, properties) {
 				
 			},
             //this gets called when an event source has selected a record
-            handleRecordSelection: function(source, index, record, html) {
-                //                  this.setContents(html);
+            handleEventRecordSelection: function(source, args) {
+                //this.setContents(args.html);
             },
             click: function(event) {
                 console.log("Clicked");

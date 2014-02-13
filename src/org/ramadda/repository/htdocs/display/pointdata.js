@@ -39,6 +39,10 @@ function DataCollection() {
     }
 
     this.addData = function(data) {
+        if(data.toString().contains("RamaddaDisplay")) {
+            console.log("add data:" + data);
+            throw "bad data";
+        }
         this.data.push(data);
     }
 

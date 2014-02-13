@@ -11,7 +11,8 @@ addGlobalDisplayType({type: DISPLAY_OPERANDS, label:"Operands",requiresData:fals
 
 
 function RamaddaEntryDisplay(displayManager, id, type, properties) {
-     RamaddaUtil.inherit(this, new RamaddaDisplay(displayManager, id, type, properties));
+     var SUPER;
+     RamaddaUtil.inherit(this, SUPER = new RamaddaDisplay(displayManager, id, type, properties));
      RamaddaUtil.defineMembers(this, {
              settings: new EntrySearchSettings({
                      parent: properties.entryParent,
@@ -458,8 +459,8 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
            highlightEntry: function(entry) {
                 $("#"+this.getDomId("entryinner_" + entry.getId())).addClass("display-entrylist-highlight");
             },
-            handleEntrySelection: function(source, entry, selected) {
-                this.selectEntry(entry, selected);
+            handleEventEntrySelection: function(source, args) {
+                this.selectEntry(args.entry, args.selected);
             },
             selectEntry: function(entry, selected) {
                 var changed  = false;
@@ -589,7 +590,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                             //                            console.log("selected:" +  entry);
                             if(entry!=null) {
                                 theDisplay.selectedEntries.push(entry);
-                                theDisplay.getDisplayManager().handleEntrySelection(theDisplay, entry, true);
+                                theDisplay.getDisplayManager().handleEventEntrySelection(theDisplay, entry, true);
                             }
                         },
                         unselected: function( event, ui ) {
@@ -599,14 +600,14 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                             //                            console.log("remove:" +  index + " " + theDisplay.selectedEntries);
                             if (index > -1) {
                                 theDisplay.selectedEntries.splice(index, 1);
-                                theDisplay.getDisplayManager().handleEntrySelection(theDisplay, entry, false);
+                                theDisplay.getDisplayManager().handleEventEntrySelection(theDisplay, entry, false);
                             }
                         },
                             
                     });
 
 
-                this.getDisplayManager().handleEntriesChanged(this, entries);
+                this.getDisplayManager().handleEventEntriesChanged(this, entries);
             }
         });
 }
@@ -621,7 +622,9 @@ function RamaddaEntrydisplayDisplay(displayManager, id, properties) {
                 this.setTitle("Entry Display");
                 this.addEntryHtml(this.selectedEntry);
             },
-            handleEntrySelection: function(source, entry, selected) {
+            handleEventEntrySelection: function(source, args) {
+                var selected = args.selected;
+                var entry = args.entry;
                 if(!selected) {
                     if(this.selectedEntry != entry) {
                         //not mine

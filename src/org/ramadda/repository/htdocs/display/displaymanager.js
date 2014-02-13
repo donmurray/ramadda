@@ -79,7 +79,6 @@ function DisplayManager(argId,argProperties) {
     RamaddaUtil.defineMembers(this, {
                 dataList : [],
                 displayTypes: [],
-                eventListeners: [],
                 group: new DisplayGroup(this, argId,argProperties),
                 showmap : this.getProperty(PROP_SHOW_MAP,null),
                 initMapBounds : null,
@@ -105,25 +104,10 @@ function DisplayManager(argId,argProperties) {
            getData: function() {
                return this.dataList;
            },
-           addDisplayEventListener: function(listener) {
-               this.eventListeners.push(listener);
+           handleEventEntriesChanged: function (source, entries) {
+               this.notifyEvent("handleEventEntriesChanged", source, entries);
            },
-           handleEntriesChanged: function (source, entries) {
-               for(var i=0;i< this.eventListeners.length;i++) {
-                   eventListener = this.eventListeners[i];
-                   if(eventListener == source) continue;
-                   var eventSource  = eventListener.getEventSource();
-                   if(eventSource!=null && eventSource.length>0) {
-                       if(eventSource!= source.getId() && eventSource!= source.getName()) {
-                           continue;
-                        }
-                   }
-                   if(eventListener.handleEntriesChanged) {
-                       eventListener.handleEntriesChanged(source, entries);
-                   }
-               }
-           },
-           handleMapClick: function (mapDisplay, lon, lat) {
+           handleEventMapClick: function (mapDisplay, lon, lat) {
                 var indexObj = [];
                 var records = null;
                 for(var i=0;i<this.dataList.length;i++) {
@@ -134,10 +118,10 @@ function DisplayManager(argId,argProperties) {
                 var indexObj = [];
                 var closest =  RecordUtil.findClosest(records, lon, lat, indexObj);
                 if(closest!=null) {
-                    this.handleRecordSelection(mapDisplay, pointData, indexObj.index);
+                    this.handleEventRecordSelection(mapDisplay, pointData, indexObj.index);
                 }
             },
-            handleRecordSelection: function(source, pointData, index) {
+            handleEventRecordSelection: function(source, pointData, index) {
                 if(pointData ==null && this.dataList.length>0) {
                     pointData = this.dataList[0];
                 }
@@ -147,7 +131,7 @@ function DisplayManager(argId,argProperties) {
                     return;
                 }
                 if(index<0 || index>= records.length) {
-                    console.log("handleRecordSelection: bad index= " + index);
+                    console.log("handleEventRecordSelection: bad index= " + index);
                     return;
                  }
                 var record = records[index];
@@ -166,42 +150,15 @@ function DisplayManager(argId,argProperties) {
                     values+= "<tr><td align=right><b>" + label +":</b></td><td>" + record.getValue(i) + "</td></tr>";
                 }
                 values += "</table>";
-
-
-                for(var i=0;i< this.eventListeners.length;i++) {
-                    eventListener = this.eventListeners[i];
-                    if(eventListener == source) continue;
-                    var eventSource  = eventListener.getEventSource();
-                    if(eventSource!=null && eventSource.length>0) {
-                        if(eventSource!= source.getId() && eventSource!= source.getName()) {
-                            //                            console.log("skipping:" + eventSource);
-                            continue;
-                        }
-                    }
-                    if(eventListener.handleRecordSelection) {
-                        eventListener.handleRecordSelection(source, index, record, values);
-                    } else {
-                        //                        console.log("no handle func : " + eventListener.getId());
-                    }
-                }
+                this.notifyEvent("handleEventRecordSelection", source, {index:index, record:record, html:values});
             },
-            handleEntrySelection: function(source, entry, selected) {
-                for(var i=0;i< this.eventListeners.length;i++) {
-                    eventListener = this.eventListeners[i];
-                    if(eventListener == source) {
-                        continue;
-                    }
-                    var eventSource  = eventListener.getEventSource();
-                    if(eventSource!=null && eventSource.length>0) {
-                        if(eventSource!= source.getId() && eventSource!= source.getName()) {
-                            continue;
-                        }
-                    }
-                    if(eventListener.handleEntrySelection) {
-                        eventListener.handleEntrySelection(source, entry, selected);
-                    } 
-                }
+            handleEventEntrySelection: function(source, entry, selected) {
+               this.notifyEvent("handleEventEntrySelection", source, {entry:entry, selected:selected});
             },
+            handleEventPointDataLoaded: function(source, pointData) {
+                this.notifyEvent("handleEventPointDataLoaded", source, pointData);
+            },
+
             makeMainMenu: function() {
                 if(!this.getProperty(PROP_SHOW_MENU, true))  {
                     return "";
@@ -348,27 +305,15 @@ function DisplayManager(argId,argProperties) {
             },
             addDisplay: function(display) {
                 display.setDisplayManager(this);
-                this.addDisplayEventListener(display);
                 display.loadInitialData();
                 this.getLayoutManager().addDisplay(display);
             },
+            notifyEvent:function(func, source, data) {
+               this.getLayoutManager().notifyEvent(func, source, data);
+            }, 
             removeDisplay:function(display) {
-                for(var i=0;i< this.eventListeners.length;i++) {
-                    eventListener = this.eventListeners[i];
-                    if(eventListener.handleDisplayDelete!=null) {
-                        eventListener.handleDisplayDelete(display);
-                    }
-                }
                 this.getLayoutManager().removeDisplay(display);
-            },
-            pointDataLoaded: function(source, pointData) {
-                for(var i=0;i< this.eventListeners.length;i++) {
-                    eventListener = this.eventListeners[i];
-                    if(eventListener.handlePointDataLoaded!=null) {
-                        eventListener.handlePointDataLoaded(source, pointData);
-                    }
-                }
-
+                this.notifyEvent("handleEventRemoveDisplay", this, display);
             },
         });
 

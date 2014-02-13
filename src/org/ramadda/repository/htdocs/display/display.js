@@ -149,9 +149,8 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             orientation: "horizontal",
         });
 
-    RamaddaUtil.inherit(this,new DisplayThing(argId, argProperties));
-
-
+    var SUPER;
+    RamaddaUtil.inherit(this,SUPER = new DisplayThing(argId, argProperties));
 
     RamaddaUtil.defineMembers(this, {
             type: argType,
@@ -165,6 +164,10 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             },
             getLayoutManager: function() {
                 return this.getDisplayManager().getLayoutManager();
+            },
+            notifyEvent:function(func, source, data) {
+                if(this[func] == null) { return;}
+                this[func].apply(this, [source,data]);
             },
             toString: function() {
                  return "RamaddaDisplay:" + this.getId();
@@ -183,7 +186,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             addEntry: function(entry) {
                 this.entries.push(entry);
             },
-            handleRecordSelection: function(source, index, record, html) {
+            handleEventRecordSelection: function(source, args) {
                 if(!source.getEntries) {
                     return;
                 }
@@ -196,12 +199,12 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                     }
                 }
             },
-            handleEntrySelection: function(source, entry, selected) {
-                var containsEntry = this.getEntries().indexOf(entry) >=0;
+            handleEventEntrySelection: function(source, args) {
+                var containsEntry = this.getEntries().indexOf(args.entry) >=0;
                 if(!containsEntry) {
                     return;
                 }
-                if(selected) {
+                if(args.selected) {
                     $("#" + this.getDomId(ID_TITLE)).addClass("display-title-select");
                 } else {
                     $("#" + this.getDomId(ID_TITLE)).removeClass("display-title-select");
@@ -788,7 +791,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             pointDataLoaded: function(pointData, url) {
                 this.addData(pointData);
                 this.updateUI(pointData);
-                this.getDisplayManager().pointDataLoaded(this, pointData);
+                this.getDisplayManager().handleEventPointDataLoaded(this, pointData);
                 if(url!=null) {
                     this.jsonUrl = url;
                 } else {
@@ -929,7 +932,8 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
     var LAYOUT_ROWS = "rows";
 
 
-    RamaddaUtil.inherit(this, new RamaddaDisplay(argDisplayManager, argId, "group", argProperties));
+    var SUPER;
+    RamaddaUtil.inherit(this, SUPER = new RamaddaDisplay(argDisplayManager, argId, "group", argProperties));
 
     RamaddaUtil.defineMembers(this, {
             layout:this.getProperty(PROP_LAYOUT_TYPE, LAYOUT_TABLE)});
@@ -970,6 +974,23 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
                     }
                 }
             },
+            getDisplays:function() {
+                return this.display;
+            },
+            notifyEvent:function(func, source, data) {
+               var displays  = this.getDisplays();
+               for(var i=0;i<this.displays.length;i++) {
+                   var display = this.displays[i];
+                   if(display == source) continue;
+                   var eventSource  = display.getEventSource();
+                   if(eventSource!=null && eventSource.length>0) {
+                       if(eventSource!= source.getId() && eventSource!= source.getName()) {
+                           continue;
+                        }
+                   }
+                   display.notifyEvent(func, source, data);
+               }
+            }, 
             getDisplaysToLayout:function() {
                 var result = [];
                 for(var i=0;i<this.displays.length;i++) {

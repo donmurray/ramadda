@@ -77,12 +77,12 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 html +=  SUPER.getDialogContents.apply(this);
                 return html;
             },
-            handleRecordSelection: function(source, index, record, html) {
+            handleEventRecordSelection: function(source, args) {
                 var chartType = this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
                 if(source==this) {
                     return;
                 }
-                this.setChartSelection(index);
+                this.setChartSelection(args.index);
             },
             displayData: function() {
                 if(this.getShowTitle()) {
@@ -172,7 +172,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                     var theDisplay = this;
                     google.visualization.events.addListener(this.chart, 'select', function() {
                             var index = theDisplay.chart.getSelection()[0].row;
-                            theDisplay.displayManager.handleRecordSelection(theDisplay, 
+                            theDisplay.displayManager.handleEventRecordSelection(theDisplay, 
                                                                             theDisplay.dataCollection.getList()[0], index);
                         });
                 }
@@ -206,7 +206,8 @@ function TableDisplay(displayManager, id, properties) {
 
 
 function RamaddaTextDisplay(displayManager, id, properties) {
-    $.extend(this, new RamaddaDisplay(displayManager, id, DISPLAY_TEXT, properties));
+    var SUPER;
+    $.extend(this, SUPER = new RamaddaDisplay(displayManager, id, DISPLAY_TEXT, properties));
     addRamaddaDisplay(this);
     RamaddaUtil.defineMembers(this, {
             lastHtml:"<p>&nbsp;<p>&nbsp;<p>",
@@ -214,9 +215,9 @@ function RamaddaTextDisplay(displayManager, id, properties) {
                 this.initUI();
                 this.setContents(this.lastHtml);
             },
-            handleRecordSelection: function(source, index, record, html) {
-                this.lastHtml = html;
-                this.setContents(html);
+            handleEventRecordSelection: function(source,  args) {
+                this.lastHtml = args.html;
+                this.setContents(args.html);
             }
         });
 }
