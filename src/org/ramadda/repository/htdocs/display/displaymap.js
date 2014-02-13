@@ -26,7 +26,7 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             initBounds:displayManager.initMapBounds,
             mapBoundsSet:false,
             features: [],
-            markers: {},
+            myMarkers: {},
             sourceToLine: {},
             sourceToPoints: {},
             snarf:true,
@@ -114,21 +114,17 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 var oldEntries = this.sourceToEntries[source.getId()];
                 if(oldEntries!=null) {
                     for(var i=0;i<oldEntries.length;i++) {
-                        this.handleEventEntrySelection(source, {entry:oldEntries[i], selected:false});
+                        var id = source.getId() +"_" + oldEntries[i].getId();
+                        this.addOrRemoveEntryMarker(id, oldEntries[i],false);
                     }
                 }
+
                 this.sourceToEntries[source.getId()] = entries;
                 for(var i=0;i<entries.length;i++) {
-                    this.handleEventEntrySelection(source, {entry:entries[i], selected:true});
+                    var id = source.getId() +"_" + entries[i].getId();
+                    this.addOrRemoveEntryMarker(id, entries[i],true);
                 }
                 this.map.zoomToMarkers();
-            },
-            handleMapClick: function(marker) {
-                if(this.selectedMarker!=null) {
-                    this.getDisplayManager().handleEventEntrySelection(this, this.selectedMarker.entry, false);
-                }
-                this.getDisplayManager().handleEventEntrySelection(this, marker.entry, true);
-                this.selectedMarker = marker;
             },
             handleEventEntrySelection: function(source, args) {
                 var entry = args.entry;
@@ -136,12 +132,16 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 if(!entry.hasLocation()) {
                     return;
                 }
-                var id = source.getId() +"_" + entry.getId();
-                var marker  = this.markers[id];
-                if(!selected) {
+                if(selected) {
+                    this.map.setSelectionMarker(entry.getLongitude(), entry.getLatitude());
+                }
+            },
+            addOrRemoveEntryMarker: function(id, entry, add) {
+                var marker  = this.myMarkers[id];
+                if(!add) {
                     if(marker!=null) {
                         this.map.removeMarker(marker);
-                        this.markers[id] = null;
+                        this.myMarkers[id] = null;
                     }  
                 } else {
                     if(marker==null) {
@@ -152,13 +152,20 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                         var theDisplay =this;
                         marker.entry = entry;
                         marker.ramaddaClickHandler = function(marker) {theDisplay.handleMapClick(marker);};
-                        this.markers[id] = marker;
+                        this.myMarkers[id] = marker;
                         if(this.handledMarkers == null) {
                             this.map.centerToMarkers();
                             this.handledMarkers = true;
                         }
                     } 
                 }
+            },
+            handleMapClick: function(marker) {
+                if(this.selectedMarker!=null) {
+                    this.getDisplayManager().handleEventEntrySelection(this, this.selectedMarker.entry, false);
+                }
+                this.getDisplayManager().handleEventEntrySelection(this, marker.entry, true);
+                this.selectedMarker = marker;
             },
             handleEventPointDataLoaded: function(source, pointData) {
                 var bounds = [NaN,NaN,NaN,NaN];
@@ -173,7 +180,7 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 }
             },
             handleEventRemoveDisplay: function(source, display) {
-                var marker  = this.markers[display];
+                var marker  = this.myMarkers[display];
                 if(marker!=null) {
                     this.map.removeMarker(marker);
                 }
@@ -203,11 +210,11 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                     var latitude = record.getLatitude();
                     var longitude = record.getLongitude();
                     var point = new OpenLayers.LonLat(longitude, latitude);
-                    var marker  = this.markers[source];
+                    var marker  = this.myMarkers[source];
                     if(marker!=null) {
                         this.map.removeMarker(marker);
                     }
-                    this.markers[source] =  this.map.addMarker(source.getId(), point, null,args.html);
+                    this.myMarkers[source] =  this.map.addMarker(source.getId(), point, null,args.html);
                 }}
         });
 }

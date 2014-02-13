@@ -518,8 +518,8 @@ function RepositoryMap(mapId, params) {
         if (!lon || !lat || lon == "" || lat == "")
             return;
         var lonlat = new OpenLayers.LonLat(lon,lat);
-        if (!this.selectorMarker) {
-            this.selectorMarker = this.addMarker(positionMarkerID, lonlat, "", "");
+        if (this.selectorMarker == null) {
+            this.selectorMarker = this.addMarker(positionMarkerID, lonlat, "", "", 20,10);
         } else {
             this.selectorMarker.lonlat = this.transformLLPoint(lonlat);
         }
@@ -611,8 +611,8 @@ function RepositoryMap(mapId, params) {
             this.selectorBox = null;
         }
         if (this.selectorMarker && this.markers) {
-        	this.markers.removeMarker(this.selectorMarker);
-        	this.selectorMarker = null;
+            this.markers.removeMarker(this.selectorMarker);
+            this.selectorMarker = null;
         }
     }
 
@@ -769,8 +769,9 @@ function RepositoryMap(mapId, params) {
     }
 
 
-    this.addMarker = function(id, location, iconUrl, text) {
-        var offset = 0.2;
+    this.addMarker = function(id, location, iconUrl, text, size, voffset) {
+        if(size == null) size = 18;
+        if(voffset ==null) voffset = 0;
 
         if (!this.markers) {
             this.markers = new OpenLayers.Layer.Markers("Markers");
@@ -789,9 +790,10 @@ function RepositoryMap(mapId, params) {
         if (!iconUrl) {
             iconUrl = 'http://www.openlayers.org/dev/img/marker.png';
         }
-        var sz = new OpenLayers.Size(18, 18);
+        var sz = new OpenLayers.Size(size, size);
         var calculateOffset = function(size) {
-            return new OpenLayers.Pixel(-(size.w / 2), -size.h);
+            //            return new OpenLayers.Pixel(-(size.w / 2), -size.h);
+            return new OpenLayers.Pixel(-(size.w / 2), -(size.h/2)-voffset);
         };
         var icon = new OpenLayers.Icon(iconUrl, sz, null, calculateOffset);
         projPoint = this.transformLLPoint(location);
@@ -812,9 +814,11 @@ function RepositoryMap(mapId, params) {
                 OpenLayers.Event.stop(evt);
         });
 
-        //        console.log("add marker:" + marker.id);
-
         this.markers.addMarker(marker);
+        if(this.selectorMarker!=null && this.selectorMarker!=marker) {
+            this.markers.removeMarker(this.selectorMarker);
+            this.markers.addMarker(this.selectorMarker);
+        }
         return marker;
     
     }
@@ -970,7 +974,6 @@ function RepositoryMap(mapId, params) {
 
     this.removeMarker = function(marker) {
         if (this.markers) {
-            //            console.log("remove marker:" + marker.id);
             this.markers.removeMarker(marker);
         }
     }
