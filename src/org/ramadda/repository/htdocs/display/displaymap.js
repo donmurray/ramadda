@@ -123,6 +123,10 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 }
                 this.map.zoomToMarkers();
             },
+            handleMapClick: function(marker) {
+                console.log("map click:" + marker.entry.getName());
+                this.getDisplayManager().handleEventEntrySelection(this, marker.entry, true);
+            },
             handleEventEntrySelection: function(source, args) {
                 var entry = args.entry;
                 var selected = args.selected;
@@ -142,16 +146,15 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                         var longitude = entry.getLongitude();
                         var point = new OpenLayers.LonLat(longitude, latitude);
                         marker =  this.map.addMarker(id, point, entry.getIconUrl(),this.getEntryHtml(entry));
-
-                        var numMarkers = this.markers.length;
+                        var theDisplay =this;
+                        marker.entry = entry;
+                        marker.ramaddaClickHandler = function(marker) {theDisplay.handleMapClick(marker);};
                         this.markers[id] = marker;
                         if(this.handledMarkers == null) {
                             this.map.centerToMarkers();
                             this.handledMarkers = true;
                         }
-                    }  else {
-                        //                        console.log("already have marker");
-                    }
+                    } 
                 }
             },
             handleEventPointDataLoaded: function(source, pointData) {

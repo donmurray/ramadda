@@ -230,16 +230,17 @@
    left:-10000px; 
    position: absolute;
    margin:0px;
-   padding:0px;
-//   margin-right:5px;
-//  border: 1px #000 solid;
+   padding-left:5px;
+   padding-right:5px;
+   background-color: #efefef;
 }
 
 .display-entry-toolbar img {
    border: 1px transparent solid;
-   padding-left: 5px;
-   padding-right: 5px;
+   padding-left: 1px;
+   padding-right: 1px;
 }
+
 
 .display-entry-toolbar img:hover {
    border: 1px #aaa solid;

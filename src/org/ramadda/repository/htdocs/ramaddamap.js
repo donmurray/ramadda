@@ -803,10 +803,13 @@ function RepositoryMap(mapId, params) {
         marker.location = location;
 
 
-        var theMap = this;
+        var theMapD = this;
         marker.events.register('click', marker, function(evt) {
-            theMap.showMarkerPopup(marker);
-            OpenLayers.Event.stop(evt);
+                theMap.showMarkerPopup(marker);
+                if(marker.ramaddaClickHandler!=null) {
+                    marker.ramaddaClickHandler.call(null, marker);
+                }
+                OpenLayers.Event.stop(evt);
         });
 
         //        console.log("add marker:" + marker.id);
