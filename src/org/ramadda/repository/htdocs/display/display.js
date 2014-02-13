@@ -946,17 +946,26 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
             isLayoutColumns: function() {
                 return this.layout == LAYOUT_COLUMNS;
             },
-            getEntries: function(entries, map) {
-                if(map == null) map = {};
+            walkTree: function(func, data) {
+                for(var i=0;i<this.displays.length;i++) {
+                    var display  = this.displays[i];
+                    if(display.walkTree!=null) {
+                        display.walkTree(func, data);
+                    } else {
+                        func.call(data, display);
+                    }
+                }
+            }, 
+            collectEntries: function(entries) {
                 if(entries == null) entries = [];
                 for(var i=0;i<this.displays.length;i++) {
                     var display  = this.displays[i];
-                    var displayEntries = display.getEntries();
-                    for(var entryIdx=0;entryIdx<displayEntries.length;entryIdx++) {
-                        var entry  = displayEntries[entryIdx];
-                        if(map[entry.getId()] == null) {
-                            map[entry.getId()] = entry;
-                            entries.push(entry);
+                    if(display.collectEntries!=null) {
+                        display.collectEntries(entries);
+                    } else {
+                        var displayEntries = display.getEntries();
+                        if(displayEntries!=null && displayEntries.length>0) {
+                            entries.push({source: display, entries: displayEntries});
                         }
                     }
                 }

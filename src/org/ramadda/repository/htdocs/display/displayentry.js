@@ -309,6 +309,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 this.settings.entryType  = this.getFieldValue(this.getDomId(ID_TYPE_FIELD), this.settings.entryType);
                 this.settings.clearAndAddType(this.settings.entryType);
                 this.addExtraForm();
+                this.submitSearchForm();
             },
             addMetadata: function(metadataType, metadata) {
                 if(metadata == null) {

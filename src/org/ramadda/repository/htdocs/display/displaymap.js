@@ -55,9 +55,6 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 html+= HtmlUtil.closeTag("div");
                 this.setContents(html);
 
-
-
-
                 var params = {
                     "defaultMapLayer": this.getProperty("defaultMapLayer", map_default_layer)
                 };
@@ -75,10 +72,12 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 for(var i=0;i<currentFeatures.length;i++)  {
                     this.addFeature(currentFeatures[i]);
                 }
-                var entries  = this.getDisplayManager().getEntries();
+                var entries  = this.getDisplayManager().collectEntries();
                 for(var i=0;i<entries.length;i++) {
-                    this.handleEventEntrySelection(this, {entry: entries[i], selected:true});
+                    var pair = entries[i];
+                    this.handleEventEntriesChanged(pair.source, pair.entries);
                 }
+
             },
             addFeature: function(feature) {
                 this.features.push(feature);
@@ -167,7 +166,6 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                     }
                 }
             },
-
             handleEventRemoveDisplay: function(source, display) {
                 var marker  = this.markers[display];
                 if(marker!=null) {

@@ -97,8 +97,8 @@ function DisplayManager(argId,argProperties) {
            getLayoutManager: function () {
                return this.group;
            },
-           getEntries: function() {
-               var entries = this.getLayoutManager().getEntries();
+           collectEntries: function() {
+               var entries = this.getLayoutManager().collectEntries();
                return entries;
            },
            getData: function() {
