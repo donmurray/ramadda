@@ -391,17 +391,20 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                     console.log("No entry:" + entryId);
                     return null;
                 }
-                //TODO: check for grids, etc
-                var url = root + "/entry/show?entryid=" + entryId +"&output=points.product&product=points.json&numpoints=1000";
-                var pointDataProps = {
-                    entry: entry,
-                    entryId: entry.getId()
-                };
                 var props = {
-                        "showMenu": true,
-                        "showMap": "false",
-                        "data": new PointData(entry.getName(), null, null, url,pointDataProps)
+                    showMenu: true,
+                    sourceEntry: entry
                 };
+
+                //TODO: figure out when to create data, check for grids, etc
+                if(displayType != DISPLAY_ENTRYLIST) {
+                    var url = root + "/entry/show?entryid=" + entryId +"&output=points.product&product=points.json&numpoints=1000";
+                    var pointDataProps = {
+                        entry: entry,
+                        entryId: entry.getId()
+                    };
+                    props.data = new PointData(entry.getName(), null, null, url,pointDataProps);
+                }
                 if(this.lastDisplay!=null) {
                     props.column = this.lastDisplay.getColumn();
                     props.row = this.lastDisplay.getRow();
@@ -420,6 +423,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 var menus = [];
                 var fileMenuItems = [];
                 var viewMenuItems = [];
+                var newMenuItems = [];
                 viewMenuItems.push(HtmlUtil.tag("li",[], HtmlUtil.tag("a", ["href", entry.getEntryUrl(),"target","_"], "View Entry")));
                 if(entry.getFilesize()>0) {
                     fileMenuItems.push(HtmlUtil.tag("li",[], HtmlUtil.tag("a", ["href", entry.getFileUrl()], "Download " + entry.getFilename() + " (" + entry.getFormattedFilesize() +")")));
@@ -430,9 +434,14 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                                                     + HtmlUtil.onClick(get+".fetchUrl('csv');", "CSV")));
                 }
 
+                newMenuItems.push(HtmlUtil.tag("li",[], HtmlUtil.onClick(get+".createDisplay('" + entry.getId() +"','entrydisplay');", "New Entry Display")));
 
-                menus.push("<a>File</a>" + HtmlUtil.tag("ul",[], HtmlUtil.join(fileMenuItems)));
-                menus.push("<a>View</a>" + HtmlUtil.tag("ul",[], HtmlUtil.join(viewMenuItems)));
+                if(fileMenuItems.length>0)
+                    menus.push("<a>File</a>" + HtmlUtil.tag("ul",[], HtmlUtil.join(fileMenuItems)));
+                if(viewMenuItems.length>0)
+                    menus.push("<a>View</a>" + HtmlUtil.tag("ul",[], HtmlUtil.join(viewMenuItems)));
+                if(newMenuItems.length>0)
+                    menus.push("<a>New</a>" + HtmlUtil.tag("ul",[], HtmlUtil.join(newMenuItems)));
 
                 //check if it has point data
                 if(entry.getService("points.latlonaltcsv")) {
@@ -457,7 +466,6 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             },
             showEntryMenu: function(event, entryId) {
                 var menu = this.getEntryMenu(entryId);               
-                console.log($("#" + this.getDomId(ID_MENU_OUTER)).size());
                 this.writeHtml(ID_MENU_OUTER, menu);
                 var srcId = this.getDomId(ID_MENU_BUTTON + entryId);
 

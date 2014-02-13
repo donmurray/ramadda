@@ -614,16 +614,25 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 }
 
 function RamaddaEntrydisplayDisplay(displayManager, id, properties) {
-    $.extend(this, new RamaddaDisplay(displayManager, id, DISPLAY_ENTRYDISPLAY, properties));
+    var SUPER;
+    $.extend(this, {
+            sourceEntry: properties.sourceEntry});
+    RamaddaUtil.inherit(this, SUPER = new RamaddaDisplay(displayManager, id, DISPLAY_ENTRYDISPLAY, properties));
     addRamaddaDisplay(this);
     $.extend(this, {
             selectedEntry: null,
             initDisplay: function() {
                 this.initUI();
+                if(this.sourceEntry!=null) {
+                    this.addEntryHtml(this.sourceEntry);
+                } else {
+                    this.addEntryHtml(this.selectedEntry);
+                }
                 this.setTitle("Entry Display");
-                this.addEntryHtml(this.selectedEntry);
             },
             handleEventEntrySelection: function(source, args) {
+                //Ignore select events
+                if(this.sourceEntry !=null) return;
                 var selected = args.selected;
                 var entry = args.entry;
                 if(!selected) {

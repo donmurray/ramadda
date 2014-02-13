@@ -124,8 +124,11 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 this.map.zoomToMarkers();
             },
             handleMapClick: function(marker) {
-                console.log("map click:" + marker.entry.getName());
+                if(this.selectedMarker!=null) {
+                    this.getDisplayManager().handleEventEntrySelection(this, this.selectedMarker.entry, false);
+                }
                 this.getDisplayManager().handleEventEntrySelection(this, marker.entry, true);
+                this.selectedMarker = marker;
             },
             handleEventEntrySelection: function(source, args) {
                 var entry = args.entry;
