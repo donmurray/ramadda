@@ -173,7 +173,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                     google.visualization.events.addListener(this.chart, 'select', function() {
                             var index = theDisplay.chart.getSelection()[0].row;
                             theDisplay.displayManager.handleEventRecordSelection(theDisplay, 
-                                                                            theDisplay.dataCollection.getList()[0], index);
+                                                                                 theDisplay.dataCollection.getList()[0], index);
                         });
                 }
             }

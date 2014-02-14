@@ -129,10 +129,13 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             handleEventEntrySelection: function(source, args) {
                 var entry = args.entry;
                 var selected = args.selected;
+                console.log("map:" + entry);
                 if(!entry.hasLocation()) {
+                    console.log("nolo");
                     return;
                 }
                 if(selected) {
+                    console.log("set selection marker:" +entry.getLongitude()+" " +  entry.getLatitude());
                     this.map.setSelectionMarker(entry.getLongitude(), entry.getLatitude());
                 }
             },

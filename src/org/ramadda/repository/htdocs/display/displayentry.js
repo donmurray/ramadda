@@ -256,6 +256,25 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 if(text == null) text = "";
                 html+= HtmlUtil.formEntry("Text:", 
                                           HtmlUtil.input("", text, ["class","input", "size","15","id",  this.getDomId(ID_TEXT_FIELD)]));
+
+
+                var areaForm = HtmlUtil.openTag("table",["cellpadding","0","cellspacing","0"]);
+                areaForm += HtmlUtil.tr([],HtmlUtil.td(["align","center"],
+                                                       HtmlUtil.input("area_north","",["class","input", "style", "margin:0px;","size", "5","id", 
+                                                                                       "area_north",  "title","North"])));
+                areaForm += HtmlUtil.tr([],HtmlUtil.td([],
+                                                       HtmlUtil.input("area_west","",["class","input", "style", "margin:0px;","size", "5","id", 
+                                                                                       "area_west",  "title","West"]) +
+                                                       HtmlUtil.input("area_east","",["class","input", "style", "margin:0px;","size", "5","id", 
+                                                                                      "area_east",  "title","East"])));
+                areaForm += HtmlUtil.tr([],HtmlUtil.td(["align","center"],
+                                                       HtmlUtil.input("area_south","",["class","input", "style", "margin:0px;","size", "5","id", 
+                                                                                       "area_south",  "title","South"])));
+
+                areaForm+=HtmlUtil.closeTag("table");
+
+                html+= HtmlUtil.formEntry("Area:", 
+                                          areaForm);
                 if(this.showMetadata) {
                     for(var i in this.metadataTypeList) {
                         var type  = this.metadataTypeList[i];

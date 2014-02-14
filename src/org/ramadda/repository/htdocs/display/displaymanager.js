@@ -122,6 +122,7 @@ function DisplayManager(argId,argProperties) {
                 }
             },
             handleEventRecordSelection: function(source, pointData, index) {
+
                 if(pointData ==null && this.dataList.length>0) {
                     pointData = this.dataList[0];
                 }
@@ -151,6 +152,10 @@ function DisplayManager(argId,argProperties) {
                 }
                 values += "</table>";
                 this.notifyEvent("handleEventRecordSelection", source, {index:index, record:record, html:values});
+                var entries  =source.getEntries();
+                if(entries!=null && entries.length>0) {
+                    this.handleEventEntrySelection(source, entries[0], true);
+                }
             },
             handleEventEntrySelection: function(source, entry, selected) {
                this.notifyEvent("handleEventEntrySelection", source, {entry:entry, selected:selected});

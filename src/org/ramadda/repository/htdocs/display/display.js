@@ -30,7 +30,6 @@ function addRamaddaDisplay(display) {
     if(window.globalDisplays == null) {
         window.globalDisplays = {};
     }
-    //    console.log("new display:" + display.getId());
     window.globalDisplays[display.getId()] = display;
 }
 
@@ -39,7 +38,6 @@ function getRamaddaDisplay(id) {
     if(window.globalDisplays == null) {
         return null;
     }
-    //    console.log("get display:" + id);
     return window.globalDisplays[id];
 }
 
@@ -63,7 +61,6 @@ function DisplayThing(argId, argProperties) {
             if(argProperties[i] == "true") argProperties[i] =true;
             else if(argProperties[i] == "false") argProperties[i] =false;
             else continue;
-            //            console.log("Changed type" + i);
         }
     }
 
@@ -483,7 +480,6 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 if(url == null) return;
                 if(as !=null && as != "json") {
                     url = url.replace("points.json","points." + as);
-                    console.log("url:" + url);
                 }
                 window.open(url,'_blank');
             },
@@ -653,12 +649,6 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
               That needs to call setContents with the html contents of the display
             */
             getHtml: function() {
-
-                //                console.log("getHtml:" + this.getId());
-                //                this.testFunction();
-                //                this.super.testFunction();
-                //                this.super.testFunction.call(this);
-
                 var html = "";
                 html+= HtmlUtil.div(["class","ramadda-popup", "id", this.getDomId(ID_MENU_OUTER)], "");
                 var menu = HtmlUtil.div(["class", "display-dialog", "id", this.getDomId(ID_DIALOG)], "");
@@ -998,7 +988,9 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
                var displays  = this.getDisplays();
                for(var i=0;i<this.displays.length;i++) {
                    var display = this.displays[i];
-                   if(display == source) continue;
+                   if(display == source) {
+                       continue;
+                   }
                    var eventSource  = display.getEventSource();
                    if(eventSource!=null && eventSource.length>0) {
                        if(eventSource!= source.getId() && eventSource!= source.getName()) {
