@@ -112,6 +112,19 @@ public class SwitchyardPointFile extends SingleSiteTextFile {
                 lonString = lons[0] + ":" + lons[1];
             }
 
+
+            if (latString == null) {
+                String[] pts =
+                    Utils.findPatterns(
+                                       hdr,
+                                       ".*\\s+([\\d\\.]+)\\s*deg\\s*([\\d\\.]+)\\s*min\\s*N .*([\\d\\.]+)\\s*deg\\s*([\\d\\.]+)\\s*min");
+                if(pts!=null) {
+                    latString = pts[0] + ":" + pts[1];
+                    lonString = pts[2] + ":" + pts[3];
+                }
+            }
+
+
             if (latString == null) {
                 //  84.122 degrees North  _  058.008 degrees West      
                 latString = StringUtil.findPattern(hdr,
@@ -155,7 +168,7 @@ public class SwitchyardPointFile extends SingleSiteTextFile {
                 makeField(FIELD_LONGITUDE, attrValue(lon)),
                 makeField(FIELD_DATE, attrType(TYPE_DATE), attrValue(dttm),
                           attrFormat("yyyy-MM-dd HH:mm")),
-                makeField(FIELD_DEPTH, attrs + attrUnit(UNIT_METERS)),
+                makeField(FIELD_DEPTH,  attrUnit(UNIT_METERS)),
                 makeField(FIELD_PRESSURE, attrs + attrUnit("dbar")),
                 makeField("In_Situ_Temperature",
                           attrs + attrUnit(UNIT_CELSIUS)),
@@ -190,6 +203,7 @@ public class SwitchyardPointFile extends SingleSiteTextFile {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
+        String s = "Station 1 (Cast 2)              84deg 01.763min N   65deg 09.247min W              2003-5-6/1730 GMT";
         PointFile.test(args, SwitchyardPointFile.class);
     }
 
