@@ -33,10 +33,14 @@ function EntryManager(repositoryRoot) {
                             if(callback!=null) {
                                 callback(this.entryTypes);
                             }
+                        }).done(function(jqxhr, textStatus, error) {
+                                //                                console.log("JSON done:" +textStatus);
+                        }).always(function(jqxhr, textStatus, error) {
+                                //                                console.log("Always:" +textStatus);
                         }).fail(function(jqxhr, textStatus, error) {
-                            var err = textStatus + ", " + error;
+                            var err = textStatus + " --  " + error;
                             console.log("JSON error:" +err);
-                        });
+                            });
                 }
                 return this.entryTypes;
             },
@@ -56,24 +60,33 @@ function EntryManager(repositoryRoot) {
                 }
                 return urls;
             },
-           getSearchUrl: function(searchSettings, output) {
+           getSearchUrl: function(settings, output) {
                 var url =  this.repositoryRoot +"/search/do?output=" +output;
-                for(var i in searchSettings.types) {
-                    var type = searchSettings.types[i];
+                for(var i in settings.types) {
+                    var type = settings.types[i];
                     url += "&type=" + type;
                 }
-                if(searchSettings.parent!=null&& searchSettings.parent.length>0) 
-                    url += "&group=" + searchSettings.parent;
-                if(searchSettings.text!=null&& searchSettings.text.length>0) 
-                    url += "&text=" + searchSettings.text;
+                if(settings.parent!=null&& settings.parent.length>0) 
+                    url += "&group=" + settings.parent;
+                if(settings.text!=null&& settings.text.length>0) 
+                    url += "&text=" + settings.text;
 
-                for(var i in searchSettings.metadata) {
-                    var metadata = searchSettings.metadata[i];
+                if(!isNaN(settings.getNorth())) 
+                   url += "&area_north=" + settings.getNorth();
+                if(!isNaN(settings.getWest())) 
+                   url += "&area_west=" + settings.getWest();
+                if(!isNaN(settings.getSouth())) 
+                   url += "&area_south=" + settings.getSouth();
+                if(!isNaN(settings.getEast())) 
+                   url += "&area_east=" + settings.getEast();
+
+                for(var i in settings.metadata) {
+                    var metadata = settings.metadata[i];
                     url += "&metadata.attr1." + metadata.type + "=" + metadata.value;
                 }
-                url += "&max=" + searchSettings.getMax();
-                url += "&skip=" + searchSettings.getSkip();
-                url += searchSettings.getExtra();
+                url += "&max=" + settings.getMax();
+                url += "&skip=" + settings.getSkip();
+                url += settings.getExtra();
                 return url;
             },
 
@@ -360,11 +373,26 @@ function EntrySearchSettings(props) {
             skip: 0,
             metadata: [],
             extra:"",
+                north: NaN,
+                west: NaN,
+                north: NaN,
+                east: NaN,
             getMax: function() {
                 return this.max;
             },
             getSkip: function() {
                 return this.skip;
+            },
+            toString: function() { return "n:" + this.north +" w:" + this.west +" s:" + this.south +" e:"  + this.east;},
+            getNorth: function() {return this.north;},
+            getSouth: function() {return this.south;},
+            getWest: function() {return this.west;},
+            getEast: function() {return this.east;},
+            setBounds: function(north, west, south, east) {
+                this.north = (north==null || north.toString().length==0?NaN:parseFloat(north));
+                this.west = (west==null || west.toString().length==0?NaN:parseFloat(west));
+                this.south = (south==null || south.toString().length==0?NaN:parseFloat(south));
+                this.east = (east==null || east.toString().length==0?NaN:parseFloat(east));
             },
             getTypes: function() {
                 return this.types;

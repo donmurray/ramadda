@@ -3,6 +3,10 @@ var DISPLAY_ENTRYLIST = "entrylist";
 var DISPLAY_ENTRYDISPLAY = "entrydisplay";
 var DISPLAY_OPERANDS = "operands";
 
+var ID_NORTH = "north";
+var ID_SOUTH = "south";
+var ID_EAST = "east";
+var ID_WEST = "west";
 
 addGlobalDisplayType({type: DISPLAY_ENTRYLIST, label:"Entry List",requiresData:false});
 addGlobalDisplayType({type: DISPLAY_ENTRYDISPLAY, label:"Entry Display",requiresData:false});
@@ -62,7 +66,9 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
             fullForm: true,            
             showEntries: true,
             showMetadata: true,
+            showArea: true,
             share: true,
+            types: null,
             metadataTypeList: [],
     });            
 
@@ -167,7 +173,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 if(this.entryList!=null && this.entryList.haveLoaded) {
                     this.entryListChanged(this.entryList);
                 }
-                this.addTypes();
+                this.addTypes(this.types);
                 for(var i in this.metadataTypeList) {
                     var type  = this.metadataTypeList[i];
                     this.addMetadata(type, null);
@@ -191,6 +197,11 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 }
                 this.settings.clearAndAddType(this.settings.entryType);
                 
+                this.settings.setBounds(this.getFieldValue(this.getDomId(ID_NORTH), null),
+                                        this.getFieldValue(this.getDomId(ID_WEST), null),
+                                        this.getFieldValue(this.getDomId(ID_SOUTH), null),
+                                        this.getFieldValue(this.getDomId(ID_EAST), null));
+
                 this.settings.metadata = [];
                 for(var i in this.metadataTypeList) {
                     var metadataType  = this.metadataTypeList[i];
@@ -252,29 +263,52 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
                 html += HtmlUtil.openTag("form",["id",this.getDomId(ID_FORM),"action","#"]);
                 html += HtmlUtil.formTable();
+
+
+
+                var extraDiv = "";
+
+                if(this.showType) {
+                    var typeSelect= HtmlUtil.tag("select",["id", this.getDomId(ID_TYPE_FIELD),
+                                                           "class","display-typelist",
+                                                           "onchange", this.getGet()+".typeChanged();"],
+
+                                                 HtmlUtil.tag("option",["title","","value",""],
+                                                              NONE));
+
+                    var typeForm = typeSelect;
+                    extraDiv = HtmlUtil.div(["id",this.getDomId(ID_FORM_EXTRA)],"");
+                    html+= HtmlUtil.formEntry("Type:", typeForm);
+                }
+
+
+
                 var text = this.settings.text;
                 if(text == null) text = "";
                 html+= HtmlUtil.formEntry("Text:", 
                                           HtmlUtil.input("", text, ["class","input", "size","15","id",  this.getDomId(ID_TEXT_FIELD)]));
 
 
-                var areaForm = HtmlUtil.openTag("table",["cellpadding","0","cellspacing","0"]);
-                areaForm += HtmlUtil.tr([],HtmlUtil.td(["align","center"],
-                                                       HtmlUtil.input("area_north","",["class","input", "style", "margin:0px;","size", "5","id", 
-                                                                                       "area_north",  "title","North"])));
-                areaForm += HtmlUtil.tr([],HtmlUtil.td([],
-                                                       HtmlUtil.input("area_west","",["class","input", "style", "margin:0px;","size", "5","id", 
-                                                                                       "area_west",  "title","West"]) +
-                                                       HtmlUtil.input("area_east","",["class","input", "style", "margin:0px;","size", "5","id", 
-                                                                                      "area_east",  "title","East"])));
-                areaForm += HtmlUtil.tr([],HtmlUtil.td(["align","center"],
-                                                       HtmlUtil.input("area_south","",["class","input", "style", "margin:0px;","size", "5","id", 
-                                                                                       "area_south",  "title","South"])));
+                if(this.showArea) {
+                    var areaForm = HtmlUtil.openTag("table",["class","display-area", "border","0","cellpadding","0","cellspacing","0"]);
+                    areaForm += HtmlUtil.tr([],HtmlUtil.td(["align","center","class"],
+                                                           HtmlUtil.input(ID_NORTH,"",["class","input display-area-input", "size", "5","id", 
+                                                                                       this.getDomId(ID_NORTH),  "title","North"])));
+                    areaForm += HtmlUtil.tr([],HtmlUtil.td([],
+                                                           HtmlUtil.input(ID_WEST,"",["class","input  display-area-input", "size", "5","id", 
+                                                                                      this.getDomId(ID_WEST),  "title","West"]) +
+                                                            HtmlUtil.input(ID_EAST,"",["class","input  display-area-input", "size", "5","id", 
+                                                                                      this.getDomId(ID_EAST),  "title","East"])));
+                    areaForm += HtmlUtil.tr([],HtmlUtil.td(["align","center"],
+                                                           HtmlUtil.input(ID_SOUTH,"",["class","input  display-area-input", "size", "5","id", 
+                                                                                       this.getDomId(ID_SOUTH),  "title","South"])));
 
-                areaForm+=HtmlUtil.closeTag("table");
+                    areaForm+=HtmlUtil.closeTag("table");
 
-                html+= HtmlUtil.formEntry("Area:", 
-                                          areaForm);
+                    html+= HtmlUtil.formEntry("Area:", 
+                                              areaForm);
+                }
+
                 if(this.showMetadata) {
                     for(var i in this.metadataTypeList) {
                         var type  = this.metadataTypeList[i];
@@ -292,25 +326,10 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     }
                 }
 
-                if(this.showType) {
-                    
-
-                    var typeSelect= HtmlUtil.tag("select",["id", this.getDomId(ID_TYPE_FIELD),
-                                                           "class","display-typelist",
-                                                           "onchange", this.getGet()+".typeChanged();"],
-
-                                                 HtmlUtil.tag("option",["title","","value",""],
-                                                              NONE));
-
-                    var typeForm = typeSelect;
-                    typeForm += HtmlUtil.div(["id",this.getDomId(ID_FORM_EXTRA)],"");
-                    html+= HtmlUtil.formEntry("Type:", typeForm);
-                }
 
 
 
-                if(this.fullForm) {
-                }
+                html+= HtmlUtil.formEntry("", extraDiv);
 
                 html+= HtmlUtil.formEntry("", 
                                           HtmlUtil.div(["id", this.getDomId(ID_SEARCH)],"Search"));
