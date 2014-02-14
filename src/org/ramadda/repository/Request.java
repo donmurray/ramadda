@@ -1325,15 +1325,16 @@ public class Request implements Constants, Cloneable {
         if (result instanceof List) {
             return ((List) result).size() > 0;
         }
-        String sresult = (String) result;
-        if (sresult.trim().length() == 0) {
-            return false;
+        if (result instanceof String) {
+            String sresult = (String) result;
+            if (sresult.trim().length() == 0) {
+                return false;
+            }
+            //Check if its a macro that was not set
+            if (sresult.equals("${" + key + "}")) {
+                return false;
+            }
         }
-        //Check if its a macro that was not set
-        if (sresult.equals("${" + key + "}")) {
-            return false;
-        }
-
         return true;
     }
 
