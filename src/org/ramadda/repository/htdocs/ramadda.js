@@ -235,6 +235,9 @@ var HtmlUtil =  {
     tr : function(attrs, inner) {
         return this.tag("tr", attrs, inner);
     },
+    td : function(attrs, inner) {
+        return this.tag("td", attrs, inner);
+    },
     formTable : function() {
         return  this.openTag("table",["class","formtable","cellspacing","0","cellspacing","0"]);
     },
@@ -318,7 +321,6 @@ var HtmlUtil =  {
         var myAttrs = ["onclick", call, "style","color:black;"];
         if(attrs!=null) {
             for(var i=0;i<attrs.length;i++) {
-                console.log("attr:" + attrs[i]);
                 myAttrs.push(attrs[i]);
             }
         }
