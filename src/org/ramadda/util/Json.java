@@ -431,23 +431,12 @@ public class Json {
             if (s == null) {
                 return NULL;
             }
+            s = cleanString(s);
             s = s.replaceAll("\"", "\\\\\"");
-
             return "\"" + s + "\"";
         } catch (Exception exc) {
             throw new IllegalArgumentException("Could not quote string:" + s);
         }
-    }
-
-    /**
-     * Clean and quote some text
-     *
-     * @param aText the text
-     *
-     * @return  the cleaned and quoted text
-     */
-    public static String cleanAndQuote(String aText) {
-        return quote(cleanString(aText));
     }
 
 
@@ -467,6 +456,7 @@ public class Json {
         char                    character   = iterator.current();
         char                    char_slash  = '\\';
         char                    char_dquote = '"';
+
         while (character != StringCharacterIterator.DONE) {
             if (character == char_dquote) {
                 //For now don't escape double quotes
@@ -495,8 +485,9 @@ public class Json {
         }
 
         String s = result.toString();
-        s = s.replaceAll("[^\n\\x20-\\x7E]+", " ");
 
+        //Make into all ascii ??
+        s = s.replaceAll("[^\n\\x20-\\x7E]+", " ");
         return s;
     }
 
@@ -510,7 +501,7 @@ public class Json {
     public static void main(String[] args) {
         System.err.println(
             cleanString(
-                "953731 NWT Ltd. also operates as \"South Camp Enterprises\".-- provides rental vehicles"));
+                "953731 NWT Ltd. \\x \\\" also operates as \"South Camp Enterprises\".-- provides rental vehicles"));
     }
 
 

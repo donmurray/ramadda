@@ -227,6 +227,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 this.footerRight  = footer;
                 this.writeHtml(ID_FOOTER_RIGHT, this.footerRight);
                 this.writeHtml(ID_ENTRIES, this.getLoadingMessage());
+                this.writeHtml(ID_RESULTS,"&nbsp;");
 
                 console.log("json:" + jsonUrl);
                 this.entryList = new EntryList(jsonUrl, this, this.entryList);
@@ -544,7 +545,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     this.settings.max=50;
                     this.writeHtml(ID_ENTRIES, this.getMessage("Nothing found"));
                     this.writeHtml(ID_FOOTER_LEFT,"");
-                    this.writeHtml(ID_RESULTS,"");
+                    this.writeHtml(ID_RESULTS,"&nbsp;");
                     return;
                 }
                 var results = "Showing #" + (this.settings.skip+1) +"-" +(this.settings.skip+Math.min(this.settings.max, entries.length))+" ";

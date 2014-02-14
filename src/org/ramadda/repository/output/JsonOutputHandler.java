@@ -225,9 +225,8 @@ public class JsonOutputHandler extends OutputHandler {
 
         List<String> items = new ArrayList<String>();
         Json.quoteAttr(items, "id", entry.getId());
-        Json.quoteAttr(items, "name", Json.cleanString(entry.getName()));
-        Json.quoteAttr(items, "description",
-                       Json.cleanString(entry.getDescription()));
+        Json.quoteAttr(items, "name", entry.getName());
+        Json.quoteAttr(items, "description", entry.getDescription());
         Json.quoteAttr(items, "type", entry.getType());
 
         //
@@ -309,7 +308,7 @@ public class JsonOutputHandler extends OutputHandler {
         Resource resource = entry.getResource();
         if (resource != null) {
             if (resource.isUrl()) {
-                String temp = Json.cleanString(resource.getPath());
+                String temp = resource.getPath();
                 if (temp == null) {
                     Json.quoteAttr(items, "filename", "");
                 } else {
@@ -351,7 +350,7 @@ public class JsonOutputHandler extends OutputHandler {
                     if (name.endsWith("_id")) {
                         continue;
                     }
-                    String value = Json.cleanAndQuote(entry.getValue(i, ""));
+                    String value = Json.quote(entry.getValue(i, ""));
                     columnNames.add(name);
                     columnLabels.add(column.getLabel());
                     Json.attr(items, "column." + name, value);
@@ -372,16 +371,16 @@ public class JsonOutputHandler extends OutputHandler {
                         entry)) {
                 OutputType outputType = link.getOutputType();
                 links.add(Json.map(new String[] {
-                    "label", Json.cleanAndQuote(link.getLabel()), "type",
+                    "label", Json.quote(link.getLabel()), "type",
                     (outputType == null)
                     ? "unknown"
-                    : Json.cleanAndQuote(outputType.toString()),
+                    : Json.quote(outputType.toString()),
                     "url",
                     (link.getUrl() == null)
                     ? Json.quote("")
                     : Json.quote(
                         java.net.URLEncoder.encode(
-                            Json.cleanString(link.getUrl()))),
+                                                   link.getUrl())),
                     "icon", Json.quote(link.getIcon())
                 }));
             }
@@ -404,7 +403,7 @@ public class JsonOutputHandler extends OutputHandler {
                         if (attr != null) {
                             if (attr.length() > 0) {
                                 Json.quoteAttr(mapItems, "attr" + attrIdx,
-                                        Json.cleanString(attr));
+                                               attr);
                             } else {
                                 Json.quoteAttr(mapItems, "attr" + attrIdx,
                                         "");
