@@ -117,6 +117,13 @@ public class Json {
         return map(values, DFLT_QUOTE);
     }
 
+    /**
+     * _more_
+     *
+     * @param values _more_
+     *
+     * @return _more_
+     */
     public static String mapAndQuote(List<String> values) {
         return map(values, true);
     }
@@ -252,21 +259,7 @@ public class Json {
         return row.toString();
     }
 
-    /**
-     * Quote a string
-     *
-     * @param s the string
-     *
-     * @return  the quoted string
-     */
-    public static String quote(String s) {
-        if (s == null) {
-            return NULL;
-        }
-        s = s.replaceAll("\"","'");
-        s = s.replaceAll("\\\\","-");
-        return "\"" + s + "\"";
-    }
+
 
     /**
      * Create a list of JSON object from a list of TwoFacedObjects
@@ -416,7 +409,8 @@ public class Json {
             return "null";
         }
 
-        if (d == Double.NEGATIVE_INFINITY || d == Double.POSITIVE_INFINITY) {
+        if ((d == Double.NEGATIVE_INFINITY)
+                || (d == Double.POSITIVE_INFINITY)) {
             return "null";
 
         }
@@ -424,6 +418,26 @@ public class Json {
         return "" + d;
     }
 
+
+    /**
+     * Quote a string
+     *
+     * @param s the string
+     *
+     * @return  the quoted string
+     */
+    public static String quote(String s) {
+        try {
+            if (s == null) {
+                return NULL;
+            }
+            s = s.replaceAll("\"", "\\\\\"");
+
+            return "\"" + s + "\"";
+        } catch (Exception exc) {
+            throw new IllegalArgumentException("Could not quote string:" + s);
+        }
+    }
 
     /**
      * Clean and quote some text
@@ -448,18 +462,20 @@ public class Json {
         if ( !Utils.stringDefined(aText)) {
             return "";
         }
-        final StringBuilder     result    = new StringBuilder();
-
-        StringCharacterIterator iterator  =
-            new StringCharacterIterator(aText);
-        char                    character = iterator.current();
+        final StringBuilder     result      = new StringBuilder();
+        StringCharacterIterator iterator = new StringCharacterIterator(aText);
+        char                    character   = iterator.current();
+        char                    char_slash  = '\\';
+        char                    char_dquote = '"';
         while (character != StringCharacterIterator.DONE) {
-            if (character == '\"') {
-                result.append("\\\"");
-            } else if (character == '\\') {
-                result.append("\\\\");
-            } else if (character == '/') {
-                result.append("\\/");
+            if (character == char_dquote) {
+                //For now don't escape double quotes
+                result.append(character);
+                //                result.append(char_slash);
+                //                result.append(char_dquote);
+            } else if (character == char_slash) {
+                result.append(char_slash);
+                result.append(char_slash);
             } else if (character == '\b') {
                 result.append("\\b");
             } else if (character == '\f') {
@@ -478,7 +494,23 @@ public class Json {
             character = iterator.next();
         }
 
-        return result.toString();
+        String s = result.toString();
+        s = s.replaceAll("[^\n\\x20-\\x7E]+", " ");
+
+        return s;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param args _more_
+     */
+    public static void main(String[] args) {
+        System.err.println(
+            cleanString(
+                "953731 NWT Ltd. also operates as \"South Camp Enterprises\".-- provides rental vehicles"));
     }
 
 

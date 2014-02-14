@@ -185,6 +185,7 @@ public class JsonOutputHandler extends OutputHandler {
             items.add(toJson(request, entry));
         }
         sb.append(Json.list(items));
+        //        System.out.println ("JSON:" + Json.list(items));
     }
 
 
