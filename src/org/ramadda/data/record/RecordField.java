@@ -331,29 +331,30 @@ public class RecordField {
      * @param index _more_
      */
     public void addJson(StringBuffer sb, int index) {
+        List<String> items = new ArrayList<String>();
         String dataType = type;
         if (type.equals(TYPE_NUMERIC)) {
             dataType = "double";
         }
-        String props = Json.map(new String[] { "chartable",
-                                               "" + getChartable(), "sortorder", ""+sortOrder, "searchable", "" + getSearchable(), });
-        sb.append(Json.map(new String[] {
-            "index", "" + index, "id", HtmlUtils.quote(name), "label",
-            HtmlUtils.quote(label), "type", HtmlUtils.quote(dataType),
-            //                    "missing",""+missingValue,
-            "unit", Utils.stringDefined(unit)
-                    ? HtmlUtils.quote(unit)
-                    : "null", "properties", props,
-        }, false));
-
-        /*
-          {index:0,
-          id:"field1",
-          label:"Field 1",
-          type:"double",
-          missing:"-999.0",
-          unit:"m"}
-        */
+        items.add("index");
+        items.add("" + index);
+        items.add("id");
+        items.add(HtmlUtils.quote(name));
+        items.add("label");
+        items.add(Json.quote(label));
+        items.add("type");
+        items.add(Json.quote(dataType));
+        items.add("unit");
+        items.add(Utils.stringDefined(unit)
+                  ? Json.quote(unit)
+                  : "null");
+        items.add( "chartable");
+        items.add("" + getChartable());
+        items.add("sortorder");
+        items.add(""+sortOrder);
+        items.add( "searchable");
+        items.add("" + getSearchable());
+        sb.append(Json.map(items));
     }
 
 

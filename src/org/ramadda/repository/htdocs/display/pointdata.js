@@ -78,7 +78,7 @@ function BasePointData(name, properties) {
             },
             clear: function() {
                 this.records = null;
-                this.recordFieldss = null;
+                this.recordFields = null;
             },
             getProperties : function() {
                 return this.properties;
@@ -118,7 +118,8 @@ function BasePointData(name, properties) {
                     }
                     numericFields.push(field);
                 }
-                return numericFields;
+
+                return RecordUtil.sort(numericFields);
             },
             loadData: function(display) {
             },
@@ -298,57 +299,41 @@ missing - the missing value forthis field. Probably not needed and isn't used
 as I think RAMADDA passes in NaN
 unit - the unit of the value
  */
-function RecordField(index, id, label, type, missing, unit, properties) {
-    this.index = index;
-    this.id = id;
-    this.label = label;
-    this.type = type;
-    this.missing = missing;
-    this.unit = unit;
-    this.properties = properties;
-    init_RecordField(this);
-}
+function RecordField(props) {
+    $.extend(this, props);
+    $.extend(this, {
+             isNumeric: props.type == "double",
+             properties: props
+             });
+ 
+   RamaddaUtil.defineMembers(this, {
+             getIndex: function() {
+                 return this.index;
+             },
+             isChartable: function() {
+               return this.chartable;
+             },
+             getSortOrder: function() {
+               return this.sortorder;
+             },
+             getId: function() {
+                 return this.id;
+             },
+             getLabel: function() {
+                 if(this.label == null || this.label.length==0) return this.id;
+                 return this.label;
+             },
+             getType: function() {
+                 return this.type;
+             },
+             getMissing: function() {
+                 return this.missing;
+             },
+             getUnit: function() {
+                 return this.unit;
+             }
+        });
 
-function init_RecordField(recordField) {
-    recordField.isNumeric = recordField.type == "double";
-
-    recordField.getIndex = function() {
-        return this.index;
-    }
-
-    recordField.getProperty = function(key, dflt) {
-        if(typeof this.properties == 'undefined') {
-            return dflt;
-        }
-        var value = this.properties[key];
-        if(value == null) return dflt;
-        return value;
-    }
-
-    recordField.isChartable = function() {
-        return this.getProperty("chartable",false);
-    }
-
-    recordField.getSortOrder = function() {
-        return this.getProperty("sortorder",0);
-    }
-
-    recordField.getId = function() {
-        return this.id;
-    }
-    recordField.getLabel = function() {
-        if(this.label == null || this.label.length==0) return this.id;
-        return this.label;
-    }
-    recordField.getType = function() {
-        return this.type;
-    }
-    recordField.getMissing = function() {
-        return this.missing;
-    }
-    recordField.getUnit = function() {
-        return recordField.unit;
-    }
 }
 
 
@@ -399,8 +384,7 @@ function makePointData(json) {
     var fields = [];
     for(var i=0;i<json.fields.length;i++) {
         var field  = json.fields[i];
-        init_RecordField(field);
-        fields.push(field);
+        fields.push(new RecordField(field));
     }
 
     var data =[];

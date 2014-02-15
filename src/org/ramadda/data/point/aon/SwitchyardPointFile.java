@@ -168,17 +168,17 @@ public class SwitchyardPointFile extends SingleSiteTextFile {
                 makeField(FIELD_LONGITUDE, attrValue(lon)),
                 makeField(FIELD_DATE, attrType(TYPE_DATE), attrValue(dttm),
                           attrFormat("yyyy-MM-dd HH:mm")),
-                makeField(FIELD_DEPTH,  attrUnit(UNIT_METERS)),
+                makeField(FIELD_DEPTH,  attrs + attrUnit(UNIT_METERS)),
                 makeField(FIELD_PRESSURE, attrs + attrUnit("dbar")),
                 makeField("In_Situ_Temperature",
-                          attrs + attrUnit(UNIT_CELSIUS)),
+                          attrSortOrder(10)+ attrs + attrUnit(UNIT_CELSIUS)),
                 ( !addPotentialTemp
                   ? null
                   : makeField(FIELD_POTENTIAL_TEMPERATURE,
                               attrs + attrUnit(UNIT_CELSIUS))),
-                makeField(FIELD_CONDUCTIVITY, attrs + attrUnit("S/m")),
-                makeField(FIELD_SALINITY, attrs + attrUnit("psu")),
-                makeField(FIELD_SIGMA, attrs + attrUnit("-theta")),
+                makeField(FIELD_CONDUCTIVITY, attrSortOrder(10)+ attrs + attrUnit("S/m")),
+                makeField(FIELD_SALINITY, attrSortOrder(10)+ attrs + attrUnit("psu")),
+                makeField(FIELD_SIGMA, attrSortOrder(10)+ attrs + attrUnit("-theta")),
                 /*
                 makeField("Dissolved_Oxygen_ML_L",  attrs +  attrUnit("ml/l")),
                 makeField("Dissolved_Oxygen_MG_L",  attrs +  attrUnit("mg/l")),

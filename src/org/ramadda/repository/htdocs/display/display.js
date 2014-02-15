@@ -246,7 +246,6 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
                     var pointData = dataList[collectionIdx];
                     var fields =pointData.getChartableFields();
-                    fields = RecordUtil.sort(fields);
                     if(html == null) {
                         html = HtmlUtil.tag("b", [],  "Fields");
                         html += HtmlUtil.openTag("div", ["class", "display-fields"]);
@@ -288,7 +287,6 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             fieldSelectionChanged: function() {
             },
             getSelectedFields:function() {
-
                 var df = [];
                 var dataList =  this.dataCollection.getList();
                 //If we have fixed fields then clear them after the first time
@@ -299,6 +297,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                         fixedFields = null;
                     } 
                 }
+
                 for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
                     var pointData = dataList[collectionIdx];
                     var fields = pointData.getChartableFields();
@@ -777,6 +776,13 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 return this.dataCollection.hasData();
             },
             addData: function(pointData) { 
+                var records = pointData.getRecords();
+                if(records.length>0) {
+                    this.hasElevation = records[0].hasElevation();
+                } else {
+                    this.hasElevation = false;
+                }
+
                 this.dataCollection.addData(pointData);
                 var entry = pointData.getEntry();
                 if(entry!=null) {
@@ -1037,7 +1043,7 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
                         html+= displaysToLayout[0].getHtml();
                     } else {
                         var width = Math.round(100/this.columns)+"%";
-                        html+=HtmlUtil.openTag("table", ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "0"]);
+                        html+=HtmlUtil.openTag("table", ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "5"]);
                         for(var i=0;i<displaysToLayout.length;i++) {
                             colCnt++;
                             if(colCnt>=this.columns) {
