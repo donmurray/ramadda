@@ -285,6 +285,8 @@ function RepositoryMap(mapId, params) {
         
 
         this.map = new OpenLayers.Map(this.mapDivId,options);
+
+
         this.addBaseLayers();
 
         //this.vectors = new OpenLayers.Layer.Vector("Drawing");
@@ -395,6 +397,10 @@ function RepositoryMap(mapId, params) {
 
 
     this.addClickHandler = function(lonfld, latfld, zoomfld, object) {
+
+        this.lonFldId = lonfld;
+        this.latFldId = latfld;
+
         if (this.clickHandler)
             return;
         if (!this.map)
@@ -514,9 +520,21 @@ function RepositoryMap(mapId, params) {
         this.boxes.redraw();
     }
 
-    this.setSelectionMarker = function(lon, lat) {
+    this.clearSelectionMarker = function() {
+        if(this.selectorMarker!=null) {
+            this.removeMarker(this.selectorMarker);
+            this.selectorMarker = null;
+        }
+    }
+
+    this.setSelectionMarker = function(lon, lat, andCenter, zoom) {
         if (!lon || !lat || lon == "" || lat == "")
             return;
+        if(this.lonFldId!=null) {
+            $("#" +this.lonFldId).val(formatLocationValue(lon));
+            $("#" +this.latFldId).val(formatLocationValue(lat));
+        }
+
         var lonlat = new OpenLayers.LonLat(lon,lat);
         if (this.selectorMarker == null) {
             this.selectorMarker = this.addMarker(positionMarkerID, lonlat, "", "", 20,10);
@@ -524,6 +542,34 @@ function RepositoryMap(mapId, params) {
             this.selectorMarker.lonlat = this.transformLLPoint(lonlat);
         }
         this.markers.redraw();
+        if(andCenter) {
+            this.map.setCenter(this.selectorMarker.lonlat);
+        }
+        if(zoom) {
+            if(zoom.zoomOut) {
+                var level = this.map.getZoom();
+                level--;
+                if(this.map.isValidZoomLevel(level)) {
+                    this.map.zoomTo(level);
+                }
+                return;
+            }
+            if(zoom.zoomIn) {
+                var level = this.map.getZoom();
+                level++;
+                if(this.map.isValidZoomLevel(level)) {
+                    this.map.zoomTo(level);
+                }
+                return;
+            }
+
+            var offset = zoom.offset;
+            if(offset) {
+                var bounds = this.transformLLBounds(new OpenLayers.Bounds(lon-offset, lat-offset,lon+offset,lat+offset));
+                this.map.zoomToExtent(bounds);
+            }
+            
+        }
     }
     
     this.transformLLBounds = function(bounds) {

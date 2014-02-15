@@ -62,6 +62,14 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 this.map = new RepositoryMap(this.getDomId(ID_MAP), params);
                 this.map.initMap(false);
                 this.map.addClickHandler(this.getDomId(ID_LONFIELD), this.getDomId(ID_LATFIELD), null, this);
+                var theDisplay = this;
+                this.map.map.events.register("zoomend","", function() {
+                        theDisplay.mapBoundsChanged();
+                    });
+                this.map.map.events.register("moveend","", function() {
+                        theDisplay.mapBoundsChanged();
+                    });
+
                 if(this.initBounds!=null) {
                     var b  = this.initBounds;
                     this.setInitMapBounds(b[0],b[1],b[2],b[3]);
@@ -78,6 +86,11 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                     this.handleEventEntriesChanged(pair.source, pair.entries);
                 }
 
+            },
+            mapBoundsChanged: function() {
+                var bounds = this.map.map.calculateBounds();
+                bounds =  bounds.transform(this.map.sourceProjection, this.map.displayProjection);
+                this.displayManager.handleEventMapBoundsChanged(this, bounds);
             },
             addFeature: function(feature) {
                 this.features.push(feature);
@@ -111,6 +124,10 @@ function RamaddaMapDisplay(displayManager, id, properties) {
 
            sourceToEntries: {},
            handleEventEntriesChanged: function (source, entries) {
+                if(source == this.lastSource) {
+                    this.map.clearSelectionMarker();
+                }
+
                 var oldEntries = this.sourceToEntries[source.getId()];
                 if(oldEntries!=null) {
                     for(var i=0;i<oldEntries.length;i++) {
@@ -128,13 +145,21 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             },
             handleEventEntrySelection: function(source, args) {
                 var entry = args.entry;
+                if(entry == null) {
+                    console.log("no entry");
+                    this.map.clearSelectionMarker();
+                    return;
+                }
                 var selected = args.selected;
                 if(!entry.hasLocation()) {
                     return;
                 }
                 if(selected) {
+                    this.lastSource = source;
                     //                    console.log("set selection marker:" +entry.getLongitude()+" " +  entry.getLatitude());
-                    this.map.setSelectionMarker(entry.getLongitude(), entry.getLatitude());
+                    this.map.setSelectionMarker(entry.getLongitude(), entry.getLatitude(), true, args.zoom);
+                }  else if(source == this.lastSource) {
+                    this.map.clearSelectionMarker();
                 }
             },
             addOrRemoveEntryMarker: function(id, entry, add) {
@@ -163,9 +188,9 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             },
             handleMapClick: function(marker) {
                 if(this.selectedMarker!=null) {
-                    this.getDisplayManager().handleEventEntrySelection(this, this.selectedMarker.entry, false);
+                    this.getDisplayManager().handleEventEntrySelection(this, {entry:this.selectedMarker.entry, selected:false});
                 }
-                this.getDisplayManager().handleEventEntrySelection(this, marker.entry, true);
+                this.getDisplayManager().handleEventEntrySelection(this, {entry:marker.entry, selected:true});
                 this.selectedMarker = marker;
             },
             handleEventPointDataLoaded: function(source, pointData) {

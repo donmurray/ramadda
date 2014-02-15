@@ -215,6 +215,15 @@ var HtmlUtil =  {
     qt : function (value) {
         return "\"" + value +"\"";
     },
+    hbox : function() {
+        var row = HtmlUtil.openTag("tr",["valign","top"]);
+        row += "<td>";
+        row += HtmlUtil.join(arguments,"</td><td>");
+        row += "</td></tr>";
+        return this.tag("table",["border","0", "cellspacing","0","cellpadding","0"],
+                        row);
+    },
+
     leftRight : function(left,right,leftWidth, rightWidth) {
         if(leftWidth==null) leftWidth = "50%";
         if(rightWidth==null) rightWidth = "50%";

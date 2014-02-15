@@ -107,6 +107,9 @@ function DisplayManager(argId,argProperties) {
            handleEventEntriesChanged: function (source, entries) {
                this.notifyEvent("handleEventEntriesChanged", source, entries);
            },
+           handleEventMapBoundsChanged: function (source,  bounds) {
+               this.notifyEvent("handleEventMapBoundsChanged", source, bounds);
+           },
            handleEventMapClick: function (mapDisplay, lon, lat) {
                 var indexObj = [];
                 var records = null;
@@ -154,11 +157,11 @@ function DisplayManager(argId,argProperties) {
                 this.notifyEvent("handleEventRecordSelection", source, {index:index, record:record, html:values});
                 var entries  =source.getEntries();
                 if(entries!=null && entries.length>0) {
-                    this.handleEventEntrySelection(source, entries[0], true);
+                    this.handleEventEntrySelection(source, {entry:entries[0], selected:true});
                 }
             },
-            handleEventEntrySelection: function(source, entry, selected) {
-               this.notifyEvent("handleEventEntrySelection", source, {entry:entry, selected:selected});
+            handleEventEntrySelection: function(source,  props) {
+               this.notifyEvent("handleEventEntrySelection", source, props);
             },
             handleEventPointDataLoaded: function(source, pointData) {
                 this.notifyEvent("handleEventPointDataLoaded", source, pointData);
