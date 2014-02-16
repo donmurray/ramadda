@@ -21,3 +21,6 @@ The JPEG metadata extractor used is from Drew Noake's metadataxtractor:
 http://code.google.com/p/metadata-extractor/
 
 
+The HTML select form style is done using Greg Franko's selectboxit 
+http://gregfranko.com/jquery.selectBoxIt.js/
+

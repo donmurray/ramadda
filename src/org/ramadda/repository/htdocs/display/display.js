@@ -216,6 +216,9 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             hasEntries: function() {
                 return this.entries.length>0;
             },
+            getWaitImage: function() {
+                return HtmlUtil.image(root + "/icons/progress.gif");
+            },
             getLoadingMessage: function() {
                 return this.getMessage("&nbsp;Loading...");
             },
@@ -656,7 +659,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 if(width>0) {
                     tableWidth = width+"px";
                 }
-                html += HtmlUtil.openTag("table", ["border","0", "width",tableWidth, "cellpadding","0", "cellspacing","0"]);
+                html += HtmlUtil.openTag("table", ["class", "display", "border","0", "width",tableWidth, "cellpadding","0", "cellspacing","0"]);
                 html += HtmlUtil.openTag("tr", ["valign", "bottom"]);
                 if(this.getShowTitle()) {
                     html += HtmlUtil.td([], HtmlUtil.div(["class","display-title","id",this.getDomId(ID_TITLE)], this.getTitle()));
@@ -746,6 +749,27 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             },
             setTitle: function(title) {
                 this.writeHtml(ID_TITLE,title);
+            },
+            makeAreaForm: function() {
+                var link = HtmlUtil.onClick(this.getGet()+".areaLinkClick();", HtmlUtil.image(root +"/icons/link_break.png",["title","Set bounds from map", "class", "display-area-link", "border","0","id", this.getDomId(ID_AREA_LINK)]));
+                var erase = HtmlUtil.onClick(this.getGet()+".areaClear();", HtmlUtil.image(root +"/icons/eraser.png",["title","Clear form", "class", "display-area-link", "border","0"]));
+                var areaForm = HtmlUtil.openTag("table",["class","display-area", "border","0","cellpadding","0","cellspacing","0"]);
+                areaForm += HtmlUtil.tr([],
+                                        HtmlUtil.td(["align","center","class"],
+                                                    HtmlUtil.input(ID_NORTH,"",["placeholder","N","class","input display-area-input", "size", "5","id", 
+                                                                                this.getDomId(ID_NORTH),  "title","North"])));
+
+                areaForm += HtmlUtil.tr([],HtmlUtil.td([],
+                                                       HtmlUtil.input(ID_WEST,"",["placeholder","W","class","input  display-area-input", "size", "5","id", 
+                                                                                  this.getDomId(ID_WEST),  "title","West"]) +
+                                                       HtmlUtil.input(ID_EAST,"",["placeholder","E","class","input  display-area-input", "size", "5","id", 
+                                                                                  this.getDomId(ID_EAST),  "title","East"])));
+                areaForm += HtmlUtil.tr([],HtmlUtil.td(["align","center"],
+                                                       HtmlUtil.input(ID_SOUTH,"",["placeholder","S","class","input  display-area-input", "size", "5","id", 
+                                                                                   this.getDomId(ID_SOUTH),  "title","South"])));
+
+                areaForm += HtmlUtil.closeTag("table");
+                return  HtmlUtil.hbox(areaForm, link, erase);
             },
             getTitle: function () {
                 var prefix  = "";

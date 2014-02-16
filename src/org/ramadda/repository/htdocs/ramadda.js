@@ -32,7 +32,7 @@ var icon_folderclosed = "${urlroot}/icons/folderclosed.png";
 var icon_folderopen = "${urlroot}/icons/togglearrowdown.gif";
 var icon_menuarrow = "${urlroot}/icons/downdart.gif";
 var icon_blank = "${urlroot}/icons/blank.gif";
-
+var uniqueCnt = 0;
 
 function Util () {
  this.loadXML = function (url, callback,arg) {
@@ -346,7 +346,27 @@ var HtmlUtil =  {
     },
 
     input :   function(name, value, attrs) {
-        return "<input " + this.attrs(attrs) + this.attrs(["name", name, "value",value]) +"/>";
+        return "<input " + HtmlUtil.attrs(attrs) + HtmlUtil.attrs(["name", name, "value",value]) +"/>";
+    },
+
+
+    squote: function(s) {return "'" + s +"'";},
+    toggleBlock: function(label, contents, visible) {
+        var id = "block_" + (uniqueCnt++);
+        var imgid = id +"_img";
+
+        var img1=root + "/icons/togglearrowdown.gif";
+        var img2=root + "/icons/togglearrowright.gif";
+        var args = HtmlUtil.join([HtmlUtil.squote(id),HtmlUtil.squote(imgid), HtmlUtil.squote(img1), HtmlUtil.squote(img2)],",");
+        var click = "toggleBlockVisibility(" + args +");";
+
+        var header = HtmlUtil.div(["class","entry-toggleblock-label","onClick", click],
+                                  HtmlUtil.image((visible?img1:img2),  ["align","bottom","id",imgid]) +
+                                  " " + label);
+        var style = (visible?"display:block;visibility:visible":"display:none;");
+        var body = HtmlUtil.div(["class","hideshowblock", "id",id, "style", style],
+                                contents);
+        return header + body;
     }
 }
 
