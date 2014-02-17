@@ -3,11 +3,7 @@ var DISPLAY_ENTRYLIST = "entrylist";
 var DISPLAY_ENTRYDISPLAY = "entrydisplay";
 var DISPLAY_OPERANDS = "operands";
 
-var ID_AREA_LINK = "arealink";
-var ID_NORTH = "north";
-var ID_SOUTH = "south";
-var ID_EAST = "east";
-var ID_WEST = "west";
+
 
 addGlobalDisplayType({type: DISPLAY_ENTRYLIST, label:"Entry List",requiresData:false});
 addGlobalDisplayType({type: DISPLAY_ENTRYDISPLAY, label:"Entry Display",requiresData:false});
@@ -65,12 +61,9 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
             showForm: true,            
             showType: true,           
             fullForm: true,            
-            showEntries: true,
             showMetadata: true,
             showArea: true,
-            linkArea: false,
-            lastBounds: null,
-            share: true,
+            showEntries: true,
             types: null,
             metadataTypeList: [],
     });            
@@ -102,7 +95,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
     RamaddaUtil.defineMembers(this, {
             haveSearched: false,
             haveTypes: false,
-           haveDisplayed: false,
+            haveDisplayed: false,
             metadata: {},
             metadataLoading: {},
             selectedEntries: [],            
@@ -211,10 +204,11 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 }
                 this.settings.clearAndAddType(this.settings.entryType);
                 
-                this.settings.setBounds(this.getFieldValue(this.getDomId(ID_NORTH), null),
-                                        this.getFieldValue(this.getDomId(ID_WEST), null),
-                                        this.getFieldValue(this.getDomId(ID_SOUTH), null),
-                                        this.getFieldValue(this.getDomId(ID_EAST), null));
+                if(this.areaForm) {
+                    this.areaForm.setAreaSettings(this.settings);
+                }
+
+
 
                 this.settings.metadata = [];
                 for(var i in this.metadataTypeList) {
@@ -240,7 +234,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 }
                 this.footerRight  = footer;
                 this.writeHtml(ID_FOOTER_RIGHT, this.footerRight);
-                this.writeHtml(ID_RESULTS, "Loading...");
+                this.writeHtml(ID_RESULTS, "Searching...");
                 this.writeHtml(ID_ENTRIES, HtmlUtil.div(["style","margin:20px;"], this.getWaitImage()));
                 //                this.writeHtml(ID_RESULTS,"&nbsp;");
 
@@ -258,14 +252,6 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     if(value == null || value.length == 0) continue;
                     this.savedValues[id] = value;
                 }
-            },
-           handleEventMapBoundsChanged: function (source,  bounds) {
-                this.lastBounds = bounds;
-                if(!this.linkArea) return;
-                $("#" + this.getDomId(ID_NORTH)).val(formatLocationValue(bounds.top));
-                $("#" + this.getDomId(ID_WEST)).val(formatLocationValue(bounds.left));
-                $("#" + this.getDomId(ID_SOUTH)).val(formatLocationValue(bounds.bottom));
-                $("#" + this.getDomId(ID_EAST)).val(formatLocationValue(bounds.right));
             },
             makeSearchUrl: function() {
                 var extra = "";
@@ -302,14 +288,13 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 form += textField;
 
                 var extra = "";
+                extra+= HtmlUtil.formTable();
                 if(this.showArea) {
-                    extra+= HtmlUtil.formTable();
-                    extra += HtmlUtil.formEntry("Area:",this.makeAreaForm());
-                    extra+= HtmlUtil.closeTag("table");
+                    this.areaForm = new AreaForm(this);
+                    extra += HtmlUtil.formEntry("Area:",this.areaForm.getHtml());
                 }
 
                 if(this.showMetadata) {
-                    extra+= HtmlUtil.formTable();
                     for(var i in this.metadataTypeList) {
                         var type  = this.metadataTypeList[i];
                         var value = type.getValue();
@@ -324,9 +309,8 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                         }
                         extra+= HtmlUtil.formEntry(type.getLabel() +":", metadataSelect);
                     }
-                    extra+= HtmlUtil.closeTag("table");
                 }
-
+                extra+= HtmlUtil.closeTag("table");
                 extra+=    HtmlUtil.div(["id",this.getDomId(ID_TYPE_FIELDS)],"");
 
                 form += HtmlUtil.div(["class", "display-search-extra"],
@@ -339,30 +323,10 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 var results =   HtmlUtil.div(["class","display-entrylist-results", "id",this.getDomId(ID_RESULTS)],"&nbsp;");
 
                 return  form  + results;
-                
-
-
-
             },
-             areaClear: function() {
-                $("#" + this.getDomId(ID_NORTH)).val("");
-                $("#" + this.getDomId(ID_WEST)).val("");
-                $("#" + this.getDomId(ID_SOUTH)).val("");
-                $("#" + this.getDomId(ID_EAST)).val("");
+            handleEventMapBoundsChanged: function (source,  bounds) {
+                if(this.areaForm) this.areaForm.handleEventMapBoundsChanged (source,  bounds);
             },
-            areaLinkClick: function() {
-                this.linkArea = !this.linkArea;
-                var image = root +( this.linkArea? "/icons/link.png":"/icons/link_break.png");
-                $("#" + this.getDomId(ID_AREA_LINK)).attr("src", image);
-                if(this.linkArea && this.lastBounds) {
-                    var b  = this.lastBounds;
-                    $("#" + this.getDomId(ID_NORTH)).val(formatLocationValue(b.top));
-                    $("#" + this.getDomId(ID_WEST)).val(formatLocationValue(b.left));
-                    $("#" + this.getDomId(ID_SOUTH)).val(formatLocationValue(b.bottom));
-                    $("#" + this.getDomId(ID_EAST)).val(formatLocationValue(b.right));
-                }
-            },
-         
             typeChanged: function() {
                 this.settings.skip=0;
                 this.settings.max=50;

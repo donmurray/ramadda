@@ -16,6 +16,9 @@ var ID_MENU_OUTER =  "menu_outer";
 var ID_MENU_INNER =  "menu_inner";
 
 
+
+
+
 var PROP_DISPLAY_FILTER = "displayFilter";
 
 var PROP_DIVID = "divid";
@@ -749,27 +752,6 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             },
             setTitle: function(title) {
                 this.writeHtml(ID_TITLE,title);
-            },
-            makeAreaForm: function() {
-                var link = HtmlUtil.onClick(this.getGet()+".areaLinkClick();", HtmlUtil.image(root +"/icons/link_break.png",["title","Set bounds from map", "class", "display-area-link", "border","0","id", this.getDomId(ID_AREA_LINK)]));
-                var erase = HtmlUtil.onClick(this.getGet()+".areaClear();", HtmlUtil.image(root +"/icons/eraser.png",["title","Clear form", "class", "display-area-link", "border","0"]));
-                var areaForm = HtmlUtil.openTag("table",["class","display-area", "border","0","cellpadding","0","cellspacing","0"]);
-                areaForm += HtmlUtil.tr([],
-                                        HtmlUtil.td(["align","center","class"],
-                                                    HtmlUtil.input(ID_NORTH,"",["placeholder","N","class","input display-area-input", "size", "5","id", 
-                                                                                this.getDomId(ID_NORTH),  "title","North"])));
-
-                areaForm += HtmlUtil.tr([],HtmlUtil.td([],
-                                                       HtmlUtil.input(ID_WEST,"",["placeholder","W","class","input  display-area-input", "size", "5","id", 
-                                                                                  this.getDomId(ID_WEST),  "title","West"]) +
-                                                       HtmlUtil.input(ID_EAST,"",["placeholder","E","class","input  display-area-input", "size", "5","id", 
-                                                                                  this.getDomId(ID_EAST),  "title","East"])));
-                areaForm += HtmlUtil.tr([],HtmlUtil.td(["align","center"],
-                                                       HtmlUtil.input(ID_SOUTH,"",["placeholder","S","class","input  display-area-input", "size", "5","id", 
-                                                                                   this.getDomId(ID_SOUTH),  "title","South"])));
-
-                areaForm += HtmlUtil.closeTag("table");
-                return  HtmlUtil.hbox(areaForm, link, erase);
             },
             getTitle: function () {
                 var prefix  = "";
