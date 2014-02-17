@@ -2,16 +2,20 @@
 var DISPLAY_ENTRYLIST = "entrylist";
 var DISPLAY_ENTRYDISPLAY = "entrydisplay";
 var DISPLAY_OPERANDS = "operands";
+var DISPLAY_METADATA = "metadata";
 
 
 
 addGlobalDisplayType({type: DISPLAY_ENTRYLIST, label:"Entry List",requiresData:false});
 addGlobalDisplayType({type: DISPLAY_ENTRYDISPLAY, label:"Entry Display",requiresData:false});
 addGlobalDisplayType({type: DISPLAY_OPERANDS, label:"Operands",requiresData:false});
+addGlobalDisplayType({type: DISPLAY_METADATA, label:"Metadata Table",requiresData:false});
 
 
 function RamaddaEntryDisplay(displayManager, id, type, properties) {
      var SUPER;
+     var ID_TOOLBAR = "toolbar";
+     var ID_TOOLBAR_INNER = "toolbarinner";
      RamaddaUtil.inherit(this, SUPER = new RamaddaDisplay(displayManager, id, type, properties));
      RamaddaUtil.defineMembers(this, {
              settings: new EntrySearchSettings({
@@ -23,7 +27,31 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
              entryMap: {},
              getSettings: function() {
                  return this.settings;
+             },
+             makeEntryToolbar: function(entry) {
+                 var get = this.getGet();
+                 var toolbarItems = [];
+                 toolbarItems.push(HtmlUtil.tag("a", ["href", entry.getEntryUrl(),"target","_"], 
+                                                HtmlUtil.image(root +"/icons/application-home.png",["border",0,"title","View Entry"])));
+                 if(entry.getService("points.latlonaltcsv")) {
+                     toolbarItems.push(HtmlUtil.tag("a", ["onclick", get+".createDisplay('" + entry.getId() +"','linechart');"], 
+                                                    HtmlUtil.image(root +"/icons/chart_line_add.png",["border",0,"title","Create Chart"])));
+                 }
+                 if(entry.getFilesize()>0) {
+                     toolbarItems.push(HtmlUtil.tag("a", ["href", entry.getFileUrl()], 
+                                                    HtmlUtil.image(root +"/icons/download.png",["border",0,"title","Download (" + entry.getFormattedFilesize() +")"])));
+                     
+                 }
+                 var entryMenuButton = this.getEntryMenuButton(entry);
+                 toolbarItems.push(entryMenuButton);
+                 return HtmlUtil.div(["class","display-entry-toolbar","id",
+                                      this.getEntryToolbarId(entry.getId())],
+                                     HtmlUtil.join(toolbarItems,""));
+             },
+             getEntryToolbarId: function(entryId) {
+                 return this.getDomId(ID_TOOLBAR +"_" + entryId);
              }
+
         });
      if(properties.entryType!=null) {
          this.settings.addType(properties.entryType);
@@ -35,8 +63,8 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
     var NONE = "-- None --";
 
-    var ID_TOOLBAR = "toolbar";
-    var ID_TOOLBAR_INNER = "toolbarinner";
+
+
     var ID_LIST = "list";
 
     var ID_COLUMN = "column";
@@ -265,7 +293,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 var text = this.settings.text;
                 if(text == null) text = "";
 
-                var textField =  HtmlUtil.input("", text, ["placeholder","search text","class", "display-search-input ui-widget", "size","20","id",  this.getDomId(ID_TEXT_FIELD)]);
+                var textField =  HtmlUtil.input("", text, ["placeholder","search text","class", "display-search-input ui-widget ui-button-text", "size","20","id",  this.getDomId(ID_TEXT_FIELD)]);
 
                 form += HtmlUtil.div(["id", this.getDomId(ID_SEARCH),"class","display-button"],"Search for:");
                 if(this.showType) {
@@ -405,7 +433,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     select += catMap[cats[i]];
                 }
                 this.writeHtml(ID_TYPE_FIELD, select);
-                $("#" + this.getDomId(ID_TYPE_FIELD)).selectBoxIt({});
+                this.jq(ID_TYPE_FIELD).selectBoxIt({});
 
                 this.addExtraForm();
            },
@@ -480,7 +508,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 
            },
            highlightEntry: function(entry) {
-                $("#"+this.getDomId("entryinner_" + entry.getId())).addClass("display-entrylist-highlight");
+                this.jq("entryinner_" + entry.getId()).addClass("display-entrylist-highlight");
             },
             handleEventEntrySelection: function(source, args) {
                 this.selectEntry(args.entry, args.selected);
@@ -488,14 +516,14 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
             selectEntry: function(entry, selected) {
                 var changed  = false;
                 if(selected) {
-                    $("#"+ this.getDomId("entry_" + entry.getId())).addClass("ui-selected");
+                    this.jq("entry_" + entry.getId()).addClass("ui-selected");
                     var index = this.selectedEntries.indexOf(entry);
                     if (index < 0) {
                         this.selectedEntries.push(entry);
                         changed = true;
                     }
                 } else {
-                    $("#"+ this.getDomId("entry_" + entry.getId())).removeClass("ui-selected");
+                    this.jq("entry_" + entry.getId()).removeClass("ui-selected");
                     var index = this.selectedEntries.indexOf(entry);
                     if (index >= 0) {
                         this.selectedEntries.splice(index, 1);
@@ -557,28 +585,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
                 for(var i=0;i<entries.length;i++) {
                     var entry = entries[i];
-                    var toolbarItems = [];
-                    toolbarItems.push(HtmlUtil.tag("a", ["href", entry.getEntryUrl(),"target","_"], 
-                                                                         HtmlUtil.image(root +"/icons/application-home.png",["border",0,"title","View Entry"])));
-                    if(entry.getService("points.latlonaltcsv")) {
-                        toolbarItems.push(HtmlUtil.tag("a", ["onclick", get+".createDisplay('" + entry.getId() +"','linechart');"], 
-                                                       HtmlUtil.image(root +"/icons/chart_line_add.png",["border",0,"title","Create Chart"])));
-                    }
-                    if(entry.getFilesize()>0) {
-                        toolbarItems.push(HtmlUtil.tag("a", ["href", entry.getFileUrl()], 
-                                                       HtmlUtil.image(root +"/icons/download.png",["border",0,"title","Download (" + entry.getFormattedFilesize() +")"])));
-                        
-                    }
-                    
-
-                    var entryMenuButton = this.getEntryMenuButton(entry);
-                    toolbarItems.push(entryMenuButton);
-                    
-                    var toolbar = HtmlUtil.div(["class","display-entry-toolbar","id",
-                                this.getDomId(ID_TOOLBAR +"_" + entry.getId())],
-                                               HtmlUtil.join(toolbarItems,""));
-
-                    right = toolbar;
+                    right = this.makeEntryToolbar(entry);
                     var icon = entry.getIconImage(["title","View entry"]);
                     var link  =  HtmlUtil.tag("a",["href", entry.getEntryUrl()],icon);
                     var entryName = entry.getName();
@@ -600,7 +607,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 var entryRows = $("#" + this.getDomId(ID_LIST) +"  .display-entrylist-entry");
                 entryRows.mouseover(function(event){
                         var entryId = $( this ).attr('entryid');
-                        var toolbarId = theDisplay.getDomId(ID_TOOLBAR +"_" + entryId);
+                        var toolbarId = theDisplay.getEntryToolbarId(entryId);
                         var toolbar = $("#" + toolbarId);
                         toolbar.show();
                         var myalign = 'right center';
@@ -616,13 +623,12 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     });
                 entryRows.mouseout(function(event){
                         var entryId = $( this ).attr('entryid');
-                        var toolbarId = theDisplay.getDomId(ID_TOOLBAR +"_" + entryId);
+                        var toolbarId = theDisplay.getEntryToolbarId(entryId);
                         var toolbar = $("#" + toolbarId);
                         toolbar.hide();
                     });
 
-
-                $("#" + this.getDomId("list")).selectable({
+                this.jq("list").selectable({
                         delay: 0,
                         cancel: 'a',
                         selected: function( event, ui ) {
@@ -762,13 +768,13 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
                 html += "</form>";
                 this.writeHtml(ID_ENTRIES, html);
                 var theDisplay = this;
-                $("#"+this.getDomId(ID_NEWDISPLAY)).button().click(function(event) {
+                this.jq(ID_NEWDISPLAY).button().click(function(event) {
                        theDisplay.createDisplay();
                    });
             },
             createDisplay: function() {
-                var entry1 = this.entryList.getEntry($("#" + this.getDomId(ID_SELECT1)).val());
-                var entry2 = this.entryList.getEntry($("#" + this.getDomId(ID_SELECT2)).val());
+                var entry1 = this.entryList.getEntry(this.jq(ID_SELECT1).val());
+                var entry2 = this.entryList.getEntry(this.jq(ID_SELECT2).val());
                 if(entry1 == null) {
                     alert("No data selected");
                     return;
@@ -784,7 +790,7 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
                 var operation = "average";
                 var derivedData = new  DerivedPointData(this.displayManager, "Derived Data", pointDataList,operation);
                 var pointData = derivedData;
-                var chartType = $("#" + this.getDomId(ID_CHARTTYPE)).val();
+                var chartType = this.jq(ID_CHARTTYPE).val();
                 displayManager.createDisplay(chartType, {
                         "layoutFixed": false,
                         "data": pointData
