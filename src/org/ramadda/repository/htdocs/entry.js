@@ -70,7 +70,8 @@ function EntryManager(repositoryRoot) {
                     url += "&group=" + settings.parent;
                 if(settings.text!=null&& settings.text.length>0) 
                     url += "&text=" + settings.text;
-
+                if(settings.name!=null&& settings.name.length>0) 
+                    url += "&name=" + settings.name;
                 if(!isNaN(settings.getNorth())) 
                    url += "&area_north=" + settings.getNorth();
                 if(!isNaN(settings.getWest())) 
@@ -351,6 +352,7 @@ function EntryList(jsonUrl, listener) {
             });
 
     this.url = jsonUrl;
+    console.log("json:" + jsonUrl);
     var jqxhr = $.getJSON( jsonUrl, function(data) {
             entryList.haveLoaded = true;
             entryList.createEntries(data);

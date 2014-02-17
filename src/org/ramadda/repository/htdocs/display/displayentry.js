@@ -154,14 +154,18 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
 
                 var theDisplay  = this;
-                $("#" + this.getDomId(ID_SEARCH)).button().click(function(event) {
+                this.jq(ID_SEARCH).button().click(function(event) {
                         theDisplay.submitSearchForm();
                         event.preventDefault();
                     });
 
+                this.jq(ID_TEXT_FIELD).autocomplete({
+                        source: function(request, callback) {
+                            theDisplay.doQuickEntrySearch(request, callback);
+                            }
+                            });
 
-
-                $( "#" + this.getDomId(ID_FORM)).submit(function( event ) {
+                this.jq(ID_FORM).submit(function( event ) {
                         theDisplay.submitSearchForm();
                         event.preventDefault();
                     });
@@ -207,9 +211,6 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 if(this.areaForm) {
                     this.areaForm.setAreaSettings(this.settings);
                 }
-
-
-
                 this.settings.metadata = [];
                 for(var i in this.metadataTypeList) {
                     var metadataType  = this.metadataTypeList[i];
@@ -225,20 +226,11 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 //Call this now because it sets settings
                 var jsonUrl = this.makeSearchUrl();
 
-                var footer = "Links: ";
                 var outputs = getEntryManager().getSearchLinks(this.settings);
-                for(var i in outputs) {
-                    if(i>0)
-                        footer += " - ";
-                    footer += outputs[i];
-                }
-                this.footerRight  = footer;
+                this.footerRight  = "Links: " + HtmlUtil.join(outputs," - "); 
                 this.writeHtml(ID_FOOTER_RIGHT, this.footerRight);
                 this.writeHtml(ID_RESULTS, "Searching...");
                 this.writeHtml(ID_ENTRIES, HtmlUtil.div(["style","margin:20px;"], this.getWaitImage()));
-                //                this.writeHtml(ID_RESULTS,"&nbsp;");
-
-                console.log("json:" + jsonUrl);
                 this.entryList = new EntryList(jsonUrl, this, this.entryList);
             },
             prepareToLayout:function() {

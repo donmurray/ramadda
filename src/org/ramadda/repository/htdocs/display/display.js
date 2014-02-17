@@ -21,6 +21,7 @@ var ID_MENU_INNER =  "menu_inner";
 
 var PROP_DISPLAY_FILTER = "displayFilter";
 
+
 var PROP_DIVID = "divid";
 var PROP_FIELDS = "fields";
 var PROP_LAYOUT_HERE = "layoutHere";
@@ -93,6 +94,9 @@ function DisplayThing(argId, argProperties) {
        getDomId:function(suffix) {
                 return this.getId() +"_" + suffix;
        },
+       jq: function(componentId) {
+             return $("#"+ this.getDomId(componentId));
+       },
        writeHtml: function(idSuffix, html) {
                 $("#" + this.getDomId(idSuffix)).html(html);
        },
@@ -128,6 +132,10 @@ function DisplayThing(argId, argProperties) {
        setProperty: function(key, value) {
            this.properties[key] = value;
         },
+
+        
+
+
        getProperty: function(key, dflt) {
             var value = this.properties[key];
             if(value != null) return value;
@@ -777,6 +785,38 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             },
                 getIsLayoutFixed: function() {
                 return this.getProperty(PROP_LAYOUT_HERE,false);
+            },
+            doingQuickEntrySearch: false,
+            doQuickEntrySearch: function(request, callback) {
+                if(this.doingQuickEntrySearch) return;
+                var text = request.term;
+                if(text == null || text.length<=1) return;
+                this.doingQuickEntrySearch = true;
+                var settings = new EntrySearchSettings({
+                        name: text,
+                        max: 10,
+                    });
+                if(this.settings) {
+                    settings.clearAndAddType(this.settings.entryType);
+                }
+                var theDisplay = this;
+                var jsonUrl = getEntryManager().getSearchUrl(settings, OUTPUT_JSON);
+                var handler = {
+                    entryListChanged: function(entryList) {
+                        theDisplay.doneQuickEntrySearch(entryList, callback);
+                    }
+                };
+                var entryList =  new EntryList(jsonUrl, handler);
+            },
+            doneQuickEntrySearch: function(entryList, callback) {
+                var names = [];
+                var entries = entryList.getEntries();
+                for(var i=0;i<entries.length;i++) {
+                    names.push(entries[i].getName());
+                }
+                callback(names);
+                this.doingQuickEntrySearch = false;
+
             },
             hasData: function() {
                 return this.dataCollection.hasData();
