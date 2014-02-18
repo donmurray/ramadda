@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -21,44 +21,15 @@
 package org.ramadda.geodata.cdmdata;
 
 
-import org.ramadda.repository.*;
-
-import org.ramadda.repository.type.*;
-
-import org.ramadda.util.HtmlUtils;
-
-
-import org.w3c.dom.*;
-
-
-import ucar.nc2.NetcdfFile;
-import ucar.nc2.units.DateUnit;
+import ucar.nc2.time.CalendarDate;
 
 import ucar.unidata.util.DateUtil;
 
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.xml.XmlUtil;
-
-
-import java.io.File;
-
-
-
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.Enumeration;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Properties;
 
 
 /**
- *
- *
- * @author RAMADDA Development Team
- * @version $Revision: 1.3 $
+ * Utility class for netCDF-Java Common Data Model (CDM) stuff
  */
 public class CdmUtil {
 
@@ -130,4 +101,23 @@ public class CdmUtil {
     /** _more_ */
     public static final String ATTR_STATION_ALTITUDE =
         "StationElevationInMeters";
+
+    /**
+     * Make a date from a calendar date.  This should probably be in a utility
+     * class.
+     *
+     * @param cd  the CalendarDate
+     * @return the corresponding date.
+     */
+    public static Date makeDate(CalendarDate cd) {
+        Date d = null;
+        try {
+            d = DateUtil.parse(cd.toString());
+        } catch (Exception e) {
+            d = cd.toDate();  // not correct for non-standard calendars
+        }
+
+        return d;
+    }
+
 }

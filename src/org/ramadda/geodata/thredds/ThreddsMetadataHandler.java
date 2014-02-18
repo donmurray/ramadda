@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -21,79 +21,48 @@
 package org.ramadda.geodata.thredds;
 
 
-import org.ramadda.geodata.cdmdata.*;
-
-
-
-import org.ramadda.repository.*;
-import org.ramadda.repository.auth.*;
-import org.ramadda.repository.metadata.*;
-
-import org.ramadda.repository.metadata.*;
-
-import org.ramadda.sql.SqlUtil;
-import org.ramadda.util.HtmlUtils;
-
-
-import org.w3c.dom.*;
-
-
-import ucar.ma2.*;
-
-import ucar.nc2.Attribute;
-import ucar.nc2.Variable;
-
-
-import ucar.nc2.VariableSimpleIF;
-import ucar.nc2.constants.AxisType;
-import ucar.nc2.constants.CDM;
-import ucar.nc2.constants.CF;
-import ucar.nc2.dataset.CoordinateAxis;
-import ucar.nc2.dataset.CoordinateAxis1D;
-
-import ucar.nc2.dataset.CoordinateSystem;
-import ucar.nc2.dataset.NetcdfDataset;
-import ucar.nc2.dataset.conv.CF1Convention;
-import ucar.nc2.dataset.conv.COARDSConvention;
-import ucar.nc2.time.Calendar;
-import ucar.nc2.time.CalendarDate;
-import ucar.nc2.time.CalendarDateRange;
-import ucar.nc2.time.CalendarDateUnit;
-
-
-import ucar.unidata.geoloc.LatLonRect;
-import ucar.unidata.geoloc.ProjectionImpl;
-import ucar.unidata.util.CatalogUtil;
-import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.Misc;
-
-
-
-
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
-import ucar.unidata.xml.XmlUtil;
-
-import visad.Unit;
-import visad.UnitException;
-
-
-import visad.data.units.NoSuchUnitException;
-
-import visad.jmet.MetUnits;
-
-import java.io.File;
-
-
-import java.sql.Statement;
-
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+
+import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
+import org.ramadda.geodata.cdmdata.CdmUtil;
+import org.ramadda.repository.Entry;
+import org.ramadda.repository.Repository;
+import org.ramadda.repository.Request;
+import org.ramadda.repository.metadata.Metadata;
+import org.ramadda.repository.metadata.MetadataHandler;
+import org.ramadda.repository.metadata.MetadataTypeBase;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+import ucar.ma2.Array;
+import ucar.ma2.IndexIterator;
+import ucar.ma2.MAMath;
+import ucar.nc2.Attribute;
+import ucar.nc2.Variable;
+import ucar.nc2.VariableSimpleIF;
+import ucar.nc2.constants.AxisType;
+import ucar.nc2.constants.CF;
+import ucar.nc2.dataset.CoordinateAxis;
+import ucar.nc2.dataset.CoordinateAxis1D;
+import ucar.nc2.dataset.CoordinateSystem;
+import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.time.Calendar;
+import ucar.nc2.time.CalendarDate;
+import ucar.nc2.time.CalendarDateUnit;
+import ucar.unidata.geoloc.LatLonRect;
+import ucar.unidata.geoloc.ProjectionImpl;
+import ucar.unidata.util.CatalogUtil;
+import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.StringUtil;
+import ucar.unidata.xml.XmlUtil;
+import visad.Unit;
+import visad.UnitException;
+import visad.data.units.NoSuchUnitException;
+import visad.jmet.MetUnits;
 
 
 /**
@@ -311,18 +280,18 @@ public class ThreddsMetadataHandler extends MetadataHandler {
      */
     public static List<Date> getDates(VariableSimpleIF var, CoordinateAxis ca)
             throws Exception {
-        
+
         CalendarDateUnit dateUnit = getCalendarDateUnit(ca);
-        List<Date>    dates  = new ArrayList<Date>();
-        Array         a      = ca.read();
-        IndexIterator iter   = a.getIndexIterator();
+        List<Date>       dates    = new ArrayList<Date>();
+        Array            a        = ca.read();
+        IndexIterator    iter     = a.getIndexIterator();
         while (iter.hasNext()) {
             double val = iter.getDoubleNext();
             if (val != val) {
                 continue;
             }
             CalendarDate cDate = dateUnit.makeCalendarDate(val);
-            dates.add(makeDate(cDate));
+            dates.add(CdmUtil.makeDate(cDate));
         }
 
         return dates;
@@ -330,25 +299,29 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
     /**
      * Get a CalendarDateUnit for the given axis
-     * 
+     *
      * @param timeAxis the axis
      * @return the CalendarDateUnit
      */
-    private static CalendarDateUnit getCalendarDateUnit(CoordinateAxis timeAxis) {
+    private static CalendarDateUnit getCalendarDateUnit(
+            CoordinateAxis timeAxis) {
         Attribute cattr = timeAxis.findAttribute(CF.CALENDAR);
-        String s = (cattr == null) ? null : cattr.getStringValue();
-        Calendar cal = null;
+        String    s     = (cattr == null)
+                          ? null
+                          : cattr.getStringValue();
+        Calendar  cal   = null;
         if (s == null) {
             cal = Calendar.gregorian;
         } else {
-            cal =  ucar.nc2.time.Calendar.get(s);
+            cal = ucar.nc2.time.Calendar.get(s);
         }
-        CalendarDateUnit dateUnit = 
-            // this will throw exception on failure
-            CalendarDateUnit.withCalendar(cal, timeAxis.getUnitsString()); 
+        CalendarDateUnit dateUnit =
+        // this will throw exception on failure
+        CalendarDateUnit.withCalendar(cal, timeAxis.getUnitsString());
+
         return dateUnit;
     }
-    
+
     /**
      * _more_
      *
@@ -393,40 +366,22 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         Date[] mmDate = null;
         if (ca instanceof CoordinateAxis1D) {
             CalendarDateUnit dateUnit = getCalendarDateUnit(ca);
-            MAMath.MinMax minmax = MAMath.getMinMax(ca.read());
-            CalendarDate minDate = dateUnit.makeCalendarDate(minmax.min);
-            CalendarDate maxDate = dateUnit.makeCalendarDate(minmax.max);
-            mmDate = new Date[] { makeDate(minDate), makeDate(maxDate) };
-            
+            MAMath.MinMax    minmax   = MAMath.getMinMax(ca.read());
+            CalendarDate     minDate  = dateUnit.makeCalendarDate(minmax.min);
+            CalendarDate     maxDate  = dateUnit.makeCalendarDate(minmax.max);
+            mmDate = new Date[] { CdmUtil.makeDate(minDate),
+                                  CdmUtil.makeDate(maxDate) };
+
         } else {  // old way - doesn't work for non-standard (e.g. no leap) calendars
             double[] minmax = getRange(var, ca.read(),
-                                   visad.CommonUnit.secondsSinceTheEpoch);
+                                       visad.CommonUnit.secondsSinceTheEpoch);
 
             mmDate = new Date[] { new Date((long) minmax[0] * 1000),
-                            new Date((long) minmax[1] * 1000) };
+                                  new Date((long) minmax[1] * 1000) };
         }
+
         return mmDate;
     }
-
-
-    /**
-     * Make a date from a calendar date.  This should probably be in a utility
-     * class.
-     * 
-     * @param cd  the CalendarDate
-     * @return the corresponding date.
-     */
-    private static Date makeDate(CalendarDate cd) {
-       Date d = null;
-       try {
-           d = DateUtil.parse(cd.toString());
-       } catch (Exception e) {
-           d = cd.toDate(); // not correct for non-standard calendars
-       }
-       return d;
-    }
-
-
 
     /**
      * _more_
