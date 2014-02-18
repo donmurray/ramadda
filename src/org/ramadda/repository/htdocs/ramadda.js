@@ -1314,27 +1314,23 @@ function showPopup(event, srcId, popupId, alignLeft, myalign, atalign) {
 
 
 function showStickyPopup(event, srcId, popupId, alignLeft) {
-    var popup = ramaddaUtil.getDomObject(popupId);
-    var srcObj = ramaddaUtil.getDomObject(srcId);
-    if(!popup || !srcObj) return;
-    event = ramaddaUtil.getEvent(event);
-    x = ramaddaUtil.getEventX(event);
-    y = ramaddaUtil.getEventY(event);
-    if(srcObj.obj.offsetLeft && srcObj.obj.offsetWidth) {
-        x = ramaddaUtil.getLeft(srcObj.obj);
-        y = srcObj.obj.offsetHeight+ramaddaUtil.getTop(srcObj.obj) + 2;
-    } 
+    var myalign = 'left top';
+    var atalign = 'left top';
 
-    if(alignLeft) {
-        x = ramaddaUtil.getLeft(srcObj.obj);
-        y = srcObj.obj.offsetHeight+ramaddaUtil.getTop(srcObj.obj) + 2;
-    } else {
-        x+=2;
-        x+=3;
-    }
-
-    showObject(popup);
-    ramaddaUtil.setPosition(popup, x,y);
+    $("#"+popupId ).show();
+    $("#"+popupId ).position({
+                of: jQuery( "#" + srcId ),
+                my: myalign,
+                at: atalign,
+                collision: "none none"
+                });
+    //Do it again to fix a bug on safari
+    $("#"+popupId ).position({
+                of: jQuery( "#" + srcId ),
+                my: myalign,
+                at: atalign,
+                collision: "none none"
+                });
 }
 
 
