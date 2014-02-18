@@ -4,6 +4,11 @@ Copyright 2008-2014 Geode Systems LLC
 
 
 
+
+//uncomment this to add this type to the global list
+//addGlobalDisplayType({type: "example", label:"Example"});
+
+
 /*
   This gets created by the displayManager.createDisplay('example')
  */
@@ -70,5 +75,3 @@ function RamaddaExampleDisplay(displayManager, id, properties) {
 }
 
 
-//Add this type to the global list
-addGlobalDisplayType({type: "example", label:"Example"});

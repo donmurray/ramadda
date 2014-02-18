@@ -9,6 +9,9 @@ var ID_TITLE = "title";
 var ID_DISPLAY_CONTENTS = "contents";
 var ID_DIALOG = "dialog";
 var ID_DIALOG_BUTTON = "dialog_button";
+var ID_FOOTER = "footer";
+var ID_FOOTER_LEFT = "footer_left";
+var ID_FOOTER_RIGHT = "footer_right";
 
 
 var ID_MENU_BUTTON = "menu_button";
@@ -235,6 +238,18 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             },
             getMessage: function(msg) {
                 return HtmlUtil.div(["class","display-message"], msg);
+            },
+            getFieldValue: function(id, dflt) {
+                var jq = $("#" + id);
+                if(jq.size()>0) {
+                    return jq.val();
+                } 
+                return dflt;
+            },
+            getFooter: function() {
+                return  HtmlUtil.div(["id",this.getDomId(ID_FOOTER),"class","display-footer"], 
+                                           HtmlUtil.leftRight(HtmlUtil.div(["id",this.getDomId(ID_FOOTER_LEFT),"class","display-footer-left"],""),
+                                                              HtmlUtil.div(["id",this.getDomId(ID_FOOTER_RIGHT),"class","display-footer-right"],"")));
             },
            checkFixedLayout: function() {
                 if(this.getIsLayoutFixed()) {
@@ -792,15 +807,15 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 var text = request.term;
                 if(text == null || text.length<=1) return;
                 this.doingQuickEntrySearch = true;
-                var settings = new EntrySearchSettings({
+                var searchSettings = new EntrySearchSettings({
                         name: text,
                         max: 10,
                     });
-                if(this.settings) {
-                    settings.clearAndAddType(this.settings.entryType);
+                if(this.searchSettings) {
+                    searchSettings.clearAndAddType(this.searchSettings.entryType);
                 }
                 var theDisplay = this;
-                var jsonUrl = getEntryManager().getSearchUrl(settings, OUTPUT_JSON);
+                var jsonUrl = getEntryManager().getSearchUrl(searchSettings, OUTPUT_JSON);
                 var handler = {
                     entryListChanged: function(entryList) {
                         theDisplay.doneQuickEntrySearch(entryList, callback);
