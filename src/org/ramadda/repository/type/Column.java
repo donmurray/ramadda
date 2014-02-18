@@ -877,7 +877,7 @@ public class Column implements DataTypes, Constants {
                         sb.append("<br>");
                     }
                     cnt++;
-                    sb.append("<a href=\"" + url + "\">" + url + "</a>");
+                    sb.append("<a target=_blank href=\"" + url + "\">" + url + "</a>");
                 }
             }
         } else {
