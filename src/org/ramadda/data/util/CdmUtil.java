@@ -18,7 +18,7 @@
 * DEALINGS IN THE SOFTWARE.
 */
 
-package org.ramadda.geodata.cdmdata;
+package org.ramadda.data.util;
 
 
 import ucar.nc2.time.CalendarDate;
