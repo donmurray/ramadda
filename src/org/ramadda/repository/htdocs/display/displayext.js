@@ -54,7 +54,9 @@ function RamaddaExampleDisplay(displayManager, id, properties) {
                 var records = pointData.getRecords();
                 var html = "";
                 html += "#records:" + records.length;
-                $("#" + this.getDomId(ID_DATA)).html(html);
+                //equivalent to:
+                //$("#" + this.getDomId(ID_DATA)).html(html);
+                this.jq(ID_DATA).html(html);
             },
             //this gets called when an event source has selected a record
             handleEventRecordSelection: function(source, args) {
@@ -62,7 +64,7 @@ function RamaddaExampleDisplay(displayManager, id, properties) {
                 //this.setContents(args.html);
             },
             click: function() {
-                $("#"+this.getDomId(ID_CLICK)).html("Click again");
+                this.jq(ID_CLICK).html("Click again");
             }
         });
 }
