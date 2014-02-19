@@ -1,0 +1,5 @@
+
+<api handler="org.ramadda.geodata.ogc.WfsApiHandler" id="wfs">
+      <property name="admin" value="false"/>
+      <api request="/ogc/wfs"    method="processWfsRequest"/>
+</api>
