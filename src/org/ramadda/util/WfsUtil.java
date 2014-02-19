@@ -21,6 +21,8 @@
 package org.ramadda.util;
 
 
+
+
 /**
  */
 public class WfsUtil {
@@ -36,12 +38,18 @@ public class WfsUtil {
 
     /** _more_ */
     public static final String ARG_REQUEST = "request";
+    public static final String ARG_TYPENAME = "typeName";
+
 
     /** _more_ */
     public static final String VERSION = "1.1.0";
 
     /** _more_ */
     public static final String REQUEST_GETCAPABILITIES = "GetCapabilities";
+
+    public static final String REQUEST_DESCRIBEFEATURETYPE = "DescribeFeatureType";
+
+
 
 
     /**
