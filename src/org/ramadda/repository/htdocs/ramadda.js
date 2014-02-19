@@ -232,6 +232,18 @@ var HtmlUtil =  {
                                 this.td(["align","left","width",leftWidth],left) +
                                 this.td(["align","right","width", rightWidth],right)));
     },
+    leftCenterRight : function(left,center, right,leftWidth, centerWidth, rightWidth) {
+        if(leftWidth==null) leftWidth = "33%";
+        if(centerWidth==null) centerWidth = "33%";
+        if(rightWidth==null) rightWidth = "33%";
+
+        return this.tag("table",["border","0", "width","100%","cellspacing","0","cellpadding","0"],
+                        this.tr(["valign","top"],
+                                this.td(["align","center","width",leftWidth],left) +
+                                this.td(["align","center","width",centerWidth],center) +
+                                this.td(["align","center","width", rightWidth],right)));
+    },
+
     div : function(attrs, inner) {
         return this.tag("div", attrs, inner);
     },
@@ -1247,7 +1259,7 @@ function  getChildText(node) {
 
 function toggleVisibility(id,style) {
     var display  = $("#" + id).css('display');
-    $("#" + id).toggle();
+    $("#" + id).toggle(800);
     return display != 'block';
 
 }
@@ -1317,7 +1329,8 @@ function showStickyPopup(event, srcId, popupId, alignLeft) {
     var myalign = 'left top';
     var atalign = 'left top';
 
-    $("#"+popupId ).show();
+
+    $("#"+popupId ).show("slow");
     $("#"+popupId ).position({
                 of: jQuery( "#" + srcId ),
                 my: myalign,

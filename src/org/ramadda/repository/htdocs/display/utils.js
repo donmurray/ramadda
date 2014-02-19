@@ -4,25 +4,30 @@ Copyright 2008-2014 Geode Systems LLC
 
 
 
-var ID_AREA_LINK = "arealink";
-var ID_NORTH = "north";
-var ID_SOUTH = "south";
-var ID_EAST = "east";
-var ID_WEST = "west";
 
 
-function AreaForm(display) {
+
+function AreaWidget(display) {
+    var ID_NORTH = "north";
+    var ID_SOUTH = "south";
+    var ID_EAST = "east";
+    var ID_WEST = "west";
+
+    var ID_AREA_LINK = "arealink";
+
     RamaddaUtil.inherit(this, {
             display:display,
             getHtml: function() {
                 var callback = this.display.getGet();
-                var link = HtmlUtil.onClick(callback+".areaForm.areaLinkClick();", HtmlUtil.image(root +"/icons/link_break.png",["title","Set bounds from map", "class", "display-area-link", "border","0","id", this.display.getDomId(ID_AREA_LINK)]));
+                //hack, hack
+                var link = HtmlUtil.onClick(callback+".areaWidget.areaLinkClick();", HtmlUtil.image(root +"/icons/link_break.png",["title","Set bounds from map", "class", "display-area-link", "border","0","id", this.display.getDomId(ID_AREA_LINK)]));
                 var erase = HtmlUtil.onClick(callback+".areaForm.areaClear();", HtmlUtil.image(root +"/icons/eraser.png",["title","Clear form", "class", "display-area-link", "border","0"]));
                 var areaForm = HtmlUtil.openTag("table",["class","display-area", "border","0","cellpadding","0","cellspacing","0"]);
                 areaForm += HtmlUtil.tr([],
-                                        HtmlUtil.td(["align","center","class"],
-                                                    HtmlUtil.input(ID_NORTH,"",["placeholder","N","class","input display-area-input", "size", "5","id", 
-                                                                                this.display.getDomId(ID_NORTH),  "title","North"])));
+                                        HtmlUtil.td(["align","center"],
+                                                    HtmlUtil.leftCenterRight(erase, 
+                                                                             HtmlUtil.input(ID_NORTH,"",["placeholder","N","class","input display-area-input", "size", "5","id", 
+                                                                                                         this.display.getDomId(ID_NORTH),  "title","North"]), link,"20%","60%","20%")));
 
                 areaForm += HtmlUtil.tr([],HtmlUtil.td([],
                                                        HtmlUtil.input(ID_WEST,"",["placeholder","W","class","input  display-area-input", "size", "5","id", 
@@ -34,7 +39,8 @@ function AreaForm(display) {
                                                                                    this.display.getDomId(ID_SOUTH),  "title","South"])));
 
                 areaForm += HtmlUtil.closeTag("table");
-                return   HtmlUtil.hbox(areaForm, link, erase);
+                return areaForm;
+                //                return   HtmlUtil.hbox(areaForm, link, erase);
             },
             areaClear: function() {
                 $("#" + this.display.getDomId(ID_NORTH)).val("");
@@ -64,7 +70,7 @@ function AreaForm(display) {
                 $("#" + this.display.getDomId(ID_SOUTH)).val(formatLocationValue(bounds.bottom));
                 $("#" + this.display.getDomId(ID_EAST)).val(formatLocationValue(bounds.right));
             },
-            setAreaSettings: function(settings) {
+            setSearchSettings: function(settings) {
                 settings.setBounds(this.display.getFieldValue(this.display.getDomId(ID_NORTH), null),
                                    this.display.getFieldValue(this.display.getDomId(ID_WEST), null),
                                    this.display.getFieldValue(this.display.getDomId(ID_SOUTH), null),
@@ -72,4 +78,33 @@ function AreaForm(display) {
             },
                 });
 }
+
+
+
+
+function DateRangeWidget(display) {
+    var ID_DATE_START = "date_start";
+    var ID_DATE_END = "date_end";
+
+    RamaddaUtil.inherit(this, {
+            display:display,
+            initHtml: function() {
+                this.display.jq(ID_DATE_START).datepicker();
+                this.display.jq(ID_DATE_END).datepicker();
+            },
+            setSearchSettings: function(settings) {
+                var start = this.display.jq(ID_DATE_START).val();
+                var end = this.display.jq(ID_DATE_START).val();
+                settings.setDateRange(start, end);
+            },
+            getHtml: function() {
+                var html = HtmlUtil.input(ID_DATE_START,"",["placeholder","Start date", "id",
+                                                            display.getDomId(ID_DATE_START),"size","10"]) + " - " +
+                    HtmlUtil.input(ID_DATE_END,"",["placeholder","End date", "id",
+                                                            display.getDomId(ID_DATE_END),"size","10"]);
+                return html;
+            }
+        });
+}
+
 

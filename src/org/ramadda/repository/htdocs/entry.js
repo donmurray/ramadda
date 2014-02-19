@@ -72,6 +72,12 @@ function EntryManager(repositoryRoot) {
                     url += "&text=" + settings.text;
                 if(settings.name!=null&& settings.name.length>0) 
                     url += "&name=" + settings.name;
+                if(settings.startDate && settings.startDate.length>0) {
+                    url += "&datadata.from=" + settings.startDate;
+                }
+                if(settings.endDate && settings.endDate.length>0) {
+                    url += "&datadata.to=" + settings.endDate;
+                }
                 if(!isNaN(settings.getNorth())) 
                    url += "&area_north=" + settings.getNorth();
                 if(!isNaN(settings.getWest())) 
@@ -375,6 +381,8 @@ function EntrySearchSettings(props) {
             skip: 0,
             metadata: [],
             extra:"",
+            startDate: null,
+                endDate: null,
                 north: NaN,
                 west: NaN,
                 north: NaN,
@@ -390,6 +398,11 @@ function EntrySearchSettings(props) {
             getSouth: function() {return this.south;},
             getWest: function() {return this.west;},
             getEast: function() {return this.east;},
+                setDateRange: function(start, end) {
+                this.startDate = start;
+                this.endDate = end;
+            },
+
             setBounds: function(north, west, south, east) {
                 this.north = (north==null || north.toString().length==0?NaN:parseFloat(north));
                 this.west = (west==null || west.toString().length==0?NaN:parseFloat(west));
