@@ -4,4 +4,8 @@
      <property name="record.file.class" value="org.ramadda.data.point.netcdf.NetcdfPointFile"/>
   </type>
 
+  <type name="type_single_point_grid_netcdf"  description="NetCDF Single Point Grid File" super="type_point" handler="org.ramadda.data.services.PointTypeHandler">
+     <property name="record.file.class" value="org.ramadda.data.point.netcdf.NetcdfSinglePointGridFile"/>
+  </type>
+  
 </types>
