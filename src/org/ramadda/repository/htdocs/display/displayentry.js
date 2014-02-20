@@ -542,6 +542,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
             },
             updateForSearching: function(jsonUrl) {
                 SUPER.updateForSearching.apply(this,[jsonUrl]);
+                this.hideEntryPopup();
                 this.writeHtml(ID_ENTRIES, HtmlUtil.div(["style","margin:20px;"], this.getWaitImage()));
             },
             highlightEntry: function(entry) {
