@@ -447,6 +447,7 @@ public class TypeHandler extends RepositoryManager {
         items.add("type");
         items.add(Json.quote(getType()));
         items.add("entryCount");
+        int cnt = getEntryUtil().getEntryCount(this);
         items.add("" + cnt);
         items.add("label");
         items.add(Json.quote(getLabel()));

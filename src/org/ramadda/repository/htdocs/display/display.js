@@ -201,8 +201,9 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 if(!source.getEntries) {
                     return;
                 }
-                for(var i in source.getEntries()) {
-                    var entry = source.getEntries()[i];
+                var entries = source.getEntries();
+                for(var i =0;i<entries.length;i++) {
+                    var entry = entries[i];
                     var containsEntry = this.getEntries().indexOf(entry) >=0;
                     if(containsEntry) {
                         this.highlightEntry(entry);
@@ -494,7 +495,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 }
 
                 var topMenus = "";
-                for(var i in menus) {
+                for(var i=0;i<menus.length;i++) {
                     topMenus += HtmlUtil.tag("li",[], menus[i]);
                 }
 
@@ -638,7 +639,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 var form = "<form>";
 
                 form += this.getDisplayMenuSettings();
-                for(var i in menuItems) {
+                for(var i=0;i<menuItems.length;i++) {
                     form += HtmlUtil.div(["class","display-menu-item"], menuItems[i]);
                 }
                 form += "</form>";
@@ -988,7 +989,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             //display.filter="filtertype:params;filtertype:params;
             //display.filter="month:0-11;
             var filters = filter.split(";");
-            for(i in filters) {
+            for(var i=0;i<filters.length;i++) {
                 filter = filters[i];
                 var toks = filter.split(":");
                 var type  = toks[0];

@@ -890,8 +890,8 @@ function RepositoryMap(mapId, params) {
             "zoomToExtent" : false
         };
 
-        for (a in params) {
-            args[a] = params[a];
+        for(var i =0;i<params.length;i++) {
+            args[i] = params[i];
         }
 
         if (!this.boxes) {
@@ -949,7 +949,7 @@ function RepositoryMap(mapId, params) {
     }
 
     this.addPolygon = function(id, points, attrs) {
-        for (i in points) {
+        for(var i =0;i<points.length;i++) {
             points[i].transform(this.displayProjection, this.sourceProjection);
         }
 

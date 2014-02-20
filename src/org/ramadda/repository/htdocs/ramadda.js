@@ -206,7 +206,7 @@ ramaddaUtil = new Util();
 var HtmlUtil =  {
     join : function (items,separator) {
         var html = "";
-        for(var i in items) {
+        for(var i =0;i<items.length;i++) {
             if(i>0 & separator!=null) html+= separator;
             html += items[i];
         }

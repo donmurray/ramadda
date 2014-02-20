@@ -27,7 +27,7 @@ function EntryManager(repositoryRoot) {
                 if(this.entryTypes == null) {
                     var jqxhr = $.getJSON(this.repositoryRoot +"/entry/types", function(data) {
                             this.entryTypes = [];
-                            for(var i in data) {
+                            for(var i =0;i<data.length;i++) {
                                 this.entryTypes.push(new EntryType(data[i]));
                             }
                             if(callback!=null) {
@@ -54,7 +54,7 @@ function EntryManager(repositoryRoot) {
             },
             getSearchLinks: function(searchSettings) {
                 var urls = [];
-                for(var i in OUTPUTS) {
+                for(var i =0;i<OUTPUTS.length;i++) {
                     urls.push(htmlUtil.href(this.getSearchUrl(searchSettings, OUTPUTS[i].id),
                                             OUTPUTS[i].name));
                 }
@@ -62,7 +62,7 @@ function EntryManager(repositoryRoot) {
             },
            getSearchUrl: function(settings, output) {
                 var url =  this.repositoryRoot +"/search/do?output=" +output;
-                for(var i in settings.types) {
+                for(var i =0;i<settings.types.length;i++) {
                     var type = settings.types[i];
                     url += "&type=" + type;
                 }
@@ -87,7 +87,7 @@ function EntryManager(repositoryRoot) {
                 if(!isNaN(settings.getEast())) 
                    url += "&area_east=" + settings.getEast();
 
-                for(var i in settings.metadata) {
+                for(var i =0;i<settings.metadata.length;i++) {
                     var metadata = settings.metadata[i];
                     url += "&metadata.attr1." + metadata.type + "=" + metadata.value;
                 }
@@ -226,7 +226,7 @@ function Entry (props) {
                 return this.services;
             },
             getService: function(relType) {
-                for(var i in this.services) {
+                for(var i =0;i<this.services.length;i++) {
                     if(this.services[i].relType == relType) return this.services[i];
                 }
                 return null;
@@ -358,7 +358,7 @@ function EntryList(jsonUrl, listener) {
             },
             createEntries: function(data) {
                 this.entries =         createEntriesFromJson(data);
-                for(var i in this.entries) {
+                for(var i =0;i<this.entries.length;i++) {
                     var entry = this.entries[i];
                     this.map[entry.getId()] = entry;
                 }

@@ -24,3 +24,7 @@ http://code.google.com/p/metadata-extractor/
 The HTML select form style is done using Greg Franko's selectboxit 
 http://gregfranko.com/jquery.selectBoxIt.js/
 
+
+
+We use Knight Labs timeline.js:
+https://github.com/NUKnightLab/TimelineJS

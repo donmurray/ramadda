@@ -562,13 +562,13 @@ padding-right-rtl-source: physical;
 
 .ui-menu, .ramadda-popup {
    display: none;
-
+   left:-10000px; 
+   z-index: 10000;
    text-decoration: none;
    border : 1px #aaa solid;
    background-color : #E6E6E6;
    position:absolute;
-   left:-10000px; 
-   z-index: 10000;
+
   -webkit-box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
   -moz-box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
   box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
@@ -1835,8 +1835,8 @@ a.toggleblocklabellink:visited {
 }
 
 .formtable td {
-      padding-top: 4px;
-      padding-bottom: 4px;
+      padding-top: 5px;
+      padding-bottom: 5px;
       padding-left: 4px;
       padding-right: 4px;
 }
