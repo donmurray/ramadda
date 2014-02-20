@@ -34,6 +34,7 @@ import org.ramadda.util.FormInfo;
 
 
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Json;
 import org.ramadda.util.Utils;
 
 
@@ -560,6 +561,59 @@ public class Column implements DataTypes, Constants {
     /**
      * _more_
      *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String getJson(Request request) throws Exception {
+        List<String> col = new ArrayList<String>();
+        col.add("name");
+        col.add(Json.quote(getName()));
+        col.add("label");
+        col.add(Json.quote(getLabel()));
+        col.add("name");
+        col.add(Json.quote(getName()));
+        col.add("type");
+        col.add(Json.quote(getType()));
+        col.add("namespace");
+        col.add(Json.quote(getTableName()));
+        col.add("suffix");
+        col.add(Json.quote(getSuffix()));
+        col.add("canshow");
+        col.add("" + getCanShow());
+        col.add("cansearch");
+        col.add("" + getCanSearch());
+        col.add("canshow");
+        col.add("" + getCanShow());
+        col.add("canlist");
+        col.add("" + getCanList());
+        if (isEnumeration()) {
+            List<String> enums = new ArrayList<String>();
+            List<TwoFacedObject> values = typeHandler.getEnumValues(request,
+                                              this, null);
+            if (values != null) {
+                for (TwoFacedObject tfo : values) {
+                    enums.add(
+                        Json.map(
+                            "value", Json.quote(tfo.getId().toString()),
+                            "label", Json.quote(tfo.getLabel().toString())));
+                }
+            }
+            col.add("values");
+            col.add(Json.list(enums));
+        }
+
+        return Json.map(col);
+
+
+    }
+
+
+    /**
+     * _more_
+     *
      * @return _more_
      */
     public boolean isNumeric() {
@@ -877,7 +931,8 @@ public class Column implements DataTypes, Constants {
                         sb.append("<br>");
                     }
                     cnt++;
-                    sb.append("<a target=_blank href=\"" + url + "\">" + url + "</a>");
+                    sb.append("<a target=_blank href=\"" + url + "\">" + url
+                              + "</a>");
                 }
             }
         } else {

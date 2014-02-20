@@ -377,18 +377,31 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 html += "<hr>";
                 html += entry.getDescription();
                 html += HtmlUtil.formTable();
-                var columnNames = entry.getColumnNames();
-                var columnLabels = entry.getColumnLabels();
+
+
+                var columns = entry.getColumns();
+
                 if(entry.getFilesize()>0) {
                     html+= HtmlUtil.formEntry("File:", entry.getFilename() +" " +
                                               HtmlUtil.href(entry.getFileUrl(), HtmlUtil.image(root +"/icons/download.png")) + " " +
                                               entry.getFormattedFilesize());
                 }
-                for(var i in columnNames) {
-                    var columnName = columnNames[i];
-                    var columnLabel = columnLabels[i];
-                    var columnValue = entry.getColumnValue(columnName);
-                    html+= HtmlUtil.formEntry(columnLabel+":", columnValue);
+                for(var colIdx =0;colIdx< columns.length;colIdx++) {
+                    var column = columns[colIdx];
+                    var columnValue = entry.getColumnValue(column.getName());
+                    if(column.isUrl()) {
+                        var tmp = "";
+                        var toks = columnValue.split("\n");
+                        for(var i=0;i<toks.length;i++) {
+                            var url = toks[i].trim();
+                            if(url.length==0) continue;
+                            tmp += HtmlUtil.href(url, url);
+                            tmp += "<br>";
+                        }
+                        columnValue = tmp;
+                    }
+
+                    html+= HtmlUtil.formEntry(column.getLabel()+":", columnValue);
                 }
 
                 html += HtmlUtil.closeTag("table");

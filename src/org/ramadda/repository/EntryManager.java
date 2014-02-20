@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -43,11 +43,11 @@ import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.repository.type.TypeInsertInfo;
 import org.ramadda.sql.Clause;
 import org.ramadda.sql.SqlUtil;
-import org.ramadda.util.Json;
 import org.ramadda.util.FormInfo;
 import org.ramadda.util.HtmlTemplate;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.JQuery;
+import org.ramadda.util.Json;
 import org.ramadda.util.TTLCache;
 import org.ramadda.util.TTLObject;
 import org.ramadda.util.Utils;
@@ -667,89 +667,35 @@ public class EntryManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processEntryTypes(Request request) throws Exception {
-        String output = request.getString(ARG_OUTPUT,"");
-        List<String> types  =new ArrayList<String>();
+        String            output       = request.getString(ARG_OUTPUT, "");
+        List<String>      types        = new ArrayList<String>();
         List<TypeHandler> typeHandlers = getRepository().getTypeHandlers();
-        boolean checkCnt = request.get("checkcount", true);
+        boolean           checkCnt     = request.get("checkcount", true);
         for (TypeHandler typeHandler : typeHandlers) {
             if ( !typeHandler.getForUser()) {
                 continue;
             }
-            int cnt = getEntryUtil().getEntryCount(typeHandler);
-            if(checkCnt) {
+            if (checkCnt) {
+                int cnt = getEntryUtil().getEntryCount(typeHandler);
                 if (cnt == 0) {
                     continue;
                 }
             }
-            List<String> items = new ArrayList<String>();
-
-            items.add("type");
-            items.add(Json.quote(typeHandler.getType()));
-            items.add("entryCount");
-            items.add(""+cnt);
-            items.add("label");
-            items.add(Json.quote(typeHandler.getLabel()));
-            items.add("isgroup");
-            items.add("" + typeHandler.isGroup());
-
-            List<String> cols = new ArrayList<String>();
-            List<Column> columns  = typeHandler.getColumns();
-            if(columns!=null) {
-                for(Column column: columns) {
-                    List<String>col = new ArrayList<String>();
-                    col.add("name");
-                    col.add(Json.quote(column.getName()));
-                    col.add("label");
-                    col.add(Json.quote(column.getLabel()));
-                    col.add("name");
-                    col.add(Json.quote(column.getName()));
-                    col.add("type");
-                    col.add(Json.quote(column.getType()));
-                    col.add("namespace");
-                    col.add(Json.quote(typeHandler.getTableName()));
-                    col.add("suffix");
-                    col.add(Json.quote(column.getSuffix()));
-                    col.add("canshow");
-                    col.add(""+column.getCanShow());
-                    col.add("cansearch");
-                    col.add(""+column.getCanSearch());
-                    col.add("canshow");
-                    col.add(""+column.getCanShow());
-                    col.add("canlist");
-                    col.add(""+column.getCanList());
-                    if(column.isEnumeration()) {
-                        List<String> enums   = new ArrayList<String>();
-                        List<TwoFacedObject> values = typeHandler.getEnumValues(request, column,null);
-                        if(values!=null) {
-                            for(TwoFacedObject tfo: values) {
-                                enums.add(Json.map("value",Json.quote(tfo.getId().toString()),"label", Json.quote(tfo.getLabel().toString())));
-                            }
-                        }
-                        col.add("values");
-                        col.add(Json.list(enums));
-                    }
-                    cols.add(Json.map(col));
-                }
-            }
-
-
-
-            items.add("columns");
-            items.add(Json.list(cols));
-
-            String icon = typeHandler.iconUrl(typeHandler.getProperty("icon", (String) ICON_FOLDER_CLOSED));
-            items.add("icon");
-            items.add(Json.quote(icon));
-            items.add("category");
-            items.add(Json.quote(typeHandler.getCategory()));
-
-            types.add(Json.map(items));
-
-
+            types.add(typeHandler.getJson(request));
         }
-                
+
         StringBuffer sb = new StringBuffer(Json.list(types));
+
         return new Result("", sb, "application/json");
     }
 
@@ -3517,8 +3463,7 @@ public class EntryManager extends RepositoryManager {
                                     HtmlUtils.attr(HtmlUtils.ATTR_WIDTH,
                                         "16"));
             } else {
-                img = HtmlUtils.img(typeHandler.iconUrl(icon)
-);
+                img = HtmlUtils.img(typeHandler.iconUrl(icon));
             }
 
 
@@ -6584,7 +6529,7 @@ public class EntryManager extends RepositoryManager {
             return;
         }
 
-        if(isNew) {
+        if (isNew) {
             for (Entry theNewEntry : entries) {
                 theNewEntry.getTypeHandler().initializeNewEntry(theNewEntry);
             }
@@ -8708,7 +8653,7 @@ public class EntryManager extends RepositoryManager {
             throws Exception {
 
         //If its not a FILE then don't do anything
-        if(!entry.getResource().isFileType()) {
+        if ( !entry.getResource().isFileType()) {
             return entry;
         }
 
@@ -8719,15 +8664,15 @@ public class EntryManager extends RepositoryManager {
 
         if (getProperty(PROP_DELETE_ENTRY_FILE_IS_MISSING, false)) {
             deleteEntry(request, entry);
-            System.err.println ("RAMADDA: Deleted entry with missing file: "
-                    + entry.getName() + " File:" + f);
+            System.err.println("RAMADDA: Deleted entry with missing file: "
+                               + entry.getName() + " File:" + f);
             logInfo("RAMADDA: Deleted entry with missing file: "
                     + entry.getName() + " File:" + f);
 
             return null;
         } else {
-            System.err.println ("RAMADDA: Not configured to delete files: "
-                                + entry.getName() + " File:" + f);
+            System.err.println("RAMADDA: Not configured to delete files: "
+                               + entry.getName() + " File:" + f);
 
         }
 

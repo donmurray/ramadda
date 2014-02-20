@@ -39,6 +39,7 @@ import org.ramadda.sql.SqlUtil;
 import org.ramadda.util.FormInfo;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.JQuery;
+import org.ramadda.util.Json;
 import org.ramadda.util.SelectionRectangle;
 import org.ramadda.util.Utils;
 import org.ramadda.util.WikiUtil;
@@ -148,7 +149,7 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_WIKI = "wiki";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_WIKI_INNER = "wiki_inner";
 
     /** _more_ */
@@ -246,7 +247,7 @@ public class TypeHandler extends RepositoryManager {
     /** the wiki tag in types.xml. If defined then use this as the default html display for entries of this type */
     private String wikiTemplate;
 
-    /** _more_          */
+    /** _more_ */
     private String wikiTemplateInner;
 
     /** _more_ */
@@ -430,6 +431,48 @@ public class TypeHandler extends RepositoryManager {
      */
     public void getTextCorpus(Entry entry, StringBuffer sb)
             throws Exception {}
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String getJson(Request request) throws Exception {
+        List<String> items = new ArrayList<String>();
+        items.add("type");
+        items.add(Json.quote(getType()));
+        items.add("entryCount");
+        items.add("" + cnt);
+        items.add("label");
+        items.add(Json.quote(getLabel()));
+        items.add("isgroup");
+        items.add("" + isGroup());
+
+        List<String> cols    = new ArrayList<String>();
+        List<Column> columns = getColumns();
+        if (columns != null) {
+            for (Column column : columns) {
+                cols.add(column.getJson(request));
+            }
+        }
+        items.add("columns");
+        items.add(Json.list(cols));
+
+        String icon = iconUrl(getProperty("icon",
+                                          (String) ICON_FOLDER_CLOSED));
+        items.add("icon");
+        items.add(Json.quote(icon));
+        items.add("category");
+        items.add(Json.quote(getCategory()));
+
+        return Json.map(items);
+    }
+
 
 
     /**
@@ -1409,8 +1452,14 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
-    public void initializeEntryFromHarvester(Entry entry)
-            throws Exception {
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
+    public void initializeEntryFromHarvester(Entry entry) throws Exception {
         if (this.parent != null) {
             this.parent.initializeEntryFromHarvester(entry);
         }
@@ -2271,10 +2320,11 @@ public class TypeHandler extends RepositoryManager {
             }
 
 
-            Resource resource      = entry.getResource();
-            String   resourceLink  = resource.getPath();
+            Resource resource     = entry.getResource();
+            String   resourceLink = resource.getPath();
 
-            String   resourceLabel = msgLabel("Resource (" + resource.getType() +")");
+            String resourceLabel = msgLabel("Resource (" + resource.getType()
+                                            + ")");
             if (resourceLink.length() > 0) {
                 if (entry.getResource().isUrl()) {
                     resourceLink = getResourcePath(request, entry);

@@ -218,7 +218,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                                                    "class","display-typelist",
                                                    "onchange", this.getGet()+".typeChanged();"],
                                                  HtmlUtil.tag("option",["title","","value",""],
-                                                              "Choose Type"));
+                                                              " Choose Type "));
                 } 
                 form += "&nbsp;&nbsp;";
                 form += textField;

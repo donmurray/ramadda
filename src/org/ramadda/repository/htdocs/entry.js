@@ -172,6 +172,7 @@ function EntryTypeColumn(props) {
             getCanSearch: function() {return this.cansearch;},
             getCanShow: function() {return this.canshow;},
             isEnumeration: function() {return this.getType() == "enumeration" || this.getType() == "enumerationplus";},
+            isUrl: function() {return this.getType() == "url"},
         });
 }
 
@@ -199,6 +200,7 @@ function EntryType(props) {
 
 function Entry (props) {
     var NONGEO = -9999;
+    if(props.type) props.type = new EntryType(props.type);
     $.extend(this, {
             latitude: NaN,
             longitude: NaN,
@@ -209,10 +211,13 @@ function Entry (props) {
             services: [],
         });
 
-    $.extend(this, props);
-    $.extend(this, {
+    RamaddaUtil.inherit(this,  props);
+    RamaddaUtil.defineMembers(this, {
             getId : function () {
                 return  this.id;
+            },
+            getType: function() {
+                return this.type;
             },
             getLocationLabel: function() {
                 return "n: " + this.north + " w:" + this.west + " s:" + this.south +" e:" + this.east;
@@ -243,22 +248,28 @@ function Entry (props) {
             getIconImage : function (attrs) {
                 return htmlUtil.image(this.getIconUrl(),attrs);
             },
+            getColumns : function () {
+                return this.type.getColumns();
+            },
             getColumnValue : function (name) {
                 var value = this["column." + name];
                 return value;
             },
             getColumnNames : function () {
-                var names =  this.columnNames;
-                if (!names) names = new Array();
+                var names =  [];
+                for(var i=0;i<this.columns.length;i++) {
+                    names.push(this.columns[i].getName());
+                }
                 return names;
             },
-
             getColumnLabels : function () {
-                var names =  this.columnLabels;
-                if (!names) names = new Array();
-                return names;
+                var labels =  [];
+                for(var i=0;i<this.columns.length;i++) {
+                    labels.push(this.columns[i].getLabel());
+                }
+                return labels;
             },
-           getName : function () {
+            getName : function () {
                 if(this.name ==null || this.name == "") {
                     return "no name";
                 }

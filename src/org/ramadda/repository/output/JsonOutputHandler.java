@@ -227,7 +227,9 @@ public class JsonOutputHandler extends OutputHandler {
         Json.quoteAttr(items, "id", entry.getId());
         Json.quoteAttr(items, "name", entry.getName());
         Json.quoteAttr(items, "description", entry.getDescription());
-        Json.quoteAttr(items, "type", entry.getType());
+        String typeJson = entry.getTypeHandler().getJson(request);
+        //        Json.quoteAttr(items, "type", entry.getType());
+        Json.attr(items, "type", typeJson);
 
         //
         if (entry.isGroup()) {
@@ -374,13 +376,10 @@ public class JsonOutputHandler extends OutputHandler {
                     "label", Json.quote(link.getLabel()), "type",
                     (outputType == null)
                     ? "unknown"
-                    : Json.quote(outputType.toString()),
-                    "url",
+                    : Json.quote(outputType.toString()), "url",
                     (link.getUrl() == null)
                     ? Json.quote("")
-                    : Json.quote(
-                        java.net.URLEncoder.encode(
-                                                   link.getUrl())),
+                    : Json.quote(java.net.URLEncoder.encode(link.getUrl())),
                     "icon", Json.quote(link.getIcon())
                 }));
             }
@@ -403,7 +402,7 @@ public class JsonOutputHandler extends OutputHandler {
                         if (attr != null) {
                             if (attr.length() > 0) {
                                 Json.quoteAttr(mapItems, "attr" + attrIdx,
-                                               attr);
+                                        attr);
                             } else {
                                 Json.quoteAttr(mapItems, "attr" + attrIdx,
                                         "");
