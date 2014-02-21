@@ -259,6 +259,9 @@ var HtmlUtil =  {
     td : function(attrs, inner) {
         return this.tag("td", attrs, inner);
     },
+    th : function(attrs, inner) {
+        return this.tag("th", attrs, inner);
+    },
     formTable : function() {
         return  this.openTag("table",["class","formtable","cellspacing","0","cellspacing","0"]);
     },
@@ -1032,7 +1035,6 @@ function checkboxClicked(event, cbxPrefix, id) {
 
 
 function toggleBlockVisibility(id, imgid, showimg, hideimg) {
-    var img = ramaddaUtil.getDomObject(imgid);
     if(toggleVisibility(id,'block')) {
         $("#"+imgid).attr('src', showimg);
     } else {
@@ -1259,9 +1261,8 @@ function  getChildText(node) {
 
 function toggleVisibility(id,style) {
     var display  = $("#" + id).css('display');
-    $("#" + id).toggle(800);
+    $("#" + id).toggle();
     return display != 'block';
-
 }
 
 

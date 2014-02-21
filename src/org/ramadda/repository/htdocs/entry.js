@@ -209,6 +209,7 @@ function Entry (props) {
             south: NaN,
             east: NaN,
             services: [],
+            metadata: [],
         });
 
     RamaddaUtil.inherit(this,  props);
@@ -218,6 +219,9 @@ function Entry (props) {
             },
             getType: function() {
                 return this.type;
+            },
+            getMetadata: function() {
+                return this.metadata;
             },
             getLocationLabel: function() {
                 return "n: " + this.north + " w:" + this.west + " s:" + this.south +" e:" + this.east;

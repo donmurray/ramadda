@@ -26,6 +26,7 @@ import com.google.gson.*;
 import org.ramadda.repository.*;
 import org.ramadda.repository.auth.*;
 import org.ramadda.repository.metadata.Metadata;
+import org.ramadda.repository.metadata.MetadataType;
 import org.ramadda.repository.type.Column;
 import org.ramadda.repository.type.TypeHandler;
 
@@ -395,6 +396,8 @@ public class JsonOutputHandler extends OutputHandler {
                     List<String> mapItems = new ArrayList<String>();
                     Json.quoteAttr(mapItems, "id", metadata.getId());
                     Json.quoteAttr(mapItems, "type", metadata.getType());
+                    MetadataType metadataType = getMetadataManager().findType( metadata.getType());
+                    Json.quoteAttr(mapItems, "label", metadataType.getLabel());
                     int attrIdx = 1;
                     //We always add the four attributes to have always the same structure
                     while (attrIdx <= 4) {

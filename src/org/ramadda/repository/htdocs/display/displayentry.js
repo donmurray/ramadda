@@ -3,14 +3,17 @@ var DISPLAY_ENTRYLIST = "entrylist";
 var DISPLAY_ENTRYDISPLAY = "entrydisplay";
 var DISPLAY_OPERANDS = "operands";
 var DISPLAY_METADATA = "metadata";
+var DISPLAY_TIMELINE = "timeline";
 
 
 var ID_RESULTS = "results";
 var ID_ENTRIES = "entries";
+var ID_DETAILS = "details";
 
 addGlobalDisplayType({type: DISPLAY_ENTRYLIST, label:"Entry List",requiresData:false});
 addGlobalDisplayType({type: DISPLAY_ENTRYDISPLAY, label:"Entry Display",requiresData:false});
-addGlobalDisplayType({type: DISPLAY_OPERANDS, label:"Operands",requiresData:false});
+//addGlobalDisplayType({type: DISPLAY_OPERANDS, label:"Operands",requiresData:false});
+addGlobalDisplayType({type: DISPLAY_TIMELINE, label:"Timeline",requiresData:false});
 addGlobalDisplayType({type: DISPLAY_METADATA, label:"Metadata Table",requiresData:false});
 
 
@@ -72,6 +75,11 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
 
 
 function RamaddaSearcher(displayManager, id, type, properties) {
+    $.extend(this, {
+            showForm: true,            
+            showEntries: true,
+    });            
+
     var NONE = "-- None --";
     var ID_TEXT_FIELD = "textfield";
     var ID_TYPE_FIELD = "typefield";
@@ -120,6 +128,59 @@ function RamaddaSearcher(displayManager, id, type, properties) {
             haveTypes: false,
             metadata: {},
             metadataLoading: {},
+            hideEntryPopup: function() {
+                var popupId = "#"+ this.getDomId(ID_DETAILS);
+                $(popupId).hide();
+                this.currentPopupEntry = null;
+            },
+            getDefaultHtml: function() {
+                var html = "";
+                var horizontal = this.isLayoutHorizontal();
+                var footer =  this.getFooter();
+                var entriesDivAttrs = ["id",this.getDomId(ID_ENTRIES),"class","display-entrylist-entries"];
+                var innerHeight = this.getProperty("innerHeight",null);
+                if(innerHeight!=null) {
+                    entriesDivAttrs.push("style");
+                    entriesDivAttrs.push("margin: 0px; padding: 0px;  min-height:" + innerHeight +"px; max-height:" + innerHeight +"px; overflow-y: none;");
+                }
+                var entriesDiv = 
+                    HtmlUtil.div(["class","display-entrylist-results", "id",this.getDomId(ID_RESULTS)],"&nbsp;") +
+                    HtmlUtil.div(entriesDivAttrs, this.getLoadingMessage());
+                
+
+
+                if(horizontal) {
+                    html+= HtmlUtil.openTag("table",["border","0", "width","100%", "cellpadding","0","cellpadding","5"]);
+                    html += HtmlUtil.openTag("tr",["valign","top"]);
+                    if(this.showForm) {
+                        html += HtmlUtil.tag("td",[],this.makeSearchForm());
+                    }
+                    if(this.showEntries) {
+                        html += HtmlUtil.tag("td",["width","60%"],entriesDiv);
+                    }
+                    html += HtmlUtil.closeTag("tr");
+
+                    html += HtmlUtil.openTag("tr",["valign","top"]);
+                    if(this.showForm) {
+                        html += HtmlUtil.tag("td",[],"");
+                    }
+                    if(this.showEntries) {
+                        html += HtmlUtil.tag("td",[],footer);
+                    }
+                    html += HtmlUtil.closeTag("tr");
+                    html += HtmlUtil.closeTag("table");
+                } else {
+                    if(this.showForm) {
+                        html += this.makeSearchForm();
+                    }
+                    if(this.showEntries) {
+                        html += entriesDiv;
+                        html += footer;
+                    }
+                }
+                html += HtmlUtil.div(["class","display-entry-popup", "id",this.getDomId(ID_DETAILS)],"&nbsp;");
+                return html;
+            },
             initDisplay: function() {
                 var theDisplay  = this;
                 this.jq(ID_SEARCH).button().click(function(event) {
@@ -147,8 +208,30 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     this.submitSearchForm();
                 }
             },
-            submitSearchForm: function() {
-                this.haveSearched = true;
+             getResultsHeader: function(entries) {
+                var left = "Showing " + (this.searchSettings.skip+1) +"-" +(this.searchSettings.skip+Math.min(this.searchSettings.max, entries.length));
+                var right = [];
+                if(this.searchSettings.skip>0) {
+                    right.push(HtmlUtil.onClick(this.getGet()+".loadPrevUrl();", "Previous",["class","display-link"]));
+                }
+                var addMore = false;
+                if(entries.length == this.searchSettings.getMax()) {
+                    right.push(HtmlUtil.onClick(this.getGet()+".loadNextUrl();", "Next",["class","display-link"]));
+                    addMore = true;
+                }
+                right.push(HtmlUtil.onClick(this.getGet()+".loadLess();", HtmlUtil.image(root +"/icons/minus-small-white.png","View less"["border","0"]),["class","display-link"]));
+                if(addMore) {
+                    right.push(HtmlUtil.onClick(this.getGet()+".loadMore();", HtmlUtil.image(root +"/icons/plus-small-white.png","View more"["border","0"]),["class","display-link"]));
+                }
+                var results = "";
+                if(right.length>0)
+                    results = HtmlUtil.leftRight(left, HtmlUtil.join(right,  ""));
+                else
+                    results  =left;
+                return results;
+        },
+        submitSearchForm: function() {
+              this.haveSearched = true;
                 this.searchSettings.text = this.getFieldValue(this.getDomId(ID_TEXT_FIELD), this.searchSettings.text);
                 if(this.haveTypes) {
                     this.searchSettings.entryType  = this.getFieldValue(this.getDomId(ID_TYPE_FIELD), this.searchSettings.entryType);
@@ -183,6 +266,8 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 this.footerRight  = "Links: " + HtmlUtil.join(outputs," - "); 
                 this.writeHtml(ID_FOOTER_RIGHT, this.footerRight);
                 this.writeHtml(ID_RESULTS, "Searching...");
+                this.writeHtml(ID_ENTRIES, HtmlUtil.div(["style","margin:20px;"], this.getWaitImage()));
+                this.hideEntryPopup();
             },
             prepareToLayout:function() {
                 SUPER.prepareToLayout.apply(this);
@@ -214,7 +299,6 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 var extra = "";
                 var text = this.searchSettings.text;
                 if(text == null) text = "";
-
                 var textField =  HtmlUtil.input("", text, ["placeholder","search text","class", "display-search-input ui-widget ui-button-text", "size","20","id",  this.getDomId(ID_TEXT_FIELD)]);
 
                 form += HtmlUtil.div(["id", this.getDomId(ID_SEARCH),"class","display-button"],"Search for:");
@@ -319,6 +403,14 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 return this.getDomId(ID_METADATA_FIELD +id);
             },
 
+            findEntryType: function(typeName) {
+                if(this.types == null) return null;
+                for(var i = 0;i< this.types.length;i++) {
+                    var type = this.types[i];
+                    if(type.getId() == typeName) return type;
+                }
+                return null;
+            },
             addTypes: function(types) {
                 if(types == null) {
                     var theDisplay = this;
@@ -459,21 +551,11 @@ function RamaddaSearcher(displayManager, id, type, properties) {
 }
 
 
-
-
 function RamaddaEntrylistDisplay(displayManager, id, properties) {
     var ID_LIST = "list";
-    var ID_DETAILS = "details";
-
-    $.extend(this, {
-            showForm: true,            
-            showEntries: true,
-    });            
-
     var SUPER;
     RamaddaUtil.inherit(this, SUPER = new RamaddaSearcher(displayManager, id, DISPLAY_ENTRYLIST, properties));
     addRamaddaDisplay(this);
-
     RamaddaUtil.defineMembers(this, {
             haveDisplayed: false,
             selectedEntries: [],            
@@ -484,69 +566,12 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 }
                 this.haveDisplayed =true;
                 this.initUI();
-                var html = "";
-                var horizontal = this.isLayoutHorizontal();
-                var footer =  this.getFooter();
-                var entriesDivAttrs = ["id",this.getDomId(ID_ENTRIES),"class","display-entrylist-entries"];
-                var innerHeight = this.getProperty("innerHeight",null);
-                if(innerHeight!=null) {
-                    entriesDivAttrs.push("style");
-                    entriesDivAttrs.push("margin: 0px; padding: 0px;  min-height:" + innerHeight +"px; max-height:" + innerHeight +"px; overflow-y: none;");
-                }
-                var entriesDiv = 
-                    HtmlUtil.div(["class","display-entrylist-results", "id",this.getDomId(ID_RESULTS)],"&nbsp;") +
-                    HtmlUtil.div(entriesDivAttrs, this.getLoadingMessage());
-                
-                html += HtmlUtil.div(["class","display-entry-popup", "id",this.getDomId(ID_DETAILS)],"&nbsp;");
-
-
-                if(horizontal) {
-                    html+= HtmlUtil.openTag("table",["border","0", "width","100%", "cellpadding","0","cellpadding","5"]);
-                    html += HtmlUtil.openTag("tr",["valign","top"]);
-                    if(this.showForm) {
-                        html += HtmlUtil.tag("td",[],this.makeSearchForm());
-                    }
-                    if(this.showEntries) {
-                        html += HtmlUtil.tag("td",["width","60%"],entriesDiv);
-                    }
-                    html += HtmlUtil.closeTag("tr");
-
-                    html += HtmlUtil.openTag("tr",["valign","top"]);
-                    if(this.showForm) {
-                        html += HtmlUtil.tag("td",[],"");
-                    }
-                    if(this.showEntries) {
-                        html += HtmlUtil.tag("td",[],footer);
-                    }
-                    html += HtmlUtil.closeTag("tr");
-                    html += HtmlUtil.closeTag("table");
-                } else {
-                    if(this.showForm) {
-                        html += this.makeSearchForm();
-                    }
-                    if(this.showEntries) {
-                        html += entriesDiv;
-                        html += footer;
-                    }
-                }
-
-                this.setContents(html);
-
+                this.setContents(this.getDefaultHtml());
                 if(this.dateRangeWidget) this.dateRangeWidget.initHtml();
-
-
                 SUPER.initDisplay.apply(this);
                 if(this.entryList!=null && this.entryList.haveLoaded) {
                     this.entryListChanged(this.entryList);
                 }
-            },
-            updateForSearching: function(jsonUrl) {
-                SUPER.updateForSearching.apply(this,[jsonUrl]);
-                this.hideEntryPopup();
-                this.writeHtml(ID_ENTRIES, HtmlUtil.div(["style","margin:20px;"], this.getWaitImage()));
-            },
-            highlightEntry: function(entry) {
-                this.jq("entryinner_" + entry.getId()).addClass("display-entrylist-highlight");
             },
             handleEventEntrySelection: function(source, args) {
                 this.selectEntry(args.entry, args.selected);
@@ -570,11 +595,6 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 }
             },
 
-            hideEntryPopup: function() {
-                var popupId = "#"+ this.getDomId(ID_DETAILS);
-                $(popupId).hide();
-                this.currentPopupEntry = null;
-            },
             showEntryPopup: function(event, entryId) {
                 var entry = this.entryList.getEntry(entryId);
                 var popupId = "#"+ this.getDomId(ID_DETAILS);
@@ -588,8 +608,8 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 $(popupId).show();
                 $(popupId).position({
                         of: jQuery( "#" +src),
-                            my: 'left top',
-                            at: 'left bottom',
+                            my: 'right top',
+                            at: 'right bottom',
                             collision: "none none"
                             });
             },
@@ -607,26 +627,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     this.getDisplayManager().handleEventEntriesChanged(this, []);
                     return;
                 }
-                var left = "Showing " + (this.searchSettings.skip+1) +"-" +(this.searchSettings.skip+Math.min(this.searchSettings.max, entries.length));
-                var right = [];
-                if(this.searchSettings.skip>0) {
-                    right.push(HtmlUtil.onClick(this.getGet()+".loadPrevUrl();", "Previous",["class","display-link"]));
-                }
-                var addMore = false;
-                if(entries.length == this.searchSettings.getMax()) {
-                    right.push(HtmlUtil.onClick(this.getGet()+".loadNextUrl();", "Next",["class","display-link"]));
-                    addMore = true;
-                }
-                right.push(HtmlUtil.onClick(this.getGet()+".loadLess();", HtmlUtil.image(root +"/icons/minus-small-white.png","View less"["border","0"]),["class","display-link"]));
-                if(addMore) {
-                    right.push(HtmlUtil.onClick(this.getGet()+".loadMore();", HtmlUtil.image(root +"/icons/plus-small-white.png","View more"["border","0"]),["class","display-link"]));
-                }
-                var results = "";
-                if(right.length>0)
-                    results = HtmlUtil.leftRight(left, HtmlUtil.join(right,  ""));
-                else
-                    results  =left;
-                this.writeHtml(ID_RESULTS, results);
+                this.writeHtml(ID_RESULTS, this.getResultsHeader(entries));
 
                 html += HtmlUtil.openTag("ol",["class","display-entrylist-list", "id",this.getDomId(ID_LIST)]);
                 html  += "\n";
@@ -719,6 +720,216 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 }
 
 
+function RamaddaMetadataDisplay(displayManager, id, properties) {
+    if(properties.formOpen == null) {
+       properties.formOpen = false;
+    }
+    var SUPER;
+    RamaddaUtil.inherit(this, SUPER = new RamaddaSearcher(displayManager, id, DISPLAY_METADATA, properties));
+    addRamaddaDisplay(this);
+    RamaddaUtil.defineMembers(this, {
+            initDisplay: function() {
+                this.initUI();
+                this.setContents(this.getDefaultHtml());
+                SUPER.initDisplay.apply(this);
+            },
+            entryListChanged: function(entryList) {
+                this.entryList = entryList;
+                var rowClass = "entryrow_" + this.getId()
+                var entries = this.entryList.getEntries();
+                var html = "";
+                if(entries.length==0) {
+                    this.writeHtml(ID_ENTRIES, "Nothing found");
+                    this.writeHtml(ID_RESULTS, "&nbsp;");
+                    return;
+                }
+                var mdtmap = {};
+                for(var i=0;i<entries.length;i++) {
+                    var entry = entries[i];
+                    var metadata = entry.getMetadata();
+                    for(var j=0;j<metadata.length;j++) {
+                        mdtmap[metadata[j].type] =metadata[j].label;
+                    }
+                }
+
+
+                var html = "<br>";
+                html += HtmlUtil.openTag("table",["class","display-metadata-table","width","100%","cellpadding", "5","cellspacing","0"]);
+                var header = [];
+                var type = this.findEntryType(this.searchSettings.entryType);
+                var typeName = "Entry";
+                if(type!=null) {
+                    typeName  = type.getLabel();
+                }
+                this.writeHtml(ID_RESULTS, this.getResultsHeader(entries));
+
+                header.push(HtmlUtil.th(["class", "display-metadata-table-cell"],HtmlUtil.b(typeName)));
+                var mdts =  (this.getProperty("metadataTypes","project_pi,project_person,project_funding")).split(",");
+                for(var i=0;i<mdts.length;i++) {
+                    var label = mdtmap[mdts[i]];
+                    if(label == null) label = mdts[i];
+                    header.push(HtmlUtil.th(["class", "display-metadata-table-cell"], HtmlUtil.b(label)));
+                }
+                html += HtmlUtil.tr([],HtmlUtil.join(header,""));
+                var missing = this.missingMessage;
+                if(missing = null) missing = "&nbsp;";
+                for(var i=0;i<entries.length;i++) {
+                    var entry = entries[i];
+                    var metadata = entry.getMetadata();
+                    var row = [];
+                    var link =  entry.getLink(entry.getIconImage() +" " + entry.getName());
+                    row.push(HtmlUtil.td(["class", "display-metadata-table-cell"],HtmlUtil.div(["class","display-metadata-entrylink"], link)));
+                    for(var mdtIdx=0;mdtIdx<mdts.length;mdtIdx++) {
+                        var mdt = mdts[mdtIdx];
+                        var cell = null;
+                        for(var j=0;j<metadata.length;j++) {
+                            var m = metadata[j];
+                            if(m.type == mdt) {
+                                if(cell==null) {
+                                    cell = "";
+                                } else {
+                                    cell += "<br>";
+                                }
+                                cell += m.attr1;
+                                if(m.attr1 && m.attr1.trim().length>0) {
+                                    cell += " - " + m.attr2;
+                                }
+                            }
+                        }
+                        if(cell ==null) {
+                            cell = missing;
+                        }
+                        if(cell ==null) {
+                            cell = "";
+                        }
+                        var add = HtmlUtil.tag("a", ["style","color:#000;", "href", root + "/metadata/addform?entryid=" + entry.getId() +"&metadata.type=" + mdt,
+                                                     "target","_blank"],"+");
+
+
+                        row.push(HtmlUtil.td(["class", "display-metadata-table-cell"],HtmlUtil.leftRight(cell, add)));
+                    }
+                    html += HtmlUtil.tr(["valign", "top"],HtmlUtil.join(row,""));
+                }
+                html += HtmlUtil.closeTag("table");
+                this.jq(ID_ENTRIES).html(html);
+            },
+                });
+
+}
+
+
+
+function RamaddaTimelineDisplay(displayManager, id, properties) {
+    if(properties.formOpen == null) {
+       properties.formOpen = false;
+    }
+    var SUPER;
+    RamaddaUtil.inherit(this, SUPER = new RamaddaSearcher(displayManager, id, DISPLAY_TIMELINE, properties));
+    addRamaddaDisplay(this);
+    RamaddaUtil.defineMembers(this, {
+            initDisplay: function() {
+                this.initUI();
+                this.setContents(this.getDefaultHtml());
+                SUPER.initDisplay.apply(this);
+            },
+            entryListChanged: function(entryList) {
+                this.entryList = entryList;
+                var entries = this.entryList.getEntries();
+                var html = "";
+                if(entries.length==0) {
+                    this.writeHtml(ID_ENTRIES, "Nothing found");
+                    this.writeHtml(ID_RESULTS, "&nbsp;");
+                    return;
+                }
+
+                var data = {
+                    "timeline":
+                    {
+                        "headline":"The Main Timeline Headline Goes here",
+                        "type":"default",
+                        "text":"<p>Intro body text goes here, some HTML is ok</p>",
+                        "asset": {
+                            "media":"http://yourdomain_or_socialmedialink_goes_here.jpg",
+                            "credit":"Credit Name Goes Here",
+                            "caption":"Caption text goes here"
+                        },
+                        "date": [
+                {
+                    "startDate":"2011,12,10",
+                    "endDate":"2011,12,11",
+                    "headline":"Headline Goes Here",
+                    "text":"<p>Body text goes here, some HTML is OK</p>",
+                    "tag":"This is Optional",
+                    "classname":"optionaluniqueclassnamecanbeaddedhere",
+                    "asset": {
+                        "media":"http://twitter.com/ArjunaSoriano/status/164181156147900416",
+                        "thumbnail":"optional-32x32px.jpg",
+                        "credit":"Credit Name Goes Here",
+                        "caption":"Caption text goes here"
+                    }
+                }
+                ,
+                {
+                    "startDate":"2012,12,10",
+                    "endDate":"2012,12,11",
+                    "headline":"Headline Goes Here",
+                    "text":"<p>Body text goes here, some HTML is OK</p>",
+                    "tag":"This is Optional",
+                    "classname":"optionaluniqueclassnamecanbeaddedhere",
+                    "asset": {
+                        "media":"http://twitter.com/ArjunaSoriano/status/164181156147900416",
+                        "thumbnail":"optional-32x32px.jpg",
+                        "credit":"Credit Name Goes Here",
+                        "caption":"Caption text goes here"
+                    }
+                },
+                {
+                    "startDate":"2013,12,10",
+                    "endDate":"2013,12,11",
+                    "headline":"Headline Goes Here",
+                    "text":"<p>Body text goes here, some HTML is OK</p>",
+                    "tag":"This is Optional",
+                    "classname":"optionaluniqueclassnamecanbeaddedhere",
+                    "asset": {
+                        "media":"http://twitter.com/ArjunaSoriano/status/164181156147900416",
+                        "thumbnail":"optional-32x32px.jpg",
+                        "credit":"Credit Name Goes Here",
+                        "caption":"Caption text goes here"
+                    }
+                }
+
+                                 ],
+                        "era": [
+                {
+                    "startDate":"2011,12,10",
+                    "endDate":"2011,12,11",
+                    "headline":"Headline Goes Here",
+                    "text":"<p>Body text goes here, some HTML is OK</p>",
+                    "tag":"This is Optional"
+                }
+
+        ]
+                    }
+                };
+
+
+                for(var i=0;i<entries.length;i++) {
+                    var entry = entries[i];
+
+                }
+                createStoryJS({
+                        type:       'timeline',
+                            width:      '800',
+                            height:     '600',
+                            source:     data,
+                            embed_id:   this.getDomId(ID_ENTRIES),  
+                            });
+
+            },
+                });
+
+}
+
 
 
 
@@ -778,7 +989,6 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
     var ID_SELECT1 = "select1";
     var ID_SELECT2 = "select2";
     var ID_NEWDISPLAY = "newdisplay";
-
 
     $.extend(this, new RamaddaEntryDisplay(displayManager, id, DISPLAY_OPERANDS, properties));
     addRamaddaDisplay(this);
@@ -860,42 +1070,3 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
 
         });
 }
-
-
-
-function RamaddaMetadataDisplay(displayManager, id, properties) {
-    var ID_TABLE = "table";
-    $.extend(this, {
-            type: null,            
-    });            
-    var SUPER;
-    RamaddaUtil.inherit(this, SUPER = new RamaddaSearcher(displayManager, id, DISPLAY_METADATA, properties));
-    addRamaddaDisplay(this);
-    RamaddaUtil.defineMembers(this, {
-            initDisplay: function() {
-                var html = HtmlUtil.div(["id", this.getDomId(ID_TABLE)],"Loading");
-                this.setContents(html);
-                var theDisplay  = this;
-            },
-            entryListChanged: function(entryList) {
-                this.entryList = entryList;
-                var rowClass = "entryrow_" + this.getId()
-                var entries = this.entryList.getEntries();
-                var html = "";
-                if(entries.length==0) {
-                    this.setHtml(ID_TABLE,"Nothing found");
-                    return;
-                }
-                var html = HtmlUtil.openTag("table",["width","100%","cellpadding", "5"]);
-                for(var i=0;i<entries.length;i++) {
-                    var entry = entries[i];
-                    html += HtmlUtil.tr([],
-                                        HtmlUtil.td([],entry.getName()));
-                }
-                html += HtmlUtil.closeTag("table");
-                this.setHtml(ID_TABLE,html);
-            },
-                });
-
-}
-

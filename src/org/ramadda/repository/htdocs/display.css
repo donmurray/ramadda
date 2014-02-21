@@ -259,6 +259,8 @@
    padding: 5px;
    background-color : #fff;
    position:absolute;   
+   min-width: 200px;
+   max-width: 400px;
 }
 
 .display-entrylist {
@@ -272,6 +274,32 @@
    padding-right: 3px;
    margin-bottom: 1px;
 //   font-style:italic;
+}
+
+
+
+
+
+
+.display-metadata {
+   border-bottom:1px #ccc solid; 
+}
+
+.display-metadata-table {
+     border:1px #888 solid;
+     border-collapse:collapse; 
+}
+
+.display-metadata-table-cell {
+     border:1px #888 solid;
+}
+
+.display-metadata-table  th {
+    background-color: #efefef;
+}
+
+.display-metadata-entrylink {
+    max-width: 200px;
 }
 
 .display-footer {

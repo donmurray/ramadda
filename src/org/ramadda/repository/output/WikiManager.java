@@ -4396,8 +4396,9 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             
 
 
-            //            sb.append(HtmlUtils.cssLink(fileUrl("/lib/timelinejs/css/timeline.css")));
-            //            sb.append(HtmlUtils.importJS(fileUrl("/lib/timelinejs/js/timeline.js")));
+            sb.append(HtmlUtils.cssLink(fileUrl("/lib/timelinejs/css/timeline.css")));
+            sb.append(HtmlUtils.importJS(fileUrl("/lib/timelinejs/js/timeline.js")));
+            sb.append(HtmlUtils.importJS(fileUrl("/lib/timelinejs/js/storyjs-embed.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/db/dom-drag.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/pointdata.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/utils.js")));
