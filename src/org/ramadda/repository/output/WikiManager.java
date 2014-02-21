@@ -4394,11 +4394,11 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                     "google.load(\"visualization\", \"1\", {packages:['corechart','table']});\n"));
             sb.append(HtmlUtils.importJS(fileUrl("/lib/d3/d3.min.js")));
             
-
-
+            /*
             sb.append(HtmlUtils.cssLink(fileUrl("/lib/timelinejs/css/timeline.css")));
             sb.append(HtmlUtils.importJS(fileUrl("/lib/timelinejs/js/timeline.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/lib/timelinejs/js/storyjs-embed.js")));
+            */
             sb.append(HtmlUtils.importJS(fileUrl("/db/dom-drag.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/pointdata.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/utils.js")));
