@@ -19,7 +19,7 @@ var ID_MENU_OUTER =  "menu_outer";
 var ID_MENU_INNER =  "menu_inner";
 
 
-
+var  displayDebug = false;
 
 
 var PROP_DISPLAY_FILTER = "displayFilter";
@@ -70,7 +70,6 @@ function DisplayThing(argId, argProperties) {
             else continue;
         }
     }
-
 
     $.extend(this, argProperties);
 
@@ -127,7 +126,7 @@ function DisplayThing(argId, argProperties) {
              this.displayParent = parent;
        },
        getDisplayParent:  function () {
-                return this.displayParent;
+            return this.displayParent;
        },
        removeProperty: function(key) {
                 this.properties[key] = null;
@@ -141,11 +140,17 @@ function DisplayThing(argId, argProperties) {
 
        getProperty: function(key, dflt) {
             var value = this.properties[key];
-            if(value != null) return value;
+            if(value != null) {
+                return value;
+            }
             if(this.displayParent!=null) {
                 return this.displayParent.getProperty(key, dflt);
              }
-             return dflt;
+            if(this.getDisplayManager) {
+                return this.getDisplayManager().getProperty(key, dflt);
+
+            }
+            return dflt;
          }
 
         });
@@ -181,14 +186,14 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 this[func].apply(this, [source,data]);
             },
             toString: function() {
-                 return "RamaddaDisplay:" + this.getId();
+                 return "RamaddaDisplay:" + this.type +" - " + this.getId();
              },
             getType: function() {
                 return this.type;
             },
             setDisplayManager: function(cm) {
                 this.displayManager = cm;
-                this.setDisplayParent(cm);
+                this.setDisplayParent(cm.getLayoutManager());
             },
             setContents: function(contents) {
                 contents = HtmlUtil.div(["class","display-contents-inner display-" + this.getType() +"-inner"], contents);
@@ -1009,7 +1014,6 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
     var LAYOUT_TABS = "tabs";
     var LAYOUT_COLUMNS = "columns";
     var LAYOUT_ROWS = "rows";
-
 
     var SUPER;
     RamaddaUtil.inherit(this, SUPER = new RamaddaDisplay(argDisplayManager, argId, "group", argProperties));

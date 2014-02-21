@@ -4280,6 +4280,12 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
         //If no json url then just add the displaymanager
         if (url == null) {
+            for (Enumeration keys = props.keys(); keys.hasMoreElements(); ) {
+                Object key   = keys.nextElement();
+                Object value = props.get(key);
+                topProps.add(key.toString());
+                topProps.add(Json.quote(value.toString()));
+            }
             sb.append(HtmlUtils.div("", HtmlUtils.id(mainDivId)));
             js.append("var displayManager = getOrCreateDisplayManager("
                       + HtmlUtils.quote(mainDivId) + ","
@@ -4393,7 +4399,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                 HtmlUtils.script(
                     "google.load(\"visualization\", \"1\", {packages:['corechart','table']});\n"));
             sb.append(HtmlUtils.importJS(fileUrl("/lib/d3/d3.min.js")));
-            
+
             /*
             sb.append(HtmlUtils.cssLink(fileUrl("/lib/timelinejs/css/timeline.css")));
             sb.append(HtmlUtils.importJS(fileUrl("/lib/timelinejs/js/timeline.js")));

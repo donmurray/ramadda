@@ -137,14 +137,23 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 var html = "";
                 var horizontal = this.isLayoutHorizontal();
                 var footer =  this.getFooter();
+                if(!this.getProperty("showFooter", true)) {
+                    footer = "";
+                }
+                displayDebug  =false;
                 var entriesDivAttrs = ["id",this.getDomId(ID_ENTRIES),"class","display-entrylist-entries"];
                 var innerHeight = this.getProperty("innerHeight",null);
                 if(innerHeight!=null) {
                     entriesDivAttrs.push("style");
                     entriesDivAttrs.push("margin: 0px; padding: 0px;  min-height:" + innerHeight +"px; max-height:" + innerHeight +"px; overflow-y: none;");
                 }
+                var resultsDiv = "";
+                if(this.getProperty("showHeader", true)) {
+                    resultsDiv = HtmlUtil.div(["class","display-entrylist-results", "id",this.getDomId(ID_RESULTS)],"&nbsp;"); 
+                }
+
                 var entriesDiv = 
-                    HtmlUtil.div(["class","display-entrylist-results", "id",this.getDomId(ID_RESULTS)],"&nbsp;") +
+                    resultsDiv +
                     HtmlUtil.div(entriesDivAttrs, this.getLoadingMessage());
                 
 

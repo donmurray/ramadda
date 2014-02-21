@@ -1150,31 +1150,16 @@ function Selector(event, selectorId, elementId, allEntries, selecttype, localeId
 
 
     this.handleClick = function(event) {
-        event = ramaddaUtil.getEvent(event);
-        x = ramaddaUtil.getEventX(event);
-        y = ramaddaUtil.getEventY(event);
-
-        var link = ramaddaUtil.getDomObject(this.id+'.selectlink');
-        if(!link) {
-            return false;
-        }
+        var srcId = this.id+'_selectlink';
         this.div = ramaddaUtil.getDomObject('ramadda-selectdiv');
-        if(!this.div) {
-            return false;
-        }
-
-        if(link && link.obj.offsetLeft && link.obj.offsetWidth) {
-            x= ramaddaUtil.getLeft(link.obj);
-            y = link.obj.offsetHeight+ramaddaUtil.getTop(link.obj) + 2;
-        } else {
-            x+=20;
-        }
-        
         hidePopupObject();
-        ramaddaUtil.setPosition(this.div, x+10,y);
-        //        popupObject = this.div;
-        //        popupSrcId = "";
-        showObject(this.div);
+        $("#ramadda-selectdiv").show();
+        $("#ramadda-selectdiv").position({
+                of: $( "#" + srcId ),
+                my: "left top",
+                at: "left bottom",
+                collision: "none none"
+                });
         url = "${urlroot}/entry/show?output=selectxml&selecttype=" + this.selecttype+"&allentries=" + this.allEntries+"&target=" + this.id+"&noredirect=true&firstclick=true";
         if(localeId) {
             url = url+"&localeid=" + localeId;

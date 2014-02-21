@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -886,11 +886,11 @@ public class OutputHandler extends RepositoryManager {
         String clearEvent = HtmlUtils.call("clearSelect",
                                            HtmlUtils.squote(selectorId));
         String link = HtmlUtils.mouseClickHref(event, label,
-                          HtmlUtils.id(selectorId + ".selectlink"));
+                          HtmlUtils.id(selectorId + "_selectlink"));
         if (addClear) {
             link = link + " "
                    + HtmlUtils.mouseClickHref(clearEvent, "Clear",
-                       HtmlUtils.id(selectorId + ".selectlink"));
+                       HtmlUtils.id(selectorId + "_selectlink"));
         }
 
         return link;
@@ -1830,9 +1830,9 @@ public class OutputHandler extends RepositoryManager {
     public StringBuffer getCommentBlock(Request request, Entry entry,
                                         boolean onlyIfWeHaveThem)
             throws Exception {
-        StringBuffer  sb       = new StringBuffer();
-        List<Comment> comments = getRepository().getCommentManager().getComments(request,
-                                     entry);
+        StringBuffer sb = new StringBuffer();
+        List<Comment> comments =
+            getRepository().getCommentManager().getComments(request, entry);
         if ( !onlyIfWeHaveThem || (comments.size() > 0)) {
             sb.append(getPageHandler().getCommentHtml(request, entry));
         }

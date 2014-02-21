@@ -393,11 +393,17 @@ public class JsonOutputHandler extends OutputHandler {
             List<String> metadataItems = new ArrayList<String>();
             if (metadataList != null) {
                 for (Metadata metadata : metadataList) {
+                    MetadataType metadataType =
+                        getMetadataManager().findType(metadata.getType());
+                    if (metadataType == null) {
+                        continue;
+                    }
+
                     List<String> mapItems = new ArrayList<String>();
                     Json.quoteAttr(mapItems, "id", metadata.getId());
                     Json.quoteAttr(mapItems, "type", metadata.getType());
-                    MetadataType metadataType = getMetadataManager().findType( metadata.getType());
-                    Json.quoteAttr(mapItems, "label", metadataType.getLabel());
+                    Json.quoteAttr(mapItems, "label",
+                                   metadataType.getLabel());
                     int attrIdx = 1;
                     //We always add the four attributes to have always the same structure
                     while (attrIdx <= 4) {
