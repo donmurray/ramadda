@@ -88,7 +88,7 @@ function RamaddaPlacemark(ramaddaEarth, id, name, desc, lat,lon, detailsUrl, ico
         this.features.push(feature);
     }
     this.isVisible = function() {
-        var cbx = ramaddaUtil.getDomObject("googleearth.visibility." + this.id);
+        var cbx = GuiUtils.getDomObject("googleearth.visibility." + this.id);
         if(!cbx) {
             return true;
         }
@@ -373,7 +373,7 @@ function  RamaddaEarth(id, url) {
     }
 
     this.showDetails = function() {
-        var cbx = ramaddaUtil.getDomObject("googleearth.showdetails");
+        var cbx = GuiUtils.getDomObject("googleearth.showdetails");
         if(cbx) {
             return cbx.obj.checked;
         }
@@ -381,7 +381,7 @@ function  RamaddaEarth(id, url) {
     }
 
     this.zoomOnClick = function() {
-        var cbx = ramaddaUtil.getDomObject("googleearth.zoomonclick");
+        var cbx = GuiUtils.getDomObject("googleearth.zoomonclick");
         if(cbx) {
             return cbx.obj.checked;
         }
@@ -462,7 +462,7 @@ function  RamaddaEarth(id, url) {
             _this.setBalloon(ramaddaPlacemark,text); 
         }
         if(ramaddaPlacemark.detailsUrl) {
-            ramaddaUtil.loadUrl(ramaddaPlacemark.detailsUrl, callback,"");
+            GuiUtils.loadUrl(ramaddaPlacemark.detailsUrl, callback,"");
         }
     }
 

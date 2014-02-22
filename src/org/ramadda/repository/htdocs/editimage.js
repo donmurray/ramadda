@@ -1,20 +1,20 @@
 
 var imageDoFirst = 1;
 function editImageClick(event, imgId, pt1x,pt1y,pt2x,pt2y) {
-    var obj = ramaddaUtil.getDomObject(imgId);
+    var obj = GuiUtils.getDomObject(imgId);
 
     if(obj) {
-	var ex  = ramaddaUtil.getEventX(event);
-	var ey  = ramaddaUtil.getEventY(event);
-        var  idx =  ramaddaUtil.getLeft(obj.obj);
-        var  idy =  ramaddaUtil.getTop(obj.obj);
+	var ex  = GuiUtils.getEventX(event);
+	var ey  = GuiUtils.getEventY(event);
+        var  idx =  GuiUtils.getLeft(obj.obj);
+        var  idy =  GuiUtils.getTop(obj.obj);
 	var ix = ex-idx;
 	var iy = ey-idy;
 
-	var    fldx1= ramaddaUtil.getDomObject(pt1x);
-	var    fldy1= ramaddaUtil.getDomObject(pt1y);
-	var    fldx2= ramaddaUtil.getDomObject(pt2x);
-	var    fldy2= ramaddaUtil.getDomObject(pt2y);
+	var    fldx1= GuiUtils.getDomObject(pt1x);
+	var    fldy1= GuiUtils.getDomObject(pt1y);
+	var    fldx2= GuiUtils.getDomObject(pt2x);
+	var    fldy2= GuiUtils.getDomObject(pt2y);
         var fldx;
 	var fldy;
 	if(imageDoFirst) {
@@ -32,9 +32,9 @@ function editImageClick(event, imgId, pt1x,pt1y,pt2x,pt2y) {
 		fldx.obj.value	 = ""+ix;
 		fldy.obj.value	 = ""+iy;
 	}
-	var box = ramaddaUtil.getDomObject("image_edit_box");
+	var box = GuiUtils.getDomObject("image_edit_box");
 	if(box) {
-		var style = ramaddaUtil.getStyle(box);
+		var style = GuiUtils.getStyle(box);
 		style.visibility =  "visible";
                 style.left = idx+parseInt(fldx1.obj.value);
 		style.top =  idy+parseInt(fldy1.obj.value);

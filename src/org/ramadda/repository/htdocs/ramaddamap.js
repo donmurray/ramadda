@@ -324,7 +324,7 @@ function RepositoryMap(mapId, params) {
             this.map.addControl(new OpenLayers.Control.LayerSwitcher());
         }
 
-        var latLonReadout = ramaddaUtil.getDomObject(this.latlonReadout);
+        var latLonReadout = GuiUtils.getDomObject(this.latlonReadout);
         if(latLonReadout) {
             this.map.addControl(new OpenLayers.Control.MousePosition( {
                         numDigits : 3,
@@ -415,31 +415,31 @@ function RepositoryMap(mapId, params) {
     this.setSelection = function(argBase, doRegion, absolute) {
     	this.selectRegion = doRegion;
         this.argBase = argBase;
-        if (!ramaddaUtil) {
+        if (!GuiUtils) {
             return;
         }
-        this.fldNorth = ramaddaUtil.getDomObject(this.argBase + "_north");
+        this.fldNorth = GuiUtils.getDomObject(this.argBase + "_north");
         if (!this.fldNorth)
-            this.fldNorth = ramaddaUtil.getDomObject(this.argBase + ".north");
-        this.fldSouth = ramaddaUtil.getDomObject(this.argBase + "_south");
+            this.fldNorth = GuiUtils.getDomObject(this.argBase + ".north");
+        this.fldSouth = GuiUtils.getDomObject(this.argBase + "_south");
         if (!this.fldSouth)
-            this.fldSouth = ramaddaUtil.getDomObject(this.argBase + ".south");
+            this.fldSouth = GuiUtils.getDomObject(this.argBase + ".south");
 
-        this.fldEast = ramaddaUtil.getDomObject(this.argBase + "_east");
+        this.fldEast = GuiUtils.getDomObject(this.argBase + "_east");
         if (!this.fldEast)
-            this.fldEast = ramaddaUtil.getDomObject(this.argBase + ".east");
+            this.fldEast = GuiUtils.getDomObject(this.argBase + ".east");
 
-        this.fldWest = ramaddaUtil.getDomObject(this.argBase + "_west");
+        this.fldWest = GuiUtils.getDomObject(this.argBase + "_west");
         if (!this.fldWest)
-            this.fldWest = ramaddaUtil.getDomObject(this.argBase + ".west");
+            this.fldWest = GuiUtils.getDomObject(this.argBase + ".west");
 
-        this.fldLat = ramaddaUtil.getDomObject(this.argBase + "_latitude");
+        this.fldLat = GuiUtils.getDomObject(this.argBase + "_latitude");
         if (!this.fldLat)
-            this.fldLat = ramaddaUtil.getDomObject(this.argBase + ".latitude");
+            this.fldLat = GuiUtils.getDomObject(this.argBase + ".latitude");
 
-        this.fldLon = ramaddaUtil.getDomObject(this.argBase + "_longitude");
+        this.fldLon = GuiUtils.getDomObject(this.argBase + "_longitude");
         if (!this.fldLon)
-            this.fldLon = ramaddaUtil.getDomObject(this.argBase + ".longitude");
+            this.fldLon = GuiUtils.getDomObject(this.argBase + ".longitude");
 
         if (this.fldLon) {
             this.addClickHandler(this.fldLon.id, this.fldLat.id);
@@ -1066,9 +1066,9 @@ OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
             this.latFldId = "latfld";
             this.zoomFldId = "zoomfld";
         }
-        lonFld = ramaddaUtil.getDomObject(this.lonFldId);
-        latFld = ramaddaUtil.getDomObject(this.latFldId);
-        zoomFld = ramaddaUtil.getDomObject(this.zoomFldId);
+        lonFld = GuiUtils.getDomObject(this.lonFldId);
+        latFld = GuiUtils.getDomObject(this.latFldId);
+        zoomFld = GuiUtils.getDomObject(this.zoomFldId);
         if (latFld && lonFld) {
             latFld.obj.value = formatLocationValue(lonlat.lat);
             lonFld.obj.value = formatLocationValue(lonlat.lon);

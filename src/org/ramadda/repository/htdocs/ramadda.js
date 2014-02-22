@@ -18,55 +18,25 @@
 * DEALINGS IN THE SOFTWARE.
 */
 
-var root = "${urlroot}";
-var urlroot = "${urlroot}";
-var icon_close = "${urlroot}/icons/close.gif";
-var icon_rightarrow = "${urlroot}/icons/grayrightarrow.gif";
-var icon_downdart ="${urlroot}/icons/downdart.gif";
-var icon_rightdart ="${urlroot}/icons/rightdart.gif";
-var icon_downdart ="${urlroot}/icons/application_side_contract.png";
-var icon_rightdart ="${urlroot}/icons/application_side_expand.png";
-var icon_progress = "${urlroot}/icons/progress.gif";
-var icon_information = "${urlroot}/icons/information.png";
-var icon_folderclosed = "${urlroot}/icons/folderclosed.png";
-var icon_folderopen = "${urlroot}/icons/togglearrowdown.gif";
-var icon_menuarrow = "${urlroot}/icons/downdart.gif";
-var icon_blank = "${urlroot}/icons/blank.gif";
+var ramaddaBaseUrl = "${urlroot}";
+var root = ramaddaBaseUrl;
+var urlroot = ramaddaBaseUrl;
+var icon_close = ramaddaBaseUrl +"/icons/close.gif";
+var icon_rightarrow = ramaddaBaseUrl +"/icons/grayrightarrow.gif";
+var icon_downdart =ramaddaBaseUrl +"/icons/downdart.gif";
+var icon_rightdart =ramaddaBaseUrl +"/icons/rightdart.gif";
+var icon_downdart =ramaddaBaseUrl +"/icons/application_side_contract.png";
+var icon_rightdart =ramaddaBaseUrl +"/icons/application_side_expand.png";
+var icon_progress = ramaddaBaseUrl +"/icons/progress.gif";
+var icon_information = ramaddaBaseUrl +"/icons/information.png";
+var icon_folderclosed = ramaddaBaseUrl +"/icons/folderclosed.png";
+var icon_folderopen = ramaddaBaseUrl +"/icons/togglearrowdown.gif";
+var icon_menuarrow = ramaddaBaseUrl +"/icons/downdart.gif";
+var icon_blank = ramaddaBaseUrl +"/icons/blank.gif";
 var uniqueCnt = 0;
 
-function Util () {
- this.loadXML = function (url, callback,arg) {
- var req = false;
- if(window.XMLHttpRequest) {
-            try {
-                req = new XMLHttpRequest();
-            } catch(e) {
-                req = false;
-            }
-        } else if(window.ActiveXObject)  {
-            try {
-                req = new ActiveXObject("Msxml2.XMLHTTP");
-            } catch(e) {
-                try {
-                    req = new ActiveXObject("Microsoft.XMLHTTP");
-                } catch(e) {
-                    req = false;
-                }
-            }
-        }
-        if(req) {
-            req.onreadystatechange = function () { 
-                if (req.readyState == 4 && req.status == 200)   {
-                    callback(req,arg); 
-                }
-            };
-            req.open("GET", url, true);
-            req.send("");
-        }
-    }
-
-
-    this.loadUrl = function (url, callback,arg) {
+var GuiUtils = {
+    loadXML: function (url, callback,arg) {
         var req = false;
         if(window.XMLHttpRequest) {
             try {
@@ -94,11 +64,37 @@ function Util () {
             req.open("GET", url, true);
             req.send("");
         }
-    }
-
-
-
-    this.getUrlArg  = function( name, dflt ) {
+    },
+    loadUrl: function (url, callback,arg) {
+        var req = false;
+        if(window.XMLHttpRequest) {
+            try {
+                req = new XMLHttpRequest();
+            } catch(e) {
+                req = false;
+            }
+        } else if(window.ActiveXObject)  {
+            try {
+                req = new ActiveXObject("Msxml2.XMLHTTP");
+            } catch(e) {
+                try {
+                    req = new ActiveXObject("Microsoft.XMLHTTP");
+                } catch(e) {
+                    req = false;
+                }
+            }
+        }
+        if(req) {
+            req.onreadystatechange = function () { 
+                if (req.readyState == 4 && req.status == 200)   {
+                    callback(req,arg); 
+                }
+            };
+            req.open("GET", url, true);
+            req.send("");
+        }
+    },
+    getUrlArg: function( name, dflt ) {
         name = name.replace(/[\[]/,"\\\[").replace(/[\]]/,"\\\]");
         var regexS = "[\\?&]"+name+"=([^&#]*)";
         var regex = new RegExp( regexS );
@@ -107,9 +103,8 @@ function Util () {
             return dflt;
         else
             return results[1];
-    }
-
-    this.setCursor = function(c) {
+    },
+    setCursor: function(c) {
         var cursor = document.cursor;
         if(!cursor && document.getElementById) {
             cursor =  document.getElementById('cursor');
@@ -117,90 +112,108 @@ function Util () {
         if(!cursor) {
             document.body.style.cursor = c;
         }
-    }
-
-
-    this.getDomObject = function(name) {
+    },
+    getDomObject : function(name) {
         obj = new DomObject(name);
         if(obj.obj) return obj;
         return null;
-    }
-
-
-
-
-    this.getKeyChar = function(event) {
-        event = ramaddaUtil.getEvent(event);
-        if(event.keyCode) {
-            return String.fromCharCode(event.keyCode);
-        }
-        if(event.which)  {
-            return String.fromCharCode(event.which);
-        }
-        return '';
-    }
-
-
-    this.getEvent = function (event) {
+    },
+    getEvent: function (event) {
         if(event) return event;
         return window.event;
-    }
-
-
-    this.getEventX =    function (event) {
+    },
+    getEventX:    function (event) {
         if (event.pageX) {
             return  event.pageX;
         }
         return  event.clientX + document.body.scrollLeft
         + document.documentElement.scrollLeft;
-    }
-
-    this.getEventY =function (event) {
+    },
+    getEventY :function (event) {
         if (event.pageY) {
             return  event.pageY;
         }
         return  event.clientY + document.body.scrollTop
         + document.documentElement.scrollTop;
 
-    }
+    },
 
-    this.getTop = function (obj) {
+    getTop : function (obj) {
         if(!obj) return 0;
         return obj.offsetTop+this.getTop(obj.offsetParent);
-    }
+    },
 
 
-    this.getBottom = function (obj) {
+    getBottom : function (obj) {
         if(!obj) return 0;
         return this.getTop(obj) + obj.offsetHeight;
-    }
+    },
 
 
-    this.setPosition = function(obj,x,y) {
+    setPosition : function(obj,x,y) {
         obj.style.top = y;
         obj.style.left = x;
-    }
+    },
 
-    this.getLeft =  function(obj) {
+    getLeft :  function(obj) {
         if(!obj) return 0;
         return obj.offsetLeft+this.getLeft(obj.offsetParent);
-    }
-    this.getRight =  function(obj) {
+    },
+    getRight :  function(obj) {
         if(!obj) return 0;
         return obj.offsetRight+this.getRight(obj.offsetParent);
-    }
+    },
 
-    this.getStyle = function(obj) {
+    getStyle : function(obj) {
         if(obj.style) return obj.style;
         if (document.layers)  { 		
             return   document.layers[obj.name];
         }        
         return null;
+    },
+    //from http://snipplr.com/view.php?codeview&id=5949
+    size_format: function (filesize) {
+        if (filesize >= 1073741824) {
+            filesize = number_format(filesize / 1073741824, 2, '.', '') + ' Gb';
+        } else { 
+            if (filesize >= 1048576) {
+                filesize = number_format(filesize / 1048576, 2, '.', '') + ' Mb';
+            } else { 
+                if (filesize >= 1024) {
+                    filesize = number_format(filesize / 1024, 0) + ' Kb';
+                } else {
+                    filesize = number_format(filesize, 0) + ' bytes';
+                };
+            };
+        };
+        return filesize;
+    },
+    inputLengthOk: function(domId, length) {
+        var value = $("#"+ domId).val();
+        if(value == null) return true;
+        if(value.length>length) {
+            closeFormLoadingDialog ();
+            return false;
+        }
+        return true;
+    },
+    inputValueOk: function (domId, rangeValue, min) {
+        var value = $("#"+ domId).val();
+        if(value == null) return true;
+        if(min && value<rangeValue) {
+            closeFormLoadingDialog ();
+            return false;
+        }
+        if(!min && value>rangeValue) {
+            closeFormLoadingDialog ();
+            return false;
+        }
+        return true;
     }
 
-}
 
-ramaddaUtil = new Util();
+};
+
 
 
 var HtmlUtil =  {
@@ -370,8 +383,8 @@ var HtmlUtil =  {
         var id = "block_" + (uniqueCnt++);
         var imgid = id +"_img";
 
-        var img1=root + "/icons/togglearrowdown.gif";
-        var img2=root + "/icons/togglearrowright.gif";
+        var img1=ramaddaBaseUrl + "/icons/togglearrowdown.gif";
+        var img2=ramaddaBaseUrl + "/icons/togglearrowright.gif";
         var args = HtmlUtil.join([HtmlUtil.squote(id),HtmlUtil.squote(imgid), HtmlUtil.squote(img1), HtmlUtil.squote(img2)],",");
         var click = "toggleBlockVisibility(" + args +");";
 
@@ -385,8 +398,6 @@ var HtmlUtil =  {
     }
 }
 
-
-var htmlUtil = HtmlUtil;
 
 
 
@@ -475,7 +486,7 @@ function mouseDown(event) {
             setTimeout(callback,250);
         }
     }
-    event = ramaddaUtil.getEvent(event);
+    event = GuiUtils.getEvent(event);
     mouseIsDown = 1;
     mouseMoveCnt =0;
     return true;
@@ -484,16 +495,16 @@ function mouseDown(event) {
 
 
 function mouseUp(event) {
-    event = ramaddaUtil.getEvent(event);
+    event = GuiUtils.getEvent(event);
     mouseIsDown = 0;
     draggedEntry   = null;
-    ramaddaUtil.setCursor('default');
-    var obj = ramaddaUtil.getDomObject('ramadda-floatdiv');
+    GuiUtils.setCursor('default');
+    var obj = GuiUtils.getDomObject('ramadda-floatdiv');
     if(obj) {
-        var dragSourceObj= ramaddaUtil.getDomObject(dragSource);
+        var dragSourceObj= GuiUtils.getDomObject(dragSource);
         if(dragSourceObj) {
-            var tox = ramaddaUtil.getLeft(dragSourceObj.obj);
-            var toy = ramaddaUtil.getTop(dragSourceObj.obj);
+            var tox = GuiUtils.getLeft(dragSourceObj.obj);
+            var toy = GuiUtils.getTop(dragSourceObj.obj);
             var fromx = parseInt(obj.style.left);
             var fromy = parseInt(obj.style.top);
             var steps = 10;
@@ -511,7 +522,7 @@ function mouseUp(event) {
 
 
 function flyBackAndHide(id, step,steps,fromx,fromy,dx,dy) {
-    var obj = ramaddaUtil.getDomObject(id);
+    var obj = GuiUtils.getDomObject(id);
     if(!obj) {
         return;
     }
@@ -519,7 +530,7 @@ function flyBackAndHide(id, step,steps,fromx,fromy,dx,dy) {
     obj.style.left = fromx+dx*step+"px";
     obj.style.top = fromy+dy*step+"px";
     var opacity = 80*(steps-step)/steps;
-    //    ramaddaUtil.print(opacity);
+    //    GuiUtils.print(opacity);
     //    obj.style.filter="alpha(opacity="+opacity+")";
     //    obj.style.opacity="0." + opacity;
 
@@ -533,7 +544,7 @@ function flyBackAndHide(id, step,steps,fromx,fromy,dx,dy) {
 }
 
 function finalHide(id) {
-    var obj = ramaddaUtil.getDomObject(id);
+    var obj = GuiUtils.getDomObject(id);
     if(!obj) {
         return;
     }
@@ -543,15 +554,15 @@ function finalHide(id) {
 }
 
 function mouseMove(event) {
-    event = ramaddaUtil.getEvent(event);
+    event = GuiUtils.getEvent(event);
     if(draggedEntry && mouseIsDown) {
         mouseMoveCnt++;
-        var obj = ramaddaUtil.getDomObject('ramadda-floatdiv');
+        var obj = GuiUtils.getDomObject('ramadda-floatdiv');
         if(mouseMoveCnt==6) {
-            ramaddaUtil.setCursor('move');
+            GuiUtils.setCursor('move');
         }
         if(mouseMoveCnt>=6&& obj) {
-            moveFloatDiv(ramaddaUtil.getEventX(event),ramaddaUtil.getEventY(event));
+            moveFloatDiv(GuiUtils.getEventX(event),GuiUtils.getEventY(event));
         }
     }    
     return false;
@@ -559,11 +570,8 @@ function mouseMove(event) {
 
 
 
-
-
-
 function moveFloatDiv(x,y) {
-    var obj = ramaddaUtil.getDomObject('ramadda-floatdiv');
+    var obj = GuiUtils.getDomObject('ramadda-floatdiv');
     if(obj) {
         if(obj.style.visibility!="visible") {
             obj.style.visibility = "visible";
@@ -581,10 +589,10 @@ function moveFloatDiv(x,y) {
 
 
 function mouseOverOnEntry(event, entryId, targetId) {
-    event = ramaddaUtil.getEvent(event);
+    event = GuiUtils.getEvent(event);
     if(entryId == draggedEntry) return;
     if(mouseIsDown)  {
-        var obj = ramaddaUtil.getDomObject(targetId);
+        var obj = GuiUtils.getDomObject(targetId);
         if(!obj)  return;
         //       if(obj.style && obj.style.borderBottom) {
         obj.style.borderBottom="2px black solid";
@@ -593,9 +601,9 @@ function mouseOverOnEntry(event, entryId, targetId) {
 }
 
 function mouseOutOnEntry(event, entryId,targetId) {
-    event = ramaddaUtil.getEvent(event);
+    event = GuiUtils.getEvent(event);
     if(entryId == draggedEntry) return;
-    var obj = ramaddaUtil.getDomObject(targetId);
+    var obj = GuiUtils.getDomObject(targetId);
     if(!obj)  return;
     if(mouseIsDown)  {
         obj.style.borderBottom="";
@@ -606,7 +614,7 @@ function mouseOutOnEntry(event, entryId,targetId) {
 
 
 function mouseDownOnEntry(event, entryId, name, sourceIconId, icon) {
-    event = ramaddaUtil.getEvent(event);
+    event = GuiUtils.getEvent(event);
     dragSource  = sourceIconId;
     draggedEntry = entryId;
     draggedEntryName=name;
@@ -622,11 +630,11 @@ function mouseDownOnEntry(event, entryId, name, sourceIconId, icon) {
 
 
 function mouseUpOnEntry(event, entryId, targetId) {
-    event = ramaddaUtil.getEvent(event);
+    event = GuiUtils.getEvent(event);
     if(entryId == draggedEntry) {
         return;
     }
-    var obj = ramaddaUtil.getDomObject(targetId);
+    var obj = GuiUtils.getDomObject(targetId);
     if(!obj)  {
         return;
     }
@@ -644,7 +652,7 @@ function mouseUpOnEntry(event, entryId, targetId) {
                 }}
         );
         */
-        url = "${urlroot}/entry/copy?action=action.move&from=" + draggedEntry +"&to=" + entryId;
+        url = ramaddaBaseUrl +"/entry/copy?action=action.move&from=" + draggedEntry +"&to=" + entryId;
         //        alert(url);
         //        window.open(url,'move window','') ;
         document.location = url;
@@ -767,7 +775,7 @@ function EntryFormList(formId,img,selectId, initialOn) {
             }
         }
 
-        var form = ramaddaUtil.getDomObject(this.formId);
+        var form = GuiUtils.getDomObject(this.formId);
         if(form) {
             form = form.obj;
             for(i=0;i<form.elements.length;i++) { 
@@ -780,7 +788,7 @@ function EntryFormList(formId,img,selectId, initialOn) {
         }
 
         for(i=0;i<this.entries.length;i++) {
-            obj = ramaddaUtil.getDomObject(this.entries[i]);
+            obj = GuiUtils.getDomObject(this.entries[i]);
             if(!obj) continue;
             if(this.on) {
                 showObject(obj,"block");
@@ -794,7 +802,7 @@ function EntryFormList(formId,img,selectId, initialOn) {
 
 function entryRowCheckboxClicked(event,cbxId) {
 
-    var cbx = ramaddaUtil.getDomObject(cbxId);
+    var cbx = GuiUtils.getDomObject(cbxId);
     if(!cbx) return;
     cbx = cbx.obj;
     if(!cbx.form) return;
@@ -875,18 +883,18 @@ function EntryRow (entryId, rowId, cbxId,cbxWrapperId, showDetails) {
 
 
     this.mouseClick = function(event) {
-        eventX = ramaddaUtil.getEventX(event);
+        eventX = GuiUtils.getEventX(event);
         var position = this.getRow().offset();
         //Don't pick up clicks on the left side
         if(eventX-position.left<150) return;
         this.lastClick = eventX;
-        var url = "${urlroot}/entry/show?entryid=" + entryId +"&output=metadataxml";
+        var url = ramaddaBaseUrl +"/entry/show?entryid=" + entryId +"&output=metadataxml";
         if(this.showDetails) {
             url+="&details=true";
         } else {
             url+="&details=false";
         }
-	ramaddaUtil.loadXML( url, this.handleTooltip,this);
+	GuiUtils.loadXML( url, this.handleTooltip,this);
     }
 
     this.handleTooltip = function(request,entryRow) {
@@ -986,7 +994,7 @@ var lastCbxClicked;
 
 function checkboxClicked(event, cbxPrefix, id) {
     if(!event) return;
-    var cbx = ramaddaUtil.getDomObject(id);
+    var cbx = GuiUtils.getDomObject(id);
     if(!cbx) return;
     cbx = cbx.obj;
 
@@ -1010,15 +1018,15 @@ function checkboxClicked(event, cbxPrefix, id) {
 
     if(event.shiftKey) {
         if(lastCbxClicked) {
-	    var pos1 = ramaddaUtil.getTop(cbx);
-	    var pos2 = ramaddaUtil.getTop(lastCbxClicked);
+	    var pos1 = GuiUtils.getTop(cbx);
+	    var pos2 = GuiUtils.getTop(lastCbxClicked);
 	    if(pos1>pos2) {
 		var tmp = pos1;
 		pos1 =pos2;
 		pos2=tmp;
 	    }
 	    for (i = 0; i < checkBoxes.length; i++) {
-		var top = ramaddaUtil.getTop(checkBoxes[i]);
+		var top = GuiUtils.getTop(checkBoxes[i]);
 		if(top>=pos1 && top<=pos2) {
 	                checkBoxes[i].checked = value;
 		}
@@ -1045,7 +1053,7 @@ function toggleBlockVisibility(id, imgid, showimg, hideimg) {
 
 
 function toggleInlineVisibility(id, imgid, showimg, hideimg) {
-    var img = ramaddaUtil.getDomObject(imgid);
+    var img = GuiUtils.getDomObject(imgid);
     if(toggleVisibility(id,'inline')) {
         if(img) img.obj.src = showimg;
     } else {
@@ -1075,7 +1083,7 @@ function folderClick(uid, url, changeImg) {
 	originalImages[uid] = jqImage.attr('src');
         jqBlock.show();
         jqImage.attr('src', icon_progress);
-	ramaddaUtil.loadXML( url, handleFolderList,uid);
+	GuiUtils.loadXML( url, handleFolderList,uid);
     } else {
 	if(changeImg) {
             if(originalImages[uid]) {
@@ -1131,7 +1139,7 @@ function Selector(event, selectorId, elementId, allEntries, selecttype, localeId
     this.localeId = localeId;
     this.allEntries = allEntries;
     this.selecttype = selecttype;
-    this.textComp = ramaddaUtil.getDomObject(this.elementId);
+    this.textComp = GuiUtils.getDomObject(this.elementId);
 
     this.getTextComponent = function() {
         var id = "#" + this.elementId;
@@ -1151,7 +1159,7 @@ function Selector(event, selectorId, elementId, allEntries, selecttype, localeId
 
     this.handleClick = function(event) {
         var srcId = this.id+'_selectlink';
-        this.div = ramaddaUtil.getDomObject('ramadda-selectdiv');
+        this.div = GuiUtils.getDomObject('ramadda-selectdiv');
         hidePopupObject();
         $("#ramadda-selectdiv").show();
         $("#ramadda-selectdiv").position({
@@ -1160,11 +1168,11 @@ function Selector(event, selectorId, elementId, allEntries, selecttype, localeId
                 at: "left bottom",
                 collision: "none none"
                 });
-        url = "${urlroot}/entry/show?output=selectxml&selecttype=" + this.selecttype+"&allentries=" + this.allEntries+"&target=" + this.id+"&noredirect=true&firstclick=true";
+        url = ramaddaBaseUrl +"/entry/show?output=selectxml&selecttype=" + this.selecttype+"&allentries=" + this.allEntries+"&target=" + this.id+"&noredirect=true&firstclick=true";
         if(localeId) {
             url = url+"&localeid=" + localeId;
         }
-        ramaddaUtil.loadXML( url, handleSelect,this.id);
+        GuiUtils.loadXML( url, handleSelect,this.id);
         return false;
     }
     this.handleClick(event);
@@ -1211,8 +1219,8 @@ function clearSelect(id) {
         selector.clearInput();
     } else {
         //In case the user never clicked select
-        var textComp = ramaddaUtil.getDomObject(id);
-        var hiddenComp = ramaddaUtil.getDomObject(id+"_hidden");
+        var textComp = GuiUtils.getDomObject(id);
+        var hiddenComp = GuiUtils.getDomObject(id+"_hidden");
 	if(hiddenComp) {
             hiddenComp.obj.value =""
         }
@@ -1257,7 +1265,7 @@ function hide(id) {
 }
 
 function hideElementById(id) {
-    hideObject(ramaddaUtil.getDomObject(id));
+    hideObject(GuiUtils.getDomObject(id));
 }
 
 function checkToHidePopup() {
@@ -1280,8 +1288,8 @@ function showPopup(event, srcId, popupId, alignLeft, myalign, atalign) {
 
     popupTime = new Date();
     hidePopupObject();
-    var popup = ramaddaUtil.getDomObject(popupId);
-    var srcObj = ramaddaUtil.getDomObject(srcId);
+    var popup = GuiUtils.getDomObject(popupId);
+    var srcObj = GuiUtils.getDomObject(srcId);
     if(!popup || !srcObj) return;
     popupObject = popup;
     popupSrcId = srcId;
@@ -1344,16 +1352,16 @@ function hideObject(obj) {
 
 
 function hideMore(base) {
-    var link = ramaddaUtil.getDomObject("morelink_" + base);
-    var div = ramaddaUtil.getDomObject("morediv_" + base);
+    var link = GuiUtils.getDomObject("morelink_" + base);
+    var div = GuiUtils.getDomObject("morediv_" + base);
     hideObject(div);
     showObject(link);
 }
 
 
 function showMore(base) {
-    var link = ramaddaUtil.getDomObject("morelink_" + base);
-    var div = ramaddaUtil.getDomObject("morediv_" + base);
+    var link = GuiUtils.getDomObject("morelink_" + base);
+    var div = GuiUtils.getDomObject("morediv_" + base);
     hideObject(link);
     showObject(div);
 }
@@ -1458,75 +1466,8 @@ function number_format( number, decimals, dec_point, thousands_sep ) {
     return s + (j ? i.substr(0, j) + t : "") + i.substr(j).replace(/(\d{3})(?=\d)/g, "$1" + t) + (c ? d + Math.abs(n - i).toFixed(c).slice(2) : "");
 }
 
-//from http://snipplr.com/view.php?codeview&id=5949
-function size_format (filesize) {
-    if (filesize >= 1073741824) {
-        filesize = number_format(filesize / 1073741824, 2, '.', '') + ' Gb';
-    } else { 
-        if (filesize >= 1048576) {
-            filesize = number_format(filesize / 1048576, 2, '.', '') + ' Mb';
-        } else { 
-            if (filesize >= 1024) {
-                filesize = number_format(filesize / 1024, 0) + ' Kb';
-            } else {
-                filesize = number_format(filesize, 0) + ' bytes';
-            };
-        };
-    };
-    return filesize;
-};
 
-
-function inputLengthOk(domId, length) {
-    var value = $("#"+ domId).val();
-    if(value == null) return true;
-    if(value.length>length) {
-        closeFormLoadingDialog ();
-        return false;
-    }
-    return true;
-}
-
-
-function inputValueOk(domId, rangeValue, min) {
-    var value = $("#"+ domId).val();
-    if(value == null) return true;
-    if(min && value<rangeValue) {
-        closeFormLoadingDialog ();
-        return false;
-    }
-    if(!min && value>rangeValue) {
-        closeFormLoadingDialog ();
-        return false;
-    }
-    return true;
-}
-
-
-
-function inputIsRequired(domId) {
-    var value = $("#"+ domId).val();
-    if(value == null) return false;
-    value = value.trim();
-    if(value.length==0) {
-        closeFormLoadingDialog ();
-        return false;
-    }
-    return true;
-}
-
-function setFormValue(id, v) {
-    $("#" +id).val(v);
-}
-
-function setHtml(id, v) {
-    $("#" +id).html(v);
-}
-
-
-
-
-RamaddaUtil = {
+var RamaddaUtil = {
     //applies extend to the given object
     //and sets a super member to the original object
     //you can call original super class methods with:
@@ -1534,6 +1475,12 @@ RamaddaUtil = {
     inherit: function(object, parent) {
         $.extend(object, parent);
         object.super = parent;
+        return object;
+    },
+    //Just a wrapper around extend. We use this so it is easy to find 
+    //class definitions
+    initMembers: function(object, members) {
+        $.extend(object, members);
         return object;
     },
     //Just a wrapper around extend. We use this so it is easy to find 

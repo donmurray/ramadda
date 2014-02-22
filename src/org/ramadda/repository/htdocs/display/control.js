@@ -33,14 +33,14 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
             timestamp: 0,
             index: 0,              
             sleepTime: 500,
-            iconStart: root+"/icons/display/control.png",
-            iconStop: root+"/icons/display/control-stop-square.png",
-            iconBack: root+"/icons/display/control-stop-180.png",
-            iconForward: root+"/icons/display/control-stop.png",
-            iconFaster: root+"/icons/display/plus.png",
-            iconSlower: root+"/icons/display/minus.png",
-            iconBegin: root+"/icons/display/control-double-180.png",
-            iconEnd: root+"/icons/display/control-double.png",
+            iconStart: ramaddaBaseUrl+"/icons/display/control.png",
+            iconStop: ramaddaBaseUrl+"/icons/display/control-stop-square.png",
+            iconBack: ramaddaBaseUrl+"/icons/display/control-stop-180.png",
+            iconForward: ramaddaBaseUrl+"/icons/display/control-stop.png",
+            iconFaster: ramaddaBaseUrl+"/icons/display/plus.png",
+            iconSlower: ramaddaBaseUrl+"/icons/display/minus.png",
+            iconBegin: ramaddaBaseUrl+"/icons/display/control-double-180.png",
+            iconEnd: ramaddaBaseUrl+"/icons/display/control-double.png",
             deltaIndex: function(i) {
                 this.stop();
                 this.setIndex(this.index+i);

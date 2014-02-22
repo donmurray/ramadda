@@ -73,7 +73,9 @@
 
 
 
-.display-metadata-item {
+
+
+.display-metadatalist-item {
     max-width: 200px;
 }
 
@@ -296,6 +298,16 @@
 
 .display-metadata-table  th {
     background-color: #efefef;
+}
+
+.display-metadata-item {
+     border-bottom: 1px #ccc dotted;
+     padding:2px;
+}
+
+
+.display-metadata-link {
+   cursor:pointer;
 }
 
 .display-metadata-entrylink {

@@ -1,5 +1,5 @@
 function insertText(id,value) {
-    var textComp = ramaddaUtil.getDomObject(id);
+    var textComp = GuiUtils.getDomObject(id);
     if(textComp) {
 	insertAtCursor(textComp.obj, value);
     }
@@ -34,7 +34,7 @@ function insertAtCursor(myField, myValue) {
 
 
 function insertTags(id, tagOpen, tagClose, sampleText) {
-    var textComp = ramaddaUtil.getDomObject(id);
+    var textComp = GuiUtils.getDomObject(id);
     if(textComp) {
 	insertTagsInner(id, textComp.obj, tagOpen,tagClose,sampleText);
     }

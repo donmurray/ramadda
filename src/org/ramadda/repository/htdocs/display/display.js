@@ -12,11 +12,12 @@ var ID_DIALOG_BUTTON = "dialog_button";
 var ID_FOOTER = "footer";
 var ID_FOOTER_LEFT = "footer_left";
 var ID_FOOTER_RIGHT = "footer_right";
-
-
 var ID_MENU_BUTTON = "menu_button";
 var ID_MENU_OUTER =  "menu_outer";
 var ID_MENU_INNER =  "menu_inner";
+
+
+
 
 
 var  displayDebug = false;
@@ -161,7 +162,8 @@ function DisplayThing(argId, argProperties) {
 
 
 function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
-    $.extend(this, {
+
+    RamaddaUtil.initMembers(this, {
             orientation: "horizontal",
         });
 
@@ -376,10 +378,12 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             getGet: function() {
                 return  "getRamaddaDisplay('" + this.getId() +"')";
             },
-            getEntryHtml: function(entry) {
+            getEntryHtml: function(entry, headerRight) {
                 var menu = this.getEntryMenuButton(entry);
                 var html = "";
-                html += menu +" " + entry.getLink(entry.getIconImage() +" " + entry.getName());
+                var left = menu +" " + entry.getLink(entry.getIconImage() +" " + entry.getName());
+                if(headerRight) html += HtmlUtil.leftRight(left,headerRight);
+                else html += left;
                 html += "<hr>";
                 html += entry.getDescription();
                 html += HtmlUtil.formTable();
@@ -651,8 +655,8 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 return HtmlUtil.div([], form);
             },
            popup: function(srcId, popupId) {
-                var popup = ramaddaUtil.getDomObject(popupId);
-                var srcObj = ramaddaUtil.getDomObject(srcId);
+                var popup = GuiUtils.getDomObject(popupId);
+                var srcObj = GuiUtils.getDomObject(srcId);
                 if(!popup || !srcObj) return;
                 var myalign = 'right top';
                 var atalign = 'right bottom';

@@ -29,7 +29,7 @@ function SelectForm (formId, entryId, arg, outputDiv, selectValues) {
 
 
     this.getUrl = function(what) {
-        var url = "${urlroot}/entry/show?entryid=" + this.entryId;
+        var url = ramaddaBaseUrl +  "/entry/show?entryid=" + this.entryId;
         var theForm = this;
         var inputs = $('#' + this.id +' ::input');
         //        $(':input[id*=\"' + this.id +'\"]')
@@ -179,7 +179,7 @@ function SelectForm (formId, entryId, arg, outputDiv, selectValues) {
             html += tableHeader;
             html += "<thead><tr style=\"background: #Fff;\">"; 
             html += "<td width=" + firstColWidth +">";
-            html += "</td>" + header +"<td width=" + widthPerColumn  +" align=right><b>" + size_format(totalSize) +"</b></td></tr></thead>";
+            html += "</td>" + header +"<td width=" + widthPerColumn  +" align=right><b>" + GuiUtils.size_format(totalSize) +"</b></td></tr></thead>";
             html += "</table>"
             html +="</div>"
 
@@ -318,7 +318,7 @@ function SelectForm (formId, entryId, arg, outputDiv, selectValues) {
     this.submit  = function() {
         var valueField = $('#' + this.id +'_value');
         var image = $('#' + this.id +'_image');
-        image.attr("src", "${urlroot}/icons/" + valueField.val());
+        image.attr("src",  ramaddaBaseUrl + "/icons/" + valueField.val());
         return false;
     }
 

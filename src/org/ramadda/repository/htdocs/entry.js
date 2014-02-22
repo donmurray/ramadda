@@ -55,7 +55,7 @@ function EntryManager(repositoryRoot) {
             getSearchLinks: function(searchSettings) {
                 var urls = [];
                 for(var i =0;i<OUTPUTS.length;i++) {
-                    urls.push(htmlUtil.href(this.getSearchUrl(searchSettings, OUTPUTS[i].id),
+                    urls.push(HtmlUtil.href(this.getSearchUrl(searchSettings, OUTPUTS[i].id),
                                             OUTPUTS[i].name));
                 }
                 return urls;
@@ -250,7 +250,7 @@ function Entry (props) {
                 return this.icon;
             },
             getIconImage : function (attrs) {
-                return htmlUtil.image(this.getIconUrl(),attrs);
+                return HtmlUtil.image(this.getIconUrl(),attrs);
             },
             getColumns : function () {
                 return this.type.getColumns();
@@ -289,7 +289,7 @@ function Entry (props) {
                 return 0;
             },
             getFormattedFilesize : function () {
-                return size_format(this.getFilesize());
+                return GuiUtils.size_format(this.getFilesize());
             },
             toString: function() {
                 return "entry:" + this.getName();
@@ -305,7 +305,7 @@ function Entry (props) {
             },
             getLink : function (label) {
                 if(!label) label = this.getName();
-                return  htmlUtil.tag("a",["href", this.getEntryUrl()],label);
+                return  HtmlUtil.tag("a",["href", this.getEntryUrl()],label);
             },
 
             toString: function() {

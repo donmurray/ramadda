@@ -41,19 +41,19 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
                  var get = this.getGet();
                  var toolbarItems = [];
                  toolbarItems.push(HtmlUtil.tag("a", ["href", entry.getEntryUrl(),"target","_"], 
-                                                HtmlUtil.image(root +"/icons/application-home.png",["border",0,"title","View Entry"])));
+                                                HtmlUtil.image(ramaddaBaseUrl +"/icons/application-home.png",["border",0,"title","View Entry"])));
                  if(entry.getService("points.latlonaltcsv")) {
                      toolbarItems.push(HtmlUtil.tag("a", ["onclick", get+".createDisplay('" + entry.getId() +"','linechart');"], 
-                                                    HtmlUtil.image(root +"/icons/chart_line_add.png",["border",0,"title","Create Chart"])));
+                                                    HtmlUtil.image(ramaddaBaseUrl +"/icons/chart_line_add.png",["border",0,"title","Create Chart"])));
                  }
                  if(entry.getFilesize()>0) {
                      toolbarItems.push(HtmlUtil.tag("a", ["href", entry.getFileUrl()], 
-                                                    HtmlUtil.image(root +"/icons/download.png",["border",0,"title","Download (" + entry.getFormattedFilesize() +")"])));
+                                                    HtmlUtil.image(ramaddaBaseUrl +"/icons/download.png",["border",0,"title","Download (" + entry.getFormattedFilesize() +")"])));
                      
                  }
                  var entryMenuButton = this.getEntryMenuButton(entry);
                  entryMenuButton =  HtmlUtil.onClick(this.getGet()+".showEntryPopup(event, '" + entry.getId() +"');", 
-                                               HtmlUtil.image(root+"/icons/downdart.png", 
+                                               HtmlUtil.image(ramaddaBaseUrl+"/icons/downdart.png", 
                                                               ["class", "display-dialog-button", "id",  this.getDomId(ID_MENU_BUTTON + entry.getId())]));
 
 
@@ -75,11 +75,6 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
 
 
 function RamaddaSearcher(displayManager, id, type, properties) {
-    $.extend(this, {
-            showForm: true,            
-            showEntries: true,
-    });            
-
     var NONE = "-- None --";
     var ID_TEXT_FIELD = "textfield";
     var ID_TYPE_FIELD = "typefield";
@@ -89,8 +84,9 @@ function RamaddaSearcher(displayManager, id, type, properties) {
     var ID_FORM = "form";
     var ID_COLUMN = "column";
 
-    $.extend(this, {
+    RamaddaUtil.initMembers(this, {
             showForm: true,            
+            showEntries: true,
             showType: true,           
             formOpen: true,
             fullForm: true,            
@@ -128,11 +124,6 @@ function RamaddaSearcher(displayManager, id, type, properties) {
             haveTypes: false,
             metadata: {},
             metadataLoading: {},
-            hideEntryPopup: function() {
-                var popupId = "#"+ this.getDomId(ID_DETAILS);
-                $(popupId).hide();
-                this.currentPopupEntry = null;
-            },
             getDefaultHtml: function() {
                 var html = "";
                 var horizontal = this.isLayoutHorizontal();
@@ -217,6 +208,40 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     this.submitSearchForm();
                 }
             },
+            hideEntryPopup: function() {
+                var popupId = "#"+ this.getDomId(ID_DETAILS);
+                $(popupId).hide();
+                this.currentPopupEntry = null;
+            },
+             showEntryPopup: function(event, entryId, src,leftAlign) {
+                var entry = this.entryList.getEntry(entryId);
+                var popupId = "#"+ this.getDomId(ID_DETAILS);
+                if(this.currentPopupEntry ==  entry) {
+                    this.hideEntryPopup();
+                    return;
+                }
+                var myloc = 'right top';
+                var atloc = 'right bottom';
+                if(leftAlign) {
+                    myloc = 'left top';
+                    atloc = 'left bottom';
+                }
+                this.currentPopupEntry = entry;
+                if(src == null) src =  this.getDomId("entry_" + entry.getId());
+                var close  = HtmlUtil.onClick(this.getGet()+ ".hideEntryPopup();",
+                                              HtmlUtil.image(ramaddaBaseUrl +"/icons/close.gif"));
+                
+                var contents = this.getEntryHtml(entry, close);
+                $(popupId).html(contents);
+                $(popupId).show();
+                $(popupId).position({
+                        of: jQuery( "#" +src),
+                            my: myloc,
+                            at: atloc,
+                            collision: "none none"
+                            });
+            },
+
              getResultsHeader: function(entries) {
                 var left = "Showing " + (this.searchSettings.skip+1) +"-" +(this.searchSettings.skip+Math.min(this.searchSettings.max, entries.length));
                 var right = [];
@@ -228,9 +253,9 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     right.push(HtmlUtil.onClick(this.getGet()+".loadNextUrl();", "Next",["class","display-link"]));
                     addMore = true;
                 }
-                right.push(HtmlUtil.onClick(this.getGet()+".loadLess();", HtmlUtil.image(root +"/icons/minus-small-white.png","View less"["border","0"]),["class","display-link"]));
+                right.push(HtmlUtil.onClick(this.getGet()+".loadLess();", HtmlUtil.image(ramaddaBaseUrl +"/icons/minus-small-white.png","View less"["border","0"]),["class","display-link"]));
                 if(addMore) {
-                    right.push(HtmlUtil.onClick(this.getGet()+".loadMore();", HtmlUtil.image(root +"/icons/plus-small-white.png","View more"["border","0"]),["class","display-link"]));
+                    right.push(HtmlUtil.onClick(this.getGet()+".loadMore();", HtmlUtil.image(ramaddaBaseUrl +"/icons/plus-small-white.png","View more"["border","0"]),["class","display-link"]));
                 }
                 var results = "";
                 if(right.length>0)
@@ -394,7 +419,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 for(var i =0;i<metadata.length;i++) {
                     var count = metadata[i].count;
                     var value = metadata[i].value;
-                    var optionAttrs  = ["value",value,"class", "display-metadata-item"];
+                    var optionAttrs  = ["value",value,"class", "display-metadatalist-item"];
                     var selected =  false;
                     if(selected) {
                         optionAttrs.push("selected");
@@ -604,24 +629,6 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 }
             },
 
-            showEntryPopup: function(event, entryId) {
-                var entry = this.entryList.getEntry(entryId);
-                var popupId = "#"+ this.getDomId(ID_DETAILS);
-                if(this.currentPopupEntry ==  entry) {
-                    this.hideEntryPopup();
-                    return;
-                }
-                this.currentPopupEntry = entry;
-                var src =  this.getDomId("entry_" + entry.getId());
-                $(popupId).html(this.getEntryHtml(entry));
-                $(popupId).show();
-                $(popupId).position({
-                        of: jQuery( "#" +src),
-                            my: 'right top',
-                            at: 'right bottom',
-                            collision: "none none"
-                            });
-            },
             entryListChanged: function(entryList) {
                 SUPER.entryListChanged.apply(this,[entryList]);
                 var rowClass = "entryrow_" + this.getId()
@@ -744,27 +751,30 @@ function RamaddaMetadataDisplay(displayManager, id, properties) {
             },
             entryListChanged: function(entryList) {
                 this.entryList = entryList;
-                var rowClass = "entryrow_" + this.getId()
                 var entries = this.entryList.getEntries();
-                var html = "";
                 if(entries.length==0) {
                     this.writeHtml(ID_ENTRIES, "Nothing found");
                     this.writeHtml(ID_RESULTS, "&nbsp;");
                     return;
                 }
+                var mdtsFromEntries = [];
                 var mdtmap = {};
+                var tmp = {};
                 for(var i=0;i<entries.length;i++) {
                     var entry = entries[i];
                     var metadata = entry.getMetadata();
                     for(var j=0;j<metadata.length;j++) {
+                        var m = metadata[j];
+                        if(tmp[m.type] == null) {
+                            tmp[m.type] = "";
+                            mdtsFromEntries.push(m.type);
+                        }
                         mdtmap[metadata[j].type] =metadata[j].label;
                     }
                 }
 
-
                 var html = "<br>";
                 html += HtmlUtil.openTag("table",["class","display-metadata-table","width","100%","cellpadding", "5","cellspacing","0"]);
-                var header = [];
                 var type = this.findEntryType(this.searchSettings.entryType);
                 var typeName = "Entry";
                 if(type!=null) {
@@ -772,21 +782,39 @@ function RamaddaMetadataDisplay(displayManager, id, properties) {
                 }
                 this.writeHtml(ID_RESULTS, this.getResultsHeader(entries));
 
-                header.push(HtmlUtil.th(["class", "display-metadata-table-cell"],HtmlUtil.b(typeName)));
-                var mdts =  (this.getProperty("metadataTypes","project_pi,project_person,project_funding")).split(",");
+
+
+                var mdts =  null;
+                //Get the metadata types to show from either a property or
+                //gather them from all of the entries
+                // e.g., "project_pi,project_person,project_funding"
+                var prop = this.getProperty("metadataTypes",null);
+                if(prop!=null) {
+                    mdts = prop.split(",");
+                } else {
+                    mdts = mdtsFromEntries;
+                    mdts.sort();
+                }
+
+                var headerItems = [];
+                headerItems.push(HtmlUtil.th(["class", "display-metadata-table-cell"],HtmlUtil.b(typeName)));
                 for(var i=0;i<mdts.length;i++) {
                     var label = mdtmap[mdts[i]];
                     if(label == null) label = mdts[i];
-                    header.push(HtmlUtil.th(["class", "display-metadata-table-cell"], HtmlUtil.b(label)));
+                    headerItems.push(HtmlUtil.th(["class", "display-metadata-table-cell"], HtmlUtil.b(label)));
                 }
-                html += HtmlUtil.tr([],HtmlUtil.join(header,""));
+                var headerRow = HtmlUtil.tr(["valign", "bottom"],HtmlUtil.join(headerItems,""));
+                html += headerRow;
+                var divider = "<div class=display-metadata-divider></div>";
                 var missing = this.missingMessage;
                 if(missing = null) missing = "&nbsp;";
-                for(var i=0;i<entries.length;i++) {
-                    var entry = entries[i];
+                for(var entryIdx=0;entryIdx<entries.length;entryIdx++) {
+                    var entry = entries[entryIdx];
                     var metadata = entry.getMetadata();
                     var row = [];
-                    var link =  entry.getLink(entry.getIconImage() +" " + entry.getName());
+                    var buttonId = this.getDomId("entrylink" + entry.getId());
+                    var link =  HtmlUtil.onClick(this.getGet()+".showEntryPopup(event, '" + entry.getId() +"','" + buttonId +"',true);", 
+                                                 entry.getIconImage() +" " + entry.getName(),["id",buttonId,"class","display-metadata-link"]);
                     row.push(HtmlUtil.td(["class", "display-metadata-table-cell"],HtmlUtil.div(["class","display-metadata-entrylink"], link)));
                     for(var mdtIdx=0;mdtIdx<mdts.length;mdtIdx++) {
                         var mdt = mdts[mdtIdx];
@@ -797,12 +825,22 @@ function RamaddaMetadataDisplay(displayManager, id, properties) {
                                 if(cell==null) {
                                     cell = "";
                                 } else {
-                                    cell += "<br>";
+                                    cell += divider;
                                 }
-                                cell += m.attr1;
-                                if(m.attr1 && m.attr1.trim().length>0) {
-                                    cell += " - " + m.attr2;
+                                var item = null;
+                                if(m.type == "content.thumbnail") {
+                                    var url =ramaddaBaseUrl +"/metadata/view/" + m.attr1 +"?element=1&entryid=" + entry.getId() +"&metadata.id=" + m.id;
+                                    item =  HtmlUtil.image(url,[]);
+                                } else {
+                                    item = m.attr1;
+                                    if(m.attr2 && m.attr2.trim().length>0) {
+                                        item += " - " + m.attr2;
+                                    }
                                 }
+                                if(item!=null) {
+                                    cell += HtmlUtil.div(["class", "display-metadata-item"], item);
+                                }
+                                
                             }
                         }
                         if(cell ==null) {
@@ -811,13 +849,16 @@ function RamaddaMetadataDisplay(displayManager, id, properties) {
                         if(cell ==null) {
                             cell = "";
                         }
-                        var add = HtmlUtil.tag("a", ["style","color:#000;", "href", root + "/metadata/addform?entryid=" + entry.getId() +"&metadata.type=" + mdt,
-                                                     "target","_blank"],"+");
-
-
-                        row.push(HtmlUtil.td(["class", "display-metadata-table-cell"],HtmlUtil.leftRight(cell, add)));
+                        var add = HtmlUtil.tag("a", ["style","color:#000;", "href", ramaddaBaseUrl + "/metadata/addform?entryid=" + entry.getId() +"&metadata.type=" + mdt,
+                                                     "target","_blank","alt","Add metadata","title","Add metadata"],"+");
+                        var cellContents = add;
+                        if(cell.length>0) 
+                            cellContents = cell+divider + add;
+                        row.push(HtmlUtil.td(["class", "display-metadata-table-cell"],cellContents));
                     }
                     html += HtmlUtil.tr(["valign", "top"],HtmlUtil.join(row,""));
+                    //Add in the header every 10 rows
+                    if(((entryIdx+1) %10) == 0) html += headerRow;
                 }
                 html += HtmlUtil.closeTag("table");
                 this.jq(ID_ENTRIES).html(html);
@@ -1061,9 +1102,9 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
                 }
                 var pointDataList = [];
 
-                pointDataList.push(new PointData(entry1.getName(), null, null, root +"/entry/show?&output=points.product&product=points.json&numpoints=1000&entryid=" +entry1.getId()));
+                pointDataList.push(new PointData(entry1.getName(), null, null, ramaddaBaseUrl +"/entry/show?&output=points.product&product=points.json&numpoints=1000&entryid=" +entry1.getId()));
                 if(entry2!=null) {
-                    pointDataList.push(new PointData(entry2.getName(), null, null, root +"/entry/show?&output=points.product&product=points.json&numpoints=1000&entryid=" +entry2.getId()));
+                    pointDataList.push(new PointData(entry2.getName(), null, null, ramaddaBaseUrl +"/entry/show?&output=points.product&product=points.json&numpoints=1000&entryid=" +entry2.getId()));
                 }
 
                 //Make up some functions

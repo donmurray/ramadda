@@ -2,13 +2,6 @@
 Copyright 2008-2014 Geode Systems LLC
 */
 
-//There are the DOM IDs for various components of the UI
-var ID_DISPLAYS = "displays";
-var ID_MENU_BUTTON = "menu_button";
-var ID_MENU_OUTER =  "menu_outer";
-var ID_MENU_INNER =  "menu_inner";
-
-
 
 //Properties
 var PROP_LAYOUT_TYPE = "layoutType";
@@ -69,18 +62,22 @@ function getDisplayManager(id) {
 
 
 
+var ID_DISPLAYS = "displays";
 
 //
 //DisplayManager constructor
 //
 
 function DisplayManager(argId,argProperties) {
+    var ID_MENU_BUTTON = "menu_button";
+    var ID_MENU_OUTER =  "menu_outer";
+    var ID_MENU_INNER =  "menu_inner";
+
     RamaddaUtil.inherit(this, new DisplayThing(argId, argProperties));
-    RamaddaUtil.defineMembers(this, {
+
+    RamaddaUtil.initMembers(this, {
                 dataList : [],
                 displayTypes: [],
-                group: new DisplayGroup(this, argId,argProperties),
-                showmap : this.getProperty(PROP_SHOW_MAP,null),
                 initMapBounds : null,
                 });
 
@@ -91,6 +88,8 @@ function DisplayManager(argId,argProperties) {
     }
 
    RamaddaUtil.defineMembers(this, {
+           group: new DisplayGroup(this, argId,argProperties),
+           showmap : this.getProperty(PROP_SHOW_MAP,null),
            addDisplayType: function(type,label) {
                this.displayTypes.push({type:label});
            },

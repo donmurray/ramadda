@@ -192,7 +192,7 @@ public class FormInfo {
          * @param js _more_
          */
         public void addJavascriptValidation(StringBuffer js) {
-            js.append("if(!inputValueOk(" + HtmlUtils.squote(id) + ","
+            js.append("if(!GuiUtils.inputValueOk(" + HtmlUtils.squote(id) + ","
                       + value + "," + (min
                                        ? "true"
                                        : "false") + ")) {\n");
@@ -241,7 +241,7 @@ public class FormInfo {
          * @param js _more_
          */
         public void addJavascriptValidation(StringBuffer js) {
-            js.append("if(!inputLengthOk(" + HtmlUtils.squote(id) + ","
+            js.append("if(!GuiUtils.inputLengthOk(" + HtmlUtils.squote(id) + ","
                       + length + ")) {\n");
             String message = "Error: " + label
                              + " is too long. Max length is " + length;
