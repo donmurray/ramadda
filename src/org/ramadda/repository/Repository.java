@@ -550,6 +550,16 @@ public class Repository extends RepositoryBase implements RequestHandler,
         return getProperty(PROP_USE_FIXED_HOSTNAME, false);
     }
 
+    /**
+     *  Are cross origin requests OK
+     *  Right now we only use this for JSON
+     *
+     * @return _more_
+     */
+    public boolean isCORSOk() {
+        return getProperty(PROP_CORS_OK, false);
+    }
+
 
     /**
      * _more_

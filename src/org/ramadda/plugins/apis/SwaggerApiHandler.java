@@ -86,10 +86,7 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
             throws Exception {
         //        request.setResultFilename("ramaddaswagger.json");
         Result result = new Result("", json, Json.MIMETYPE);
-        result.addHttpHeader("Access-Control-Allow-Methods",
-                             "POST, GET, OPTIONS , PUT");
-        result.addHttpHeader("Access-Control-Allow-Origin", "*");
-
+        request.setCORSHeaderOnResponse();
         return result;
     }
 

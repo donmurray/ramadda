@@ -1335,6 +1335,7 @@ public class Request implements Constants, Cloneable {
                 return false;
             }
         }
+
         return true;
     }
 
@@ -1508,6 +1509,20 @@ public class Request implements Constants, Cloneable {
         return v;
         //        return repository.getDatabaseManager().escapeString(v);
     }
+
+
+
+    /**
+     * _more_
+     */
+    public void setCORSHeaderOnResponse() {
+        if (repository.isCORSOk()) {
+            httpServletResponse.setHeader("Access-Control-Allow-Methods",
+                                          "POST, GET, OPTIONS , PUT");
+            httpServletResponse.setHeader("Access-Control-Allow-Origin", "*");
+        }
+    }
+
 
 
     /**
@@ -1744,6 +1759,7 @@ public class Request implements Constants, Cloneable {
             //TODO: iterate through the handlers
             if (accept.equals("application/json")) {
                 put(ARG_OUTPUT, "json");
+
                 return true;
             }
         }

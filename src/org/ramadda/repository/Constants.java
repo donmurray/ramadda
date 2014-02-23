@@ -300,7 +300,7 @@ public interface Constants {
     /** _more_ */
     public static final String ICON_SEARCH = "ramadda.icon.search";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_SEARCH_SMALL =
         "ramadda.icon.search.small";
 
@@ -1728,6 +1728,9 @@ public interface Constants {
     public static final String PROP_USE_FIXED_HOSTNAME =
         "ramadda.usefixedhostname";
 
+    /** _more_          */
+    public static final String PROP_CORS_OK = "ramadda.cors.ok";
+
 
     /** _more_ */
     public static final String PROP_RATINGS_ENABLE = "ramadda.ratings.enable";
@@ -1921,7 +1924,7 @@ public interface Constants {
     /** _more_ */
     public static final String RESPONSE_TEXT = "text";
 
-    /** _more_          */
+    /** _more_ */
     public static final String RESPONSE_JSON = "json";
 
     /** _more_ */

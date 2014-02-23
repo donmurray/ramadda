@@ -154,6 +154,9 @@ public class JsonOutputHandler extends OutputHandler {
 
         if (group.isDummy()) {
             request.setReturnFilename("Search_Results.json");
+        } else {
+            request.setReturnFilename(IOUtil.stripExtension(group.getName())
+                                      + ".json");
         }
         List<Entry> allEntries = new ArrayList<Entry>();
         if (request.get(ARG_ONLYENTRY, false)) {
@@ -164,8 +167,9 @@ public class JsonOutputHandler extends OutputHandler {
         }
         StringBuffer sb = new StringBuffer();
         makeJson(request, allEntries, sb);
+        request.setCORSHeaderOnResponse();
 
-        return new Result("", sb, "application/json");
+        return new Result("", sb, Json.MIMETYPE);
     }
 
 
@@ -216,7 +220,6 @@ public class JsonOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param entry _more_
-     * @param sb _more_
      *
      *
      * @return _more_

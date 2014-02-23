@@ -781,25 +781,23 @@ public class PointOutputHandler extends RecordOutputHandler {
         if (outputType.equals(OUTPUT_FORM)) {
             return getPointFormHandler().outputEntryForm(request, entry);
         }
-
+        boolean asynchronous  = request.get(ARG_ASYNCH, false);
         boolean doingPublish = request.defined(ARG_PUBLISH_ENTRY + "_hidden");
         List<PointEntry> pointEntries = new ArrayList<PointEntry>();
         pointEntries.add((PointEntry) doMakeEntry(request, entry));
-        if ( !doingPublish && !request.get(ARG_ASYNCH, false)) {
+        if ( !doingPublish && !asynchronous) {
             Result result = processEntries(request, entry, false,
                                            pointEntries, null);
-            if (result == null) {
-                StringBuffer sb = new StringBuffer();
-                if ( !outputType.equals(OUTPUT_FORM)) {
-                    sb.append(
-                        getPageHandler().showDialogError(
-                            "Unknown output type:" + outputType));
-                }
-
-                return getPointFormHandler().outputEntryForm(request, entry);
+            if (result != null) {
+                return result;
             }
-
-            return result;
+            StringBuffer sb = new StringBuffer();
+            if ( !outputType.equals(OUTPUT_FORM)) {
+                sb.append(
+                          getPageHandler().showDialogError(
+                                                           "Unknown output type:" + outputType));
+            }
+            return getPointFormHandler().outputEntryForm(request, entry);
         }
 
         return getRecordJobManager().handleAsynchRequest(request, entry,
@@ -957,8 +955,8 @@ public class PointOutputHandler extends RecordOutputHandler {
             PointEntry.toPointEntryList(doSubsetEntries(request,
                 makeRecordEntries(request, entries, true)));
 
-        boolean asynch = request.get(ARG_ASYNCH, false);
-        if ( !doingPointCount && (pointEntries.size() == 0) && asynch) {
+        boolean asynchronous = request.get(ARG_ASYNCH, false);
+        if ( !doingPointCount && (pointEntries.size() == 0) && asynchronous) {
             return makeRequestErrorResult(
                 request, "No entries found that matched the criteria");
         }
@@ -1001,7 +999,7 @@ public class PointOutputHandler extends RecordOutputHandler {
         boolean doingPublish = doingPublish(request);
 
         //If its synchronous
-        if ( !doingPublish && !asynch) {
+        if ( !doingPublish && !asynchronous) {
             Result result = processEntries(request, group, false,
                                            pointEntries, null);
             if (result != null) {
@@ -1052,6 +1050,7 @@ public class PointOutputHandler extends RecordOutputHandler {
                                  List<RecordVisitor> visitors)
             throws Exception {
 
+
         Result result = null;
         //Make a RecordVisitor for each point product type
         if (formats.contains(OUTPUT_CSV.getId())) {
@@ -1059,6 +1058,12 @@ public class PointOutputHandler extends RecordOutputHandler {
                                         jobInfo.getJobId()));
         }
         if (formats.contains(OUTPUT_JSON.getId())) {
+            if(!asynch) {
+                String tail = IOUtil.stripExtension(entry.getName());
+                request.setReturnFilename(tail +".json");
+                request.getHttpServletResponse().setContentType(Json.MIMETYPE);
+                request.setCORSHeaderOnResponse();
+            }
             visitors.add(makeJsonVisitor(request, entry, pointEntries,
                                          jobInfo.getJobId()));
         }
