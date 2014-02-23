@@ -214,7 +214,16 @@ var GuiUtils = {
 
 };
 
+var TAG_B = "b";
+var TAG_DIV = "div";
+var TAG_LI = "li";
+var TAG_TABLE = "table";
+var TAG_TR = "tr";
+var TAG_TD = "td";
+var TAG_UL= "ul";
 
+var ATTR_ID = "id";
+var ATTR_CLASS = "class";
 
 var HtmlUtil =  {
     join : function (items,separator) {

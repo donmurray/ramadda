@@ -7,7 +7,7 @@ It requires displaymanager.js pointdata.js
 
 var DISPLAY_LINECHART = "linechart";
 var DISPLAY_BARCHART = "barchart";
-var DISPLAY_TABLE = "table";
+var DISPLAY_TABLE = TAG_TABLE;
 var DISPLAY_TEXT = "text";
 
 
@@ -73,7 +73,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
             },
             getDialogContents: function() {
                 var height = this.getProperty(PROP_HEIGHT,"400");
-                var html  =  HtmlUtil.div(["id",  this.getDomId(ID_FIELDS),"style","overflow-y: auto;    max-height:" + height +"px;"],"FIELDS");
+                var html  =  HtmlUtil.div([ATTR_ID,  this.getDomId(ID_FIELDS),"style","overflow-y: auto;    max-height:" + height +"px;"],"FIELDS");
                 html +=  SUPER.getDialogContents.apply(this);
                 return html;
             },
@@ -90,7 +90,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 }
                 if(!this.hasData()) {
                     this.clearChart();
-                    this.setContents(HtmlUtil.div(["class","display-message"],
+                    this.setContents(HtmlUtil.div([ATTR_CLASS,"display-message"],
                                                   this.getLoadingMessage()));
                     return;
                 }
@@ -104,7 +104,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 }
                 var dataList = this.getStandardData(selectedFields);
                 if(dataList.length==0) {
-                    this.setContents(HtmlUtil.div(["class","display-message"],
+                    this.setContents(HtmlUtil.div([ATTR_CLASS,"display-message"],
                                                   "No data available"));
                     return;
                 }
@@ -155,7 +155,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                     chartArea:{left:75,top:10,height:"60%",width:width}
                  });
                 var chartId = this.getDomId(ID_CHART);
-                this.setContents(HtmlUtil.div(["id", chartId],""));
+                this.setContents(HtmlUtil.div([ATTR_ID, chartId],""));
 
                 if(chartType == DISPLAY_BARCHART) {
                     chartOptions.orientation =  "horizontal";

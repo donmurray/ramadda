@@ -20,25 +20,25 @@ function AreaWidget(display) {
             getHtml: function() {
                 var callback = this.display.getGet();
                 //hack, hack
-                var link = HtmlUtil.onClick(callback+".areaWidget.areaLinkClick();", HtmlUtil.image(root +"/icons/link_break.png",["title","Set bounds from map", "class", "display-area-link", "border","0","id", this.display.getDomId(ID_AREA_LINK)]));
-                var erase = HtmlUtil.onClick(callback+".areaForm.areaClear();", HtmlUtil.image(root +"/icons/eraser.png",["title","Clear form", "class", "display-area-link", "border","0"]));
-                var areaForm = HtmlUtil.openTag("table",["class","display-area", "border","0","cellpadding","0","cellspacing","0"]);
+                var link = HtmlUtil.onClick(callback+".areaWidget.areaLinkClick();", HtmlUtil.image(root +"/icons/link_break.png",["title","Set bounds from map", ATTR_CLASS, "display-area-link", "border","0",ATTR_ID, this.display.getDomId(ID_AREA_LINK)]));
+                var erase = HtmlUtil.onClick(callback+".areaForm.areaClear();", HtmlUtil.image(root +"/icons/eraser.png",["title","Clear form", ATTR_CLASS, "display-area-link", "border","0"]));
+                var areaForm = HtmlUtil.openTag(TAG_TABLE,[ATTR_CLASS,"display-area", "border","0","cellpadding","0","cellspacing","0"]);
                 areaForm += HtmlUtil.tr([],
                                         HtmlUtil.td(["align","center"],
                                                     HtmlUtil.leftCenterRight(erase, 
-                                                                             HtmlUtil.input(ID_NORTH,"",["placeholder","N","class","input display-area-input", "size", "5","id", 
+                                                                             HtmlUtil.input(ID_NORTH,"",["placeholder","N",ATTR_CLASS,"input display-area-input", "size", "5",ATTR_ID, 
                                                                                                          this.display.getDomId(ID_NORTH),  "title","North"]), link,"20%","60%","20%")));
 
                 areaForm += HtmlUtil.tr([],HtmlUtil.td([],
-                                                       HtmlUtil.input(ID_WEST,"",["placeholder","W","class","input  display-area-input", "size", "5","id", 
+                                                       HtmlUtil.input(ID_WEST,"",["placeholder","W",ATTR_CLASS,"input  display-area-input", "size", "5",ATTR_ID, 
                                                                                   this.display.getDomId(ID_WEST),  "title","West"]) +
-                                                       HtmlUtil.input(ID_EAST,"",["placeholder","E","class","input  display-area-input", "size", "5","id", 
+                                                       HtmlUtil.input(ID_EAST,"",["placeholder","E",ATTR_CLASS,"input  display-area-input", "size", "5",ATTR_ID, 
                                                                                   this.display.getDomId(ID_EAST),  "title","East"])));
                 areaForm += HtmlUtil.tr([],HtmlUtil.td(["align","center"],
-                                                       HtmlUtil.input(ID_SOUTH,"",["placeholder","S","class","input  display-area-input", "size", "5","id", 
+                                                       HtmlUtil.input(ID_SOUTH,"",["placeholder","S",ATTR_CLASS,"input  display-area-input", "size", "5",ATTR_ID, 
                                                                                    this.display.getDomId(ID_SOUTH),  "title","South"])));
 
-                areaForm += HtmlUtil.closeTag("table");
+                areaForm += HtmlUtil.closeTag(TAG_TABLE);
                 return areaForm;
                 //                return   HtmlUtil.hbox(areaForm, link, erase);
             },
@@ -98,9 +98,9 @@ function DateRangeWidget(display) {
                 settings.setDateRange(start, end);
             },
             getHtml: function() {
-                var html = HtmlUtil.input(ID_DATE_START,"",["placeholder","Start date", "id",
+                var html = HtmlUtil.input(ID_DATE_START,"",["placeholder","Start date", ATTR_ID,
                                                             display.getDomId(ID_DATE_START),"size","10"]) + " - " +
-                    HtmlUtil.input(ID_DATE_END,"",["placeholder","End date", "id",
+                    HtmlUtil.input(ID_DATE_END,"",["placeholder","End date", ATTR_ID,
                                                             display.getDomId(ID_DATE_END),"size","10"]);
                 return html;
             }

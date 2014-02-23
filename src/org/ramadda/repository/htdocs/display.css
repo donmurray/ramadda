@@ -271,7 +271,7 @@
 
 
 
-.display-entrylist-results {
+.display-entries-results {
    padding-left: 3px;
    padding-right: 3px;
    margin-bottom: 1px;
@@ -314,6 +314,15 @@
     max-width: 200px;
 }
 
+.display-metadata .display-entries-content   { 
+   min-width: 250px;
+   min-height: 200px;
+   overflow-y: auto;
+   max-height: 300px;
+//   margin: 4px;
+}
+
+
 .display-footer {
    padding: 4px;
    padding-top: 0px;
@@ -348,7 +357,7 @@
 }
 
 
-.display-entrylist-entries   { 
+.display-entrylist .display-entries-content   { 
    min-width: 250px;
    min-height: 200px;
    border:1px #ccc solid; 

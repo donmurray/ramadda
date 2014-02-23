@@ -190,15 +190,15 @@ function DisplayManager(argId,argProperties) {
                     HtmlUtil.tag("li",[], HtmlUtil.onClick(layout +".setLayout('tabs');", "Tabs"));
 
 
-                var menu = HtmlUtil.div(["class","ramadda-popup", "id", this.getDomId(ID_MENU_OUTER)], 
-                                        HtmlUtil.tag("ul", ["id", this.getDomId(ID_MENU_INNER),"class", "sf-menu"], 
+                var menu = HtmlUtil.div([ATTR_CLASS,"ramadda-popup", ATTR_ID, this.getDomId(ID_MENU_OUTER)], 
+                                        HtmlUtil.tag("ul", [ATTR_ID, this.getDomId(ID_MENU_INNER),ATTR_CLASS, "sf-menu"], 
                                                      HtmlUtil.tag("li",[],"<a>New</a>" + HtmlUtil.tag("ul",[], newMenu)) +
                                                      HtmlUtil.tag("li",[],"<a>Layout</a>" + HtmlUtil.tag("ul", [], layoutMenu))));
 
 
 
                 html += menu;
-                html += HtmlUtil.tag("a", ["class", "display-menu-button", "id", this.getDomId(ID_MENU_BUTTON)]);
+                html += HtmlUtil.tag("a", [ATTR_CLASS, "display-menu-button", ATTR_ID, this.getDomId(ID_MENU_BUTTON)]);
                 html+="<br>";
 
                 return html;
@@ -327,9 +327,9 @@ function DisplayManager(argId,argProperties) {
     addDisplayManager(this);
 
     var html = "";
-    html += HtmlUtil.openTag("div", ["class","display-container"]);
+    html += HtmlUtil.openTag(TAG_TABLE, [ATTR_CLASS,"display-container"]);
     html += this.makeMainMenu();
-    html +=  HtmlUtil.div(["id", this.getDomId(ID_DISPLAYS)]);
+    html +=  HtmlUtil.div([ATTR_ID, this.getDomId(ID_DISPLAYS)]);
     $("#"+ this.getId()).html(html)
     if(this.showmap) {
         this.createDisplay('map');
