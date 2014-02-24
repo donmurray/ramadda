@@ -20,23 +20,23 @@ function AreaWidget(display) {
             getHtml: function() {
                 var callback = this.display.getGet();
                 //hack, hack
-                var link = HtmlUtil.onClick(callback+".areaWidget.areaLinkClick();", HtmlUtil.image(root +"/icons/link_break.png",["title","Set bounds from map", ATTR_CLASS, "display-area-link", "border","0",ATTR_ID, this.display.getDomId(ID_AREA_LINK)]));
-                var erase = HtmlUtil.onClick(callback+".areaForm.areaClear();", HtmlUtil.image(root +"/icons/eraser.png",["title","Clear form", ATTR_CLASS, "display-area-link", "border","0"]));
+                var link = HtmlUtil.onClick(callback+".areaWidget.areaLinkClick();", HtmlUtil.image(root +"/icons/link_break.png",[ATTR_TITLE,"Set bounds from map", ATTR_CLASS, "display-area-link", "border","0",ATTR_ID, this.display.getDomId(ID_AREA_LINK)]));
+                var erase = HtmlUtil.onClick(callback+".areaForm.areaClear();", HtmlUtil.image(root +"/icons/eraser.png",[ATTR_TITLE,"Clear form", ATTR_CLASS, "display-area-link", "border","0"]));
                 var areaForm = HtmlUtil.openTag(TAG_TABLE,[ATTR_CLASS,"display-area", "border","0","cellpadding","0","cellspacing","0"]);
                 areaForm += HtmlUtil.tr([],
                                         HtmlUtil.td(["align","center"],
                                                     HtmlUtil.leftCenterRight(erase, 
                                                                              HtmlUtil.input(ID_NORTH,"",["placeholder","N",ATTR_CLASS,"input display-area-input", "size", "5",ATTR_ID, 
-                                                                                                         this.display.getDomId(ID_NORTH),  "title","North"]), link,"20%","60%","20%")));
+                                                                                                         this.display.getDomId(ID_NORTH),  ATTR_TITLE,"North"]), link,"20%","60%","20%")));
 
                 areaForm += HtmlUtil.tr([],HtmlUtil.td([],
                                                        HtmlUtil.input(ID_WEST,"",["placeholder","W",ATTR_CLASS,"input  display-area-input", "size", "5",ATTR_ID, 
-                                                                                  this.display.getDomId(ID_WEST),  "title","West"]) +
+                                                                                  this.display.getDomId(ID_WEST),  ATTR_TITLE,"West"]) +
                                                        HtmlUtil.input(ID_EAST,"",["placeholder","E",ATTR_CLASS,"input  display-area-input", "size", "5",ATTR_ID, 
-                                                                                  this.display.getDomId(ID_EAST),  "title","East"])));
+                                                                                  this.display.getDomId(ID_EAST),  ATTR_TITLE,"East"])));
                 areaForm += HtmlUtil.tr([],HtmlUtil.td(["align","center"],
                                                        HtmlUtil.input(ID_SOUTH,"",["placeholder","S",ATTR_CLASS,"input  display-area-input", "size", "5",ATTR_ID, 
-                                                                                   this.display.getDomId(ID_SOUTH),  "title","South"])));
+                                                                                   this.display.getDomId(ID_SOUTH),  ATTR_TITLE,"South"])));
 
                 areaForm += HtmlUtil.closeTag(TAG_TABLE);
                 return areaForm;

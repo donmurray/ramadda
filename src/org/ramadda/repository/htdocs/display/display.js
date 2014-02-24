@@ -5,7 +5,7 @@ Copyright 2008-2014 Geode Systems LLC
 //Ids of DOM components
 var ID_FIELDS = "fields";
 var ID_HEADER = "header";
-var ID_TITLE = "title";
+var ID_TITLE = ATTR_TITLE;
 var ID_DISPLAY_CONTENTS = "contents";
 var ID_DIALOG = "dialog";
 var ID_DIALOG_BUTTON = "dialog_button";
@@ -297,7 +297,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                         }  else if(this.selectedCbx.length==0) {
                             on = (i==0);
                         }
-                        html += HtmlUtil.tag(TAG_DIV, ["title", field.getId()],
+                        html += HtmlUtil.tag(TAG_DIV, [ATTR_TITLE, field.getId()],
                                              HtmlUtil.checkbox(field.checkboxId, checkboxClass,
                                                                on) +" " +field.getLabel()
                                              );
@@ -468,9 +468,9 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 var fileMenuItems = [];
                 var viewMenuItems = [];
                 var newMenuItems = [];
-                viewMenuItems.push(HtmlUtil.tag(TAG_LI,[], HtmlUtil.tag("a", ["href", entry.getEntryUrl(),"target","_"], "View Entry")));
+                viewMenuItems.push(HtmlUtil.tag(TAG_LI,[], HtmlUtil.tag(TAG_A, ["href", entry.getEntryUrl(),"target","_"], "View Entry")));
                 if(entry.getFilesize()>0) {
-                    fileMenuItems.push(HtmlUtil.tag(TAG_LI,[], HtmlUtil.tag("a", ["href", entry.getFileUrl()], "Download " + entry.getFilename() + " (" + entry.getFormattedFilesize() +")")));
+                    fileMenuItems.push(HtmlUtil.tag(TAG_LI,[], HtmlUtil.tag(TAG_A, ["href", entry.getFileUrl()], "Download " + entry.getFilename() + " (" + entry.getFormattedFilesize() +")")));
                 }
 
                 if(this.jsonUrl!=null) {
@@ -494,7 +494,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                         var type = this.getDisplayManager().displayTypes[i];
                         if(!type.requiresData) continue;
                         
-                        newMenu+= HtmlUtil.tag(TAG_LI,[], HtmlUtil.tag("a", ["onclick", get+".createDisplay('" + entry.getId() +"','" + type.type+"');"], type.label));
+                        newMenu+= HtmlUtil.tag(TAG_LI,[], HtmlUtil.tag(TAG_A, ["onclick", get+".createDisplay('" + entry.getId() +"','" + type.type+"');"], type.label));
                     }
                     menus.push("<a>New Chart</a>" + HtmlUtil.tag(TAG_UL,[], newMenu));
                 }
@@ -800,7 +800,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 if(this.hasEntries()) {
                     prefix = this.getEntryMenuButton(this.getEntries()[0])+" ";
                 }
-                var title = this.getProperty("title");
+                var title = this.getProperty(ATTR_TITLE);
                 if(title!=null) {
                     return prefix +title;
                 }

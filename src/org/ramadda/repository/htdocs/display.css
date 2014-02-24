@@ -255,19 +255,21 @@
 
 .display-entry-popup {
    display: none;
-   left:-10000px; 
-   z-index: 5000;
-   border : 1px #888 solid;
+//   left:-10000px; 
+//   z-index: 5000;
+   border-top : 1px #888 solid;
+   border-bottom : 1px #888 solid;
    padding: 5px;
    background-color : #fff;
-   position:absolute;   
-   min-width: 200px;
-   max-width: 400px;
+//   position:absolute;   
+//   min-width: 200px;
+//   max-width: 400px;
 }
 
 .display-entrylist {
 
 }
+
 
 
 
@@ -343,19 +345,51 @@
      background: #e0f0ff; 
 }
 
-.display-entrylist-list { list-style-type: none; margin: 0; padding: 0; }
+.display-entrylist-list { 
+        list-style-type: none; 
+        margin: 0; 
+        padding: 0; 
+}
 
 .display-entrylist-list li { 
       vertical-align: center;
-       padding-left:6px; 
+//       padding-left:6px; 
 //       border-bottom:1px #efefef solid; 
 }
 
-.display-entrylist-list li:hover { 
-     background: #f0f0f0; 
-//     border-bottom:1px #aaa solid; 
+.display-entrylist-entry-main {
+   padding: 5px;
 }
 
+.display-entrylist-entry {
+   margin: 0px;
+   border-bottom: 1px #ccc solid;
+   cursor:pointer;
+}
+
+
+.display-entrylist-entry-main:hover {
+   background-color: #f0f0f0; 
+}
+
+
+.display-entrylist-list li:hover { 
+     //background: #f0f0f0; 
+}
+
+
+.display-entrylist-details {
+   display: none;
+   border-top : 1px #888 solid;
+   border-bottom : 1px #888 solid;
+   padding: 5px;
+   background-color : #fff;
+}
+
+
+.ui-selected  .display-entrylist-details {
+   background-color : #fff;
+}
 
 .display-entrylist .display-entries-content   { 
    min-width: 250px;
@@ -363,7 +397,7 @@
    border:1px #ccc solid; 
    overflow-y: auto;
    max-height: 300px;
-   margin: 4px;
+//   margin: 4px;
 }
 
 .display-entry-toolbar {
@@ -388,21 +422,6 @@
    border: 1px #aaa solid;
 }
 
-.display-entrylist-entry {
-   padding: 5px;
-   margin: 0px;
-   border-bottom: 1px #ccc solid;
-   cursor:pointer;
-}
-
-
-.display-entrylist-entry:hover {
-   background-color: #efefef;
-}
-
-
-.display-entrylist-highlight {
-}
 
 
 .display-operands {

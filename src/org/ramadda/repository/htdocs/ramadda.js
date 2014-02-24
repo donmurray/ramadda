@@ -214,6 +214,7 @@ var GuiUtils = {
 
 };
 
+var TAG_A = "a";
 var TAG_B = "b";
 var TAG_DIV = "div";
 var TAG_LI = "li";
@@ -221,9 +222,13 @@ var TAG_TABLE = "table";
 var TAG_TR = "tr";
 var TAG_TD = "td";
 var TAG_UL= "ul";
+var TAG_OL= "ol";
 
+var ATTR_HREF = "href";
+var ATTR_TITLE = "title";
 var ATTR_ID = "id";
 var ATTR_CLASS = "class";
+var ATTR_STYLE = "style";
 
 var HtmlUtil =  {
     join : function (items,separator) {

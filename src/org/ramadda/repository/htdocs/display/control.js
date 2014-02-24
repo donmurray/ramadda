@@ -111,17 +111,17 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
 
                 var get = this.getGet();
                 var html =  "";
-                html+=  HtmlUtil.onClick(get +".setIndex(0);", HtmlUtil.image(this.iconBegin,["title","beginning", ATTR_CLASS, "display-animation-button", "xwidth","32"]));
+                html+=  HtmlUtil.onClick(get +".setIndex(0);", HtmlUtil.image(this.iconBegin,[ATTR_TITLE,"beginning", ATTR_CLASS, "display-animation-button", "xwidth","32"]));
                 html +="  ";
-                html+=  HtmlUtil.onClick(get +".deltaIndex(-1);", HtmlUtil.image(this.iconBack,["title","back 1", ATTR_CLASS, "display-animation-button", "xwidth","32"]));
+                html+=  HtmlUtil.onClick(get +".deltaIndex(-1);", HtmlUtil.image(this.iconBack,[ATTR_TITLE,"back 1", ATTR_CLASS, "display-animation-button", "xwidth","32"]));
                 html +="  ";
-                html+=  HtmlUtil.onClick(get +".toggle();", HtmlUtil.image(this.iconStart,["title","play/stop", ATTR_CLASS, "display-animation-button", "xwidth","32", ATTR_ID, this.getDomId(ID_START)]));
+                html+=  HtmlUtil.onClick(get +".toggle();", HtmlUtil.image(this.iconStart,[ATTR_TITLE,"play/stop", ATTR_CLASS, "display-animation-button", "xwidth","32", ATTR_ID, this.getDomId(ID_START)]));
                 html +="  ";
-                html+=  HtmlUtil.onClick(get +".deltaIndex(1);", HtmlUtil.image(this.iconForward,["title","forward 1", ATTR_CLASS, "display-animation-button", "xwidth","32"]));
+                html+=  HtmlUtil.onClick(get +".deltaIndex(1);", HtmlUtil.image(this.iconForward,[ATTR_TITLE,"forward 1", ATTR_CLASS, "display-animation-button", "xwidth","32"]));
                 html +="  ";
-                html+=  HtmlUtil.onClick(get +".faster();", HtmlUtil.image(this.iconFaster,[ATTR_CLASS, "display-animation-button", "title","faster", "xwidth","32"]));
+                html+=  HtmlUtil.onClick(get +".faster();", HtmlUtil.image(this.iconFaster,[ATTR_CLASS, "display-animation-button", ATTR_TITLE,"faster", "xwidth","32"]));
                 html +="  ";
-                html+=  HtmlUtil.onClick(get +".slower();", HtmlUtil.image(this.iconSlower,[ATTR_CLASS, "display-animation-button", "title","slower", "xwidth","32"]));
+                html+=  HtmlUtil.onClick(get +".slower();", HtmlUtil.image(this.iconSlower,[ATTR_CLASS, "display-animation-button", ATTR_TITLE,"slower", "xwidth","32"]));
                 html+=  HtmlUtil.div([ATTR_ID, this.getDomId(ID_TIME)],"&nbsp;");
                 this.setTitle("Animation");
                 this.setContents(html);
