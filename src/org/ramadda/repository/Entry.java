@@ -408,6 +408,7 @@ public class Entry implements Cloneable {
         if (Utils.stringDefined(template.getDescription())) {
             setDescription(template.getDescription());
         }
+        setTypeHandler(template.getTypeHandler());
 
         if (template.getMetadata() != null) {
             List<Metadata> thisMetadata = new ArrayList<Metadata>();

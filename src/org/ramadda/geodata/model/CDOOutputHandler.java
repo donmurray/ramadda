@@ -732,13 +732,15 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
         sb.append(
             HtmlUtils.formEntry(
                 msgLabel("Months"),
+                /*
                 HtmlUtils.radio(ARG_CDO_MONTHS, "all", true)+msg("All")+
                 HtmlUtils.space(2)+
                 HtmlUtils.radio(ARG_CDO_MONTHS, "", false)+msg("Season")+
                 HtmlUtils.space(2)+
+                */
                 msgLabel("Start")
                 + HtmlUtils.select(ARG_CDO_STARTMONTH, MONTHS)
-                + HtmlUtils.space(1) + msgLabel("End")
+                + HtmlUtils.space(2) + msgLabel("End")
                 + HtmlUtils.select(
                     ARG_CDO_ENDMONTH, MONTHS,
                     MONTHS.get(MONTHS.size() - 1).getId().toString())));
@@ -1086,6 +1088,10 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
                                       ? request.get(ARG_CDO_ENDMONTH,
                                           startMonth)
                                       : startMonth;
+            // if they requested all months, no need to do a select on month
+            if (startMonth == 1 && endMonth == 12) {
+            	return;
+            }
             StringBuffer buf = new StringBuffer(OP_SELMON + "," + startMonth);
             if (endMonth > startMonth) {
                 buf.append("/");

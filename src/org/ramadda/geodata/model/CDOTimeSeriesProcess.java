@@ -44,6 +44,8 @@ import ucar.unidata.util.IOUtil;
 import ucar.visad.data.CalendarDateTime;
 
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -278,7 +280,7 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
         getOutputHandler().addDateSelectCommands(request, oneOfThem,
                 commands, opNum);
 
-        //System.err.println("cmds:" + commands);
+        System.err.println("cmds:" + commands);
 
         commands.add(oneOfThem.getResource().getPath());
         commands.add(outFile.toString());
@@ -392,8 +394,10 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
         //System.out.println("Name: " + outputName.toString());
 
         Resource resource = new Resource(outFile, Resource.TYPE_LOCAL_FILE);
-        Entry outputEntry = new Entry(new TypeHandler(getRepository()), true);
+        TypeHandler myHandler = getRepository().getTypeHandler("type_single_point_grid_netcdf",false, true);
+        Entry outputEntry = new Entry(myHandler, true, outputName.toString());
         outputEntry.setResource(resource);
+        getOutputHandler().getEntryManager().writeEntryXmlFile(request, outputEntry);
 
         //return new DataProcessOperand(outputEntry.getName(), outputEntry);
         return new DataProcessOperand(outputName.toString(), outputEntry);

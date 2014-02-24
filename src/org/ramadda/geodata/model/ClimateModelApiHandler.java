@@ -207,7 +207,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         String template =
             getStorageManager().readSystemResource(
-                "/org/ramadda/geodata/model/resources/template.xml");
+                "/org/ramadda/geodata/model/resources/plot_template.xml");
         template = template.replace("${name}",
                                     "Climate model comparison output");
         StringBuffer dpiDesc = new StringBuffer();
@@ -325,7 +325,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         String template =
             getStorageManager().readSystemResource(
-                "/org/ramadda/geodata/model/resources/template.xml");
+                "/org/ramadda/geodata/model/resources/ts_template.xml");
         template = template.replace("${name}",
                                     "Climate model comparison output");
         StringBuffer dpiDesc = new StringBuffer();

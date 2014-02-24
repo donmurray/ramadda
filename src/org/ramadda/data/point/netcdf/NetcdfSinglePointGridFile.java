@@ -31,6 +31,7 @@ import org.ramadda.util.Utils;
 import ucar.ma2.DataType;
 
 import ucar.nc2.VariableSimpleIF;
+import ucar.nc2.dataset.CoordinateAxis1D;
 import ucar.nc2.dt.GridCoordSystem;
 import ucar.nc2.dt.GridDatatype;
 import ucar.nc2.dt.grid.GridDataset;
@@ -187,6 +188,12 @@ public class NetcdfSinglePointGridFile extends PointFile {
                 && (sample.getYDimension().getLength() != 1)) {
             throw new Exception("Not a single point grid");
         }
+        GridCoordSystem  gcs       = sample.getCoordinateSystem();
+        CoordinateAxis1D lons      = (CoordinateAxis1D) gcs.getXHorizAxis();
+        double lon = lons.getCoordValue(0);
+        CoordinateAxis1D lats = (CoordinateAxis1D) gcs.getYHorizAxis();
+        double lat          = lats.getCoordValue(0);
+        setLocation(lat, lon, 0);
 
         return gds;
     }
