@@ -1108,7 +1108,7 @@ public class UserManager extends RepositoryManager {
             sb.append(formEntry(request, msgLabel("Name"),
                                 HtmlUtils.input(ARG_USER_NAME,
                                     user.getName(), HtmlUtils.SIZE_40)));
-            sb.append(formEntry(request, msgLabel("Desription"),
+            sb.append(formEntry(request, msgLabel("Description"),
                                 HtmlUtils.textArea(ARG_USER_DESCRIPTION,
                                     user.getDescription(), 5, 20)));
         }
@@ -1435,7 +1435,7 @@ public class UserManager extends RepositoryManager {
                                 HtmlUtils.input(ARG_USER_NAME, name,
                                     HtmlUtils.SIZE_40)));
 
-        formSB.append(formEntry(request, msgLabel("Desription"),
+        formSB.append(formEntry(request, msgLabel("Description"),
                                 HtmlUtils.textArea(ARG_USER_DESCRIPTION,
                                     desc, 5, 20)));
 
