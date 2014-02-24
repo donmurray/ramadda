@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -52,6 +52,9 @@ public class OpendapApiHandler extends RepositoryManager implements RequestHandl
 
     /** the output handler to pass opendap calls to */
     private CdmDataOutputHandler dataOutputHandler;
+
+    /** _more_          */
+    private GridPointOutputHandler gridPointOutputHandler;
 
     /** _more_ */
     private static boolean useApi = true;
@@ -162,6 +165,24 @@ public class OpendapApiHandler extends RepositoryManager implements RequestHandl
     }
 
     /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private GridPointOutputHandler getGridPointOutputHandler()
+            throws Exception {
+        if (gridPointOutputHandler == null) {
+            gridPointOutputHandler =
+                (GridPointOutputHandler) getRepository().getOutputHandler(
+                    GridPointOutputHandler.class);
+        }
+
+        return gridPointOutputHandler;
+    }
+
+    /**
      * handle the request
      *
      * @param request request
@@ -171,8 +192,10 @@ public class OpendapApiHandler extends RepositoryManager implements RequestHandl
      * @throws Exception on badness
      */
     public Result processOpendapRequest(Request request) throws Exception {
-        String  prefix   = getRepository().getUrlBase() + "/" + PATH_OPENDAP;
-        Entry entry = getDataOutputHandler().getCdmManager().findEntryFromPath(request, prefix);
+        String prefix = getRepository().getUrlBase() + "/" + PATH_OPENDAP;
+        Entry entry =
+            getDataOutputHandler().getCdmManager().findEntryFromPath(request,
+                prefix);
 
         return getDataOutputHandler().outputOpendap(request, entry);
     }
@@ -180,8 +203,17 @@ public class OpendapApiHandler extends RepositoryManager implements RequestHandl
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processJsonRequest(Request request) throws Exception {
-        return getDataOutputHandler().processJsonRequest(request);
+        return getGridPointOutputHandler().processJsonRequest(request);
     }
 
 }

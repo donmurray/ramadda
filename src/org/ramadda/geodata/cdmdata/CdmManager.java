@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -222,9 +222,10 @@ public class CdmManager extends RepositoryManager {
         ucar.nc2.util.DiskCache.setCachePolicy(true);
         //        ucar.nc2.iosp.grib.GribServiceProvider.setIndexAlwaysInCache(true);
         ucar.nc2.iosp.grid.GridServiceProvider.setIndexAlwaysInCache(true);
-        
+
         // for ncj 4.3
-        DiskCache2 dc = new DiskCache2(nj22Dir.getDir().toString(), false, -1, -1);
+        DiskCache2 dc = new DiskCache2(nj22Dir.getDir().toString(), false,
+                                       -1, -1);
         dc.setAlwaysUseCache(true);
         ucar.nc2.grib.GribCollection.setDiskCache2(dc);
 
@@ -1480,7 +1481,18 @@ public class CdmManager extends RepositoryManager {
         }
     }
 
-    public Entry findEntryFromPath(Request request, String prefix) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param prefix _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Entry findEntryFromPath(Request request, String prefix)
+            throws Exception {
         String  path     = request.getRequestPath();
         boolean doLatest = false;
         path = path.substring(prefix.length());
@@ -1518,9 +1530,9 @@ public class CdmManager extends RepositoryManager {
             entries = getEntryUtil().sortEntriesOnDate(entries, true);
             Entry theEntry = null;
             for (Entry child : entries) {
-                if (canLoadAsCdm(
-                        child)) {
+                if (canLoadAsCdm(child)) {
                     theEntry = child;
+
                     break;
                 }
             }
@@ -1531,6 +1543,7 @@ public class CdmManager extends RepositoryManager {
             entry = theEntry;
             System.err.println("OPENDAP: using latest:" + entry.getName());
         }
+
         return entry;
     }
 

@@ -847,10 +847,10 @@ public class CdmDataOutputHandler extends OutputHandler {
                 jsonUrl = jsonUrl.replace("_LATITUDEMACRO_", "${latitude}");
                 jsonUrl = jsonUrl.replace("_LONGITUDEMACRO_", "${longitude}");
 
-                Hashtable  props = new Hashtable();
+                Hashtable props = new Hashtable();
                 props.put("mapenabled", "true");
-                getWikiManager().getEntryDisplay(request, entry, title, jsonUrl, html,
-                        props);
+                getWikiManager().getEntryDisplay(request, entry, title,
+                        jsonUrl, html, props);
 
                 return new Result("Point As Grid Time Series", html);
             }
