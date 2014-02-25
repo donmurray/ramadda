@@ -1524,9 +1524,10 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
         }
         //Add the GridPoint service
         if (getCdmManager().canLoadAsGrid(entry)) {
-            String url = getRepository().getUrlBase() + "/grid/json?" + HtmlUtils.attrs(ARG_ENTRYID , entry.getId(),
-                                                                                       ARG_LOCATION_LATITUDE,  "${latitude}",
-                                                                                       ARG_LOCATION_LONGITUDE, "${longitude}");
+            String url = getRepository().getUrlBase() + "/grid/json?" + HtmlUtils.args(new String[]{ARG_ENTRYID , entry.getId(),
+                                                                                                    ARG_LOCATION_LATITUDE,  "${latitude}",
+                                                                                                    ARG_LOCATION_LONGITUDE, "${longitude}"}, false);
+
             services.add(new Service("grid.point.json", "Point time series - " + entry.getName(),
                                      request.getAbsoluteUrl(url), iconUrl("/icons/chart.png")));
             

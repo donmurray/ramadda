@@ -90,15 +90,15 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             mapBoundsChanged: function() {
                 var bounds = this.map.map.calculateBounds();
                 bounds =  bounds.transform(this.map.sourceProjection, this.map.displayProjection);
-                this.displayManager.handleEventMapBoundsChanged(this, bounds);
+                this.getDisplayManager().handleEventMapBoundsChanged(this, bounds);
             },
             addFeature: function(feature) {
                 this.features.push(feature);
                 feature.line = this.map.addPolygon("lines_" + feature.source.getId(), RecordUtil.clonePoints(feature.points), null);
             },
             loadInitialData: function() {
-                if(this.displayManager.getData().length>0) {
-                    this.handleEventPointDataLoaded(this, this.displayManager.getData()[0]);
+                if(this.getDisplayManager().getData().length>0) {
+                    this.handleEventPointDataLoaded(this, this.getDisplayManager().getData()[0]);
                 }
             },
 
@@ -107,7 +107,7 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             },
 
             handleClick: function (theMap, lon,lat) {
-                this.displayManager.handleEventMapClick(this, lon, lat);
+                this.getDisplayManager().handleEventMapClick(this, lon, lat);
             },
 
             getPosition:function() {

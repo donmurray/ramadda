@@ -242,6 +242,9 @@ var HtmlUtil =  {
     qt : function (value) {
         return "\"" + value +"\"";
     },
+    sqt : function (value) {
+        return "\'" + value +"\'";
+    },
     hbox : function() {
         var row = HtmlUtil.openTag("tr",["valign","top"]);
         row += "<td>";

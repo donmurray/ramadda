@@ -1513,7 +1513,10 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                 
                 jsonUrl = poh.getJsonUrl(request, entry);
             } else {
-                jsonUrl = getRepository().getUrlBase() +"/grid/json?" + ARG_ENTRYID +"=" + entry.getId();
+                jsonUrl = getRepository().getUrlBase() + "/grid/json?" + HtmlUtils.args(new String[]{ARG_ENTRYID , entry.getId(),
+                                                                                        ARG_LOCATION_LATITUDE,  "${latitude}",
+                                                                                                     ARG_LOCATION_LONGITUDE, "${longitude}"}, false);
+
             }
             getEntryDisplay(request, entry, entry.getName(), jsonUrl, sb,
                             props);

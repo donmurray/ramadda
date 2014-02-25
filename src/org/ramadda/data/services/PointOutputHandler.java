@@ -2111,8 +2111,11 @@ public class PointOutputHandler extends RecordOutputHandler {
             lasProduct = OUTPUT_LAS.toString();
         }
         String[][] values = {
+            { OUTPUT_JSON.toString(), "Point JSON", ".json",
+              ICON_POINTS,"&max=${numpoints}" }, 
             { OUTPUT_LATLONALTCSV.toString(), "Lat/Lon/Alt CSV", ".csv",
-              ICON_POINTS }, { lasProduct, "LAS 1.2", ".las", ICON_POINTS },
+              ICON_POINTS }, 
+            { lasProduct, "LAS 1.2", ".las", ICON_POINTS },
             { OUTPUT_KMZ.toString(), ".kmz", "Google Earth KMZ",
               getIconUrl(request, ICON_KML) }
         };
@@ -2128,6 +2131,10 @@ public class PointOutputHandler extends RecordOutputHandler {
             String name   = tuple[1];
             String suffix = tuple[2];
             String icon   = tuple[3];
+            String extraArgs = "";
+            if(tuple.length >=5) {
+                extraArgs = tuple[4];
+            }
             url = HtmlUtils.url(getRepository().URL_ENTRY_SHOW + "/"
                                 + entry.getName() + suffix, new String[] {
                 ARG_ENTRYID, entry.getId(), ARG_OUTPUT,
@@ -2138,6 +2145,7 @@ public class PointOutputHandler extends RecordOutputHandler {
                 //                ARG_BBOX,  macro(ARG_BBOX), 
                 //                ARG_DEFAULTBBOX, dfltBbox
             }, false);
+            url+= extraArgs;
             services.add(new Service(product, name,
                                      request.getAbsoluteUrl(url), icon));
         }

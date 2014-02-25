@@ -77,6 +77,9 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 html +=  SUPER.getDialogContents.apply(this);
                 return html;
             },
+            handleEventMapClick: function (source,args) {
+                this.data.handleEventMapClick(this, source, args.lon,args.lat);
+            },
             handleEventRecordSelection: function(source, args) {
                 var chartType = this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
                 if(source==this) {

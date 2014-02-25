@@ -1298,11 +1298,14 @@ public class HtmlUtils {
      * @return _more_
      */
     public static String args(String[] args) {
+        return args(args, true);
+    }
+
+    public static String args(String[] args, boolean encodeArgs) {
         List<String> a = new ArrayList<String>();
         for (int i = 0; i < args.length; i += 2) {
-            a.add(arg(args[i], args[i + 1]));
+            a.add(arg(args[i], args[i + 1], encodeArgs));
         }
-
         return StringUtil.join("&", a);
     }
 

@@ -1845,7 +1845,7 @@ public class Request implements Constants, Cloneable {
             return dflt;
         }
         String llString = (String) getString(from, "").trim();
-        if ((llString == null) || (llString.length() == 0)) {
+        if ((llString == null) || (llString.length() == 0) || (llString.startsWith("${"))) {
             return dflt;
         }
 

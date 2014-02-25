@@ -25,27 +25,30 @@ This package supports charting and mapping of georeferenced time series data
 
 
 function DataCollection() {
-    this.data = [];
+    RamaddaUtil.defineMembers(this,{ 
+            data: [],
+            hasData: function() {
+                for(var i=0;i<this.data.length;i++) {
+                    if(this.data[i].hasData()) return true;
+                }
+                return false;
+            },
+            getList: function() {
+                return this.data;
+            },
+            addData: function(data) {
+                this.data.push(data);
+            },
+            handleEventMapClick: function (myDisplay, source, lon, lat) {
+                for(var i=0;i<this.data.length;i++ ) {
+                    this.data[i].handleEventMapClick(myDisplay, source, lon, lat);
+                }
 
-    this.hasData = function() {
-        for(var i=0;i<this.data.length;i++) {
-            if(this.data[i].hasData()) return true;
-        }
-        return false;
-    }
+            },
 
-    this.getList = function() {
-        return this.data;
-    }
 
-    this.addData = function(data) {
-        if(data.toString().contains("RamaddaDisplay")) {
-            console.log("add data:" + data);
-            throw "bad data";
-        }
-        this.data.push(data);
-    }
-
+});
+    
 }
 
 function BasePointData(name, properties) {
@@ -65,6 +68,8 @@ function BasePointData(name, properties) {
             initWith : function(thatPointData) {
                 this.recordFields = thatPointData.recordFields;
                 this.records = thatPointData.records;
+            },
+            handleEventMapClick: function (myDisplay, source, lon, lat) {
             },
             getEntry: function() {
                 if(this.entry!=null) {
@@ -156,28 +161,39 @@ function PointData(name, recordFields, records, url, properties) {
             getIsLoading: function() {
                 return this.loadingCnt>0;
             },
+            handleEventMapClick: function (myDisplay, source, lon, lat) {
+                this.lon = lon;
+                this.lat = lat;
+                if(myDisplay.getDisplayManager().hasGeoMacro(this.url)) {
+                    this.loadData(myDisplay, true);
+                }
+            },
             startLoading: function() {
                 this.loadingCnt++;
             },
             stopLoading: function() {
                 this.loadingCnt--;
             },
-            loadData: function(display) {
+            loadData: function(display, reload) {
                 if(this.url==null) {
                     console.log("No URL");
                     return;
                 }
-                var jsonUrl = display.displayManager.getJsonUrl(this.url, display);
-                this.loadPointJson(jsonUrl, display);
+                var props = {
+                    lat:this.lat,                    
+                    lon:this.lon,
+                };
+                var jsonUrl = display.displayManager.getJsonUrl(this.url, display, props);
+                this.loadPointJson(jsonUrl, display, reload);
             },
-            loadPointJson: function(url, display) {
+            loadPointJson: function(url, display, reload) {
                 var pointData = this;
                 console.log("loadPointJson url:" + url);
                 this.startLoading();
                 var jqxhr = $.getJSON( url, function(data) {
                         var newPointData =    makePointData(data);
                         pointData.initWith(newPointData);
-                        display.pointDataLoaded(pointData, url);
+                        display.pointDataLoaded(pointData, url, reload);
                         pointData.stopLoading();
                     })
                     .fail(function(jqxhr, textStatus, error) {
@@ -258,7 +274,6 @@ function DerivedPointData(displayManager, name, pointDataList, operation) {
                     newRecordFields = pointData1.getRecordFields();
                 } else  if(this.operation == "other func") {
                 }
-
                 if(newRecordFields==null) {
                     //for now just use the first operand
                     newRecords = records1;

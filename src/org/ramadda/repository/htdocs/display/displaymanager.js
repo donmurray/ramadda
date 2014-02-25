@@ -122,6 +122,8 @@ function DisplayManager(argId,argProperties) {
                 if(closest!=null) {
                     this.handleEventRecordSelection(mapDisplay, pointData, indexObj.index);
                 }
+                console.log("notify");
+                this.notifyEvent("handleEventMapClick", mapDisplay, {mapDisplay:mapDisplay,lon:lon,lat:lat});
             },
             handleEventRecordSelection: function(source, pointData, index) {
 
@@ -203,8 +205,10 @@ function DisplayManager(argId,argProperties) {
 
                 return html;
             },
-            getJsonUrl:function(jsonUrl, display) {
-                var hasGeoMacro = jsonUrl.match(/(\${latitude})/g);
+            hasGeoMacro: function(jsonUrl) {
+               return  jsonUrl.match(/(\${latitude})/g) !=null;
+            },
+            getJsonUrl:function(jsonUrl, display, props) {
                 var fromDate  = display.getProperty(PROP_FROMDATE);
                 if(fromDate!=null) {
                     jsonUrl += "&fromdate=" + fromDate;
@@ -213,19 +217,25 @@ function DisplayManager(argId,argProperties) {
                 if(toDate!=null) {
                     jsonUrl += "&todate=" + toDate;
                 }
-                if(hasGeoMacro !=null) {
-                    if(this.map!=null) {
+                
+                if(this.hasGeoMacro(jsonUrl)) {
+                    var lon = props.lon;
+                    var lat = props.lat;
+                    if((lon == null || lat == null) &&  this.map!=null) {
                         var tuple = this.getPosition();
                         if(tuple!=null) {
-                            var lat = tuple[0];
-                            var lon = tuple[1];
-                            jsonUrl = jsonUrl.replace("${latitude}",lat);
-                            jsonUrl = jsonUrl.replace("${longitude}",lon);
+                            lat = tuple[0];
+                            lon = tuple[1];
                         }
                     } 
-                    jsonUrl = jsonUrl.replace("${latitude}","40.0");
-                    jsonUrl = jsonUrl.replace("${longitude}","-107.0");
+                    if(lon == null || lat == null) {
+                        lat = "40.0";
+                        lon = "-105";
+                    }
+                    jsonUrl = jsonUrl.replace("${latitude}",lat);
+                    jsonUrl = jsonUrl.replace("${longitude}",lon);
                 }
+                jsonUrl = jsonUrl.replace("${numpoints}",1000);
                 return jsonUrl;
             },
             getDefaultData: function() {

@@ -429,7 +429,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 }
                 return entry;
             },
-            createDisplay: function(entryId, displayType) {
+             createDisplay: function(entryId, displayType, jsonUrl) {
                 var entry = this.getEntry(entryId);
                 if(entry == null) {
                     console.log("No entry:" + entryId);
@@ -442,12 +442,14 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
 
                 //TODO: figure out when to create data, check for grids, etc
                 if(displayType != DISPLAY_ENTRYLIST) {
-                    var url = root + "/entry/show?entryid=" + entryId +"&output=points.product&product=points.json&numpoints=1000";
+                    if(jsonUrl == null) {
+                        jsonUrl = this.getPointUrl(entry);
+                    }
                     var pointDataProps = {
                         entry: entry,
                         entryId: entry.getId()
                     };
-                    props.data = new PointData(entry.getName(), null, null, url,pointDataProps);
+                    props.data = new PointData(entry.getName(), null, null, jsonUrl,pointDataProps);
                 }
                 if(this.lastDisplay!=null) {
                     props.column = this.lastDisplay.getColumn();
@@ -458,11 +460,25 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 }
                 this.lastDisplay = this.getDisplayManager().createDisplay(displayType, props);
             },
+            getPointUrl: function(entry) {
+                //check if it has point data
+                var service = entry.getService("points.json");
+                if(service!=null) {
+                    return  service.url;
+                }
+                service = entry.getService("grid.point.json");
+                if(service!=null) {
+                    return  service.url;
+                }
+                return null;
+            },
             getEntryMenu: function(entryId) {
                 var entry = this.getEntry(entryId);
                 if(entry == null) {
                     return "null entry";
                 }
+
+
                 var get = this.getGet();
                 var menus = [];
                 var fileMenuItems = [];
@@ -488,13 +504,14 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                     menus.push("<a>New</a>" + HtmlUtil.tag(TAG_UL,[], HtmlUtil.join(newMenuItems)));
 
                 //check if it has point data
-                if(entry.getService("points.latlonaltcsv")) {
+                var pointUrl = this.getPointUrl(entry);
+                if(pointUrl!=null) {
                     var newMenu = "";
                     for(var i=0;i<this.getDisplayManager().displayTypes.length;i++) {
                         var type = this.getDisplayManager().displayTypes[i];
                         if(!type.requiresData) continue;
                         
-                        newMenu+= HtmlUtil.tag(TAG_LI,[], HtmlUtil.tag(TAG_A, ["onclick", get+".createDisplay('" + entry.getId() +"','" + type.type+"');"], type.label));
+                        newMenu+= HtmlUtil.tag(TAG_LI,[], HtmlUtil.tag(TAG_A, ["onclick", get+".createDisplay(" + HtmlUtil.sqt(entry.getId()) +"," + HtmlUtil.sqt(type.type)+"," +HtmlUtil.sqt(pointUrl) +");"], type.label));
                     }
                     menus.push("<a>New Chart</a>" + HtmlUtil.tag(TAG_UL,[], newMenu));
                 }
@@ -872,10 +889,16 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 }
             },
             //callback from the pointData.loadData call
-            pointDataLoaded: function(pointData, url) {
-                this.addData(pointData);
+            pointDataLoaded: function(pointData, url, reload)  {
+                console.log("reload:" + reload);
+                if(!reload) {
+                    this.addData(pointData);
+                }
                 this.updateUI(pointData);
-                this.getDisplayManager().handleEventPointDataLoaded(this, pointData);
+                if(!reload) {
+                    console.log("doing event");
+                    this.getDisplayManager().handleEventPointDataLoaded(this, pointData);
+                }
                 if(url!=null) {
                     this.jsonUrl = url;
                 } else {

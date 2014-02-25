@@ -43,9 +43,11 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
                  var toolbarItems = [];
                  toolbarItems.push(HtmlUtil.tag(TAG_A, [ATTR_HREF, entry.getEntryUrl(),"target","_"], 
                                                 HtmlUtil.image(ramaddaBaseUrl +"/icons/application-home.png",["border",0,ATTR_TITLE,"View Entry"])));
-                 if(entry.getService("points.latlonaltcsv")) {
-                     toolbarItems.push(HtmlUtil.tag(TAG_A, ["onclick", get+".createDisplay('" + entry.getId() +"','linechart');"], 
-                                                    HtmlUtil.image(ramaddaBaseUrl +"/icons/chart_line_add.png",["border",0,ATTR_TITLE,"Create Chart"])));
+                 var jsonUrl = this.getPointUrl(entry);
+                 if(jsonUrl!=null) {
+                     toolbarItems.push(HtmlUtil.tag(TAG_A, ["onclick", get+".createDisplay(" + HtmlUtil.sqt(entry.getId()) +"," +
+                                                            HtmlUtil.sqt("linechart") +"," + HtmlUtil.sqt(jsonUrl)+");"],
+                                                            HtmlUtil.image(ramaddaBaseUrl +"/icons/chart_line_add.png",["border",0,ATTR_TITLE,"Create Chart"])));
                  }
                  if(entry.getFilesize()>0) {
                      toolbarItems.push(HtmlUtil.tag(TAG_A, [ATTR_HREF, entry.getFileUrl()], 
