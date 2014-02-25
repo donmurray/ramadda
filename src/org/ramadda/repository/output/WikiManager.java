@@ -1504,15 +1504,17 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             return sb.toString();
         } else if (theTag.equals(WIKI_PROP_DISPLAY)
                    || theTag.equals("chart")) {
-            //TODO: don't hard code the class
-            //TODO: handle grids
-            PointTypeHandler pth =
-                (PointTypeHandler) getRepository().getTypeHandler(
-                    "type_point");
-            PointOutputHandler poh =
-                (PointOutputHandler) pth.getRecordOutputHandler();
 
-            String jsonUrl = poh.getJsonUrl(request, entry);
+            String jsonUrl = null;
+            if(entry.getTypeHandler() instanceof PointTypeHandler) {
+                PointTypeHandler pth = (PointTypeHandler) entry.getTypeHandler();
+                PointOutputHandler poh =
+                    (PointOutputHandler) pth.getRecordOutputHandler();
+                
+                jsonUrl = poh.getJsonUrl(request, entry);
+            } else {
+                jsonUrl = getRepository().getUrlBase() +"/grid/json?" + ARG_ENTRYID +"=" + entry.getId();
+            }
             getEntryDisplay(request, entry, entry.getName(), jsonUrl, sb,
                             props);
 
@@ -4184,6 +4186,27 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         content = HtmlUtils.div(content, HtmlUtils.cssClass("entry-simple"));
 
         return content;
+    }
+
+    public  String getStandardChartDisplay(Request request, Entry entry) throws Exception {
+        String       name  = entry.getName();
+        StringBuffer wiki = new StringBuffer();
+        wiki.append("{{displaygroup  showTitle=\"true\"  showMenu=\"true\"  layoutType=\"columns\"  layoutColumns=\"2\"  }}\n");
+
+        wiki.append("{{display  width=\"600\"  height=\"400\"   type=\"linechart\"  name=\"\"  layoutHere=\"false\"  showMenu=\"true\"  showTitle=\"true\"  row=\"0\"  column=\"0\"  }}");
+
+        if(entry.isGeoreferenced()) {
+            wiki.append("{{display  width=\"600\"  height=\"400\"   type=\"map\"  name=\"\"  layoutHere=\"false\"  showMenu=\"true\"  showTitle=\"true\"  row=\"0\"  column=\"1\"  }}");
+        }
+
+        Hashtable    props = new Hashtable();
+
+        props.put("layoutHere", "false");
+        props.put("layoutType", "table");
+        props.put("layoutColumns", "2");
+        props.put("showMenu", "true");
+        props.put("showMap", "" + entry.isGeoreferenced());
+        return wikifyEntry(request,  entry,wiki.toString());
     }
 
     /**

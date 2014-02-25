@@ -161,6 +161,8 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
     }
 
 
+
+
     /**
      * Get the path for the Entry
      *
@@ -267,7 +269,27 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
                 varNames.add(arg.substring(VAR_PREFIX.length()));
             }
         }
-        //            System.err.println(varNames);
+
+        //For now add either the 2d or the 3d vars
+        if(varNames.size()==0)  {
+            List<GridDatatype> grids             = sortGrids(gds);
+            for (GridDatatype grid : grids) {
+                VariableEnhanced var     = grid.getVariable();
+                if (grid.getZDimension() == null) {
+                    varNames.add(var.getShortName());
+                }
+            }
+            if(varNames.size()==0)  {
+                for (GridDatatype grid : grids) {
+                    VariableEnhanced var     = grid.getVariable();
+                    if (grid.getZDimension() != null) {
+                        varNames.add(var.getShortName());
+                    }
+                }
+            }
+        }
+
+        System.err.println(varNames);
         LatLonRect llr    = gds.getBoundingBox();
         double     deflat = 0;
         double     deflon = 0;
@@ -384,24 +406,18 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
 
             String baseName = IOUtil.stripExtension(entry.getName());
             if (format.equalsIgnoreCase(FORMAT_TIMESERIES_CHART)) {
-                StringBuffer html  = new StringBuffer();
-                String       title = entry.getName() + " at "
-                                     + llp.toString();
                 request.put(CdmConstants.ARG_FORMAT, FORMAT_JSON);
                 request.put(ARG_LOCATION_LATITUDE, "_LATITUDEMACRO_");
                 request.put(ARG_LOCATION_LONGITUDE, "_LONGITUDEMACRO_");
+
                 String jsonUrl = request.getRequestPath() + "/" + baseName
                                  + suffix + "?" + request.getUrlArgs();
                 jsonUrl = jsonUrl.replace("_LATITUDEMACRO_", "${latitude}");
                 jsonUrl = jsonUrl.replace("_LONGITUDEMACRO_", "${longitude}");
 
-                Hashtable props = new Hashtable();
-                props.put("showMenu", "true");
-                props.put("mapenabled", "true");
-                getWikiManager().getEntryDisplay(request, entry, title,
-                        jsonUrl, html, props);
-
-                return new Result("Point As Grid Time Series", html);
+                StringBuffer html  = new StringBuffer();
+                html.append(getWikiManager().getStandardChartDisplay(request,  entry));
+                return new Result("Point as Grid Time Series", html);
             }
 
             File tmpFile = getStorageManager().getTmpFile(request,
@@ -449,9 +465,17 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
                     int     cnt         = 0;
                     boolean hasVertical = (pdrb.getVertCoord() != null);
 
+                    //                    System.err.println ("has vert:" + hasVertical);
+                    //                    System.err.println ("vars:" + varNames.size() +" " + varNames);
                     while ((line = br.readLine()) != null) {
                         cnt++;
+                        List<String> toks = StringUtil.split(line, ",", true, true);
                         if (cnt == 1) {
+                            //                            System.err.println ("line:" + line);
+                            //time/lat/lon  maybeZ vars
+                            if(toks.size() == 3 + 1 + varNames.size()) {
+                                hasVertical = true;
+                            }
                             continue;
                         }
                         if (cnt > 2) {
@@ -459,8 +483,6 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
                         }
                         bw.append("\n");
                         bw.append(Json.mapOpen());
-                        List<String> toks = StringUtil.split(line, ",", true,
-                                                true);
                         //       date            lat   lon   alt     value(s)
                         // 2009-11-10T00:00:00Z,34.6,-101.1,100.0,207.89999389648438
                         CalendarDate date =
@@ -477,18 +499,15 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
                                             date.getMillis()));
                         bw.append(",");
                         bw.append(Json.mapKey(Json.FIELD_VALUES));
-                        bw.append(Json.listOpen());
                         int startIdx = (hasVertical
                                         ? 4
                                         : 3);
+                        List<String> values = new ArrayList();
                         for (int i = startIdx; i < toks.size(); i++) {
-                            if (i > startIdx) {
-                                bw.append(",");
-                            }
                             double v = Double.parseDouble(toks.get(i));
-                            bw.append(Json.formatNumber(v));
+                            values.add(Json.formatNumber(v));
                         }
-                        bw.append(Json.listClose());
+                        bw.append(Json.list(values));
                         bw.append(Json.mapClose());
                     }
                     RecordField.addJsonFooter(bw);

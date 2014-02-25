@@ -821,28 +821,7 @@ public class PointOutputHandler extends RecordOutputHandler {
     public Result outputEntryChart(Request request, OutputType outputType,
                                    Entry entry)
             throws Exception {
-        StringBuffer sb    = new StringBuffer();
-        String       url   = getJsonUrl(request, entry);
-        String       name  = entry.getName();
-        StringBuffer wiki = new StringBuffer();
-
-        wiki.append("{{displaygroup  showTitle=\"true\"  showMenu=\"true\"  layoutType=\"columns\"  layoutColumns=\"2\"  }}\n");
-
-        wiki.append("{{display  width=\"600\"  height=\"400\"   type=\"linechart\"  name=\"\"  layoutHere=\"false\"  showMenu=\"true\"  showTitle=\"true\"  row=\"0\"  column=\"0\"  }}");
-        if(entry.isGeoreferenced()) {
-            wiki.append("{{display  width=\"600\"  height=\"400\"   type=\"map\"  name=\"\"  layoutHere=\"false\"  showMenu=\"true\"  showTitle=\"true\"  row=\"0\"  column=\"1\"  }}");
-        }
-
-        Hashtable    props = new Hashtable();
-
-        props.put("layoutHere", "false");
-        props.put("layoutType", "table");
-        props.put("layoutColumns", "2");
-        props.put("showMenu", "true");
-        props.put("showMap", "" + entry.isGeoreferenced());
-
-        sb.append(getWikiManager().wikifyEntry(request,  entry,wiki.toString()));
-        //        getWikiManager().getEntryDisplay(request, entry, name, url, sb, props);
+        StringBuffer sb    = new StringBuffer(getWikiManager().getStandardChartDisplay(request,  entry));
         return new Result("", sb);
     }
 

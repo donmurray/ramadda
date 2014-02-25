@@ -26,23 +26,6 @@ import opendap.dap.DAP2Exception;
 import opendap.servlet.GuardedDataset;
 import opendap.servlet.ReqState;
 
-import org.jfree.chart.ChartFactory;
-import org.jfree.chart.JFreeChart;
-import org.jfree.chart.axis.AxisLocation;
-import org.jfree.chart.axis.DateAxis;
-import org.jfree.chart.axis.NumberAxis;
-import org.jfree.chart.axis.ValueAxis;
-import org.jfree.chart.plot.XYPlot;
-import org.jfree.chart.renderer.xy.XYAreaRenderer;
-import org.jfree.chart.renderer.xy.XYItemRenderer;
-import org.jfree.data.time.FixedMillisecond;
-import org.jfree.data.time.TimeSeries;
-import org.jfree.data.time.TimeSeriesCollection;
-import org.jfree.data.time.TimeSeriesDataItem;
-import org.jfree.data.xy.XYDataset;
-import org.jfree.ui.RectangleInsets;
-
-import org.ramadda.data.record.RecordField;
 
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Link;
@@ -60,7 +43,6 @@ import org.ramadda.repository.output.OutputHandler;
 import org.ramadda.repository.output.OutputType;
 import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.util.HtmlUtils;
-import org.ramadda.util.Json;
 
 import org.w3c.dom.Element;
 
@@ -89,7 +71,6 @@ import ucar.nc2.dt.GridCoordSystem;
 import ucar.nc2.dt.GridDatatype;
 import ucar.nc2.dt.TrajectoryObsDataset;
 import ucar.nc2.dt.TrajectoryObsDatatype;
-import ucar.nc2.dt.grid.GridAsPointDataset;
 import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.dt.grid.NetcdfCFWriter;
 import ucar.nc2.ft.FeatureCollection;
@@ -146,107 +127,7 @@ import javax.servlet.http.HttpServletRequest;
 /**
  * A class for handling CDM data output
  */
-public class CdmDataOutputHandler extends OutputHandler {
-
-    /** OPeNDAP icon */
-    public static final String ICON_OPENDAP = "/cdmdata/opendap.gif";
-
-    /** CSV format */
-    public static final String FORMAT_CSV = "csv";
-
-    /** KML format */
-    public static final String FORMAT_KML = "kml";
-
-    /** NCML format */
-    public static final String FORMAT_NCML = "ncml";
-
-    /** _more_ */
-    public static final String FORMAT_JSON = "json";
-
-    /** NCML suffix */
-    public static final String SUFFIX_NCML = ".ncml";
-
-    /** netcdf suffix */
-    public static final String SUFFIX_NC = ".nc";
-
-    /** netcdf4 suffix */
-    public static final String SUFFIX_NC4 = ".nc4";
-
-    /** GrADS CTL suffix */
-    public static final String SUFFIX_CTL = ".ctl";
-
-    /** CSV suffix */
-    public static final String SUFFIX_CSV = ".csv";
-
-    /** _more_ */
-    public static final String SUFFIX_JSON = ".json";
-
-    /** CSV suffix */
-    public static final String SUFFIX_XML = ".xml";
-
-    /** bounding box argument */
-    public static final String ARG_POINT_BBOX = "bbox";
-
-    /** Variable prefix */
-    public static final String VAR_PREFIX = ARG_VARIABLE + ".";
-
-    /** add lat lon argument */
-    public static final String ARG_ADDLATLON = "addlatlon";
-
-
-    /** horizontal stride */
-    public static final String ARG_HSTRIDE = "hstride";
-
-    /** level */
-    public static final String ARG_LEVEL = "level";
-
-    /** format */
-    public static final String ARG_FORMAT = "format";
-
-    /** format */
-    public static final String ARG_IMAGE_WIDTH = "image_width";
-
-    /** format */
-    public static final String ARG_IMAGE_HEIGHT = "image_height";
-
-    /** calendar */
-    public static final String ARG_CALENDAR = "calendar";
-
-    /** spatial arguments */
-    private static final String[] SPATIALARGS = new String[] { ARG_AREA_NORTH,
-            ARG_AREA_WEST, ARG_AREA_SOUTH, ARG_AREA_EAST, };
-
-    /** chart format */
-    private static final String FORMAT_TIMESERIES = "timeseries";
-
-    /** chart format */
-    private static final String FORMAT_TIMESERIES_CHART = "timeserieschart";
-
-
-    /** chart format */
-    private static final String FORMAT_TIMESERIES_CHART_DATA =
-        "timeserieschartdata";
-
-    /** chart image format */
-    private static final String FORMAT_TIMESERIES_IMAGE = "timeseriesimage";
-
-    /** Data group */
-    public static final String GROUP_DATA = "Data";
-
-    /** CDM Type */
-    public static final String TYPE_CDM = "cdm";
-
-    /** GRID type */
-    public static final String TYPE_GRID = "grid";
-
-    /** TRAJECTORY type */
-    public static final String TYPE_TRAJECTORY = "trajectory";
-
-    /** POINT_TYPE */
-    public static final String TYPE_POINT = "point";
-
-    /** GrADS type */
-    public static final String TYPE_GRADS = "gradsbinary";
+public class CdmDataOutputHandler extends OutputHandler implements CdmConstants {
 
     /** set of suffixes */
     private HashSet<String> suffixSet;
@@ -309,18 +190,7 @@ public class CdmDataOutputHandler extends OutputHandler {
     public static final OutputType OUTPUT_GRIDSUBSET =
         new OutputType("data.gridsubset", OutputType.TYPE_FEEDS);
 
-    /** Grid as point form Output Type */
-    public static final OutputType OUTPUT_GRIDASPOINT_FORM =
-        new OutputType("Extract Time Series", "data.gridaspoint.form",
-                       OutputType.TYPE_OTHER | OutputType.TYPE_IMPORTANT,
-                       OutputType.SUFFIX_NONE, "/cdmdata/chart_line.png",
-                       GROUP_DATA);
-
-    /** Grid as point Output Type */
-    public static final OutputType OUTPUT_GRIDASPOINT =
-        new OutputType("data.gridaspoint", OutputType.TYPE_FEEDS);
-
-
+    
 
     /** opendap counter */
     Counter opendapCounter = new Counter();
@@ -381,8 +251,6 @@ public class CdmDataOutputHandler extends OutputHandler {
         addType(OUTPUT_POINT_SUBSET);
         addType(OUTPUT_GRIDSUBSET);
         addType(OUTPUT_GRIDSUBSET_FORM);
-        addType(OUTPUT_GRIDASPOINT);
-        addType(OUTPUT_GRIDASPOINT_FORM);
     }
 
 
@@ -477,7 +345,7 @@ public class CdmDataOutputHandler extends OutputHandler {
 
         if (getCdmManager().canLoadAsGrid(entry)) {
             addOutputLink(request, entry, links, OUTPUT_GRIDSUBSET_FORM);
-            addOutputLink(request, entry, links, OUTPUT_GRIDASPOINT_FORM);
+            addOutputLink(request, entry, links, GridPointOutputHandler.OUTPUT_GRIDASPOINT_FORM);
         } else if (getCdmManager().canLoadAsTrajectory(entry)) {
             addOutputLink(request, entry, links, OUTPUT_TRAJECTORY_MAP);
         } else if (getCdmManager().canLoadAsPoint(entry)) {
@@ -590,7 +458,7 @@ public class CdmDataOutputHandler extends OutputHandler {
             throws Exception {
         String path     = getPath(request, entry);
         String dodspath = getAbsoluteOpendapUrl(request, entry);
-        if (request.getString(ARG_FORMAT, "").equals(FORMAT_NCML)) {
+        if (request.getString(CdmConstants.ARG_FORMAT, "").equals(FORMAT_NCML)) {
 
             /**
              *  This gets hung up calling back into the repository
@@ -659,7 +527,7 @@ public class CdmDataOutputHandler extends OutputHandler {
         sb.append(HtmlUtils.href(HtmlUtils.url(getRepository().URL_ENTRY_SHOW
                 + "/" + tail + SUFFIX_NCML, new String[] {
             ARG_ENTRYID, entry.getId(), ARG_OUTPUT, OUTPUT_CDL.getId(),
-            ARG_FORMAT, FORMAT_NCML
+            CdmConstants.ARG_FORMAT, FORMAT_NCML
         }), "NCML"));
 
 
@@ -695,464 +563,7 @@ public class CdmDataOutputHandler extends OutputHandler {
     }
 
 
-    /**
-     * Process a grid as point request
-     *
-     * @param request  the request
-     * @param entry    the entry
-     * @param gds      the corresponding grid dataset
-     * @param sb       the StringBuffer
-     *
-     * @return a Result
-     *
-     * @throws Exception problem doing what was asked
-     */
-    public Result outputGridAsPointProcess(Request request, Entry entry,
-                                           GridDataset gds, StringBuffer sb)
-            throws Exception {
 
-        List      varNames = new ArrayList<String>();
-        Hashtable args     = request.getArgs();
-        for (Enumeration keys = args.keys(); keys.hasMoreElements(); ) {
-            String arg = (String) keys.nextElement();
-            if (arg.startsWith(VAR_PREFIX) && request.get(arg, false)) {
-                varNames.add(arg.substring(VAR_PREFIX.length()));
-            }
-        }
-        //            System.err.println(varNames);
-        LatLonRect llr    = gds.getBoundingBox();
-        double     deflat = 0;
-        double     deflon = 0;
-        if (llr != null) {
-            deflat = llr.getLatMin() + llr.getHeight() / 2;
-            deflon = llr.getCenterLon();
-        }
-        LatLonPointImpl llp = null;
-
-        if (request.defined(ARG_LOCATION_LATITUDE)) {
-            llp = new LatLonPointImpl(
-                request.getLatOrLonValue(ARG_LOCATION_LATITUDE, deflat),
-                request.getLatOrLonValue(ARG_LOCATION_LONGITUDE, deflon));
-            System.err.println("llp:" + llp);
-        }
-        if (llp == null) {
-            llp = new LatLonPointImpl(deflat, deflon);
-        }
-
-        double             levelVal   = request.get(ARG_LEVEL, Double.NaN);
-
-        int                timeStride = 1;
-        List<CalendarDate> allDates   =
-            CdmDataOutputHandler.getGridDates(gds);
-        CalendarDate[]     dates      = new CalendarDate[2];
-        Calendar           cal        = null;
-        String             calString  = request.getString(ARG_CALENDAR, null);
-        if (calString == null) {
-            calString = allDates.get(0).getCalendar().toString();
-        }
-        if (request.defined(ARG_FROMDATE)) {
-            String fromDateString = request.getString(ARG_FROMDATE,
-                                        formatDate(request, allDates.get(0)));
-            dates[0] = CalendarDate.parseISOformat(calString, fromDateString);
-        }
-        if (request.defined(ARG_TODATE)) {
-            String toDateString = request.getString(ARG_TODATE,
-                                      formatDate(request,
-                                          allDates.get(allDates.size() - 1)));
-            dates[1] = CalendarDate.parseISOformat(calString, toDateString);
-        }
-        //have to have both dates
-        if ((dates[0] != null) && (dates[1] == null)) {
-            dates[0] = null;
-        }
-        if ((dates[1] != null) && (dates[0] == null)) {
-            dates[1] = null;
-        }
-
-        if ((dates[0] != null) && (dates[1] != null)
-                && (dates[0].isAfter(dates[1]))) {
-            sb.append(
-                getPageHandler().showDialogWarning(
-                    "From date is after to date"));
-        } else if (varNames.size() == 0) {
-            sb.append(
-                getPageHandler().showDialogWarning("No variables selected"));
-        } else {
-            //                System.err.println ("varNames:" + varNames);
-            // modelled after thredds.server.ncSubset.controller.PointDataController
-            String format = request.getString(ARG_FORMAT,
-                                SupportedFormat.NETCDF3.toString());
-
-            boolean doingJson = format.equals(FORMAT_JSON);
-            if (doingJson) {
-                format = FORMAT_CSV;
-            }
-            SupportedFormat            sf   = getSupportedFormat(format);
-            PointDataRequestParamsBean pdrb =
-                new PointDataRequestParamsBean();
-            GridAsPointDataset gapds =
-                NcssRequestUtils.buildGridAsPointDataset(gds, varNames);
-            pdrb.setVar(varNames);
-            // accept uses the response type
-            pdrb.setAccept(
-                (format.equalsIgnoreCase(FORMAT_TIMESERIES_CHART)
-                 || format.equalsIgnoreCase(FORMAT_TIMESERIES_IMAGE))
-                ? SupportedFormat.CSV.getResponseContentType()
-                : sf.getResponseContentType());
-            pdrb.setPoint(true);
-            pdrb.setLatitude(llp.getLatitude());
-            pdrb.setLongitude(llp.getLongitude());
-            if (dates[0] != null) {
-                pdrb.setTime_start(dates[0].toString());
-                if (dates[1] != null) {
-                    pdrb.setTime_end(dates[1].toString());
-                } else {
-                    pdrb.setTime(pdrb.getTime_start());
-                }
-            } else {  // dates weren't specified
-                dates[0] = allDates.get(0);
-                dates[1] = allDates.get(allDates.size() - 1);
-                pdrb.setTemporal("all");
-            }
-            if (levelVal == levelVal) {
-                pdrb.setVertCoord(levelVal);
-            }
-            Map<String, List<String>> groupVars = groupVarsByVertLevels(gds,
-                                                      pdrb);
-
-            String suffix = SUFFIX_NC;
-            if (sf.equals(SupportedFormat.NETCDF4)) {
-                suffix = SUFFIX_NC4;
-            } else if (pdrb.getAccept()
-                    .equals(SupportedFormat.CSV
-                        .getResponseContentType()) || format
-                            .equals(FORMAT_TIMESERIES_CHART_DATA) || format
-                            .equals(FORMAT_TIMESERIES_IMAGE)) {
-                suffix = SUFFIX_CSV;
-            } else if (pdrb.getAccept().equals(
-                    SupportedFormat.XML.getResponseContentType())) {
-                suffix = SUFFIX_XML;
-            }
-
-            String baseName = IOUtil.stripExtension(entry.getName());
-            if (format.equalsIgnoreCase(FORMAT_TIMESERIES_CHART)) {
-                StringBuffer html  = new StringBuffer();
-                String       title = entry.getName() + " at "
-                                     + llp.toString();
-                request.put(ARG_FORMAT, FORMAT_JSON);
-                request.put(ARG_LOCATION_LATITUDE, "_LATITUDEMACRO_");
-                request.put(ARG_LOCATION_LONGITUDE, "_LONGITUDEMACRO_");
-                String jsonUrl = request.getRequestPath() + "/" + baseName
-                                 + suffix + "?" + request.getUrlArgs();
-                jsonUrl = jsonUrl.replace("_LATITUDEMACRO_", "${latitude}");
-                jsonUrl = jsonUrl.replace("_LONGITUDEMACRO_", "${longitude}");
-
-                Hashtable props = new Hashtable();
-                props.put("mapenabled", "true");
-                getWikiManager().getEntryDisplay(request, entry, title,
-                        jsonUrl, html, props);
-
-                return new Result("Point As Grid Time Series", html);
-            }
-
-            File tmpFile = getStorageManager().getTmpFile(request,
-                               "pointsubset" + suffix);
-
-            OutputStream outStream =
-                getStorageManager().getUncheckedFileOutputStream(tmpFile);
-            PointDataStream pds = PointDataStream.createPointDataStream(sf,
-                                      outStream);
-            List<CalendarDate> wantedDates =
-                NcssRequestUtils.wantedDates(gapds,
-                                             CalendarDateRange.of(dates[0],
-                                                 dates[1]), 0);
-
-            boolean allWritten = false;
-            allWritten = pds.stream(gds, llp, wantedDates, groupVars,
-                                    pdrb.getVertCoord());
-
-            File f = null;
-            if (allWritten) {
-                outStream.close();
-                f = tmpFile;
-                if (doingJson) {
-                    File jsonFile =
-                        getRepository().getStorageManager().getTmpFile(
-                            request, "subset.json");
-                    BufferedReader br = new BufferedReader(
-                                            new InputStreamReader(
-                                                new FileInputStream(f)));
-                    BufferedWriter bw = new BufferedWriter(
-                                            new OutputStreamWriter(
-                                                new FileOutputStream(
-                                                    jsonFile)));
-                    List<RecordField> fields = new ArrayList<RecordField>();
-                    for (int i = 0; i < varNames.size(); i++) {
-                        String var = (String) varNames.get(i);
-                        RecordField recordField = new RecordField(var, var,
-                                                      var, i, "");
-                        recordField.setChartable(true);
-                        fields.add(recordField);
-                    }
-                    RecordField.addJsonHeader(bw, entry.getName(), fields);
-
-                    String  line        = null;
-                    int     cnt         = 0;
-                    boolean hasVertical = (pdrb.getVertCoord() != null);
-
-                    while ((line = br.readLine()) != null) {
-                        cnt++;
-                        if (cnt == 1) {
-                            continue;
-                        }
-                        if (cnt > 2) {
-                            bw.append(",");
-                        }
-                        bw.append("\n");
-                        bw.append(Json.mapOpen());
-                        List<String> toks = StringUtil.split(line, ",", true,
-                                                true);
-                        //       date            lat   lon   alt     value(s)
-                        // 2009-11-10T00:00:00Z,34.6,-101.1,100.0,207.89999389648438
-                        CalendarDate date =
-                            CalendarDate.parseISOformat(toks.get(0),
-                                toks.get(0));
-                        double lat = Double.parseDouble(toks.get(1));
-                        double lon = Double.parseDouble(toks.get(2));
-                        double alt = (hasVertical
-                                      ? Double.parseDouble(toks.get(3))
-                                      : Double.NaN);
-                        Json.addGeolocation(bw, lat, lon, alt);
-                        bw.append(",");
-                        bw.append(Json.attr(Json.FIELD_DATE,
-                                            date.getMillis()));
-                        bw.append(",");
-                        bw.append(Json.mapKey(Json.FIELD_VALUES));
-                        bw.append(Json.listOpen());
-                        int startIdx = (hasVertical
-                                        ? 4
-                                        : 3);
-                        for (int i = startIdx; i < toks.size(); i++) {
-                            if (i > startIdx) {
-                                bw.append(",");
-                            }
-                            double v = Double.parseDouble(toks.get(i));
-                            bw.append(Json.formatNumber(v));
-                        }
-                        bw.append(Json.listClose());
-                        bw.append(Json.mapClose());
-                    }
-                    RecordField.addJsonFooter(bw);
-                    bw.close();
-                    f = jsonFile;
-                }
-
-            } else {
-                //Something went wrong...
-                System.err.println("something went wrong");
-            }
-
-            if (doingPublish(request)) {
-                return getEntryManager().processEntryPublish(request, f,
-                        (Entry) entry.clone(), entry, "point series of");
-            }
-            Result result = null;
-            if (format.equalsIgnoreCase(FORMAT_TIMESERIES_IMAGE)) {
-                result = outputTimeSeriesImage(request, entry, f);
-            } else {
-                result =
-                    new Result(getStorageManager().getFileInputStream(f),
-                               pdrb.getAccept());
-                //Set return filename sets the Content-Disposition http header so the browser saves the file
-                //with the correct name and suffix
-                result.setReturnFilename(baseName + "_pointsubset" + suffix);
-            }
-
-            return result;
-        }
-
-        return new Result("", sb);
-    }
-
-
-    /**
-     * Get the SupportedFormat from the name
-     * @param name
-     * @return the corresponding format
-     */
-    private SupportedFormat getSupportedFormat(String name) {
-
-        if (name.equalsIgnoreCase(FORMAT_TIMESERIES_CHART)
-                || name.equalsIgnoreCase(FORMAT_TIMESERIES_IMAGE)) {
-            return SupportedFormat.CSV;
-        }
-        for (SupportedFormat sf : SupportedFormat.values()) {
-            // check for the name
-            if (name.equalsIgnoreCase(sf.getFormatName())) {
-                return sf;
-            }
-            // check for aliases
-            List<String> aliases = sf.getAliases();
-            if (aliases.contains(name)) {
-                return sf;
-            }
-        }
-
-        // default to netCDF 3
-        return SupportedFormat.NETCDF3;
-    }
-
-    /**
-     * Group the variables by level.  Copied from  thredds.server.ncSubset.controller.PointDataController
-     * @param gds   GridDataSet
-     * @param params list of parameter names
-     * @return map by levels
-     * @throws VariableNotContainedInDatasetException
-     */
-    private Map<String, List<String>> groupVarsByVertLevels(GridDataset gds,
-            PointDataRequestParamsBean params)
-            throws VariableNotContainedInDatasetException {
-        String       no_vert_levels = "no_vert_level";
-        List<String> vars           = params.getVar();
-        Map<String, List<String>> varsGroupsByLevels = new HashMap<String,
-                                                           List<String>>();
-
-        for (String var : vars) {
-            GridDatatype grid = gds.findGridDatatype(var);
-
-            //Variables should have been checked before...  
-            if (grid == null) {
-                throw new VariableNotContainedInDatasetException("Variable: "
-                        + var + " is not contained in the requested dataset");
-            }
-
-
-            CoordinateAxis1D axis =
-                grid.getCoordinateSystem().getVerticalAxis();
-
-            String axisKey = null;
-            if (axis == null) {
-                axisKey = no_vert_levels;
-            } else {
-                axisKey = axis.getShortName();
-            }
-
-            if (varsGroupsByLevels.containsKey(axisKey)) {
-                varsGroupsByLevels.get(axisKey).add(var);
-            } else {
-                List<String> varListForVerlLevel = new ArrayList<String>();
-                varListForVerlLevel.add(var);
-                varsGroupsByLevels.put(axisKey, varListForVerlLevel);
-            }
-        }
-
-        return varsGroupsByLevels;
-    }
-
-
-    /**
-     * Output the grid as a point form
-     *
-     * @param request   the request
-     * @param entry     the entry
-     * @param dataset   the corresponding dataset
-     * @param sb        the string buffer
-     *
-     * @return the result
-     *
-     * @throws Exception problem creating form
-     */
-    public Result outputGridAsPointForm(Request request, Entry entry,
-                                        GridDataset dataset, StringBuffer sb)
-            throws Exception {
-
-        boolean canAdd =
-            getRepository().getAccessManager().canDoAction(request,
-                entry.getParentEntry(), Permission.ACTION_NEW);
-
-        String formUrl  = request.url(getRepository().URL_ENTRY_SHOW);
-        String fileName = IOUtil.stripExtension(entry.getName()) + "_point";
-
-        sb.append(HtmlUtils.form(formUrl + "/" + fileName));
-        sb.append(HtmlUtils.br());
-
-
-
-        sb.append(HtmlUtils.submit("Get Point", ARG_SUBMIT));
-        sb.append(HtmlUtils.br());
-        sb.append(HtmlUtils.hidden(ARG_OUTPUT, OUTPUT_GRIDASPOINT));
-        sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
-        sb.append(HtmlUtils.formTable());
-
-        List<CalendarDate> dates = getGridDates(dataset);
-
-        StringBuffer       varSB = getVariableForm(dataset, true, false,
-                                       true);
-
-        LatLonRect         llr   = dataset.getBoundingBox();
-        String             lat   = "";
-        String             lon   = "";
-        if (llr != null) {
-            lat = Misc.format(llr.getLatMin() + llr.getHeight() / 2);
-            lon = Misc.format(llr.getCenterLon());
-        }
-        MapInfo map = getRepository().getMapManager().createMap(request,
-                          true);
-        map.addBox("", llr, new MapBoxProperties("blue", false, true));
-        String llb = map.makeSelector(ARG_LOCATION, true, new String[] { lat,
-                lon });
-        sb.append(HtmlUtils.formEntryTop(msgLabel("Location"), llb));
-
-        addTimeWidget(request, dates, sb);
-
-        List<TwoFacedObject> formats = new ArrayList<TwoFacedObject>();
-        formats.add(new TwoFacedObject("Interactive Time Series",
-                                       FORMAT_TIMESERIES_CHART));
-
-        formats.add(new TwoFacedObject("JSON", FORMAT_JSON));
-        formats.add(
-            new TwoFacedObject(
-                "NetCDF", SupportedFormat.NETCDF3.getFormatName()));
-        /* comment out until file sizes are smaller
-        //Check if netcdf4 is available
-        try {
-            if (Nc4Iosp.isClibraryPresent()) {
-                formats.add(new TwoFacedObject("NetCDF4",
-                        SupportedFormat.NETCDF4.getFormatName()));
-            }
-        } catch (UnsatisfiedLinkError e) {}
-        */
-        formats.add(new TwoFacedObject("Comma Separated Values (CSV)",
-                                       SupportedFormat.CSV.getFormatName()));
-        formats.add(new TwoFacedObject("Time Series Image",
-                                       FORMAT_TIMESERIES));
-        formats.add(new TwoFacedObject("XML",
-                                       SupportedFormat.XML.getFormatName()));
-
-
-        String format = request.getString(ARG_FORMAT,
-                                          FORMAT_TIMESERIES_CHART);
-
-        sb.append(HtmlUtils.formEntry(msgLabel("Format"),
-                                      HtmlUtils.select(ARG_FORMAT, formats,
-                                          format)));
-        addPublishWidget(request, entry, sb,
-                         msg("Select a folder to publish the results to"));
-        sb.append(HtmlUtils.formTableClose());
-        sb.append("<hr>");
-        sb.append(msgLabel("Select Variables"));
-        sb.append(HtmlUtils.insetDiv(HtmlUtils.table(varSB.toString(),
-                HtmlUtils.attrs(HtmlUtils.ATTR_CELLPADDING, "5",
-                                HtmlUtils.ATTR_CELLSPACING, "0")), 0, 30, 0,
-                                    0));
-
-        sb.append(HtmlUtils.submit("Get Point"));
-        //sb.append(submitExtra);
-        sb.append(HtmlUtils.formClose());
-
-        return makeLinksResult(request, msg("Grid At Point"), sb,
-                               new State(entry));
-    }
 
     /**
      * Get the grid dates
@@ -1316,50 +727,6 @@ public class CdmDataOutputHandler extends OutputHandler {
         return varSB;
     }
 
-    /**
-     * Handle a grid as point request
-     *
-     * @param request  the request
-     * @param entry    the entry
-     *
-     * @return  the result
-     *
-     * @throws Exception problems
-     */
-    public Result outputGridAsPoint(Request request, Entry entry)
-            throws Exception {
-        String format =
-            request.getString(ARG_FORMAT,
-                              SupportedFormat.NETCDF3.getFormatName());
-        String baseName = IOUtil.stripExtension(entry.getName());
-        if (format.equalsIgnoreCase(FORMAT_TIMESERIES)) {
-            request.put(ARG_FORMAT, FORMAT_TIMESERIES_IMAGE);
-            String redirectUrl = request.getRequestPath() + "/" + baseName
-                                 + ".png" + "?" + request.getUrlArgs();
-
-            return new Result("Point As Grid Time Series Image",
-                              new StringBuffer(HtmlUtils.img(redirectUrl,
-                                  "Image is being processed...")));
-        }
-        StringBuffer sb     = new StringBuffer();
-        String       path   = getPath(request, entry);
-
-        GridDataset  gds    = getCdmManager().getGridDataset(entry, path);
-        OutputType   output = request.getOutput();
-        try {
-            if (output.equals(OUTPUT_GRIDASPOINT)) {
-                Result result = outputGridAsPointProcess(request, entry, gds,
-                                    sb);
-                if (result != null) {
-                    return result;
-                }
-            }
-
-            return outputGridAsPointForm(request, entry, gds, sb);
-        } finally {
-            getCdmManager().returnGridDataset(path, gds);
-        }
-    }
 
 
     /**
@@ -1444,10 +811,10 @@ public class CdmDataOutputHandler extends OutputHandler {
                            new TwoFacedObject("NetCDF4", NetcdfFileWriter.Version.netcdf4.toString()),
                            new TwoFacedObject("NetCDF4 Classic", NetcdfFileWriter.Version.netcdf4_classic.toString())});
 
-        String format = request.getString(ARG_FORMAT, SupportedFormat.NETCDF3.getFormatName());
+        String format = request.getString(CdmConstants.ARG_FORMAT, SupportedFormat.NETCDF3.getFormatName());
 
         sb.append(HtmlUtils.formEntry(msgLabel("Format"),
-                                      HtmlUtils.select(ARG_FORMAT, formats,
+                                      HtmlUtils.select(CdmConstants.ARG_FORMAT, formats,
                                           format)));
         */
 
@@ -1493,7 +860,7 @@ public class CdmDataOutputHandler extends OutputHandler {
         StringBuffer sb   = new StringBuffer();
 
         String format =
-            request.getString(ARG_FORMAT,
+            request.getString(CdmConstants.ARG_FORMAT,
                               NetcdfFileWriter.Version.netcdf3.toString());
 
 
@@ -2120,9 +1487,9 @@ public class CdmDataOutputHandler extends OutputHandler {
         List<TwoFacedObject> formats = new ArrayList<TwoFacedObject>();
         formats.add(new TwoFacedObject("CSV", FORMAT_CSV));
         formats.add(new TwoFacedObject("KML", FORMAT_KML));
-        String format = request.getString(ARG_FORMAT, FORMAT_CSV);
+        String format = request.getString(CdmConstants.ARG_FORMAT, FORMAT_CSV);
         sb.append(HtmlUtils.formEntry(msgLabel("Format"),
-                                      HtmlUtils.select(ARG_FORMAT, formats,
+                                      HtmlUtils.select(CdmConstants.ARG_FORMAT, formats,
                                           format)));
 
         MapInfo map = getRepository().getMapManager().createMap(request,
@@ -2155,6 +1522,16 @@ public class CdmDataOutputHandler extends OutputHandler {
         if ( !getCdmManager().canLoadAsCdm(entry)) {
             return;
         }
+        //Add the GridPoint service
+        if (getCdmManager().canLoadAsGrid(entry)) {
+            String url = getRepository().getUrlBase() + "/grid/json?" + HtmlUtils.attrs(ARG_ENTRYID , entry.getId(),
+                                                                                       ARG_LOCATION_LATITUDE,  "${latitude}",
+                                                                                       ARG_LOCATION_LONGITUDE, "${longitude}");
+            services.add(new Service("grid.point.json", "Point time series - " + entry.getName(),
+                                     request.getAbsoluteUrl(url), iconUrl("/icons/chart.png")));
+            
+        }
+
         String url = getAbsoluteOpendapUrl(request, entry);
         services.add(new Service("opendap", "OPeNDAP Link", url));
     }
@@ -2172,10 +1549,10 @@ public class CdmDataOutputHandler extends OutputHandler {
      */
     public Result outputPointSubset(Request request, Entry entry)
             throws Exception {
-        if ( !request.defined(ARG_FORMAT)) {
+        if ( !request.defined(CdmConstants.ARG_FORMAT)) {
             return makePointSubsetForm(request, entry, "");
         }
-        String format = request.getString(ARG_FORMAT, FORMAT_CSV);
+        String format = request.getString(CdmConstants.ARG_FORMAT, FORMAT_CSV);
 
         if (format.equals(FORMAT_CSV)) {
             request.getHttpServletResponse().setContentType("text/csv");
@@ -2428,11 +1805,6 @@ public class CdmDataOutputHandler extends OutputHandler {
             return outputGridSubset(request, entry);
         }
 
-        if (outputType.equals(OUTPUT_GRIDASPOINT)
-                || outputType.equals(OUTPUT_GRIDASPOINT_FORM)) {
-            return outputGridAsPoint(request, entry);
-        }
-
         if (outputType.equals(OUTPUT_TRAJECTORY_MAP)) {
             return outputTrajectoryMap(request, entry);
         }
@@ -2629,330 +2001,5 @@ public class CdmDataOutputHandler extends OutputHandler {
 
     }
 
-
-
-    /**
-     * Output the timeseries image
-     *
-     * @param request the request
-     * @param entry  the entry
-     * @param f  the file
-     *
-     * @return  the image
-     *
-     * @throws Exception  problem creating image
-     */
-    private Result outputTimeSeriesImage(Request request, Entry entry, File f)
-            throws Exception {
-
-        StringBuffer sb = new StringBuffer();
-        //sb.append(getHeader(request, entry));
-        sb.append(header(msg("Chart")));
-
-        TimeSeriesCollection dummy  = new TimeSeriesCollection();
-        JFreeChart chart = createChart(request, entry, dummy);
-        XYPlot               xyPlot = (XYPlot) chart.getPlot();
-
-        Hashtable<String, MyTimeSeries> seriesMap = new Hashtable<String,
-                                                        MyTimeSeries>();
-        List<MyTimeSeries> allSeries = new ArrayList<MyTimeSeries>();
-        int     paramCount = 0;
-        int     colorCount = 0;
-        boolean axisLeft   = true;
-        Hashtable<String, List<ValueAxis>> axisMap = new Hashtable<String,
-                                                         List<ValueAxis>>();
-        Hashtable<String, double[]> rangeMap = new Hashtable<String,
-                                                   double[]>();
-        List<String> units      = new ArrayList<String>();
-        List<String> paramUnits = new ArrayList<String>();
-        List<String> paramNames = new ArrayList<String>();
-
-        long         t1         = System.currentTimeMillis();
-        String contents =
-            IOUtil.readContents(getStorageManager().getFileInputStream(f));
-        List<String> lines      = StringUtil.split(contents, "\n", true,
-                                      true);
-        String       header     = lines.get(0);
-        String[]     headerToks = header.split(",");
-        for (int i = 0; i < headerToks.length; i++) {
-            paramNames.add(getParamName(headerToks[i]));
-            paramUnits.add(getUnitFromName(headerToks[i]));
-        }
-        boolean hasLevel   = paramNames.get(3).equals("vertCoord");
-
-        boolean readHeader = false;
-        for (String line : lines) {
-            if ( !readHeader) {
-                readHeader = true;
-
-                continue;
-            }
-            String[] lineTokes = line.split(",");
-            Date     date      = DateUtil.parse(lineTokes[0]);
-            int      startIdx  = hasLevel
-                                 ? 4
-                                 : 3;
-            for (int i = startIdx; i < lineTokes.length; i++) {
-                double value = Double.parseDouble(lineTokes[i]);
-                if (value != value) {
-                    continue;
-                }
-                List<ValueAxis> axises     = null;
-                double[]        range      = null;
-                String          u          = paramUnits.get(i);
-                String          paramName  = paramNames.get(i);
-                String          formatName = paramName.replaceAll("_", " ");
-                String formatUnit = ((u == null) || (u.length() == 0))
-                                    ? ""
-                                    : "[" + u + "]";
-                if (u != null) {
-                    axises = axisMap.get(u);
-                    range  = rangeMap.get(u);
-                    if (axises == null) {
-                        axises = new ArrayList<ValueAxis>();
-                        range  = new double[] { value, value };
-                        rangeMap.put(u, range);
-                        axisMap.put(u, axises);
-                        units.add(u);
-                    }
-                    range[0] = Math.min(range[0], value);
-                    range[1] = Math.max(range[1], value);
-                }
-                MyTimeSeries series = seriesMap.get(paramName);
-                if (series == null) {
-                    paramCount++;
-                    TimeSeriesCollection dataset = new TimeSeriesCollection();
-                    series = new MyTimeSeries(formatName,
-                            FixedMillisecond.class);
-                    allSeries.add(series);
-                    ValueAxis rangeAxis = new NumberAxis(formatName + " "
-                                              + formatUnit);
-                    if (axises != null) {
-                        axises.add(rangeAxis);
-                    }
-                    XYItemRenderer renderer =
-                        new XYAreaRenderer(XYAreaRenderer.LINES);
-                    if (colorCount >= HtmlUtils.COLORS.length) {
-                        colorCount = 0;
-                    }
-                    renderer.setSeriesPaint(0, HtmlUtils.COLORS[colorCount]);
-                    colorCount++;
-                    xyPlot.setRenderer(paramCount, renderer);
-                    xyPlot.setRangeAxis(paramCount, rangeAxis, false);
-                    AxisLocation side = (axisLeft
-                                         ? AxisLocation.TOP_OR_LEFT
-                                         : AxisLocation.BOTTOM_OR_RIGHT);
-                    axisLeft = !axisLeft;
-                    xyPlot.setRangeAxisLocation(paramCount, side);
-
-                    dataset.setDomainIsPointsInTime(true);
-                    dataset.addSeries(series);
-                    seriesMap.put(paramNames.get(i), series);
-                    xyPlot.setDataset(paramCount, dataset);
-                    xyPlot.mapDatasetToRangeAxis(paramCount, paramCount);
-                }
-                //series.addOrUpdate(new FixedMillisecond(pointData.date),value);
-                TimeSeriesDataItem item =
-                    new TimeSeriesDataItem(new FixedMillisecond(date), value);
-                series.addItem(item);
-            }
-        }
-
-
-
-        for (MyTimeSeries timeSeries : allSeries) {
-            timeSeries.finish();
-        }
-
-        for (String unit : units) {
-            List<ValueAxis> axises = axisMap.get(unit);
-            double[]        range  = rangeMap.get(unit);
-            for (ValueAxis rangeAxis : axises) {
-                rangeAxis.setRange(new org.jfree.data.Range(range[0],
-                        range[1]));
-            }
-        }
-
-
-        long t2 = System.currentTimeMillis();
-
-        BufferedImage newImage =
-            chart.createBufferedImage(request.get(ARG_IMAGE_WIDTH, 1000),
-                                      request.get(ARG_IMAGE_HEIGHT, 400));
-        long t3 = System.currentTimeMillis();
-        //System.err.println("timeseries image time:" + (t2 - t1) + " "
-        //                   + (t3 - t2));
-
-        File file = getStorageManager().getTmpFile(request, "point.png");
-        ImageUtils.writeImageToFile(newImage, file);
-        InputStream is     = getStorageManager().getFileInputStream(file);
-        Result      result = new Result("", is, "image/png");
-
-        return result;
-
-    }
-
-    /**
-     * get the parameter name from the raw name
-     *
-     * @param rawname the raw name
-     *
-     * @return  the parameter name
-     */
-    public String getParamName(String rawname) {
-        String name  = rawname;
-        int    index = rawname.indexOf("[unit=");
-        if (index >= 0) {
-            name = rawname.substring(0, index);
-        }
-
-        return name;
-    }
-
-    /**
-     * Get the parameter unit from the raw name
-     *
-     * @param rawname  the raw name
-     *
-     * @return  the unit or null
-     */
-    private String getUnitFromName(String rawname) {
-        String unit  = null;
-        int    index = rawname.indexOf("[unit=");
-        if (index >= 0) {
-            unit = rawname.substring(index + 6, rawname.indexOf("]"));
-            unit = unit.replaceAll("\"", "");
-        }
-
-        return unit;
-    }
-
-
-    /**
-     * A wrapper for TimeSeries
-     *
-     * @author RAMADDA Development Team
-     */
-    private static class MyTimeSeries extends TimeSeries {
-
-        /** the items */
-        List<TimeSeriesDataItem> items = new ArrayList<TimeSeriesDataItem>();
-
-        /** seen items */
-        HashSet<TimeSeriesDataItem> seen = new HashSet<TimeSeriesDataItem>();
-
-        /**
-         * Construct the time series
-         *
-         * @param name  the name
-         * @param c     the class
-         */
-        public MyTimeSeries(String name, Class c) {
-            super(name, c);
-        }
-
-        /**
-         * Add an item to the timeseries
-         *
-         * @param item  the item to add
-         */
-        public void addItem(TimeSeriesDataItem item) {
-            if (seen.contains(item)) {
-                return;
-            }
-            seen.add(item);
-            items.add(item);
-        }
-
-        /**
-         * finish this
-         */
-        public void finish() {
-            items = new ArrayList<TimeSeriesDataItem>(Misc.sort(items));
-
-            for (TimeSeriesDataItem item : items) {
-                this.data.add(item);
-            }
-            fireSeriesChanged();
-        }
-
-
-    }
-
-
-    /**
-     * Create the chart
-     *
-     *
-     * @param request  the request
-     * @param entry    the entry
-     * @param dataset  the dataset
-     *
-     * @return the chart
-     */
-    private static JFreeChart createChart(Request request, Entry entry,
-                                          XYDataset dataset) {
-        LatLonPointImpl llp =
-            new LatLonPointImpl(request.getLatOrLonValue(ARG_LOCATION
-                + ".latitude", 0), request.getLatOrLonValue(ARG_LOCATION
-                               + ".longitude", 0));
-        String     title = entry.getName() + " at " + llp.toString();
-
-        JFreeChart chart = ChartFactory.createTimeSeriesChart(
-        //entry.getName(),  // title
-        title,    // title
-        "Date",   // x-axis label
-        "",       // y-axis label
-        dataset,  // data
-        true,     // create legend?
-        true,     // generate tooltips?
-        false     // generate URLs?
-            );
-
-        chart.setBackgroundPaint(Color.white);
-        ValueAxis rangeAxis = new NumberAxis("");
-        rangeAxis.setVisible(false);
-        XYPlot plot = (XYPlot) chart.getPlot();
-        if (request.get("gray", false)) {
-            plot.setBackgroundPaint(Color.lightGray);
-            plot.setDomainGridlinePaint(Color.white);
-            plot.setRangeGridlinePaint(Color.white);
-        } else {
-            plot.setBackgroundPaint(Color.white);
-            plot.setDomainGridlinePaint(Color.lightGray);
-            plot.setRangeGridlinePaint(Color.lightGray);
-        }
-        plot.setAxisOffset(new RectangleInsets(5.0, 5.0, 5.0, 5.0));
-        plot.setDomainCrosshairVisible(true);
-        plot.setRangeCrosshairVisible(true);
-        plot.setRangeAxis(0, rangeAxis, false);
-
-
-        XYItemRenderer r    = plot.getRenderer();
-        DateAxis       axis = (DateAxis) plot.getDomainAxis();
-        //axis.setDateFormatOverride(new SimpleDateFormat("MMM-yyyy"));
-
-        return chart;
-
-    }
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result processJsonRequest(Request request) throws Exception {
-        String prefix = getRepository().getUrlBase() + "/grid/json";
-        Entry  entry  = getCdmManager().findEntryFromPath(request, prefix);
-
-        request.put(ARG_FORMAT, FORMAT_JSON);
-        request.put(ARG_OUTPUT, OUTPUT_GRIDASPOINT.getId());
-
-        return outputGridAsPoint(request, entry);
-    }
 
 }
