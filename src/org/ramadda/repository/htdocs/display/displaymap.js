@@ -27,6 +27,7 @@ function RamaddaMapDisplay(displayManager, id, properties) {
             mapBoundsSet:false,
             features: [],
             myMarkers: {},
+            mapEntryInfos: {},
             sourceToLine: {},
             sourceToPoints: {},
             snarf:true,
@@ -163,22 +164,28 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 }
             },
             addOrRemoveEntryMarker: function(id, entry, add) {
-                var marker  = this.myMarkers[id];
+                var mapEntryInfo  = this.mapEntryInfos[id];
                 if(!add) {
-                    if(marker!=null) {
-                        this.map.removeMarker(marker);
-                        this.myMarkers[id] = null;
+                    if(mapEntryInfo!=null) {
+                        mapEntryInfo.removeFromMap(this.map);
+                        this.mapEntryInfos[id] = null;
                     }  
                 } else {
-                    if(marker==null) {
+                    if(mapEntryInfo==null) {
+                        mapEntryInfo = new MapEntryInfo(entry);
+                        if(entry.hasBounds()) {
+                            var attrs ={};
+                            mapEntryInfo.rectangle = this.map.addRectangle (id, entry.getNorth(), entry.getWest(), entry.getSouth(), entry.getEast(), attrs);
+                        }
+
                         var latitude = entry.getLatitude();
                         var longitude = entry.getLongitude();
                         var point = new OpenLayers.LonLat(longitude, latitude);
-                        marker =  this.map.addMarker(id, point, entry.getIconUrl(),this.getEntryHtml(entry));
+                        mapEntryInfo.marker =  this.map.addMarker(id, point, entry.getIconUrl(),this.getEntryHtml(entry));
                         var theDisplay =this;
-                        marker.entry = entry;
-                        marker.ramaddaClickHandler = function(marker) {theDisplay.handleMapClick(marker);};
-                        this.myMarkers[id] = marker;
+                        mapEntryInfo.marker.entry = entry;
+                        mapEntryInfo.marker.ramaddaClickHandler = function(marker) {theDisplay.handleMapClick(marker);};
+                        this.mapEntryInfos[id] = mapEntryInfo;
                         if(this.handledMarkers == null) {
                             this.map.centerToMarkers();
                             this.handledMarkers = true;
@@ -206,9 +213,9 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                 }
             },
             handleEventRemoveDisplay: function(source, display) {
-                var marker  = this.myMarkers[display];
-                if(marker!=null) {
-                    this.map.removeMarker(marker);
+                var mapEntryInfo =  this.mapEntryInfos[display];
+                if(mapEntryInfo!=null) {
+                    mapEntryInfo.removeFromMap(this.map);
                 }
                 var feature = this.findFeature(display, true);
                 if(feature!=null) {
@@ -246,3 +253,20 @@ function RamaddaMapDisplay(displayManager, id, properties) {
 }
 
 
+
+function MapEntryInfo(entry) {
+    RamaddaUtil.defineMembers(this,{
+            entry: entry,
+            marker: null,
+            rectangle: null,
+            removeFromMap: function(map) {
+                if(this.marker != null) {
+                    map.removeMarker(this.marker);
+                }
+                if(this.rectangle != null) {
+                    map.removePolygon(this.rectangle);
+                }
+            }
+
+        });
+}

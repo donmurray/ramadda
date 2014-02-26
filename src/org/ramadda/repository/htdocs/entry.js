@@ -235,8 +235,26 @@ function Entry (props) {
                 }
                 return null;
             },
+            goodLoc: function(v) {
+                return !isNaN(v) && v != NONGEO;
+            },
+            hasBounds: function() {
+                return this.goodLoc(this.north) && this.goodLoc(this.west) && this.goodLoc(this.south) && this.goodLoc(this.east);
+            },
             hasLocation: function() {
-                return !isNaN(this.north) && this.north != NONGEO;
+                return this.goodLoc(this.north);
+            },
+            getNorth: function() {
+                return this.north;
+            },
+            getWest: function() {
+                return this.west;
+            },
+            getSouth: function() {
+                return this.south;
+            },
+            getEast: function() {
+                return this.east;
             },
             getLatitude: function() {
                 return this.north;

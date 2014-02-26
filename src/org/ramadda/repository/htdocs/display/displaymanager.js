@@ -228,12 +228,10 @@ function DisplayManager(argId,argProperties) {
                             lon = tuple[1];
                         }
                     } 
-                    if(lon == null || lat == null) {
-                        lat = "40.0";
-                        lon = "-105";
-                    }
-                    jsonUrl = jsonUrl.replace("${latitude}",lat);
-                    jsonUrl = jsonUrl.replace("${longitude}",lon);
+                    if(lon != null && lat != null) {
+                        jsonUrl = jsonUrl.replace("${latitude}",lat);
+                        jsonUrl = jsonUrl.replace("${longitude}",lon);
+                    } 
                 }
                 jsonUrl = jsonUrl.replace("${numpoints}",1000);
                 return jsonUrl;

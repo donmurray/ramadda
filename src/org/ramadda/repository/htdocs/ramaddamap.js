@@ -928,6 +928,7 @@ function RepositoryMap(mapId, params) {
         return box;
     }
 
+
     this.addRectangle = function(id, north, west, south, east, attrs) {
         var points = [ new OpenLayers.Geometry.Point(west, north),
                 new OpenLayers.Geometry.Point(west, south),
