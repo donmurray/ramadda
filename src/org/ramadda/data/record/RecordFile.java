@@ -467,6 +467,11 @@ public abstract class RecordFile {
             value = (String) getProperty(fieldProp, (String) null);
         }
         if (value == null) {
+            value = (String) getProperty(prop, (String) null);
+        }
+
+
+        if (value == null) {
             value = dflt;
         }
 
@@ -1438,6 +1443,8 @@ public abstract class RecordFile {
         dttm.setLength(0);
         getDateTimeString(record, dttm, dateIndex, timeIndex);
         Date date = sdf.parse(dttm.toString());
+        //xxx
+        System.err.println ("dttm - " + dttm +" DATE:" + date);
         record.setRecordTime(date.getTime());
     }
 
@@ -1565,7 +1572,9 @@ public abstract class RecordFile {
     public void setDateTimeIndex(int dateIndex, int timeIndex) {
         this.dateIndex = dateIndex;
         this.timeIndex = timeIndex;
-        sdf = makeDateFormat(getProperty(PROP_DATEFORMAT, "yyyy-MM-dd"));
+        String pattern = "yyyy-MM-dd";
+        if(timeIndex>=0) pattern += " HHmm";
+        sdf = makeDateFormat(getProperty(PROP_DATEFORMAT, pattern));
 
 
     }

@@ -103,6 +103,9 @@ public abstract class TextFile extends PointFile  {
     /** _more_ */
     private boolean headerStandard = false;
 
+    String commentLineStart = null;
+
+
     /**
      * _more_
      */
@@ -469,6 +472,7 @@ public abstract class TextFile extends PointFile  {
      * @return _more_
      */
     public boolean isLineValidData(String line) {
+        if(commentLineStart!=null && line.startsWith(commentLineStart)) return false;
         return true;
     }
 

@@ -255,6 +255,7 @@ public class DataRecord extends PointRecord {
 
         //timeField
 
+
         if ((dateIndex >= 0) || (timeIndex >= 0)) {
             getRecordFile().setDateTimeIndex(dateIndex, timeIndex);
         }

@@ -175,6 +175,9 @@ public class CsvFile extends TextFile {
         }
 
 
+        commentLineStart = getProperty("commentLineStart", null);
+
+
         if (fieldString == null) {
             setIsHeaderStandard(true);
             doQuickVisit();
