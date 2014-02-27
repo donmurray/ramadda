@@ -189,8 +189,9 @@ public class PointTiler extends RecordTool {
         if ((message != null) && (message.length() > 0)) {
             System.err.println("Error:" + message);
         }
+        
         System.err.println(
-            "usage: PointTiler\n\t-bounds <north> <west> <south> <east>\n\t-calcbounds (use the bounds of the input files)\n\t-size <size of major axis> (used with -calcbounds minor access size is calculated)\n\t-width <number of grid columns> -height <number of grid rows>\n\t-skip <decimation factor>\n\t-destination <destination directory>\n\t-suffix <file suffix - note: if .csv then we write out a csv file>\n\t-prefix <file prefix>\n\t<input files>");
+            "usage: PointTiler\n\t-class <class path of point file reader (see README)>\n\t-bounds <north> <west> <south> <east>\n\t-calcbounds (use the bounds of the input files)\n\t-size <size of major axis> (used with -calcbounds minor access size is calculated)\n\t-width <number of grid columns> -height <number of grid rows>\n\t-skip <decimation factor>\n\t-destination <destination directory>\n\t-suffix <file suffix - note: if .csv then we write out a csv file>\n\t-prefix <file prefix>\n\t<input files>");
 
         System.err.println(
             "e.g., -bounds 90 -180 -90 180 -width 12 -height 6 -destination tiles -suffix .dat -prefix TILED <input files>");
