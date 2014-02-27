@@ -590,9 +590,13 @@ public class Column implements DataTypes, Constants {
         col.add("canlist");
         col.add("" + getCanList());
         if (isEnumeration()) {
-            List<String> enums = new ArrayList<String>();
-            List<TwoFacedObject> values = typeHandler.getEnumValues(request,
-                                              this, null);
+            List<String>         enums = new ArrayList<String>();
+            List<TwoFacedObject> values;
+            if (isType(DATATYPE_ENUMERATION)) {
+                values = enumValues;
+            } else {
+                values = typeHandler.getEnumValues(request, this, null);
+            }
             if (values != null) {
                 for (TwoFacedObject tfo : values) {
                     enums.add(
