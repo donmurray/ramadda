@@ -42,21 +42,24 @@ import java.awt.geom.*;
 
 import java.io.*;
 
-import java.util.Date;
-
 
 import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
-import java.util.List;
+
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Hashtable;
+import java.util.List;
+import java.util.TimeZone;
 
 
 
 
 /**
  */
-public abstract class PointFile extends RecordFile implements Cloneable,  Fields {
+public abstract class PointFile extends RecordFile implements Cloneable,
+        Fields {
 
     /** _more_ */
     public static final String DFLT_PROPERTIES_FILE = "point.properties";
@@ -843,7 +846,7 @@ public abstract class PointFile extends RecordFile implements Cloneable,  Fields
     public static final String ATTR_MISSING = "missing";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SORTORDER = "sortorder";
 
     /** _more_ */
@@ -952,8 +955,7 @@ public abstract class PointFile extends RecordFile implements Cloneable,  Fields
                 field.setMissingValue(Double.parseDouble(missing));
             }
 
-            String timezone = getProperty(field, properties, "timezone",
-                                          (String) null);
+
             String fmt = getProperty(field, properties, "fmt", (String) null);
             if (fmt == null) {
                 fmt = getProperty(field, properties, PROP_FORMAT,
@@ -961,8 +963,13 @@ public abstract class PointFile extends RecordFile implements Cloneable,  Fields
             }
 
             if (fmt != null) {
+                String timezone = getProperty(field, properties, "timezone",
+                                      "UTC");
                 field.setType(field.TYPE_DATE);
-                field.setDateFormat(new SimpleDateFormat(fmt));
+                SimpleDateFormat sdf = new SimpleDateFormat();
+                sdf.setTimeZone(TimeZone.getTimeZone(timezone));
+                sdf.applyPattern(fmt);
+                field.setDateFormat(sdf);
             }
 
             String type = getProperty(field, properties, ATTR_TYPE,
@@ -984,7 +991,7 @@ public abstract class PointFile extends RecordFile implements Cloneable,  Fields
                     if (patternMatch == null) {
                         throw new IllegalArgumentException(
                             "No match.\nPattern:" + pattern + "\nField:"
-                            + field+"\nHeader:" + header);
+                            + field + "\nHeader:" + header);
                     }
 
                     if (name.equalsIgnoreCase(FIELD_LATITUDE)
@@ -1140,6 +1147,11 @@ public abstract class PointFile extends RecordFile implements Cloneable,  Fields
         return ht;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getTextHeader() {
         return "";
     }

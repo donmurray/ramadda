@@ -139,9 +139,10 @@ public class TextRecord extends DataRecord {
      */
     public void setDelimiter(String value) {
         delimiter = value;
-        if ((!delimiter.equals("\t") && (delimiter.trim().length() == 0)) || delimiter.equals("space")) {
+        if (( !delimiter.equals("\t") && (delimiter.trim().length() == 0))
+                || delimiter.equals("space")) {
             delimiterIsSpace = true;
-            delimiter = " ";
+            delimiter        = " ";
         } else {
             delimiterIsSpace = false;
         }
@@ -332,12 +333,15 @@ public class TextRecord extends DataRecord {
         Date date   = null;
         int  offset = field.getUtcOffset();
         try {
-
-
             date = getDateFormat(field).parse(tok);
-            System.err.println ("tok:" + tok +" date:" + date);
+            //            System.err.println ("Date:" + tok +" parsed:" + date);
         } catch (java.text.ParseException ignore) {
-            date = getDateFormat(field).parse(tok + " UTC");
+            //Try tacking on UTC
+            try {
+                date = getDateFormat(field).parse(tok + " UTC");
+            } catch (java.text.ParseException ignoreThisOne) {
+                throw ignore;
+            }
         }
         if (offset != 0) {
             long millis = date.getTime();

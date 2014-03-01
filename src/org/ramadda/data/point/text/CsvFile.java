@@ -28,6 +28,7 @@ import ucar.unidata.util.StringUtil;
 
 import java.awt.*;
 import java.awt.image.*;
+
 import java.io.*;
 
 import java.util.ArrayList;
@@ -163,7 +164,7 @@ public class CsvFile extends TextFile {
             fieldString = getProperty(PROP_FIELDS, null);
         } else {
             //Read the header because there are properties
-            if(getProperty(PROP_HEADER_STANDARD, false)) {
+            if (getProperty(PROP_HEADER_STANDARD, false)) {
                 doQuickVisit();
             }
         }

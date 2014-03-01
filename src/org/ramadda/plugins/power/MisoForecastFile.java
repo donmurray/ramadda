@@ -21,10 +21,12 @@
 package org.ramadda.plugins.power;
 
 
-import org.ramadda.repository.RepositoryUtil;
 import org.ramadda.data.point.*;
 import org.ramadda.data.point.text.*;
 import org.ramadda.data.record.*;
+
+
+import org.ramadda.repository.RepositoryUtil;
 
 import org.w3c.dom.Element;
 
@@ -32,17 +34,19 @@ import ucar.unidata.xml.XmlUtil;
 
 import java.io.*;
 
+import java.text.SimpleDateFormat;
+
+import java.util.Date;
 import java.util.List;
 
 import java.util.TimeZone;
-
-import java.text.SimpleDateFormat;
 
 
 /**
  */
 public class MisoForecastFile extends CsvFile {
 
+    /** _more_          */
     private boolean windForecast = false;
 
 
@@ -70,13 +74,15 @@ public class MisoForecastFile extends CsvFile {
     public InputStream doMakeInputStream(boolean buffered)
             throws IOException {
         try {
-            InputStream  source = super.doMakeInputStream(buffered);
-            Element      root   = XmlUtil.getRoot(source);
+            InputStream source = super.doMakeInputStream(buffered);
+            Element     root   = XmlUtil.getRoot(source);
             windForecast = root.getTagName().equals("WindForecastDayAhead");
 
-            StringBuffer s      = new StringBuffer("#converted stream\n");
+            StringBuffer s     = new StringBuffer("#converted stream\n");
 
-            List         nodes  = XmlUtil.findChildren(root, windForecast?"Forecast":"instance");
+            List         nodes = XmlUtil.findChildren(root, windForecast
+                    ? "Forecast"
+                    : "instance");
             for (int i = 0; i < nodes.size(); i++) {
                 Element node = (Element) nodes.get(i);
                 String dttm = XmlUtil.getGrandChildText(node, "DateTimeEST",
@@ -84,9 +90,8 @@ public class MisoForecastFile extends CsvFile {
                 String hour = XmlUtil.getGrandChildText(node,
                                   "HourEndingEST", null);
                 String value = XmlUtil.getGrandChildText(node, "Value", null);
-                s.append(dttm + " EST ," + hour + "," + value + "\n");
+                s.append(dttm + "," + hour + "," + value + "\n");
             }
-
 
             ByteArrayInputStream bais =
                 new ByteArrayInputStream(s.toString().getBytes());
@@ -113,21 +118,19 @@ public class MisoForecastFile extends CsvFile {
         String format;
         String varName;
         String varLabel;
-        if(windForecast) {
-            format = "MM/dd/yyyy k:mm a Z";
-            varName = "wind_forecast";
+        if (windForecast) {
+            format   = "MM/dd/yyyy h:mm a";
+            varName  = "wind_forecast";
             varLabel = "Wind Forecast";
         } else {
-            format = "MMM dd yyyy k:mma Z";
-            varName = "wind_generation";
+            format   = "MMM dd yyyy h:mma";
+            varName  = "wind_generation";
             varLabel = "Wind Generation";
             //            <DateTimeEST>Feb 27 2014  8:00PM</DateTimeEST>
         }
-
-
-
         putFields(new String[] {
-                makeField(FIELD_DATE, attrType("date"), attrFormat(format)),
+            makeField(FIELD_DATE, attr("timezone", "EST"), attrType("date"),
+                      attrFormat(format)),
             makeField("hour_ending", attrType("string"),
                       attrLabel("Hour Ending"), attrChartable()),
             makeField(varName, attrLabel(varLabel), attrChartable()), });
@@ -137,18 +140,15 @@ public class MisoForecastFile extends CsvFile {
 
 
 
+
     /**
      * _more_
      *
      * @param args _more_
+     *
+     * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
-        SimpleDateFormat sdf = RepositoryUtil.makeDateFormat("MM/dd/yyy k:mm a");
-        sdf.setTimeZone(TimeZone.getTimeZone("EST"));
-        /*
-        System.err.println(sdf.parse("3/28/2014 12:00 AM"));
-        System.err.println(sdf.parse("3/28/2014 12:30 AM"));
-        */
         PointFile.test(args, MisoForecastFile.class);
     }
 

@@ -52,7 +52,7 @@ import javax.swing.*;
 /**
  *
  */
-public abstract class TextFile extends PointFile  {
+public abstract class TextFile extends PointFile {
 
     /** _more_ */
     static int cnt = 0;
@@ -85,6 +85,7 @@ public abstract class TextFile extends PointFile  {
     /** _more_ */
     public static final String PROP_HEADER_DELIMITER = "header.delimiter";
 
+    /** _more_          */
     public static final String PROP_HEADER_STANDARD = "header.standard";
 
     /** _more_ */
@@ -103,6 +104,7 @@ public abstract class TextFile extends PointFile  {
     /** _more_ */
     private boolean headerStandard = false;
 
+    /** _more_          */
     String commentLineStart = null;
 
 
@@ -150,9 +152,11 @@ public abstract class TextFile extends PointFile  {
     public RecordIO doMakeInputIO(boolean buffered) throws IOException {
         String file = getFilename();
         if (file.endsWith(".xls")) {
-            return new RecordIO(new BufferedReader(new StringReader(XlsUtil.xlsToCsv(file))));
+            return new RecordIO(
+                new BufferedReader(new StringReader(XlsUtil.xlsToCsv(file))));
 
-        } 
+        }
+
         return super.doMakeInputIO(buffered);
     }
 
@@ -346,7 +350,7 @@ public abstract class TextFile extends PointFile  {
 
         boolean haveReadHeader  = headerLines.size() > 0;
         String  headerDelimiter = getHeaderDelimiter();
-        boolean isStandard = getProperty(PROP_HEADER_STANDARD, false);
+        boolean isStandard      = getProperty(PROP_HEADER_STANDARD, false);
 
 
         if (headerDelimiter != null) {
@@ -388,6 +392,7 @@ public abstract class TextFile extends PointFile  {
                 }
                 if ( !isHeaderLine(line)) {
                     firstDataLine = line;
+
                     break;
                 }
                 if ( !haveReadHeader) {
@@ -429,7 +434,7 @@ public abstract class TextFile extends PointFile  {
      */
     @Override
     public String getTextHeader() {
-        if(getHeaderLines().size()==0) {
+        if (getHeaderLines().size() == 0) {
             doQuickVisit();
         }
         StringBuffer textHeader = new StringBuffer();
@@ -468,7 +473,10 @@ public abstract class TextFile extends PointFile  {
      * @return _more_
      */
     public boolean isLineValidData(String line) {
-        if(commentLineStart!=null && line.startsWith(commentLineStart)) return false;
+        if ((commentLineStart != null) && line.startsWith(commentLineStart)) {
+            return false;
+        }
+
         return true;
     }
 
