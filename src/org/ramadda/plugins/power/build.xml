@@ -4,6 +4,7 @@
       <property name="plugin" value="power"/>
       <property file="${basedir}/build.properties"/>
       <ant antfile="${basedir}/build.xml" target="commoninit" />
+      <property name="plugindestdir" value="${dist_dir}/otherplugins"/>
       <property name="jarfile" value="${plugin}plugin.jar"/>
       <property name="plugin_dir" value="org/ramadda/plugins/power"/>
       <ant antfile="${basedir}/build.xml" target="plugin"/>
