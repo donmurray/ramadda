@@ -4437,11 +4437,11 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             sb.append(
                 HtmlUtils.importJS(fileUrl("/display/displaymanager.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/display.js")));
+            sb.append(
+                HtmlUtils.importJS(fileUrl("/display/displayentry.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/displaymap.js")));
             sb.append(
                 HtmlUtils.importJS(fileUrl("/display/displaychart.js")));
-            sb.append(
-                HtmlUtils.importJS(fileUrl("/display/displayentry.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/control.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/displayd3.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/displayext.js")));

@@ -936,6 +936,8 @@ public abstract class RecordFile {
                         }
                     }
 
+                    //System.err.println ("TIME:" + new Date(record.getRecordTime()));
+
                     record = makeNextRecord(record);
                     if (record == null) {
                         return;

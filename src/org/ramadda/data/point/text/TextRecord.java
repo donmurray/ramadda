@@ -166,67 +166,6 @@ public class TextRecord extends DataRecord {
         return delimiter;
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    @Override
-    public boolean hasRecordTime() {
-        if (super.hasRecordTime()) {
-            return true;
-        }
-
-        return idxTime >= 0;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    @Override
-    public long getRecordTime() {
-        if (idxTime >= 0) {
-            return ((Date) objectValues[idxTime]).getTime();
-        }
-
-        return super.getRecordTime();
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param attrId _more_
-     *
-     * @return _more_
-     */
-    public double getValue(int attrId) {
-        int idx = attrId - ATTR_FIRST;
-        //Offset since the  field ids are 1 based not 0 based
-        idx = idx - 1;
-        if ((idx >= 0) && (idx < values.length)) {
-            return values[idx];
-        }
-
-        return super.getValue(attrId);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param attrId _more_
-     * @param value _more_
-     */
-    public void setValue(int attrId, double value) {
-        int idx = attrId - ATTR_FIRST;
-        //Offset since the  field ids are 1 based not 0 based
-        idx         = idx - 1;
-        values[idx] = value;
-    }
 
 
 
@@ -393,7 +332,10 @@ public class TextRecord extends DataRecord {
         Date date   = null;
         int  offset = field.getUtcOffset();
         try {
+
+
             date = getDateFormat(field).parse(tok);
+            System.err.println ("tok:" + tok +" date:" + date);
         } catch (java.text.ParseException ignore) {
             date = getDateFormat(field).parse(tok + " UTC");
         }

@@ -11,11 +11,11 @@ var ID_ENTRIES = "entries";
 var ID_DETAILS = "details";
 var ID_DETAILS_MAIN = "detailsmain";
 
-addGlobalDisplayType({type: DISPLAY_ENTRYLIST, label:"Entry List",requiresData:false});
-addGlobalDisplayType({type: DISPLAY_ENTRYDISPLAY, label:"Entry Display",requiresData:false});
-//addGlobalDisplayType({type: DISPLAY_OPERANDS, label:"Operands",requiresData:false});
-addGlobalDisplayType({type: DISPLAY_TIMELINE, label:"Timeline",requiresData:false});
-addGlobalDisplayType({type: DISPLAY_METADATA, label:"Metadata Table",requiresData:false});
+addGlobalDisplayType({type: DISPLAY_ENTRYLIST, label:"Entry List",requiresData:false,category:"Entry Displays"});
+addGlobalDisplayType({type: DISPLAY_ENTRYDISPLAY, label:"Entry Display",requiresData:false,category:"Entry Displays"});
+//addGlobalDisplayType({type: DISPLAY_OPERANDS, label:"Operands",requiresData:false,category:"Entry Displays"});
+addGlobalDisplayType({type: DISPLAY_TIMELINE, label:"Timeline",requiresData:false,category:"Test"});
+addGlobalDisplayType({type: DISPLAY_METADATA, label:"Metadata Table",requiresData:false,category:"Entry Displays"});
 
 
 function RamaddaEntryDisplay(displayManager, id, type, properties) {

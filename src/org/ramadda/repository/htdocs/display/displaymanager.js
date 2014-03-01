@@ -176,13 +176,29 @@ function DisplayManager(argId,argProperties) {
                 var get = "getDisplayManager('" + this.getId() +"')";
                 var layout = "getDisplayManager('" + this.getId() +"').getLayoutManager()";
                 var html = "";
-                var newMenu = "";
+                var newMenus = {};
+                var cats = [];
                 for(var i=0;i<this.displayTypes.length;i++) {
                     //The ids (.e.g., 'linechart' have to match up with some class function with the name 
                     var type = this.displayTypes[i];
-                    newMenu+= HtmlUtil.tag(TAG_LI,[], HtmlUtil.tag(TAG_A, ["onclick", get+".createDisplay('" + type.type+"');"], type.label));
+                    var category = type.category;
+                    if(category == null) {
+                        category = "Misc";
+                    }
+                    if(newMenus[category] == null) {
+                        newMenus[category] = "";
+                        cats.push(category);
+                    }
+                    newMenus[category]+= HtmlUtil.tag(TAG_LI,[], HtmlUtil.tag(TAG_A, ["onclick", get+".createDisplay('" + type.type+"');"], type.label));
                 }
 
+                var newMenu = "";
+                for(var i=0;i<cats.length;i++) {
+                    var subMenu = HtmlUtil.tag("ul",[], newMenus[cats[i]]);
+                    var catLabel = HtmlUtil.tag(TAG_A,[],cats[i]);
+                    newMenu  += HtmlUtil.tag(TAG_LI,[],catLabel+subMenu);
+                    //                    newMenu  += HtmlUtil.tag(TAG_LI,[], "SUB " + i);
+                }
                 var layoutMenu = 
                     HtmlUtil.tag(TAG_LI,[], HtmlUtil.onClick(layout +".setLayout('table',1);", "Table - 1 column")) +"\n" +
                     HtmlUtil.tag(TAG_LI,[], HtmlUtil.onClick(layout +".setLayout('table',2);", "Table - 2 column")) +"\n" +
@@ -190,6 +206,7 @@ function DisplayManager(argId,argProperties) {
                     HtmlUtil.tag(TAG_LI,[], HtmlUtil.onClick(layout +".setLayout('rows');", "Rows")) +"\n" +
                     HtmlUtil.tag(TAG_LI,[], HtmlUtil.onClick(layout +".setLayout('columns');", "Columns")) +"\n" +
                     HtmlUtil.tag(TAG_LI,[], HtmlUtil.onClick(layout +".setLayout('tabs');", "Tabs"));
+
 
 
                 var menu = HtmlUtil.div([ATTR_CLASS,"ramadda-popup", ATTR_ID, this.getDomId(ID_MENU_OUTER)], 

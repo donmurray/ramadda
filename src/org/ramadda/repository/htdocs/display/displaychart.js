@@ -12,11 +12,11 @@ var DISPLAY_TEXT = "text";
 
 
 
-addGlobalDisplayType({type: DISPLAY_LINECHART, label:"Line chart",requiresData:true});
-addGlobalDisplayType({type:DISPLAY_BARCHART,label: "Bar chart",requiresData:true});
-addGlobalDisplayType({type:DISPLAY_TABLE , label: "Table",requiresData:true});
 
-addGlobalDisplayType({type:DISPLAY_TEXT , label: "Text Readout",requiresData:false});
+addGlobalDisplayType({type: DISPLAY_LINECHART, label:"Line chart",requiresData:true,category:"Charts"});
+addGlobalDisplayType({type:DISPLAY_BARCHART,label: "Bar chart",requiresData:true,category:"Charts"});
+addGlobalDisplayType({type:DISPLAY_TABLE , label: "Table",requiresData:true,category:"Charts"});
+addGlobalDisplayType({type:DISPLAY_TEXT , label: "Text Readout",requiresData:false,category:"Charts"});
 
 
 
@@ -87,6 +87,13 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 }
                 this.setChartSelection(args.index);
             },
+            getFieldsToSelect: function(pointData) {
+                var chartType = this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
+                if(chartType ==  DISPLAY_TABLE) {
+                    return pointData.getRecordFields();
+                } 
+                return  pointData.getChartableFields();
+            },
             displayData: function() {
                 if(this.getShowTitle()) {
                     this.setTitle(this.getTitle());
@@ -101,18 +108,25 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 this.allFields =  this.dataCollection.getList()[0].getRecordFields();
 
                 var selectedFields = this.getSelectedFields();
+                var chartType = this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
                 if(selectedFields.length==0) {
                     this.setContents("No fields selected");
                     return;
                 }
-                var dataList = this.getStandardData(selectedFields);
+                var props = {
+                    includeIndex: true
+                };
+                if(chartType == DISPLAY_TABLE) {
+                    props.includeIndex = false;
+                }
+                var dataList = this.getStandardData(selectedFields, props);
+            
                 if(dataList.length==0) {
                     this.setContents(HtmlUtil.div([ATTR_CLASS,"display-message"],
                                                   "No data available"));
                     return;
                 }
 
-                var chartType = this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
                 this.makeChart(chartType, dataList, selectedFields);
             },
             clearChart: function() {

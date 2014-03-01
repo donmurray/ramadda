@@ -22,19 +22,13 @@ package org.ramadda.data.point.text;
 
 
 import org.ramadda.data.point.*;
-
 import org.ramadda.data.record.*;
-
-import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringUtil;
 
 import java.awt.*;
 import java.awt.image.*;
-
 import java.io.*;
-
-import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 import java.util.Hashtable;

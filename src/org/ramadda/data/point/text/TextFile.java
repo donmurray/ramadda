@@ -149,18 +149,11 @@ public abstract class TextFile extends PointFile  {
      */
     public RecordIO doMakeInputIO(boolean buffered) throws IOException {
         String file = getFilename();
-        Reader reader;
         if (file.endsWith(".xls")) {
-            reader = new StringReader(XlsUtil.xlsToCsv(file));
-        } else {
-            if (file.startsWith("http:") || file.startsWith("https:")) {
-                reader = new InputStreamReader(IOUtil.getInputStream(file));
-            } else {
-                reader = new FileReader(file);
-            }
-        }
+            return new RecordIO(new BufferedReader(new StringReader(XlsUtil.xlsToCsv(file))));
 
-        return new RecordIO(new BufferedReader(reader));
+        } 
+        return super.doMakeInputIO(buffered);
     }
 
 
@@ -436,6 +429,9 @@ public abstract class TextFile extends PointFile  {
      */
     @Override
     public String getTextHeader() {
+        if(getHeaderLines().size()==0) {
+            doQuickVisit();
+        }
         StringBuffer textHeader = new StringBuffer();
         for (String line : getHeaderLines()) {
             List<String> toks = StringUtil.splitUpTo(line, "=", 2);

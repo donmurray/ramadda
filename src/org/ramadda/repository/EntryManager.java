@@ -6587,6 +6587,9 @@ public class EntryManager extends RepositoryManager {
         connection.setAutoCommit(false);
         long updateTime = getRepository().currentTime();
         for (Entry entry : entries) {
+            entry.getTypeHandler().clearCache();
+
+
             //Do we want to clear it from the cache???
             removeFromCache(entry);
             if ( !isNew) {

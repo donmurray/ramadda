@@ -279,7 +279,8 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 var dataList =  this.dataCollection.getList();
                 for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
                     var pointData = dataList[collectionIdx];
-                    var fields =pointData.getChartableFields();
+                    
+                    var fields =this.getFieldsToSelect(pointData);
                     if(html == null) {
                         html = HtmlUtil.tag(TAG_B, [],  "Fields");
                         html += HtmlUtil.openTag(TAG_DIV, [ATTR_CLASS, "display-fields"]);
@@ -333,7 +334,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
 
                 for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
                     var pointData = dataList[collectionIdx];
-                    var fields = pointData.getChartableFields();
+                    var fields = this.getFieldsToSelect(pointData);
                     if(fixedFields !=null) {
                         for(i=0;i<fields.length;i++) { 
                             var field = fields[i];
@@ -352,7 +353,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 this.selectedCbx = [];
                 for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
                     var pointData = dataList[collectionIdx];
-                    var fields = pointData.getChartableFields();
+                    var fields = this.getFieldsToSelect(pointData);
                     for(i=0;i<fields.length;i++) { 
                         var field = fields[i];
                         if(firstField==null) firstField = field;
@@ -370,6 +371,9 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                     df.push(firstField);
                 }
                 return df;
+            },
+            getFieldsToSelect: function(pointData) {
+                return  pointData.getChartableFields();
             },
             getGet: function() {
                 return  "getRamaddaDisplay('" + this.getId() +"')";
@@ -890,13 +894,11 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             },
             //callback from the pointData.loadData call
             pointDataLoaded: function(pointData, url, reload)  {
-                console.log("reload:" + reload);
                 if(!reload) {
                     this.addData(pointData);
                 }
                 this.updateUI(pointData);
                 if(!reload) {
-                    console.log("doing event");
                     this.getDisplayManager().handleEventPointDataLoaded(this, pointData);
                 }
                 if(url!=null) {
@@ -906,12 +908,24 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 }
             },
             //get an array of arrays of data 
-            getStandardData : function(fields) {
+            getStandardData : function(fields, props) {
+                if(props == null) {
+                    props = {
+                        includeIndex: true,
+                    };
+                }
+                
                 var dataList = [];
                 //The first entry in the dataList is the array of names
                 //The first field is the domain, e.g., time or index
                 //        var fieldNames = ["domain","depth"];
-                var fieldNames = ["Date"];
+                var fieldNames = [];
+
+
+                if(props.includeIndex) {
+                    fieldNames.push("Date");
+                }
+
                 for(i=0;i<fields.length;i++) { 
                     var field = fields[i];
                     var name  = field.getLabel();
@@ -952,23 +966,25 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 for(j=0;j<records.length;j++) { 
                     var record = records[j];
                     var values = [];
-                    var date = record.getDate();
-                    if(indexField>=0) {
-                        var field = allFields[indexField];
-                        var value = record.getValue(indexField);
-                        if(j==0) {
-                            fieldNames[0] = field.getLabel();
-                        }
-                        values.push(value);
-                    } else {
-                        if(this.hasDate) {
-                            date = new Date(date);
-                            values.push(date);
-                        } else {
+                    if(props.includeIndex) {
+                        var date = record.getDate();
+                        if(indexField>=0) {
+                            var field = allFields[indexField];
+                            var value = record.getValue(indexField);
                             if(j==0) {
-                                fieldNames[0] = "Index";
+                                fieldNames[0] = field.getLabel();
                             }
-                            values.push(j);
+                            values.push(value);
+                        } else {
+                            if(this.hasDate) {
+                                date = new Date(date);
+                                values.push(date);
+                            } else {
+                                if(j==0) {
+                                    fieldNames[0] = "Index";
+                                }
+                                values.push(j);
+                            }
                         }
                     }
 

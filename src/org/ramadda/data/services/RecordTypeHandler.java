@@ -333,6 +333,18 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
         return recordFile;
     }
 
+    private String getPath(Entry entry) throws Exception {
+        String path;
+        if(entry.isFile()) {
+            path = entry.getFile().toString();
+        } else {
+            path = entry.getResource().getPath();
+        }
+        System.err.println ("path:" + path);
+        return path;
+    }
+
+
     /**
      * _more_
      *
@@ -352,9 +364,9 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
         if (recordFileClass != null) {
             return doMakeRecordFile(entry, recordFileClass, properties);
         }
-        String path = entry.getFile().toString();
 
-        return (RecordFile) getRecordFileFactory().doMakeRecordFile(path,
+
+        return (RecordFile) getRecordFileFactory().doMakeRecordFile(getPath(entry),
                 properties);
     }
 
@@ -378,7 +390,7 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
                                                                  Hashtable.class });
         if (ctor != null) {
             return (RecordFile) ctor.newInstance(new Object[] {
-                entry.getFile().toString(),
+                    getPath(entry),
                 properties });
         }
         ctor = Misc.findConstructor(c, new Class[] { String.class });
