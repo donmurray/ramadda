@@ -806,7 +806,9 @@ public class TypeHandler extends RepositoryManager {
     /**
      * _more_
      */
-    public void clearCache() {}
+    public void clearCache() {
+        columnEnumValues = new Hashtable<String, HashSet>();
+    }
 
     /**
      * _more_
@@ -1489,6 +1491,7 @@ public class TypeHandler extends RepositoryManager {
      * @param entry _more_
      */
     public void doFinalEntryInitialization(Request request, Entry entry) {
+        //Clear the column value cache
         if (request == null) {
             return;
         }
