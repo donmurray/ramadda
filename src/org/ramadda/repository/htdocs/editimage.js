@@ -1,6 +1,7 @@
 
 var imageDoFirst = 1;
 function editImageClick(event, imgId, pt1x,pt1y,pt2x,pt2y) {
+
     var obj = GuiUtils.getDomObject(imgId);
 
     if(obj) {
@@ -34,20 +35,19 @@ function editImageClick(event, imgId, pt1x,pt1y,pt2x,pt2y) {
 	}
 	var box = GuiUtils.getDomObject("image_edit_box");
 	if(box) {
-		var style = GuiUtils.getStyle(box);
-		style.visibility =  "visible";
-                style.left = idx+parseInt(fldx1.obj.value);
-		style.top =  idy+parseInt(fldy1.obj.value);
-		var x2 = parseInt(fldx2.obj.value);
-		var y2 = parseInt(fldy2.obj.value);
-	        if(x2>0) {
- 	            style.width = x2-parseInt(fldx1.obj.value);
-	            style.height = y2-parseInt(fldy1.obj.value);
-		}  else {
- 	            style.width = 0;
-	            style.height = 0;
-		}
-//		alert(style.top + " " + style.left + " w:" + style.width + " " + style.height);
+            var b = $("#image_edit_box");
+            var x2 = parseInt(fldx2.obj.value);
+            var y2 = parseInt(fldy2.obj.value);
+            var width = x2-parseInt(fldx1.obj.value);
+            var height = y2-parseInt(fldy1.obj.value);
+            console.log(b.size());
+            b.show();
+            b.css({
+                   top: idy+parseInt(fldy1.obj.value), 
+                   left: idx+parseInt(fldx1.obj.value), 
+                   width: width,
+                   height: height,
+                   position:'absolute'});
 	}
     }
 }
