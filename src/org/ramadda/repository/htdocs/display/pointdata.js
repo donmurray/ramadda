@@ -71,13 +71,6 @@ function BasePointData(name, properties) {
             },
             handleEventMapClick: function (myDisplay, source, lon, lat) {
             },
-            getEntry: function() {
-                if(this.entry!=null) {
-                    return this.entry;
-                }
-                this.entry = getEntryManager().getEntry(this.entryId);
-                return this.entry;
-            },
             hasData : function() {
                 return this.records!=null;
             },

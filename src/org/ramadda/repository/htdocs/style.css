@@ -1595,8 +1595,8 @@ xxxpath.link {
    background-color : black;
    */
    position: absolute; 
-   visibility: hidden; 
-   z-index: 1;
+//   visibility: hidden; 
+   z-index: 1000;
 }
 
 

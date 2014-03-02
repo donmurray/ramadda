@@ -301,7 +301,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 this.updateForSearching(jsonUrl);
             },
             updateForSearching: function(jsonUrl) {
-                var outputs = getEntryManager().getSearchLinks(this.searchSettings);
+                var outputs = this.getEntryManager().getSearchLinks(this.searchSettings);
                 this.footerRight  = "Links: " + HtmlUtil.join(outputs," - "); 
                 this.writeHtml(ID_FOOTER_RIGHT, this.footerRight);
                 this.writeHtml(ID_RESULTS, "Searching...");
@@ -330,7 +330,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     extra+= "&" + col.getSearchArg() +"=" + encodeURI(value);
                 }
                 this.searchSettings.setExtra(extra);
-                var jsonUrl = getEntryManager().getSearchUrl(this.searchSettings, OUTPUT_JSON);
+                var jsonUrl = this.getEntryManager().getSearchUrl(this.searchSettings, OUTPUT_JSON);
                 return jsonUrl;
             },
             makeSearchForm: function() {
@@ -410,7 +410,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     var theDisplay = this;
                     if(!this.metadataLoading[metadataType.getType()]) {
                         this.metadataLoading[metadataType.getType()] = true;
-                        metadata = getEntryManager().getMetadataCount(metadataType, function(metadataType, metadata) {theDisplay.addMetadata(metadataType, metadata);});
+                        metadata = this.getEntryManager().getMetadataCount(metadataType, function(metadataType, metadata) {theDisplay.addMetadata(metadataType, metadata);});
                     }
                 }
                 if(metadata == null) {
@@ -453,7 +453,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
             addTypes: function(types) {
                 if(types == null) {
                     var theDisplay = this;
-                    types = getEntryManager().getEntryTypes(function(types) {theDisplay.addTypes(types);});
+                    types = this.getEntryManager().getEntryTypes(function(types) {theDisplay.addTypes(types);});
                 }
                 if(types == null) {
                     return;
@@ -1061,7 +1061,7 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
             baseUrl: null,
             initDisplay: function() {
                 this.initUI();
-                this.baseUrl = getEntryManager().getSearchUrl(this.searchSettings, OUTPUT_JSON);
+                this.baseUrl = this.getEntryManager().getSearchUrl(this.searchSettings, OUTPUT_JSON);
                 this.entryList = new EntryList(jsonUrl, this, this.entryList);
                 var html = "";
                 html += HtmlUtil.div([ATTR_ID,this.getDomId(ID_ENTRIES),ATTR_CLASS,"display-entrylist-entries"], "");

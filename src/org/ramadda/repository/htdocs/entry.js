@@ -128,7 +128,7 @@ function EntryManager(repositoryRoot) {
 
 
 
-function getEntryManager() {
+function getGlobalEntryManager() {
     if(window.globalEntryManager == null) {
         window.globalEntryManager = new EntryManager();
     }
@@ -143,7 +143,7 @@ function createEntriesFromJson(data) {
     for(var i=0;i<data.length;i++)  {
         var entryData = data[i];
         var entry = new Entry(entryData);
-        getEntryManager().addEntry(entry);
+        getGlobalEntryManager().addEntry(entry);
         entries.push(entry);
     }
     return entries;

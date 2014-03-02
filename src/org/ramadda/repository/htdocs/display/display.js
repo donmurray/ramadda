@@ -423,13 +423,17 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                                                               [ATTR_CLASS, "display-dialog-button", ATTR_ID,  this.getDomId(ID_MENU_BUTTON + entry.getId())]));
              return menuButton;
          },
-            getEntry: function(entryId) {
+         getEntryManager: function() {
+                if(this.entryManager!=null) return this.entryManager;
+                return getGlobalEntryManager();
+        },
+        getEntry: function(entryId) {
                 var entry = null;
                 if(this.entryList!=null) {
                     entry = this.entryList.getEntry(entryId);
                 }
                 if(entry == null) {
-                    entry = getEntryManager().getEntry(entryId);
+                    entry = this.getEntryManager().getEntry(entryId);
                 }
                 return entry;
             },
@@ -855,7 +859,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                     searchSettings.clearAndAddType(this.searchSettings.entryType);
                 }
                 var theDisplay = this;
-                var jsonUrl = getEntryManager().getSearchUrl(searchSettings, OUTPUT_JSON);
+                var jsonUrl = this.getEntryManager().getSearchUrl(searchSettings, OUTPUT_JSON);
                 var handler = {
                     entryListChanged: function(entryList) {
                         theDisplay.doneQuickEntrySearch(entryList, callback);
@@ -885,11 +889,13 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 }
 
                 this.dataCollection.addData(pointData);
-                var entry = pointData.getEntry();
-                if(entry!=null) {
+                var entry  =  pointData.entry;
+                if(entry == null) {
+                    entry  = this.getEntryManager().getEntry(pointData.entryId);
+                } 
+                if(entry) {
+                    pointData.entry = entry;
                     this.addEntry(entry);
-                } else {
-                    //console.log("no entry:" + pointData.entryId);
                 }
             },
             //callback from the pointData.loadData call
