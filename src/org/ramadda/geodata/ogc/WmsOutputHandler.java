@@ -18,7 +18,7 @@
 * DEALINGS IN THE SOFTWARE.
 */
 
-package org.ramadda.plugins.wms;
+package org.ramadda.geodata.ogc;
 
 
 import org.ramadda.repository.*;
