@@ -38,10 +38,25 @@ function EntryManager(repositoryRoot) {
     if(repositoryRoot == null) {
         repositoryRoot = ramaddaBaseUrl;
     }
+
+    console.log("root:" + repositoryRoot);
+    var hostname = null;
+    var match =  repositoryRoot.match("^(http.?://[^/]+)/");
+    if(match && match.length>0) {
+        hostname = match[1];
+    } else {
+        //        console.log("no match");
+    }
+    //    console.log("hostname:" + hostname);
+
     RamaddaUtil.defineMembers(this, {
             repositoryRoot:repositoryRoot,
+            hostname: hostname,
             entryCache: {},
             entryTypes: null,
+            getHostname: function() {
+                return this.hostname;
+            },
             getRoot: function() {
                 return this.repositoryRoot;
             },
@@ -308,7 +323,14 @@ function Entry(props) {
                 if(this.icon==null) {
                     return this.getEntryManager().getRoot() + "/icons/page.png";
                 }
-                return this.getEntryManager().getRoot() + this.icon;
+                var url;
+                var hostname = this.getEntryManager().getHostname();
+                if(hostname)
+                    url =  hostname + this.icon;
+                else 
+                    url =  this.getEntryManager().getRoot() + this.icon;
+                console.log("url: " + url);
+                return url;
             },
             getIconImage : function (attrs) {
                 return HtmlUtil.image(this.getIconUrl(),attrs);

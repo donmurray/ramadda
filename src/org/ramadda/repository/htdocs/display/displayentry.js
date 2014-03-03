@@ -463,14 +463,17 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 var cats =[];
                 var catMap = {}; 
                 var select = HtmlUtil.tag("option",[ATTR_TITLE,"","value",""],"Any Type");
+                var hostname = this.getEntryManager().getHostname();
                 for(var i = 0;i< types.length;i++) {
                     var type = types[i];
                     var map = catMap[type.getCategory()];
                     //                    var style = " background: URL(" + type.getIcon() +") no-repeat;";
-                    
+
+                    var icon =                     type.getIcon();
+                    if(hostname) icon = hostname + icon;
                     var optionAttrs  = [ATTR_TITLE,type.getLabel(),"value",type.getId(),ATTR_CLASS, "display-typelist-type",
                                         //                                        ATTR_STYLE, style,
-                                        "data-iconurl",type.getIcon()];
+                                        "data-iconurl",icon];
                     var selected =  this.searchSettings.hasType(type.getId());
                     if(selected) {
                         optionAttrs.push("selected");
