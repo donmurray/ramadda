@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -302,22 +302,26 @@ public class RepositoryManager implements RepositorySource, Constants,
      * @param label _more_
      * @param value _more_
      */
-    public void addCriteria(Request request, StringBuffer sb, String label,
+    public void addCriteria(Request request, Appendable sb, String label,
                             Object value) {
-        String sv;
-        if (value instanceof Date) {
-            Date dttm = (Date) value;
-            sv = formatDate(request, dttm);
-        } else {
-            sv = value.toString();
+        try {
+            String sv;
+            if (value instanceof Date) {
+                Date dttm = (Date) value;
+                sv = formatDate(request, dttm);
+            } else {
+                sv = value.toString();
+            }
+            sv = sv.replace("<", "&lt;");
+            sv = sv.replace(">", "&gt;");
+            sb.append("<tr valign=\"top\"><td align=right>");
+            sb.append(HtmlUtils.b(label));
+            sb.append("</td><td>");
+            sb.append(sv);
+            sb.append("</td></tr>");
+        } catch (IOException ioe) {
+            throw new RuntimeException(ioe);
         }
-        sv = sv.replace("<", "&lt;");
-        sv = sv.replace(">", "&gt;");
-        sb.append("<tr valign=\"top\"><td align=right>");
-        sb.append(HtmlUtils.b(label));
-        sb.append("</td><td>");
-        sb.append(sv);
-        sb.append("</td></tr>");
     }
 
     /**
@@ -793,14 +797,15 @@ public class RepositoryManager implements RepositorySource, Constants,
      *
      * @return _more_
      */
-    public String makeFormSubmitDialog(StringBuffer sb, String message) {
+    public String makeFormSubmitDialog(Appendable sb, String message) {
         String id = "dialog-message" + (dialogCnt++);
         String onSubmit = " onsubmit=\"return submitEntryForm('#" + id
                           + "');\" ";
         String loadingImage =
             HtmlUtils.img(getRepository().iconUrl(ICON_PROGRESS));
-        sb.append("<div style=\"display:none;\" id=\"" + id + "\">"
-                  + loadingImage + " " + message + "</div>");
+        Utils.append(sb,
+                     "<div style=\"display:none;\" id=\"" + id + "\">"
+                     + loadingImage + " " + message + "</div>");
 
         return onSubmit;
 
@@ -815,14 +820,15 @@ public class RepositoryManager implements RepositorySource, Constants,
      *
      * @return _more_
      */
-    public String makeButtonSubmitDialog(StringBuffer sb, String message) {
+    public String makeButtonSubmitDialog(Appendable sb, String message) {
         String id = HtmlUtils.getUniqueId("dialog-message");
         String onSubmit = " onclick=\"return submitEntryForm('#" + id
                           + "');\" ";
         String loadingImage =
             HtmlUtils.img(getRepository().iconUrl(ICON_PROGRESS));
-        sb.append("<div style=\"display:none;\" id=\"" + id + "\">"
-                  + loadingImage + " " + message + "</div>");
+        Utils.append(sb,
+                     "<div style=\"display:none;\" id=\"" + id + "\">"
+                     + loadingImage + " " + message + "</div>");
 
         return onSubmit;
 

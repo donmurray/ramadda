@@ -1728,7 +1728,7 @@ public interface Constants {
     public static final String PROP_USE_FIXED_HOSTNAME =
         "ramadda.usefixedhostname";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_CORS_OK = "ramadda.cors.ok";
 
 

@@ -155,7 +155,7 @@ public class Result {
      *
      * @param content  the content
      */
-    public Result(StringBuffer content) {
+    public Result(Appendable content) {
         this("", content);
     }
 
@@ -165,7 +165,7 @@ public class Result {
      * @param title   the title
      * @param content the content
      */
-    public Result(String title, StringBuffer content) {
+    public Result(String title, Appendable content) {
         this(title, content.toString().getBytes(), TYPE_HTML);
     }
 
@@ -187,7 +187,7 @@ public class Result {
      * @param content  the content
      * @param mimeType     the mime type
      */
-    public Result(String title, StringBuffer content, String mimeType) {
+    public Result(String title, Appendable content, String mimeType) {
         this(title, content.toString().getBytes(), mimeType);
     }
 

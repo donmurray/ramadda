@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -556,7 +556,7 @@ public class HtmlOutputHandler extends OutputHandler {
             wikiTemplate = null;
         }
 
-        if(innerContent == null) {
+        if (innerContent == null) {
             innerContent = entry.getTypeHandler().getWikiTemplateInner();
         }
 
@@ -1116,7 +1116,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 tabTitles, tabContents);
 
 
-        StringBuffer comments = getCommentBlock(request, entry, true);
+        StringBuilder comments = getCommentBlock(request, entry, true);
         if (comments.length() > 0) {
             tabTitles.add(msg("Comments"));
             //        System.out.println (comments);
@@ -1360,7 +1360,7 @@ public class HtmlOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public void makeGrid(Request request, List<Entry> allEntries,
-                         StringBuffer sb)
+                         Appendable sb)
             throws Exception {
         int cols = request.get(ARG_COLUMNS, 4);
         sb.append("<table width=100% border=0 cellpadding=10>");
@@ -1442,7 +1442,7 @@ public class HtmlOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public void makeTreeView(Request request, List<Entry> children,
-                             StringBuffer sb)
+                             Appendable sb)
             throws Exception {
         request.put(ARG_TREEVIEW, "true");
         StringBuffer listSB = new StringBuffer();
@@ -1475,7 +1475,7 @@ public class HtmlOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public void makeTable(Request request, List<Entry> allEntries,
-                          StringBuffer sb)
+                          Appendable sb)
             throws Exception {
 
         boolean showCategories = request.get(ARG_SHOWCATEGORIES, true);

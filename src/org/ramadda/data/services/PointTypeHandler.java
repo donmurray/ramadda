@@ -257,7 +257,7 @@ public class PointTypeHandler extends RecordTypeHandler {
      */
     @Override
     public void addColumnToEntryForm(Request request, Column column,
-                                     StringBuffer formBuffer, Entry entry,
+                                     Appendable formBuffer, Entry entry,
                                      Object[] values, Hashtable state,
                                      FormInfo formInfo)
             throws Exception {
@@ -343,9 +343,9 @@ public class PointTypeHandler extends RecordTypeHandler {
                 pointEntry.getBinaryPointFile().visit(metadata2,
                         new VisitInfo(VisitInfo.QUICKSCAN_NO), null);
                 List<double[]> polygon = llg.getBoundingPolygon();
-                StringBuffer[] sb = new StringBuffer[] { new StringBuffer(),
-                        new StringBuffer(), new StringBuffer(),
-                        new StringBuffer() };
+                StringBuilder[] sb = new StringBuilder[] { new StringBuilder(),
+                        new StringBuilder(), new StringBuilder(),
+                        new StringBuilder() };
                 int idx = 0;
                 for (double[] point : polygon) {
                     String toAdd = point[0] + "," + point[1] + ";";

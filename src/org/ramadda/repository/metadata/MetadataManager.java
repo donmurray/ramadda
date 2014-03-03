@@ -268,15 +268,17 @@ public class MetadataManager extends RepositoryManager {
      *
      * @throws Exception On badness
      */
-    public void decorateEntry(Request request, Entry entry, StringBuffer sb,
+    public void decorateEntry(Request request, Entry entry, Appendable sb,
                               boolean forLink)
             throws Exception {
-        int currentLength = sb.length();
+        StringBuilder mine = new StringBuilder();
         for (Metadata metadata : getMetadata(entry)) {
             MetadataHandler handler = findMetadataHandler(metadata.getType());
-            handler.decorateEntry(request, entry, sb, metadata, forLink);
+            handler.decorateEntry(request, entry, mine, metadata, forLink);
             //Only do the first one so we don't get multiple thumbnails
-            if (currentLength != sb.length()) {
+            if (mine.length() > 0) {
+                sb.append(mine);
+
                 break;
             }
         }
@@ -1109,7 +1111,7 @@ public class MetadataManager extends RepositoryManager {
      * @throws Exception On badness
      */
     public void doMakeTagCloudOrList(Request request, String metadataType,
-                                     StringBuffer sb, boolean doCloud,
+                                     Appendable sb, boolean doCloud,
                                      int threshold)
             throws Exception {
         boolean         doJson  = request.responseInJson();
@@ -1167,7 +1169,7 @@ public class MetadataManager extends RepositoryManager {
                 for (int i = 0; i < tuples.size(); i++) {
                     Object[] tuple = (Object[]) tuples.get(i);
                     sb.append("<tr><td width=\"1%\" align=right>");
-                    sb.append(tuple[0]);
+                    sb.append(tuple[0].toString());
                     sb.append("</td><td>");
                     String value = (String) tuple[1];
                     sb.append(HtmlUtils.href(handler.getSearchUrl(request,

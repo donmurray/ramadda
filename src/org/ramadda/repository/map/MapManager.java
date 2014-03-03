@@ -161,7 +161,7 @@ public class MapManager extends RepositoryManager {
      * @return  the imports
      */
     public String getHtmlImports() {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(HtmlUtils.cssLink(getRepository().htdocsUrl(OPENLAYERS_BASE
                 + "/theme/default/style.css")));
         sb.append("\n");
@@ -273,7 +273,7 @@ public class MapManager extends RepositoryManager {
      * Get the GoogleEarth plugin html
      *
      * @param request   The Request
-     * @param sb        StringBuffer for passing strings
+     * @param sb        StringBuilder for passing strings
      * @param width     width of GE plugin
      * @param height    height of GE plugin
      * @param url       the KML URL
@@ -375,7 +375,7 @@ public class MapManager extends RepositoryManager {
      *
      * @param request      the Request
      * @param entries      the Entrys
-     * @param sb           StringBuffer to pass info back
+     * @param sb           StringBuilder to pass info back
      * @param width        width of GE plugin
      * @param height       height of GE plugin
      * @param includeList  true to include a list of entries
@@ -384,21 +384,21 @@ public class MapManager extends RepositoryManager {
      * @throws Exception problem creating the plugin
      */
     public void getGoogleEarth(Request request, List<Entry> entries,
-                               StringBuffer sb, int width, int height,
+                               Appendable sb, int width, int height,
                                boolean includeList, boolean justPoints)
             throws Exception {
 
 
 
-        StringBuffer mapSB = new StringBuffer();
+        StringBuilder mapSB = new StringBuilder();
 
         String id = getMapManager().getGoogleEarthPlugin(request, mapSB,
                         width, height, null);
 
-        StringBuffer js         = new StringBuffer();
-        List<String> categories = new ArrayList<String>();
-        Hashtable<String, StringBuffer> catMap = new Hashtable<String,
-                                                     StringBuffer>();
+        StringBuilder js         = new StringBuilder();
+        List<String>  categories = new ArrayList<String>();
+        Hashtable<String, StringBuilder> catMap = new Hashtable<String,
+                                                      StringBuilder>();
         String categoryType = request.getString("category", "type");
 
         int    kmlCnt       = 0;
@@ -421,9 +421,9 @@ public class MapManager extends RepositoryManager {
             if ( !Utils.stringDefined(category)) {
                 category = entry.getTypeHandler().getDescription();
             }
-            StringBuffer catSB = catMap.get(category);
+            StringBuilder catSB = catMap.get(category);
             if (catSB == null) {
-                catMap.put(category, catSB = new StringBuffer());
+                catMap.put(category, catSB = new StringBuilder());
                 categories.add(category);
             }
             String call = id + ".entryClicked("
@@ -483,7 +483,7 @@ public class MapManager extends RepositoryManager {
                 }
                 List<double[]> points   = new ArrayList<double[]>();
                 String         s        = metadata.getAttr1();
-                StringBuffer   pointsSB = new StringBuffer();
+                StringBuilder  pointsSB = new StringBuilder();
                 for (String pair : StringUtil.split(s, ";", true, true)) {
                     List<String> toks = StringUtil.splitUpTo(pair, ",", 2);
                     if (toks.size() != 2) {
@@ -588,7 +588,7 @@ public class MapManager extends RepositoryManager {
     /**
      * Make the table for the entry list
      *
-     * @param sb          StringBuffer to append to
+     * @param sb          StringBuilder to append to
      * @param includeList flag to include the list or not
      * @param numEntries  number of entries
      * @param listwidth   width of list table element
@@ -596,20 +596,23 @@ public class MapManager extends RepositoryManager {
      * @param categories  list of categories
      * @param catMap      category map
      * @param mapHtml     the map html
+     *
+     * @throws Exception _more_
      */
-    private void layoutMap(StringBuffer sb, boolean includeList,
+    private void layoutMap(Appendable sb, boolean includeList,
                            int numEntries, int listwidth, int height,
                            List<String> categories,
-                           Hashtable<String, StringBuffer> catMap,
-                           String mapHtml) {
+                           Hashtable<String, StringBuilder> catMap,
+                           String mapHtml)
+            throws Exception {
 
         if (includeList) {
             sb.append(
                 "<table border=\"0\" width=\"100%\"><tr valign=\"top\">");
             sb.append("<td width=\"");
-            sb.append(listwidth);
+            sb.append(listwidth + "");
             sb.append("\" style=\"max-width:");
-            sb.append(listwidth);
+            sb.append(listwidth + "");
             sb.append("px;\">");
             sb.append(
                 HtmlUtils.open(
@@ -620,8 +623,8 @@ public class MapManager extends RepositoryManager {
 
             boolean doToggle = (numEntries > 5) && (categories.size() > 1);
             for (int catIdx = 0; catIdx < categories.size(); catIdx++) {
-                String       category = categories.get(catIdx);
-                StringBuffer catSB    = catMap.get(category);
+                String        category = categories.get(catIdx);
+                StringBuilder catSB    = catMap.get(category);
                 if (doToggle) {
                     sb.append(HtmlUtils.makeShowHideBlock(category,
                             catSB.toString(), catIdx == 0));
@@ -661,7 +664,7 @@ public class MapManager extends RepositoryManager {
         if (fromEntry != null) {
             return fromEntry;
         }
-        StringBuffer info = new StringBuffer();
+        StringBuilder info = new StringBuilder();
 
         if (entry.getResource().isImage()) {
             int width  = request.get(ATTR_WIDTH, 400);
@@ -781,7 +784,7 @@ public class MapManager extends RepositoryManager {
      *
      * @param request       the Request
      * @param entriesToUse  the list of Entrys
-     * @param sb            StringBuffer to pass back html
+     * @param sb            StringBuilder to pass back html
      * @param width         width of the map
      * @param height        height of the map
      * @param detailed      detailed or not
@@ -792,7 +795,7 @@ public class MapManager extends RepositoryManager {
      * @throws Exception  problem creating map
      */
     public MapInfo getMap(Request request, List<Entry> entriesToUse,
-                          StringBuffer sb, int width, int height,
+                          StringBuilder sb, int width, int height,
                           boolean detailed, boolean[] haveBearingLines)
             throws Exception {
         return getMap(request, entriesToUse, sb, width, height, detailed,
@@ -805,7 +808,7 @@ public class MapManager extends RepositoryManager {
      *
      * @param request       the Request
      * @param entriesToUse  the list of Entrys
-     * @param sb            StringBuffer to pass back html
+     * @param sb            StringBuilder to pass back html
      * @param width         width of the map
      * @param height        height of the map
      * @param detailed      detailed or not
@@ -817,7 +820,7 @@ public class MapManager extends RepositoryManager {
      * @throws Exception  problem creating map
      */
     public MapInfo getMap(Request request, List<Entry> entriesToUse,
-                          StringBuffer sb, int width, int height,
+                          StringBuilder sb, int width, int height,
                           boolean detailed, boolean[] haveBearingLines,
                           boolean listentries)
             throws Exception {
@@ -833,8 +836,8 @@ public class MapManager extends RepositoryManager {
 
 
         List<String> categories = new ArrayList<String>();
-        Hashtable<String, StringBuffer> catMap = new Hashtable<String,
-                                                     StringBuffer>();
+        Hashtable<String, StringBuilder> catMap = new Hashtable<String,
+                                                      StringBuilder>();
         String categoryType = request.getString("category", "type");
         int    numEntries   = 0;
         for (Entry entry : entriesToUse) {
@@ -849,9 +852,9 @@ public class MapManager extends RepositoryManager {
                 category = entry.getTypeHandler().getCategory(
                     entry).getLabel().toString();
             }
-            StringBuffer catSB = catMap.get(category);
+            StringBuilder catSB = catMap.get(category);
             if (catSB == null) {
-                catMap.put(category, catSB = new StringBuffer());
+                catMap.put(category, catSB = new StringBuilder());
                 categories.add(category);
             }
             catSB.append(

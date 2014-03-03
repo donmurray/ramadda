@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -255,7 +255,7 @@ public class GraphOutputHandler extends OutputHandler {
     public Result outputGraphEntries(Request request, Entry mainEntry,
                                      List<Entry> entries)
             throws Exception {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         getGraph(request, mainEntry, entries, sb, 960, 500);
         Result result = new Result(msg("Graph"), sb);
         addLinks(request, result, new State(mainEntry));
@@ -278,10 +278,10 @@ public class GraphOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public void getGraph(Request request, Entry mainEntry,
-                         List<Entry> entries, StringBuffer sb, int width,
+                         List<Entry> entries, Appendable sb, int width,
                          int height)
             throws Exception {
-        StringBuffer    js    = new StringBuffer();
+        StringBuilder   js    = new StringBuilder();
         String          id    = addPrefixHtml(sb, js, width, height);
         HashSet<String> seen  = new HashSet<String>();
         List<String>    nodes = new ArrayList<String>();
@@ -309,9 +309,12 @@ public class GraphOutputHandler extends OutputHandler {
      * @param height _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public String addPrefixHtml(StringBuffer sb, StringBuffer js, int width,
-                                int height) {
+    public String addPrefixHtml(Appendable sb, Appendable js, int width,
+                                int height)
+            throws Exception {
         String divId = "graph_" + (graphCnt++);
         js.append("function createGraph" + divId + "() {\n");
         sb.append(HtmlUtils.importJS(fileUrl("/lib/d3/d3.min.js")));
@@ -334,10 +337,13 @@ public class GraphOutputHandler extends OutputHandler {
      * @param links _more_
      * @param width _more_
      * @param height _more_
+     *
+     * @throws Exception _more_
      */
-    public void addSuffixHtml(StringBuffer sb, StringBuffer js, String id,
+    public void addSuffixHtml(Appendable sb, Appendable js, String id,
                               List<String> nodes, List<String> links,
-                              int width, int height) {
+                              int width, int height)
+            throws Exception {
         js.append("var nodes  = [\n");
         js.append(StringUtil.join(",\n", nodes));
         js.append("];\n");
@@ -386,7 +392,7 @@ public class GraphOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     protected void getAssociationsGraph(Request request, String id,
-                                        StringBuffer sb)
+                                        Appendable sb)
             throws Exception {
         List<Association> associations =
             getAssociationManager().getAssociations(request, id);
@@ -444,7 +450,7 @@ public class GraphOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    private void addNodeTag(Request request, StringBuffer sb, Entry entry)
+    private void addNodeTag(Request request, Appendable sb, Entry entry)
             throws Exception {
         if (entry == null) {
             return;
@@ -496,9 +502,11 @@ public class GraphOutputHandler extends OutputHandler {
      * @param from _more_
      * @param to _more_
      * @param type _more_
+     *
+     * @throws Exception _more_
      */
-    private void addEdgeTag(StringBuffer sb, Entry from, Entry to,
-                            String type) {
+    private void addEdgeTag(Appendable sb, Entry from, Entry to, String type)
+            throws Exception {
         addEdgeTag(sb, from.getId(), to.getId(), type);
     }
 
@@ -509,9 +517,12 @@ public class GraphOutputHandler extends OutputHandler {
      * @param from _more_
      * @param to _more_
      * @param type _more_
+     *
+     * @throws Exception _more_
      */
-    private void addEdgeTag(StringBuffer sb, String from, String to,
-                            String type) {
+    private void addEdgeTag(Appendable sb, String from, String to,
+                            String type)
+            throws Exception {
         sb.append(XmlUtil.tag(TAG_EDGE,
                               XmlUtil.attrs(ATTR_TYPE, type, ATTR_FROM, from,
                                             ATTR_TO, to)));
@@ -537,8 +548,8 @@ public class GraphOutputHandler extends OutputHandler {
 
         }
 
-        StringBuffer    js      = new StringBuffer();
-        StringBuffer    linkJS  = new StringBuffer();
+        StringBuilder   js      = new StringBuilder();
+        StringBuilder   linkJS  = new StringBuilder();
 
         List<String>    nodes   = new ArrayList<String>();
         List<String>    links   = new ArrayList<String>();

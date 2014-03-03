@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -333,8 +333,7 @@ public class CalendarOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public void makeTimeline(Request request, Entry mainEntry,
-                             List<Entry> entries, StringBuffer sb,
-                             String style)
+                             List<Entry> entries, Appendable sb, String style)
             throws Exception {
         SimpleDateFormat sdf = new SimpleDateFormat("MMM d yyyy HH:mm:ss Z");
         long             minDate = 0;
@@ -401,7 +400,7 @@ public class CalendarOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     private Result outputDateGrid(Request request, Entry group,
-                                  List<Entry> entries, StringBuffer sb)
+                                  List<Entry> entries, Appendable sb)
             throws Exception {
         List             types    = new ArrayList();
         List             days     = new ArrayList();
@@ -596,7 +595,7 @@ public class CalendarOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public Result outputCalendar(Request request, Entry group,
-                                 List<Entry> entries, StringBuffer sb)
+                                 List<Entry> entries, Appendable sb)
             throws Exception {
 
         if (entries.size() == 0) {
@@ -1011,7 +1010,7 @@ public class CalendarOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public void outputCalendar(Request request, List<CalendarEntry> entries,
-                               StringBuffer sb, boolean doDay)
+                               Appendable sb, boolean doDay)
             throws Exception {
 
 

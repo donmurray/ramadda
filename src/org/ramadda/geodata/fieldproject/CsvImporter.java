@@ -78,7 +78,7 @@ public class CsvImporter extends ImportHandler {
      */
     @Override
     public void addImportTypes(List<TwoFacedObject> importTypes,
-                               StringBuffer formBuffer) {
+                               Appendable formBuffer) {
         super.addImportTypes(importTypes, formBuffer);
         importTypes.add(new TwoFacedObject("Csv Site Import", TYPE_CSV));
         //        formBuffer.append(HtmlUtils.formEntry(msgLabel("CSV Type"), HtmlUtils.input(ARG_CSV_TYPE,"")));

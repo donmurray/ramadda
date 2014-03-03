@@ -82,8 +82,8 @@ public class DifImporter extends ImportHandler {
      * @param formBuffer _more_
      */
     @Override
-    public void addImportTypes(List<TwoFacedObject> importTypes,
-                               StringBuffer formBuffer) {
+     public void addImportTypes(List<TwoFacedObject> importTypes,
+                                Appendable formBuffer) {
         super.addImportTypes(importTypes, formBuffer);
         importTypes.add(new TwoFacedObject("Dif Import", TYPE_DIF));
         //        formBuffer.append(HtmlUtils.formEntry(msgLabel("DIF Type"), HtmlUtils.input(ARG_DIF_TYPE,"")));

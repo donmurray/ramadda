@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -103,9 +103,10 @@ public class ZipOutputHandler extends OutputHandler {
         new OutputType("Zip and Download Files", "zip.zipgroup",
                        OutputType.TYPE_FILE, "", ICON_ZIP);
 
+    /** _more_          */
     public static final OutputType OUTPUT_EXPORT =
-        new OutputType("Export Entries", "zip.export",
-                       OutputType.TYPE_FILE, "", ICON_ZIP);
+        new OutputType("Export Entries", "zip.export", OutputType.TYPE_FILE,
+                       "", ICON_ZIP);
 
 
     /**
@@ -251,11 +252,14 @@ public class ZipOutputHandler extends OutputHandler {
             all.addAll(subGroups);
             all.addAll(entries);
             getLogManager().logInfo("Doing zip tree");
+
             return toZip(request, group.getName(), all, true, false);
-        } if (output.equals(OUTPUT_EXPORT)) {
+        }
+        if (output.equals(OUTPUT_EXPORT)) {
             List<Entry> all = new ArrayList<Entry>();
             all.addAll(subGroups);
             all.addAll(entries);
+
             return toZip(request, group.getName(), all, true, true);
         } else {
             return toZip(request, group.getName(), entries, false, false);

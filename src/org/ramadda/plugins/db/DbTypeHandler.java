@@ -33,7 +33,9 @@ import org.ramadda.repository.output.OutputType;
 import org.ramadda.repository.output.RssOutputHandler;
 import org.ramadda.repository.type.*;
 import org.ramadda.sql.*;
+import org.ramadda.util.Utils;
 import org.ramadda.util.FormInfo;
+import org.ramadda.util.XmlUtils;
 import org.ramadda.util.GoogleChart;
 
 import org.ramadda.util.HtmlUtils;
@@ -762,7 +764,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         request.remove(ARG_OUTPUT);
         List<Object[]> valueList = readValues(request, entry,
                                        Clause.eq(COL_ID, entry.getId()));
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         addStyleSheet(sb);
         makeTable(request, entry, valueList, false, sb, false, true);
 
@@ -802,7 +804,7 @@ public class DbTypeHandler extends BlobTypeHandler {
     public Result getHtmlDisplay(Request request, Entry entry)
             throws Exception {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if ( !getRepository().getAccessManager().canAccessFile(request,
                 entry)) {
             sb.append(
@@ -841,7 +843,7 @@ public class DbTypeHandler extends BlobTypeHandler {
             }
 
             return new Result("",
-                              new StringBuffer("<contents>ok</contents>"),
+                              new StringBuilder("<contents>ok</contents>"),
                               "text/xml");
         }
 
@@ -947,7 +949,7 @@ public class DbTypeHandler extends BlobTypeHandler {
      *
      * @throws Exception _more_
      */
-    public void addViewHeader(Request request, Entry entry, StringBuffer sb,
+    public void addViewHeader(Request request, Entry entry, Appendable sb,
                               String view, int numValues, boolean fromSearch)
             throws Exception {
 
@@ -967,7 +969,7 @@ public class DbTypeHandler extends BlobTypeHandler {
      *
      * @throws Exception _more_
      */
-    public void addViewHeader(Request request, Entry entry, StringBuffer sb,
+    public void addViewHeader(Request request, Entry entry, Appendable sb,
                               String view, int numValues, boolean fromSearch,
                               String extraLinks)
             throws Exception {
@@ -1363,7 +1365,7 @@ public class DbTypeHandler extends BlobTypeHandler {
      * @throws Exception _more_
      */
     @Override
-    public void addToEntryForm(Request request, StringBuffer formBuffer,
+    public void addToEntryForm(Request request, Appendable formBuffer,
                                Entry parentEntry, Entry entry,
                                FormInfo formInfo)
             throws Exception {
@@ -1436,7 +1438,7 @@ public class DbTypeHandler extends BlobTypeHandler {
      * @param formBuffer _more_
      */
     public void addToEditForm(Request request, Entry entry,
-                              StringBuffer formBuffer) {}
+                              Appendable formBuffer) {}
 
 
     /**
@@ -1449,7 +1451,7 @@ public class DbTypeHandler extends BlobTypeHandler {
      * @throws Exception _more_
      */
     private void addEnumerationAttributes(Request request, Entry entry,
-                                          StringBuffer formBuffer)
+                                          Appendable formBuffer)
             throws Exception {
 
         if (enumColumns.size() == 0) {
@@ -1481,7 +1483,7 @@ public class DbTypeHandler extends BlobTypeHandler {
             if (iconMap == null) {
                 iconMap = new Hashtable<String, String>();
             }
-            StringBuffer         sb   = new StringBuffer("");
+            StringBuilder         sb   = new StringBuilder("");
             List<TwoFacedObject> tfos = getEnumValues(request, entry, col);
             if ((tfos != null) && (tfos.size() < 15) && (tfos.size() > 0)) {
                 formBuffer.append(
@@ -1503,7 +1505,7 @@ public class DbTypeHandler extends BlobTypeHandler {
                     }
                     String       colorArg = colorID + "." + value;
                     String       iconArg  = iconID + "." + value;
-                    StringBuffer colorSB  = new StringBuffer();
+                    StringBuilder colorSB  = new StringBuilder();
                     colorSB.append(HtmlUtils.radio(colorArg, "",
                             currentColor.equals("")));
                     colorSB.append(msg("None"));
@@ -1517,7 +1519,7 @@ public class DbTypeHandler extends BlobTypeHandler {
                                         "margin-left:2px; margin-right:2px; padding-left:5px; padding-right:7px; border:1px solid #000; background-color:"
                                         + c)));
                     }
-                    StringBuffer iconSB = new StringBuffer();
+                    StringBuilder iconSB = new StringBuilder();
                     iconSB.append(HtmlUtils.radio(iconArg, "",
                             currentIcon.equals("")));
                     iconSB.append(msg("None"));
@@ -1662,11 +1664,11 @@ public class DbTypeHandler extends BlobTypeHandler {
      *
      * @throws Exception _more_
      */
-    public StringBuffer getSearchForm(Request request, Entry entry)
+    public StringBuilder getSearchForm(Request request, Entry entry)
             throws Exception {
-        StringBuffer sb       = new StringBuffer();
+        StringBuilder sb       = new StringBuilder();
 
-        StringBuffer advanced = new StringBuffer(HtmlUtils.formTable());
+        StringBuilder advanced = new StringBuilder(HtmlUtils.formTable());
         String       formUrl  = request.url(getRepository().URL_ENTRY_SHOW);
         sb.append(HtmlUtils.form(formUrl));
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
@@ -1741,7 +1743,7 @@ public class DbTypeHandler extends BlobTypeHandler {
      */
     public Result handleSearchForm(Request request, Entry entry)
             throws Exception {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         addViewHeader(request, entry, sb, VIEW_SEARCH, 0, false);
         sb.append(getSearchForm(request, entry));
 
@@ -1761,14 +1763,14 @@ public class DbTypeHandler extends BlobTypeHandler {
      */
     public Result handleSearch(Request request, Entry entry)
             throws Exception {
-        StringBuffer sb    = new StringBuffer();
+        StringBuilder sb    = new StringBuilder();
         List<Clause> where = new ArrayList<Clause>();
         if (request.get(ARG_DB_ALL, false) && request.getUser().getAdmin()) {
             System.err.println("searching all");
         } else {
             where.add(Clause.eq(COL_ID, entry.getId()));
         }
-        StringBuffer searchCriteria = new StringBuffer();
+        StringBuilder searchCriteria = new StringBuilder();
         for (Column column : columns) {
             column.assembleWhereClause(request, where, searchCriteria);
         }
@@ -1838,7 +1840,7 @@ public class DbTypeHandler extends BlobTypeHandler {
      */
     public Result handleDeleteAsk(Request request, Entry entry)
             throws Exception {
-        StringBuffer sb    = new StringBuffer();
+        StringBuilder sb    = new StringBuilder();
         List         dbids = request.get(ARG_DBID_SELECTED, new ArrayList());
 
         if (dbids.size() == 0) {
@@ -2054,7 +2056,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         }
 
 
-        StringBuffer sb       = new StringBuffer();
+        StringBuilder sb       = new StringBuilder();
         List<String> colNames = tableHandler.getColumnNames();
         Object[]     values   = ((dbid != null)
                                  ? tableHandler.getValues(makeClause(entry,
@@ -2200,7 +2202,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         if (theColumn == null) {
             throw new IllegalStateException("No email data found");
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         makeForm(request, entry, sb);
         sb.append(HtmlUtils.hidden(ARG_DB_ACTION, ACTION_EMAIL));
         sb.append(HtmlUtils.submit(msg("Send Message")));
@@ -2260,11 +2262,11 @@ public class DbTypeHandler extends BlobTypeHandler {
     public Result handleListCsv(Request request, Entry entry,
                                 List<Object[]> valueList)
             throws Exception {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int cnt = 0; cnt < valueList.size(); cnt++) {
             Object[] values = valueList.get(cnt);
             for (int i = 0; i < columnsToUse.size(); i++) {
-                StringBuffer cb = new StringBuffer();
+                StringBuilder cb = new StringBuilder();
                 columnsToUse.get(i).formatValue(entry, cb, Column.OUTPUT_CSV,
                                  values);
                 String colValue = cb.toString();
@@ -2296,7 +2298,7 @@ public class DbTypeHandler extends BlobTypeHandler {
     public Result handleListRss(Request request, Entry entry,
                                 List<Object[]> valueList)
             throws Exception {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         sb.append(XmlUtil.XML_HEADER + "\n");
         sb.append(XmlUtil.openTag(RssUtil.TAG_RSS,
@@ -2331,7 +2333,7 @@ public class DbTypeHandler extends BlobTypeHandler {
             sb.append(XmlUtil.tag(RssUtil.TAG_GUID, "",
                                   XmlUtil.getCdata(url)));
             sb.append(XmlUtil.openTag(RssUtil.TAG_DESCRIPTION, ""));
-            XmlUtil.appendCdata(sb, info);
+            XmlUtils.appendCdata(sb, info);
             sb.append(XmlUtil.closeTag(RssUtil.TAG_DESCRIPTION));
             if (hasLocation) {
                 double[] ll = latLonColumn.getLatLon(values);
@@ -2401,7 +2403,7 @@ public class DbTypeHandler extends BlobTypeHandler {
                                   boolean fromSearch, boolean showHeaderLinks)
             throws Exception {
         return handleListTable(request, entry, valueList, fromSearch,
-                               showHeaderLinks, new StringBuffer());
+                               showHeaderLinks, new StringBuilder());
     }
 
     /**
@@ -2421,7 +2423,7 @@ public class DbTypeHandler extends BlobTypeHandler {
     public Result handleListTable(Request request, Entry entry,
                                   List<Object[]> valueList,
                                   boolean fromSearch,
-                                  boolean showHeaderLinks, StringBuffer sb)
+                                  boolean showHeaderLinks, Appendable sb)
             throws Exception {
         List<String> links = new ArrayList<String>();
 
@@ -2458,10 +2460,10 @@ public class DbTypeHandler extends BlobTypeHandler {
      *
      * @param sb _more_
      */
-    private void addStyleSheet(StringBuffer sb) {
-        sb.append(HtmlUtils.cssLink(getRepository().getUrlBase()
+    private void addStyleSheet(Appendable sb) {
+        Utils.append(sb, HtmlUtils.cssLink(getRepository().getUrlBase()
                                     + "/db/dbstyle.css"));
-        sb.append(HtmlUtils.importJS(getRepository().fileUrl("/db/db.js")));
+        Utils.append(sb,HtmlUtils.importJS(getRepository().fileUrl("/db/db.js")));
     }
 
     /**
@@ -2479,14 +2481,14 @@ public class DbTypeHandler extends BlobTypeHandler {
      */
     public void makeTable(Request request, Entry entry,
                           List<Object[]> valueList, boolean fromSearch,
-                          StringBuffer sb, boolean doForm,
+                          Appendable sb, boolean doForm,
                           boolean showHeaderLinks)
             throws Exception {
 
         SimpleDateFormat sdf        = getDateFormat(entry);
         Hashtable        entryProps = getProperties(entry);
 
-        StringBuffer     chartJS    = new StringBuffer();
+        StringBuilder     chartJS    = new StringBuilder();
         //        GoogleChart.addChartImport(sb);
 
         if (doForm) {
@@ -2665,7 +2667,7 @@ public class DbTypeHandler extends BlobTypeHandler {
                 if (column.isEnumeration()) {
                     String value = (String) values[column.getOffset()];
                     if (value != null) {
-                        StringBuffer prefix = new StringBuffer();
+                        StringBuilder prefix = new StringBuilder();
                         String iconID = PROP_CAT_ICON + "."
                                         + column.getName();
                         Hashtable<String, String> iconMap =
@@ -2762,10 +2764,10 @@ public class DbTypeHandler extends BlobTypeHandler {
      * @throws Exception _more_
      */
     public void formatTableValue(Request request, Entry entry,
-                                 StringBuffer sb, Column column,
+                                 Appendable sb, Column column,
                                  Object[] values, SimpleDateFormat sdf)
             throws Exception {
-        StringBuffer htmlSB = new StringBuffer();
+        StringBuilder htmlSB = new StringBuilder();
         column.formatValue(entry, htmlSB, Column.OUTPUT_HTML, values, sdf);
         String html = htmlSB.toString();
 
@@ -2912,7 +2914,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         Hashtable    entryProps = getProperties(entry);
         boolean      canEdit = getAccessManager().canEditEntry(request,
                                    entry);
-        StringBuffer sb         = new StringBuffer();
+        StringBuilder sb         = new StringBuilder();
 
         String links = getHref(request, entry, VIEW_KML,
                                msg("Google Earth KML"));
@@ -2949,7 +2951,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         String       leftWidth      = "350";
         String       icon           = getMapIcon(request, entry);
-        StringBuffer entryList      = new StringBuffer();
+        StringBuilder entryList      = new StringBuilder();
         entryList.append(
             HtmlUtils.cssBlock(
                 "\n.db-map-list-inner {max-height: 500px; overflow-y: auto; overflow-x:auto; }\n.db-map-list-outer {border:  1px #888888 solid;}\n"));
@@ -2958,10 +2960,10 @@ public class DbTypeHandler extends BlobTypeHandler {
                 HtmlUtils.TAG_DIV, HtmlUtils.cssClass("db-map-list-inner")));
         SimpleDateFormat                sdf    = getDateFormat(entry);
 
-        Hashtable<String, StringBuffer> catMap = null;
+        Hashtable<String, StringBuilder> catMap = null;
         List<String>                    cats   = null;
         if (mapCategoryColumn != null) {
-            catMap = new Hashtable<String, StringBuffer>();
+            catMap = new Hashtable<String, StringBuilder>();
             cats   = new ArrayList<String>();
         }
 
@@ -2998,12 +3000,12 @@ public class DbTypeHandler extends BlobTypeHandler {
                 map.addBox("", new MapBoxProperties("red", false), north,
                            west, south, east);
             }
-            StringBuffer theSB = entryList;
+            StringBuilder theSB = entryList;
             if (mapCategoryColumn != null) {
                 String cat = mapCategoryColumn.getString(values);
                 theSB = catMap.get(cat);
                 if (theSB == null) {
-                    theSB = new StringBuffer();
+                    theSB = new StringBuilder();
                     catMap.put(cat, theSB);
                     cats.add(cat);
                 }
@@ -3061,7 +3063,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         if (catMap != null) {
             boolean open = true;
             for (String cat : cats) {
-                StringBuffer theSB = catMap.get(cat);
+                StringBuilder theSB = catMap.get(cat);
                 String content     = HtmlUtils.insetLeft(theSB.toString(),
                                          20);
                 entryList.append(HtmlUtils.makeShowHideBlock(cat, content,
@@ -3174,7 +3176,7 @@ public class DbTypeHandler extends BlobTypeHandler {
             String viewUrl = request.getAbsoluteUrl(getViewUrl(request,
                                  entry, dbid));
             String       href = HtmlUtils.href(viewUrl, label);
-            StringBuffer desc = new StringBuffer(href + "<br>");
+            StringBuilder desc = new StringBuilder(href + "<br>");
             getHtml(request, desc, entry, values);
             Element placemark = KmlUtil.placemark(folder, label,
                                     desc.toString(), lat, lon, 0, null);
@@ -3185,7 +3187,7 @@ public class DbTypeHandler extends BlobTypeHandler {
                 }
             }
         }
-        StringBuffer sb = new StringBuffer(XmlUtil.toString(root));
+        StringBuilder sb = new StringBuilder(XmlUtil.toString(root));
 
         return new Result("", sb, "text/kml");
     }
@@ -3249,7 +3251,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         boolean      canEdit = getAccessManager().canEditEntry(request,
                                    entry);
-        StringBuffer sb      = new StringBuffer();
+        StringBuilder sb      = new StringBuilder();
         addViewHeader(request, entry, sb, VIEW_CHART, valueList.size(),
                       fromSearch);
 
@@ -3377,7 +3379,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         SimpleDateFormat sdf        = getDateFormat(entry);
         boolean canEdit = getAccessManager().canEditEntry(request, entry);
-        StringBuffer     sb         = new StringBuffer();
+        StringBuilder     sb         = new StringBuilder();
         String           view       = getWhatToShow(request);
         Column           gridColumn = null;
         for (Column column : categoryColumns) {
@@ -3579,7 +3581,7 @@ public class DbTypeHandler extends BlobTypeHandler {
             throws Exception {
         SimpleDateFormat sdf        = getDateFormat(entry);
         boolean canEdit = getAccessManager().canEditEntry(request, entry);
-        StringBuffer     sb         = new StringBuffer();
+        StringBuilder     sb         = new StringBuilder();
         String           view       = getWhatToShow(request);
         Column           gridColumn = null;
         for (Column column : categoryColumns) {
@@ -3599,8 +3601,8 @@ public class DbTypeHandler extends BlobTypeHandler {
                       VIEW_CATEGORY + gridColumn.getName(), valueList.size(),
                       fromSearch, links);
 
-        Hashtable<String, StringBuffer> map = new Hashtable<String,
-                                                  StringBuffer>();
+        Hashtable<String, StringBuilder> map = new Hashtable<String,
+                                                  StringBuilder>();
         List<String> rowValues = new ArrayList<String>();
         int          cnt       = 0;
 
@@ -3614,9 +3616,9 @@ public class DbTypeHandler extends BlobTypeHandler {
                                          getLabel(entry, valuesArray, sdf));
             String rowValue     =
                 (String) valuesArray[gridColumn.getOffset()];
-            StringBuffer buffer = map.get(rowValue);
+            StringBuilder buffer = map.get(rowValue);
             if (buffer == null) {
-                map.put(rowValue, buffer = new StringBuffer());
+                map.put(rowValue, buffer = new StringBuilder());
                 rowValues.add(rowValue);
             }
             String rowId = "row_" + valuesArray[IDX_DBID];
@@ -3677,7 +3679,7 @@ public class DbTypeHandler extends BlobTypeHandler {
                                         List<Object[]> valueList,
                                         boolean fromSearch)
             throws Exception {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         addViewHeader(request, entry, sb, VIEW_CHART, valueList.size(),
                       fromSearch);
 
@@ -3685,7 +3687,7 @@ public class DbTypeHandler extends BlobTypeHandler {
             "<script type=\"text/javascript\" src=\"http://www.google.com/jsapi\"></script>\n");
         sb.append(
             "<script type=\"text/javascript\">\ngoogle.load('visualization', '1', {'packages':['motionchart']});\ngoogle.setOnLoadCallback(drawChart);\nfunction drawChart() {\n        var data = new google.visualization.DataTable();\n");
-        StringBuffer init      = new StringBuffer();
+        StringBuilder init      = new StringBuilder();
 
         int          columnCnt = 0;
         init.append("data.addColumn('string', 'Name');\n");
@@ -3801,7 +3803,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
 
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         addViewHeader(request, entry, sb, VIEW_TIMELINE, valueList.size(),
                       fromSearch);
         //        String links = getHref(request, entry,VIEW_CALENDAR, msg("Calendar"));
@@ -3860,7 +3862,7 @@ public class DbTypeHandler extends BlobTypeHandler {
             throws Exception {
         boolean      canEdit = getAccessManager().canEditEntry(request,
                                    entry);
-        StringBuffer sb      = new StringBuffer();
+        StringBuilder sb      = new StringBuilder();
         String links = getHref(request, entry, VIEW_TIMELINE,
                                msg("Timeline")) + "&nbsp;|&nbsp;"
                                    + getHref(request, entry, VIEW_ICAL,
@@ -3886,7 +3888,7 @@ public class DbTypeHandler extends BlobTypeHandler {
             Date         date  = (Date) values[dateColumn.getOffset()];
             String       url   = getViewUrl(request, entry, dbid);
             String       label = getCalendarLabel(entry, values, sdf).trim();
-            StringBuffer html  = new StringBuffer();
+            StringBuilder html  = new StringBuilder();
             if (label.length() == 0) {
                 label = "NA";
             }
@@ -3947,8 +3949,8 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         boolean      canEdit = getAccessManager().canEditEntry(request,
                                    entry);
-        StringBuffer sb      = new StringBuffer();
-        StringBuffer js      = new StringBuffer();
+        StringBuilder sb      = new StringBuilder();
+        StringBuilder js      = new StringBuilder();
         addViewHeader(request, entry, sb, VIEW_STICKYNOTES, valueList.size(),
                       fromSearch);
 
@@ -4087,7 +4089,7 @@ public class DbTypeHandler extends BlobTypeHandler {
             throws Exception {
         SimpleDateFormat sdf =
             RepositoryUtil.makeDateFormat("yyyyMMdd'T'HHmmss");
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("BEGIN:VCALENDAR\n");
         sb.append("PRODID:-//Unidata/UCAR//RAMADDA Calendar//EN\n");
         sb.append("VERSION:2.0\n");
@@ -4266,11 +4268,11 @@ public class DbTypeHandler extends BlobTypeHandler {
      *
      * @return _more_
      */
-    public String makeForm(Request request, Entry entry, StringBuffer sb) {
+    public String makeForm(Request request, Entry entry, Appendable sb) {
         String formId  = HtmlUtils.getUniqueId("entryform_");
         String formUrl = request.url(getRepository().URL_ENTRY_SHOW);
-        sb.append(HtmlUtils.uploadForm(formUrl, HtmlUtils.id(formId)));
-        sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
+        Utils.append(sb,HtmlUtils.uploadForm(formUrl, HtmlUtils.id(formId)));
+        Utils.append(sb,HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
 
         return formId;
     }
@@ -4295,12 +4297,12 @@ public class DbTypeHandler extends BlobTypeHandler {
             throws Exception {
 
         List<String> colNames = tableHandler.getColumnNames();
-        StringBuffer sb       = new StringBuffer();
+        StringBuilder sb       = new StringBuilder();
         addViewHeader(request, entry, sb, ((dbid == null)
                                            ? VIEW_NEW
                                            : ""), 0, false);
 
-        StringBuffer formBuffer = new StringBuffer();
+        StringBuilder formBuffer = new StringBuilder();
 
         String       formId     = makeForm(request, entry, formBuffer);
 
@@ -4313,7 +4315,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         }
 
 
-        StringBuffer buttons = new StringBuffer();
+        StringBuilder buttons = new StringBuilder();
         if (forEdit) {
             if (dbid == null) {
                 buttons.append(HtmlUtils.submit(msg("Create entry"),
@@ -4345,7 +4347,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         formBuffer.append(buttons);
         formBuffer.append(HtmlUtils.formClose());
 
-        StringBuffer validateJavascript = new StringBuffer("");
+        StringBuilder validateJavascript = new StringBuilder("");
         formInfo.addJavascriptValidation(validateJavascript);
         String script = JQuery.ready(JQuery.submit(JQuery.id(formId),
                             validateJavascript.toString()));
@@ -4368,11 +4370,11 @@ public class DbTypeHandler extends BlobTypeHandler {
      * @param sb _more_
      * @param formBuffer _more_
      */
-    public void createBulkForm(Request request, Entry entry, StringBuffer sb,
-                               StringBuffer formBuffer) {
-        StringBuffer bulkSB = new StringBuffer();
+    public void createBulkForm(Request request, Entry entry, Appendable sb,
+                               Appendable formBuffer) {
+        StringBuilder bulkSB = new StringBuilder();
         makeForm(request, entry, bulkSB);
-        StringBuffer bulkButtons = new StringBuffer();
+        StringBuilder bulkButtons = new StringBuilder();
         bulkButtons.append(HtmlUtils.submit(msg("Create entries"),
                                             ARG_DB_CREATE));
         bulkButtons.append(HtmlUtils.submit(msg("Cancel"), ARG_DB_LIST));
@@ -4414,7 +4416,7 @@ public class DbTypeHandler extends BlobTypeHandler {
                                         bulkSB.toString());
         String contents = OutputHandler.makeTabs(tabTitles, tabContents,
                               true);
-        sb.append(contents);
+        Utils.append(sb, contents);
     }
 
 
@@ -4433,7 +4435,7 @@ public class DbTypeHandler extends BlobTypeHandler {
     public Result handleView(Request request, Entry entry, String dbid)
             throws Exception {
         boolean      asXml = request.getString("result", "").equals("xml");
-        StringBuffer sb    = new StringBuffer();
+        StringBuilder sb    = new StringBuilder();
         if ( !asXml) {
             addViewHeader(request, entry, sb, "", 0, false);
         }
@@ -4444,8 +4446,8 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         getHtml(request, sb, entry, values);
         if (asXml) {
-            StringBuffer xml = new StringBuffer("<contents>\n");
-            XmlUtil.appendCdata(xml, sb.toString());
+            StringBuilder xml = new StringBuilder("<contents>\n");
+            XmlUtils.appendCdata(xml, sb.toString());
             xml.append("</contents>");
 
             return new Result("", xml, "text/xml");
@@ -4464,7 +4466,7 @@ public class DbTypeHandler extends BlobTypeHandler {
      *
      * @throws Exception _more_
      */
-    public void getHtml(Request request, StringBuffer sb, Entry entry,
+    public void getHtml(Request request, StringBuilder sb, Entry entry,
                         Object[] values)
             throws Exception {
         sb.append(HtmlUtils.formTable());
@@ -4473,7 +4475,7 @@ public class DbTypeHandler extends BlobTypeHandler {
             if ( !isDataColumn(column)) {
                 continue;
             }
-            StringBuffer tmpSb = new StringBuffer();
+            StringBuilder tmpSb = new StringBuilder();
             formatTableValue(request, entry, tmpSb, column, values, sdf);
             String tmp = tmpSb.toString();
             tmp = tmp.replaceAll("'", "&apos;");
@@ -4570,7 +4572,7 @@ public class DbTypeHandler extends BlobTypeHandler {
     public String getLabelInner(Entry entry, Object[] values,
                                 SimpleDateFormat sdf)
             throws Exception {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (labelColumn != null) {
             labelColumn.formatValue(entry, sb, Column.OUTPUT_HTML, values,
                                     sdf);
@@ -4618,7 +4620,7 @@ public class DbTypeHandler extends BlobTypeHandler {
                            List<Column> columns, Object[] values,
                            SimpleDateFormat sdf)
             throws Exception {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(HtmlUtils.formTable());
         int valueIdx = 0;
         //        String url = getViewUrl(request,  entry,  dbid);
@@ -4631,7 +4633,7 @@ public class DbTypeHandler extends BlobTypeHandler {
             if ( !isDataColumn(column)) {
                 continue;
             }
-            StringBuffer tmpSb = new StringBuffer();
+            StringBuilder tmpSb = new StringBuilder();
             formatTableValue(request, entry, tmpSb, column, values, sdf);
             //            column.formatValue(entry, tmpSb, Column.OUTPUT_HTML, values);
             String tmp = tmpSb.toString();

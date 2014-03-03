@@ -31,7 +31,7 @@ import java.util.List;
  *
  * @param <T>
  */
-public class BufferMapList<T> extends MapList<T, StringBuffer> {
+public class BufferMapList<T> extends MapList<T, Appendable> {
 
 
     /**
@@ -41,10 +41,10 @@ public class BufferMapList<T> extends MapList<T, StringBuffer> {
      *
      * @return _more_
      */
-    public StringBuffer get(T key) {
-        StringBuffer sb = super.get(key);
+    public Appendable get(T key) {
+        Appendable sb = super.get(key);
         if (sb == null) {
-            sb = new StringBuffer();
+            sb = new StringBuilder();
             super.put(key, sb);
         }
 

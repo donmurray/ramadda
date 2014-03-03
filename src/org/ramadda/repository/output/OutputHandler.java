@@ -36,6 +36,7 @@ import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.JQuery;
 
 import org.ramadda.util.WikiUtil;
+import org.ramadda.util.XmlUtils;
 
 
 import org.w3c.dom.Element;
@@ -295,12 +296,12 @@ public class OutputHandler extends RepositoryManager {
      * @param request   the Request
      * @param subGroups the subgroups
      * @param entries   the List of Entries
-     * @param sb        the output StringBuffer
+     * @param sb        the output
      *
      * @throws Exception  problems showing entries
      */
     public void showNext(Request request, List<Entry> subGroups,
-                         List<Entry> entries, StringBuffer sb)
+                         List<Entry> entries, Appendable sb)
             throws Exception {
         int cnt = subGroups.size() + entries.size();
         showNext(request, cnt, sb);
@@ -311,11 +312,11 @@ public class OutputHandler extends RepositoryManager {
      *
      * @param request   the Request
      * @param cnt       the number to show
-     * @param sb        the output StringBuffer
+     * @param sb        the output
      *
      * @throws Exception  problem showing them
      */
-    public void showNext(Request request, int cnt, StringBuffer sb)
+    public void showNext(Request request, int cnt, Appendable sb)
             throws Exception {
 
         int max = request.get(ARG_MAX, VIEW_MAX_ROWS);
@@ -551,7 +552,7 @@ public class OutputHandler extends RepositoryManager {
      *
      * @param request  the Request
      * @param title    the links title
-     * @param sb       the StringBuffer to add to
+     * @param sb       the buffer to add to
      * @param state    the State
      *
      * @return  the Result
@@ -559,7 +560,7 @@ public class OutputHandler extends RepositoryManager {
      * @throws Exception problem making Result
      */
     public Result makeLinksResult(Request request, String title,
-                                  StringBuffer sb, State state)
+                                  Appendable sb, State state)
             throws Exception {
         Result result = new Result(title, sb);
         addLinks(request, result, state);
@@ -909,12 +910,12 @@ public class OutputHandler extends RepositoryManager {
      */
     public String getSelectLink(Request request, Entry entry, String target)
             throws Exception {
-        String       linkText = getEntryDisplayName(entry);
-        StringBuffer sb       = new StringBuffer();
-        String       entryId  = entry.getId();
-        String       icon     = getPageHandler().getIconUrl(request, entry);
-        String       event;
-        String       uid = "link_" + HtmlUtils.blockCnt++;
+        String        linkText = getEntryDisplayName(entry);
+        StringBuilder sb       = new StringBuilder();
+        String        entryId  = entry.getId();
+        String        icon     = getPageHandler().getIconUrl(request, entry);
+        String        event;
+        String        uid = "link_" + HtmlUtils.blockCnt++;
         String folderClickUrl =
             request.entryUrl(getRepository().URL_ENTRY_SHOW, entry) + "&"
             + HtmlUtils.args(new String[] {
@@ -985,10 +986,13 @@ public class OutputHandler extends RepositoryManager {
      * @param contents _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public Result makeAjaxResult(Request request, String contents) {
-        StringBuffer xml = new StringBuffer("<content>\n");
-        XmlUtil.appendCdata(xml, contents);
+    public Result makeAjaxResult(Request request, String contents)
+            throws Exception {
+        StringBuilder xml = new StringBuilder("<content>\n");
+        XmlUtils.appendCdata(xml, contents);
         xml.append("\n</content>");
 
         return new Result("", xml, "text/xml");
@@ -1035,8 +1039,10 @@ public class OutputHandler extends RepositoryManager {
      * _more_
      *
      * @param buffer _more_
+     *
+     * @throws Exception _more_
      */
-    public void addToSettingsForm(StringBuffer buffer) {}
+    public void addToSettingsForm(Appendable buffer) throws Exception {}
 
     /**
      * _more_
@@ -1060,11 +1066,12 @@ public class OutputHandler extends RepositoryManager {
      * @return _more_
      */
     public String getSortLinks(Request request) {
-        StringBuffer sb           = new StringBuffer();
+        StringBuilder sb           = new StringBuilder();
         String oldOrderBy = request.getString(ARG_ORDERBY, SORTBY_FROMDATE);
-        String       oldAscending = request.getString(ARG_ASCENDING, "false");
+        String        oldAscending = request.getString(ARG_ASCENDING,
+                                         "false");
 
-        String[]     order        = {
+        String[]      order        = {
             SORTBY_FROMDATE, "true",
             msg("Date")
             + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),
@@ -1147,9 +1154,9 @@ public class OutputHandler extends RepositoryManager {
         }
 
 
-        String       base   = "toggleentry" + (entryCnt++);
-        String       formId = "entryform_" + (HtmlUtils.blockCnt++);
-        StringBuffer formSB = new StringBuffer("");
+        String        base   = "toggleentry" + (entryCnt++);
+        String        formId = "entryform_" + (HtmlUtils.blockCnt++);
+        StringBuilder formSB = new StringBuilder("");
 
         formSB.append(request.formPost(getRepository().URL_ENTRY_GETENTRIES,
                                        HtmlUtils.id(formId)));
@@ -1216,9 +1223,9 @@ public class OutputHandler extends RepositoryManager {
             tfos.addAll(linksForCategory);
         }
 
-        StringBuffer selectSB  = new StringBuffer();
+        StringBuilder selectSB  = new StringBuilder();
 
-        StringBuffer actionsSB = new StringBuffer();
+        StringBuilder actionsSB = new StringBuilder();
 
 
         actionsSB.append(
@@ -1228,10 +1235,10 @@ public class OutputHandler extends RepositoryManager {
         actionsSB.append(HtmlUtils.space(2));
         actionsSB.append(msgLabel("to"));
 
-        StringBuffer js               = new StringBuffer();
+        StringBuilder js               = new StringBuilder();
 
-        String       allButtonId      = HtmlUtils.getUniqueId("getall");
-        String       selectedButtonId = HtmlUtils.getUniqueId("getselected");
+        String        allButtonId      = HtmlUtils.getUniqueId("getall");
+        String        selectedButtonId = HtmlUtils.getUniqueId("getselected");
         actionsSB.append(HtmlUtils.submit(msg("Selected"), "getselected",
                                           HtmlUtils.id(selectedButtonId)));
         actionsSB.append(HtmlUtils.space(1));
@@ -1293,7 +1300,7 @@ public class OutputHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public void addEntryTableRow(Request request, Entry entry,
-                                 StringBuffer htmlSB, StringBuffer jsSB,
+                                 Appendable htmlSB, Appendable jsSB,
                                  boolean showDetails)
             throws Exception {
         String rowId        = HtmlUtils.getUniqueId("entryrow_");
@@ -1338,7 +1345,7 @@ public class OutputHandler extends RepositoryManager {
      * @return _more_
      */
     public String getEntryFormEnd(Request request, String formId) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(HtmlUtils.formClose());
 
         //        sb.append(HtmlUtils.script(HtmlUtils.callln("initEntryListForm",HtmlUtils.squote(formId))));
@@ -1360,7 +1367,7 @@ public class OutputHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public String getEntriesList(Request request, StringBuffer sb,
+    public String getEntriesList(Request request, Appendable sb,
                                  List entries, boolean doForm,
                                  boolean showCrumbs, boolean showDetails)
             throws Exception {
@@ -1415,13 +1422,13 @@ public class OutputHandler extends RepositoryManager {
 
 
         int            cnt          = 0;
-        StringBuffer   jsSB         = new StringBuffer();
+        StringBuilder  jsSB         = new StringBuilder();
         for (Entry entry : (List<Entry>) entries) {
-            StringBuffer cbxSB        = new StringBuffer();
-            String       rowId        = base + (cnt++);
-            String       cbxArgId     = "entry_" + entry.getId();
-            String       cbxId        = HtmlUtils.getUniqueId("entry_");
-            String       cbxWrapperId = "checkboxwrapper_" + (cnt++);
+            StringBuilder cbxSB        = new StringBuilder();
+            String        rowId        = base + (cnt++);
+            String        cbxArgId     = "entry_" + entry.getId();
+            String        cbxId        = HtmlUtils.getUniqueId("entry_");
+            String        cbxWrapperId = "checkboxwrapper_" + (cnt++);
             jsSB.append(
                 HtmlUtils.callln(
                     "new EntryRow",
@@ -1465,10 +1472,10 @@ public class OutputHandler extends RepositoryManager {
                                       null, true, crumbs);
             //entryLink.setLink(cbxSB + entryLink.getLink());
 
-            StringBuffer buffer = cb.get(doCategories
-                                         ? entry.getTypeHandler().getCategory(
-                                             entry).getLabel().toString()
-                                         : "");
+            Appendable buffer = cb.get(doCategories
+                                       ? entry.getTypeHandler().getCategory(
+                                           entry).getLabel().toString()
+                                       : "");
             decorateEntryRow(request, entry, buffer, entryLink, rowId,
                              cbxSB.toString(), showDetails);
         }
@@ -1520,11 +1527,14 @@ public class OutputHandler extends RepositoryManager {
      * @param rowId _more_
      * @param extra _more_
      * @param showDetails _more_
+     *
+     * @throws Exception _more_
      */
     protected void decorateEntryRow(Request request, Entry entry,
-                                    StringBuffer sb, EntryLink link,
+                                    Appendable sb, EntryLink link,
                                     String rowId, String extra,
-                                    boolean showDetails) {
+                                    boolean showDetails)
+            throws Exception {
 
         if (rowId == null) {
             rowId = "entryrow_" + (HtmlUtils.blockCnt++);
@@ -1560,8 +1570,8 @@ public class OutputHandler extends RepositoryManager {
 
 
 
-        StringBuffer extraAlt = new StringBuffer();
-        boolean      showDate = !request.get(ARG_TREEVIEW, false);
+        StringBuilder extraAlt = new StringBuilder();
+        boolean       showDate = !request.get(ARG_TREEVIEW, false);
 
         if ( !showDetails) {
             showDate = false;
@@ -1827,10 +1837,10 @@ public class OutputHandler extends RepositoryManager {
      * @return _more_
      * @throws Exception _more_
      */
-    public StringBuffer getCommentBlock(Request request, Entry entry,
-                                        boolean onlyIfWeHaveThem)
+    public StringBuilder getCommentBlock(Request request, Entry entry,
+                                         boolean onlyIfWeHaveThem)
             throws Exception {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         List<Comment> comments =
             getRepository().getCommentManager().getComments(request, entry);
         if ( !onlyIfWeHaveThem || (comments.size() > 0)) {
@@ -1935,8 +1945,8 @@ public class OutputHandler extends RepositoryManager {
      */
     public static String makeTabs(List titles, List tabs, boolean skipEmpty,
                                   boolean useCookies) {
-        StringBuffer tabHtml = new StringBuffer();
-        String       tabId   = "tabId" + (tabCnt++);
+        StringBuilder tabHtml = new StringBuilder();
+        String        tabId   = "tabId" + (tabCnt++);
         tabHtml.append("\n\n");
         tabHtml.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
                                       HtmlUtils.id(tabId)
@@ -2048,8 +2058,8 @@ public class OutputHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void addPublishWidget(Request request, Entry entry,
-                                 StringBuffer sb, String header)
+    public void addPublishWidget(Request request, Entry entry, Appendable sb,
+                                 String header)
             throws Exception {
         addPublishWidget(request, entry, sb, header, true);
     }
@@ -2065,12 +2075,11 @@ public class OutputHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void addPublishWidget(Request request, Entry entry,
-                                 StringBuffer sb, String header,
-                                 boolean addNameField)
+    public void addPublishWidget(Request request, Entry entry, Appendable sb,
+                                 String header, boolean addNameField)
             throws Exception {
         if ( !request.getUser().getAnonymous()) {
-            StringBuffer publishSB = new StringBuffer();
+            StringBuilder publishSB = new StringBuilder();
             sb.append(HtmlUtils.hidden(ARG_PUBLISH_ENTRY + "_hidden", "",
                                        HtmlUtils.id(ARG_PUBLISH_ENTRY
                                            + "_hidden")));
@@ -2125,7 +2134,7 @@ public class OutputHandler extends RepositoryManager {
      */
     public Result getErrorResult(Request request, String title, String msg) {
         return new Result(
-            title, new StringBuffer(getPageHandler().showDialogError(msg)));
+            title, new StringBuilder(getPageHandler().showDialogError(msg)));
     }
 
 

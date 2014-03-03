@@ -321,7 +321,7 @@ _more_ */
      * @throws Exception _more_
      */
     @Override
-    public void addToEntryForm(Request request, StringBuffer sb,
+    public void addToEntryForm(Request request, Appendable sb,
                                Entry parentEntry, Entry entry,
                                FormInfo formInfo)
             throws Exception {
@@ -382,7 +382,7 @@ _more_ */
 
 
 
-        StringBuffer help = new StringBuffer();
+        StringBuilder help = new StringBuilder();
         help.append("<b>Import:</b><br>");
         help.append(
             "e.g., <i>{{property &lt;optional arguments&gt;}}</i><br>");

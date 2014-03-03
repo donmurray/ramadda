@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -35,6 +35,7 @@ import org.ramadda.util.CategoryBuffer;
 import org.ramadda.util.HtmlTemplate;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.JQuery;
+import org.ramadda.util.MapRegion;
 
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
@@ -122,6 +123,10 @@ public class PageHandler extends RepositoryManager {
     /** _more_ */
     protected SimpleDateFormat timeSdf =
         RepositoryUtil.makeDateFormat("HH:mm:ss z");
+
+
+    /** _more_ */
+    private List<MapRegion> mapRegions = new ArrayList<MapRegion>();
 
 
     /** _more_ */
@@ -343,7 +348,7 @@ public class PageHandler extends RepositoryManager {
 
         List<FavoriteEntry> favoritesList =
             getUserManager().getFavorites(request, request.getUser());
-        StringBuffer favorites = new StringBuffer();
+        StringBuilder favorites = new StringBuilder();
         if (favoritesList.size() > 0) {
             List favoriteLinks = new ArrayList();
             int  favoriteCnt   = 0;
@@ -442,7 +447,7 @@ public class PageHandler extends RepositoryManager {
 
 
 
-        StringBuffer extra = new StringBuffer();
+        StringBuilder extra = new StringBuilder();
         String userLinks = getUserManager().getUserLinks(request,
                                userLinkTemplate, separator, extra, makePopup);
 
@@ -461,12 +466,9 @@ public class PageHandler extends RepositoryManager {
 
         }
 
+        StringBuilder bottom = new StringBuilder(result.getBottomHtml());
 
-
-
-        StringBuffer bottom = new StringBuffer(result.getBottomHtml());
-
-        String[]     macros = new String[] {
+        String[]      macros = new String[] {
             MACRO_LOGO_URL, logoUrl, MACRO_LOGO_IMAGE, logoImage,
             MACRO_HEADER_IMAGE, iconUrl(ICON_HEADER), MACRO_HEADER_TITLE,
             pageTitle, MACRO_USERLINK, userLinks, MACRO_LINKS, linksHtml,
@@ -483,7 +485,8 @@ public class PageHandler extends RepositoryManager {
         };
 
 
-        //TODO: This is really inefficient 
+        //TODO: This is really inefficient. The template needs to be tokenized to find the macros
+        //Not this way
         for (int i = 0; i < macros.length; i += 2) {
             html = html.replace("${" + macros[i] + "}", macros[i + 1]);
         }
@@ -517,7 +520,7 @@ public class PageHandler extends RepositoryManager {
     public String getTemplateJavascriptContent() {
         if (templateJavascriptContent == null) {
             //TODO: add a property to not buttonize
-            StringBuffer js = new StringBuffer();
+            StringBuilder js = new StringBuilder();
             js.append(JQuery.buttonize(":submit"));
             js.append("\n");
             /*
@@ -530,7 +533,7 @@ public class PageHandler extends RepositoryManager {
 
             String buttonizeJS = HtmlUtils.script(js.toString());
             //j-
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             sb.append(HtmlUtils.div("",
                                     HtmlUtils.id("ramadda-tooltipdiv")
                                     + HtmlUtils.cssClass("tooltip-outer")));
@@ -567,8 +570,8 @@ public class PageHandler extends RepositoryManager {
      * @return _more_
      */
     public String processTemplate(String template, boolean ignoreErrors) {
-        List<String> toks   = StringUtil.splitMacros(template);
-        StringBuffer result = new StringBuffer();
+        List<String>  toks   = StringUtil.splitMacros(template);
+        StringBuilder result = new StringBuilder();
         if (toks.size() > 0) {
             result.append(toks.get(0));
             for (int i = 1; i < toks.size(); i++) {
@@ -644,9 +647,9 @@ public class PageHandler extends RepositoryManager {
         }
 
 
-        StringBuffer stripped     = new StringBuffer();
-        int          prefixLength = MSG_PREFIX.length();
-        int          suffixLength = MSG_PREFIX.length();
+        StringBuilder stripped     = new StringBuilder();
+        int           prefixLength = MSG_PREFIX.length();
+        int           suffixLength = MSG_PREFIX.length();
         //        System.out.println(s);
         while (s.length() > 0) {
             String tmp  = s;
@@ -911,7 +914,7 @@ public class PageHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public String processTemplate(String html) throws Exception {
-        StringBuffer template = new StringBuffer();
+        StringBuilder template = new StringBuilder();
         while (true) {
             int idx1 = html.indexOf("<include");
             if (idx1 < 0) {
@@ -1002,6 +1005,79 @@ public class PageHandler extends RepositoryManager {
                     getLogManager().logError("No _type_ found in: " + path);
                 }
             }
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public List<MapRegion> getMapRegions() {
+        return mapRegions;
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param inputArgBase _more_
+     *
+     * @return _more_
+     */
+    public String getMapRegionSelector(Request request, String inputArgBase) {
+        StringBuilder sb = new StringBuilder();
+
+        return sb.toString();
+    }
+
+
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void loadMapRegions() throws Exception {
+        List<String> mapRegionFiles = new ArrayList<String>();
+        List<String> allFiles       = getPluginManager().getAllFiles();
+        for (String f : allFiles) {
+            if (f.endsWith("regions.csv")) {
+                mapRegionFiles.add(f);
+            }
+        }
+        String dir = getStorageManager().getSystemResourcePath() + "/geo";
+        List<String> listing = getRepository().getListing(dir, getClass());
+        for (String f : listing) {
+            if (f.endsWith("regions.csv")) {
+                mapRegionFiles.add(f);
+            }
+        }
+
+        for (String path : mapRegionFiles) {
+            String contents =
+                getStorageManager().readUncheckedSystemResource(path,
+                    (String) null);
+            if (contents == null) {
+                getLogManager().logInfoAndPrint("RAMADDA: could not read:"
+                        + path);
+
+                continue;
+            }
+            List<String> lines = StringUtil.split(contents, "\n", true, true);
+            lines.remove(0);
+            for (String line : lines) {
+                List<String> toks = StringUtil.split(line, ",");
+                if (toks.size() != 6) {
+                    throw new IllegalArgumentException("Bad map region line:"
+                            + line + "\nFile:" + path);
+                }
+                mapRegions.add(new MapRegion(toks.get(1), toks.get(0),
+                                             Misc.decodeLatLon(toks.get(2)),
+                                             Misc.decodeLatLon(toks.get(3)),
+                                             Misc.decodeLatLon(toks.get(4)),
+                                             Misc.decodeLatLon(toks.get(5))));
+            }
+
         }
     }
 
@@ -1241,9 +1317,12 @@ public class PageHandler extends RepositoryManager {
      * @param date _more_
      * @param url _more_
      * @param dayLinks _more_
+     *
+     * @throws Exception _more_
      */
-    public void createMonthNav(StringBuffer sb, Date date, String url,
-                               Hashtable dayLinks) {
+    public void createMonthNav(Appendable sb, Date date, String url,
+                               Hashtable dayLinks)
+            throws Exception {
 
         GregorianCalendar cal =
             new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
@@ -1529,7 +1608,7 @@ public class PageHandler extends RepositoryManager {
     public String makePopupLink(String link, String menuContents,
                                 String linkAttributes, boolean makeClose,
                                 boolean alignLeft) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         link = makePopupLink(link, menuContents, linkAttributes, makeClose,
                              alignLeft, sb);
 
@@ -1550,21 +1629,29 @@ public class PageHandler extends RepositoryManager {
      */
     public String makePopupLink(String link, String menuContents,
                                 String linkAttributes, boolean makeClose,
-                                boolean alignLeft, StringBuffer popup) {
+                                boolean alignLeft, Appendable popup) {
+        try {
 
-        String compId = "menu_" + HtmlUtils.blockCnt++;
-        String linkId = "menulink_" + HtmlUtils.blockCnt++;
-        popup.append(makePopupDiv(menuContents, compId, makeClose));
-        String onClick = HtmlUtils.onMouseClick(HtmlUtils.call("showPopup",
-                             HtmlUtils.comma(new String[] { "event",
-                HtmlUtils.squote(linkId), HtmlUtils.squote(compId), (alignLeft
-                ? "1"
-                : "0") })));
-        String href = HtmlUtils.href("javascript:noop();", link,
-                                     onClick + HtmlUtils.id(linkId)
-                                     + linkAttributes);
+            String compId = "menu_" + HtmlUtils.blockCnt++;
+            String linkId = "menulink_" + HtmlUtils.blockCnt++;
+            popup.append(makePopupDiv(menuContents, compId, makeClose));
+            String onClick =
+                HtmlUtils.onMouseClick(HtmlUtils.call("showPopup",
+                    HtmlUtils.comma(new String[] { "event",
+                    HtmlUtils.squote(linkId), HtmlUtils.squote(compId),
+                    (alignLeft
+                     ? "1"
+                     : "0") })));
+            String href = HtmlUtils.href("javascript:noop();", link,
+                                         onClick + HtmlUtils.id(linkId)
+                                         + linkAttributes);
 
-        return href;
+            return href;
+        } catch (java.io.IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
+
+
     }
 
 
@@ -1607,7 +1694,7 @@ public class PageHandler extends RepositoryManager {
      * @return _more_
      */
     public String makeStickyPopupDiv(String contents, String compId) {
-        StringBuffer menu = new StringBuffer();
+        StringBuilder menu = new StringBuilder();
         String cLink = HtmlUtils.jsLink(
                            HtmlUtils.onMouseClick(
                                HtmlUtils.call(
@@ -1637,7 +1724,7 @@ public class PageHandler extends RepositoryManager {
      */
     public String makePopupDiv(String contents, String compId,
                                boolean makeClose) {
-        StringBuffer menu = new StringBuffer();
+        StringBuilder menu = new StringBuilder();
         if (makeClose) {
             String cLink = HtmlUtils.jsLink(
                                HtmlUtils.onMouseClick("hidePopupObject();"),
@@ -1666,7 +1753,7 @@ public class PageHandler extends RepositoryManager {
      */
     public static String makeOkCancelForm(Request request, RequestUrl url,
                                           String okArg, String extra) {
-        StringBuffer fb = new StringBuffer();
+        StringBuilder fb = new StringBuilder();
         fb.append(request.form(url));
         fb.append(extra);
         String okButton     = HtmlUtils.submit("OK", okArg);
@@ -2406,7 +2493,7 @@ public class PageHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public String getEntryHeader(Request request, Entry entry,
-                                 StringBuffer title)
+                                 Appendable title)
             throws Exception {
         if (entry == null) {
             return BLANK;
@@ -2444,7 +2531,7 @@ public class PageHandler extends RepositoryManager {
                     msgLabel("Links for") + " " + getEntryDisplayName(entry));
 
 
-        StringBuffer popup = new StringBuffer();
+        StringBuilder popup = new StringBuilder();
         String menuLinkImg =
             HtmlUtils.img(getRepository().iconUrl("/icons/menu_arrow.gif"),
                           msg("Click to show menu"),
@@ -2465,8 +2552,8 @@ public class PageHandler extends RepositoryManager {
         String  header          = "";
         if (showBreadcrumbs) {
             header = makeBreadcrumbs(request, breadcrumbs);
-            StringBuffer sb =
-                new StringBuffer(
+            StringBuilder sb =
+                new StringBuilder(
                     "<div class=ramadda-breadcrumbs><table border=0 width=100% cellspacing=0 cellpadding=0><tr valign=center>");
             if (showMenu) {
                 sb.append(
@@ -2509,10 +2596,11 @@ public class PageHandler extends RepositoryManager {
      */
     public String getEntryToolbar(Request request, Entry entry)
             throws Exception {
-        List<Link>   links  = getEntryManager().getEntryLinks(request, entry);
-        StringBuffer sb     = new StringBuffer();
+        List<Link>    links  = getEntryManager().getEntryLinks(request,
+                                   entry);
+        StringBuilder sb     = new StringBuilder();
 
-        OutputType   output = HtmlOutputHandler.OUTPUT_INFO;
+        OutputType    output = HtmlOutputHandler.OUTPUT_INFO;
         String treeLink = HtmlUtils.href(
                               request.entryUrl(
                                   getRepository().URL_ENTRY_SHOW, entry,
@@ -2713,8 +2801,8 @@ public class PageHandler extends RepositoryManager {
      * @return _more_
      */
     public String makeBreadcrumbs(Request request, List<String> breadcrumbs) {
-        StringBuffer sb =
-            new StringBuffer(
+        StringBuilder sb =
+            new StringBuilder(
                 "<div class=\"breadCrumbHolder module\"><div id=\"breadCrumb0\" class=\"breadCrumb module\"><ul>");
 
         for (Object crumb : breadcrumbs) {
@@ -2734,6 +2822,16 @@ public class PageHandler extends RepositoryManager {
     /** _more_ */
     private Image remoteImage;
 
+
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    public void loadResources() throws Exception {
+        loadLanguagePacks();
+        loadMapRegions();
+    }
 
     /**
      * _more_
@@ -2842,7 +2940,7 @@ public class PageHandler extends RepositoryManager {
         if (entry == null) {
             entry = getEntryManager().getTopGroup();
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         String entryUrl =
             HtmlUtils.url(
@@ -2948,7 +3046,7 @@ public class PageHandler extends RepositoryManager {
         boolean canComment = getAccessManager().canDoAction(request, entry,
                                  Permission.ACTION_COMMENT);
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         List<Comment> comments =
             getRepository().getCommentManager().getComments(request, entry);
 
@@ -2991,7 +3089,7 @@ public class PageHandler extends RepositoryManager {
             if (rowNum > 2) {
                 rowNum = 1;
             }
-            StringBuffer content = new StringBuffer();
+            StringBuilder content = new StringBuilder();
             String byLine = HtmlUtils.span(
                                 "Posted by " + comment.getUser().getLabel(),
                                 HtmlUtils.cssClass(
@@ -3097,40 +3195,43 @@ public class PageHandler extends RepositoryManager {
      * @param sb _more_
      * @param cb _more_
      */
-    public void doTableLayout(Request request, StringBuffer sb,
+    public void doTableLayout(Request request, Appendable sb,
                               CategoryBuffer cb) {
 
-        sb.append("<table width=100%><tr valign=top>");
+        try {
 
-        int colCnt = 0;
-        for (String cat : cb.getCategories()) {
-            StringBuffer content = cb.get(cat);
-            if (content.length() == 0) {
-                continue;
+            sb.append("<table width=100%><tr valign=top>");
+
+            int colCnt = 0;
+            for (String cat : cb.getCategories()) {
+                String content = cb.get(cat).toString();
+                if (content.length() == 0) {
+                    continue;
+                }
+                colCnt++;
+                if (colCnt > 4) {
+                    sb.append("</tr><tr valign=top>");
+                    sb.append("<td colspan=4><hr></td>");
+                    sb.append("</tr><tr valign=top>");
+                    colCnt = 1;
+                }
+
+                sb.append("<td>");
+                sb.append(HtmlUtils.b(msg(cat)));
+                sb.append(
+                    "<div style=\"solid black; max-height: 150px; overflow-y: auto\";>");
+                sb.append("<ul>");
+                sb.append(content);
+                sb.append("</ul>");
+                sb.append("</div>");
+                sb.append("</td>");
+
             }
-            colCnt++;
-            if (colCnt > 4) {
-                sb.append("</tr><tr valign=top>");
-                sb.append("<td colspan=4><hr></td>");
-                sb.append("</tr><tr valign=top>");
-                colCnt = 1;
-            }
-
-            sb.append("<td>");
-            sb.append(HtmlUtils.b(msg(cat)));
-            sb.append(
-                "<div style=\"solid black; max-height: 150px; overflow-y: auto\";>");
-            sb.append("<ul>");
-            sb.append(content);
-            sb.append("</ul>");
-            sb.append("</div>");
-            sb.append("</td>");
-
+            sb.append("</table>");
+        } catch (java.io.IOException ioe) {
+            throw new RuntimeException(ioe);
         }
-        sb.append("</table>");
     }
-
-
 
 
 }

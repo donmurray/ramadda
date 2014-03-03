@@ -869,8 +869,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
         CacheManager.setDoCache(false);
         initProperties(properties);
         initServer();
-        StringBuffer statusMsg =
-            new StringBuffer("RAMADDA: repository started");
+        StringBuilder statusMsg =
+            new StringBuilder("RAMADDA: repository started");
         statusMsg.append("  --  Version:"
                          + getProperty(PROP_BUILD_VERSION, "1.0"));
         statusMsg.append("  --  Build Date:"
@@ -1280,7 +1280,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
         loadOutputHandlers();
         getMetadataManager().loadMetadataHandlers(getPluginManager());
         getApiManager().loadApi();
-        getPageHandler().loadLanguagePacks();
+        getPageHandler().loadResources();
         loadSql();
         MyTrace.call1("Repository.loadAdminHandlers");
         loadAdminHandlers();
@@ -2601,7 +2601,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
                 if ( !group.isDummy()) {
                     return outputEntry(request, outputType, group);
                 }
-                StringBuffer idBuffer = new StringBuffer();
+                StringBuilder idBuffer = new StringBuilder();
                 entries.addAll(subGroups);
                 for (Entry entry : entries) {
                     idBuffer.append(",");
@@ -2667,8 +2667,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
                     throw new AccessException("File listing not enabled",
                             request);
                 }
-                StringBuffer sb     = new StringBuffer();
-                boolean      didOne = false;
+                StringBuilder sb     = new StringBuilder();
+                boolean       didOne = false;
                 for (Entry child : entries) {
                     Resource resource = child.getResource();
                     if (resource == null) {
@@ -2748,7 +2748,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
         if ( !getActive()) {
             Result result =
                 new Result(msg("Error"),
-                           new StringBuffer("Repository not active"));
+                           new StringBuilder("Repository not active"));
             result.setResponseCode(Result.RESPONSE_NOTFOUND);
 
             return result;
@@ -2781,7 +2781,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @return _more_
      */
     public Result getNoRobotsResult(Request request) {
-        Result result = new Result("", new StringBuffer("no bots"));
+        Result result = new Result("", new StringBuilder("no bots"));
         result.setResponseCode(Result.RESPONSE_UNAUTHORIZED);
 
         return result;
@@ -2822,9 +2822,9 @@ public class Repository extends RepositoryBase implements RequestHandler,
             }
 
             //TODO: For non-html outputs come up with some error format
-            Throwable    inner     = LogUtil.getInnerException(exc);
-            boolean      badAccess = inner instanceof AccessException;
-            StringBuffer sb        = new StringBuffer();
+            Throwable     inner     = LogUtil.getInnerException(exc);
+            boolean       badAccess = inner instanceof AccessException;
+            StringBuilder sb        = new StringBuilder();
             if ( !badAccess) {
                 sb.append(
                     getPageHandler().showDialogError(
@@ -3054,12 +3054,17 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @param request The request
      * @param sb _more_
      */
-    public void addAuthToken(Request request, StringBuffer sb) {
-        String sessionId = request.getSessionId();
-        if (sessionId != null) {
-            String authToken = getAuthToken(sessionId);
-            sb.append(HtmlUtils.hidden(ARG_AUTHTOKEN, authToken));
+    public void addAuthToken(Request request, Appendable sb) {
+        try {
+            String sessionId = request.getSessionId();
+            if (sessionId != null) {
+                String authToken = getAuthToken(sessionId);
+                sb.append(HtmlUtils.hidden(ARG_AUTHTOKEN, authToken));
+            }
+        } catch (java.io.IOException ioe) {
+            throw new RuntimeException(ioe);
         }
+
     }
 
     /**
@@ -3152,7 +3157,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
                                 "Unknown request" + " \"" + path + "\"");
             Result result = new Result(
                                 msg("Error"),
-                                new StringBuffer(
+                                new StringBuilder(
                                     getPageHandler().showDialogError(
                                         msgLabel("Unknown request") + "\""
                                         + path + "\"")));
@@ -3207,7 +3212,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
                     html = html.replace("${urlroot}", urlBase);
 
                     return getEntryManager().addHeaderToAncillaryPage(
-                        request, new Result(BLANK, new StringBuffer(html)));
+                        request, new Result(BLANK, new StringBuilder(html)));
                 }
                 Result result = new Result(BLANK, inputStream, type);
                 result.setCacheOk(true);
@@ -3231,7 +3236,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
                 html = html.replace("${urlroot}", urlBase);
 
                 return getEntryManager().addHeaderToAncillaryPage(request,
-                        new Result(BLANK, new StringBuffer(html)));
+                        new Result(BLANK, new StringBuilder(html)));
             }
             String mimeType =
                 getMimeTypeFromSuffix(IOUtil.getFileExtension(path));
@@ -3284,7 +3289,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
                             + request.getIp());
         Result result = new Result(
                             msg("Error"),
-                            new StringBuffer(
+                            new StringBuilder(
                                 getPageHandler().showDialogError(
                                     msgLabel("Unknown request") + path)));
         result.setResponseCode(Result.RESPONSE_NOTFOUND);
@@ -4158,7 +4163,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
 
             return new Result(xml, MIME_XML);
         }
-        StringBuffer sb = new StringBuffer("OK");
+        StringBuilder sb = new StringBuilder("OK");
 
         return new Result("", sb);
     }
@@ -4174,8 +4179,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @throws Exception _more_
      */
     public Result processClearState(Request request) throws Exception {
-        StringBuffer sb         = new StringBuffer("");
-        String       passPhrase = getProperty(PROP_PASSPHRASE, "").trim();
+        StringBuilder sb         = new StringBuilder("");
+        String        passPhrase = getProperty(PROP_PASSPHRASE, "").trim();
         if ((passPhrase.length() > 0) && request.defined(PROP_PASSPHRASE)) {
             if (request.getString(PROP_PASSPHRASE,
                                   "").trim().equals(passPhrase)) {
@@ -4270,7 +4275,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @throws Exception _more_
      */
     public Result processBlank(Request request) throws Exception {
-        Result result = new Result("", new StringBuffer());
+        Result result = new Result("", new StringBuilder());
         result.setShouldDecorate(false);
 
         return result;
@@ -4354,7 +4359,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @throws Exception _more_
      */
     public Result processRobotsTxt(Request request) throws Exception {
-        StringBuffer sb = new StringBuffer("User-agent: *\n");
+        StringBuilder sb = new StringBuilder("User-agent: *\n");
         if ( !acceptRobots()) {
             sb.append("Disallow: /\n");
         } else {
@@ -4386,7 +4391,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
             //            System.err.println("returning xml:" + xml);
             return new Result(xml, MIME_XML);
         }
-        StringBuffer sb = new StringBuffer("");
+        StringBuilder sb = new StringBuilder("");
 
         return new Result("", sb);
     }
@@ -4404,7 +4409,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @throws Exception _more_
      */
     public Result processDocs(Request request) throws Exception {
-        StringBuffer   sb      = new StringBuffer();
+        StringBuilder  sb      = new StringBuilder();
         List<String[]> docUrls = getPluginManager().getDocUrls();
         sb.append(msgHeader("Available documentation"));
         if (docUrls.size() == 0) {
@@ -4437,7 +4442,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @throws Exception _more_
      */
     public Result processMessage(Request request) throws Exception {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         request.appendMessage(sb);
 
         return new Result(BLANK, sb);
@@ -4454,7 +4459,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @throws Exception _more_
      */
     public Result processTest(Request request) throws Exception {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append("HttpServletRequest.getServerName: ");
         sb.append(request.getHttpServletRequest().getServerName());
         sb.append("<br>");
@@ -4478,7 +4483,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @throws Exception _more_
      */
     public Result processDummy(Request request) throws Exception {
-        return new Result(BLANK, new StringBuffer(BLANK));
+        return new Result(BLANK, new StringBuilder(BLANK));
     }
 
 

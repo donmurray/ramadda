@@ -814,7 +814,7 @@ public class Column implements DataTypes, Constants {
      *
      * @throws Exception _more_
      */
-    public void formatValue(Entry entry, StringBuffer sb, String output,
+    public void formatValue(Entry entry, Appendable sb, String output,
                             Object[] values)
             throws Exception {
         formatValue(entry, sb, output, values, null);
@@ -832,7 +832,7 @@ public class Column implements DataTypes, Constants {
      *
      * @throws Exception _more_
      */
-    public void formatValue(Entry entry, StringBuffer sb, String output,
+    public void formatValue(Entry entry, Appendable sb, String output,
                             Object[] values, SimpleDateFormat sdf)
             throws Exception {
 
@@ -870,7 +870,7 @@ public class Column implements DataTypes, Constants {
                 if ((v == dfltDouble) && !getShowEmpty()) {
                     return;
                 }
-                sb.append(v);
+                sb.append(v + "");
             }
         } else if (isType(DATATYPE_DATETIME)) {
             if (sdf != null) {
@@ -1441,7 +1441,7 @@ public class Column implements DataTypes, Constants {
      * @throws Exception _more_
      */
     public void assembleWhereClause(Request request, List<Clause> where,
-                                    StringBuffer searchCriteria)
+                                    Appendable searchCriteria)
             throws Exception {
 
         String          searchArg  = getSearchArg();
@@ -1696,7 +1696,7 @@ public class Column implements DataTypes, Constants {
      * @throws Exception _more_
      */
     public void addToEntryForm(Request request, Entry entry,
-                               StringBuffer formBuffer, Object[] values,
+                               Appendable formBuffer, Object[] values,
                                Hashtable state, FormInfo formInfo)
             throws Exception {
         if ( !addToForm) {
@@ -2335,7 +2335,7 @@ public class Column implements DataTypes, Constants {
      *
      * @throws Exception _more_
      */
-    public void addToSearchForm(Request request, StringBuffer formBuffer,
+    public void addToSearchForm(Request request, Appendable formBuffer,
                                 List<Clause> where)
             throws Exception {
         addToSearchForm(request, formBuffer, where, null);
@@ -2352,7 +2352,7 @@ public class Column implements DataTypes, Constants {
      *
      * @throws Exception _more_
      */
-    public void addToSearchForm(Request request, StringBuffer formBuffer,
+    public void addToSearchForm(Request request, Appendable formBuffer,
                                 List<Clause> where, Entry entry)
             throws Exception {
 

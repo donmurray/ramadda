@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -83,7 +83,7 @@ public class StorageManager extends RepositoryManager {
     /** the users directory */
     public static final String DIR_USERS = "users";
 
-    /** _more_          */
+    /** _more_ */
     public static final String DIR_VOLATILE = "volatile";
 
     /** the backups directory */
@@ -428,7 +428,7 @@ public class StorageManager extends RepositoryManager {
         sb.append(HtmlUtils.formEntry("Storage Directory:",
                                       getStorageDir().toString()));
         String usage = getDiskUsage();
-        if(usage!=null) {
+        if (usage != null) {
             sb.append(HtmlUtils.formEntry("Disk Usage:", usage));
         }
 

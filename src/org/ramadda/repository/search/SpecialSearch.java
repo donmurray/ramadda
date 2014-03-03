@@ -106,10 +106,10 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
     /** _more_ */
     private boolean showText = true;
 
-    /** _more_          */
+    /** _more_ */
     private boolean showName = false;
 
-    /** _more_          */
+    /** _more_ */
     private boolean showDesc = false;
 
     /** _more_ */
@@ -292,8 +292,7 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    public void makeHeader(Request request, StringBuffer sb)
-            throws Exception {}
+    public void makeHeader(Request request, Appendable sb) throws Exception {}
 
 
     /**
@@ -333,7 +332,7 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    public Result processSearchRequest(Request request, StringBuffer sb)
+    public Result processSearchRequest(Request request, Appendable sb)
             throws Exception {
 
 
@@ -604,7 +603,7 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    private void makeSearchForm(Request request, StringBuffer formSB)
+    private void makeSearchForm(Request request, Appendable formSB)
             throws Exception {
 
 
@@ -742,7 +741,7 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
      *
      * @throws Exception _more_
      */
-    public void makeEntryList(Request request, StringBuffer sb,
+    public void makeEntryList(Request request, Appendable sb,
                               List<Entry> entries)
             throws Exception {
         getRepository().getHtmlOutputHandler().makeTable(request, entries,

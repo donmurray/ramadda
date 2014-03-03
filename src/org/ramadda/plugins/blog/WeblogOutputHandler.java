@@ -156,7 +156,7 @@ public class WeblogOutputHandler extends OutputHandler {
         boolean canAdd = getAccessManager().canDoAction(request, group,
                              Permission.ACTION_NEW);
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(HtmlUtils.cssLink(getRepository().getUrlBase()
                                     + "/blog/blogstyle.css"));
         if (canAdd && !request.get(ARG_EMBEDDED, false)) {
@@ -174,7 +174,7 @@ public class WeblogOutputHandler extends OutputHandler {
                                                         "New Weblog Entry"))));
         }
 
-        StringBuffer blogEntries = new StringBuffer();
+        StringBuilder blogEntries = new StringBuilder();
         for (Entry entry : entries) {
             if ( !entry.getType().equals("blogentry")) {
                 continue;
@@ -215,7 +215,7 @@ public class WeblogOutputHandler extends OutputHandler {
      */
     public String getBlogEntry(Request request, Entry entry, boolean single)
             throws Exception {
-        StringBuffer blogEntry = new StringBuffer();
+        StringBuilder blogEntry = new StringBuilder();
         String entryUrl = request.entryUrl(getRepository().URL_ENTRY_SHOW,
                                            entry);
         String subject;
@@ -248,7 +248,7 @@ public class WeblogOutputHandler extends OutputHandler {
         desc = getWikiManager().wikifyEntry(request, entry, desc);
 
 
-        StringBuffer blogBody = new StringBuffer(desc);
+        StringBuilder blogBody = new StringBuilder(desc);
         Object[]     values   = entry.getValues();
         if (values[0] != null) {
             String extra = ((String) values[0]).trim();
@@ -258,7 +258,7 @@ public class WeblogOutputHandler extends OutputHandler {
                         extra, false));
             }
         }
-        StringBuffer comments = getCommentBlock(request, entry, false);
+        StringBuilder comments = getCommentBlock(request, entry, false);
         String commentsBlock = HtmlUtils.makeShowHideBlock(msg("Comments"),
                                    HtmlUtils.insetDiv(comments.toString(), 0,
                                        30, 0, 0), false);

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -265,7 +265,7 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void decorateEntry(Request request, Entry entry, StringBuffer sb,
+    public void decorateEntry(Request request, Entry entry, Appendable sb,
                               Metadata metadata, boolean forLink)
             throws Exception {
         MetadataType type = getType(metadata.getType());
@@ -680,7 +680,7 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void makeAddForm(Request request, Entry entry, StringBuffer sb)
+    public void makeAddForm(Request request, Entry entry, Appendable sb)
             throws Exception {
         for (MetadataType type : metadataTypes) {
             makeAddForm(request, entry, type, sb);
@@ -915,7 +915,7 @@ public class MetadataHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public void makeAddForm(Request request, Entry entry, MetadataType type,
-                            StringBuffer sb)
+                            Appendable sb)
             throws Exception {
         if (type == null) {
             return;

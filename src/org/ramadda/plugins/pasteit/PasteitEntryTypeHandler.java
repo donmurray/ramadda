@@ -71,7 +71,7 @@ public class PasteitEntryTypeHandler extends GenericTypeHandler {
      * @throws Exception _more_
      */
     @Override
-    public void addSpecialToEntryForm(Request request, StringBuffer sb,
+    public void addSpecialToEntryForm(Request request, Appendable sb,
                                       Entry parentEntry, Entry entry,
                                       FormInfo formInfo)
             throws Exception {

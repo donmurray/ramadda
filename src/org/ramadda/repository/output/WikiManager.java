@@ -545,8 +545,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
      * @return  the string version
      */
     private static String attrs(String... attrs) {
-        StringBuffer sb = new StringBuffer();
-        String       qt = "&quote;";
+        StringBuilder sb = new StringBuilder();
+        String        qt = "&quote;";
 
         for (int i = 0; i < attrs.length; i += 2) {
             sb.append(attr(attrs[i], qt + attrs[i + 1] + qt));
@@ -996,7 +996,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                 hrefUrl = entry.getTypeHandler().getEntryResourceUrl(request,
                         entry);
             }
-            StringBuffer buf = new StringBuffer();
+            StringBuilder buf = new StringBuilder();
             addImagePopupJS(request, buf, props);
             buf.append(HtmlUtils.href(hrefUrl, img,
                                       HtmlUtils.cssClass("popup_image")));
@@ -1194,7 +1194,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             return "";
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         String rowLabel = Misc.getProperty(props,
                                            attrPrefix + ATTR_ROW_LABEL,
@@ -1203,8 +1203,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             return HtmlUtils.formEntry(rowLabel, result);
         }
 
-        boolean      wrapInADiv = false;
-        StringBuffer style      = new StringBuffer();
+        boolean       wrapInADiv = false;
+        StringBuilder style      = new StringBuilder();
         int maxHeight = Misc.getProperty(props, "box." + ATTR_MAXHEIGHT, -1);
         style.append(Misc.getProperty(props, "box." + ATTR_STYLE, ""));
         String cssClass = Misc.getProperty(props, "box." + ATTR_CLASS,
@@ -1287,7 +1287,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         String  criteria = Misc.getProperty(props, ATTR_IF, (String) null);
         if (criteria != null) {}
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (theTag.equals(WIKI_PROP_INFORMATION)) {
             boolean details = Misc.getProperty(props, ATTR_DETAILS, false);
             if ( !details) {
@@ -1298,8 +1298,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             return getRepository().getHtmlOutputHandler().getInformationTabs(
                 request, entry, false);
         } else if (theTag.equals(WIKI_PROP_TAGCLOUD)) {
-            StringBuffer tagCloud  = new StringBuffer();
-            int          threshold = Misc.getProperty(props, "threshold", 0);
+            StringBuilder tagCloud  = new StringBuilder();
+            int           threshold = Misc.getProperty(props, "threshold", 0);
             getMetadataManager().doMakeTagCloudOrList(request,
                     Misc.getProperty(props, "type", ""), tagCloud, true,
                     threshold);
@@ -1506,16 +1506,19 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                    || theTag.equals("chart")) {
 
             String jsonUrl = null;
-            if(entry.getTypeHandler() instanceof PointTypeHandler) {
-                PointTypeHandler pth = (PointTypeHandler) entry.getTypeHandler();
+            if (entry.getTypeHandler() instanceof PointTypeHandler) {
+                PointTypeHandler pth =
+                    (PointTypeHandler) entry.getTypeHandler();
                 PointOutputHandler poh =
                     (PointOutputHandler) pth.getRecordOutputHandler();
-                
+
                 jsonUrl = poh.getJsonUrl(request, entry);
             } else {
-                jsonUrl = getRepository().getUrlBase() + "/grid/json?" + HtmlUtils.args(new String[]{ARG_ENTRYID , entry.getId(),
-                                                                                        ARG_LOCATION_LATITUDE,  "${latitude}",
-                                                                                                     ARG_LOCATION_LONGITUDE, "${longitude}"}, false);
+                jsonUrl = getRepository().getUrlBase() + "/grid/json?"
+                          + HtmlUtils.args(new String[] {
+                    ARG_ENTRYID, entry.getId(), ARG_LOCATION_LATITUDE,
+                    "${latitude}", ARG_LOCATION_LONGITUDE, "${longitude}"
+                }, false);
 
             }
             getEntryDisplay(request, entry, entry.getName(), jsonUrl, sb,
@@ -1643,8 +1646,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
             return sb.toString();
         } else if (theTag.equals(WIKI_PROP_TOOLS)) {
-            StringBuffer links = new StringBuffer();
-            int          cnt   = 0;
+            StringBuilder links = new StringBuilder();
+            int           cnt   = 0;
             for (Link link :
                     getEntryManager().getEntryLinks(request, entry)) {
                 if ( !link.isType(OutputType.TYPE_IMPORTANT)) {
@@ -1708,8 +1711,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
             return sb.toString();
         } else if (theTag.equals(WIKI_PROP_APPLY)) {
-            StringBuffer style = new StringBuffer(Misc.getProperty(props,
-                                     APPLY_PREFIX + ATTR_STYLE, ""));
+            StringBuilder style = new StringBuilder(Misc.getProperty(props,
+                                      APPLY_PREFIX + ATTR_STYLE, ""));
             int padding = Misc.getProperty(props,
                                            APPLY_PREFIX + ATTR_PADDING, 5);
             int border = Misc.getProperty(props, APPLY_PREFIX + ATTR_BORDER,
@@ -1809,7 +1812,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                 prefix = prefix.replace("${icon}", icon);
                 suffix = suffix.replace("${icon}", icon);
 
-                StringBuffer content = new StringBuffer();
+                StringBuilder content = new StringBuilder();
                 content.append(prefix);
                 content.append(childsHtml);
                 content.append(suffix);
@@ -2036,7 +2039,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                                 + startSpeed
                                 + ", pause: 2500, hoverPause: true"
                                 + ", generatePagination: " + shownav + "\n";
-                StringBuffer js = new StringBuffer();
+                StringBuilder js = new StringBuilder();
 
                 js.append(
                     "$(function(){\n$(" + HtmlUtils.squote("#" + slideId)
@@ -2153,20 +2156,21 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                             || (changeDate.getTime() > date2.getTime())) {
                         continue;
                     }
-                    StringBuffer buff = map.get(date1);
+                    Appendable buff = map.get(date1);
                     buff.append("<tr><td width=75%>&nbsp;&nbsp;&nbsp;");
                     buff.append(getEntryManager().getAjaxLink(request, e,
-                            e.getLabel()));
+                            e.getLabel()).toString());
                     buff.append("</td><td width=25% align=right><i>");
                     buff.append(formatDate(request, changeDate));
                     buff.append("</i></td></tr>");
                 }
             }
             for (Date date : map.getKeys()) {
-                StringBuffer tmp = new StringBuffer();
-                String msg = msg("New on") + " " + dateFormat.format(date);
+                Appendable tmp = new StringBuilder();
+                String     msg = msg("New on") + " "
+                                 + dateFormat.format(date);
                 tmp.append("<table width=100% border=0>");
-                tmp.append(map.get(date));
+                tmp.append(map.get(date).toString());
                 tmp.append("</table>");
                 sb.append(HtmlUtils.makeShowHideBlock(msg, tmp.toString(),
                         true));
@@ -2323,7 +2327,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                 String href = HtmlUtils.href(url, linkLabel,
                                              HtmlUtils.cssClass(cssClass)
                                              + HtmlUtils.style(style));
-                StringBuffer link = new StringBuffer();
+                StringBuilder link = new StringBuilder();
                 link.append(tagOpen);
                 link.append(href);
                 link.append(tagClose);
@@ -2379,15 +2383,15 @@ public class WikiManager extends RepositoryManager implements WikiUtil
      * Add the image popup javascript
      *
      * @param request  the Request
-     * @param buf      the page StringBuffer
+     * @param buf      the page StringBuilder
      * @param props    the properties
      */
-    private void addImagePopupJS(Request request, StringBuffer buf,
+    private void addImagePopupJS(Request request, StringBuilder buf,
                                  Hashtable props) {
         if (request.getExtraProperty("added fancybox") == null) {
             String captionpos = Misc.getProperty(props, ATTR_POPUPCAPTION,
                                     "none");
-            StringBuffer options = new StringBuffer("{");
+            StringBuilder options = new StringBuilder("{");
             if ( !captionpos.equals("none")) {
                 options.append(HtmlUtils.squote("titlePosition"));
                 options.append(" : ");
@@ -3188,7 +3192,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
      * @throws Exception  problem making the gallery
      */
     public void makeGallery(Request request, List<Entry> imageEntries,
-                            Hashtable props, StringBuffer sb)
+                            Hashtable props, StringBuilder sb)
             throws Exception {
 
         int     width        = Misc.getProperty(props, ATTR_WIDTH, 200);
@@ -3218,9 +3222,9 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         }
 
 
-        StringBuffer[] colsSB = new StringBuffer[columns];
+        StringBuilder[] colsSB = new StringBuilder[columns];
         for (int i = 0; i < columns; i++) {
-            colsSB[i] = new StringBuffer();
+            colsSB[i] = new StringBuilder();
         }
         int num    = 0;
         int colCnt = 0;
@@ -3230,7 +3234,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             if (colCnt >= columns) {
                 colCnt = 0;
             }
-            StringBuffer buff = colsSB[colCnt];
+            StringBuilder buff = colsSB[colCnt];
             colCnt++;
             String url = null;
 
@@ -3310,7 +3314,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         }
         sb.append("<table cellspacing=4 align='center'>");
         sb.append("<tr valign=\"top\">");
-        for (StringBuffer buff : colsSB) {
+        for (StringBuilder buff : colsSB) {
             sb.append("<td>");
             sb.append(buff);
             sb.append("</td>");
@@ -3540,7 +3544,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
 
 
-        StringBuffer buttons = new StringBuffer();
+        StringBuilder buttons = new StringBuilder();
         buttons.append(addWikiEditButton(textAreaId, "button_bold.png",
                                          "Bold text", "\\'\\'\\'",
                                          "\\'\\'\\'", "Bold text",
@@ -3598,9 +3602,9 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                                          "mw-editbutton-hr"));
 
 
-        StringBuffer importMenu = new StringBuffer();
-        String       inset      = "&nbsp;&nbsp;";
-        int          cnt        = 0;
+        StringBuilder importMenu = new StringBuilder();
+        String        inset      = "&nbsp;&nbsp;";
+        int           cnt        = 0;
         importMenu.append("<table><tr valign=top><td valign=top>\n");
         for (int i = 0; i < WIKIPROPS.length; i++) {
             String prop = WIKIPROPS[i];
@@ -3670,7 +3674,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         }
 
 
-        StringBuffer importOutputMenu = new StringBuffer();
+        StringBuilder importOutputMenu = new StringBuilder();
         /*
                 List<OutputType> allTypes = getRepository().getOutputTypes();
                 //        importMenu.append("<hr>");
@@ -4072,7 +4076,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
 
         if (imageUrl != null) {
-            StringBuffer extra = new StringBuffer();
+            StringBuilder extra = new StringBuilder();
             String position = request.getString(ATTR_TEXTPOSITION, POS_LEFT);
             boolean layoutHorizontal = position.equals(POS_RIGHT)
                                        || position.equals(POS_LEFT);
@@ -4177,7 +4181,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         if (entry.getTypeHandler().isGroup()
                 && entry.getTypeHandler().isType(TypeHandler.TYPE_GROUP)) {
             //Do we tack on the listing
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             List<Entry> children = getEntryManager().getChildren(request,
                                        entry);
             if (children.size() > 0) {
@@ -4191,25 +4195,40 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         return content;
     }
 
-    public  String getStandardChartDisplay(Request request, Entry entry) throws Exception {
-        String       name  = entry.getName();
-        StringBuffer wiki = new StringBuffer();
-        wiki.append("{{displaygroup  showTitle=\"true\"  showMenu=\"true\"  layoutType=\"columns\"  layoutColumns=\"2\"  }}\n");
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String getStandardChartDisplay(Request request, Entry entry)
+            throws Exception {
+        String        name = entry.getName();
+        StringBuilder wiki = new StringBuilder();
+        wiki.append(
+            "{{displaygroup  showTitle=\"true\"  showMenu=\"true\"  layoutType=\"columns\"  layoutColumns=\"2\"  }}\n");
 
-        wiki.append("{{display  width=\"600\"  height=\"400\"   type=\"linechart\"  name=\"\"  layoutHere=\"false\"  showMenu=\"true\"  showTitle=\"true\"  row=\"0\"  column=\"0\"  }}");
+        wiki.append(
+            "{{display  width=\"600\"  height=\"400\"   type=\"linechart\"  name=\"\"  layoutHere=\"false\"  showMenu=\"true\"  showTitle=\"true\"  row=\"0\"  column=\"0\"  }}");
 
-        if(entry.isGeoreferenced()) {
-            wiki.append("{{display  width=\"600\"  height=\"400\"   type=\"map\"  name=\"\"  layoutHere=\"false\"  showMenu=\"true\"  showTitle=\"true\"  row=\"0\"  column=\"1\"  }}");
+        if (entry.isGeoreferenced()) {
+            wiki.append(
+                "{{display  width=\"600\"  height=\"400\"   type=\"map\"  name=\"\"  layoutHere=\"false\"  showMenu=\"true\"  showTitle=\"true\"  row=\"0\"  column=\"1\"  }}");
         }
 
-        Hashtable    props = new Hashtable();
+        Hashtable props = new Hashtable();
 
         props.put("layoutHere", "false");
         props.put("layoutType", "table");
         props.put("layoutColumns", "2");
         props.put("showMenu", "true");
         props.put("showMap", "" + entry.isGeoreferenced());
-        return wikifyEntry(request,  entry,wiki.toString());
+
+        return wikifyEntry(request, entry, wiki.toString());
     }
 
     /**
@@ -4225,17 +4244,17 @@ public class WikiManager extends RepositoryManager implements WikiUtil
      * @throws Exception _more_
      */
     public void getEntryDisplay(Request request, Entry entry, String name,
-                                String url, StringBuffer sb, Hashtable props)
+                                String url, StringBuilder sb, Hashtable props)
             throws Exception {
 
         this.addDisplayImports(request, sb);
-        List<String> topProps = new ArrayList<String>();
+        List<String>  topProps = new ArrayList<String>();
 
 
-        List<String> propList = new ArrayList<String>();
+        List<String>  propList = new ArrayList<String>();
 
 
-        StringBuffer js       = new StringBuffer();
+        StringBuilder js       = new StringBuilder();
 
 
         for (String showArg : new String[] { ATTR_SHOWMAP, ATTR_SHOWMENU }) {
@@ -4409,7 +4428,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
      *
      * @throws Exception _more_
      */
-    public void addDisplayImports(Request request, StringBuffer sb)
+    public void addDisplayImports(Request request, StringBuilder sb)
             throws Exception {
 
         if (request.getExtraProperty("initmap") == null) {

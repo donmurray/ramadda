@@ -54,6 +54,16 @@ import java.util.regex.Pattern;
 
 public class Utils {
 
+    public static Appendable append(Appendable sb, String s) {
+        try {
+            sb.append(s);
+            return sb;
+        } catch(java.io.IOException ioe) {
+            throw new RuntimeException(ioe);
+        }
+    }
+
+
     /**
      * _more_
      *

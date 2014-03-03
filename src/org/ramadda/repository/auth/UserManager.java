@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -206,7 +206,7 @@ public class UserManager extends RepositoryManager {
         new Hashtable<String, PasswordReset>();
 
 
-    /** _more_          */
+    /** _more_ */
     private boolean debug = false;
 
     /** _more_ */
@@ -2106,11 +2106,14 @@ public class UserManager extends RepositoryManager {
      * @param request the request
      * @param template template to make the links
      * @param separator separator between links
+     * @param prefix _more_
+     * @param makePopup _more_
      *
      * @return user links
      */
     public String getUserLinks(Request request, String template,
-                               String separator, StringBuffer prefix, boolean makePopup) {
+                               String separator, StringBuilder prefix,
+                               boolean makePopup) {
         User user   = request.getUser();
 
         List extras = new ArrayList();
@@ -2146,10 +2149,11 @@ public class UserManager extends RepositoryManager {
             tips.add(msg("Logout"));
 
             String label = user.getLabel().replace(" ", "&nbsp;");
-            String settingsUrl = request.url(getRepositoryBase().URL_USER_HOME);
+            String settingsUrl =
+                request.url(getRepositoryBase().URL_USER_HOME);
 
-            if(makePopup) {
-                prefix.append(HtmlUtils.href(settingsUrl,label));
+            if (makePopup) {
+                prefix.append(HtmlUtils.href(settingsUrl, label));
                 prefix.append(HtmlUtils.space(2));
             } else {
                 extras.add("");
@@ -2172,7 +2176,7 @@ public class UserManager extends RepositoryManager {
         List links = new ArrayList();
         for (int i = 0; i < urls.size(); i++) {
             String link = template.replace("${label}",
-                                           labels.get(i).toString()); 
+                                           labels.get(i).toString());
             link = link.replace("${url}", urls.get(i).toString());
             link = link.replace("${tooltip}", tips.get(i).toString());
             link = link.replace("${extra}", extras.get(i).toString());

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -79,6 +79,8 @@ public class RepositoryUtil {
      *
      * @param password _more_
      *
+     * @param string _more_
+     *
      * @return _more_
      */
     public static String hashString(String string) {
@@ -86,8 +88,9 @@ public class RepositoryUtil {
             MessageDigest md = MessageDigest.getInstance("SHA-512");
             md.update(string.getBytes("UTF-8"));
             byte[] bytes  = md.digest();
-            String s = new String(bytes);
+            String s      = new String(bytes);
             String result = encodeBase64(bytes);
+
             //            System.err.println("Hash input string:" + string  +":");
             //            System.err.println("Hash result:" + s  +":");
             //            System.err.println("Hash base64:" + result  +":");
@@ -292,8 +295,13 @@ public class RepositoryUtil {
 
 
 
-    public static void main(String[]args) {
-        for(String arg: args) {
+    /**
+     * _more_
+     *
+     * @param args _more_
+     */
+    public static void main(String[] args) {
+        for (String arg : args) {
             hashString(arg);
         }
     }

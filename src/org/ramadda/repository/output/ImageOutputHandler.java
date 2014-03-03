@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -665,8 +665,8 @@ public class ImageOutputHandler extends OutputHandler {
                               List<Entry> entries)
             throws Exception {
 
-        StringBuffer sb     = new StringBuffer();
-        OutputType   output = request.getOutput();
+        StringBuilder sb     = new StringBuilder();
+        OutputType    output = request.getOutput();
         if (entries.size() == 0) {
             sb.append("<b>Nothing Found</b><p>");
 
@@ -784,7 +784,7 @@ public class ImageOutputHandler extends OutputHandler {
                                          msg("Use fixed width"));
             }
 
-            sb = new StringBuffer();
+            sb = new StringBuilder();
             sb.append(tmp);
             sb.append(HtmlUtils.leftRight(getSortLinks(request), fullUrl));
         } else if (output.equals(OUTPUT_SLIDESHOW)) {
@@ -792,9 +792,9 @@ public class ImageOutputHandler extends OutputHandler {
             template = template.replace("${imagelist}", sb.toString());
             template = StringUtil.replace(template, "${root}",
                                           repository.getUrlBase());
-            sb = new StringBuffer(template);
+            sb = new StringBuilder(template);
         }
-        StringBuffer finalSB = new StringBuffer();
+        StringBuilder finalSB = new StringBuilder();
         showNext(request, new ArrayList<Entry>(), entries, finalSB);
 
         finalSB.append(HtmlUtils.p());
@@ -817,13 +817,13 @@ public class ImageOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public void makePlayer(Request request, List<Entry> entries,
-                           StringBuffer finalSB, boolean addHeader)
+                           Appendable finalSB, boolean addHeader)
             throws Exception {
-        String       playerPrefix = "imageplayer_" + HtmlUtils.blockCnt++;
-        String       playerVar    = playerPrefix + "Var";
+        String        playerPrefix = "imageplayer_" + HtmlUtils.blockCnt++;
+        String        playerVar    = playerPrefix + "Var";
 
 
-        StringBuffer sb           = new StringBuffer();
+        StringBuilder sb           = new StringBuilder();
         if (entries.size() == 0) {
             finalSB.append("<b>Nothing Found</b><p>");
 
@@ -890,10 +890,10 @@ public class ImageOutputHandler extends OutputHandler {
                 fullUrl = HtmlUtils.href(request.getUrl(),
                                          msg("Use fixed width"));
             }
-            sb = new StringBuffer(HtmlUtils.leftRight(getSortLinks(request),
+            sb = new StringBuilder(HtmlUtils.leftRight(getSortLinks(request),
                     fullUrl));
         } else {
-            sb = new StringBuffer();
+            sb = new StringBuilder();
         }
         sb.append(tmp);
         finalSB.append(sb);
@@ -905,9 +905,9 @@ public class ImageOutputHandler extends OutputHandler {
     /**
      *
      * public void makeSlideshow(Request request, List<Entry> entries,
-     *                      StringBuffer finalSB, boolean addHeader)
+     *                      StringBuilder finalSB, boolean addHeader)
      *       throws Exception {
-     *   StringBuffer sb = new StringBuffer();
+     *   StringBuilder sb = new StringBuilder();
      *   if (entries.size() == 0) {
      *       finalSB.append("<b>Nothing Found</b><p>");
      *       return;
@@ -961,10 +961,10 @@ public class ImageOutputHandler extends OutputHandler {
      *           fullUrl = HtmlUtils.href(request.getUrl(),
      *                                   msg("Use fixed width"));
      *       }
-     *       sb = new StringBuffer(HtmlUtils.leftRight(getSortLinks(request),
+     *       sb = new StringBuilder(HtmlUtils.leftRight(getSortLinks(request),
      *               fullUrl));
      *   } else {
-     *       sb = new StringBuffer();
+     *       sb = new StringBuilder();
      *   }
      *   sb.append(tmp);
      *   finalSB.append(sb);

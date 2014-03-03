@@ -429,8 +429,7 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void getTextCorpus(Entry entry, StringBuffer sb)
-            throws Exception {}
+    public void getTextCorpus(Entry entry, Appendable sb) throws Exception {}
 
 
     /**
@@ -775,11 +774,12 @@ public class TypeHandler extends RepositoryManager {
      * @param sb _more_
      */
     public void handleNoEntriesHtml(Request request, Entry entry,
-                                    StringBuffer sb) {
+                                    Appendable sb) {
         if ( !Utils.stringDefined(entry.getDescription())
                 && getType().equals(TYPE_GROUP)) {
-            sb.append(HtmlUtils.tag(HtmlUtils.TAG_I, "",
-                                    msg(LABEL_EMPTY_FOLDER)));
+            Utils.append(sb,
+                         HtmlUtils.tag(HtmlUtils.TAG_I, "",
+                                       msg(LABEL_EMPTY_FOLDER)));
         }
     }
 
@@ -874,7 +874,7 @@ public class TypeHandler extends RepositoryManager {
     public Result processEntryAccess(Request request, Entry entry)
             throws Exception {
         return new Result("Error",
-                          new StringBuffer("Entry access not defined"));
+                          new StringBuilder("Entry access not defined"));
     }
 
     /**
@@ -1647,8 +1647,7 @@ public class TypeHandler extends RepositoryManager {
      * @param metadataType _more_
      */
     public void addMetadataToXml(Entry entry, Element root,
-                                 StringBuffer extraXml,
-                                 String metadataType) {}
+                                 Appendable extraXml, String metadataType) {}
 
     /**
      * _more_
@@ -1697,19 +1696,19 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public StringBuffer getEntryContent(Request request, Entry entry,
-                                        boolean showDescription,
-                                        boolean showResource)
+    public StringBuilder getEntryContent(Request request, Entry entry,
+                                         boolean showDescription,
+                                         boolean showResource)
             throws Exception {
 
-        StringBuffer sb     = new StringBuffer();
-        OutputType   output = request.getOutput();
+        StringBuilder sb     = new StringBuilder();
+        OutputType    output = request.getOutput();
         if (true) {
             if (displayTemplatePath != null) {
                 String html =
                     getRepository().getResource(displayTemplatePath);
 
-                return new StringBuffer(processDisplayTemplate(request,
+                return new StringBuilder(processDisplayTemplate(request,
                         entry, html));
             }
             sb.append(HtmlUtils.formTable());
@@ -1722,7 +1721,7 @@ public class TypeHandler extends RepositoryManager {
             List<Metadata> metadataList = getRepository().getMetadata(entry);
             if (metadataList.size() > 0) {
                 sb.append(HtmlUtils.formEntry("<p>", ""));
-                StringBuffer mSB = new StringBuffer();
+                StringBuilder mSB = new StringBuilder();
                 mSB.append("<ul>");
                 for (Metadata metadata : metadataList) {
                     mSB.append("<li>");
@@ -2234,11 +2233,9 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public StringBuffer getInnerEntryContent(Entry entry, Request request,
-                                             OutputType output,
-                                             boolean showDescription,
-                                             boolean showResource,
-                                             boolean linkToDownload)
+    public StringBuilder getInnerEntryContent(Entry entry, Request request,
+            OutputType output, boolean showDescription, boolean showResource,
+            boolean linkToDownload)
             throws Exception {
 
         if (parent != null) {
@@ -2256,7 +2253,7 @@ public class TypeHandler extends RepositoryManager {
             }
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (true || output.equals(OutputHandler.OUTPUT_HTML)) {
             OutputHandler outputHandler =
                 getRepository().getOutputHandler(request);
@@ -2476,8 +2473,9 @@ public class TypeHandler extends RepositoryManager {
                     sb.append(formEntry(request, msgLabel("End Date"),
                                         endDate));
                 } else {
-                    boolean showTime    = okToShowInForm(entry, "time", true);
-                    StringBuffer dateSB = new StringBuffer();
+                    boolean showTime     = okToShowInForm(entry, "time",
+                                               true);
+                    StringBuilder dateSB = new StringBuilder();
                     dateSB.append(formatDate(request, entry.getStartDate(),
                                              entry));
 
@@ -2680,8 +2678,8 @@ public class TypeHandler extends RepositoryManager {
      */
     public Result processList(Request request, String what) throws Exception {
         return new Result("Error",
-                          new StringBuffer(msgLabel("Unknown listing type")
-                                           + what));
+                          new StringBuilder(msgLabel("Unknown listing type")
+                                            + what));
     }
 
     /**
@@ -2877,7 +2875,7 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void addToEntryForm(Request request, StringBuffer sb,
+    public void addToEntryForm(Request request, Appendable sb,
                                Entry parentEntry, Entry entry,
                                FormInfo formInfo)
             throws Exception {
@@ -2926,7 +2924,7 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void addSpecialToEntryForm(Request request, StringBuffer sb,
+    public void addSpecialToEntryForm(Request request, Appendable sb,
                                       Entry parentEntry, Entry entry,
                                       FormInfo formInfo)
             throws Exception {
@@ -2950,7 +2948,7 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void addSpatialToEntryForm(Request request, StringBuffer sb,
+    public void addSpatialToEntryForm(Request request, Appendable sb,
                                       Entry parentEntry, Entry entry,
                                       FormInfo formInfo)
             throws Exception {
@@ -3037,7 +3035,7 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void addAreaWidget(Request request, Entry entry, StringBuffer sb,
+    public void addAreaWidget(Request request, Entry entry, Appendable sb,
                               FormInfo formInfo)
             throws Exception {
         String[] nwse = null;
@@ -3086,7 +3084,7 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void addDateToEntryForm(Request request, StringBuffer sb,
+    public void addDateToEntryForm(Request request, Appendable sb,
                                    Entry entry)
             throws Exception {
 
@@ -3186,7 +3184,7 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void addBasicToEntryForm(Request request, StringBuffer sb,
+    public void addBasicToEntryForm(Request request, Appendable sb,
                                     Entry parentEntry, Entry entry,
                                     FormInfo formInfo)
             throws Exception {
@@ -3359,7 +3357,7 @@ public class TypeHandler extends RepositoryManager {
                     }
 
                     if (showLocalFile) {
-                        StringBuffer localFilesSB = new StringBuffer();
+                        StringBuilder localFilesSB = new StringBuilder();
                         localFilesSB.append(HtmlUtils.formTable());
                         localFilesSB.append(
                             HtmlUtils.formEntry(
@@ -3713,38 +3711,43 @@ public class TypeHandler extends RepositoryManager {
      * @param request The request
      * @param sb _more_
      */
-    public void addTextSearch(Request request, StringBuffer sb) {
-        String name           = (String) request.getString(ARG_TEXT, "");
-        String searchMetaData = " ";
-        /*HtmlUtils.checkbox(ARG_SEARCHMETADATA,
-                                    "true",
-                                    request.get(ARG_SEARCHMETADATA,
-                                    false)) + " "
-                                    + msg("Search metadata");*/
+    public void addTextSearch(Request request, Appendable sb) {
+        try {
+            String name           = (String) request.getString(ARG_TEXT, "");
+            String searchMetaData = " ";
+            /*HtmlUtils.checkbox(ARG_SEARCHMETADATA,
+                                        "true",
+                                        request.get(ARG_SEARCHMETADATA,
+                                        false)) + " "
+                                        + msg("Search metadata");*/
 
-        String searchExact = " "
-                             + HtmlUtils.checkbox(ARG_EXACT, "true",
-                                 request.get(ARG_EXACT, false)) + " "
-                                     + msg("Match exactly");
-        String extra = HtmlUtils.p() + searchExact + searchMetaData;
-        if (getDatabaseManager().supportsRegexp()) {
-            extra =
-                HtmlUtils.checkbox(ARG_ISREGEXP, "true",
-                                   request.get(ARG_ISREGEXP, false)) + " "
-                                       + msg("Use regular expression");
+            String searchExact = " "
+                                 + HtmlUtils.checkbox(ARG_EXACT, "true",
+                                     request.get(ARG_EXACT, false)) + " "
+                                         + msg("Match exactly");
+            String extra = HtmlUtils.p() + searchExact + searchMetaData;
+            if (getDatabaseManager().supportsRegexp()) {
+                extra = HtmlUtils.checkbox(
+                    ARG_ISREGEXP, "true",
+                    request.get(ARG_ISREGEXP, false)) + " "
+                        + msg("Use regular expression");
 
-            extra = HtmlUtils.makeToggleInline(msg("More..."), extra, false);
-        } else {
-            extra = "";
+                extra = HtmlUtils.makeToggleInline(msg("More..."), extra,
+                        false);
+            } else {
+                extra = "";
+            }
+
+
+
+            sb.append(formEntry(request, msgLabel("Text"),
+                                HtmlUtils.input(ARG_TEXT, name,
+                                    HtmlUtils.SIZE_50 + " autofocus ") + " "
+                                        + extra));
+
+        } catch (java.io.IOException ioe) {
+            throw new RuntimeException(ioe);
         }
-
-
-
-        sb.append(formEntry(request, msgLabel("Text"),
-                            HtmlUtils.input(ARG_TEXT, name,
-                                            HtmlUtils.SIZE_50
-                                            + " autofocus ") + " " + extra));
-
     }
 
 
@@ -3756,8 +3759,7 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void addToSpecialSearchForm(Request request,
-                                       StringBuffer formBuffer)
+    public void addToSpecialSearchForm(Request request, Appendable formBuffer)
             throws Exception {
         if (parent != null) {
             parent.addToSpecialSearchForm(request, formBuffer);
@@ -3775,7 +3777,7 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void addToSearchForm(Request request, StringBuffer formBuffer,
+    public void addToSearchForm(Request request, Appendable formBuffer,
                                 List<Clause> where, boolean advancedForm)
             throws Exception {
 
@@ -3818,8 +3820,8 @@ public class TypeHandler extends RepositoryManager {
         //        maxDate = "";
 
 
-        StringBuffer basicSB    = new StringBuffer(HtmlUtils.formTable());
-        StringBuffer advancedSB = new StringBuffer(HtmlUtils.formTable());
+        StringBuilder basicSB    = new StringBuilder(HtmlUtils.formTable());
+        StringBuilder advancedSB = new StringBuilder(HtmlUtils.formTable());
 
 
         addTextSearch(request, basicSB);
@@ -4009,10 +4011,13 @@ public class TypeHandler extends RepositoryManager {
      * @param basicSB _more_
      * @param arg _more_
      * @param showTime _more_
+     *
+     * @throws Exception _more_
      */
     public static void addDateSearch(Repository repository, Request request,
-                                     StringBuffer basicSB, DateArgument arg,
-                                     boolean showTime) {
+                                     Appendable basicSB, DateArgument arg,
+                                     boolean showTime)
+            throws Exception {
         List dateTypes = new ArrayList();
         dateTypes.add(new TwoFacedObject(msg("Contained by range"),
                                          DATE_SEARCHMODE_CONTAINEDBY));
@@ -4130,12 +4135,12 @@ public class TypeHandler extends RepositoryManager {
      * @param what _more_
      * @param sb _more_
      */
-    public void addSearchField(Request request, String what,
-                               StringBuffer sb) {
+    public void addSearchField(Request request, String what, Appendable sb) {
         if (what.equals(ARG_FILESUFFIX)) {
-            sb.append(formEntry(request, msgLabel("File Suffix"),
-                                HtmlUtils.input(ARG_FILESUFFIX, "",
-                                    " size=\"8\" ")));
+            Utils.append(sb,
+                         formEntry(request, msgLabel("File Suffix"),
+                                   HtmlUtils.input(ARG_FILESUFFIX, "",
+                                       " size=\"8\" ")));
         }
     }
 
@@ -4166,7 +4171,7 @@ public class TypeHandler extends RepositoryManager {
      */
     public List<Clause> assembleWhereClause(Request request)
             throws Exception {
-        return assembleWhereClause(request, new StringBuffer());
+        return assembleWhereClause(request, new StringBuilder());
     }
 
 
@@ -4182,7 +4187,7 @@ public class TypeHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public List<Clause> assembleWhereClause(Request request,
-                                            StringBuffer searchCriteria)
+                                            Appendable searchCriteria)
             throws Exception {
 
         //        Misc.printStack("Assemble where clause", 10);
@@ -4794,7 +4799,7 @@ public class TypeHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public void addTextSearch(Request request, String textToSearch,
-                              StringBuffer searchCriteria, List<Clause> where)
+                              Appendable searchCriteria, List<Clause> where)
             throws Exception {
 
         DatabaseManager dbm     = getDatabaseManager();
@@ -5682,11 +5687,12 @@ public class TypeHandler extends RepositoryManager {
      * @param inner _more_
      */
     public static void addPropertyTags(Hashtable properties,
-                                       StringBuffer inner) {
+                                       Appendable inner) {
         for (Enumeration keys = properties.keys(); keys.hasMoreElements(); ) {
             String arg   = (String) keys.nextElement();
             String value = (String) properties.get(arg);
-            inner.append(XmlUtil.tag(TypeHandler.TAG_PROPERTY,
+            Utils.append(inner,
+                         XmlUtil.tag(TypeHandler.TAG_PROPERTY,
                                      XmlUtil.attrs(ATTR_NAME, arg,
                                          TypeHandler.ATTR_VALUE, value)));
         }

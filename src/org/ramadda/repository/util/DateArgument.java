@@ -1,5 +1,5 @@
 /*
-/* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -30,13 +30,13 @@ import org.ramadda.repository.Constants;
 public class DateArgument implements Constants {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final int TYPE_CREATE = 0;
 
-    /** _more_          */
+    /** _more_ */
     public static final int TYPE_CHANGE = 1;
 
-    /** _more_          */
+    /** _more_ */
     public static final int TYPE_DATA = 2;
 
     /** _more_ */
@@ -52,12 +52,13 @@ public class DateArgument implements Constants {
         new DateArgument(TYPE_CHANGE, ARG_CHANGE_DATE, "Change Date");
 
     /** _more_ */
-    public static final DateArgument[] SEARCH_ARGS = {ARG_DATA, ARG_CREATE, ARG_CHANGE};
+    public static final DateArgument[] SEARCH_ARGS = { ARG_DATA, ARG_CREATE,
+            ARG_CHANGE };
 
 
 
 
-    /** _more_          */
+    /** _more_ */
     private int type;
 
     /** _more_ */

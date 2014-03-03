@@ -801,7 +801,7 @@ public class HtmlUtils {
      * @return _more_
      */
     public static String buttons(String... args) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < args.length; i++) {
             if (i > 0) {
                 sb.append(buttonSpace());
@@ -820,7 +820,7 @@ public class HtmlUtils {
      * @return _more_
      */
     public static String buttons(List<String> args) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < args.size(); i++) {
             if (i > 0) {
                 sb.append(buttonSpace());
@@ -1517,7 +1517,7 @@ public class HtmlUtils {
      * @return _more_
      */
     public static String headerCols(Object[] columns) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < columns.length; i++) {
             sb.append(cols(HtmlUtils.b(columns[i].toString())));
         }
@@ -1534,7 +1534,7 @@ public class HtmlUtils {
      * @return _more_
      */
     public static String cols(Object[] columns) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < columns.length; i++) {
             sb.append(cols(columns[i].toString()));
         }
@@ -2334,7 +2334,7 @@ public class HtmlUtils {
      */
     public static String select(String name, List values, List selected,
                                 String extra, int maxLength) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         String       attrs;
         attrs = attrs(ATTR_NAME, name);
         sb.append(open(TAG_SELECT, attrs + extra));
@@ -2402,7 +2402,7 @@ public class HtmlUtils {
      * @return _more_
      */
     public static String colorSelect(String name, String selected) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(open(TAG_SELECT,
                        attrs(ATTR_NAME, name, ATTR_CLASS, CLASS_SELECT)));
         String value;
@@ -2532,7 +2532,7 @@ public class HtmlUtils {
      * @return _more_
      */
     public static String formTableTop(String[] cols) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(formTable());
 
         for (int i = 0; i < cols.length; i += 2) {
@@ -2551,7 +2551,7 @@ public class HtmlUtils {
      * @return _more_
      */
     public static String formTable(String[] cols) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(formTable());
         for (int i = 0; i < cols.length; i += 2) {
             sb.append(formEntry(cols[i], cols[i + 1]));
@@ -2570,7 +2570,7 @@ public class HtmlUtils {
      * @return _more_
      */
     public static String formEntryTop(String[] cols) {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < cols.length; i += 2) {
             sb.append(formEntryTop(cols[i], cols[i + 1]));
         }
@@ -3731,8 +3731,8 @@ public class HtmlUtils {
      * @param titles _more_
      * @param contents _more_
      */
-    public static void makeAccordian(StringBuffer sb, List<String> titles,
-                                     List<String> contents) {
+    public static void makeAccordian(Appendable sb, List<String> titles,
+                                     List<String> contents) throws Exception {
 
         String accordianId = "accordion_" + (blockCnt++);
         sb.append(

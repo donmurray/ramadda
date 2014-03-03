@@ -637,7 +637,7 @@ public class Request implements Constants, Cloneable {
      * @param sb _more_
      * @param theUrl _more_
      */
-    public void formPostWithAuthToken(StringBuffer sb, RequestUrl theUrl) {
+    public void formPostWithAuthToken(Appendable sb, RequestUrl theUrl) {
         formPostWithAuthToken(sb, theUrl, null);
     }
 
@@ -648,9 +648,9 @@ public class Request implements Constants, Cloneable {
      * @param theUrl _more_
      * @param extra _more_
      */
-    public void formPostWithAuthToken(StringBuffer sb, RequestUrl theUrl,
+    public void formPostWithAuthToken(Appendable sb, RequestUrl theUrl,
                                       String extra) {
-        sb.append(formPost(theUrl, extra));
+        Utils.append(sb, formPost(theUrl, extra));
         repository.addAuthToken(this, sb);
     }
 
@@ -661,7 +661,7 @@ public class Request implements Constants, Cloneable {
      * @param sb _more_
      * @param theUrl _more_
      */
-    public void uploadFormWithAuthToken(StringBuffer sb, RequestUrl theUrl) {
+    public void uploadFormWithAuthToken(Appendable sb, RequestUrl theUrl) {
         uploadFormWithAuthToken(sb, theUrl, null);
     }
 
@@ -672,9 +672,9 @@ public class Request implements Constants, Cloneable {
      * @param theUrl _more_
      * @param extra _more_
      */
-    public void uploadFormWithAuthToken(StringBuffer sb, RequestUrl theUrl,
+    public void uploadFormWithAuthToken(Appendable sb, RequestUrl theUrl,
                                         String extra) {
-        sb.append(HtmlUtils.uploadForm(url(theUrl), extra));
+        Utils.append(sb, HtmlUtils.uploadForm(url(theUrl), extra));
         repository.addAuthToken(this, sb);
     }
 
@@ -992,8 +992,8 @@ public class Request implements Constants, Cloneable {
     public String getUrlArgs(HashSet<String> exceptArgs,
                              HashSet<String> exceptValues,
                              String exceptArgsPattern) {
-        StringBuffer sb  = new StringBuffer();
-        int          cnt = 0;
+        StringBuilder sb  = new StringBuilder();
+        int           cnt = 0;
         for (Enumeration keys = parameters.keys(); keys.hasMoreElements(); ) {
             String arg = (String) keys.nextElement();
             if ((exceptArgs != null) && (exceptArgs.contains(arg))) {
@@ -1063,8 +1063,8 @@ public class Request implements Constants, Cloneable {
      */
     public String getPathEmbeddedArgs() {
         try {
-            StringBuffer sb  = new StringBuffer();
-            int          cnt = 0;
+            StringBuilder sb  = new StringBuilder();
+            int           cnt = 0;
             for (Enumeration keys =
                     parameters.keys(); keys.hasMoreElements(); ) {
                 String arg   = (String) keys.nextElement();
@@ -1461,15 +1461,20 @@ public class Request implements Constants, Cloneable {
      *
      * @param sb _more_
      */
-    public void appendMessage(StringBuffer sb) {
-        if (defined(ARG_MESSAGE)) {
-            String message = getUnsafeString(ARG_MESSAGE, "");
-            //            message = HtmlUtils.entityEncode(getUnsafeString(ARG_MESSAGE, "");
-            message = PageHandler.getDialogString(message);
-            //Encode this to keep from a spoof attack
-            message = HtmlUtils.entityEncode(message);
-            sb.append(repository.getPageHandler().showDialogNote(message));
-            remove(ARG_MESSAGE);
+    public void appendMessage(Appendable sb) {
+        try {
+            if (defined(ARG_MESSAGE)) {
+                String message = getUnsafeString(ARG_MESSAGE, "");
+                //            message = HtmlUtils.entityEncode(getUnsafeString(ARG_MESSAGE, "");
+                message = PageHandler.getDialogString(message);
+                //Encode this to keep from a spoof attack
+                message = HtmlUtils.entityEncode(message);
+                sb.append(
+                    repository.getPageHandler().showDialogNote(message));
+                remove(ARG_MESSAGE);
+            }
+        } catch (java.io.IOException ioe) {
+            throw new RuntimeException(ioe);
         }
     }
 
@@ -1845,7 +1850,8 @@ public class Request implements Constants, Cloneable {
             return dflt;
         }
         String llString = (String) getString(from, "").trim();
-        if ((llString == null) || (llString.length() == 0) || (llString.startsWith("${"))) {
+        if ((llString == null) || (llString.length() == 0)
+                || (llString.startsWith("${"))) {
             return dflt;
         }
 

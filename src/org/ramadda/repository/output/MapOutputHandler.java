@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -164,7 +164,7 @@ public class MapOutputHandler extends OutputHandler {
             throws Exception {
         List<Entry> entriesToUse = new ArrayList<Entry>();
         entriesToUse.add(entry);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         if (outputType.equals(OUTPUT_GEMAP)) {
             getMapManager().getGoogleEarth(request, entriesToUse, sb, -1, -1,
@@ -202,7 +202,7 @@ public class MapOutputHandler extends OutputHandler {
             throws Exception {
         List<Entry> entriesToUse = new ArrayList<Entry>(subGroups);
         entriesToUse.addAll(entries);
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (entriesToUse.size() == 0) {
             sb.append(HtmlUtils.b(msg(LABEL_NO_ENTRIES_FOUND))
                       + HtmlUtils.p());

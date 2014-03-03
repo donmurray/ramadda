@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -202,8 +202,8 @@ public class GenericTypeHandler extends TypeHandler {
     public void init(List<Element> columnNodes) throws Exception {
         Statement statement = getDatabaseManager().createStatement();
         colNames.add(COL_ID);
-        StringBuffer tableDef = new StringBuffer("CREATE TABLE "
-                                    + getTableName() + " (\n");
+        StringBuilder tableDef = new StringBuilder("CREATE TABLE "
+                                     + getTableName() + " (\n");
 
         tableDef.append(COL_ID + " varchar(200))");
         try {
@@ -215,7 +215,7 @@ public class GenericTypeHandler extends TypeHandler {
             }
         }
 
-        StringBuffer indexDef = new StringBuffer();
+        StringBuilder indexDef = new StringBuilder();
         indexDef.append("CREATE INDEX " + getTableName() + "_INDEX_" + COL_ID
                         + "  ON " + getTableName() + " (" + COL_ID + ");\n");
 
@@ -592,8 +592,8 @@ public class GenericTypeHandler extends TypeHandler {
         String[] values =
             SqlUtil.readString(getDatabaseManager().getIterator(statement),
                                1);
-        StringBuffer sb     = new StringBuffer();
-        OutputType   output = request.getOutput();
+        StringBuilder sb     = new StringBuilder();
+        OutputType    output = request.getOutput();
         if (output.equals(OutputHandler.OUTPUT_HTML)) {
             sb.append(RepositoryUtil.header(title));
             sb.append("<ul>");
@@ -727,8 +727,9 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @throws Exception on badness
      */
+    @Override
     public List<Clause> assembleWhereClause(Request request,
-                                            StringBuffer searchCriteria)
+                                            Appendable searchCriteria)
             throws Exception {
         List<Clause> where = super.assembleWhereClause(request,
                                  searchCriteria);
@@ -952,7 +953,7 @@ public class GenericTypeHandler extends TypeHandler {
      * @throws Exception on badness
      */
     public void formatColumnHtmlValue(Request request, Entry entry,
-                                      Column column, StringBuffer tmpSb,
+                                      Column column, Appendable tmpSb,
                                       Object[] values)
             throws Exception {
         column.formatValue(entry, tmpSb, Column.OUTPUT_HTML, values);
@@ -967,13 +968,14 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @throws Exception on badness
      */
-    public void getTextCorpus(Entry entry, StringBuffer sb) throws Exception {
+    @Override
+    public void getTextCorpus(Entry entry, Appendable sb) throws Exception {
         super.getTextCorpus(entry, sb);
         /*
         Object[] values = entry.getValues();
         if (values == null) { return;}
         for (Column column : columns) {
-            StringBuffer tmpSb = new StringBuffer();
+            StringBuilder tmpSb = new StringBuilder();
             formatColumnHtmlValue(request, entry, column, tmpSb,  values);
             if ( !column.getCanShow()) {
                 continue;
@@ -1022,7 +1024,7 @@ public class GenericTypeHandler extends TypeHandler {
         if (values != null) {
             for (Column column : getColumns()) {
                 if (column.isField(name)) {
-                    StringBuffer tmpSB = new StringBuffer();
+                    StringBuilder tmpSB = new StringBuilder();
                     formatColumnHtmlValue(request, entry, column, tmpSB,
                                           values);
 
@@ -1048,19 +1050,18 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @throws Exception on badness
      */
-    public StringBuffer getInnerEntryContent(Entry entry, Request request,
-                                             OutputType output,
-                                             boolean showDescription,
-                                             boolean showResource,
-                                             boolean linkToDownload)
+    @Override
+    public StringBuilder getInnerEntryContent(Entry entry, Request request,
+            OutputType output, boolean showDescription, boolean showResource,
+            boolean linkToDownload)
             throws Exception {
-        StringBuffer parentBuff = super.getInnerEntryContent(entry, request,
-                                      output, showDescription, showResource,
-                                      linkToDownload);
+        StringBuilder parentBuff = super.getInnerEntryContent(entry, request,
+                                       output, showDescription, showResource,
+                                       linkToDownload);
         //        if (shouldShowInHtml(request, entry, output)) {
         if (true) {
-            StringBuffer myBuff = new StringBuffer();
-            Object[]     values = getEntryValues(entry);
+            StringBuilder myBuff = new StringBuilder();
+            Object[]      values = getEntryValues(entry);
             if (values != null) {
                 String lastGroup = "";
                 for (Column column : getMyColumns()) {
@@ -1078,7 +1079,7 @@ public class GenericTypeHandler extends TypeHandler {
                                         lastGroup,
                                         " class=\"formgroupheader\" "), " colspan=2 ")));
                     }
-                    StringBuffer tmpSb = new StringBuffer();
+                    StringBuilder tmpSb = new StringBuilder();
                     formatColumnHtmlValue(request, entry, column, tmpSb,
                                           values);
                     if ( !column.getShowEmpty() && (tmpSb.length() == 0)) {
@@ -1130,7 +1131,7 @@ public class GenericTypeHandler extends TypeHandler {
         OutputType output = request.getOutput();
         if (values != null) {
             for (Column column : columns) {
-                StringBuffer tmpSb = new StringBuffer();
+                StringBuilder tmpSb = new StringBuilder();
                 column.formatValue(entry, tmpSb, Column.OUTPUT_HTML, values);
                 html = html.replace("${" + column.getName() + ".content}",
                                     tmpSb.toString());
@@ -1196,8 +1197,7 @@ public class GenericTypeHandler extends TypeHandler {
      * @throws Exception on badness
      */
     @Override
-    public void addSpecialToEntryForm(Request request,
-                                      StringBuffer formBuffer,
+    public void addSpecialToEntryForm(Request request, Appendable formBuffer,
                                       Entry parentEntry, Entry entry,
                                       FormInfo formInfo)
             throws Exception {
@@ -1217,9 +1217,8 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @throws Exception on badness
      */
-    public void addColumnsToEntryForm(Request request,
-                                      StringBuffer formBuffer, Entry entry,
-                                      FormInfo formInfo)
+    public void addColumnsToEntryForm(Request request, Appendable formBuffer,
+                                      Entry entry, FormInfo formInfo)
             throws Exception {
         addColumnsToEntryForm(request, formBuffer, entry, ((entry == null)
                 ? null
@@ -1240,9 +1239,9 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @throws Exception on badness
      */
-    public void addColumnsToEntryForm(Request request,
-                                      StringBuffer formBuffer, Entry entry,
-                                      Object[] values, FormInfo formInfo)
+    public void addColumnsToEntryForm(Request request, Appendable formBuffer,
+                                      Entry entry, Object[] values,
+                                      FormInfo formInfo)
             throws Exception {
         Hashtable state = new Hashtable();
         for (Column column : columns) {
@@ -1267,14 +1266,14 @@ public class GenericTypeHandler extends TypeHandler {
      * @throws Exception on badness
      */
     public void addColumnToEntryForm(Request request, Column column,
-                                     StringBuffer formBuffer, Entry entry,
+                                     Appendable formBuffer, Entry entry,
                                      Object[] values, Hashtable state,
                                      FormInfo formInfo)
             throws Exception {
         boolean hasValue = column.getString(values) != null;
 
         if ((entry != null) && hasValue && !column.getEditable()) {
-            StringBuffer tmpSb = new StringBuffer();
+            StringBuilder tmpSb = new StringBuilder();
             column.formatValue(entry, tmpSb, Column.OUTPUT_HTML, values);
             formBuffer.append(HtmlUtils.formEntry(column.getLabel() + ":",
                     tmpSb.toString()));
@@ -1316,8 +1315,8 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @throws Exception on badness
      */
-    public void addToSpecialSearchForm(Request request,
-                                       StringBuffer formBuffer)
+    @Override
+    public void addToSpecialSearchForm(Request request, Appendable formBuffer)
             throws Exception {
         super.addToSpecialSearchForm(request, formBuffer);
         addColumnsToSearchForm(request, formBuffer, new ArrayList<Clause>(),
@@ -1335,7 +1334,8 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @throws Exception on badness
      */
-    public void addToSearchForm(Request request, StringBuffer formBuffer,
+    @Override
+    public void addToSearchForm(Request request, Appendable formBuffer,
                                 List<Clause> where, boolean advancedForm)
             throws Exception {
         super.addToSearchForm(request, formBuffer, where, advancedForm);
@@ -1356,21 +1356,21 @@ public class GenericTypeHandler extends TypeHandler {
      * @throws Exception on badness
      */
     public void addColumnsToSearchForm(Request request,
-                                       StringBuffer formBuffer,
+                                       Appendable formBuffer,
                                        List<Clause> where,
                                        boolean advancedForm,
                                        boolean makeToggleBox)
             throws Exception {
-        StringBuffer typeSB = (makeToggleBox
-                               ? new StringBuffer()
-                               : formBuffer);
+        Appendable typeSB = (makeToggleBox
+                             ? new StringBuilder()
+                             : formBuffer);
         for (Column column : columns) {
             column.addToSearchForm(request, typeSB, where);
         }
 
         if (makeToggleBox && (typeSB.toString().length() > 0)) {
-            typeSB = new StringBuffer(HtmlUtils.formTable() + typeSB
-                                      + HtmlUtils.formTableClose());
+            typeSB = new StringBuilder(HtmlUtils.formTable() + typeSB
+                                       + HtmlUtils.formTableClose());
             formBuffer.append(HtmlUtils.p());
             formBuffer.append(HtmlUtils.makeShowHideBlock(msg(getLabel()),
                     typeSB.toString(), true));

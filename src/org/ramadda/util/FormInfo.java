@@ -57,7 +57,7 @@ public class FormInfo {
      *
      * @param js _more_
      */
-    public void addJavascriptValidation(StringBuffer js) {
+    public void addJavascriptValidation(Appendable js) {
         for (Constraint constraint : constraints) {
             constraint.addJavascriptValidation(js);
         }
@@ -139,7 +139,7 @@ public class FormInfo {
          *
          * @param js _more_
          */
-        public void addJavascriptValidation(StringBuffer js) {}
+        public void addJavascriptValidation(Appendable js) {}
 
         /**
          * _more_
@@ -147,10 +147,10 @@ public class FormInfo {
          * @param js _more_
          * @param message _more_
          */
-        public void error(StringBuffer js, String message) {
-            js.append(HtmlUtils.call("alert", HtmlUtils.squote(message)));
-            js.append("event.preventDefault();\n");
-            js.append("return;\n");
+        public void error(Appendable js, String message) {
+            Utils.append(js, HtmlUtils.call("alert", HtmlUtils.squote(message)));
+            Utils.append(js, "event.preventDefault();\n");
+            Utils.append(js,"return;\n");
         }
 
     }
@@ -191,8 +191,8 @@ public class FormInfo {
          *
          * @param js _more_
          */
-        public void addJavascriptValidation(StringBuffer js) {
-            js.append("if(!GuiUtils.inputValueOk(" + HtmlUtils.squote(id) + ","
+        public void addJavascriptValidation(Appendable js) {
+            Utils.append(js, "if(!GuiUtils.inputValueOk(" + HtmlUtils.squote(id) + ","
                       + value + "," + (min
                                        ? "true"
                                        : "false") + ")) {\n");
@@ -203,7 +203,7 @@ public class FormInfo {
                 message = "Error: " + label + " is > " + value;
             }
             error(js, message);
-            js.append("}\n");
+            Utils.append(js,"}\n");
         }
 
 
@@ -240,13 +240,13 @@ public class FormInfo {
          *
          * @param js _more_
          */
-        public void addJavascriptValidation(StringBuffer js) {
-            js.append("if(!GuiUtils.inputLengthOk(" + HtmlUtils.squote(id) + ","
+        public void addJavascriptValidation(Appendable js) {
+            Utils.append(js, "if(!GuiUtils.inputLengthOk(" + HtmlUtils.squote(id) + ","
                       + length + ")) {\n");
             String message = "Error: " + label
                              + " is too long. Max length is " + length;
             error(js, message);
-            js.append("}\n");
+            Utils.append(js,"}\n");
         }
 
 

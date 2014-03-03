@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -114,11 +114,16 @@ public class PluginManager extends RepositoryManager {
     /** _more_ */
     private Properties properties;
 
+    /** _more_          */
+    private List<String> allFiles = new ArrayList<String>();
+
+
     /** _more_ */
     private List<String> metadataDefFiles = new ArrayList<String>();
 
     /** _more_ */
     private List<String> typeDefFiles = new ArrayList<String>();
+
 
     /** _more_ */
     private List<String> apiDefFiles = new ArrayList<String>();
@@ -133,6 +138,7 @@ public class PluginManager extends RepositoryManager {
 
     /** _more_ */
     private List<String> pythonLibs = new ArrayList<String>();
+
 
 
 
@@ -542,6 +548,8 @@ public class PluginManager extends RepositoryManager {
      * @return _more_
      */
     protected boolean checkFile(String file, boolean fromPlugin) {
+        allFiles.add(file);
+
         if (file.indexOf("api.xml") >= 0) {
             if (fromPlugin) {
                 pluginStat("Api", file);
@@ -794,6 +802,15 @@ public class PluginManager extends RepositoryManager {
      */
     public List<String> getTypeDefFiles() {
         return typeDefFiles;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public List<String> getAllFiles() {
+        return allFiles;
     }
 
 

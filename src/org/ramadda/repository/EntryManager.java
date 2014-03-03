@@ -694,7 +694,7 @@ public class EntryManager extends RepositoryManager {
             types.add(typeHandler.getJson(request));
         }
 
-        StringBuffer sb = new StringBuffer(Json.list(types));
+        StringBuilder sb = new StringBuilder(Json.list(types));
 
         return new Result("", sb, "application/json");
     }
@@ -762,8 +762,8 @@ public class EntryManager extends RepositoryManager {
 
         //If entry is a dummy that means its from search results
         if (result.getShouldDecorate() && !entry.isDummy()) {
-            StringBuffer sb             = new StringBuffer();
-            Entry        entryForHeader = entry;
+            StringBuilder sb             = new StringBuilder();
+            Entry         entryForHeader = entry;
 
             //If its a search result then use the top-level group for the header
             if (entry.isDummy()) {
@@ -772,7 +772,7 @@ public class EntryManager extends RepositoryManager {
             String entryFooter = getPageHandler().entryFooter(request,
                                      entryForHeader);
 
-            StringBuffer titleCrumbs = new StringBuffer();
+            StringBuilder titleCrumbs = new StringBuilder();
             String crumbs = getPageHandler().getEntryHeader(request,
                                 entryForHeader, titleCrumbs);
             sb.append(crumbs);
@@ -1079,7 +1079,7 @@ public class EntryManager extends RepositoryManager {
         if(request.exists(ARG_EXTEDIT_MD5)) {
             ActionManager.Action action = new ActionManager.Action() {
                 public void run(Object actionId) throws Exception {
-                    StringBuffer sb = new StringBuffer();
+                    StringBuilder sb = new StringBuilder();
                     setMD5(request, actionId, sb, recurse, entry.getId(), new int[]{0}, new int[]{0});
                     if(sb.length()==0) sb.append("No checksums set");
                     getActionManager().setContinueHtml(actionId,
@@ -1093,7 +1093,7 @@ public class EntryManager extends RepositoryManager {
 
         */
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         if (request.exists(ARG_EXTEDIT_CHANGETYPE)) {
             String newType = request.getString(ARG_EXTEDIT_NEWTYPE, "");
@@ -1110,7 +1110,7 @@ public class EntryManager extends RepositoryManager {
         if(request.exists(ARG_EXTEDIT_SETPARENTID)) {
             ActionManager.Action action = new ActionManager.Action() {
                 public void run(Object actionId) throws Exception {
-                    StringBuffer sb = new StringBuffer();
+                    StringBuilder sb = new StringBuilder();
                     setParentId(request, actionId, sb, recurse, entry.getId(), new int[]{0}, new int[]{0});
                     getActionManager().setContinueHtml(actionId,
                                                        sb.toString());
@@ -1230,7 +1230,7 @@ public class EntryManager extends RepositoryManager {
             sb.append(HtmlUtils.p());
             List<Column> columns = entry.getTypeHandler().getColumns();
             if ((columns != null) && (columns.size() > 0)) {
-                StringBuffer note = new StringBuffer();
+                StringBuilder note = new StringBuilder();
                 for (Column col : columns) {
                     if (note.length() > 0) {
                         note.append(", ");
@@ -1258,7 +1258,7 @@ public class EntryManager extends RepositoryManager {
 
 
     /*
-    private void setMD5(Request request, StringBuffer sb, boolean recurse, String entryId, int []totalCnt, int[] setCnt) throws Exception {
+    private void setMD5(Request request, StringBuilder sb, boolean recurse, String entryId, int []totalCnt, int[] setCnt) throws Exception {
         if(!getRepository().getActionManager().getActionOk(actionId)) {
             return;
         }
@@ -1366,8 +1366,8 @@ public class EntryManager extends RepositoryManager {
         if (request.defined(ARG_ENTRYID)) {
             entry = getEntry(request);
         }
-        StringBuffer sb    = new StringBuffer();
-        Entry        group = addEntryForm(request, entry, sb);
+        StringBuilder sb    = new StringBuilder();
+        Entry         group = addEntryForm(request, entry, sb);
         if (entry == null) {
             return addEntryHeader(request, group,
                                   new Result(msg("Add Entry"), sb));
@@ -1388,7 +1388,7 @@ public class EntryManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public Entry addEntryForm(Request request, Entry entry, StringBuffer sb)
+    public Entry addEntryForm(Request request, Entry entry, Appendable sb)
             throws Exception {
 
         String type  = null;
@@ -1540,7 +1540,7 @@ public class EntryManager extends RepositoryManager {
             FormInfo formInfo = new FormInfo();
             typeHandler.addToEntryForm(request, sb, group, entry, formInfo);
 
-            StringBuffer validateJavascript = new StringBuffer("");
+            StringBuilder validateJavascript = new StringBuilder("");
             formInfo.addJavascriptValidation(validateJavascript);
             String script = JQuery.ready(JQuery.submit(JQuery.id(formId),
                                 validateJavascript.toString()));
@@ -1818,8 +1818,8 @@ public class EntryManager extends RepositoryManager {
                                            "0");
                 String currentTimestamp = getEntryTimestamp(entry);
                 if ( !Misc.equals(formTimestamp, currentTimestamp)) {
-                    StringBuffer sb        = new StringBuffer();
-                    String       dateRange = "";
+                    StringBuilder sb        = new StringBuilder();
+                    String        dateRange = "";
                     try {
                         dateRange = new Date(formTimestamp) + ":"
                                     + new Date(currentTimestamp);
@@ -2032,8 +2032,8 @@ public class EntryManager extends RepositoryManager {
 
             if (serverFile != null) {
                 if ( !serverFile.exists()) {
-                    StringBuffer message =
-                        new StringBuffer(
+                    StringBuilder message =
+                        new StringBuilder(
                             getPageHandler().showDialogError(
                                 msg("File does not exist")));
 
@@ -2075,8 +2075,8 @@ public class EntryManager extends RepositoryManager {
                         }
                     }
                     if (fileCnt == 0) {
-                        StringBuffer message =
-                            new StringBuffer(
+                        StringBuilder message =
+                            new StringBuilder(
                                 getPageHandler().showDialogError(
                                     msg("No files found matching pattern")));
 
@@ -2453,7 +2453,7 @@ public class EntryManager extends RepositoryManager {
                             request, "files uploaded"))));
         } else {
             return new Result(BLANK,
-                              new StringBuffer(msg("No entries created")));
+                              new StringBuilder(msg("No entries created")));
         }
 
     }
@@ -2772,8 +2772,8 @@ public class EntryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processEntryDelete(Request request) throws Exception {
-        Entry        entry = getEntry(request);
-        StringBuffer sb    = new StringBuffer();
+        Entry         entry = getEntry(request);
+        StringBuilder sb    = new StringBuilder();
         if (entry.isTopEntry()) {
             sb.append(
                 getPageHandler().showDialogNote(
@@ -2808,7 +2808,7 @@ public class EntryManager extends RepositoryManager {
 
         String breadcrumbs = getPageHandler().getConfirmBreadCrumbs(request,
                                  entry);
-        StringBuffer inner = new StringBuffer();
+        StringBuilder inner = new StringBuilder();
         if (entry.isGroup()) {
             inner.append(
                 msg("Are you sure you want to delete the following folder?"));
@@ -2831,7 +2831,7 @@ public class EntryManager extends RepositoryManager {
 
 
 
-        StringBuffer fb = new StringBuffer();
+        StringBuilder fb = new StringBuilder();
         fb.append(request.form(getRepository().URL_ENTRY_DELETE, BLANK));
 
         getRepository().addAuthToken(request, fb);
@@ -2870,7 +2870,7 @@ public class EntryManager extends RepositoryManager {
                     "Could not find entry:" + id);
             }
             if (entry.isTopEntry()) {
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 sb.append(
                     getPageHandler().showDialogNote(
                         msg("Cannot delete top-level folder")));
@@ -2896,7 +2896,7 @@ public class EntryManager extends RepositoryManager {
      */
     public Result processEntryListDelete(Request request, List<Entry> entries)
             throws Exception {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         if (request.exists(ARG_CANCEL)) {
             if (entries.size() == 0) {
                 return new Result(
@@ -2918,19 +2918,19 @@ public class EntryManager extends RepositoryManager {
         if (entries.size() == 0) {
             return new Result(
                 "",
-                new StringBuffer(
+                new StringBuilder(
                     getPageHandler().showDialogWarning(
                         msg("No entries selected"))));
         }
 
-        StringBuffer msgSB    = new StringBuffer();
-        StringBuffer idBuffer = new StringBuffer();
+        StringBuilder msgSB    = new StringBuilder();
+        StringBuilder idBuffer = new StringBuilder();
         for (Entry entry : entries) {
             idBuffer.append(",");
             idBuffer.append(entry.getId());
         }
-        boolean      anyFolders  = false;
-        StringBuffer entryListSB = new StringBuffer();
+        boolean       anyFolders  = false;
+        StringBuilder entryListSB = new StringBuilder();
         for (Entry toBeDeletedEntry : entries) {
             entryListSB.append(
                 getPageHandler().getConfirmBreadCrumbs(
@@ -2966,8 +2966,9 @@ public class EntryManager extends RepositoryManager {
         }
         request.formPostWithAuthToken(sb,
                                       getRepository().URL_ENTRY_DELETELIST);
-        StringBuffer hidden = new StringBuffer(HtmlUtils.hidden(ARG_ENTRYIDS,
-                                  idBuffer.toString()));
+        StringBuilder hidden =
+            new StringBuilder(HtmlUtils.hidden(ARG_ENTRYIDS,
+                idBuffer.toString()));
         String form = PageHandler.makeOkCancelForm(request,
                           getRepository().URL_ENTRY_DELETELIST,
                           ARG_DELETE_CONFIRM, hidden.toString());
@@ -3026,7 +3027,7 @@ public class EntryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result makeEntryEditResult(Request request, Entry entry,
-                                      String title, StringBuffer sb)
+                                      String title, Appendable sb)
             throws Exception {
         Result result = new Result(title, sb);
 
@@ -3233,8 +3234,8 @@ public class EntryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processEntryUploadOk(Request request) throws Exception {
-        StringBuffer sb    = new StringBuffer();
-        Entry        entry = getEntry(request);
+        StringBuilder sb    = new StringBuilder();
+        Entry         entry = getEntry(request);
         //We use the category on the entry to flag the uploaded entries
         entry.setCategory("");
         addNewEntry(request, entry);
@@ -3339,8 +3340,8 @@ public class EntryManager extends RepositoryManager {
         entry.setUser(parentUser);
 
         if (getAdmin().isEmailCapable()) {
-            StringBuffer contents =
-                new StringBuffer(
+            StringBuilder contents =
+                new StringBuilder(
                     "A new entry has been uploaded to the RAMADDA server under the folder: ");
             String url1 = HtmlUtils.url(getFullEntryShowUrl(request),
                                         ARG_ENTRYID, parentEntry.getId());
@@ -3386,8 +3387,8 @@ public class EntryManager extends RepositoryManager {
     public Result processEntryUpload(Request request) throws Exception {
         TypeHandler typeHandler =
             getRepository().getTypeHandler(TypeHandler.TYPE_CONTRIBUTION);
-        Entry        group = findGroup(request);
-        StringBuffer sb    = new StringBuffer();
+        Entry         group = findGroup(request);
+        StringBuilder sb    = new StringBuilder();
         if ( !request.exists(ARG_CONTRIBUTION_FROMNAME)) {
             sb.append(request.uploadForm(getRepository().URL_ENTRY_UPLOAD,
                                          HtmlUtils.attr("name",
@@ -3419,17 +3420,17 @@ public class EntryManager extends RepositoryManager {
      */
     public Result processEntryNew(Request request) throws Exception {
 
-        Entry        group = findGroup(request);
-        StringBuffer sb    = new StringBuffer();
+        Entry         group = findGroup(request);
+        StringBuilder sb    = new StringBuilder();
         sb.append(HtmlUtils.p());
         sb.append(msgHeader("Choose entry type"));
         List<String> categories = new ArrayList<String>();
-        Hashtable<String, StringBuffer> catMap = new Hashtable<String,
-                                                     StringBuffer>();
+        Hashtable<String, StringBuilder> catMap = new Hashtable<String,
+                                                      StringBuilder>();
 
         for (String preload : PRELOAD_CATEGORIES) {
             categories.add(preload);
-            catMap.put(preload, new StringBuffer());
+            catMap.put(preload, new StringBuilder());
         }
 
         HashSet<String> exclude = new HashSet<String>();
@@ -3472,11 +3473,11 @@ public class EntryManager extends RepositoryManager {
             boolean hasUsedType =
                 ((sessionTypes != null)
                  && sessionTypes.contains(typeHandler.getType()));
-            String       category = typeHandler.getCategory();
-            StringBuffer buffer   = catMap.get(category);
+            String        category = typeHandler.getCategory();
+            StringBuilder buffer   = catMap.get(category);
 
             if (buffer == null) {
-                catMap.put(category, buffer = new StringBuffer());
+                catMap.put(category, buffer = new StringBuilder());
                 if (hasUsedType) {
                     categories.add(0, category);
                 } else {
@@ -3498,7 +3499,7 @@ public class EntryManager extends RepositoryManager {
         sb.append("<table cellpadding=10><tr valign=top>");
         int colCnt = 0;
         for (String cat : categories) {
-            StringBuffer catBuff = catMap.get(cat);
+            StringBuilder catBuff = catMap.get(cat);
             if (catBuff.length() == 0) {
                 continue;
             }
@@ -3591,7 +3592,7 @@ public class EntryManager extends RepositoryManager {
             throw new IllegalArgumentException("Unable to find entry:"
                     + request);
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
 
         sb.append(header("Entry Links"));
 
@@ -3680,7 +3681,7 @@ public class EntryManager extends RepositoryManager {
             long length = file.length();
             if (request.isHeadRequest()) {
                 System.err.println("got head request");
-                Result result = new Result("", new StringBuffer());
+                Result result = new Result("", new StringBuilder());
                 result.addHttpHeader(HtmlUtils.HTTP_CONTENT_LENGTH,
                                      "" + length);
                 result.addHttpHeader("Connection", "close");
@@ -3811,7 +3812,7 @@ public class EntryManager extends RepositoryManager {
                     "Could not find entry:" + id);
             }
             if (entry.isTopEntry()) {
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 sb.append(
                     getPageHandler().showDialogNote(
                         msg("Cannot copy top-level folder")));
@@ -3834,8 +3835,8 @@ public class EntryManager extends RepositoryManager {
 
         if ( !request.exists(ARG_TO) && !request.exists(ARG_TO + "_hidden")
                 && !request.exists(ARG_TONAME)) {
-            boolean      didOne = false;
-            StringBuffer sb     = new StringBuffer();
+            boolean       didOne = false;
+            StringBuilder sb     = new StringBuilder();
             /*
             List<Entry>  cart      = getUserManager().getCart(request);
             List<Entry>  favorites = FavoriteEntry.getEntries(
@@ -3993,7 +3994,7 @@ public class EntryManager extends RepositoryManager {
         }
 
 
-        StringBuffer fromList = new StringBuffer();
+        StringBuilder fromList = new StringBuilder();
         for (Entry fromEntry : entries) {
             fromList.append(getPageHandler().getBreadCrumbs(request,
                     fromEntry));
@@ -4004,7 +4005,7 @@ public class EntryManager extends RepositoryManager {
         if ( !(request.exists(ARG_ACTION_MOVE)
                 || request.exists(ARG_ACTION_COPY)
                 || request.exists(ARG_ACTION_ASSOCIATE))) {
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             if (entries.size() > 1) {
                 sb.append(
                     msg(
@@ -4015,7 +4016,7 @@ public class EntryManager extends RepositoryManager {
             }
             sb.append(HtmlUtils.br());
             sb.append(HtmlUtils.insetDiv(fromList.toString(), 20, 20, 20, 0));
-            StringBuffer fb = new StringBuffer();
+            StringBuilder fb = new StringBuilder();
             request.formPostWithAuthToken(fb, getRepository().URL_ENTRY_COPY);
             fb.append(HtmlUtils.hidden(ARG_TO, toEntry.getId()));
             fb.append(HtmlUtils.hidden(ARG_FROM, fromIds));
@@ -4039,9 +4040,9 @@ public class EntryManager extends RepositoryManager {
             fb.append(HtmlUtils.buttonSpace());
             fb.append(HtmlUtils.submit(msg("Cancel"), ARG_CANCEL));
             fb.append(HtmlUtils.formClose());
-            StringBuffer contents = new StringBuffer(
-                                        getPageHandler().showDialogQuestion(
-                                            sb.toString(), fb.toString()));
+            StringBuilder contents = new StringBuilder(
+                                         getPageHandler().showDialogQuestion(
+                                             sb.toString(), fb.toString()));
             Result result = new Result(msg("Move confirm"), contents);
 
             return addEntryHeader(request, toEntry, result);
@@ -4050,7 +4051,7 @@ public class EntryManager extends RepositoryManager {
 
         for (Entry fromEntry : entries) {
             if ( !okToMove(fromEntry, toEntry)) {
-                StringBuffer sb = new StringBuffer();
+                StringBuilder sb = new StringBuilder();
                 sb.append(
                     getPageHandler().showDialogError(
                         msg("Cannot move a folder to its descendent")));
@@ -4077,7 +4078,7 @@ public class EntryManager extends RepositoryManager {
             }
         }
 
-        Result result = new Result(msg("Move"), new StringBuffer());
+        Result result = new Result(msg("Move"), new StringBuilder());
 
         return addEntryHeader(request, toEntry, result);
 
@@ -4100,8 +4101,8 @@ public class EntryManager extends RepositoryManager {
     public Result processEntryCopy(Request request, Entry toGroup,
                                    List<Entry> entries)
             throws Exception {
-        StringBuffer sb         = new StringBuffer();
-        Connection   connection = getDatabaseManager().getConnection();
+        StringBuilder sb         = new StringBuilder();
+        Connection    connection = getDatabaseManager().getConnection();
         connection.setAutoCommit(false);
         List<Entry> newEntries = new ArrayList<Entry>();
         try {
@@ -4392,8 +4393,8 @@ public class EntryManager extends RepositoryManager {
      */
     public Result processEntryImport(Request request) throws Exception {
         Entry                group       = findGroup(request);
-        StringBuffer         sb          = new StringBuffer();
-        StringBuffer         extraForm   = new StringBuffer();
+        StringBuilder        sb          = new StringBuilder();
+        StringBuilder        extraForm   = new StringBuilder();
         List<TwoFacedObject> importTypes = new ArrayList<TwoFacedObject>();
         for (ImportHandler importHandler :
                 getRepository().getImportHandlers()) {
@@ -4596,7 +4597,7 @@ public class EntryManager extends RepositoryManager {
             return new Result(xml, MIME_XML);
         }
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(msgHeader("Imported entries"));
         sb.append("<ul>");
 
@@ -5159,14 +5160,14 @@ public class EntryManager extends RepositoryManager {
                                        entry.getId(),
                                        url, label }, true));
         }
-        boolean      showLink    = request.get(ARG_SHOWLINK, true);
-        boolean      showDetails = request.get(ARG_DETAILS, true);
+        boolean       showLink    = request.get(ARG_SHOWLINK, true);
+        boolean       showDetails = request.get(ARG_DETAILS, true);
 
-        StringBuffer sb          = new StringBuffer();
-        String       entryId     = entry.getId();
+        StringBuilder sb          = new StringBuilder();
+        String        entryId     = entry.getId();
 
-        String       uid         = HtmlUtils.getUniqueId("link_");
-        String       output      = "inline";
+        String        uid         = HtmlUtils.getUniqueId("link_");
+        String        output      = "inline";
 
         String folderClickUrl =
             request.entryUrl(getRepository().URL_ENTRY_SHOW, entry) + "&"
@@ -5221,11 +5222,10 @@ public class EntryManager extends RepositoryManager {
         }
 
 
-        StringBuffer sourceEvent = new StringBuffer();
-        StringBuffer targetEvent = new StringBuffer();
-        String       entryIcon   = getPageHandler().getIconUrl(request,
-                                       entry);
-        String       iconId      = "img_" + uid;
+        StringBuilder sourceEvent = new StringBuilder();
+        StringBuilder targetEvent = new StringBuilder();
+        String        entryIcon = getPageHandler().getIconUrl(request, entry);
+        String        iconId      = "img_" + uid;
         if (okToMove) {
             if (forTreeNavigation) {
                 targetEvent.append(
@@ -5477,7 +5477,7 @@ public class EntryManager extends RepositoryManager {
 
 
 
-        StringBuffer
+        StringBuilder
             htmlSB          = null,
             exportSB        = null,
             nonHtmlSB       = null,
@@ -5491,10 +5491,10 @@ public class EntryManager extends RepositoryManager {
             if ( !link.isType(typeMask)) {
                 continue;
             }
-            StringBuffer sb;
+            StringBuilder sb;
             if (link.isType(OutputType.TYPE_VIEW)) {
                 if (htmlSB == null) {
-                    htmlSB = new StringBuffer(tableHeader);
+                    htmlSB = new StringBuilder(tableHeader);
                     //                    htmlSB.append("<tr><td class=entrymenulink>" + msg("View") +"</td></tr>");
                     cnt++;
                 }
@@ -5504,25 +5504,25 @@ public class EntryManager extends RepositoryManager {
             } else if (link.isType(OutputType.TYPE_FEEDS)) {
                 if (exportSB == null) {
                     cnt++;
-                    exportSB = new StringBuffer(tableHeader);
+                    exportSB = new StringBuilder(tableHeader);
                 }
                 sb = exportSB;
             } else if (link.isType(OutputType.TYPE_FILE)) {
                 if (fileSB == null) {
                     cnt++;
-                    fileSB = new StringBuffer(tableHeader);
+                    fileSB = new StringBuilder(tableHeader);
                 }
                 sb = fileSB;
             } else if (link.isType(OutputType.TYPE_OTHER)) {
                 if (categorySB == null) {
                     cnt++;
-                    categorySB = new StringBuffer(tableHeader);
+                    categorySB = new StringBuilder(tableHeader);
                 }
                 sb = categorySB;
             } else {
                 if (actionSB == null) {
                     cnt++;
-                    actionSB = new StringBuffer(tableHeader);
+                    actionSB = new StringBuilder(tableHeader);
                     //                    actionSB.append("<tr><td class=entrymenulink>" + msg("Edit") +"</td></tr>");
                 }
                 sb = actionSB;
@@ -5565,7 +5565,7 @@ public class EntryManager extends RepositoryManager {
         }
 
 
-        StringBuffer menu = new StringBuffer();
+        StringBuilder menu = new StringBuilder();
         if (header != null) {
             menu.append(
                 HtmlUtils.div(
@@ -6003,7 +6003,7 @@ public class EntryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public List[] getEntries(Request request) throws Exception {
-        return getEntries(request, new StringBuffer());
+        return getEntries(request, new StringBuilder());
     }
 
     /**
@@ -6016,7 +6016,7 @@ public class EntryManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public List[] getEntries(Request request, StringBuffer searchCriteriaSB)
+    public List[] getEntries(Request request, Appendable searchCriteriaSB)
             throws Exception {
         return getEntries(request, searchCriteriaSB, null);
     }
@@ -6032,7 +6032,7 @@ public class EntryManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public List[] getEntries(Request request, StringBuffer searchCriteriaSB,
+    public List[] getEntries(Request request, Appendable searchCriteriaSB,
                              List<Clause> extraClauses)
             throws Exception {
         TypeHandler typeHandler = getRepository().getTypeHandler(request);
@@ -6301,7 +6301,7 @@ public class EntryManager extends RepositoryManager {
         if (parent == null) {
             return new Result(
                 "",
-                new StringBuffer(
+                new StringBuilder(
                     getPageHandler().showDialogError(
                         msg("Could not find folder"))));
         }
@@ -7173,7 +7173,7 @@ public class EntryManager extends RepositoryManager {
             }
         }
         insertEntries(changedEntries, false);*/
-        return new Result("Metadata", new StringBuffer("OK"));
+        return new Result("Metadata", new StringBuilder("OK"));
     }
 
 
@@ -7191,9 +7191,9 @@ public class EntryManager extends RepositoryManager {
      */
     public Result publishEntries(Request request, List<Entry> entries)
             throws Exception {
-        StringBuffer sb               = new StringBuffer();
-        List<Entry>  publishedEntries = new ArrayList<Entry>();
-        boolean      didone           = false;
+        StringBuilder sb               = new StringBuilder();
+        List<Entry>   publishedEntries = new ArrayList<Entry>();
+        boolean       didone           = false;
         for (Entry entry : entries) {
             if ( !getAccessManager().canDoAction(request, entry,
                     Permission.ACTION_EDIT)) {
@@ -7242,7 +7242,7 @@ public class EntryManager extends RepositoryManager {
     public Result addInitialMetadataToEntries(Request request,
             List<Entry> entries, boolean shortForm)
             throws Exception {
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         List<Entry> changedEntries = addInitialMetadata(request, entries,
                                          false, shortForm);
         if (changedEntries.size() == 0) {
