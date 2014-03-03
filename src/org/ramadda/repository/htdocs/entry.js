@@ -36,12 +36,15 @@ function getGlobalEntryManager() {
 
 function EntryManager(repositoryRoot) {
     if(repositoryRoot == null) {
-        repositoryRoot = root;
+        repositoryRoot = ramaddaBaseUrl;
     }
-    $.extend(this, {
+    RamaddaUtil.defineMembers(this, {
             repositoryRoot:repositoryRoot,
             entryCache: {},
             entryTypes: null,
+            getRoot: function() {
+                return this.repositoryRoot;
+            },
             getJsonUrl: function(entryId) {
                 return this.repositoryRoot + "/entry/show?entryid=" + id +"&output=json";
             },
@@ -130,9 +133,10 @@ function EntryManager(repositoryRoot) {
                 if(callback==null) {
                     return null;
                 }
+                var entryManager = this;
                 var jsonUrl = this.getJsonUrl(id);
                 var jqxhr = $.getJSON( jsonUrl, function(data) {
-                        var entryList =  createEntriesFromJson(data);
+                        var entryList =  createEntriesFromJson(data, entryManager);
                         console.log("got entry:" + entryList);
                         callback.call(data);
                     })
@@ -157,10 +161,13 @@ function EntryManager(repositoryRoot) {
 
 
 
-function createEntriesFromJson(data) {
+function createEntriesFromJson(data, entryManager) {
     var entries = new Array();
     for(var i=0;i<data.length;i++)  {
         var entryData = data[i];
+        if(entryManager!=null) {
+            entryData.baseUrl = entryManager.getRoot();
+        }
         var entry = new Entry(entryData);
         getGlobalEntryManager().addEntry(entry);
         entries.push(entry);
@@ -217,7 +224,8 @@ function EntryType(props) {
         });
 }
 
-function Entry (props) {
+function Entry(props) {
+    if(props.baseUrl == null) props.baseUrl = ramaddaBaseUrl;
     var NONGEO = -9999;
     if(props.type) props.type = new EntryType(props.type);
     $.extend(this, {
@@ -241,6 +249,9 @@ function Entry (props) {
             },
             getMetadata: function() {
                 return this.metadata;
+            },
+            getEntryManager: function() {
+                return getEntryManager(this.baseUrl);
             },
             getLocationLabel: function() {
                 return "n: " + this.north + " w:" + this.west + " s:" + this.south +" e:" + this.east;
@@ -283,7 +294,7 @@ function Entry (props) {
             },
             getIconUrl : function () {
                 if(this.icon==null)
-                    return root + "/icons/page.png";
+                    return this.getEntryManager().getRoot() + "/icons/page.png";
                 return this.icon;
             },
             getIconImage : function (attrs) {
@@ -332,13 +343,13 @@ function Entry (props) {
                 return "entry:" + this.getName();
             },
             getEntryUrl : function () {
-                return  root + "/entry/show?entryid=" + this.id;
+                return  this.getEntryManager().getRoot() + "/entry/show?entryid=" + this.id;
             },
             getFilename : function () {
                 return this.filename;
             }, 
             getFileUrl : function () {
-                return  root + "/entry/get?entryid=" + this.id;
+                return  this.getEntryManager().getRoot() + "/entry/get?entryid=" + this.id;
             },
             getLink : function (label) {
                 if(!label) label = this.getName();
@@ -353,9 +364,9 @@ function Entry (props) {
 
 
 
-function EntryList(jsonUrl, listener) {
+function EntryList(entryManager, jsonUrl, listener) {
+    this.entryManager = entryManager;
     var entryList = this;
-
 
     $.extend(this, {
             haveLoaded : false,
@@ -398,7 +409,7 @@ function EntryList(jsonUrl, listener) {
                 return html;
             },
             createEntries: function(data) {
-                this.entries =         createEntriesFromJson(data);
+                this.entries =         createEntriesFromJson(data, this.entryManager);
                 for(var i =0;i<this.entries.length;i++) {
                     var entry = this.entries[i];
                     this.map[entry.getId()] = entry;

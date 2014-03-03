@@ -297,7 +297,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
 
                 //Call this now because it sets settings
                 var jsonUrl = this.makeSearchUrl();
-                this.entryList = new EntryList(jsonUrl, this, this.entryList);
+                this.entryList = new EntryList(this.getEntryManager(), jsonUrl, this, this.entryList);
                 this.updateForSearching(jsonUrl);
             },
             updateForSearching: function(jsonUrl) {
@@ -1062,7 +1062,7 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
             initDisplay: function() {
                 this.initUI();
                 this.baseUrl = this.getEntryManager().getSearchUrl(this.searchSettings, OUTPUT_JSON);
-                this.entryList = new EntryList(jsonUrl, this, this.entryList);
+                this.entryList = new EntryList(this.getEntryManager(), jsonUrl, this, this.entryList);
                 var html = "";
                 html += HtmlUtil.div([ATTR_ID,this.getDomId(ID_ENTRIES),ATTR_CLASS,"display-entrylist-entries"], "");
                 this.setContents(html);
