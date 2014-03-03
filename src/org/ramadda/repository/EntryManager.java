@@ -695,8 +695,9 @@ public class EntryManager extends RepositoryManager {
         }
 
         StringBuilder sb = new StringBuilder(Json.list(types));
-
-        return new Result("", sb, "application/json");
+        request.setReturnFilename("types.json");
+        request.setCORSHeaderOnResponse();
+        return new Result("", sb, Json.MIMETYPE);
     }
 
 

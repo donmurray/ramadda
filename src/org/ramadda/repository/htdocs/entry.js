@@ -1,5 +1,6 @@
 
 
+
 var OUTPUT_JSON = "json";
 var OUTPUT_CSV = "default.csv";
 var OUTPUT_ZIP = "zip.tree";
@@ -11,6 +12,27 @@ var OUTPUTS = [
                {id: OUTPUT_JSON, name:  "JSON"},
                {id: OUTPUT_CSV, name:  "CSV"},
                ];
+
+//
+//return the global display manager with the given id, null if not found
+//
+function getEntryManager(baseUrl) {
+    if(window.globalEntryManagers==null) {
+        window.globalEntryManagers = {};
+    }
+    var manager =  window.globalEntryManagers[baseUrl];
+    if(manager == null) {
+        manager = new EntryManager(baseUrl);
+        window.globalEntryManagers[baseUrl] = manager;
+    }
+    return manager;
+}
+
+function getGlobalEntryManager() {
+    return getEntryManager(ramaddaBaseUrl);
+}
+
+
 
 function EntryManager(repositoryRoot) {
     if(repositoryRoot == null) {
@@ -128,12 +150,9 @@ function EntryManager(repositoryRoot) {
 
 
 
-function getGlobalEntryManager() {
-    if(window.globalEntryManager == null) {
-        window.globalEntryManager = new EntryManager();
-    }
-    return window.globalEntryManager;
-}
+
+
+
 
 
 

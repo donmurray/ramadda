@@ -425,6 +425,11 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
          },
          getEntryManager: function() {
                 if(this.entryManager!=null) return this.entryManager;
+                if(this.ramaddaBaseUrl !=null) {
+                    console.log("entry:" +this.ramaddaBaseUrl);
+                    this.entryManager =  getEntryManager(this.ramaddaBaseUrl);
+                    return this.entryManager;
+                }
                 return getGlobalEntryManager();
         },
         getEntry: function(entryId) {
