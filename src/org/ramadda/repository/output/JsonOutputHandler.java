@@ -165,10 +165,9 @@ public class JsonOutputHandler extends OutputHandler {
             allEntries.addAll(subGroups);
             allEntries.addAll(entries);
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         makeJson(request, allEntries, sb);
         request.setCORSHeaderOnResponse();
-
         return new Result("", sb, Json.MIMETYPE);
     }
 
@@ -183,7 +182,7 @@ public class JsonOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public void makeJson(Request request, List<Entry> entries,
-                         StringBuffer sb)
+                         Appendable sb)
             throws Exception {
         List<String> items = new ArrayList<String>();
         for (Entry entry : entries) {

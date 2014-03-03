@@ -130,6 +130,18 @@ function EntryManager(repositoryRoot) {
                 if(entry!=null)  {
                     return entry;
                 }
+                //Check any others
+                if(window.globalEntryManagers) {
+                    for(var i=0;i<window.globalEntryManagers.length;i++) {
+                        var em = window.globalEntryManagers[i];
+                        var entry = em.entryCache[id];
+                        if(entry!=null)  {
+                            return entry;
+                        }
+                    }
+                }
+
+
                 if(callback==null) {
                     return null;
                 }
@@ -293,9 +305,10 @@ function Entry(props) {
                 return this.west;
             },
             getIconUrl : function () {
-                if(this.icon==null)
+                if(this.icon==null) {
                     return this.getEntryManager().getRoot() + "/icons/page.png";
-                return this.icon;
+                }
+                return this.getEntryManager().getRoot() + this.icon;
             },
             getIconImage : function (attrs) {
                 return HtmlUtil.image(this.getIconUrl(),attrs);
