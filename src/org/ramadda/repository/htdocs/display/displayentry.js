@@ -354,6 +354,15 @@ function RamaddaSearcher(displayManager, id, type, properties) {
 
                 var extra = "";
 
+                var ramaddas = ["http://ramadda.org/repository","http://community.ramadda.org/repository/repos/data"];
+
+                if(ramaddas.length>0) {
+                    for(var i=0;i<ramaddas.length;i++) {
+                        var entryManager = getEntryManager(ramaddas[i]);
+                    }
+                }
+
+
                 extra+= HtmlUtil.formTable();
                 if(this.showArea) {
                     this.areaWidget = new AreaWidget(this);

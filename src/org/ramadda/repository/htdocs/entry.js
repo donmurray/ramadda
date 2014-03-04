@@ -86,11 +86,16 @@ function EntryManager(repositoryRoot) {
             },
             getMetadataCount: function(type, callback) {
                 var url  = this.repositoryRoot +"/metadata/list?metadata.type=" + type.getType() +"&response=json";
-                //                console.log("getMetadata:" + type.getType() + " URL:" + url);
+                console.log("getMetadata:" + type.getType() + " URL:" + url);
                 var jqxhr = $.getJSON(url, function(data) {
                         callback(type, data);
-                    });
-                    return null;
+                    })
+                    .fail(function(jqxhr, textStatus, error) {
+                            var err = textStatus + ", " + error;
+                            //                            alert("JSON error:" + err);
+                            console.log("JSON error:" +err);
+                        });
+                return null;
             },
             getSearchLinks: function(searchSettings) {
                 var urls = [];
@@ -329,7 +334,6 @@ function Entry(props) {
                     url =  hostname + this.icon;
                 else 
                     url =  this.getEntryManager().getRoot() + this.icon;
-                console.log("url: " + url);
                 return url;
             },
             getIconImage : function (attrs) {

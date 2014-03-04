@@ -18,6 +18,7 @@ var ID_MENU_INNER =  "menu_inner";
 
 
 
+var ID_REPOSITORY = "repository";
 
 var  displayDebug = false;
 
@@ -424,9 +425,10 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
              return menuButton;
          },
          getEntryManager: function() {
-                if(this.entryManager!=null) return this.entryManager;
+                if(this.entryManager!=null) {
+                    return this.entryManager;
+                }
                 if(this.ramaddaBaseUrl !=null) {
-                    console.log("entry:" +this.ramaddaBaseUrl);
                     this.entryManager =  getEntryManager(this.ramaddaBaseUrl);
                     return this.entryManager;
                 }
