@@ -1090,6 +1090,7 @@ public class MetadataManager extends RepositoryManager {
         }
         doMakeTagCloudOrList(request, metadataType, sb, doCloud, 0);
         if (request.responseInJson()) {
+            request.setCORSHeaderOnResponse();
             return new Result("", sb, Json.MIMETYPE);
         }
 
