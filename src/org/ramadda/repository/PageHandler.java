@@ -485,6 +485,7 @@ public class PageHandler extends RepositoryManager {
         };
 
 
+        long t1 = System.currentTimeMillis();
         //TODO: This is really inefficient. The template needs to be tokenized to find the macros
         //Not this way
         for (int i = 0; i < macros.length; i += 2) {
@@ -496,11 +497,13 @@ public class PageHandler extends RepositoryManager {
                                 getRepository().getProperty(property, ""));
         }
 
-
         //cleanup old macro
         html = StringUtil.replace(html, "${sublinks}", BLANK);
 
+        long t2 = System.currentTimeMillis();
         html = translate(request, html);
+        long t3 = System.currentTimeMillis();
+        //        System.err.println ("time:" + (t2-t1) +" t2:" + (t3-t2));
         result.setContent(html.getBytes());
 
 

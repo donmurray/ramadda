@@ -239,7 +239,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 return this.entries.length>0;
             },
             getWaitImage: function() {
-                return HtmlUtil.image(root + "/icons/progress.gif");
+                return HtmlUtil.image(ramaddaBaseUrl + "/icons/progress.gif");
             },
             getLoadingMessage: function() {
                 return this.getMessage("&nbsp;Loading...");
@@ -394,7 +394,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
 
                 if(entry.getFilesize()>0) {
                     html+= HtmlUtil.formEntry("File:", entry.getFilename() +" " +
-                                              HtmlUtil.href(entry.getFileUrl(), HtmlUtil.image(root +"/icons/download.png")) + " " +
+                                              HtmlUtil.href(entry.getFileUrl(), HtmlUtil.image(ramaddaBaseUrl +"/icons/download.png")) + " " +
                                               entry.getFormattedFilesize());
                 }
                 for(var colIdx =0;colIdx< columns.length;colIdx++) {
@@ -420,7 +420,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
         },
         getEntryMenuButton: function(entry) {
              var menuButton = HtmlUtil.onClick(this.getGet()+".showEntryMenu(event, '" + entry.getId() +"');", 
-                                               HtmlUtil.image(root+"/icons/downdart.png", 
+                                               HtmlUtil.image(ramaddaBaseUrl+"/icons/downdart.png", 
                                                               [ATTR_CLASS, "display-dialog-button", ATTR_ID,  this.getDomId(ID_MENU_BUTTON + entry.getId())]));
              return menuButton;
          },
@@ -748,7 +748,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
 
                 if(this.getShowMenu()) {
                     var menuButton = HtmlUtil.onClick(get+".showDialog();", 
-                                                      HtmlUtil.image(root+"/icons/downdart.png", 
+                                                      HtmlUtil.image(ramaddaBaseUrl+"/icons/downdart.png", 
                                                                      [ATTR_CLASS, "display-dialog-button", ATTR_ID,  this.getDomId(ID_DIALOG_BUTTON)]));
                     html += HtmlUtil.td(["align", "right"], menuButton);
                 } else {
@@ -767,7 +767,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 html +=   HtmlUtil.div([ATTR_ID, this.getDomId(ID_HEADER),ATTR_CLASS, "display-header"]);
                 var get = this.getGet();
 
-                var header = HtmlUtil.div([ATTR_CLASS,"display-dialog-header"], HtmlUtil.onClick("$('#" +this.getDomId(ID_DIALOG) +"').hide();",HtmlUtil.image(root +"/icons/close.gif",[ATTR_CLASS,"display-dialog-close"])));
+                var header = HtmlUtil.div([ATTR_CLASS,"display-dialog-header"], HtmlUtil.onClick("$('#" +this.getDomId(ID_DIALOG) +"').hide();",HtmlUtil.image(ramaddaBaseUrl +"/icons/close.gif",[ATTR_CLASS,"display-dialog-close"])));
 
                 var dialogContents = HtmlUtil.div([ATTR_CLASS, "display-dialog-contents"], this.getDialogContents());
                 dialogContents  = header + dialogContents;

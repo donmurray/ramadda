@@ -21,7 +21,7 @@ function AreaWidget(display) {
                 var callback = this.display.getGet();
                 //hack, hack
                 var link = HtmlUtil.onClick(callback+".areaWidget.areaLinkClick();", HtmlUtil.image(root +"/icons/link_break.png",[ATTR_TITLE,"Set bounds from map", ATTR_CLASS, "display-area-link", "border","0",ATTR_ID, this.display.getDomId(ID_AREA_LINK)]));
-                var erase = HtmlUtil.onClick(callback+".areaForm.areaClear();", HtmlUtil.image(root +"/icons/eraser.png",[ATTR_TITLE,"Clear form", ATTR_CLASS, "display-area-link", "border","0"]));
+                var erase = HtmlUtil.onClick(callback+".areaWidget.areaClear();", HtmlUtil.image(root +"/icons/eraser.png",[ATTR_TITLE,"Clear form", ATTR_CLASS, "display-area-link", "border","0"]));
                 var areaForm = HtmlUtil.openTag(TAG_TABLE,[ATTR_CLASS,"display-area", "border","0","cellpadding","0","cellspacing","0"]);
                 areaForm += HtmlUtil.tr([],
                                         HtmlUtil.td(["align","center"],
