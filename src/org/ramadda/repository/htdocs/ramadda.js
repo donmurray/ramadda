@@ -1183,8 +1183,9 @@ function Selector(event, selectorId, elementId, allEntries, selecttype, localeId
         this.div = GuiUtils.getDomObject('ramadda-selectdiv');
         hidePopupObject();
         $("#ramadda-selectdiv").show();
+        var src = $( "#" + srcId );
         $("#ramadda-selectdiv").position({
-                of: $( "#" + srcId ),
+                of: src,
                 my: "left top",
                 at: "left bottom",
                 collision: "none none"

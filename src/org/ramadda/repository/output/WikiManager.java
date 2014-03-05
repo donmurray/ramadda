@@ -3036,8 +3036,6 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             throws Exception {
 
 
-
-
         StringBuilder buttons = new StringBuilder();
         buttons.append(addWikiEditButton(textAreaId, "button_bold.png",
                                          "Bold text", "\\'\\'\\'",
@@ -3174,8 +3172,10 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         String importButton = getPageHandler().makePopupLink(importMenuLabel,
                                   HtmlUtils.hbox(importMenu.toString(),
                                       importOutputMenu.toString()));
+
         String addEntry = OutputHandler.getSelect(request, textAreaId,
                               "Add entry id", true, "entryid", entry, false);
+
 
         String addLink = OutputHandler.getSelect(request, textAreaId,
                              "Add entry link", true, "wikilink", entry,
