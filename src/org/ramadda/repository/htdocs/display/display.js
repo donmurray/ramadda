@@ -424,6 +424,9 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                                                               [ATTR_CLASS, "display-dialog-button", ATTR_ID,  this.getDomId(ID_MENU_BUTTON + entry.getId())]));
              return menuButton;
          },
+         setEntryManager: function(e) {
+                this.entryManager = e;
+         },
          getEntryManager: function() {
                 if(this.entryManager!=null) {
                     return this.entryManager;

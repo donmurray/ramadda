@@ -81,7 +81,8 @@ function RamaddaSearcher(displayManager, id, type, properties) {
     var NONE = "-- None --";
     var ID_TEXT_FIELD = "textfield";
     var ID_TYPE_FIELD = "typefield";
-    var ID_TYPE_FIELDS = "typefields";
+    var ID_TYPE_DIV = "typediv";
+    var ID_FIELDS = "typefields";
     var ID_METADATA_FIELD = "metadatafield";
     var ID_SEARCH = "search";
     var ID_FORM = "form";
@@ -186,6 +187,8 @@ function RamaddaSearcher(displayManager, id, type, properties) {
             },
             initDisplay: function() {
                 var theDisplay  = this;
+
+
                 this.jq(ID_SEARCH).button().click(function(event) {
                         theDisplay.submitSearchForm();
                         event.preventDefault();
@@ -196,6 +199,13 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                             theDisplay.doQuickEntrySearch(request, callback);
                             }
                             });
+
+                this.jq(ID_REPOSITORY).change(function() {
+                        var entryManager = getEntryManager(theDisplay.jq(ID_REPOSITORY).val());
+                        theDisplay.setEntryManager(entryManager);
+                        theDisplay.addTypes(null);
+                        theDisplay.typeChanged();
+                    });
 
                 this.jq(ID_FORM).submit(function( event ) {
                         theDisplay.submitSearchForm();
@@ -343,27 +353,32 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 form += HtmlUtil.div([ATTR_ID, this.getDomId(ID_SEARCH),ATTR_CLASS,"display-button"],"Search for:");
                 if(this.showType) {
                     form += "&nbsp;&nbsp;";
-                    form += HtmlUtil.tag("select",[ATTR_ID, this.getDomId(ID_TYPE_FIELD),
-                                                   ATTR_CLASS,"display-typelist",
-                                                   "onchange", this.getGet()+".typeChanged();"],
-                                                 HtmlUtil.tag("option",[ATTR_TITLE,"","value",""],
-                                                              " Choose Type "));
+                    form += HtmlUtil.span([ATTR_ID, this.getDomId(ID_TYPE_DIV)],HtmlUtil.span([ATTR_CLASS, "display-loading"], "Loading types..."));
                 } 
                 form += "&nbsp;&nbsp;";
                 form += textField;
 
-                var extra = "";
+                var extra =   HtmlUtil.formTable();
 
                 var ramaddas = ["http://ramadda.org/repository","http://community.ramadda.org/repository/repos/data"];
-
                 if(ramaddas.length>0) {
+                    var select  = HtmlUtil.openTag(TAG_SELECT,[ATTR_ID, this.getDomId(ID_REPOSITORY)]);
                     for(var i=0;i<ramaddas.length;i++) {
                         var entryManager = getEntryManager(ramaddas[i]);
+                        var attrs = [ATTR_TITLE,"",ATTR_VALUE,entryManager.getId()];
+                        if(this.getEntryManager().getId() == entryManager.getId()) {
+                            attrs.push("selected");
+                            attrs.push(null);
+                        }
+                        select += HtmlUtil.tag(TAG_OPTION,attrs,
+                                               entryManager.getHostname());
                     }
+                    select += HtmlUtil.closeTag(TAG_SELECT);
+                    extra += HtmlUtil.formEntry("Repository:",select);
                 }
 
 
-                extra+= HtmlUtil.formTable();
+
                 if(this.showArea) {
                     this.areaWidget = new AreaWidget(this);
                     extra += HtmlUtil.formEntry("Area:",this.areaWidget.getHtml());
@@ -380,16 +395,16 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                         if(value!=null) {
                             metadataSelect= value;
                         } else {
-                            metadataSelect= HtmlUtil.tag("select",[ATTR_ID, this.getMetadataFieldId(type),
+                            metadataSelect= HtmlUtil.tag(TAG_SELECT,[ATTR_ID, this.getMetadataFieldId(type),
                                                                    ATTR_CLASS,"display-metadatalist"],
-                                                         HtmlUtil.tag("option",[ATTR_TITLE,"","value",""],
+                                                         HtmlUtil.tag(TAG_OPTION,[ATTR_TITLE,"",ATTR_VALUE,""],
                                                                       NONE));
                         }
                         extra+= HtmlUtil.formEntry(type.getLabel() +":", metadataSelect);
                     }
                 }
                 extra+= HtmlUtil.closeTag(TAG_TABLE);
-                extra+=    HtmlUtil.div([ATTR_ID,this.getDomId(ID_TYPE_FIELDS)],"");
+                extra+=    HtmlUtil.div([ATTR_ID,this.getDomId(ID_FIELDS)],"");
 
                 form += HtmlUtil.div([ATTR_CLASS, "display-search-extra"],
                                      HtmlUtil.toggleBlock("Search Settings", HtmlUtil.div([ATTR_CLASS, "display-search-extra-inner"], extra), this.formOpen));
@@ -429,21 +444,20 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 this.metadata[metadataType.getType()] = metadata;
 
 
-                var select = HtmlUtil.tag("option",[ATTR_TITLE,"","value",""],NONE);
+                var select = HtmlUtil.tag(TAG_OPTION,[ATTR_TITLE,"",ATTR_VALUE,""],NONE);
                 for(var i =0;i<metadata.length;i++) {
                     var count = metadata[i].count;
                     var value = metadata[i].value;
-                    var optionAttrs  = ["value",value,ATTR_CLASS, "display-metadatalist-item"];
+                    var optionAttrs  = [ATTR_VALUE,value,ATTR_CLASS, "display-metadatalist-item"];
                     var selected =  false;
                     if(selected) {
                         optionAttrs.push("selected");
                         optionAttrs.push(null);
                     }
-                    select +=  HtmlUtil.tag("option",optionAttrs, value +" (" + count +")");
+                    select +=  HtmlUtil.tag(TAG_OPTION,optionAttrs, value +" (" + count +")");
                 }
                 $("#" + this.getMetadataFieldId(metadataType)).html(select);
             },
-                
                 
             getMetadataFieldId: function(metadataType) {
                 var id = metadataType.getType();
@@ -471,16 +485,21 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 this.haveTypes = true;
                 var cats =[];
                 var catMap = {}; 
-                var select = HtmlUtil.tag("option",[ATTR_TITLE,"","value",""],"Any Type");
+                var select =  HtmlUtil.openTag(TAG_SELECT,[ATTR_ID, this.getDomId(ID_TYPE_FIELD),
+                                                           ATTR_CLASS,"display-typelist",
+                                                           "onchange", this.getGet()+".typeChanged();"]);
+                //                HtmlUtil.tag(TAG_OPTION,[ATTR_TITLE,"",ATTR_VALUE,""], " Choose Type "));
+                select += HtmlUtil.tag(TAG_OPTION,[ATTR_TITLE,"",ATTR_VALUE,""],"Any Type");
+
                 var hostname = this.getEntryManager().getHostname();
                 for(var i = 0;i< types.length;i++) {
                     var type = types[i];
-                    var map = catMap[type.getCategory()];
+
                     //                    var style = " background: URL(" + type.getIcon() +") no-repeat;";
 
                     var icon =                     type.getIcon();
                     if(hostname) icon = hostname + icon;
-                    var optionAttrs  = [ATTR_TITLE,type.getLabel(),"value",type.getId(),ATTR_CLASS, "display-typelist-type",
+                    var optionAttrs  = [ATTR_TITLE,type.getLabel(),ATTR_VALUE,type.getId(),ATTR_CLASS, "display-typelist-type",
                                         //                                        ATTR_STYLE, style,
                                         "data-iconurl",icon];
                     var selected =  this.searchSettings.hasType(type.getId());
@@ -488,9 +507,10 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                         optionAttrs.push("selected");
                         optionAttrs.push(null);
                     }
-                    var option = HtmlUtil.tag("option",optionAttrs, type.getLabel() +" (" + type.getEntryCount() +")");
+                    var option = HtmlUtil.tag(TAG_OPTION,optionAttrs,  type.getLabel() +" (" + type.getEntryCount() +")");
+                    var map = catMap[type.getCategory()];
                     if(map == null) {
-                        catMap[type.getCategory()] = HtmlUtil.tag("option",[ATTR_CLASS, "display-typelist-category", ATTR_TITLE,"","value",""],type.getCategory());
+                        catMap[type.getCategory()] = HtmlUtil.tag(TAG_OPTION,[ATTR_CLASS, "display-typelist-category", ATTR_TITLE,"",ATTR_VALUE,""],type.getCategory());
                         cats.push(type.getCategory());
                     }
                     catMap[type.getCategory()] += option;
@@ -499,7 +519,11 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 for(var i in cats) {
                     select += catMap[cats[i]];
                 }
-                this.writeHtml(ID_TYPE_FIELD, select);
+
+                select+=  HtmlUtil.closeTag(TAG_SELECT);
+                //                this.writeHtml(ID_TYPE_FIELD, "# " + types.length);
+                //                this.writeHtml(ID_TYPE_FIELD, select);
+                this.writeHtml(ID_TYPE_DIV, select);
                 this.jq(ID_TYPE_FIELD).selectBoxIt({});
                 this.addExtraForm();
            },
@@ -544,8 +568,8 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     var savedValue  = this.savedValues[id];
                     if(savedValue == null) savedValue = "";
                     if(col.isEnumeration()) {
-                        field  = HtmlUtil.openTag("select",[ATTR_ID, id]);
-                        field += HtmlUtil.tag("option",[ATTR_TITLE,"","value",""],
+                        field  = HtmlUtil.openTag(TAG_SELECT,[ATTR_ID, id]);
+                        field += HtmlUtil.tag(TAG_OPTION,[ATTR_TITLE,"",ATTR_VALUE,""],
                                               "-- Select --");
                         var values = col.getValues();
                         for(var vidx in values) {
@@ -555,10 +579,10 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                             if(value == savedValue) {
                                 extraAttr =  " selected ";
                             }
-                            field += HtmlUtil.tag("option",[ATTR_TITLE,label,"value",value, extraAttr,  null],
+                            field += HtmlUtil.tag(TAG_OPTION,[ATTR_TITLE,label,ATTR_VALUE,value, extraAttr,  null],
                                                   label);
                         }
-                        field  += HtmlUtil.closeTag("select");
+                        field  += HtmlUtil.closeTag(TAG_SELECT);
                     } else {
                         field = HtmlUtil.input("", savedValue, [ATTR_CLASS,"input", "size","15",ATTR_ID,  id]);
                     }
@@ -569,7 +593,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     extra+=HtmlUtil.closeTag(TAG_TABLE);
                 }
                 
-                this.writeHtml(ID_TYPE_FIELDS, extra);
+                this.writeHtml(ID_FIELDS, extra);
 
                 
            },
@@ -1062,7 +1086,7 @@ function RamaddaEntrydisplayDisplay(displayManager, id, properties) {
 
 
 function RamaddaOperandsDisplay(displayManager, id, properties) {
-    var ID_SELECT = "select";
+    var ID_SELECT = TAG_SELECT;
     var ID_SELECT1 = "select1";
     var ID_SELECT2 = "select2";
     var ID_NEWDISPLAY = "newdisplay";
@@ -1087,26 +1111,26 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
                 var get = this.getGet();
 
                 for(var j=1;j<=2;j++) {
-                    var select= HtmlUtil.openTag("select",[ATTR_ID, this.getDomId(ID_SELECT +j)]);
-                    select += HtmlUtil.tag("option",[ATTR_TITLE,"","value",""],
+                    var select= HtmlUtil.openTag(TAG_SELECT,[ATTR_ID, this.getDomId(ID_SELECT +j)]);
+                    select += HtmlUtil.tag(TAG_OPTION,[ATTR_TITLE,"",ATTR_VALUE,""],
                                          "-- Select --");
                     for(var i=0;i<entries.length;i++) {
                         var entry = entries[i];
                         var label = entry.getIconImage() +" " + entry.getName();
-                        select += HtmlUtil.tag("option",[ATTR_TITLE,entry.getName(),"value",entry.getId()],
+                        select += HtmlUtil.tag(TAG_OPTION,[ATTR_TITLE,entry.getName(),ATTR_VALUE,entry.getId()],
                                              entry.getName());
                         
                     }
-                    select += HtmlUtil.closeTag("select");
+                    select += HtmlUtil.closeTag(TAG_SELECT);
                     html += HtmlUtil.formEntry("Data:",select);
                 }
 
-                var select  = HtmlUtil.openTag("select",[ATTR_ID, this.getDomId(ID_CHARTTYPE)]);
-                select += HtmlUtil.tag("option",[ATTR_TITLE,"","value","linechart"],
+                var select  = HtmlUtil.openTag(TAG_SELECT,[ATTR_ID, this.getDomId(ID_CHARTTYPE)]);
+                select += HtmlUtil.tag(TAG_OPTION,[ATTR_TITLE,"",ATTR_VALUE,"linechart"],
                                      "Line chart");
-                select += HtmlUtil.tag("option",[ATTR_TITLE,"","value","barchart"],
+                select += HtmlUtil.tag(TAG_OPTION,[ATTR_TITLE,"",ATTR_VALUE,"barchart"],
                                      "Bar chart");
-                select += HtmlUtil.closeTag("select");
+                select += HtmlUtil.closeTag(TAG_SELECT);
                 html += HtmlUtil.formEntry("Chart Type:",select);
 
                 html += HtmlUtil.closeTag(TAG_TABLE);

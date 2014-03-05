@@ -52,10 +52,18 @@ function EntryManager(repositoryRoot) {
     RamaddaUtil.defineMembers(this, {
             repositoryRoot:repositoryRoot,
             hostname: hostname,
+            name: null,
             entryCache: {},
             entryTypes: null,
             getHostname: function() {
                 return this.hostname;
+            },
+            getName: function() {
+                if(this.name!=null) return this.name;
+                return this.repositoryRoot;
+            },
+            getId: function() {
+                return this.repositoryRoot;
             },
             getRoot: function() {
                 return this.repositoryRoot;
