@@ -69,653 +69,146 @@ import java.util.List;
 /**
  * Provides wiki text processing services
  */
-public class WikiManager extends RepositoryManager implements WikiUtil
-    .WikiPageHandler {
-
-    /** id counter */
-    static int idCounter = 0;
-
-    /** wiki page type */
-    public static String TYPE_WIKIPAGE = "wikipage";
-
-    /** attribute in import tag */
-    public static final String ATTR_ENTRY = "entry";
-
-    /** _more_ */
-    public static final String ATTR_ALIGN = "align";
-
-    /** _more_ */
-    public static final String ATTR_ID = "id";
-
-
-    /** _more_ */
-    public static final String ATTR_BLOCK_SHOW = "block.show";
-
-    /** _more_ */
-    public static final String ATTR_BLOCK_OPEN = "block.open";
-
-    /** _more_ */
-    public static final String ATTR_BLOCK_TITLE = "block.title";
-
-    /** _more_ */
-    public static final String ATTR_BLOCK_POPUP = "block.popup";
-
-    /** _more_ */
-    public static final String ATTR_ROW_LABEL = "row.label";
-
-
-    /** border attribute */
-    public static final String ATTR_BORDER = "border";
-
-    /** _more_ */
-    public static final String ATTR_METADATA_TYPES = "metadata.types";
-
-    /** _more_ */
-    public static final String ATTR_PADDING = "padding";
-
-    /** border color */
-    public static final String ATTR_BORDERCOLOR = "bordercolor";
-
-    /** _more_ */
-    public static final String ATTR_COLORS = "colors";
-
-    /** show the details attribute */
-    public static final String ATTR_DETAILS = "details";
-
-    /** _more_ */
-    public static final String ATTR_DECORATE = "decorate";
-
-    /** maximum attribute */
-    public static final String ATTR_MAX = "max";
-
-    /** linkresource attribute */
-    public static final String ATTR_LINKRESOURCE = "linkresource";
-
-    /** listentries attribute */
-    public static final String ATTR_LISTENTRIES = "listentries";
-
-    /** _more_ */
-    public static final String ATTR_LAYER = "layer";
-
-    /** listwidth attribute */
-    public static final String ATTR_LISTWIDTH = "listwidth";
-
-    /** link attribute */
-    public static final String ATTR_LINK = "link";
-
-    /** attribute in the tabs tag */
-    public static final String ATTR_USEDESCRIPTION = "usedescription";
-
-    /** attribute in the tabs tag */
-    public static final String ATTR_SHOWLINK = "showlink";
-
-    /** _more_ */
-    public static final String ATTR_SHOWTITLE = "showTitle";
-
-    /** _more_ */
-    public static final String ATTR_SHOWMAP = "showMap";
-
-    /** _more_ */
-    public static final String ATTR_SHOWMENU = "showMenu";
-
-    /** src attribute */
-    public static final String ATTR_SRC = "src";
-
-    /** _more_ */
-    public static final String ATTR_PREFIX = "prefix";
-
-    /** _more_ */
-    public static final String ATTR_SUFFIX = "suffix";
-
-
-    /** _more_ */
-    public static final String ATTR_IF = "if";
-
-
-    /** include icon attribute */
-    public static final String ATTR_INCLUDEICON = "includeicon";
-
-    /** _more_ */
-    public static final String ATTR_SHOWDESCRIPTION = "showdescription";
-
-
-    /** _more_ */
-    public static final String ATTR_ICON = "icon";
-
-    /** attribute in the tabs tag */
-    public static final String ATTR_LINKLABEL = "linklabel";
-
-    /** attribute in import tag */
-    public static final String ATTR_ENTRIES = "entries";
-
-    /** exclude attribute */
-    public static final String ATTR_EXCLUDE = "exclude";
-
-    /** first attribute */
-    public static final String ATTR_FIRST = "first";
-
-    /** _more_ */
-    public static final String ATTR_LAST = "last";
-
-    /** sort attribute */
-    public static final String ATTR_SORT = "sort";
-
-    /** sort order attribute */
-    public static final String ATTR_SORT_ORDER = "sortorder";
-
-    /** sort date attribute */
-    public static final String SORT_DATE = "date";
-
-    /** change date attribute */
-    public static final String SORT_CHANGEDATE = "changedate";
-
-    /** sort name attribute */
-    public static final String SORT_NAME = "name";
-
-    /** the message attribute */
-    public static final String ATTR_MESSAGE = "message";
-
-    /** the associations attribute */
-    public static final String ATTR_ASSOCIATIONS = "associations";
-
-    /** attribute in import tag */
-    public static final String ATTR_SHOWHIDE = "showhide";
-
-    /** attribute in import tag */
-    public static final String ATTR_OUTPUT = "output";
-
-    /** attribute in import tag */
-    public static final String ATTR_RANDOM = "random";
-
-    /** attribute in import tag */
-    public static final String ATTR_CHILDREN = "children";
-
-    /** _more_ */
-    public static final String ATTR_CONSTRAINSIZE = "constrainsize";
-
-    /** attribute in import tag */
-    public static final String ATTR_FORMAT = "format";
-
-    /** attribute in import tag */
-    public static final String ATTR_SHOWTOGGLE = "showtoggle";
-
-    /** attribute in import tag */
-    public static final String ATTR_OPEN = "open";
-
-    /** attribute in import tag */
-    public static final String ATTR_FILES = "files";
-
-    /** attribute in import tag */
-    public static final String ATTR_FOLDERS = "folders";
-
-    /** images only attribute */
-    public static final String ATTR_IMAGES = "images";
-
-    /** attribute in import tag */
-    public static final String ATTR_TYPE = "type";
-
-    /** thumbnail attribute */
-    public static final String ATTR_THUMBNAIL = "thumbnail";
-
-    /** caption attribute */
-    public static final String ATTR_CAPTION = "caption";
-
-    /** attribute in import tag */
-    public static final String ATTR_SEPARATOR = "separator";
-
-    /** attribute in import tag */
-    public static final String ATTR_CLASS = "class";
-
-    /** attribute in import tag */
-    public static final String ATTR_STYLE = "style";
-
-    /** _more_ */
-    public static final String ATTR_TAG = "tag";
-
-
-    /** attribute in import tag */
-    public static final String ATTR_TAGOPEN = "tagopen";
-
-    /** attribute in import tag */
-    public static final String ATTR_TAGCLOSE = "tagclose";
-
-    /** attribute in import tag */
-    public static final String ATTR_TITLE = "title";
-
-    /** attribute in import tag */
-    public static final String ATTR_LAYOUT = "layout";
-
-    /** the columns attribute */
-    public static final String ATTR_COLUMNS = "columns";
-
-    /** the fieldname attribute */
-    public static final String ATTR_FIELDNAME = "name";
-
-    /** attribute in import tag */
-    public static final String LAYOUT_HORIZONTAL = "hor";
-
-    /** attribute in import tag */
-    public static final String LAYOUT_VERTICAL = "vert";
-
-    /** attribute in import tag */
-    public static final String ATTR_MENUS = "menus";
-
-    /** attribute in import tag */
-    public static final String ATTR_REQUEST = "request";
-
-    /** _more_ */
-    public static final String ATTR_POPUP = "popup";
-
-    /** attribute in import tag */
-    public static final String ATTR_POPUPCAPTION = "popupcaption";
-
-    /** attribute in import tag */
-    public static final String ATTR_LEVEL = "level";
-
-    /** attribute in import tag */
-    public static final String ATTR_COUNT = "count";
-
-    /** attribute to wikify the content */
-    public static final String ATTR_WIKIFY = "wikify";
-
-    /** max image height attribute */
-    public static final String ATTR_MAXIMAGEHEIGHT = "maximageheight";
-
-    /** _more_ */
-    public static final String ATTR_MAXHEIGHT = "maxheight";
-
-    /** _more_ */
-    public static final String ATTR_MINHEIGHT = "minheight";
-
-    /** attribute in import tag */
-    public static final String ATTR_DAY = "day";
-
-    /** attribute in import tag */
-    public static final String ATTR_DAYS = "days";
-
-    /** wiki group property */
-    public static final String WIKI_PROP_GROUP = "wiki.group";
-
-    /** _more_ */
-    public static final String WIKI_PROP_GROUP_NOBR = "wiki.group.nobr";
-
-    /** _more_ */
-    public static final String WIKI_PROP_DISPLAYGROUP = "displaygroup";
-
-    /** _more_ */
-    public static final String WIKI_PROP_DISPLAY = "display";
-
-    /** wiki import */
-    public static final String WIKI_PROP_IMPORT = "import";
-
-    /** the field property */
-    public static final String WIKI_PROP_FIELD = "field";
-
-    /** _more_ */
-    public static final String WIKI_PROP_ROOT = "root";
-
-    /** the calendar property */
-    public static final String WIKI_PROP_CALENDAR = "calendar";
-
-    /** _more_ */
-    public static final String WIKI_PROP_GRAPH = "graph";
-
-    /** the timeline property */
-    public static final String WIKI_PROP_TIMELINE = "timeline";
-
-    /** wiki import */
-    public static final String WIKI_PROP_DATE = "date";
-
-    /** wiki import */
-    public static final String WIKI_PROP_DATE_FROM = "fromdate";
-
-    /** wiki import */
-    public static final String WIKI_PROP_DATE_TO = "todate";
-
-    /** wiki import */
-    public static final String WIKI_PROP_MENU = "menu";
-
-
-    /** _more_ */
-    public static final String WIKI_PROP_SEARCH = "search";
-
-    /** wiki import */
-    public static final String WIKI_PROP_TREE = "tree";
-
-    /** _more_ */
-    public static final String WIKI_PROP_TREEVIEW = "treeview";
-
-    /** the table property */
-    public static final String WIKI_PROP_TABLE = "table";
-
-    /** wiki import */
-    public static final String WIKI_PROP_COMMENTS = "comments";
-
-    /** _more_ */
-    public static final String WIKI_PROP_TAGCLOUD = "tagcloud";
-
-    /** wiki import */
-    public static final String WIKI_PROP_RECENT = "recent";
-
-    /** wiki import */
-    public static final String WIKI_PROP_GALLERY = "gallery";
-
-    /** the image player property */
-    public static final String WIKI_PROP_PLAYER = "imageplayer";
-
-    /** the old image player property */
-    private static final String WIKI_PROP_PLAYER_OLD = "player";
-
-    /** wiki import */
-    public static final String WIKI_PROP_TABS = "tabs";
-
-    /** _more_ */
-    public static final String WIKI_PROP_APPLY = "apply";
-
-    /** _more_ */
-    public static final String APPLY_PREFIX = "apply.";
-
-    /** _more_ */
-    public static final String ATTR_APPLY_TAG = APPLY_PREFIX + "tag";
-
-    /** accordian property */
-    public static final String WIKI_PROP_ACCORDIAN = "accordian";
-
-    /** the slideshow property */
-    public static final String WIKI_PROP_SLIDESHOW = "slideshow";
-
-    /** wiki import */
-    public static final String WIKI_PROP_GRID = "grid";
-
-    /** wiki import */
-    public static final String WIKI_PROP_TOOLBAR = "toolbar";
-
-    /** wiki import */
-    public static final String WIKI_PROP_BREADCRUMBS = "breadcrumbs";
-
-    /** wiki import */
-    public static final String WIKI_PROP_INFORMATION = "information";
-
-    /** _more_ */
-    public static final String WIKI_PROP_DOWNLOAD = "download";
-
-    /** wiki import */
-    public static final String WIKI_PROP_IMAGE = "image";
-
-    /** wiki import */
-    public static final String WIKI_PROP_NAME = "name";
-
-    /** wiki import */
-    public static final String WIKI_PROP_MAP = "map";
-
-    /** wiki import */
-    public static final String WIKI_PROP_EARTH = "earth";
-
-    /** wiki import */
-    public static final String WIKI_PROP_HTML = "html";
-
-    /** wiki import */
-    public static final String WIKI_PROP_MAPENTRY = "mapentry";
-
-    /** wiki import */
-    public static final String WIKI_PROP_DESCRIPTION = "description";
-
-    /** _more_ */
-    public static final String WIKI_PROP_SIMPLE = "simple";
-
-    /** wiki import */
-    public static final String WIKI_PROP_PROPERTIES = "properties";
-
-    /** wiki import */
-    public static final String WIKI_PROP_LINKS = "links";
-
-    /** link property */
-    public static final String WIKI_PROP_LINK = "link";
-
-    /** list property */
-    public static final String WIKI_PROP_LIST = "list";
-
-    /** wiki import */
-    public static final String WIKI_PROP_ENTRYID = "entryid";
-
-    /** wiki import */
-    public static final String WIKI_PROP_LAYOUT = "layout";
-
-    /** wiki import */
-    public static final String WIKI_PROP_CHILDREN_GROUPS = "subgroups";
-
-    /** wiki import */
-    public static final String WIKI_PROP_CHILDREN_ENTRIES = "subentries";
-
-    /** wiki import */
-    public static final String WIKI_PROP_CHILDREN = "children";
-
-    /** wiki import */
-    public static final String WIKI_PROP_URL = "url";
-
-    /** _more_ */
-
-    public static final String WIKI_PROP_RESOURCE = "resource";
-
-    /** _more_ */
-    public static final String WIKI_PROP_TOOLS = "tools";
-
-    /** Upload property */
-    public static final String WIKI_PROP_UPLOAD = "upload";
-
-
-    /** _more_ */
-    public static final String FILTER_IMAGE = "image";
-
-    /** _more_ */
-    public static final String FILTER_FILE = "file";
-
-    /** _more_ */
-    public static final String FILTER_GEO = "geo";
-
-    /** _more_ */
-    public static final String FILTER_FOLDER = "folder";
-
-    /** _more_ */
-    public static final String FILTER_TYPE = "type:";
-
-    /** _more_ */
-    public static final String FILTER_SUFFIX = "suffix:";
-
-
-
-
-    /**
-     * Create an attribute with the name and value
-     *
-     * @param name  attribute name
-     * @param value  value
-     *
-     * @return  the attribute string
-     */
-    private static String attr(String name, String value) {
-        return " " + name + "=" + value + " ";
-    }
-
-    /**
-     * Generate a list of attributes
-     *
-     * @param attrs  set of attrs
-     *
-     * @return  the string version
-     */
-    private static String attrs(String... attrs) {
-        StringBuilder sb = new StringBuilder();
-        String        qt = "&quote;";
-
-        for (int i = 0; i < attrs.length; i += 2) {
-            sb.append(attr(attrs[i], qt + attrs[i + 1] + qt));
-        }
-
-        return sb.toString();
-    }
-
-    /**
-     * Create a property string
-     *
-     * @param prop  the property
-     * @param args  the property arguments
-     *
-     * @return  the property string
-     */
-    private static String prop(String prop, String args) {
-        return prop + PROP_DELIM + args;
-    }
-
-
-
-    /** property delimiter */
-    public static final String PROP_DELIM = ":";
+public class WikiManager extends RepositoryManager implements WikiConstants,
+        WikiUtil.WikiPageHandler {
 
     /** layout attributes */
     public static final String ATTRS_LAYOUT = attrs(ATTR_TEXTPOSITION,
                                                   POS_LEFT);
 
     /** list of import items for the text editor menu */
-    //j-
-    public static final String[] WIKIPROPS = {
-        WIKI_PROP_GROUP + "Information",
-        prop(WIKI_PROP_INFORMATION, attrs(ATTR_DETAILS, "false")),
-        WIKI_PROP_NAME, WIKI_PROP_DESCRIPTION, WIKI_PROP_RESOURCE,
-        WIKI_PROP_DATE_FROM, WIKI_PROP_DATE_TO, WIKI_PROP_LINK,
-        WIKI_PROP_HTML,
-        prop(WIKI_PROP_SIMPLE, attrs(ATTR_TEXTPOSITION, POS_LEFT)),
-        WIKI_PROP_IMPORT, prop(WIKI_PROP_FIELD, attrs("name", "")),
-        WIKI_PROP_GROUP + "Layout",
-        prop(WIKI_PROP_LINKS,
-             attrs(ATTR_LINKRESOURCE, "true", ATTR_SEPARATOR, " | ",
-                   ATTR_TAGOPEN, "", ATTR_TAGCLOSE, "")),
-        WIKI_PROP_LIST,
-        prop(WIKI_PROP_TABS,
-             attrs(ATTR_TAG, WIKI_PROP_HTML, ATTR_SHOWLINK, "true",
-                   ATTR_INCLUDEICON, "false") + ATTRS_LAYOUT),
-        prop(WIKI_PROP_TREE, attrs(ATTR_DETAILS, "true")), WIKI_PROP_TREEVIEW,
-        prop(WIKI_PROP_ACCORDIAN,
-             attrs(ATTR_TAG, WIKI_PROP_HTML, ATTR_SHOWLINK, "true",
-                   ATTR_INCLUDEICON, "false") + ATTRS_LAYOUT),
-        WIKI_PROP_GRID, WIKI_PROP_TABLE,
-        prop(WIKI_PROP_RECENT, attrs(ATTR_DAYS, "3")),
-        prop(WIKI_PROP_APPLY,
-             attrs(APPLY_PREFIX + "tag", WIKI_PROP_HTML,
-                   APPLY_PREFIX + "layout", "table",
-                   APPLY_PREFIX + "columns", "1", APPLY_PREFIX + "header",
-                   "", APPLY_PREFIX + "footer", "", APPLY_PREFIX + "border",
-                   "0", APPLY_PREFIX + "bordercolor", "#000")),
-        WIKI_PROP_GROUP + "Earth",
-        prop(WIKI_PROP_MAP,
-             attrs(ATTR_WIDTH, "400", ATTR_HEIGHT, "400", ATTR_LISTENTRIES,
-                   "false", ATTR_DETAILS, "false", ATTR_ICON,
-                   "#/icons/dots/green.png", ARG_MAP_ICONSONLY, "false")),
-        prop(WIKI_PROP_MAPENTRY,
-             attrs(ATTR_WIDTH, "400", ATTR_HEIGHT, "400", ATTR_DETAILS,
-                   "false")),
-        prop(WIKI_PROP_EARTH,
-             attrs(ATTR_WIDTH, "400", ATTR_HEIGHT, "400", ATTR_LISTENTRIES,
-                   "false")),
-        WIKI_PROP_GROUP_NOBR + "Images",
-        prop(WIKI_PROP_IMAGE,
-             attrs(ATTR_SRC, "", ATTR_ALIGN, "left|center|right")),
-        prop(WIKI_PROP_GALLERY,
-             attrs(ATTR_WIDTH, "200", ATTR_COLUMNS, "3", ATTR_POPUP, "true",
-                   ATTR_THUMBNAIL, "true", ATTR_CAPTION,
-                   "Figure ${count}: ${name}", ATTR_POPUPCAPTION, "over")),
-        prop(WIKI_PROP_SLIDESHOW,
-             attrs(ATTR_TAG, WIKI_PROP_SIMPLE, ATTR_SHOWLINK, "true")
-             + ATTRS_LAYOUT + attrs(ATTR_WIDTH, "400", ATTR_HEIGHT, "270")),
-        WIKI_PROP_PLAYER, WIKI_PROP_GROUP + "Misc",
-        prop(WIKI_PROP_CALENDAR, attrs(ATTR_DAY, "false")),
-        prop(WIKI_PROP_TIMELINE, attrs(ATTR_HEIGHT, "150")),
-        prop(WIKI_PROP_GRAPH, attrs(ATTR_WIDTH, "400", ATTR_HEIGHT, "400")),
-        WIKI_PROP_COMMENTS,
-        prop(WIKI_PROP_TAGCLOUD, attrs("type", "", "threshold", "0")),
-        WIKI_PROP_PROPERTIES, WIKI_PROP_BREADCRUMBS, WIKI_PROP_TOOLS,
-        WIKI_PROP_TOOLBAR, WIKI_PROP_LAYOUT, WIKI_PROP_MENU,
-        WIKI_PROP_ENTRYID,
-        prop(WIKI_PROP_SEARCH,
-             attrs(ATTR_TYPE, "", ARG_MAX, "10", ARG_SEARCH_SHOWFORM,
-                   "false", SpecialSearch.ATTR_TABS, SpecialSearch.TAB_LIST)),
-        prop(WIKI_PROP_UPLOAD,
-             attrs(ATTR_TITLE, "Upload file", ATTR_INCLUDEICON, "false")),
-        WIKI_PROP_ROOT, WIKI_PROP_GROUP + "Display",
-        prop(WIKI_PROP_DISPLAYGROUP,
-             attrs(ATTR_SHOWTITLE, "true", ATTR_SHOWMENU, "false",
-                   "layoutType", "table", "layoutColumns", "1")),
-        prop(WIKI_PROP_DISPLAY,
-             attrs(ATTR_WIDTH, "800", ATTR_HEIGHT, "400", "fields", "",
-                   "type", "linechart", "name", "", "eventSource", "",
-                   "layoutHere", "true", ATTR_SHOWMENU, "true",
-                   ATTR_SHOWTITLE, "true", "row", "0", "column", "0",
-                   ARG_FROMDATE, "", ARG_TODATE, "")),
+    //J-
+    public static final WikiTagCategory[] WIKITAGS = {
+        new WikiTagCategory(
+                            "Information",
+                            new WikiTag(WIKI_TAG_INFORMATION, attrs(ATTR_DETAILS, "false")),
+                            new WikiTag(WIKI_TAG_NAME), new WikiTag(WIKI_TAG_DESCRIPTION),
+                            new WikiTag(WIKI_TAG_RESOURCE), new WikiTag(WIKI_TAG_DATE_FROM),
+                            new WikiTag(WIKI_TAG_DATE_TO), new WikiTag(WIKI_TAG_LINK),
+                            new WikiTag(WIKI_TAG_HTML),
+                            new WikiTag(WIKI_TAG_SIMPLE, attrs(ATTR_TEXTPOSITION, POS_LEFT)),
+                            new WikiTag(WIKI_TAG_IMPORT),
+                            new WikiTag(WIKI_TAG_FIELD, attrs("name", ""))),
+        new WikiTagCategory("Layout", 
+                            new WikiTag(WIKI_TAG_LINKS, attrs(
+                                                              ATTR_LINKRESOURCE, "true", 
+                                                              ATTR_SEPARATOR, " | ", 
+                                                              ATTR_TAGOPEN, "", 
+                                                              ATTR_TAGCLOSE, "")), 
+                            new WikiTag(WIKI_TAG_LIST), 
+                            new WikiTag(WIKI_TAG_TABS, attrs(
+                                                             ATTR_TAG, WIKI_TAG_HTML, ATTR_SHOWLINK, "true", ATTR_INCLUDEICON, "false") + ATTRS_LAYOUT), 
+                            new WikiTag(WIKI_TAG_TREE, attrs(
+                                                             ATTR_DETAILS, "true")), 
+                            new WikiTag(WIKI_TAG_TREEVIEW), 
+                            new WikiTag(WIKI_TAG_ACCORDIAN, attrs(
+                                                                 ATTR_TAG, WIKI_TAG_HTML, ATTR_SHOWLINK, "true", ATTR_INCLUDEICON, "false") + ATTRS_LAYOUT), 
+                            new WikiTag(WIKI_TAG_GRID), 
+                            new WikiTag(WIKI_TAG_TABLE), 
+                            new WikiTag(WIKI_TAG_RECENT, attrs(
+                                                               ATTR_DAYS, "3")), 
+                            new WikiTag(WIKI_TAG_APPLY, attrs(APPLY_PREFIX
+                                                              + "tag", WIKI_TAG_HTML, APPLY_PREFIX
+                                                              + "layout", "table", APPLY_PREFIX
+                                                              + "columns", "1", APPLY_PREFIX
+                                                              + "header", "", APPLY_PREFIX
+                                                              + "footer", "", APPLY_PREFIX
+                                                              + "border", "0", APPLY_PREFIX
+                                                              + "bordercolor", "#000"))),
+        
+        new WikiTagCategory("Earth",            
+                            new WikiTag(WIKI_TAG_MAP,
+                                        attrs(ATTR_WIDTH, "400", ATTR_HEIGHT, "400",
+                                              ATTR_LISTENTRIES, "false", ATTR_DETAILS, "false",
+                                              ATTR_ICON, "#/icons/dots/green.png", ARG_MAP_ICONSONLY,
+                                              "false")), 
+                            new WikiTag(WIKI_TAG_MAPENTRY,
+                                        attrs(ATTR_WIDTH, "400", ATTR_HEIGHT, "400",
+                                              ATTR_DETAILS,
+                                              "false")), 
+                            new WikiTag(WIKI_TAG_EARTH,
+                                        attrs(ATTR_WIDTH, "400", ATTR_HEIGHT, "400",
+                                              ATTR_LISTENTRIES, "false"))),
+        
+        new WikiTagCategory("Images",
+                            new WikiTag(WIKI_TAG_IMAGE,
+                                        attrs(ATTR_SRC, "", ATTR_ALIGN,
+                                              "left|center|right")), 
+                            new WikiTag(WIKI_TAG_GALLERY,
+                                        attrs(ATTR_WIDTH, "200", ATTR_COLUMNS, "3",
+                                              ATTR_POPUP, "true", ATTR_THUMBNAIL, "true",
+                                              ATTR_CAPTION, "Figure ${count}: ${name}",
+                                              ATTR_POPUPCAPTION,
+                                              "over")), 
+                            new WikiTag(WIKI_TAG_SLIDESHOW,
+                                        attrs(ATTR_TAG, WIKI_TAG_SIMPLE,
+                                              ATTR_SHOWLINK, "true") + ATTRS_LAYOUT
+                                        + attrs(ATTR_WIDTH, "400",
+                                                ATTR_HEIGHT,
+                                                "270")), 
+                            new WikiTag(WIKI_TAG_PLAYER)),
+        new WikiTagCategory("Misc",
+                            new WikiTag(WIKI_TAG_CALENDAR, attrs(ATTR_DAY, "false")),
+                            new WikiTag(WIKI_TAG_TIMELINE, attrs(ATTR_HEIGHT, "150")),
+                            new WikiTag(WIKI_TAG_GRAPH,
+                                        attrs(ATTR_WIDTH, "400", ATTR_HEIGHT,
+                                              "400")), 
+                            new WikiTag(WIKI_TAG_COMMENTS),
+                            new WikiTag(WIKI_TAG_TAGCLOUD,
+                                        attrs("type", "", "threshold",
+                                              "0")), 
+                            new WikiTag(WIKI_TAG_PROPERTIES),
+                            new WikiTag(WIKI_TAG_BREADCRUMBS),
+                            new WikiTag(WIKI_TAG_TOOLS),
+                            new WikiTag(WIKI_TAG_TOOLBAR),
+                            new WikiTag(WIKI_TAG_LAYOUT),
+                            new WikiTag(WIKI_TAG_MENU),
+                            new WikiTag(WIKI_TAG_ENTRYID),
+                            new WikiTag(WIKI_TAG_SEARCH,
+                                        attrs(ATTR_TYPE, "", ARG_MAX, "10",
+                                              ARG_SEARCH_SHOWFORM, "false",
+                                              SpecialSearch.ATTR_TABS,
+                                              SpecialSearch
+                                              .TAB_LIST)), 
+                            new WikiTag(WIKI_TAG_UPLOAD,
+                                        attrs(ATTR_TITLE,
+                                              "Upload file",
+                                              ATTR_INCLUDEICON,
+                                              "false")), 
+                            new WikiTag(WIKI_TAG_ROOT)),
+        
+        new WikiTagCategory("Display",
+                            new WikiTag(WIKI_TAG_GROUP, "Display group",
+                                        attrs("layoutType", "table", 
+                                              "layoutColumns", "1",
+                                              ATTR_SHOWMENU, "false")), 
+                            new WikiTag(WIKI_TAG_DISPLAY, "Search form",
+                                        attrs(ATTR_TYPE, "entrylist", ATTR_WIDTH, "800",
+                                              ATTR_HEIGHT, "400", 
+                                              "orientation", "vertical",
+                                              ATTR_SHOWFORM, "true", 
+                                              ATTR_FORMOPEN, "true",
+                                              ATTR_LAYOUTHERE, "true", 
+                                              ATTR_SHOWMENU, "true",
+                                              ATTR_SHOWTITLE,    "true")), 
+                            new WikiTag(WIKI_TAG_DISPLAY, "Map",
+                                        attrs(ATTR_TYPE, "map", 
+                                              ATTR_WIDTH, "400",
+                                              ATTR_HEIGHT, "400", 
+                                              ATTR_LAYOUTHERE, "true", 
+                                              ATTR_SHOWMENU, "true",
+                                              ATTR_SHOWTITLE, "true")), 
+                            new WikiTag(WIKI_TAG_DISPLAY,
+                                        "Line Chart",
+                                        attrs(ATTR_TYPE, "linechart", ATTR_WIDTH, "800",
+                                              ATTR_HEIGHT, "400", "fields", "",
+                                              ATTR_LAYOUTHERE, "true", 
+                                              ATTR_SHOWMENU, "true", 
+                                              ATTR_SHOWTITLE, "true"))),
     };
-    //j+
+    //J+
 
 
-
-    //j++
-
-    /** the id for this */
-    public static final String ID_THIS = "this";
-
-    /** _more_ */
-    public static final String ID_REMOTE = "remote:";
-
-    /** _more_ */
-    public static final String ID_ROOT = "root";
-
-    /** _more_ */
-    public static final String ID_CHILDREN = "children";
-
-    /** _more_ */
-    public static final String PREFIX_SEARCH = "search.";
-
-    /** _more_ */
-    public static final String ATTR_SEARCH_TYPE = PREFIX_SEARCH + "type";
-
-    /** _more_ */
-    public static final String ATTR_SEARCH_TEXT = PREFIX_SEARCH + "text";
-
-    /** _more_ */
-    public static final String ATTR_SEARCH_PARENT = PREFIX_SEARCH + "parent";
-
-    /** _more_ */
-    public static final String ATTR_SEARCH_NORTH = PREFIX_SEARCH + "north";
-
-    /** _more_ */
-    public static final String ATTR_SEARCH_URL = PREFIX_SEARCH + "url";
-
-    //    public static final String ATTR_SEARCH_PARENT = PREFIX_SEARCH +"parent";
-
-    /** _more_ */
-    public static final String ID_SEARCH = "search";
-
-    /** _more_ */
-    public static final String ID_SIBLINGS = "siblings";
-
-    /** the id for my parent */
-    public static final String ID_PARENT = "parent";
-
-    /** _more_ */
-    public static final String ID_ANCESTORS = "ancestors";
-
-    /** the id for my grandparent */
-    public static final String ID_GRANDPARENT = "grandparent";
-
-    /** _more_ */
-    public static final String ID_GRANDCHILDREN = "grandchildren";
-
-    /** _more_ */
-    public static final String ID_GREATGRANDCHILDREN = "greatgrandchildren";
-
-    /** _more_ */
-    public static final String ID_LINKS = "links";
-
-    /** default label */
-    public static final String LABEL_LINKS = "Actions";
 
     /** output type */
     public static final OutputType OUTPUT_WIKI = new OutputType("Wiki",
@@ -771,7 +264,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                 remainder = toks.get(1);
             }
             Entry theEntry = entry;
-            if (tag.equals(WIKI_PROP_IMPORT)) {
+            if (tag.equals(WIKI_TAG_IMPORT)) {
                 //Old style
                 if (remainder.indexOf("=") < 0) {
                     toks = StringUtil.splitUpTo(remainder, " ", 3);
@@ -1169,7 +662,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                                   Entry originalEntry, Entry entry,
                                   String tag, Hashtable props)
             throws Exception {
-        boolean doingApply = tag.equals(WIKI_PROP_APPLY);
+        boolean doingApply = tag.equals(WIKI_TAG_APPLY);
         String  attrPrefix = "";
         if (doingApply) {
             attrPrefix = APPLY_PREFIX;
@@ -1288,7 +781,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         if (criteria != null) {}
 
         StringBuilder sb = new StringBuilder();
-        if (theTag.equals(WIKI_PROP_INFORMATION)) {
+        if (theTag.equals(WIKI_TAG_INFORMATION)) {
             boolean details = Misc.getProperty(props, ATTR_DETAILS, false);
             if ( !details) {
                 return entry.getTypeHandler().getEntryContent(request, entry,
@@ -1297,7 +790,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
             return getRepository().getHtmlOutputHandler().getInformationTabs(
                 request, entry, false);
-        } else if (theTag.equals(WIKI_PROP_TAGCLOUD)) {
+        } else if (theTag.equals(WIKI_TAG_TAGCLOUD)) {
             StringBuilder tagCloud  = new StringBuilder();
             int           threshold = Misc.getProperty(props, "threshold", 0);
             getMetadataManager().doMakeTagCloudOrList(request,
@@ -1305,19 +798,19 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                     threshold);
 
             return tagCloud.toString();
-        } else if (theTag.equals(WIKI_PROP_COMMENTS)) {
+        } else if (theTag.equals(WIKI_TAG_COMMENTS)) {
             return getHtmlOutputHandler().getCommentBlock(request, entry,
                     false).toString();
-        } else if (theTag.equals(WIKI_PROP_TOOLBAR)) {
+        } else if (theTag.equals(WIKI_TAG_TOOLBAR)) {
             return getPageHandler().getEntryToolbar(request, entry);
-        } else if (theTag.equals(WIKI_PROP_BREADCRUMBS)) {
+        } else if (theTag.equals(WIKI_TAG_BREADCRUMBS)) {
             List<Entry> children = getEntries(request, originalEntry, entry,
                                        props);
             List<String> breadcrumbs =
                 getPageHandler().makeBreadcrumbList(request, children, null);
 
             return getPageHandler().makeBreadcrumbs(request, breadcrumbs);
-        } else if (theTag.equals(WIKI_PROP_LINK)) {
+        } else if (theTag.equals(WIKI_TAG_LINK)) {
             boolean linkResource = Misc.getProperty(props, ATTR_LINKRESOURCE,
                                        false);
             String title = Misc.getProperty(props, ATTR_TITLE,
@@ -1334,7 +827,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
             return HtmlUtils.href(url, title);
 
-        } else if (theTag.equals(WIKI_PROP_RESOURCE)) {
+        } else if (theTag.equals(WIKI_TAG_RESOURCE)) {
             if ( !entry.getResource().isDefined()) {
                 String message = Misc.getProperty(props, ATTR_MESSAGE,
                                      (String) null);
@@ -1369,7 +862,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
             return HtmlUtils.href(url, label);
 
-        } else if (theTag.equals(WIKI_PROP_UPLOAD)) {
+        } else if (theTag.equals(WIKI_TAG_UPLOAD)) {
             Entry group = getEntryManager().findGroup(request);
             if ( !getEntryManager().canAddTo(request, group)) {
                 return "";
@@ -1415,7 +908,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                     ARG_GROUP, group.getId(), EntryManager.ARG_TYPE,
                     typeHandler.getType()), img + " " + msg(label));
 
-        } else if (theTag.equals(WIKI_PROP_DESCRIPTION)) {
+        } else if (theTag.equals(WIKI_TAG_DESCRIPTION)) {
             String desc = entry.getDescription();
             desc = desc.replaceAll("\r\n\r\n", "\n<p>\n");
             if (wikify) {
@@ -1423,12 +916,12 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             }
 
             return desc;
-        } else if (theTag.equals(WIKI_PROP_LAYOUT)) {
+        } else if (theTag.equals(WIKI_TAG_LAYOUT)) {
             return getHtmlOutputHandler().makeHtmlHeader(request, entry,
                     Misc.getProperty(props, ATTR_TITLE, "Layout"));
-        } else if (theTag.equals(WIKI_PROP_NAME)) {
+        } else if (theTag.equals(WIKI_TAG_NAME)) {
             return getEntryDisplayName(entry);
-        } else if (theTag.equals(WIKI_PROP_FIELD)) {
+        } else if (theTag.equals(WIKI_TAG_FIELD)) {
             String name = Misc.getProperty(props, ATTR_FIELDNAME,
                                            (String) null);
             if (name != null) {
@@ -1442,27 +935,27 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             } else {
                 return "No name=... specified in wiki tag";
             }
-        } else if (theTag.equals(WIKI_PROP_DATE_FROM)
-                   || theTag.equals(WIKI_PROP_DATE_TO)) {
+        } else if (theTag.equals(WIKI_TAG_DATE_FROM)
+                   || theTag.equals(WIKI_TAG_DATE_TO)) {
             String format =
                 Misc.getProperty(props, ATTR_FORMAT,
                                  RepositoryBase.DEFAULT_TIME_FORMAT);
-            Date date = new Date(theTag.equals(WIKI_PROP_DATE_FROM)
+            Date date = new Date(theTag.equals(WIKI_TAG_DATE_FROM)
                                  ? entry.getStartDate()
                                  : entry.getEndDate());
             SimpleDateFormat dateFormat = new SimpleDateFormat(format);
             dateFormat.setTimeZone(RepositoryUtil.TIMEZONE_DEFAULT);
 
             return dateFormat.format(date);
-        } else if (theTag.equals(WIKI_PROP_ENTRYID)) {
+        } else if (theTag.equals(WIKI_TAG_ENTRYID)) {
             return entry.getId();
-        } else if (theTag.equals(WIKI_PROP_PROPERTIES)) {
+        } else if (theTag.equals(WIKI_TAG_PROPERTIES)) {
             return makeEntryTabs(request, entry, props);
-        } else if (theTag.equals(WIKI_PROP_IMAGE)) {
+        } else if (theTag.equals(WIKI_TAG_IMAGE)) {
             return getWikiImage(wikiUtil, request, entry, props);
-        } else if (theTag.equals(WIKI_PROP_URL)) {
+        } else if (theTag.equals(WIKI_TAG_URL)) {
             return getWikiUrl(wikiUtil, request, entry, props);
-        } else if (theTag.equals(WIKI_PROP_HTML)) {
+        } else if (theTag.equals(WIKI_TAG_HTML)) {
             Request newRequest = makeRequest(request, props);
             if (Misc.getProperty(props, ATTR_CHILDREN, false)) {
                 List<Entry> children = getEntries(request, originalEntry,
@@ -1493,7 +986,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             //                                OutputHandler.OUTPUT_HTML, entry);
 
             return new String(result.getContent());
-        } else if (theTag.equals(WIKI_PROP_CALENDAR)) {
+        } else if (theTag.equals(WIKI_TAG_CALENDAR)) {
             List<Entry> children = getEntries(request, originalEntry, entry,
                                        props);
             boolean doDay = Misc.getProperty(props, ATTR_DAY, false);
@@ -1502,7 +995,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                         children), sb, doDay);
 
             return sb.toString();
-        } else if (theTag.equals(WIKI_PROP_DISPLAY)
+        } else if (theTag.equals(WIKI_TAG_DISPLAY)
                    || theTag.equals("chart")) {
 
             String jsonUrl = null;
@@ -1525,11 +1018,12 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                             props);
 
             return sb.toString();
-        } else if (theTag.equals(WIKI_PROP_DISPLAYGROUP)) {
+        } else if (theTag.equals(WIKI_TAG_GROUP)
+                   || theTag.equals(WIKI_TAG_GROUP_OLD)) {
             getEntryDisplay(request, entry, entry.getName(), null, sb, props);
 
             return sb.toString();
-        } else if (theTag.equals(WIKI_PROP_GRAPH)) {
+        } else if (theTag.equals(WIKI_TAG_GRAPH)) {
             int width  = Misc.getProperty(props, ATTR_WIDTH, 400);
             int height = Misc.getProperty(props, ATTR_HEIGHT, 300);
             List<Entry> children = getEntries(request, originalEntry, entry,
@@ -1538,7 +1032,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                                              width, height);
 
             return sb.toString();
-        } else if (theTag.equals(WIKI_PROP_TIMELINE)) {
+        } else if (theTag.equals(WIKI_TAG_TIMELINE)) {
             Entry mainEntry = entry;
             List<Entry> children = getEntries(request, originalEntry,
                                        mainEntry, props);
@@ -1548,20 +1042,20 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                     children, sb, style);
 
             return sb.toString();
-        } else if (theTag.equals(WIKI_PROP_MAP)
-                   || theTag.equals(WIKI_PROP_EARTH)
-                   || theTag.equals(WIKI_PROP_MAPENTRY)) {
+        } else if (theTag.equals(WIKI_TAG_MAP)
+                   || theTag.equals(WIKI_TAG_EARTH)
+                   || theTag.equals(WIKI_TAG_MAPENTRY)) {
             int     width      = Misc.getProperty(props, ATTR_WIDTH, 400);
             int     height     = Misc.getProperty(props, ATTR_HEIGHT, 300);
             boolean justPoints = Misc.getProperty(props, "justpoints", false);
             boolean listEntries = Misc.getProperty(props, ATTR_LISTENTRIES,
                                       false);
             boolean googleEarth =
-                theTag.equals(WIKI_PROP_EARTH)
+                theTag.equals(WIKI_TAG_EARTH)
                 && getMapManager().isGoogleEarthEnabled(request);
 
             List<Entry> children;
-            if (theTag.equals(WIKI_PROP_MAPENTRY)) {
+            if (theTag.equals(WIKI_TAG_MAPENTRY)) {
                 children = new ArrayList<Entry>();
                 children.add(entry);
             } else {
@@ -1645,7 +1139,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             }
 
             return sb.toString();
-        } else if (theTag.equals(WIKI_PROP_TOOLS)) {
+        } else if (theTag.equals(WIKI_TAG_TOOLS)) {
             StringBuilder links = new StringBuilder();
             int           cnt   = 0;
             for (Link link :
@@ -1668,14 +1162,14 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                                     HtmlUtils.cssClass("entry-tools-box")));
 
             return sb.toString();
-        } else if (theTag.equals(WIKI_PROP_MENU)) {
+        } else if (theTag.equals(WIKI_TAG_MENU)) {
             String menus = Misc.getProperty(props, ATTR_MENUS, "");
             int type = OutputType.getTypeMask(StringUtil.split(menus, ",",
                            true, true));
 
             return getEntryManager().getEntryActionsTable(request, entry,
                     type);
-        } else if (theTag.equals(WIKI_PROP_SEARCH)) {
+        } else if (theTag.equals(WIKI_TAG_SEARCH)) {
             String type = Misc.getProperty(props, ATTR_TYPE,
                                            Misc.getProperty(props, ATTR_ID,
                                                TypeHandler.TYPE_ANY));
@@ -1710,7 +1204,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             ss.processSearchRequest(myRequest, sb);
 
             return sb.toString();
-        } else if (theTag.equals(WIKI_PROP_APPLY)) {
+        } else if (theTag.equals(WIKI_TAG_APPLY)) {
             StringBuilder style = new StringBuilder(Misc.getProperty(props,
                                       APPLY_PREFIX + ATTR_STYLE, ""));
             int padding = Misc.getProperty(props,
@@ -1858,26 +1352,26 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             }
 
             return sb.toString();
-        } else if (theTag.equals(WIKI_PROP_SIMPLE)) {
+        } else if (theTag.equals(WIKI_TAG_SIMPLE)) {
             return makeSimpleDisplay(request, props, originalEntry, entry);
-        } else if (theTag.equals(WIKI_PROP_TABS)
-                   || theTag.equals(WIKI_PROP_ACCORDIAN)
-                   || theTag.equals(WIKI_PROP_SLIDESHOW)) {
+        } else if (theTag.equals(WIKI_TAG_TABS)
+                   || theTag.equals(WIKI_TAG_ACCORDIAN)
+                   || theTag.equals(WIKI_TAG_SLIDESHOW)) {
             List<Entry> children = getEntries(request, originalEntry, entry,
                                        props);
-            boolean      doingSlideshow = theTag.equals(WIKI_PROP_SLIDESHOW);
+            boolean      doingSlideshow = theTag.equals(WIKI_TAG_SLIDESHOW);
             List<String> titles         = new ArrayList<String>();
             List<String> contents       = new ArrayList<String>();
-            String       dfltTag        = WIKI_PROP_SIMPLE;
+            String       dfltTag        = WIKI_TAG_SIMPLE;
 
             if (props.get(ATTR_USEDESCRIPTION) != null) {
                 boolean useDescription = Misc.getProperty(props,
                                              ATTR_USEDESCRIPTION, true);
 
                 if (useDescription) {
-                    dfltTag = WIKI_PROP_SIMPLE;
+                    dfltTag = WIKI_TAG_SIMPLE;
                 } else {
-                    dfltTag = WIKI_PROP_HTML;
+                    dfltTag = WIKI_TAG_HTML;
                 }
             }
 
@@ -1896,8 +1390,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                 props.put(ATTR_CONSTRAINSIZE, "true");
             }
 
-            if (theTag.equals(WIKI_PROP_TABS)) {
-                dfltTag = WIKI_PROP_HTML;
+            if (theTag.equals(WIKI_TAG_TABS)) {
+                dfltTag = WIKI_TAG_HTML;
             }
 
 
@@ -1990,7 +1484,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             }
 
 
-            if (theTag.equals(WIKI_PROP_ACCORDIAN)) {
+            if (theTag.equals(WIKI_TAG_ACCORDIAN)) {
                 HtmlUtils.makeAccordian(sb, titles, contents);
 
                 return sb.toString();
@@ -2002,7 +1496,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
                 String  arrowWidth  = "24";
                 String  arrowHeight = "43";
-                String  slideId     = "slides_" + (idCounter++);
+                String  slideId     = HtmlUtils.getUniqueId("slides_");
 
                 sb.append(HtmlUtils.open("style",
                                          HtmlUtils.attr("type", "text/css")));
@@ -2109,20 +1603,20 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                 return OutputHandler.makeTabs(titles, contents, true,
                         useCookies);
             }
-        } else if (theTag.equals(WIKI_PROP_GRID)) {
+        } else if (theTag.equals(WIKI_TAG_GRID)) {
             getHtmlOutputHandler().makeGrid(request,
                                             getEntries(request,
                                                 originalEntry, entry,
                                                     props), sb);
 
             return sb.toString();
-        } else if (theTag.equals(WIKI_PROP_TABLE)) {
+        } else if (theTag.equals(WIKI_TAG_TABLE)) {
             List<Entry> entries = getEntries(request, originalEntry, entry,
                                              props);
             getHtmlOutputHandler().makeTable(request, entries, sb);
 
             return sb.toString();
-        } else if (theTag.equals(WIKI_PROP_RECENT)) {
+        } else if (theTag.equals(WIKI_TAG_RECENT)) {
             List<Entry> children = getEntries(request, originalEntry, entry,
                                        props);
             int numDays = Misc.getProperty(props, ATTR_DAYS, 3);
@@ -2178,8 +1672,8 @@ public class WikiManager extends RepositoryManager implements WikiUtil
 
             return sb.toString();
 
-        } else if (theTag.equals(WIKI_PROP_PLAYER)
-                   || theTag.equals(WIKI_PROP_PLAYER_OLD)) {
+        } else if (theTag.equals(WIKI_TAG_PLAYER)
+                   || theTag.equals(WIKI_TAG_PLAYER_OLD)) {
             List<Entry> children = getEntries(request, originalEntry, entry,
                                        props, true);
             if (children.size() == 0) {
@@ -2200,7 +1694,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             imageOutputHandler.makePlayer(imageRequest, children, sb, false);
 
             return sb.toString();
-        } else if (theTag.equals(WIKI_PROP_GALLERY)) {
+        } else if (theTag.equals(WIKI_TAG_GALLERY)) {
             List<Entry> children = getEntries(request, originalEntry, entry,
                                        props, true);
             if (children.size() == 0) {
@@ -2213,16 +1707,16 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             makeGallery(request, children, props, sb);
 
             return sb.toString();
-        } else if (theTag.equals(WIKI_PROP_ROOT)) {
+        } else if (theTag.equals(WIKI_TAG_ROOT)) {
             return getRepository().getUrlBase();
-        } else if (theTag.equals(WIKI_PROP_CHILDREN_GROUPS)
-                   || theTag.equals(WIKI_PROP_CHILDREN_ENTRIES)
-                   || theTag.equals(WIKI_PROP_CHILDREN)
-                   || theTag.equals(WIKI_PROP_TREE)) {
+        } else if (theTag.equals(WIKI_TAG_CHILDREN_GROUPS)
+                   || theTag.equals(WIKI_TAG_CHILDREN_ENTRIES)
+                   || theTag.equals(WIKI_TAG_CHILDREN)
+                   || theTag.equals(WIKI_TAG_TREE)) {
 
-            if (theTag.equals(WIKI_PROP_CHILDREN_GROUPS)) {
+            if (theTag.equals(WIKI_TAG_CHILDREN_GROUPS)) {
                 props.put(ATTR_FOLDERS, "true");
-            } else if (theTag.equals(WIKI_PROP_CHILDREN_ENTRIES)) {
+            } else if (theTag.equals(WIKI_TAG_CHILDREN_ENTRIES)) {
                 props.put(ATTR_FILES, "true");
             }
 
@@ -2263,7 +1757,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                 return sb.toString();
             }
 
-        } else if (theTag.equals(WIKI_PROP_TREEVIEW)) {
+        } else if (theTag.equals(WIKI_TAG_TREEVIEW)) {
             List<Entry> children = getEntries(request, originalEntry, entry,
                                        props);
             if (children.size() == 0) {
@@ -2272,9 +1766,9 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             getHtmlOutputHandler().makeTreeView(request, children, sb);
 
             return sb.toString();
-        } else if (theTag.equals(WIKI_PROP_LINKS)
-                   || theTag.equals(WIKI_PROP_LIST)) {
-            boolean isList = theTag.equals(WIKI_PROP_LIST);
+        } else if (theTag.equals(WIKI_TAG_LINKS)
+                   || theTag.equals(WIKI_TAG_LIST)) {
+            boolean isList = theTag.equals(WIKI_TAG_LIST);
             List<Entry> children = getEntries(request, originalEntry, entry,
                                        props);
             if (children.size() == 0) {
@@ -3380,7 +2874,7 @@ public class WikiManager extends RepositoryManager implements WikiUtil
                                     Entry originalEntry, Entry importEntry,
                                     String tag, Hashtable props) {
         try {
-            if ( !tag.equals(WIKI_PROP_IMPORT)) {
+            if ( !tag.equals(WIKI_TAG_IMPORT)) {
                 String include = getWikiInclude(wikiUtil, request,
                                      originalEntry, importEntry, tag, props);
                 if (include != null) {
@@ -3597,62 +3091,46 @@ public class WikiManager extends RepositoryManager implements WikiUtil
         //        buttons.append(addWikiEditButton(textAreaId,"button_nowiki.png","Ignore wiki formatting","\\x3cnowiki\\x3e","\\x3c/nowiki\\x3e","Insert non-formatted text here","mw-editbutton-nowiki"));
         //        buttons.append(addWikiEditButton(textAreaId,"button_sig.png","Your signature with timestamp","--~~~~","","","mw-editbutton-signature"));
         buttons.append(addWikiEditButton(textAreaId, "button_hr.png",
-                                         "Horizontal line (use sparingly)",
-                                         "\\n----\\n", "", "",
-                                         "mw-editbutton-hr"));
+                                         "Horizontal line", "\\n----\\n", "",
+                                         "", "mw-editbutton-hr"));
 
 
         StringBuilder importMenu = new StringBuilder();
         String        inset      = "&nbsp;&nbsp;";
-        int           cnt        = 0;
-        importMenu.append("<table><tr valign=top><td valign=top>\n");
-        for (int i = 0; i < WIKIPROPS.length; i++) {
-            String prop = WIKIPROPS[i];
-
-            if (prop.startsWith(WIKI_PROP_GROUP_NOBR)) {
-                String group = prop.substring(WIKI_PROP_GROUP_NOBR.length());
-                importMenu.append(HtmlUtils.b(group));
-                importMenu.append(HtmlUtils.br());
-                importMenu.append("\n");
-
-                continue;
-            }
-
-
-            if (prop.startsWith(WIKI_PROP_GROUP)) {
-                cnt++;
-                if (cnt > 1) {
+        int           rowCnt     = 0;
+        importMenu.append("<table border=0><tr valign=top><td valign=top>\n");
+        for (int i = 0; i < WIKITAGS.length; i++) {
+            WikiTagCategory cat = WIKITAGS[i];
+            if (rowCnt + cat.tags.length > 10) {
+                rowCnt = 0;
+                if (i > 0) {
                     importMenu.append(
                         "</td><td>&nbsp;</td><td valign=top>\n");
-                    cnt = 1;
                 }
-                String group = prop.substring(WIKI_PROP_GROUP.length());
-                importMenu.append(HtmlUtils.b(group));
+            }
+            importMenu.append("\n");
+
+            importMenu.append(HtmlUtils.b(cat.category));
+            importMenu.append(HtmlUtils.br());
+            rowCnt += cat.tags.length;
+            for (int tagIdx = 0; tagIdx < cat.tags.length; tagIdx++) {
+                WikiTag tag          = cat.tags[tagIdx];
+                String  textToInsert = tag.tag;
+                if (tag.attrs.length() > 0) {
+                    textToInsert += " " + tag.attrs;
+                }
+
+                String js2 = "javascript:insertTags("
+                             + HtmlUtils.squote(textAreaId) + ","
+                             + HtmlUtils.squote("{{" + textToInsert + " ")
+                             + "," + HtmlUtils.squote("}}") + ","
+                             + HtmlUtils.squote("") + ");";
+                importMenu.append(inset);
+                importMenu.append(HtmlUtils.href(js2, tag.label));
                 importMenu.append(HtmlUtils.br());
                 importMenu.append("\n");
-
-                continue;
             }
-
-
-            String textToInsert = prop;
-            int    colonIdx     = prop.indexOf(PROP_DELIM);
-            if (colonIdx >= 0) {
-                prop = prop.substring(0, colonIdx);
-                textToInsert = prop + " "
-                               + textToInsert.substring(colonIdx + 1);
-            }
-
-
-            String js2 = "javascript:insertTags("
-                         + HtmlUtils.squote(textAreaId) + ","
-                         + HtmlUtils.squote("{{" + textToInsert + " ") + ","
-                         + HtmlUtils.squote("}}") + ","
-                         + HtmlUtils.squote("") + ");";
-            importMenu.append(inset);
-            importMenu.append(HtmlUtils.href(js2, prop));
             importMenu.append(HtmlUtils.br());
-            importMenu.append("\n");
         }
         importMenu.append("</td></tr></table>\n");
         List<Link> links = getRepository().getOutputLinks(request,
@@ -4477,5 +3955,130 @@ public class WikiManager extends RepositoryManager implements WikiUtil
             }
         }
     }
+
+
+
+    /**
+     * Create an attribute with the name and value
+     *
+     * @param name  attribute name
+     * @param value  value
+     *
+     * @return  the attribute string
+     */
+    private static String attr(String name, String value) {
+        return " " + name + "=" + value + " ";
+    }
+
+    /**
+     * Generate a list of attributes
+     *
+     * @param attrs  set of attrs
+     *
+     * @return  the string version
+     */
+    private static String attrs(String... attrs) {
+        StringBuilder sb = new StringBuilder();
+        String        qt = "&quote;";
+
+        for (int i = 0; i < attrs.length; i += 2) {
+            sb.append(attr(attrs[i], qt + attrs[i + 1] + qt));
+        }
+
+        return sb.toString();
+    }
+
+    /**
+     * Create a property string
+     *
+     * @param prop  the property
+     * @param args  the property arguments
+     *
+     * @return  the property string
+     */
+    private static String prop(String prop, String args) {
+        return prop + PROP_DELIM + args;
+    }
+
+
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Wed, Mar 5, '14
+     * @author         Enter your name here...
+     */
+    private static class WikiTag {
+
+        /** _more_ */
+        String label;
+
+        /** _more_ */
+        String tag;
+
+        /** _more_ */
+        String attrs;
+
+        /**
+         * _more_
+         *
+         * @param tag _more_
+         */
+        WikiTag(String tag) {
+            this(tag, "");
+        }
+
+        /**
+         * _more_
+         *
+         * @param tag _more_
+         * @param attrs _more_
+         */
+        WikiTag(String tag, String attrs) {
+            this(tag, tag, attrs);
+        }
+
+        /**
+         * _more_
+         *
+         * @param tag _more_
+         * @param label _more_
+         * @param attrs _more_
+         */
+        WikiTag(String tag, String label, String attrs) {
+            this.tag   = tag;
+            this.label = label;
+            this.attrs = attrs;
+        }
+
+    }
+
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Wed, Mar 5, '14
+     * @author         Enter your name here...
+     */
+    private static class WikiTagCategory {
+
+        /** _more_ */
+        String category;
+
+        /** _more_ */
+        WikiTag[] tags;
+
+        /**
+         * _more_
+         *
+         * @param c _more_
+         * @param tags _more_
+         */
+        WikiTagCategory(String c, WikiTag... tags) {
+            this.category = c;
+            this.tags     = tags;
+        }
+    }
+
 
 }

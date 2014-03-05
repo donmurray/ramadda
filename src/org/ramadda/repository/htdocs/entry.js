@@ -341,7 +341,8 @@ function Entry(props) {
                 if(hostname)
                     url =  hostname + this.icon;
                 else 
-                    url =  this.getEntryManager().getRoot() + this.icon;
+                    url =  this.icon;
+                //this.getEntryManager().getRoot() + 
                 return url;
             },
             getIconImage : function (attrs) {
