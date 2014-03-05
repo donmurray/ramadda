@@ -1445,8 +1445,6 @@ public abstract class RecordFile {
         dttm.setLength(0);
         getDateTimeString(record, dttm, dateIndex, timeIndex);
         Date date = sdf.parse(dttm.toString());
-        //xxx
-        System.err.println ("dttm - " + dttm +" DATE:" + date);
         record.setRecordTime(date.getTime());
     }
 
