@@ -17,12 +17,24 @@ var OUTPUTS = [
 //return the global display manager with the given id, null if not found
 //
 function getEntryManager(baseUrl) {
+    //check for the embed label
+    var toks = baseUrl.split(";");
+    var name = null;
+    if(toks.length>1) {
+        baseUrl = toks[0];
+        name = toks[1];
+    }
+
+
     if(window.globalEntryManagers==null) {
         window.globalEntryManagers = {};
     }
     var manager =  window.globalEntryManagers[baseUrl];
     if(manager == null) {
         manager = new EntryManager(baseUrl);
+        if(name!=null) {
+            manager.name = name;
+        }
         window.globalEntryManagers[baseUrl] = manager;
     }
     return manager;
@@ -58,9 +70,21 @@ function EntryManager(repositoryRoot) {
             getHostname: function() {
                 return this.hostname;
             },
+            
             getName: function() {
                 if(this.name!=null) return this.name;
-                return this.repositoryRoot;
+                if(this.repositoryRoot.indexOf("/") == 0)  {
+                    return this.name  = "This RAMADDA";
+                }
+                var url  = this.repositoryRoot;
+                //Do the a trick
+                var parser = document.createElement('a');
+                parser.href = url;
+                var host   = parser.hostname;
+                var path = parser.pathname;
+                //if its the default then just return the host;
+                if(path == "/repository") return host;
+                return this.name = host+": " + path;
             },
             getId: function() {
                 return this.repositoryRoot;

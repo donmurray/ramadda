@@ -200,6 +200,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                             }
                             });
 
+                this.jq(ID_REPOSITORY).selectBoxIt({});
                 this.jq(ID_REPOSITORY).change(function() {
                         var entryManager = getEntryManager(theDisplay.jq(ID_REPOSITORY).val());
                         theDisplay.setEntryManager(entryManager);
@@ -360,18 +361,23 @@ function RamaddaSearcher(displayManager, id, type, properties) {
 
                 var extra =   HtmlUtil.formTable();
 
-                var ramaddas = ["http://ramadda.org/repository","http://community.ramadda.org/repository/repos/data"];
+                var ramaddas = ["http://ramadda.org/repository;ramadda.org","http://community.ramadda.org/repository/repos/data;Community data site","http://community.ramadda.org/repository"];
                 if(ramaddas.length>0) {
-                    var select  = HtmlUtil.openTag(TAG_SELECT,[ATTR_ID, this.getDomId(ID_REPOSITORY)]);
+                    ramaddas.unshift(this.getEntryManager().getId());
+
+                    var select  = HtmlUtil.openTag(TAG_SELECT,[ATTR_ID, this.getDomId(ID_REPOSITORY), ATTR_CLASS,"display-repositories-select"]);
+                    var icon = ramaddaBaseUrl +"/icons/favicon.png";
                     for(var i=0;i<ramaddas.length;i++) {
                         var entryManager = getEntryManager(ramaddas[i]);
-                        var attrs = [ATTR_TITLE,"",ATTR_VALUE,entryManager.getId()];
+                        var attrs = [ATTR_TITLE,"",ATTR_VALUE,entryManager.getId(),
+                                     "data-iconurl",icon];
                         if(this.getEntryManager().getId() == entryManager.getId()) {
                             attrs.push("selected");
                             attrs.push(null);
                         }
+                        var label = 
                         select += HtmlUtil.tag(TAG_OPTION,attrs,
-                                               entryManager.getHostname());
+                                               entryManager.getName());
                     }
                     select += HtmlUtil.closeTag(TAG_SELECT);
                     extra += HtmlUtil.formEntry("Repository:",select);

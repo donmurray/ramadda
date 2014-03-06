@@ -93,6 +93,8 @@
 }
 
 
+
+
 .display-typelist {
    max-width:200px;
    padding: 0px;
@@ -275,7 +277,11 @@
 }
 
 
-
+.display-repositories-select {
+   max-width:200px;
+   padding: 0px;
+   margin: 0px;
+}
 
 .display-entries-results {
    padding-left: 3px;
