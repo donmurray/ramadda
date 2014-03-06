@@ -129,17 +129,23 @@ function RamaddaD3Display(displayManager, id, properties) {
             initDisplay: function() {
                 this.initUI();
                 this.setTitle(properties.graph.title);
-				
-                var height = this.getProperty("height",300);
+
+                //Note: use innerHeight/innerWidth wiki attributes
+                var width = this.getProperty("innerWidth", 600);
+                var height = this.getProperty("innerHeight",300);
                 var margin = {top: 20, right: 50, bottom: 30, left: 50};
-				
-                var html = HtmlUtil.div([ATTR_ID, this.getDomId(ID_SVG),ATTR_STYLE,"height:" + height +"px;"],"");
+                var divStyle = 
+                    "height:" + height +"px;" +
+                    "width:" + width +"px;";
+                var html = HtmlUtil.div([ATTR_ID, this.getDomId(ID_SVG),ATTR_STYLE,divStyle],"");
                 this.setContents(html);
 
-                // To create dinamic size of the div
+                // To create dynamic size of the div
                 this.displayHeight = parseInt((d3.select("#"+this.getDomId(ID_SVG)).style("height")).split("px")[0])-margin.top-margin.bottom;//this.getProperty("height",300);//d3.select("#"+this.getDomId(ID_SVG)).style("height");//
                 this.displayWidth  = parseInt((d3.select("#"+this.getDomId(ID_SVG)).style("width")).split("px")[0])-margin.left-margin.right;//this.getProperty("width",600);//d3.select("#"+this.getDomId(ID_SVG)).style("width");//
                 	
+                console.log("WxH:" + this.displayHeight +" " + this.displayWidth);
+
                 // To solve the problem with the classess within the class
                 var myThis = this;
                 var zoom = d3.behavior.zoom()
