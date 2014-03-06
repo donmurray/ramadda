@@ -78,7 +78,10 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 return html;
             },
             handleEventMapClick: function (source,args) {
-                this.data.handleEventMapClick(this, source, args.lon,args.lat);
+                var pointData =   this.dataCollection.getList();
+                for(var i=0;i<pointData.length;i++) {
+                    pointData[i].handleEventMapClick(this, source, args.lon,args.lat);
+                }
             },
             handleEventRecordSelection: function(source, args) {
                 //TODO: don't do this in index space, do it in time or space space

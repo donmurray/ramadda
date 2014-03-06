@@ -85,7 +85,6 @@ function DisplayThing(argId, argProperties) {
         if(typeof  argProperties[i]  == "string") {
             if(argProperties[i] == "true") argProperties[i] =true;
             else if(argProperties[i] == "false") argProperties[i] =false;
-            else continue;
         }
     }
 
@@ -116,10 +115,9 @@ function DisplayThing(argId, argProperties) {
                 map = nextMap;
             }
         }
-        $.extend(this, argProperties);
     }
 
-
+    $.extend(this, argProperties);
 
     RamaddaUtil.defineMembers(this, {
             objectId: argId,

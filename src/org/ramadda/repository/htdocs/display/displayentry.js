@@ -104,6 +104,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
     var SUPER;
     RamaddaUtil.inherit(this, SUPER = new RamaddaEntryDisplay(displayManager, id, type, properties));
 
+
     var metadataTypesAttr= this.getProperty("metadataTypes","enum_tag:Tag");
     //look for type:value:label, or type:label,
     var toks  = metadataTypesAttr.split(",");
