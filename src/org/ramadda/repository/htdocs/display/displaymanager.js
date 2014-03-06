@@ -283,7 +283,9 @@ function DisplayManager(argId,argProperties) {
 
            },
            createDisplay: function(type, props) {
-                if(props == null) props ={};
+               if(props == null) {
+                   props ={};
+               }
                 if(props.data!=null) {
                     var haveItAlready = false;
                     for(var i=0;i<this.dataList.length;i++) {
