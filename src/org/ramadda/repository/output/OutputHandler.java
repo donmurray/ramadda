@@ -956,7 +956,8 @@ public class OutputHandler extends RepositoryManager {
         String type      = request.getString(ARG_SELECTTYPE, "");
         String elementId = entry.getId();
         String value     = (entry.isGroup()
-                            ? ((Entry) entry).getFullName()
+                            //getFullName
+                            ? ((Entry) entry).getName()
                             : getEntryDisplayName(entry));
         value = value.replace("'", "\\'");
 
