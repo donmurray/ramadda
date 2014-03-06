@@ -55,11 +55,12 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
                      
                  }
                  var entryMenuButton = this.getEntryMenuButton(entry);
+                 /*
                  entryMenuButton =  HtmlUtil.onClick(this.getGet()+".showEntryDetails(event, '" + entry.getId() +"');", 
                                                HtmlUtil.image(ramaddaBaseUrl+"/icons/downdart.png", 
                                                               [ATTR_CLASS, "display-dialog-button", ATTR_ID,  this.getDomId(ID_MENU_BUTTON + entry.getId())]));
 
-
+                 */
 
                  toolbarItems.push(entryMenuButton);
                  return HtmlUtil.div([ATTR_CLASS,"display-entry-toolbar",ATTR_ID,

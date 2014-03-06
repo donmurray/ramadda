@@ -961,8 +961,10 @@ function RepositoryMap(mapId, params) {
     }
 
     this.removePolygon = function(line) {
-        this.lines.removeAllFeatures();
-        this.lines.removeFeatures([line]);
+        if (this.lines) {
+            this.lines.removeAllFeatures();
+            this.lines.removeFeatures([line]);
+        }
     }
 
     this.addPolygon = function(id, points, attrs) {
