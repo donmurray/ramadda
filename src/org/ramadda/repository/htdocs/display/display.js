@@ -62,7 +62,6 @@ function DisplayThing(argId, argProperties) {
     if(argProperties == null) {
        argProperties = {};
     }
-
     
     //check for booleans as strings
     for(var i in argProperties) {
@@ -74,30 +73,35 @@ function DisplayThing(argId, argProperties) {
     }
 
 
-
-    $.extend(this, argProperties);
-
     //Now look for the structured foo.bar=value
     for(var key  in argProperties) {
         var toks = key.split(".");
         if(toks.length<=1) {
             continue;
         }
-        var map = this; 
-        var lastTok;
+        var map = argProperties;
+        var topMap  = map;
+        //graph.axis.foo=bar
         var v = argProperties[key];
+        if(v == "true") v = true;
+        else if(v == "false") v = false;
         for(var i=0;i<toks.length;i++) {
             var tok = toks[i];
-            lastTok = tok;
-            if(i<toks.length-1) {
-                map[tok]  = {};
+            if(i == toks.length-1) {
+                map[tok] = v;
+                break;
+            }
+            var nextMap = map[tok];
+            if(nextMap == null) {
+                map[tok] = {};
                 map = map[tok];
-            } else {
-                map[tok]  = v;
+            }  else {
+                map = nextMap;
             }
         }
-        $.extend(this, map);
+        $.extend(this, argProperties);
     }
+
 
 
     RamaddaUtil.defineMembers(this, {

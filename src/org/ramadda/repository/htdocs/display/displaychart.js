@@ -81,7 +81,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 this.data.handleEventMapClick(this, source, args.lon,args.lat);
             },
             handleEventRecordSelection: function(source, args) {
-                var chartType = this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
+                //TODO: don't do this in index space, do it in time or space space
                 if(source==this) {
                     return;
                 }
