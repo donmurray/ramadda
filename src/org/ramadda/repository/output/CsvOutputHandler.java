@@ -304,6 +304,9 @@ public class CsvOutputHandler extends OutputHandler {
         s = s.replaceAll("\n", " ");
         //quote the columns that have commas in them
         if(s.indexOf(",")>=0) {
+            //Not sure how to escape the quotes
+            s = s.replaceAll("\"", "'");
+            //wrap in a quote
             s = "\"" + s +"\"";
         }
         //s = s.replaceAll(",", "%2C");
