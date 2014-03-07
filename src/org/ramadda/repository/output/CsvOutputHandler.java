@@ -302,7 +302,11 @@ public class CsvOutputHandler extends OutputHandler {
         s = s.replaceAll("\r\n", " ");
         s = s.replaceAll("\r", " ");
         s = s.replaceAll("\n", " ");
-        s = s.replaceAll(",", "%2C");
+        //quote the columns that have commas in them
+        if(s.indexOf(",")>=0) {
+            s = "\"" + s +"\"";
+        }
+        //s = s.replaceAll(",", "%2C");
 
         return s;
     }
