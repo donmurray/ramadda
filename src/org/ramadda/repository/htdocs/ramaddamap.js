@@ -79,10 +79,9 @@ function RepositoryMap(mapId, params) {
         mapId = "map";
     }
 
-
     $.extend(this, {
             sourceProjection:sphericalMercatorCS,
-            //sourceProjection: earthCS,
+                //sourceProjection: earthCS,
                 displayProjection: earthCS,
                 mapDivId: mapId,
                 showScaleLine : true,
@@ -101,6 +100,7 @@ function RepositoryMap(mapId, params) {
                 selectorBox: null,
                 selectorMarker: null,
                 listeners: [],
+                initialLayers: [],
                 });
     $.extend(this, params);
 
@@ -110,6 +110,16 @@ function RepositoryMap(mapId, params) {
             }
      });
 
+
+    RamaddaUtil.defineMembers(this,  {
+            addLayer: function(layer) {
+                if(this.map!=null) {
+                    this.map.addLayer(layer);
+                } else {
+                    this.initialLayers.push(layer);
+                }
+            }
+        });
 
     this.addImageLayer = function(name, url, north,west,south,east, width,height) {
         //Things go blooeey with lat up to 90
@@ -385,10 +395,10 @@ function RepositoryMap(mapId, params) {
             sf.activate();
         }
 
-        if (this.initialLines) {
-            this.map.addLayer(this.initialLines);
-            this.initialLines = null;
+        for(var i=0;i<this.initialLayers.length;i++) {
+            this.map.addLayer(this.initialLayers[i]);
         }
+        this.initialLayers = [];
 
         if (doRegion) {
             this.addRegionSelectorControl();
@@ -831,6 +841,7 @@ function RepositoryMap(mapId, params) {
     }
 
 
+
     this.addMarker = function(id, location, iconUrl, text, size, voffset) {
         if(size == null) size = 18;
         if(voffset ==null) voffset = 0;
@@ -924,7 +935,6 @@ function RepositoryMap(mapId, params) {
         var bounds = new OpenLayers.Bounds(west, Math.max(south, -maxLatValue),
                 east, Math.min(north, maxLatValue));
         var projBounds = this.transformLLBounds(bounds);
-
         box = new OpenLayers.Marker.Box(projBounds);
         var theMap = this;
 
@@ -937,11 +947,47 @@ function RepositoryMap(mapId, params) {
         box.setBorder(args["color"]);
         box.id = id;
         this.boxes.addMarker(box);
+        var attrs =   {
+            fillColor: "red",
+            fillOpacity:1.0,
+            pointRadius : 5, 
+            zIndex: 20,
+        };
+
+        this.addPoint(id, north, west, attrs);
+        this.addPoint(id, south, west, attrs);
+        this.addPoint(id, north, east, attrs);
+        this.addPoint(id, south, east, attrs);
 
         if (args["zoomToExtent"]) {
             this.centerOnMarkers(bounds);
         }
         return box;
+    }
+
+
+    this.addPoint = function(id, lat,lon, attrs) {
+
+        if(this.circles == null) {
+            this.circles =  new OpenLayers.Layer.Vector("Circles Layer");
+            this.addLayer(this.circles);
+        }
+
+        var cstyle = OpenLayers.Util.extend( {},  OpenLayers.Feature.Vector.style['default']);
+        $.extend(cstyle, {
+                strokeColor : "red",
+                strokeWidth : 0,
+                pointRadius : 10, 
+                fillColor: "green",
+                fillOpacity: 0.5}
+            );
+        if (attrs) {
+            $.extend(cstyle, attrs);
+        }
+        var center = new OpenLayers.Geometry.Point(lon, lat);
+        center.transform(this.displayProjection, this.sourceProjection);
+        var point = new OpenLayers.Feature.Vector(center, null, cstyle);
+        return this.circles.addFeatures( [point]);
     }
 
 
@@ -967,10 +1013,15 @@ function RepositoryMap(mapId, params) {
         }
     }
 
+    var cnt = 0;
+
     this.addPolygon = function(id, points, attrs) {
+
+
         for(var i =0;i<points.length;i++) {
             points[i].transform(this.displayProjection, this.sourceProjection);
         }
+
 
         var base_style = OpenLayers.Util.extend( {},
                 OpenLayers.Feature.Vector.style['default']);
@@ -983,23 +1034,31 @@ function RepositoryMap(mapId, params) {
             }
         }
 
+
+
+
+        var pointLayer = new OpenLayers.Layer.Vector("Point Layer");
+
+
         if (!this.lines) {
             // this.lines = new OpenLayers.Layer.Vector("Lines", {style:
             // base_style});
             this.lines = new OpenLayers.Layer.PointTrack("Lines", {
                 style : base_style
             });
-            if (this.map) {
-                this.map.addLayer(this.lines);
-            } else {
-                this.initialLines = this.lines;
-            }
+            this.addLayer(this.lines);
+
             /*
              * var sf = new OpenLayers.Control.SelectFeature(this.lines,{
              * onSelect: function(o) { alert(o) } }); this.map.addControl(sf);
              * sf.activate();
              */
         }
+
+
+
+
+
         var lineString = new OpenLayers.Geometry.LineString(points);
         var line = new OpenLayers.Feature.Vector(lineString, null, style);
         var theMap = this;

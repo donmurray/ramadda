@@ -11,9 +11,12 @@
      <property name="form.date.show" value="false"/>
      <property name="form.area.show" value="false"/>
 
-     <column name="software_type" label="Software Type"  type="enumerationplus" values="Visualization,Analysis,Server,Other" cansearch="true" />
+     <column name="software_use" label="Software Use"  type="enumerationplus" values="Visualization,Analysis,Other" cansearch="true" />
+     <column name="software_type" label="Software Type"  type="enumerationplus" values="Desktop,Server" cansearch="true" />
      <column name="os" label="Operating System"  type="enumerationplus" values="Windows,Unix,Both,Other" cansearch="true" />
+     <column name="license" label="License"  type="enumerationplus" values="Open Source,Commercial" cansearch="true" />
      <column name="capabilities" label="Capabilities"  size="1024" rows="5" cansearch="true" />
+
      <wiki><![CDATA[
 == Package: {{name}} ==
 

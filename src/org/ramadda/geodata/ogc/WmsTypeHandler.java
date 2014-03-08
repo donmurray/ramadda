@@ -22,24 +22,25 @@ package org.ramadda.geodata.ogc;
 
 
 import org.ramadda.repository.*;
+import org.ramadda.repository.metadata.Metadata;
 import org.ramadda.repository.output.*;
 import org.ramadda.repository.type.*;
 
+import ucar.unidata.util.WmsUtil;
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.xml.XmlUtil;
+import java.io.*;
 
 import org.w3c.dom.*;
 
+import java.util.List;
+import java.util.ArrayList;
 
 /**
  * A place holder class that provides services for WMS URL entry types.
  * Right now this does nothing but we could use it to provide a new defalt html display
  */
-public class WmsTypeHandler extends GenericTypeHandler {
-
-
-    /**
-     * ctor
-     */
-    public WmsTypeHandler() {}
+public class WmsTypeHandler extends ExtensibleGroupTypeHandler {
 
 
     /**
@@ -53,5 +54,66 @@ public class WmsTypeHandler extends GenericTypeHandler {
             throws Exception {
         super(repository, node);
     }
+
+
+
+    public void initializeNewEntry(Entry entry)
+            throws Exception {
+        super.initializeNewEntry(entry);
+        String url = entry.getResource().getPath();
+        InputStream fis =  getStorageManager().getFileInputStream(url);
+        Element root = XmlUtil.getRoot(fis);
+        IOUtil.close(fis);
+        Element service = XmlUtil.findChild(root, "Service");
+        if(service == null) return;
+        entry.setName(XmlUtil.getGrandChildText(service, WmsUtil.TAG_TITLE,entry.getName()));
+        if(entry.getDescription().length()==0) {
+            entry.setDescription(XmlUtil.getGrandChildText(service, "Abstract",entry.getDescription()));
+        }
+        addKeywords(entry, service);
+        List<Entry> children = new ArrayList<Entry>();
+        entry.putProperty("entries", children);
+        List layers =   XmlUtil.findDescendants(root, "Layer");
+        TypeHandler layerTypeHandler = getRepository().getTypeHandler("type_wms_layer");
+
+        for(int i=0;i<layers.size();i++) {
+            Element layer = (Element) layers.get(i);
+            
+            
+        }
+
+    }
+
+    @Override
+    public void doFinalEntryInitialization(Request request, Entry entry)  {
+        try {
+            super.doFinalEntryInitialization(request, entry);
+            List<Entry> childrenEntries = (List<Entry>) entry.getProperty("entries");
+            if(childrenEntries == null) return;
+            
+        
+        } catch (Exception exc) {
+            throw new RuntimeException(exc);
+        }
+    }
+
+
+
+    private void addKeywords(Entry entry, Element service) throws Exception {
+        Element keyWords = XmlUtil.findChild(service, "KeywordList");
+        if(keyWords!=null) {
+            List children = XmlUtil.findChildren(keyWords, "Keyword");
+            for(int i=0;i<children.size();i++) {
+                String text = XmlUtil.getChildText((Element) children.get(i));
+                entry.addMetadata(new Metadata(getRepository().getGUID(),
+                                               entry.getId(), "content.keyword", false, text,
+                                               "", "", "", ""));
+                    
+            }
+        }
+    }
+
+
+
 
 }

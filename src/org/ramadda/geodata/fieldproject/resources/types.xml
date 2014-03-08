@@ -217,22 +217,17 @@
      <property name="icon" value="/fieldproject/map_magnify.png"/>
      <property name="html.type.show" value="false"/>
      <property name="html.date.show" value="false"/>
-
      <property name="form.resource.show" value="false"/>
      <property name="form.date.show" value="false"/>
-
      <property name="form.area.show" value="false"/>
      <property name="form.location.show" value="true"/>
      <property name="form.datatype.show" value="false"/>
      <property name="form.altitude.show" value="false"/>
-
      <property name="search.tabs" value="list,map"/>
      <property name="search.form.date.show" value="false"/>
 
-
      <column label="Description" group="Facilities" name="facilities_description"  size="1000" rows="5"   canexport="false"  showlabel="false"/>
      <column label="Research Logistics" group="Facilities" name="facilities_score" type="enumeration" values="0:na,1,2,3,4,5" cansearch="true"/>
-
      <column label="Lodging" group="Facilities" name="lodging" rows="3"    xxxcanexport="false"  size="500" changetype="true" />
      <column label="Communications" group="Facilities" name="communications" rows="3"    xxxcanexport="false"  size="500" changetype="true"  />
      <column label="Vehicles" group="Facilities" name="vehicles" rows="3"    xxxcanexport="false"  size="500" changetype="true"  />
@@ -240,16 +235,12 @@
      <column label="Equipment" group="Facilities" name="equipment" rows="3"    xxxcanexport="false"  size="500" changetype="true"  />
      <column label="Usable Space" group="Facilities" name="usable_space" rows="3"    xxxcanexport="false"  size="500" changetype="true"  />
      <column label="URLs" group="Facilities" name="facilities_url" rows="3" size="500" changetype="true"  type="url"   xxxcanexport="false"   />
-
-
      <column group="Accessibility"  name="access_description" label="Description" size="1000"  rows="5"   xxxcanexport="false"   showlabel="false"/>
      <column label="Transportation" group="Accessibility" name="access_score" type="enumeration" values="0:na,1,2,3,4,5" cansearch="true"/>
      <column label="URLs" group="Accessibility" name="access_url" rows="3" size="500" changetype="true"   type="url"   xxxcanexport="false" />
-
      <column group="Research Record"  name="research_description" label="Description" size="1000"  rows="5"   xxxcanexport="false"   showlabel="false"/>
      <column label="Observatory" group="Research Record" name="research_score" type="enumeration" values="0:na,1,2,3,4,5" cansearch="true"/>
      <column label="URLs" group="Research Record" name="research_url" rows="3" size="500" changetype="true"   type="url"   xxxcanexport="false"   />
-
      <column group="Data Availability"  name="data_description" label="Description" size="1000" rows="5"   xxxcanexport="false"   showlabel="false"/>
      <column label="Data Access" group="Data Availability" name="data_score" type="enumeration" values="0:na,1,2,3,4,5" cansearch="true"/>
      <column label="URLs" group="Data Availability" name="data_url" rows="3" size="500" changetype="true"   type="url"   xxxcanexport="false" />
