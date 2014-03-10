@@ -113,18 +113,9 @@ public class EdgarFilingTypeHandler extends GenericTypeHandler {
         };
         for(int i=0;i<patterns.length;i++) {
             String value = StringUtil.findPattern(header, patterns[i]);
-if(value!=null) value = value.trim();
+            if(value!=null) value = value.trim();
             values[i] =  value;
-            System.err.println ("value:" + value);
         }
-
-        /*
-		COMPANY CONFORMED NAME:			INTERNATIONAL BUSINESS MACHINES CORP
-
-        */
-
-
-
     }
 
 
