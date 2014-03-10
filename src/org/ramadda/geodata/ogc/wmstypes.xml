@@ -1,6 +1,6 @@
 <types>
 
-  <type name="type_wms_capabilities"  description="WMS Capabilities" category="GIS Data" handler="org.ramadda.geodata.ogc.WmsTypeHandler">  
+  <type name="type_wms_capabilities"  description="WMS Capabilities" category="GIS Data" handler="org.ramadda.geodata.ogc.WmsCapabilitiesTypeHandler" pattern=".*service=WMS.*request=GetCapabilities.*">  
      <property name="icon" value="/icons/globe.jpg"/>
      <property name="form.date.show" value="false"/>
      <property name="form.file.show" value="false"/>
@@ -8,11 +8,17 @@
    </type>
 
 
-  <type name="type_wms_layer"  description="WMS Capabilities" category="GIS Data" handler="org.ramadda.geodata.ogc.WmsTypeHandler">  
-     <property name="icon" value="/icons/globe.jpg"/>
+  <type name="type_wms_layer"  description="WMS Layer" category="GIS Data" handler="org.ramadda.geodata.ogc.WmsLayerTypeHandler" foruser="false">  
+     <property name="icon" value="/ogc/layer.png"/>
      <property name="form.date.show" value="false"/>
      <property name="form.file.show" value="false"/>
      <property name="form.datatype.show" value="false"/>
+     <column name="base_url"  type="string" label="Base URL"/>
+     <column name="layer_name"  type="string" label="Layer Name"/>
+     <column name="version"  type="string" label="Version"/>
+     <column name="epsg"  type="string" label="EPSG"/>
+     <column name="format"  type="string" label="Format"/>
+
    </type>
 
 </types>
