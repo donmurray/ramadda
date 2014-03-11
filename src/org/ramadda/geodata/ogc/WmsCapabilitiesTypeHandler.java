@@ -98,7 +98,7 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
             entry.setDescription(XmlUtil.getGrandChildText(service,
                     "Abstract", entry.getDescription()));
         }
-        addKeywords(entry, service);
+        addMetadata(entry, service);
         Element capabilityNode = XmlUtil.findChild(root, WmsUtil.TAG_CAPABILITY);
         if(capabilityNode == null) {
             logError("WMS: No capability node", null);
@@ -164,8 +164,8 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
             imageUrl += "&" + HtmlUtils.arg("BBOX",minx +"," + miny +"," + maxx +"," + maxy, false);
             imageUrl += "&width=400&height=400";
 
-            System.err.println("name:" + name + " title:" + title);            
-            System.err.println("url:" + imageUrl);
+            //            System.err.println("name:" + name + " title:" + title);            
+            //            System.err.println("url:" + imageUrl);
             Resource resource = new Resource(imageUrl, Resource.TYPE_URL);
             Date now  = new Date();
             Date date  = now;
@@ -215,6 +215,33 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
 
         } catch (Exception exc) {
             throw new RuntimeException(exc);
+        }
+    }
+
+
+
+    private String getText(Element node, String path, String dflt) throws Exception {
+        Element child = XmlUtil.findDescendantFromPath(node, path);
+        if(child !=null) {
+            return XmlUtil.getChildText(child);
+        }
+        return dflt;
+
+    }
+
+
+
+    private void addMetadata(Entry entry, Element service) throws Exception {
+        addKeywords(entry, service);
+        String person = getText(service, "ContactInformation.ContactPersonPrimary.ContactPerson", null);
+        String org = getText(service, "ContactInformation.ContactOrganization", "");
+        String position = getText(service, "ContactInformation.ContactPosition", "");
+        String email = getText(service, "ContactInformation.ContactElectronicMailAddress", "");
+        System.err.println ("person:" + person +" org:" + org +" pos:" +  position +" " + email);
+        if(person!=null) {
+            entry.addMetadata(new Metadata(getRepository().getGUID(),
+                                           entry.getId(), "project_person", false, person, position,
+                                           org, email, ""));
         }
     }
 
