@@ -199,6 +199,10 @@ public class CsvOutputHandler extends OutputHandler {
             //            }
         }
 
+        Hashtable<String,Column> columnMap = null;
+
+
+
         for (Entry entry : entries) {
             if (sb.length() == 0) {
                 String headerString = header.toString();
@@ -231,6 +235,9 @@ public class CsvOutputHandler extends OutputHandler {
                 sb.append(headerString);
                 sb.append("\n");
             }
+
+            Object[] values =
+                entry.getTypeHandler().getEntryValues(entry);
 
             int colCnt = 0;
             for (String field : fieldNames) {
@@ -279,8 +286,6 @@ public class CsvOutputHandler extends OutputHandler {
                     List<Column> columns =
                         entry.getTypeHandler().getColumns();
                     if (columns != null) {
-                        Object[] values =
-                            entry.getTypeHandler().getEntryValues(entry);
                         int cnt = 0;
                         for (int col = 0; col < columns.size(); col++) {
                             Column column = columns.get(col);
@@ -303,7 +308,27 @@ public class CsvOutputHandler extends OutputHandler {
                         }
                     }
                 } else {
-                    sb.append("unknown:" + field);
+                    if(columnMap==null) {
+                        columnMap = new Hashtable<String, Column>();
+                        List<Column> columns =
+                            entry.getTypeHandler().getColumns();
+                        if (columns != null) {
+                            for (int col = 0; col < columns.size(); col++) {
+                                Column column = columns.get(col);
+                                if ( !column.getCanExport()) {
+                                    continue;
+                                }
+                                columnMap.put(column.getName(), column);
+                            }
+                        }
+                    }
+                    Column column = columnMap.get(field);
+                    if(column!=null) {
+                        String s = sanitize(column.getString(values));
+                        sb.append(s);
+                    } else {
+                        sb.append("unknown:" + field);
+                    }
                 }
             }
             sb.append("\n");
