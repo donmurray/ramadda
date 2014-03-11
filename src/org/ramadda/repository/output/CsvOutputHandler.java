@@ -139,12 +139,35 @@ public class CsvOutputHandler extends OutputHandler {
             throws Exception {
 
         String delimiter = request.getString(ARG_DELIMITER, ",");
-        String fieldsArg = request.getString(ARG_FIELDS,
-        //                "name,id,type,entry_url,north,south,east,west,url,fields");
-        "name,id,type,entry_url,latitude,longitude,south,east,west,url,fields");
-        StringBuffer sb            = new StringBuffer();
-        List<String> fields = StringUtil.split(fieldsArg, ",", true, true);
-        int[]        maxStringSize = null;
+        String fieldsArg =
+            request.getString(
+                ARG_FIELDS,
+                "name,id,type,entry_url,north,south,east,west,url,fields");
+        StringBuffer sb          = new StringBuffer();
+        StringBuffer header      = new StringBuffer();
+        List<String> toks = StringUtil.split(fieldsArg, ",", true, true);
+
+        List<String> fieldNames  = new ArrayList<String>();
+        List<String> fieldLabels = new ArrayList<String>();
+        for (int i = 0; i < toks.size(); i++) {
+            String       tok   = toks.get(i);
+            String       name  = tok;
+            String       label = tok;
+            List<String> pair  = StringUtil.splitUpTo(tok, ";", 2);
+            if (pair.size() > 1) {
+                name  = pair.get(0);
+                label = pair.get(1);
+            }
+            fieldNames.add(name);
+            fieldLabels.add(label);
+            if (header.length() > 0) {
+                header.append(",");
+            }
+            header.append(label);
+        }
+
+
+        int[] maxStringSize = null;
         for (Entry entry : entries) {
             List<Column> columns = entry.getTypeHandler().getColumns();
             if (columns == null) {
@@ -171,14 +194,15 @@ public class CsvOutputHandler extends OutputHandler {
         }
 
         if (maxStringSize != null) {
-            for (int i = 0; i < maxStringSize.length; i++) {
-                System.err.println("i:" + i + " " + maxStringSize[i]);
-            }
+            //            for (int i = 0; i < maxStringSize.length; i++) {
+            //                System.err.println("i:" + i + " " + maxStringSize[i]);
+            //            }
         }
 
         for (Entry entry : entries) {
             if (sb.length() == 0) {
-                if (fields.contains("fields")) {
+                String headerString = header.toString();
+                if (fieldNames.contains("fields")) {
                     List<Column> columns =
                         entry.getTypeHandler().getColumns();
 
@@ -200,16 +224,16 @@ public class CsvOutputHandler extends OutputHandler {
                                       ? "(max:" + maxStringSize[col] + ")"
                                       : "");
                         }
-                        fieldsArg = fieldsArg.replace(",fields", tmp);
+                        headerString = headerString.replace(",fields", tmp);
                     }
                 }
                 //                sb.append("#fields=");
-                sb.append(fieldsArg);
+                sb.append(headerString);
                 sb.append("\n");
             }
 
             int colCnt = 0;
-            for (String field : fields) {
+            for (String field : fieldNames) {
                 if (colCnt != 0) {
                     sb.append(delimiter);
                 }
@@ -303,11 +327,11 @@ public class CsvOutputHandler extends OutputHandler {
         s = s.replaceAll("\r", " ");
         s = s.replaceAll("\n", " ");
         //quote the columns that have commas in them
-        if(s.indexOf(",")>=0) {
+        if (s.indexOf(",") >= 0) {
             //Not sure how to escape the quotes
             s = s.replaceAll("\"", "'");
             //wrap in a quote
-            s = "\"" + s +"\"";
+            s = "\"" + s + "\"";
         }
         //s = s.replaceAll(",", "%2C");
 
