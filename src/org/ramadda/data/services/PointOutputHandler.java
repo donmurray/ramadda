@@ -2375,8 +2375,9 @@ public class PointOutputHandler extends RecordOutputHandler {
      * @return _more_
      */
     public boolean canHandleEntry(Entry entry) {
-        //entry.getTypeHandler().isType("lidar") || entry.getTypeHandler().isType("lidar_collection") || 
-        return entry.getTypeHandler().isType("type_point");
+        return 
+            entry.getTypeHandler().isType("type_point") ||
+            entry.getTypeHandler().isType("lidar"); 
     }
 
 
