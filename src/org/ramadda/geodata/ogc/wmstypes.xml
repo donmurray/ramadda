@@ -5,6 +5,39 @@
      <property name="form.date.show" value="false"/>
      <property name="form.file.show" value="false"/>
      <property name="form.datatype.show" value="false"/>
+     <wiki><![CDATA[
+{{noheading}}
+<div class="wiki-h1">{{name}}</div>
+<table width=100% cellspacing=10>
+<tr valign=top>
+<td width=50%>
+<div style="max-height: 400px; overflow-y: auto;">
+{{description wikify="true"}}
+</div>
+
+==WMS Capabilities==
+<table class="formtable">
+{{resource row.label="URL:"  message=""}}
+</table>
+
+{{properties xmetadata.types="!project_pi" message="" }}
+
+</td>
+<td width=50%>
+
+==WMS Layers==
+
+{{map width="400" message="" listentries="true" prefix=""}}
+
+{{tree  details="false" xshowtoggle="false" message=""}}
+
+</td>
+</tr></table>
+
+
+]]>
+</wiki>
+
    </type>
 
 
