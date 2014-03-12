@@ -3660,7 +3660,7 @@ public class EntryManager extends RepositoryManager {
         String mimeType = getRepository().getMimeTypeFromSuffix(
                               IOUtil.getFileExtension(path));
 
-        boolean isImage = ImageUtils.isImage(path);
+        boolean isImage = Utils.isImage(path);
         if (request.defined(ARG_IMAGEWIDTH) && isImage) {
             int width = request.get(ARG_IMAGEWIDTH, 75);
             File thumb = getStorageManager().getThumbFile("entry"

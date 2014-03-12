@@ -23,6 +23,7 @@ package org.ramadda.repository.metadata;
 
 import org.ramadda.repository.*;
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Utils;
 
 
 import org.w3c.dom.*;
@@ -578,7 +579,7 @@ public class MetadataTypeBase extends RepositoryManager {
             }
 
         }
-        if (ImageUtils.isImage(f.toString())) {
+        if (Utils.isImage(f.toString())) {
             tail = tail.replaceAll(" ", "_");
             String path =
                 handler.getRepository().getMetadataManager()
@@ -622,7 +623,7 @@ public class MetadataTypeBase extends RepositoryManager {
             + "/" + tail;
 
 
-        if (ImageUtils.isImage(f.toString())) {
+        if (Utils.isImage(f.toString())) {
             String img = HtmlUtils.img(HtmlUtils.url(path, ARG_ELEMENT,
                              element.getIndex() + "", ARG_ENTRYID,
                              metadata.getEntryId(), ARG_METADATA_ID,

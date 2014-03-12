@@ -29,6 +29,7 @@ import org.ramadda.repository.type.*;
 import org.ramadda.sql.SqlUtil;
 
 import org.ramadda.util.AtomUtil;
+import org.ramadda.util.Utils;
 import org.ramadda.util.HtmlUtils;
 
 
@@ -214,7 +215,7 @@ public class AtomOutputHandler extends OutputHandler {
             links.add(new AtomUtil.Link(AtomUtil.REL_ALTERNATE, selfUrl,
                                         "Web page", "text/html"));
             String resource = entry.getResource().getPath();
-            if (ImageUtils.isImage(resource)) {
+            if (Utils.isImage(resource)) {
                 String imageUrl = request.getAbsoluteUrl(
                                       HtmlUtils.url(
                                           getRepository().URL_ENTRY_GET

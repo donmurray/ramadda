@@ -21,7 +21,7 @@
 package org.ramadda.repository;
 
 
-
+import org.ramadda.util.Utils;
 
 import java.io.File;
 
@@ -192,14 +192,7 @@ public class Resource {
      * @return _more_
      */
     public static boolean isImage(String path) {
-        if (path == null) {
-            return false;
-        }
-        String file = path.toLowerCase();
-
-        return file.endsWith(".jpg") || file.endsWith(".jpeg")
-               || file.endsWith(".gif") || file.endsWith(".png")
-               || file.endsWith(".bmp");
+        return Utils.isImage(path);
     }
 
     /**

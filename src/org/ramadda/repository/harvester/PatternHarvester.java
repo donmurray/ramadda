@@ -1363,7 +1363,7 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
 
         //If it is an image then we create a thumbnail for it in the JpegMetadataHandler
         //else we check if there is a .thm file
-        if ( !ImageUtils.isImage(resource.getPath())) {
+        if ( !Utils.isImage(resource.getPath())) {
             File thumbnail = null;
             File tmp;
             tmp = new File(IOUtil.stripExtension(resource.getPath())

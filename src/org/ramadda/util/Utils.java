@@ -54,11 +54,20 @@ import java.util.regex.Pattern;
 
 public class Utils {
 
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public static Appendable append(Appendable sb, String s) {
         try {
             sb.append(s);
+
             return sb;
-        } catch(java.io.IOException ioe) {
+        } catch (java.io.IOException ioe) {
             throw new RuntimeException(ioe);
         }
     }
@@ -732,6 +741,31 @@ public class Utils {
 
         return sb.toString();
 
+    }
+
+    /**
+     * _more_
+     *
+     * @param path _more_
+     *
+     * @return _more_
+     */
+    public static boolean isImage(String path) {
+        if (path == null) {
+            return false;
+        }
+        path = path.toLowerCase();
+        if (path.endsWith(".jpg") || path.endsWith(".jpeg")
+                || path.endsWith(".gif") || path.endsWith(".png")
+                || path.endsWith(".bmp")) {
+            return true;
+        }
+        //wms layer
+        if (path.startsWith("http") && (path.indexOf("format=image") >= 0)) {
+            return true;
+        }
+
+        return false;
     }
 
 }

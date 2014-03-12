@@ -27,6 +27,7 @@ import org.ramadda.repository.type.*;
 
 import org.ramadda.sql.SqlUtil;
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Utils;
 
 import org.ramadda.util.RssUtil;
 
@@ -241,7 +242,7 @@ public class RssOutputHandler extends OutputHandler {
         for (Entry entry : entries) {
             StringBuffer extra    = new StringBuffer();
             String       resource = entry.getResource().getPath();
-            if (ImageUtils.isImage(resource)) {
+            if (Utils.isImage(resource)) {
                 String imageUrl = request.getAbsoluteUrl(
                                       HtmlUtils.url(
                                           getRepository().URL_ENTRY_GET

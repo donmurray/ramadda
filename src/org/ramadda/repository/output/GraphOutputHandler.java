@@ -31,6 +31,7 @@ import org.ramadda.sql.*;
 
 import org.ramadda.sql.SqlUtil;
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Utils;
 import org.ramadda.util.Json;
 
 
@@ -456,7 +457,7 @@ public class GraphOutputHandler extends OutputHandler {
             return;
         }
         String imageUrl = null;
-        if (ImageUtils.isImage(entry.getResource().getPath())) {
+        if (Utils.isImage(entry.getResource().getPath())) {
             imageUrl =
                 HtmlUtils.url(
                     getRepository().URL_ENTRY_GET + entry.getId()
