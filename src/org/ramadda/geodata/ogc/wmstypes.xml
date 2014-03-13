@@ -27,7 +27,7 @@
 
 ==WMS Layers==
 
-{{map width="400" message="" listentries="true" prefix=""}}
+{{map width="400" message="" listentries="false" prefix=""}}
 
 {{tree  details="false" xshowtoggle="false" message=""}}
 
@@ -41,7 +41,7 @@
    </type>
 
 
-  <type name="type_wms_layer"  description="WMS Layer" category="GIS Data" handler="org.ramadda.geodata.ogc.WmsLayerTypeHandler" foruser="false">  
+  <type name="type_wms_layer"  description="WMS Layer" category="GIS Data" handler="org.ramadda.geodata.ogc.WmsLayerTypeHandler" foruser="true">  
      <property name="icon" value="/ogc/layer.png"/>
      <property name="form.date.show" value="false"/>
      <property name="form.file.show" value="false"/>

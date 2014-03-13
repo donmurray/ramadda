@@ -201,6 +201,9 @@ public class WmsUtils {
     public static final String TAG_BOUNDINGBOX = "BoundingBox";
 
     /** _more_ */
+    public static final String TAG_LATLONBOUNDINGBOX = "LatLonBoundingBox";
+
+    /** _more_ */
     public static final String TAG_ATTRIBUTION = "Attribution";
 
     /** _more_ */

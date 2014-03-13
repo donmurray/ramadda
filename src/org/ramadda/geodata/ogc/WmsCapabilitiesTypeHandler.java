@@ -30,6 +30,8 @@ import org.ramadda.util.HtmlUtils;
 import org.w3c.dom.*;
 
 import ucar.unidata.util.IOUtil;
+
+import ucar.unidata.util.Misc;
 import ucar.unidata.xml.XmlUtil;
 
 import java.io.*;
@@ -143,6 +145,11 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
         TypeHandler layerTypeHandler =
             getRepository().getTypeHandler("type_wms_layer");
 
+        double mnorth = Double.NaN,
+               msouth = Double.NaN,
+               mwest  = Double.NaN,
+               meast  = Double.NaN;
+
         for (int i = 0; i < layers.size(); i++) {
             Element layer    = (Element) layers.get(i);
             Element nameNode = XmlUtil.findChild(layer, WmsUtils.TAG_NAME);
@@ -153,12 +160,20 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
             String name = XmlUtil.getChildText(nameNode);
             String title = XmlUtil.getGrandChildText(layer,
                                WmsUtils.TAG_TITLE, name);
+            String desc = XmlUtil.getGrandChildText(layer,
+                              WmsUtils.TAG_ABSTRACT, "");
 
             String srsAttr  = defaultSrs;
             String imageUrl = getMapUrl;
             imageUrl += "&" + HtmlUtils.arg(WmsUtils.ARG_LAYERS, name, true);
             imageUrl += "&"
                         + HtmlUtils.arg(WmsUtils.ARG_FORMAT, format, true);
+
+            double  north = Double.NaN,
+                    south = Double.NaN,
+                    west  = Double.NaN,
+                    east  = Double.NaN;
+
 
             Element crs = XmlUtil.findChildRecurseUp(layer, WmsUtils.TAG_CRS);
             if (crs != null) {
@@ -173,7 +188,7 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
                 if (srs != null) {
                     imageUrl += "&"
                                 + HtmlUtils.arg(WmsUtils.ARG_SRS,
-                                    srsAttr = XmlUtil.getChildText(crs),
+                                    srsAttr = XmlUtil.getChildText(srs),
                                     true);
                 }
             }
@@ -182,6 +197,22 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
             Element bbox = XmlUtil.findChildRecurseUp(layer,
                                WmsUtils.TAG_BOUNDINGBOX);
             if (bbox == null) {
+                bbox = XmlUtil.findChildRecurseUp(layer,
+                        WmsUtils.TAG_LATLONBOUNDINGBOX);
+                if (bbox != null) {
+                    north = Misc.decodeLatLon(XmlUtil.getAttribute(bbox,
+                            WmsUtils.ATTR_MAXY));
+                    south = Misc.decodeLatLon(XmlUtil.getAttribute(bbox,
+                            WmsUtils.ATTR_MINY));
+                    west = Misc.decodeLatLon(XmlUtil.getAttribute(bbox,
+                            WmsUtils.ATTR_MINX));
+                    east = Misc.decodeLatLon(XmlUtil.getAttribute(bbox,
+                            WmsUtils.ATTR_MAXY));
+
+                }
+            }
+
+            if (bbox == null) {
                 logError("WMS: No BBOX specified: "
                          + XmlUtil.toString(layer), null);
                 System.err.println("WMS: No BBOX specified: "
@@ -189,6 +220,27 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
 
                 continue;
             }
+
+
+
+            Element gbbox = XmlUtil.findChildRecurseUp(layer,
+                                WmsUtils.TAG_EX_GEOGRAPHICBOUNDINGBOX);
+
+
+            if (gbbox != null) {
+                north = Misc.decodeLatLon(XmlUtil.getGrandChildText(gbbox,
+                        WmsUtils.TAG_NORTHBOUNDLATITUDE, ""));
+                south = Misc.decodeLatLon(XmlUtil.getGrandChildText(gbbox,
+                        WmsUtils.TAG_SOUTHBOUNDLATITUDE, ""));
+                east = Misc.decodeLatLon(XmlUtil.getGrandChildText(gbbox,
+                        WmsUtils.TAG_EASTBOUNDLONGITUDE, ""));
+                west = Misc.decodeLatLon(XmlUtil.getGrandChildText(gbbox,
+                        WmsUtils.TAG_WESTBOUNDLONGITUDE, ""));
+            }
+
+
+
+
             String minx = XmlUtil.getAttribute(bbox, WmsUtils.ATTR_MINX);
             String maxx = XmlUtil.getAttribute(bbox, WmsUtils.ATTR_MAXX);
             String miny = XmlUtil.getAttribute(bbox, WmsUtils.ATTR_MINY);
@@ -217,12 +269,31 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
             Entry layerEntry =
                 layerTypeHandler.createEntry(getRepository().getGUID());
 
-            layerEntry.initEntry(title, "", entry, entry.getUser(), resource,
-                                 "", now.getTime(), now.getTime(),
+            if ( !Double.isNaN(north)) {
+                mnorth = Math.max(mnorth, north);
+                msouth = Math.min(msouth, south);
+                meast  = Math.max(meast, east);
+                mwest  = Math.min(mwest, west);
+                layerEntry.setNorth(north);
+                layerEntry.setSouth(south);
+                layerEntry.setEast(east);
+                layerEntry.setWest(west);
+            }
+
+
+            layerEntry.initEntry(title, desc, entry, entry.getUser(),
+                                 resource, "", now.getTime(), now.getTime(),
                                  date.getTime(), date.getTime(), values);
             children.add(layerEntry);
         }
 
+
+        if ( !Double.isNaN(mnorth)) {
+            entry.setNorth(mnorth);
+            entry.setSouth(msouth);
+            entry.setEast(meast);
+            entry.setWest(mwest);
+        }
     }
 
 

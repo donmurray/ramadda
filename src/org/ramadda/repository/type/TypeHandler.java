@@ -1868,6 +1868,16 @@ public class TypeHandler extends RepositoryManager {
             boolean didone = addTypes(request, entry, links, childTypes,
                                       seen);
             didone |= addTypes(request, entry, links, pastTypes, seen);
+
+
+            didone |= addTypesFromEntries(request, entry, links,
+                                          entry.getSubGroups(), seen);
+            didone |= addTypesFromEntries(request, entry, links,
+                                          entry.getSubEntries(), seen);
+
+
+
+
             if (didone) {
                 links.add(makeHRLink(OutputType.TYPE_FILE));
             }
@@ -2071,6 +2081,38 @@ public class TypeHandler extends RepositoryManager {
         hr.setLinkType(mask);
 
         return hr;
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param links _more_
+     * @param entries _more_
+     * @param seen _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private boolean addTypesFromEntries(Request request, Entry entry,
+                                        List<Link> links,
+                                        List<Entry> entries,
+                                        HashSet<String> seen)
+            throws Exception {
+        if (entries == null) {
+            return false;
+        }
+        List<String> types = new ArrayList<String>();
+        for (Entry e : entries) {
+            String type = e.getTypeHandler().getType();
+            if ( !seen.contains(type)) {
+                types.add(type);
+            }
+        }
+
+        return addTypes(request, entry, links, types, seen);
     }
 
 
