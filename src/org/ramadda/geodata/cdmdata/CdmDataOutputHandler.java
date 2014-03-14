@@ -190,7 +190,7 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
     public static final OutputType OUTPUT_GRIDSUBSET =
         new OutputType("data.gridsubset", OutputType.TYPE_FEEDS);
 
-    
+
 
     /** opendap counter */
     Counter opendapCounter = new Counter();
@@ -345,7 +345,8 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
 
         if (getCdmManager().canLoadAsGrid(entry)) {
             addOutputLink(request, entry, links, OUTPUT_GRIDSUBSET_FORM);
-            addOutputLink(request, entry, links, GridPointOutputHandler.OUTPUT_GRIDASPOINT_FORM);
+            addOutputLink(request, entry, links,
+                          GridPointOutputHandler.OUTPUT_GRIDASPOINT_FORM);
         } else if (getCdmManager().canLoadAsTrajectory(entry)) {
             addOutputLink(request, entry, links, OUTPUT_TRAJECTORY_MAP);
         } else if (getCdmManager().canLoadAsPoint(entry)) {
@@ -458,7 +459,8 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
             throws Exception {
         String path     = getPath(request, entry);
         String dodspath = getAbsoluteOpendapUrl(request, entry);
-        if (request.getString(CdmConstants.ARG_FORMAT, "").equals(FORMAT_NCML)) {
+        if (request.getString(CdmConstants.ARG_FORMAT,
+                              "").equals(FORMAT_NCML)) {
 
             /**
              *  This gets hung up calling back into the repository
@@ -1487,10 +1489,12 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
         List<TwoFacedObject> formats = new ArrayList<TwoFacedObject>();
         formats.add(new TwoFacedObject("CSV", FORMAT_CSV));
         formats.add(new TwoFacedObject("KML", FORMAT_KML));
-        String format = request.getString(CdmConstants.ARG_FORMAT, FORMAT_CSV);
-        sb.append(HtmlUtils.formEntry(msgLabel("Format"),
-                                      HtmlUtils.select(CdmConstants.ARG_FORMAT, formats,
-                                          format)));
+        String format = request.getString(CdmConstants.ARG_FORMAT,
+                                          FORMAT_CSV);
+        sb.append(
+            HtmlUtils.formEntry(
+                msgLabel("Format"),
+                HtmlUtils.select(CdmConstants.ARG_FORMAT, formats, format)));
 
         MapInfo map = getRepository().getMapManager().createMap(request,
                           true);
@@ -1524,17 +1528,25 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
         }
         //Add the GridPoint service
         if (getCdmManager().canLoadAsGrid(entry)) {
-            String url = getRepository().getUrlBase() + "/grid/json?" + HtmlUtils.args(new String[]{ARG_ENTRYID , entry.getId(),
-                                                                                                    ARG_LOCATION_LATITUDE,  "${latitude}",
-                                                                                                    ARG_LOCATION_LONGITUDE, "${longitude}"}, false);
+            String url = getRepository().getUrlBase() + "/grid/json?"
+                         + HtmlUtils.args(new String[] {
+                ARG_ENTRYID, entry.getId(), ARG_LOCATION_LATITUDE,
+                "${latitude}", ARG_LOCATION_LONGITUDE, "${longitude}"
+            }, false);
 
-            services.add(new Service("grid.point.json", "Point time series - " + entry.getName(),
-                                     request.getAbsoluteUrl(url), iconUrl("/icons/chart.png")));
-            
+            services.add(
+                new Service(
+                    "grid.point.json",
+                    "Point time series - " + entry.getName(),
+                    request.getAbsoluteUrl(url),
+                    request.getAbsoluteUrl(iconUrl("/icons/chart.png"))));
         }
 
         String url = getAbsoluteOpendapUrl(request, entry);
-        services.add(new Service("opendap", "OPeNDAP Link", url));
+        services.add(
+            new Service(
+                "opendap", "OPeNDAP Link", url,
+                request.getAbsoluteUrl(iconUrl(ICON_OPENDAP))));
     }
 
 
@@ -1553,7 +1565,8 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
         if ( !request.defined(CdmConstants.ARG_FORMAT)) {
             return makePointSubsetForm(request, entry, "");
         }
-        String format = request.getString(CdmConstants.ARG_FORMAT, FORMAT_CSV);
+        String format = request.getString(CdmConstants.ARG_FORMAT,
+                                          FORMAT_CSV);
 
         if (format.equals(FORMAT_CSV)) {
             request.getHttpServletResponse().setContentType("text/csv");
