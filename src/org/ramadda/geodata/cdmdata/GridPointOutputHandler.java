@@ -356,6 +356,7 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
             boolean doingJson = format.equals(FORMAT_JSON);
             if (doingJson) {
                 format = FORMAT_CSV;
+                request.setCORSHeaderOnResponse();
             }
             SupportedFormat            sf   = getSupportedFormat(format);
             PointDataRequestParamsBean pdrb =
@@ -1376,10 +1377,9 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
     public Result processJsonRequest(Request request) throws Exception {
         String prefix = getRepository().getUrlBase() + "/grid/json";
         Entry  entry  = getCdmManager().findEntryFromPath(request, prefix);
-
+        request.setCORSHeaderOnResponse();
         request.put(CdmConstants.ARG_FORMAT, FORMAT_JSON);
         request.put(ARG_OUTPUT, OUTPUT_GRIDASPOINT.getId());
-
         return outputGridAsPoint(request, entry);
     }
 
