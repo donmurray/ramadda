@@ -231,7 +231,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
     private boolean isLuceneEnabled = true;
 
 
-
+    private List<SearchProvider> searchProviders = null;
 
 
     /**
@@ -1297,6 +1297,22 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
         return addHeaderToAncillaryPage(request, result);
     }
 
+    public List[] doSearch(Request request, Appendable searchCriteriaSB) throws Exception {
+        if(searchProviders == null) {
+            List<SearchProvider> tmp = new ArrayList<SearchProvider>();
+            tmp.add(new SearchProvider.RamaddaSearchProvider(getRepository()));
+            searchProviders = tmp;            
+        }
+
+        //TODO: clean up the whole array  of lists and handle multiple search providers
+        for(int i=0;i<searchProviders.size();i++) {
+            SearchProvider searchProvider = searchProviders.get(i);
+            return  searchProvider.getEntries(request, searchCriteriaSB);
+        }
+        return null;
+    }
+
+
     /**
      * _more_
      *
@@ -1356,12 +1372,11 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
         if (textSearch) {
             processLuceneSearch(request, groups, entries);
         } else if (searchThis) {
-            List[] pair = getEntryManager().getEntries(request,
-                              searchCriteriaSB);
+            List[] pair = doSearch(request,
+                                   searchCriteriaSB);
             groups.addAll((List<Entry>) pair[0]);
             entries.addAll((List<Entry>) pair[1]);
         }
-
 
 
         if ((servers != null) && (servers.size() > 0)) {
