@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -443,7 +443,7 @@ public class CatalogOutputHandler extends OutputHandler {
                                             CatalogUtil.TAG_DATASET, null,
                                             new String[] {
                                                 CatalogUtil.ATTR_NAME,
-                        "Latest OPeNDAP Data" });
+                        "Latest " + group.getName() });
                 XmlUtil.create(catalogInfo.doc, CatalogUtil.TAG_PROPERTY,
                                latestDataset,
                                new String[] { CatalogUtil.ATTR_NAME,
@@ -803,13 +803,15 @@ public class CatalogOutputHandler extends OutputHandler {
         File   f    = entry.getFile();
         String path = f.toString();
         path = path.replace("\\", "/");
-
-
+        String entryName = entry.getName();
+        if (doLatest) {
+            entryName = "Latest " + entry.getParentEntry().getName();
+        }
 
         Element dataset = XmlUtil.create(catalogInfo.doc,
                                          CatalogUtil.TAG_DATASET, parent,
                                          new String[] { CatalogUtil.ATTR_NAME,
-                entry.getName() });
+                entryName });
 
         String iconUrl =
             request.getAbsoluteUrl(getPageHandler().getIconUrl(request,
