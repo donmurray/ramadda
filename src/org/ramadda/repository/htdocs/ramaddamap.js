@@ -144,7 +144,8 @@ function RepositoryMap(mapId, params) {
 
     this.addWMSLayer = function(name, url, layer, isBaseLayer) {
         var layer = new OpenLayers.Layer.WMS(name, url, {
-            layers : layer
+                layers : layer,
+                format: "image/png"
         }, {
             wrapDateLine : wrapDatelineDefault
         });

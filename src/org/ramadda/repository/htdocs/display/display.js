@@ -491,7 +491,16 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 }
                 return entry;
             },
-             createDisplay: function(entryId, displayType, jsonUrl) {
+            addMapLayer: function(entryId) {
+                var entry = this.getEntry(entryId);
+                if(entry == null) {
+                    console.log("No entry:" + entryId);
+                    return;
+                }
+                this.getDisplayManager().addMapLayer(this, entry);
+              
+            },
+            createDisplay: function(entryId, displayType, jsonUrl) {
                 var entry = this.getEntry(entryId);
                 if(entry == null) {
                     console.log("No entry:" + entryId);

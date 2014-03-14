@@ -86,7 +86,18 @@ function RamaddaMapDisplay(displayManager, id, properties) {
                     var pair = entries[i];
                     this.handleEventEntriesChanged(pair.source, pair.entries);
                 }
-
+            },
+            addMapLayer: function(source, props) {
+                var entry = props.entry;
+                console.log("addMapLayer:" + entry.getName());
+                if(entry["column.base_url"] == null) {
+                    console.log("No base url:" + entryId);
+                    return;
+                }
+                this.map.addWMSLayer(entry.getName(),       
+                                     entry["column.base_url"],
+                                     entry["column.layer_name"],
+                                     false);
             },
             mapBoundsChanged: function() {
                 var bounds = this.map.map.calculateBounds();

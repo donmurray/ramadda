@@ -109,6 +109,9 @@ function DisplayManager(argId,argProperties) {
            handleEventMapBoundsChanged: function (source,  bounds) {
                this.notifyEvent("handleEventMapBoundsChanged", source, bounds);
            },
+           addMapLayer: function(source, entry) {
+               this.notifyEvent("addMapLayer", source, {entry:entry});
+           },
            handleEventMapClick: function (mapDisplay, lon, lat) {
                 var indexObj = [];
                 var records = null;

@@ -43,6 +43,13 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
                  var toolbarItems = [];
                  toolbarItems.push(HtmlUtil.tag(TAG_A, [ATTR_HREF, entry.getEntryUrl(),"target","_"], 
                                                 HtmlUtil.image(ramaddaBaseUrl +"/icons/application-home.png",["border",0,ATTR_TITLE,"View Entry"])));
+                 if(entry.getType().getId() == "type_wms_layer") {
+                     toolbarItems.push(HtmlUtil.tag(TAG_A, ["onclick", get+".addMapLayer(" + HtmlUtil.sqt(entry.getId()) + ");"],
+                                                            HtmlUtil.image(ramaddaBaseUrl +"/icons/map.png",["border",0,ATTR_TITLE,"Add Map Layer"])));
+
+                 }
+
+
                  var jsonUrl = this.getPointUrl(entry);
                  if(jsonUrl!=null) {
                      toolbarItems.push(HtmlUtil.tag(TAG_A, ["onclick", get+".createDisplay(" + HtmlUtil.sqt(entry.getId()) +"," +
