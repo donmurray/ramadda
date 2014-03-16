@@ -69,6 +69,9 @@ public class WmsUtils {
     /** _more_ */
     public static final String TAG_NAME = "Name";
 
+    /** _more_          */
+    public static final String TAG_STYLE = "Style";
+
     /** _more_ */
     public static final String TAG_TITLE = "Title";
 

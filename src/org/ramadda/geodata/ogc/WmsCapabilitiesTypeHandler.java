@@ -193,35 +193,24 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
                 }
             }
 
+
             //<BoundingBox CRS="EPSG:4326" minx="-180.0" miny="-90" maxx="180.0" maxy="90"/>
-            Element bbox = XmlUtil.findChildRecurseUp(layer,
-                               WmsUtils.TAG_BOUNDINGBOX);
-            if (bbox == null) {
-                bbox = XmlUtil.findChildRecurseUp(layer,
-                        WmsUtils.TAG_LATLONBOUNDINGBOX);
-                if (bbox != null) {
-                    north = Misc.decodeLatLon(XmlUtil.getAttribute(bbox,
-                            WmsUtils.ATTR_MAXY));
-                    south = Misc.decodeLatLon(XmlUtil.getAttribute(bbox,
-                            WmsUtils.ATTR_MINY));
-                    west = Misc.decodeLatLon(XmlUtil.getAttribute(bbox,
-                            WmsUtils.ATTR_MINX));
-                    east = Misc.decodeLatLon(XmlUtil.getAttribute(bbox,
-                            WmsUtils.ATTR_MAXY));
+            Element llbbox = XmlUtil.findChildRecurseUp(layer,
+                                 WmsUtils.TAG_LATLONBOUNDINGBOX);
 
-                }
+
+            System.err.println("layer:" + name + " ll:" + llbbox + " ");
+
+            if (llbbox != null) {
+                north = Misc.decodeLatLon(XmlUtil.getAttribute(llbbox,
+                        WmsUtils.ATTR_MAXY));
+                south = Misc.decodeLatLon(XmlUtil.getAttribute(llbbox,
+                        WmsUtils.ATTR_MINY));
+                west = Misc.decodeLatLon(XmlUtil.getAttribute(llbbox,
+                        WmsUtils.ATTR_MINX));
+                east = Misc.decodeLatLon(XmlUtil.getAttribute(llbbox,
+                        WmsUtils.ATTR_MAXX));
             }
-
-            if (bbox == null) {
-                logError("WMS: No BBOX specified: "
-                         + XmlUtil.toString(layer), null);
-                System.err.println("WMS: No BBOX specified: "
-                                   + XmlUtil.toString(layer));
-
-                continue;
-            }
-
-
 
             Element gbbox = XmlUtil.findChildRecurseUp(layer,
                                 WmsUtils.TAG_EX_GEOGRAPHICBOUNDINGBOX);
@@ -240,11 +229,27 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
 
 
 
+            Element bbox = XmlUtil.findChildRecurseUp(layer,
+                               WmsUtils.TAG_BOUNDINGBOX);
+
+            if (bbox == null) {
+                logError("WMS: No BBOX specified: "
+                         + XmlUtil.toString(layer), null);
+                System.err.println("WMS: No BBOX specified: "
+                                   + XmlUtil.toString(layer));
+
+                continue;
+            }
+
 
             String minx = XmlUtil.getAttribute(bbox, WmsUtils.ATTR_MINX);
             String maxx = XmlUtil.getAttribute(bbox, WmsUtils.ATTR_MAXX);
             String miny = XmlUtil.getAttribute(bbox, WmsUtils.ATTR_MINY);
             String maxy = XmlUtil.getAttribute(bbox, WmsUtils.ATTR_MAXY);
+
+
+
+
             //Don't encode the args
             imageUrl += "&"
                         + HtmlUtils.arg(WmsUtils.ARG_BBOX,
@@ -252,6 +257,19 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
                                         + maxy, false);
             imageUrl += "&" + HtmlUtils.arg(WmsUtils.ARG_WIDTH, "400") + "&"
                         + HtmlUtils.arg(WmsUtils.ARG_HEIGHT, "400");
+
+            //<BoundingBox CRS="EPSG:4326" minx="-180.0" miny="-90" maxx="180.0" maxy="90"/>
+            Element style = XmlUtil.findChildRecurseUp(layer,
+                                WmsUtils.TAG_STYLE);
+            if (style != null) {
+                imageUrl += "&"
+                            + HtmlUtils.arg("styles",
+                                            XmlUtil.getGrandChildText(style,
+                                                WmsUtils.TAG_NAME,
+                                                    "default"));
+            }
+
+
 
             Resource resource = new Resource(imageUrl, Resource.TYPE_URL);
             Date     now      = new Date();
@@ -270,10 +288,19 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
                 layerTypeHandler.createEntry(getRepository().getGUID());
 
             if ( !Double.isNaN(north)) {
-                mnorth = Math.max(mnorth, north);
-                msouth = Math.min(msouth, south);
-                meast  = Math.max(meast, east);
-                mwest  = Math.min(mwest, west);
+                mnorth = Double.isNaN(mnorth)
+                         ? north
+                         : Math.max(mnorth, north);
+                msouth = Double.isNaN(msouth)
+                         ? south
+                         : Math.min(msouth, south);
+                meast  = Double.isNaN(meast)
+                         ? east
+                         : Math.max(meast, east);
+                mwest  = Double.isNaN(mwest)
+                         ? west
+                         : Math.min(mwest, west);
+                //                System.err.println("north:" + north +" south:" + south +" east:" + east +" west:" + west);
                 layerEntry.setNorth(north);
                 layerEntry.setSouth(south);
                 layerEntry.setEast(east);
@@ -289,6 +316,7 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
 
 
         if ( !Double.isNaN(mnorth)) {
+            //            System.err.println("final north:" + mnorth +" south:" + msouth +" east:" + meast +" west:" + mwest);
             entry.setNorth(mnorth);
             entry.setSouth(msouth);
             entry.setEast(meast);
