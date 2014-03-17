@@ -75,7 +75,6 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
         super.initializeNewEntry(entry);
 
         //Read the xml
-
         String url = entry.getResource().getPath();
         System.err.println("URL:" + url);
         InputStream fis  = getStorageManager().getInputStream(url);
@@ -345,6 +344,7 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
             if (childrenEntries == null) {
                 return;
             }
+            entry.putProperty("entries",new ArrayList<Entry>());
             getEntryManager().addNewEntries(request, childrenEntries);
         } catch (Exception exc) {
             throw new RuntimeException(exc);
