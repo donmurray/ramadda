@@ -120,7 +120,7 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
         }
 
         entry.setName(XmlUtil.getGrandChildText(service, WmsUtils.TAG_TITLE,
-                entry.getName()));
+                                                entry.getName()).replaceAll("_"," "));
         if (entry.getDescription().length() == 0) {
             entry.setDescription(XmlUtil.getGrandChildText(service,
                     WmsUtils.TAG_ABSTRACT, entry.getDescription()));
@@ -312,6 +312,7 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
             }
 
 
+            title = title.replaceAll("_", " ");
             layerEntry.initEntry(title, desc, entry, entry.getUser(),
                                  resource, "", now.getTime(), now.getTime(),
                                  date.getTime(), date.getTime(), values);

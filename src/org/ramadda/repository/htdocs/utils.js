@@ -31,6 +31,11 @@ var icon_progress = ramaddaBaseUrl +"/icons/progress.gif";
 var icon_information = ramaddaBaseUrl +"/icons/information.png";
 var icon_folderclosed = ramaddaBaseUrl +"/icons/folderclosed.png";
 var icon_folderopen = ramaddaBaseUrl +"/icons/togglearrowdown.gif";
+
+var icon_tree_open = ramaddaBaseUrl +"/icons/togglearrowdown.gif";
+var icon_tree_closed = ramaddaBaseUrl +"/icons/togglearrowright.gif";
+
+
 var icon_menuarrow = ramaddaBaseUrl +"/icons/downdart.gif";
 var icon_blank = ramaddaBaseUrl +"/icons/blank.gif";
 var uniqueCnt = 0;
@@ -232,6 +237,7 @@ var TAG_UL= "ul";
 var TAG_OL= "ol";
 
 var ATTR_HREF = "href";
+var ATTR_BORDER = "border";
 var ATTR_VALUE = "value";
 var ATTR_TITLE = "title";
 var ATTR_ID = "id";

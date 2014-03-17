@@ -193,7 +193,6 @@ function EntryManager(repositoryRoot) {
                     }
                 }
 
-
                 if(callback==null) {
                     return null;
                 }
@@ -301,12 +300,30 @@ function Entry(props) {
             east: NaN,
             services: [],
             metadata: [],
+            childrenEntries: null,
         });
 
     RamaddaUtil.inherit(this,  props);
     RamaddaUtil.defineMembers(this, {
             getId : function () {
                 return  this.id;
+            },
+            getIsGroup: function() {return this.isGroup;},
+            getChildrenEntries: function(callback) {
+                if(this.childrenEntries !=null) {
+                    return this.childrenEntries;
+                }
+                var theEntry =this;
+                var settings = new  EntrySearchSettings({parent: this.getId()});
+                var jsonUrl = this.getEntryManager().getSearchUrl(settings, OUTPUT_JSON);
+                var myCallback = {
+                    entryListChanged: function(list) {
+                        console.log("callback");
+                        callback(list.getEntries());
+                    }
+                };
+                var entryList = new EntryList(this.getEntryManager(), jsonUrl, myCallback);
+                return null;
             },
             getType: function() {
                 return this.type;
@@ -446,8 +463,12 @@ function EntryList(entryManager, jsonUrl, listener) {
             entries :[],
             map: {},
             listener : listener,
+
+
             getEntry : function(id) {
-                return this.map[id];
+                var entry =  this.map[id];
+                if(entry!=null) return entry;
+                return this.entryManager.getEntry(id);
             },
             getEntries : function() {
                 return this.entries;
@@ -504,6 +525,7 @@ function EntryList(entryManager, jsonUrl, listener) {
                 console.log("JSON error:" +err);
             });
 }
+
 
 
 

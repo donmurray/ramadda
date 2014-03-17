@@ -367,16 +367,22 @@
 //       border-bottom:1px #efefef solid; 
 }
 
-.display-entrylist-entry-main {
-   padding: 5px;
-}
+
 
 .display-entrylist-entry {
+//   padding-left:2px;
+// padding-top:5px;
+   padding:0px;
    margin: 0px;
-   border-bottom: 1px #ccc solid;
+//   border-bottom: 1px #ccc solid;
    cursor:pointer;
 }
 
+
+.display-entrylist-entry-main {
+   padding: 4px;
+   padding: 4px;
+}
 
 .display-entrylist-entry-main:hover {
    background-color: #f0f0f0; 
@@ -384,16 +390,21 @@
 
 
 .display-entrylist-list li:hover { 
-     //background: #f0f0f0; 
+//    background: #f0f0f0; 
 }
 
 
 .display-entrylist-details {
    display: none;
-   border-top : 1px #888 solid;
-   border-bottom : 1px #888 solid;
-   padding: 5px;
-   background-color : #fff;
+//   border-top : 1px #888 solid;
+//   border-bottom : 1px #888 solid;
+    padding: 0px;
+//   background-color : #fff;
+}
+
+
+.display-entrylist-details-inner {
+    padding-left: 16px;
 }
 
 
@@ -418,7 +429,7 @@
    margin:0px;
    padding-left:5px;
    padding-right:5px;
-   background-color: #efefef;
+//   background-color: #efefef;
 }
 
 .display-entry-toolbar img {

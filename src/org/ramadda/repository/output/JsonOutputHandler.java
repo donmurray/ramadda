@@ -237,6 +237,15 @@ public class JsonOutputHandler extends OutputHandler {
         //
         if (entry.isGroup()) {
             Json.attr(items, "isGroup", "true");
+            /*
+            List<Entry> children = getEntryManager().getChildren(request, entry);
+            List<String> ids = new ArrayList<String>();
+            for(Entry child: children) {
+                ids.add(Json.quote(child.getId()));
+            }
+            Json.attr(items, "childEntryIds", Json.list(ids));
+            */
+
         } else {
             Json.attr(items, "isGroup", "false");
         }

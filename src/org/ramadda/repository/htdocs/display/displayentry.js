@@ -9,7 +9,11 @@ var DISPLAY_TIMELINE = "timeline";
 var ID_RESULTS = "results";
 var ID_ENTRIES = "entries";
 var ID_DETAILS = "details";
+var ID_DETAILS_INNER = "detailsinner";
 var ID_DETAILS_MAIN = "detailsmain";
+
+
+var ID_TREE_LINK = "treelink";
 
 addGlobalDisplayType({type: DISPLAY_ENTRYLIST, label:"Entry List",requiresData:false,category:"Entry Displays"});
 addGlobalDisplayType({type: DISPLAY_ENTRYDISPLAY, label:"Entry Display",requiresData:false,category:"Entry Displays"});
@@ -232,11 +236,60 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 }
             },
             hideEntryDetails: function(entryId) {
-                var popupId = "#"+ this.getDomId(ID_DETAILS + entryId);
-                $(popupId).hide();
-                this.currentPopupEntry = null;
+                //                var popupId = "#"+ this.getDomId(ID_DETAILS + entryId);
+                //                $(popupId).hide();
+                //                this.currentPopupEntry = null;
+            },
+            toggleEntryDetails: function(entryId) {
+                var entry = this.entryList.getEntry(entryId);
+                var link = this.jq(ID_TREE_LINK+entry.getId());
+                var details = this.jq(ID_DETAILS + entry.getId());
+                var detailsInner = this.jq(ID_DETAILS_INNER + entry.getId());
+                var open = link.attr("tree-open")=="true";
+                if(open) {
+                    link.attr("src", icon_tree_closed);
+                } else {
+                    link.attr("src", icon_tree_open);
+                }
+                link.attr("tree-open", open?"false":"true");
+
+                var hereBefore  =  details.attr("has-content") !=null;
+                details.attr("has-content","true");
+                if(hereBefore) {
+                    //                    detailsInner.html(HtmlUtils.image(icon_progress));
+                } else {
+                    if(entry.getIsGroup()) {
+                        detailsInner.html(HtmlUtil.image(icon_progress));
+                        var theDisplay = this;
+                        var callback = function(entries) {
+                            theDisplay.displayChildren(entry, entries);
+                        };
+                        var entries = entry.getChildrenEntries(callback);
+                    } else {
+                        detailsInner.html(this.getEntryHtml(entry));
+                    }
+                }
+
+
+                if(open) {
+                    details.hide();
+                } else {
+                    details.show();
+                }
+
+            },
+            displayChildren: function(entry, entries) {
+                var detailsInner = this.jq(ID_DETAILS_INNER + entry.getId());
+                if(entries.length==0) {
+                    detailsInner.html(this.getEntryHtml(entry));
+                } else {
+                    var entriesHtml  = this.getEntriesTree(entries);
+                    detailsInner.html(entriesHtml);
+                    this.addEntrySelect();
+                }
             },
             showEntryDetails: function(event, entryId, src,leftAlign) {
+                if(true) return;
                 var entry = this.entryList.getEntry(entryId);
                 var popupId = "#"+ this.getDomId(ID_DETAILS+ entryId);
                 if(this.currentPopupEntry ==  entry) {
@@ -291,20 +344,20 @@ function RamaddaSearcher(displayManager, id, type, properties) {
         },
         submitSearchForm: function() {
               this.haveSearched = true;
-                this.searchSettings.text = this.getFieldValue(this.getDomId(ID_TEXT_FIELD), this.searchSettings.text);
-                if(this.haveTypes) {
-                    this.searchSettings.entryType  = this.getFieldValue(this.getDomId(ID_TYPE_FIELD), this.searchSettings.entryType);
-                }
-                this.searchSettings.clearAndAddType(this.searchSettings.entryType);
+              this.searchSettings.text = this.getFieldValue(this.getDomId(ID_TEXT_FIELD), this.searchSettings.text);
+              if(this.haveTypes) {
+                  this.searchSettings.entryType  = this.getFieldValue(this.getDomId(ID_TYPE_FIELD), this.searchSettings.entryType);
+              }
+              this.searchSettings.clearAndAddType(this.searchSettings.entryType);
                 
-                if(this.areaWidget) {
-                    this.areaWidget.setSearchSettings(this.searchSettings);
-                }
-                if(this.dateRangeWidget) {
-                    this.dateRangeWidget.setSearchSettings(this.searchSettings);
-                }
-                this.searchSettings.metadata = [];
-                for(var i=0;i<this.metadataTypeList.length;i++) {
+              if(this.areaWidget) {
+                  this.areaWidget.setSearchSettings(this.searchSettings);
+              }
+              if(this.dateRangeWidget) {
+                  this.dateRangeWidget.setSearchSettings(this.searchSettings);
+              }
+              this.searchSettings.metadata = [];
+              for(var i=0;i<this.metadataTypeList.length;i++) {
                     var metadataType  = this.metadataTypeList[i];
                     var value = metadataType.getValue();
                     if(value == null) {
@@ -513,7 +566,6 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 var hostname = this.getEntryManager().getHostname();
                 for(var i = 0;i< types.length;i++) {
                     var type = types[i];
-
                     //                    var style = " background: URL(" + type.getIcon() +") no-repeat;";
 
                     var icon =                     type.getIcon();
@@ -647,6 +699,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
 
 function RamaddaEntrylistDisplay(displayManager, id, properties) {
     var ID_LIST = "list";
+
     var SUPER;
     RamaddaUtil.inherit(this, SUPER = new RamaddaSearcher(displayManager, id, DISPLAY_ENTRYLIST, properties));
     addRamaddaDisplay(this);
@@ -693,9 +746,8 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
             entryListChanged: function(entryList) {
                 SUPER.entryListChanged.apply(this,[entryList]);
-                var rowClass = "entryrow_" + this.getId()
                 var entries = this.entryList.getEntries();
-                var html = "";
+
                 if(entries.length==0) {
                     this.searchSettings.skip=0;
                     this.searchSettings.max=50;
@@ -707,42 +759,34 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 }
                 this.writeHtml(ID_RESULTS, this.getResultsHeader(entries));
 
-                html += HtmlUtil.openTag(TAG_OL,[ATTR_CLASS,"display-entrylist-list", ATTR_ID,this.getDomId(ID_LIST)]);
-                html  += "\n";
+
                 var get = this.getGet();
                 this.writeHtml(ID_FOOTER_LEFT,"");
                 if(this.footerRight!=null) {
                     this.writeHtml(ID_FOOTER_RIGHT, this.footerRight);
                 }
 
-                for(var i=0;i<entries.length;i++) {
-                    var entry = entries[i];
-                    var toolbar = this.makeEntryToolbar(entry);
-                    var icon = entry.getIconImage([ATTR_TITLE,"View entry"]);
-                    var link  =  HtmlUtil.tag(TAG_A,[ATTR_HREF, entry.getEntryUrl()],icon);
-                    var entryName = entry.getName();
-                    if(entryName.length>100) {
-                        entryName = entryName.substring(0,99)+"...";
-                    }
-                    var left =  HtmlUtil.div([ATTR_STYLE," white-space: nowrap;  overflow-x:none; max-width:300px;"],link +" " +  entryName);
+                var entriesHtml  = this.getEntriesTree(entries);
 
-                    var details = HtmlUtil.div([ATTR_ID,this.getDomId(ID_DETAILS+entry.getId()), ATTR_CLASS,"display-entry-details"],"");
-
-                    var mainLine = HtmlUtil.div([ATTR_ID, this.getDomId(ID_DETAILS_MAIN+ entry.getId()), ATTR_CLASS,"display-entrylist-entry-main"], HtmlUtil.leftRight(left,toolbar,"60%","30%"));
-                    var line = HtmlUtil.div([ATTR_ID,this.getDomId("entryinner_" + entry.getId())], mainLine + details);
-                    html  += HtmlUtil.tag(TAG_LI,[ATTR_ID,
-                                                this.getDomId("entry_" + entry.getId()),
-                                                "entryid",entry.getId(), ATTR_CLASS,"display-entrylist-entry ui-widget-content " + rowClass], line);
-                    html  += "\n";
-                }
+                var html = "";
+                html += HtmlUtil.openTag(TAG_OL,[ATTR_CLASS,"display-entrylist-list", ATTR_ID,this.getDomId(ID_LIST)]);
+                html += entriesHtml;
                 html += HtmlUtil.closeTag(TAG_OL);
-
                 this.writeHtml(ID_ENTRIES, html);
+                this.addEntrySelect();
+
+                this.getDisplayManager().handleEventEntriesChanged(this, entries);
+            },
+            addEntrySelect: function() {
                 var theDisplay   =this;
-                var entryRows = $("#" + this.getDomId(ID_LIST) +"  .display-entrylist-entry");
+                //                var entryRows = $("#" + this.getDomId(ID_LIST) +"  .display-entrylist-entry-main");
+                var entryRows = $("#" + this.getDomId(ID_DISPLAY_CONTENTS) +"  .display-entrylist-entry-main");
+
+                entryRows.unbind();
                 entryRows.mouseover(function(event){
                         var entryId = $( this ).attr('entryid');
                         var toolbarId = theDisplay.getEntryToolbarId(entryId);
+
                         var toolbar = $("#" + toolbarId);
                         toolbar.show();
                         var myalign = 'right center';
@@ -794,8 +838,40 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                         },
                             
                     });
+            },
+            getEntriesTree:function (entries) {
+                var html = "";
+                var rowClass = "entryrow_" + this.getId()
+                for(var i=0;i<entries.length;i++) {
+                    var entry = entries[i];
+                    var toolbar = this.makeEntryToolbar(entry);
+                    var icon = entry.getIconImage([ATTR_TITLE,"View entry"]);
+                    var link  =  HtmlUtil.tag(TAG_A,[ATTR_HREF, entry.getEntryUrl()],icon);
+                    var entryName = entry.getName();
+                    if(entryName.length>100) {
+                        entryName = entryName.substring(0,99)+"...";
+                    }
 
-                this.getDisplayManager().handleEventEntriesChanged(this, entries);
+                    var  arrow = HtmlUtil.image(icon_tree_closed,[ATTR_BORDER,"0",
+                                                                  "tree-open","false",
+                                                                  ATTR_ID,
+                                                                  this.getDomId(ID_TREE_LINK+entry.getId())]);
+                    var open =  HtmlUtil.onClick(this.getGet()+".toggleEntryDetails('" + entry.getId()+ "');", 
+                                                 arrow);
+
+
+                    var left =   HtmlUtil.div([ATTR_STYLE," white-space: nowrap;  overflow-x:none; max-width:300px;"],open +" " + link +" " +  entryName);
+
+                    var details = HtmlUtil.div([ATTR_ID,this.getDomId(ID_DETAILS+entry.getId()), ATTR_CLASS,"display-entrylist-details"],HtmlUtil.div([ATTR_CLASS,"display-entrylist-details-inner",ATTR_ID,this.getDomId(ID_DETAILS_INNER+entry.getId())],""));
+
+                    var mainLine = HtmlUtil.div([ATTR_ID, this.getDomId(ID_DETAILS_MAIN+ entry.getId()), ATTR_CLASS,"display-entrylist-entry-main", "entryid",entry.getId()], HtmlUtil.leftRight(left,toolbar,"60%","30%"));
+                    var line = HtmlUtil.div([ATTR_ID, this.getDomId("entryinner_" + entry.getId())], mainLine + details);
+                    html  += HtmlUtil.tag(TAG_LI,[ATTR_ID,
+                                                this.getDomId("entry_" + entry.getId()),
+                                                  "entryid",entry.getId(), ATTR_CLASS,"display-entrylist-entry ui-widget-content " + rowClass], line);
+                    html  += "\n";
+                }
+                return html;
             }
         });
 }
