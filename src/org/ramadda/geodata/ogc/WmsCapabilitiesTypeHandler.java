@@ -75,7 +75,9 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
         super.initializeNewEntry(entry);
 
         //Read the xml
-        String      url  = entry.getResource().getPath();
+
+        String url = entry.getResource().getPath();
+        System.err.println("URL:" + url);
         InputStream fis  = getStorageManager().getInputStream(url);
         Element     root = XmlUtil.getRoot(fis);
         IOUtil.close(fis);
@@ -163,9 +165,12 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
             String desc = XmlUtil.getGrandChildText(layer,
                               WmsUtils.TAG_ABSTRACT, "");
 
-            String srsAttr  = defaultSrs;
-            String imageUrl = getMapUrl;
-            imageUrl += "&" + HtmlUtils.arg(WmsUtils.ARG_LAYERS, name, true);
+            String srsAttr   = defaultSrs;
+            String imageUrl  = getMapUrl;
+            String layersArg = name.replaceAll(" ", "%20");
+            imageUrl += "&"
+                        + HtmlUtils.arg(WmsUtils.ARG_LAYERS, layersArg,
+                                        false);
             imageUrl += "&"
                         + HtmlUtils.arg(WmsUtils.ARG_FORMAT, format, true);
 
@@ -199,7 +204,7 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
                                  WmsUtils.TAG_LATLONBOUNDINGBOX);
 
 
-            System.err.println("layer:" + name + " ll:" + llbbox + " ");
+            //            System.err.println("layer:" + name + " ll:" + llbbox + " ");
 
             if (llbbox != null) {
                 north = Misc.decodeLatLon(XmlUtil.getAttribute(llbbox,
