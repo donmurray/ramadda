@@ -320,9 +320,10 @@ public class EntryManager extends RepositoryManager {
      * @return _more_
      */
     public String getFullEntryShowUrl(Request request) {
-        if(request == null) {
-            request = new Request(getRepository(),null);
+        if (request == null) {
+            request = new Request(getRepository(), null);
         }
+
         return request.getAbsoluteUrl(getRepository().URL_ENTRY_SHOW);
     }
 
@@ -700,6 +701,7 @@ public class EntryManager extends RepositoryManager {
         StringBuilder sb = new StringBuilder(Json.list(types));
         request.setReturnFilename("types.json");
         request.setCORSHeaderOnResponse();
+
         return new Result("", sb, Json.MIMETYPE);
     }
 
@@ -4978,7 +4980,12 @@ public class EntryManager extends RepositoryManager {
         NodeList entryChildren = XmlUtil.getElements(node);
         for (Element entryChild : (List<Element>) entryChildren) {
             String tag = entryChild.getTagName();
-            if (tag.equals(TAG_METADATA)) {
+            if (tag.equals("tag")) {
+                entry.addMetadata(new Metadata(getRepository().getGUID(),
+                        entry.getId(), "enum_tag", true,
+                        XmlUtil.getChildText(entryChild), "", "", "", ""));
+
+            } else if (tag.equals(TAG_METADATA)) {
                 getMetadataManager().processMetadataXml(entry, entryChild,
                         files, internal);
             } else if (tag.equals(TAG_DESCRIPTION)) {}
@@ -5464,8 +5471,6 @@ public class EntryManager extends RepositoryManager {
      * @param entry _more_
      * @param typeMask _more_
      * @param links _more_
-     * @param return NullIfNoneMatch _more_
-     * @param returnNullIfNoneMatch _more_
      * @param header _more_
      *
      * @return _more_

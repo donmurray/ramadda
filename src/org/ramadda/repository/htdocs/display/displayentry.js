@@ -372,6 +372,24 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 var jsonUrl = this.makeSearchUrl();
                 this.entryList = new EntryList(this.getEntryManager(), jsonUrl, this, this.entryList);
                 this.updateForSearching(jsonUrl);
+
+                /*****
+                var url = "http://mirador.gsfc.nasa.gov/cgi-bin/mirador/granlist.pl?format=atom&startTime=2010-12-01&endTime=2011-01-01&osLocation=-75%2C45%2C-81%2C47&maxgranules=4&page=1&dataSet=AIRX2RET.005";
+                url = "http://localhost:8080/repository/entry/show/Top.xml?entryid=ff29d75c-8baf-4b17-b121-6c0e10eb9c60&output=atom";
+                console.log("calling atom");
+                $.ajax({
+                        type: "GET",
+                        url: url,
+                        dataType: "xml",
+                        success: function(xml) {
+                            console.log("got it");
+                        },
+                        error: function(jqXHR, textStatus, errorThrown ) {
+                            console.log("error:" + errorThrown + " " + textStatus);
+                        }
+                    });
+                *****/
+
             },
             updateForSearching: function(jsonUrl) {
                 var outputs = this.getEntryManager().getSearchLinks(this.searchSettings);
@@ -637,6 +655,9 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     var field  ="";
                     var id = this.getDomId(ID_COLUMN+col.getName());
                     var savedValue  = this.savedValues[id];
+                    if(savedValue == null) {
+                        savedValue = this.jq(ID_COLUMN+col.getName()).val();
+                    }
                     if(savedValue == null) savedValue = "";
                     if(col.isEnumeration()) {
                         field  = HtmlUtil.openTag(TAG_SELECT,[ATTR_ID, id]);
@@ -815,7 +836,6 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                             var entryId = ui.selected.getAttribute('entryid');
                             theDisplay.hideEntryDetails(entryId);
                             var entry = theDisplay.entryList.getEntry(entryId);
-                            //                            console.log("selected:" +  entry);
                             if(entry == null) return;
 
                             var zoom = null;
