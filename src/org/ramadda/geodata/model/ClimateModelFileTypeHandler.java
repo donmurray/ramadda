@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -47,14 +47,14 @@ public class ClimateModelFileTypeHandler extends GranuleTypeHandler {
     /** the default file regex */
     public static final String FILE_REGEX =
         "([^_]+)_([^_]+)_(.*)_(ens..|mean|sprd|clim)(_([^_]+))?.nc";
-    
+
     /** local regex */
     private String myRegex = FILE_REGEX;
-    
+
     /** the regex property */
     public static final String PROP_FILE_PATTERN = "filepattern";
 
-    /** pattern for file names*/
+    /** pattern for file names */
     //public static final Pattern pattern = Pattern.compile(FILE_REGEX);
     protected Pattern pattern = null;
 
@@ -117,6 +117,7 @@ public class ClimateModelFileTypeHandler extends GranuleTypeHandler {
         Matcher m = pattern.matcher(filename);
         if ( !m.find()) {
             System.err.println("no match");
+
             return;
         }
         String var        = m.group(1);
@@ -149,18 +150,18 @@ public class ClimateModelFileTypeHandler extends GranuleTypeHandler {
      * Test it
      *
      * @param args  the arguments
-    public static void main(String[] args) {
-        for (String arg : args) {
-            Matcher m = pattern.matcher(arg);
-            if ( !m.find()) {
-                System.err.println("no match x");
-            } else {
-                System.err.println("match");
-                String var = m.group(1);
-                System.err.println("var:" + var);
-            }
-        }
-    }
+     * public static void main(String[] args) {
+     *   for (String arg : args) {
+     *       Matcher m = pattern.matcher(arg);
+     *       if ( !m.find()) {
+     *           System.err.println("no match x");
+     *       } else {
+     *           System.err.println("match");
+     *           String var = m.group(1);
+     *           System.err.println("var:" + var);
+     *       }
+     *   }
+     * }
      */
 
 

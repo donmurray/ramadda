@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -109,6 +109,22 @@ public class NCLModelPlotDataProcess extends DataProcess {
     }
 
     /**
+     * _more_
+     *
+     * @param request _more_
+     * @param js _more_
+     * @param formVar _more_
+     *
+     * @throws Exception _more_
+     */
+    public void initFormJS(Request request, Appendable js, String formVar)
+            throws Exception {
+        js.append(formVar
+                  + ".addDataProcess(new NCLModelPlotDataProcess());\n");
+    }
+
+
+    /**
      * Add this process to the form
      *
      * @param request  the Request
@@ -136,9 +152,9 @@ public class NCLModelPlotDataProcess extends DataProcess {
             sb.append(
                 HtmlUtils.formEntry(
                     Repository.msgLabel("Plot As"),
-                    HtmlUtils.radio(ARG_NCL_OUTPUT, "diff", true)
+                    HtmlUtils.radio(ARG_NCL_OUTPUT, "diff", request.get(ARG_NCL_OUTPUT, true))
                     + Repository.msg("Difference")
-                    + HtmlUtils.radio(ARG_NCL_OUTPUT, "comp", false)
+                    + HtmlUtils.radio(ARG_NCL_OUTPUT, "comp", request.get(ARG_NCL_OUTPUT, false))
                     + Repository.msg("Comparison")));
         }
         sb.append(
@@ -146,19 +162,19 @@ public class NCLModelPlotDataProcess extends DataProcess {
                 Repository.msgLabel("Plot Type"),
                 HtmlUtils.radio(
                     NCLOutputHandler.ARG_NCL_PLOTTYPE, "png",
-                    true) + Repository.msg("Map")
+                    request.get(NCLOutputHandler.ARG_NCL_PLOTTYPE, true)) + Repository.msg("Map")
                           + HtmlUtils.radio(
                               NCLOutputHandler.ARG_NCL_PLOTTYPE, "kmz",
-                              false) + Repository.msg("Google Earth")
+                              request.get(NCLOutputHandler.ARG_NCL_PLOTTYPE, false)) + Repository.msg("Google Earth")
         /*
                + "<br>"
                + HtmlUtils.radio(
-                   NCLOutputHandler.ARG_NCL_PLOTTYPE,
+               NCLOutputHandler.ARG_NCL_PLOTTYPE,
                    "timeseries",
-                   false) + Repository.msg(
+                   request.get(NCLOutputHandler.ARG_NCL_PLOTTYPE, false)) + Repository.msg(
                        "Time Series") + HtmlUtils.radio(
                        NCLOutputHandler.ARG_NCL_PLOTTYPE,
-                       "pdf", false) + Repository.msg(
+                       "pdf", request.get(NCLOutputHandler.ARG_NCL_PLOTTYPE, false)) + Repository.msg(
                            "PDF")
          */
         ));
@@ -168,20 +184,21 @@ public class NCLModelPlotDataProcess extends DataProcess {
             sb.append(
                 HtmlUtils.formEntry(
                     Repository.msgLabel("Plot Units"),
-                    HtmlUtils.radio(ARG_NCL_UNITS, "K", true)
+                    HtmlUtils.radio(ARG_NCL_UNITS, "K", request.get(ARG_NCL_UNITS, true))
                     + Repository.msg("Kelvin")
-                    + HtmlUtils.radio(ARG_NCL_UNITS, "degC", false)
+                    + HtmlUtils.radio(ARG_NCL_UNITS, "degC", request.get(ARG_NCL_UNITS, false))
                     + Repository.msg("Celsius")));
         } else if (units.equals("kg m-2 s-1") || units.equals("mm/s")) {
             sb.append(
                 HtmlUtils.formEntry(
                     Repository.msgLabel("Output Units"),
-                    HtmlUtils.radio(ARG_NCL_UNITS, "mm/s", false)
+                    HtmlUtils.radio(ARG_NCL_UNITS, "mm/s", request.get(ARG_NCL_UNITS, false))
                     + Repository.msg("mm/s")
-                    + HtmlUtils.radio(ARG_NCL_UNITS, "mm/day", true)
+                    + HtmlUtils.radio(ARG_NCL_UNITS, "mm/day", request.get(ARG_NCL_UNITS, true))
                     + Repository.msg("mm/day")));
         }
         // Contour interval
+        //TODO: get the default value from the request
         StringBuffer contourSB = new StringBuffer();
         contourSB.append(Repository.msg("Interval: "));
         contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CINT, ""));

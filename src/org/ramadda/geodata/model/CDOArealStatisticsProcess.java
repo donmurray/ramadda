@@ -71,6 +71,22 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
     }
 
     /**
+     * _more_
+     *
+     * @param request _more_
+     * @param js _more_
+     * @param formVar _more_
+     *
+     * @throws Exception _more_
+     */
+    public void initFormJS(Request request, Appendable js, String formVar)
+            throws Exception {
+        js.append(formVar
+                  + ".addDataProcess(new CDOArealStatisticsProcess());\n");
+    }
+
+
+    /**
      * Add to form
      *
      * @param request  the Request
@@ -394,14 +410,20 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @param sb       the HTML
      */
     public void addStatsWidget(Request request, StringBuffer sb) {
-        sb.append(HtmlUtils.hidden(CDOOutputHandler.ARG_CDO_PERIOD,
-                                   CDOOutputHandler.PERIOD_TIM));
+
+        sb.append(
+            HtmlUtils.hidden(
+                CDOOutputHandler.ARG_CDO_PERIOD,
+                request.getString(
+                    CDOOutputHandler.ARG_CDO_PERIOD,
+                    CDOOutputHandler.PERIOD_TIM)));
         sb.append(
             HtmlUtils.formEntry(
                 Repository.msgLabel("Statistic"),
                 HtmlUtils.select(
                     CDOOutputHandler.ARG_CDO_STAT,
-                    CDOOutputHandler.STAT_TYPES)));
+                    CDOOutputHandler.STAT_TYPES,
+                    request.getString(CDOOutputHandler.ARG_CDO_STAT, null))));
     }
 
     /**
@@ -455,7 +477,9 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                     sb.append(
                         HtmlUtils.hidden(
                             CdmDataOutputHandler.ARG_CALENDAR,
-                            cal.toString()));
+                            request.getString(
+                                CdmDataOutputHandler.ARG_CALENDAR,
+                                cal.toString())));
                 }
             }
             SortedSet<String> uniqueYears =
@@ -498,16 +522,21 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                     Repository.msgLabel("Years"), yrLabel
                     + HtmlUtils.select(
                         CDOOutputHandler.ARG_CDO_STARTYEAR
-                        + yearNum, years, years.get(0)) + HtmlUtils.space(3)
-                            + Repository.msgLabel("End")
-                            + HtmlUtils.select(
-                                CDOOutputHandler.ARG_CDO_ENDYEAR
-                                + yearNum, years, years.get(
-                                    endIndex)) + HtmlUtils.p()
-                                        + Repository.msgLabel("or List")
-                                        + HtmlUtils.input(
-                                            CDOOutputHandler.ARG_CDO_YEARS
-                                            + yearNum, "", 20)));
+                        + yearNum, years, request.getString(
+                            CDOOutputHandler.ARG_CDO_STARTYEAR, years.get(
+                                0))) + HtmlUtils.space(3)
+                                     + Repository.msgLabel("End")
+                                     + HtmlUtils.select(
+                                         CDOOutputHandler.ARG_CDO_ENDYEAR
+                                         + yearNum, years, request.getString(
+                                             CDOOutputHandler.ARG_CDO_ENDYEAR, years.get(
+                                                 endIndex))) + HtmlUtils.p()
+                                                     + Repository.msgLabel(
+                                                         "or List") + HtmlUtils.input(
+                                                             CDOOutputHandler.ARG_CDO_YEARS
+                                                                 + yearNum, request.getString(
+                                                                     CDOOutputHandler.ARG_CDO_YEARS
+                                                                         + yearNum, ""), 20)));
             grid++;
         }
     }

@@ -17,6 +17,7 @@
 * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 * DEALINGS IN THE SOFTWARE.
 */
+
 package org.ramadda.geodata.model;
 
 
@@ -59,7 +60,7 @@ import java.util.TreeSet;
  *
  *
  * @version        $version$, Wed, Feb 12, '14
- * @author         Enter your name here...    
+ * @author         Enter your name here...
  */
 public class CDOTimeSeriesProcess extends CDODataProcess {
 
@@ -72,6 +73,21 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
      */
     public CDOTimeSeriesProcess(Repository repository) throws Exception {
         super(repository, "CDO_TIMESERIES", "Time Series");
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param js _more_
+     * @param formVar _more_
+     *
+     * @throws Exception _more_
+     */
+    public void initFormJS(Request request, Appendable js, String formVar)
+            throws Exception {
+        js.append(formVar + ".addDataProcess(new CDOTimeSeriesProcess());\n");
     }
 
     /**
@@ -394,10 +410,13 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
         //System.out.println("Name: " + outputName.toString());
 
         Resource resource = new Resource(outFile, Resource.TYPE_LOCAL_FILE);
-        TypeHandler myHandler = getRepository().getTypeHandler("type_single_point_grid_netcdf",false, true);
+        TypeHandler myHandler =
+            getRepository().getTypeHandler("type_single_point_grid_netcdf",
+                                           false, true);
         Entry outputEntry = new Entry(myHandler, true, outputName.toString());
         outputEntry.setResource(resource);
-        getOutputHandler().getEntryManager().writeEntryXmlFile(request, outputEntry);
+        getOutputHandler().getEntryManager().writeEntryXmlFile(request,
+                outputEntry);
 
         //return new DataProcessOperand(outputEntry.getName(), outputEntry);
         return new DataProcessOperand(outputName.toString(), outputEntry);

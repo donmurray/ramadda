@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -90,8 +90,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
     private static final String PROP_CDO_PATH = "cdo.path";
 
     /** prefix for cdo args */
-    private static final String ARG_CDO_PREFIX = "cdo.";
-
+    private static final String ARG_CDO_PREFIX = "cdo_";
 
     /** operation identifier */
     public static final String ARG_CDO_OPERATION = ARG_CDO_PREFIX
@@ -556,9 +555,14 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
             HtmlUtils.formEntry(
                 msgLabel("Statistic"),
                 msgLabel("Period")
-                + HtmlUtils.select(ARG_CDO_PERIOD, PERIOD_TYPES)
-                + HtmlUtils.space(3) + msgLabel("Type")
-                + HtmlUtils.select(ARG_CDO_STAT, STAT_TYPES)));
+                + HtmlUtils.select(
+                    ARG_CDO_PERIOD, PERIOD_TYPES,
+                    request.getString(
+                        ARG_CDO_PERIOD, null)) + HtmlUtils.space(3)
+                            + msgLabel("Type")
+                            + HtmlUtils.select(
+                                ARG_CDO_STAT, STAT_TYPES,
+                                request.getString(ARG_CDO_STAT, null))));
     }
 
     /**
@@ -590,7 +594,8 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
         //for (GridDatatype grid : dataset.getGrids()) {
         //    varList.add(new TwoFacedObject(grid.getDescription(), grid.getName()));
         //}
-        //varsb.append(HtmlUtils.select(ARG_CDO_PARAM, varList));
+
+        //varsb.append(HtmlUtils.select(ARG_CDO_PARAM, varList, request.getString(ARG_CDO_PARAM, null)));
         GridDatatype grid = grids.get(0);
         varsb.append(grid.getDescription());
         if (grid.getZDimension() != null) {
@@ -611,7 +616,8 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
                         : lev);
                 levels.add(new TwoFacedObject(label, String.valueOf(lev)));
             }
-            varsb.append(HtmlUtils.select(levelArg, levels));
+            varsb.append(HtmlUtils.select(levelArg, levels,
+                                          request.getString(levelArg, null)));
             varsb.append(HtmlUtils.space(2));
             varsb.append("hPa");
         }
@@ -627,9 +633,12 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param sb       the StringBuffer to add to
      */
     private void addInfoWidget(Request request, StringBuffer sb) {
-        sb.append(HtmlUtils.formEntry(msgLabel("Months"),
-                                      HtmlUtils.select(ARG_CDO_OPERATION,
-                                          INFO_TYPES)));
+        sb.append(
+            HtmlUtils.formEntry(
+                msgLabel("Months"),
+                HtmlUtils.select(
+                    ARG_CDO_OPERATION, INFO_TYPES,
+                    request.getString(ARG_CDO_OPERATION, null))));
     }
 
     /**
@@ -647,8 +656,12 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
             CalendarDate cd  = dates.get(0);
             Calendar     cal = cd.getCalendar();
             if (cal != null) {
-                sb.append(HtmlUtils.hidden(CdmDataOutputHandler.ARG_CALENDAR,
-                                           cal.toString()));
+                sb.append(
+                    HtmlUtils.hidden(
+                        CdmDataOutputHandler.ARG_CALENDAR,
+                        request.getString(
+                            CdmDataOutputHandler.ARG_CALENDAR,
+                            cal.toString())));
             }
         }
         //if ((dates != null) && (!dates.size() > 0)) {
@@ -729,21 +742,28 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      */
     public static void makeMonthsWidget(Request request, StringBuffer sb,
                                         List<CalendarDate> dates) {
+        /*
+        HtmlUtils.radio(ARG_CDO_MONTHS, "all", request.get(ARG_CDO_MONTHS, true))+msg("All")+
+        HtmlUtils.space(2)+
+        HtmlUtils.radio(ARG_CDO_MONTHS, "", request.get(ARG_CDO_MONTHS, false))+msg("Season")+
+        HtmlUtils.space(2)+
+        */
         sb.append(
             HtmlUtils.formEntry(
                 msgLabel("Months"),
-                /*
-                HtmlUtils.radio(ARG_CDO_MONTHS, "all", true)+msg("All")+
-                HtmlUtils.space(2)+
-                HtmlUtils.radio(ARG_CDO_MONTHS, "", false)+msg("Season")+
-                HtmlUtils.space(2)+
-                */
                 msgLabel("Start")
-                + HtmlUtils.select(ARG_CDO_STARTMONTH, MONTHS)
-                + HtmlUtils.space(2) + msgLabel("End")
                 + HtmlUtils.select(
-                    ARG_CDO_ENDMONTH, MONTHS,
-                    MONTHS.get(MONTHS.size() - 1).getId().toString())));
+                    ARG_CDO_STARTMONTH, MONTHS,
+                    request.getString(
+                        ARG_CDO_STARTMONTH, null)) + HtmlUtils.space(2)
+                            + msgLabel("End")
+                            + HtmlUtils.select(
+                                ARG_CDO_ENDMONTH, MONTHS,
+                                request.getString(
+                                    ARG_CDO_ENDMONTH,
+                                    MONTHS.get(
+                                        MONTHS.size()
+                                        - 1).getId().toString()))));
     }
 
     /**
@@ -779,9 +799,16 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
             HtmlUtils.formEntry(
                 msgLabel("Years"),
                 msgLabel("Start")
-                + HtmlUtils.select(ARG_CDO_STARTYEAR, years, years.get(0))
-                + HtmlUtils.space(3) + msgLabel("End")
-                + HtmlUtils.select(ARG_CDO_ENDYEAR, years, years.get(years.size()-1))));
+                + HtmlUtils.select(
+                    ARG_CDO_STARTYEAR, years,
+                    request.getString(
+                        ARG_CDO_STARTYEAR, years.get(0))) + HtmlUtils.space(
+                            3) + msgLabel("End")
+                               + HtmlUtils.select(
+                                   ARG_CDO_ENDYEAR, years,
+                                   request.getString(
+                                       ARG_CDO_ENDYEAR,
+                                       years.get(years.size() - 1)))));
     }
 
     /**
@@ -1075,22 +1102,22 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
                                        List<String> commands)
             throws Exception {
 
-        if (request.defined(ARG_CDO_MONTHS) && 
-                request.getString(ARG_CDO_MONTHS).equalsIgnoreCase("all")) { 
+        if (request.defined(ARG_CDO_MONTHS)
+                && request.getString(ARG_CDO_MONTHS).equalsIgnoreCase(
+                    "all")) {
             return;
         }
         if (request.defined(ARG_CDO_STARTMONTH)
                 || request.defined(ARG_CDO_ENDMONTH)) {
-            int          startMonth = request.defined(ARG_CDO_STARTMONTH)
-                                      ? request.get(ARG_CDO_STARTMONTH, 1)
-                                      : 1;
-            int          endMonth   = request.defined(ARG_CDO_ENDMONTH)
-                                      ? request.get(ARG_CDO_ENDMONTH,
-                                          startMonth)
-                                      : startMonth;
+            int startMonth = request.defined(ARG_CDO_STARTMONTH)
+                             ? request.get(ARG_CDO_STARTMONTH, 1)
+                             : 1;
+            int endMonth   = request.defined(ARG_CDO_ENDMONTH)
+                             ? request.get(ARG_CDO_ENDMONTH, startMonth)
+                             : startMonth;
             // if they requested all months, no need to do a select on month
-            if (startMonth == 1 && endMonth == 12) {
-            	return;
+            if ((startMonth == 1) && (endMonth == 12)) {
+                return;
             }
             StringBuffer buf = new StringBuffer(OP_SELMON + "," + startMonth);
             if (endMonth > startMonth) {
@@ -1326,7 +1353,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
             } else if (period.equals(PERIOD_YMON)) {
                 commands.add("-" + PERIOD_YMON + stat);
             }
-        } //else {  // ONLY FOR TESTING
+        }  //else {  // ONLY FOR TESTING
         //    commands.add("-" + PERIOD_TIM + STAT_MEAN);
         //}
 

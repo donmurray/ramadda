@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -71,7 +71,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
     /** timeseries action */
     public static final String ARG_ACTION_TIMESERIES = "action.timeseries";
-    
+
     /** fixed collection id */
     public static final String ARG_COLLECTION = "collection";
 
@@ -115,6 +115,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
      * Get the data processes for this request
      *
      * @param request  the Request
+     * @param action _more_
      *
      * @return  the list of data processes
      *
@@ -125,7 +126,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         //return getTypeHandler().getDataProcessesToRun(request);
         List<DataProcess> processes = new ArrayList<DataProcess>();
         if (action.equals(ARG_ACTION_COMPARE)) {
-            DataProcess       process = new CDOArealStatisticsProcess(repository);
+            DataProcess process = new CDOArealStatisticsProcess(repository);
             if (process.isEnabled()) {
                 processes.add(process);
             }
@@ -134,7 +135,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 processes.add(process);
             }
         } else if (action.equals(ARG_ACTION_TIMESERIES)) {
-            DataProcess       process = new CDOTimeSeriesProcess(repository);
+            DataProcess process = new CDOTimeSeriesProcess(repository);
             if (process.isEnabled()) {
                 processes.add(process);
             }
@@ -158,7 +159,8 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             throws Exception {
 
         //This finds the selected processes
-        List<DataProcess> processesToRun = getDataProcesses(request, ARG_ACTION_COMPARE);
+        List<DataProcess> processesToRun = getDataProcesses(request,
+                                               ARG_ACTION_COMPARE);
 
         //This is the dir under <home>/process
         File processDir = null;
@@ -261,7 +263,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         return new Result(entryUrl);
     }
-    
+
     /**
      * Make the time series
      *
@@ -276,7 +278,8 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             throws Exception {
 
         //This finds the selected processes
-        List<DataProcess> processesToRun = getDataProcesses(request, ARG_ACTION_TIMESERIES);
+        List<DataProcess> processesToRun = getDataProcesses(request,
+                                               ARG_ACTION_TIMESERIES);
 
         //This is the dir under <home>/process
         File processDir = null;
@@ -410,12 +413,14 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
      * handle the request
      *
      * @param request request
+     * @param type _more_
      *
      * @return result
      *
      * @throws Exception on badness
      */
-    public Result handleRequest(Request request, String type) throws Exception {
+    public Result handleRequest(Request request, String type)
+            throws Exception {
 
         if (getDataProcesses(request, type).isEmpty()) {
             throw new RuntimeException(
@@ -449,8 +454,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         File processDir = getStorageManager().createProcessDir();
 
         //If we are searching or comparing then find the selected entries
-        if (request.exists(ARG_ACTION_SEARCH)
-                || request.exists(type)) {
+        if (request.exists(ARG_ACTION_SEARCH) || request.exists(type)) {
             int collectionCnt = 0;
             for (String collection : new String[] { ARG_COLLECTION1,
                     ARG_COLLECTION2 }) {
@@ -523,9 +527,9 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             if (hasOperands) {
                 try {
                     if (type.equals(ARG_ACTION_COMPARE)) {
-                       return doCompare(request, dpi);
+                        return doCompare(request, dpi);
                     } else {
-                       return makeTimeSeries(request, dpi);
+                        return makeTimeSeries(request, dpi);
                     }
                 } catch (Exception exc) {
                     sb.append(
@@ -552,13 +556,13 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         String formId = "selectform" + HtmlUtils.blockCnt++;
         sb.append(HtmlUtils.comment("collection form"));
-
         sb.append(HtmlUtils.importJS(fileUrl("/model/compare.js")));
 
+        String formAttrs = HtmlUtils.attrs(ATTR_ID, formId);
         if (type.equals(ARG_ACTION_COMPARE)) {
-            sb.append(HtmlUtils.form(getCompareUrlPath()));
+            sb.append(HtmlUtils.form(getCompareUrlPath(), formAttrs));
         } else {
-            sb.append(HtmlUtils.form(getTimeSeriesUrlPath()));
+            sb.append(HtmlUtils.form(getTimeSeriesUrlPath(), formAttrs));
         }
 
         List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
@@ -568,19 +572,32 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                                         collection.getId()));
         }
 
+        List<DataProcess> processes = getDataProcesses(request, type);
+
+
         StringBuffer js =
             new StringBuffer("\n//collection form initialization\n");
         js.append("var " + formId + " = new "
                   + HtmlUtils.call("CollectionForm",
-                                   HtmlUtils.squote(formId), HtmlUtils.squote("compare")));
+                                   HtmlUtils.squote(formId),
+                                   HtmlUtils.squote("compare")));
+
+
+
+
+        for (DataProcess process : processes) {
+            process.initFormJS(request, js, formId);
+        }
+
+
         if (type.equals(ARG_ACTION_COMPARE)) {
             sb.append(HtmlUtils.h2("Climate Model Comparison"));
             sb.append(
-            "Plot monthly maps from different climate model datasets as well as differences between datasets.");
+                "Plot monthly maps from different climate model datasets as well as differences between datasets.");
         } else {
             sb.append(HtmlUtils.h2("Climate Model Time Series"));
             sb.append(
-            "Plot monthly time series from different climate model datasets.");
+                "Plot monthly time series from different climate model datasets.");
         }
 
         if (fixedCollection != null) {
@@ -682,10 +699,9 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                                          false));
         sb.append(HtmlUtils.p());
 
-
         if ( !hasOperands) {
             sb.append(HtmlUtils.submit("Select Data", ARG_ACTION_SEARCH,
-                                       HtmlUtils.id(formId + ".submit")
+                                       HtmlUtils.id(formId + "_submit")
                                        + makeButtonSubmitDialog(sb,
                                            msg("Searching for data")
                                            + "...")));
@@ -694,17 +710,17 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             sb.append("<td width=\"400px\">&nbsp;</td>");
         } else {
             sb.append(HtmlUtils.submit("Select Again", ARG_ACTION_SEARCH,
-                                       HtmlUtils.id(formId + ".submit")
+                                       HtmlUtils.id(formId + "_.submit")
                                        + makeButtonSubmitDialog(sb,
                                            msg("Searching for new data")
                                            + "...")));
             sb.append("</td>\n");
             sb.append("<td width=\"400px\">\n");
-            List<String>      processTabs   = new ArrayList<String>();
-            List<String>      processTitles = new ArrayList<String>();
+            List<String> processTabs   = new ArrayList<String>();
+            List<String> processTitles = new ArrayList<String>();
 
-            boolean           first         = true;
-            List<DataProcess> processes     = getDataProcesses(request, type);
+            boolean      first         = true;
+
             for (DataProcess process : processes) {
                 StringBuffer tmpSB = new StringBuffer();
                 if (processes.size() > 1) {
@@ -748,17 +764,20 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             }
             sb.append(HtmlUtils.p());
             if (type.equals(ARG_ACTION_COMPARE)) {
-                sb.append(HtmlUtils.submit("Make Plot", ARG_ACTION_COMPARE,
-                                           HtmlUtils.id(formId + ".submit")
-                                           + makeButtonSubmitDialog(sb,
-                                               msg("Making Plot, Please Wait")
-                                               + "...")));
+                sb.append(
+                    HtmlUtils.submit(
+                        "Make Plot", ARG_ACTION_COMPARE,
+                        HtmlUtils.id(formId + "_submit")
+                        + makeButtonSubmitDialog(
+                            sb, msg("Making Plot, Please Wait") + "...")));
             } else {
-                sb.append(HtmlUtils.submit("Make Time Series", ARG_ACTION_TIMESERIES,
-                                           HtmlUtils.id(formId + ".submit")
-                                           + makeButtonSubmitDialog(sb,
-                                               msg("Making Time Series, Please Wait")
-                                               + "...")));
+                sb.append(
+                    HtmlUtils.submit(
+                        "Make Time Series", ARG_ACTION_TIMESERIES,
+                        HtmlUtils.id(formId + "_submit")
+                        + makeButtonSubmitDialog(
+                            sb,
+                            msg("Making Time Series, Please Wait") + "...")));
             }
 
             sb.append("</td>");
@@ -780,7 +799,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
 
     }
-    
+
 
 
     /**
