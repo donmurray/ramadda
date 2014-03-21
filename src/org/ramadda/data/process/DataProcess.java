@@ -71,6 +71,10 @@ public abstract class DataProcess {
      throws Exception;
 
 
+    public void initFormJS(Request request, Appendable js, String formVar) throws Exception {
+    }
+
+
     /**
      * Process the request
      *
