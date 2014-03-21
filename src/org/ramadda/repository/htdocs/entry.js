@@ -1,6 +1,4 @@
 
-
-
 var OUTPUT_JSON = "json";
 var OUTPUT_CSV = "default.csv";
 var OUTPUT_ZIP = "zip.tree";
@@ -14,7 +12,7 @@ var OUTPUTS = [
                ];
 
 //
-//return the global display manager with the given id, null if not found
+//return the global entry manager with the given id, null if not found
 //
 function getEntryManager(baseUrl) {
     //check for the embed label
@@ -46,12 +44,91 @@ function getGlobalEntryManager() {
 
 
 
+//
+//return the global entry manager with the given id, null if not found
+//
+function getRamadda(baseUrl) {
+    //check for the embed label
+    var toks = baseUrl.split(";");
+    var name = null;
+    if(toks.length>1) {
+        baseUrl = toks[0];
+        name = toks[1];
+    }
+
+
+    if(window.globalRamaddas==null) {
+        window.globalRamaddas = {};
+    }
+    var manager =  window.globalRamaddas[baseUrl];
+    if(manager == null) {
+        manager = new Ramadda(baseUrl);
+        if(name!=null) {
+            manager.name = name;
+        }
+        window.globalRamaddas[baseUrl] = manager;
+    }
+    return manager;
+}
+
+function getGlobalRamadda() {
+    return getRamadda(ramaddaBaseUrl);
+}
+
+
+
+function Ramadda(repositoryRoot) {
+    if(repositoryRoot == null) {
+        repositoryRoot = ramaddaBaseUrl;
+    }
+
+    var hostname = null;
+    var match =  repositoryRoot.match("^(http.?://[^/]+)/");
+    if(match && match.length>0) {
+        hostname = match[1];
+    } else {
+        //        console.log("no match");
+    }
+    //    console.log("hostname:" + hostname);
+
+    RamaddaUtil.defineMembers(this, {
+            repositoryRoot:repositoryRoot,
+            hostname: hostname,
+            name: null,
+            getHostname: function() {
+                return this.hostname;
+            },
+            getName: function() {
+                if(this.name!=null) return this.name;
+                if(this.repositoryRoot.indexOf("/") == 0)  {
+                    return this.name  = "This RAMADDA";
+                }
+                var url  = this.repositoryRoot;
+                //Do the a trick
+                var parser = document.createElement('a');
+                parser.href = url;
+                var host   = parser.hostname;
+                var path = parser.pathname;
+                //if its the default then just return the host;
+                if(path == "/repository") return host;
+                return this.name = host+": " + path;
+            },
+            getId: function() {
+                return this.repositoryRoot;
+            },
+            getRoot: function() {
+                return this.repositoryRoot;
+            },
+                });
+}
+
+
 function EntryManager(repositoryRoot) {
     if(repositoryRoot == null) {
         repositoryRoot = ramaddaBaseUrl;
     }
 
-    console.log("root:" + repositoryRoot);
+    //    console.log("root:" + repositoryRoot);
     var hostname = null;
     var match =  repositoryRoot.match("^(http.?://[^/]+)/");
     if(match && match.length>0) {
@@ -205,7 +282,7 @@ function EntryManager(repositoryRoot) {
                     })
                     .fail(function(jqxhr, textStatus, error) {
                             var err = textStatus + ", " + error;
-                            alert("JSON error:" + err);
+                            //                            alert("JSON error:" + err);
                             console.log("JSON error:" +err);
                         });
                 return null;
@@ -521,7 +598,7 @@ function EntryList(entryManager, jsonUrl, listener) {
         })
         .fail(function(jqxhr, textStatus, error) {
                 var err = textStatus + ", " + error;
-                alert("JSON error:" + err);
+                //                alert("JSON error:" + err);
                 console.log("JSON error:" +err);
             });
 }

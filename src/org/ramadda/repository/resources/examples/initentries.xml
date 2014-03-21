@@ -13,4 +13,52 @@
 <description>A place to store data</description>
 </entry>
 
+<entry parent="root" name="Utilities" type="group" id="utilities">
+<description></description>
+</entry>
+
+<entry parent="utilities" name="Search Page" type="wikipage" >
+<wikitext>
+== Search ==
+
+{{display   
+type="entrylist"  
+orientation="vertical"
+formOpen="true"
+layoutHere="true"  
+showMetadata="false"
+innerHeight="200" 
+}}
+</wikitext>
+</entry>
+
+
+
+
+<entry parent="utilities" name="Metadata List" type="wikipage" >
+<wikitext>
+== Metadata Listing ==
+
+{{display   
+type="metadata"  
+orientation="vertical"
+formOpen="true"
+layoutHere="true"  
+showMetadata="false"
+innerHeight="200" 
+}}
+</wikitext>
+</entry>
+
+
+<entry parent="utilities" name="Last 3 days" type="type_virtual" >
+<description>Entries created in the last 3 days</description>
+<entry_ids>
+search.createdate.relative=-3 days
+search
+</entry_ids>
+</entry>
+
+
+
 </entries>
