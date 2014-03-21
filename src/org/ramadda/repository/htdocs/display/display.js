@@ -482,11 +482,21 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 return getGlobalEntryManager();
         },
         getEntry: function(entryId) {
+                var entryManager = this.getEntryManager();
+                var toks = entryId.split(",");
+                if(toks.length==2) {
+                    entryId = toks[1];
+                    entryManager = getEntryManager(toks[0]);
+                }
                 var entry = null;
                 if(this.entryList!=null) {
                     entry = this.entryList.getEntry(entryId);
                 }
                 if(entry == null) {
+                    entry = entryManager.getEntry(entryId);
+                }
+                if(entry == null) {
+                    console.log("Display.getEntry: entry not found id=" + entryId +" repository=" + entryManager.getRoot());
                     entry = this.getEntryManager().getEntry(entryId);
                 }
                 return entry;
@@ -565,7 +575,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                                                     + HtmlUtil.onClick(get+".fetchUrl('csv');", "CSV")));
                 }
 
-                newMenuItems.push(HtmlUtil.tag(TAG_LI,[], HtmlUtil.onClick(get+".createDisplay('" + entry.getId() +"','entrydisplay');", "New Entry Display")));
+                newMenuItems.push(HtmlUtil.tag(TAG_LI,[], HtmlUtil.onClick(get+".createDisplay('" + entry.getFullId() +"','entrydisplay');", "New Entry Display")));
 
                 if(fileMenuItems.length>0)
                     menus.push("<a>File</a>" + HtmlUtil.tag(TAG_UL,[], HtmlUtil.join(fileMenuItems)));
@@ -582,7 +592,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                         var type = this.getDisplayManager().displayTypes[i];
                         if(!type.requiresData) continue;
                         
-                        newMenu+= HtmlUtil.tag(TAG_LI,[], HtmlUtil.tag(TAG_A, ["onclick", get+".createDisplay(" + HtmlUtil.sqt(entry.getId()) +"," + HtmlUtil.sqt(type.type)+"," +HtmlUtil.sqt(pointUrl) +");"], type.label));
+                        newMenu+= HtmlUtil.tag(TAG_LI,[], HtmlUtil.tag(TAG_A, ["onclick", get+".createDisplay(" + HtmlUtil.sqt(entry.getFullId()) +"," + HtmlUtil.sqt(type.type)+"," +HtmlUtil.sqt(pointUrl) +");"], type.label));
                     }
                     menus.push("<a>New Chart</a>" + HtmlUtil.tag(TAG_UL,[], newMenu));
                 }

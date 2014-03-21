@@ -66,10 +66,9 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
 
                  }
 
-
                  var jsonUrl = this.getPointUrl(entry);
                  if(jsonUrl!=null) {
-                     toolbarItems.push(HtmlUtil.tag(TAG_A, ["onclick", get+".createDisplay(" + HtmlUtil.sqt(entry.getId()) +"," +
+                     toolbarItems.push(HtmlUtil.tag(TAG_A, ["onclick", get+".createDisplay(" + HtmlUtil.sqt(entry.getFullId()) +"," +
                                                             HtmlUtil.sqt("linechart") +"," + HtmlUtil.sqt(jsonUrl)+");"],
                                                             HtmlUtil.image(ramaddaBaseUrl +"/icons/chart_line_add.png",["border",0,ATTR_TITLE,"Create Chart"])));
                  }
@@ -255,7 +254,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 //                this.currentPopupEntry = null;
             },
             toggleEntryDetails: function(entryId) {
-                var entry = this.entryList.getEntry(entryId);
+                var entry = this.getEntry(entryId);
                 var link = this.jq(ID_TREE_LINK+entry.getId());
                 var details = this.jq(ID_DETAILS + entry.getId());
                 var detailsInner = this.jq(ID_DETAILS_INNER + entry.getId());
@@ -304,7 +303,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
             },
             showEntryDetails: function(event, entryId, src,leftAlign) {
                 if(true) return;
-                var entry = this.entryList.getEntry(entryId);
+                var entry = this.getEntry(entryId);
                 var popupId = "#"+ this.getDomId(ID_DETAILS+ entryId);
                 if(this.currentPopupEntry ==  entry) {
                     this.hideEntryDetails(entryId);
@@ -837,7 +836,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                         selected: function( event, ui ) {
                             var entryId = ui.selected.getAttribute('entryid');
                             theDisplay.hideEntryDetails(entryId);
-                            var entry = theDisplay.entryList.getEntry(entryId);
+                            var entry = theDisplay.getEntry(entryId);
                             if(entry == null) return;
 
                             var zoom = null;
@@ -850,7 +849,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                         },
                         unselected: function( event, ui ) {
                             var entryId = ui.unselected.getAttribute('entryid');
-                            var entry = theDisplay.entryList.getEntry(entryId);
+                            var entry = theDisplay.getEntry(entryId);
                             var index = theDisplay.selectedEntries.indexOf(entry);
                             //                            console.log("remove:" +  index + " " + theDisplay.selectedEntries);
                             if (index > -1) {
@@ -1262,8 +1261,8 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
                    });
             },
             createDisplay: function() {
-                var entry1 = this.entryList.getEntry(this.jq(ID_SELECT1).val());
-                var entry2 = this.entryList.getEntry(this.jq(ID_SELECT2).val());
+                var entry1 = this.getEntry(this.jq(ID_SELECT1).val());
+                var entry2 = this.getEntry(this.jq(ID_SELECT2).val());
                 if(entry1 == null) {
                     alert("No data selected");
                     return;

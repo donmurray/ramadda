@@ -32,6 +32,7 @@ function getEntryManager(baseUrl) {
     }
     var manager =  window.globalEntryManagers[baseUrl];
     if(manager == null) {
+        //        console.log("new ramadda:" + baseUrl);
         manager = new EntryManager(baseUrl);
         if(name!=null) {
             manager.name = name;
@@ -316,13 +317,14 @@ function EntryManager(repositoryRoot) {
 
 function createEntriesFromJson(data, entryManager) {
     var entries = new Array();
+    if(entryManager==null) {
+        entryManager = getGlobalEntryManager();
+    }
     for(var i=0;i<data.length;i++)  {
         var entryData = data[i];
-        if(entryManager!=null) {
-            entryData.baseUrl = entryManager.getRoot();
-        }
+        entryData.baseUrl = entryManager.getRoot();
         var entry = new Entry(entryData);
-        getGlobalEntryManager().addEntry(entry);
+        entryManager.addEntry(entry);
         entries.push(entry);
     }
     return entries;
@@ -397,6 +399,9 @@ function Entry(props) {
     RamaddaUtil.defineMembers(this, {
             getId : function () {
                 return  this.id;
+            },
+            getFullId: function() {
+                return this.getEntryManager().getRoot() +"," + this.id;
             },
             getIsGroup: function() {return this.isGroup;},
             getChildrenEntries: function(callback) {
@@ -553,8 +558,6 @@ function EntryList(entryManager, jsonUrl, listener) {
             entries :[],
             map: {},
             listener : listener,
-
-
             getEntry : function(id) {
                 var entry =  this.map[id];
                 if(entry!=null) return entry;
@@ -592,7 +595,7 @@ function EntryList(entryManager, jsonUrl, listener) {
                 return html;
             },
             createEntries: function(data) {
-                this.entries =         createEntriesFromJson(data, this.entryManager);
+                this.entries =   createEntriesFromJson(data, this.entryManager);
                 for(var i =0;i<this.entries.length;i++) {
                     var entry = this.entries[i];
                     this.map[entry.getId()] = entry;
