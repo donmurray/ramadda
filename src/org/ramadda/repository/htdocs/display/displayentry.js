@@ -4,7 +4,7 @@ var DISPLAY_ENTRYDISPLAY = "entrydisplay";
 var DISPLAY_OPERANDS = "operands";
 var DISPLAY_METADATA = "metadata";
 var DISPLAY_TIMELINE = "timeline";
-
+var DISPLAY_REPOSITORIES = "repositories";
 
 var ID_RESULTS = "results";
 var ID_ENTRIES = "entries";
@@ -27,6 +27,19 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
      var ID_TOOLBAR = "toolbar";
      var ID_TOOLBAR_INNER = "toolbarinner";
      RamaddaUtil.inherit(this, SUPER = new RamaddaDisplay(displayManager, id, type, properties));
+
+     this.ramaddas = [];
+     var repos = this.getProperty("repositories",this.getProperty("repos",null));
+     if(repos != null) {
+         var toks = repos.split(",");
+         for(var i=0;i<toks.length;i++) {
+             this.ramaddas.push(getEntryManager(toks[i]));
+         }
+         if(this.ramaddas.length>0) {
+             this.setEntryManager(this.ramaddas[0]);
+         }
+     }
+
      RamaddaUtil.defineMembers(this, {
              searchSettings: new EntrySearchSettings({
                          parent: properties.entryParent,
@@ -87,6 +100,7 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
          this.searchSettings.addType(properties.entryType);
      }
 }
+
 
 
 function RamaddaSearcher(displayManager, id, type, properties) {
@@ -369,7 +383,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 }
 
                 //Call this now because it sets settings
-                var jsonUrl = this.makeSearchUrl();
+                var jsonUrl = this.makeSearchUrl(this.getEntryManager());
                 this.entryList = new EntryList(this.getEntryManager(), jsonUrl, this, this.entryList);
                 this.updateForSearching(jsonUrl);
 
@@ -411,7 +425,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     this.savedValues[id] = value;
                 }
             },
-            makeSearchUrl: function() {
+            makeSearchUrl: function(entryManager) {
                 var extra = "";
                 var cols  = this.getSearchableColumns();
                 for(var i =0;i<cols.length;i++) {
@@ -421,7 +435,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     extra+= "&" + col.getSearchArg() +"=" + encodeURI(value);
                 }
                 this.searchSettings.setExtra(extra);
-                var jsonUrl = this.getEntryManager().getSearchUrl(this.searchSettings, OUTPUT_JSON);
+                var jsonUrl = entryManager.getSearchUrl(this.searchSettings, OUTPUT_JSON);
                 return jsonUrl;
             },
             makeSearchForm: function() {
@@ -441,31 +455,23 @@ function RamaddaSearcher(displayManager, id, type, properties) {
 
                 var extra =   HtmlUtil.formTable();
 
-
-                //["http://ramadda.org/repository;ramadda.org","http://community.ramadda.org/repository/repos/data;Community data site","http://community.ramadda.org/repository"];
-                var repos = this.getProperty("repositories",this.getProperty("repos",null));
-                if(repos != null) {
-                    var ramaddas = repos.split(",");
-                    if(ramaddas.length>0) {
-                        ramaddas.unshift(this.getEntryManager().getId());
-
-                        var select  = HtmlUtil.openTag(TAG_SELECT,[ATTR_ID, this.getDomId(ID_REPOSITORY), ATTR_CLASS,"display-repositories-select"]);
-                        var icon = ramaddaBaseUrl +"/icons/favicon.png";
-                        for(var i=0;i<ramaddas.length;i++) {
-                            var entryManager = getEntryManager(ramaddas[i]);
-                            var attrs = [ATTR_TITLE,"",ATTR_VALUE,entryManager.getId(),
-                                         "data-iconurl",icon];
-                            if(this.getEntryManager().getId() == entryManager.getId()) {
-                                attrs.push("selected");
-                                attrs.push(null);
-                            }
-                            var label = 
-                                select += HtmlUtil.tag(TAG_OPTION,attrs,
-                                                       entryManager.getName());
+                if(this.ramaddas.length>0) {
+                    var select  = HtmlUtil.openTag(TAG_SELECT,[ATTR_ID, this.getDomId(ID_REPOSITORY), ATTR_CLASS,"display-repositories-select"]);
+                    var icon = ramaddaBaseUrl +"/icons/favicon.png";
+                    for(var i=0;i<this.ramaddas.length;i++) {
+                        var entryManager = this.ramaddas[i].getEntryManager();
+                        var attrs = [ATTR_TITLE,"",ATTR_VALUE,entryManager.getId(),
+                                     "data-iconurl",icon];
+                        if(this.getEntryManager().getId() == entryManager.getId()) {
+                            attrs.push("selected");
+                            attrs.push(null);
                         }
-                        select += HtmlUtil.closeTag(TAG_SELECT);
-                        extra += HtmlUtil.formEntry("Repository:",select);
+                        var label = 
+                            select += HtmlUtil.tag(TAG_OPTION,attrs,
+                                                   entryManager.getName());
                     }
+                    select += HtmlUtil.closeTag(TAG_SELECT);
+                    extra += HtmlUtil.formEntry("Repository:",select);
                 }
 
 
@@ -566,7 +572,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
             addTypes: function(types) {
                 if(types == null) {
                     var theDisplay = this;
-                    types = this.getEntryManager().getEntryTypes(function(types) {theDisplay.addTypes(types);});
+                    types = this.getEntryManager().getEntryTypes(function(entryManager, types) {theDisplay.addTypes(types);});
                 }
                 if(types == null) {
                     return;
@@ -581,13 +587,10 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 //                HtmlUtil.tag(TAG_OPTION,[ATTR_TITLE,"",ATTR_VALUE,""], " Choose Type "));
                 select += HtmlUtil.tag(TAG_OPTION,[ATTR_TITLE,"",ATTR_VALUE,""],"Any Type");
 
-                var hostname = this.getEntryManager().getHostname();
                 for(var i = 0;i< types.length;i++) {
                     var type = types[i];
                     //                    var style = " background: URL(" + type.getIcon() +") no-repeat;";
-
                     var icon =                     type.getIcon();
-                    if(hostname) icon = hostname + icon;
                     var optionAttrs  = [ATTR_TITLE,type.getLabel(),ATTR_VALUE,type.getId(),ATTR_CLASS, "display-typelist-type",
                                         //                                        ATTR_STYLE, style,
                                         "data-iconurl",icon];
@@ -686,7 +689,6 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 }
                 
                 this.writeHtml(ID_FIELDS, extra);
-
                 
            },
             getEntries: function() {
@@ -1286,3 +1288,146 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
 
         });
 }
+
+
+function RamaddaRepositoriesDisplay(displayManager, id, properties) {
+    RamaddaUtil.inherit(this, new RamaddaEntryDisplay(displayManager, id, DISPLAY_REPOSITORIES, properties));
+    addRamaddaDisplay(this);
+    RamaddaUtil.defineMembers(this, {
+            initDisplay: function() {
+                var theDisplay = this;
+                this.initUI();
+                var html = "";
+                if(this.ramaddas.length==0) {
+                    html += this.getMessage("No repositories specified");
+                } else {
+                    html += this.getMessage("Loading repository listing");
+                }
+                this.numberWithTypes = 0;
+                this.finishedInitDisplay = false;
+                for(var i=0;i<this.ramaddas.length;i++) {
+                    if(i == 0) {
+                    }
+                    var entryManager = this.ramaddas[i].getEntryManager();
+                    var types = entryManager.getEntryTypes(function(entryManager, types) {theDisplay.gotTypes(entryManager, types);});
+                    if(types !=null) {
+                        this.numberWithTypes++;
+                    }
+                }
+                this.setTitle("Repositories");
+                this.setContents(html);
+                this.finishedInitDisplay = true;
+                this.displayRepositories();
+            },
+            displayRepositories: function() {
+                //                console.log("displayRepositories " + this.numberWithTypes + " " + this.ramaddas.length);
+                if(!this.finishedInitDisplay || this.numberWithTypes != this.ramaddas.length) {
+                    return;
+                }
+                var typeMap = {};
+                var allTypes = [];
+                var html = "";
+                html += HtmlUtil.openTag(TAG_TABLE, [ATTR_CLASS, "display-repositories-table",ATTR_WIDTH,"100%",ATTR_BORDER,"1","cellspacing","0","cellpadding","5"]);
+                for(var i=0;i<this.ramaddas.length;i++) {
+                    var entryManager = this.ramaddas[i].getEntryManager(); 
+                   var types = entryManager.getEntryTypes();
+                    for(var typeIdx=0;typeIdx<types.length;typeIdx++) {
+                        var type = types[typeIdx];
+                        if(typeMap[type.getId()] == null) {
+                            typeMap[type.getId()] = type;
+                            allTypes.push(type);
+                        }
+                    }
+                }
+
+                html += HtmlUtil.openTag(TAG_TR, ["valign", "bottom"]);
+                html += HtmlUtil.th([ATTR_CLASS,"display-repositories-table-header"],"Type");
+                for(var i=0;i<this.ramaddas.length;i++) {
+                    var entryManager = this.ramaddas[i].getEntryManager();
+                    var link = HtmlUtil.href(entryManager.getRoot(),entryManager.getName());
+                    html += HtmlUtil.th([ATTR_CLASS,"display-repositories-table-header"],link);
+                }
+                html += "</tr>";
+
+                var onlyCats = [];
+                if(this.categories!=null) {
+                    onlyCats = this.categories.split(",");
+                }
+
+
+
+                var catMap = {};
+                var cats = [];
+                for(var typeIdx =0;typeIdx<allTypes.length;typeIdx++) {
+                    var type = allTypes[typeIdx];
+                    
+
+                    var row = "";
+
+
+                    row += "<tr>";
+                    row += HtmlUtil.td([],HtmlUtil.image(type.getIcon()) +" " + type.getLabel());
+                    for(var i=0;i<this.ramaddas.length;i++) {
+                        var entryManager = this.ramaddas[i].getEntryManager();
+                        var repoType = entryManager.getEntryType(type.getId());
+                        var col = "";
+                        if(repoType == null) {
+                            row += HtmlUtil.td([ATTR_CLASS,"display-repositories-table-type-hasnot"],"");
+                        } else {
+                            var label  =
+                                HtmlUtil.tag(TAG_A, ["href", entryManager.getRoot()+"/search/type/" + repoType.getId(),"target","_blank"],
+                                             repoType.getEntryCount());
+                            row += HtmlUtil.td([ATTR_ALIGN, "right", ATTR_CLASS,"display-repositories-table-type-has"],label);
+                        }
+
+                    }
+                    row += "</tr>";
+
+                    var catRows = catMap[type.getCategory()];
+                    if(catRows == null) {
+                        catRows = [];
+                        catMap[type.getCategory()] = catRows;
+                        cats.push(type.getCategory());
+                    }
+                    catRows.push(row);
+                }
+
+                for(var i=0;i<cats.length;i++) {
+                    var cat = cats[i];
+                    if(onlyCats.length>0) {
+                        var ok = false;
+                        for(var patternIdx=0;patternIdx<onlyCats.length;patternIdx++) {
+                            if(cat == onlyCats[patternIdx]) {
+                                ok = true;
+                                break;
+                            }
+                            if(cat.match(onlyCats[patternIdx])) {
+                                ok = true;
+                                break;
+                                
+                            }
+                        }
+                        if(!ok) continue;
+
+                    }
+                    var rows = catMap[cat];
+                    html +=  "<tr>";
+                    html += HtmlUtil.th(["colspan", ""+(1 + this.ramaddas.length)], cat);
+                    html +=  "</tr>";
+                    for(var row=0;row<rows.length;row++) {
+                        html += rows[row];
+                    }
+
+                }
+
+
+                html += HtmlUtil.closeTag(HtmlUtil.TAG_TABLE);
+                this.setContents(html);
+            },
+            gotTypes: function(entryManager,  types) {
+                this.numberWithTypes++;
+                this.displayRepositories();
+            }
+        });
+}
+

@@ -718,12 +718,13 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             },
             getDialogContents: function() {
                 var get = this.getGet();
-                var copyMe = HtmlUtil.onClick(get+".copyDisplay();", "Copy Display");
-                var deleteMe = HtmlUtil.onClick("removeRamaddaDisplay('" + this.getId() +"')", "Remove Display");
                 var menuItems = [];
+
                 this.getMenuItems(menuItems);
-                menuItems.push(copyMe);
-                menuItems.push(deleteMe);
+                menuItems.push(HtmlUtil.onClick(get+".copyDisplay();", "Copy Display"));
+                if(!this.getIsLayoutFixed()) {
+                    menuItems.push(HtmlUtil.onClick("removeRamaddaDisplay('" + this.getId() +"')", "Remove Display"));
+                }
 
                 if(this.jsonUrl!=null) {
                     menuItems.push("Data: " + HtmlUtil.onClick(get+".fetchUrl('json');", "JSON")
@@ -905,7 +906,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
 
                 return prefix+title;
             },
-                getIsLayoutFixed: function() {
+            getIsLayoutFixed: function() {
                 return this.getProperty(PROP_LAYOUT_HERE,false);
             },
             doingQuickEntrySearch: false,

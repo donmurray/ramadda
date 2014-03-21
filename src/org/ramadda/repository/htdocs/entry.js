@@ -23,6 +23,9 @@ function getEntryManager(baseUrl) {
         name = toks[1];
     }
 
+    if(baseUrl == "this") {
+        return getGlobalEntryManager();
+    }
 
     if(window.globalEntryManagers==null) {
         window.globalEntryManagers = {};
@@ -144,10 +147,14 @@ function EntryManager(repositoryRoot) {
             name: null,
             entryCache: {},
             entryTypes: null,
+            entryTypeMap: {},
             getHostname: function() {
                 return this.hostname;
             },
             
+            getEntryManager: function() {
+                return this;
+            },
             getName: function() {
                 if(this.name!=null) return this.name;
                 if(this.repositoryRoot.indexOf("/") == 0)  {
@@ -172,15 +179,21 @@ function EntryManager(repositoryRoot) {
             getJsonUrl: function(entryId) {
                 return this.repositoryRoot + "/entry/show?entryid=" + id +"&output=json";
             },
+            getEntryType: function(typeId) {
+                return this.entryTypeMap[typeId];
+            },
             getEntryTypes: function(callback) {
                 if(this.entryTypes == null) {
+                    var theEntryManager = this;
                     var jqxhr = $.getJSON(this.repositoryRoot +"/entry/types", function(data) {
-                            this.entryTypes = [];
+                            theEntryManager.entryTypes = [];
                             for(var i =0;i<data.length;i++) {
-                                this.entryTypes.push(new EntryType(data[i]));
+                                var type = new EntryType(data[i]);
+                                theEntryManager.entryTypeMap[type.getId()] = type;
+                                theEntryManager.entryTypes.push(type);
                             }
                             if(callback!=null) {
-                                callback(this.entryTypes);
+                                callback(theEntryManager, theEntryManager.entryTypes);
                             }
                         }).done(function(jqxhr, textStatus, error) {
                                 //                                console.log("JSON done:" +textStatus);

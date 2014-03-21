@@ -276,12 +276,39 @@
 
 }
 
-
 .display-repositories-select {
    max-width:200px;
    padding: 0px;
    margin: 0px;
 }
+
+.display-repositories-table {
+}
+
+
+.display-repositories-table-header {
+}
+
+
+.display-repositories-table th {
+    background-color: #efefef;
+}
+
+
+.display-repositories-table th a {
+    color: #000;
+}
+
+.display-repositories-table-type {
+}
+
+.display-repositories-table-type-has {
+}
+
+.display-repositories-table-type-hasnot {
+}
+
+
 
 .display-entries-results {
    padding-left: 3px;

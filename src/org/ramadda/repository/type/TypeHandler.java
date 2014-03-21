@@ -463,8 +463,8 @@ public class TypeHandler extends RepositoryManager {
         items.add("columns");
         items.add(Json.list(cols));
 
-        String icon = iconUrl(getProperty("icon",
-                                          (String) ICON_FOLDER_CLOSED));
+        String icon = request.getAbsoluteUrl(iconUrl(getProperty("icon",
+                          (String) ICON_FOLDER_CLOSED)));
         items.add("icon");
         items.add(Json.quote(icon));
         items.add("category");

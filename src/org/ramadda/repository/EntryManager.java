@@ -101,7 +101,6 @@ import java.util.zip.ZipInputStream;
 
 
 
-
 /**
  * This class does most of the work of managing repository content
  */
@@ -5471,6 +5470,7 @@ public class EntryManager extends RepositoryManager {
      * @param entry _more_
      * @param typeMask _more_
      * @param links _more_
+     * @param returnNullIfNoneMatch _more_
      * @param header _more_
      *
      * @return _more_
