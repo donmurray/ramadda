@@ -122,10 +122,14 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                               ATTR_LISTENTRIES, "false", ATTR_DETAILS, "false",
                                               ATTR_ICON, "#/icons/dots/green.png", ARG_MAP_ICONSONLY,
                                               "false")), 
+                            /*
+                              keep the implementation around for legacy wikis but don't show this anymore
+                              as we can do {{map entries="this"}}
                             new WikiTag(WIKI_TAG_MAPENTRY,
                                         attrs(ATTR_WIDTH, "400", ATTR_HEIGHT, "400",
                                               ATTR_DETAILS,
                                               "false")), 
+                            */
                             new WikiTag(WIKI_TAG_EARTH,
                                         attrs(ATTR_WIDTH, "400", ATTR_HEIGHT, "400",
                                               ATTR_LISTENTRIES, "false"))),
@@ -288,9 +292,21 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             }
 
 
-            Hashtable props   = StringUtil.parseHtmlProperties(remainder);
-            String    entryId = (String) props.get(ATTR_ENTRY);
+            Hashtable tmpProps = StringUtil.parseHtmlProperties(remainder);
+            Hashtable props    = new Hashtable();
+            for (Enumeration keys =
+                    tmpProps.keys(); keys.hasMoreElements(); ) {
+                Object key   = keys.nextElement();
+                Object value = tmpProps.get(key);
+                props.put(key, value);
+                if (key instanceof String) {
+                    String lowerCaseKey = ((String) key).toLowerCase();
+                    props.put(lowerCaseKey, value);
+                }
+            }
 
+
+            String entryId = (String) props.get(ATTR_ENTRY);
             if (entryId != null) {
                 theEntry = findEntryFromId(request, entry, wikiUtil, entryId);
                 if (theEntry == null) {
@@ -1045,7 +1061,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         } else if (theTag.equals(WIKI_TAG_MAP)
                    || theTag.equals(WIKI_TAG_EARTH)
                    || theTag.equals(WIKI_TAG_MAPENTRY)) {
-            int     width      = Misc.getProperty(props, ATTR_WIDTH, 400);
+            int     width      = Misc.getProperty(props, ATTR_WIDTH, -1);
             int     height     = Misc.getProperty(props, ATTR_HEIGHT, 300);
             boolean justPoints = Misc.getProperty(props, "justpoints", false);
             boolean listEntries = Misc.getProperty(props, ATTR_LISTENTRIES,

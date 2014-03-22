@@ -18,8 +18,9 @@ var ID_TREE_LINK = "treelink";
 addGlobalDisplayType({type: DISPLAY_ENTRYLIST, label:"Entry List",requiresData:false,category:"Entry Displays"});
 addGlobalDisplayType({type: DISPLAY_ENTRYDISPLAY, label:"Entry Display",requiresData:false,category:"Entry Displays"});
 //addGlobalDisplayType({type: DISPLAY_OPERANDS, label:"Operands",requiresData:false,category:"Entry Displays"});
-addGlobalDisplayType({type: DISPLAY_TIMELINE, label:"Timeline",requiresData:false,category:"Test"});
 addGlobalDisplayType({type: DISPLAY_METADATA, label:"Metadata Table",requiresData:false,category:"Entry Displays"});
+
+addGlobalDisplayType({type: DISPLAY_TIMELINE, label:"Timeline",requiresData:false,category:"Test"});
 
 
 function RamaddaEntryDisplay(displayManager, id, type, properties) {
@@ -33,10 +34,10 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
      if(repos != null) {
          var toks = repos.split(",");
          for(var i=0;i<toks.length;i++) {
-             this.ramaddas.push(getEntryManager(toks[i]));
+             this.ramaddas.push(getRamadda(toks[i]));
          }
          if(this.ramaddas.length>0) {
-             this.setEntryManager(this.ramaddas[0]);
+             this.setRamadda(this.ramaddas[0]);
          }
      }
 
@@ -228,8 +229,8 @@ function RamaddaSearcher(displayManager, id, type, properties) {
 
                 this.jq(ID_REPOSITORY).selectBoxIt({});
                 this.jq(ID_REPOSITORY).change(function() {
-                        var entryManager = getEntryManager(theDisplay.jq(ID_REPOSITORY).val());
-                        theDisplay.setEntryManager(entryManager);
+                        var ramadda = getRamadda(theDisplay.jq(ID_REPOSITORY).val());
+                        theDisplay.setRamadda(ramadda);
                         theDisplay.addTypes(null);
                         theDisplay.typeChanged();
                     });
@@ -382,8 +383,8 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 }
 
                 //Call this now because it sets settings
-                var jsonUrl = this.makeSearchUrl(this.getEntryManager());
-                this.entryList = new EntryList(this.getEntryManager(), jsonUrl, this, this.entryList);
+                var jsonUrl = this.makeSearchUrl(this.getRamadda());
+                this.entryList = new EntryList(this.getRamadda(), jsonUrl, this, this.entryList);
                 this.updateForSearching(jsonUrl);
 
                 /*****
@@ -405,7 +406,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
 
             },
             updateForSearching: function(jsonUrl) {
-                var outputs = this.getEntryManager().getSearchLinks(this.searchSettings);
+                var outputs = this.getRamadda().getSearchLinks(this.searchSettings);
                 this.footerRight  = "Links: " + HtmlUtil.join(outputs," - "); 
                 this.writeHtml(ID_FOOTER_RIGHT, this.footerRight);
                 this.writeHtml(ID_RESULTS, "Searching...");
@@ -424,7 +425,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     this.savedValues[id] = value;
                 }
             },
-            makeSearchUrl: function(entryManager) {
+            makeSearchUrl: function(ramadda) {
                 var extra = "";
                 var cols  = this.getSearchableColumns();
                 for(var i =0;i<cols.length;i++) {
@@ -434,7 +435,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     extra+= "&" + col.getSearchArg() +"=" + encodeURI(value);
                 }
                 this.searchSettings.setExtra(extra);
-                var jsonUrl = entryManager.getSearchUrl(this.searchSettings, OUTPUT_JSON);
+                var jsonUrl = ramadda.getSearchUrl(this.searchSettings, OUTPUT_JSON);
                 return jsonUrl;
             },
             makeSearchForm: function() {
@@ -458,16 +459,16 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     var select  = HtmlUtil.openTag(TAG_SELECT,[ATTR_ID, this.getDomId(ID_REPOSITORY), ATTR_CLASS,"display-repositories-select"]);
                     var icon = ramaddaBaseUrl +"/icons/favicon.png";
                     for(var i=0;i<this.ramaddas.length;i++) {
-                        var entryManager = this.ramaddas[i].getEntryManager();
-                        var attrs = [ATTR_TITLE,"",ATTR_VALUE,entryManager.getId(),
+                        var ramadda = this.ramaddas[i];
+                        var attrs = [ATTR_TITLE,"",ATTR_VALUE,ramadda.getId(),
                                      "data-iconurl",icon];
-                        if(this.getEntryManager().getId() == entryManager.getId()) {
+                        if(this.getRamadda().getId() == ramadda.getId()) {
                             attrs.push("selected");
                             attrs.push(null);
                         }
                         var label = 
                             select += HtmlUtil.tag(TAG_OPTION,attrs,
-                                                   entryManager.getName());
+                                                   ramadda.getName());
                     }
                     select += HtmlUtil.closeTag(TAG_SELECT);
                     extra += HtmlUtil.formEntry("Repository:",select);
@@ -529,7 +530,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     var theDisplay = this;
                     if(!this.metadataLoading[metadataType.getType()]) {
                         this.metadataLoading[metadataType.getType()] = true;
-                        metadata = this.getEntryManager().getMetadataCount(metadataType, function(metadataType, metadata) {theDisplay.addMetadata(metadataType, metadata);});
+                        metadata = this.getRamadda().getMetadataCount(metadataType, function(metadataType, metadata) {theDisplay.addMetadata(metadataType, metadata);});
                     }
                 }
                 if(metadata == null) {
@@ -571,7 +572,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
             addTypes: function(types) {
                 if(types == null) {
                     var theDisplay = this;
-                    types = this.getEntryManager().getEntryTypes(function(entryManager, types) {theDisplay.addTypes(types);});
+                    types = this.getRamadda().getEntryTypes(function(ramadda, types) {theDisplay.addTypes(types);});
                 }
                 if(types == null) {
                     return;
@@ -1213,8 +1214,8 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
             baseUrl: null,
             initDisplay: function() {
                 this.initUI();
-                this.baseUrl = this.getEntryManager().getSearchUrl(this.searchSettings, OUTPUT_JSON);
-                this.entryList = new EntryList(this.getEntryManager(), jsonUrl, this, this.entryList);
+                this.baseUrl = this.getRamadda().getSearchUrl(this.searchSettings, OUTPUT_JSON);
+                this.entryList = new EntryList(this.getRamadda(), jsonUrl, this, this.entryList);
                 var html = "";
                 html += HtmlUtil.div([ATTR_ID,this.getDomId(ID_ENTRIES),ATTR_CLASS,"display-entrylist-entries"], "");
                 this.setContents(html);
@@ -1307,8 +1308,8 @@ function RamaddaRepositoriesDisplay(displayManager, id, properties) {
                 for(var i=0;i<this.ramaddas.length;i++) {
                     if(i == 0) {
                     }
-                    var entryManager = this.ramaddas[i].getEntryManager();
-                    var types = entryManager.getEntryTypes(function(entryManager, types) {theDisplay.gotTypes(entryManager, types);});
+                    var ramadda = this.ramaddas[i];
+                    var types = ramadda.getEntryTypes(function(ramadda, types) {theDisplay.gotTypes(ramadda, types);});
                     if(types !=null) {
                         this.numberWithTypes++;
                     }
@@ -1328,8 +1329,8 @@ function RamaddaRepositoriesDisplay(displayManager, id, properties) {
                 var html = "";
                 html += HtmlUtil.openTag(TAG_TABLE, [ATTR_CLASS, "display-repositories-table",ATTR_WIDTH,"100%",ATTR_BORDER,"1","cellspacing","0","cellpadding","5"]);
                 for(var i=0;i<this.ramaddas.length;i++) {
-                    var entryManager = this.ramaddas[i].getEntryManager(); 
-                   var types = entryManager.getEntryTypes();
+                    var ramadda = this.ramaddas[i]; 
+                   var types = ramadda.getEntryTypes();
                     for(var typeIdx=0;typeIdx<types.length;typeIdx++) {
                         var type = types[typeIdx];
                         if(typeMap[type.getId()] == null) {
@@ -1342,8 +1343,8 @@ function RamaddaRepositoriesDisplay(displayManager, id, properties) {
                 html += HtmlUtil.openTag(TAG_TR, ["valign", "bottom"]);
                 html += HtmlUtil.th([ATTR_CLASS,"display-repositories-table-header"],"Type");
                 for(var i=0;i<this.ramaddas.length;i++) {
-                    var entryManager = this.ramaddas[i].getEntryManager();
-                    var link = HtmlUtil.href(entryManager.getRoot(),entryManager.getName());
+                    var ramadda = this.ramaddas[i];
+                    var link = HtmlUtil.href(ramadda.getRoot(),ramadda.getName());
                     html += HtmlUtil.th([ATTR_CLASS,"display-repositories-table-header"],link);
                 }
                 html += "</tr>";
@@ -1367,14 +1368,14 @@ function RamaddaRepositoriesDisplay(displayManager, id, properties) {
                     row += "<tr>";
                     row += HtmlUtil.td([],HtmlUtil.image(type.getIcon()) +" " + type.getLabel());
                     for(var i=0;i<this.ramaddas.length;i++) {
-                        var entryManager = this.ramaddas[i].getEntryManager();
-                        var repoType = entryManager.getEntryType(type.getId());
+                        var ramadda = this.ramaddas[i];
+                        var repoType = ramadda.getEntryType(type.getId());
                         var col = "";
                         if(repoType == null) {
                             row += HtmlUtil.td([ATTR_CLASS,"display-repositories-table-type-hasnot"],"");
                         } else {
                             var label  =
-                                HtmlUtil.tag(TAG_A, ["href", entryManager.getRoot()+"/search/type/" + repoType.getId(),"target","_blank"],
+                                HtmlUtil.tag(TAG_A, ["href", ramadda.getRoot()+"/search/type/" + repoType.getId(),"target","_blank"],
                                              repoType.getEntryCount());
                             row += HtmlUtil.td([ATTR_ALIGN, "right", ATTR_CLASS,"display-repositories-table-type-has"],label);
                         }
@@ -1423,7 +1424,7 @@ function RamaddaRepositoriesDisplay(displayManager, id, properties) {
                 html += HtmlUtil.closeTag(HtmlUtil.TAG_TABLE);
                 this.setContents(html);
             },
-            gotTypes: function(entryManager,  types) {
+            gotTypes: function(ramadda,  types) {
                 this.numberWithTypes++;
                 this.displayRepositories();
             }

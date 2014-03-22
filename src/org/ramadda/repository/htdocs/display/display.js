@@ -468,36 +468,36 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                                                               [ATTR_CLASS, "display-dialog-button", ATTR_ID,  this.getDomId(ID_MENU_BUTTON + entry.getId())]));
              return menuButton;
          },
-         setEntryManager: function(e) {
-                this.entryManager = e;
+         setRamadda: function(e) {
+                this.ramadda = e;
          },
-         getEntryManager: function() {
-                if(this.entryManager!=null) {
-                    return this.entryManager;
+         getRamadda: function() {
+                if(this.ramadda!=null) {
+                    return this.ramadda;
                 }
                 if(this.ramaddaBaseUrl !=null) {
-                    this.entryManager =  getEntryManager(this.ramaddaBaseUrl);
-                    return this.entryManager;
+                    this.ramadda =  getRamadda(this.ramaddaBaseUrl);
+                    return this.ramadda;
                 }
-                return getGlobalEntryManager();
+                return getGlobalRamadda();
         },
         getEntry: function(entryId) {
-                var entryManager = this.getEntryManager();
+                var ramadda = this.getRamadda();
                 var toks = entryId.split(",");
                 if(toks.length==2) {
                     entryId = toks[1];
-                    entryManager = getEntryManager(toks[0]);
+                    ramadda = getRamadda(toks[0]);
                 }
                 var entry = null;
                 if(this.entryList!=null) {
                     entry = this.entryList.getEntry(entryId);
                 }
                 if(entry == null) {
-                    entry = entryManager.getEntry(entryId);
+                    entry = ramadda.getEntry(entryId);
                 }
                 if(entry == null) {
-                    console.log("Display.getEntry: entry not found id=" + entryId +" repository=" + entryManager.getRoot());
-                    entry = this.getEntryManager().getEntry(entryId);
+                    console.log("Display.getEntry: entry not found id=" + entryId +" repository=" + ramadda.getRoot());
+                    entry = this.getRamadda().getEntry(entryId);
                 }
                 return entry;
             },
@@ -933,7 +933,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                     searchSettings.clearAndAddType(this.searchSettings.entryType);
                 }
                 var theDisplay = this;
-                var jsonUrl = this.getEntryManager().getSearchUrl(searchSettings, OUTPUT_JSON);
+                var jsonUrl = this.getRamadda().getSearchUrl(searchSettings, OUTPUT_JSON);
                 var handler = {
                     entryListChanged: function(entryList) {
                         theDisplay.doneQuickEntrySearch(entryList, callback);
@@ -965,7 +965,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 this.dataCollection.addData(pointData);
                 var entry  =  pointData.entry;
                 if(entry == null) {
-                    entry  = this.getEntryManager().getEntry(pointData.entryId);
+                    entry  = this.getRamadda().getEntry(pointData.entryId);
                 } 
                 if(entry) {
                     pointData.entry = entry;

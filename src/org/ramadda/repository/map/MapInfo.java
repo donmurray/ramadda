@@ -251,14 +251,17 @@ public class MapInfo {
                           HtmlUtils.id("ramadda-map-latlonreadout")
                           + HtmlUtils.style("font-style:italic; width:"
                                             + width + "px;"));
-
-        result.append(
-            HtmlUtils.div(
-                contents,
-                HtmlUtils.style(
-                    "border:1px #888888 solid; background-color:#7391ad; width:"
-                    + width + "px; height:" + height + "px") + " "
-                        + HtmlUtils.id(mapVarName)));
+        String styles =
+            "border:1px #888888 solid; background-color:#7391ad; height:"
+            + height + "px; ";
+        if (width > 0) {
+            styles += " width:" + width + "px; ";
+        } else {
+            styles += " width: 100%;";
+        }
+        result.append(HtmlUtils.div(contents,
+                                    HtmlUtils.style(styles) + " "
+                                    + HtmlUtils.id(mapVarName)));
         result.append("\n");
         result.append(readout);
         result.append("\n");
@@ -282,23 +285,26 @@ public class MapInfo {
             pageDecorator.addToMap(request, this);
         }
 
-
         StringBuffer result = new StringBuffer();
         result.append(html);
-        if (rightSide.length() > 0) {
-            result.append("<table xxwidth=\"100%\"><tr valign=top><td>");
+
+
+        //For now don't decorate with the WMS legend popup
+        /*if (rightSide.length() > 0) {
+            result.append("<table width=\"100%\"><tr valign=top><td>");
         }
-
-
+        */
 
 
         result.append(getMapDiv(""));
+        //For now don't decorate with the WMS legend popup
+        /*
         if (rightSide.length() > 0) {
-            result.append("</td><td>");
+            result.append("</td><td width=10%>");
             result.append(rightSide);
             result.append("</td></tr></table>");
         }
-
+        */
         result.append(HtmlUtils.script(getJS().toString()));
         result.append("\n");
 

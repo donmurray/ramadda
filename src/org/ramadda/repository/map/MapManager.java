@@ -578,7 +578,8 @@ public class MapManager extends RepositoryManager {
         }
 
 
-        int listwidth = request.get(WikiManager.ATTR_LISTWIDTH, 250);
+        String listwidth = request.getString(WikiManager.ATTR_LISTWIDTH,
+                                             "20%");
         layoutMap(sb, includeList, numEntries, listwidth, height, categories,
                   catMap, mapSB.toString());
         sb.append(HtmlUtils.script(js.toString()));
@@ -600,7 +601,7 @@ public class MapManager extends RepositoryManager {
      * @throws Exception _more_
      */
     private void layoutMap(Appendable sb, boolean includeList,
-                           int numEntries, int listwidth, int height,
+                           int numEntries, String listwidth, int height,
                            List<String> categories,
                            Hashtable<String, StringBuilder> catMap,
                            String mapHtml)
@@ -609,11 +610,8 @@ public class MapManager extends RepositoryManager {
         if (includeList) {
             sb.append(
                 "<table border=\"0\" width=\"100%\"><tr valign=\"top\">");
-            sb.append("<td width=\"");
-            sb.append(listwidth + "");
-            sb.append("\" style=\"max-width:");
-            sb.append(listwidth + "");
-            sb.append("px;\">");
+            sb.append(HtmlUtils.open("td",
+                                     HtmlUtils.attr("width", listwidth)));
             sb.append(
                 HtmlUtils.open(
                     HtmlUtils.TAG_DIV,
@@ -884,7 +882,8 @@ public class MapManager extends RepositoryManager {
             catSB.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
             numEntries++;
         }
-        int listwidth = request.get(WikiManager.ATTR_LISTWIDTH, 250);
+        String listwidth = request.getString(WikiManager.ATTR_LISTWIDTH,
+                                             "250");
         layoutMap(sb, listentries, numEntries, listwidth, height, categories,
                   catMap, map.getHtml());
 
