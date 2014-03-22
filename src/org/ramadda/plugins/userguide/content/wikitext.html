@@ -175,11 +175,23 @@ Java <a href="http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateForma
 <li> [wiki::tagdef information]: The information tabs.
 <li> [wiki::tagdef properties]: Show the properties listing.
 <li> [wiki::tagdef html]: Shows the default html view of the entry. Note: this requires an entry="..." to specify a different entry.
-<li> [wiki::tagdef map {width="width of map" height="height of map"}]: Display a map. If the entry is a folder then display the children entries of the folder.
-<li> [wiki::tagdef mapentry {width="width of map" height="height of map"}]:
-Display a map just for a group.
-If you used the map tag with a folder then the children get mapped. The mapentry tag
-says to make a map for just the entry.
+<li> [wiki::tagdef map {width="width of map" height="height of map" listentries="true|false" listwidth="width or percent"}]: Display a map. If the entry is a folder then display the children entries of the folder.
+
+If you do not specify a width then the map will be sized to fit its page. 
+
+The listwidth is the width devoted to the entry list. This may be a fixed pixel value or a percentage:
+
+<pre>
+{{map listentries="true" listwidth="25%"}}
+</pre>
+
+
+If you have a Folder (or other group) and want to just show the Folder and nots it children then do:
+<pre>
+{{map entries="this"}}
+</pre>
+
+
 <li> [wiki::tagdef earth {width="width of map" height="height of map"}]: 
 If enabled, display the Google Earth plugin. To enable the Google Earth see the
 <a href="admin.html#display">Admin help</a>. 

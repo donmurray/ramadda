@@ -95,7 +95,7 @@ function Ramadda(repositoryRoot) {
                 return this.repositoryRoot;
             },
             getJsonUrl: function(entryId) {
-                return this.repositoryRoot + "/entry/show?entryid=" + id +"&output=json";
+                return this.repositoryRoot + "/entry/show?entryid=" + entryId +"&output=json";
             },
             getEntryType: function(typeId) {
                 return this.entryTypeMap[typeId];
@@ -326,11 +326,15 @@ function Entry(props) {
                     return this.childrenEntries;
                 }
                 var theEntry =this;
+
                 var settings = new  EntrySearchSettings({parent: this.getId()});
                 var jsonUrl = this.getRamadda().getSearchUrl(settings, OUTPUT_JSON);
+
+                var jsonUrl =  this.getRamadda().getJsonUrl(this.getId()) +"&justchildren=true";
+                console.log(jsonUrl);
+
                 var myCallback = {
                     entryListChanged: function(list) {
-                        console.log("callback");
                         callback(list.getEntries());
                     }
                 };

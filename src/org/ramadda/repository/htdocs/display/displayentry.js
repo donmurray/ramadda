@@ -443,17 +443,13 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 var extra = "";
                 var text = this.searchSettings.text;
                 if(text == null) text = "";
-                var textField =  HtmlUtil.input("", text, ["placeholder","search text",ATTR_CLASS, "display-search-input ui-widget ui-button-text", "size","20",ATTR_ID,  this.getDomId(ID_TEXT_FIELD)]);
+                var textField =  HtmlUtil.input("", text, ["placeholder","search text",ATTR_CLASS, "display-search-input", ATTR_SIZE,"8",ATTR_ID,  this.getDomId(ID_TEXT_FIELD)]);
 
-                form += HtmlUtil.div([ATTR_ID, this.getDomId(ID_SEARCH),ATTR_CLASS,"display-button"],"Search for:");
-                if(this.showType) {
-                    form += "&nbsp;&nbsp;";
-                    form += HtmlUtil.span([ATTR_ID, this.getDomId(ID_TYPE_DIV)],HtmlUtil.span([ATTR_CLASS, "display-loading"], "Loading types..."));
-                } 
-                form += "&nbsp;&nbsp;";
-                form += textField;
-
+                var buttonLabel =  HtmlUtil.image(ramaddaBaseUrl +"/icons/magnifier.png",[ATTR_BORDER,"0",ATTR_TITLE,"Search"]);
+                var topItems = [];
                 var extra =   HtmlUtil.formTable();
+
+                topItems.push(HtmlUtil.div([ATTR_ID, this.getDomId(ID_SEARCH),ATTR_CLASS,"display-button"],buttonLabel));
 
                 if(this.ramaddas.length>0) {
                     var select  = HtmlUtil.openTag(TAG_SELECT,[ATTR_ID, this.getDomId(ID_REPOSITORY), ATTR_CLASS,"display-repositories-select"]);
@@ -471,9 +467,16 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                                                    ramadda.getName());
                     }
                     select += HtmlUtil.closeTag(TAG_SELECT);
-                    extra += HtmlUtil.formEntry("Repository:",select);
+                    topItems.push(select);
                 }
 
+
+                if(this.showType) {
+                    topItems.push(HtmlUtil.span([ATTR_ID, this.getDomId(ID_TYPE_DIV)],HtmlUtil.span([ATTR_CLASS, "display-loading"], "Loading types...")));
+                } 
+
+                topItems.push(textField);
+                form += HtmlUtil.join(topItems,"&nbsp;");
 
                 if(this.showArea) {
                     this.areaWidget = new AreaWidget(this);
@@ -679,7 +682,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                         }
                         field  += HtmlUtil.closeTag(TAG_SELECT);
                     } else {
-                        field = HtmlUtil.input("", savedValue, [ATTR_CLASS,"input", "size","15",ATTR_ID,  id]);
+                        field = HtmlUtil.input("", savedValue, [ATTR_CLASS,"input", ATTR_SIZE,"15",ATTR_ID,  id]);
                     }
                     extra+= HtmlUtil.formEntry(col.getLabel() +":" ,field + " " + col.getSuffix());
 
