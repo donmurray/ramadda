@@ -49,12 +49,16 @@ function CollectionForm(formId, type) {
                         }
                     });       
 
-
-                //TODO: add the arg that gives us the image directly back then set the img src
-                
-
-
-                
+                console.log("url:" + url);
+                //add the arg that gives us the image directly back then set the img src
+                url += "&givemeimage=true";
+                var outputDiv = $('#' + this.formId +"_output");
+                if(outputDiv.size()==0) {
+                    console.log("no output div");
+                }
+                //Make the html with the image
+                var html = "Results:<br>" + HtmlUtil.image(url,[ATTR_TITLE, "Loading"])
+                outputDiv.html(html);
             },
             initCollection: function(collection) {
                 var collectionForm = this;
