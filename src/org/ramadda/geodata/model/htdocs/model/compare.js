@@ -86,7 +86,7 @@ function CollectionForm(formId, type) {
             },
             addDataProcess: function(dataProcess) {
                 this.dataProcesses.push(dataProcess);
-            }
+            },
            //Gets called when the collection select widget is changed
             collectionChanged: function  (collection, selectId) {
                 var collectionId = this.getCollectionSelect(collection).val();
@@ -130,7 +130,7 @@ function CollectionForm(formId, type) {
                     //this.getFieldSelect(collection, idx).html("<select><option value=''>--</option></select>");
                     this.getFieldSelect(collection, idx).html("<option value=''>--</option>");
                 }
-            }
+            },
          //Get the select object for the given field
          getFieldSelect: function(collection, fieldIdx) {
                return  $('#' + this.getFieldSelectId(collection, fieldIdx));
@@ -153,10 +153,10 @@ function CollectionForm(formId, type) {
             },
            //dom id of the collection select widget
            //This matches up with ClimateModelApiHandler.getCollectionSelectId
-                getCollectionSelectId: function(collection) {
+            getCollectionSelectId: function(collection) {
                 return  this.formId +"_"  + collection;
             },
-                setFieldValues: function(collection, data, fieldIdx) {
+            setFieldValues: function(collection, data, fieldIdx) {
                 var currentValue =    this.getFieldSelect(collection, fieldIdx).val();
                 var currentValueIsInNewList = false;
                 //var html = "<select>";
