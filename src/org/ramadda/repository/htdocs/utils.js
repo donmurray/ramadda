@@ -413,6 +413,13 @@ var HtmlUtil =  {
         return "<input " + HtmlUtil.attrs(attrs) + HtmlUtil.attrs(["name", name, "value",value]) +"/>";
     },
 
+    valueDefined: function(value) {
+        if(value != "" && value.indexOf("--") != 0) {
+            return true;
+        }
+        return false;
+    }, 
+
 
     squote: function(s) {return "'" + s +"'";},
     toggleBlock: function(label, contents, visible) {

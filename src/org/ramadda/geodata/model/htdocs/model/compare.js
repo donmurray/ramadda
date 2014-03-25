@@ -44,7 +44,7 @@ function CollectionForm(formId, type) {
                                 return;
                             }
                         }
-                        if(theForm.valueDefined(value)) {
+                        if(HtmlUtil.valueDefined(value)) {
                             url += "&" + this.name+ "=" + encodeURIComponent(value);
                         }
                     });       
