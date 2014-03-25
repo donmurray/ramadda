@@ -414,15 +414,15 @@ function Entry(props) {
             },
             getColumnNames : function () {
                 var names =  [];
-                for(var i=0;i<this.columns.length;i++) {
-                    names.push(this.columns[i].getName());
+                for(var i=0;i<this.type.columns.length;i++) {
+                    names.push(this.type.columns[i].getName());
                 }
                 return names;
             },
             getColumnLabels : function () {
                 var labels =  [];
-                for(var i=0;i<this.columns.length;i++) {
-                    labels.push(this.columns[i].getLabel());
+                for(var i=0;i<this.type.columns.length;i++) {
+                    labels.push(this.type.columns[i].getLabel());
                 }
                 return labels;
             },
