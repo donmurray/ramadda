@@ -37,7 +37,7 @@ form {
 }
 
 
-input, password, fileinput,textarea,select {
+input, password, fileinput,textarea {
   border : 1px #888 solid;
 }
 
