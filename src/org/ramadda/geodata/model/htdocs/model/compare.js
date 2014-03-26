@@ -1,4 +1,5 @@
 
+var ARG_ACTION_SEARCH = "action.search";
 
 function CollectionForm(formId, type) {
 
@@ -14,16 +15,18 @@ function CollectionForm(formId, type) {
                 }
 
                 var theForm = this;
+                var which_button;
                 //Listen to the form
                 $("#"+ this.formId).submit(function( event ) {
-                        theForm.handleFormSubmission();
-                        event.preventDefault();
+                        if (which_button != ARG_ACTION_SEARCH) {
+                            theForm.handleFormSubmission();
+                            event.preventDefault();
+                        }
                     });                
 
                 //Listen to the button
                 $("#" + this.formId+"_submit").button().click(function(event) {
-                        theForm.handleFormSubmission();
-                        event.preventDefault();
+                        which_button = $(this).attr("name");
                     });
 
             },
@@ -157,6 +160,7 @@ function CollectionForm(formId, type) {
                 return  this.formId +"_"  + collection;
             },
             setFieldValues: function(collection, data, fieldIdx) {
+                if (data == null) return false;
                 var currentValue =    this.getFieldSelect(collection, fieldIdx).val();
                 var currentValueIsInNewList = false;
                 //var html = "<select>";

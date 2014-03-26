@@ -2,7 +2,7 @@
 <description><![CDATA[<wiki>
 <h2>${description}</h2>
 <p>
-{{display showmap="false" entries.filter="type:type_single_point_grid_netcdf"}}
+{{apply apply.tag="display" apply.entries.filter="type:type_single_point_grid_netcdf" apply.layout="table" apply.columns="1"}}
 <p>
 <br>
 <b>File(s) for Plot</b> 

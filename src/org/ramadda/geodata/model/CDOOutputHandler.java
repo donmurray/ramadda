@@ -253,7 +253,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
 
     /** month names */
     private static final String[] MONTH_NAMES = {
-        "January", "Febuary", "March", "April", "May", "June", "July",
+        "January", "February", "March", "April", "May", "June", "July",
         "August", "September", "October", "November", "December"
     };
 

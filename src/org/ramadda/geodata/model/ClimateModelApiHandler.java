@@ -255,13 +255,17 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         String entryUrl =
             HtmlUtils.url(
-                request.getAbsoluteUrl(getRepository().URL_ENTRY_SHOW),
+                request.getAbsoluteUrl(getRepository().URL_ENTRY_GET),
                 ARG_ENTRYID,
         // Use this if you want to return the process directory
-        processEntryId);
-        //processEntryId + "/" + IOUtil.getFileTail(lastFile.toString()));
+        //processEntryId);
+        processEntryId + "/" + IOUtil.getFileTail(lastFile.toString()));
 
-        return new Result(entryUrl);
+        //return new Result(entryUrl);
+        
+        request.setReturnFilename("generated.png");
+        return new Result("", getStorageManager().getFileInputStream(lastFile.toString()),                                            
+     "image/png");
     }
 
     /**
@@ -665,7 +669,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 // don't show variable selector for subsequent collections when we have a fixed
                 // collection
                 if (request.defined(ARG_COLLECTION) && (collectionNumber > 1)
-                        && column.getName().equals("variable")) {
+                        && column.getName().equals("variable") && false) {
                     dsb.append(HtmlUtils.formEntry(msg(""),
                             "<span style=\"max-width:250px;min-width:250px;\">&nbsp;</span>"));
                 } else {
@@ -710,7 +714,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             sb.append("<td width=\"400px\">&nbsp;</td>");
         } else {
             sb.append(HtmlUtils.submit("Select Again", ARG_ACTION_SEARCH,
-                                       HtmlUtils.id(formId + "_.submit")
+                                       HtmlUtils.id(formId + "_submit")
                                        + makeButtonSubmitDialog(sb,
                                            msg("Searching for new data")
                                            + "...")));
@@ -781,6 +785,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             }
 
             sb.append("</td>");
+            sb.append("<td><div id=\""+formId+"_output\"></div></td>");
         }
         sb.append("\n</tr></table>");
 
