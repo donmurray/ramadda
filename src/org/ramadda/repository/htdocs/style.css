@@ -1844,6 +1844,7 @@ a.toggleblocklabellink:visited {
 .formlabel, .formlabeltop {
   font-weight: bold;
   text-align:right;
+  vertical-align: top;
   color: #000;
 }
 
