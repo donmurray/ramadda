@@ -228,6 +228,9 @@ public class CsvOutputHandler extends OutputHandler {
                                       ? "(max:" + maxStringSize[col] + ")"
                                       : "");
                         }
+                        if (tmp == null) {
+                            tmp = "";
+                        }
                         headerString = headerString.replace(",fields", tmp);
                     }
                 }
