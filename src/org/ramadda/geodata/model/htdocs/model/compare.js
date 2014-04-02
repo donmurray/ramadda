@@ -15,19 +15,24 @@ function CollectionForm(formId, type) {
                 }
 
                 var theForm = this;
+                var $submits = $("#"+this.formId).find( 'input[type=submit]' );
                 var which_button;
                 //Listen to the form
                 $("#"+ this.formId).submit(function( event ) {
-                        if (which_button != ARG_ACTION_SEARCH) {
-                            theForm.handleFormSubmission();
-                            event.preventDefault();
-                        }
-                    });                
+                    if (null == which_button) {
+                         which_button = $submits[0];
+                    }
+                    if (which_button != ARG_ACTION_SEARCH) {
+                       theForm.handleFormSubmission();
+                       event.preventDefault();
+                    }
+                });                
 
-                //Listen to the button
-                $("#" + this.formId+"_submit").button().click(function(event) {
-                        which_button = $(this).attr("name");
-                    });
+                //Listen to the buttons
+                $submits.click( function(event) {
+                //$("#" + this.formId+"_submit").button().click(function(event) {
+                    which_button = $(this).attr("name");
+                });
 
             },
             handleFormSubmission: function() {
@@ -54,13 +59,13 @@ function CollectionForm(formId, type) {
 
                 console.log("url:" + url);
                 //add the arg that gives us the image directly back then set the img src
-                url += "&givemeimage=true";
+                url += "&returnimage=true";
                 var outputDiv = $('#' + this.formId +"_output");
                 if(outputDiv.size()==0) {
                     console.log("no output div");
                 }
                 //Make the html with the image
-                var html = "Results:<br>" + HtmlUtil.image(url,[ATTR_TITLE, "Loading"])
+                var html = HtmlUtil.image(url,[ATTR_ALT, "Generating Image..."])
                 outputDiv.html(html);
             },
             initCollection: function(collection) {

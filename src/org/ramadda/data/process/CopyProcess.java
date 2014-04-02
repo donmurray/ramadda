@@ -71,7 +71,7 @@ public class CopyProcess extends DataProcess {
      * @throws Exception  problem adding to the form
      */
     public void addToForm(Request request, DataProcessInput input,
-                          StringBuffer sb)
+                          StringBuilder sb)
             throws Exception {}
 
 

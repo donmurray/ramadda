@@ -30,6 +30,7 @@ import org.ramadda.repository.type.CollectionTypeHandler;
 import org.ramadda.repository.type.Column;
 import org.ramadda.repository.type.GranuleTypeHandler;
 import org.ramadda.sql.Clause;
+import org.ramadda.util.HtmlUtils;
 
 import java.io.File;
 
@@ -201,6 +202,31 @@ public abstract class CDODataProcess extends DataProcess {
                     "Humm, the CDO processing failed for some reason");
             }
         }
+    }
+
+    /**
+     * Add the statitics widget  - use instead of CDOOutputHandler
+     *
+     * @param request  the Request
+     * @param sb       the HTML
+     */
+    public void addStatsWidget(Request request, StringBuilder sb) {
+        sb.append(
+            HtmlUtils.formEntry(
+                Repository.msgLabel("Statistic"),
+                HtmlUtils.radio(
+                    CDOOutputHandler.ARG_CDO_STAT,
+                    CDOOutputHandler.STAT_MEAN,
+                    request.getString(CDOOutputHandler.ARG_CDO_STAT).equals(
+                        CDOOutputHandler.STAT_MEAN)) + Repository.msg("Mean")
+                            + HtmlUtils.space(2)
+                            + HtmlUtils.radio(
+                                CDOOutputHandler.ARG_CDO_STAT,
+                                CDOOutputHandler.STAT_ANOM,
+                                request.getString(
+                                    CDOOutputHandler.ARG_CDO_STAT).equals(
+                                    CDOOutputHandler.STAT_ANOM)) + Repository.msg(
+                                        "Anomaly")));
     }
 
 }

@@ -127,9 +127,9 @@ public class ClimateCollectionTypeHandler extends CollectionTypeHandler {
         }
 
 
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(entry.getDescription());
-        StringBuffer js     = new StringBuffer();
+        StringBuilder js     = new StringBuilder();
         String       formId = openForm(request, entry, sb, js);
 
         addSelectorWidgets(request, entry, sb, js, formId);
@@ -154,11 +154,11 @@ public class ClimateCollectionTypeHandler extends CollectionTypeHandler {
      * @throws Exception  problem creating the form
      */
     protected void addSelectorWidgets(Request request, Entry entry,
-                                      StringBuffer sb, StringBuffer js,
+                                      StringBuilder sb, StringBuilder js,
                                       String formId)
             throws Exception {
 
-        StringBuffer selectorSB = new StringBuffer();
+        StringBuilder selectorSB = new StringBuilder();
         selectorSB.append(HtmlUtils.formTable());
         addSelectorsToForm(request, entry, selectorSB, formId, js);
         String searchButton = JQ.button("Search", formId + "_search", js,
@@ -199,7 +199,7 @@ public class ClimateCollectionTypeHandler extends CollectionTypeHandler {
      * @throws Exception Problem creating widgets
      */
     protected void addProcessWidgets(Request request, Entry entry,
-                                     StringBuffer sb, StringBuffer js,
+                                     StringBuilder sb, StringBuilder js,
                                      String formId)
             throws Exception {
         // for now, don't add in the process widgets - just do a search/download.
@@ -227,7 +227,7 @@ JQ.button(
         List<String> processTabs   = new ArrayList<String>();
         List<String> processTitles = new ArrayList<String>();
 
-        StringBuffer settingsSB    = new StringBuffer();
+        StringBuilder settingsSB    = new StringBuilder();
         settingsSB.append(HtmlUtils.radio(ARG_DATA_PROCESS_ID, "none", true));
         settingsSB.append(HtmlUtils.space(1));
         settingsSB.append(msg("No Processing"));
@@ -238,7 +238,7 @@ JQ.button(
                                       HtmlUtils.style("min-height:200px;")));
         for (DataProcess process : processes) {
             //TODO: add radio buttons
-            StringBuffer tmpSB = new StringBuffer();
+            StringBuilder tmpSB = new StringBuilder();
             tmpSB.append(HtmlUtils.radio(ARG_DATA_PROCESS_ID,
                                          process.getDataProcessId(), false));
             tmpSB.append(HtmlUtils.space(1));

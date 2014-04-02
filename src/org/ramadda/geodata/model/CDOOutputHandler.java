@@ -437,7 +437,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
         if (request.defined(ARG_SUBMIT)) {
             return outputCDO(request, entry);
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         addForm(request, entry, sb);
 
         return new Result("CDO Form", sb);
@@ -452,7 +452,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      *
      * @throws Exception problems
      */
-    private void addForm(Request request, Entry entry, StringBuffer sb)
+    private void addForm(Request request, Entry entry, StringBuilder sb)
             throws Exception {
 
         String formUrl = request.url(getRepository().URL_ENTRY_SHOW);
@@ -492,7 +492,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      *
      * @throws Exception  on badness
      */
-    public void addToForm(Request request, Entry entry, StringBuffer sb)
+    public void addToForm(Request request, Entry entry, StringBuilder sb)
             throws Exception {
         //sb.append(HtmlUtils.formTable());
         if (entry.getType().equals("noaa_climate_modelfile")) {
@@ -502,7 +502,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
             //values[4] = member;
             //values[5] = frequency;
             Object[]     values = entry.getValues();
-            StringBuffer header = new StringBuffer();
+            StringBuilder header = new StringBuilder();
             header.append("Model: ");
             header.append(values[2]);
             header.append(" Experiment: ");
@@ -550,7 +550,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param request  the Request
      * @param sb       the HTML
      */
-    public void addStatsWidget(Request request, StringBuffer sb) {
+    public void addStatsWidget(Request request, StringBuilder sb) {
         sb.append(
             HtmlUtils.formEntry(
                 msgLabel("Statistic"),
@@ -572,8 +572,8 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param sb       the HTML
      * @param dataset  the dataset
      */
-    public void addVarLevelWidget(Request request, StringBuffer sb,
-                                  GridDataset dataset) {
+    public void addVarLevelWidget(Request request, StringBuilder sb,
+                                  GridDataset dataset) throws Exception {
         addVarLevelWidget(request, sb, dataset, ARG_CDO_LEVEL);
     }
 
@@ -585,10 +585,10 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param dataset  the dataset
      * @param levelArg the level argument
      */
-    public void addVarLevelWidget(Request request, StringBuffer sb,
-                                  GridDataset dataset, String levelArg) {
+    public void addVarLevelWidget(Request request, StringBuilder sb,
+                                  GridDataset dataset, String levelArg) throws Exception {
         List<GridDatatype> grids = dataset.getGrids();
-        StringBuffer       varsb = new StringBuffer();
+        StringBuilder       varsb = new StringBuilder();
         //TODO: handle multiple variables
         //List<TwoFacedObject> varList = new ArrayList<TwoFacedObject>(grids.size());
         //for (GridDatatype grid : dataset.getGrids()) {
@@ -630,9 +630,9 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * Add the months widget
      *
      * @param request  the Request
-     * @param sb       the StringBuffer to add to
+     * @param sb       the StringBuilder to add to
      */
-    private void addInfoWidget(Request request, StringBuffer sb) {
+    private void addInfoWidget(Request request, StringBuilder sb) throws Exception {
         sb.append(
             HtmlUtils.formEntry(
                 msgLabel("Months"),
@@ -649,8 +649,8 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param dataset  the GridDataset
      * @param useYYMM  true to provide month/year widgets, otherwise straight dates
      */
-    public void addTimeWidget(Request request, StringBuffer sb,
-                              GridDataset dataset, boolean useYYMM) {
+    public void addTimeWidget(Request request, StringBuilder sb,
+                              GridDataset dataset, boolean useYYMM) throws Exception {
         List<CalendarDate> dates = CdmDataOutputHandler.getGridDates(dataset);
         if ( !dates.isEmpty()) {
             CalendarDate cd  = dates.get(0);
@@ -706,8 +706,8 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param sb       the HTML
      * @param dates    the list of Dates
      */
-    private void makeTimesWidget(Request request, StringBuffer sb,
-                                 List<CalendarDate> dates) {
+    private void makeTimesWidget(Request request, StringBuilder sb,
+                                 List<CalendarDate> dates) throws Exception {
         List formattedDates = new ArrayList();
         formattedDates.add(new TwoFacedObject("---", ""));
         for (CalendarDate date : dates) {
@@ -737,11 +737,11 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * Add the month selection widget
      *
      * @param request  the Request
-     * @param sb       the StringBuffer to add to
+     * @param sb       the StringBuilder to add to
      * @param dates    the list of dates (just in case)
      */
-    public static void makeMonthsWidget(Request request, StringBuffer sb,
-                                        List<CalendarDate> dates) {
+    public static void makeMonthsWidget(Request request, StringBuilder sb,
+                                        List<CalendarDate> dates) throws Exception {
         /*
         HtmlUtils.radio(ARG_CDO_MONTHS, "all", request.get(ARG_CDO_MONTHS, true))+msg("All")+
         HtmlUtils.space(2)+
@@ -770,11 +770,11 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * Add the year selection widget
      *
      * @param request  the Request
-     * @param sb       the StringBuffer to add to
+     * @param sb       the StringBuilder to add to
      * @param dates    the list of dates
      */
-    private void makeYearsWidget(Request request, StringBuffer sb,
-                                 List<CalendarDate> dates) {
+    private void makeYearsWidget(Request request, StringBuilder sb,
+                                 List<CalendarDate> dates) throws Exception {
         SortedSet<String> uniqueYears =
             Collections.synchronizedSortedSet(new TreeSet<String>());
         if ((dates != null) && !dates.isEmpty()) {
@@ -818,7 +818,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param sb        the HTML
      * @param llr       the lat/lon rectangle
      */
-    public void addMapWidget(Request request, StringBuffer sb,
+    public void addMapWidget(Request request, StringBuilder sb,
                              LatLonRect llr) {
         addMapWidget(request, sb, llr, false);
     }
@@ -831,7 +831,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param llr       the lat/lon rectangle
      * @param usePopup  use a popup
      */
-    public void addMapWidget(Request request, StringBuffer sb,
+    public void addMapWidget(Request request, StringBuilder sb,
                              LatLonRect llr, boolean usePopup) {
 
         MapInfo map;
@@ -966,7 +966,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
                 info = outMsg;
             }
 
-            StringBuffer sb = new StringBuffer();
+            StringBuilder sb = new StringBuilder();
             addForm(request, entry, sb);
             sb.append(header(msg("CDO Information")));
             sb.append(HtmlUtils.pre(info));
@@ -1119,7 +1119,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
             if ((startMonth == 1) && (endMonth == 12)) {
                 return;
             }
-            StringBuffer buf = new StringBuffer(OP_SELMON + "," + startMonth);
+            StringBuilder buf = new StringBuilder(OP_SELMON + "," + startMonth);
             if (endMonth > startMonth) {
                 buf.append("/");
                 buf.append(endMonth);
@@ -1383,7 +1383,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
          * @throws Exception  problem adding to the form
          */
         public void addToForm(Request request, DataProcessInput input,
-                              StringBuffer sb)
+                              StringBuilder sb)
                 throws Exception {
             sb.append(HtmlUtils.formTable());
             Entry first = input.getOperands().get(0).getEntries().get(0);
@@ -1394,7 +1394,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
                 //values[4] = member;
                 //values[5] = frequency;
                 Object[]     values = first.getValues();
-                StringBuffer header = new StringBuffer();
+                StringBuilder header = new StringBuilder();
                 header.append("Model: ");
                 header.append(values[2]);
                 header.append(" Experiment: ");

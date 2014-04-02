@@ -101,7 +101,7 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
      */
     @Override
     public void addToForm(Request request, DataProcessInput input,
-                          StringBuffer sb)
+                          StringBuilder sb)
             throws Exception {
         sb.append(HtmlUtils.formTable());
         makeInputForm(request, input, sb);
@@ -113,12 +113,12 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
      *
      * @param request  the Request
      * @param input    the DataProcessInput
-     * @param sb       the StringBuffer
+     * @param sb       the StringBuilder
      *
      * @throws Exception  problem making stuff
      */
     private void makeInputForm(Request request, DataProcessInput input,
-                               StringBuffer sb)
+                               StringBuilder sb)
             throws Exception {
         Entry first = input.getOperands().get(0).getEntries().get(0);
 
@@ -144,7 +144,7 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
             llr = new LatLonRect(new LatLonPointImpl(90.0, -180.0),
                                  new LatLonPointImpl(-90.0, 180.0));
         }
-        getOutputHandler().addMapWidget(request, sb, llr, false);
+
     }
 
 
@@ -217,11 +217,10 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
     }
 
     /**
-     * Add the statitics widget
+     * Add the statitics widget  - use instead of CDOOutputHandler
      *
      * @param request  the Request
      * @param sb       the HTML
-     */
     public void addStatsWidget(Request request, StringBuffer sb) {
         sb.append(
             HtmlUtils.formEntry(
@@ -235,7 +234,7 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
                                     CDOOutputHandler.STAT_ANOM,
                                     false) + Repository.msg("Anomaly")));
     }
-
+     */
 
 
     /**
@@ -342,7 +341,7 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
             outFile = anomFile;
         }
 
-        StringBuffer outputName = new StringBuffer();
+        StringBuilder outputName = new StringBuilder();
         Object[]     values     = oneOfThem.getValues();
         // values = collection,model,experiment,ens,var
         // model

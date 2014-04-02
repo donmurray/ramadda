@@ -135,7 +135,7 @@ public class NCLModelPlotDataProcess extends DataProcess {
      */
     @Override
     public void addToForm(Request request, DataProcessInput input,
-                          StringBuffer sb)
+                          StringBuilder sb)
             throws Exception {
         sb.append(HtmlUtils.formTable());
         Entry first = input.getOperands().get(0).getEntries().get(0);
@@ -152,61 +152,72 @@ public class NCLModelPlotDataProcess extends DataProcess {
             sb.append(
                 HtmlUtils.formEntry(
                     Repository.msgLabel("Plot As"),
-                    HtmlUtils.radio(ARG_NCL_OUTPUT, "diff", request.get(ARG_NCL_OUTPUT, true))
-                    + Repository.msg("Difference")
-                    + HtmlUtils.radio(ARG_NCL_OUTPUT, "comp", request.get(ARG_NCL_OUTPUT, false))
-                    + Repository.msg("Comparison")));
+                    HtmlUtils.radio(
+                        ARG_NCL_OUTPUT, "diff",
+                        request.getString(ARG_NCL_OUTPUT).equals(
+                            "diff")) + Repository.msg("Difference")
+                                     + HtmlUtils.radio(
+                                         ARG_NCL_OUTPUT, "comp",
+                                         request.getString(
+                                             ARG_NCL_OUTPUT).equals(
+                                             "comp")) + Repository.msg(
+                                                 "Separate Plots")));
         }
-        sb.append(
-            HtmlUtils.formEntry(
-                Repository.msgLabel("Plot Type"),
-                HtmlUtils.radio(
-                    NCLOutputHandler.ARG_NCL_PLOTTYPE, "png",
-                    request.get(NCLOutputHandler.ARG_NCL_PLOTTYPE, true)) + Repository.msg("Map")
-                          + HtmlUtils.radio(
-                              NCLOutputHandler.ARG_NCL_PLOTTYPE, "kmz",
-                              request.get(NCLOutputHandler.ARG_NCL_PLOTTYPE, false)) + Repository.msg("Google Earth")
-        /*
-               + "<br>"
-               + HtmlUtils.radio(
-               NCLOutputHandler.ARG_NCL_PLOTTYPE,
-                   "timeseries",
-                   request.get(NCLOutputHandler.ARG_NCL_PLOTTYPE, false)) + Repository.msg(
-                       "Time Series") + HtmlUtils.radio(
-                       NCLOutputHandler.ARG_NCL_PLOTTYPE,
-                       "pdf", request.get(NCLOutputHandler.ARG_NCL_PLOTTYPE, false)) + Repository.msg(
-                           "PDF")
-         */
-        ));
+        sb.append(HtmlUtils
+            .formEntry(Repository.msgLabel("Plot Type"), HtmlUtils
+                .radio(NCLOutputHandler.ARG_NCL_PLOTTYPE, "png", request
+                    .getString(NCLOutputHandler.ARG_NCL_PLOTTYPE)
+                        .equals("png")) + Repository.msg("Map")
+                            + HtmlUtils
+                                .radio(NCLOutputHandler
+                                    .ARG_NCL_PLOTTYPE, "kmz", request
+                                        .getString(NCLOutputHandler
+                                            .ARG_NCL_PLOTTYPE)
+                                                .equals("kmz")) + Repository
+                                                    .msg("Google Earth")));
         // units
         String units = grid.getUnitsString();
         if (units.equals("K") || units.equals("degK")) {
             sb.append(
                 HtmlUtils.formEntry(
                     Repository.msgLabel("Plot Units"),
-                    HtmlUtils.radio(ARG_NCL_UNITS, "K", request.get(ARG_NCL_UNITS, true))
-                    + Repository.msg("Kelvin")
-                    + HtmlUtils.radio(ARG_NCL_UNITS, "degC", request.get(ARG_NCL_UNITS, false))
-                    + Repository.msg("Celsius")));
+                    HtmlUtils.radio(
+                        ARG_NCL_UNITS, "K",
+                        request.getString(ARG_NCL_UNITS).equals(
+                            "K")) + Repository.msg("Kelvin")
+                                  + HtmlUtils.radio(
+                                      ARG_NCL_UNITS, "degC",
+                                      request.getString(ARG_NCL_UNITS).equals(
+                                          "degC")) + Repository.msg(
+                                              "Celsius")));
         } else if (units.equals("kg m-2 s-1") || units.equals("mm/s")) {
             sb.append(
                 HtmlUtils.formEntry(
                     Repository.msgLabel("Output Units"),
-                    HtmlUtils.radio(ARG_NCL_UNITS, "mm/s", request.get(ARG_NCL_UNITS, false))
-                    + Repository.msg("mm/s")
-                    + HtmlUtils.radio(ARG_NCL_UNITS, "mm/day", request.get(ARG_NCL_UNITS, true))
-                    + Repository.msg("mm/day")));
+                    HtmlUtils.radio(
+                        ARG_NCL_UNITS, "mm/s",
+                        request.getString(ARG_NCL_UNITS).equals(
+                            "mm/s")) + Repository.msg("mm/s")
+                                     + HtmlUtils.radio(
+                                         ARG_NCL_UNITS, "mm/day",
+                                         request.getString(
+                                             ARG_NCL_UNITS).equals(
+                                             "mm/day")) + Repository.msg(
+                                                 "mm/day")));
         }
         // Contour interval
         //TODO: get the default value from the request
         StringBuffer contourSB = new StringBuffer();
         contourSB.append(Repository.msg("Interval: "));
-        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CINT, ""));
+        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CINT,
+                request.getString(ARG_NCL_CINT, "")));
         contourSB.append("<br>");
         contourSB.append(Repository.msg("Range: Low"));
-        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMIN, ""));
+        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMIN,
+                request.getString(ARG_NCL_CMIN, "")));
         contourSB.append(Repository.msg("High"));
-        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMAX, ""));
+        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMAX,
+                request.getString(ARG_NCL_CMAX, "")));
         sb.append(
             HtmlUtils.formEntry(
                 "<div style=\"width:9em\">"

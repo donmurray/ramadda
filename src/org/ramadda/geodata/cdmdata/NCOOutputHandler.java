@@ -627,7 +627,7 @@ public class NCOOutputHandler extends OutputHandler implements DataProcessProvid
          * @throws Exception  on badness
          */
         public void addToForm(Request request, DataProcessInput input,
-                              StringBuffer sb)
+                              StringBuilder sb)
                 throws Exception {
             sb.append(HtmlUtils.formTable());
             sb.append(HtmlUtils.formEntry(msgLabel("CDO Stuff"), "widgets"));

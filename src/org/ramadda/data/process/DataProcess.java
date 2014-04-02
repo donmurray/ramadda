@@ -67,7 +67,7 @@ public abstract class DataProcess {
      * @throws Exception  problem adding to the form
      */
     public abstract void addToForm(Request request, DataProcessInput input,
-                                   StringBuffer sb)
+                                   StringBuilder sb)
      throws Exception;
 
 

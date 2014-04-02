@@ -451,8 +451,8 @@ public class CollectionTypeHandler extends ExtensibleGroupTypeHandler {
      * @throws Exception _more_
      */
     public void addSelectorsToForm(Request request, Entry entry,
-                                   StringBuffer sb, String formId,
-                                   StringBuffer js)
+                                   StringBuilder sb, String formId,
+                                   StringBuilder js)
             throws Exception {
 
         for (int selectIdx = 0; selectIdx < columns.size(); selectIdx++) {
@@ -878,8 +878,8 @@ public class CollectionTypeHandler extends ExtensibleGroupTypeHandler {
      *
      * @return _more_
      */
-    public String openForm(Request request, Entry entry, StringBuffer sb,
-                           StringBuffer js) {
+    public String openForm(Request request, Entry entry, StringBuilder sb,
+                           StringBuilder js) {
         sb.append(HtmlUtils.importJS(fileUrl("/selectform.js")));
         String formId = "selectform" + HtmlUtils.blockCnt++;
         sb.append(

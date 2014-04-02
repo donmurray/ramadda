@@ -79,7 +79,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      *
      * @throws Exception _more_
      */
-    public void initFormJS(Request request, Appendable js, String formVar)
+    public void initFormJS(Request request, StringBuilder js, String formVar)
             throws Exception {
         js.append(formVar
                   + ".addDataProcess(new CDOArealStatisticsProcess());\n");
@@ -96,7 +96,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @throws Exception  problem adding to the form
      */
     public void addToForm(Request request, DataProcessInput input,
-                          StringBuffer sb)
+                          StringBuilder sb)
             throws Exception {
         sb.append(HtmlUtils.formTable());
         makeInputForm(request, input, sb);
@@ -108,12 +108,12 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      *
      * @param request  the Request
      * @param input    the DataProcessInput
-     * @param sb       the StringBuffer
+     * @param sb       the StringBuilder
      *
      * @throws Exception  problem making stuff
      */
     private void makeInputForm(Request request, DataProcessInput input,
-                               StringBuffer sb)
+                               StringBuilder sb)
             throws Exception {
         Entry first = input.getOperands().get(0).getEntries().get(0);
 
@@ -295,7 +295,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             outFile = anomFile;
         }
 
-        StringBuffer outputName = new StringBuffer();
+        StringBuilder outputName = new StringBuilder();
         Object[]     values     = oneOfThem.getValues();
         // values = collection,model,experiment,ens,var
         // model
@@ -409,7 +409,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @param request  the Request
      * @param sb       the HTML
      */
-    public void addStatsWidget(Request request, StringBuffer sb) {
+    public void addStatsWidget(Request request, StringBuilder sb) {
 
         sb.append(
             HtmlUtils.hidden(
@@ -417,6 +417,8 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                 request.getString(
                     CDOOutputHandler.ARG_CDO_PERIOD,
                     CDOOutputHandler.PERIOD_TIM)));
+        super.addStatsWidget(request, sb);
+        /*
         sb.append(
             HtmlUtils.formEntry(
                 Repository.msgLabel("Statistic"),
@@ -424,6 +426,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                     CDOOutputHandler.ARG_CDO_STAT,
                     CDOOutputHandler.STAT_TYPES,
                     request.getString(CDOOutputHandler.ARG_CDO_STAT, null))));
+                    */
     }
 
     /**
@@ -435,7 +438,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      *
      * @throws Exception  problem making datasets
      */
-    public void addTimeWidget(Request request, StringBuffer sb,
+    public void addTimeWidget(Request request, StringBuilder sb,
                               DataProcessInput input)
             throws Exception {
 
@@ -461,10 +464,10 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * Add the year selection widget
      *
      * @param request  the Request
-     * @param sb       the StringBuffer to add to
+     * @param sb       the StringBuilder to add to
      * @param grids    list of grids to use
      */
-    private void makeYearsWidget(Request request, StringBuffer sb,
+    private void makeYearsWidget(Request request, StringBuilder sb,
                                  List<GridDataset> grids) {
         int grid = 0;
         for (GridDataset dataset : grids) {

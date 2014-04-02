@@ -126,8 +126,8 @@ public class JQuery {
      *
      * @return _more_
      */
-    public static String button(String label, String id, StringBuffer js,
-                                String code) {
+    public static String button(String label, String id, Appendable js,
+                                String code) throws Exception {
         String html = HtmlUtils.tag("button", HtmlUtils.id(id), label);
         js.append(
             JQuery.select(JQuery.id(id))
@@ -147,8 +147,8 @@ public class JQuery {
      *
      * @return _more_
      */
-    public static String makeButton(String label, String id, StringBuffer js,
-                                    String code) {
+    public static String makeButton(String label, String id, Appendable js,
+                                    String code) throws Exception {
         String html = HtmlUtils.tag("button", HtmlUtils.id(id), label);
         js.append(JQuery.select(JQuery.id(id))
                   + ".button().click(function(event){\n" + code + "\n});\n");
