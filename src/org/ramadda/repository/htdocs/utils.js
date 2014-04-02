@@ -241,6 +241,7 @@ var ATTR_HREF = "href";
 var ATTR_BORDER = "border";
 var ATTR_VALUE = "value";
 var ATTR_TITLE = "title";
+var ATTR_ALT = "alt";
 var ATTR_ID = "id";
 var ATTR_CLASS = "class";
 var ATTR_SIZE = "size";
