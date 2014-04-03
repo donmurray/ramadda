@@ -680,6 +680,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
 
 
+            List<String> selectors = new ArrayList<String>();
             if (fixedCollection != null) {
                 dsb.append("\n");
                 dsb.append(HtmlUtils.hidden(arg, fixedCollection.getId(),
@@ -687,16 +688,16 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             } else {
                 String collectionWidget = HtmlUtils.select(arg, tfos,
                                               request.getString(arg, ""),
+                                              HtmlUtils.cssClass("select_widget") +
                                               HtmlUtils.id(id));
                 String select = "<label class=\"selector\" for=\"" + id
                                 + "\">" + msgLabel("Collection") + "</label>"
                                 + collectionWidget;
-                dsb.append(select);
+                selectors.add(select);
             }
 
             Entry        entry     = collections.get(0);
             List<Column> columns   = typeHandler.getGranuleColumns();
-            List<String> selectors = new ArrayList<String>(columns.size());
             for (int fieldIdx = 0; fieldIdx < columns.size(); fieldIdx++) {
                 Column column = columns.get(fieldIdx);
                 //String key = "values::" + entry.getId()+"::" +column.getName();
