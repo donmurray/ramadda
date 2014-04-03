@@ -32,7 +32,6 @@ import org.ramadda.repository.Request;
 import org.ramadda.repository.RequestHandler;
 import org.ramadda.repository.Result;
 import org.ramadda.repository.database.Tables;
-import org.ramadda.repository.output.OutputHandler;
 import org.ramadda.repository.type.CollectionTypeHandler;
 import org.ramadda.repository.type.Column;
 import org.ramadda.sql.Clause;
@@ -262,6 +261,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         if (request.get("returnimage", false)) {
             request.setReturnFilename("generated_image.png");
+
             return new Result(
                 "",
                 getStorageManager().getFileInputStream(lastFile.toString()),
@@ -454,7 +454,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         }
 
         Hashtable<String, StringBuilder> extra = new Hashtable<String,
-                                                    StringBuilder>();
+                                                     StringBuilder>();
         List<DataProcessOperand> operands =
             new ArrayList<DataProcessOperand>();
 
@@ -527,7 +527,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
 
 
-        StringBuilder     sb  = new StringBuilder();
+        StringBuilder    sb  = new StringBuilder();
         DataProcessInput dpi = new DataProcessInput(processDir, operands);
 
         if (request.exists(type)) {
@@ -675,8 +675,9 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 datasetTitles.add("Dataset 2 (Optional)");
             }
             collectionNumber++;
-            String arg = getCollectionSelectArg(collection);
-            String id  = getCollectionSelectId(formId, collection);
+            String       arg       = getCollectionSelectArg(collection);
+            String       id        = getCollectionSelectId(formId,
+                                         collection);
 
 
 
@@ -686,18 +687,18 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 dsb.append(HtmlUtils.hidden(arg, fixedCollection.getId(),
                                             HtmlUtils.id(id)));
             } else {
-                String collectionWidget = HtmlUtils.select(arg, tfos,
-                                              request.getString(arg, ""),
-                                              HtmlUtils.cssClass("select_widget") +
-                                              HtmlUtils.id(id));
+                String collectionWidget =
+                    HtmlUtils.select(arg, tfos, request.getString(arg, ""),
+                                     HtmlUtils.cssClass("select_widget")
+                                     + HtmlUtils.id(id));
                 String select = "<label class=\"selector\" for=\"" + id
                                 + "\">" + msgLabel("Collection") + "</label>"
                                 + collectionWidget;
                 selectors.add(select);
             }
 
-            Entry        entry     = collections.get(0);
-            List<Column> columns   = typeHandler.getGranuleColumns();
+            Entry        entry   = collections.get(0);
+            List<Column> columns = typeHandler.getGranuleColumns();
             for (int fieldIdx = 0; fieldIdx < columns.size(); fieldIdx++) {
                 Column column = columns.get(fieldIdx);
                 //String key = "values::" + entry.getId()+"::" +column.getName();
@@ -1087,6 +1088,5 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         return collections;
     }
-
 
 }

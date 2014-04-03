@@ -859,4 +859,20 @@ public class RepositoryManager implements RepositorySource, Constants,
      */
     public void clearCache() {}
 
+    /**
+     * A method to find out if a radio button should be selected based on the request arguments
+     * @param request     the request
+     * @param requestArg  the request argument
+     * @param buttonValue the value to check against
+     * @param dflt        default if requestArg is not defined in request
+     * @return  true if requestArg is present and equals buttonValue, else dflt
+     */
+    public static boolean getShouldButtonBeSelected(Request request, 
+    		String requestArg, String buttonValue, boolean dflt) {
+    	if (request.defined(requestArg)) {
+    		return request.getString(requestArg).equals(buttonValue);
+    	}
+    	return dflt;
+    }
+
 }

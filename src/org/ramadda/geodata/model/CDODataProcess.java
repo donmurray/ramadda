@@ -24,6 +24,7 @@ package org.ramadda.geodata.model;
 import org.ramadda.data.process.DataProcess;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
+import org.ramadda.repository.RepositoryManager;
 import org.ramadda.repository.Request;
 import org.ramadda.repository.database.Tables;
 import org.ramadda.repository.type.CollectionTypeHandler;
@@ -31,6 +32,7 @@ import org.ramadda.repository.type.Column;
 import org.ramadda.repository.type.GranuleTypeHandler;
 import org.ramadda.sql.Clause;
 import org.ramadda.util.HtmlUtils;
+
 
 import java.io.File;
 
@@ -217,16 +219,19 @@ public abstract class CDODataProcess extends DataProcess {
                 HtmlUtils.radio(
                     CDOOutputHandler.ARG_CDO_STAT,
                     CDOOutputHandler.STAT_MEAN,
-                    request.getString(CDOOutputHandler.ARG_CDO_STAT).equals(
-                        CDOOutputHandler.STAT_MEAN)) + Repository.msg("Mean")
-                            + HtmlUtils.space(2)
-                            + HtmlUtils.radio(
-                                CDOOutputHandler.ARG_CDO_STAT,
-                                CDOOutputHandler.STAT_ANOM,
-                                request.getString(
-                                    CDOOutputHandler.ARG_CDO_STAT).equals(
-                                    CDOOutputHandler.STAT_ANOM)) + Repository.msg(
-                                        "Anomaly")));
+                    RepositoryManager.getShouldButtonBeSelected(
+                        request, CDOOutputHandler.ARG_CDO_STAT,
+                        CDOOutputHandler.STAT_MEAN, true)) + Repository.msg(
+                            "Mean") + HtmlUtils.space(2)
+                                    + HtmlUtils.radio(
+                                        CDOOutputHandler.ARG_CDO_STAT,
+                                        CDOOutputHandler.STAT_ANOM,
+                                        RepositoryManager.getShouldButtonBeSelected(
+                                            request,
+                                            CDOOutputHandler.ARG_CDO_STAT,
+                                            CDOOutputHandler.STAT_ANOM,
+                                            false)) + Repository.msg(
+                                                "Anomaly")));
     }
 
 }

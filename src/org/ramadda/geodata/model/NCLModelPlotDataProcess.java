@@ -29,6 +29,7 @@ import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
 import org.ramadda.repository.Constants;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
+import org.ramadda.repository.RepositoryManager;
 import org.ramadda.repository.Request;
 import org.ramadda.repository.Resource;
 import org.ramadda.repository.type.TypeHandler;
@@ -154,27 +155,31 @@ public class NCLModelPlotDataProcess extends DataProcess {
                     Repository.msgLabel("Plot As"),
                     HtmlUtils.radio(
                         ARG_NCL_OUTPUT, "diff",
-                        request.getString(ARG_NCL_OUTPUT).equals(
-                            "diff")) + Repository.msg("Difference")
-                                     + HtmlUtils.radio(
-                                         ARG_NCL_OUTPUT, "comp",
-                                         request.getString(
-                                             ARG_NCL_OUTPUT).equals(
-                                             "comp")) + Repository.msg(
-                                                 "Separate Plots")));
+                        RepositoryManager.getShouldButtonBeSelected(
+                            request, ARG_NCL_OUTPUT, "diff",
+                            true)) + Repository.msg("Difference")
+                                   + HtmlUtils.radio(
+                                       ARG_NCL_OUTPUT, "comp",
+                                       RepositoryManager.getShouldButtonBeSelected(
+                                           request, ARG_NCL_OUTPUT, "comp",
+                                           false)) + Repository.msg(
+                                               "Separate Plots")));
         }
-        sb.append(HtmlUtils
-            .formEntry(Repository.msgLabel("Plot Type"), HtmlUtils
-                .radio(NCLOutputHandler.ARG_NCL_PLOTTYPE, "png", request
-                    .getString(NCLOutputHandler.ARG_NCL_PLOTTYPE)
-                        .equals("png")) + Repository.msg("Map")
-                            + HtmlUtils
-                                .radio(NCLOutputHandler
-                                    .ARG_NCL_PLOTTYPE, "kmz", request
-                                        .getString(NCLOutputHandler
-                                            .ARG_NCL_PLOTTYPE)
-                                                .equals("kmz")) + Repository
-                                                    .msg("Google Earth")));
+        sb.append(
+            HtmlUtils.formEntry(
+                Repository.msgLabel("Plot Type"),
+                HtmlUtils.radio(
+                    NCLOutputHandler.ARG_NCL_PLOTTYPE, "png",
+                    RepositoryManager.getShouldButtonBeSelected(
+                        request, NCLOutputHandler.ARG_NCL_PLOTTYPE, "png",
+                        true)) + Repository.msg("Map")
+                               + HtmlUtils.radio(
+                                   NCLOutputHandler.ARG_NCL_PLOTTYPE, "kmz",
+                                   RepositoryManager.getShouldButtonBeSelected(
+                                       request,
+                                       NCLOutputHandler.ARG_NCL_PLOTTYPE,
+                                       "kmz", false)) + Repository.msg(
+                                           "Google Earth")));
         // units
         String units = grid.getUnitsString();
         if (units.equals("K") || units.equals("degK")) {
@@ -183,27 +188,30 @@ public class NCLModelPlotDataProcess extends DataProcess {
                     Repository.msgLabel("Plot Units"),
                     HtmlUtils.radio(
                         ARG_NCL_UNITS, "K",
-                        request.getString(ARG_NCL_UNITS).equals(
-                            "K")) + Repository.msg("Kelvin")
-                                  + HtmlUtils.radio(
-                                      ARG_NCL_UNITS, "degC",
-                                      request.getString(ARG_NCL_UNITS).equals(
-                                          "degC")) + Repository.msg(
-                                              "Celsius")));
+                        RepositoryManager.getShouldButtonBeSelected(
+                            request, ARG_NCL_UNITS, "K",
+                            true)) + Repository.msg("Kelvin")
+                                   + HtmlUtils.radio(
+                                       ARG_NCL_UNITS, "degC",
+                                       RepositoryManager.getShouldButtonBeSelected(
+                                           request, ARG_NCL_UNITS, "degC",
+                                           false)) + Repository.msg(
+                                               "Celsius")));
         } else if (units.equals("kg m-2 s-1") || units.equals("mm/s")) {
             sb.append(
                 HtmlUtils.formEntry(
                     Repository.msgLabel("Output Units"),
                     HtmlUtils.radio(
                         ARG_NCL_UNITS, "mm/s",
-                        request.getString(ARG_NCL_UNITS).equals(
-                            "mm/s")) + Repository.msg("mm/s")
-                                     + HtmlUtils.radio(
-                                         ARG_NCL_UNITS, "mm/day",
-                                         request.getString(
-                                             ARG_NCL_UNITS).equals(
-                                             "mm/day")) + Repository.msg(
-                                                 "mm/day")));
+                        RepositoryManager.getShouldButtonBeSelected(
+                            request, ARG_NCL_UNITS, "mm/s",
+                            true)) + Repository.msg("mm/s")
+                                   + HtmlUtils.radio(
+                                       ARG_NCL_UNITS, "mm/day",
+                                       RepositoryManager.getShouldButtonBeSelected(
+                                           request, ARG_NCL_UNITS, "mm/day",
+                                           true)) + Repository.msg(
+                                               "mm/day")));
         }
         // Contour interval
         //TODO: get the default value from the request
