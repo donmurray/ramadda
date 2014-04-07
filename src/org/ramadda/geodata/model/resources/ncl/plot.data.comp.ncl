@@ -284,24 +284,25 @@ begin
   ;print(ratio)
   opts@ratio=ratio
 
+  tmpdata = datafile->$varname$
   if (numdims .eq. 3) then  ; (time,lat,lon)
     if (vartype .eq. "short") then
-      vardata = short2flt(datafile->$varname$(:,{minLat:maxLat},{minLon:maxLon}))
+      vardata = short2flt(tmpdata(:,{minLat:maxLat},{minLon:maxLon}))
     else
-      vardata = datafile->$varname$(:,{minLat:maxLat},{minLon:maxLon})
+      vardata = tmpdata(:,{minLat:maxLat},{minLon:maxLon})
     end if
   else ; (time,level,lat,lon)
     if (vartype .eq. "short") then
       if (ismissing(varlevel)) then
-        vardata = short2flt(datafile->$varname$(:,0,{minLat:maxLat},{minLon:maxLon}))
+        vardata = short2flt(tmpdata(:,0,{minLat:maxLat},{minLon:maxLon}))
       else
-        vardata = short2flt(datafile->$varname$(:,{varlevel},{minLat:maxLat},{minLon:maxLon}))
+        vardata = short2flt(tmpdata(:,{varlevel},{minLat:maxLat},{minLon:maxLon}))
       end if
     else
       if (ismissing(varlevel)) then
-        vardata = datafile->$varname$(:,0,{minLat:maxLat},{minLon:maxLon})
+        vardata = tmpdata(:,0,{minLat:maxLat},{minLon:maxLon})
       else
-        vardata = datafile->$varname$(:,{varlevel},{minLat:maxLat},{minLon:maxLon})
+        vardata = tmpdata(:,{varlevel},{minLat:maxLat},{minLon:maxLon})
       end if
     end if
   end if
