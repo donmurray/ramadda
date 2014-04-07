@@ -713,9 +713,10 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 // don't show variable selector for subsequent collections when we have a fixed
                 // collection
                 if (request.defined(ARG_COLLECTION) && (collectionNumber > 1)
-                        && column.getName().equals("variable") && false) {
-                    dsb.append(HtmlUtils.formEntry(msg(""),
-                            "<span style=\"max-width:250px;min-width:250px;\">&nbsp;</span>"));
+                        && column.getName().equals("variable")) {
+                    //dsb.append(HtmlUtils.formEntry(msg(""),
+                    String selector = "<span class=\"select_widget\">&nbsp;</span>";
+                    selectors.add("<label class=\"selector\">"+msg("")+"</label>"+selector);
                 } else {
 
                     String selectBox =
@@ -764,7 +765,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                                 HtmlUtils.cssClass("model-dataset_title")));
         sb.append(datasets.get(0));
         sb.append("</td>");
-        sb.append("<td>");
+        sb.append("<td valign=\"top\">");
         sb.append(HtmlUtils.div(msg(datasetTitles.get(1)),
                                 HtmlUtils.cssClass("model-dataset_title")));
         sb.append(datasets.get(1));

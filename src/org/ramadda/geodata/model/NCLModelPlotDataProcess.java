@@ -213,19 +213,20 @@ public class NCLModelPlotDataProcess extends DataProcess {
                                            true)) + Repository.msg(
                                                "mm/day")));
         }
+        // TODO:  For now, don't get value from request.  May not
+        // be valid if variable changes.
         // Contour interval
-        //TODO: get the default value from the request
         StringBuffer contourSB = new StringBuffer();
         contourSB.append(Repository.msg("Interval: "));
-        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CINT,
-                request.getString(ARG_NCL_CINT, "")));
+        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CINT, ""));
+                //request.getString(ARG_NCL_CINT, "")));
         contourSB.append("<br>");
         contourSB.append(Repository.msg("Range: Low"));
-        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMIN,
-                request.getString(ARG_NCL_CMIN, "")));
+        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMIN, ""));
+                //request.getString(ARG_NCL_CMIN, "")));
         contourSB.append(Repository.msg("High"));
-        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMAX,
-                request.getString(ARG_NCL_CMAX, "")));
+        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMAX, ""));
+                //request.getString(ARG_NCL_CMAX, "")));
         sb.append(
             HtmlUtils.formEntry(
                 "<div style=\"width:9em\">"
