@@ -1,6 +1,6 @@
 
 .model-header {
-    border: 1px solid blue;
+    border: 1px solid black;
     padding: 0.2em .8em;
     background-color: #CCFFFF;
     font-weight: bold;
@@ -42,7 +42,7 @@ label.selector {
 }
 
 .titled_border { 
-    border: 1px solid blue; 
+    border: 1px solid black; 
     margin-top: 1em;
     margin-bottom: .75em;
     border-radius: 5px;
@@ -55,7 +55,7 @@ label.selector {
     margin-top: 1em;
     display: inline; 
     background-color: white; 
-    color: blue; 
+    color: black; 
     font-weight: bold;
     font-size: .9em;
 }
@@ -70,4 +70,13 @@ label.selector {
 
 .formtable td {
     font-size: .9em;
+}
+
+.ui-button {
+    font-size: 105%;
+    font-weight: bold;
+    padding: 0.2em .5em !important;
+    border: 1px solid black;
+    border-radius: 5px;
+    background: lightblue;
 }
