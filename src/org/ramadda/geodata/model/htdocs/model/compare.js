@@ -57,7 +57,56 @@ function CollectionForm(formId, type) {
                         }
                     });       
 
-                console.log("url:" + url);
+
+
+                var doJson = true;
+
+                if(doJson) {
+                    var jsonUrl =  url + "&returnjson=true";
+                    console.log("json url:" + jsonUrl);
+
+                    //Define a variable pointing to this object so we can reference it in the callback below
+                    var theCollectionForm  = this;
+
+                    //The Ramadda and EntryList classes are in repository/htdocs/entry.js
+                    //the global ramadda is the ramadda where this page came from
+                    var ramadda = getGlobalRamadda(); 
+
+                    //The EntryList below takes an object and calls the entryListChanged method 
+                    //when it gets the entries from the jsonUrl
+                    //Create the object that gets called back
+                    var callbackObject = {
+                        entryListChanged: function(entryList) {
+                            //todo: hide the dialog
+
+                            //Get the list of entries from the EntryList
+                            //There should just be one entry  -  the process folder
+                            var entries = entryList.getEntries();
+                            if(entries.length != 0) {
+                                console.log("Error: didn't get just one entry:" + entries.length);
+                                return;
+                            }
+
+                            //This should be the process directory entry that you encoded into JSON
+                            var processEntry = entries[0];
+
+                            //Now, one more callback function (just a function, not an object) that will
+                            //get called when the children entries are retrieved
+                            var finalCallback  = function(entries) {
+                                theCollectionForm.handleProcessEntries(entries);
+                            };
+
+                            //This will go back to the server and get the children 
+                            processEntry.getChildrenEntries(finalCallback);
+                            
+                        }
+                    };
+                    //Just create the entry list, passing in the callback object
+                    var entryList = new EntryList(ramadda, jsonUrl, callbackObject);
+                    return;
+                } 
+
+
                 //add the arg that gives us the image directly back then set the img src
                 url += "&returnimage=true";
                 var outputDiv = $('#' + this.formId +"_output");
@@ -66,6 +115,22 @@ function CollectionForm(formId, type) {
                 }
                 //Make the html with the image
                 var html = HtmlUtil.image(url,[ATTR_ALT, "Generating Image..."])
+                outputDiv.html(html);
+            },
+            handleProcessEntries: function(entries) {
+                console.log("got list of process entries:" + entries.length);
+
+                //Look in htdocs/entry.js for the Entry class methods
+                var html = "";
+                for(var i=0;i<entries.length;i++) {
+                    var entry = entries[i];
+                    html += HtmlUtil.href(entry.getEntryUrl(), entry.getName());
+                    html += "<br>";
+                }
+                var outputDiv = $('#' + this.formId +"_output");
+                if(outputDiv.size()==0) {
+                    console.log("no output div");
+                }
                 outputDiv.html(html);
             },
             initCollection: function(collection) {
