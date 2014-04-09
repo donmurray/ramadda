@@ -375,7 +375,7 @@ public class RepositoryServlet extends HttpServlet implements Constants {
                     }
                 } else if (repositoryResult.getInputStream() != null) {
                     try {
-                        System.err.println ("code:" +repositoryResult.getResponseCode());
+
                         response.setStatus(
                                            repositoryResult.getResponseCode());
                         response.setContentType(
