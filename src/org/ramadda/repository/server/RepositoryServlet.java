@@ -62,6 +62,7 @@ import java.util.StringTokenizer;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
+import org.apache.commons.io.IOUtils;
 
 /**
  *
@@ -374,14 +375,16 @@ public class RepositoryServlet extends HttpServlet implements Constants {
                     }
                 } else if (repositoryResult.getInputStream() != null) {
                     try {
+                        System.err.println ("code:" +repositoryResult.getResponseCode());
                         response.setStatus(
-                            repositoryResult.getResponseCode());
+                                           repositoryResult.getResponseCode());
                         response.setContentType(
                             repositoryResult.getMimeType());
                         OutputStream output = response.getOutputStream();
                         try {
-                            IOUtil.writeTo(repositoryResult.getInputStream(),
-                                           output);
+                            IOUtils.copy(repositoryResult.getInputStream(),   output);
+                            //IOUtil.writeTo(repositoryResult.getInputStream(),
+                            //                               output);
                         } finally {
                             IOUtil.close(output);
                         }

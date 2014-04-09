@@ -3659,6 +3659,7 @@ public class EntryManager extends RepositoryManager {
             }
         }
 
+
         String path = entry.getResource().getPath();
 
         String mimeType = getRepository().getMimeTypeFromSuffix(
@@ -3685,7 +3686,6 @@ public class EntryManager extends RepositoryManager {
             File file   = entry.getFile();
             long length = file.length();
             if (request.isHeadRequest()) {
-                System.err.println("got head request");
                 Result result = new Result("", new StringBuilder());
                 result.addHttpHeader(HtmlUtils.HTTP_CONTENT_LENGTH,
                                      "" + length);
@@ -3695,13 +3695,42 @@ public class EntryManager extends RepositoryManager {
                 return result;
             }
 
+            int response = Result.RESPONSE_OK;
             InputStream inputStream =
                 getStorageManager().getFileInputStream(file);
+
+            String range = (String) request.getHttpHeaderArgs().get("Range");
+            System.err.println("Range:" + range);
+            System.err.println("all:" +request.getHttpHeaderArgs());
+            long byteStart = -1;
+            long byteEnd = -1;
+            if(Utils.stringDefined(range)) {
+                //assume: bytes=start-end
+                List<String> toks1 = StringUtil.splitUpTo(range,"=",2);
+                List<String> toks = StringUtil.split(toks1.get(1),"-");
+                byteStart = Long.decode(toks.get(0)).longValue();
+                if(toks.size()>1 && Utils.stringDefined(toks.get(1))) {
+                    byteEnd = Long.decode(toks.get(1)).longValue();
+                }
+            }
+
+
+            if(byteStart >0) {
+                inputStream.skip(byteStart);
+                response = Result.RESPONSE_PARTIAL;
+                if(byteEnd >0) {
+                   //TODO: how to limit the length
+                }
+                length-= byteStart;
+            }
+
+            System.err.println("byte start:" + byteStart +" length:"  + length);
             Result result = new Result(BLANK, inputStream, mimeType);
+            result.setResponseCode(response);
+            result.addHttpHeader("Accept-Ranges","bytes");
             result.addHttpHeader(HtmlUtils.HTTP_CONTENT_LENGTH, "" + length);
             result.setLastModified(new Date(file.lastModified()));
             result.setCacheOk(true);
-
             return result;
         }
 

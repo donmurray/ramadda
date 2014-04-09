@@ -23,7 +23,6 @@ package org.ramadda.repository.type;
 
 import org.ramadda.repository.*;
 import org.ramadda.repository.database.*;
-import org.ramadda.repository.output.JsonOutputHandler;
 import org.ramadda.repository.output.ZipOutputHandler;
 import org.ramadda.repository.type.*;
 import org.ramadda.repository.type.Column;
@@ -97,8 +96,7 @@ public class CollectionTypeHandler extends ExtensibleGroupTypeHandler {
     /** _more_ */
     public static final String PROP_GRANULE_TYPE = "granule_type";
 
-    /** _more_ */
-    private JsonOutputHandler jsonOutputHandler;
+
 
     /** _more_ */
     private ZipOutputHandler zipOutputHandler;
@@ -148,20 +146,6 @@ public class CollectionTypeHandler extends ExtensibleGroupTypeHandler {
         labelCache = new Hashtable<String, Properties>();
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public JsonOutputHandler getJsonOutputHandler() {
-        if (jsonOutputHandler == null) {
-            jsonOutputHandler =
-                (JsonOutputHandler) getRepository().getOutputHandler(
-                    org.ramadda.repository.output.JsonOutputHandler.class);
-        }
-
-        return jsonOutputHandler;
-    }
 
     /**
      * _more_
@@ -648,7 +632,7 @@ public class CollectionTypeHandler extends ExtensibleGroupTypeHandler {
 
         if (what.equals(REQUEST_SEARCH) || request.defined(ARG_SEARCH)) {
             StringBuffer json = new StringBuffer();
-            getJsonOutputHandler().makeJson(request,
+            getRepository().getJsonOutputHandler().makeJson(request,
                                             processSearch(request, entry),
                                             json);
 

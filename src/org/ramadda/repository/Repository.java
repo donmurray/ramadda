@@ -45,6 +45,7 @@ import org.ramadda.repository.metadata.ContentMetadataHandler;
 import org.ramadda.repository.metadata.Metadata;
 import org.ramadda.repository.metadata.MetadataManager;
 import org.ramadda.repository.monitor.MonitorManager;
+import org.ramadda.repository.output.JsonOutputHandler;
 import org.ramadda.repository.output.CalendarOutputHandler;
 import org.ramadda.repository.output.HtmlOutputHandler;
 import org.ramadda.repository.output.OutputHandler;
@@ -3853,6 +3854,25 @@ public class Repository extends RepositoryBase implements RequestHandler,
             throw new RuntimeException(exc);
         }
     }
+
+
+    private JsonOutputHandler jsonOutputHandler;
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public JsonOutputHandler getJsonOutputHandler() {
+        if (jsonOutputHandler == null) {
+            jsonOutputHandler =
+                (JsonOutputHandler) getOutputHandler(
+                                                     org.ramadda.repository.output.JsonOutputHandler.class);
+        }
+
+        return jsonOutputHandler;
+    }
+
 
 
     /**

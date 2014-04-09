@@ -27,6 +27,8 @@ import org.ramadda.repository.database.*;
 import org.ramadda.repository.harvester.*;
 import org.ramadda.repository.map.*;
 import org.ramadda.repository.metadata.*;
+import org.ramadda.repository.output.JsonOutputHandler;
+
 import org.ramadda.repository.output.WikiManager;
 import org.ramadda.repository.search.*;
 
@@ -94,6 +96,9 @@ public class RepositoryManager implements RepositorySource, Constants,
 
     /** _more_ */
     protected Repository repository;
+
+
+
 
 
     /**

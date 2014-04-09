@@ -574,6 +574,11 @@ public class HtmlOutputHandler extends OutputHandler {
                     wikiTemplate);
         }
 
+        //Check for 
+        if (innerContent == null) {
+
+        }
+
         if (innerContent == null) {
             innerContent = getPageHandler().getWikiTemplate(request, entry,
                     PageHandler.TEMPLATE_CONTENT);

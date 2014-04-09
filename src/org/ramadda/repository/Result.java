@@ -41,6 +41,8 @@ public class Result {
     /** OK response code */
     public static final int RESPONSE_OK = 200;
 
+    public static final int RESPONSE_PARTIAL = 206;
+
     /** Not found response code */
     public static final int RESPONSE_NOTFOUND = 404;
 
