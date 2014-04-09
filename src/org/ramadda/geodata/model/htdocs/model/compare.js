@@ -93,7 +93,7 @@ function CollectionForm(formId, type) {
                             //Now, one more callback function (just a function, not an object) that will
                             //get called when the children entries are retrieved
                             var finalCallback  = function(entries) {
-                                theCollectionForm.handleProcessEntries(entries);
+                                theCollectionForm.handleProcessEntries(processEntry, entries);
                             };
 
                             //This will go back to the server and get the children 
@@ -117,7 +117,7 @@ function CollectionForm(formId, type) {
                 var html = HtmlUtil.image(url,[ATTR_ALT, "Generating Image..."])
                 outputDiv.html(html);
             },
-            handleProcessEntries: function(entries) {
+            handleProcessEntries: function(parentProcessEntry, entries) {
                 console.log("got list of process entries:" + entries.length);
 
                 //Look in htdocs/entry.js for the Entry class methods
