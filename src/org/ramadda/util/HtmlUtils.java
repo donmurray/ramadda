@@ -83,6 +83,13 @@ public class HtmlUtils {
     public static final String HTTP_SET_COOKIE = "Set-Cookie";
 
 
+    public static final String SUFFIX_NORTH = "_north";
+    public static final String SUFFIX_SOUTH = "_south";
+    public static final String SUFFIX_EAST = "_east";
+    public static final String SUFFIX_WEST = "_west";
+
+
+
     /** _more_ */
     public static final String SIZE_3 = "  size=\"3\" ";
 
@@ -311,6 +318,8 @@ public class HtmlUtils {
 
     /** _more_ */
     public static final String ATTR_ONCLICK = "onClick";
+
+    public static final String ATTR_ONCHANGE = "onchange";
 
     /** _more_ */
     public static final String ATTR_READONLY = "READONLY";
@@ -1552,8 +1561,8 @@ public class HtmlUtils {
      *
      * @return _more_
      */
-    public static String makeLatLonInput(String arg, String value) {
-        return makeLatLonInput(arg, value, null);
+    public static String makeLatLonInput(String id, String arg, String value) {
+        return makeLatLonInput(id, arg, value, null);
     }
 
 
@@ -1566,9 +1575,10 @@ public class HtmlUtils {
      *
      * @return _more_
      */
-    public static String makeLatLonInput(String arg, String value,
+    public static String makeLatLonInput(String id, String arg, String value,
                                          String tip) {
         return input(arg, value,
+                     id(id) + 
                      style("margin:0px;") + attrs(ATTR_SIZE, "5") + id(arg)
                      + ((tip != null)
                         ? title(tip)
@@ -1587,12 +1597,13 @@ public class HtmlUtils {
      *
      * @return _more_
      */
-    public static String makeLatLonBox(String baseName, String southValue,
+    public static String makeLatLonBox(String baseId, String baseName, String southValue,
                                        String northValue, String eastValue,
                                        String westValue) {
 
-        return makeLatLonBox(baseName + "_south", baseName + "_north",
-                             baseName + "_east", baseName + "_west",
+        
+        return makeLatLonBox(baseId, baseName + SUFFIX_SOUTH, baseName + SUFFIX_NORTH,
+                             baseName + SUFFIX_EAST, baseName + SUFFIX_WEST,
                              southValue, northValue, eastValue, westValue);
     }
 
@@ -1610,17 +1621,17 @@ public class HtmlUtils {
      *
      * @return _more_
      */
-    public static String makeLatLonBox(String southArg, String northArg,
+    public static String makeLatLonBox(String baseId, String southArg, String northArg,
                                        String eastArg, String westArg,
                                        String southValue, String northValue,
                                        String eastValue, String westValue) {
         return "<table border=0 cellspacing=0 cellpadding=0><tr><td colspan=\"2\" align=\"center\">"
-               + makeLatLonInput(northArg, northValue, "North")
+            + makeLatLonInput(baseId + SUFFIX_NORTH, northArg, northValue, "North")
                + "</td></tr>" + "<tr><td>"
-               + makeLatLonInput(westArg, westValue, "West") + "</td><td>"
-               + makeLatLonInput(eastArg, eastValue, "East") + "</tr>"
+               + makeLatLonInput(baseId + SUFFIX_WEST, westArg, westValue, "West") + "</td><td>"
+               + makeLatLonInput(baseId + SUFFIX_EAST, eastArg, eastValue, "East") + "</tr>"
                + "<tr><td colspan=\"2\" align=\"center\">"
-               + makeLatLonInput(southArg, southValue, "South") + "</table>";
+               + makeLatLonInput(baseId + SUFFIX_SOUTH, southArg, southValue, "South") + "</table>";
     }
 
     /**
@@ -1634,10 +1645,10 @@ public class HtmlUtils {
      *
      * @return _more_
      */
-    public static String makeLatLonBox(String baseName, double south,
+    public static String makeLatLonBox(String baseId, String baseName, double south,
                                        double north, double east,
                                        double west) {
-        return makeLatLonBox(baseName, toString(south), toString(north),
+        return makeLatLonBox(baseId, baseName, toString(south), toString(north),
                              toString(east), toString(west));
     }
 
@@ -3063,6 +3074,7 @@ public class HtmlUtils {
     public static String onMouseClick(String call) {
         return attrs(ATTR_ONCLICK, call);
     }
+
 
 
     /**

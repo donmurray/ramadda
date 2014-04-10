@@ -28,11 +28,13 @@ import org.ramadda.repository.Request;
 import org.ramadda.repository.metadata.Metadata;
 import org.ramadda.repository.metadata.MetadataHandler;
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.MapRegion;
 
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.TwoFacedObject;
 
 
 import java.awt.geom.Rectangle2D;
@@ -75,6 +77,9 @@ public class MapInfo {
 
     /** is the map for selection */
     private boolean forSelection = false;
+
+    /** _more_          */
+    private List<MapRegion> mapRegions = null;
 
     /** the javascript buffer? */
     private StringBuffer jsBuffer = null;
@@ -501,30 +506,56 @@ public class MapInfo {
         if (nwse == null) {
             nwse = new String[] { "", "", "", "" };
         }
-        String widget;
+        StringBuffer widget = new StringBuffer();
         if (nwse.length == 2) {
             doRegion = false;
         }
 
         if (doRegion) {
-            widget = HtmlUtils.makeLatLonBox(arg, nwse[2], nwse[0], nwse[3],
-                                             nwse[1]);
+            widget.append(HtmlUtils.makeLatLonBox(mapVarName, arg, nwse[2],
+                    nwse[0], nwse[3], nwse[1]));
+
+            //            mapRegions = repository.getPageHandler().getMapRegions();
+
+            if ((mapRegions != null) && (mapRegions.size() > 0)) {
+                List values = new ArrayList<String>();
+                values.add(new TwoFacedObject("Select Region", ""));
+                for (MapRegion region : mapRegions) {
+                    String value = region.getNorth() + "," + region.getWest()
+                                   + "," + region.getSouth() + ","
+                                   + region.getEast();
+                    values.add(new TwoFacedObject(region.getName(), value));
+                }
+                String regionSelectId = mapVarName + "_regions";
+                widget.append(
+                    HtmlUtils.select(
+                        "mapregion", values, (String) null,
+                        HtmlUtils.id(regionSelectId)
+                        + HtmlUtils.attr(
+                            HtmlUtils.ATTR_ONCHANGE,
+                            HtmlUtils.call(
+                                "MapUtils.mapRegionSelected",
+                                HtmlUtils.squote(regionSelectId),
+                                HtmlUtils.squote(mapVarName)))));
+            }
         } else {
-            widget =
-                " " + msgLabel("Latitude") + " "
-                + HtmlUtils.input(arg + ".latitude", nwse[0],
-                                  HtmlUtils.SIZE_5 + " "
-                                  + HtmlUtils.id(arg + ".latitude")) + " "
-                                      + msgLabel("Longitude") + " "
-                                      + HtmlUtils.input(arg + ".longitude",
-                                          nwse[1],
-                                          HtmlUtils.SIZE_5 + " "
-                                          + HtmlUtils.id(arg
-                                              + ".longitude")) + " ";
+            widget.append(" ");
+            widget.append(msgLabel("Latitude"));
+            widget.append(" ");
+            widget.append(
+                HtmlUtils.input(
+                    arg + ".latitude", nwse[0],
+                    HtmlUtils.SIZE_5 + " "
+                    + HtmlUtils.id(arg + ".latitude")) + " "
+                        + msgLabel("Longitude") + " "
+                        + HtmlUtils.input(
+                            arg + ".longitude", nwse[1],
+                            HtmlUtils.SIZE_5 + " "
+                            + HtmlUtils.id(arg + ".longitude")) + " ");
 
         }
 
-        return widget;
+        return widget.toString();
     }
 
 
@@ -866,6 +897,26 @@ public class MapInfo {
     public boolean forSelection() {
         return forSelection;
     }
+
+
+    /**
+     *  Set the MapRegions property.
+     *
+     *  @param value The new value for MapRegions
+     */
+    public void setMapRegions(List<MapRegion> value) {
+        mapRegions = value;
+    }
+
+    /**
+     *  Get the MapRegions property.
+     *
+     *  @return The MapRegions
+     */
+    public List<MapRegion> getMapRegions() {
+        return mapRegions;
+    }
+
 
 
 }

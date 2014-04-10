@@ -26,12 +26,15 @@ package org.ramadda.util;
  */
 public class MapRegion {
 
-    /** _more_          */
+    /** _more_ */
     private String id;
 
 
     /** _more_ */
     private String name;
+
+    /** _more_          */
+    private String group;
 
     /** _more_ */
     private double north;
@@ -51,15 +54,17 @@ public class MapRegion {
      *
      * @param id _more_
      * @param name _more_
+     * @param group _more_
      * @param north _more_
      * @param west _more_
      * @param south _more_
      * @param east _more_
      */
-    public MapRegion(String id, String name, double north, double west,
-                     double south, double east) {
+    public MapRegion(String id, String name, String group, double north,
+                     double west, double south, double east) {
         this.id    = id;
         this.name  = name;
+        this.group = group;
         this.north = north;
         this.west  = west;
         this.south = south;
@@ -160,6 +165,40 @@ public class MapRegion {
 
 
     /**
+     * Set the Group property.
+     *
+     * @param value The new value for Group
+     */
+    public void setGroup(String value) {
+        group = value;
+    }
+
+    /**
+     * Get the Group property.
+     *
+     * @return The Group
+     */
+    public String getGroup() {
+        return group;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param group _more_
+     *
+     * @return _more_
+     */
+    public boolean isGroup(String group) {
+        if (group == null) {
+            return true;
+        }
+
+        return this.group.equals(group);
+    }
+
+    /**
      * Set the Id property.
      *
      * @param value The new value for Id
@@ -175,6 +214,17 @@ public class MapRegion {
      */
     public String getId() {
         return id;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String toString() {
+        return name + "," + id + "," + group + "," + north + "," + west + ","
+               + south + "," + east;
+
     }
 
 }

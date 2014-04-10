@@ -1165,3 +1165,27 @@ OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
     }
     
 });
+
+
+
+var MapUtils = {
+    mapRegionSelected: function(selectId, baseId) {
+        var value  = $( "#" + selectId).val();
+        if(value == null) {
+            console.log("Error: No map region value");
+            return;
+        }
+        var toks = value.split(",");
+        this.setMapRegion(baseId, toks[0], toks[1], toks[2], toks[3]);
+    },
+
+
+    setMapRegion: function(baseId, north, west, south, east) {
+        $("#"+ baseId +"_north").val(north);
+        $("#"+ baseId +"_west").val(west);
+        $("#"+ baseId +"_south").val(south);
+        $("#"+ baseId +"_east").val(east);
+
+    }
+
+}

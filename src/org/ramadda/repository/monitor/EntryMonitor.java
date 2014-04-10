@@ -509,7 +509,7 @@ public class EntryMonitor implements Constants {
                                ? new double[] { Entry.NONGEO, Entry.NONGEO,
                     Entry.NONGEO, Entry.NONGEO }
                                : (double[]) filter.getValue());
-            String latLonForm = HtmlUtils.makeLatLonBox(ARG_AREA,
+            String latLonForm = HtmlUtils.makeLatLonBox(ARG_AREA, ARG_AREA,
                                     (values[0] != Entry.NONGEO)
                                     ? values[0]
                                     : Double.NaN, (values[1] != Entry.NONGEO)

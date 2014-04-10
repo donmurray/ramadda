@@ -394,8 +394,14 @@ sb.append(HtmlUtils.form(formUrl,
         }
         LatLonRect llr = dataset.getBoundingBox();
         if (llr != null) {
+
+
+            String mapRegionGroup = null;
+
             MapInfo map = getRepository().getMapManager().createMap(request,
                               true);
+
+            map.setMapRegions(getPageHandler().getMapRegions(mapRegionGroup));
             map.addBox("", llr, new MapBoxProperties("blue", false, true));
             String[] points = new String[] { "" + llr.getLatMax(),
                                              "" + llr.getLonMin(),

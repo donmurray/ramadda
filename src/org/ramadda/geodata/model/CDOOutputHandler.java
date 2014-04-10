@@ -834,6 +834,11 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
     public void addMapWidget(Request request, StringBuilder sb,
                              LatLonRect llr, boolean usePopup) {
 
+        //TODO: This should be a parameter to the method.
+        //If its null then all map regions are used 
+        //If non-null then only map regions with the group
+        String mapRegionGroup = null;
+
         MapInfo map;
         if ( !usePopup) {
             map = getRepository().getMapManager().createMap(request, 250,
@@ -846,6 +851,9 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
         } else {
             map = getRepository().getMapManager().createMap(request, true);
         }
+
+        map.setMapRegions(getPageHandler().getMapRegions(mapRegionGroup));
+
         map.addBox("", llr, new MapBoxProperties("blue", false, true));
         String[] points = new String[] { "" + llr.getLatMax(),
                                          "" + llr.getLonMin(),

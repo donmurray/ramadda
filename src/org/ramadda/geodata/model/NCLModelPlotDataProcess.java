@@ -218,14 +218,14 @@ public class NCLModelPlotDataProcess extends DataProcess {
         // Contour interval
         StringBuffer contourSB = new StringBuffer();
         contourSB.append(Repository.msg("Interval: "));
-        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CINT, ""));
+        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CINT, ARG_NCL_CINT, ""));
                 //request.getString(ARG_NCL_CINT, "")));
         contourSB.append("<br>");
         contourSB.append(Repository.msg("Range: Low"));
-        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMIN, ""));
+        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMIN, ARG_NCL_CMIN, ""));
                 //request.getString(ARG_NCL_CMIN, "")));
         contourSB.append(Repository.msg("High"));
-        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMAX, ""));
+        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMAX, ARG_NCL_CMAX, ""));
                 //request.getString(ARG_NCL_CMAX, "")));
         sb.append(
             HtmlUtils.formEntry(

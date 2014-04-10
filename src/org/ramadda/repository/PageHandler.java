@@ -1017,7 +1017,28 @@ public class PageHandler extends RepositoryManager {
      * @return _more_
      */
     public List<MapRegion> getMapRegions() {
-        return mapRegions;
+        return getMapRegions(null);
+    }
+
+    /**
+     * _more_
+     *
+     * @param group _more_
+     *
+     * @return _more_
+     */
+    public List<MapRegion> getMapRegions(String group) {
+        if (group == null) {
+            return mapRegions;
+        }
+        List<MapRegion> regions = new ArrayList<MapRegion>();
+        for (MapRegion region : mapRegions) {
+            if (region.isGroup(group)) {
+                regions.add(region);
+            }
+        }
+
+        return regions;
     }
 
     /**
@@ -1048,6 +1069,7 @@ public class PageHandler extends RepositoryManager {
                 mapRegionFiles.add(f);
             }
         }
+
         String dir = getStorageManager().getSystemResourcePath() + "/geo";
         List<String> listing = getRepository().getListing(dir, getClass());
         for (String f : listing) {
@@ -1066,7 +1088,11 @@ public class PageHandler extends RepositoryManager {
 
                 continue;
             }
+            //Name,ID,Group,North,West,South,East
+            //Group
             List<String> lines = StringUtil.split(contents, "\n", true, true);
+            lines.remove(0);
+            String group = lines.get(0);
             lines.remove(0);
             for (String line : lines) {
                 List<String> toks = StringUtil.split(line, ",");
@@ -1074,7 +1100,9 @@ public class PageHandler extends RepositoryManager {
                     throw new IllegalArgumentException("Bad map region line:"
                             + line + "\nFile:" + path);
                 }
-                mapRegions.add(new MapRegion(toks.get(1), toks.get(0),
+
+
+                mapRegions.add(new MapRegion(toks.get(1), toks.get(0), group,
                                              Misc.decodeLatLon(toks.get(2)),
                                              Misc.decodeLatLon(toks.get(3)),
                                              Misc.decodeLatLon(toks.get(4)),

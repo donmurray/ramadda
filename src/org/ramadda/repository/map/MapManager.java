@@ -130,6 +130,8 @@ public class MapManager extends RepositoryManager {
     public MapInfo createMap(Request request, int width, int height,
                              boolean forSelection) {
 
+
+
         MapInfo mapInfo = new MapInfo(request, getRepository(), width,
                                       height, forSelection);
 
