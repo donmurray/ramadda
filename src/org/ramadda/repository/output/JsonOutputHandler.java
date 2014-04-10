@@ -254,7 +254,11 @@ public class JsonOutputHandler extends OutputHandler {
                        getPageHandler().getIconUrl(request, entry));
 
         Json.quoteAttr(items, "parent", entry.getParentEntryId());
-        Json.quoteAttr(items, "user", entry.getUser().getId());
+        if (entry.getUser() != null) {
+            Json.quoteAttr(items, "user", entry.getUser().getId());
+        } else {
+            Json.quoteAttr(items, "user", null);
+        }
         if (entry.getResource().isUrl()) {
             Json.quoteAttr(items, "url", entry.getResource().getPath());
         }
