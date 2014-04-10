@@ -1175,8 +1175,18 @@ var MapUtils = {
             console.log("Error: No map region value");
             return;
         }
+        if( value == "") {
+            return;
+        }
         var toks = value.split(",");
-        this.setMapRegion(baseId, toks[0], toks[1], toks[2], toks[3]);
+
+        if(toks.length == 1) {
+            return;
+        }
+        if(toks.length != 4) {
+            return;
+        }
+       this.setMapRegion(baseId, toks[0], toks[1], toks[2], toks[3]);
     },
 
 
