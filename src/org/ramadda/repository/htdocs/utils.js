@@ -249,7 +249,6 @@ var ATTR_STYLE = "style";
 var ATTR_ALIGN = "align";
 var ATTR_VALIGN = "valign";
 
-
 var HtmlUtil =  {
     join : function (items,separator) {
         var html = "";
@@ -442,6 +441,17 @@ var HtmlUtil =  {
     }
 }
 
+
+var StringUtil = {
+    endsWith : function(str,suffix) {
+        return (str.length >= suffix.length) && 
+               (str.lastIndexOf(suffix) + suffix.length == str.length);
+    },
+    startsWith : function(str,prefix) {
+        return (str.length >= prefix.length) && 
+               (str.lastIndexOf(prefix, 0) === 0);
+    }
+}
 
 
 

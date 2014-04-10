@@ -34,6 +34,7 @@ import org.ramadda.repository.Result;
 import org.ramadda.repository.database.Tables;
 import org.ramadda.repository.type.CollectionTypeHandler;
 import org.ramadda.repository.type.Column;
+import org.ramadda.repository.type.ProcessFileTypeHandler;
 import org.ramadda.sql.Clause;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.JQuery;
@@ -254,7 +255,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         String entryUrl = HtmlUtils.url(
                               request.getAbsoluteUrl(
-                                  getRepository().URL_ENTRY_GET), ARG_ENTRYID,
+                                  getRepository().URL_ENTRY_SHOW), ARG_ENTRYID,
         // Use this if you want to return the process directory
         processEntryId);
         //processEntryId + "/" + IOUtil.getFileTail(lastFile.toString()));
@@ -266,6 +267,17 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 "",
                 getStorageManager().getFileInputStream(lastFile.toString()),
                 "image/png");
+        } else if (request.get("returnjson", false)) {
+            StringBuilder json = new StringBuilder();
+            Entry processDirEntry = 
+            	//new Entry(processEntryId, new ProcessFileTypeHandler(getRepository(), null));
+            	new Entry(processEntryId, getEntryManager().getProcessFileTypeHandler());
+            getRepository().getJsonOutputHandler().makeJson(request,
+            		Misc.newList(processDirEntry),
+                                            json);
+
+            return new Result("", json, "application/json");
+
         } else {
             return new Result(entryUrl);
         }
@@ -387,7 +399,20 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         processEntryId);
         //processEntryId + "/" + IOUtil.getFileTail(lastFile.toString()));
 
-        return new Result(entryUrl);
+        if (request.get("returnjson", false)) {
+            StringBuilder json = new StringBuilder();
+            Entry processDirEntry = 
+            	//new Entry(processEntryId, new ProcessFileTypeHandler(getRepository(), null));
+            	new Entry(processEntryId, getEntryManager().getProcessFileTypeHandler());
+            getRepository().getJsonOutputHandler().makeJson(request,
+            		Misc.newList(processDirEntry),
+                                            json);
+
+            return new Result("", json, "application/json");
+
+        } else {
+            return new Result(entryUrl);
+        }
     }
 
     /**

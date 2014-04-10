@@ -82,7 +82,7 @@ function CollectionForm(formId, type) {
                             //Get the list of entries from the EntryList
                             //There should just be one entry  -  the process folder
                             var entries = entryList.getEntries();
-                            if(entries.length != 0) {
+                            if(entries.length != 1) {
                                 console.log("Error: didn't get just one entry:" + entries.length);
                                 return;
                             }
@@ -124,14 +124,27 @@ function CollectionForm(formId, type) {
                 var html = "";
                 for(var i=0;i<entries.length;i++) {
                     var entry = entries[i];
-                    html += HtmlUtil.href(entry.getEntryUrl(), entry.getName());
-                    html += "<br>";
+                    if (StringUtil.endsWith(entry.getName(), ".png")) {
+                        html += //HtmlUtil.href(entry.getFileUrl(), 
+                                HtmlUtil.image(entry.getFileUrl());
+                                //HtmlUtil.image(entry.getFileUrl(), ["width", "500px"]));
+                        html += "<br/>";
+                        html += HtmlUtil.href(entry.getFileUrl(), "Download image");
+                        html += "<p/>";
+                    } else if (StringUtil.endsWith(entry.getName(),".nc")) {
+                        html += HtmlUtil.href(entry.getFileUrl(), "Download file used for image");
+                    }
+                    html += "<br/>";
                 }
+                html += "<p/>";
+                html += HtmlUtil.href(parentProcessEntry.getEntryUrl()+"&output=zip.tree", "Download All Files")
                 var outputDiv = $('#' + this.formId +"_output");
                 if(outputDiv.size()==0) {
                     console.log("no output div");
+                } else {
+                    outputDiv.html(html);
                 }
-                outputDiv.html(html);
+                closeFormLoadingDialog();
             },
             initCollection: function(collection) {
                 var collectionForm = this;

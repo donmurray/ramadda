@@ -296,7 +296,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         }
 
         StringBuilder outputName = new StringBuilder();
-        Object[]     values     = oneOfThem.getValues();
+        Object[]      values     = oneOfThem.getValues();
         // values = collection,model,experiment,ens,var
         // model
         outputName.append(values[1].toString().toUpperCase());
@@ -342,29 +342,34 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             outputName.append(MONTHS[endMonth - 1]);
         }
         outputName.append(" ");
-        String startYear = request.defined(CDOOutputHandler.ARG_CDO_STARTYEAR
-                                           + yearNum)
-                           ? request.getString(
-                               CDOOutputHandler.ARG_CDO_STARTYEAR + yearNum)
-                           : request.defined(
-                               CDOOutputHandler.ARG_CDO_STARTYEAR)
-                             ? request.getString(
-                                 CDOOutputHandler.ARG_CDO_STARTYEAR, "")
-                             : "";
-        String endYear = request.defined(CDOOutputHandler.ARG_CDO_ENDYEAR
-                                         + yearNum)
-                         ? request.getString(CDOOutputHandler.ARG_CDO_ENDYEAR
-                                             + yearNum)
-                         : request.defined(CDOOutputHandler.ARG_CDO_ENDYEAR)
-                           ? request.getString(
-                               CDOOutputHandler.ARG_CDO_ENDYEAR, startYear)
-                           : startYear;
-        if (startYear.equals(endYear)) {
-            outputName.append(startYear);
+        if (request.defined(CDOOutputHandler.ARG_CDO_YEARS + yearNum)) {
+            outputName.append(
+                request.getString(CDOOutputHandler.ARG_CDO_YEARS + yearNum));
         } else {
-            outputName.append(startYear);
-            outputName.append("-");
-            outputName.append(endYear);
+            String startYear =
+                request.defined(CDOOutputHandler.ARG_CDO_STARTYEAR + yearNum)
+                ? request.getString(CDOOutputHandler.ARG_CDO_STARTYEAR
+                                    + yearNum)
+                : request.defined(CDOOutputHandler.ARG_CDO_STARTYEAR)
+                  ? request.getString(CDOOutputHandler.ARG_CDO_STARTYEAR, "")
+                  : "";
+            String endYear = request.defined(CDOOutputHandler.ARG_CDO_ENDYEAR
+                                             + yearNum)
+                             ? request.getString(
+                                 CDOOutputHandler.ARG_CDO_ENDYEAR + yearNum)
+                             : request.defined(
+                                 CDOOutputHandler.ARG_CDO_ENDYEAR)
+                               ? request.getString(
+                                   CDOOutputHandler.ARG_CDO_ENDYEAR,
+                                   startYear)
+                               : startYear;
+            if (startYear.equals(endYear)) {
+                outputName.append(startYear);
+            } else {
+                outputName.append(startYear);
+                outputName.append("-");
+                outputName.append(endYear);
+            }
         }
         //System.out.println("Name: " + outputName.toString());
 
