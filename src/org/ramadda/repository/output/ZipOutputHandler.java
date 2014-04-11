@@ -247,6 +247,7 @@ public class ZipOutputHandler extends OutputHandler {
         }
 
         OutputType output = request.getOutput();
+        request.setReturnFilename(IOUtil.stripExtension(group.getName())+ ".zip");
         if (output.equals(OUTPUT_ZIPTREE)) {
             List<Entry> all = new ArrayList<Entry>();
             all.addAll(subGroups);
