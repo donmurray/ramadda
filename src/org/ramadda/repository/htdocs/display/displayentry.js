@@ -74,7 +74,7 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
                                                             HtmlUtil.image(ramaddaBaseUrl +"/icons/chart_line_add.png",["border",0,ATTR_TITLE,"Create Chart"])));
                  }
                  if(entry.getFilesize()>0) {
-                     toolbarItems.push(HtmlUtil.tag(TAG_A, [ATTR_HREF, entry.getFileUrl()], 
+                     toolbarItems.push(HtmlUtil.tag(TAG_A, [ATTR_HREF, entry.getResourceUrl()], 
                                                     HtmlUtil.image(ramaddaBaseUrl +"/icons/download.png",["border",0,ATTR_TITLE,"Download (" + entry.getFormattedFilesize() +")"])));
                      
                  }

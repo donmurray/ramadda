@@ -438,7 +438,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
 
                 if(entry.getFilesize()>0) {
                     html+= HtmlUtil.formEntry("File:", entry.getFilename() +" " +
-                                              HtmlUtil.href(entry.getFileUrl(), HtmlUtil.image(ramaddaBaseUrl +"/icons/download.png")) + " " +
+                                              HtmlUtil.href(entry.getResourceUrl(), HtmlUtil.image(ramaddaBaseUrl +"/icons/download.png")) + " " +
                                               entry.getFormattedFilesize());
                 }
                 for(var colIdx =0;colIdx< columns.length;colIdx++) {
@@ -567,7 +567,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 var newMenuItems = [];
                 viewMenuItems.push(HtmlUtil.tag(TAG_LI,[], HtmlUtil.tag(TAG_A, ["href", entry.getEntryUrl(),"target","_"], "View Entry")));
                 if(entry.getFilesize()>0) {
-                    fileMenuItems.push(HtmlUtil.tag(TAG_LI,[], HtmlUtil.tag(TAG_A, ["href", entry.getFileUrl()], "Download " + entry.getFilename() + " (" + entry.getFormattedFilesize() +")")));
+                    fileMenuItems.push(HtmlUtil.tag(TAG_LI,[], HtmlUtil.tag(TAG_A, ["href", entry.getResourceUrl()], "Download " + entry.getFilename() + " (" + entry.getFormattedFilesize() +")")));
                 }
 
                 if(this.jsonUrl!=null) {

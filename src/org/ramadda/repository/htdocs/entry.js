@@ -457,7 +457,7 @@ function Entry(props) {
             getFilename : function () {
                 return this.filename;
             }, 
-            getFileUrl : function () {
+            getResourceUrl : function () {
                 return  this.getRamadda().getRoot() + "/entry/get?entryid=" + this.id;
             },
             getLink : function (label) {
