@@ -3695,13 +3695,17 @@ public class EntryManager extends RepositoryManager {
                 return result;
             }
 
+            //Get the original filename and set that on the result so the browser sees the file - not just "get"
+            String fileName = getStorageManager().getFileTail(entry);
+            request.setReturnFilename(fileName);
+
             int response = Result.RESPONSE_OK;
             InputStream inputStream =
                 getStorageManager().getFileInputStream(file);
 
             String range = (String) request.getHttpHeaderArgs().get("Range");
-            System.err.println("Range:" + range);
-            System.err.println("all:" +request.getHttpHeaderArgs());
+            //            System.err.println("Range:" + range);
+            //            System.err.println("all:" +request.getHttpHeaderArgs());
             long byteStart = -1;
             long byteEnd = -1;
             if(Utils.stringDefined(range)) {
