@@ -1920,17 +1920,6 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             options.append("}");
 
             buf.append(
-                HtmlUtils.importJS(
-                    getRepository().htdocsUrl(
-                        "/lib/fancybox/jquery.fancybox-1.3.4.pack.js")));
-            buf.append("\n");
-            buf.append("<link rel=\"stylesheet\" href=\"");
-            buf.append(
-                getRepository().htdocsUrl(
-                    "/lib/fancybox/jquery.fancybox-1.3.4.css"));
-            buf.append("\" type=\"text/css\" media=\"screen\" />");
-            buf.append("\n");
-            buf.append(
                 HtmlUtils.script(
                     "$(document).ready(function() {\n $(\"a.popup_image\").fancybox("
                     + options.toString() + ");\n });\n"));
