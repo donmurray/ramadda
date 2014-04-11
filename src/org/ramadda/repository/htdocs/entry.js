@@ -447,8 +447,12 @@ function Entry(props) {
             toString: function() {
                 return "entry:" + this.getName();
             },
-            getEntryUrl : function () {
-                return  this.getRamadda().getRoot() + "/entry/show?entryid=" + this.id;
+            getEntryUrl : function (extraArgs) {
+                var url =   this.getRamadda().getRoot() + "/entry/show?entryid=" + this.id;
+                if(extraArgs!=null) {
+                    url += "&" + extraArgs;
+                }
+                return url;
             },
             getFilename : function () {
                 return this.filename;
