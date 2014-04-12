@@ -26,9 +26,12 @@ import org.apache.commons.lang.text.StrTokenizer;
 import org.w3c.dom.*;
 
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
+
+import java.io.File;
 
 import java.lang.reflect.Constructor;
 
@@ -36,6 +39,9 @@ import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
@@ -766,6 +772,85 @@ public class Utils {
         }
 
         return false;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param files _more_
+     * @param ascending _more_
+     *
+     * @return _more_
+     */
+    public static File[] sortFilesOnSize(File[] files,
+                                         final boolean ascending) {
+
+        ArrayList<IOUtil.FileWrapper> sorted =
+            (ArrayList<IOUtil.FileWrapper>) new ArrayList();
+
+        for (int i = 0; i < files.length; i++) {
+            sorted.add(new IOUtil.FileWrapper(files[i], ascending));
+        }
+
+        Collections.sort(sorted, new FileSizeCompare(ascending));
+
+
+        for (int i = 0; i < files.length; i++) {
+            files[i] = sorted.get(i).getFile();
+        }
+
+        return files;
+    }
+
+
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Sat, Apr 12, '14
+     * @author         Enter your name here...    
+     */
+    private static class FileSizeCompare implements Comparator<IOUtil
+        .FileWrapper> {
+
+        /** _more_          */
+        private boolean ascending;
+
+        /**
+         * _more_
+         *
+         * @param ascending _more_
+         */
+        public FileSizeCompare(boolean ascending) {
+            this.ascending = ascending;
+        }
+
+        /**
+         * _more_
+         *
+         * @param o1 _more_
+         * @param o2 _more_
+         *
+         * @return _more_
+         */
+        public int compare(IOUtil.FileWrapper o1, IOUtil.FileWrapper o2) {
+            int result;
+            if (o1.length() < o2.length()) {
+                result = -1;
+            } else if (o1.length() > o2.length()) {
+                result = 1;
+            } else {
+                result = o1.getFile().compareTo(o1.getFile());
+            }
+            if ( !ascending || (result == 0)) {
+                return result;
+            }
+
+            return -result;
+
+        }
+
     }
 
 }

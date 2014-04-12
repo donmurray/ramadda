@@ -320,7 +320,6 @@ public class OutputHandler extends RepositoryManager {
             throws Exception {
 
         int max = request.get(ARG_MAX, VIEW_MAX_ROWS);
-        //        ucar.unidata.util.Misc.printStack ("cnt:" + cnt + " " + max,5);
         if ((cnt > 0) && ((cnt == max) || request.defined(ARG_SKIP))) {
             int skip = Math.max(0, request.get(ARG_SKIP, 0));
             sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
@@ -956,7 +955,7 @@ public class OutputHandler extends RepositoryManager {
         String type      = request.getString(ARG_SELECTTYPE, "");
         String elementId = entry.getId();
         String value     = (entry.isGroup()
-                            //getFullName
+        //getFullName
                             ? ((Entry) entry).getName()
                             : getEntryDisplayName(entry));
         value = value.replace("'", "\\'");
@@ -1076,16 +1075,22 @@ public class OutputHandler extends RepositoryManager {
             SORTBY_FROMDATE, "true",
             msg("Date")
             + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),
-            "Sort by date ascending", SORTBY_FROMDATE, "false",
+            "Sort by date older to newer", SORTBY_FROMDATE, "false",
             msg("Date")
             + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),
-            "Sort by date descending", SORTBY_NAME, "true",
+            "Sort by date newer to older", SORTBY_NAME, "true",
             msg("Name")
             + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),
-            "Sort by name ascending", SORTBY_NAME, "false",
+            "Sort by name Z-A", SORTBY_NAME, "false",
             msg("Name")
             + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),
-            "Sort by name descending",
+            "Sort by name A-Z", SORTBY_SIZE, "true",
+            msg("Size")
+            + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),
+            "Sort by size smallest to largest", SORTBY_SIZE, "false",
+            msg("Size")
+            + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),
+            "Sort by size largest to smallest",
         };
 
         if (request.isMobile()) {
@@ -1392,6 +1397,7 @@ public class OutputHandler extends RepositoryManager {
         sb.append(HtmlUtils.open("div",
                                  HtmlUtils.cssClass(prefix + "-block")));
         boolean isMobile = request.isMobile();
+        showNext(request, entries.size(), sb);
         if (showDetails) {
             String cls = isMobile
                          ? "entry-list-header-mobile"

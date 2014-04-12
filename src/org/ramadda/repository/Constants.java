@@ -2204,11 +2204,17 @@ public interface Constants {
     /** _more_ */
     public static final String SORTBY_TODATE = "todate";
 
+    /** _more_          */
+    public static final String SORTBY_SIZE = "size";
+
     /** _more_ */
     public static final String SORTBY_CREATEDATE = "createdate";
 
     /** _more_ */
     public static final String SORTBY_NAME = "name";
+
+    /** _more_          */
+    public static final String SORTBY_MIXED = "mixed";
 
 
 

@@ -1756,6 +1756,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             if ( !decorate) {
                 request.put(ARG_DECORATE, "false");
             }
+
             String link = getHtmlOutputHandler().getEntriesList(request, sb,
                               children, true, false, showDetails);
             if ( !decorate) {

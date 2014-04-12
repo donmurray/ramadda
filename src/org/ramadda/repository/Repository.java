@@ -45,9 +45,9 @@ import org.ramadda.repository.metadata.ContentMetadataHandler;
 import org.ramadda.repository.metadata.Metadata;
 import org.ramadda.repository.metadata.MetadataManager;
 import org.ramadda.repository.monitor.MonitorManager;
-import org.ramadda.repository.output.JsonOutputHandler;
 import org.ramadda.repository.output.CalendarOutputHandler;
 import org.ramadda.repository.output.HtmlOutputHandler;
+import org.ramadda.repository.output.JsonOutputHandler;
 import org.ramadda.repository.output.OutputHandler;
 import org.ramadda.repository.output.OutputType;
 import org.ramadda.repository.output.WikiManager;
@@ -3856,6 +3856,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
     }
 
 
+    /** _more_          */
     private JsonOutputHandler jsonOutputHandler;
 
     /**
@@ -3865,9 +3866,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
      */
     public JsonOutputHandler getJsonOutputHandler() {
         if (jsonOutputHandler == null) {
-            jsonOutputHandler =
-                (JsonOutputHandler) getOutputHandler(
-                                                     org.ramadda.repository.output.JsonOutputHandler.class);
+            jsonOutputHandler = (JsonOutputHandler) getOutputHandler(
+                org.ramadda.repository.output.JsonOutputHandler.class);
         }
 
         return jsonOutputHandler;
@@ -5084,6 +5084,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
                 orderBy = " ORDER BY " + Tables.ENTRIES.COL_FROMDATE + order;
             } else if (by.equals(SORTBY_TODATE)) {
                 orderBy = " ORDER BY " + Tables.ENTRIES.COL_TODATE + order;
+            } else if (by.equals(SORTBY_SIZE)) {
+                orderBy = " ORDER BY " + Tables.ENTRIES.COL_FILESIZE + order;
             } else if (by.equals(SORTBY_CREATEDATE)) {
                 orderBy = " ORDER BY " + Tables.ENTRIES.COL_CREATEDATE
                           + order;

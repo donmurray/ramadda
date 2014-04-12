@@ -231,6 +231,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
     private boolean isLuceneEnabled = true;
 
 
+    /** _more_          */
     private List<SearchProvider> searchProviders = null;
 
 
@@ -848,6 +849,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             orderByList.add(new TwoFacedObject(msg("Create Date"),
                     SORTBY_CREATEDATE));
             orderByList.add(new TwoFacedObject(msg("Name"), SORTBY_NAME));
+            orderByList.add(new TwoFacedObject(msg("Size"), SORTBY_SIZE));
 
             String orderBy = HtmlUtils.select(
                                  ARG_ORDERBY, orderByList,
@@ -1297,18 +1299,32 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
         return addHeaderToAncillaryPage(request, result);
     }
 
-    public List[] doSearch(Request request, Appendable searchCriteriaSB) throws Exception {
-        if(searchProviders == null) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param searchCriteriaSB _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public List[] doSearch(Request request, Appendable searchCriteriaSB)
+            throws Exception {
+        if (searchProviders == null) {
             List<SearchProvider> tmp = new ArrayList<SearchProvider>();
-            tmp.add(new SearchProvider.RamaddaSearchProvider(getRepository()));
-            searchProviders = tmp;            
+            tmp.add(
+                new SearchProvider.RamaddaSearchProvider(getRepository()));
+            searchProviders = tmp;
         }
 
         //TODO: clean up the whole array  of lists and handle multiple search providers
-        for(int i=0;i<searchProviders.size();i++) {
+        for (int i = 0; i < searchProviders.size(); i++) {
             SearchProvider searchProvider = searchProviders.get(i);
-            return  searchProvider.getEntries(request, searchCriteriaSB);
+
+            return searchProvider.getEntries(request, searchCriteriaSB);
         }
+
         return null;
     }
 
@@ -1372,8 +1388,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
         if (textSearch) {
             processLuceneSearch(request, groups, entries);
         } else if (searchThis) {
-            List[] pair = doSearch(request,
-                                   searchCriteriaSB);
+            List[] pair = doSearch(request, searchCriteriaSB);
             groups.addAll((List<Entry>) pair[0]);
             entries.addAll((List<Entry>) pair[1]);
         }

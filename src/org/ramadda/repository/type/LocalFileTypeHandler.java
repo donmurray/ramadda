@@ -30,7 +30,9 @@ import org.ramadda.sql.Clause;
 
 import org.ramadda.sql.SqlUtil;
 
+
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Utils;
 
 
 import org.w3c.dom.*;
@@ -222,7 +224,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
 
 
         boolean descending = !request.get(ARG_ASCENDING, false);
-        String  by         = request.getString(ARG_ORDERBY, "fromdate");
+        String  by         = request.getString(ARG_ORDERBY, SORTBY_FROMDATE);
         if (sortMetadata != null) {
             if ( !request.exists(ARG_ASCENDING)) {
                 if (Misc.equals(sortMetadata.getAttr2(), "true")) {
@@ -238,9 +240,12 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
 
 
 
-        if (by.equals("name")) {
+        if (by.equals(SORTBY_NAME)) {
             files = IOUtil.sortFilesOnName(files, descending);
-        } else if (by.equals("mixed")) {
+        } else if (by.equals(SORTBY_SIZE)) {
+            files = Utils.sortFilesOnSize(files, descending);
+
+        } else if (by.equals(SORTBY_MIXED)) {
             List<File> filesByDate = new ArrayList<File>();
             List<File> filesByName = new ArrayList<File>();
             for (File f : files) {
