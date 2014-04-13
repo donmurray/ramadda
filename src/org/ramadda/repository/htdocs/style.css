@@ -205,6 +205,10 @@ input, password, fileinput,textarea {
    color: #000;
 }
 
+.entry-list-header-column a {
+        color: black;
+}
+
 .entry-list-row {
   margin-top:0px;
   padding-top: 2px;

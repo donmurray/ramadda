@@ -1545,6 +1545,7 @@ public class HtmlOutputHandler extends OutputHandler {
             tableSB.append("<thead>");
             tableSB.append("<tr valign=bottom>");
             numCols++;
+
             tableSB.append(HtmlUtils.th(HtmlUtils.b(msg("Name"))));
             numCols++;
             tableSB.append(HtmlUtils.th(HtmlUtils.b(msg("Date"))));
