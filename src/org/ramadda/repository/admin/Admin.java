@@ -491,8 +491,9 @@ public class Admin extends RepositoryManager {
                     if (request.get(ARG_ADMIN_INSTALLPLUGIN, false)) {
                         getRepository().getPluginManager().installPlugin(
                             PluginManager.PLUGIN_ALL);
-                        getRepository().loadAdminHandlers();
-                        getRepository().loadTypeHandlers();
+                        getRepository().loadPluginResources();
+                        //                        getRepository().loadAdminHandlers();
+                        //                        getRepository().loadTypeHandlers();
                     }
 
                     addInitEntries(user);

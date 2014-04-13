@@ -1273,19 +1273,23 @@ public class Repository extends RepositoryBase implements RequestHandler,
     private void loadResources() throws Exception {
         getPluginManager().loadPlugins();
         getPageHandler().clearCache();
+        loadPluginResources();
+    }
 
-        MyTrace.call1("Repository.loadTypehandlers");
+
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    public void loadPluginResources() throws Exception {
         loadTypeHandlers();
-        MyTrace.call2("Repository.loadTypehandlers");
-
         loadOutputHandlers();
         getMetadataManager().loadMetadataHandlers(getPluginManager());
         getApiManager().loadApi();
         getPageHandler().loadResources();
         loadSql();
-        MyTrace.call1("Repository.loadAdminHandlers");
         loadAdminHandlers();
-        MyTrace.call2("Repository.loadAdminHandlers");
     }
 
     /**
@@ -1424,6 +1428,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
                     addOutputHandler(outputHandler);
 
                 } catch (Exception exc) {
+                    System.err.println("\terror:" + exc);
+                    exc.printStackTrace();
                     if ( !required) {
                         getLogManager().logWarning(
                             "Couldn't load optional output handler:"
@@ -3856,7 +3862,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
     }
 
 
-    /** _more_          */
+    /** _more_ */
     private JsonOutputHandler jsonOutputHandler;
 
     /**
@@ -3987,6 +3993,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
             type = OutputHandler.OUTPUT_HTML.getId();
         }
         OutputType output = new OutputType("", type, OutputType.TYPE_VIEW);
+
 
         for (OutputHandler outputHandler : outputHandlers) {
             if (outputHandler.canHandleOutput(output)) {
