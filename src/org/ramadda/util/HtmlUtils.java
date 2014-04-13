@@ -83,9 +83,16 @@ public class HtmlUtils {
     public static final String HTTP_SET_COOKIE = "Set-Cookie";
 
 
+    /** _more_          */
     public static final String SUFFIX_NORTH = "_north";
+
+    /** _more_          */
     public static final String SUFFIX_SOUTH = "_south";
+
+    /** _more_          */
     public static final String SUFFIX_EAST = "_east";
+
+    /** _more_          */
     public static final String SUFFIX_WEST = "_west";
 
 
@@ -319,6 +326,7 @@ public class HtmlUtils {
     /** _more_ */
     public static final String ATTR_ONCLICK = "onClick";
 
+    /** _more_          */
     public static final String ATTR_ONCHANGE = "onchange";
 
     /** _more_ */
@@ -1087,6 +1095,19 @@ public class HtmlUtils {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param content _more_
+     * @param extra _more_
+     *
+     * @return _more_
+     */
+    public static String td(String content, String extra) {
+        return tag(TAG_TD, extra, content);
+    }
+
+
 
     /**
      * _more_
@@ -1310,11 +1331,20 @@ public class HtmlUtils {
         return args(args, true);
     }
 
+    /**
+     * _more_
+     *
+     * @param args _more_
+     * @param encodeArgs _more_
+     *
+     * @return _more_
+     */
     public static String args(String[] args, boolean encodeArgs) {
         List<String> a = new ArrayList<String>();
         for (int i = 0; i < args.length; i += 2) {
             a.add(arg(args[i], args[i + 1], encodeArgs));
         }
+
         return StringUtil.join("&", a);
     }
 
@@ -1556,12 +1586,15 @@ public class HtmlUtils {
     /**
      * _more_
      *
+     *
+     * @param id _more_
      * @param arg _more_
      * @param value _more_
      *
      * @return _more_
      */
-    public static String makeLatLonInput(String id, String arg, String value) {
+    public static String makeLatLonInput(String id, String arg,
+                                         String value) {
         return makeLatLonInput(id, arg, value, null);
     }
 
@@ -1569,6 +1602,8 @@ public class HtmlUtils {
     /**
      * _more_
      *
+     *
+     * @param id _more_
      * @param arg _more_
      * @param value _more_
      * @param tip _more_
@@ -1578,17 +1613,18 @@ public class HtmlUtils {
     public static String makeLatLonInput(String id, String arg, String value,
                                          String tip) {
         return input(arg, value,
-                     id(id) + 
-                     style("margin:0px;") + attrs(ATTR_SIZE, "5") + id(arg)
-                     + ((tip != null)
-                        ? title(tip)
-                        : ""));
+                     id(id) + style("margin:0px;") + attrs(ATTR_SIZE, "5")
+                     + id(arg) + ((tip != null)
+                                  ? title(tip)
+                                  : ""));
     }
 
 
     /**
      * _more_
      *
+     *
+     * @param baseId _more_
      * @param baseName _more_
      * @param southValue _more_
      * @param northValue _more_
@@ -1597,19 +1633,22 @@ public class HtmlUtils {
      *
      * @return _more_
      */
-    public static String makeLatLonBox(String baseId, String baseName, String southValue,
-                                       String northValue, String eastValue,
-                                       String westValue) {
+    public static String makeLatLonBox(String baseId, String baseName,
+                                       String southValue, String northValue,
+                                       String eastValue, String westValue) {
 
-        
-        return makeLatLonBox(baseId, baseName + SUFFIX_SOUTH, baseName + SUFFIX_NORTH,
-                             baseName + SUFFIX_EAST, baseName + SUFFIX_WEST,
-                             southValue, northValue, eastValue, westValue);
+
+        return makeLatLonBox(baseId, baseName + SUFFIX_SOUTH,
+                             baseName + SUFFIX_NORTH, baseName + SUFFIX_EAST,
+                             baseName + SUFFIX_WEST, southValue, northValue,
+                             eastValue, westValue);
     }
 
     /**
      * _more_
      *
+     *
+     * @param baseId _more_
      * @param southArg _more_
      * @param northArg _more_
      * @param eastArg _more_
@@ -1621,22 +1660,34 @@ public class HtmlUtils {
      *
      * @return _more_
      */
-    public static String makeLatLonBox(String baseId, String southArg, String northArg,
-                                       String eastArg, String westArg,
-                                       String southValue, String northValue,
-                                       String eastValue, String westValue) {
+    public static String makeLatLonBox(String baseId, String southArg,
+                                       String northArg, String eastArg,
+                                       String westArg, String southValue,
+                                       String northValue, String eastValue,
+                                       String westValue) {
         return "<table border=0 cellspacing=0 cellpadding=0><tr><td colspan=\"2\" align=\"center\">"
-            + makeLatLonInput(baseId + SUFFIX_NORTH, northArg, northValue, "North")
-               + "</td></tr>" + "<tr><td>"
-               + makeLatLonInput(baseId + SUFFIX_WEST, westArg, westValue, "West") + "</td><td>"
-               + makeLatLonInput(baseId + SUFFIX_EAST, eastArg, eastValue, "East") + "</tr>"
-               + "<tr><td colspan=\"2\" align=\"center\">"
-               + makeLatLonInput(baseId + SUFFIX_SOUTH, southArg, southValue, "South") + "</table>";
+               + makeLatLonInput(
+                   baseId + SUFFIX_NORTH, northArg, northValue,
+                   "North") + "</td></tr>" + "<tr><td>"
+                            + makeLatLonInput(
+                                baseId + SUFFIX_WEST, westArg, westValue,
+                                "West") + "</td><td>"
+                                        + makeLatLonInput(
+                                            baseId + SUFFIX_EAST, eastArg,
+                                            eastValue, "East") + "</tr>"
+                                                + "<tr><td colspan=\"2\" align=\"center\">"
+                                                    + makeLatLonInput(
+                                                        baseId + SUFFIX_SOUTH,
+                                                            southArg,
+                                                                southValue,
+                                                                    "South") + "</table>";
     }
 
     /**
      * _more_
      *
+     *
+     * @param baseId _more_
      * @param baseName _more_
      * @param south _more_
      * @param north _more_
@@ -1645,11 +1696,11 @@ public class HtmlUtils {
      *
      * @return _more_
      */
-    public static String makeLatLonBox(String baseId, String baseName, double south,
-                                       double north, double east,
-                                       double west) {
-        return makeLatLonBox(baseId, baseName, toString(south), toString(north),
-                             toString(east), toString(west));
+    public static String makeLatLonBox(String baseId, String baseName,
+                                       double south, double north,
+                                       double east, double west) {
+        return makeLatLonBox(baseId, baseName, toString(south),
+                             toString(north), toString(east), toString(west));
     }
 
     /**
@@ -2346,7 +2397,7 @@ public class HtmlUtils {
     public static String select(String name, List values, List selected,
                                 String extra, int maxLength) {
         StringBuilder sb = new StringBuilder();
-        String       attrs;
+        String        attrs;
         attrs = attrs(ATTR_NAME, name);
         sb.append(open(TAG_SELECT, attrs + extra));
         sb.append("\n");
@@ -3742,9 +3793,12 @@ public class HtmlUtils {
      * @param sb _more_
      * @param titles _more_
      * @param contents _more_
+     *
+     * @throws Exception _more_
      */
     public static void makeAccordian(Appendable sb, List<String> titles,
-                                     List<String> contents) throws Exception {
+                                     List<String> contents)
+            throws Exception {
 
         String accordianId = "accordion_" + (blockCnt++);
         sb.append(

@@ -86,6 +86,15 @@ import java.util.zip.*;
  */
 public class OutputHandler extends RepositoryManager {
 
+    /** _more_          */
+    public static final String WIDTH_DATE = "150";
+
+    /** _more_          */
+    public static final String WIDTH_SIZE = "100";
+
+    /** _more_          */
+    public static final String WIDTH_KIND = "200";
+
     /** _more_ */
     public static final JQuery JQ = null;
 
@@ -1072,29 +1081,31 @@ public class OutputHandler extends RepositoryManager {
                                          "false");
 
         //j-
-        String[]      order        = {
+        String[] order = {
             SORTBY_NAME, "true",
-            msg("Name") + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),           
-            "Sort by name A-Z", 
-
-            SORTBY_NAME, "false",           
-            msg("Name")  + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),
-            "Sort by name Z-A", 
-
-            SORTBY_FROMDATE, "true",
-            msg("Date") + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),
-            "Sort by date older to newer", 
-
-            SORTBY_FROMDATE, "false",
-            msg("Date") + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),
-            "Sort by date newer to older", 
-
-            SORTBY_SIZE, "true",
-            msg("Size") + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),
-            "Sort by size smallest to largest", 
-
-            SORTBY_SIZE, "false",  
-            msg("Size") + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),
+            msg("Name")
+            + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),
+            "Sort by name A-Z", SORTBY_NAME, "false",
+            msg("Name")
+            + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),
+            "Sort by name Z-A", SORTBY_FROMDATE, "true",
+            msg("Date")
+            + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),
+            "Sort by date older to newer", SORTBY_FROMDATE, "false",
+            msg("Date")
+            + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),
+            "Sort by date newer to older", SORTBY_CREATEDATE, "true",
+            msg("Created")
+            + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),
+            "Sort by created date older to newer", SORTBY_CREATEDATE, "false",
+            msg("Created")
+            + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),
+            "Sort by created date newer to older", SORTBY_SIZE, "true",
+            msg("Size")
+            + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),
+            "Sort by size smallest to largest", SORTBY_SIZE, "false",
+            msg("Size")
+            + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),
             "Sort by size largest to smallest",
         };
         //j+
@@ -1114,7 +1125,12 @@ public class OutputHandler extends RepositoryManager {
                     entryIds));
         }
 
+        int cnt = 0;
         for (int i = 0; i < order.length; i += 4) {
+            if ((cnt > 0) && (cnt % 2) == 0) {
+                sb.append(HtmlUtils.space(2));
+            }
+            cnt++;
             if (Misc.equals(order[i], oldOrderBy)
                     && Misc.equals(order[i + 1], oldAscending)) {
                 sb.append(HtmlUtils.span(order[i + 2],
@@ -1402,7 +1418,8 @@ public class OutputHandler extends RepositoryManager {
 
         sb.append(HtmlUtils.open("div",
                                  HtmlUtils.cssClass(prefix + "-block")));
-        boolean isMobile = request.isMobile();
+        boolean isMobile       = request.isMobile();
+        boolean showCreateDate = getPageHandler().showEntryTableCreateDate();
         showNext(request, entries.size(), sb);
         if (showDetails) {
             String cls = isMobile
@@ -1416,27 +1433,68 @@ public class OutputHandler extends RepositoryManager {
             sb.append("</div></td>");
 
 
-            String sortLink; 
+            String  sortLink;
             Request tmpRequest = request.cloneMe();
             tmpRequest.put(ARG_SHOWENTRYSELECTFORM, "true");
 
             tmpRequest.put(ARG_ORDERBY, SORTBY_NAME);
-            tmpRequest.put(ARG_ASCENDING, ""+!request.get(ARG_ASCENDING, false));
-            sortLink= tmpRequest.getUrl();
-            sb.append(HtmlUtils.tag(HtmlUtils.TAG_TD, HtmlUtils.attrs(HtmlUtils.ATTR_CLASS, "entry-list-header-column"), 
-                                    HtmlUtils.href(sortLink, msg("Name"))));
+            tmpRequest.put(ARG_ASCENDING,
+                           "" + !request.get(ARG_ASCENDING, false));
+            sortLink = tmpRequest.getUrl();
+            sb.append(
+                HtmlUtils.tag(
+                    HtmlUtils.TAG_TD,
+                    HtmlUtils.attrs(
+                        HtmlUtils.ATTR_CLASS,
+                        "entry-list-header-column"), HtmlUtils.href(
+                            sortLink, msg("Name"))));
+
             tmpRequest.put(ARG_ORDERBY, SORTBY_FROMDATE);
-            sortLink= tmpRequest.getUrl();
-            sb.append(HtmlUtils.tag(HtmlUtils.TAG_TD, HtmlUtils.attrs(HtmlUtils.ATTR_WIDTH, "200", HtmlUtils.ATTR_CLASS, "entry-list-header-column"), 
-                                    HtmlUtils.href(sortLink, msg("Date"))));
+            sortLink = tmpRequest.getUrl();
+            sb.append(
+                HtmlUtils.tag(
+                    HtmlUtils.TAG_TD,
+                    HtmlUtils.attrs(
+                        HtmlUtils.ATTR_WIDTH, WIDTH_DATE,
+                        HtmlUtils.ATTR_CLASS,
+                        "entry-list-header-column"), HtmlUtils.href(
+                            sortLink, msg("Date"))));
+
+
+
+            if (showCreateDate) {
+                tmpRequest.put(ARG_ORDERBY, SORTBY_CREATEDATE);
+                sortLink = tmpRequest.getUrl();
+                sb.append(
+                    HtmlUtils.tag(
+                        HtmlUtils.TAG_TD,
+                        HtmlUtils.attrs(
+                            HtmlUtils.ATTR_WIDTH, WIDTH_DATE,
+                            HtmlUtils.ATTR_CLASS,
+                            "entry-list-header-column"), HtmlUtils.href(
+                                sortLink, msg("Created"))));
+
+
+            }
 
             if ( !isMobile) {
                 tmpRequest.put(ARG_ORDERBY, SORTBY_SIZE);
-                sortLink= tmpRequest.getUrl();
-                sb.append(HtmlUtils.tag(HtmlUtils.TAG_TD, HtmlUtils.attrs(HtmlUtils.ATTR_WIDTH, "100", HtmlUtils.ATTR_CLASS, "entry-list-header-column"), 
-                                    HtmlUtils.href(sortLink, msg("Size"))));
-                sb.append(HtmlUtils.tag(HtmlUtils.TAG_TD, HtmlUtils.attrs(HtmlUtils.ATTR_WIDTH, "200", HtmlUtils.ATTR_CLASS, "entry-list-header-column"), 
-                                        msg("Kind")));
+                sortLink = tmpRequest.getUrl();
+                sb.append(
+                    HtmlUtils.tag(
+                        HtmlUtils.TAG_TD,
+                        HtmlUtils.attrs(
+                            HtmlUtils.ATTR_WIDTH, WIDTH_SIZE,
+                            HtmlUtils.ATTR_CLASS,
+                            "entry-list-header-column"), HtmlUtils.href(
+                                sortLink, msg("Size"))));
+                sb.append(
+                    HtmlUtils.tag(
+                        HtmlUtils.TAG_TD,
+                        HtmlUtils.attrs(
+                            HtmlUtils.ATTR_WIDTH, WIDTH_KIND,
+                            HtmlUtils.ATTR_CLASS,
+                            "entry-list-header-column"), msg("Kind")));
             }
             sb.append("</tr></table>");
 
@@ -1600,24 +1658,47 @@ public class OutputHandler extends RepositoryManager {
 
         StringBuilder extraAlt = new StringBuilder();
         boolean       showDate = !request.get(ARG_TREEVIEW, false);
+        boolean showCreateDate = getPageHandler().showEntryTableCreateDate();
 
         if ( !showDetails) {
-            showDate = false;
+            showDate       = false;
+            showCreateDate = false;
         }
 
+
         boolean isMobile = request.isMobile();
-        //TODO: 
-        //        showDate = false;
+
         if (showDate) {
-            sb.append("<td width=200 align=right><div "
-                      + HtmlUtils.cssClass(CSS_CLASS_ENTRY_ROW_LABEL) + ">");
-            sb.append(entry.getTypeHandler().formatDate(request, entry,
-                    new Date(entry.getStartDate()), extraAlt.toString()));
-            sb.append("</div></td>");
+            String dttm = entry.getTypeHandler().formatDate(request, entry,
+                              new Date(entry.getStartDate()),
+                              extraAlt.toString());
+
+            sb.append(
+                HtmlUtils.td(
+                    HtmlUtils.div(
+                        dttm,
+                        HtmlUtils.cssClass(
+                            CSS_CLASS_ENTRY_ROW_LABEL)), HtmlUtils.attrs(
+                                HtmlUtils.ATTR_WIDTH, WIDTH_DATE,
+                                HtmlUtils.ATTR_ALIGN, "right")));
+        }
+
+        if (showCreateDate) {
+            String dttm = entry.getTypeHandler().formatDate(request, entry,
+                              new Date(entry.getCreateDate()),
+                              extraAlt.toString());
+            sb.append(
+                HtmlUtils.td(
+                    HtmlUtils.div(
+                        dttm,
+                        HtmlUtils.cssClass(
+                            CSS_CLASS_ENTRY_ROW_LABEL)), HtmlUtils.attrs(
+                                HtmlUtils.ATTR_WIDTH, WIDTH_DATE,
+                                HtmlUtils.ATTR_ALIGN, "right")));
         }
 
         if ( !isMobile && showDetails) {
-            sb.append("<td width=\"100\" align=right "
+            sb.append("<td width=\"" + WIDTH_SIZE + "\" align=right "
                       + HtmlUtils.cssClass(CSS_CLASS_ENTRY_ROW_LABEL) + ">");
             if (entry.getResource().isFile()) {
                 sb.append(
@@ -1630,7 +1711,7 @@ public class OutputHandler extends RepositoryManager {
 
         if ( !isMobile && showDetails) {
             sb.append(
-                "<td width=\"200\" align=right "
+                "<td width=\"" + WIDTH_KIND + "\" align=right "
                 + HtmlUtils.cssClass(CSS_CLASS_ENTRY_ROW_LABEL)
                 + "><div style=\"max-width:190px; overflow-x: hidden;\">");
             sb.append(entry.getTypeHandler().getFileTypeDescription(request,

@@ -137,6 +137,10 @@ public class PageHandler extends RepositoryManager {
     public static final String PROP_LANGUAGE_DEFAULT =
         "ramadda.language.default";
 
+    /** _more_          */
+    public static final String PROP_ENTRY_TABLE_SHOW_CREATEDATE =
+        "ramadda.entry.table.show.createdate";
+
 
     /** _more_ */
     public static final String MSG_PREFIX = "<msg ";
@@ -3263,6 +3267,16 @@ public class PageHandler extends RepositoryManager {
             throw new RuntimeException(ioe);
         }
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean showEntryTableCreateDate() {
+        return getProperty(PROP_ENTRY_TABLE_SHOW_CREATEDATE, false);
+    }
+
 
 
 }

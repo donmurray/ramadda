@@ -1078,16 +1078,19 @@ a.image-link {
 
 
 
+
 .sortlinkon  {
   background-color : #eee;
   font-weight: bold;
   padding-left:2px;
   padding-right:2px;
+ font-style:italic;
 }
 
 .sortlinkoff  {
   padding-left:2px;
   padding-right:2px;
+  font-style:italic;
 }
 
 .sortlinkoff a {
