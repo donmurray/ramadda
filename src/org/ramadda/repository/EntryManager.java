@@ -3728,7 +3728,6 @@ public class EntryManager extends RepositoryManager {
                 length-= byteStart;
             }
 
-            System.err.println("byte start:" + byteStart +" length:"  + length);
             Result result = new Result(BLANK, inputStream, mimeType);
             result.setResponseCode(response);
             result.addHttpHeader("Accept-Ranges","bytes");

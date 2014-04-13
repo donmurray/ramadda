@@ -275,13 +275,19 @@ public class MetadataManager extends RepositoryManager {
         for (Metadata metadata : getMetadata(entry)) {
             MetadataHandler handler = findMetadataHandler(metadata.getType());
             handler.decorateEntry(request, entry, mine, metadata, forLink);
-            //Only do the first one so we don't get multiple thumbnails
-            if (mine.length() > 0) {
-                sb.append(mine);
-
-                break;
+            if (forLink) {
+                //Only do the first one so we don't get multiple thumbnails
+                if(mine.length() > 0) {
+                    break;
+                }
+            }  else {
+                if(mine.length() > 0) {
+                    mine.append(HtmlUtils.br());
+                }
             }
+
         }
+        sb.append(mine);
     }
 
 
