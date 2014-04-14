@@ -668,6 +668,9 @@ features
 {{field name="notes" row.label="Notes:"}}
 </table>
 
+{{tree title="Data" details="false" showtoggle="false" message="No data available" prefix="==Data=="}}
+
+
 </td><td>
 {{mapentry width="350" message=""}}
 <table class="formtable">
@@ -682,7 +685,7 @@ features
 </td>
 </table>
 
-{{tree title="Data" details="false" showtoggle="false" message="No data available" prefix="==Data=="}}
+
 
 ]]>
 </wiki>
