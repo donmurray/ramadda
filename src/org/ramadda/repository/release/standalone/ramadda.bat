@@ -1,5 +1,7 @@
 REM To run RAMADDA stand-alone just do
 
+
+
 java -Xmx512m -XX:MaxPermSize=256m -Dfile.encoding=utf-8  -jar lib/@REPOSITORYJAR@ -port 8080 %*
 
 

@@ -5,7 +5,7 @@
 #
 #ramadda
 #      /installfrombuild.sh
-#      /ramadda1.6b
+#      /@RELEASE@
 #source/ramadda-code
 #
 #Copy this file into the ramadda directory as it deletes and copies over
@@ -14,7 +14,7 @@
 #Before you run this do a full  Ant build in source/ramadda-code
 #
 
-VERSION=ramadda1.6b
+VERSION=@RELEASE@
 DIST=../source/ramadda-code/dist
 
 sh ${VERSION}/ramaddainit.sh stop

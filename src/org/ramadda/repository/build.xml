@@ -214,6 +214,7 @@
         </zip>
      </target>
 
+
     <target name="ramadda.zip" depends="init,ramadda.jar">
         <mkdir dir="${release_dir}"/>
         <delete includeemptydirs="true">
@@ -229,9 +230,12 @@
               <exclude name="**/init.sh"/>
           </fileset>
           <filterset>
+              <filter token="RELEASE" value="${release_name}"/>
               <filter token="REPOSITORYJAR" value="${ramadda_jar}"/>
+              <filter token="VERSION" value="${version}"/>
           </filterset>
         </copy>
+
         <copy  file="${lib_dir}/ramaddatds.jar" todir="${release_dir}/lib" overwrite="true" />
         <copy  file="${lib_dir}/servlet-api.jar" todir="${release_dir}/lib" overwrite="true" />
         <delete file="${lib_dir}/repository.tar"/>
@@ -239,25 +243,6 @@
         <zip destfile="${dist_dir}/${ramadda_zip}">
           <zipfileset dir="${release_dir}" prefix="${release_name}"/>
         </zip>
-
-<!--
-        <tar 
-            destfile="${lib_dir}/repository.tar">
-          <tarfileset dir="${release_dir}"
-              prefix="${release_name}">
-              <include name="*"/>
-         </tarfileset>
-
-        </tar>
-
--->
-
-
-<!--
-        <delete includeemptydirs="true">
-            <fileset dir="${release_dir}" includes="**/*"/>
-        </delete>
--->
     </target>
 
 

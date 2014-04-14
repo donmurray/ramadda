@@ -15,23 +15,31 @@ There are a few things you need to do to get RAMADDA running:
 RAMADDA  can run <a href="#standalone">stand alone</a> or under a servlet container like <a href="#tomcat">Tomcat</a>. 
 
 <li> Where is RAMADDA going to store files? <br>
-RAMADDA needs a <a href="#home">home directory</a> to store files, databases, etc.
-
+RAMADDA needs a <a href="#home">home directory</a> on your server to store files, databases, etc.
 
 
 <li> What kind of database are you going to use? <br>
 RAMADDA comes with its own built-in  database  (Java Derby) but 
-can be <a href="database.html">configured</a> to use other databases.
+can be easily <a href="database.html">configured</a> to use other databases.
 
 <li> Configure RAMADDA<br>
 <ul>
-<li> Once installed you can finish the installation of RAMADDA online at
-<a href="http://localhost:8080/repository">http://localhost:8080/repository</a>.
+<li> Once installed and running you can finish the configuration process through your browser by going to:<pre>
+<i>http://&lt;hostname&gt;:&lt;port&gt;/repository </i>
+</pre>
+
+If you are running on your local machine you go to:<pre>
+<a href="http://localhost:8080/repository">http://localhost:8080/repository</a>
+</pre>
+
+<li> <b>Important!</b>. For security you really should configure <a href="#ssl">https (SSL) </a> access. 
+
 <li>  Do further  <a href="#configuration">site configuration</a>.
-<li>  You should also configure <a href="#ssl">SSL</a> access.
+
 <li> During the installation process you can install a common set of "plugins" to RAMADDA that provide additional functionality.
 There are other <a href="releasenotes.html#plugins">plugins</a> available as well.
 </ol>
+
 
 
 <subhead intoc="false" id="standalone">Running Standalone</subhead>
@@ -113,7 +121,7 @@ more information.
 
 RAMADDA uses a local home directory on the server.
 This is where RAMADDA looks for properties files and other resources, where the 
-Java derby database is stored and where any uploaded data files are stored, etc. 
+Java derby database is stored  (if its used) and where any uploaded data files are stored, etc. 
 <p>
 By default ramadda will use: <pre>
    &lt;server process home directory&gt;/.ramadda</pre>
@@ -276,7 +284,6 @@ More information is available at the <a href="http://sourceforge.net/projects/ra
 
 
 
-
 <a name="ssl"></a>
 <h3>Configuring SSL under Tomcat</h3>
 If you have your Tomcat server configured for SSL access all you need to do is to tell RAMADDA what port it is running under. Add the property:
@@ -286,9 +293,11 @@ ramadda.ssl.port=&lt;the ssl port&gt;
 to a properties file in the RAMADDA home directory (See <a href="#properties">above</a>).
 <p>
 
-<b>Note: When you define an SSL port then RAMADDA will automatically redirect all login and admin requests
+<div class=note>
+Note: When you define an SSL port then RAMADDA will automatically redirect all login and admin requests
 to that port. If your Tomcat server is not really configured for SSL then you will not be able to access RAMADDA. 
-See the <a href="faq.html#fixssl">FAQ</a> for how to fix this.</b>
+See the <a href="faq.html#fixssl">FAQ</a> for how to fix this.
+</div>
 
 
 <a name="ssljetty"></a>

@@ -1,7 +1,6 @@
 
 
-The latest version is 1.6b
-
+The latest version is 
 repository.war: self contained war file for running under Tomcat, Glassfish, etc
 
 ramadda1.6b.zip: stand-alone version of RAMADDA. Just needs Java to run. Download and unzip the file
