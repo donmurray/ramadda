@@ -3,7 +3,7 @@
 
   <handler category="Project" xclass="org.unavco.projects.nlas.ramadda.NlasMetadataHandler">
 
-    <type id="project_creator" name="Creator" searchable="true" priority="20"  displaygroup="Creators">
+    <type id="project_creator" name="Creator" searchable="true" priority="20"  displaygroup="Creator">
       <element id="name" name="Name"/>
       <element id="institution" name="Institution"/>
       <element id="email" name="Email" datatype="email"/>

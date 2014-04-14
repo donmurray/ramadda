@@ -684,15 +684,22 @@ features
 
 {{properties metadata.types="project_creator" message="" }}
 
+== Location and Time ==
+
 {{mapentry width="350" message=""}}
+
 <table class="formtable">
 {{field name="location" row.label="Location:"}}
+{{daterange row.label="Date Range:" format="yyyy-MM-dd"}}
 </table>
 
-<b>Date:</b> {{fromdate}} -- {{todate}}
 <p>
 
 {{properties metadata.types="!project_creator" message="" }}
+
+
+{{list includeicon="true" details="false" entries="siblings,links"  message="" box.maxheight="200" box.class="entry-sidebox" prefix="==Related=="}}
+
 
 </td>
 </table>

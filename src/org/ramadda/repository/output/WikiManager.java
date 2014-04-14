@@ -83,7 +83,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                             "Information",
                             new WikiTag(WIKI_TAG_INFORMATION, attrs(ATTR_DETAILS, "false")),
                             new WikiTag(WIKI_TAG_NAME), new WikiTag(WIKI_TAG_DESCRIPTION),
-                            new WikiTag(WIKI_TAG_RESOURCE), new WikiTag(WIKI_TAG_DATE_FROM),
+                            new WikiTag(WIKI_TAG_RESOURCE), new WikiTag(WIKI_TAG_DATERANGE),
+                            new WikiTag(WIKI_TAG_DATE_FROM),
                             new WikiTag(WIKI_TAG_DATE_TO), new WikiTag(WIKI_TAG_LINK),
                             new WikiTag(WIKI_TAG_HTML),
                             new WikiTag(WIKI_TAG_SIMPLE, attrs(ATTR_TEXTPOSITION, POS_LEFT)),
@@ -963,6 +964,16 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             dateFormat.setTimeZone(RepositoryUtil.TIMEZONE_DEFAULT);
 
             return dateFormat.format(date);
+
+        } else if (theTag.equals(WIKI_TAG_DATERANGE)) {
+            String format =
+                Misc.getProperty(props, ATTR_FORMAT,
+                                 RepositoryBase.DEFAULT_TIME_FORMAT);
+            Date date1 = new Date(entry.getStartDate());
+            Date date2 = new Date(entry.getEndDate());
+            SimpleDateFormat dateFormat = new SimpleDateFormat(format);
+            dateFormat.setTimeZone(RepositoryUtil.TIMEZONE_DEFAULT);
+            return dateFormat.format(date1) + " -- " + dateFormat.format(date2);
         } else if (theTag.equals(WIKI_TAG_ENTRYID)) {
             return entry.getId();
         } else if (theTag.equals(WIKI_TAG_PROPERTIES)) {

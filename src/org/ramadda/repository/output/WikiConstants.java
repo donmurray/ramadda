@@ -309,6 +309,8 @@ public interface WikiConstants {
     /** wiki import */
     public static final String WIKI_TAG_DATE = "date";
 
+    public static final String WIKI_TAG_DATERANGE = "daterange";
+
     /** wiki import */
     public static final String WIKI_TAG_DATE_FROM = "fromdate";
 
