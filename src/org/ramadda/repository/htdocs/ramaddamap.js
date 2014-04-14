@@ -83,6 +83,7 @@ function RepositoryMap(mapId, params) {
             sourceProjection:sphericalMercatorCS,
                 //sourceProjection: earthCS,
                 displayProjection: earthCS,
+                mapId: mapId,
                 mapDivId: mapId,
                 showScaleLine : true,
                 showLayerSwitcher : true,
@@ -446,27 +447,47 @@ function RepositoryMap(mapId, params) {
             return;
         }
         this.fldNorth = GuiUtils.getDomObject(this.argBase + "_north");
-        if (!this.fldNorth)
+        if (this.fldNorth ==null)
             this.fldNorth = GuiUtils.getDomObject(this.argBase + ".north");
+        if (this.fldNorth ==null)
+            this.fldNorth = GuiUtils.getDomObject(this.mapId + "_north");
+
+
+
+
         this.fldSouth = GuiUtils.getDomObject(this.argBase + "_south");
         if (!this.fldSouth)
             this.fldSouth = GuiUtils.getDomObject(this.argBase + ".south");
+        if (this.fldSouth ==null)
+            this.fldSouth = GuiUtils.getDomObject(this.mapId + "_south");
 
         this.fldEast = GuiUtils.getDomObject(this.argBase + "_east");
         if (!this.fldEast)
             this.fldEast = GuiUtils.getDomObject(this.argBase + ".east");
+        if (this.fldEast ==null)
+            this.fldEast = GuiUtils.getDomObject(this.mapId + "_east");
 
         this.fldWest = GuiUtils.getDomObject(this.argBase + "_west");
         if (!this.fldWest)
             this.fldWest = GuiUtils.getDomObject(this.argBase + ".west");
 
+        if (this.fldWest ==null)
+            this.fldWest = GuiUtils.getDomObject(this.mapId + "_west");
+
         this.fldLat = GuiUtils.getDomObject(this.argBase + "_latitude");
         if (!this.fldLat)
             this.fldLat = GuiUtils.getDomObject(this.argBase + ".latitude");
 
+        if (this.fldLat ==null)
+            this.fldLat = GuiUtils.getDomObject(this.mapId + "_latitude");
+
+
         this.fldLon = GuiUtils.getDomObject(this.argBase + "_longitude");
         if (!this.fldLon)
             this.fldLon = GuiUtils.getDomObject(this.argBase + ".longitude");
+        if (this.fldLon ==null)
+            this.fldLon = GuiUtils.getDomObject(this.mapId + "_longitude");
+
 
         if (this.fldLon) {
             this.addClickHandler(this.fldLon.id, this.fldLat.id);
@@ -955,10 +976,12 @@ function RepositoryMap(mapId, params) {
             zIndex: 20,
         };
 
+        /*
         this.addPoint(id, north, west, attrs);
         this.addPoint(id, south, west, attrs);
         this.addPoint(id, north, east, attrs);
         this.addPoint(id, south, east, attrs);
+        */
 
         if (args["zoomToExtent"]) {
             this.centerOnMarkers(bounds);
