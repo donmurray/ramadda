@@ -2,7 +2,7 @@
 <metadata>
 
   <handler category="Tags">
-    <type name="GCMD Science Keyword" id="enum_gcmdkeyword" searchable="true" browsable="true" category="GCMD Science Keywords">
+    <type name="GCMD Science Keyword" id="enum_gcmdkeyword" searchable="true" browsable="true" displaygroup="GCMD Science Keywords">
       <element
          name="Keyword"
          datatype="enumeration"
