@@ -153,6 +153,9 @@ public class TypeHandler extends RepositoryManager {
     public static final String ATTR_WIKI_INNER = "wiki_inner";
 
     /** _more_ */
+    public static final String TAG_CHILDREN = "children";
+
+    /** _more_ */
     public static final String ATTR_VALUE = "value";
 
     /** _more_ */
@@ -248,6 +251,9 @@ public class TypeHandler extends RepositoryManager {
     private String wikiTemplate;
 
     /** _more_ */
+    private String defaultChildrenEntries;
+
+    /** _more_ */
     private String wikiTemplateInner;
 
     /** _more_ */
@@ -329,7 +335,6 @@ public class TypeHandler extends RepositoryManager {
      *
      * @param entryNode _more_
      *
-     * @throws Exception _more_
      */
     private void initTypeHandler(Element entryNode) {
         try {
@@ -350,6 +355,10 @@ public class TypeHandler extends RepositoryManager {
 
             wikiTemplateInner = Utils.getAttributeOrTag(entryNode,
                     ATTR_WIKI_INNER, (String) null);
+
+
+            defaultChildrenEntries = Utils.getAttributeOrTag(entryNode,
+                    TAG_CHILDREN, (String) null);
 
 
             List metadataNodes = XmlUtil.findChildren(entryNode,
@@ -1452,6 +1461,12 @@ public class TypeHandler extends RepositoryManager {
             this.parent.initializeEntryFromForm(request, entry, parent,
                     newEntry);
         }
+
+
+
+
+
+
     }
 
 
@@ -1492,10 +1507,20 @@ public class TypeHandler extends RepositoryManager {
      */
     public void doFinalEntryInitialization(Request request, Entry entry) {
         //Clear the column value cache
+
         if (request == null) {
             return;
         }
         try {
+            //Check if there is a default set of children entries
+            if (defaultChildrenEntries != null) {
+                Element root = XmlUtil.getRoot(defaultChildrenEntries);
+                List<Entry> newEntries =
+                    getEntryManager().processEntryXml(request, root, entry,
+                        new Hashtable<String, File>());
+            }
+
+
             if (requiredMetadata.size() == 0) {
                 return;
             }
@@ -1519,7 +1544,6 @@ public class TypeHandler extends RepositoryManager {
 
             //            getEntryManager().setBoundsFromChildren(request, entry.getParentEntry());
             //            getEntryManager().setTimeFromChildren(request, entry.getParentEntry(), null);
-
 
         } catch (Exception exc) {
             throw new RuntimeException(exc);
@@ -2348,21 +2372,21 @@ public class TypeHandler extends RepositoryManager {
 
 
             /**
-            boolean isPdf = entry.getResource().getPath().endsWith(".pdf");
-            if(showResource && isPdf) {
-                if(getAccessManager().canDownload(request, entry)) {
-                    String fileUrl = getEntryResourceUrl(request, entry);
-                    String embed = HtmlUtils.tag(HtmlUtils.TAG_OBJECT, 
-                                                 HtmlUtils.attrs(
-                                                                 HtmlUtils.ATTR_TYPE,"application/pdf",
-                                                                 HtmlUtils.ATTR_SRC, fileUrl, 
-                                                                 HtmlUtils.ATTR_WIDTH, "600",
-                                                                 HtmlUtils.ATTR_HEIGHT, "1000"),
-                                                 msg("PDF view not supported"));
-                    sb.append(HtmlUtils.col(embed, " colspan=2 "));
-                }
-            }
-            */
+             * boolean isPdf = entry.getResource().getPath().endsWith(".pdf");
+             * if(showResource && isPdf) {
+             *   if(getAccessManager().canDownload(request, entry)) {
+             *       String fileUrl = getEntryResourceUrl(request, entry);
+             *       String embed = HtmlUtils.tag(HtmlUtils.TAG_OBJECT,
+             *                                    HtmlUtils.attrs(
+             *                                                    HtmlUtils.ATTR_TYPE,"application/pdf",
+             *                                                    HtmlUtils.ATTR_SRC, fileUrl,
+             *                                                    HtmlUtils.ATTR_WIDTH, "600",
+             *                                                    HtmlUtils.ATTR_HEIGHT, "1000"),
+             *                                    msg("PDF view not supported"));
+             *       sb.append(HtmlUtils.col(embed, " colspan=2 "));
+             *   }
+             * }
+             */
 
             if (showResource && entry.getResource().isImage()) {
                 String width = "600";

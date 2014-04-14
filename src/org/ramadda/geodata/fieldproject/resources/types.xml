@@ -649,6 +649,14 @@ features
      <column name="intended_use"  type="string"  rows="5" size="1000" label="Intended Use" columns="60"  cansearch="true"/>
      <column name="location"  type="string"  label="Where" rows="2" columns="60"  cansearch="true"/>
      <column name="notes" type="string"  label="Notes" rows="5" size="5000" changetype="true" columns="60" />
+     <children><![CDATA[
+<entries>
+<entry  name="Data"  type="group"/>
+<entry  name="Documents"  type="group"/>
+</entries>
+]]>
+</children>
+
      <wiki><![CDATA[
 {{noheading}}
 <table width="100%" cellspacing="10" >
