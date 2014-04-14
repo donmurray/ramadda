@@ -634,6 +634,7 @@ features
 
 
 
+
   <type name="project_casestudy"  description="Case Study" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Science Project"      metadata="enum_tag,content.keyword">
      <property name="icon" value="/fieldproject/briefcase.png"/>
 
@@ -672,6 +673,9 @@ features
 <table class="formtable">
 {{field name="location" row.label="Location:"}}
 </table>
+
+<b>Date:</b> {{fromdate}} -- {{todate}}
+<p>
 
 
 {{properties  message="" }}
