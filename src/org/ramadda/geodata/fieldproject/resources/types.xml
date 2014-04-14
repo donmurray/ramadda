@@ -81,6 +81,11 @@
 
 {{properties metadata.types="!project_pi" message="" }}
 
+
+
+
+
+
 {{links entry="Links" message=""}}
 
 
@@ -635,7 +640,7 @@ features
 
 
 
-  <type name="project_casestudy"  description="Case Study" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Science Project"      metadata="enum_tag,content.keyword">
+  <type name="project_casestudy"  description="Case Study" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Science Project"      metadata="project_creator,enum_tag,content.keyword">
      <property name="icon" value="/fieldproject/briefcase.png"/>
 
      <property name="form.file.show" value="false"/>
@@ -644,8 +649,6 @@ features
      <property name="form.altitude.show" value="false"/>
      <property name="form.altitude.show.top" value="false"/>
 
-     <column name="creator"  type="enumerationplus"  size="500" label="Creator"   cansearch="true"/>
-     <column name="institution"  type="enumerationplus"   label="Institution" cansearch="true"/>
      <column name="intended_use"  type="string"  rows="5" size="1000" label="Intended Use" columns="60"  cansearch="true"/>
      <column name="location"  type="string"  label="Where" rows="2" columns="60"  cansearch="true"/>
      <column name="notes" type="string"  label="Notes" rows="5" size="5000" changetype="true" columns="60" />
@@ -670,8 +673,6 @@ features
 ==Case Study Information==
 <table class="formtable">
 {{resource row.label="URL:"  message=""}}
-{{field name="creator" row.label="Creator:"}}
-{{field name="institution" row.label="Institution:"}}
 {{field name="intended_use" row.label="Intended Use:"}}
 {{field name="notes" row.label="Notes:"}}
 </table>
@@ -680,6 +681,9 @@ features
 
 
 </td><td>
+
+{{properties metadata.types="project_creator" message="" }}
+
 {{mapentry width="350" message=""}}
 <table class="formtable">
 {{field name="location" row.label="Location:"}}
@@ -688,8 +692,8 @@ features
 <b>Date:</b> {{fromdate}} -- {{todate}}
 <p>
 
+{{properties metadata.types="!project_creator" message="" }}
 
-{{properties  message="" }}
 </td>
 </table>
 
