@@ -444,13 +444,13 @@ function Entry(props) {
             getFormattedFilesize : function () {
                 return GuiUtils.size_format(this.getFilesize());
             },
-            toString: function() {
-                return "entry:" + this.getName();
-            },
             getEntryUrl : function (extraArgs) {
                 var url =   this.getRamadda().getRoot() + "/entry/show?entryid=" + this.id;
                 if(extraArgs!=null) {
-                    url += "&" + extraArgs;
+                    if (!StringUtil.startsWith(extraArgs, "&")) {
+                      url += "&";
+                    }
+                    url += extraArgs;
                 }
                 return url;
             },
@@ -464,7 +464,6 @@ function Entry(props) {
                 if(!label) label = this.getName();
                 return  HtmlUtil.tag("a",["href", this.getEntryUrl()],label);
             },
-
             toString: function() {
                 return "entry:" + this.getName();
             }
