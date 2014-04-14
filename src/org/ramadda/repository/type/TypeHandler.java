@@ -2295,6 +2295,8 @@ public class TypeHandler extends RepositoryManager {
             }
         }
 
+
+
         StringBuilder sb = new StringBuilder();
         if (true || output.equals(OutputHandler.OUTPUT_HTML)) {
             OutputHandler outputHandler =
@@ -2342,6 +2344,25 @@ public class TypeHandler extends RepositoryManager {
             } else {
                 showCreated = false;
             }
+
+
+
+            /**
+            boolean isPdf = entry.getResource().getPath().endsWith(".pdf");
+            if(showResource && isPdf) {
+                if(getAccessManager().canDownload(request, entry)) {
+                    String fileUrl = getEntryResourceUrl(request, entry);
+                    String embed = HtmlUtils.tag(HtmlUtils.TAG_OBJECT, 
+                                                 HtmlUtils.attrs(
+                                                                 HtmlUtils.ATTR_TYPE,"application/pdf",
+                                                                 HtmlUtils.ATTR_SRC, fileUrl, 
+                                                                 HtmlUtils.ATTR_WIDTH, "600",
+                                                                 HtmlUtils.ATTR_HEIGHT, "1000"),
+                                                 msg("PDF view not supported"));
+                    sb.append(HtmlUtils.col(embed, " colspan=2 "));
+                }
+            }
+            */
 
             if (showResource && entry.getResource().isImage()) {
                 String width = "600";
