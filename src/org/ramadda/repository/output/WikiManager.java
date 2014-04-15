@@ -2544,13 +2544,24 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 continue;
             }
 
-            if (entryid.equals(ID_SIBLINGS)) {
+            if (entryid.startsWith(ID_SIBLINGS)) {
+                List<String> toks  = StringUtil.splitUpTo(entryid, ":", 2);
+                String type = null;
+                if(toks.size()>1) {
+                    entryid = toks.get(0);
+                    type = toks.get(1);
+                }
                 Entry parent = getEntryManager().getEntry(request,
                                    baseEntry.getParentEntryId());
                 if (parent != null) {
                     for (Entry sibling :
                             getEntryManager().getChildren(request, parent)) {
                         if ( !sibling.getId().equals(baseEntry.getId())) {
+                            if(type!=null) {
+                                if(!sibling.getTypeHandler().isType(type)) {
+                                    continue;
+                                }
+                            }
                             entries.add(sibling);
                         }
                     }
