@@ -399,7 +399,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         processEntryId);
         //processEntryId + "/" + IOUtil.getFileTail(lastFile.toString()));
 
-        if (request.get("returnjson", false)) {
+        if (request.get("returnjson", false) && false) {
             StringBuilder json = new StringBuilder();
             Entry processDirEntry = 
             	//new Entry(processEntryId, new ProcessFileTypeHandler(getRepository(), null));

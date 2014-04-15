@@ -464,6 +464,10 @@ function Entry(props) {
                 if(!label) label = this.getName();
                 return  HtmlUtil.tag("a",["href", this.getEntryUrl()],label);
             },
+            getResourceLink : function (label) {
+                if(!label) label = this.getName();
+                return  HtmlUtil.tag("a",["href", this.getResourceUrl()],label);
+            },
             toString: function() {
                 return "entry:" + this.getName();
             }

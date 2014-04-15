@@ -435,10 +435,18 @@ public class NCLModelPlotDataProcess extends DataProcess {
                     "Humm, the NCL image generation failed for some reason");
             }
         }
+        String outType = "type_image";
+        if (plotType.equals("kmz")) {
+        	outType = "geo_kml";
+        }
         Resource resource    = new Resource(outFile,
                                             Resource.TYPE_LOCAL_FILE);
-        Entry    outputEntry = new Entry(new TypeHandler(repository), true);
+        TypeHandler myHandler =
+            repository.getTypeHandler(outType, false, true);
+        Entry outputEntry = new Entry(myHandler, true, outFile.toString());
         outputEntry.setResource(resource);
+        nclOutputHandler.getEntryManager().writeEntryXmlFile(request,
+                outputEntry);
         outputEntries.add(outputEntry);
         DataProcessOutput dpo =
             new DataProcessOutput(new DataProcessOperand("Plot of "

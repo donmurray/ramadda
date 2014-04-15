@@ -1,5 +1,8 @@
 
 var ARG_ACTION_SEARCH = "action.search";
+var TYPE_IMAGE = "type_image";
+var TYPE_KMZ = "geo_kml";
+var TYPE_NC = "cdm_grid";
 
 function CollectionForm(formId, type) {
 
@@ -60,10 +63,11 @@ function CollectionForm(formId, type) {
 
 
                 var doJson = true;
+                var doImage = false;
 
                 if(doJson) {
                     var jsonUrl =  url + "&returnjson=true";
-                    console.log("json url:" + jsonUrl);
+                    //console.log("json url:" + jsonUrl);
 
                     //Define a variable pointing to this object so we can reference it in the callback below
                     var theCollectionForm  = this;
@@ -83,7 +87,7 @@ function CollectionForm(formId, type) {
                             //There should just be one entry  -  the process folder
                             var entries = entryList.getEntries();
                             if(entries.length != 1) {
-                                console.log("Error: didn't get just one entry:" + entries.length);
+                                //console.log("Error: didn't get just one entry:" + entries.length);
                                 return;
                             }
 
@@ -103,41 +107,51 @@ function CollectionForm(formId, type) {
                     };
                     //Just create the entry list, passing in the callback object
                     var entryList = new EntryList(ramadda, jsonUrl, callbackObject);
-                    return;
-                } 
+                }  else if (doImage) {
 
-
-                //add the arg that gives us the image directly back then set the img src
-                url += "&returnimage=true";
-                var outputDiv = $('#' + this.formId +"_output");
-                if(outputDiv.size()==0) {
-                    console.log("no output div");
+                    //add the arg that gives us the image directly back then set the img src
+                    url += "&returnimage=true";
+                    var outputDiv = $('#' + this.formId +"_output");
+                    if(outputDiv.size()==0) {
+                        console.log("no output div");
+                        return;
+                    }
+                    //Make the html with the image
+                    var html = HtmlUtil.image(url,[ATTR_ALT, "Generating Image..."])
+                    outputDiv.html(html);
                 }
-                //Make the html with the image
-                var html = HtmlUtil.image(url,[ATTR_ALT, "Generating Image..."])
-                outputDiv.html(html);
             },
             handleProcessEntries: function(parentProcessEntry, entries) {
-                console.log("got list of process entries:" + entries.length);
+                //console.log("got list of process entries:" + entries.length);
 
                 //Look in htdocs/entry.js for the Entry class methods
                 var html = "";
+                var images = [];
+                var kmz;
+                var ncfiles = [];
+                var zipentries = "";
                 for(var i=0;i<entries.length;i++) {
                     var entry = entries[i];
-                    if (StringUtil.endsWith(entry.getName(), ".png")) {
-                        html += //HtmlUtil.href(entry.getFileUrl(), 
-                                HtmlUtil.image(entry.getFileUrl());
-                                //HtmlUtil.image(entry.getFileUrl(), ["width", "500px"]));
-                        html += "<br/>";
-                        html += HtmlUtil.href(entry.getFileUrl(), "Download image");
-                        html += "<p/>";
-                    } else if (StringUtil.endsWith(entry.getName(),".nc")) {
-                        html += HtmlUtil.href(entry.getFileUrl(), "Download file used for image");
+                    console.log(entry.toString() +", type: " + entry.getType().getId());
+                    var typeid = entry.getType().getId();
+                    if (typeid === TYPE_IMAGE) {
+                        images.push(entry);
+                    } else if (typeid === TYPE_NC) {
+                        ncfiles.push(entry);
+                    } else if (typeid === TYPE_KMZ) {
+                        kmz = entry;
+                    } else {
+                        continue;
                     }
-                    html += "<br/>";
+                    zipentries += "&entry_"+entry.getId()+"=true";
                 }
+                html += this.outputImages(images);
                 html += "<p/>";
-                html += HtmlUtil.href(parentProcessEntry.getEntryUrl()+"&output=zip.tree", "Download All Files")
+                html += this.outputFiles(ncfiles);
+                html += "<p/>";
+                html += HtmlUtil.href(
+                     parentProcessEntry.getRamadda().getRoot() + "/entry/getentries?output=zip.zipgroup" + 
+                     zipentries, "(Download All Files)");
                 var outputDiv = $('#' + this.formId +"_output");
                 if(outputDiv.size()==0) {
                     console.log("no output div");
@@ -145,6 +159,29 @@ function CollectionForm(formId, type) {
                     outputDiv.html(html);
                 }
                 closeFormLoadingDialog();
+            },
+            outputImages: function(imageEntries) {
+                var imagehtml = "";
+                for (var i = 0; i < imageEntries.length; i++) {
+                    var entry = imageEntries[i];
+                    imagehtml += //HtmlUtil.href(entry.getResourceUrl(), 
+                            HtmlUtil.image(entry.getResourceUrl());
+                            //HtmlUtil.image(entry.getResourceUrl(), ["width", "500px"]));
+                    imagehtml += "<br/>";
+                    imagehtml += HtmlUtil.href(entry.getResourceUrl(), "Download image");
+                }
+                return imagehtml;
+            },
+            outputFiles: function(files) {
+                if (files.length == 0) return;
+                var filehtml = ""
+                filehtml += "<b>Files used for plots:</b><br/>"
+                for (var i = 0; i < files.length; i++) {
+                    var entry = files[i];
+                    filehtml += entry.getResourceLink();
+                    filehtml += "<br/>";
+                }
+                return filehtml;
             },
             initCollection: function(collection) {
                 var collectionForm = this;
