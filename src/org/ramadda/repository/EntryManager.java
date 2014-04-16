@@ -3817,8 +3817,9 @@ public class EntryManager extends RepositoryManager {
 
         OutputHandler outputHandler =
             getRepository().getOutputHandler(request);
+        String dummyGroupName = request.getString(ARG_RETURNFILENAME, "Search Results");
         Result result = outputHandler.outputGroup(request,
-                            request.getOutput(), getDummyGroup(),
+                            request.getOutput(), getDummyGroup(dummyGroupName),
                             new ArrayList<Entry>(), entries);
 
         return addEntryHeader(request, (group != null)

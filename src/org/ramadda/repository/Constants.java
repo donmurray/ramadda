@@ -366,6 +366,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_SHOWCATEGORIES = "showcategories";
 
+    public static final String ARG_RETURNFILENAME = "returnfilename";
     /** _more_ */
     public static final String ATTR_ADDSHORTMETADATA = "addshortmetadata";
 
