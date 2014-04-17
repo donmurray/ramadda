@@ -4419,6 +4419,16 @@ public class Repository extends RepositoryBase implements RequestHandler,
             return new Result(xml, MIME_XML);
         }
         StringBuilder sb = new StringBuilder("");
+        sb.append(HtmlUtils.formTable());
+        sb.append(
+            HtmlUtils.formEntry(
+                msgLabel("Version"),
+                getRepository().getProperty(PROP_BUILD_VERSION, "1.0")));
+        sb.append(
+            HtmlUtils.formEntry(
+                msgLabel("Build Date"),
+                getRepository().getProperty(PROP_BUILD_DATE, "N/A")));
+        sb.append(HtmlUtils.formTableClose());
 
         return new Result("", sb);
     }
