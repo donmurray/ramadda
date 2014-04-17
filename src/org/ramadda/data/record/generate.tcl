@@ -381,7 +381,8 @@ proc generateRecordClass {class args} {
                     append csv "if(superCnt>0) pw.print(',');\n"
                     append csvHeader "if(superCnt>0) pw.print(',');\n"
                 }
-                append csv "pw.print($var\[getCurrentIndex()\]);\n"
+                append csv "pw.print(getStringValue(${recordAttrName}, $var\[getCurrentIndex()\]));\n"
+##                append csv "pw.print($var\[getCurrentIndex()\]);\n"
                 append csv "myCnt++;\n"
                 append csvHeader "${recordAttrName}.printCsvHeader(visitInfo,pw);\n"
                 append csvHeader "myCnt++;\n"
@@ -447,7 +448,8 @@ proc generateRecordClass {class args} {
                 if {$A(-csv)!=""} {
                     append csv "$A(-csv);\n"
                 } else {
-                    append csv "pw.print($var);\n"
+#                    append csv "pw.print($var);\n"
+                    append csv "pw.print(getStringValue(${recordAttrName}, $var));\n"
                 }
                 append csv "myCnt++;\n"
                 append csvHeader "${recordAttrName}.printCsvHeader(visitInfo,pw);\n"
