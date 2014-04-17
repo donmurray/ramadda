@@ -196,6 +196,8 @@ input, password, fileinput,textarea {
   padding-top: 0px;
 }
 
+
+
 .entry-list-header-column {
    font-weight: bold; 
    border-right : 1px #aaa solid;
@@ -205,7 +207,20 @@ input, password, fileinput,textarea {
    color: #000;
 }
 
+.entry-list-header-column-last {
+   font-weight: bold; 
+//   border-right : 1px #aaa solid;
+   text-align: center;
+   padding-bottom:1px;
+   padding-top:4px;
+   color: #000;
+}
+
 .entry-list-header-column a {
+        color: black;
+}
+
+.entry-list-header-column-last a {
         color: black;
 }
 
@@ -1081,6 +1096,7 @@ a.image-link {
 
 .sortlinkon  {
   background-color : #eee;
+  font-size: 80%;
   font-weight: bold;
   padding-left:2px;
   padding-right:2px;
@@ -1088,6 +1104,7 @@ a.image-link {
 }
 
 .sortlinkoff  {
+  font-size: 80%;
   padding-left:2px;
   padding-right:2px;
   font-style:italic;

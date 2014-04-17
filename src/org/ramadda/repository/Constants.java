@@ -2208,6 +2208,9 @@ public interface Constants {
     /** _more_          */
     public static final String SORTBY_SIZE = "size";
 
+    /** _more_          */
+    public static final String SORTBY_TYPE = "type";
+
     /** _more_ */
     public static final String SORTBY_CREATEDATE = "createdate";
 

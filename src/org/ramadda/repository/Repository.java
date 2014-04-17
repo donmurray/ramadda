@@ -5101,6 +5101,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
                 orderBy = " ORDER BY " + Tables.ENTRIES.COL_FROMDATE + order;
             } else if (by.equals(SORTBY_TODATE)) {
                 orderBy = " ORDER BY " + Tables.ENTRIES.COL_TODATE + order;
+            } else if (by.equals(SORTBY_TYPE)) {
+                orderBy = " ORDER BY " + Tables.ENTRIES.COL_TYPE + order;
             } else if (by.equals(SORTBY_SIZE)) {
                 orderBy = " ORDER BY " + Tables.ENTRIES.COL_FILESIZE + order;
             } else if (by.equals(SORTBY_CREATEDATE)) {

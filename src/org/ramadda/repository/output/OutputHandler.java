@@ -86,13 +86,13 @@ import java.util.zip.*;
  */
 public class OutputHandler extends RepositoryManager {
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIDTH_DATE = "150";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIDTH_SIZE = "100";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIDTH_KIND = "200";
 
     /** _more_ */
@@ -1080,35 +1080,20 @@ public class OutputHandler extends RepositoryManager {
         String        oldAscending = request.getString(ARG_ASCENDING,
                                          "false");
 
-        //j-
+        //J--
         String[] order = {
-            SORTBY_NAME, "true",
-            msg("Name")
-            + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),
-            "Sort by name A-Z", SORTBY_NAME, "false",
-            msg("Name")
-            + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),
-            "Sort by name Z-A", SORTBY_FROMDATE, "true",
-            msg("Date")
-            + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),
-            "Sort by date older to newer", SORTBY_FROMDATE, "false",
-            msg("Date")
-            + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),
-            "Sort by date newer to older", SORTBY_CREATEDATE, "true",
-            msg("Created")
-            + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),
-            "Sort by created date older to newer", SORTBY_CREATEDATE, "false",
-            msg("Created")
-            + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),
-            "Sort by created date newer to older", SORTBY_SIZE, "true",
-            msg("Size")
-            + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),
-            "Sort by size smallest to largest", SORTBY_SIZE, "false",
-            msg("Size")
-            + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),
-            "Sort by size largest to smallest",
+            SORTBY_NAME, "true", msg("Name") + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),  "Sort by name A-Z", 
+            SORTBY_NAME, "false", msg("Name")  + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)), "Sort by name Z-A", 
+            SORTBY_FROMDATE, "true",   msg("Date") + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),   "Sort by date older to newer", 
+            SORTBY_FROMDATE, "false", msg("Date")  + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),"Sort by date newer to older", 
+            SORTBY_CREATEDATE, "true",   msg("Created") + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),  "Sort by created date older to newer", 
+            SORTBY_CREATEDATE, "false",  msg("Created")            + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),   "Sort by created date newer to older", 
+            SORTBY_SIZE, "true",  msg("Size") + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),"Sort by size smallest to largest", 
+            SORTBY_SIZE, "false",  msg("Size") + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),  "Sort by size largest to smallest",
+            SORTBY_TYPE, "true",  msg("Type") + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),"Sort by type A-Z", 
+            SORTBY_TYPE, "false",  msg("Type") + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),  "Sort by type Z-A",
         };
-        //j+
+        //J++
 
         if (request.isMobile()) {
             sb.append(HtmlUtils.br());
@@ -1128,7 +1113,7 @@ public class OutputHandler extends RepositoryManager {
         int cnt = 0;
         for (int i = 0; i < order.length; i += 4) {
             if ((cnt > 0) && (cnt % 2) == 0) {
-                sb.append(HtmlUtils.space(2));
+                sb.append(HtmlUtils.space(1));
             }
             cnt++;
             if (Misc.equals(order[i], oldOrderBy)
@@ -1488,13 +1473,17 @@ public class OutputHandler extends RepositoryManager {
                             HtmlUtils.ATTR_CLASS,
                             "entry-list-header-column"), HtmlUtils.href(
                                 sortLink, msg("Size"))));
+                tmpRequest.put(ARG_ORDERBY, SORTBY_TYPE);
+                sortLink = tmpRequest.getUrl();
                 sb.append(
                     HtmlUtils.tag(
                         HtmlUtils.TAG_TD,
                         HtmlUtils.attrs(
                             HtmlUtils.ATTR_WIDTH, WIDTH_KIND,
                             HtmlUtils.ATTR_CLASS,
-                            "entry-list-header-column"), msg("Kind")));
+                            "entry-list-header-column-last"), 
+                        HtmlUtils.href(
+                                       sortLink, msg("Kind"))));
             }
             sb.append("</tr></table>");
 
