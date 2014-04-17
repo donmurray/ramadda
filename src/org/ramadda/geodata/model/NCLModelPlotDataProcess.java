@@ -403,7 +403,7 @@ public class NCLModelPlotDataProcess extends DataProcess {
 
 
         //System.err.println("cmds:" + commands);
-        //System.err.println("env:" + envMap);
+        System.err.println("env:" + envMap);
 
         //Use new repository method to execute. This gets back [stdout,stderr]
         String[] results = repository.executeCommand(commands, envMap,

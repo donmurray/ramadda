@@ -78,17 +78,17 @@ public class MapInfo {
     /** is the map for selection */
     private boolean forSelection = false;
 
-    /** _more_          */
+    /** _more_ */
     private List<MapRegion> mapRegions = null;
 
     /** the javascript buffer? */
-    private StringBuffer jsBuffer = null;
+    private StringBuilder jsBuffer = null;
 
     /** right side of widget */
-    private StringBuffer rightSide = new StringBuffer();
+    private StringBuilder rightSide = new StringBuilder();
 
     /** the html */
-    private StringBuffer html = new StringBuffer();
+    private StringBuilder html = new StringBuilder();
 
     /** map properties */
     private Hashtable mapProps;
@@ -250,7 +250,7 @@ public class MapInfo {
      * @return  the div tag
      */
     private String getMapDiv(String contents) {
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         String readout =
             HtmlUtils.div("&nbsp;",
                           HtmlUtils.id("ramadda-map-latlonreadout")
@@ -290,7 +290,7 @@ public class MapInfo {
             pageDecorator.addToMap(request, this);
         }
 
-        StringBuffer result = new StringBuffer();
+        StringBuilder result = new StringBuilder();
         result.append(html);
 
 
@@ -322,9 +322,9 @@ public class MapInfo {
      *
      * @return  the JavaScript
      */
-    private StringBuffer getJS() {
+    private StringBuilder getJS() {
         if (jsBuffer == null) {
-            jsBuffer = new StringBuffer();
+            jsBuffer = new StringBuilder();
             jsBuffer.append("//mapjs\n");
             jsBuffer.append("var params = " + formatProps() + ";\n");
             jsBuffer.append("var " + mapVarName + " = new RepositoryMap("
@@ -358,7 +358,7 @@ public class MapInfo {
      * @return  the properties as a Javascript string
      */
     private String formatProps() {
-        StringBuffer props = new StringBuffer("{");
+        StringBuilder props = new StringBuilder("{");
         if ((mapProps != null) && !mapProps.isEmpty()) {
             for (Enumeration<String> e =
                     mapProps.keys(); e.hasMoreElements(); ) {
@@ -426,23 +426,28 @@ public class MapInfo {
         if (nwse.length == 2) {
             doRegion = false;
         }
-        String widget = getSelectorWidget(arg, nwse);
+        StringBuilder widget  = new StringBuilder();
+        String        regions = "";
+        if (doRegion) {
+            regions = getRegionSelectorWidget();
+        }
+        widget.append(getSelectorWidget(arg, nwse));
         if ( !showMaps()) {
-            return widget;
+            return widget.toString();
         }
 
-        String       msg       = HtmlUtils.italics(doRegion
+        String        msg       = HtmlUtils.italics(doRegion
                 ? msg("Shift-drag to select region")
                 : msg("Click to select point"));
 
-        StringBuffer sb        = new StringBuffer();
-        String       clearLink = getSelectorClearLink(msg("Clear"));
+        StringBuilder sb        = new StringBuilder();
+        String        clearLink = getSelectorClearLink(msg("Clear"));
         sb.append(HtmlUtils.leftRight(msg, clearLink));
         //        sb.append(HtmlUtils.br());
         //        sb.append(clearLink);
         sb.append(getMapDiv(""));
         if ((extraLeft != null) && (extraLeft.length() > 0)) {
-            widget = widget + HtmlUtils.br() + extraLeft;
+            widget.append(HtmlUtils.br() + extraLeft);
         }
 
         String rightSide = null;
@@ -476,8 +481,28 @@ public class MapInfo {
             addJS(getVariableName() + ".initMap(" + forSelection + ");\n");
         }
 
-        return HtmlUtils.table(new Object[] { widget, rightSide }) + html
-               + HtmlUtils.script(getJS().toString());
+        String mapStuff = HtmlUtils.table(new Object[] { widget.toString(),
+                rightSide });
+        StringBuilder retBuf = new StringBuilder();
+        if ((regions != null) && !regions.isEmpty()) {
+            retBuf.append(regions);
+            retBuf.append("<div id=\"" + getVariableName() + "_mapToggle\">");
+            retBuf.append(mapStuff);
+            retBuf.append("</div>");
+            // Hack to hide the maps if they haven't selected a custom region.
+            addJS("if ($('#" + getVariableName()
+                  + "_regions option:selected').val() != \"CUSTOM\")"
+                  + "$('#" + getVariableName() + "_mapToggle').hide();");
+        } else {
+            retBuf.append(mapStuff);
+        }
+        retBuf.append(html);
+        retBuf.append(HtmlUtils.script(getJS().toString()));
+
+        return retBuf.toString();
+
+        //return HtmlUtils.table(new Object[] { widget.toString(), rightSide }) + html
+        //       + HtmlUtils.script(getJS().toString());
     }
 
     /**
@@ -492,6 +517,39 @@ public class MapInfo {
                                         + ".selectionClear();", msg);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getRegionSelectorWidget() {
+        StringBuilder widget = new StringBuilder();
+        if ((mapRegions != null) && (mapRegions.size() > 0)) {
+            List values = new ArrayList<String>();
+            values.add(new TwoFacedObject("Select Region", ""));
+            for (MapRegion region : mapRegions) {
+                String value = region.getNorth() + "," + region.getWest()
+                               + "," + region.getSouth() + ","
+                               + region.getEast();
+                values.add(new TwoFacedObject(region.getName(), value));
+            }
+            values.add(new TwoFacedObject("Custom", "CUSTOM"));
+            String regionSelectId = getVariableName() + "_regions";
+            widget.append(
+                HtmlUtils.select(
+                    "mapregion", values, (String) null,
+                    HtmlUtils.id(regionSelectId)
+                    + HtmlUtils.attr(
+                        HtmlUtils.ATTR_ONCHANGE,
+                        HtmlUtils.call(
+                            "MapUtils.mapRegionSelected",
+                            HtmlUtils.squote(regionSelectId),
+                            HtmlUtils.squote(mapVarName)))));
+        }
+
+        return widget.toString();
+
+    }
 
     /**
      * GEt the selector widget
@@ -506,7 +564,7 @@ public class MapInfo {
         if (nwse == null) {
             nwse = new String[] { "", "", "", "" };
         }
-        StringBuffer widget = new StringBuffer();
+        StringBuilder widget = new StringBuilder();
         if (nwse.length == 2) {
             doRegion = false;
         }
@@ -515,29 +573,6 @@ public class MapInfo {
             widget.append(HtmlUtils.makeLatLonBox(mapVarName, arg, nwse[2],
                     nwse[0], nwse[3], nwse[1]));
 
-            //            mapRegions = repository.getPageHandler().getMapRegions();
-
-            if ((mapRegions != null) && (mapRegions.size() > 0)) {
-                List values = new ArrayList<String>();
-                values.add(new TwoFacedObject("Select Region", ""));
-                for (MapRegion region : mapRegions) {
-                    String value = region.getNorth() + "," + region.getWest()
-                                   + "," + region.getSouth() + ","
-                                   + region.getEast();
-                    values.add(new TwoFacedObject(region.getName(), value));
-                }
-                String regionSelectId = mapVarName + "_regions";
-                widget.append(
-                    HtmlUtils.select(
-                        "mapregion", values, (String) null,
-                        HtmlUtils.id(regionSelectId)
-                        + HtmlUtils.attr(
-                            HtmlUtils.ATTR_ONCHANGE,
-                            HtmlUtils.call(
-                                "MapUtils.mapRegionSelected",
-                                HtmlUtils.squote(regionSelectId),
-                                HtmlUtils.squote(mapVarName)))));
-            }
         } else {
             widget.append(" ");
             widget.append(msgLabel("Latitude"));

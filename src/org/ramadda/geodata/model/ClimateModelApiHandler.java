@@ -595,6 +595,8 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         String formAttrs = HtmlUtils.attrs(ATTR_ID, formId);
         if (type.equals(ARG_ACTION_COMPARE)) {
             sb.append(HtmlUtils.form(getCompareUrlPath(), formAttrs));
+            getMapManager().addGoogleEarthImports(request, sb);
+            sb.append("<script type=\"text/JavaScript\">google.load(\"earth\", \"1\");</script>");
         } else {
             sb.append(HtmlUtils.form(getTimeSeriesUrlPath(), formAttrs));
         }

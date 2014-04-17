@@ -269,7 +269,6 @@ public class SlideshowTypeHandler extends GenericTypeHandler {
      *
      * @throws Exception _more_
      */
-    @Override
     public void addToEntryForm(Request request, StringBuffer sb,
                                Entry parentEntry, Entry entry,
                                FormInfo formInfo)

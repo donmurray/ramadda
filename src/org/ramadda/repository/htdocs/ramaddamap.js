@@ -1190,6 +1190,7 @@ OpenLayers.Control.Click = OpenLayers.Class(OpenLayers.Control, {
 });
 
 
+var CUSTOM_MAP = "CUSTOM";
 
 var MapUtils = {
     mapRegionSelected: function(selectId, baseId) {
@@ -1199,17 +1200,25 @@ var MapUtils = {
             return;
         }
         if( value == "") {
+            this.toggleMapWidget(baseId, false);
             return;
         }
         var toks = value.split(",");
 
         if(toks.length == 1) {
-            return;
+            if (toks[0] != CUSTOM_MAP) {
+                return;
+            } else {
+                this.setMapRegion(baseId, "", "", "", "");
+                this.toggleMapWidget(baseId, true);
+                return;
+            }
         }
         if(toks.length != 4) {
             return;
         }
-       this.setMapRegion(baseId, toks[0], toks[1], toks[2], toks[3]);
+        this.toggleMapWidget(baseId, false);
+        this.setMapRegion(baseId, toks[0], toks[1], toks[2], toks[3]);
     },
 
 
@@ -1219,6 +1228,14 @@ var MapUtils = {
         $("#"+ baseId +"_south").val(south);
         $("#"+ baseId +"_east").val(east);
 
-    }
+    },
+    
+    toggleMapWidget: function(baseId, onOrOff) {
+        if (onOrOff) {
+            $("#"+ baseId +"_mapToggle").show();
+        } else {
+            $("#"+ baseId +"_mapToggle").hide();
+        }
+     }
 
 }

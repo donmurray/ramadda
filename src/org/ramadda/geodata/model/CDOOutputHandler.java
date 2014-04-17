@@ -837,7 +837,8 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
         //TODO: This should be a parameter to the method.
         //If its null then all map regions are used 
         //If non-null then only map regions with the group
-        String mapRegionGroup = null;
+        //String mapRegionGroup = null;
+        String mapRegionGroup = "model regions";
 
         MapInfo map;
         if ( !usePopup) {

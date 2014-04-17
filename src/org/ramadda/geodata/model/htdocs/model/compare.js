@@ -16,7 +16,6 @@ function CollectionForm(formId, type) {
                     collection  = 'collection' + i;
                     this.initCollection(collection);
                 }
-
                 var theForm = this;
                 var $submits = $("#"+this.formId).find( 'input[type=submit]' );
                 var which_button;
@@ -25,6 +24,8 @@ function CollectionForm(formId, type) {
                     if (null == which_button) {
                          which_button = $submits[0];
                     }
+                    //if (which_button != ARG_ACTION_SEARCH && type === "compare" ) {
+                    //if (which_button != ARG_ACTION_SEARCH && false) {
                     if (which_button != ARG_ACTION_SEARCH) {
                        theForm.handleFormSubmission();
                        event.preventDefault();
@@ -147,16 +148,27 @@ function CollectionForm(formId, type) {
                 }
                 html += this.outputImages(images);
                 html += "<p/>";
+                html += this.outputKMZ(kmz);
+                html += "<p/>";
                 html += this.outputFiles(ncfiles);
                 html += "<p/>";
                 html += HtmlUtil.href(
-                     parentProcessEntry.getRamadda().getRoot() + "/entry/getentries?output=zip.zipgroup" + 
+                     parentProcessEntry.getRamadda().getRoot() + 
+                     "/entry/getentries?output=zip.zipgroup&returnfilename=Climate_Model_Comparison" + 
                      zipentries, "(Download All Files)");
                 var outputDiv = $('#' + this.formId +"_output");
                 if(outputDiv.size()==0) {
                     console.log("no output div");
                 } else {
                     outputDiv.html(html);
+                }
+                if (kmz != null) {
+                    //if(!window.haveLoadedEarth) {
+                    //     google.load("earth", "1");
+                    //     window.haveLoadedEarth=true;
+                    //}
+                    var map3d1 = new RamaddaEarth('map3d1', location.protocol+"//"+location.hostname+":"+location.port+kmz.getResourceUrl());
+                    //var map3d1 = new RamaddaEarth('map3d1', null);
                 }
                 closeFormLoadingDialog();
             },
@@ -171,6 +183,14 @@ function CollectionForm(formId, type) {
                     imagehtml += HtmlUtil.href(entry.getResourceUrl(), "Download image");
                 }
                 return imagehtml;
+            },
+            outputKMZ: function(entry) {
+                var kmzhtml = "";
+                if (entry != null) {
+                    kmzhtml += "<div  id=\"map3d1\"  style=\"width:500px; height:500px;\"  class=\"ramadda-earth-container\" ><\/div>\n";
+                    kmzhtml += HtmlUtil.href(entry.getResourceUrl(), "Download KMZ file");
+                }
+                return kmzhtml;
             },
             outputFiles: function(files) {
                 if (files.length == 0) return;
