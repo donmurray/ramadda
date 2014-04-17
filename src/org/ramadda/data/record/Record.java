@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -1670,5 +1670,77 @@ public abstract class Record implements Cloneable {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param field _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
+    public String getStringValue(RecordField field, long value) {
+        return "" + value;
+    }
+
+    /**
+     * _more_
+     *
+     * @param field _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
+    public String getStringValue(RecordField field, double value) {
+        return "" + value;
+    }
+
+    /**
+     * _more_
+     *
+     * @param field _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
+    public String getStringValue(RecordField field, float value) {
+        return "" + value;
+    }
+
+    /**
+     * _more_
+     *
+     * @param field _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
+    public String getStringValue(RecordField field, int value) {
+        return "" + value;
+    }
+
+    /**
+     * _more_
+     *
+     * @param field _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
+    public String getStringValue(RecordField field, short value) {
+        return "" + value;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param field _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
+    public String getStringValue(RecordField field, byte value) {
+        return "" + value;
+    }
 
 }
