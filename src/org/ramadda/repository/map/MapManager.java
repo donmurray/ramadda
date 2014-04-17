@@ -314,18 +314,9 @@ public class MapManager extends RepositoryManager {
         request.putExtraProperty("ge.id", new Integer(nextNum));
         String id = "map3d" + nextNum;
         if (request.getExtraProperty("ge.inited") == null) {
-            sb.append(HtmlUtils.importJS("http://www.google.com/jsapi"
-                                         + mapsKey));
-            sb.append(
-                HtmlUtils.importJS(
-                    getRepository().htdocsUrl("/google/googleearth.js")));
-            sb.append(
-                HtmlUtils.importJS(
-                    getRepository().htdocsUrl(
-                        "/google/extensions-0.2.1.pack.js")));
+            addGoogleEarthImports(request, sb);
             sb.append(HtmlUtils.script("google.load(\"earth\", \"1\""
                                        + otherOpts + ");"));
-            request.putExtraProperty("ge.inited", "true");
         }
 
 
@@ -369,6 +360,33 @@ public class MapManager extends RepositoryManager {
                                       : HtmlUtils.squote(url)) + ");\n"));
 
         return id;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addGoogleEarthImports(Request request, Appendable sb)
+            throws Exception {
+        if (request.getExtraProperty("ge.inited") == null) {
+            request.putExtraProperty("ge.inited", "true");
+            //Don't need the maps key (I think)
+            //            sb.append(HtmlUtils.importJS("http://www.google.com/jsapi" + mapsKey));
+            sb.append(HtmlUtils.importJS("http://www.google.com/jsapi"));
+            sb.append(
+                HtmlUtils.importJS(
+                    getRepository().htdocsUrl("/google/googleearth.js")));
+            sb.append(
+                HtmlUtils.importJS(
+                    getRepository().htdocsUrl(
+                        "/google/extensions-0.2.1.pack.js")));
+        }
+
     }
 
 
