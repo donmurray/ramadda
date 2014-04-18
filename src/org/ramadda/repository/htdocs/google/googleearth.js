@@ -118,12 +118,16 @@ function RamaddaPlacemark(ramaddaEarth, id, name, desc, lat,lon, detailsUrl, ico
 
 
 //Wrapper around an instantiation of a google earth plugin
-function  RamaddaEarth(id, url) {
+function  RamaddaEarth(id, url, props) {
     this.googleEarth = null;
     this.placemarksToAdd = new Array();
     this.placemarks = new Array();
     this.url = url;
     this.id = id;
+    this.showOverview = true;
+    if(props!=null) {
+        $.extend(this, props);
+    }
     ramaddaEarths[id] = this;
 
 
@@ -138,7 +142,7 @@ function  RamaddaEarth(id, url) {
         this.googleEarth.getLayerRoot().enableLayerById(this.googleEarth.LAYER_BORDERS, true);
         this.googleEarth.getLayerRoot().enableLayerById(this.googleEarth.LAYER_ROADS, true);
         this.googleEarth.getOptions().setFlyToSpeed(0.5);
-        this.googleEarth.getOptions().setOverviewMapVisibility(true);
+        this.googleEarth.getOptions().setOverviewMapVisibility(this.showOverview);
 
         this.gex= new GEarthExtensions(this.googleEarth);
 
