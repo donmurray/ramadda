@@ -505,8 +505,19 @@ begin
   
   ; map stuff
   rescf@mpFillOn = False
-  rescf@mpGeophysicalLineThicknessF = 2.
+  
+  rescf@mpOutlineBoundarySets = "National"
+  rescf@mpDataBaseVersion = "MediumRes"
+  rescf@mpOutlineSpecifiers = (/"Canada : Provinces","United States : States"/) 
+  rescf@mpDataSetName = "Earth..4"
+  
+  rescf@mpGeophysicalLineThicknessF = 1.5
+  rescf@mpNationalLineThicknessF = 1.5
 
+  rescf@mpGeophysicalLineColor = "gray49"       ; color of cont. outlines
+  rescf@mpNationalLineColor    = rescf@mpGeophysicalLineColor ; color of nat'l outlines
+  rescf@mpUSStateLineColor     = rescf@mpGeophysicalLineColor ; color of state outlines
+  
   ; contour stuff
   rescf@gsnSpreadColors = True
   rescf@cnFillOn= True          ; color fill
@@ -599,6 +610,7 @@ begin
     if (.not. doGoogle) then
         addAnnotation(wks,opts@annotation)
     end if
+    delete(mydata)
   else 
     if (.not. doGoogle) then
       mydata = data(0,:,:)
@@ -646,6 +658,7 @@ begin
         res2 = remove_middle_contours(gplot, rescf, 1)
         gplot = gsn_csm_contour_map_ce(wks,mydata,res2)
       end if
+      delete(mydata)
 
       kres = True
       kres@product_dir=opts@product_dir

@@ -167,7 +167,9 @@ function CollectionForm(formId, type) {
                     //     google.load("earth", "1");
                     //     window.haveLoadedEarth=true;
                     //}
-                    var map3d1 = new RamaddaEarth('map3d1', location.protocol+"//"+location.hostname+":"+location.port+kmz.getResourceUrl());
+                    var map3d1 = new RamaddaEarth('map3d1', 
+                         location.protocol+"//"+location.hostname+":"+location.port+kmz.getResourceUrl(),
+                         {showOverview:false});
                     //var map3d1 = new RamaddaEarth('map3d1', null);
                 }
                 closeFormLoadingDialog();
@@ -188,7 +190,7 @@ function CollectionForm(formId, type) {
                 var kmzhtml = "";
                 if (entry != null) {
                     kmzhtml += "<div  id=\"map3d1\"  style=\"width:500px; height:500px;\"  class=\"ramadda-earth-container\" ><\/div>\n";
-                    kmzhtml += HtmlUtil.href(entry.getResourceUrl(), "Download KMZ file");
+                    kmzhtml += HtmlUtil.href(entry.getResourceUrl(), "Download Google Earth (KMZ) file");
                 }
                 return kmzhtml;
             },
