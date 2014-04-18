@@ -34,7 +34,6 @@ import org.ramadda.repository.Result;
 import org.ramadda.repository.database.Tables;
 import org.ramadda.repository.type.CollectionTypeHandler;
 import org.ramadda.repository.type.Column;
-import org.ramadda.repository.type.ProcessFileTypeHandler;
 import org.ramadda.sql.Clause;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.JQuery;
@@ -253,9 +252,10 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         String processEntryId =
             getStorageManager().getProcessDirEntryId(processId);
 
-        String entryUrl = HtmlUtils.url(
-                              request.getAbsoluteUrl(
-                                  getRepository().URL_ENTRY_SHOW), ARG_ENTRYID,
+        String entryUrl =
+            HtmlUtils.url(
+                request.getAbsoluteUrl(getRepository().URL_ENTRY_SHOW),
+                ARG_ENTRYID,
         // Use this if you want to return the process directory
         processEntryId);
         //processEntryId + "/" + IOUtil.getFileTail(lastFile.toString()));
@@ -268,13 +268,13 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 getStorageManager().getFileInputStream(lastFile.toString()),
                 "image/png");
         } else if (request.get("returnjson", false)) {
-            StringBuilder json = new StringBuilder();
-            Entry processDirEntry = 
-            	//new Entry(processEntryId, new ProcessFileTypeHandler(getRepository(), null));
-            	new Entry(processEntryId, getEntryManager().getProcessFileTypeHandler());
+            StringBuilder json            = new StringBuilder();
+            Entry         processDirEntry =
+            //new Entry(processEntryId, new ProcessFileTypeHandler(getRepository(), null));
+            new Entry(processEntryId,
+                      getEntryManager().getProcessFileTypeHandler());
             getRepository().getJsonOutputHandler().makeJson(request,
-            		Misc.newList(processDirEntry),
-                                            json);
+                    Misc.newList(processDirEntry), json);
 
             return new Result("", json, "application/json");
 
@@ -400,13 +400,13 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         //processEntryId + "/" + IOUtil.getFileTail(lastFile.toString()));
 
         if (request.get("returnjson", false) && false) {
-            StringBuilder json = new StringBuilder();
-            Entry processDirEntry = 
-            	//new Entry(processEntryId, new ProcessFileTypeHandler(getRepository(), null));
-            	new Entry(processEntryId, getEntryManager().getProcessFileTypeHandler());
+            StringBuilder json            = new StringBuilder();
+            Entry         processDirEntry =
+            //new Entry(processEntryId, new ProcessFileTypeHandler(getRepository(), null));
+            new Entry(processEntryId,
+                      getEntryManager().getProcessFileTypeHandler());
             getRepository().getJsonOutputHandler().makeJson(request,
-            		Misc.newList(processDirEntry),
-                                            json);
+                    Misc.newList(processDirEntry), json);
 
             return new Result("", json, "application/json");
 
@@ -596,7 +596,8 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         if (type.equals(ARG_ACTION_COMPARE)) {
             sb.append(HtmlUtils.form(getCompareUrlPath(), formAttrs));
             getMapManager().addGoogleEarthImports(request, sb);
-            sb.append("<script type=\"text/JavaScript\">google.load(\"earth\", \"1\");</script>");
+            sb.append(
+                "<script type=\"text/JavaScript\">google.load(\"earth\", \"1\");</script>");
         } else {
             sb.append(HtmlUtils.form(getTimeSeriesUrlPath(), formAttrs));
         }
@@ -611,12 +612,16 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         List<DataProcess> processes = getDataProcesses(request, type);
 
 
+        String            formType  = "compare";
+        if (type.equals(ARG_ACTION_TIMESERIES)) {
+            formType = "timeseries";
+        }
         StringBuilder js =
             new StringBuilder("\n//collection form initialization\n");
         js.append("var " + formId + " = new "
                   + HtmlUtils.call("CollectionForm",
                                    HtmlUtils.squote(formId),
-                                   HtmlUtils.squote("compare")));
+                                   HtmlUtils.squote(formType)));
 
 
 
@@ -742,8 +747,10 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 if (request.defined(ARG_COLLECTION) && (collectionNumber > 1)
                         && column.getName().equals("variable")) {
                     //dsb.append(HtmlUtils.formEntry(msg(""),
-                    String selector = "<span class=\"select_widget\">&nbsp;</span>";
-                    selectors.add("<label class=\"selector\">"+msg("")+"</label>"+selector);
+                    String selector =
+                        "<span class=\"select_widget\">&nbsp;</span>";
+                    selectors.add("<label class=\"selector\">" + msg("")
+                                  + "</label>" + selector);
                 } else {
 
                     String selectBox =

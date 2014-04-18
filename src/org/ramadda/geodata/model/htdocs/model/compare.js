@@ -9,6 +9,7 @@ function CollectionForm(formId, type) {
     RamaddaUtil.defineMembers(this, {
             formId:formId,
             analysisUrl: ramaddaBaseUrl +"/model/" + type +"?",
+            type:type,
             dataProcesses: [],
             init: function() {
                 var collectionForm = this;
@@ -24,9 +25,8 @@ function CollectionForm(formId, type) {
                     if (null == which_button) {
                          which_button = $submits[0];
                     }
-                    //if (which_button != ARG_ACTION_SEARCH && type === "compare" ) {
-                    //if (which_button != ARG_ACTION_SEARCH && false) {
-                    if (which_button != ARG_ACTION_SEARCH) {
+                    if (which_button != ARG_ACTION_SEARCH && theForm.type === "compare" ) {
+                    //if (which_button != ARG_ACTION_SEARCH) {
                        theForm.handleFormSubmission();
                        event.preventDefault();
                     }
@@ -63,7 +63,7 @@ function CollectionForm(formId, type) {
 
 
 
-                var doJson = true;
+                var doJson = theForm.type === "compare";
                 var doImage = false;
 
                 if(doJson) {
