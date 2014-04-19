@@ -337,8 +337,8 @@
 }
 
 .display-metadata-table-cell-contents {
+   max-height: 250px;
    overflow-y: auto;
-   max-height: 300px;
 }
 
 .display-metadata-table  th {
