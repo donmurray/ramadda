@@ -985,7 +985,7 @@ function RamaddaMetadataDisplay(displayManager, id, properties) {
                                 var item = null;
                                 if(m.type == "content.thumbnail") {
                                     var url =ramaddaBaseUrl +"/metadata/view/" + m.attr1 +"?element=1&entryid=" + entry.getId() +"&metadata.id=" + m.id;
-                                    item =  HtmlUtil.image(url,[]);
+                                    item =  HtmlUtil.image(url,["width","100"]);
                                 } else {
                                     item = m.attr1;
                                     if(m.attr2 && m.attr2.trim().length>0) {
