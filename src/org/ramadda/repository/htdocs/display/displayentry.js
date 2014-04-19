@@ -951,9 +951,18 @@ function RamaddaMetadataDisplay(displayManager, id, properties) {
                     mdts.sort();
                 }
 
+                var skip ={
+                    "content.pagestyle": true,
+                    "content.pagetemplate": true,
+                    "content.sort": true,
+                };
                 var headerItems = [];
                 headerItems.push(HtmlUtil.th([ATTR_CLASS, "display-metadata-table-cell"],HtmlUtil.b(typeName)));
                 for(var i=0;i<mdts.length;i++) {
+                    var type = mdts[i];
+                    if(skip[type]) {
+                        continue;
+                    }
                     var label = mdtmap[mdts[i]];
                     if(label == null) label = mdts[i];
                     headerItems.push(HtmlUtil.th([ATTR_CLASS, "display-metadata-table-cell"], HtmlUtil.b(label)));
@@ -968,11 +977,15 @@ function RamaddaMetadataDisplay(displayManager, id, properties) {
                     var metadata = entry.getMetadata();
                     var row = [];
                     var buttonId = this.getDomId("entrylink" + entry.getId());
-                    var link =  HtmlUtil.onClick(this.getGet()+".showEntryDetails(event, '" + entry.getId() +"','" + buttonId +"',true);", 
-                                                 entry.getIconImage() +" " + entry.getName(),[ATTR_ID,buttonId,ATTR_CLASS,"display-metadata-link"]);
+                    //                    var link =  HtmlUtil.onClick(this.getGet()+".showEntryDetails(event, '" + entry.getId() +"','" + buttonId +"',true);", 
+                    //                                                 entry.getIconImage() +" " + entry.getName(),[ATTR_ID,buttonId,ATTR_CLASS,"display-metadata-link"]);
+                    var link =  entry.getLink(entry.getIconImage() +" " + entry.getName());
                     row.push(HtmlUtil.td([ATTR_CLASS, "display-metadata-table-cell"],HtmlUtil.div([ATTR_CLASS,"display-metadata-entrylink"], link)));
                     for(var mdtIdx=0;mdtIdx<mdts.length;mdtIdx++) {
                         var mdt = mdts[mdtIdx];
+                        if(skip[mdt]) {
+                            continue;
+                        }
                         var cell = null;
                         for(var j=0;j<metadata.length;j++) {
                             var m = metadata[j];
@@ -983,9 +996,20 @@ function RamaddaMetadataDisplay(displayManager, id, properties) {
                                     cell += divider;
                                 }
                                 var item = null;
-                                if(m.type == "content.thumbnail") {
-                                    var url =ramaddaBaseUrl +"/metadata/view/" + m.attr1 +"?element=1&entryid=" + entry.getId() +"&metadata.id=" + m.id;
+                                if(m.type == "content.thumbnail" || m.type == "content.logo") {
+                                    var url =this.getRamadda().getRoot() +"/metadata/view/" + m.attr1 +"?element=1&entryid=" + entry.getId() +"&metadata.id=" + m.id;
                                     item =  HtmlUtil.image(url,["width","100"]);
+                                } else if(m.type == "content.url") {
+                                    var label = m.attr2;
+                                    if(label == null || label == "") {
+                                        label = m.attr1;
+                                    }
+                                    item =  HtmlUtil.href(m.attr1,label);
+                                } else if(m.type == "content.attachment") {
+                                    var toks = m.attr1.split("_file_");
+                                    var filename = toks[1];
+                                    var url =this.getRamadda().getRoot()+"/metadata/view/" + m.attr1 +"?element=1&entryid=" + entry.getId() +"&metadata.id=" + m.id;
+                                    item =  HtmlUtil.href(url,filename);
                                 } else {
                                     item = m.attr1;
                                     if(m.attr2 && m.attr2.trim().length>0) {
@@ -1004,7 +1028,7 @@ function RamaddaMetadataDisplay(displayManager, id, properties) {
                         if(cell ==null) {
                             cell = "";
                         }
-                        var add = HtmlUtil.tag(TAG_A, [ATTR_STYLE,"color:#000;", ATTR_HREF, ramaddaBaseUrl + "/metadata/addform?entryid=" + entry.getId() +"&metadata.type=" + mdt,
+                        var add = HtmlUtil.tag(TAG_A, [ATTR_STYLE,"color:#000;", ATTR_HREF, this.getRamadda().getRoot() + "/metadata/addform?entryid=" + entry.getId() +"&metadata.type=" + mdt,
                                                      "target","_blank","alt","Add metadata",ATTR_TITLE,"Add metadata"],"+");
                         var cellContents = add;
                         if(cell.length>0) 
