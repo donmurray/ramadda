@@ -336,6 +336,11 @@
      border:1px #888 solid;
 }
 
+.display-metadata-table-cell-contents {
+   overflow-y: auto;
+   max-height: 300px;
+}
+
 .display-metadata-table  th {
     background-color: #efefef;
 }

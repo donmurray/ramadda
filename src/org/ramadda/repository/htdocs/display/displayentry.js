@@ -1009,7 +1009,7 @@ function RamaddaMetadataDisplay(displayManager, id, properties) {
                         var cellContents = add;
                         if(cell.length>0) 
                             cellContents = cell+divider + add;
-                        row.push(HtmlUtil.td([ATTR_CLASS, "display-metadata-table-cell"],cellContents));
+                        row.push(HtmlUtil.td([ATTR_CLASS, "display-metadata-table-cell"],HtmlUtil.div([ATTR_CLASS,"display-metadata-table-cell-contents"], cellContents)));
                     }
                     html += HtmlUtil.tr(["valign", "top"],HtmlUtil.join(row,""));
                     //Add in the header every 10 rows
