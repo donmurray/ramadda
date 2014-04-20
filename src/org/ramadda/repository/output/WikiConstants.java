@@ -133,7 +133,7 @@ public interface WikiConstants {
     /** attribute in the tabs tag */
     public static final String ATTR_LINKLABEL = "linklabel";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ENTRY = "entry";
 
     /** attribute in import tag */
@@ -282,8 +282,11 @@ public interface WikiConstants {
     public static final String WIKI_TAG_GROUP_OLD = "displaygroup";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKI_TAG_GROUP = "group";
+
+    /** _more_          */
+    public static final String WIKI_TAG_CHART = "chart";
 
     /** _more_ */
     public static final String WIKI_TAG_DISPLAY = "display";
@@ -309,6 +312,7 @@ public interface WikiConstants {
     /** wiki import */
     public static final String WIKI_TAG_DATE = "date";
 
+    /** _more_          */
     public static final String WIKI_TAG_DATERANGE = "daterange";
 
     /** wiki import */
@@ -316,6 +320,12 @@ public interface WikiConstants {
 
     /** wiki import */
     public static final String WIKI_TAG_DATE_TO = "todate";
+
+    /** _more_          */
+    public static final String WIKI_TAG_DATE_CREATE = "createdate";
+
+    /** _more_          */
+    public static final String WIKI_TAG_DATE_CHANGE = "changedate";
 
     /** wiki import */
     public static final String WIKI_TAG_MENU = "menu";
@@ -500,9 +510,14 @@ public interface WikiConstants {
     /** _more_ */
     public static final String ATTR_SEARCH_URL = PREFIX_SEARCH + "url";
 
+    /** _more_          */
     public static final String ATTR_SHOWFORM = "showForm";
-    public static final String ATTR_FORMOPEN =  "formOpen";
-    public static final String ATTR_LAYOUTHERE =  "layoutHere";
+
+    /** _more_          */
+    public static final String ATTR_FORMOPEN = "formOpen";
+
+    /** _more_          */
+    public static final String ATTR_LAYOUTHERE = "layoutHere";
 
 
 

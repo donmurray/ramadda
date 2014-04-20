@@ -45,8 +45,11 @@ function getOrCreateDisplayManager(id, properties, force) {
             return window.globalDisplayManager;
         }
     }
-    window.globalDisplayManager =  new DisplayManager(id, properties);
-    return window.globalDisplayManager;
+    var displayManager =     new DisplayManager(id, properties);
+    if(window.globalDisplayManager==null) {
+        window.globalDisplayManager  = displayManager;
+    }
+    return displayManager;
 }
 
 //

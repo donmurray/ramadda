@@ -311,7 +311,7 @@ public class RepositoryBase implements Constants, RepositorySource {
 
 
     /** _more_ */
-    public static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm:ss z";
+    public static final String DEFAULT_TIME_FORMAT = "yyyy-MM-dd HH:mm z";
 
     /** _more_ */
     public static final String DEFAULT_TIME_SHORTFORMAT =

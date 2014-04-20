@@ -77,15 +77,20 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                                   POS_LEFT);
 
     /** list of import items for the text editor menu */
-    //J-
+    //J--
     public static final WikiTagCategory[] WIKITAGS = {
-        new WikiTagCategory(
-                            "Information",
+        new WikiTagCategory("Information",
                             new WikiTag(WIKI_TAG_INFORMATION, attrs(ATTR_DETAILS, "false")),
-                            new WikiTag(WIKI_TAG_NAME), new WikiTag(WIKI_TAG_DESCRIPTION),
-                            new WikiTag(WIKI_TAG_RESOURCE), new WikiTag(WIKI_TAG_DATERANGE),
-                            new WikiTag(WIKI_TAG_DATE_FROM),
-                            new WikiTag(WIKI_TAG_DATE_TO), new WikiTag(WIKI_TAG_LINK),
+                            new WikiTag(WIKI_TAG_NAME), 
+                            new WikiTag(WIKI_TAG_DESCRIPTION),
+                            new WikiTag(WIKI_TAG_RESOURCE), 
+                            new WikiTag(WIKI_TAG_DATERANGE, attrs(ATTR_FORMAT,RepositoryBase.DEFAULT_TIME_FORMAT)),
+                            new WikiTag(WIKI_TAG_DATE_FROM, attrs(ATTR_FORMAT,RepositoryBase.DEFAULT_TIME_FORMAT)),
+                            new WikiTag(WIKI_TAG_DATE_TO,attrs(ATTR_FORMAT,RepositoryBase.DEFAULT_TIME_FORMAT)), 
+                            new WikiTag(WIKI_TAG_DATE_CREATE,attrs(ATTR_FORMAT,RepositoryBase.DEFAULT_TIME_FORMAT)), 
+                            new WikiTag(WIKI_TAG_DATE_CHANGE,attrs(ATTR_FORMAT,RepositoryBase.DEFAULT_TIME_FORMAT)), 
+
+                            new WikiTag(WIKI_TAG_LINK),
                             new WikiTag(WIKI_TAG_HTML),
                             new WikiTag(WIKI_TAG_SIMPLE, attrs(ATTR_TEXTPOSITION, POS_LEFT)),
                             new WikiTag(WIKI_TAG_IMPORT),
@@ -211,7 +216,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                               ATTR_SHOWMENU, "true", 
                                               ATTR_SHOWTITLE, "true"))),
     };
-    //J+
+    //J++
 
 
 
@@ -953,13 +958,22 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 return "No name=... specified in wiki tag";
             }
         } else if (theTag.equals(WIKI_TAG_DATE_FROM)
-                   || theTag.equals(WIKI_TAG_DATE_TO)) {
+                   || theTag.equals(WIKI_TAG_DATE_TO)
+                   || theTag.equals(WIKI_TAG_DATE_CREATE)
+                   || theTag.equals(WIKI_TAG_DATE_CHANGE)) {
             String format =
                 Misc.getProperty(props, ATTR_FORMAT,
                                  RepositoryBase.DEFAULT_TIME_FORMAT);
-            Date date = new Date(theTag.equals(WIKI_TAG_DATE_FROM)
-                                 ? entry.getStartDate()
-                                 : entry.getEndDate());
+            Date date;
+            if (theTag.equals(WIKI_TAG_DATE_FROM)) {
+                date = new Date(entry.getStartDate());
+            } else if (theTag.equals(WIKI_TAG_DATE_TO)) {
+                date = new Date(entry.getEndDate());
+            } else if (theTag.equals(WIKI_TAG_DATE_CREATE)) {
+                date = new Date(entry.getCreateDate());
+            } else {
+                date = new Date(entry.getChangeDate());
+            }
             SimpleDateFormat dateFormat = new SimpleDateFormat(format);
             dateFormat.setTimeZone(RepositoryUtil.TIMEZONE_DEFAULT);
 
@@ -969,11 +983,16 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             String format =
                 Misc.getProperty(props, ATTR_FORMAT,
                                  RepositoryBase.DEFAULT_TIME_FORMAT);
-            Date date1 = new Date(entry.getStartDate());
-            Date date2 = new Date(entry.getEndDate());
+            Date             date1      = new Date(entry.getStartDate());
+            Date             date2      = new Date(entry.getEndDate());
             SimpleDateFormat dateFormat = new SimpleDateFormat(format);
             dateFormat.setTimeZone(RepositoryUtil.TIMEZONE_DEFAULT);
-            return dateFormat.format(date1) + " -- " + dateFormat.format(date2);
+
+            String separator = Misc.getProperty(props, ATTR_SEPARATOR,
+                                   " -- ");
+
+            return dateFormat.format(date1) + separator
+                   + dateFormat.format(date2);
         } else if (theTag.equals(WIKI_TAG_ENTRYID)) {
             return entry.getId();
         } else if (theTag.equals(WIKI_TAG_PROPERTIES)) {
@@ -1023,7 +1042,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
             return sb.toString();
         } else if (theTag.equals(WIKI_TAG_DISPLAY)
-                   || theTag.equals("chart")) {
+                   || theTag.equals(WIKI_TAG_CHART)) {
 
             String jsonUrl = null;
             if (entry.getTypeHandler() instanceof PointTypeHandler) {
@@ -2545,11 +2564,11 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             }
 
             if (entryid.startsWith(ID_SIBLINGS)) {
-                List<String> toks  = StringUtil.splitUpTo(entryid, ":", 2);
-                String type = null;
-                if(toks.size()>1) {
+                List<String> toks = StringUtil.splitUpTo(entryid, ":", 2);
+                String       type = null;
+                if (toks.size() > 1) {
                     entryid = toks.get(0);
-                    type = toks.get(1);
+                    type    = toks.get(1);
                 }
                 Entry parent = getEntryManager().getEntry(request,
                                    baseEntry.getParentEntryId());
@@ -2557,8 +2576,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                     for (Entry sibling :
                             getEntryManager().getChildren(request, parent)) {
                         if ( !sibling.getId().equals(baseEntry.getId())) {
-                            if(type!=null) {
-                                if(!sibling.getTypeHandler().isType(type)) {
+                            if (type != null) {
+                                if ( !sibling.getTypeHandler().isType(type)) {
                                     continue;
                                 }
                             }
@@ -3716,12 +3735,13 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         String        name = entry.getName();
         StringBuilder wiki = new StringBuilder();
         wiki.append(
-            "{{displaygroup  showTitle=\"true\"  showMenu=\"true\"  layoutType=\"columns\"  layoutColumns=\"2\"  }}\n");
+            "{{group  showTitle=\"true\"  showMenu=\"true\"  layoutType=\"columns\"  layoutColumns=\"2\"  }}\n");
 
         wiki.append(
             "{{display  width=\"600\"  height=\"400\"   type=\"linechart\"  name=\"\"  layoutHere=\"false\"  showMenu=\"true\"  showTitle=\"true\"  row=\"0\"  column=\"0\"  }}");
 
-        if (entry.isGeoreferenced()) {
+        if (entry.isGeoreferenced()
+                || getEntryManager().isSynthEntry(entry.getId())) {
             wiki.append(
                 "{{display  width=\"600\"  height=\"400\"   type=\"map\"  name=\"\"  layoutHere=\"false\"  showMenu=\"true\"  showTitle=\"true\"  row=\"0\"  column=\"1\"  }}");
         }
@@ -3847,6 +3867,10 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         }
 
 
+        boolean needToCreateGroup = request.getExtraProperty("added group")
+                                    == null;
+        request.putExtraProperty("added group", "true");
+
 
         String fields = Misc.getProperty(props, "fields", (String) null);
         if (fields != null) {
@@ -3907,6 +3931,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         }
 
 
+        js.append(
+            "//This gets the global display manager or creates it if not created\n");
         js.append("var displayManager = getOrCreateDisplayManager("
                   + HtmlUtils.quote(mainDivId) + ","
                   + Json.map(topProps, false) + ");\n");

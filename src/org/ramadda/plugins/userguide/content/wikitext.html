@@ -149,7 +149,7 @@ If, however, you specify a blank message then nothing will be shown:
 Note: you can specify a prefix and suffix attributes that are only used if the tag was successful. So for example you could specify a heading for the links: 
 
 [wiki::text {
-{{links entry="Links" message="" prefix="Here are the links:<br>"}}
+{{links entry="Links" message="" prefix="Here are the links:&lt;br&gt;}}
 }]
 
 
@@ -163,17 +163,35 @@ The first set of property tags show some information for the entry. Note: the at
 <ul>
 <li> [wiki::tagdef name]:  Entry name
 <li> [wiki::tagdef entryid]:  Entry ID
-<li> [wiki::tagdef description]: Entry description
-<li> [wiki::tagdef fromdate {format="date time format"} ], [wiki::tagdef todate {format="date time format"} ]: 
-From date/to date of entry. 
+<li> [wiki::tagdef description {wikify="true|false"}]: Entry description. If wikify=true then treat the description as
+wiki text.
+<li> 
+[wiki::tagdef fromdate {format="date time format"} ]<br> 
+[wiki::tagdef todate {format="date time format"} ]<br> 
+[wiki::tagdef daterange {format="date time format" separator=" -- "} ]<br> 
+[wiki::tagdef createdate {format="date time format"} ]<br>  
+[wiki::tagdef changedate {format="date time format"} ]<br>  
+Show the different dates available for an entyr.
 If specified, format the date with the given date time format.
 This follows the
 Java <a href="http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">date format</a> conventions.
 
 
-
 <li> [wiki::tagdef information]: The information tabs.
-<li> [wiki::tagdef properties]: Show the properties listing.
+<li> [wiki::tagdef properties {metadata.types="types to show or not show"}]: Show the properties listing.
+The attribute metadata.types is an optional comma separated list of the metata (or property) types that should be shown or not shown.
+
+For example, if you wanted to show all of the properties except for the Project PI property do:
+<pre>
+{{properties metadata.types="!project_pi" message="" }}
+</pre>
+
+Then if you wanted to just show  the Project PI property then do:
+<pre>
+{{properties metadata.types="project_pi" message="" }}
+</pre>
+
+
 <li> [wiki::tagdef html]: Shows the default html view of the entry. Note: this requires an entry="..." to specify a different entry.
 <li> [wiki::tagdef map {width="width of map" height="height of map" listentries="true|false" listwidth="width or percent"}]: Display a map. If the entry is a folder then display the children entries of the folder.
 
@@ -193,8 +211,8 @@ If you have a Folder (or other group) and want to just show the Folder and nots 
 
 
 <li> [wiki::tagdef earth {width="width of map" height="height of map"}]: 
-If enabled, display the Google Earth plugin. To enable the Google Earth see the
-<a href="admin.html#display">Admin help</a>. 
+Display the Google Earth plugin. 
+
 <li> [wiki::tagdef comments]: Show the comments.
 <li> [wiki::tagdef breadcrumbs]: Show the breadcrumb path.
 <li> [wiki::tagdef layout]: This shows the "Layout:" toolbar bar for an entry.
@@ -244,6 +262,102 @@ Show the menu actions in a popup:
 
 </ul>
 
+
+
+<subhead intoc="false" id="displays">Display Components</subhead>
+There is a set of new "display" wiki tags that allow you to develop rich 
+integrated and interactive search, map and charting wiki pages.
+
+There are numerous examples of this facility available at <a href="http://ramadda.org/repository/alias/displays">ramadda.org</a>.
+
+The idea is that there is a new <i>group</i> tag that can manage a number of children displays. Each child display
+may be located in a fixed location (using layoutHere=false) in the web page or the group can manage the layout of the children displays.
+
+
+The group is defined as:
+
+[wiki::tagdef group {showTitle="true"  showMenu="false"  layoutType="table"  layoutColumns="1" divid="maindiv"}]
+
+And the displays are defined as:
+[wiki::tagdef display {type="display type"   layoutHere="true"  ...}]
+
+If you have a wiki page that does not have a group but only one or more display tags then a group will be
+added automatically.
+
+The major role for the group is to allow for the different displays to communicate with each other 
+(e.g., creating a new chart, map click, animation, etc) and to layout the set of children displays.
+
+<h3>Display Layout</h3>
+
+You can specify different layouts with the <i>layoutType</i> attribute. The available layouts are:
+<pre>
+layoutType=table
+layoutType=columns
+layoutType=rows
+</pre>
+
+Using the table layout you also specify a number of columns with the <i>layoutColumns</i> attibute.
+
+For the <i>columns</i> and <i>rows</i> layout type each child display can specify the <i>column</i> number of
+<i>row</i> number it should be placed in. 
+
+For example, for the <i>rows</i> layout if you had:
+<pre>
+{{group layoutType="rows"}}
+{{display display1  row="1"}}
+{{display display2  row="1"}}
+{{display display3  row="1"}}
+{{display display4  row="2"}}
+{{display display5  row="2"}}
+{{display display6  row="3"}}
+</pre>
+
+Would result in (without the border):
+<table width="50%" border=1><tr><td width=33%>display1</td><td width=33%>display2</td><td width=33%>display3</td></table>
+<table width="50%" border=1><tr><td width=50%>display4</td><td width=50%>display5</td></table>
+<table width="50%" border=1><tr><td width=100%>display6</td></table>
+
+
+The <i>divid</i> attribute allows you to specify a div tag that is in the wiki page as the location for the group and the displays
+to place themselves in. For example, below is the (abbreviated) wiki text used to create
+this <a href="http://ramadda.org/repository/entry/show/Home/RAMADDA+Examples/Rich+Content+Wikis/Display+Wikis/General+purpose+file+viewer?entryid=a98aa183-939b-471d-b31d-382e10657f2f">page</a> on ramadda.org.
+
+We want to have a fixed layout where the entry list is on the left and the map is on the right. Any charts or other display components that are interactively created by the user are managed by the group and layed out below the list and map.
+To do this we define a regular html table layout that contains a couple of div tags - one for the list and one for the map. We set the IDs of the div tags and then reference those IDs in the display wiki tags below.
+
+Likewise, the group has a divid=maindiv which corresponds to the div at the bottom of the page.
+
+[xml {
+<table width=100% border=0 cellpadding=10>
+<tr valign=top>
+<td width=50%><div id="listdiv"></div></td>
+<td width=50%><div id="mapdiv"></div></td>
+</table>
+
+<div id=maindiv></div>
+
+{{displaygroup  layoutType="table"  layoutColumns="1" divid="maindiv"}}
+
+{{display   type="entrylist"   divid="listdiv" }}
+
+{{display   type="map"  layoutHere="true" height="250" divid="mapdiv"}}
+}]
+
+
+
+
+When using the display tag you need to specify the type of display.
+
+[wiki::tagdef display {type="entrylist"   layoutHere="true"   orientation="vertical"  showMetadata="false" showTypes="true" name="list1" innerHeight="200" divid="listdiv" formOpen="false"}
+]:
+
+<h3>Entry List Display</h3>
+
+
+<pre>
+entryType="type_point_pbo_position_time_series"
+ramaddaBaseUrl="http://community.ramadda.org/repository/repos/data"
+</pre>
 
 
 <subhead intoc="false" id="collection">Collection Wiki Properties</subhead>
@@ -321,7 +435,7 @@ You can filter what entries to use with <i>entries.filter</i>, e.g.:
 entries.filter=file|folder|image|type:some type|geo|suffix:file suffixes
 </pre>
 
-If you specify <i>suffix:file suffixes<i> then this will only match entries that have files with the given suffix. This
+If you specify <i>suffix:file suffixes</i> then this will only match entries that have files with the given suffix. This
  can be a comma separated list of suffixes, e.g.:
 <pre>
 entries.filter="suffix:.ppt,.pptx,.pdf" 
@@ -367,6 +481,8 @@ search
 </pre>
 
 
+
+<h3>Collection Tags</h3>
 
 <ul>
 

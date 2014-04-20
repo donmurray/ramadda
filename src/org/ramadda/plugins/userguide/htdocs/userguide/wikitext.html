@@ -174,7 +174,7 @@ If, however, you specify a blank message then nothing will be shown:
 Note: you can specify a prefix and suffix attributes that are only used if the tag was successful. So for example you could specify a heading for the links: 
 
 <blockquote><pre>
-{{links entry="Links" message="" prefix="Here are the links:<br>"}}
+{{links entry="Links" message="" prefix="Here are the links:&lt;br&gt;}}
 </pre></blockquote>
 
 
@@ -188,17 +188,35 @@ The first set of property tags show some information for the entry. Note: the at
 <ul>
 <li> <a name="name"></a>{{name}}:  Entry name
 <li> <a name="entryid"></a>{{entryid}}:  Entry ID
-<li> <a name="description"></a>{{description}}: Entry description
-<li> <a name="fromdate"></a>{{fromdate <i>format="date time format"</i>}}, <a name="todate"></a>{{todate <i>format="date time format"</i>}}: 
-From date/to date of entry. 
+<li> <a name="description"></a>{{description <i>wikify="true|false"</i>}}: Entry description. If wikify=true then treat the description as
+wiki text.
+<li> 
+<a name="fromdate"></a>{{fromdate <i>format="date time format"</i>}}<br> 
+<a name="todate"></a>{{todate <i>format="date time format"</i>}}<br> 
+<a name="daterange"></a>{{daterange <i>format="date time format" separator=" -- "</i>}}<br> 
+<a name="createdate"></a>{{createdate <i>format="date time format"</i>}}<br>  
+<a name="changedate"></a>{{changedate <i>format="date time format"</i>}}<br>  
+Show the different dates available for an entyr.
 If specified, format the date with the given date time format.
 This follows the
 Java <a href="http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">date format</a> conventions.
 
 
-
 <li> <a name="information"></a>{{information}}: The information tabs.
-<li> <a name="properties"></a>{{properties}}: Show the properties listing.
+<li> <a name="properties"></a>{{properties <i>metadata.types="types to show or not show"</i>}}: Show the properties listing.
+The attribute metadata.types is an optional comma separated list of the metata (or property) types that should be shown or not shown.
+
+For example, if you wanted to show all of the properties except for the Project PI property do:
+<pre>
+{{properties metadata.types="!project_pi" message="" }}
+</pre>
+
+Then if you wanted to just show  the Project PI property then do:
+<pre>
+{{properties metadata.types="project_pi" message="" }}
+</pre>
+
+
 <li> <a name="html"></a>{{html}}: Shows the default html view of the entry. Note: this requires an entry="..." to specify a different entry.
 <li> <a name="map"></a>{{map <i>width="width of map" height="height of map" listentries="true|false" listwidth="width or percent"</i>}}: Display a map. If the entry is a folder then display the children entries of the folder.
 
@@ -218,8 +236,8 @@ If you have a Folder (or other group) and want to just show the Folder and nots 
 
 
 <li> <a name="earth"></a>{{earth <i>width="width of map" height="height of map"</i>}}: 
-If enabled, display the Google Earth plugin. To enable the Google Earth see the
-<a href="admin.html#display">Admin help</a>. 
+Display the Google Earth plugin. 
+
 <li> <a name="comments"></a>{{comments}}: Show the comments.
 <li> <a name="breadcrumbs"></a>{{breadcrumbs}}: Show the breadcrumb path.
 <li> <a name="layout"></a>{{layout}}: This shows the "Layout:" toolbar bar for an entry.
@@ -271,7 +289,102 @@ Show the menu actions in a popup:
 
 
 
-<a name="collection"></a><div class="pagesubtitle">10.1.5 Collection Wiki Properties</div> 
+<a name="displays"></a><div class="pagesubtitle">10.1.5 Display Components</div> 
+There is a set of new "display" wiki tags that allow you to develop rich 
+integrated and interactive search, map and charting wiki pages.
+
+There are numerous examples of this facility available at <a href="http://ramadda.org/repository/alias/displays">ramadda.org</a>.
+
+The idea is that there is a new <i>group</i> tag that can manage a number of children displays. Each child display
+may be located in a fixed location (using layoutHere=false) in the web page or the group can manage the layout of the children displays.
+
+
+The group is defined as:
+
+<a name="group"></a>{{group <i>showTitle="true"  showMenu="false"  layoutType="table"  layoutColumns="1" divid="maindiv"</i>}}
+
+And the displays are defined as:
+<a name="display"></a>{{display <i>type="display type"   layoutHere="true"  ...</i>}}
+
+If you have a wiki page that does not have a group but only one or more display tags then a group will be
+added automatically.
+
+The major role for the group is to allow for the different displays to communicate with each other 
+(e.g., creating a new chart, map click, animation, etc) and to layout the set of children displays.
+
+<h3>Display Layout</h3>
+
+You can specify different layouts with the <i>layoutType</i> attribute. The available layouts are:
+<pre>
+layoutType=table
+layoutType=columns
+layoutType=rows
+</pre>
+
+Using the table layout you also specify a number of columns with the <i>layoutColumns</i> attibute.
+
+For the <i>columns</i> and <i>rows</i> layout type each child display can specify the <i>column</i> number of
+<i>row</i> number it should be placed in. 
+
+For example, for the <i>rows</i> layout if you had:
+<pre>
+{{group layoutType="rows"}}
+{{display display1  row="1"}}
+{{display display2  row="1"}}
+{{display display3  row="1"}}
+{{display display4  row="2"}}
+{{display display5  row="2"}}
+{{display display6  row="3"}}
+</pre>
+
+Would result in (without the border):
+<table width="50%" border=1><tr><td width=33%>display1</td><td width=33%>display2</td><td width=33%>display3</td></table>
+<table width="50%" border=1><tr><td width=50%>display4</td><td width=50%>display5</td></table>
+<table width="50%" border=1><tr><td width=100%>display6</td></table>
+
+
+The <i>divid</i> attribute allows you to specify a div tag that is in the wiki page as the location for the group and the displays
+to place themselves in. For example, below is the (abbreviated) wiki text used to create
+this <a href="http://ramadda.org/repository/entry/show/Home/RAMADDA+Examples/Rich+Content+Wikis/Display+Wikis/General+purpose+file+viewer?entryid=a98aa183-939b-471d-b31d-382e10657f2f">page</a> on ramadda.org.
+
+We want to have a fixed layout where the entry list is on the left and the map is on the right. Any charts or other display components that are interactively created by the user are managed by the group and layed out below the list and map.
+To do this we define a regular html table layout that contains a couple of div tags - one for the list and one for the map. We set the IDs of the div tags and then reference those IDs in the display wiki tags below.
+
+Likewise, the group has a divid=maindiv which corresponds to the div at the bottom of the page.
+
+<blockquote><pre>
+&lt;table width=100% border=0 cellpadding=10&gt;
+&lt;tr valign=top&gt;
+&lt;td width=50%&gt;&lt;div <span class="xmlattr">id</span>="listdiv&quot;&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;td width=50%&gt;&lt;div <span class="xmlattr">id</span>="mapdiv&quot;&gt;&lt;/div&gt;&lt;/td&gt;
+&lt;/table&gt;
+
+&lt;div id=maindiv&gt;&lt;/div&gt;
+
+{{displaygroup  <span class="xmlattr">layoutType</span>="table&quot;  <span class="xmlattr">layoutColumns</span>="1&quot; <span class="xmlattr">divid</span>="maindiv&quot;}}
+
+{{display   <span class="xmlattr">type</span>="entrylist&quot;   <span class="xmlattr">divid</span>="listdiv&quot; }}
+
+{{display   <span class="xmlattr">type</span>="map&quot;  <span class="xmlattr">layoutHere</span>="true&quot; <span class="xmlattr">height</span>="250&quot; <span class="xmlattr">divid</span>="mapdiv&quot;}}
+</pre></blockquote>
+
+
+
+
+When using the display tag you need to specify the type of display.
+
+<a name="display"></a>{{display <i>type="entrylist"   layoutHere="true"   orientation="vertical"  showMetadata="false" showTypes="true" name="list1" innerHeight="200" divid="listdiv" formOpen="false"</i>}}:
+
+<h3>Entry List Display</h3>
+
+
+<pre>
+entryType="type_point_pbo_position_time_series"
+ramaddaBaseUrl="http://community.ramadda.org/repository/repos/data"
+</pre>
+
+
+<a name="collection"></a><div class="pagesubtitle">10.1.6 Collection Wiki Properties</div> 
 
 The following properties display a collection of entries. By default they
 are the children entries of the wiki entry but you can specify
@@ -346,7 +459,7 @@ You can filter what entries to use with <i>entries.filter</i>, e.g.:
 entries.filter=file|folder|image|type:some type|geo|suffix:file suffixes
 </pre>
 
-If you specify <i>suffix:file suffixes<i> then this will only match entries that have files with the given suffix. This
+If you specify <i>suffix:file suffixes</i> then this will only match entries that have files with the given suffix. This
  can be a comma separated list of suffixes, e.g.:
 <pre>
 entries.filter="suffix:.ppt,.pptx,.pdf" 
@@ -392,6 +505,8 @@ search
 </pre>
 
 
+
+<h3>Collection Tags</h3>
 
 <ul>
 
@@ -581,7 +696,7 @@ apply.header="${url}"
 
 
 
-<a name="block"></a><div class="pagesubtitle">10.1.6 Hiding and showing content</div> 
+<a name="block"></a><div class="pagesubtitle">10.1.7 Hiding and showing content</div> 
 
 The &lt;block&gt; tag allows you to easily create a toggle block and/or show or hide content
 based on the user's device.
@@ -638,7 +753,7 @@ This will not show the content in place. Rather you can reference and insert the
 
 
 
-<a name="import"></a><div class="pagesubtitle">10.1.7 Importing any page</div> 
+<a name="import"></a><div class="pagesubtitle">10.1.8 Importing any page</div> 
 
 
 You can also import any of the views of an entry, e.g., the map view, 
