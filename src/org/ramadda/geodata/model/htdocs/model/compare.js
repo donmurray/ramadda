@@ -3,6 +3,7 @@ var ARG_ACTION_SEARCH = "action.search";
 var TYPE_IMAGE = "type_image";
 var TYPE_KMZ = "geo_kml";
 var TYPE_NC = "cdm_grid";
+var TYPE_TS = "type_single_point_grid_netcdf";
 
 function CollectionForm(formId, type) {
 
@@ -25,8 +26,8 @@ function CollectionForm(formId, type) {
                     if (null == which_button) {
                          which_button = $submits[0];
                     }
-                    if (which_button != ARG_ACTION_SEARCH && theForm.type === "compare" ) {
-                    //if (which_button != ARG_ACTION_SEARCH) {
+                    //if (which_button != ARG_ACTION_SEARCH && theForm.type === "compare" ) {
+                    if (which_button != ARG_ACTION_SEARCH) {
                        theForm.handleFormSubmission();
                        event.preventDefault();
                     }
@@ -63,7 +64,8 @@ function CollectionForm(formId, type) {
 
 
 
-                var doJson = theForm.type === "compare";
+                //var doJson = theForm.type === "compare";
+                var doJson = true;
                 var doImage = false;
 
                 if(doJson) {
@@ -129,7 +131,8 @@ function CollectionForm(formId, type) {
                 var html = "";
                 var images = [];
                 var kmz;
-                var ncfiles = [];
+                var plotfiles = [];
+                var tsfiles = [];
                 var zipentries = "";
                 for(var i=0;i<entries.length;i++) {
                     var entry = entries[i];
@@ -138,20 +141,20 @@ function CollectionForm(formId, type) {
                     if (typeid === TYPE_IMAGE) {
                         images.push(entry);
                     } else if (typeid === TYPE_NC) {
-                        ncfiles.push(entry);
+                        plotfiles.push(entry);
                     } else if (typeid === TYPE_KMZ) {
                         kmz = entry;
+                    } else if (typeid === TYPE_TS) {
+                        tsfiles.push(entry);
                     } else {
                         continue;
                     }
                     zipentries += "&entry_"+entry.getId()+"=true";
                 }
                 html += this.outputImages(images);
-                html += "<p/>";
                 html += this.outputKMZ(kmz);
-                html += "<p/>";
-                html += this.outputFiles(ncfiles);
-                html += "<p/>";
+                html += this.outputPlotFiles(plotfiles);
+                html += this.outputTimeSeriesFiles(tsfiles);
                 html += HtmlUtil.href(
                      parentProcessEntry.getRamadda().getRoot() + 
                      "/entry/getentries?output=zip.zipgroup&returnfilename=Climate_Model_Comparison" + 
@@ -162,6 +165,7 @@ function CollectionForm(formId, type) {
                 } else {
                     outputDiv.html(html);
                 }
+                // Show GE plugin if we have KMZ
                 if (kmz != null) {
                     //if(!window.haveLoadedEarth) {
                     //     google.load("earth", "1");
@@ -170,11 +174,42 @@ function CollectionForm(formId, type) {
                     var map3d1 = new RamaddaEarth('map3d1', 
                          location.protocol+"//"+location.hostname+":"+location.port+kmz.getResourceUrl(),
                          {showOverview:false});
-                    //var map3d1 = new RamaddaEarth('map3d1', null);
+                }
+                // show the ts stuff
+                if (tsfiles.length > 0) {
+                  var displayManager = getOrCreateDisplayManager("manager1", {
+                    "showMap": false,
+                    "showMenu": false,
+                    "showTitle": false,
+                    "layoutType": "table",
+                    "layoutColumns": 1,
+                    "defaultMapLayer": "google.terrain"
+                  });
+                  for (var i = 0; i<tsfiles.length; i++) {
+                    var tsfile = tsfiles[i];
+                    var pointDataProps = {
+                      entryId: HtmlUtil.squote(tsfile.getId())
+                    };
+                    displayManager.createDisplay("linechart", {
+                      "showMenu": false,
+                      "showTitle": true,
+                      "layoutHere": false,
+                      "divid": "chart"+i,
+                      "width": "650",
+                      "height": "250",
+                      "layouthere": "false",
+                      "showmenu": "false",
+                      "showtitle": "true",
+                      "data": new PointData(entry.getName(), null, null, 
+                                  tsfile.getEntryUrl("&output=points.product&product=points.json&numpoints=1000"), 
+                                  pointDataProps)
+                    });
+                  }
                 }
                 closeFormLoadingDialog();
             },
             outputImages: function(imageEntries) {
+                if (imageEntries.length == 0) return "";
                 var imagehtml = "";
                 for (var i = 0; i < imageEntries.length; i++) {
                     var entry = imageEntries[i];
@@ -184,25 +219,44 @@ function CollectionForm(formId, type) {
                     imagehtml += "<br/>";
                     imagehtml += HtmlUtil.href(entry.getResourceUrl(), "Download image");
                 }
+                imagehtml += "<p/>";
                 return imagehtml;
             },
             outputKMZ: function(entry) {
-                var kmzhtml = "";
+                kmzhtml = "";
                 if (entry != null) {
                     kmzhtml += "<div  id=\"map3d1\"  style=\"width:500px; height:500px;\"  class=\"ramadda-earth-container\" ><\/div>\n";
                     kmzhtml += HtmlUtil.href(entry.getResourceUrl(), "Download Google Earth (KMZ) file");
+                    kmzhtml += "<p/>";
                 }
                 return kmzhtml;
             },
-            outputFiles: function(files) {
-                if (files.length == 0) return;
+            outputPlotFiles: function(files) {
+                if (files.length == 0) return "";
                 var filehtml = ""
-                filehtml += "<b>Files used for plots:</b><br/>"
+                filehtml += "<b>Files used for plots:</b><br/>";
                 for (var i = 0; i < files.length; i++) {
                     var entry = files[i];
                     filehtml += entry.getResourceLink();
                     filehtml += "<br/>";
                 }
+                filehtml += "<p/>";
+                return filehtml;
+            },
+            outputTimeSeriesFiles: function(files) {
+                if (files.length == 0) return "";
+                var filehtml = ""
+                filehtml += "<div id=\"manager1\"></div>"
+                for (var i = 0; i < files.length; i++) {
+                   filehtml += "<div id=\"chart"+i+"\"></div>"
+                }
+                filehtml += "<b>Files used for timeseries:</b><br/>";
+                for (var i = 0; i < files.length; i++) {
+                    var entry = files[i];
+                    filehtml += entry.getResourceLink();
+                    filehtml += "<br/>";
+                }
+                filehtml += "<p/>";
                 return filehtml;
             },
             initCollection: function(collection) {

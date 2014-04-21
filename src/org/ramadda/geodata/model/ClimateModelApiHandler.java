@@ -399,7 +399,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         processEntryId);
         //processEntryId + "/" + IOUtil.getFileTail(lastFile.toString()));
 
-        if (request.get("returnjson", false) && false) {
+        if (request.get("returnjson", false)) {
             StringBuilder json            = new StringBuilder();
             Entry         processDirEntry =
             //new Entry(processEntryId, new ProcessFileTypeHandler(getRepository(), null));
@@ -600,6 +600,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 "<script type=\"text/JavaScript\">google.load(\"earth\", \"1\");</script>");
         } else {
             sb.append(HtmlUtils.form(getTimeSeriesUrlPath(), formAttrs));
+            getWikiManager().addDisplayImports(request, sb);
         }
 
         List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
