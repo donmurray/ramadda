@@ -200,7 +200,7 @@ function CollectionForm(formId, type) {
                       "layouthere": "false",
                       "showmenu": "false",
                       "showtitle": "true",
-                      "data": new PointData(entry.getName(), null, null, 
+                      "data": new PointData(tsfile.getName(), null, null, 
                                   tsfile.getEntryUrl("&output=points.product&product=points.json&numpoints=1000"), 
                                   pointDataProps)
                     });
