@@ -321,7 +321,7 @@ function Entry(props) {
                 return this.getRamadda().getRoot() +"," + this.id;
             },
             getIsGroup: function() {return this.isGroup;},
-            getChildrenEntries: function(callback) {
+            getChildrenEntries: function(callback, extraArgs) {
                 if(this.childrenEntries !=null) {
                     return this.childrenEntries;
                 }
@@ -329,8 +329,11 @@ function Entry(props) {
 
                 var settings = new  EntrySearchSettings({parent: this.getId()});
                 var jsonUrl = this.getRamadda().getSearchUrl(settings, OUTPUT_JSON);
-
                 var jsonUrl =  this.getRamadda().getJsonUrl(this.getId()) +"&justchildren=true";
+                if(extraArgs!=null) {
+                    jsonUrl += "&" + extraArgs;
+                }
+
                 console.log(jsonUrl);
 
                 var myCallback = {
