@@ -699,7 +699,7 @@ features
 
 
 
-{{list includeicon="true" details="false" entries="siblings:project_casestudy,links"  message="" box.maxheight="200" box.class="entry-sidebox" prefix="==Related=="}}
+{{list includeicon="true" details="false" entries="siblings:type:project_casestudy,links"  message="" box.maxheight="200" box.class="entry-sidebox" prefix="==Related=="}}
 
 
 </td>

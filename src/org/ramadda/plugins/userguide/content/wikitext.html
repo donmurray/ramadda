@@ -374,7 +374,7 @@ other groups of entries with any of the following arguments:
                sort="name|date"  sortorder="up|down"
                count="number of entries to use" }}}]
 
-The entries attribute is a comma separated list of entry identifiers. They can be specific entry ids or they can be one of:
+The entries attribute is a comma separated list of entry identifiers. They can be specific entry ids or they can be one of a set of relative descriptors:
 <ul>
 <li> <i>this</i> - the current entry
 <li> <i>children</i> - the children entry
@@ -388,6 +388,29 @@ The entries attribute is a comma separated list of entry identifiers. They can b
 <li> <i>search</i>  - search the entire repository. The search terms are defined as attributes and described below.
 
 </ul>
+
+The relative descriptors are applied to the base entry specified with the <i>entry</i> attribute. You can specify an alternative
+base entry for each descriptor with the syntax:
+<pre>
+descriptor:baseEntryId
+</pre>
+
+
+So, for example, if you had 2 different Folder entries - folder1 and folder2 and you wanted to list all of the children of each folder you could do:
+
+<pre>
+{{tree  entries="children:folder1_id,children:folder2_id"}}
+</pre>
+
+
+You can combine different relative descriptors, e.g.:
+<pre>
+{{tree  entries="children:folder1_id,grandchildren:folder2_id"}}
+</pre>
+
+
+
+
 
 <h3>Search for entries</h3>
 

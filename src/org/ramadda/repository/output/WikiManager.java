@@ -2431,10 +2431,29 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 continue;
             }
             entryid = entryid.replace("_COMMA_", ",");
+            Entry        theBaseEntry = baseEntry;
+            String       type         = null;
+            //            entries="children:<other id>
+            //            entries="children:type:type
+
+            List<String> toks         = StringUtil.splitUpTo(entryid, ":", 2);
+            if (toks.size() == 2) {
+                //TODO: handle specifying a type
+                entryid = toks.get(0);
+                String       suffix = toks.get(1);
+                List<String> toks2  = StringUtil.splitUpTo(suffix, ":", 2);
+                if (toks2.size() == 2) {}
+                else {
+                    theBaseEntry = getEntryManager().getEntry(request,
+                            suffix);
+                }
+            }
+
+
 
             if (entryid.equals(ID_ANCESTORS)) {
                 List<Entry> tmp    = new ArrayList<Entry>();
-                Entry       parent = baseEntry.getParentEntry();
+                Entry       parent = theBaseEntry.getParentEntry();
                 while (parent != null) {
                     tmp.add(0, parent);
                     parent = parent.getParentEntry();
@@ -2447,13 +2466,14 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             if (entryid.equals(ID_LINKS)) {
                 List<Association> associations =
                     getRepository().getAssociationManager().getAssociations(
-                        request, baseEntry.getId());
+                        request, theBaseEntry.getId());
                 for (Association association : associations) {
                     String id = null;
-                    if ( !association.getFromId().equals(baseEntry.getId())) {
+                    if ( !association.getFromId().equals(
+                            theBaseEntry.getId())) {
                         id = association.getFromId();
                     } else if ( !association.getToId().equals(
-                            baseEntry.getId())) {
+                            theBaseEntry.getId())) {
                         id = association.getToId();
                     } else {
                         continue;
@@ -2472,25 +2492,24 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
 
             if (entryid.startsWith(ID_REMOTE)) {
-                //                http://ramadda.org/repository/entry/show/Home/RAMADDA+Examples?entryid=a96b9616-40b0-41f5-914a-fb1be157d97c
-                List<String> toks = StringUtil.splitUpTo(entryid, ID_REMOTE,
-                                        2);
-                String url = toks.get(1);
-
+                //TBD
+                //http://ramadda.org/repository/entry/show/Home/RAMADDA+Examples?entryid=a96b9616-40b0-41f5-914a-fb1be157d97c
+                //                List<String> toks = StringUtil.splitUpTo(entryid, ID_REMOTE,  2);
+                //                String url = toks.get(1);
                 continue;
             }
 
             if (entryid.equals(ID_THIS)) {
-                entries.add(baseEntry);
+                entries.add(theBaseEntry);
 
                 continue;
             }
 
 
             if (entryid.startsWith(ATTR_ENTRIES + ".filter")) {
-                List<String> toks = StringUtil.splitUpTo(entryid, "=", 2);
-                if (toks.size() == 2) {
-                    props.put(ATTR_ENTRIES + ".filter", toks.get(1));
+                List<String> tokens = StringUtil.splitUpTo(entryid, "=", 2);
+                if (tokens.size() == 2) {
+                    props.put(ATTR_ENTRIES + ".filter", tokens.get(1));
                 }
 
                 continue;
@@ -2499,14 +2518,14 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
             boolean isRemote = entryid.startsWith(ATTR_SEARCH_URL);
             if ( !isRemote && entryid.startsWith(ID_SEARCH + ".")) {
-                List<String> toks = StringUtil.splitUpTo(entryid, "=", 2);
-                if (toks.size() == 2) {
+                List<String> tokens = StringUtil.splitUpTo(entryid, "=", 2);
+                if (tokens.size() == 2) {
                     if (searchProps == null) {
                         searchProps = new Hashtable();
                         searchProps.putAll(props);
                     }
-                    searchProps.put(toks.get(0), toks.get(1));
-                    myRequest.put(toks.get(0), toks.get(1));
+                    searchProps.put(tokens.get(0), tokens.get(1));
+                    myRequest.put(tokens.get(0), tokens.get(1));
                 }
 
                 continue;
@@ -2523,17 +2542,17 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                               Misc.getProperty(searchProps,
                                   PREFIX_SEARCH + ARG_MAX, "100"));
 
-                addSearchTerms(myRequest, searchProps, baseEntry);
+                addSearchTerms(myRequest, searchProps, theBaseEntry);
 
                 if (isRemote) {
-                    List<String> toks = (entryid.indexOf("=") >= 0)
-                                        ? StringUtil.splitUpTo(entryid, "=",
-                                            2)
-                                        : StringUtil.splitUpTo(entryid, ":",
-                                            2);
+                    List<String> tokens = (entryid.indexOf("=") >= 0)
+                                          ? StringUtil.splitUpTo(entryid,
+                                              "=", 2)
+                                          : StringUtil.splitUpTo(entryid,
+                                              ":", 2);
                     ServerInfo serverInfo =
-                        new ServerInfo(new URL(toks.get(1)), "remote server",
-                                       "");
+                        new ServerInfo(new URL(tokens.get(1)),
+                                       "remote server", "");
 
                     List<ServerInfo> servers = new ArrayList<ServerInfo>();
                     servers.add(serverInfo);
@@ -2541,7 +2560,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                     List<Entry> remoteEntries = new ArrayList<Entry>();
 
                     getSearchManager().doDistributedSearch(myRequest,
-                            servers, baseEntry, remoteGroups, remoteEntries);
+                            servers, theBaseEntry, remoteGroups,
+                            remoteEntries);
                     entries.addAll(remoteGroups);
                     entries.addAll(remoteEntries);
 
@@ -2558,24 +2578,20 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
             if (entryid.equals(ID_PARENT)) {
                 entries.add(getEntryManager().getEntry(request,
-                        baseEntry.getParentEntryId()));
+                        theBaseEntry.getParentEntryId()));
 
                 continue;
             }
 
+
+
             if (entryid.startsWith(ID_SIBLINGS)) {
-                List<String> toks = StringUtil.splitUpTo(entryid, ":", 2);
-                String       type = null;
-                if (toks.size() > 1) {
-                    entryid = toks.get(0);
-                    type    = toks.get(1);
-                }
                 Entry parent = getEntryManager().getEntry(request,
-                                   baseEntry.getParentEntryId());
+                                   theBaseEntry.getParentEntryId());
                 if (parent != null) {
                     for (Entry sibling :
                             getEntryManager().getChildren(request, parent)) {
-                        if ( !sibling.getId().equals(baseEntry.getId())) {
+                        if ( !sibling.getId().equals(theBaseEntry.getId())) {
                             if (type != null) {
                                 if ( !sibling.getTypeHandler().isType(type)) {
                                     continue;
@@ -2592,7 +2608,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
             if (entryid.equals(ID_GRANDPARENT)) {
                 Entry parent = getEntryManager().getEntry(request,
-                                   baseEntry.getParentEntryId());
+                                   theBaseEntry.getParentEntryId());
                 if (parent != null) {
                     Entry grandparent = getEntryManager().getEntry(request,
                                             parent.getParentEntryId());
@@ -2604,9 +2620,10 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 continue;
             }
 
+
             if (entryid.equals(ID_CHILDREN)) {
                 List<Entry> children = getEntryManager().getChildren(request,
-                                           baseEntry);
+                                           theBaseEntry);
                 entries.addAll(children);
 
                 continue;
@@ -2616,7 +2633,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             if (entryid.equals(ID_GRANDCHILDREN)
                     || entryid.equals(ID_GREATGRANDCHILDREN)) {
                 List<Entry> children = getEntryManager().getChildren(request,
-                                           baseEntry);
+                                           theBaseEntry);
                 List<Entry> grandChildren = new ArrayList<Entry>();
                 for (Entry child : children) {
                     //Include the children non folders
