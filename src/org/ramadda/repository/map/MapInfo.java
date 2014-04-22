@@ -476,10 +476,6 @@ public class MapInfo {
         }
 
         addJS(getVariableName() + ".setSelection(" + initParams + ");\n");
-        // this wasn't done in the initial making of the JS
-        if (forSelection && !popup) {
-            addJS(getVariableName() + ".initMap(" + forSelection + ");\n");
-        }
 
         String mapStuff = HtmlUtils.table(new Object[] { widget.toString(),
                 rightSide });
@@ -491,10 +487,15 @@ public class MapInfo {
             retBuf.append("</div>");
             // Hack to hide the maps if they haven't selected a custom region.
             addJS("if ($('#" + getVariableName()
-                  + "_regions option:selected').val() != \"CUSTOM\")"
-                  + "$('#" + getVariableName() + "_mapToggle').hide();");
+                  + "_regions option:selected').val() != \"CUSTOM\") {"
+                  + "$('#" + getVariableName() + "_mapToggle').hide(); } else {"
+                  + getVariableName() + ".initMap(" + forSelection + ");}\n");
         } else {
             retBuf.append(mapStuff);
+            // this wasn't done in the initial making of the JS
+            if (forSelection && !popup) {
+                addJS(getVariableName() + ".initMap(" + forSelection + ");\n");
+            }
         }
         retBuf.append(html);
         retBuf.append(HtmlUtils.script(getJS().toString()));

@@ -104,7 +104,7 @@ function CollectionForm(formId, type) {
                             };
 
                             //This will go back to the server and get the children 
-                            processEntry.getChildrenEntries(finalCallback);
+                            processEntry.getChildrenEntries(finalCallback, "ascending=true&orderby=createdate");
                             
                         }
                     };
@@ -193,11 +193,11 @@ function CollectionForm(formId, type) {
                     displayManager.createDisplay("linechart", {
                       "showMenu": false,
                       "showTitle": true,
-                      "layoutHere": false,
+                      "layoutHere": true,
                       "divid": "chart"+i,
                       "width": "650",
                       "height": "250",
-                      "layouthere": "false",
+                      "layouthere": "true",
                       "showmenu": "false",
                       "showtitle": "true",
                       "data": new PointData(tsfile.getName(), null, null, 

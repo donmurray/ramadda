@@ -144,6 +144,7 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
             llr = new LatLonRect(new LatLonPointImpl(90.0, -180.0),
                                  new LatLonPointImpl(-90.0, 180.0));
         }
+        getOutputHandler().addMapWidget(request, sb, llr);
 
     }
 

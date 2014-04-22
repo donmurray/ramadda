@@ -382,7 +382,7 @@ function RepositoryMap(mapId, params) {
             // this.map.restrictedExtent = this.initialBounds;
             this.initialBounds = null;
         }  else { 
-            //            this.map.zoomToMaxExtent(); 
+            this.map.zoomToMaxExtent(); 
         }
 
         if (this.initialCircles) {
@@ -1232,6 +1232,11 @@ var MapUtils = {
     
     toggleMapWidget: function(baseId, onOrOff) {
         if (onOrOff) {
+            // check if the map has been initialized
+            var mapVar = window[baseId];
+            if (mapVar && !mapVar.inited) {
+                mapVar.initMap(true);
+            }
             $("#"+ baseId +"_mapToggle").show();
         } else {
             $("#"+ baseId +"_mapToggle").hide();
