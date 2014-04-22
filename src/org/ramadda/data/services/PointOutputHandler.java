@@ -2400,6 +2400,13 @@ public class PointOutputHandler extends RecordOutputHandler {
         if (entry == null) {
             return;
         }
+
+        if (entry.getTypeHandler() instanceof PointCollectionTypeHandler) {
+            links.add(makeLink(request, state.getEntry(), OUTPUT_FORM));
+            return;
+        }
+
+
         if ( !canHandleEntry(entry)) {
             return;
         }
