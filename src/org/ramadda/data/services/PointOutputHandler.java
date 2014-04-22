@@ -639,7 +639,7 @@ public class PointOutputHandler extends RecordOutputHandler {
 
                 memoryCheck("POINT: memory before:");
                 VisitInfo visitInfo = new VisitInfo(VisitInfo.QUICKSCAN_NO);
-                if (request.exists(ARG_MAX)) {
+                if (request.defined(ARG_MAX)) {
                     visitInfo.setMax(request.get(ARG_MAX, 1000));
                 }
                 getRecordJobManager().visitSequential(request, pointEntries,
@@ -1969,7 +1969,6 @@ public class PointOutputHandler extends RecordOutputHandler {
             };
             long numRecords = pointEntry.getNumRecords();
             int  skip       = (int) (numRecords / 1000);
-            //            System.err.println("SKIP:" + skip + " " + numRecords);
 
             getRecordJobManager().visitSequential(request, pointEntry,
                     visitor, new VisitInfo(VisitInfo.QUICKSCAN_YES, skip));
@@ -2449,14 +2448,15 @@ public class PointOutputHandler extends RecordOutputHandler {
 
 
 
+
         if (request.defined(ARG_RECORD_SKIP)) {
             int skip = getSkip(request, 1000);
             recordFile.setDefaultSkip(skip);
         } else if (request.defined(RecordFormHandler.ARG_NUMPOINTS)) {
             int numPoints = request.get(RecordFormHandler.ARG_NUMPOINTS,
                                         1000);
-            System.err.println("numPoints:" + numRecords + " " + numPoints);
-            recordFile.setDefaultSkip((int) (numRecords / numPoints));
+            int skip = (int) (numRecords / numPoints);
+            recordFile.setDefaultSkip(skip);
         } else if (numRecords < 10000) {
             recordFile.setDefaultSkip(0);
         } else {
