@@ -734,7 +734,9 @@ public class PointFormHandler extends RecordFormHandler {
             new ArrayList<HtmlUtils.Selector>();
         List<HtmlUtils.Selector> gridFormats =
             new ArrayList<HtmlUtils.Selector>();
-        getPointOutputHandler().getPointFormats(pointFormats, forGroup);
+
+        //Do this so we get the LidarOutputHandler in case of a lidar entry
+        ((PointEntry)recordEntry).getPointOutputHandler().getPointFormats(pointFormats, forGroup);
         getGridFormats(gridFormats, forGroup);
         List<List<HtmlUtils.Selector>> formatLists =
             new ArrayList<List<HtmlUtils.Selector>>();
