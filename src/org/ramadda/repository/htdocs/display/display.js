@@ -423,13 +423,21 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             getGet: function() {
                 return  "getRamaddaDisplay('" + this.getId() +"')";
             },
-            getEntryHtml: function(entry, headerRight) {
+            getEntryHtml: function(entry, props) {
+                var dfltProps = {
+                    showHeader: true,
+                    headerRight: false
+                };
+                $.extend(dfltProps, props);
+                props = dfltProps;
                 var menu = this.getEntryMenuButton(entry);
                 var html = "";
-                var left = menu +" " + entry.getLink(entry.getIconImage() +" " + entry.getName());
-                if(headerRight) html += HtmlUtil.leftRight(left,headerRight);
-                else html += left;
-                html += "<hr>";
+                if(props.showHeader) {
+                    var left = menu +" " + entry.getLink(entry.getIconImage() +" " + entry.getName());
+                    if(props.headerRight) html += HtmlUtil.leftRight(left,props.headerRight);
+                    else html += left;
+                    html += "<hr>";
+                }
                 html += entry.getDescription();
                 html += HtmlUtil.formTable();
 

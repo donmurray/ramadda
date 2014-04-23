@@ -280,7 +280,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                         };
                         var entries = entry.getChildrenEntries(callback);
                     } else {
-                        detailsInner.html(this.getEntryHtml(entry));
+                        detailsInner.html(this.getEntryHtml(entry,{showHeader:false}));
                     }
                 }
 
@@ -295,7 +295,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
             displayChildren: function(entry, entries) {
                 var detailsInner = this.jq(ID_DETAILS_INNER + entry.getId());
                 if(entries.length==0) {
-                    detailsInner.html(this.getEntryHtml(entry));
+                    detailsInner.html(this.getEntryHtml(entry,{showHeader:false}));
                 } else {
                     var entriesHtml  = this.getEntriesTree(entries);
                     detailsInner.html(entriesHtml);
@@ -321,7 +321,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 var close  = HtmlUtil.onClick(this.getGet()+ ".hideEntryDetails('" + entryId +"');",
                                               HtmlUtil.image(ramaddaBaseUrl +"/icons/close.gif"));
                 
-                var contents = this.getEntryHtml(entry, close);
+                var contents = this.getEntryHtml(entry, {headerRight:close});
                 $(popupId).html(contents);
                 $(popupId).show();
                 /*
