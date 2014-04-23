@@ -758,9 +758,11 @@ public class RecordJobManager extends JobManager implements RecordConstants {
         Runnable runnable = new Runnable() {
             public void run() {
                 try {
-                    ((PointOutputHandler) getRecordOutputHandler())
-                        .processEntries(request, entry, true, recordEntries,
-                                        jobInfo.getJobId());
+                    //Note - normally the POH here is "this" POH but for Lidar types over in the nlasplugin
+                    //We want to get the LidarOutputHandler
+                    PointOutputHandler pointOutputHandler = (PointOutputHandler)recordEntries.get(0).getOutputHandler();
+                    pointOutputHandler.processEntries(request, entry, true, recordEntries,
+                                                      jobInfo.getJobId());
                     if ( !jobOK(jobInfo.getJobId())) {
                         return;
                     }
