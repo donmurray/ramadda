@@ -83,16 +83,16 @@ public class HtmlUtils {
     public static final String HTTP_SET_COOKIE = "Set-Cookie";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String SUFFIX_NORTH = "_north";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SUFFIX_SOUTH = "_south";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SUFFIX_EAST = "_east";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SUFFIX_WEST = "_west";
 
 
@@ -179,6 +179,7 @@ public class HtmlUtils {
     /** _more_ */
     public static final String TAG_EMBED = "embed";
 
+    /** _more_          */
     public static final String TAG_OBJECT = "object";
 
     /** _more_ */
@@ -328,7 +329,7 @@ public class HtmlUtils {
     /** _more_ */
     public static final String ATTR_ONCLICK = "onClick";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ONCHANGE = "onchange";
 
     /** _more_ */
@@ -1532,6 +1533,7 @@ public class HtmlUtils {
     }
 
 
+
     /**
      * _more_
      *
@@ -1549,6 +1551,27 @@ public class HtmlUtils {
         return cols(s1) + cols(s2) + cols(s3) + cols(s4) + cols(s5)
                + cols(s6);
     }
+
+    /**
+     * _more_
+     *
+     * @param s1 _more_
+     * @param s2 _more_
+     * @param s3 _more_
+     * @param s4 _more_
+     * @param s5 _more_
+     * @param s6 _more_
+     * @param s7 _more_
+     *
+     * @return _more_
+     */
+    public static String cols(String s1, String s2, String s3, String s4,
+                              String s5, String s6, String s7) {
+        return cols(s1, s2, s3, s4, s5) + cols(s6, s7);
+    }
+
+
+
 
     /**
      * _more_
