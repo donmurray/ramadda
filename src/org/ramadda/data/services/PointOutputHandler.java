@@ -380,7 +380,8 @@ public class PointOutputHandler extends RecordOutputHandler {
      * @return _more_
      */
     public RecordEntry doMakeEntry(Request request, Entry entry) {
-        return new PointEntry(this, request, entry);
+        RecordTypeHandler typeHandler =  (RecordTypeHandler) entry.getTypeHandler();
+        return new PointEntry((PointOutputHandler)typeHandler.getRecordOutputHandler(), request, entry);
     }
 
 
@@ -786,8 +787,11 @@ public class PointOutputHandler extends RecordOutputHandler {
         List<PointEntry> pointEntries = new ArrayList<PointEntry>();
         pointEntries.add((PointEntry) doMakeEntry(request, entry));
         if ( !doingPublish && !asynchronous) {
-            Result result = processEntries(request, entry, false,
-                                           pointEntries, null);
+            //Note - normally the POH here is "this" POH but for Lidar types over in the nlasplugin
+            //We want to get the LidarOutputHandler
+            PointOutputHandler pointOutputHandler = pointEntries.get(0).getPointOutputHandler();
+            Result result = pointOutputHandler.processEntries(request, entry, false,
+                                                              pointEntries, null);
             if (result != null) {
                 return result;
             }
@@ -979,7 +983,10 @@ public class PointOutputHandler extends RecordOutputHandler {
 
         //If its synchronous
         if ( !doingPublish && !asynchronous) {
-            Result result = processEntries(request, group, false,
+            //Note - normally the POH here is "this" POH but for Lidar types over in the nlasplugin
+            //We want to get the LidarOutputHandler
+            PointOutputHandler pointOutputHandler = pointEntries.get(0).getPointOutputHandler();
+            Result result = pointOutputHandler.processEntries(request, group, false,
                                            pointEntries, null);
             if (result != null) {
                 return result;
