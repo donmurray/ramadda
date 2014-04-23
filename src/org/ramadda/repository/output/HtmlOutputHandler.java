@@ -518,10 +518,12 @@ public class HtmlOutputHandler extends OutputHandler {
         StringBuffer sb        = new StringBuffer();
         boolean      doingInfo = outputType.equals(OUTPUT_INFO);
         if (doingInfo) {
-            addDescription(request, entry, sb, true);
+            StringBuffer suffix = new StringBuffer();
+            addDescription(request, entry, sb, true, suffix);
             String informationBlock = getInformationTabs(request, entry,
                                           false);
             sb.append(informationBlock);
+            sb.append(suffix);
         } else {
             handleDefaultWiki(request, entry, sb, null, null);
         }
@@ -575,9 +577,7 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
         //Check for 
-        if (innerContent == null) {
-
-        }
+        if (innerContent == null) {}
 
         if (innerContent == null) {
             innerContent = getPageHandler().getWikiTemplate(request, entry,
@@ -1061,12 +1061,14 @@ public class HtmlOutputHandler extends OutputHandler {
      * @param entry _more_
      * @param sb _more_
      * @param open _more_
+     * @param suffix _more_
      */
     private void addDescription(Request request, Entry entry,
-                                StringBuffer sb, boolean open) {
-        String desc = entry.getDescription().trim();
-        if ((desc.length() > 0) && !TypeHandler.isWikiText(desc)
-                && !desc.equals("<nolinks>")) {
+                                StringBuffer sb, boolean open,
+                                StringBuffer suffix) {
+        String  desc   = entry.getDescription().trim();
+        boolean isWiki = TypeHandler.isWikiText(desc);
+        if ((desc.length() > 0) && !isWiki && !desc.equals("<nolinks>")) {
             desc = processText(request, entry, desc);
             StringBuffer descSB =
                 new StringBuffer("\n<div class=\"description\">\n");
@@ -1080,6 +1082,13 @@ public class HtmlOutputHandler extends OutputHandler {
             //                                                desc, true));
             sb.append(desc);
         }
+        if (isWiki) {
+            suffix.append(HtmlUtils.p());
+            suffix.append(subHeader(msg("Wiki Text")));
+            suffix.append(HtmlUtils.textArea("", desc, 20, 80));
+            suffix.append(HtmlUtils.p());
+        }
+
     }
 
 
@@ -1805,13 +1814,13 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
 
-        String wikiTemplate = null;
-
+        String       wikiTemplate = null;
+        StringBuffer suffix       = new StringBuffer();
         if ( !doingInfo && !group.isDummy()) {
             handleDefaultWiki(request, group, sb, subGroups, entries);
         } else {
             if ( !group.isDummy()) {
-                addDescription(request, group, sb, true);
+                addDescription(request, group, sb, true, suffix);
                 if ( !doSimpleListing) {
                     String informationBlock = getInformationTabs(request,
                                                   group, false);
@@ -1870,7 +1879,7 @@ public class HtmlOutputHandler extends OutputHandler {
             }
         }
 
-
+        sb.append(suffix);
 
         Result result = makeLinksResult(request, msg("Folder"), sb,
                                         new State(group, subGroups, entries));

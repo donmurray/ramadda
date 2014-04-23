@@ -1780,24 +1780,17 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                       true);
             boolean showDetails = Misc.getProperty(props, ATTR_DETAILS, true);
 
+            Request newRequest = request.cloneMe();
+
             if ( !showDetails) {
-                request.put(ARG_DETAILS, "false");
+                newRequest.put(ARG_DETAILS, "false");
             }
             if ( !decorate) {
-                request.put(ARG_DECORATE, "false");
+                newRequest.put(ARG_DECORATE, "false");
             }
 
-            String link = getHtmlOutputHandler().getEntriesList(request, sb,
+            String link = getHtmlOutputHandler().getEntriesList(newRequest, sb,
                               children, true, false, showDetails);
-            if ( !decorate) {
-                request.put(ARG_DECORATE, "false");
-            }
-            if ( !showDetails) {
-                request.remove(ARG_DETAILS);
-            }
-            if (showCategories) {
-                request.remove(ARG_SHOWCATEGORIES);
-            }
             if (Misc.getProperty(props, "form", false)) {
                 return link + HtmlUtils.br() + sb.toString();
             } else {

@@ -3599,14 +3599,14 @@ public class EntryManager extends RepositoryManager {
         }
         StringBuilder sb = new StringBuilder();
 
-        sb.append(header("Entry Links"));
+        sb.append(header("All Entry Actions"));
 
 
         sb.append(getEntryActionsTable(request, entry, OutputType.TYPE_ALL));
 
         //                                       OutputType.TYPE_FEEDS));
         return addEntryHeader(request, entry,
-                              new Result(msg("Entry Links"), sb));
+                              new Result(msg("Entry Actions"), sb));
     }
 
     /**

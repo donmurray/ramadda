@@ -913,14 +913,15 @@ public class UserManager extends RepositoryManager {
      *
      * @return Are the passwords equal and did the user's password get set
      */
-    private boolean checkAndSetNewPassword(Request request, User user) {
+    private boolean checkAndSetNewPassword(Request request, User user) throws Exception {
         String password1 = request.getString(ARG_USER_PASSWORD1, "").trim();
         String password2 = request.getString(ARG_USER_PASSWORD2, "").trim();
         if (Utils.stringDefined(password1)
                 || Utils.stringDefined(password2)) {
             if (password1.equals(password2)) {
                 user.setPassword(hashPassword(password1));
-
+                addActivity(request, user,
+                            ACTIVITY_PASSWORD_CHANGE, "");
                 return true;
             }
 
@@ -1604,10 +1605,13 @@ public class UserManager extends RepositoryManager {
             users.add(getUser(results));
         }
 
+        //        addActivity(request, request.getUser(),  ACTIVITY_PASSWORD_CHANGE, "");
 
         usersHtml.append("<table>");
-        usersHtml.append(HtmlUtils.row(HtmlUtils.cols("",
-                HtmlUtils.bold(msg("ID")) + HtmlUtils.space(2),
+        usersHtml.append(HtmlUtils.row(HtmlUtils.cols(
+                                                      HtmlUtils.bold(msg("Log")),
+                                                      HtmlUtils.bold(msg("Edit")),
+                                                      HtmlUtils.bold(msg("ID")) + HtmlUtils.space(2),
                 HtmlUtils.bold(msg("Name")) + HtmlUtils.space(2),
         //                    HtmlUtils.bold(msg("Roles")) + HtmlUtils.space(2),
         HtmlUtils.bold(msg("Email")) + HtmlUtils.space(2), HtmlUtils.bold(
@@ -1642,7 +1646,7 @@ public class UserManager extends RepositoryManager {
             String row = (user.getAdmin()
                           ? "<tr valign=\"top\" style=\"background-color:#cccccc;\">"
                           : "<tr valign=\"top\" >") + HtmlUtils.cols(
-                              userLogLink + userEditLink, userProfileLink,
+                                                                     userLogLink,userEditLink, userProfileLink,
                               user.getName(),
             /*user.getRolesAsString("<br>"),*/
             user.getEmail(), "" + user.getAdmin(),
@@ -3266,9 +3270,10 @@ public class UserManager extends RepositoryManager {
         SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
         ResultSet        results;
         if (theUser != null) {
-            sb.append(msgLabel("Activity for User"));
-            sb.append(HtmlUtils.space(1));
-            sb.append(theUser.getLabel());
+            sb.append(RepositoryUtil.header(msgLabel("Activity for User: ") + HtmlUtils.space(1)
+                                            + theUser.getLabel()));
+
+
         }
         sb.append(HtmlUtils.p());
         sb.append(HtmlUtils.open(HtmlUtils.TAG_TABLE));

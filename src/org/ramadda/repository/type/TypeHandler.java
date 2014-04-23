@@ -1907,15 +1907,6 @@ public class TypeHandler extends RepositoryManager {
             }
         }
 
-        links.add(
-            new Link(
-                HtmlUtils.url(
-                    getRepository().URL_ENTRY_LINKS.toString(),
-                    new String[] { ARG_ENTRYID,
-                                   entry.getId() }), getRepository()
-                                   .iconUrl(
-                                       "/icons/application-detail.png"), "All Services", OutputType
-                                           .TYPE_FILE));
 
 
         //We don't actually prevent an export - just don't show the link in the menu
@@ -1949,6 +1940,17 @@ public class TypeHandler extends RepositoryManager {
             links.add(makeHRLink(OutputType.TYPE_FILE));
         }
 
+        links.add(
+            new Link(
+                HtmlUtils.url(
+                    getRepository().URL_ENTRY_LINKS.toString(),
+                    new String[] { ARG_ENTRYID,
+                                   entry.getId() }), getRepository()
+                                   .iconUrl(
+                                       "/icons/application-detail.png"), "All Actions", OutputType
+                                           .TYPE_FILE));
+
+        links.add(makeHRLink(OutputType.TYPE_FILE));
 
 
         if ( !canDoNew && isGroup
