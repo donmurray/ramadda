@@ -1473,7 +1473,7 @@ public class HtmlOutputHandler extends OutputHandler {
         sb.append(HtmlUtils.col(listSB.toString()));
         sb.append(
             HtmlUtils.col(
-                "<iframe id=\"treeview_view\" src=\"/repository/blank\" width=\"750\" height=\"500\"></iframe>"));
+                "<iframe id=\"treeview_view\" src=\"" + getRepository().getUrlBase()+"/blank\" width=\"750\" height=\"500\"></iframe>"));
         sb.append("</tr></table>");
         request.remove(ARG_TREEVIEW);
     }
