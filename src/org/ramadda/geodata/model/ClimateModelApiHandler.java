@@ -818,7 +818,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             sb.append(HtmlUtils.close("div"));  // titled_border_content
         } else {
             sb.append("<tr><td colspan=\"2\" align=\"center\">");
-            sb.append(HtmlUtils.submit("Update Selection", ARG_ACTION_SEARCH,
+            sb.append(HtmlUtils.submit("Update Data Selection", ARG_ACTION_SEARCH,
                                        HtmlUtils.id(formId + "_submit")
                                        + makeButtonSubmitDialog(sb,
                                            msg("Searching for new data")
