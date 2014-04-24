@@ -3799,7 +3799,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
         if ((prop == null) || prop.equals("true")) {
             return true;
         }
-        System.err.println("NOT OK:" + outputType);
+        System.err.println("isOutputTypeOK: output type not ok:" + outputType);
 
         return false;
     }
