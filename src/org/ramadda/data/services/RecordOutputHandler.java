@@ -99,8 +99,8 @@ public class RecordOutputHandler extends OutputHandler implements RecordConstant
     private TempDir productDir;
 
 
-    /** _more_ */
-    private RecordJobManager jobManager;
+    /** This is a static so we can correctly handle mulitple output handlers (e.g., lidar) */
+    private static RecordJobManager jobManager;
 
 
     /** _more_ */
@@ -129,7 +129,9 @@ public class RecordOutputHandler extends OutputHandler implements RecordConstant
      * @param jobManager _more_
      */
     protected void setRecordJobManager(RecordJobManager jobManager) {
-        this.jobManager = jobManager;
+        if(this.jobManager==null) {
+            this.jobManager = jobManager;
+        }
     }
 
 
