@@ -284,6 +284,13 @@ begin
   ;print(ratio)
   opts@ratio=ratio
 
+  ;; find the level units
+  if (.not. isatt(opts, "levelunit") .and. numdims .gt. 3) then
+     levname=dNames(numdims-3)
+     levvar = datafile->$levname$
+     opts@levelunit = levvar@units
+  end if
+
   tmpdata = datafile->$varname$
   if (numdims .eq. 3) then  ; (time,lat,lon)
     if (vartype .eq. "short") then
@@ -578,6 +585,12 @@ begin
     end if
     gsn_reverse_colormap(wks)
   end if
+  level = opts@level
+  levelunit = opts@levelunit
+  if (.not. ismissing(levelunit) .and. levelunit .eq. "Pa") then
+    level = level/100
+    levelunit = "hPa"
+  end if
 
   ; TODO: Handle multiple times
   if (dodiff) then
@@ -599,6 +612,9 @@ begin
     end if
     rescf@tiMainString        = plottitle
     mydata = data(0,:,:)
+    if (.not. ismissing(opts@level)) then
+      rescf@gsnLeftString = mydata@long_name + " (" + level +" "+levelunit+ ")"
+    end if
     if (cint .eq. 0) then
       symMinMaxPlt(mydata,20,False,rescf)
     end if
@@ -616,6 +632,9 @@ begin
       mydata = data(0,:,:)
       if ((.not. ismissing(plottitles(0))) .and. (plottitles(0) .ne. "")) then
         rescf@tiMainString        = plottitles(0)
+      end if
+      if (.not. ismissing(opts@level)) then
+        rescf@gsnLeftString = mydata@long_name + " (" + level +" "+levelunit+ ")"
       end if
       if (isanom .and. cint .eq. 0) then
         symMinMaxPlt(mydata,20,False,rescf)
