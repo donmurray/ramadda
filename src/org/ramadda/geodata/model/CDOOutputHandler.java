@@ -136,7 +136,8 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
     public static final String ARG_CDO_PERIOD = ARG_CDO_PREFIX + "period";
 
     /** area argument */
-    public static final String ARG_CDO_AREA = ARG_CDO_PREFIX + "area";
+    //public static final String ARG_CDO_AREA = ARG_CDO_PREFIX + "area";
+    public static final String ARG_CDO_AREA = "area";
 
     /** area argument - north */
     private static final String ARG_CDO_AREA_NORTH = ARG_CDO_AREA + "_north";

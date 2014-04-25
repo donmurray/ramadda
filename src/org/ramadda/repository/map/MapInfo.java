@@ -429,7 +429,7 @@ public class MapInfo {
         StringBuilder widget  = new StringBuilder();
         String        regions = "";
         if (doRegion) {
-            regions = getRegionSelectorWidget();
+            regions = getRegionSelectorWidget(arg);
         }
         widget.append(getSelectorWidget(arg, nwse));
         if ( !showMaps()) {
@@ -488,13 +488,15 @@ public class MapInfo {
             // Hack to hide the maps if they haven't selected a custom region.
             addJS("if ($('#" + getVariableName()
                   + "_regions option:selected').val() != \"CUSTOM\") {"
-                  + "$('#" + getVariableName() + "_mapToggle').hide(); } else {"
-                  + getVariableName() + ".initMap(" + forSelection + ");}\n");
+                  + "$('#" + getVariableName()
+                  + "_mapToggle').hide(); } else {" + getVariableName()
+                  + ".initMap(" + forSelection + ");}\n");
         } else {
             retBuf.append(mapStuff);
             // this wasn't done in the initial making of the JS
             if (forSelection && !popup) {
-                addJS(getVariableName() + ".initMap(" + forSelection + ");\n");
+                addJS(getVariableName() + ".initMap(" + forSelection
+                      + ");\n");
             }
         }
         retBuf.append(html);
@@ -521,21 +523,26 @@ public class MapInfo {
     /**
      * _more_
      *
+     *
+     * @param arg _more_
      * @return _more_
      */
-    public String getRegionSelectorWidget() {
+    public String getRegionSelectorWidget(String arg) {
         StringBuilder widget = new StringBuilder();
         if ((mapRegions != null) && (mapRegions.size() > 0)) {
             List values = new ArrayList<String>();
-            values.add(new TwoFacedObject("Select Region", ""));
+            //values.add(new TwoFacedObject("Select Region", ""));
             for (MapRegion region : mapRegions) {
-                String value = region.getNorth() + "," + region.getWest()
-                               + "," + region.getSouth() + ","
-                               + region.getEast();
+                String value = region.getId() + "," + region.getNorth() + ","
+                               + region.getWest() + "," + region.getSouth()
+                               + "," + region.getEast();
                 values.add(new TwoFacedObject(region.getName(), value));
             }
             values.add(new TwoFacedObject("Custom", "CUSTOM"));
             String regionSelectId = getVariableName() + "_regions";
+            widget.append(HtmlUtils.hidden(arg + "_regionid", "",
+                                           HtmlUtils.id(getVariableName()
+                                               + "_regionid")));
             widget.append(
                 HtmlUtils.select(
                     "mapregion", values, (String) null,

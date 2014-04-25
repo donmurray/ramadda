@@ -90,14 +90,14 @@ public class NCLOutputHandler extends OutputHandler {
             "remove_middle_contours.ncl", SCRIPT_HLURESFILE };
 
     /** NCL prefix string */
-    private static final String ARG_NCL_PREFIX = "ncl.";
+    private static final String ARG_NCL_PREFIX = "ncl_";
 
     /** NCL plot string */
-    public static final String ARG_NCL_PLOTTYPE = ARG_NCL_PREFIX
-                                                  + "_plottype";
+    public static final String ARG_NCL_PLOTTYPE = ARG_NCL_PREFIX + "plottype";
 
     /** area arg prefix */
-    public static final String ARG_NCL_AREA = ARG_NCL_PREFIX + "area";
+    //public static final String ARG_NCL_AREA = ARG_NCL_PREFIX + "area";
+    public static final String ARG_NCL_AREA = "area";
 
     /** area North argument */
     public static final String ARG_NCL_AREA_NORTH = ARG_NCL_AREA + "_north";
@@ -110,6 +110,11 @@ public class NCLOutputHandler extends OutputHandler {
 
     /** area West argument */
     public static final String ARG_NCL_AREA_WEST = ARG_NCL_AREA + "_west";
+
+    /** region id argument */
+    public static final String ARG_NCL_AREA_REGIONID = ARG_NCL_AREA
+                                                       + "_regionid";
+
 
     /** NCL variable argument */
     public static final String ARG_NCL_VARIABLE = ARG_NCL_PREFIX
@@ -415,19 +420,6 @@ sb.append(HtmlUtils.form(formUrl,
             String llb = map.makeSelector(ARG_NCL_AREA, true, points);
             sb.append(HtmlUtils.formEntryTop(msgLabel("Area"), llb));
         }
-        /*  TODO: Figure out how to do time series
-        sb.append(
-            HtmlUtils.formEntry(
-                Repository.msg("Plot Type"),
-                HtmlUtils.radio(
-                    ARG_NCL_PLOTTYPE, "png",
-                    true) + Repository.msg("Image")
-                          + HtmlUtils.radio(
-                              ARG_NCL_PLOTTYPE, "kmz",
-                              false) + Repository.msg("Google Earth") +
-                              HtmlUtils.radio(ARG_NCL_PLOTTYPE,
-                                          "timeseries", false) + Repository.msg("Time Series")));
-        */
     }
 
     /**
@@ -571,6 +563,11 @@ sb.append(HtmlUtils.form(formUrl,
             }
         }
         envMap.put("addCyclic", Boolean.toString(haveOriginalBounds));
+        String mapid = request.getString(ARG_NCL_AREA_REGIONID, "");
+        boolean usepolar = mapid.equalsIgnoreCase("NH")
+                           || mapid.equalsIgnoreCase("SH")
+                           || mapid.equalsIgnoreCase("ANT");
+        envMap.put("usepolar", Boolean.toString(usepolar));
 
         boolean haveAnom = input.toString().indexOf("anom") >= 0;
         envMap.put("anom", Boolean.toString(haveAnom));

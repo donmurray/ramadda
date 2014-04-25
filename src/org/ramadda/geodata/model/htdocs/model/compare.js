@@ -45,22 +45,22 @@ function CollectionForm(formId, type) {
                 var theForm = this;
                 var inputs = $('#' + this.formId +' ::input');
                 inputs.each(function() {             
-                        var value = $(this).val();
-                        if(this.name == "entryselect") {
-                            if(!$(this).is(':checked')) {
-                                return;
-                            }
+                    var value = $(this).val();
+                    if(this.name == "entryselect") {
+                        if(!$(this).is(':checked')) {
+                            return;
                         }
-                        //A hack for now but 
-                        if(this.type == 'radio') {
-                            if(!$(this).is(':checked')) {
-                                return;
-                            }
+                    }
+                    //A hack for now but 
+                    if(this.type == 'radio') {
+                        if(!$(this).is(':checked')) {
+                            return;
                         }
-                        if(HtmlUtil.valueDefined(value)) {
-                            url += "&" + this.name+ "=" + encodeURIComponent(value);
-                        }
-                    });       
+                    }
+                    if(HtmlUtil.valueDefined(value)) {
+                        url += "&" + this.name+ "=" + encodeURIComponent(value);
+                    }
+                });       
 
 
 

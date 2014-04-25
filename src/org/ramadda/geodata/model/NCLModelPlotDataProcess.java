@@ -218,15 +218,18 @@ public class NCLModelPlotDataProcess extends DataProcess {
         // Contour interval
         StringBuffer contourSB = new StringBuffer();
         contourSB.append(Repository.msg("Interval: "));
-        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CINT, ARG_NCL_CINT, ""));
-                //request.getString(ARG_NCL_CINT, "")));
+        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CINT,
+                ARG_NCL_CINT, ""));
+        //request.getString(ARG_NCL_CINT, "")));
         contourSB.append("<br>");
         contourSB.append(Repository.msg("Range: Low"));
-        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMIN, ARG_NCL_CMIN, ""));
-                //request.getString(ARG_NCL_CMIN, "")));
+        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMIN,
+                ARG_NCL_CMIN, ""));
+        //request.getString(ARG_NCL_CMIN, "")));
         contourSB.append(Repository.msg("High"));
-        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMAX, ARG_NCL_CMAX, ""));
-                //request.getString(ARG_NCL_CMAX, "")));
+        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMAX,
+                ARG_NCL_CMAX, ""));
+        //request.getString(ARG_NCL_CMAX, "")));
         sb.append(
             HtmlUtils.formEntry(
                 "<div style=\"width:9em\">"
@@ -389,6 +392,12 @@ public class NCLModelPlotDataProcess extends DataProcess {
             envMap.put("cmax", String.valueOf(cvals[2]));
         }
 
+        String mapid =
+            request.getString(NCLOutputHandler.ARG_NCL_AREA_REGIONID, "");
+        boolean usepolar = mapid.equalsIgnoreCase("NH")
+                           || mapid.equalsIgnoreCase("SH")
+                           || mapid.equalsIgnoreCase("ANT");
+        envMap.put("usepolar", Boolean.toString(usepolar));
 
         boolean haveAnom = fileList.toString().indexOf("anom") >= 0;
         String  colormap = "rainbow";
@@ -437,12 +446,11 @@ public class NCLModelPlotDataProcess extends DataProcess {
         }
         String outType = "type_image";
         if (plotType.equals("kmz")) {
-        	outType = "geo_kml";
+            outType = "geo_kml";
         }
-        Resource resource    = new Resource(outFile,
-                                            Resource.TYPE_LOCAL_FILE);
-        TypeHandler myHandler =
-            repository.getTypeHandler(outType, false, true);
+        Resource resource = new Resource(outFile, Resource.TYPE_LOCAL_FILE);
+        TypeHandler myHandler = repository.getTypeHandler(outType, false,
+                                    true);
         Entry outputEntry = new Entry(myHandler, true, outFile.toString());
         outputEntry.setResource(resource);
         nclOutputHandler.getEntryManager().writeEntryXmlFile(request,

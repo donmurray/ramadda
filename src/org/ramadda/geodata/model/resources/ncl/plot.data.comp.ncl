@@ -491,17 +491,28 @@ begin
   plottitles = opts@titles
   ;print(plottitles)
   numtitles = dimsizes(plottitles)
+  usepolar = opts@usepolar
+  
 
   rescf = True;
   ;rescf@gsnAddCyclic          = (addCyclic .eq. "true")    ; turn off if subset
   rescf@gsnAddCyclic          = False
   rescf@mpMinLatF            = opts@minLat       ; range to zoom in on
   rescf@mpMaxLatF            = opts@maxLat
-  rescf@mpMinLonF            = opts@minLon
-  rescf@mpMaxLonF            = opts@maxLon
-  centerLonF         = (opts@maxLon + opts@minLon)/2
-  centerLatF         = (opts@maxLat + opts@minLat)/2
-  rescf@mpCenterLonF         = centerLonF
+  if (.not. usepolar) then 
+    rescf@mpMinLonF            = opts@minLon
+    rescf@mpMaxLonF            = opts@maxLon
+    centerLonF         = (opts@maxLon + opts@minLon)/2
+    centerLatF         = (opts@maxLat + opts@minLat)/2
+    rescf@mpCenterLonF         = centerLonF
+  else 
+    if (opts@maxLat .gt. 0) then
+      rescf@gsnPolar = "NH"
+    else
+      rescf@gsnPolar = "SH"
+    end if
+    rescf@gsnAddCyclic          = True
+  end if
 
 
   rescf@gsnDraw           = False         ; Don't draw plots (for overlay)
@@ -586,8 +597,12 @@ begin
     gsn_reverse_colormap(wks)
   end if
   level = opts@level
-  levelunit = opts@levelunit
-  if (.not. ismissing(levelunit) .and. levelunit .eq. "Pa") then
+  if (isatt(opts,"levelunit")) then
+    levelunit = opts@levelunit
+  else
+    levelunit = ""
+  end if
+  if (isdefined(levelunit) .and. levelunit .eq. "Pa") then
     level = level/100
     levelunit = "hPa"
   end if
@@ -612,16 +627,24 @@ begin
     end if
     rescf@tiMainString        = plottitle
     mydata = data(0,:,:)
-    if (.not. ismissing(opts@level)) then
+    if (.not. ismissing(level)) then
       rescf@gsnLeftString = mydata@long_name + " (" + level +" "+levelunit+ ")"
     end if
     if (cint .eq. 0) then
       symMinMaxPlt(mydata,20,False,rescf)
     end if
-    plots(0) = gsn_csm_contour_map_ce(wks,mydata,rescf)
+    if (usepolar) then
+      plots(0) = gsn_csm_contour_map_polar(wks,mydata,rescf)
+    else
+      plots(0) = gsn_csm_contour_map_ce(wks,mydata,rescf)
+    end if
     if (cint .eq. 0) then
       res2 = remove_middle_contours(plots(0), rescf, 1)
-      plots(0) = gsn_csm_contour_map_ce(wks,mydata,res2)
+      if (usepolar) then
+        plots(0) = gsn_csm_contour_map_polar(wks,mydata,res2)
+      else
+        plots(0) = gsn_csm_contour_map_ce(wks,mydata,res2)
+      end if
     end if
     if (.not. doGoogle) then
         addAnnotation(wks,opts@annotation)
@@ -639,10 +662,19 @@ begin
       if (isanom .and. cint .eq. 0) then
         symMinMaxPlt(mydata,20,False,rescf)
       end if
-      plots(0) = gsn_csm_contour_map_ce(wks,mydata,rescf)
+      if (usepolar) then
+        plots(0) = gsn_csm_contour_map_polar(wks,mydata,rescf)
+      else
+        plots(0) = gsn_csm_contour_map_ce(wks,mydata,rescf)
+      end if
       if (isanom .and. cint .eq. 0) then
         res2 = remove_middle_contours(plots(0), rescf, 1)
-        plots(0) = gsn_csm_contour_map_ce(wks,mydata,res2)
+        if (usepolar) then
+          plot = gsn_csm_contour_map_polar(wks,mydata,res2)
+          plots(0) = plot
+        else
+          plots(0) = gsn_csm_contour_map_ce(wks,mydata,res2)
+        end if
       end if
       if (.not. doPanel) then
         addAnnotation(wks,opts@annotation)
@@ -654,10 +686,18 @@ begin
         if ((.not. ismissing(plottitles(i))) .and. (plottitles(i) .ne. "")) then
           rescf@tiMainString        = plottitles(i)
         end if
-        plots(i) = gsn_csm_contour_map_ce(wks,mydata,rescf)
+        if (usepolar) then
+          plots(i) = gsn_csm_contour_map_polar(wks,mydata,rescf)
+        else
+          plots(i) = gsn_csm_contour_map_ce(wks,mydata,rescf)
+        end if
         if (isanom .and. cint .eq. 0) then
           res2 = remove_middle_contours(plots(i), rescf, 1)
-          plots(i) = gsn_csm_contour_map_ce(wks,mydata,res2)
+          if (usepolar) then
+            plots(i) = gsn_csm_contour_map_polar(wks,mydata,res2)
+          else
+            plots(i) = gsn_csm_contour_map_ce(wks,mydata,res2)
+          end if
         end if
         if (.not. doPanel) then
           addAnnotation(wks,opts@annotation)
@@ -1186,6 +1226,12 @@ begin
   end if
   cmin=stringtofloat(getenv("cmin"))
   cmax=stringtofloat(getenv("cmax"))
+  polar=getenv("usepolar")
+  if (.not. ismissing(polar)) then
+    usepolar = polar .eq. "true"
+  else
+    usepolar = False
+  end if
   
   options = True
   options@plottype=plotType
@@ -1205,6 +1251,7 @@ begin
   options@cint=cint
   options@cmin=cmin
   options@cmax=cmax
+  options@usepolar=usepolar
   
   if (plotType.eq."timeseries") then
     ;print("plotting timeseries")

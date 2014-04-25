@@ -374,12 +374,13 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         //System.out.println("Name: " + outputName.toString());
 
         Resource resource = new Resource(outFile, Resource.TYPE_LOCAL_FILE);
-        TypeHandler myHandler =
-            getRepository().getTypeHandler("cdm_grid", false, true);
+        TypeHandler myHandler = getRepository().getTypeHandler("cdm_grid",
+                                    false, true);
         Entry outputEntry = new Entry(myHandler, true, outputName.toString());
         outputEntry.setResource(resource);
         getOutputHandler().getEntryManager().writeEntryXmlFile(request,
                 outputEntry);
+
         //return new DataProcessOperand(outputEntry.getName(), outputEntry);
         return new DataProcessOperand(outputName.toString(), outputEntry);
     }

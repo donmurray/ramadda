@@ -1209,20 +1209,21 @@ var MapUtils = {
             if (toks[0] != CUSTOM_MAP) {
                 return;
             } else {
-                this.setMapRegion(baseId, "", "", "", "");
+                this.setMapRegion(baseId, "", "", "", "", "");
                 this.toggleMapWidget(baseId, true);
                 return;
             }
         }
-        if(toks.length != 4) {
+        if(toks.length != 5) {
             return;
         }
         this.toggleMapWidget(baseId, false);
-        this.setMapRegion(baseId, toks[0], toks[1], toks[2], toks[3]);
+        this.setMapRegion(baseId, toks[0], toks[1], toks[2], toks[3], toks[4]);
     },
 
 
-    setMapRegion: function(baseId, north, west, south, east) {
+    setMapRegion: function(baseId, regionid, north, west, south, east) {
+        $("#"+ baseId +"_regionid").val(regionid);
         $("#"+ baseId +"_north").val(north);
         $("#"+ baseId +"_west").val(west);
         $("#"+ baseId +"_south").val(south);
