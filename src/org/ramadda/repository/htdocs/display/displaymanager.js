@@ -173,7 +173,17 @@ function DisplayManager(argId,argProperties) {
             handleEventPointDataLoaded: function(source, pointData) {
                 this.notifyEvent("handleEventPointDataLoaded", source, pointData);
             },
-
+           ranges: {
+               //               "TRF": [0,100],
+           },
+           setRange: function(field, range) {
+               if(this.ranges[field.getId()] == null) {
+                   this.ranges[field.getId()] = range;
+               } 
+           },
+           getRange: function(field) {
+               return this.ranges[field.getId()];
+           },
             makeMainMenu: function() {
                 if(!this.getProperty(PROP_SHOW_MENU, true))  {
                     return "";

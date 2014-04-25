@@ -159,11 +159,29 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 if(this.fontSize>0) {
                     chartOptions.fontSize = this.fontSize;
                 }
+
+
+                var defaultRange = this.getDisplayManager().getRange(selectedFields[0]);
+
+                var range = [NaN,NaN];
                 if(!isNaN(this.vAxisMinValue)) {
-                    chartOptions.vAxis.minValue =parseFloat(this.vAxisMinValue);
+                    range[0] = parseFloat(this.vAxisMinValue);
+                } else if(defaultRange!=null) {
+                    range[0] = defaultRange[0];
                 }
                 if(!isNaN(this.vAxisMaxValue)) {
-                    chartOptions.vAxis.maxValue =parseFloat(this.vAxisMaxValue);
+                    range[1] = parseFloat(this.vAxisMaxValue);
+                } else if(defaultRange!=null) {
+                    range[1] = defaultRange[1];
+                }
+                //                console.log("range:" + range);
+                
+
+                if(!isNaN(range[0])) {
+                    chartOptions.vAxis.minValue =range[0];
+                }
+                if(!isNaN(range[1])) {
+                    chartOptions.vAxis.maxValue =range[1];
                 }
                 var width = "95%";
                 if(selectedFields.length>1) {

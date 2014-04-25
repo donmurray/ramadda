@@ -1033,6 +1033,10 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 //These are Record objects 
                 //TODO: handle multiple data sources (or not?)
                 var pointData = this.dataCollection.getList()[0];
+
+
+
+
                 var nonNullRecords = 0;
                 var indexField = this.indexField;
                 var allFields = this.allFields;
