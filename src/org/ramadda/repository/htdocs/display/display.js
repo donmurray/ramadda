@@ -316,12 +316,13 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 if(!this.hasData()) {
                     return;
                 }
-                if(this.getProperty(PROP_FIELDS,null)!=null) {
-                    //            return;
-                }
+                var selectedField = this.getProperty(PROP_FIELDS,null);
+                
                 var html =  null;
                 var checkboxClass = this.getId() +"_checkbox";
                 var dataList =  this.dataCollection.getList();
+
+
                 for(var collectionIdx=0;collectionIdx<dataList.length;collectionIdx++) {             
                     var pointData = dataList[collectionIdx];
                     
@@ -333,15 +334,20 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                         html+= "<br>";
                     }
 
+
                     for(i=0;i<fields.length;i++) { 
                         var field = fields[i];
                         var idBase = "cbx_" + collectionIdx +"_" +i;
                         field.checkboxId  = this.getDomId(idBase);
                         var on = false;
-                        if(this.selectedCbx.indexOf(idBase)>=0) {
-                            on = true;
-                        }  else if(this.selectedCbx.length==0) {
-                            on = (i==0);
+                        if(selectedField!=null) {
+                            on = (selectedField == field.getId());
+                        } else {
+                            if(this.selectedCbx.indexOf(idBase)>=0) {
+                                on = true;
+                            }  else if(this.selectedCbx.length==0) {
+                                on = (i==0);
+                            }
                         }
                         html += HtmlUtil.tag(TAG_DIV, [ATTR_TITLE, field.getId()],
                                              HtmlUtil.checkbox(field.checkboxId, checkboxClass,
@@ -360,6 +366,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 var theDisplay = this;
                 //Listen for changes to the checkboxes
                 $("." + checkboxClass).click(function(event) {
+                        theDisplay.removeProperty(PROP_FIELDS);
                         theDisplay.fieldSelectionChanged();
                     });
             },
@@ -371,7 +378,6 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 //If we have fixed fields then clear them after the first time
                 var fixedFields = this.getProperty(PROP_FIELDS);
                 if(fixedFields!=null) {
-                    this.removeProperty(PROP_FIELDS);
                     if(fixedFields.length==0) {
                         fixedFields = null;
                     } 
