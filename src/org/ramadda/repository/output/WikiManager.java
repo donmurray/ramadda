@@ -24,6 +24,7 @@ package org.ramadda.repository.output;
 import org.ramadda.data.services.PointOutputHandler;
 import org.ramadda.data.services.PointTypeHandler;
 import org.ramadda.repository.Association;
+import org.ramadda.repository.Constants;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.EntryManager;
 import org.ramadda.repository.Link;
@@ -1053,12 +1054,27 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
                 jsonUrl = poh.getJsonUrl(request, entry);
             } else {
-                jsonUrl = getRepository().getUrlBase() + "/grid/json?"
-                          + HtmlUtils.args(new String[] {
+                StringBuilder jsonbuf = new StringBuilder();
+                jsonbuf.append(getRepository().getUrlBase() + "/grid/json?"
+                               + HtmlUtils.args(new String[] {
                     ARG_ENTRYID, entry.getId(), ARG_LOCATION_LATITUDE,
                     "${latitude}", ARG_LOCATION_LONGITUDE, "${longitude}"
-                }, false);
-
+                }, false));
+                // add in the list of selected variables as well
+                String    VAR_PREFIX = Constants.ARG_VARIABLE + ".";
+                Hashtable args       = request.getArgs();
+                for (Enumeration keys =
+                        args.keys(); keys.hasMoreElements(); ) {
+                    String arg = (String) keys.nextElement();
+                    if (arg.startsWith(VAR_PREFIX)
+                            && request.get(arg, false)) {
+                        jsonbuf.append("&");
+                        jsonbuf.append(VAR_PREFIX);
+                        jsonbuf.append(arg.substring(VAR_PREFIX.length()));
+                        jsonbuf.append("=true");
+                    }
+                }
+                jsonUrl = jsonbuf.toString();
             }
             getEntryDisplay(request, entry, entry.getName(), jsonUrl, sb,
                             props);
@@ -1780,7 +1796,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                       true);
             boolean showDetails = Misc.getProperty(props, ATTR_DETAILS, true);
 
-            Request newRequest = request.cloneMe();
+            Request newRequest  = request.cloneMe();
 
             if ( !showDetails) {
                 newRequest.put(ARG_DETAILS, "false");
@@ -1789,8 +1805,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 newRequest.put(ARG_DECORATE, "false");
             }
 
-            String link = getHtmlOutputHandler().getEntriesList(newRequest, sb,
-                              children, true, false, showDetails);
+            String link = getHtmlOutputHandler().getEntriesList(newRequest,
+                              sb, children, true, false, showDetails);
             if (Misc.getProperty(props, "form", false)) {
                 return link + HtmlUtils.br() + sb.toString();
             } else {
