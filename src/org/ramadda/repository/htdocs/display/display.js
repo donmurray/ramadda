@@ -316,7 +316,14 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 if(!this.hasData()) {
                     return;
                 }
-                var selectedField = this.getProperty(PROP_FIELDS,null);
+                var fixedFields = this.getProperty(PROP_FIELDS);
+                if(fixedFields!=null) {
+                    if(fixedFields.length==0) {
+                        fixedFields = null;
+                    } 
+                }
+
+
                 
                 var html =  null;
                 var checkboxClass = this.getId() +"_checkbox";
@@ -340,8 +347,8 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                         var idBase = "cbx_" + collectionIdx +"_" +i;
                         field.checkboxId  = this.getDomId(idBase);
                         var on = false;
-                        if(selectedField!=null) {
-                            on = (selectedField == field.getId());
+                        if(fixedFields!=null) {
+                            on = (fixedFields.indexOf(field.getId())>=0);
                         } else {
                             if(this.selectedCbx.indexOf(idBase)>=0) {
                                 on = true;
@@ -396,7 +403,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                     }
                 }
 
-                if(fixedFields !=null) {
+                if(fixedFields !=null && fixedFields.length>0) {
                     return df;
                 }
 
