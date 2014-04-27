@@ -47,7 +47,19 @@
      <property name="icon" value="/media/pictures.png"/>
      <wiki><![CDATA[
 {{noheading}}
+{{description}}
 {{gallery columns="4"}}
+]]>
+</wiki>
+</type>
+
+
+  <type name="media_imageloop"  description="Image Loop" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Information">
+     <property name="icon" value="/media/film.png"/>
+     <wiki><![CDATA[
+{{noheading}}
+{{description}}
+{{imageplayer}}
 ]]>
 </wiki>
 </type>
