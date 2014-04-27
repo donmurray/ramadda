@@ -96,7 +96,7 @@ public class CsvImporter extends ImportHandler {
      * @throws Exception _more_
      */
     @Override
-    public InputStream getStream(Request request, String fileName,
+        public InputStream getStream(Request request, Entry parent, String fileName,
                                  InputStream stream)
             throws Exception {
         if ( !request.getString(ARG_IMPORT_TYPE, "").equals(TYPE_CSV)) {

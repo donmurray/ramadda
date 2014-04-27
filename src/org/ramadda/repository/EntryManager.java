@@ -4547,7 +4547,7 @@ public class EntryManager extends RepositoryManager {
                         for (ImportHandler importHandler :
                                 getRepository().getImportHandlers()) {
                             InputStream newStream =
-                                importHandler.getStream(request, entryName,
+                                importHandler.getStream(request, parent, entryName,
                                     entriesStream);
                             if (newStream != null) {
                                 entriesStream = newStream;
@@ -4582,7 +4582,7 @@ public class EntryManager extends RepositoryManager {
                 //Check the import handlers
                 for (ImportHandler importHandler :
                         getRepository().getImportHandlers()) {
-                    InputStream newStream = importHandler.getStream(request,
+                    InputStream newStream = importHandler.getStream(request, parent,
                                                 file, entriesStream);
                     if ((newStream != null) && (newStream != entriesStream)) {
                         entriesStream = newStream;

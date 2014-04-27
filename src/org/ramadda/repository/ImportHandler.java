@@ -90,7 +90,7 @@ public abstract class ImportHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public InputStream getStream(Request request, String fileName,
+    public InputStream getStream(Request request, Entry parent, String fileName,
                                  InputStream stream)
             throws Exception {
         return null;

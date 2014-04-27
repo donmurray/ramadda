@@ -77,7 +77,7 @@ public class OwlConverter extends ImportHandler {
      * @throws Exception _more_
      */
     @Override
-    public InputStream getStream(Request request, String fileName,
+        public InputStream getStream(Request request, Entry parent, String fileName,
                                  InputStream stream)
             throws Exception {
         String  ext   = IOUtil.getFileExtension(fileName);
