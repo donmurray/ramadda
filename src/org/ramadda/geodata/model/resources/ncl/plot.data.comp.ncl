@@ -17,36 +17,6 @@ load "$NCL_RESOURCES/kml.ncl"
 load "$NCL_RESOURCES/remove_middle_contours.ncl"
 ;************************************************
 
-;*********************************************************
-; Function: maxmin
-;
-; Purpose:  Compute the maxmin of a field
-;
-; Params: data:  data to look at
-;         equalize:  make max min reciprocal (-max = min)
-;
-; Return: array of (min,max)
-;********************************************************
-undef("maxmin")
-function maxmin(data, equalize:logical)
-
-local maxX,minX
-
-begin
-
-  minX = ceil(min(data))
-  maxX = floor(max(data))
-  if (equalize) then
-    if (abs(minX) .gt. maxX) then
-       maxX = abs(minX)
-    else
-      minX = -maxX
-    end if
-  end if
-  return (/minX,maxX/)
-
-end
-
 ;*************************************************
 ; Function: changeUnits
 ;
@@ -333,29 +303,6 @@ begin
 
 end
 
-;*************************************
-; Function: areaavg_data
-;
-; Purpose:  Make an area average of the data
-;
-; Params:   data - map data 
-;
-; Return:   area average of the data
-;*************************************
-undef("areaavg_data")
-function areaavg_data(data:float)
-
-local lat1,rad,clat1,data_FieldAvg_wgt
-
-begin
-  lat1=data&lat
-  rad    = 4.0*atan(1.0)/180.0
-  ; weighted Area Mean (use the cosine of the latitudes for weight)
-  clat1   = cos(lat1*rad)
-  data_FieldAvg_wgt = wgt_areaave_Wrap(data, clat1, 1.0, 0)
-  return data_FieldAvg_wgt
-end
-
 ;************************************************
 ; Function:  remapData
 ;
@@ -499,7 +446,7 @@ begin
   rescf@gsnAddCyclic          = False
   rescf@mpMinLatF            = opts@minLat       ; range to zoom in on
   rescf@mpMaxLatF            = opts@maxLat
-  if (.not. usepolar) then 
+  if (.not. usepolar .or. doGoogle) then 
     rescf@mpMinLonF            = opts@minLon
     rescf@mpMaxLonF            = opts@maxLon
     centerLonF         = (opts@maxLon + opts@minLon)/2
@@ -955,186 +902,6 @@ begin
 
 end
 
-
-
-;*********************************************************
-; Procedure:  plotts
-; 
-; Purpose:    Plot a time series
-;
-; Params:     files - files to use for time series
-;             wks_name - name of the workstation
-;             wkx_type - type of image output
-;             opts     - holder for passed in options
-;*********************************************************
-
-undef("plotts")
-procedure plotts(files[*]:string, wks_name:string, wks_type:string, opts:logical)
-
-begin
-
-  numfiles = dimsizes(files)
-  data = areaavg_data(readdata(files(0), opts))
-  ;printVarSummary(data)
-
-  ;--- get the time dimension
-  tdim = data&time
-  ;printVarSummary(tdim)
-  tnum = dimsizes(tdim);
-  endindex = tnum(0)-1
-  cals = ut_calendar(tdim,-5)
-  yrs = cals(:,0)
-  ;print(yrs)
-  startYear = yrs(0)
-  endYear = yrs(tnum-1)
-  ;print(startYear)
-  ;print(endYear)
-
-  dodiff = opts@outtype .eq. "diff"
-  if (dodiff) then
-    plot_data = new((/1,tnum/),float)
-    if (numfiles .gt. 1) then
-      do i = 1,numfiles-1
-        nextdata = readdata(files(i),opts)
-        data2 = areaavg_data(nextdata)
-        ;printVarSummary(data2)
-        data = data-data2
-        delete(data2)
-        delete(nextdata)
-      end do
-      ;printVarSummary(data)
-    end if
-    plot_data(0,:) = data
-  else
-    plot_data = new((/numfiles,tnum/),float)
-    plot_data(0,:) = data
-    do i = 1,numfiles-1
-      nextdata = readdata(files(i),opts)
-      plot_data(i,:) = areaavg_data(nextdata)
-    end do
-  end if
-
-;  ; Gaussian smoothing (21yr)
-;  if (nyrs.ge.11) then
-;    data_FieldAvg_wgt_21yr = Gauss_Filter_Pad (data_FieldAvg_wgt,21)
-;  else
-;    data_FieldAvg_wgt_21yr = new(11,float,data@_FillValue)
-;  end if
-;   data_FieldAvg_wgt_21yr = runave(data_FieldAvg_wgt,1,0)
-
-  ;; ***  Create plot ***
-  ;; ***  create time series plot (overlay annual and 21yr Gauss smooth) ***
-  wks_type = "png"
-  wks_type@wkWidth = 800
-  wks_type@wkHeight = 600
-  wks = gsn_open_wks(wks_type,wks_name)
-
-  res                   = True
-  res@gsnDraw           = False         ; Don't draw plots (for overlay)
-  res@gsnFrame          = False         ; don't advance frame yet
-
-  res@tiMainFontHeightF   = 0.025
-  res@tiMainFontThicknessF=.8
-  res@tiMainString        = data@long_name
-  res@txFontHeightF   = 0.017
-  res@gsnLeftString     = "area-weighted average: lat ( "+opts@minLat+" to "+opts@maxLat+" ), lon ( "+opts@minLon+" to "+opts@maxLon+" )"
-  res@tiYAxisFontHeightF = 0.025
-  res@tiYAxisString   = data@units
-  res@tiXAxisFontHeightF = 0.025
-  res@tiXAxisString   = "Year"
-
-  res@gsnMaximize   =True
-  res@vpHeightF= 0.8                    ; change aspect ratio of plot
-  res@vpWidthF = 0.9
-  res@vpXF     = 0.1                   ; start plot at x ndc coord
-
-  res@xyLineThicknesses = 0.5
-  ;res@xyDashPattern = 1               ; dashed/solid(=0)
-  res@trXMinF = startYear-1		; set minimum X-axis value
-  res@trXMaxF = endYear+1		; set maximum X-axis value
-
-  res@xyLineColors      = (/"black"/)
-
-  plot1  = gsn_csm_xy(wks,yrs,plot_data,res) ; create plot
-
-  draw(plot1)
-
-  ; add text
-  addAnnotation(wks,opts@annotation)
-
-  frame(wks)
-    
-  delete(wks) ;; closing the file
-  delete(plot1)
-;  addLogo(wks_name,logoFilePath)
-
-end
-
-;*********************************************************
-; Procedure;  plotpdf
-;
-; Purpose:    Plot a Probability Distribution Function (PDF)
-;
-; Params:    files - files to use for time series
-;            wks_name - name of the workstation
-;            wkx_type - type of image output
-;            opts     - holder for passed in options
-;*********************************************************
-
-undef("plotpdf")
-procedure plotpdf(files[*]:string, wks_name:string, wks_type:string, opts:logical)
-
-begin
-  ;printVarSummary(data)
-  ; weighted Area Mean (use the cosine of the latitudes for weight)
-  myfile = files(0)
-  data = readdata(myfile, opts)
-  lat1   = data&lat
-  rad    = 4.0*atan(1.0)/180.0
-  clat1   = cos(lat1*rad)
-  data_FieldAvg_wgt = wgt_areaave(data, clat1, 1.0, 0)
-  ;printVarSummary(data_FieldAvg_wgt)
-  std_FieldAvg = dim_standardize(data_FieldAvg_wgt, 0)
-
-  pdfdata = pdfx(std_FieldAvg, 6, False)
-  ;printVarSummary(pdfdata)
-
-  ;; ***  Create plot ***
-  wks_type = "png"
-  wks_type@wkWidth = 800
-  wks_type@wkHeight = 600
-  wks = gsn_open_wks(wks_type,wks_name)
-
-
-  res                   = True
-  res@gsnDraw           = False         ; Don't draw plots (for overlay)
-  res@gsnFrame          = False         ; don't advance frame yet
-
-  res@tiMainString        = "PDF of " + opts@variable 
-  res@txFontHeightF   = 0.017
-
-  res@gsnMaximize   =True
-  res@vpHeightF= 0.4                    ; change aspect ratio of plot
-  res@vpWidthF = 0.8
-  res@vpXF     = 0.1                   ; start plot at x ndc coord
-
-
-  plot1  = gsn_csm_xy(wks,pdfdata@bin_center,pdfdata,res) ; create plot
-
-  draw(plot1)
-
-  ; add text
-  addAnnotation(wks,opts@annotation)
-
-  frame(wks)
-    
-  delete(wks) ;; closing the file
-  delete(plot1)
-;  addLogo(wks_name,logoFilePath)
-
-end
-
-
 ;**************************************************
 ; Main routine
 ;**************************************************
@@ -1253,17 +1020,7 @@ begin
   options@cmax=cmax
   options@usepolar=usepolar
   
-  if (plotType.eq."timeseries") then
-    ;print("plotting timeseries")
-    plotts(ncfiles, wks_name, "png", options)
-  else if (plotType.eq."pdf") then
-    ;print("plotting map")
-    plotpdf(ncfiles, wks_name, "png", options)
-  else
-    ;print("plotting map")
-    plotmap(ncfiles, wks_name, "png", options)
-  end if
-  end if
+  plotmap(ncfiles, wks_name, "png", options)
   
   status_exit(0)
 
