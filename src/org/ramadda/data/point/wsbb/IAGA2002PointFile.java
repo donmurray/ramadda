@@ -20,15 +20,11 @@
 
 package org.ramadda.data.point.wsbb;
 
-
 import org.ramadda.data.point.*;
 import org.ramadda.data.point.text.*;
 import org.ramadda.data.record.*;
-
 import ucar.unidata.util.StringUtil;
-
 import java.io.*;
-
 import java.util.List;
 
 
@@ -37,6 +33,10 @@ import java.util.List;
  * A file reader for IAGA2002 formatted geomagnetic data
  * run:
  * java org.ramadda.data.point.geomag.IAGA2002PointFile  examples/abk20130725vmin.min
+ *
+ * The RAMADDA entry type for this file is defined in the point plugin:
+ * src/org/ramadda/geodata/point/resources/geomagtypes.xml
+ *
  */
 public class IAGA2002PointFile extends CsvFile {
 
