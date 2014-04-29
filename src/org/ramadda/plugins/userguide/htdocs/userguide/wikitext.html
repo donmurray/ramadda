@@ -516,9 +516,27 @@ You can also:
 </ul>
 
 
+<a name="virtual_group"></a>
 <h3>Virtual Groups</h3>
 
-If you are using a search in a virtual entry then in the Entry IDs field you enter the search parameters one per line. Don't forget to end this with &quot;search&quot; as that invokes the search.  e.g.:
+RAMADDA provides a "Virtual Group" entry type. This acts as a Folder except a set of entry IDs or searches can be specified. There are a number of examples available <a href="http://ramadda.org/repository/entry/show/Home/RAMADDA+Examples/Miscellany/Virtual+Groups?entryid=f5ccdc47-62f7-481a-b67d-bf76e5b34359">here</a>.
+
+The Entry IDs field of the Virtual Group can be a list of specific entries, e.g.:
+<pre>
+67259186-574e-4453-a2af-969e1cf658c8
+f5ccdc47-62f7-481a-b67d-bf76e5b34359
+...
+</pre>
+
+If an entry id has a "+" prefix then the children entries of the specified entry is used
+<pre>
++67259186-574e-4453-a2af-969e1cf658c8
++f5ccdc47-62f7-481a-b67d-bf76e5b34359
+...
+</pre>
+
+
+You can also specify a  search.  This is a set of search terms followed by  &quot;search&quot;. You can specify text to search for, the entry type, spatial bounds and date based search.
 <pre>
 search.text=text to search
 search.type=entry type

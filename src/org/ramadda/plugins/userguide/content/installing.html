@@ -16,14 +16,17 @@ There are a few things you need to figure out to install RAMADDA:
 RAMADDA  can run <a href="#standalone">stand alone</a> or under 
 a servlet container like <a href="#tomcat">Tomcat</a>. 
 
+<p>
 
 <li> Where is RAMADDA going to store files? <br>
 RAMADDA needs a <a href="#home">home directory</a> on your server to store files, databases, etc.
 
+<p>
 
 <li> What  database are you going to use? <br>
 RAMADDA comes with its own built-in  database  (Java Derby) but 
 can be easily <a href="database.html">configured</a> to use other databases.
+<p>
 
 <li> Configure RAMADDA<br>
 <ul>
@@ -35,10 +38,14 @@ If you are running on your local machine you go to:<pre>
 <a href="http://localhost:8080/repository">http://localhost:8080/repository</a>
 </pre>
 
+<p>
+
 <li> <b>Important!</b>. For security you really should configure <a href="#ssl">https (SSL) </a> access. 
 
+<p>
 <li>  Do further  <a href="#configuration">site configuration</a>.
 
+<p>
 <li> During the installation process you can install a common set of plugins to RAMADDA that provide additional functionality.
 There are other <a href="releasenotes.html#plugins">plugins</a> available as well.
 </ol>
@@ -54,8 +61,10 @@ Download the latest release from the
 <a href="http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>">RAMADDA SourceForge</a> site -  
 <a href="http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/ramadda<%ramadda.version%>.zip/download">ramadda<%ramadda.version%>.zip</a> 
 
+<p>
 <li> Unzip the file and consult the README.
 
+<p>
 <li> Or, skip reading the documentation (like everyone else does) and jump right in and start RAMADDA. 
 
 Figure out where you want RAMADDA to store files in its <a href="#home">home directory</a> (default is <i>&lt;your home dir&gt;/.ramadda</i>). Then just run the script in the ramadda<%ramadda.version%> directory.
@@ -64,6 +73,7 @@ Figure out where you want RAMADDA to store files in its <a href="#home">home dir
    sh ramadda.sh -Dramadda_home=&lt;/ramadda/home/dir&gt;
 </pre>
 
+<p>
 
 <li> The rest of the RAMADDA configuration is done through the web at
 <a href="http://localhost:8080/repository">http://localhost:8080/repository</a>.
@@ -83,6 +93,7 @@ This assumes you have Tomcat or some other servlet (e.g., Glassfish) container a
 <li> First,  download the
 <a href="http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/repository.war/download">repository.war</a> from the <a href="http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>">RAMADDA SourceForge</a> site. 
 
+<p>
 
 <li> Specify the location of the  RAMADDA <a href="#home">home directory</a> by setting the property ramadda_home=/home/dir. 
 Either set this as an environmental or Java run time variable as  a property 
@@ -91,9 +102,11 @@ in a <i>repository.properties</i> in the ${CATALINA_HOME}/conf directory.
 
 <li> To run under Tomcat just place the repository.war in the tomcat webapps directory. 
 
+<p>
 <li> Go to the /repository page in your browser to continue the installation process, e.g.:
 http://&lt;server&gt;/repository
 
+<p>
 <li> 
 By default the repository is accessed at /repository on the web server. 
 With Tomcat the top-level path can only be a single level and
