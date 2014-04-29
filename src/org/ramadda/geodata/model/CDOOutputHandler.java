@@ -1049,13 +1049,15 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
             double lonMax =
                 Double.parseDouble(request.getString(ARG_CDO_AREA_EAST,
                     "180"));
-            if (origLonMin < 0) {  // -180 to 180
-                lonMin = GeoUtils.normalizeLongitude(lonMin);
-                lonMax = GeoUtils.normalizeLongitude(lonMax);
-            } else {               // 0-360
-                lonMin = GeoUtils.normalizeLongitude360(lonMin);
-                lonMax = GeoUtils.normalizeLongitude360(lonMax);
-            }
+            // TODO: do we need to do this?  CDO seems to handle 
+            // the -180 to 180 vs 0 to 360 subsetting okay.
+//            if (origLonMin < 0) {  // -180 to 180
+//                lonMin = GeoUtils.normalizeLongitude(lonMin);
+//                lonMax = GeoUtils.normalizeLongitude(lonMax);
+//            } else {               // 0-360
+//                lonMin = GeoUtils.normalizeLongitude360(lonMin);
+//                lonMax = GeoUtils.normalizeLongitude360(lonMax);
+//            }
             llSelect = OP_SELLLBOX + "," + String.valueOf(lonMin) + ","
                        + String.valueOf(lonMax) + ","
             //+ request.getString(ARG_CDO_AREA_WEST, "-180") + ","
