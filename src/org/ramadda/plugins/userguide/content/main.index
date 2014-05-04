@@ -27,6 +27,11 @@ index.html
 >>pagestyle.html
 
 
+>title:Data ingest,  harvesters and import
+>>dataingest.html
+>>entryxml.html
+>>harvesters.html
+
 >title:Geodata Facilities
 #>>pointdata.html
 >>gridsubset.html
@@ -37,7 +42,6 @@ index.html
 >title:Installation and Site Administration:These pages are intended for Site Administrators
 >>installing.html
 >>database.html
->>quickinstall.html
 >>readonly.html
 >>plugins.html
 >>templates.html
@@ -45,7 +49,6 @@ index.html
 >>adminusers.html
 >>adminmisc.html
 >>backups.html
->>harvesters.html
 >>remoteservers.html
 
 

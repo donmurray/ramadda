@@ -1,20 +1,20 @@
 <html>
 <head>
-<title>Publish API</title>
-  <link rel="stylesheet" type="text/css" href="../default.css" title="Style">
+<title>Entry Xml Import/Export Format</title>
+  <link rel="stylesheet" type="text/css" href="./default.css" title="Style">
 
 </head>
 
 <body>
 <table width=100% cellspacing=0 cellpadding=0 ><tr><td width=30%>
-<a href="searchapi.html"><img src="../images/PreviousArrow.gif" border="0"   alt="Previous: Search API" title="Previous: Search API"></a> <a href="developer.html"><img src="../images/NextArrow.gif" border="0"   alt="Next: RAMADDA Developer Notes" title="Next: RAMADDA Developer Notes"></a>  <a href="../toc.html#developer/publishapi.html"><img src="../images/TOCIcon.gif" border="0"   alt="Table of contents" title="Table of contents"></a>
+<a href="dataingest.html"><img src="images/PreviousArrow.gif" border="0"   alt="Previous: Data Ingest" title="Previous: Data Ingest"></a> <a href="harvesters.html"><img src="images/NextArrow.gif" border="0"   alt="Next: Harvesters" title="Next: Harvesters"></a>  <a href="toc.html#entryxml.html"><img src="images/TOCIcon.gif" border="0"   alt="Table of contents" title="Table of contents"></a>
 </td>
 <td width=40% align=center>
 <div class="pagetitle">RAMADDA User Guide</div>
 </td>
 <td width=30%>&nbsp;</td>
 </tr></table>
-<div class="pagetitle">14.6 Publish API</div>
+<div class="pagetitle">11.1 Entry Xml Import/Export Format</div>
 
 <style type="text/css">
 pre {
@@ -24,63 +24,59 @@ pre {
 
 
 
-You can programmatically create new entries on a RAMADDA server. There is a  Java class, ucar.unidata.repository.RepositoryClient, 
-that provides some of the facilities.  You can also look at the ucar.unidata.repository.idv.RamaddaPublisher which is used within the 
-IDV to publish content to RAMADDA. This class uses the ucar.unidata.repository.InteractiveRepositoryClient class that provides some 
-GUI facilities (e.g., a folder JTree component).
 
-<p>
+RAMADDA supports a simple import/export xml format. 
 
 
-
-
-
-
-
-Lets say you want to upload a file (e.g., test.png) to RAMADDA. First you need to establish a session with RAMADDA.
-You can just do a url get with:
 <pre>
-https://&lt;server&gt;:&lt;https port&gt;/repository/user/login?output=xml&user.password=&lt;password&gt;&user.id=&lt;user&gt;
-Or if you don't have https:
-http://&lt;server&gt;/repository/user/login?output=xml&user.password=&lt;password&gt;&user.id=&lt;user&gt;
-</pre> 
+ &lt;entries&gt;
+  &lt;entry name="test.png" 
+            description=""  
+            type="file" 
+            id="0" 
+            file="test.png"  
+            parent="&lt;some parent entry id&gt;" 
+            south="-7.926" 
+            west="-198.358"
+            north="71.864" 
+            east="-3.950"
+            fromdate="2008-08-19 16:01:00 GMT"
+            todate="2008-08-19 16:01:00 GMT" 
 
-
-
-The output=xml tells RAMADDA to return the result as xml.
-<p>
-The above request returns xml of the form:
-<pre>
-&lt;response code="ok"&gt;
-sessionid
-&lt;/response&gt;
+&lt;/entries&gt;
 </pre>
 
-Or if there was an error:
+A simple way to see the example entry xml is to create a folder or file entry  in RAMADDA. 
+Set its description, time, spatial bounds, etc and add a number of properties to it.
+Or create a tree of folders and files.
+Then do File->Export. Uzip the .zip file and look at the entries.xml
+
+
+
+<ul>
+<li> The type attribute is the data types available in RAMADDA. Its best to stay with file and group. 
+<li> The parent is the actual parent id in RAMADDA.
+<li> The fromdata, todate, south, west, east, north and description are all optional. 
+<li> The id attribute will not be the actual id of the entry but allows you to reference the entries elsewhere. For example, you
+could create a folder entry and then another entry that is a child of the folder:
 <pre>
-&lt;response code="error"&gt;
-some error message
-&lt;/response&gt;
-</pre>
+ &lt;entries&gt;
+  &lt;entry name="Some folder" 
+            id="somedummyid0"
+            parent="&lt;some parent entry id&gt;" 
+            type="group"  /&gt;
 
-
-Subsequent posts to RAMADDA just require an extra argument:
-<pre>sessionid=&lt;sessionid&gt;</pre>
-
-You can also use   RepositoryClient code:
-<pre>
-  RepositoryClient client = new RepositoryClient(server, 80, "/repository", userId,password);
-  String[] msg = { "" };
-  if (client.isValidSession(true, msg)) {
-       System.err.println("Valid session");
-   } else {
-        System.err.println("Invalid session:" + msg[0]);
-   }
+  &lt;entry name="test.png" 
+            description=""  
+            type="file" 
+            id="somedummyid1" 
+            file="test.png"  
+            parent="somedummyid0"  /&gt;
+&lt;/entries&gt;
 </pre>
 
 
-
-Next, create an <a href="../entryxml.html">entry xml</a> file that defines the entries you want to create.  
+</ul>
 
 <p>
 Now, zip up this xml file along with the file you want to upload and then post the zipped file to:
@@ -154,7 +150,7 @@ With its response:
 </pre>
 
 
-<a name="metadata"></a><div class="pagesubtitle">14.6.0 Metadata</div> 
+<a name="metadata"></a><div class="pagesubtitle">11.1.0 Metadata</div> 
 
 You can also create metadata (or properties) in the XML.
 
@@ -221,12 +217,12 @@ you have encoded=false.
 
 <p>
 <div  class="childlist" ><table  width="100%" ><tr  valign="top" ><td  width="10%"  align="right" ><span  class="childlist-level" >
-14.6.0&nbsp;
-</span></td><td><a  class="childlist-link"  href="publishapi.html#metadata" >
+11.1.0&nbsp;
+</span></td><td><a  class="childlist-link"  href="entryxml.html#metadata" >
 Metadata
 </a><br></td></tr></table></div>
 <p>&nbsp;<p>
-<a href="searchapi.html"><img src="../images/PreviousArrow.gif" border="0"   alt="Previous: Search API" title="Previous: Search API"></a> <a href="developer.html"><img src="../images/NextArrow.gif" border="0"   alt="Next: RAMADDA Developer Notes" title="Next: RAMADDA Developer Notes"></a>  <a href="../toc.html#developer/publishapi.html"><img src="../images/TOCIcon.gif" border="0"   alt="Table of contents" title="Table of contents"></a>
+<a href="dataingest.html"><img src="images/PreviousArrow.gif" border="0"   alt="Previous: Data Ingest" title="Previous: Data Ingest"></a> <a href="harvesters.html"><img src="images/NextArrow.gif" border="0"   alt="Next: Harvesters" title="Next: Harvesters"></a>  <a href="toc.html#entryxml.html"><img src="images/TOCIcon.gif" border="0"   alt="Table of contents" title="Table of contents"></a>
 <p>
 
 </body>
