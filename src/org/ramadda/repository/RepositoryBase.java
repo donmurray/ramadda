@@ -470,7 +470,8 @@ public class RepositoryBase implements Constants, RepositorySource {
             return getHttpProtocol() + "://" + hostname + ":" + getPort()
                    + url;
         }
-        if (port == 0) {
+        //Don't include the default https port in the url 
+        if (port == 0 || port == 443) {
             return "https://" + hostname + url;
         } else {
             return "https://" + hostname + ":" + port + url;

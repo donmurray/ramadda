@@ -175,7 +175,7 @@ public class MapManager extends RepositoryManager {
         sb.append("\n");
         sb.append(
             HtmlUtils.importJS(
-                "http://maps.google.com/maps/api/js?v=3.5&amp;sensor=false"));
+                "https://maps.google.com/maps/api/js?v=3.5&amp;sensor=false"));
         sb.append("\n");
         sb.append(
             HtmlUtils.importJS(getRepository().htdocsUrl("/ramaddamap.js")));
@@ -377,7 +377,7 @@ public class MapManager extends RepositoryManager {
             request.putExtraProperty("ge.inited", "true");
             //Don't need the maps key (I think)
             //            sb.append(HtmlUtils.importJS("http://www.google.com/jsapi" + mapsKey));
-            sb.append(HtmlUtils.importJS("http://www.google.com/jsapi"));
+            sb.append(HtmlUtils.importJS("https://www.google.com/jsapi"));
             sb.append(
                 HtmlUtils.importJS(
                     getRepository().htdocsUrl("/google/googleearth.js")));
