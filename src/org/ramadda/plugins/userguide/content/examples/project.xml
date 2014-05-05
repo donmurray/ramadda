@@ -1,0 +1,11 @@
+<entries>
+  <entry  name="Example Project" type="project_project" east="-103.359" fromdate="2013-11-21 11:58:11 UTC" id="theproject"   north="40.17" parent="" south="32.833" todate="2013-11-21 11:58:11 UTC"  west="-111.094">
+    <project_id encoded="false"><![CDATA[some id]]></project_id>
+    <status encoded="false"><![CDATA[active]]></status>
+    <project_type encoded="false"><![CDATA[airborne]]></project_type>
+    <location encoded="false"><![CDATA[some location]]></location>
+    <notes encoded="false"><![CDATA[some notes]]></notes>
+  </entry>
+  <entry  name="Dataset 1" parent="theproject" type="project_dataset"/>
+  <entry  name="Dataset 2" parent="theproject" type="project_dataset"/>
+</entries>

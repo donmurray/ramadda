@@ -3,6 +3,8 @@
 index.html
 >releasenotes.html
 -examples/folder.xml
+-examples/project.xml
+-examples/glossary.xml
 -repository.dummy_properties
 -map.html
 >overview.html

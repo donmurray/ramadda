@@ -37,8 +37,8 @@ Then do File->Export. Uzip the .zip file and look at the entries.xml
 
 
 <ul>
-<li> The type attribute is the data types available in RAMADDA. Its best to stay with file and group. 
-<li> The parent is the actual parent id in RAMADDA.
+<li> The type attribute is the data types available in RAMADDA. 
+<li> The parent is the actual parent id in RAMADDA or may be an id of another entry defined in the XML file.
 <li> The fromdata, todate, south, west, east, north and description are all optional. 
 <li> The id attribute will not be the actual id of the entry but allows you to reference the entries elsewhere. For example, you
 could create a folder entry and then another entry that is a child of the folder:
@@ -73,6 +73,7 @@ In that case instead of a file= attribute in the xml use url=, e.g.,:
             parent="&lt;some parent entry id&gt;" 
 &lt;/entries&gt;
 </pre>
+
 
 
 
