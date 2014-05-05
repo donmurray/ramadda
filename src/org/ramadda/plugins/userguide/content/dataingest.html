@@ -7,60 +7,98 @@
 <body>
 
 
+There are lots of ways of getting information and data ingested into RAMADDA. 
+It is often the case that you have a large collection of files organized in some fashion on your server that 
+you would like to ingest into RAMADDA.
 
 
-<a name="localfiles"></a>
-<h2>Accessing your data</h2>
 
-You can create and organize content in RAMADDA in a number of ways but we'll show you how to provide access 
-to data that is already on your server.
 
-<ul>
 
-<li> Now, lets assume you have a data directory on your server, e.g., <i>/data/ldm</i>
+<a name="fileaccess"></a>
+<h2>Accessing server side files</h2>
 
-<li> First, we need to tell RAMADDA that it is OK to provide access to that area of your file system. 
+RAMADDA contains a white list of file system directories that it allows access to. 
+When you have files on your server that you want to ingest into RAMADDA you need to 
+specify the directories. 
+<p>
+Assuming you have a data directory on your server, e.g., <i>/mnt/data</i>:
+
 <ul>
 
 <li> Go to the site Administration pages from the &quot;Admin&quot; link:
 
 [ht::cimg images/quick/adminlink.gif {} {border=0}]
 
-<li> Open the  &quot;Access &quot; section and enter the data directory, e.g., /data/ldm, in the &quot;File system access&quot; field and press Change Settings:
+<li> Open the  &quot;Access &quot; section and enter the data directory, e.g., /mnt/data, in the &quot;File system access&quot; field and press Change Settings:
 
 [ht::cimg images/quick/access.gif {} {border=0}]
 
 </ul>
 
-<li> Now you need to create an entry that provides access to that data.
+
+
+<a name="serverfiles"></a>
+<h2>Server Side File Entry</h2>
+
+If you have a very large set of files or you have a set of files that are changing all of the time (e.g,, real-time feeds)
+it might not be practical or possible to have RAMADDA ingest each and every file. However, you can provide RAMADDA access 
+to these files by creating a Server Side File Entry. 
+
 
 <ul>
-<li> Go to the top-level entry in RAMADDA (the &quot;Top&quot; link in the upper left).
+<li> Go to the some destination folder  in RAMADDA
 
 <li> Select &quot;New Entry&quot; under the File menu.
 
-<li> In the &quot;Or create a&quot; list choose Local File View and press Go:
-[ht::cimg images/quick/createentry.gif {} {border=0}]
+<li> Under the  &quot;General&quot; list choose Server Side Files.
 
+<li>  This will take you to the Server Side File View Entry create form. 
+Enter a name, the server file path and any patterns  to use to include or exclude specific files.
 
-<li>  This will take you to the Local File View Entry create form. Enter a name, the file path and that
-patterns  that match the files you want to exclude. When done press &quot;Add Local File View&quot;
-[ht::cimg images/quick/localfileview.gif {} {border=0}]
-
-Note: If you are providing access to your LDM/IDD data feed and you are also getting the NLDN lightning data and/or the ACARS feed make sure
-you exclude those directories and files.
-
-
-<li> Congratulations you are done! To access your server from Unidata's Integrated Data View (IDV) go to the top level entry, click on the 
-View menu and copy the &quot;Catalog&quot; link into the IDV's catalog data chooser.
-
-
+<li> Once created all of the  entries  shown under the new entry are dynamic and are not stored
+in the RAMADDA database.
 </ul>
 
 
-</ul>
 
 
+
+<a name="infoarch"></a>
+<h2>Data and project organization</h2>
+
+There are a number of contstructs provided by RAMADDA to help you create and organize your information and data.
+
+You might have, for example, a directory tree like:
+<pre>
+Dataset_1
+     datafile1.suff
+     datafile2.suff
+     ...
+Dataset_2
+     datafile1.suff
+     datafile2.suff
+...
+</pre>
+
+
+
+For the directories RAMADDA would create generic Folder entries. You can specify a different type (e.g., Dataset) in an entry xml file.
+
+
+For a given file RAMADDA will look for the following entry xml file in its parent directory:
+<pre>
+.&lt;filename&gt;.ramadda.xml
+.dir.ramadda.xml
+.file.ramadda.xml
+.ramadda.xml
+</pre>
+
+A directory can also contain its own entry xml file:
+
+<pre>
+.this.ramadda.xml 
+</pre>
 
 
 

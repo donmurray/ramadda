@@ -61,26 +61,6 @@ could create a folder entry and then another entry that is a child of the folder
 
 </ul>
 
-<p>
-Now, zip up this xml file along with the file you want to upload and then post the zipped file to:
-<pre>http://&lt;server&gt;/repository/entry/xmlcreate</pre>
-
-
-Include the arguments:
-<pre>
-output=xml
-sessionid=&lt;sessionid&gt;
-file=thezipfile
-</pre>
-
-
-Note: an alternative way to specify the destination parent entry in the repository is to pass the entry id
-in as a URL argument:
-<pre>
-group=<i>some parent entry id</i> 
-</pre>
-
-
 
 If you are not uploading files you can just post the xml file instead of the zip file.
 In that case instead of a file= attribute in the xml use url=, e.g.,:
@@ -96,23 +76,6 @@ In that case instead of a file= attribute in the xml use url=, e.g.,:
 
 
 
-Either way, you will get back the response xml with either code=ok and a list of the entry ids created:
-<pre>
-&lt;response code="ok"&gt;
-  &lt;entry id="1219161636252_0.6145187911490728_17"/&gt;
-&lt;/response&gt;
-</pre>
-
-Or an error response:
-<pre>
-&lt;response code="error"&gt;
-error message
-&lt;/response&gt;
-</pre>
-
-
-Here is a longer version of an entries file:
-
 
 
 <pre>
@@ -123,14 +86,6 @@ Here is a longer version of an entries file:
 &lt;/entries&gt;
 </pre>
 
-With its response:
-<pre>
-&lt;response code="ok"&gt;
-  &lt;entry id="1219161636252_0.5912686911125428_33"/&gt;
-  &lt;entry id="1219161636252_0.34475975368841827_34"/&gt;
-  &lt;association id="1219161636252_0.18087075533515407_35"/&gt;
-&lt;/response&gt;
-</pre>
 
 
 <subhead intoc="false" id="metadata">Metadata</subhead>

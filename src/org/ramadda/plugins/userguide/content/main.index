@@ -2,6 +2,7 @@
 
 index.html
 >releasenotes.html
+-examples/folder.xml
 -repository.dummy_properties
 -map.html
 >overview.html
