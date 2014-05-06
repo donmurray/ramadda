@@ -519,54 +519,17 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
         if ((notfilePattern == null) && (notfilePatternString.length() > 0)) {
             notfilePattern = Pattern.compile(notfilePatternString);
         }
-        boolean gotAttributeInPattern = false;
+
+
 
 
         if ((filePattern == null) && (filePatternString != null)
                 && (filePatternString.length() > 0)) {
-            String       tmp     = filePatternString;
-            StringBuffer pattern = new StringBuffer();
+
             patternNames = new ArrayList<String>();
-            while (true) {
-                int openParenIdx = tmp.indexOf("(");
-                if (openParenIdx < 0) {
-                    pattern.append(tmp);
-
-                    break;
-                }
-                int closeParenIdx = tmp.indexOf(")");
-                if (closeParenIdx < openParenIdx) {
-                    pattern.append(tmp);
-
-                    break;
-                }
-                int colonIdx = tmp.indexOf(":");
-                if (colonIdx < 0) {
-                    pattern.append(tmp);
-
-                    break;
-                }
-                if (closeParenIdx < colonIdx) {
-                    pattern.append(tmp.substring(0, closeParenIdx + 1));
-                    patternNames.add("");
-                    tmp = tmp.substring(closeParenIdx + 1);
-
-                    continue;
-                }
-                pattern.append(tmp.substring(0, openParenIdx + 1));
-                String name = tmp.substring(openParenIdx + 1, colonIdx);
-                patternNames.add(name);
-                gotAttributeInPattern = true;
-                tmp                   = tmp.substring(colonIdx + 1);
-            }
-            //            System.err.println ("pattern:" + pattern);
-            //            System.err.println ("pattern names:" + patternNames);
-            if ( !gotAttributeInPattern) {
-                pattern      = new StringBuffer(filePatternString);
-                patternNames = new ArrayList<String>();
-            }
-
-            filePattern = Pattern.compile(pattern.toString());
+            String pattern = Utils.extractPatternNames(filePatternString,
+                                 patternNames);
+            filePattern = Pattern.compile(pattern);
             if (getTestMode()) {
                 getRepository().getLogManager().logInfo("orig pattern:"
                         + "  " + filePatternString);
@@ -1184,7 +1147,12 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
         }
 
 
-        String dirPath = f.getParent().toString();
+        String dirPath     = f.getParent().toString();
+
+        File   dirPathFile = new File(dirPath);
+        //        Entry dirTemplateEntry = getEntryManager().getTemplateEntry(dirPathFile);
+        //        System.err.println("Entry:" + dirTemplateEntry);
+
         dirPath =
             dirPath.substring(fileInfo.getRootDir().toString().length());
         dirPath = dirPath.replace("\\", "/");
