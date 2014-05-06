@@ -83,14 +83,14 @@ public class RecordFileFactory {
      * @throws Exception _more_
      */
     public void addPrototypes(String classListFile) throws Exception {
-        System.err.println ("file:" + classListFile);
+        //        System.err.println ("file:" + classListFile);
         for (String line :
                 StringUtil.split(IOUtil.readContents(classListFile,
                     getClass()), "\n", true, true)) {
             if (line.startsWith("#")) {
                 continue;
             }
-            System.err.println ("line:" + line);
+            //            System.err.println ("line:" + line);
             Class c = Misc.findClass(line);
             addPrototype((RecordFile) c.newInstance());
         }
