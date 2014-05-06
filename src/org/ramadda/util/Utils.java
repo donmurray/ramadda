@@ -809,12 +809,12 @@ public class Utils {
      *
      *
      * @version        $version$, Sat, Apr 12, '14
-     * @author         Enter your name here...    
+     * @author         Enter your name here...
      */
     private static class FileSizeCompare implements Comparator<IOUtil
         .FileWrapper> {
 
-        /** _more_          */
+        /** _more_ */
         private boolean ascending;
 
         /**
@@ -852,5 +852,62 @@ public class Utils {
         }
 
     }
+
+
+    /**
+     * _more_
+     *
+     * @param filePatternString _more_
+     * @param patternNames _more_
+     *
+     * @return _more_
+     */
+    public static String extractPatternNames(String filePatternString,
+                                             List<String> patternNames) {
+        List<String> names                 = new ArrayList<String>();
+        String       tmp                   = filePatternString;
+        StringBuffer pattern               = new StringBuffer();
+        boolean      gotAttributeInPattern = false;
+        while (true) {
+            int openParenIdx = tmp.indexOf("(");
+            if (openParenIdx < 0) {
+                pattern.append(tmp);
+
+                break;
+            }
+            int closeParenIdx = tmp.indexOf(")");
+            if (closeParenIdx < openParenIdx) {
+                pattern.append(tmp);
+
+                break;
+            }
+            int colonIdx = tmp.indexOf(":");
+            if (colonIdx < 0) {
+                pattern.append(tmp);
+
+                break;
+            }
+            if (closeParenIdx < colonIdx) {
+                pattern.append(tmp.substring(0, closeParenIdx + 1));
+                names.add("");
+                tmp = tmp.substring(closeParenIdx + 1);
+
+                continue;
+            }
+            pattern.append(tmp.substring(0, openParenIdx + 1));
+            String name = tmp.substring(openParenIdx + 1, colonIdx);
+            names.add(name);
+            gotAttributeInPattern = true;
+            tmp                   = tmp.substring(colonIdx + 1);
+        }
+        if ( !gotAttributeInPattern) {
+            pattern = new StringBuffer(filePatternString);
+            names   = new ArrayList<String>();
+        }
+        patternNames.addAll(names);
+
+        return pattern.toString();
+    }
+
 
 }
