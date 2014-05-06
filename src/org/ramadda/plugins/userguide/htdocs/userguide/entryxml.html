@@ -54,8 +54,8 @@ Then do File->Export. Uzip the .zip file and look at the entries.xml
 
 
 <ul>
-<li> The type attribute is the data types available in RAMADDA. Its best to stay with file and group. 
-<li> The parent is the actual parent id in RAMADDA.
+<li> The type attribute is the data types available in RAMADDA. 
+<li> The parent is the actual parent id in RAMADDA or may be an id of another entry defined in the XML file.
 <li> The fromdata, todate, south, west, east, north and description are all optional. 
 <li> The id attribute will not be the actual id of the entry but allows you to reference the entries elsewhere. For example, you
 could create a folder entry and then another entry that is a child of the folder:
@@ -79,35 +79,17 @@ could create a folder entry and then another entry that is a child of the folder
 </ul>
 
 
-If you are not uploading files you can just post the xml file instead of the zip file.
-In that case instead of a file= attribute in the xml use url=, e.g.,:
-<pre>
- &lt;entries&gt;
-  &lt;entry name="Some opendap url" 
-            type="file" 
-            id="0" 
-            url="the opendap url"  
-            parent="&lt;some parent entry id&gt;" 
-&lt;/entries&gt;
-</pre>
+<a name="import"></a><div class="pagesubtitle">11.1.0 Importing Entries</div> 
+
+
+Here is a simple <a href="examples/test.zip">test.zip</a> entries file that you can import. It contains a single file entry defined in an entries.xml file and its associated data file (test.txt). In your RAMADDA, go to File->Import Entries menu and you can upload a .zip file or the entries.xml directly.
 
 
 
 
+<a name="metadata"></a><div class="pagesubtitle">11.1.1 Metadata</div> 
 
-<pre>
-&lt;entries&gt;
-  &lt;entry description="" east="-3.950" file="test.xidv" fromdate="2008-08-19 16:01:00 GMT" id="0" name="test.png" north="71.864" parent="&lt;some parent entry id&gt;" south="-7.926" todate="2008-08-19 16:01:00 GMT" type="file" west="-198.358"/&gt;
-  &lt;entry east="-3.950" file="test.png" fromdate="2008-08-19 16:01:00 GMT" id="1" name="test.png - Product" north="71.864" parent="&lt;some parent entry id&gt;" south="-7.926" todate="2008-08-19 16:01:00 GMT" type="file" west="-198.358"/&gt;
-  &lt;association from="0" name="generated product" to="1"/&gt;
-&lt;/entries&gt;
-</pre>
-
-
-
-<a name="metadata"></a><div class="pagesubtitle">11.1.0 Metadata</div> 
-
-You can also create metadata (or properties) in the XML.
+The <a href="examples/folder.xml">folder.xml</a> example just defines a set of folders with associated metadata. 
 
 Inside the entry tag you can have any number of metadata tags. You define the type and the attribute values.
 
@@ -166,15 +148,72 @@ you have encoded=false.
 
 
 
+<a name="configuration"></a><div class="pagesubtitle">11.1.2 Harvest Configuration</div> 
+When <a href="harvesters.html">harvesting files</a> or configuring <a href="dataingest.html">Server Side Files</a> RAMADDA will look on the file system for an entry XML configuration file to use as a template when creating entries for the files and folders being ingested or displayed. For a given file RAMADDA will look for the following entry xml file in the file's parent directory:
+<pre>
+.&lt;filename&gt;.ramadda.xml
+.dir.ramadda.xml
+.file.ramadda.xml
+.ramadda.xml
+</pre>
 
+
+So if you had:
+<pre>
+dir1
+     file1.txt
+     file2.txt
+dir2
+</pre>
+
+
+The file types and metadata could be configured with:
+<pre>
+.dir1.ramadda.xml
+dir1
+     file1.txt
+     .file1.txt.ramadda.xml
+     file2.txt
+     .file2.txt.ramadda.xml
+.dir2.ramadda.xml
+dir2
+</pre>
+
+You could also place a single .ramadda.xml as a sibling file of dir1 and dir2 to configure their types.
+
+
+A directory can also contain its own entry xml file:
+
+<pre>
+.this.ramadda.xml 
+</pre>
+
+
+You could also have  .this.ramadda.xml for each directory:
+<pre>
+dir1
+     .this.ramadda.xml
+     file1.txt
+     file2.txt
+dir2
+     .this.ramadda.xml
+</pre>
 
 
 
 <p>
 <div  class="childlist" ><table  width="100%" ><tr  valign="top" ><td  width="10%"  align="right" ><span  class="childlist-level" >
 11.1.0&nbsp;
+</span></td><td><a  class="childlist-link"  href="entryxml.html#import" >
+Importing Entries
+</a><br></td></tr><tr  valign="top" ><td  width="10%"  align="right" ><span  class="childlist-level" >
+11.1.1&nbsp;
 </span></td><td><a  class="childlist-link"  href="entryxml.html#metadata" >
 Metadata
+</a><br></td></tr><tr  valign="top" ><td  width="10%"  align="right" ><span  class="childlist-level" >
+11.1.2&nbsp;
+</span></td><td><a  class="childlist-link"  href="entryxml.html#configuration" >
+Harvest Configuration
 </a><br></td></tr></table></div>
 <p>&nbsp;<p>
 <a href="dataingest.html"><img src="images/PreviousArrow.gif" border="0"   alt="Previous: Data Ingest" title="Previous: Data Ingest"></a> <a href="harvesters.html"><img src="images/NextArrow.gif" border="0"   alt="Next: Harvesters" title="Next: Harvesters"></a>  <a href="toc.html#entryxml.html"><img src="images/TOCIcon.gif" border="0"   alt="Table of contents" title="Table of contents"></a>

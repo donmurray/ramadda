@@ -7,34 +7,17 @@
 <body>
 
 
-There are lots of ways of getting information and data ingested into RAMADDA. 
-It is often the case that you have a large collection of files organized in some fashion on your server that 
-you would like to ingest into RAMADDA.
+
+Note: If you are trying to access files on your server you  need
+to first configure the <a href="admin.html#filesystemaccess">file access settings</a>.
 
 
+There are lots of ways of getting information and data ingested into RAMADDA.   
 
+If you have a large and/or dynamic collection of files that you want quick view only access try the 
+<a href="#serverfiles">Server Side File entry</a>. If you have a directory of data you want fully ingested you can use a 
+<a href="#harvester">harvester</a>.
 
-
-<a name="fileaccess"></a>
-<h2>Accessing server side files</h2>
-
-RAMADDA contains a white list of file system directories that it allows access to. 
-When you have files on your server that you want to ingest into RAMADDA you need to 
-specify the directories. 
-<p>
-Assuming you have a data directory on your server, e.g., <i>/mnt/data</i>:
-
-<ul>
-
-<li> Go to the site Administration pages from the &quot;Admin&quot; link:
-
-[ht::cimg images/quick/adminlink.gif {} {border=0}]
-
-<li> Open the  &quot;Access &quot; section and enter the data directory, e.g., /mnt/data, in the &quot;File system access&quot; field and press Change Settings:
-
-[ht::cimg images/quick/access.gif {} {border=0}]
-
-</ul>
 
 
 
@@ -42,7 +25,7 @@ Assuming you have a data directory on your server, e.g., <i>/mnt/data</i>:
 <h2>Server Side File Entry</h2>
 
 If you have a very large set of files or you have a set of files that are changing all of the time (e.g,, real-time feeds)
-it might not be practical or possible to have RAMADDA ingest each and every file. However, you can provide RAMADDA access 
+it might not be practical or possible to have RAMADDA ingest each and every file. However, you can provide RAMADDA view access 
 to these files by creating a Server Side File Entry. 
 
 
@@ -62,43 +45,30 @@ in the RAMADDA database.
 
 
 
-
-
-<a name="infoarch"></a>
+<a name="harvester"></a>
 <h2>Data and project organization</h2>
 
-There are a number of contstructs provided by RAMADDA to help you create and organize your information and data.
+You can organize a file system directory tree that can represent project or data sets 
 
-You might have, for example, a directory tree like:
+<a href="harvesters.html">harvester</a>.
+
+There are a number of constructs provided by RAMADDA to help you create and organize your information and data.
+
+You might for example have  a directory tree as shown below  that you want to harvest into RAMADDA. Normally the <a href="harvesters.html">harvester</a> would create generic File and Folder entries for the directories and files. You can configure the types and metadata with  <a href="entryxml.html#configuration">Entry XML Configuration</a>. Copy this  <a href="examples/dataset.xml">dataset.xml</a> as a <i>.ramadda.xml</i> file under the  same parent directory before the harvest.
+
 <pre>
 Dataset_1
      datafile1.suff
      datafile2.suff
-     ...
+          ...
 Dataset_2
      datafile1.suff
      datafile2.suff
-...
 </pre>
 
 
+There are numerous other organizational schemes and constructs available. One could have Project information, Sites, Site Visits, etc. The entrtypes and metadata for the data files can be specified as well.
 
-For the directories RAMADDA would create generic Folder entries. You can specify a different type (e.g., Dataset) in an entry xml file.
-
-
-For a given file RAMADDA will look for the following entry xml file in its parent directory:
-<pre>
-.&lt;filename&gt;.ramadda.xml
-.dir.ramadda.xml
-.file.ramadda.xml
-.ramadda.xml
-</pre>
-
-A directory can also contain its own entry xml file:
-
-<pre>
-.this.ramadda.xml 
-</pre>
 
 
 

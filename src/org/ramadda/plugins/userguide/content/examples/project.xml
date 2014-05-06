@@ -6,6 +6,4 @@
     <location encoded="false"><![CDATA[some location]]></location>
     <notes encoded="false"><![CDATA[some notes]]></notes>
   </entry>
-  <entry  name="Dataset 1" parent="theproject" type="project_dataset"/>
-  <entry  name="Dataset 2" parent="theproject" type="project_dataset"/>
 </entries>
