@@ -7375,8 +7375,22 @@ public class EntryManager extends RepositoryManager {
      */
     public Entry parseEntryXml(File xmlFile, boolean internal)
             throws Exception {
+        
         Element root =
             XmlUtil.getRoot(getStorageManager().readSystemResource(xmlFile));
+
+        if(root.getTagName().equals(TAG_ENTRIES)) {
+            //Look for the child entry
+            Element child = XmlUtil.findChild(root,
+                                          TAG_ENTRY);
+            if(child == null) {
+                throw new IllegalArgumentException("Could not find entry xml definition in:" + xmlFile);
+            }
+            root = child;
+
+        }
+
+
 
         return createEntryFromXml(new Request(getRepository(),
                 getUserManager().getDefaultUser()), root, new Hashtable(),
@@ -8079,6 +8093,7 @@ public class EntryManager extends RepositoryManager {
                 if ( !createIfNeeded) {
                     return null;
                 }
+
                 currentEntry = makeNewGroup(currentEntry, childName, user,
                                             null, (lastOne
                         ? lastGroupType
