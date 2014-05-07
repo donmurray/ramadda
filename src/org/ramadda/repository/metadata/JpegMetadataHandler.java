@@ -105,9 +105,15 @@ public class JpegMetadataHandler extends MetadataHandler {
             ImageUtils.waitOnImage(newImage);
             System.err.println("done");
 
-            File f = getStorageManager().getTmpFile(request,
-                         IOUtil.stripExtension(entry.getName())
-                         + "_thumb.jpg");
+            String thumbFile = IOUtil.stripExtension(entry.getName())  + "_thumb.";
+            if(path.toLowerCase().endsWith("gif")) {
+                thumbFile+= "gif";
+            } else {
+                thumbFile+= "jpg";            
+            }
+
+
+            File f = getStorageManager().getTmpFile(request, thumbFile);
             ImageUtils.writeImageToFile(newImage, f);
 
 
