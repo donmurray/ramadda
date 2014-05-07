@@ -99,8 +99,17 @@ public class MsDocTypeHandler extends GenericTypeHandler {
                     continue;
                 }
                 String path = ze.getName();
+                String lcpath = path.toLowerCase();
+                boolean isImage = false;
+                
+                if (lcpath.endsWith("thumbnail.jpeg")) {
+                    isImage = true;
+                } else if (lcpath.endsWith(".jpeg") || lcpath.endsWith(".jpg") || lcpath.endsWith(".png") || lcpath.endsWith(".gif")) {
+                    isImage = true;
+                }
+
                 System.err.println("path:" + path);
-                if (path.endsWith("thumbnail.jpeg")) {
+                if(isImage) {
                     String thumbFile = IOUtil.getFileTail(path);
                     File   f = getStorageManager().getTmpFile(null,
                                    thumbFile);
@@ -113,13 +122,13 @@ public class MsDocTypeHandler extends GenericTypeHandler {
                     String fileName =
                         getStorageManager().copyToEntryDir(entry,
                             f).getName();
-                    Metadata thumbnailMetadata =
+                    Metadata metadata =
                         new Metadata(getRepository().getGUID(),
                                      entry.getId(),
-                                     ContentMetadataHandler.TYPE_THUMBNAIL,
+                                     (path.endsWith("thumbnail.jpeg")?ContentMetadataHandler.TYPE_THUMBNAIL:ContentMetadataHandler.TYPE_ATTACHMENT),
                                      false, fileName, null, null, null, null);
 
-                    entry.addMetadata(thumbnailMetadata);
+                    entry.addMetadata(metadata);
                 }
             }
         } catch (Exception exc) {
