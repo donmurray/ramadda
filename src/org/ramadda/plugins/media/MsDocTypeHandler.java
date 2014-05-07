@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -38,9 +38,16 @@ import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.xml.XmlUtil;
 
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
+
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 
 /**
@@ -64,6 +71,60 @@ public class MsDocTypeHandler extends GenericTypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
+    public void initializeNewEntry(Entry entry) throws Exception {
+        super.initializeNewEntry(entry);
+        File file = entry.getFile();
+        if ( !file.exists()) {
+            return;
+        }
+        String filename = file.toString().toLowerCase();
+        if ( !(filename.endsWith(".pptx") || filename.endsWith(".docx"))) {
+            return;
+        }
 
+        try {
+            InputStream    fis = getStorageManager().getFileInputStream(file);
+            OutputStream   fos = null;
+            ZipInputStream zin = new ZipInputStream(fis);
+            ZipEntry       ze  = null;
+            while ((ze = zin.getNextEntry()) != null) {
+                if (ze.isDirectory()) {
+                    continue;
+                }
+                String path = ze.getName();
+                System.err.println("path:" + path);
+                if (path.endsWith("thumbnail.jpeg")) {
+                    String thumbFile = IOUtil.getFileTail(path);
+                    File   f = getStorageManager().getTmpFile(null,
+                                   thumbFile);
+                    fos = getStorageManager().getFileOutputStream(f);
+                    try {
+                        IOUtil.writeTo(zin, fos);
+                    } finally {
+                        IOUtil.close(fos);
+                    }
+                    String fileName =
+                        getStorageManager().copyToEntryDir(entry,
+                            f).getName();
+                    Metadata thumbnailMetadata =
+                        new Metadata(getRepository().getGUID(),
+                                     entry.getId(),
+                                     ContentMetadataHandler.TYPE_THUMBNAIL,
+                                     false, fileName, null, null, null, null);
+
+                    entry.addMetadata(thumbnailMetadata);
+                }
+            }
+        } catch (Exception exc) {
+            System.err.println("oops:" + exc);
+        }
+    }
 
 }
