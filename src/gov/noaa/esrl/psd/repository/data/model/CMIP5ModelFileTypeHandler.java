@@ -1,7 +1,7 @@
 package gov.noaa.esrl.psd.repository.data.model;
 
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+//import java.util.regex.Pattern;
 
 import org.ramadda.geodata.model.ClimateModelFileTypeHandler;
 import org.ramadda.repository.Entry;
@@ -16,10 +16,6 @@ public class CMIP5ModelFileTypeHandler extends ClimateModelFileTypeHandler {
     //var_model_experiment_member
     public static final String CMIP5_FILE_REGEX = "([^_]+)_([^_]+)_([^_]+)_([^_]+)_(r\\d+i\\d+p\\d+)(_([^_.]+))?(\\.1x1)?.nc";
 
-    public static final Pattern pattern = Pattern.compile(CMIP5_FILE_REGEX);
-    
-
-
     /** type identifier */
     public final static String TYPE_CMIP5_MODEL_FILE =
         "cmip5_model_file";
@@ -27,6 +23,7 @@ public class CMIP5ModelFileTypeHandler extends ClimateModelFileTypeHandler {
 
     public CMIP5ModelFileTypeHandler(Repository repository, Element entryNode)
             throws Exception {
+        //super(repository, entryNode, CMIP5_FILE_REGEX);
         super(repository, entryNode);
     }
     
