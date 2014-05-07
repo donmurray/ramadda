@@ -186,7 +186,7 @@ public class RepositoryBase implements Constants, RepositorySource {
 
     /** _more_ */
     public final RequestUrl URL_ENTRY_EXTEDIT = new RequestUrl(this,
-                                                    "/entry/walk",
+                                                    "/entry/extedit",
                                                     "Extra Edit");
 
     /** _more_ */

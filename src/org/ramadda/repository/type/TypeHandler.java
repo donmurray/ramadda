@@ -1276,6 +1276,8 @@ public class TypeHandler extends RepositoryManager {
         return false;
     }
 
+
+
     /**
      * _more_
      *
@@ -1391,6 +1393,33 @@ public class TypeHandler extends RepositoryManager {
     public boolean canChangeTo(TypeHandler newType) {
         return true;
     }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     *
+     * @return _more_
+     * @throws Exception _more_
+     */
+    public Entry changeType(Request request, Entry entry) throws Exception {
+        //Recreate the entry. This will fill in any extra entry type db tables
+        entry = getEntryManager().getEntry(request, entry.getId());
+        //Then initialize it, e.g., point data type will read the file and set the entry values, etc.
+        initializeNewEntry(entry);
+        //        Object[] values =  getEntryValues(entry);
+        //        System.err.println("type:" + this);
+        //        for(int i=0;i<values.length;i++) {
+        //            System.err.println("value[" + i +"] = " + values[i]);
+        //        }
+        //Now store the changes
+        getEntryManager().updateEntry(request, entry);
+
+        return entry;
+    }
+
 
     /**
      * _more_
@@ -3525,8 +3554,7 @@ public class TypeHandler extends RepositoryManager {
                     String extra =
                         HtmlUtils.makeShowHideBlock(msg("More..."),
                             extraMore + addMetadata + HtmlUtils.br()
-                            + unzipWidget + HtmlUtils.br()
-                            + datePatternWidget, false);
+                            + unzipWidget /* + HtmlUtils.br() + datePatternWidget*/, false);
                     if (forUpload || !showDownload) {
                         extra = "";
                     }

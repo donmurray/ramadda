@@ -1208,25 +1208,39 @@ public class EntryManager extends RepositoryManager {
 
 
         //For now only support changing types for folders
-        if (entry.isGroup()) {
-            List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
+        boolean isGroup = entry.isGroup();
+        if (true || isGroup) {
+            List<TwoFacedObject> groupTfos = new ArrayList<TwoFacedObject>();
+            List<TwoFacedObject> fileTfos  = new ArrayList<TwoFacedObject>();
             for (TypeHandler typeHandler :
                     getRepository().getTypeHandlers()) {
-                if ( !typeHandler.isGroup()) {
-                    continue;
-                }
                 if (typeHandler.equals(entry.getTypeHandler())) {
                     continue;
                 }
                 if ( !entry.getTypeHandler().canChangeTo(typeHandler)) {
                     continue;
                 }
-                tfos.add(
+                TwoFacedObject tfo =
                     new TwoFacedObject(
                         typeHandler.getCategory() + " - "
-                        + typeHandler.getLabel(), typeHandler.getType()));
+                        + typeHandler.getLabel(), typeHandler.getType());
+                if (typeHandler.isGroup()) {
+                    groupTfos.add(tfo);
+                } else {
+                    fileTfos.add(tfo);
+                }
             }
-            TwoFacedObject.sort(tfos);
+            TwoFacedObject.sort(groupTfos);
+            TwoFacedObject.sort(fileTfos);
+            List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
+            if (isGroup) {
+                tfos.addAll(groupTfos);
+                tfos.addAll(fileTfos);
+            } else {
+                tfos.addAll(fileTfos);
+                tfos.addAll(groupTfos);
+            }
+
             sb.append(HtmlUtils.p());
             sb.append(msgHeader("Change Type"));
             sb.append(msgLabel("Change type to"));
@@ -1349,10 +1363,10 @@ public class EntryManager extends RepositoryManager {
                                     new String[] {
                                         newTypeHandler.getType() });
 
-        entry.setTypeHandler(newTypeHandler);
         removeFromCache(entry);
+        entry =  newTypeHandler.changeType(request, entry);
 
-        return getEntry(request, entry.getId());
+        return entry;
     }
 
 
@@ -3707,33 +3721,34 @@ public class EntryManager extends RepositoryManager {
             //            System.err.println("Range:" + range);
             //            System.err.println("all:" +request.getHttpHeaderArgs());
             long byteStart = -1;
-            long byteEnd = -1;
-            if(Utils.stringDefined(range)) {
+            long byteEnd   = -1;
+            if (Utils.stringDefined(range)) {
                 //assume: bytes=start-end
-                List<String> toks1 = StringUtil.splitUpTo(range,"=",2);
-                List<String> toks = StringUtil.split(toks1.get(1),"-");
+                List<String> toks1 = StringUtil.splitUpTo(range, "=", 2);
+                List<String> toks  = StringUtil.split(toks1.get(1), "-");
                 byteStart = Long.decode(toks.get(0)).longValue();
-                if(toks.size()>1 && Utils.stringDefined(toks.get(1))) {
+                if ((toks.size() > 1) && Utils.stringDefined(toks.get(1))) {
                     byteEnd = Long.decode(toks.get(1)).longValue();
                 }
             }
 
 
-            if(byteStart >0) {
+            if (byteStart > 0) {
                 inputStream.skip(byteStart);
                 response = Result.RESPONSE_PARTIAL;
-                if(byteEnd >0) {
-                   //TODO: how to limit the length
+                if (byteEnd > 0) {
+                    //TODO: how to limit the length
                 }
-                length-= byteStart;
+                length -= byteStart;
             }
 
             Result result = new Result(BLANK, inputStream, mimeType);
             result.setResponseCode(response);
-            result.addHttpHeader("Accept-Ranges","bytes");
+            result.addHttpHeader("Accept-Ranges", "bytes");
             result.addHttpHeader(HtmlUtils.HTTP_CONTENT_LENGTH, "" + length);
             result.setLastModified(new Date(file.lastModified()));
             result.setCacheOk(true);
+
             return result;
         }
 
@@ -3817,9 +3832,11 @@ public class EntryManager extends RepositoryManager {
 
         OutputHandler outputHandler =
             getRepository().getOutputHandler(request);
-        String dummyGroupName = request.getString(ARG_RETURNFILENAME, "Search Results");
+        String dummyGroupName = request.getString(ARG_RETURNFILENAME,
+                                    "Search Results");
         Result result = outputHandler.outputGroup(request,
-                            request.getOutput(), getDummyGroup(dummyGroupName),
+                            request.getOutput(),
+                            getDummyGroup(dummyGroupName),
                             new ArrayList<Entry>(), entries);
 
         return addEntryHeader(request, (group != null)
@@ -4547,8 +4564,8 @@ public class EntryManager extends RepositoryManager {
                         for (ImportHandler importHandler :
                                 getRepository().getImportHandlers()) {
                             InputStream newStream =
-                                importHandler.getStream(request, parent, entryName,
-                                    entriesStream);
+                                importHandler.getStream(request, parent,
+                                    entryName, entriesStream);
                             if (newStream != null) {
                                 entriesStream = newStream;
 
@@ -4582,8 +4599,8 @@ public class EntryManager extends RepositoryManager {
                 //Check the import handlers
                 for (ImportHandler importHandler :
                         getRepository().getImportHandlers()) {
-                    InputStream newStream = importHandler.getStream(request, parent,
-                                                file, entriesStream);
+                    InputStream newStream = importHandler.getStream(request,
+                                                parent, file, entriesStream);
                     if ((newStream != null) && (newStream != entriesStream)) {
                         entriesStream = newStream;
 
@@ -7375,16 +7392,16 @@ public class EntryManager extends RepositoryManager {
      */
     public Entry parseEntryXml(File xmlFile, boolean internal)
             throws Exception {
-        
+
         Element root =
             XmlUtil.getRoot(getStorageManager().readSystemResource(xmlFile));
 
-        if(root.getTagName().equals(TAG_ENTRIES)) {
+        if (root.getTagName().equals(TAG_ENTRIES)) {
             //Look for the child entry
-            Element child = XmlUtil.findChild(root,
-                                          TAG_ENTRY);
-            if(child == null) {
-                throw new IllegalArgumentException("Could not find entry xml definition in:" + xmlFile);
+            Element child = XmlUtil.findChild(root, TAG_ENTRY);
+            if (child == null) {
+                throw new IllegalArgumentException(
+                    "Could not find entry xml definition in:" + xmlFile);
             }
             root = child;
 
