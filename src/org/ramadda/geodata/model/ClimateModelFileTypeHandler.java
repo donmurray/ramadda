@@ -52,7 +52,7 @@ public class ClimateModelFileTypeHandler extends GranuleTypeHandler {
     private String myRegex = FILE_REGEX;
 
     /** the regex property */
-    public static final String PROP_FILE_PATTERN = "filepattern";
+    public static final String PROP_FILE_PATTERN = "model.file.pattern";
 
     /** pattern for file names */
     //public static final Pattern pattern = Pattern.compile(FILE_REGEX);
