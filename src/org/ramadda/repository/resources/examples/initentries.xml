@@ -17,22 +17,6 @@
 <description></description>
 </entry>
 
-<entry parent="utilities" name="Search Page" type="wikipage" >
-<wikitext>
-== Search ==
-
-{{display   
-type="entrylist"  
-orientation="vertical"
-formOpen="true"
-layoutHere="true"  
-showMetadata="false"
-innerHeight="200" 
-}}
-</wikitext>
-</entry>
-
-
 
 
 <entry parent="utilities" name="Metadata List" type="wikipage" >
@@ -51,12 +35,46 @@ innerHeight="200"
 </entry>
 
 
-<entry parent="utilities" name="Last 3 days" type="type_virtual" >
+<entry parent="utilities" name="All entries created in the last 1 days" type="type_virtual" >
+<description>Entries created in the last day</description>
+<entry_ids>
+search.createdate.relative=-1 days
+search
+</entry_ids>
+</entry>
+
+
+<entry parent="utilities" name="All entries created in the last 3 days" type="type_virtual" >
 <description>Entries created in the last 3 days</description>
 <entry_ids>
 search.createdate.relative=-3 days
 search
 </entry_ids>
+</entry>
+
+
+<entry parent="utilities" name="All entries created in the last 7 days" type="type_virtual" >
+<description>Entries created in the last 7 days</description>
+<entry_ids>
+search.createdate.relative=-7 days
+search
+</entry_ids>
+</entry>
+
+
+<entry parent="utilities" name="Search Page" type="wikipage" >
+<wikitext>
+== Search ==
+
+{{display   
+type="entrylist"  
+orientation="vertical"
+formOpen="true"
+layoutHere="true"  
+showMetadata="false"
+innerHeight="200" 
+}}
+</wikitext>
 </entry>
 
 
