@@ -80,8 +80,8 @@ public class AmerifluxLevel2PointFile extends CsvFile {
         //Example file at examples/AMF_USBar_2004_L2_WG_V004.example.csv
         List<String> header = getHeaderLines();
 
-        System.err.println("DESC:"
-                           + StringUtil.join("\n", header.subList(5, 16)));
+        //        System.err.println("DESC:"
+        //                           + StringUtil.join("\n", header.subList(5, 16)));
         setDescriptionFromFile(StringUtil.join("\n", header.subList(5, 16)));
 
 
