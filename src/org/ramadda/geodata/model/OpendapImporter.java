@@ -78,7 +78,7 @@ public class OpendapImporter extends ImportHandler {
     public void addImportTypes(List<TwoFacedObject> importTypes,
                                Appendable formBuffer) {
         super.addImportTypes(importTypes, formBuffer);
-        importTypes.add(new TwoFacedObject("Climate Model Opendap Links",
+        importTypes.add(new TwoFacedObject("Climate Model OPeNDAP Links",
                                            TYPE_OPENDAP));
     }
 
@@ -134,11 +134,21 @@ public class OpendapImporter extends ImportHandler {
             throws Exception {
 
         String entryType = "climate_modelfile";
+        String filepattern = ClimateModelFileTypeHandler.FILE_REGEX;
         for (String line : StringUtil.split(csv, "\n", true, true)) {
             if (line.startsWith("#")) {
                 continue;
             }
             System.err.println("Line:" + line);
+            // check for a pattern
+            if (line.startsWith(ClimateModelFileTypeHandler.PROP_FILE_PATTERN)) {
+                String pattern = line.substring(ClimateModelFileTypeHandler.PROP_FILE_PATTERN.length());
+                if (!pattern.isEmpty()) {
+                    filepattern = pattern;
+                }
+                continue;
+            }
+            System.out.println("Using file pattern: " + filepattern);
 
             String       name     = line;
             String       desc     = "";
