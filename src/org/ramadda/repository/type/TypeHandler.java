@@ -2395,17 +2395,23 @@ public class TypeHandler extends RepositoryManager {
                 if (request.isMobile()) {
                     width = "250";
                 }
-                String img = null;
+                String img    = null;
+                String imgUrl = null;
                 if (entry.getResource().isFile()
                         && getAccessManager().canDownload(request, entry)) {
-                    img = HtmlUtils.img(getEntryResourceUrl(request, entry),
-                                        "", "width=" + width);
+                    imgUrl = getEntryResourceUrl(request, entry);
+                    img    = HtmlUtils.img(imgUrl, "", "width=" + width);
                 } else if (entry.getResource().isUrl()) {
-                    img = HtmlUtils.img(entry.getResource().getPath(), "",
-                                        "width=" + width);
+                    imgUrl = entry.getResource().getPath();
+                    img    = HtmlUtils.img(imgUrl, "", "width=" + width);
                 }
                 if (img != null) {
-                    sb.append(HtmlUtils.col(img, " colspan=2 "));
+                    String outer = HtmlUtils.href(imgUrl, img,
+                                       HtmlUtils.cssClass("popup_image"));
+                    //                    sb.append(HtmlUtils.col(img, " colspan=2 "));
+                    sb.append(HtmlUtils.col(outer, " colspan=2 "));
+                    getWikiManager().addImagePopupJS(request, sb,
+                            new Hashtable());
                 }
             }
 

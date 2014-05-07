@@ -1936,8 +1936,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
      * @param buf      the page StringBuilder
      * @param props    the properties
      */
-    private void addImagePopupJS(Request request, StringBuilder buf,
-                                 Hashtable props) {
+    public void addImagePopupJS(Request request, StringBuilder buf,
+                                Hashtable props) {
         if (request.getExtraProperty("added fancybox") == null) {
             String captionpos = Misc.getProperty(props, ATTR_POPUPCAPTION,
                                     "none");
