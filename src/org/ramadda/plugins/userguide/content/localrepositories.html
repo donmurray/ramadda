@@ -6,6 +6,58 @@
 
 
 
+If you are running RAMADDA with the Derby database then RAMADDA has the ability to 
+create self-contained sub-repositories that are wholly independent from the parent repository.
+Derby is required because the database is stored fully in the RAMADDA home directory and RAMADDA has 
+control over creating multiple databases.
+
+
+
+
+<ul>
+<li> Go to Admin->Local Repositories
+<li> Specify a repository ID, e.g. "test"
+<li> Specify an admin ID and password.
+<li> Once created, the new repository can be accessed at:
+<pre>
+http://hostname/&lt;base&gt;/repos/&lt;sub repository&gt;
+e.g:
+http://community.ramadda.org/repository/repos/data
+</pre>
+
+<li> You can login to a sub repository with the credentials from its parent repository
+<li> Sub- repositories themselves can contain sub-repositories
+</ul>
+
+
+<h2>Moving a sub-repository</h2>
+
+<ul>
+
+<li> In your RAMADDA home directory there should be a directory:
+<pre>
+repositories/repository_test
+</pre>
+This is the home directory of the test repository.
+
+
+<li> Move the repository_test directory to the server or location
+Edit the repository.properties - comment out ramadda.html.urlbase and ramadda_home
+
+Add an admin to the properties file -  http://ramadda.org/repository/userguide/faq.html#faq1_cat1_6
+
+ramadda.admin=userid:password
+
+
+If you have https configured for tomcat specify the port in the properties file:
+http://ramadda.org/repository/userguide/installing.html#ssl
+
+Specify  the ramadda_home property in a separate repository.properties in the Tomcat conf directory - http://ramadda.org/repository/userguide/installing.html#tomcat -  to point to the repository_above dir
+
+Once you're running you should be able to go to http://<server>/repository
+Log in as admin and go to Admin->Settings page and clear the hostname and port - you don't have to set a new one
+
+</ul>
 
 
 </body>
