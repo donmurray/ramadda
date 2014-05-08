@@ -2,8 +2,7 @@
 
 <%nochildlist%>
 
-Once an entry is created you can edit its name, description, time range
-and lat/lon bounding box with the Edit Entry link in the Edit menu:<br>
+Once an entry is created you can edit its name, description, time range, lat/lon bounding box  and other fields with the Edit Entry link in the Edit menu:<br>
 [ht::cimg images/editmenu.gif {} {border=0}]
 <p>
 
@@ -79,6 +78,19 @@ there will be a &quot;Add short properties&quot; and &quot;Add full properties&q
 Adding  short properties will just try to determine the geospatial bounds and the time range of
 the data file and set those properties. Adding full properties will also add as properties elements
 the netcdf varbiables and all of the netcdf global attributes found.
+
+
+
+<subhead intoc="false" id="extended">Extended Edit</subhead>
+There are a number of other edit capabilities under the Edit-&gt;Extended Edit menu. 
+
+For Folders you can recurse down the entry hierarchy and set the spatial and/or temporal bounds of each folder entry as the union of its children entry metadata.
+
+The Generate File Listing will provide a summary of all of the files in the hierarchy.
+
+You can also change the entry type. Note: for entries that have special attribbutes (e.g., Project, Point Data) when you change the type to a different type the special attributes will be deleted
+
+ 
 
 
 
