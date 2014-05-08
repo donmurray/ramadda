@@ -136,6 +136,11 @@ RAMADDA uses a local home directory on the server.
 This is where RAMADDA looks for properties files and other resources, where the 
 Java derby database is stored  (if its used) and where any uploaded data files are stored, etc. 
 <p>
+<b>
+Note: the home directory needs to be owned or writable by the process that the server is running under. So, if you are running Tomcat then the home directory should be owned by the Tomcat process.
+</b>
+
+<p>
 By default ramadda will use: <pre>
    &lt;server process home directory&gt;/.ramadda</pre>
 i.e., the home directory of the process that is running the server (.e.g., "~", "tomcat").
@@ -174,6 +179,7 @@ ${CATALINA_HOME}/conf/repository.properties
 if found then RAMADDA looks for the property: <pre>
      ramadda_home=/home/dir</pre>
 </ol>
+
 
 <subhead intoc="false" id="properties">RAMADDA Property Files</subhead>
 

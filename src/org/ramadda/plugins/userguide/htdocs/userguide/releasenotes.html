@@ -34,6 +34,21 @@ RAMADDA version 1.6b is now available for download at:
 http://sourceforge.net/projects/ramadda/files/ramadda1.6b/</a>
 </ul>
 
+<div class="boxquote">
+Note: This release fixes a long-standing but recently discovered issue that results in having user  passwords appear in the server side access logs.  There is also a chance that the passwords would be exposed in the REFERER HTTP argument when accessing resources from  external sites (e.g., style sheets).
+
+
+We strongly recommend users take the following steps:
+<ul>
+<li> Upgrade to the latest 1.6 release.
+<li> Delete any of the access.log or repository.log files in your ramadda home/logs directory on your server.
+<li> Likewise, if you are running Apache or Tomcat they too may have the passwords exposed in their access logs. To check grep for "password=" in the logs. Delete the logs if necessary.
+<li> Change your  RAMADDA passwords. 
+</ul>
+
+My (Jeff McWhirter) apologies for this screw up. I strive to make RAMADDA secure but this was a dumb mistake. See <a href="passwords">below</a> for details.
+</div>
+
 This release features a new display front-end - <a href="http://ramadda.org/repository/alias/displays">http://ramadda.org/repository/alias/displays</a>.
 
 <p>
@@ -60,6 +75,26 @@ Once you have installed allplugins.jar then RAMADDA will update it automatically
 
 
 </div>
+
+
+<a name="passwords"></a>
+<h2>Password Exposure</h2>
+
+
+When you are visiting any page in RAMADDA the Login link that is shown has an extra <i>redirect</i> argument which is the URL of the  page you are viewing. Normally, if you are viewing some page and then go to login, after a successful login you will be redirected back to the original page.
+
+
+The exposure comes about in the following way:
+<ul>
+<li> Go to the login page
+<li> Enter an incorrect  password or userid and attempt to login
+<li> The result page will show the login error. But, the  Login link in the upper right will have as its redirect argument the original credentials.
+<li> In the result page,  if you then login correctly through the form there is no problem.
+<li> However,  if you click on the Login link again then login successfully you will be redirected back to the login page with your original credentials showing up in the URL. 
+</ul>
+
+
+
 
 
 <p>

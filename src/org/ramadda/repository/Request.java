@@ -992,6 +992,15 @@ public class Request implements Constants, Cloneable {
     public String getUrlArgs(HashSet<String> exceptArgs,
                              HashSet<String> exceptValues,
                              String exceptArgsPattern) {
+
+        if(exceptArgs==null) {
+            exceptArgs = new HashSet<String>();
+        }
+        //Just in case, never want to let slip the passwords
+        exceptArgs.add(ARG_USER_PASSWORD);
+        exceptArgs.add(ARG_USER_PASSWORD1);
+        exceptArgs.add(ARG_USER_PASSWORD2);
+
         StringBuilder sb  = new StringBuilder();
         int           cnt = 0;
         for (Enumeration keys = parameters.keys(); keys.hasMoreElements(); ) {

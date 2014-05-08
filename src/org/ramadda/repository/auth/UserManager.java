@@ -2125,15 +2125,31 @@ public class UserManager extends RepositoryManager {
         List labels = new ArrayList();
         List tips   = new ArrayList();
 
+
+        //System.err.println("Request:" + request.getUrl());
+
         if (user.getAnonymous()) {
             if (canDoLogin(request)) {
-                request.remove(ARG_MESSAGE);
-                request.remove(ARG_REDIRECT);
-                String redirect =
-                    RepositoryUtil.encodeBase64(request.getUrl().getBytes());
                 extras.add("");
-                urls.add(request.url(getRepositoryBase().URL_USER_LOGIN,
-                                     ARG_REDIRECT, redirect));
+                String url;
+
+                String path = request.getRequestPath();
+                //If it was  a post or  if this was a user access request 
+                //then don't include the redirect back to this page
+                if(request.isPost() || path.indexOf("/user/")>=0 || path.indexOf("/admin/")>=0) {
+                    url = request.url(getRepositoryBase().URL_USER_LOGIN);
+                } else {
+                    //The request.getUrlArgs will always exclude the passwords
+                    request.remove(ARG_MESSAGE);
+                    request.remove(ARG_REDIRECT);
+                    request.remove(ARG_USER_ID);
+                    String redirect =
+                        RepositoryUtil.encodeBase64(request.getUrl().getBytes());
+                    url = request.url(getRepositoryBase().URL_USER_LOGIN,
+                                      ARG_REDIRECT, redirect);
+                }
+
+                urls.add(url);
                 labels.add(msg("Login"));
                 tips.add(msg("Login"));
             }
