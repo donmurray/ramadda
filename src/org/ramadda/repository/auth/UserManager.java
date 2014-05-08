@@ -2650,6 +2650,9 @@ public class UserManager extends RepositoryManager {
         String url =
             request.getAbsoluteUrl(getRepository().URL_USER_RESETPASSWORD)
             + "?" + ARG_USER_PASSWORDKEY + "=" + key;
+        url = getRepository().getHttpsUrl(request, getRepository().getUrlBase() +getRepository().URL_USER_RESETPASSWORD.getPath());
+
+
         String template = getProperty(PROP_USER_RESET_PASSWORD_TEMPLATE, "");
         template = template.replace("${url}", url);
         template = template.replace("${userid}", user.getId());

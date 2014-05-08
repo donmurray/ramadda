@@ -2984,7 +2984,7 @@ public class PageHandler extends RepositoryManager {
 
 
 
-        //Table to englobe this toolbar
+        //Table to enclose this toolbar
         sb.append("<table width=\"100%\"><tr><td>");
 
         // Comments
@@ -3009,8 +3009,9 @@ public class PageHandler extends RepositoryManager {
             sb.append("</td><td>");
         }
 
+        /*
+          Don't include the sharing from addthis.com for now since I think theyre doing tracking
         String title = getEntryManager().getEntryDisplayName(entry);
-
         String share =
             "<script type=\"text/javascript\">"
             + "var addthis_disable_flash=\"true\"; addthis_pub=\"jeffmc\";</script>"
@@ -3021,6 +3022,8 @@ public class PageHandler extends RepositoryManager {
 
 
         sb.append(share);
+        */
+
         sb.append("</td><td>");
 
 
