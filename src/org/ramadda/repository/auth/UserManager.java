@@ -2647,10 +2647,8 @@ public class UserManager extends RepositoryManager {
                                           + 1000 * 60 * 60));
         passwordResets.put(key, resetInfo);
         String toUser = user.getEmail();
-        String url =
-            request.getAbsoluteUrl(getRepository().URL_USER_RESETPASSWORD)
+        String url = getRepository().getHttpsUrl(request, getRepository().getUrlBase() +getRepository().URL_USER_RESETPASSWORD.getPath())
             + "?" + ARG_USER_PASSWORDKEY + "=" + key;
-        url = getRepository().getHttpsUrl(request, getRepository().getUrlBase() +getRepository().URL_USER_RESETPASSWORD.getPath());
 
 
         String template = getProperty(PROP_USER_RESET_PASSWORD_TEMPLATE, "");
