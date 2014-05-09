@@ -86,12 +86,14 @@ Once you have installed allplugins.jar then RAMADDA will update it automatically
 Some RAMADDA html templates may import resources (e.g., style sheets, images) from somewhere other than RAMADDA.  In that case, passwords may also  be exposed in the REFERER HTTP argument for the resource request.
 To check grep for "password=" in the logs. Delete the logs if necessary. 
 
+<p>
 There is a new Admin-&gt;>Maintenance-&gt;Clear All Passwords service that allows you to
 clear all of the passwords held in the RAMADDA user database.
+<p>
 
 
 When you are visiting any page in RAMADDA the Login link that is shown has an extra <i>redirect</i> argument which is the URL of the  page you are viewing. Normally, if you are viewing a page and then go to login, after a successful login you will be redirected back to the original page.
-
+<p>
 
 The exposure comes about in the following way:
 <ul>
