@@ -10,14 +10,15 @@ http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/</a>
 </ul>
 
 <div class="boxquote">
-Note: This release fixes a long-standing but recently discovered issue that results in having user  passwords appear in the server side access logs.  There is also a chance that the passwords would be exposed in the REFERER HTTP argument when accessing resources from  external sites (e.g., style sheets).
-
+Note: This release fixes a long-standing but recently discovered issue that results in having user  passwords occasionally appear in the server side access logs.  
 
 We strongly recommend users take the following steps:
 <ul>
 <li> Upgrade to the latest 1.6 release.
 <li> Delete any of the access.log or repository.log files in your ramadda home/logs directory on your server.
-<li> Likewise, if you are running Apache or Tomcat they too may have the passwords exposed in their access logs. To check grep for "password=" in the logs. Delete the logs if necessary.
+<li> Likewise, if you are running Apache or Tomcat they too may have the passwords exposed in their access logs. To check grep for "password=" in the logs. Delete the logs if necessary. 
+Some RAMADDA html templates import resources (e.g., style sheets, images) from somehwere other than RAMADDA. 
+In that case, passwords may also  be exposed in the REFERER HTTP argument for the resource request.
 <li> Change your  RAMADDA passwords. 
 </ul>
 
@@ -67,6 +68,7 @@ The exposure comes about in the following way:
 <li> In the result page,  if you then login correctly through the form there is no problem.
 <li> However,  if you click on the Login link again then login successfully you will be redirected back to the login page with your original credentials showing up in the URL. 
 </ul>
+
 
 
 
