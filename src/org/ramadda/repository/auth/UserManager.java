@@ -113,7 +113,7 @@ public class UserManager extends RepositoryManager {
     public static final String PROP_PASSWORD_ITERATIONS =
         "ramadda.password.hash.iterations";
 
-    /** _more_ */
+    /** Note: we don't actively use the SALT properties anymore but we keep them around for backwards compatibilty */
     public static final String PROP_PASSWORD_SALT =
         "ramadda.password.hash.salt";
 
@@ -912,16 +912,19 @@ public class UserManager extends RepositoryManager {
      * @param user The user
      *
      * @return Are the passwords equal and did the user's password get set
+     *
+     * @throws Exception _more_
      */
-    private boolean checkAndSetNewPassword(Request request, User user) throws Exception {
+    private boolean checkAndSetNewPassword(Request request, User user)
+            throws Exception {
         String password1 = request.getString(ARG_USER_PASSWORD1, "").trim();
         String password2 = request.getString(ARG_USER_PASSWORD2, "").trim();
         if (Utils.stringDefined(password1)
                 || Utils.stringDefined(password2)) {
             if (password1.equals(password2)) {
                 user.setPassword(hashPassword(password1));
-                addActivity(request, user,
-                            ACTIVITY_PASSWORD_CHANGE, "");
+                addActivity(request, user, ACTIVITY_PASSWORD_CHANGE, "");
+
                 return true;
             }
 
@@ -1608,11 +1611,12 @@ public class UserManager extends RepositoryManager {
         //        addActivity(request, request.getUser(),  ACTIVITY_PASSWORD_CHANGE, "");
 
         usersHtml.append("<table>");
-        usersHtml.append(HtmlUtils.row(HtmlUtils.cols(
-                                                      HtmlUtils.bold(msg("Log")),
-                                                      HtmlUtils.bold(msg("Edit")),
-                                                      HtmlUtils.bold(msg("ID")) + HtmlUtils.space(2),
-                HtmlUtils.bold(msg("Name")) + HtmlUtils.space(2),
+        usersHtml.append(
+            HtmlUtils.row(
+                HtmlUtils.cols(
+                    HtmlUtils.bold(msg("Log")), HtmlUtils.bold(msg("Edit")),
+                    HtmlUtils.bold(msg("ID")) + HtmlUtils.space(2),
+                    HtmlUtils.bold(msg("Name")) + HtmlUtils.space(2),
         //                    HtmlUtils.bold(msg("Roles")) + HtmlUtils.space(2),
         HtmlUtils.bold(msg("Email")) + HtmlUtils.space(2), HtmlUtils.bold(
             msg("Admin")) + HtmlUtils.space(2), HtmlUtils.bold(
@@ -1646,7 +1650,7 @@ public class UserManager extends RepositoryManager {
             String row = (user.getAdmin()
                           ? "<tr valign=\"top\" style=\"background-color:#cccccc;\">"
                           : "<tr valign=\"top\" >") + HtmlUtils.cols(
-                                                                     userLogLink,userEditLink, userProfileLink,
+                              userLogLink, userEditLink, userProfileLink,
                               user.getName(),
             /*user.getRolesAsString("<br>"),*/
             user.getEmail(), "" + user.getAdmin(),
@@ -2136,15 +2140,16 @@ public class UserManager extends RepositoryManager {
                 String path = request.getRequestPath();
                 //If it was  a post or  if this was a user access request 
                 //then don't include the redirect back to this page
-                if(request.isPost() || path.indexOf("/user/")>=0 || path.indexOf("/admin/")>=0) {
+                if (request.isPost() || (path.indexOf("/user/") >= 0)
+                        || (path.indexOf("/admin/") >= 0)) {
                     url = request.url(getRepositoryBase().URL_USER_LOGIN);
                 } else {
                     //The request.getUrlArgs will always exclude the passwords
                     request.remove(ARG_MESSAGE);
                     request.remove(ARG_REDIRECT);
                     request.remove(ARG_USER_ID);
-                    String redirect =
-                        RepositoryUtil.encodeBase64(request.getUrl().getBytes());
+                    String redirect = RepositoryUtil.encodeBase64(
+                                          request.getUrl().getBytes());
                     url = request.url(getRepositoryBase().URL_USER_LOGIN,
                                       ARG_REDIRECT, redirect);
                 }
@@ -2663,8 +2668,12 @@ public class UserManager extends RepositoryManager {
                                           + 1000 * 60 * 60));
         passwordResets.put(key, resetInfo);
         String toUser = user.getEmail();
-        String url = getRepository().getHttpsUrl(request, getRepository().getUrlBase() +getRepository().URL_USER_RESETPASSWORD.getPath())
-            + "?" + ARG_USER_PASSWORDKEY + "=" + key;
+        String url =
+            getRepository().getHttpsUrl(
+                request,
+                getRepository().getUrlBase()
+                + getRepository().URL_USER_RESETPASSWORD.getPath()) + "?"
+                    + ARG_USER_PASSWORDKEY + "=" + key;
 
 
         String template = getProperty(PROP_USER_RESET_PASSWORD_TEMPLATE, "");
@@ -2849,7 +2858,7 @@ public class UserManager extends RepositoryManager {
 
                 return addHeader(request, new Result("Login", response));
             } else {
-                Misc.sleepSeconds(1);
+                handleBadPassword(name);
                 if (responseAsXml) {
                     return new Result(XmlUtil.tag(TAG_RESPONSE,
                             XmlUtil.attr(ATTR_CODE, CODE_ERROR),
@@ -2867,11 +2876,16 @@ public class UserManager extends RepositoryManager {
                     if (results.next()) {
                         password = results.getString(1);
                         if ((password == null) || (password.length() == 0)) {
-                            sb.append(
-                                getPageHandler().showDialogNote(
-                                    "Sorry, we were doing some cleanup and have reset your password"));
-
-                            addPasswordResetForm(request, sb, name);
+                            if (getAdmin().isEmailCapable()) {
+                                sb.append(
+                                    getPageHandler().showDialogNote(
+                                        "Sorry, we were doing some cleanup and have reset your password"));
+                                addPasswordResetForm(request, sb, name);
+                            } else {
+                                sb.append(
+                                    getPageHandler().showDialogNote(
+                                        "Sorry, we were doing some cleanup and your password has been reset. Please contact the RAMADDA administrator to reset your password."));
+                            }
                             getDatabaseManager().closeAndReleaseConnection(
                                 statement);
 
@@ -2919,6 +2933,47 @@ public class UserManager extends RepositoryManager {
                                   StringBuffer loginFormExtra)
             throws Exception {
 
+        User user = authenticateUserInner(request, name, password,
+                                          loginFormExtra);
+        if (user == null) {
+            handleBadPassword(name);
+        }
+
+        return user;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param user _more_
+     */
+    private void handleBadPassword(String user) {
+        //TODO: track bad logins
+        //If the login failed then sleep for 1 second
+        //This will keep bots from repeatedly trying passwords
+        Misc.sleepSeconds(1);
+    }
+
+    /**
+     * _more_
+     *
+     * @param request the request
+     * @param name _more_
+     * @param password _more_
+     * @param loginFormExtra _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception on badness
+     */
+    private User authenticateUserInner(Request request, String name,
+                                       String password,
+                                       StringBuffer loginFormExtra)
+            throws Exception {
+
+
+
         debugLogin("RAMADDA.authenticateUser:" + name);
 
         User user = authenticateUserFromDatabase(request, name, password);
@@ -2959,7 +3014,8 @@ public class UserManager extends RepositoryManager {
             }
             debugLogin("RAMADDA. authenticating user with parent repository");
             user = getRepository().getParentRepository().getUserManager()
-                .authenticateUser(request, name, password, loginFormExtra);
+                .authenticateUserInner(request, name, password,
+                                       loginFormExtra);
             if (user != null) {
                 debugLogin("RAMADDA. got user from parent repository");
                 String userName = user.getName();
@@ -2969,6 +3025,8 @@ public class UserManager extends RepositoryManager {
                 //Change the name to denote this user comes from above
                 user.setName(getRepository().getParentRepository()
                     .getUrlBase().substring(1) + ":" + userName);
+
+                return user;
             }
         }
 
@@ -3287,7 +3345,8 @@ public class UserManager extends RepositoryManager {
         SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
         ResultSet        results;
         if (theUser != null) {
-            sb.append(RepositoryUtil.header(msgLabel("Activity for User: ") + HtmlUtils.space(1)
+            sb.append(RepositoryUtil.header(msgLabel("Activity for User: ")
+                                            + HtmlUtils.space(1)
                                             + theUser.getLabel()));
 
 
