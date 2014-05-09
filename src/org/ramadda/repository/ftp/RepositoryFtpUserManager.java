@@ -103,7 +103,7 @@ public class RepositoryFtpUserManager implements org.ramadda.repository
                     (UsernamePasswordAuthentication) auth;
                 name     = upa.getUsername();
                 password = upa.getPassword();
-                ftpManager.logInfo("name:" + name + " password:" + password);
+                //                ftpManager.logInfo("name:" + name + " password:" + password);
                 if ( !ftpManager.getRepository().getUserManager()
                         .isPasswordValid(name, password)) {
                     System.err.println("bad pass");
