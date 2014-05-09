@@ -89,6 +89,10 @@ public class SessionManager extends RepositoryManager {
     /** _more_ */
     private String cookieName;
 
+    private boolean topRepository = false;
+
+
+
     /** _more_ */
     private Hashtable<String, UserSession> sessionMap = new Hashtable<String,
                                                             UserSession>();
@@ -114,9 +118,14 @@ public class SessionManager extends RepositoryManager {
      */
     public SessionManager(Repository repository) {
         super(repository);
+        this.topRepository = (repository.getParentRepository() == null);
+        if(topRepository) {
+        } else {
+        }
         this.cookieName = "ramadda"
                           + repository.getUrlBase().replaceAll("/", "_")
                           + "_session";
+
     }
 
     /**
@@ -702,7 +711,7 @@ public class SessionManager extends RepositoryManager {
             } else if (cookieName.equals(COOKIE_NAME)) {
                 //For backwards compatability
                 cookies.add(cookieValue);
-            }
+            } 
         }
 
 

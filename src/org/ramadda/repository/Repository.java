@@ -2959,8 +2959,16 @@ public class Repository extends RepositoryBase implements RequestHandler,
             debugSession("Cookie:"
                          + getSessionManager().getSessionCookieName() + "="
                          + sessionId + " path=" + getUrlBase());
+            String path;
+
+            if(getShutdownEnabled() && getParentRepository() == null) {
+                path = "/";
+            } else {
+                path  = getUrlBase();
+            }
+
             result.addCookie(getSessionManager().getSessionCookieName(),
-                             sessionId + "; path=" + getUrlBase()
+                             sessionId + "; path=" + path
                              + "; expires=" + cookieExpirationDate
                              + " 23:59:59 GMT");
         }
