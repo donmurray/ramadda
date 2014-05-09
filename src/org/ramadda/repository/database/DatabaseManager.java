@@ -481,6 +481,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                 HtmlUtils.makeShowHideBlock(
                     msg("Connection Pool"), poolSB.toString(), false), 20));
 
+        /********************
+          Don't show the entry break down as it can be kind of slow
         dbSB.append(HtmlUtils.br());
         dbSB.append("<table>\n");
         String[] names = { msg("Users"), msg("Associations"),
@@ -520,6 +522,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
 
 
         dbSB.append("</table>\n");
+        *****/
     }
 
 
