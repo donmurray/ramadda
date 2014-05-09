@@ -1047,6 +1047,8 @@ public class UserManager extends RepositoryManager {
                         "Incorrect passwords"));
             } else {
                 if (request.defined(ARG_USER_PASSWORD1)) {
+                    //clear the bad password count
+                    handleGoodPassword(request, userId);
                     sb.append(
                         getPageHandler().showDialogNote(
                             msg("Password changed")));
@@ -2858,7 +2860,6 @@ public class UserManager extends RepositoryManager {
 
                 return addHeader(request, new Result("Login", response));
             } else {
-                handleBadPassword(name);
                 if (responseAsXml) {
                     return new Result(XmlUtil.tag(TAG_RESPONSE,
                             XmlUtil.attr(ATTR_CODE, CODE_ERROR),
@@ -2936,22 +2937,74 @@ public class UserManager extends RepositoryManager {
         User user = authenticateUserInner(request, name, password,
                                           loginFormExtra);
         if (user == null) {
-            handleBadPassword(name);
+            handleBadPassword(request, name);
+        } else {
+            handleGoodPassword(request, name);
         }
 
         return user;
     }
 
 
+    /** store the number of bad login attempts for each user     */
+    private static Hashtable<String, Integer> badPasswordCount =
+        new Hashtable<String, Integer>();
+
+    /** how many login tries before we blow up   */
+    private static int MAX_BAD_PASSWORD_COUNT = 100;
+
     /**
      * _more_
      *
+     * @param request _more_
      * @param user _more_
      */
-    private void handleBadPassword(String user) {
-        //TODO: track bad logins
-        //If the login failed then sleep for 1 second
-        //This will keep bots from repeatedly trying passwords
+    private void handleGoodPassword(Request request, String user) {
+        badPasswordCount.remove(user);
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param user _more_
+     */
+    private void checkUserPasswordAttempts(Request request, String user) {
+        Integer count = badPasswordCount.get(user);
+        if (count == null) {
+            return;
+        }
+        count = new Integer(count.intValue() + 1);
+        if (count.intValue() > MAX_BAD_PASSWORD_COUNT) {
+            throw new IllegalArgumentException("Number of login attempts ("
+                    + count + ") for user " + user
+                    + " has exceeded the maximum allowed");
+        }
+
+    }
+
+
+    /**
+     * _more_
+     *
+     *
+     * @param request _more_
+     * @param user _more_
+     */
+    private void handleBadPassword(Request request, String user) {
+        Integer count = badPasswordCount.get(user);
+        if (count == null) {
+            count = new Integer(0);
+        }
+        count = new Integer(count.intValue() + 1);
+        badPasswordCount.put(user, count);
+        if (count.intValue() > MAX_BAD_PASSWORD_COUNT) {
+            throw new IllegalArgumentException("Number of login attempts ("
+                    + count + ") for user " + user
+                    + " has exceeded the maximum allowed");
+        }
+        //If the login failed then sleep for 1 second. This will keep bots 
+        //from repeatedly trying passwords though maybe not needed with the above checks
         Misc.sleepSeconds(1);
     }
 
@@ -2973,6 +3026,7 @@ public class UserManager extends RepositoryManager {
             throws Exception {
 
 
+        checkUserPasswordAttempts(request, name);
 
         debugLogin("RAMADDA.authenticateUser:" + name);
 
