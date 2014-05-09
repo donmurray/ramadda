@@ -366,7 +366,9 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_SHOWCATEGORIES = "showcategories";
 
+    /** _more_          */
     public static final String ARG_RETURNFILENAME = "returnfilename";
+
     /** _more_ */
     public static final String ATTR_ADDSHORTMETADATA = "addshortmetadata";
 
@@ -1880,6 +1882,16 @@ public interface Constants {
     public static final String ACTION_STOP = "action.stop";
 
 
+    /** _more_          */
+    public static final String ACTION_PASSWORDS_CLEAR =
+        "action.passwords.clear";
+
+    /** _more_          */
+    public static final String ARG_PASSWORDS_CLEAR_CONFIRM =
+        "action.passwords.clear.confirm";
+
+
+
     /** _more_ */
     public static final String WHAT_ENTRIES = "entries";
 
@@ -2205,10 +2217,10 @@ public interface Constants {
     /** _more_ */
     public static final String SORTBY_TODATE = "todate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SORTBY_SIZE = "size";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SORTBY_TYPE = "type";
 
     /** _more_ */
@@ -2217,7 +2229,7 @@ public interface Constants {
     /** _more_ */
     public static final String SORTBY_NAME = "name";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SORTBY_MIXED = "mixed";
 
 

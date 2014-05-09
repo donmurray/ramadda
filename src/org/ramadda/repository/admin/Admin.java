@@ -2079,6 +2079,7 @@ public class Admin extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result adminCleanup(Request request) throws Exception {
+
         StringBuffer sb = new StringBuffer();
         if (request.defined(ACTION_STOP)) {
             runningCleanup = false;
@@ -2104,6 +2105,15 @@ public class Admin extends RepositoryManager {
                 if (request.get(ARG_SHUTDOWN_CONFIRM, false)) {
                     return processShutdown(request);
                 }
+            }
+        } else if (request.defined(ACTION_PASSWORDS_CLEAR)) {
+            request.ensureAuthToken();
+            if (request.get(ARG_PASSWORDS_CLEAR_CONFIRM, false)) {
+                clearAllPasswords();
+                sb.append(
+                    "All passwords have been cleared. Make sure you go and change your password immediately");
+
+                return makeResult(request, msg("Cleanup"), sb);
             }
         }
 
@@ -2145,6 +2155,23 @@ public class Admin extends RepositoryManager {
 
 
 
+            sb.append("<p><hr>");
+            sb.append(HtmlUtils.submit(msg("Clear all passwords"),
+                                       ACTION_PASSWORDS_CLEAR));
+            sb.append(HtmlUtils.space(2));
+            sb.append(HtmlUtils.checkbox(ARG_PASSWORDS_CLEAR_CONFIRM, "true",
+                                         false));
+            sb.append(HtmlUtils.space(1));
+            sb.append(msg("Yes, I really want to delete all passwords"));
+            sb.append(HtmlUtils.br());
+            sb.append(
+                getPageHandler().showDialogNote(
+                    "Note:  All users including you will have to reset their passwords. If you do not have email enabled then only the admin will be able to reset the passwords. So, if you do this then right away, while your session is active, go and change your password. If things go bad and you can't login at all see the  <a href=\"http://ramadda.org/repository/userguide/faq.html#faq1_cat1_6\">FAQ</a> post."));
+
+
+
+
+
             /*
             sb.append("<p>");
             sb.append(
@@ -2163,8 +2190,20 @@ public class Admin extends RepositoryManager {
 
         //        sb.append(cnt +" files do not exist in " + (t2-t1) );
         return makeResult(request, msg("Cleanup"), sb);
+
     }
 
+
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    private void clearAllPasswords() throws Exception {
+        String sql = "update " + Tables.USERS.NAME + " set "
+                     + Tables.USERS.COL_NODOT_PASSWORD + " = ''";
+        Statement statement = getDatabaseManager().execute(sql, -1, 10000);
+    }
 
 
     /**
