@@ -41,12 +41,15 @@ We strongly recommend users take the following steps:
 <ul>
 <li> Upgrade to the latest 1.6 release.
 <li> Delete any of the access.log or repository.log files in your ramadda home/logs directory on your server.
-<li> If you are running RAMADDA from within Apache and/or Tomcat they too may have the passwords exposed in their access logs. Some RAMADDA html templates may import resources (e.g., style sheets, images) from somewhere other than RAMADDA.  In that case, passwords may also  be exposed in the REFERER HTTP argument for the resource request.
-To check grep for "password=" in the logs. Delete the logs if necessary. 
+<li> If you are running RAMADDA from within Apache and/or Tomcat they too may have the passwords exposed in their access logs. 
 <li> Change your  RAMADDA passwords. 
+<li> See <a href="#passwords">below</a> for more details.
 </ul>
 
-My (Jeff McWhirter) apologies for this screw up. I strive to make RAMADDA secure but this slipped through the cracks. See <a href="#passwords">below</a> for details.
+My apologies for this problem. I strive to make RAMADDA secure but this slipped through the cracks.  If you have any questions please <a href="mailto:jeff.mcwhirter@gmail.com">contact me</a>.
+
+-Jeff McWhirter
+<br>
 </div>
 
 This release features a new display front-end - <a href="http://ramadda.org/repository/alias/displays">http://ramadda.org/repository/alias/displays</a>.
@@ -80,8 +83,14 @@ Once you have installed allplugins.jar then RAMADDA will update it automatically
 <a name="passwords"></a>
 <h2>Password Exposure</h2>
 
+Some RAMADDA html templates may import resources (e.g., style sheets, images) from somewhere other than RAMADDA.  In that case, passwords may also  be exposed in the REFERER HTTP argument for the resource request.
+To check grep for "password=" in the logs. Delete the logs if necessary. 
 
-When you are visiting any page in RAMADDA the Login link that is shown has an extra <i>redirect</i> argument which is the URL of the  page you are viewing. Normally, if you are viewing some page and then go to login, after a successful login you will be redirected back to the original page.
+There is a new Admin-&gt;>Maintenance-&gt;Clear All Passwords service that allows you to
+clear all of the passwords held in the RAMADDA user database.
+
+
+When you are visiting any page in RAMADDA the Login link that is shown has an extra <i>redirect</i> argument which is the URL of the  page you are viewing. Normally, if you are viewing a page and then go to login, after a successful login you will be redirected back to the original page.
 
 
 The exposure comes about in the following way:
@@ -92,6 +101,7 @@ The exposure comes about in the following way:
 <li> In the result page,  if you then login correctly through the form there is no problem.
 <li> However,  if you click on the Login link again then login successfully you will be redirected back to the login page with your original credentials showing up in the URL. 
 </ul>
+
 
 
 
