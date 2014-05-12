@@ -1,6 +1,16 @@
 [ht::head {RAMADDA Version <%ramadda.version%> Release Notes}]
 
+
+
 <%nochildlist%>
+
+
+<style type="text/css">
+li {
+margin-top: 10px;
+}
+</style>
+
 
 RAMADDA version <%ramadda.version%> is now available for download at:
 <br>
@@ -10,53 +20,79 @@ http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/</a>
 </ul>
 
 <div class="boxquote">
-Note: This release fixes a long-standing but recently discovered issue that results in having user passwords occasionally appear in the server side access logs.  
-
-We strongly recommend users take the following steps:
-<ul>
-<li> Upgrade to the latest 1.6 release.
-<li> Delete any of the access.log or repository.log files in your ramadda home/logs directory on your server.
-<li> If you are running RAMADDA from within Apache and/or Tomcat they too may have the passwords exposed in their access logs. 
-<li> Change your  RAMADDA passwords. 
-<li> See <a href="#passwords">below</a> for more details.
-</ul>
-
-My apologies for this problem. I strive to make RAMADDA secure but this slipped through the cracks.  If you have any questions please <a href="mailto:jeff.mcwhirter@gmail.com">contact me</a>.
-
--Jeff McWhirter
-<br>
+Note: This release fixes a long-standing but recently discovered issue that results in having user passwords occasionally appear in the server side access logs.   See <a href="#passwords">below</a> for more details.
 </div>
 
-This release features a new display front-end - <a href="http://ramadda.org/repository/alias/displays">http://ramadda.org/repository/alias/displays</a>.
+<h2>What's new?</h2>
+<ul> 
 
+<li> This release features a new display front-end integrated into the wiki facility - <a href="http://ramadda.org/repository/alias/displays">http://ramadda.org/repository/alias/displays</a>. This enables the creation of rich interactive search, charting and data access interfaces across multiple federated  repositories.
+
+
+<li> A new <a href="http://ramadda.org/repository/entry/show/Home/RAMADDA+Information/Development/Example+Case+Study?entryid=b6ce8986-0a93-4436-8ec4-d30eb092365e">Case Study</a> contstruct
+
+<li> <a href="editing.html#extended">Extended entry editing</a> including the ability to change entry types.
+
+<li> Automatic <a href="http://ramadda.org/repository/entry/show/Home/RAMADDA+Examples/Miscellany/Documents?entryid=babccf50-d206-4546-9fd6-b6c9ff67291a">extraction of thumbnail images</a> from powerpoint and word files.
+
+<li> And as usual, lots  of bug fixes and additions to the documentation.
+
+</ul>
+
+
+
+<h2>Upgrading</h2>
+
+Note: Many users ask if upgrading RAMADDA will effect any existing content. All of the content and files are kept in the RAMADDA home directory and in the database. As long as those directories remain untouched there should not be any problem in upgrading. However, you will need to update any plugins you have installed in the RAMADDA plugins directory. 
 <p>
-
-<div class="boxquote">
-You may need to update your plugins. Plugins are installed in the <i>&lt;ramadda home&gt;/plugins</i> directory. Most of the plugins are provided in an 
-<a href="http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/allplugins.jar/download">allplugins.jar</a> file. If you are installing RAMADDA for the first time you can opt to install the allplugins.jar during
-the site installation process.
-<p>
-
 To update an existing RAMADDA install:
+
 <ul>
 
-<li> If you are running stand-alone then you will need to adjust your scripts to point to the ramadda<%ramadda.version%> directory.
+<li> Update plugins
+<ul>
+<li> If you have installed the old allplugins.<i>zip</i> then delete the file and install  the new 
+<a href="http://sourceforge.net/projects/ramadda/files/ramadda1.6/allplugins.jar/download">allplugins.jar</a>.
+Plugins are installed in the <i>&lt;ramadda home&gt;/plugins</i> directory. 
+If you currently have allplugins.jar installed  then RAMADDA will update it automatically.
 
-<li> If you have installed the old allplugins.<i>zip</i> then delete the file and install allplugins.<i>jar</i>. 
-Once you have installed allplugins.jar then RAMADDA will update it automatically in future releases.
-
-<p>
 <li> If you have the pointplugin.jar installed then delete it. It is now provided in the core.
-<p>
+
 <li> If you have other plugins installed then you should update them to the latest <a href="http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/plugins/">versions</a>.
+
 </ul>
 
+<li> Install the new server
 
-</div>
+<ul>
+
+
+<li> If you are running stand-alone then download and unzip the
+<a href="http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/ramadda<%ramadda.version%>.zip/download">ramadda<%ramadda.version%>.zip</a>. You will need to adjust your scripts to point to the ramadda<%ramadda.version%> directory.
+
+<li> If you are running under Tomcat or Glassfish download and install the 
+<a href="http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/repository.war">repository.war</a>
+
+</ul>
+</ul>
+
 
 
 <a name="passwords"></a>
 <h2>Password Exposure</h2>
+
+Up until and including  RAMADDA V1.6B there is the possibility to have clear text passwords written out in the server side access logs. The 1.6 release fixes this problem.
+
+We strongly recommend users take the following steps:
+<ul>
+<li> Upgrade to the latest 1.6 release.
+<li> Change your  RAMADDA passwords. 
+<li> Delete any of the access.log or repository.log files in your ramadda home/logs directory on your server.
+<li> If you are running RAMADDA from within Apache and/or Tomcat they too may have the passwords exposed in their access logs. 
+
+</ul>
+
+<p>
 
 Some RAMADDA html templates may import resources (e.g., style sheets, images) from somewhere other than RAMADDA.  In that case, passwords may also  be exposed in the REFERER HTTP argument for the resource request.
 To check grep for "password=" in the logs. Delete the logs if necessary. 
@@ -67,6 +103,7 @@ clear all of the passwords held in the RAMADDA user database.
 <p>
 
 
+<b>What happened?</b><br>
 When you are visiting any page in RAMADDA the Login link that is shown has an extra <i>redirect</i> argument which is the URL of the  page you are viewing. Normally, if you are viewing a page and then go to login, after a successful login you will be redirected back to the original page.
 <p>
 
@@ -79,6 +116,10 @@ The exposure comes about in the following way:
 <li> However,  if you click on the Login link again then login successfully you will be redirected back to the login page with your original credentials showing up in the URL. 
 </ul>
 
+
+My apologies for this problem. I strive to make RAMADDA secure but this slipped through the cracks.  If you have any questions please <a href="mailto:jeff.mcwhirter@gmail.com">contact me</a>.
+
+-Jeff McWhirter
 
 
 [ht::foot]
