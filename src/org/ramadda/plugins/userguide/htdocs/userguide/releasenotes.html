@@ -51,13 +51,13 @@ Note: This release fixes a long-standing but recently discovered issue that resu
 <h2>What's new?</h2>
 <ul> 
 
-<li> This release features a new display front-end integrated into the wiki facility - <a href="http://ramadda.org/repository/alias/displays">http://ramadda.org/repository/alias/displays</a>. This enables the creation of rich interactive search, charting and data access interfaces across multiple federated  repositories.
+<li> This release features a new <a href="http://ramadda.org/repository/alias/displays">display front-end </a> integrated into the wiki facility. This enables the creation of rich interactive search, charting and data access interfaces across multiple federated  repositories.
 
-<li> A new <a href="http://ramadda.org/repository/entry/show/Home/RAMADDA+Examples/Miscellany/Virtual+Groups?entryid=f5ccdc47-62f7-481a-b67d-bf76e5b34359">Virual Group</a> entry type.
-
-<li> A new <a href="http://ramadda.org/repository/entry/show/Home/RAMADDA+Information/Development/Example+Case+Study?entryid=b6ce8986-0a93-4436-8ec4-d30eb092365e">Case Study</a> contstruct.
+<li> New  entry types - <a href="http://ramadda.org/repository/entry/show/Home/RAMADDA+Examples/Miscellany/Virtual+Groups?entryid=f5ccdc47-62f7-481a-b67d-bf76e5b34359">Virtual Group</a>,  <a href="http://ramadda.org/repository/entry/show/Home/RAMADDA+Information/Development/Example+Case+Study?entryid=b6ce8986-0a93-4436-8ec4-d30eb092365e">Case Study</a>, <a href="http://ramadda.org/repository/entry/show/Home/RAMADDA+Examples/Science+Data/Ontologies/CF+Standard+Names?entryid=66e17bbf-cdef-40b6-a875-e035c98072c3">Vocabulary</a>, etc.
 
 <li> <a href="editing.html#extended">Extended entry editing</a> including the ability to change entry types.
+
+<li> The beginnings of an entry type, metadata and data dictionary <a href="http://ramadda.org/repository/metameta/index.html">editor</a>.
 
 <li> Automatic <a href="http://ramadda.org/repository/entry/show/Home/RAMADDA+Examples/Miscellany/Documents?entryid=babccf50-d206-4546-9fd6-b6c9ff67291a">extraction of thumbnail images</a> from powerpoint and word files.
 
@@ -69,8 +69,11 @@ Note: This release fixes a long-standing but recently discovered issue that resu
 
 <h2>Upgrading</h2>
 
+<div class="boxquote">
 Note: Many users ask if upgrading RAMADDA will effect any existing content. All of the content and files are kept in the RAMADDA home directory and in the database. As long as those directories remain untouched there should not be any problem in upgrading. However, you will need to update any plugins you have installed in the RAMADDA plugins directory. 
-<p>
+</div>
+
+
 To update an existing RAMADDA install:
 
 <ul>
@@ -111,22 +114,17 @@ Up until and including  RAMADDA V1.6B there is the possibility to have clear tex
 
 We strongly recommend users take the following steps:
 <ul>
-<li> Upgrade to the latest 1.6 release.
-<li> Change your  RAMADDA passwords. 
-<li> Delete any of the access.log or repository.log files in your ramadda home/logs directory on your server.
-<li> If you are running RAMADDA from within Apache and/or Tomcat they too may have the passwords exposed in their access logs. 
-
-</ul>
-
-<p>
-
-Some RAMADDA html templates may import resources (e.g., style sheets, images) from somewhere other than RAMADDA.  In that case, passwords may also  be exposed in the REFERER HTTP argument for the resource request.
-To check grep for "password=" in the logs. Delete the logs if necessary. 
-
-<p>
+<li> Delete any of the access.log or repository.log files in your <i>&lt;ramadda home&gt;/logs</i> directory on your server.   If you are running RAMADDA from within Apache and/or Tomcat they too may have the passwords exposed in their access logs. 
+<li> Upgrade to the latest 1.6 release and change your  RAMADDA passwords. 
 There is a new Admin-&gt;Maintenance-&gt;Clear All Passwords service that allows you to
 clear all of the passwords held in the RAMADDA user database.
-<p>
+<li> Some RAMADDA html templates may import resources (e.g., style sheets, images) from servers other than RAMADDA.  In that case, passwords may also  be exposed in those server logs in the REFERER HTTP argument.
+</ul>
+
+
+
+
+
 
 
 <b>What happened?</b><br>
@@ -135,11 +133,9 @@ When you are visiting any page in RAMADDA the Login link that is shown has an ex
 
 The exposure comes about in the following way:
 <ul>
-<li> Go to the login page
-<li> Enter an incorrect  password or userid and attempt to login
-<li> The result page will show the login error. But, the  Login link in the upper right will have as its redirect argument the original credentials.
-<li> In the result page,  if you then login correctly through the form there is no problem.
-<li> However,  if you click on the Login link again then login successfully you will be redirected back to the login page with your original credentials showing up in the URL. 
+<li> Go to the login page and enter an incorrect  password or userid and attempt to login
+<li> The result page will show the login error. But, the  Login link in the upper right will have as its redirect argument the original credentials. If you then login correctly through the form there is no problem.
+<li> However,  if you click on the Login link again then login successfully you will be redirected back to the login page with your original credentials showing up in the URL. This results in your password being passed back to the server as the REFERER URL for that page and any resources the page loads. 
 </ul>
 
 
