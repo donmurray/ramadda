@@ -317,19 +317,21 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
         CalendarDate[]     dates      = new CalendarDate[2];
         Calendar           cal        = null;
         String             calString  = request.getString(ARG_CALENDAR, null);
-        if (calString == null) {
-            calString = allDates.get(0).getCalendar().toString();
-        }
-        if (request.defined(ARG_FROMDATE)) {
-            String fromDateString = request.getString(ARG_FROMDATE,
-                                        formatDate(request, allDates.get(0)));
-            dates[0] = CalendarDate.parseISOformat(calString, fromDateString);
-        }
-        if (request.defined(ARG_TODATE)) {
-            String toDateString = request.getString(ARG_TODATE,
-                                      formatDate(request,
-                                          allDates.get(allDates.size() - 1)));
-            dates[1] = CalendarDate.parseISOformat(calString, toDateString);
+        if (!allDates.isEmpty()) { // have to have some dates
+            if (calString == null) {
+                calString = allDates.get(0).getCalendar().toString();
+            }
+            if (request.defined(ARG_FROMDATE)) {
+                String fromDateString = request.getString(ARG_FROMDATE,
+                                            formatDate(request, allDates.get(0)));
+                dates[0] = CalendarDate.parseISOformat(calString, fromDateString);
+            }
+            if (request.defined(ARG_TODATE)) {
+                String toDateString = request.getString(ARG_TODATE,
+                                          formatDate(request,
+                                              allDates.get(allDates.size() - 1)));
+                dates[1] = CalendarDate.parseISOformat(calString, toDateString);
+            }
         }
         //have to have both dates
         if ((dates[0] != null) && (dates[1] == null)) {
