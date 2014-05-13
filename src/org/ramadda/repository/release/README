@@ -1,9 +1,10 @@
 
 
 The latest version is 
+
 repository.war: self contained war file for running under Tomcat, Glassfish, etc
 
-ramadda1.6b.zip: stand-alone version of RAMADDA. Just needs Java to run. Download and unzip the file
+ramadda1.6.zip: stand-alone version of RAMADDA. Just needs Java to run. Download and unzip the file
 
 allplugins.jar: You only need this if you have previously installed RAMADDA without 
 installing allplugins.jar
