@@ -1649,16 +1649,20 @@ public class RepositoryClient extends RepositoryBase {
         RequestUrl URL_ENTRY_SEARCH = new RequestUrl(this, "/search/do",
                                           "Search");
         List<String> argList = new ArrayList<String>();
+        String output  = "xml.xml";
         for (String[] args : searchArgs) {
             if (args[0].startsWith("-")) {
                 args[0] = args[0].substring(1);
+            }
+            if(args[0].equals("output")) {
+                output = args[1];
             }
             argList.add(args[0]);
             argList.add(args[1]);
         }
         checkSession();
         argList.add(ARG_OUTPUT);
-        argList.add("xml.xml");
+        argList.add(output);
         argList.add(ARG_SESSIONID);
         argList.add(getSessionId());
         String url = HtmlUtils.url(URL_ENTRY_SEARCH.getFullUrl(), argList);
