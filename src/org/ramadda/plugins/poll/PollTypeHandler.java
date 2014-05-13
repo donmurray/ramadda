@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -27,12 +27,13 @@ import org.ramadda.repository.metadata.*;
 import org.ramadda.repository.output.OutputHandler;
 import org.ramadda.repository.type.*;
 
-
 import org.ramadda.sql.Clause;
 
 
 import org.ramadda.sql.SqlUtil;
 import org.ramadda.sql.SqlUtil;
+
+import org.ramadda.util.FormInfo;
 
 import org.ramadda.util.HtmlUtils;
 
@@ -124,9 +125,11 @@ public class PollTypeHandler extends BlobTypeHandler {
      * @param request _more_
      * @param formBuffer _more_
      * @param entry _more_
+     * @param formInfo _more_
      */
-    public void addColumnsToEntryForm(Request request,
-                                      StringBuffer formBuffer, Entry entry) {
+    @Override
+    public void addColumnsToEntryForm(Request request, Appendable formBuffer,
+                                      Entry entry, FormInfo formInfo) {
         try {
             Hashtable    props   = getProperties(entry);
             List<String> choices = (List<String>) props.get(ATTR_CHOICES);
@@ -164,6 +167,7 @@ public class PollTypeHandler extends BlobTypeHandler {
      * @param type _more_
      * @return _more_
      */
+    @Override
     public String getTypePermissionName(String type) {
         if (type.equals(Permission.ACTION_TYPE1)) {
             return "Who can add to poll";
@@ -185,6 +189,7 @@ public class PollTypeHandler extends BlobTypeHandler {
      *
      * @throws Exception _more_
      */
+    @Override
     public void initializeEntryFromForm(Request request, Entry entry,
                                         Entry parent, boolean newEntry)
             throws Exception {
@@ -213,14 +218,12 @@ public class PollTypeHandler extends BlobTypeHandler {
      *
      * @param request _more_
      * @param entry _more_
-     * @param group _more_
-     * @param subGroups _more_
-     * @param entries _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
+    @Override
     public Result getHtmlDisplay(Request request, Entry entry)
             throws Exception {
 
