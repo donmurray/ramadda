@@ -898,7 +898,8 @@ public class Utils {
             String name = tmp.substring(openParenIdx + 1, colonIdx);
             names.add(name);
             gotAttributeInPattern = true;
-            tmp                   = tmp.substring(colonIdx + 1);
+            pattern.append(tmp.substring(colonIdx+1,closeParenIdx+1));
+            tmp                   = tmp.substring(closeParenIdx + 1);
         }
         if ( !gotAttributeInPattern) {
             pattern = new StringBuffer(filePatternString);
