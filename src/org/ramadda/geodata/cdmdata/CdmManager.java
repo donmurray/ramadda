@@ -181,6 +181,9 @@ public class CdmManager extends RepositoryManager {
     /** the cdm manager id */
     public static final String CDMMANAGER_ID = "cdmmanager";
 
+    /** climate model file type */
+	private static final String TYPE_CLIMATE_MODEL_GRANULE = "climate_modelfile";
+
 
     /**
      * Create a new CdmManager
@@ -685,6 +688,10 @@ public class CdmManager extends RepositoryManager {
 
         if (entry.isType(OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
             return true;
+        }
+        
+        if (entry.isType(TYPE_CLIMATE_MODEL_GRANULE)) {
+        	return true;
         }
 
         if (isGrads(entry)) {

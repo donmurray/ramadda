@@ -21,33 +21,23 @@
 package org.ramadda.geodata.model;
 
 
-import org.ramadda.repository.*;
-import org.ramadda.repository.metadata.*;
-import org.ramadda.repository.metadata.Metadata;
-import org.ramadda.util.HtmlUtils;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import org.ramadda.repository.Entry;
+import org.ramadda.repository.ImportHandler;
+import org.ramadda.repository.Repository;
+import org.ramadda.repository.Request;
 import org.ramadda.util.Utils;
 
-
-import org.w3c.dom.*;
-
-import ucar.unidata.util.DateUtil;
-
 import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.Misc;
-
-
 import ucar.unidata.util.StringUtil;
-
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
-
-import java.io.*;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Hashtable;
-
-import java.util.List;
 
 
 /**
@@ -133,19 +123,30 @@ public class OpendapImporter extends ImportHandler {
                               String csv)
             throws Exception {
 
-        String entryType = "climate_modelfile";
-        String filepattern = ClimateModelFileTypeHandler.FILE_REGEX;
+        String       entryType    = "climate_modelfile";
+        String       filepattern  = ClimateModelFileTypeHandler.FILE_REGEX;
+        List<String> patternNames = new ArrayList<String>();
+        Pattern      myPattern    = Pattern.compile(filepattern);
         for (String line : StringUtil.split(csv, "\n", true, true)) {
             if (line.startsWith("#")) {
                 continue;
             }
             System.err.println("Line:" + line);
             // check for a pattern
-            if (line.startsWith(ClimateModelFileTypeHandler.PROP_FILE_PATTERN)) {
-                String pattern = line.substring(ClimateModelFileTypeHandler.PROP_FILE_PATTERN.length());
-                if (!pattern.isEmpty()) {
-                    filepattern = pattern;
+            if (line.startsWith(
+                    ClimateModelFileTypeHandler.PROP_FILE_PATTERN)) {
+                String pattern =
+                    line
+                    .substring(ClimateModelFileTypeHandler.PROP_FILE_PATTERN
+                        .length()+1);
+                if ( !pattern.isEmpty()) {
+                    filepattern  = pattern;
+                    patternNames = new ArrayList<String>();
+                    String userPattern =
+                        Utils.extractPatternNames(filepattern, patternNames);
+                    myPattern = Pattern.compile(userPattern);
                 }
+
                 continue;
             }
             System.out.println("Using file pattern: " + filepattern);
@@ -156,10 +157,34 @@ public class OpendapImporter extends ImportHandler {
             StringBuffer innerXml = new StringBuffer();
 
             //TODO: extract the attributes from the url
-            String model      = "";
-            String experiment = "";
-            String ensemble   = "";
-            String variable   = "";
+            String  file       = IOUtil.getFileTail(name);
+            String  model      = "";
+            String  experiment = "";
+            String  ensemble   = "mean";
+            String  variable   = "";
+            Matcher matcher          = myPattern.matcher(file);
+            if ( !matcher.find()) {
+                System.err.println("no match for: " + file);
+
+                // TODO:  should we continue?
+                continue;
+            }
+            for (int dataIdx = 0; dataIdx < patternNames.size(); dataIdx++) {
+                String dataName = patternNames.get(dataIdx);
+                if ( !Utils.stringDefined(dataName)) {
+                    continue;
+                }
+                String value = (String) matcher.group(dataIdx + 1);
+                if (dataName.equals("model")) {
+                      model = value;
+                } else if (dataName.equals("experiment")) {
+                      experiment = value;
+                } else if (dataName.equals("ensemble")) {
+                      ensemble = value;
+                } else if (dataName.equals("variable")) {
+                      variable = value;
+                }
+            }
 
             innerXml.append(XmlUtil.tag("collection_id", "", parent.getId()));
             innerXml.append(XmlUtil.tag("model", "", model));
