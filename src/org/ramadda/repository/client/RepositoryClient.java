@@ -1506,7 +1506,7 @@ public class RepositoryClient extends RepositoryBase {
      *
      * @return _more_
      */
-    private static String argLine(String arg, String desc) {
+    public static String argLine(String arg, String desc) {
         return "\t" + arg + " " + desc + "\n";
     }
 
@@ -1678,7 +1678,7 @@ public class RepositoryClient extends RepositoryBase {
      *
      * @throws Exception _more_
      */
-    private void preProcessArgs(String[] args) throws Exception {
+    public void preProcessArgs(String[] args) throws Exception {
         for (int i = 3; i < args.length; i++) {
             String arg = args[i];
             if (arg.equals(CMD_TIMEOUT)) {
@@ -1700,7 +1700,7 @@ public class RepositoryClient extends RepositoryBase {
      *
      * @throws Exception _more_
      */
-    private void processCommandLine(String[] args) throws Exception {
+    public void processCommandLine(String[] args) throws Exception {
 
         String     xmlFile   = null;
         List<File> files     = new ArrayList<File>();
