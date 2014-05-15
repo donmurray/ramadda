@@ -549,7 +549,7 @@ begin
   else
     levelunit = ""
   end if
-  if (isdefined(levelunit) .and. levelunit .eq. "Pa") then
+  if (levelunit .eq. "Pa") then
     level = level/100
     levelunit = "hPa"
   end if
