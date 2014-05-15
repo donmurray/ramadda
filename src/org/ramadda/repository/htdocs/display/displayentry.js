@@ -955,6 +955,7 @@ function RamaddaMetadataDisplay(displayManager, id, properties) {
                     "content.pagestyle": true,
                     "content.pagetemplate": true,
                     "content.sort": true,
+                    "spatial.polygon":true,
                 };
                 var headerItems = [];
                 headerItems.push(HtmlUtil.th([ATTR_CLASS, "display-metadata-table-cell"],HtmlUtil.b(typeName)));
