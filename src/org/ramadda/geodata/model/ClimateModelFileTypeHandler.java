@@ -112,7 +112,9 @@ public class ClimateModelFileTypeHandler extends GranuleTypeHandler {
         }
         //System.err.println("no values set");
         String filepath = entry.getFile().toString();
-        String filename = IOUtil.getFileTail(entry.getFile().toString());
+        // strip off entry.das in case it's an opendap link from RAMADDA
+        filepath = filepath.replaceAll("/entry.das", "");
+        String filename = IOUtil.getFileTail(filepath);
         // Filename looks like  var_model_scenario_ens??_<date>.nc
         Matcher m = pattern.matcher(filename);
         if ( !m.find()) {

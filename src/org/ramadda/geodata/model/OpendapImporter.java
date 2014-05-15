@@ -157,6 +157,10 @@ public class OpendapImporter extends ImportHandler {
             StringBuffer innerXml = new StringBuffer();
 
             //TODO: extract the attributes from the url
+            //String  file       = IOUtil.getFileTail(name);
+            // if it comes from RAMADDA, strip off the /entry.das
+            name = name.replaceAll("/entry.das", "");
+            
             String  file       = IOUtil.getFileTail(name);
             String  model      = "";
             String  experiment = "";
@@ -169,6 +173,7 @@ public class OpendapImporter extends ImportHandler {
                 // TODO:  should we continue?
                 continue;
             }
+            
             for (int dataIdx = 0; dataIdx < patternNames.size(); dataIdx++) {
                 String dataName = patternNames.get(dataIdx);
                 if ( !Utils.stringDefined(dataName)) {
