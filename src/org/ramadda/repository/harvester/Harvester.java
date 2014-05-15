@@ -892,6 +892,10 @@ public abstract class Harvester extends RepositoryManager {
      */
     public final void run() throws Exception {
         try {
+            if(active) {
+                logHarvesterError("Error: harvester is already running", null);
+                return;
+            }
             error = new StringBuffer();
             setActive(true);
             runInner(++timestamp);
