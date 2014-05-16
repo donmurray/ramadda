@@ -266,7 +266,7 @@ public class NCLModelPlotDataProcess extends DataProcess {
             for (Entry entry : opEntries) {
                 if (haveOne) {
                     fileList.append(",");
-                    nameList.append(",");
+                    nameList.append(";");
                 }
                 //fileList.append("\"");
                 fileList.append(entry.getResource().toString());

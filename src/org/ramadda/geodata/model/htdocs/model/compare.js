@@ -376,6 +376,7 @@ function CollectionForm(formId, type) {
                     if(label == "") {
                         label =  "--";
                     }
+                    if (value == "sprd" || value == "clim") continue;
                     var extra = "";
                     if(currentValue == value) {
                         extra = " selected ";

@@ -930,7 +930,7 @@ begin
     numfiles = dimsizes(ncfiles)
     titles = new((/numfiles/),string)
   else 
-    titles=str_split(tmptitles,",")
+    titles=str_split(tmptitles,";")
   end if
   
   ; output variables
