@@ -24,12 +24,13 @@ pre {
 
 
 By default RAMADDA uses a built in Java Derby relational database. 
-RAMADDA also runs using MySQL, PostgresSQL, Oracle and H2.
+RAMADDA also can run using MySQL, PostgresSQL, Oracle and H2.
 Derby works pretty well though there are some performance issues with search and doing many deletes.
 If you are planning on really using RAMADDA and foresee a large amount of content stored in the
-repository (by large we don't mean  file size but rather we mean the number of entries in the repository)
+repository (by large we  we mean the number of entries in the repository not the overall file size)
 then its probably a good idea to use mysql or postgres. 
 <p>
+
 
 The database to use and its connection parameters are specified in a .properties file, e.g., db.properties. 
 The properties file can be placed in the <a href="installing.html#properties">ramadda home directory</a>.
@@ -44,16 +45,47 @@ ramadda.db=derby
 
 
 And then specify the jdbc url and the login credentials.
-
-e..g, for MySQL:
+The URLS can be  of the form:
 <pre>
+jdbc:&lt;db type&gt;://&lt;hostname&gt;/&lt;database name&gt;
+jdbc:&lt;db type&gt;:&lt;database name&gt;
+jdbc:&lt;db type&gt;://&lt;hostname&gt;/&lt;database name&gt;
+jdbc:&lt;db type&gt;://&lt;hostname&gt;:port/&lt;database name&gt;
+</pre>
+
+If you are running the database on the same machine as RAMADDA the hostname can be "localhost".
+In the below examples we assume a database called "repository".
+
+
+<h2>MySQL</h2>
+For <a href="http://dev.mysql.com/doc/connector-j/en/connector-j-reference-configuration-properties.html">MySQL</a>:
+
+<pre>
+ramadda.db=mysql
 ramadda.db.mysql.url=jdbc:mysql://localhost:3306/repository?zeroDateTimeBehavior=convertToNull
 ramadda.db.mysql.user=the database user
 ramadda.db.mysql.password=the database password
 </pre>
 
-For H2 the default is to store the database in the RAMADDA home directory:
+
+<h3>Postgres</h3>
+For <a href="jdbc:postgresql://host:port/database">Postgres</a>:
+
 <pre>
+ramadda.db=postgres
+#note: the jdbc url uses "postgresql" as the database type
+ramadda.db.postgres.url=jdbc:postgresql://localhost/repository
+ramadda.db.postgres.user=the database user
+ramadda.db.postgres.password=the database password
+</pre>
+
+
+
+
+<h3>H2</h3>
+For H2 the default setting specifies  the database to be in the RAMADDA home directory under the sub-directory h2db. The JDBC URL has the full file path of where to store the database.
+<pre>
+ramadda.db=h2
 ramadda.db.h2.url=jdbc:h2:%repositorydir%/h2db
 ramadda.db.h2.user=
 ramadda.db.h2.password=
