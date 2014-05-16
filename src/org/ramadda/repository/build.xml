@@ -111,20 +111,40 @@
             </manifest> 
 
             <include name="org/**/*.class"/>
+<!--
             <include name="${lib_dir}/unidatautil.jar"/>
+-->
             <include name="${ramadda_dir}/htdocs/icons/folderopen.png"/>
             <include name="${ramadda_dir}/htdocs/icons/folderclosed.png"/>
-
 	    </jar>
+
+        <jar 
+            basedir="${compile_dir}"
+            update="false"
+            compress="true"
+            jarfile="${dist_dir}/ramaddasearch.jar">
+           <include name="org/**/*.class"/>
+           <include name="${ramadda_dir}/htdocs/icons/folderopen.png"/>
+           <manifest>
+              <attribute name="Implementation-Title" value="Ramadda Search Client"/>
+              <attribute name="Implementation-Version" value="1.0"/>
+              <attribute name="Implementation-Vendor" value="RAMADDA"/>
+              <attribute name="Main-class" value="org.ramadda.repository.client.RepositorySearch"/>
+              <attribute name="Class-Path" value="unidatautil.jar commons-httpclient-3.1.jar commons-logging-1.1.jar commons-codec-1.3.jar"/>
+            </manifest> 
+       </jar>
 
         <zip destfile="${dist_dir}/${clientbase}.zip">
          <zipfileset dir="${dist_dir}" includes="${clientbase}.jar" fullpath="${clientbase}/lib/${clientbase}.jar"/>
+         <zipfileset dir="${dist_dir}" includes="ramaddasearch.jar" fullpath="${clientbase}/lib/ramaddasearch.jar"/>
          <zipfileset dir="${lib_dir}" includes="unidatautil.jar" fullpath="${clientbase}/lib/unidatautil.jar"/>
          <zipfileset dir="${lib_dir}" includes="commons-httpclient-3.1.jar" fullpath="${clientbase}/lib/commons-httpclient-3.1.jar"/>
          <zipfileset dir="${lib_dir}" includes="commons-logging-1.1.jar" fullpath="${clientbase}/lib/commons-logging-1.1.jar"/>
          <zipfileset dir="${lib_dir}" includes="commons-codec-1.3.jar" fullpath="${clientbase}/lib/commons-codec-1.3.jar"/>
          <zipfileset dir="${ramadda_dir}/release" includes="README.CLIENT" fullpath="${clientbase}/README"/>
          <zipfileset dir="${ramadda_dir}/client" includes="ramaddaclient.sh" fullpath="${clientbase}/ramaddaclient.sh"/>
+         <zipfileset dir="${ramadda_dir}/client" includes="search.sh" fullpath="${clientbase}/search.sh"/>
+         <zipfileset dir="${ramadda_dir}/client" includes="ramaddaenv.sh" fullpath="${clientbase}/ramaddaenv.sh"/>
         </zip>
 
     </target>

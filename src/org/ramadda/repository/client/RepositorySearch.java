@@ -119,14 +119,33 @@ public class RepositorySearch extends RepositoryClient  {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
-        if (args.length < 3) {
-            usage("Incorrect number of arguments");
+        String repository = System.getenv(PROP_REPOSITORY);
+        String user = System.getenv(PROP_USER);
+        String password = System.getenv(PROP_PASSWORD);
+        if(repository == null) {
+            repository = "http://localhost/repository";
         }
-        try {
-            if (args[0].startsWith("-") || args[1].startsWith("-")
-                    || args[2].startsWith("-")) {
-                usage("Incorrect argument");
+        if(user == null) {
+            user = "";
+        }
+        if(password == null) {
+            password = "";
+        }
+
+        List<String> argList = new ArrayList<String>();
+        for(int i=0;i<args.length;i++)  {
+            if(args[i].startsWith("-repos")) {
+                repository = args[++i];
+            } else if(args[i].equals("-user")) {
+                user = args[++i];
+            } else if(args[i].equals("-password")) {
+                password = args[++i];
+            } else {
             }
+        }
+
+
+        try {
             RepositorySearch client = new RepositorySearch(new URL(args[0]),
                                                            args[1], args[2]);
             client.preProcessArgs(args);

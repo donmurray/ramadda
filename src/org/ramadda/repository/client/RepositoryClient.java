@@ -57,6 +57,13 @@ import java.util.zip.ZipOutputStream;
  */
 public class RepositoryClient extends RepositoryBase {
 
+    public static final String PROP_REPOSITORY = "RAMADDA_CLIENT_REPOSITORY";
+
+    public static final String PROP_USER = "RAMADDA_CLIENT_USER";
+
+    public static final String PROP_PASSWORD = "RAMADDA_CLIENT_PASSWORD";
+
+
     /** _more_ */
     public static final String CMD_URL = "-url";
 
