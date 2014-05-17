@@ -173,7 +173,8 @@ public class CsvOutputHandler extends OutputHandler {
             if (columns == null) {
                 continue;
             }
-            if (maxStringSize == null) {
+            if ((maxStringSize == null)
+                    || (maxStringSize.length < columns.size())) {
                 maxStringSize = new int[columns.size()];
                 for (int i = 0; i < maxStringSize.length; i++) {
                     maxStringSize[i] = 0;
@@ -199,7 +200,7 @@ public class CsvOutputHandler extends OutputHandler {
             //            }
         }
 
-        Hashtable<String,Column> columnMap = null;
+        Hashtable<String, Column> columnMap = null;
 
 
 
@@ -239,10 +240,9 @@ public class CsvOutputHandler extends OutputHandler {
                 sb.append("\n");
             }
 
-            Object[] values =
-                entry.getTypeHandler().getEntryValues(entry);
+            Object[] values = entry.getTypeHandler().getEntryValues(entry);
 
-            int colCnt = 0;
+            int      colCnt = 0;
             for (String field : fieldNames) {
                 if (colCnt != 0) {
                     sb.append(delimiter);
@@ -311,7 +311,7 @@ public class CsvOutputHandler extends OutputHandler {
                         }
                     }
                 } else {
-                    if(columnMap==null) {
+                    if (columnMap == null) {
                         columnMap = new Hashtable<String, Column>();
                         List<Column> columns =
                             entry.getTypeHandler().getColumns();
@@ -326,7 +326,7 @@ public class CsvOutputHandler extends OutputHandler {
                         }
                     }
                     Column column = columnMap.get(field);
-                    if(column!=null) {
+                    if (column != null) {
                         String s = sanitize(column.getString(values));
                         sb.append(s);
                     } else {
