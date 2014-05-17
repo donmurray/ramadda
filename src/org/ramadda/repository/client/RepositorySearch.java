@@ -126,6 +126,15 @@ public class RepositorySearch extends RepositoryClient  {
             } else if(arg.equals("-type")) {
                 argList.add(ARG_TYPE);
                 argList.add(args.get(++i));
+            } else if(arg.equals("-tag")) {
+                argList.add("metadata.attr1.enum_tag");
+                argList.add(args.get(++i));
+            } else if(arg.equals("-keyword")) {
+                argList.add("metadata.attr1.content.keyword");
+                argList.add(args.get(++i));
+            } else if(arg.equals("-variable")) {
+                argList.add("metadata.attr1.thredds.variable");
+                argList.add(args.get(++i));
             } else if(arg.equals("-output")) {
                 output = args.get(++i);
                 if(output.equals("wget")) output = "wget.wget";
@@ -208,7 +217,7 @@ public class RepositorySearch extends RepositoryClient  {
     public static void usage(String msg) {
         System.err.println(msg);
         System.err.println(
-            "Usage: RepositorySearch -repository <server url> -user <user id> <password> -text <search text> -output <csv|wget|...>  -type <entry type> ");
+            "Usage: RepositorySearch -repository <server url> -user <user id> <password> -text <search text> -output <csv|wget|...>  -type <entry type> -variable <var name> -tag <tag> -keyword <keyword>");
         System.exit(1);
     }
 
