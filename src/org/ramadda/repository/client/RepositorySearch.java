@@ -32,8 +32,10 @@ import org.w3c.dom.Element;
 
 import ucar.unidata.ui.HttpFormEntry;
 import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.xml.XmlUtil;
+
 
 
 import java.io.ByteArrayOutputStream;
@@ -58,6 +60,8 @@ import java.util.zip.ZipOutputStream;
 public class RepositorySearch extends RepositoryClient  {
 
     private String output = "default.csv";
+
+    private boolean download = false;
 
     /**
      * _more_
@@ -135,10 +139,24 @@ public class RepositorySearch extends RepositoryClient  {
             } else if(arg.equals("-variable")) {
                 argList.add("metadata.attr1.thredds.variable");
                 argList.add(args.get(++i));
+            } else if(arg.equals("-fields")) {
+                argList.add("fields");
+                argList.add(args.get(++i));
+                output = "default.csv";
+            } else if(arg.equals("-download")) {
+                download = true;
+                argList.add("fields");
+                argList.add("name,url");
+                output = "default.csv";
             } else if(arg.equals("-output")) {
                 output = args.get(++i);
                 if(output.equals("wget")) output = "wget.wget";
                 else if(output.equals("csv")) output = "default.csv";
+                else if(output.equals("name")) {
+                    output = "default.csv";
+                    argList.add("fields");
+                    argList.add("name");
+                }
             } else {
                 usage("Unknown arg:" + arg);
             }
@@ -153,9 +171,25 @@ public class RepositorySearch extends RepositoryClient  {
         argList.add(getSessionId());
         String url = HtmlUtils.url(URL_ENTRY_SEARCH.getFullUrl(), argList);
         String xml = IOUtil.readContents(url, getClass());
+
+        if(download) {
+            handleDownload(xml);
+            return;
+        }
         System.out.println(xml);
     }
 
+
+    private void handleDownload(String csv) throws Exception {
+        List<String> lines = StringUtil.split(csv,"\n", true,true);
+        for(int i=0;i<lines.size();i++) {
+            if(i == 0) continue;
+            List<String> toks = StringUtil.splitUpTo(lines.get(i),",",2);
+            String name   = toks.get(0);
+            String url   = toks.get(1);
+            System.err.println (name +" " + url);
+        }
+    }
 
     /**
      * _more_
@@ -217,7 +251,7 @@ public class RepositorySearch extends RepositoryClient  {
     public static void usage(String msg) {
         System.err.println(msg);
         System.err.println(
-            "Usage: RepositorySearch -repository <server url> -user <user id> <password> -text <search text> -output <csv|wget|...>  -type <entry type> -variable <var name> -tag <tag> -keyword <keyword>");
+            "Usage: RepositorySearch -repository <server url> -user <user id> <password> -text <search text> -output <csv|wget|name|...>  -type <entry type> -variable <var name> -tag <tag> -keyword <keyword>");
         System.exit(1);
     }
 
