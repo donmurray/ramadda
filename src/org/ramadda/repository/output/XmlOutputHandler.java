@@ -208,7 +208,9 @@ public class XmlOutputHandler extends OutputHandler {
             ATTR_TODATE,
             getPageHandler().formatDate(new Date(entry.getEndDate())),
             ATTR_CREATEDATE,
-            getPageHandler().formatDate(new Date(entry.getCreateDate()))
+            getPageHandler().formatDate(new Date(entry.getCreateDate())),
+            ATTR_PATH,
+            entry.getFullName(false)
         });
 
 

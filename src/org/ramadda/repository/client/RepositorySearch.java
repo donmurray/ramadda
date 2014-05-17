@@ -38,6 +38,7 @@ import ucar.unidata.xml.XmlUtil;
 
 
 
+import java.io.FileOutputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -62,6 +63,10 @@ public class RepositorySearch extends RepositoryClient  {
     private String output = "default.csv";
 
     private boolean download = false;
+
+    private boolean overwrite = false;
+
+    private boolean showMetadata = false;
 
     /**
      * _more_
@@ -130,6 +135,26 @@ public class RepositorySearch extends RepositoryClient  {
             } else if(arg.equals("-type")) {
                 argList.add(ARG_TYPE);
                 argList.add(args.get(++i));
+            } else if(arg.equals("-daterange")) {
+                argList.add("datadate.from");
+                argList.add(args.get(++i));
+                argList.add("datadate.to");
+                argList.add(args.get(++i));
+            } else if(arg.equals("-mindate")) {
+                argList.add("datadate.from");
+                argList.add(args.get(++i));
+            } else if(arg.equals("-maxdate")) {
+                argList.add("datadate.to");
+                argList.add(args.get(++i));
+            } else if(arg.equals("-bounds")) {
+                argList.add(ARG_AREA_NORTH);
+                argList.add(args.get(++i));
+                argList.add(ARG_AREA_WEST);
+                argList.add(args.get(++i));
+                argList.add(ARG_AREA_SOUTH);
+                argList.add(args.get(++i));
+                argList.add(ARG_AREA_EAST);
+                argList.add(args.get(++i));
             } else if(arg.equals("-tag")) {
                 argList.add("metadata.attr1.enum_tag");
                 argList.add(args.get(++i));
@@ -143,6 +168,8 @@ public class RepositorySearch extends RepositoryClient  {
                 argList.add("fields");
                 argList.add(args.get(++i));
                 output = "default.csv";
+            } else if(arg.equals("-overwrite")) {
+                overwrite = true;
             } else if(arg.equals("-download")) {
                 download = true;
                 argList.add("fields");
@@ -150,9 +177,14 @@ public class RepositorySearch extends RepositoryClient  {
                 output = "default.csv";
             } else if(arg.equals("-output")) {
                 output = args.get(++i);
-                if(output.equals("wget")) output = "wget.wget";
-                else if(output.equals("csv")) output = "default.csv";
-                else if(output.equals("name")) {
+                if(output.equals("wget")) {
+                    output = "wget.wget";
+                } else if(output.equals("csv")) {
+                    output = "default.csv";
+                }  else if(output.equals("metadata")) {
+                    output = "xml.xml";
+                    showMetadata = true;
+                }  else if(output.equals("name")) {
                     output = "default.csv";
                     argList.add("fields");
                     argList.add("name");
@@ -176,18 +208,76 @@ public class RepositorySearch extends RepositoryClient  {
             handleDownload(xml);
             return;
         }
+
+        if(showMetadata) {
+            handleMetadata(xml);
+            return;
+        }
+
         System.out.println(xml);
+    }
+
+
+    private void handleMetadata(String xml) throws Exception {
+        Element root = XmlUtil.getRoot(xml);
+        System.err.println (XmlUtil.toString(root));
+        List children = XmlUtil.findChildren(root, "entry");
+        if(children.size() == 0) {
+            System.err.println("no results found:\n" + XmlUtil.toString(root));
+        }
+        for (int i = 0; i < children.size(); i++) {
+            Element entry = (Element) children.get(i);
+            System.out.println("name: " + XmlUtil.getAttribute(entry,"name",""));
+            System.out.println("path: " + XmlUtil.getAttribute(entry,"path",""));
+            System.out.println("\tcreate date: " + XmlUtil.getAttribute(entry,"createdate",""));
+            System.out.println("\tfrom date: " + XmlUtil.getAttribute(entry,"fromdate",""));
+            System.out.println("\tto date: " + XmlUtil.getAttribute(entry,"todate",""));
+            System.out.println("\tfile size: " + XmlUtil.getAttribute(entry,"filesize","0"));
+            List mdts = XmlUtil.findChildren(entry, "metadata");
+            for (int j = 0; j < mdts.size(); j++) {
+                Element mdt = (Element) mdts.get(j);
+                String type = XmlUtil.getAttribute(mdt,"type","");
+                System.out.println("\tmetadata: " + type);
+                List attrs = XmlUtil.findChildren(mdt, "attr");
+                for (int k = 0; k < attrs.size(); k++) {
+                    Element attr = (Element) attrs.get(k);
+                    String childText = new String(RepositoryUtil.decodeBase64(XmlUtil.getChildText(attr)));
+                    System.out.println("\t\tattr[" + k +"]="  + childText);
+                }
+
+            }            
+        }
+        
     }
 
 
     private void handleDownload(String csv) throws Exception {
         List<String> lines = StringUtil.split(csv,"\n", true,true);
         for(int i=0;i<lines.size();i++) {
+            
             if(i == 0) continue;
-            List<String> toks = StringUtil.splitUpTo(lines.get(i),",",2);
+            String line = lines.get(i);
+            //            System.err.println("line:" + line);
+            List<String> toks = StringUtil.splitUpTo(line,",",2);
+            if(toks.size() != 2) {
+                continue;
+            }
             String name   = toks.get(0);
+            File f = new File(name);
+            if(f.exists()) {
+                if(!overwrite) {
+                    System.err.println ("Not overwriting:" + f);
+                    continue;
+                }
+                System.err.println ("Overwriting:" + f);
+            }
             String url   = toks.get(1);
-            System.err.println (name +" " + url);
+            InputStream inputStream = IOUtil.getInputStream(url, getClass());
+            FileOutputStream fos = new FileOutputStream(f);
+            IOUtil.writeTo(inputStream, fos);
+            IOUtil.close(fos);
+            IOUtil.close(inputStream);
+            System.err.println ("downloaded:" + name);
         }
     }
 
@@ -251,7 +341,7 @@ public class RepositorySearch extends RepositoryClient  {
     public static void usage(String msg) {
         System.err.println(msg);
         System.err.println(
-            "Usage: RepositorySearch -repository <server url> -user <user id> <password> -text <search text> -output <csv|wget|name|...>  -type <entry type> -variable <var name> -tag <tag> -keyword <keyword>");
+            "Usage: RepositorySearch -repository <server url> -user <user id> <password> -output <csv|wget|name|metadata|...>  -download -overwrite \n-text <search text>  \n-type <entry type> \n-variable <var name> \n-tag <tag> \n-keyword <keyword> \n-bounds <north> <west> <south> <east> \n-daterange <startdate yyyy-MM-dd> <todate yyyy-MM-dd> \n-mindate <startdate yyyy-MM-dd> \n-maxdate <startdate yyyy-MM-dd> ");
         System.exit(1);
     }
 

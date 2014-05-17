@@ -493,6 +493,8 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_TODATE = "todate";
 
+    public static final String ATTR_PATH = "path";
+
     /** _more_ */
     public static final String ATTR_CREATEDATE = "createdate";
 

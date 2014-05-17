@@ -6,7 +6,7 @@ JAVA=java
 dirname=`dirname $0`
 
 
-${JAVA} -Xmx512m  -jar ${dirname}/lib/ramaddaclient.jar "$@"
+${JAVA} -Xmx512m  -jar ${dirname}/lib/ramaddasearch.jar "$@"
 
 
 

@@ -267,9 +267,10 @@ public class CsvOutputHandler extends OutputHandler {
                             entry.getTypeHandler().getResourcePath(
                                 request, entry));
                     } else if (entry.getResource().isFile()) {
-                        sb.append(
-                            entry.getTypeHandler().getEntryResourceUrl(
-                                request, entry));
+                        String url = entry.getTypeHandler().getEntryResourceUrl(
+                                                                                request, entry);
+                        url = request.getAbsoluteUrl(url);
+                        sb.append(url);
                     } else {}
                 } else if (field.equals("latitude")) {
                     sb.append(entry.getLatitude());
