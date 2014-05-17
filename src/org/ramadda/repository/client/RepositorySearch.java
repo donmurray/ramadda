@@ -57,6 +57,8 @@ import java.util.zip.ZipOutputStream;
  */
 public class RepositorySearch extends RepositoryClient  {
 
+    private String output = "default.csv";
+
     /**
      * _more_
      */
@@ -111,6 +113,41 @@ public class RepositorySearch extends RepositoryClient  {
         super(hostname, port, base, user, password);
     }
 
+    private void doSearch(List<String> args) throws Exception {
+        RequestUrl URL_ENTRY_SEARCH = new RequestUrl(this, "/search/do",
+                                          "Search");
+
+        List<String> argList = new ArrayList<String>();
+        for(int i=0;i<args.size();i++) {
+            String arg = args.get(i);
+            if(arg.equals("-text")) {
+                argList.add(ARG_TEXT);
+                argList.add(args.get(++i));
+            } else if(arg.equals("-type")) {
+                argList.add(ARG_TYPE);
+                argList.add(args.get(++i));
+            } else if(arg.equals("-output")) {
+                output = args.get(++i);
+                if(output.equals("wget")) output = "wget.wget";
+                else if(output.equals("csv")) output = "default.csv";
+            } else {
+                usage("Unknown arg:" + arg);
+            }
+        }
+
+        //        argList.add(args[0]);
+        //argList.add(args[1]);
+        checkSession();
+        argList.add(ARG_OUTPUT);
+        argList.add(output);
+        argList.add(ARG_SESSIONID);
+        argList.add(getSessionId());
+        String url = HtmlUtils.url(URL_ENTRY_SEARCH.getFullUrl(), argList);
+        String xml = IOUtil.readContents(url, getClass());
+        System.out.println(xml);
+    }
+
+
     /**
      * _more_
      *
@@ -123,7 +160,7 @@ public class RepositorySearch extends RepositoryClient  {
         String user = System.getenv(PROP_USER);
         String password = System.getenv(PROP_PASSWORD);
         if(repository == null) {
-            repository = "http://localhost/repository";
+            repository = "http://localhost:8080/repository";
         }
         if(user == null) {
             user = "";
@@ -138,25 +175,23 @@ public class RepositorySearch extends RepositoryClient  {
                 repository = args[++i];
             } else if(args[i].equals("-user")) {
                 user = args[++i];
-            } else if(args[i].equals("-password")) {
                 password = args[++i];
             } else {
+                argList.add(args[i]);
             }
         }
 
 
         try {
-            RepositorySearch client = new RepositorySearch(new URL(args[0]),
-                                                           args[1], args[2]);
-            client.preProcessArgs(args);
+            RepositorySearch client = new RepositorySearch(new URL(repository),
+                                                           user,password);
+
+            client.doSearch(argList);
             String[] msg = { "" };
-            if ( !client.isValidSession(true, msg)) {
+            /*            if ( !client.isValidSession(true, msg)) {
                 System.err.println("Error: invalid session:" + msg[0]);
-
                 return;
-            }
-
-            client.processCommandLine(args);
+                }*/
         } catch (Exception exc) {
             System.err.println("Error:" + exc);
             exc.printStackTrace();
@@ -173,44 +208,9 @@ public class RepositorySearch extends RepositoryClient  {
     public static void usage(String msg) {
         System.err.println(msg);
         System.err.println(
-            "Usage: RepositorySearch <server url> <user id> <password> <arguments>");
-        System.err.println(
-            "e.g,  RepositoryClient http://localhost:8080/repository <user id> <password> <arguments>");
-        System.err.println("Where arguments are:\nFor fetching: \n"
-                + argLine(CMD_PRINT, "<entry id> Create and print the given entry")
-                + argLine(CMD_PRINTXML, " <entry id> Print out the xml for the given entry id")
-                + argLine(CMD_FETCH, "<entry id> <destination file or directory>")
-                + argLine(CMD_SEARCH, "<any number of search arguments pairs>")
-                + "\n" + "For creating a new folder:\n"
-                + argLine(CMD_FOLDER, "<folder name> <parent folder id (see below)>")
-                + "\n" + "For uploading files:\n"
-                + argLine(CMD_IMPORT, "entries.xml <parent entry id or path>")
-                + "\n"
-                + argLine(CMD_FILE, "<entry name> <file to upload> <parent folder id (see below)>")
-                + "\n"
-                + argLine(CMD_FILES, "<parent folder id (see below)> <one or more files to upload>")
-                + "\n"
-                + argLine(CMD_TIMEOUT, "<timeout in seconds for server info and login attempts>")
-                + "\n"
-                + "The following arguments get applied to the previously created folder or file:\n"
-                + "\t-description <entry description>\n"
-                + "\t-attach <file to attach>\n"
-                + "\t-addmetadata (Add full metadata to entry)\n"
-                + "\t-addshortmetadata (Add spatial/temporal metadata to entry)\n"
-                + "\n" + "Miscellaneous:\n"
-                + "\t-url (login to server and access url)\n"
-                + "\t-debug (print out the generated xml)\n"
-                + "\t-exit (exit without adding anything to the repository\n");
-
-
-        System.err.println(
-            "Note: the  <parent folder id> can be an identifier from a existing folder in the repository or it can be \"previous\" which will use the id of the previously specified folder\n"
-            + "For example you could do:\n"
-            + " ...  -folder \"Some new folder\" \"some id from the repository\" -file \"\" somefile1.nc -file somefile2.nc \"previous\" -folder \"some other folder\" \"previous\" -file \"\" someotherfile.nc \"previous\"\n" + "This results in the heirarchy:\n" + "Some new folder\n" + "\tsomefile1.nc\n" + "\tsomefile2.nc\n" + "\tsome other folder\n" + "\t\tsomeotherfile.nc\n");
-
+            "Usage: RepositorySearch -repository <server url> -user <user id> <password> -text <search text> -output <csv|wget|...>  -type <entry type> ");
         System.exit(1);
     }
-
 
 
 

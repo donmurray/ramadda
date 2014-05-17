@@ -1652,7 +1652,7 @@ public class RepositoryClient extends RepositoryBase {
      *
      * @throws Exception _more_
      */
-    private void doSearch() throws Exception {
+    private void xxxdoSearch() throws Exception {
         RequestUrl URL_ENTRY_SEARCH = new RequestUrl(this, "/search/do",
                                           "Search");
         List<String> argList = new ArrayList<String>();
@@ -1902,8 +1902,7 @@ public class RepositoryClient extends RepositoryBase {
         }
 
         if (doingSearch) {
-            doSearch();
-
+            //            doSearch();
             return;
         }
 

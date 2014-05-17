@@ -5,7 +5,7 @@
 
 
 
-export RAMADDA_CLIENT_REPOSITORY=http://localhost/repository
+export RAMADDA_CLIENT_REPOSITORY=http://localhost:8080/repository
 export RAMADDA_CLIENT_USER=
 export RAMADDA_CLIENT_PASSWORD=
 
