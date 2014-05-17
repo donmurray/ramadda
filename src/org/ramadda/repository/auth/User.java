@@ -650,7 +650,7 @@ public class User {
      *
      *  @param value The new value for Favorites
      */
-    public void setFavorites(List<FavoriteEntry> value) {
+    public void setUserFavorites(List<FavoriteEntry> value) {
         favorites = value;
     }
 

@@ -122,6 +122,7 @@
       <api request="/user/edit"               method="adminUserEdit"       admin="true" needs_ssl="true" />
       <api request="/user/new/form"           method="adminUserNewForm"        admin="true" needs_ssl="true" />
       <api request="/user/new/do"             method="adminUserNewDo"        admin="true" needs_ssl="true" />
+      <api request="/user/select/do"          method="adminUserSelectDo"      admin="true" needs_ssl="true" />
 
   </group>
 

@@ -52,6 +52,7 @@ import java.sql.Statement;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -152,6 +153,9 @@ public class UserManager extends RepositoryManager {
     public final RequestUrl URL_USER_NEW_DO = new RequestUrl(this,
                                                   "/user/new/do");
 
+    /** _more_ */
+    public final RequestUrl URL_USER_SELECT_DO = new RequestUrl(this,
+                                                     "/user/select/do");
 
 
     /** _more_ */
@@ -495,7 +499,7 @@ public class UserManager extends RepositoryManager {
                 }
                 favorites.add(new FavoriteEntry(id, entry, name, category));
             }
-            user.setFavorites(favorites);
+            user.setUserFavorites(favorites);
         }
 
         return favorites;
@@ -1415,6 +1419,43 @@ public class UserManager extends RepositoryManager {
     /**
      * _more_
      *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result adminUserSelectDo(Request request) throws Exception {
+        request.ensureAuthToken();
+        StringBuffer sb    = new StringBuffer();
+        List<User>   users = new ArrayList<User>();
+
+        Hashtable    args  = request.getArgs();
+        for (Enumeration keys = args.keys(); keys.hasMoreElements(); ) {
+            String arg = (String) keys.nextElement();
+            if ( !arg.startsWith("user_")) {
+                continue;
+            }
+
+            if ( !request.get(arg, false)) {
+                continue;
+            }
+            String userId = arg.substring("user_".length());
+            User   user   = findUser(userId);
+            users.add(user);
+            //            System.err.println ("user:" + user +" " + user.getPassword());
+        }
+        sb.append(getRepository().encodeObject(users));
+        request.setReturnFilename("users.xml");
+
+        return new Result("", sb, "text/xml");
+    }
+
+
+
+    /**
+     * _more_
+     *
      * @param request the request
      * @param sb _more_
      *
@@ -1612,13 +1653,12 @@ public class UserManager extends RepositoryManager {
 
         //        addActivity(request, request.getUser(),  ACTIVITY_PASSWORD_CHANGE, "");
 
+        request.formPostWithAuthToken(usersHtml, URL_USER_SELECT_DO);
         usersHtml.append("<table>");
-        usersHtml.append(
-            HtmlUtils.row(
-                HtmlUtils.cols(
-                    HtmlUtils.bold(msg("Log")), HtmlUtils.bold(msg("Edit")),
-                    HtmlUtils.bold(msg("ID")) + HtmlUtils.space(2),
-                    HtmlUtils.bold(msg("Name")) + HtmlUtils.space(2),
+        usersHtml.append(HtmlUtils.row(HtmlUtils.cols("",
+                HtmlUtils.bold(msg("Log")), HtmlUtils.bold(msg("Edit")),
+                HtmlUtils.bold(msg("ID")) + HtmlUtils.space(2),
+                HtmlUtils.bold(msg("Name")) + HtmlUtils.space(2),
         //                    HtmlUtils.bold(msg("Roles")) + HtmlUtils.space(2),
         HtmlUtils.bold(msg("Email")) + HtmlUtils.space(2), HtmlUtils.bold(
             msg("Admin")) + HtmlUtils.space(2), HtmlUtils.bold(
@@ -1648,10 +1688,13 @@ public class UserManager extends RepositoryManager {
                             getRepository().iconUrl(ICON_LOG),
                             msg("View user log")));
 
+            String userCbx = HtmlUtils.checkbox("user_" + user.getId(),
+                                 "true", false, "");
+
 
             String row = (user.getAdmin()
                           ? "<tr valign=\"top\" style=\"background-color:#cccccc;\">"
-                          : "<tr valign=\"top\" >") + HtmlUtils.cols(
+                          : "<tr valign=\"top\" >") + HtmlUtils.cols(userCbx,
                               userLogLink, userEditLink, userProfileLink,
                               user.getName(),
             /*user.getRolesAsString("<br>"),*/
@@ -1675,6 +1718,9 @@ public class UserManager extends RepositoryManager {
             }
         }
         usersHtml.append("</table>");
+
+        usersHtml.append(HtmlUtils.submit(msg("Export Selected")));
+        usersHtml.append(HtmlUtils.formClose());
 
         for (String role : rolesList) {
             StringBuffer rolesSB = rolesMap.get(role);
@@ -2266,7 +2312,7 @@ public class UserManager extends RepositoryManager {
                         request.getString(ARG_FAVORITE_ID, "")), Clause.eq(
                             Tables.FAVORITES.COL_USER_ID, user.getId())));
             message = "Favorite deleted";
-            user.setFavorites(null);
+            user.setUserFavorites(null);
         } else {
             message = "Unknown favorite command";
         }
@@ -2313,7 +2359,7 @@ public class UserManager extends RepositoryManager {
                                    user.getId(), entry.getId(), name,
                                    category });
         }
-        user.setFavorites(null);
+        user.setUserFavorites(null);
     }
 
 
@@ -2946,11 +2992,11 @@ public class UserManager extends RepositoryManager {
     }
 
 
-    /** store the number of bad login attempts for each user     */
+    /** store the number of bad login attempts for each user */
     private static Hashtable<String, Integer> badPasswordCount =
         new Hashtable<String, Integer>();
 
-    /** how many login tries before we blow up   */
+    /** how many login tries before we blow up */
     private static int MAX_BAD_PASSWORD_COUNT = 100;
 
     /**
