@@ -1469,108 +1469,13 @@ public class HtmlUtils {
      *
      * @return _more_
      */
-    public static String cols(String s1) {
-        return tag(TAG_TD, "", s1);
+    public static String cols(String ... cols) {
+        StringBuffer sb = new StringBuffer();
+        for(int i=0;i<cols.length;i++) {
+            sb.append(tag(TAG_TD, "", cols[i]));
+        }
+        return sb.toString();
     }
-
-    /**
-     * _more_
-     *
-     * @param s1 _more_
-     * @param s2 _more_
-     *
-     * @return _more_
-     */
-    public static String cols(String s1, String s2) {
-        return cols(s1) + cols(s2);
-    }
-
-    /**
-     * _more_
-     *
-     * @param s1 _more_
-     * @param s2 _more_
-     * @param s3 _more_
-     *
-     * @return _more_
-     */
-    public static String cols(String s1, String s2, String s3) {
-        return cols(s1) + cols(s2) + cols(s3);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param s1 _more_
-     * @param s2 _more_
-     * @param s3 _more_
-     * @param s4 _more_
-     *
-     * @return _more_
-     */
-    public static String cols(String s1, String s2, String s3, String s4) {
-        return cols(s1) + cols(s2) + cols(s3) + cols(s4);
-    }
-
-
-
-
-    /**
-     * _more_
-     *
-     * @param s1 _more_
-     * @param s2 _more_
-     * @param s3 _more_
-     * @param s4 _more_
-     * @param s5 _more_
-     *
-     * @return _more_
-     */
-    public static String cols(String s1, String s2, String s3, String s4,
-                              String s5) {
-        return cols(s1) + cols(s2) + cols(s3) + cols(s4) + cols(s5);
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param s1 _more_
-     * @param s2 _more_
-     * @param s3 _more_
-     * @param s4 _more_
-     * @param s5 _more_
-     * @param s6 _more_
-     *
-     * @return _more_
-     */
-    public static String cols(String s1, String s2, String s3, String s4,
-                              String s5, String s6) {
-        return cols(s1) + cols(s2) + cols(s3) + cols(s4) + cols(s5)
-               + cols(s6);
-    }
-
-    /**
-     * _more_
-     *
-     * @param s1 _more_
-     * @param s2 _more_
-     * @param s3 _more_
-     * @param s4 _more_
-     * @param s5 _more_
-     * @param s6 _more_
-     * @param s7 _more_
-     *
-     * @return _more_
-     */
-    public static String cols(String s1, String s2, String s3, String s4,
-                              String s5, String s6, String s7) {
-        return cols(s1, s2, s3, s4, s5) + cols(s6, s7);
-    }
-
-
 
 
     /**
