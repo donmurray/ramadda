@@ -1254,6 +1254,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TEMPLATE = "template";
 
+    public static final String ARG_USER_TEMPLATE = "usertemplate";
+
     /** _more_ */
     public static final String ARG_TARGET = "target";
 
@@ -1308,48 +1310,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_USER = "user";
 
-    /** _more_ */
-    public static final String ARG_USER_ADMIN = "user.admin";
 
-    /** _more_ */
-    public static final String ARG_USER_ISGUEST = "user.isguest";
-
-    /** _more_ */
-    public static final String ARG_USER_ANSWER = "user.answer";
-
-    /** _more_ */
-    public static final String ARG_USER_BULK = "user.bulk";
-
-    /** _more_ */
-    public static final String ARG_USER_CANCEL = "user.cancel";
-
-    /** _more_ */
-    public static final String ARG_USER_CHANGE = "user.change";
-
-    /** _more_ */
-    public static final String ARG_USER_DELETE = "user.delete";
-
-    /** _more_ */
-    public static final String ARG_USER_DELETE_CONFIRM =
-        "user.delete.confirm";
-
-    /** _more_ */
-    public static final String ARG_USER_EMAIL = "user.email";
-
-    /** _more_ */
-    public static final String ARG_USER_ID = "user.id";
-
-    /** _more_ */
-    public static final String ARG_USER_LANGUAGE = "user.language";
-
-    /** _more_ */
-    public static final String ARG_USER_NAME = "user.name";
-
-    /** _more_ */
-    public static final String ARG_USER_DESCRIPTION = "user.description";
-
-    /** _more_ */
-    public static final String ARG_USER_NEW = "user.new";
 
     /** _more_ */
     public static final String ARG_PASSWORD = "password";

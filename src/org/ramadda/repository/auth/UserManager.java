@@ -33,10 +33,13 @@ import org.ramadda.util.HtmlTemplate;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Utils;
 
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
+
+import java.io.File;
 
 import java.io.UnsupportedEncodingException;
 
@@ -66,6 +69,53 @@ import javax.crypto.spec.SecretKeySpec;
  * @author Jeff McWhirter
  */
 public class UserManager extends RepositoryManager {
+
+    /** _more_ */
+    public static final String ARG_USER_ADMIN = "user.admin";
+
+    /** _more_ */
+    public static final String ARG_USER_ISGUEST = "user.isguest";
+
+    /** _more_ */
+    public static final String ARG_USER_ANSWER = "user.answer";
+
+    /** _more_ */
+    public static final String ARG_USER_BULK = "user.bulk";
+
+    /** _more_ */
+    public static final String ARG_USER_CANCEL = "user.cancel";
+
+    /** _more_ */
+    public static final String ARG_USER_CHANGE = "user.change";
+
+    /** _more_ */
+    public static final String ARG_USER_DELETE = "user.delete";
+
+    /** _more_ */
+    public static final String ARG_USER_DELETE_CONFIRM =
+        "user.delete.confirm";
+
+    /** _more_ */
+    public static final String ARG_USER_EMAIL = "user.email";
+
+    /** _more_ */
+    public static final String ARG_USER_ID = "user.id";
+
+    /** _more_ */
+    public static final String ARG_USER_LANGUAGE = "user.language";
+
+    /** _more_ */
+    public static final String ARG_USER_NAME = "user.name";
+
+    /** _more_ */
+    public static final String ARG_USER_DESCRIPTION = "user.description";
+
+    /** _more_ */
+    public static final String ARG_USER_NEW = "user.new";
+    public static final String ARG_USER_IMPORT = "userimport";
+    public static final String ARG_USER_EXPORT = "userexport";
+
+
 
     /** output type */
     public static final OutputType OUTPUT_CART_ADD =
@@ -955,7 +1005,7 @@ public class UserManager extends RepositoryManager {
         user.setDescription(request.getString(ARG_USER_DESCRIPTION,
                 user.getDescription()));
         user.setEmail(request.getString(ARG_USER_EMAIL, user.getEmail()));
-        user.setTemplate(request.getString(ARG_TEMPLATE, user.getTemplate()));
+        user.setTemplate(request.getString(ARG_USER_TEMPLATE, user.getTemplate()));
         user.setLanguage(request.getString(ARG_USER_LANGUAGE,
                                            user.getLanguage()));
         user.setQuestion(request.getString(ARG_USER_QUESTION,
@@ -1037,7 +1087,6 @@ public class UserManager extends RepositoryManager {
         if (request.defined(ARG_USER_DELETE_CONFIRM)) {
             request.ensureAuthToken();
             deleteUser(user);
-
             return new Result(request.url(getRepositoryBase().URL_USER_LIST));
         }
 
@@ -1165,7 +1214,7 @@ public class UserManager extends RepositoryManager {
         List<TwoFacedObject> templates =
             getPageHandler().getTemplateSelectList();
         sb.append(formEntry(request, msgLabel("Page Style"),
-                            HtmlUtils.select(ARG_TEMPLATE, templates,
+                            HtmlUtils.select(ARG_USER_TEMPLATE, templates,
                                              user.getTemplate())));
 
         List languages = new ArrayList(getPageHandler().getLanguages());
@@ -1233,105 +1282,132 @@ public class UserManager extends RepositoryManager {
         StringBuffer errorBuffer = new StringBuffer();
         List<User>   users       = new ArrayList<User>();
         boolean      ok          = true;
-        for (String line :
-                (List<String>) StringUtil.split(
-                    request.getString(ARG_USER_BULK, ""), "\n", true, true)) {
-            if (line.startsWith("#")) {
-                continue;
-            }
-            List<String> toks = (List<String>) StringUtil.split(line, ",",
-                                    true, true);
-            if (toks.size() == 0) {
-                continue;
-            }
-            if (toks.size() < 2) {
-                ok = false;
-                sb.append(getPageHandler().showDialogError("Bad line:"
-                        + line));
 
-                break;
-            }
-            String id        = toks.get(0);
-            String password1 = toks.get(1);
-            String name      = ((toks.size() >= 3)
-                                ? toks.get(2)
-                                : id);
-            String email     = ((toks.size() >= 4)
-                                ? toks.get(3)
-                                : "");
-            if (findUser(id) != null) {
-                ok = false;
-                sb.append(
-                    getPageHandler().showDialogError(
-                        getRepository().translate(
-                            request, "User already exists") + " " + id));
+        String       importFile  = request.getUploadedFile(ARG_USER_IMPORT);
+        if (importFile != null) {
+            List<User> importUsers =
+                (List<User>) getRepository().decodeObject(
+                    IOUtil.readInputStream(
+                        getStorageManager().getFileInputStream(
+                            new File(importFile))));
+            for (User user : importUsers) {
+                if (findUser(user.getId()) != null) {
+                    sb.append("<li> Imported user already exists:"
+                              + user.getId() + "<br>");
 
-                break;
-            }
-            User user = new User(id, name, email, "", "",
-                                 hashPassword(password1), "", false, "", "",
-                                 false, null);
-            users.add(user);
-        }
-
-
-        if ( !ok) {
-            makeNewUserForm(request, sb);
-
-            return getAdmin().makeResult(request, msg("New User"), sb);
-        }
-
-        String  id        = "";
-        String  name      = "";
-        String  desc      = "";
-        String  email     = "";
-        String  password1 = "";
-        String  password2 = "";
-        boolean admin     = false;
-
-        if (request.defined(ARG_USER_ID)) {
-            id        = request.getString(ARG_USER_ID, "").trim();
-            name      = request.getString(ARG_USER_NAME, name).trim();
-            desc      = request.getString(ARG_USER_DESCRIPTION, name).trim();
-            email     = request.getString(ARG_USER_EMAIL, "").trim();
-            password1 = request.getString(ARG_USER_PASSWORD1, "").trim();
-            password2 = request.getString(ARG_USER_PASSWORD2, "").trim();
-            admin     = request.get(ARG_USER_ADMIN, false);
-
-            boolean okToAdd = true;
-            if (id.length() == 0) {
-                okToAdd = false;
-                errorBuffer.append(msg("Please enter an ID"));
-                errorBuffer.append(HtmlUtils.br());
-            }
-
-            if ((password1.length() == 0) && (password2.length() == 0)) {
-                password1 = password2 = getRepository().getGUID() + "."
-                                        + Math.random();
-            }
-
-
-            if ((password1.length() == 0) || !password1.equals(password2)) {
-                okToAdd = false;
-                errorBuffer.append(msg("Invalid password"));
-                errorBuffer.append(HtmlUtils.br());
-            }
-
-            if (findUser(id) != null) {
-                okToAdd = false;
-                errorBuffer.append(msg("User with given id already exists"));
-                errorBuffer.append(HtmlUtils.br());
-            }
-
-            if (okToAdd) {
-                User newUser = new User(id, name, email, "", "",
-                                        hashPassword(password1), desc, admin,
-                                        "", "", false, null);
-                users.add(newUser);
+                    continue;
+                }
+                users.add(user);
             }
         }
 
 
+        if (importFile == null) {
+            for (String line :
+                    (List<String>) StringUtil.split(
+                        request.getString(ARG_USER_BULK, ""), "\n", true,
+                        true)) {
+                if (line.startsWith("#")) {
+                    continue;
+                }
+                List<String> toks = (List<String>) StringUtil.split(line,
+                                        ",", true, true);
+                if (toks.size() == 0) {
+                    continue;
+                }
+                if (toks.size() < 2) {
+                    ok = false;
+                    sb.append(getPageHandler().showDialogError("Bad line:"
+                            + line));
+
+                    break;
+                }
+                String id        = toks.get(0);
+                String password1 = toks.get(1);
+                String name      = ((toks.size() >= 3)
+                                    ? toks.get(2)
+                                    : id);
+                String email     = ((toks.size() >= 4)
+                                    ? toks.get(3)
+                                    : "");
+                if (findUser(id) != null) {
+                    ok = false;
+                    sb.append(
+                        getPageHandler().showDialogError(
+                            getRepository().translate(
+                                request, "User already exists") + " " + id));
+
+                    break;
+                }
+                User user = new User(id, name, email, "", "",
+                                     hashPassword(password1), "", false, "",
+                                     "", false, null);
+                users.add(user);
+            }
+
+
+            if ( !ok) {
+                makeNewUserForm(request, sb);
+
+                return getAdmin().makeResult(request, msg("New User"), sb);
+            }
+        }
+
+
+        if (users.size() == 0) {
+            String  id        = "";
+            String  name      = "";
+            String  desc      = "";
+            String  email     = "";
+            String  password1 = "";
+            String  password2 = "";
+            boolean admin     = false;
+
+            if (request.defined(ARG_USER_ID)) {
+                id        = request.getString(ARG_USER_ID, "").trim();
+                name      = request.getString(ARG_USER_NAME, name).trim();
+                desc = request.getString(ARG_USER_DESCRIPTION, name).trim();
+                email     = request.getString(ARG_USER_EMAIL, "").trim();
+                password1 = request.getString(ARG_USER_PASSWORD1, "").trim();
+                password2 = request.getString(ARG_USER_PASSWORD2, "").trim();
+                admin     = request.get(ARG_USER_ADMIN, false);
+
+                boolean okToAdd = true;
+                if (id.length() == 0) {
+                    okToAdd = false;
+                    errorBuffer.append(msg("Please enter an ID"));
+                    errorBuffer.append(HtmlUtils.br());
+                }
+
+                if ((password1.length() == 0) && (password2.length() == 0)) {
+                    password1 = password2 = getRepository().getGUID() + "."
+                                            + Math.random();
+                }
+
+
+                if ((password1.length() == 0)
+                        || !password1.equals(password2)) {
+                    okToAdd = false;
+                    errorBuffer.append(msg("Invalid password"));
+                    errorBuffer.append(HtmlUtils.br());
+                }
+
+                if (findUser(id) != null) {
+                    okToAdd = false;
+                    errorBuffer.append(
+                        msg("User with given id already exists"));
+                    errorBuffer.append(HtmlUtils.br());
+                }
+
+                if (okToAdd) {
+                    User newUser = new User(id, name, email, "", "",
+                                            hashPassword(password1), desc,
+                                            admin, "", "", false, null);
+                    users.add(newUser);
+                }
+            }
+
+        }
         List<String> newUserRoles =
             StringUtil.split(request.getString(ARG_USER_ROLES, ""), "\n",
                              true, true);
@@ -1340,7 +1416,9 @@ public class UserManager extends RepositoryManager {
 
         sb.append("<ul>");
         for (User newUser : users) {
-            newUser.setRoles(newUserRoles);
+            if (importFile == null) {
+                newUser.setRoles(newUserRoles);
+            }
             makeOrUpdateUser(newUser, false);
             setRoles(request, newUser);
 
@@ -1443,8 +1521,48 @@ public class UserManager extends RepositoryManager {
             String userId = arg.substring("user_".length());
             User   user   = findUser(userId);
             users.add(user);
-            //            System.err.println ("user:" + user +" " + user.getPassword());
         }
+
+        if (request.defined(ARG_USER_CANCEL)) {
+            return new Result(request.url(getRepositoryBase().URL_USER_LIST));
+        }
+
+
+        if (request.defined(ARG_USER_DELETE_CONFIRM)) {
+            sb.append(HtmlUtils.p());
+            for(User user: users) {
+                deleteUser(user);
+                sb.append("Deleted user: " + user.getId());
+                sb.append(HtmlUtils.p());
+            }
+            return getAdmin().makeResult(request, msg("Delete Users"), sb);
+        } else if (request.defined(ARG_USER_DELETE)) {
+            request.formPostWithAuthToken(sb, URL_USER_SELECT_DO);
+            sb.append(HtmlUtils.p());
+            sb.append(getPageHandler().showDialogNote(msg("Are you sure you want to delete these users?")));
+            sb.append(HtmlUtils.submit(msg("Yes, really delete these users"), ARG_USER_DELETE_CONFIRM));
+            sb.append(HtmlUtils.space(2));
+            sb.append(HtmlUtils.submit(msg("Cancel"), ARG_USER_CANCEL));
+
+            sb.append(HtmlUtils.p());
+            for(User user: users) {
+                String userCbx = HtmlUtils.checkbox("user_" + user.getId(),
+                                                    "true", true, "");
+                sb.append(userCbx);
+                sb.append(HtmlUtils.space(1));
+                sb.append(user.getId());
+                sb.append(HtmlUtils.space(1));
+                sb.append(user.getName());
+                sb.append(HtmlUtils.br());
+            }
+            sb.append(HtmlUtils.formClose());
+            return getAdmin().makeResult(request, msg("Delete Users"), sb);
+        }
+
+
+
+
+
         sb.append(getRepository().encodeObject(users));
         request.setReturnFilename("users.xml");
 
@@ -1464,7 +1582,7 @@ public class UserManager extends RepositoryManager {
     private void makeNewUserForm(Request request, StringBuffer sb)
             throws Exception {
 
-        request.formPostWithAuthToken(sb, URL_USER_NEW_DO);
+        request.uploadFormWithAuthToken(sb, URL_USER_NEW_DO);
         StringBuffer formSB = new StringBuffer();
         String       id     = request.getString(ARG_USER_ID, "").trim();
         String       name   = request.getString(ARG_USER_NAME, "").trim();
@@ -1559,6 +1677,12 @@ public class UserManager extends RepositoryManager {
 
 
 
+        bulkSB.append(HtmlUtils.p());
+        bulkSB.append(HtmlUtils.b("User Import:"));
+        bulkSB.append(HtmlUtils.space(1));
+        bulkSB.append(HtmlUtils.fileInput(ARG_USER_IMPORT, ""));
+
+
         StringBuffer top = new StringBuffer();
         top.append(
             HtmlUtils.table(
@@ -1633,9 +1757,13 @@ public class UserManager extends RepositoryManager {
         StringBuffer usersHtml = new StringBuffer();
         StringBuffer rolesHtml = new StringBuffer();
 
-        usersHtml.append(request.form(URL_USER_NEW_FORM));
-        usersHtml.append(HtmlUtils.submit(msg("New User")));
-        usersHtml.append(HtmlUtils.formClose());
+        StringBuffer sb         = new StringBuffer();
+
+
+        sb.append(request.form(URL_USER_NEW_FORM));
+        sb.append(HtmlUtils.submit(msg("Create New User")));
+        sb.append(HtmlUtils.formClose());
+        sb.append(HtmlUtils.p());
 
         Statement statement =
             getDatabaseManager().select(Tables.USERS.COLUMNS,
@@ -1654,15 +1782,15 @@ public class UserManager extends RepositoryManager {
         //        addActivity(request, request.getUser(),  ACTIVITY_PASSWORD_CHANGE, "");
 
         request.formPostWithAuthToken(usersHtml, URL_USER_SELECT_DO);
-        usersHtml.append("<table>");
+        usersHtml.append("<table cellpadding=3 cellspacing=0>");
         usersHtml.append(HtmlUtils.row(HtmlUtils.cols("",
-                HtmlUtils.bold(msg("Log")), HtmlUtils.bold(msg("Edit")),
-                HtmlUtils.bold(msg("ID")) + HtmlUtils.space(2),
-                HtmlUtils.bold(msg("Name")) + HtmlUtils.space(2),
-        //                    HtmlUtils.bold(msg("Roles")) + HtmlUtils.space(2),
-        HtmlUtils.bold(msg("Email")) + HtmlUtils.space(2), HtmlUtils.bold(
-            msg("Admin")) + HtmlUtils.space(2), HtmlUtils.bold(
-            msg("Guest")))));
+                                                      HtmlUtils.bold(msg("Edit"))  + HtmlUtils.space(2),
+                                                      HtmlUtils.bold(msg("ID"))    + HtmlUtils.space(2),
+                                                      HtmlUtils.bold(msg("Name"))  + HtmlUtils.space(2),
+                                                      HtmlUtils.bold(msg("Email")) + HtmlUtils.space(2), 
+                                                      HtmlUtils.bold(msg("Admin")) + HtmlUtils.space(2), 
+                                                      HtmlUtils.bold(msg("Guest")) + HtmlUtils.space(2), 
+                                                      HtmlUtils.bold(msg("Log")))));
 
         for (User user : users) {
             String userEditLink = HtmlUtils.href(
@@ -1695,11 +1823,11 @@ public class UserManager extends RepositoryManager {
             String row = (user.getAdmin()
                           ? "<tr valign=\"top\" style=\"background-color:#cccccc;\">"
                           : "<tr valign=\"top\" >") + HtmlUtils.cols(userCbx,
-                              userLogLink, userEditLink, userProfileLink,
+                                                                     userEditLink, userProfileLink,
                               user.getName(),
             /*user.getRolesAsString("<br>"),*/
             user.getEmail(), "" + user.getAdmin(),
-                             "" + user.getIsGuest()) + "</tr>";
+                                                                     "" + user.getIsGuest(),userLogLink) + "</tr>";
             usersHtml.append(row);
 
             List<String> roles = user.getRoles();
@@ -1719,7 +1847,11 @@ public class UserManager extends RepositoryManager {
         }
         usersHtml.append("</table>");
 
-        usersHtml.append(HtmlUtils.submit(msg("Export Selected")));
+        usersHtml.append(HtmlUtils.p());
+        usersHtml.append(HtmlUtils.submit(msg("Export Selected Users"), ARG_USER_EXPORT));
+        usersHtml.append(HtmlUtils.space(2));
+        usersHtml.append(HtmlUtils.submit(msg("Delete Selected Users"), ARG_USER_DELETE));
+
         usersHtml.append(HtmlUtils.formClose());
 
         for (String role : rolesList) {
@@ -1732,7 +1864,7 @@ public class UserManager extends RepositoryManager {
         }
 
 
-        StringBuffer sb         = new StringBuffer();
+
         List         tabTitles  = new ArrayList();
         List         tabContent = new ArrayList();
 
