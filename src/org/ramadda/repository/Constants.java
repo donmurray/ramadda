@@ -1070,6 +1070,10 @@ public interface Constants {
     public static final String ARG_USER_MESSAGE = "usermessage";
 
     /** _more_ */
+    public static final String ARG_USER_ID = "user.id";
+
+
+    /** _more_ */
     public static final String ARG_USER_SENDMAIL = "usersendmail";
 
     /** _more_ */

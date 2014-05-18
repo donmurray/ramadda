@@ -98,8 +98,6 @@ public class UserManager extends RepositoryManager {
     /** _more_ */
     public static final String ARG_USER_EMAIL = "user.email";
 
-    /** _more_ */
-    public static final String ARG_USER_ID = "user.id";
 
     /** _more_ */
     public static final String ARG_USER_LANGUAGE = "user.language";
