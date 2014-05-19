@@ -179,7 +179,7 @@ public class HtmlUtils {
     /** _more_ */
     public static final String TAG_EMBED = "embed";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_OBJECT = "object";
 
     /** _more_ */
@@ -1463,17 +1463,19 @@ public class HtmlUtils {
 
 
     /**
-     * _more_
+     * Wrap the args in TD tags
      *
-     * @param s1 _more_
      *
-     * @return _more_
+     * @param cols one or more columns
+     *
+     * @return wrapped columns
      */
-    public static String cols(String ... cols) {
+    public static String cols(String... cols) {
         StringBuffer sb = new StringBuffer();
-        for(int i=0;i<cols.length;i++) {
+        for (int i = 0; i < cols.length; i++) {
             sb.append(tag(TAG_TD, "", cols[i]));
         }
+
         return sb.toString();
     }
 
@@ -3634,6 +3636,18 @@ public class HtmlUtils {
         }
     }
 
+
+
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    public static String urlEncodeSpace(String s) {
+        return s.replace(" ", "+");
+    }
 
 
     /**
