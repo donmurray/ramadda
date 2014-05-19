@@ -175,6 +175,8 @@ public class RepositorySearch extends RepositoryClient  {
                 download = true;
                 fields = "name,url";
                 output = "default.csv";
+            } else if(arg.equals("-help")) {
+                usage("");
             } else if(arg.equals("-output")) {
                 output = args.get(++i);
                 if(output.equals("wget")) {
@@ -345,7 +347,7 @@ public class RepositorySearch extends RepositoryClient  {
     public static void usage(String msg) {
         System.err.println(msg);
         System.err.println(
-            "Usage: RepositorySearch -repository <server url> -user <user id> <password> -output <csv|wget|name|metadata|...>  -download -overwrite \n-text <search text>  \n-type <entry type> \n-variable <var name> \n-tag <tag> \n-keyword <keyword> \n-bounds <north> <west> <south> <east> \n-daterange <startdate yyyy-MM-dd> <todate yyyy-MM-dd> \n-mindate <startdate yyyy-MM-dd> \n-maxdate <startdate yyyy-MM-dd> ");
+            "Usage: RepositorySearch -repository <server url> -user <user id> <password> -output <csv|wget|name|metadata|...>  \n-fields <comma separated list of fields to output - e.g. name, url, size, id, lat, lon, ....>\n-download -overwrite \n-text <search text>  \n-type <entry type> \n-variable <var name> \n-tag <tag> \n-keyword <keyword> \n-bounds <north> <west> <south> <east> \n-daterange <startdate yyyy-MM-dd> <todate yyyy-MM-dd> \n-mindate <startdate yyyy-MM-dd> \n-maxdate <startdate yyyy-MM-dd> ");
         System.exit(1);
     }
 

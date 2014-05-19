@@ -145,6 +145,7 @@
          <zipfileset dir="${ramadda_dir}/release" includes="README.CLIENT" fullpath="${clientbase}/README"/>
          <zipfileset dir="${ramadda_dir}/client" includes="ramaddaclient.sh" fullpath="${clientbase}/ramaddaclient.sh"/>
          <zipfileset dir="${ramadda_dir}/client" includes="search.sh" fullpath="${clientbase}/search.sh"/>
+         <zipfileset dir="${ramadda_dir}/client" includes="install.sh" fullpath="${clientbase}/install.sh"/>
          <zipfileset dir="${ramadda_dir}/client" includes="ramaddaenv.sh" fullpath="${clientbase}/ramaddaenv.sh"/>
          <zipfileset dir="${ramadda_dir}/client" includes="README" fullpath="${clientbase}/README"/>
         </zip>
