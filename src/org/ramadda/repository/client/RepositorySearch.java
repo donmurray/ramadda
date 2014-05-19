@@ -62,6 +62,8 @@ public class RepositorySearch extends RepositoryClient  {
 
     private String output = "default.csv";
 
+    private String fields = "name,url";
+
     private boolean download = false;
 
     private boolean overwrite = false;
@@ -165,15 +167,13 @@ public class RepositorySearch extends RepositoryClient  {
                 argList.add("metadata.attr1.thredds.variable");
                 argList.add(args.get(++i));
             } else if(arg.equals("-fields")) {
-                argList.add("fields");
-                argList.add(args.get(++i));
+                fields = args.get(++i);
                 output = "default.csv";
             } else if(arg.equals("-overwrite")) {
                 overwrite = true;
             } else if(arg.equals("-download")) {
                 download = true;
-                argList.add("fields");
-                argList.add("name,url");
+                fields = "name,url";
                 output = "default.csv";
             } else if(arg.equals("-output")) {
                 output = args.get(++i);
@@ -186,13 +186,15 @@ public class RepositorySearch extends RepositoryClient  {
                     showMetadata = true;
                 }  else if(output.equals("name")) {
                     output = "default.csv";
-                    argList.add("fields");
-                    argList.add("name");
+                    fields = "name";
                 }
             } else {
                 usage("Unknown arg:" + arg);
             }
         }
+
+        argList.add("fields");
+        argList.add(fields);
 
         //        argList.add(args[0]);
         //argList.add(args[1]);
@@ -293,7 +295,7 @@ public class RepositorySearch extends RepositoryClient  {
         String user = System.getenv(PROP_USER);
         String password = System.getenv(PROP_PASSWORD);
         if(repository == null) {
-            repository = "http://localhost:8080/repository";
+            repository = "http://localhost/repository";
         }
         if(user == null) {
             user = "";
@@ -328,7 +330,9 @@ public class RepositorySearch extends RepositoryClient  {
         } catch (Exception exc) {
             System.err.println("Error:" + exc);
             exc.printStackTrace();
+            System.exit(1);
         }
+        System.exit(0);
 
     }
 

@@ -259,16 +259,18 @@ public class CsvOutputHandler extends OutputHandler {
                 } else if (field.equals("entry_url")) {
                     String url = request.url(repository.URL_ENTRY_SHOW,
                                              ARG_ENTRYID, entry.getId());
+                    url  = HtmlUtils.urlEncodeSpace(url);
                     url = request.getAbsoluteUrl(url);
                     sb.append(url);
                 } else if (field.equals("url")) {
                     if (entry.getResource().isUrl()) {
                         sb.append(
-                            entry.getTypeHandler().getResourcePath(
-                                request, entry));
+                                  entry.getTypeHandler().getResourcePath(
+                                                                                             request, entry));
                     } else if (entry.getResource().isFile()) {
                         String url = entry.getTypeHandler().getEntryResourceUrl(
                                                                                 request, entry);
+                        url = HtmlUtils.urlEncodeSpace(url);
                         url = request.getAbsoluteUrl(url);
                         sb.append(url);
                     } else {}
@@ -286,6 +288,8 @@ public class CsvOutputHandler extends OutputHandler {
                     sb.append(entry.getWest());
                 } else if (field.equals("description")) {
                     sb.append(sanitize(entry.getDescription()));
+                } else if (field.equals("size")) {
+                    sb.append(entry.getResource().getFileSize());
                 } else if (field.equals("fields")) {
                     List<Column> columns =
                         entry.getTypeHandler().getColumns();
