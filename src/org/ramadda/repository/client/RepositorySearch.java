@@ -173,7 +173,7 @@ public class RepositorySearch extends RepositoryClient  {
                 overwrite = true;
             } else if(arg.equals("-download")) {
                 download = true;
-                fields = "name,url";
+                fields = "name,size,url";
                 output = "default.csv";
             } else if(arg.equals("-help")) {
                 usage("");
@@ -262,11 +262,12 @@ public class RepositorySearch extends RepositoryClient  {
             if(i == 0) continue;
             String line = lines.get(i);
             //            System.err.println("line:" + line);
-            List<String> toks = StringUtil.splitUpTo(line,",",2);
-            if(toks.size() != 2) {
+            List<String> toks = StringUtil.splitUpTo(line,",",3);
+            if(toks.size() != 3) {
                 continue;
             }
             String name   = toks.get(0);
+            long size = new Long(toks.get(1)).longValue();
             File f = new File(name);
             if(f.exists()) {
                 if(!overwrite) {
@@ -275,13 +276,14 @@ public class RepositorySearch extends RepositoryClient  {
                 }
                 System.err.println ("Overwriting:" + f);
             }
-            String url   = toks.get(1);
+            String url   = toks.get(2);
+            System.err.print ("Downloading " + name +" size=" + size);
             InputStream inputStream = IOUtil.getInputStream(url, getClass());
             FileOutputStream fos = new FileOutputStream(f);
             IOUtil.writeTo(inputStream, fos);
             IOUtil.close(fos);
             IOUtil.close(inputStream);
-            System.err.println ("downloaded:" + name);
+            System.err.println (" done");
         }
     }
 
