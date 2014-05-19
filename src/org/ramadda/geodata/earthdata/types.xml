@@ -1,0 +1,14 @@
+<types>
+
+
+  <type name="earth"  description="Gridded Data File" foruser="false" category="Geoscience Data">
+  </type>
+
+  <type name="earth_satellite"  description="Satellite Data" foruser="false">
+  </type>
+
+  <type name="earth_satellite_landsat"  description="Landsat Satellite Data" foruser="true">
+  </type>
+
+
+</types>
