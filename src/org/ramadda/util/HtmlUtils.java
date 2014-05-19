@@ -2034,6 +2034,19 @@ public class HtmlUtils {
         return input(name, value, attrs(ATTR_SIZE, "" + size));
     }
 
+    /**
+     * Create an input field
+     *
+     * @param name   the name of the input field
+     * @param value  the value
+     * @param size   size of the input field
+     * @param extra  extra attributes
+     *
+     * @return  an input widget
+     */
+    public static String input(String name, Object value, int size, String extra) {
+        return input(name, value, attrs(ATTR_SIZE, "" + size) + " " + extra);
+    }
 
     /**
      * _more_
