@@ -122,7 +122,7 @@ import java.util.concurrent.TimeUnit;
 
 
 /**
- * The main class.
+ * The main RAMADDA class.
  *
  */
 public class Repository extends RepositoryBase implements RequestHandler,
