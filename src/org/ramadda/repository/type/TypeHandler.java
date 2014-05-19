@@ -2576,7 +2576,6 @@ public class TypeHandler extends RepositoryManager {
             }
 
 
-
             if (showDate && hasDataDate) {
                 if (entry.getEndDate() != entry.getStartDate()) {
                     String startDate = formatDate(request,
@@ -4458,13 +4457,6 @@ public class TypeHandler extends RepositoryManager {
             if ((dateRange[0] != null) || (dateRange[1] != null)) {
                 Date date1 = dateRange[0];
                 Date date2 = dateRange[1];
-                if (date1 == null) {
-                    date1 = date2;
-                }
-                if (date2 == null) {
-                    date2 = date1;
-                }
-
                 if (arg.forCreateDate() || arg.forChangeDate()) {
                     String column = arg.forCreateDate()
                                     ? Tables.ENTRIES.COL_CREATEDATE
@@ -4481,6 +4473,13 @@ public class TypeHandler extends RepositoryManager {
                     }
 
                     continue;
+                }
+
+                if (date1 == null) {
+                    date1 = date2;
+                }
+                if (date2 == null) {
+                    date2 = date1;
                 }
 
 
