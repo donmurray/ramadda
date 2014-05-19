@@ -148,6 +148,19 @@ public class RepositorySearch extends RepositoryClient  {
             } else if(arg.equals("-maxdate")) {
                 argList.add("datadate.to");
                 argList.add(args.get(++i));
+            } else if(arg.equals("-mincreatedate")) {
+                argList.add("createdate.from");
+                argList.add(args.get(++i));
+            } else if(arg.equals("-maxcreatedate")) {
+                argList.add("createdate.to");
+                argList.add(args.get(++i));
+            } else if(arg.equals("-max")) {
+                argList.add("max");
+                argList.add(args.get(++i));
+            } else if(arg.equals("-suffix")) {
+                argList.add("filesuffix");
+                argList.add(args.get(++i));
+
             } else if(arg.equals("-bounds")) {
                 argList.add(ARG_AREA_NORTH);
                 argList.add(args.get(++i));
@@ -349,7 +362,8 @@ public class RepositorySearch extends RepositoryClient  {
     public static void usage(String msg) {
         System.err.println(msg);
         System.err.println(
-            "Usage: RepositorySearch -repository <server url> -user <user id> <password> -output <csv|wget|name|metadata|...>  \n-fields <comma separated list of fields to output - e.g. name, url, size, id, lat, lon, ....>\n-download -overwrite \n-text <search text>  \n-type <entry type> \n-variable <var name> \n-tag <tag> \n-keyword <keyword> \n-bounds <north> <west> <south> <east> \n-daterange <startdate yyyy-MM-dd> <todate yyyy-MM-dd> \n-mindate <startdate yyyy-MM-dd> \n-maxdate <startdate yyyy-MM-dd> ");
+            "Usage: search.sh -repository <server url> -user <user id> <password>\n\t-output <csv|wget|name|metadata|...>  \n\t-fields <comma separated list of fields to output - e.g. name, url, size, id, lat, lon, ....>\n\t-download -overwrite \n\t-max <max entries to show>\n\tSearch options:\n\t-text <search text>  \n\t-type <entry type>  \n\t-bounds <north> <west> <south> <east> \n\t-daterange <startdate yyyy-MM-dd> <todate yyyy-MM-dd> \n\t-mindate <date yyyy-MM-dd> \n\t-maxdate <date yyyy-MM-dd>\n\t-mincreatedate <date yyyy-MM-dd> \n\t-maxcreatedate <date yyyy-MM-dd>\n\t-suffix <file suffix>\n\t-variable <var name> \n\t-tag <tag> \n\t-keyword <keyword> ");
+        System.err.println("e.g., search.sh -repos http://ramadda.org/repository -text foo -max 5 -fields \"name,size,url\"");
         System.exit(1);
     }
 
