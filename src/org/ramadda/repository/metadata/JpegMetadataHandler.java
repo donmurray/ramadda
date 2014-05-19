@@ -29,6 +29,8 @@ import com.drew.metadata.exif.*;
 import com.drew.metadata.iptc.IptcDirectory;
 
 
+import org.ramadda.util.Utils;
+
 import org.ramadda.repository.*;
 
 import ucar.unidata.ui.ImageUtils;
@@ -92,19 +94,15 @@ public class JpegMetadataHandler extends MetadataHandler {
 
         String path = entry.getResource().getPath();
         try {
-            Image image = ImageUtils.readImage(path, false);
+            Image image = Utils.readImage(path);
             if (image == null) {
                 System.err.print("JpegMetadataHandler: image is null:"
                                  + entry.getResource());
 
                 return;
             }
-            System.err.print("JpegMetadataHandler: wait...");
-            ImageUtils.waitOnImage(image);
             Image newImage = ImageUtils.resize(image, 150, -1);
             ImageUtils.waitOnImage(newImage);
-            System.err.println("done");
-
             String thumbFile = IOUtil.stripExtension(entry.getName())  + "_thumb.";
             if(path.toLowerCase().endsWith("gif")) {
                 thumbFile+= "gif";
@@ -289,8 +287,7 @@ public class JpegMetadataHandler extends MetadataHandler {
 
         int cnt = 0;
         for (String path : args) {
-            Image image = ImageUtils.readImage(path, false);
-            ImageUtils.waitOnImage(image);
+            Image image = Utils.readImage(path);
             System.err.println("before:" + image.getWidth(null) + " "
                                + image.getHeight(null));
             Image newImage = ImageUtils.resize(image, 100, -1);

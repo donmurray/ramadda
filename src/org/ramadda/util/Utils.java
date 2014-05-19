@@ -25,13 +25,21 @@ import org.apache.commons.lang.text.StrTokenizer;
 
 import org.w3c.dom.*;
 
+import ucar.unidata.ui.ImageUtils;
+
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
+import java.awt.Image;
+
+import java.awt.Toolkit;
+import java.awt.image.*;
+
 import java.io.File;
+import java.io.InputStream;
 
 import java.lang.reflect.Constructor;
 
@@ -898,8 +906,8 @@ public class Utils {
             String name = tmp.substring(openParenIdx + 1, colonIdx);
             names.add(name);
             gotAttributeInPattern = true;
-            pattern.append(tmp.substring(colonIdx+1,closeParenIdx+1));
-            tmp                   = tmp.substring(closeParenIdx + 1);
+            pattern.append(tmp.substring(colonIdx + 1, closeParenIdx + 1));
+            tmp = tmp.substring(closeParenIdx + 1);
         }
         if ( !gotAttributeInPattern) {
             pattern = new StringBuffer(filePatternString);
@@ -909,6 +917,38 @@ public class Utils {
 
         return pattern.toString();
     }
+
+    /**
+     * _more_
+     *
+     * @param file _more_
+     *
+     * @return _more_
+     */
+    public static Image readImage(String file) {
+        if (file == null) {
+            return null;
+        }
+        try {
+            InputStream is = IOUtil.getInputStream(file, Utils.class);
+            if (is != null) {
+                byte[] bytes = IOUtil.readBytes(is);
+                Image  image = Toolkit.getDefaultToolkit().createImage(bytes);
+                image = ImageUtils.waitOnImage(image);
+
+                return image;
+            }
+            System.err.println("Could not read image:" + file);
+        } catch (Exception exc) {
+            System.err.println(exc + " getting image:  " + file);
+
+            return null;
+        }
+
+        return null;
+    }
+
+
 
 
 }
