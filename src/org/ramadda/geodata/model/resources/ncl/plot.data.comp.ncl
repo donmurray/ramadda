@@ -574,8 +574,14 @@ begin
     end if
     rescf@tiMainString        = plottitle
     mydata = data(0,:,:)
+    vartitle = mydata@long_name
+    if (isanom) then
+      vartitle = vartitle + " Anomaly"
+    end if 
     if (.not. ismissing(level)) then
-      rescf@gsnLeftString = mydata@long_name + " (" + level +" "+levelunit+ ")"
+      rescf@gsnLeftString = vartitle + " (" + level +" "+levelunit+ ")"
+    else 
+      rescf@gsnLeftString = vartitle
     end if
     if (cint .eq. 0) then
       symMinMaxPlt(mydata,20,False,rescf)
@@ -597,14 +603,21 @@ begin
         addAnnotation(wks,opts@annotation)
     end if
     delete(mydata)
+    delete(vartitle)
   else 
     if (.not. doGoogle) then
       mydata = data(0,:,:)
+      vartitle = mydata@long_name
+      if (isanom) then
+        vartitle = vartitle + " Anomaly"
+      end if 
       if ((.not. ismissing(plottitles(0))) .and. (plottitles(0) .ne. "")) then
         rescf@tiMainString        = plottitles(0)
       end if
       if (.not. ismissing(opts@level)) then
-        rescf@gsnLeftString = mydata@long_name + " (" + level +" "+levelunit+ ")"
+        rescf@gsnLeftString = vartitle + " (" + level +" "+levelunit+ ")"
+      else 
+        rescf@gsnLeftString = vartitle
       end if
       if (isanom .and. cint .eq. 0) then
         symMinMaxPlt(mydata,20,False,rescf)
@@ -652,6 +665,7 @@ begin
         delete(mydata)
         delete(nextdata)
       end do
+      delete(vartitle)
     else
       
       ;; Make the first plot to get the labelbar

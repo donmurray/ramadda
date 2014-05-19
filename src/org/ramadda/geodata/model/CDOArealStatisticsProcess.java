@@ -225,9 +225,10 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         if (stat.equals(CDOOutputHandler.STAT_ANOM)) {
             System.err.println("Looking for climo");
             List<Entry> climo = findClimatology(request, oneOfThem);
-            if (climo == null) {
-                throw new Exception("Unable to find climatology for "
-                                    + oneOfThem.getName());
+            if (climo == null || climo.isEmpty()) {
+                climEntry = makeClimatology(request, oneOfThem, dpi, tail);
+                //throw new Exception("Unable to find climatology for "
+                //                    + oneOfThem.getName());
             } else if (climo.size() > 1) {
                 System.err.println("found too many");
             } else {
@@ -536,19 +537,20 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                         CDOOutputHandler.ARG_CDO_STARTYEAR
                         + yearNum, years, request.getString(
                             CDOOutputHandler.ARG_CDO_STARTYEAR, years.get(
-                                0))) + HtmlUtils.space(3)
+                                0)),HtmlUtils.title("Select the starting year")) + HtmlUtils.space(3)
                                      + Repository.msgLabel("End")
                                      + HtmlUtils.select(
                                          CDOOutputHandler.ARG_CDO_ENDYEAR
                                          + yearNum, years, request.getString(
                                              CDOOutputHandler.ARG_CDO_ENDYEAR, years.get(
-                                                 endIndex))) + HtmlUtils.p()
+                                                 endIndex)), HtmlUtils.title("Select the ending year")) + HtmlUtils.p()
                                                      + Repository.msgLabel(
                                                          "or List") + HtmlUtils.input(
                                                              CDOOutputHandler.ARG_CDO_YEARS
                                                                  + yearNum, request.getString(
                                                                      CDOOutputHandler.ARG_CDO_YEARS
-                                                                         + yearNum, ""), 20)));
+                                                                         + yearNum, ""), 20, HtmlUtils.title(
+                                                                                 "Input a set of years separated by commas (e.g. 1980,1983,2012)"))));
             grid++;
         }
     }

@@ -21,24 +21,27 @@
 package org.ramadda.geodata.model;
 
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+
 import org.ramadda.data.process.DataProcess;
+import org.ramadda.data.process.DataProcessInput;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
 import org.ramadda.repository.RepositoryManager;
 import org.ramadda.repository.Request;
+import org.ramadda.repository.Resource;
 import org.ramadda.repository.database.Tables;
 import org.ramadda.repository.type.CollectionTypeHandler;
 import org.ramadda.repository.type.Column;
 import org.ramadda.repository.type.GranuleTypeHandler;
+import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.sql.Clause;
 import org.ramadda.util.HtmlUtils;
 
-
-import java.io.File;
-
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import ucar.unidata.util.IOUtil;
 
 
 /**
@@ -142,6 +145,30 @@ public abstract class CDODataProcess extends DataProcess {
         return pair[1];
     }
 
+    /**
+     * Make a climatology for the given entry
+     * @param request the request
+     * @param entry the entry
+     */
+    protected Entry makeClimatology(Request request, Entry entry, DataProcessInput dpi, String tail) 
+      throws Exception {
+        String climName = IOUtil.stripExtension(tail) + "_clim.nc";
+        File climFile = new File(IOUtil.joinDir(dpi.getProcessDir(),
+                            climName));
+        List<String> commands  = initCDOCommand();
+        commands.add("ymonmean");
+        commands.add(entry.getResource().getPath());
+        commands.add(climFile.toString());
+        runProcess(commands, dpi.getProcessDir(), climFile);
+        Resource resource = new Resource(climFile, Resource.TYPE_LOCAL_FILE);
+        TypeHandler myHandler = getRepository().getTypeHandler("file",
+                                    false, true);
+        Entry climEntry = new Entry(myHandler, true, climFile.toString());
+        climEntry.setResource(resource);
+        return climEntry;
+
+    }
+    
     /**
      * Get the repository
      *

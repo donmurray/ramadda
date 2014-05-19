@@ -756,7 +756,8 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
                 + HtmlUtils.select(
                     ARG_CDO_STARTMONTH, MONTHS,
                     request.getString(
-                        ARG_CDO_STARTMONTH, null)) + HtmlUtils.space(2)
+                        ARG_CDO_STARTMONTH, null), HtmlUtils.title("Select the starting month")) 
+                        + HtmlUtils.space(2)
                             + msgLabel("End")
                             + HtmlUtils.select(
                                 ARG_CDO_ENDMONTH, MONTHS,
@@ -764,7 +765,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
                                     ARG_CDO_ENDMONTH,
                                     MONTHS.get(
                                         MONTHS.size()
-                                        - 1).getId().toString()))));
+                                        - 1).getId().toString()), HtmlUtils.title("Select the ending month"))));
     }
 
     /**
@@ -803,13 +804,13 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
                 + HtmlUtils.select(
                     ARG_CDO_STARTYEAR, years,
                     request.getString(
-                        ARG_CDO_STARTYEAR, years.get(0))) + HtmlUtils.space(
+                        ARG_CDO_STARTYEAR, years.get(0)), HtmlUtils.title("Select the starting year")) + HtmlUtils.space(
                             3) + msgLabel("End")
                                + HtmlUtils.select(
                                    ARG_CDO_ENDYEAR, years,
                                    request.getString(
                                        ARG_CDO_ENDYEAR,
-                                       years.get(years.size() - 1)))));
+                                       years.get(years.size() - 1)), HtmlUtils.title("Select the ending year"))));
     }
 
     /**
