@@ -456,12 +456,28 @@ public class Utils {
      * @param args _more_
      */
     public static void main(String args[]) {
+        List<String> patternNames = new ArrayList<String>();
+        String patternString = ".*(frequency_type:inst|tavg|const)(frequency:1|3|6|M|U|0)_(dimensions:2d|3d)_(group:...)_(horizontal_resolution:N|F|C)(vertical_location:x|p|v|e).*";
+        //        String patternString = ".*(inst|tavg|const).*";
+
+        patternString = extractPatternNames(patternString, patternNames);
+        System.err.println("pattern names:" + patternNames);
+
+        Pattern filePattern   = Pattern.compile(patternString);
         for (String file : args) {
-            System.err.println(
-                "file:" + file + " date:"
-                + extractDate(new java.io.File(file).getName()));
+            Matcher matcher = filePattern.matcher(new File(file).getName());
+            if ( !matcher.find()) {
+                System.err.println ("no match:" + file);
+                continue;
+            }
+            System.err.println ("match:" + file);
+
+            for(int i=0;i<patternNames.size();i++) {
+                Object value = matcher.group(i+1);
+                System.err.println ("\t" + patternNames.get(i) +"=" + value);
+            }
+
         }
-        //        testJulian(args);
     }
 
 
