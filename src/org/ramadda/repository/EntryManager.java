@@ -1004,11 +1004,22 @@ public class EntryManager extends RepositoryManager {
     /** _more_ */
     public static final String ARG_EXTEDIT_NEWTYPE = "extedit.newtype";
 
+    /** _more_          */
+    public static final String ARG_EXTEDIT_NEWTYPE_PATTERN =
+        "extedit.newtype.pattern";
+
+    /** _more_          */
+    public static final String ARG_EXTEDIT_OLDTYPE = "extedit.oldtype";
+
     /** _more_ */
     public static final String ARG_EXTEDIT_RECURSE = "extedit.recurse";
 
     /** _more_ */
     public static final String ARG_EXTEDIT_CHANGETYPE = "extedit.changetype";
+
+    /** _more_          */
+    public static final String ARG_EXTEDIT_CHANGETYPE_RECURSE =
+        "extedit.changetype.recurse";
 
 
     /**
@@ -1182,7 +1193,6 @@ public class EntryManager extends RepositoryManager {
         }
 
 
-
         sb.append(request.form(getRepository().URL_ENTRY_EXTEDIT,
                                HtmlUtils.attr("name", "entryform")));
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
@@ -1207,68 +1217,97 @@ public class EntryManager extends RepositoryManager {
                                    ARG_EXTEDIT_REPORT));
 
 
-        //For now only support changing types for folders
-        boolean isGroup = entry.isGroup();
-        if (true || isGroup) {
-            List<TwoFacedObject> groupTfos = new ArrayList<TwoFacedObject>();
-            List<TwoFacedObject> fileTfos  = new ArrayList<TwoFacedObject>();
-            for (TypeHandler typeHandler :
-                    getRepository().getTypeHandlers()) {
-                if (typeHandler.equals(entry.getTypeHandler())) {
-                    continue;
-                }
-                if ( !entry.getTypeHandler().canChangeTo(typeHandler)) {
-                    continue;
-                }
-                TwoFacedObject tfo =
-                    new TwoFacedObject(
-                        typeHandler.getCategory() + " - "
-                        + typeHandler.getLabel(), typeHandler.getType());
-                if (typeHandler.isGroup()) {
-                    groupTfos.add(tfo);
-                } else {
-                    fileTfos.add(tfo);
-                }
+
+        List<String> cats = new ArrayList<String>();
+        Hashtable<String, List<TwoFacedObject>> map =
+            new Hashtable<String, List<TwoFacedObject>>();
+        for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
+            if ( !typeHandler.getForUser()) {
+                continue;
             }
-            TwoFacedObject.sort(groupTfos);
-            TwoFacedObject.sort(fileTfos);
-            List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
-            if (isGroup) {
-                tfos.addAll(groupTfos);
-                tfos.addAll(fileTfos);
-            } else {
-                tfos.addAll(fileTfos);
-                tfos.addAll(groupTfos);
+            if (typeHandler.equals(entry.getTypeHandler())) {
+                continue;
             }
-
-            sb.append(HtmlUtils.p());
-            sb.append(msgHeader("Change Type"));
-            sb.append(msgLabel("Change type to"));
-            sb.append(HtmlUtils.space(1));
-            sb.append(HtmlUtils.select(ARG_EXTEDIT_NEWTYPE, tfos));
-            sb.append(HtmlUtils.p());
-            List<Column> columns = entry.getTypeHandler().getColumns();
-            if ((columns != null) && (columns.size() > 0)) {
-                StringBuilder note = new StringBuilder();
-                for (Column col : columns) {
-                    if (note.length() > 0) {
-                        note.append(", ");
-                    }
-                    note.append(col.getLabel());
-                }
-                sb.append(msgLabel("Note: this metadata would be lost")
-                          + note);
+            if ( !entry.getTypeHandler().canChangeTo(typeHandler)) {
+                continue;
             }
-
-
-
-            sb.append(HtmlUtils.p());
-            sb.append(HtmlUtils.submit(msg("Change Type"),
-                                       ARG_EXTEDIT_CHANGETYPE));
+            String cat = typeHandler.getCategory();
+            TwoFacedObject tfo =
+                new TwoFacedObject(
+                    HtmlUtils.space(4) + typeHandler.getLabel(),
+                    typeHandler.getType());
+            List<TwoFacedObject> tfos = map.get(cat);
+            if (tfos == null) {
+                tfos = new ArrayList<TwoFacedObject>();
+                map.put(cat, tfos);
+                cats.add(cat);
+            }
+            tfos.add(tfo);
+        }
+        //        TwoFacedObject.sort(groupTfos);
+        //        TwoFacedObject.sort(fileTfos);
+        List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
+        for (String cat : cats) {
+            tfos.add(new TwoFacedObject("<b>Category: " + cat + "</b>", ""));
+            tfos.addAll(map.get(cat));
         }
 
+        sb.append(HtmlUtils.p());
+        sb.append(msgHeader("Change Entry Type"));
+        sb.append(HtmlUtils.p());
+        sb.append(msgLabel("New type"));
+        sb.append(HtmlUtils.space(1));
+        sb.append(HtmlUtils.select(ARG_EXTEDIT_NEWTYPE, tfos));
+        sb.append(HtmlUtils.p());
+        List<Column> columns = entry.getTypeHandler().getColumns();
+        if ((columns != null) && (columns.size() > 0)) {
+            StringBuilder note = new StringBuilder();
+            for (Column col : columns) {
+                if (note.length() > 0) {
+                    note.append(", ");
+                }
+                note.append(col.getLabel());
+            }
+            sb.append(msgLabel("Note: this metadata would be lost") + note);
+        }
 
-        //        sb.append(HtmlUtils.submit(msg("Set Parent ID"),ARG_EXTEDIT_SETPARENTID));
+        sb.append(HtmlUtils.p());
+        sb.append(HtmlUtils.submit(msg("Change type of this Entry"),
+                                   ARG_EXTEDIT_CHANGETYPE));
+
+
+
+        sb.append(HtmlUtils.formClose());
+
+
+
+        sb.append(request.form(getRepository().URL_ENTRY_EXTEDIT,
+                               HtmlUtils.attr("name", "entryform")));
+        sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
+
+
+        sb.append(HtmlUtils.p());
+        sb.append(msgHeader("Change Descendent Entry Type"));
+        sb.append(HtmlUtils.p());
+        sb.append(HtmlUtils.formTable());
+        sb.append(HtmlUtils.formEntry(msgLabel("Old type"),
+                                      HtmlUtils.select(ARG_EXTEDIT_OLDTYPE,
+                                          tfos)));
+
+        sb.append(
+            HtmlUtils.formEntry(
+                msgLabel("Entries that match this pattern"),
+                HtmlUtils.input(ARG_EXTEDIT_NEWTYPE_PATTERN, "")));
+        sb.append(HtmlUtils.formEntry(msgLabel("New type"),
+                                      HtmlUtils.select(ARG_EXTEDIT_NEWTYPE,
+                                          tfos)));
+        sb.append(HtmlUtils.formTableClose());
+        sb.append(HtmlUtils.p());
+        sb.append(
+            HtmlUtils.submit(
+                msg("Change the type of all descendent entries"),
+                ARG_EXTEDIT_CHANGETYPE_RECURSE));
+
         sb.append(HtmlUtils.formClose());
 
         return makeEntryEditResult(request, entry, "Entry Walk", sb);
@@ -1364,7 +1403,7 @@ public class EntryManager extends RepositoryManager {
                                         newTypeHandler.getType() });
 
         removeFromCache(entry);
-        entry =  newTypeHandler.changeType(request, entry);
+        entry = newTypeHandler.changeType(request, entry);
 
         return entry;
     }
