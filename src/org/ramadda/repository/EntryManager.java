@@ -1004,11 +1004,11 @@ public class EntryManager extends RepositoryManager {
     /** _more_ */
     public static final String ARG_EXTEDIT_NEWTYPE = "extedit.newtype";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_EXTEDIT_NEWTYPE_PATTERN =
         "extedit.newtype.pattern";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_EXTEDIT_OLDTYPE = "extedit.oldtype";
 
     /** _more_ */
@@ -1017,9 +1017,13 @@ public class EntryManager extends RepositoryManager {
     /** _more_ */
     public static final String ARG_EXTEDIT_CHANGETYPE = "extedit.changetype";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_EXTEDIT_CHANGETYPE_RECURSE =
         "extedit.changetype.recurse";
+
+    /** _more_          */
+    public static final String ARG_EXTEDIT_CHANGETYPE_RECURSE_CONFIRM =
+        "extedit.changetype.recurse.confirm";
 
 
     /**
@@ -1047,7 +1051,8 @@ public class EntryManager extends RepositoryManager {
             ActionManager.Action action = new ActionManager.Action() {
                 public void run(Object actionId) throws Exception {
                     EntryVisitor walker = new EntryVisitor(request,
-                                              getRepository(), actionId) {
+                                              getRepository(), actionId,
+                                              recurse) {
                         public boolean processEntry(Entry entry,
                                 List<Entry> children)
                                 throws Exception {
@@ -1109,16 +1114,82 @@ public class EntryManager extends RepositoryManager {
 
         */
 
-        StringBuilder sb = new StringBuilder();
+        final StringBuilder sb = new StringBuilder();
+
+
 
         if (request.exists(ARG_EXTEDIT_CHANGETYPE)) {
-            String newType = request.getString(ARG_EXTEDIT_NEWTYPE, "");
-            TypeHandler newTypeHandler =
-                getRepository().getTypeHandler(newType);
+            TypeHandler newTypeHandler = getRepository().getTypeHandler(
+                                             request.getString(
+                                                 ARG_EXTEDIT_NEWTYPE, ""));
+
             entry = changeType(request, entry, newTypeHandler);
             sb.append(
                 getPageHandler().showDialogNote(
                     msg("Entry type has been changed")));
+        } else if (request.exists(ARG_EXTEDIT_CHANGETYPE_RECURSE)) {
+            final boolean forReal =
+                request.get(ARG_EXTEDIT_CHANGETYPE_RECURSE_CONFIRM, false);
+            final TypeHandler newTypeHandler = getRepository().getTypeHandler(
+                                                   request.getString(
+                                                       ARG_EXTEDIT_NEWTYPE,
+                                                       ""));
+            final String oldType = request.getString(ARG_EXTEDIT_OLDTYPE, "");
+            final String pattern =
+                request.getString(ARG_EXTEDIT_NEWTYPE_PATTERN, (String) null);
+            ActionManager.Action action = new ActionManager.Action() {
+                public void run(final Object actionId) throws Exception {
+                    EntryVisitor walker = new EntryVisitor(request,
+                                              getRepository(), actionId,
+                                              true) {
+                        public boolean processEntry(Entry entry,
+                                List<Entry> children)
+                                throws Exception {
+
+                            System.err.println("processEntry:"
+                                    + entry.getName());
+                            if ( !oldType.equals(TypeHandler.TYPE_ANY)
+                                    && !entry.getTypeHandler().isType(
+                                        oldType)) {
+                                System.err.println("\tdoesn't match type:"
+                                        + oldType);
+
+                                return true;
+                            }
+                            if ((pattern != null) && (pattern.length() > 0)) {
+                                if ( !entry.getName().matches(pattern)) {
+                                    System.err.println(
+                                        "\tdoesn't match pattern:" + pattern);
+
+                                    return true;
+                                }
+                            }
+                            if (forReal) {
+                                System.err.println("\tchanging type:"
+                                        + entry.getName());
+                                append("Changing type:" + entry.getName()
+                                       + "<br>");
+                                entry = changeType(request, entry,
+                                        newTypeHandler);
+                            } else {
+                                System.err.println(
+                                    "\twould be changing type:"
+                                    + entry.getName());
+                                append("We would be changing type:"
+                                       + entry.getName() + "<br>");
+                            }
+
+                            return true;
+                        }
+                    };
+                    walker.walk(finalEntry);
+                    getActionManager().setContinueHtml(actionId,
+                            walker.getMessageBuffer().toString());
+                }
+            };
+
+            return getActionManager().doAction(request, action,
+                    "Walking the tree, changing entries", "", entry);
         }
 
 
@@ -1142,7 +1213,7 @@ public class EntryManager extends RepositoryManager {
             final long[] size     = { 0 };
             final int[]  numFiles = { 0 };
             EntryVisitor walker = new EntryVisitor(request, getRepository(),
-                                      null) {
+                                      null, true) {
                 @Override
                 public boolean processEntry(Entry entry, List<Entry> children)
                         throws Exception {
@@ -1205,40 +1276,50 @@ public class EntryManager extends RepositoryManager {
         sb.append(HtmlUtils.labeledCheckbox(ARG_EXTEDIT_TEMPORAL, "true",
                                             false, "Set temporal metadata"));
         sb.append(HtmlUtils.p());
-        //        sb.append(HtmlUtils.labeledCheckbox(ARG_EXTEDIT_MD5,"true", false, "Set MD5 checksums"));
-        //        sb.append(HtmlUtils.p());
-        sb.append(HtmlUtils.submit(msg("Apply"), ARG_EXTEDIT_EDIT));
         sb.append(HtmlUtils.labeledCheckbox(ARG_EXTEDIT_RECURSE, "true",
                                             true, "Recurse"));
-
         sb.append(HtmlUtils.p());
-        sb.append(msgHeader("Generate File Listing"));
+        //        sb.append(HtmlUtils.labeledCheckbox(ARG_EXTEDIT_MD5,"true", false, "Set MD5 checksums"));
+        //        sb.append(HtmlUtils.p());
+        sb.append(HtmlUtils.submit(msg("Set spatial and temporal metadata"),
+                                   ARG_EXTEDIT_EDIT));
+
+
+        sb.append("<br>&nbsp;<br>");
+        sb.append(msgHeader("File Listing"));
         sb.append(HtmlUtils.submit(msg("Generate File Listing"),
                                    ARG_EXTEDIT_REPORT));
 
 
 
+        //public Selector(String label, String id, String icon) {
+
         List<String> cats = new ArrayList<String>();
-        Hashtable<String, List<TwoFacedObject>> map =
-            new Hashtable<String, List<TwoFacedObject>>();
+
+        Hashtable<String, List<HtmlUtils.Selector>> map =
+            new Hashtable<String, List<HtmlUtils.Selector>>();
         for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
             if ( !typeHandler.getForUser()) {
                 continue;
             }
-            if (typeHandler.equals(entry.getTypeHandler())) {
-                continue;
-            }
+            //            if (typeHandler.equals(entry.getTypeHandler())) {
+            //                continue;
+            //            }
             if ( !entry.getTypeHandler().canChangeTo(typeHandler)) {
                 continue;
             }
-            String cat = typeHandler.getCategory();
-            TwoFacedObject tfo =
-                new TwoFacedObject(
-                    HtmlUtils.space(4) + typeHandler.getLabel(),
-                    typeHandler.getType());
-            List<TwoFacedObject> tfos = map.get(cat);
+            String cat  = typeHandler.getCategory();
+            String icon = typeHandler.getProperty("icon", (String) null);
+            if (icon != null) {
+                icon = typeHandler.iconUrl(icon);
+            }
+            HtmlUtils.Selector tfo =
+                new HtmlUtils.Selector(
+                    HtmlUtils.space(2) + typeHandler.getLabel(),
+                    typeHandler.getType(), icon);
+            List<HtmlUtils.Selector> tfos = map.get(cat);
             if (tfos == null) {
-                tfos = new ArrayList<TwoFacedObject>();
+                tfos = new ArrayList<HtmlUtils.Selector>();
                 map.put(cat, tfos);
                 cats.add(cat);
             }
@@ -1246,17 +1327,23 @@ public class EntryManager extends RepositoryManager {
         }
         //        TwoFacedObject.sort(groupTfos);
         //        TwoFacedObject.sort(fileTfos);
-        List<TwoFacedObject> tfos = new ArrayList<TwoFacedObject>();
+        List<HtmlUtils.Selector> tfos = new ArrayList<HtmlUtils.Selector>();
         for (String cat : cats) {
-            tfos.add(new TwoFacedObject("<b>Category: " + cat + "</b>", ""));
+            tfos.add(new HtmlUtils.Selector(cat, "", null, 0, true));
             tfos.addAll(map.get(cat));
         }
 
-        sb.append(HtmlUtils.p());
-        sb.append(msgHeader("Change Entry Type"));
+
+
+        sb.append("<br>&nbsp;<br>");
+        sb.append(msgHeader("Entry Type"));
         sb.append(HtmlUtils.p());
         sb.append(msgLabel("New type"));
         sb.append(HtmlUtils.space(1));
+
+        //        this.jq(ID_TYPE_FIELD).selectBoxIt({});
+        //        "data-iconurl",icon];
+
         sb.append(HtmlUtils.select(ARG_EXTEDIT_NEWTYPE, tfos));
         sb.append(HtmlUtils.p());
         List<Column> columns = entry.getTypeHandler().getColumns();
@@ -1272,22 +1359,17 @@ public class EntryManager extends RepositoryManager {
         }
 
         sb.append(HtmlUtils.p());
-        sb.append(HtmlUtils.submit(msg("Change type of this Entry"),
+        sb.append(HtmlUtils.submit(msg("Change type of this entry"),
                                    ARG_EXTEDIT_CHANGETYPE));
-
-
-
         sb.append(HtmlUtils.formClose());
-
-
 
         sb.append(request.form(getRepository().URL_ENTRY_EXTEDIT,
                                HtmlUtils.attr("name", "entryform")));
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
 
 
-        sb.append(HtmlUtils.p());
-        sb.append(msgHeader("Change Descendent Entry Type"));
+        sb.append("<br>&nbsp;<br>");
+        sb.append(msgHeader("Descendents Entry Type"));
         sb.append(HtmlUtils.p());
         sb.append(HtmlUtils.formTable());
         sb.append(HtmlUtils.formEntry(msgLabel("Old type"),
@@ -1296,11 +1378,20 @@ public class EntryManager extends RepositoryManager {
 
         sb.append(
             HtmlUtils.formEntry(
-                msgLabel("Entries that match this pattern"),
-                HtmlUtils.input(ARG_EXTEDIT_NEWTYPE_PATTERN, "")));
+                msgLabel("Pattern"),
+                HtmlUtils.input(ARG_EXTEDIT_NEWTYPE_PATTERN, "") + " "
+                + msg("Only change type for entries that match this pattern")));
         sb.append(HtmlUtils.formEntry(msgLabel("New type"),
                                       HtmlUtils.select(ARG_EXTEDIT_NEWTYPE,
                                           tfos)));
+        sb.append(
+            HtmlUtils.formEntry(
+                "",
+                HtmlUtils.checkbox(
+                    ARG_EXTEDIT_CHANGETYPE_RECURSE_CONFIRM, "true",
+                    false) + " " + msg("Yes, change them")));
+
+
         sb.append(HtmlUtils.formTableClose());
         sb.append(HtmlUtils.p());
         sb.append(

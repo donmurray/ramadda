@@ -131,14 +131,15 @@ public abstract class EntryVisitor implements Constants {
      * @param request _more_
      * @param repository _more_
      * @param actionId _more_
+     * @param recurse _more_
      */
     public EntryVisitor(Request request, Repository repository,
-                        Object actionId) {
+                        Object actionId, boolean recurse) {
         this.repository = repository;
         this.request    = request;
         this.actionId   = actionId;
-        recurse         = request.get(EntryManager.ARG_EXTEDIT_RECURSE,
-                                      false);
+        this.recurse    = recurse;
+
     }
 
     /**
@@ -208,7 +209,8 @@ public abstract class EntryVisitor implements Constants {
      */
     public boolean entryOk(Entry entry) {
         if ( !entry.isGroup()) {
-            return false;
+            //TODO: do we recurse
+            //            return false;
         }
         if (entry.getTypeHandler().isSynthType()
                 || getRepository().getEntryManager().isSynthEntry(
@@ -233,6 +235,15 @@ public abstract class EntryVisitor implements Constants {
     /**
      * _more_
      *
+     * @return _more_
+     */
+    public Object getActionId() {
+        return actionId;
+    }
+
+    /**
+     * _more_
+     *
      * @param entry _more_
      *
      * @return _more_
@@ -240,10 +251,15 @@ public abstract class EntryVisitor implements Constants {
      * @throws Exception _more_
      */
     public boolean walk(Entry entry) throws Exception {
+        System.err.println("Walk: " + entry);
         if ( !isRunning()) {
+            System.err.println("\t- not running");
+
             return true;
         }
         if ( !entryOk(entry)) {
+            System.err.println("\tEntry not ok");
+
             return true;
         }
         totalCnt++;
@@ -251,6 +267,8 @@ public abstract class EntryVisitor implements Constants {
         List<Entry> children =
             getRepository().getEntryManager().getChildren(request, entry);
         if (children == null) {
+            System.err.println("\tNo children");
+
             return true;
         }
         if (recurse) {
@@ -265,6 +283,7 @@ public abstract class EntryVisitor implements Constants {
                 }
             }
         }
+
         if ( !processEntry(entry, children)) {
             return false;
         }
