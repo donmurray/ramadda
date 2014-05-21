@@ -1021,7 +1021,7 @@ public class EntryManager extends RepositoryManager {
     public static final String ARG_EXTEDIT_CHANGETYPE_RECURSE =
         "extedit.changetype.recurse";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_EXTEDIT_CHANGETYPE_RECURSE_CONFIRM =
         "extedit.changetype.recurse.confirm";
 
@@ -1157,7 +1157,17 @@ public class EntryManager extends RepositoryManager {
                                 return true;
                             }
                             if ((pattern != null) && (pattern.length() > 0)) {
-                                if ( !entry.getName().matches(pattern)) {
+                                boolean matches =
+                                    entry.getName().matches(pattern);
+                                if ( !matches
+                                        && (entry.getResource().getPath()
+                                            != null)) {
+                                    matches =
+                                        entry.getResource().getPath().matches(
+                                            pattern);
+                                }
+
+                                if ( !matches) {
                                     System.err.println(
                                         "\tdoesn't match pattern:" + pattern);
 
@@ -1295,9 +1305,16 @@ public class EntryManager extends RepositoryManager {
         //public Selector(String label, String id, String icon) {
 
         List<String> cats = new ArrayList<String>();
-
         Hashtable<String, List<HtmlUtils.Selector>> map =
             new Hashtable<String, List<HtmlUtils.Selector>>();
+
+        for (String preload : PRELOAD_CATEGORIES) {
+            cats.add(preload);
+            map.put(preload, new ArrayList<HtmlUtils.Selector>());
+        }
+
+
+
         for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
             if ( !typeHandler.getForUser()) {
                 continue;
