@@ -2503,6 +2503,40 @@ public class HtmlUtils {
     /**
      * _more_
      *
+     * @param top _more_
+     * @param left _more_
+     * @param bottom _more_
+     * @param right _more_
+     *
+     * @return _more_
+     */
+    public static String beginInset(int top, int left, int bottom,
+                                    int right) {
+        return open(TAG_DIV, style(((top == 0)
+                                    ? ""
+                                    : "margin-top:" + top
+                                      + "px;") + ((left == 0)
+                ? ""
+                : "margin-left:" + left + "px;") + ((bottom == 0)
+                ? ""
+                : "margin-bottom:" + bottom + "px;") + ((right == 0)
+                ? ""
+                : "margin-right:" + top + "px;")));
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public static String endInset() {
+        return close(TAG_DIV);
+    }
+
+
+    /**
+     * _more_
+     *
      * @param html _more_
      * @param space _more_
      *
