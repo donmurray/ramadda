@@ -85,7 +85,8 @@ public class MsDocTypeHandler extends GenericTypeHandler {
             return;
         }
         String filename = file.toString().toLowerCase();
-        if ( !(filename.endsWith(".pptx") || filename.endsWith(".docx"))) {
+        if ( !(filename.endsWith(".pptx") || filename.endsWith(".docx")
+                || filename.endsWith(".xlsx"))) {
             return;
         }
 
@@ -98,19 +99,22 @@ public class MsDocTypeHandler extends GenericTypeHandler {
                 if (ze.isDirectory()) {
                     continue;
                 }
-                String path = ze.getName();
-                String lcpath = path.toLowerCase();
-                boolean isImage = false;
+                String  path        = ze.getName();
+                String  lcpath      = path.toLowerCase();
+                boolean isImage     = false;
                 boolean isThumbnail = false;
-                
+
                 if (lcpath.endsWith("thumbnail.jpeg")) {
                     isThumbnail = isImage = true;
-                } else if (lcpath.endsWith(".jpeg") || lcpath.endsWith(".jpg") || lcpath.endsWith(".png") || lcpath.endsWith(".gif")) {
+                } else if (lcpath.endsWith(".jpeg")
+                           || lcpath.endsWith(".jpg")
+                           || lcpath.endsWith(".png")
+                           || lcpath.endsWith(".gif")) {
                     isImage = true;
                 }
 
                 //For now just extract the thumbnails, not all of the images
-                if(isThumbnail) {
+                if (isThumbnail) {
                     String thumbFile = IOUtil.getFileTail(path);
                     File   f = getStorageManager().getTmpFile(null,
                                    thumbFile);
@@ -125,9 +129,10 @@ public class MsDocTypeHandler extends GenericTypeHandler {
                             f).getName();
                     Metadata metadata =
                         new Metadata(getRepository().getGUID(),
-                                     entry.getId(),
-                                     (isThumbnail?ContentMetadataHandler.TYPE_THUMBNAIL:ContentMetadataHandler.TYPE_ATTACHMENT),
-                                     false, fileName, null, null, null, null);
+                                     entry.getId(), (isThumbnail
+                            ? ContentMetadataHandler.TYPE_THUMBNAIL
+                            : ContentMetadataHandler.TYPE_ATTACHMENT), false,
+                                fileName, null, null, null, null);
 
                     entry.addMetadata(metadata);
                 }

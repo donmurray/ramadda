@@ -81,6 +81,10 @@
      <property name="icon" value="/icons/ppt.png"/>
 </type>
 
+  <type name="type_document_xls"  description="Microsoft Excel File" pattern="(.*\.xls|.*\.xlsx)"  super="type_document"   handler="org.ramadda.plugins.media.MsDocTypeHandler">
+     <property name="icon" value="/icons/xls.png"/>
+</type>
+
 
 
 </types>
