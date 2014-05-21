@@ -1,6 +1,6 @@
 <types>
 
-  <type name="earth_satellite"  description="Satellite Data" foruser="false" super="earth">
+  <type name="earth_satellite"  description="Satellite Data" foruser="false" super="earth" category="Satellite Data">
      <property name="icon" value="/earthdata/satellite.gif"/>
   </type>
 
