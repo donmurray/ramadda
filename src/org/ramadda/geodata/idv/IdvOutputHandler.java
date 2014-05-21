@@ -1133,13 +1133,13 @@ public class IdvOutputHandler extends OutputHandler implements IdvConstants {
                 String div = HtmlUtils.div(img + " " + colorTable.getName(),
                                            "");
                 String call1 = HtmlUtils.call(
-                                   "setFormValue",
+                                   "HtmlUtil.setFormValue",
                                    HtmlUtils.squote(
                                        ARG_COLORTABLE + displayIdx) + ","
                                            + HtmlUtils.squote(
                                                colorTable.getName()));
                 String call2 =
-                    HtmlUtils.call("setHtml", HtmlUtils.squote(ARG_COLORTABLE
+                    HtmlUtils.call("HtmlUtil.setHtml", HtmlUtils.squote(ARG_COLORTABLE
                         + "_html" + displayIdx) + ","
                             + HtmlUtils.squote(colorTable.getName() + " "
                                 + img));
@@ -1191,10 +1191,10 @@ public class IdvOutputHandler extends OutputHandler implements IdvConstants {
                               HtmlUtils.id(ARG_COLORTABLE + "_html"
                                            + displayIdx)) }, 2));
 
-            String call = HtmlUtils.call("setFormValue",
+            String call = HtmlUtils.call("HtmlUtil.setFormValue",
                                          "'" + ARG_COLORTABLE + displayIdx
                                          + "','" + "" + "'") + ";"
-                                             + HtmlUtils.call("setHtml",
+                                             + HtmlUtils.call("HtmlUtil.setHtml",
                                                  "'" + ARG_COLORTABLE
                                                  + "_html" + displayIdx
                                                  + "','" + "-default-" + "'");
