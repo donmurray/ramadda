@@ -997,6 +997,22 @@ public class EntryManager extends RepositoryManager {
     /** _more_ */
     public static final String ARG_EXTEDIT_REPORT = "extedit.report";
 
+    /** _more_          */
+    public static final String ARG_EXTEDIT_REPORT_MISSING =
+        "extedit.report.missing";
+
+    /** _more_          */
+    public static final String ARG_EXTEDIT_REPORT_FILES =
+        "extedit.report.files";
+
+    /** _more_          */
+    public static final String ARG_EXTEDIT_REPORT_EXTERNAL =
+        "extedit.report.external";
+
+    /** _more_          */
+    public static final String ARG_EXTEDIT_REPORT_INTERNAL =
+        "extedit.report.internal";
+
     /** _more_ */
     public static final String ARG_EXTEDIT_SETPARENTID =
         "extedit.setparentid";
@@ -1222,6 +1238,10 @@ public class EntryManager extends RepositoryManager {
         if (request.exists(ARG_EXTEDIT_REPORT)) {
             final long[] size     = { 0 };
             final int[]  numFiles = { 0 };
+            final boolean showMissing =
+                request.get(ARG_EXTEDIT_REPORT_MISSING, false);
+            final boolean showFiles = request.get(ARG_EXTEDIT_REPORT_FILES,
+                                          false);
             EntryVisitor walker = new EntryVisitor(request, getRepository(),
                                       null, true) {
                 @Override
@@ -1233,6 +1253,12 @@ public class EntryManager extends RepositoryManager {
                                              child);
                         if (child.isFileType()) {
                             boolean exists = child.getResource().fileExists();
+                            if ( !exists && !showMissing) {
+                                continue;
+                            }
+                            if (exists && !showFiles) {
+                                continue;
+                            }
                             append("<tr><td>");
                             append(getPageHandler().getBreadCrumbs(request,
                                     child, entry));
@@ -1279,7 +1305,7 @@ public class EntryManager extends RepositoryManager {
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
 
         sb.append(msgHeader("Group Edit"));
-        sb.append(HtmlUtils.p());
+        sb.append(HtmlUtils.beginInset(0, 10, 0, 0));
         sb.append(HtmlUtils.labeledCheckbox(ARG_EXTEDIT_SPATIAL, "true",
                                             false, "Set spatial metadata"));
         sb.append(HtmlUtils.p());
@@ -1294,12 +1320,21 @@ public class EntryManager extends RepositoryManager {
         sb.append(HtmlUtils.submit(msg("Set spatial and temporal metadata"),
                                    ARG_EXTEDIT_EDIT));
 
+        sb.append(HtmlUtils.endInset());
+
 
         sb.append("<br>&nbsp;<br>");
         sb.append(msgHeader("File Listing"));
+        sb.append(HtmlUtils.beginInset(0, 10, 0, 0));
+        sb.append(HtmlUtils.checkbox(ARG_EXTEDIT_REPORT_MISSING, "true",
+                                     true) + " " + msg("Show missing files")
+                                           + "<p>");
+        sb.append(HtmlUtils.checkbox(ARG_EXTEDIT_REPORT_FILES, "true", true)
+                  + " " + msg("Show OK files") + "<p>");
         sb.append(HtmlUtils.submit(msg("Generate File Listing"),
                                    ARG_EXTEDIT_REPORT));
 
+        sb.append(HtmlUtils.endInset());
 
 
         //public Selector(String label, String id, String icon) {
@@ -1354,7 +1389,7 @@ public class EntryManager extends RepositoryManager {
 
         sb.append("<br>&nbsp;<br>");
         sb.append(msgHeader("Entry Type"));
-        sb.append(HtmlUtils.p());
+        sb.append(HtmlUtils.beginInset(0, 10, 0, 0));
         sb.append(msgLabel("New type"));
         sb.append(HtmlUtils.space(1));
 
@@ -1379,6 +1414,7 @@ public class EntryManager extends RepositoryManager {
         sb.append(HtmlUtils.submit(msg("Change type of this entry"),
                                    ARG_EXTEDIT_CHANGETYPE));
         sb.append(HtmlUtils.formClose());
+        sb.append(HtmlUtils.endInset());
 
         sb.append(request.form(getRepository().URL_ENTRY_EXTEDIT,
                                HtmlUtils.attr("name", "entryform")));
@@ -1387,7 +1423,7 @@ public class EntryManager extends RepositoryManager {
 
         sb.append("<br>&nbsp;<br>");
         sb.append(msgHeader("Descendents Entry Type"));
-        sb.append(HtmlUtils.p());
+        sb.append(HtmlUtils.beginInset(0, 10, 0, 0));
         sb.append(HtmlUtils.formTable());
         sb.append(HtmlUtils.formEntry(msgLabel("Old type"),
                                       HtmlUtils.select(ARG_EXTEDIT_OLDTYPE,
@@ -1417,6 +1453,7 @@ public class EntryManager extends RepositoryManager {
                 ARG_EXTEDIT_CHANGETYPE_RECURSE));
 
         sb.append(HtmlUtils.formClose());
+        sb.append(HtmlUtils.endInset());
 
         return makeEntryEditResult(request, entry, "Entry Walk", sb);
 
