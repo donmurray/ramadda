@@ -2044,7 +2044,8 @@ public class HtmlUtils {
      *
      * @return  an input widget
      */
-    public static String input(String name, Object value, int size, String extra) {
+    public static String input(String name, Object value, int size,
+                               String extra) {
         return input(name, value, attrs(ATTR_SIZE, "" + size) + " " + extra);
     }
 
@@ -2367,7 +2368,8 @@ public class HtmlUtils {
                         + "px;padding-left:20px;padding-bottom:0px;padding-top:2px;background-repeat:no-repeat; background-image: url("
                         + selector.icon + ");");
                 } else if (selector.isHeader) {
-                    extraAttr = style("font-weight:bold");
+                    extraAttr = style(
+                        "font-weight:bold;background: #ddd;padding:4px;");
                 }
             } else {
                 value = label = obj.toString();
@@ -2383,6 +2385,11 @@ public class HtmlUtils {
             }
             if (label.length() > maxLength) {
                 label = "..." + label.substring(label.length() - maxLength);
+            }
+            if (label.equals("hr")) {
+                sb.append(hr());
+
+                continue;
             }
 
             sb.append(tag(TAG_OPTION,
