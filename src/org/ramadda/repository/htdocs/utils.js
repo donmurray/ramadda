@@ -311,6 +311,12 @@ var HtmlUtil =  {
     th : function(attrs, inner) {
         return this.tag("th", attrs, inner);
     },
+    setFormValue: function(id,val) {
+        $("#"+ id).val(val);
+    },
+    setHtml: function(id,val) {
+        $("#"+ id).html(val);
+    },
     formTable : function() {
         return  this.openTag("table",["class","formtable","cellspacing","0","cellspacing","0"]);
     },
