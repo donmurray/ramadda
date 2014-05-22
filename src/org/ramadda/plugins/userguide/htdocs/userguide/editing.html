@@ -108,13 +108,20 @@ the netcdf varbiables and all of the netcdf global attributes found.
 
 <a name="extended"></a><div class="pagesubtitle">5.3 Extended Edit</div> 
 There are a number of other edit capabilities under the Edit-&gt;Extended Edit menu. 
+<p>
 
-For Folders you can recurse down the entry hierarchy and set the spatial and/or temporal bounds of each folder entry as the union of its children entry metadata.
+For Folders you can recurse down the entry hierarchy and set the spatial and/or temporal bounds of each entry as the union of its children entry metadata.
 
-The Generate File Listing will provide a summary of all of the files in the hierarchy.
+<p>
+The Generate File Listing will provide a summary of all of the files in the hierarchy. You can choose to only list entries that have a file that is missing or only list entries that are OK.
 
-You can also change the entry type. Note: for entries that have special attribbutes (e.g., Project, Point Data) when you change the type to a different type the special attributes will be deleted
+<p>
 
+The entry type of the entry you are editing can be changed. Note: for entries that have special attributes (e.g., Project, Point Data) when you change the type to a different type the special attributes will be deleted.
+<p>
+You can also recurse down the folder tree and change the type of all entries that match the specified original entry type and/or a pattern that is matched on the name or the filename of the entry. Note: the pattern is a regular expression.
+<p>
+So, for example, you might have a folder that contains a set of plain File entries that you want to change to be a certain data type (e.g., Landsat Satellite Data). You would select "File" as the Old Type, Landsat Satellite data as the new type. If you had a number of File entries but not all are to be changed you can use the pattern (e.g., ".*.hdf") to match on the File entries that you want to change.
  
 
 

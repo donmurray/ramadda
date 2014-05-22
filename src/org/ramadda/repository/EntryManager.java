@@ -1304,7 +1304,8 @@ public class EntryManager extends RepositoryManager {
                                HtmlUtils.attr("name", "entryform")));
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
 
-        sb.append(msgHeader("Group Edit"));
+
+        sb.append(msgHeader("Spatial and Temporal Metadata"));
         sb.append(HtmlUtils.beginInset(0, 10, 0, 0));
         sb.append(HtmlUtils.labeledCheckbox(ARG_EXTEDIT_SPATIAL, "true",
                                             false, "Set spatial metadata"));
@@ -1431,7 +1432,7 @@ public class EntryManager extends RepositoryManager {
 
         sb.append(
             HtmlUtils.formEntry(
-                msgLabel("Pattern"),
+                msgLabel("Regexp Pattern"),
                 HtmlUtils.input(ARG_EXTEDIT_NEWTYPE_PATTERN, "") + " "
                 + msg("Only change type for entries that match this pattern")));
         sb.append(HtmlUtils.formEntry(msgLabel("New type"),
