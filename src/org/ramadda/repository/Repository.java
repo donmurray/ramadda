@@ -3111,6 +3111,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
         boolean sslEnabled = isSSLEnabled(request);
         boolean allSsl     = false;
 
+        //check for the sub-repositories
         if (apiMethod.getRequest().startsWith("/repos/")) {
             return null;
         }
@@ -3125,9 +3126,13 @@ public class Repository extends RepositoryBase implements RequestHandler,
         if (sslEnabled) {
             if ( !request.get(ARG_NOREDIRECT, false)) {
                 if (apiMethod.getNeedsSsl() && !request.getSecure()) {
+                    //redirect them to the https request
                     return new Result(httpsUrl(request, request.getUrl()));
                 } else if ( !allSsl && !apiMethod.getNeedsSsl()
                             && request.getSecure()) {
+                    /*
+                    //we used to redirect the https: request to entry points that don't require https
+                    //back to the http request
                     String url = request.getUrl();
                     String redirectUrl;
                     int    port = getPort();
@@ -3139,8 +3144,9 @@ public class Repository extends RepositoryBase implements RequestHandler,
                                       + request.getServerName() + ":" + port
                                       + url;
                     }
-
                     return new Result(redirectUrl);
+                    */
+                    return null;
                 }
             }
         }
