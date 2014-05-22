@@ -494,15 +494,22 @@ function EntryRow (entryId, rowId, cbxId,cbxWrapperId, showDetails) {
         var eWidth = entryRow.getRow().outerWidth();
         var eHeight = entryRow.getRow().outerHeight();
         var mWidth = getTooltip().outerWidth();
-        var left =  entryRow.lastClick + "px";
+        var wWidth = $( window ).width();
+        
+        var x = entryRow.lastClick;
+
+        if(entryRow.lastClick + mWidth > wWidth) {
+            x -= (entryRow.lastClick+mWidth-wWidth);
+        }
+        var left =   x + "px";
         var top = (3+pos.top+eHeight) + "px";
-        //show the menu directly over the placeholder  
+
         getTooltip().css( { 
                 position: 'absolute',
-                    zIndex: 5000,
-                    left: left, 
-                    top: top
-                    } );
+                zIndex: 5000,
+                left: left, 
+                top: top
+               } );
         getTooltip().show();
     }
 
