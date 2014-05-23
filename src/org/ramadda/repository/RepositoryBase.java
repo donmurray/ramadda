@@ -156,6 +156,10 @@ public class RepositoryBase implements Constants, RepositorySource {
     public final RequestUrl URL_ENTRY_COPY = new RequestUrl(this,
                                                  "/entry/copy");
 
+    /** _more_ */
+    public final RequestUrl URL_ENTRY_TYPECHANGE = new RequestUrl(this,
+                                                       "/entry/typechange");
+
 
     /** _more_ */
     public final RequestUrl URL_ENTRY_DELETE = new RequestUrl(this,
@@ -471,7 +475,7 @@ public class RepositoryBase implements Constants, RepositorySource {
                    + url;
         }
         //Don't include the default https port in the url 
-        if (port == 0 || port == 443) {
+        if ((port == 0) || (port == 443)) {
             return "https://" + hostname + url;
         } else {
             return "https://" + hostname + ":" + port + url;

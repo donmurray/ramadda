@@ -2220,6 +2220,22 @@ public class TypeHandler extends RepositoryManager {
         return didone;
     }
 
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getTypeIconUrl() {
+        String icon = getProperty("icon", (String) null);
+        if (icon != null) {
+            icon = iconUrl(icon);
+        }
+
+        return icon;
+    }
+
+
     /**
      * _more_
      *
@@ -5820,9 +5836,16 @@ public class TypeHandler extends RepositoryManager {
         }
     }
 
-    public static void main(String[]args) throws Exception {
+    /**
+     * _more_
+     *
+     * @param args _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void main(String[] args) throws Exception {
         String pattern = ".*\\.ggp$";
-        System.err.println (args[0].toLowerCase().matches(pattern));
+        System.err.println(args[0].toLowerCase().matches(pattern));
     }
 
 

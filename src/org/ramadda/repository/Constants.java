@@ -366,7 +366,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_SHOWCATEGORIES = "showcategories";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_RETURNFILENAME = "returnfilename";
 
     /** _more_ */
@@ -493,6 +493,7 @@ public interface Constants {
     /** _more_ */
     public static final String ATTR_TODATE = "todate";
 
+    /** _more_          */
     public static final String ATTR_PATH = "path";
 
     /** _more_ */
@@ -649,6 +650,9 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_CANCEL = "cancel";
+
+    /** _more_          */
+    public static final String ARG_CONFIRM = "confirm";
 
     /** _more_ */
     public static final String ARG_COLUMNS = "columns";
@@ -1258,6 +1262,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_TEMPLATE = "template";
 
+    /** _more_          */
     public static final String ARG_USER_TEMPLATE = "usertemplate";
 
     /** _more_ */
@@ -1849,11 +1854,11 @@ public interface Constants {
     public static final String ACTION_STOP = "action.stop";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ACTION_PASSWORDS_CLEAR =
         "action.passwords.clear";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_PASSWORDS_CLEAR_CONFIRM =
         "action.passwords.clear.confirm";
 

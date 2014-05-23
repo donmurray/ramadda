@@ -2469,9 +2469,9 @@ public class Repository extends RepositoryBase implements RequestHandler,
 
             public boolean canHandleOutput(OutputType output) {
                 return output.equals(OUTPUT_DELETER)
-                /*                    || output.equals(OUTPUT_TYPECHANGE)*/
-                || output.equals(OUTPUT_METADATA_SHORT) || output.equals(
-                    OUTPUT_PUBLISH) || output.equals(OUTPUT_METADATA_FULL);
+                       || output.equals(OUTPUT_METADATA_SHORT)
+                       || output.equals(OUTPUT_PUBLISH)
+                       || output.equals(OUTPUT_METADATA_FULL);
             }
             public void getEntryLinks(Request request, State state,
                                       List<Link> links)
@@ -2480,11 +2480,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
                     return;
                 }
 
-                /*                if(request.getUser().getAdmin()) {
-                    links.add(makeLink(request, state.getEntry(),
-                                       OUTPUT_TYPECHANGE));
 
-                                       }*/
                 for (Entry entry : state.getAllEntries()) {
                     if (getAccessManager().canDoAction(request, entry,
                             Permission.ACTION_EDIT)) {
@@ -2506,6 +2502,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
                     }
                 }
                 if (metadataOk) {
+                    links.add(makeLink(request, state.getEntry(),
+                                       OUTPUT_TYPECHANGE));
                     links.add(makeLink(request, state.getEntry(),
                                        OUTPUT_METADATA_SHORT));
 
@@ -2545,10 +2543,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
                         request, entries, true);
                 }
 
-                /*                if (output.equals(OUTPUT_TYPECHANGE)) {
-                    return getEntryManager().changeType(
-                                                        request, subGroups, entries);
-                                                        }*/
+
                 if (output.equals(OUTPUT_METADATA_FULL)) {
                     return getEntryManager().addInitialMetadataToEntries(
                         request, entries, false);
@@ -2562,6 +2557,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
         };
         outputHandler.addType(OUTPUT_DELETER);
         addOutputHandler(outputHandler);
+
 
 
 
@@ -2624,6 +2620,69 @@ public class Repository extends RepositoryBase implements RequestHandler,
         };
         copyHandler.addType(OUTPUT_COPY);
         addOutputHandler(copyHandler);
+
+
+
+        OutputHandler typeChangeHandler = new OutputHandler(getRepository(),
+                                              "Entry Type Changer") {
+            public boolean canHandleOutput(OutputType output) {
+                return output.equals(OUTPUT_TYPECHANGE);
+            }
+            public void getEntryLinks(Request request, State state,
+                                      List<Link> links)
+                    throws Exception {
+                if ((request.getUser() == null)
+                        || request.getUser().getAnonymous()) {
+                    return;
+                }
+                if ( !state.isDummyGroup()) {
+                    return;
+                }
+                links.add(makeLink(request, state.getEntry(),
+                                   OUTPUT_TYPECHANGE));
+            }
+
+            public Result outputEntry(Request request, OutputType outputType,
+                                      Entry entry)
+                    throws Exception {
+                if (request.getUser().getAnonymous()) {
+                    return new Result("", "");
+                }
+
+                return new Result(request.url(URL_ENTRY_TYPECHANGE, ARG_FROM,
+                        entry.getId()));
+            }
+
+            public String toString() {
+                return "Type Change handler";
+            }
+
+            public Result outputGroup(Request request, OutputType outputType,
+                                      Entry group, List<Entry> subGroups,
+                                      List<Entry> entries)
+                    throws Exception {
+                if (request.getUser().getAnonymous()) {
+                    return new Result("", "");
+                }
+                if ( !group.isDummy()) {
+                    return outputEntry(request, outputType, group);
+                }
+                StringBuilder idBuffer = new StringBuilder();
+                entries.addAll(subGroups);
+                for (Entry entry : entries) {
+                    idBuffer.append(",");
+                    idBuffer.append(entry.getId());
+                }
+                request.put(ARG_FROM, idBuffer);
+
+                return getEntryManager().processEntryTypeChange(request);
+                //                return new Result(request.url(URL_ENTRY_COPY, ARG_FROM,
+                //                        idBuffer.toString()));
+            }
+        };
+        typeChangeHandler.addType(OUTPUT_TYPECHANGE);
+        addOutputHandler(typeChangeHandler);
+
 
 
         OutputHandler fileListingHandler = new OutputHandler(getRepository(),
@@ -2961,16 +3020,15 @@ public class Repository extends RepositoryBase implements RequestHandler,
                          + sessionId + " path=" + getUrlBase());
             String path;
 
-            if(getShutdownEnabled() && getParentRepository() == null) {
+            if (getShutdownEnabled() && (getParentRepository() == null)) {
                 path = "/";
             } else {
-                path  = getUrlBase();
+                path = getUrlBase();
             }
 
             result.addCookie(getSessionManager().getSessionCookieName(),
-                             sessionId + "; path=" + path
-                             + "; expires=" + cookieExpirationDate
-                             + " 23:59:59 GMT");
+                             sessionId + "; path=" + path + "; expires="
+                             + cookieExpirationDate + " 23:59:59 GMT");
         }
 
         return result;
@@ -3737,7 +3795,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
             if (isRobot && !outputHandler.allowRobots()) {
                 continue;
             }
-            String c = outputHandler.getClass().getName().toLowerCase();
+            //            String c = outputHandler.getClass().getName().toLowerCase();
             outputHandler.getEntryLinks(request, state, links);
         }
         List<Link> okLinks = new ArrayList<Link>();
@@ -3813,7 +3871,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
         if ((prop == null) || prop.equals("true")) {
             return true;
         }
-        System.err.println("isOutputTypeOK: output type not ok:" + outputType);
+        System.err.println("isOutputTypeOK: output type not ok:"
+                           + outputType);
 
         return false;
     }

@@ -1226,7 +1226,7 @@ public class OutputHandler extends RepositoryManager {
             new ArrayList<HtmlUtils.Selector>();
         //        selectSB.append(msgLabel("Apply action"));
 
-        tfos.add(new HtmlUtils.Selector("apply action", "", null, 0, true));
+        tfos.add(new HtmlUtils.Selector("Apply action", "", null, 5, false));
         for (String category : linkCategories) {
             List<HtmlUtils.Selector> linksForCategory = linkMap.get(category);
             if (linksForCategory.size() == 0) {
@@ -1481,9 +1481,8 @@ public class OutputHandler extends RepositoryManager {
                         HtmlUtils.attrs(
                             HtmlUtils.ATTR_WIDTH, WIDTH_KIND,
                             HtmlUtils.ATTR_CLASS,
-                            "entry-list-header-column-last"), 
-                        HtmlUtils.href(
-                                       sortLink, msg("Kind"))));
+                            "entry-list-header-column-last"), HtmlUtils.href(
+                                sortLink, msg("Kind"))));
             }
             sb.append("</tr></table>");
 

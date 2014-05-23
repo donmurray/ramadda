@@ -1448,14 +1448,11 @@ public class EntryManager extends RepositoryManager {
                     && !entry.getTypeHandler().canChangeTo(typeHandler)) {
                 continue;
             }
-            String icon = typeHandler.getProperty("icon", (String) null);
-            if (icon != null) {
-                icon = typeHandler.iconUrl(icon);
-            }
+
             HtmlUtils.Selector tfo =
                 new HtmlUtils.Selector(
                     HtmlUtils.space(2) + typeHandler.getLabel(),
-                    typeHandler.getType(), icon);
+                    typeHandler.getType(), typeHandler.getTypeIconUrl());
             cats.add(typeHandler.getCategory(), tfo);
         }
         List<HtmlUtils.Selector> tfos = new ArrayList<HtmlUtils.Selector>();
@@ -4330,6 +4327,136 @@ public class EntryManager extends RepositoryManager {
         Result result = new Result(msg("Move"), new StringBuilder());
 
         return addEntryHeader(request, toEntry, result);
+
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result processEntryTypeChange(Request request) throws Exception {
+
+        String      fromIds = request.getString(ARG_FROM, "");
+        List<Entry> entries = new ArrayList<Entry>();
+        for (String id : StringUtil.split(fromIds, ",", true, true)) {
+            Entry entry = getEntry(request, id, false);
+            if (entry == null) {
+                throw new RepositoryUtil.MissingEntryException(
+                    "Could not find entry:" + id);
+            }
+            if (entry.isTopEntry()) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(
+                    getPageHandler().showDialogNote(
+                        msg("Cannot copy top-level folder")));
+
+                return new Result(msg("Entry Delete"), sb);
+            }
+            entries.add(entry);
+        }
+
+
+        if (entries.size() == 0) {
+            throw new IllegalArgumentException("No entries specified");
+        }
+
+        if (request.exists(ARG_CANCEL)) {
+            return new Result(
+                request.entryUrl(
+                    getRepository().URL_ENTRY_SHOW, entries.get(0)));
+        }
+
+
+        StringBuffer sb = new StringBuffer();
+        if (request.exists(ARG_CONFIRM)) {
+            TypeHandler newTypeHandler = getRepository().getTypeHandler(
+                                             request.getString(
+                                                 ARG_EXTEDIT_NEWTYPE, ""));
+
+
+
+            request.ensureAuthToken();
+
+            sb.append(msgLabel("The following entries have been changed"));
+            sb.append("<ul>");
+            for (Entry entry : entries) {
+                if ( !getAccessManager().canDoAction(request, entry,
+                        Permission.ACTION_EDIT)) {
+                    throw new IllegalArgumentException(
+                        "Whoa dude, you can't edit this entry:"
+                        + entry.getName());
+                }
+                entry = changeType(request, entry, newTypeHandler);
+                String icon = newTypeHandler.getProperty("icon",
+                                  (String) null);
+                if (icon != null) {
+                    icon = newTypeHandler.iconUrl(icon);
+                }
+                sb.append(HtmlUtils.href(getEntryURL(request, entry),
+                                         HtmlUtils.img(icon) + " "
+                                         + entry.getName()));
+                sb.append("<br>");
+            }
+            sb.append("</ul>");
+
+
+
+
+
+            return new Result(msg(""), sb);
+        }
+
+
+
+        List<HtmlUtils.Selector> tfos = getTypeHandlerSelectors(true, true,
+                                            null);
+
+        request.formPostWithAuthToken(sb,
+                                      getRepository().URL_ENTRY_TYPECHANGE);
+        sb.append(HtmlUtils.hidden(ARG_FROM, fromIds));
+        sb.append(HtmlUtils.p());
+
+        StringBuffer inner = new StringBuffer();
+        inner.append(msg("Are you sure you want to change the entry types?"));
+        inner.append(HtmlUtils.p());
+        inner.append(HtmlUtils.formTable());
+        inner.append(
+            HtmlUtils.formEntry(
+                msgLabel("New type"),
+                HtmlUtils.select(ARG_EXTEDIT_NEWTYPE, tfos)));
+
+        inner.append(HtmlUtils.formTableClose());
+
+        sb.append(
+            getPageHandler().showDialogQuestion(
+                inner.toString(),
+                HtmlUtils.buttons(
+                    HtmlUtils.submit(
+                        msg("Yes, change the entry types"),
+                        ARG_CONFIRM), HtmlUtils.submit(
+                            msg("Cancel"), ARG_CANCEL))));
+        sb.append(HtmlUtils.formClose());
+        sb.append("<table>");
+        sb.append("<tr><td><b>Entry</b></td><td><b>Type</b></td></tr>");
+        for (Entry entry : entries) {
+            sb.append("<tr><td>");
+            sb.append(HtmlUtils.img(entry.getTypeHandler().getTypeIconUrl()));
+            sb.append(" ");
+            sb.append(entry.getName());
+            sb.append("</td><td>");
+            sb.append(entry.getTypeHandler().getLabel());
+            sb.append("</td></tr>");
+        }
+        sb.append("</table>");
+
+
+        return new Result(msg(""), sb);
 
     }
 
