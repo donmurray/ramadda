@@ -182,7 +182,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
     public static final OutputType OUTPUT_TYPECHANGE =
         new OutputType("Change Type", "repository.typechange",
                        OutputType.TYPE_ACTION | OutputType.TYPE_EDIT, "",
-                       null);
+                       "/icons/shape_rotate_clockwise.png");
 
     /** Publish OutputType */
     public static final OutputType OUTPUT_PUBLISH =
