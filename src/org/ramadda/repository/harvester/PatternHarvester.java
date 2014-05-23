@@ -475,9 +475,8 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
     public String makeEntryTypeSelector(Request request,
                                         TypeHandler typeHandler)
             throws Exception {
-        List items = new ArrayList();
-        items.add(new TwoFacedObject(msg("Find match"), TYPE_FINDMATCH));
-
+        List<HtmlUtils.Selector> items =  getEntryManager().getTypeHandlerSelectors(true, false, null);
+        items.add(0, new HtmlUtils.Selector(msg("Find match"), TYPE_FINDMATCH, null));
         return repository.makeTypeSelect(items, request, false,
                                          getTypeHandler().getType(), false,
                                          null);

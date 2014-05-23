@@ -43,6 +43,7 @@ import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.repository.type.TypeInsertInfo;
 import org.ramadda.sql.Clause;
 import org.ramadda.sql.SqlUtil;
+import org.ramadda.util.CategoryList;
 import org.ramadda.util.FormInfo;
 import org.ramadda.util.HtmlTemplate;
 import org.ramadda.util.HtmlUtils;
@@ -997,19 +998,19 @@ public class EntryManager extends RepositoryManager {
     /** _more_ */
     public static final String ARG_EXTEDIT_REPORT = "extedit.report";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_EXTEDIT_REPORT_MISSING =
         "extedit.report.missing";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_EXTEDIT_REPORT_FILES =
         "extedit.report.files";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_EXTEDIT_REPORT_EXTERNAL =
         "extedit.report.external";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_EXTEDIT_REPORT_INTERNAL =
         "extedit.report.internal";
 
@@ -1336,57 +1337,8 @@ public class EntryManager extends RepositoryManager {
                                    ARG_EXTEDIT_REPORT));
 
         sb.append(HtmlUtils.endInset());
-
-
-        //public Selector(String label, String id, String icon) {
-
-        List<String> cats = new ArrayList<String>();
-        Hashtable<String, List<HtmlUtils.Selector>> map =
-            new Hashtable<String, List<HtmlUtils.Selector>>();
-
-        for (String preload : PRELOAD_CATEGORIES) {
-            cats.add(preload);
-            map.put(preload, new ArrayList<HtmlUtils.Selector>());
-        }
-
-
-
-        for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
-            if ( !typeHandler.getForUser()) {
-                continue;
-            }
-            //            if (typeHandler.equals(entry.getTypeHandler())) {
-            //                continue;
-            //            }
-            if ( !entry.getTypeHandler().canChangeTo(typeHandler)) {
-                continue;
-            }
-            String cat  = typeHandler.getCategory();
-            String icon = typeHandler.getProperty("icon", (String) null);
-            if (icon != null) {
-                icon = typeHandler.iconUrl(icon);
-            }
-            HtmlUtils.Selector tfo =
-                new HtmlUtils.Selector(
-                    HtmlUtils.space(2) + typeHandler.getLabel(),
-                    typeHandler.getType(), icon);
-            List<HtmlUtils.Selector> tfos = map.get(cat);
-            if (tfos == null) {
-                tfos = new ArrayList<HtmlUtils.Selector>();
-                map.put(cat, tfos);
-                cats.add(cat);
-            }
-            tfos.add(tfo);
-        }
-        //        TwoFacedObject.sort(groupTfos);
-        //        TwoFacedObject.sort(fileTfos);
-        List<HtmlUtils.Selector> tfos = new ArrayList<HtmlUtils.Selector>();
-        for (String cat : cats) {
-            tfos.add(new HtmlUtils.Selector(cat, "", null, 0, true));
-            tfos.addAll(map.get(cat));
-        }
-
-
+        List<HtmlUtils.Selector> tfos = getTypeHandlerSelectors(true, true,
+                                            entry);
 
         sb.append("<br>&nbsp;<br>");
         sb.append(msgHeader("Entry Type"));
@@ -1461,55 +1413,112 @@ public class EntryManager extends RepositoryManager {
     }
 
 
-    /*
-    private void setMD5(Request request, StringBuilder sb, boolean recurse, String entryId, int []totalCnt, int[] setCnt) throws Exception {
-        if(!getRepository().getActionManager().getActionOk(actionId)) {
-            return;
+    /**
+     * _more_
+     *
+     * @param fileType _more_
+     * @param nonFileType _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public List<HtmlUtils.Selector> getTypeHandlerSelectors(boolean fileType,
+            boolean nonFileType, Entry entry)
+            throws Exception {
+        CategoryList<HtmlUtils.Selector> cats =
+            new CategoryList<HtmlUtils.Selector>();
+        for (String preload : PRELOAD_CATEGORIES) {
+            cats.get(preload);
         }
-        Statement stmt = getDatabaseManager().select(SqlUtil.comma(new String[]{Tables.ENTRIES.COL_ID,
-                                                                                Tables.ENTRIES.COL_TYPE,
-                                                                                Tables.ENTRIES.COL_MD5,
-                                                                                Tables.ENTRIES.COL_RESOURCE}),
-            Tables.ENTRIES.NAME,
-            Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID, entryId));
-        SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
-        ResultSet        results;
 
-        while ((results = iter.getNext()) != null) {
-            totalCnt[0]++;
-            int col = 1;
-            String id = results.getString(col++);
-            String type= results.getString(col++);
-            String md5 = results.getString(col++);
-            String resource = results.getString(col++);
-            if(new File(resource).exists() && !Utils.stringDefined(md5)) {
-                setCnt[0]++;
-                Entry entry = getEntry(request, id);
-                if(!getAccessManager().canDoAction(request, entry,
-                                                   Permission.ACTION_EDIT)) {
-                    continue;
-                }
-                md5 = ucar.unidata.util.IOUtil.getMd5(resource);
-                getDatabaseManager().update(Tables.ENTRIES.NAME,
-                                            Tables.ENTRIES.COL_ID,
-                                            id, new String[]{Tables.ENTRIES.COL_MD5},
-                                            new String[]{md5});
-                sb.append(getPageHandler().getConfirmBreadCrumbs(request, entry));
-                sb.append(HtmlUtils.br());
+        for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
+            if ( !typeHandler.getForUser()) {
+                continue;
             }
-            getActionManager().setActionMessage(actionId,
-                                                "Checked " + totalCnt[0] +" entries<br>Changed " + setCnt[0] +" entries");
+            if ( !fileType && !typeHandler.isGroup()) {
+                continue;
+            }
+            if ( !nonFileType && typeHandler.isGroup()) {
+                continue;
+            }
 
-            if(recurse) {
-                TypeHandler typeHandler = getRepository().getTypeHandler(type);
-                if(typeHandler.isGroup()) {
-                    setMD5(request, actionId,  sb, recurse, id, totalCnt, setCnt);
-                }
+            if ((entry != null)
+                    && !entry.getTypeHandler().canChangeTo(typeHandler)) {
+                continue;
+            }
+            String icon = typeHandler.getProperty("icon", (String) null);
+            if (icon != null) {
+                icon = typeHandler.iconUrl(icon);
+            }
+            HtmlUtils.Selector tfo =
+                new HtmlUtils.Selector(
+                    HtmlUtils.space(2) + typeHandler.getLabel(),
+                    typeHandler.getType(), icon);
+            cats.add(typeHandler.getCategory(), tfo);
+        }
+        List<HtmlUtils.Selector> tfos = new ArrayList<HtmlUtils.Selector>();
+        for (String cat : cats.getCategories()) {
+            List<HtmlUtils.Selector> selectors = cats.get(cat);
+            if (selectors.size() > 0) {
+                tfos.add(new HtmlUtils.Selector(cat, "", null, 0, true));
+                tfos.addAll(selectors);
             }
         }
-        getDatabaseManager().closeStatement(stmt);
+
+        return tfos;
     }
-    */
+
+    /*
+        private void setMD5(Request request, StringBuilder sb, boolean recurse, String entryId, int []totalCnt, int[] setCnt) throws Exception {
+            if(!getRepository().getActionManager().getActionOk(actionId)) {
+                return;
+            }
+            Statement stmt = getDatabaseManager().select(SqlUtil.comma(new String[]{Tables.ENTRIES.COL_ID,
+                                                                                    Tables.ENTRIES.COL_TYPE,
+                                                                                    Tables.ENTRIES.COL_MD5,
+                                                                                    Tables.ENTRIES.COL_RESOURCE}),
+                Tables.ENTRIES.NAME,
+                Clause.eq(Tables.ENTRIES.COL_PARENT_GROUP_ID, entryId));
+            SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
+            ResultSet        results;
+
+            while ((results = iter.getNext()) != null) {
+                totalCnt[0]++;
+                int col = 1;
+                String id = results.getString(col++);
+                String type= results.getString(col++);
+                String md5 = results.getString(col++);
+                String resource = results.getString(col++);
+                if(new File(resource).exists() && !Utils.stringDefined(md5)) {
+                    setCnt[0]++;
+                    Entry entry = getEntry(request, id);
+                    if(!getAccessManager().canDoAction(request, entry,
+                                                       Permission.ACTION_EDIT)) {
+                        continue;
+                    }
+                    md5 = ucar.unidata.util.IOUtil.getMd5(resource);
+                    getDatabaseManager().update(Tables.ENTRIES.NAME,
+                                                Tables.ENTRIES.COL_ID,
+                                                id, new String[]{Tables.ENTRIES.COL_MD5},
+                                                new String[]{md5});
+                    sb.append(getPageHandler().getConfirmBreadCrumbs(request, entry));
+                    sb.append(HtmlUtils.br());
+                }
+                getActionManager().setActionMessage(actionId,
+                                                    "Checked " + totalCnt[0] +" entries<br>Changed " + setCnt[0] +" entries");
+
+                if(recurse) {
+                    TypeHandler typeHandler = getRepository().getTypeHandler(type);
+                    if(typeHandler.isGroup()) {
+                        setMD5(request, actionId,  sb, recurse, id, totalCnt, setCnt);
+                    }
+                }
+            }
+            getDatabaseManager().closeStatement(stmt);
+        }
+        */
 
 
 
