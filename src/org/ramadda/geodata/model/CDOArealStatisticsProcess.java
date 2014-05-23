@@ -213,6 +213,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             throws Exception {
 
         Entry oneOfThem = op.getEntries().get(0);
+        Object[]      values     = oneOfThem.getValues();
         String tail =
             getOutputHandler().getStorageManager().getFileTail(oneOfThem);
         String       id        = getRepository().getGUID();
@@ -239,17 +240,20 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
 
         // Select order (left to right) - operations go right to left:
         //   - stats
-        //   - level
         //   - region
+        //   - level
         //   - month range
         //   - year or time range
+        //   - variable
         getOutputHandler().addStatCommands(request, oneOfThem, commands);
-        getOutputHandler().addLevelSelectCommands(request, oneOfThem,
-                commands, CdmDataOutputHandler.ARG_LEVEL);
         getOutputHandler().addAreaSelectCommands(request, oneOfThem,
                 commands);
+        commands.add("-remapbil,r360x180");
+        getOutputHandler().addLevelSelectCommands(request, oneOfThem,
+                commands, CdmDataOutputHandler.ARG_LEVEL);
         getOutputHandler().addDateSelectCommands(request, oneOfThem,
                 commands, opNum);
+        commands.add("-selname,"+values[4]);
 
         System.err.println("cmds:" + commands);
 
@@ -265,16 +269,18 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             commands = initCDOCommand();
 
             // Select order (left to right) - operations go right to left:
-            //   - level
             //   - region
+            //   - level
             //   - month range
             getOutputHandler().addStatCommands(request, climEntry, commands);
-            getOutputHandler().addLevelSelectCommands(request, climEntry,
-                    commands, CdmDataOutputHandler.ARG_LEVEL);
             getOutputHandler().addAreaSelectCommands(request, climEntry,
                     commands);
+            commands.add("-remapbil,r360x180");
+            getOutputHandler().addLevelSelectCommands(request, climEntry,
+                    commands, CdmDataOutputHandler.ARG_LEVEL);
             getOutputHandler().addMonthSelectCommands(request, climEntry,
                     commands);
+            commands.add("-selname,"+values[4]);
 
             //System.err.println("clim cmds:" + commands);
 
@@ -297,7 +303,6 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         }
 
         StringBuilder outputName = new StringBuilder();
-        Object[]      values     = oneOfThem.getValues();
         // values = collection,model,experiment,ens,var
         // model
         outputName.append(values[1].toString().toUpperCase());
