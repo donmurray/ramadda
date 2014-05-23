@@ -1613,12 +1613,12 @@ public class TypeHandler extends RepositoryManager {
         if (filePattern != null) {
             //If the pattern has file delimiters then use the whole path
             if (filePattern.indexOf("/") >= 0) {
-                if (fullPath.matches(filePattern)) {
+                if (fullPath.toLowerCase().matches(filePattern)) {
                     return true;
                 }
             } else {
                 //Else, just use the name
-                if (name.matches(filePattern)) {
+                if (name.toLowerCase().matches(filePattern)) {
                     return true;
                 }
             }
@@ -5818,6 +5818,11 @@ public class TypeHandler extends RepositoryManager {
                                      XmlUtil.attrs(ATTR_NAME, arg,
                                          TypeHandler.ATTR_VALUE, value)));
         }
+    }
+
+    public static void main(String[]args) throws Exception {
+        String pattern = ".*\\.ggp$";
+        System.err.println (args[0].toLowerCase().matches(pattern));
     }
 
 

@@ -430,13 +430,11 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
     public boolean canHandleResource(String path, String filename) {
         try {
             boolean ok = getRecordFileFactory().canLoad(path);
-
-            return ok;
+            if(ok) return true;
         } catch (Exception exc) {
-            //If the point loading flaked out then just keep going
-            //            logException("Harvesting file:" + f, exc);
-            return false;
+            //            return false;
         }
+        return super.canHandleResource(path, filename);
     }
 
 
