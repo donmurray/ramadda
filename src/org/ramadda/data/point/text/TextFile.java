@@ -85,7 +85,7 @@ public abstract class TextFile extends PointFile {
     /** _more_ */
     public static final String PROP_HEADER_DELIMITER = "header.delimiter";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_HEADER_STANDARD = "header.standard";
 
     /** _more_ */
@@ -104,7 +104,7 @@ public abstract class TextFile extends PointFile {
     /** _more_ */
     private boolean headerStandard = false;
 
-    /** _more_          */
+    /** _more_ */
     String commentLineStart = null;
 
 
@@ -651,6 +651,18 @@ public abstract class TextFile extends PointFile {
      */
     public String attrType(String v) {
         return HtmlUtils.attr(ATTR_TYPE, v);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param v _more_
+     *
+     * @return _more_
+     */
+    public String attrWidth(int v) {
+        return HtmlUtils.attr("width", "" + v);
     }
 
     /**

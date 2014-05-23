@@ -62,6 +62,9 @@ public class TextRecord extends DataRecord {
     /** _more_ */
     private String[] tokens;
 
+    /** _more_          */
+    private int[] fixedWidth = null;
+
     /** _more_ */
     private String currentLine = "";
 
@@ -110,7 +113,29 @@ public class TextRecord extends DataRecord {
     public void initFields(List<RecordField> fields) {
         super.initFields(fields);
         tokens = new String[numDataFields];
+        for (int i = 0; i < fields.size(); i++) {
+            RecordField field = fields.get(i);
+            if (field.getSynthetic() || field.hasDefaultValue()
+                    || field.getSkip()) {
+                continue;
+            }
+            if (field.getColumnWidth() > 0) {
+                fixedWidth = new int[tokens.length];
+                int widthIdx = 0;
+                for (int j = 0; j < fields.size(); j++) {
+                    field = fields.get(j);
+                    if (field.getSynthetic() || field.hasDefaultValue()
+                            || field.getSkip()) {
+                        continue;
+                    }
+                    fixedWidth[widthIdx++] = field.getColumnWidth();
+                }
+
+                break;
+            }
+        }
     }
+
 
     /**
      * _more_
@@ -239,7 +264,7 @@ public class TextRecord extends DataRecord {
             for (int i = 0; i < tokens.length; i++) {
                 tokens[i] = "";
             }
-            if ( !split(line)) {
+            if ( !split(line, fields)) {
                 //throw new IllegalArgumentException("Could not tokenize line:" + line);
                 return ReadStatus.SKIP;
             }
@@ -422,10 +447,12 @@ public class TextRecord extends DataRecord {
      * _more_
      *
      * @param sourceString _more_
+     * @param fields _more_
      *
      * @return _more_
      */
-    public boolean split(String sourceString) {
+    public boolean split(String sourceString, List<RecordField> fields) {
+
         if (tokens == null) {
             testing = true;
             tokens  = new String[10];
@@ -443,49 +470,66 @@ public class TextRecord extends DataRecord {
         0
         */
 
-        while (true) {
-            //            System.err.println("FROM:" + fromIndex +" " + inQuotes);
-
-            if (inQuotes) {
-                idx = sourceString.indexOf("\"", fromIndex + 1);
-                //                System.err.println ("\tidx:" + idx);
-                idx++;
-            } else {
-                idx = sourceString.indexOf(delimiter, fromIndex);
+        if (fixedWidth != null) {
+            int lastIdx = 0;
+            for (int i = 0; i < fixedWidth.length; i++) {
+                //                System.err.println("last idx:" + lastIdx +" w:" + fixedWidth[i]);
+                String theString = sourceString.substring(lastIdx,
+                                       lastIdx + fixedWidth[i]);
+                tokens[numTokensRead++] = theString;
+                lastIdx                 += fixedWidth[i];
+                //                System.err.println(" tok:" + theString);
             }
-            //            System.err.println ("\tidx:" + idx +" delimiter:" + delimiter +":  str:" + sourceString);
-            String theString;
-            if (idx < 0) {
-                theString = sourceString.substring(fromIndex);
-            } else {
-                theString = sourceString.substring(fromIndex, idx);
-                if (delimiterIsSpace) {
-                    while ((sourceString.charAt(idx) == ' ')
-                            && (idx < sourceLength)) {
-                        idx++;
-                    }
-                    fromIndex = idx;
+        } else {
+            while (true) {
+                //            System.err.println("FROM:" + fromIndex +" " + inQuotes);
+                if (fixedWidth != null) {
+                    idx = fromIndex + fixedWidth[numTokensRead];
+                    System.err.println("idx:" + idx);
                 } else {
-                    fromIndex = idx + length;
+                    if (inQuotes) {
+                        idx = sourceString.indexOf("\"", fromIndex + 1);
+                        //                System.err.println ("\tidx:" + idx);
+                        idx++;
+                    } else {
+                        idx = sourceString.indexOf(delimiter, fromIndex);
+                    }
                 }
-            }
+                //            System.err.println ("\tidx:" + idx +" delimiter:" + delimiter +":  str:" + sourceString);
+                String theString;
+                if (idx < 0) {
+                    theString = sourceString.substring(fromIndex);
+                } else {
+                    theString = sourceString.substring(fromIndex, idx);
+                    if (delimiterIsSpace) {
+                        while ((sourceString.charAt(idx) == ' ')
+                                && (idx < sourceLength)) {
+                            idx++;
+                        }
+                        fromIndex = idx;
+                    } else {
+                        fromIndex = idx + length;
+                    }
+                }
 
-            theString = theString.trim();
-            if (inQuotes) {
-                theString = theString.substring(1, theString.length() - 1);
-            }
-            //            System.err.println ("\ttokens[" + numTokensRead +"] = " + theString);
-            tokens[numTokensRead++] = theString;
+                theString = theString.trim();
+                if (inQuotes) {
+                    theString = theString.substring(1,
+                            theString.length() - 1);
+                }
+                //            System.err.println ("\ttokens[" + numTokensRead +"] = " + theString);
+                tokens[numTokensRead++] = theString;
 
-            if ((idx < 0) || (numTokensRead == tokens.length)) {
-                break;
-            }
-            if (fromIndex >= sourceLength) {
-                break;
-            }
-            if (fromIndex < sourceLength) {
-                //                System.err.println("C:" + sourceString.charAt(fromIndex));
-                inQuotes = sourceString.charAt(fromIndex) == '\"';
+                if ((idx < 0) || (numTokensRead == tokens.length)) {
+                    break;
+                }
+                if (fromIndex >= sourceLength) {
+                    break;
+                }
+                if (fromIndex < sourceLength) {
+                    //                System.err.println("C:" + sourceString.charAt(fromIndex));
+                    inQuotes = sourceString.charAt(fromIndex) == '\"';
+                }
             }
         }
 
@@ -520,6 +564,7 @@ public class TextRecord extends DataRecord {
             System.err.println("tok:" + tok);
         }
         */
+
     }
 
 
@@ -619,7 +664,7 @@ public class TextRecord extends DataRecord {
         record.setDelimiter(",");
         record.testing = true;
         for (String line : args) {
-            record.split(line);
+            record.split(line, null);
         }
     }
 

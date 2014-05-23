@@ -60,21 +60,22 @@ public class RecordField {
     /** _more_ */
     public static final String PROP_ISTIME = "istime";
 
+    /** _more_          */
     public static final String PROP_SORTORDER = "sortorder";
 
 
     /** Latitude-Longitude-altitude properties */
     public static final String PROP_ISLATITUDE = "islatitude";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_ISLONGITUDE = "islongitude";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_ISALTITUDE = "isaltitude";
 
     /* For depth sometimes is reversed. 0 is the surface and goes on instead of -1 */
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_ISALTITUDEREVERSE = "isaltitudereverse";
 
 
@@ -110,22 +111,25 @@ public class RecordField {
     private boolean isDate = false;
 
 
-    /** _more_          */
+    /** _more_ */
     private int sortOrder = 0;
+
+    /** _more_          */
+    private int columnWidth = 0;
 
     /** _more_ */
     private boolean isTime = false;
 
-    /** _more_          */
+    /** _more_ */
     private boolean isLatitude = false;
 
-    /** _more_          */
+    /** _more_ */
     private boolean isLongitude = false;
 
-    /** _more_          */
+    /** _more_ */
     private boolean isAltitude = false;
 
-    /** _more_          */
+    /** _more_ */
     private boolean isAltitudeReverse = false;
 
     /** _more_ */
@@ -331,8 +335,8 @@ public class RecordField {
      * @param index _more_
      */
     public void addJson(StringBuffer sb, int index) {
-        List<String> items = new ArrayList<String>();
-        String dataType = type;
+        List<String> items    = new ArrayList<String>();
+        String       dataType = type;
         if (type.equals(TYPE_NUMERIC)) {
             dataType = "double";
         }
@@ -348,11 +352,11 @@ public class RecordField {
         items.add(Utils.stringDefined(unit)
                   ? Json.quote(unit)
                   : "null");
-        items.add( "chartable");
+        items.add("chartable");
         items.add("" + getChartable());
         items.add("sortorder");
-        items.add(""+sortOrder);
-        items.add( "searchable");
+        items.add("" + sortOrder);
+        items.add("searchable");
         items.add("" + getSearchable());
         sb.append(Json.map(items));
     }
@@ -1134,6 +1138,24 @@ public class RecordField {
         return sortOrder;
     }
 
+
+    /**
+     *  Set the ColumnWidth property.
+     *
+     *  @param value The new value for ColumnWidth
+     */
+    public void setColumnWidth(int value) {
+        columnWidth = value;
+    }
+
+    /**
+     *  Get the ColumnWidth property.
+     *
+     *  @return The ColumnWidth
+     */
+    public int getColumnWidth() {
+        return columnWidth;
+    }
 
 
 

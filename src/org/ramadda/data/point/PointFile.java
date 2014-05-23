@@ -884,6 +884,7 @@ public abstract class PointFile extends RecordFile implements Cloneable,
      */
     public List<RecordField> doMakeFields(String fieldString) {
 
+        //        System.err.println ("fields:" + fieldString);
         //x[unit="m"],y[unit="m"],z[unit="m"],red[],green[],blue[],amplitude[]
         //        System.err.println ("fields:" + fieldString);
         String defaultMissing     = getProperty(ATTR_MISSING, (String) null);
@@ -907,6 +908,8 @@ public abstract class PointFile extends RecordFile implements Cloneable,
             RecordField field = new RecordField(name, name, "", paramId++,
                                     getProperty(properties, ATTR_UNIT, ""));
 
+            field.setColumnWidth(new Integer(getProperty(field, properties,
+                    "width", "0")).intValue());
             field.setScale(Double.parseDouble(getProperty(field, properties,
                     ATTR_SCALE, "1.0")));
             field.setOffset(Double.parseDouble(getProperty(field, properties,
@@ -1052,6 +1055,7 @@ public abstract class PointFile extends RecordFile implements Cloneable,
         }
 
         return fields;
+
 
     }
 

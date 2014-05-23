@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -190,14 +190,16 @@ public class GgpPointFile extends CsvFile {
             makeField(FIELD_LONGITUDE, attrValue(longitude)),
             makeField(FIELD_ELEVATION, attrValue(elevation)),
             makeField(FIELD_DATE,
-                      attrType(TYPE_STRING) + attr("isdate", "true")),
+                      attrType(TYPE_STRING) + attr("isdate", "true")
+                      + attrWidth(9)),
             makeField(FIELD_TIME,
-                      attrType(TYPE_STRING) + attr("istime", "true")),
+                      attrType(TYPE_STRING) + attr("istime", "true")
+                      + attrWidth(7)),
             //TODO: What is the unit for gravity and pressure
             makeField("gravity", attrUnit("V"), attrChartable(),
-                      attrMissing(MISSING)),
+                      attrMissing(MISSING) + attrWidth(10)),
             makeField("pressure", attrUnit("hPa"), attrChartable(),
-                      attrMissing(MISSING)),
+                      attrMissing(MISSING) + attrWidth(9)),
         });
 
         return visitInfo;
