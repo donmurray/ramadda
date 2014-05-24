@@ -632,8 +632,13 @@ public abstract class PointFile extends RecordFile implements Cloneable,
      * @param pointFileClass _more_
      */
     public static void test(String[] args, Class pointFileClass) {
+        boolean verbose = true;
         for (int argIdx = 0; argIdx < args.length; argIdx++) {
             String arg = args[argIdx];
+            if(arg.equals("-noverbose")) {
+                verbose = false;
+                continue;
+            }
             try {
                 PointFile pointFile =
                     (PointFile) Misc.findConstructor(pointFileClass,
@@ -641,12 +646,15 @@ public abstract class PointFile extends RecordFile implements Cloneable,
                             String.class }).newInstance(new Object[] { arg });
                 StringBuffer sb = new StringBuffer();
                 pointFile.runCheck(arg, sb);
-                System.err.println(sb);
+                if(verbose) {
+                    System.err.println(sb);
+                }
             } catch (Exception exc) {
                 System.err.println("Error:" + exc + " file:" + arg);
-                exc.printStackTrace();
-
-                return;
+                //                exc.printStackTrace();
+                if(verbose) {
+                    return;
+                }
             }
         }
     }

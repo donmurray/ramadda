@@ -129,8 +129,25 @@ public class GgpPointFile extends CsvFile {
                      longitude           = 0,
                      elevation           = 0;
 
+        String gravityUnit = "V";
+        String pressureUnit = "hPa";
+
         //The header lines can be in different order so look at each one
         for (String line : headerLines) {
+            if (line.indexOf("yyyymmdd") >= 0) {
+                    gravityUnit = StringUtil.findPattern(line, ".*gravity\\(([^\\)]+)\\).*");
+                    pressureUnit = StringUtil.findPattern(line, ".*pressure\\(([^\\)]+)\\).*");
+                    if(gravityUnit == null) {
+                        System.err.println("ggp: could not read gravity unit:" +line);
+                        gravityUnit = "V";
+                    }
+                    if(pressureUnit == null) {
+                        System.err.println("ggp: could not read pressure unit:" +line);
+                        pressureUnit = "hPa";
+                    }
+                    continue;
+            }
+                
             List<String> toks = StringUtil.splitUpTo(line, ":", 2);
             if (toks.size() == 2) {
                 String name  = toks.get(0);
@@ -191,15 +208,15 @@ public class GgpPointFile extends CsvFile {
             makeField(FIELD_ELEVATION, attrValue(elevation)),
             makeField(FIELD_DATE,
                       attrType(TYPE_STRING) + attr("isdate", "true")
-                      + attrWidth(9)),
+                      + attrWidth(8)),
             makeField(FIELD_TIME,
                       attrType(TYPE_STRING) + attr("istime", "true")
                       + attrWidth(7)),
             //TODO: What is the unit for gravity and pressure
-            makeField("gravity", attrUnit("V"), attrChartable(),
+            makeField("gravity", attrUnit(gravityUnit), attrChartable(),
                       attrMissing(MISSING) + attrWidth(10)),
-            makeField("pressure", attrUnit("hPa"), attrChartable(),
-                      attrMissing(MISSING) + attrWidth(9)),
+            makeField("pressure", attrUnit(pressureUnit), attrChartable(),
+                      attrMissing(MISSING) + attrWidth(10)),
         });
 
         return visitInfo;
@@ -222,12 +239,13 @@ public class GgpPointFile extends CsvFile {
             throws Exception {
         dttm.append(getString(record, dateIndex));
         dttm.append(" ");
-        String timeField = getString(record, timeIndex);
+        String timeField = getString(record, timeIndex).trim();
         //Account for one of the non padded hhmmss formats
         while (timeField.length() < 6) {
             timeField = "0" + timeField;
         }
         dttm.append(timeField);
+
     }
 
     /**

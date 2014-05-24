@@ -337,7 +337,6 @@ public class TextRecord extends DataRecord {
             return ReadStatus.OK;
         } catch (Exception exc) {
             System.err.println("Line:" + line);
-
             throw exc;
         }
 
@@ -482,18 +481,11 @@ public class TextRecord extends DataRecord {
             }
         } else {
             while (true) {
-                //            System.err.println("FROM:" + fromIndex +" " + inQuotes);
-                if (fixedWidth != null) {
-                    idx = fromIndex + fixedWidth[numTokensRead];
-                    System.err.println("idx:" + idx);
+                if (inQuotes) {
+                    idx = sourceString.indexOf("\"", fromIndex + 1);
+                    idx++;
                 } else {
-                    if (inQuotes) {
-                        idx = sourceString.indexOf("\"", fromIndex + 1);
-                        //                System.err.println ("\tidx:" + idx);
-                        idx++;
-                    } else {
-                        idx = sourceString.indexOf(delimiter, fromIndex);
-                    }
+                    idx = sourceString.indexOf(delimiter, fromIndex);
                 }
                 //            System.err.println ("\tidx:" + idx +" delimiter:" + delimiter +":  str:" + sourceString);
                 String theString;
