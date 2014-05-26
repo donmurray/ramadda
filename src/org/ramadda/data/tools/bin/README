@@ -21,11 +21,17 @@ Installing other libraries
 ##############################################################################
 
 The point tools comes with a set of point file readers (from core RAMADDA) but can
-be extended by providing jar files. You can copy the jar file that contains your
-point file reader classes (e.g., the nlasplugin.jar) into either:
+be extended by providing jar files that contain the point file readers. 
+The scripts are set up to load 3 files:
 
 lib/libext1.jar
 lib/libext2.jar
+lib/libext3.jar
+
+
+You can copy the jar file that contains your point file reader classes as one of the 3 files.
+For example, if you want to read various LiDAR formats (eg. LAS, GLANL, LVIS) copy the nlasplugin.jar
+as lib/libext1.jar
 
 
 ##############################################################################
@@ -44,6 +50,12 @@ e.g.:
 or set the environment variable:
 
 export ramadda_point_class="org.unavco.data.lidar.glas.GlasFile"
+
+To read LAS files specify:
+<pointtool>  -class org.unavco.data.lidar.las.LasFile
+
+For LVIS files:
+<pointtool>  -class org.unavco.data.lidar.lvis.LvisFile
 
 
 
