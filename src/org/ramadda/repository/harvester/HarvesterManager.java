@@ -587,7 +587,6 @@ public class HarvesterManager extends RepositoryManager {
                     if ( !harvester.getActive()) {
                         getEntryManager().clearSeenResources();
                         harvester.clearCache();
-                        harvester.setActive(true);
                         Misc.run(harvester, "run");
                         msg = "Harvester started:" + harvester;
                     } else {

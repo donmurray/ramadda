@@ -958,6 +958,9 @@ public abstract class Harvester extends RepositoryManager {
      * @param e _more_
      */
     public void appendError(String e) {
+        if(this.error == null) {
+            this.error = new StringBuffer();
+        }
         this.error.append(e);
         this.error.append("<br>");
     }
