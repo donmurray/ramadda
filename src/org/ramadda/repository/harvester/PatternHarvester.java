@@ -336,7 +336,7 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
             } else if ( !getStorageManager().isLocalFileOk(rootDir)) {
                 String adminLink =
                     HtmlUtils.href(
-                        getRepository().getUrlBase()
+                                   getRepository().getUrlBase()
                         + "/userguide/admin.html#filesystemaccess", msg(
                             "More information"), " target=_HELP");
                 extraLabel =
@@ -678,15 +678,17 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
             cnt++;
             //            System.err.println("found:" + entries.size() + " files in:"
             //                               + (t2 - t1) + "ms");
+            String logLink = HtmlUtils.href(getRepository().getUrlBase() +getAdmin().URL_ADMIN_LOG +"?log=harvester.log", msg("Harvest details")) + "<br>";
             if ( !getMonitor()) {
                 status.append("Done<br>");
+                status.append(logLink);
                 logHarvesterInfo("Ran one time only. Exiting loop");
-
                 break;
             }
 
             status.append("Done... sleeping for " + getSleepMinutes()
                           + " minutes<br>");
+            status.append(logLink);
             logHarvesterInfo("Sleeping for " + getSleepMinutes()
                              + " minutes");
             doPause();
