@@ -341,6 +341,64 @@
    </type>
 
 
+
+  <type name="project_experiment"  description="Experiment" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Science Project"      metadata="enum_tag,content.keyword,project_person">
+     <property name="icon" value="/fieldproject/experiment.png"/>
+     <property name="form.file.show" value="false"/>
+     <property name="form.url.show" value="false"/>
+     <property name="form.datatype.show" value="false"/>
+     <property name="form.altitude.show" value="false"/>
+     <property name="form.altitude.show.top" value="false"/>
+     <property name="form.area.show" value="false"/>
+     <property name="search.label" value="Search for Experiments"/>
+     <property name="search.tabs" value="list,timeline"/>
+     <children><![CDATA[
+<entries>
+<entry  name="Data"  type="group"/>
+<entry  name="Documents"  type="group"/>
+</entries>
+]]>
+</children>
+     <column name="experiment_type"  type="enumerationplus"  label="Experiment Type"/>
+     <column name="notes" type="string"  label="Notes" rows="5" size="5000" changetype="true"/>
+     <wiki><![CDATA[
+{{noheading}}
+<table width="100%">
+<tr valign=top>
+<td width="50%">
+<div class="wiki-h1">{{name}}</div>
+<div style="max-height: 400px; overflow-y: auto;">
+{{description wikify="true"}}
+</div>
+
+==Experiment Information==
+<table class="formtable">
+{{field name="experiment_type" row.label="Type:"}}
+{{field name="notes" row.label="Notes:"}}
+</table>
+
+{{properties message="" }}
+
+{{links entry="Links" message=""}}
+
+
+{{tree title="Data" details="false" showtoggle="false" message="" prefix="==Data=="}}
+
+
+</td></tr>
+
+
+</table>
+
+
+
+
+]]>
+</wiki>
+   </type>
+
+
+
   <type name="project_instrument"  description="Instrument Data Collection" handler="org.ramadda.geodata.fieldproject.FieldProjectTypeHandler" category="Science Project">
      <property name="icon" value="/fieldproject/system-monitor.png"/>
      <property name="form.resource.show" value="false"/>
