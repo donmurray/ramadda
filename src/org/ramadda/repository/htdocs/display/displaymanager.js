@@ -254,7 +254,6 @@ function DisplayManager(argId,argProperties) {
                 if(this.hasGeoMacro(jsonUrl)) {
                     var lon = props.lon;
                     var lat = props.lat;
-                    alert(lat);
                     
                     if((lon == null || lat == null) &&  this.map!=null) {
                         var tuple = this.getPosition();
@@ -264,8 +263,8 @@ function DisplayManager(argId,argProperties) {
                         }
                     } 
                     if(lon != null && lat != null) {
-                    	jsonUrl = jsonUrl.replace("${latitude}",lat.toString().replace(".",","));
-                        jsonUrl = jsonUrl.replace("${longitude}",lon.toString().replace(".",","));
+                    	jsonUrl = jsonUrl.replace("${latitude}",lat.toString());
+                        jsonUrl = jsonUrl.replace("${longitude}",lon.toString());
                     } 
                 }
                 jsonUrl = jsonUrl.replace("${numpoints}",1000);
