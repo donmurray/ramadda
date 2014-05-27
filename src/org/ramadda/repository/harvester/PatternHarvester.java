@@ -678,7 +678,7 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
             cnt++;
             //            System.err.println("found:" + entries.size() + " files in:"
             //                               + (t2 - t1) + "ms");
-            String logLink = HtmlUtils.href(getRepository().getUrlBase() +getAdmin().URL_ADMIN_LOG +"?log=harvester.log", msg("Harvest details")) + "<br>";
+            String logLink = HtmlUtils.href(getAdmin().URL_ADMIN_LOG +"?log=harvester.log", msg("Harvest details")) + "<br>";
             if ( !getMonitor()) {
                 status.append("Done<br>");
                 status.append(logLink);
