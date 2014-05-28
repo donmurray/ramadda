@@ -14,13 +14,16 @@
 #Before you run this do a full  Ant build in source/ramadda-code
 #
 
+RAMADDA_HOME=/ramadda
+
 VERSION=@RELEASE@
 DIST=../source/ramadda-code/dist
+
 
 sh ${VERSION}/ramaddainit.sh stop
 
 
-cp ${DIST}/otherplugins/* /ramadda/plugins
+cp ${DIST}/otherplugins/* ${RAMADDA_HOME}/plugins
 rm -r -f $VERSION
 cp -r ${DIST}/$VERSION .
 chmod 755 $VERSION/*.sh
