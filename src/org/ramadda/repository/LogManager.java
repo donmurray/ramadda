@@ -40,6 +40,7 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringUtil;
 
+import java.sql.SQLException;
 import java.io.*;
 
 import java.io.FileNotFoundException;
@@ -449,6 +450,7 @@ public class LogManager extends RepositoryManager {
      * @param exc _more_
      */
     public void logError(Logger log, String message, Throwable exc) {
+        System.err.println ("LOG ERROR:" + exc);
         message = encode(message);
         Throwable thr = null;
         if (exc != null) {
@@ -470,6 +472,15 @@ public class LogManager extends RepositoryManager {
                           + "\n</stack>");
                 System.err.println("RAMADDA ERROR:" + message);
                 System.err.println(stackTrace);
+                if(thr instanceof SQLException) {
+                    SQLException sqlException = (SQLException) thr;
+                    while((sqlException = sqlException.getNextException())!=null) {
+                        log.error("getNextException:" + "\n<stack>\n" + sqlException + "\n" + LogUtil.getStackTrace(sqlException)
+                                  + "\n</stack>");
+                        System.err.println("getNextException:" + sqlException + "\n" + LogUtil.getStackTrace(sqlException));
+                    }
+                }
+
             }
         } else {
             System.err.println("RAMADDA ERROR:" + message);

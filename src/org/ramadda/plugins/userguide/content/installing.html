@@ -59,7 +59,7 @@ You can run RAMADDA stand-alone from the command line. This requires  Java 1.6 o
 <li>
 Download the latest release from the 
 <a href="http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>">RAMADDA SourceForge</a> site -  
-<a href="http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/ramadda<%ramadda.version%>.zip/download">ramadda<%ramadda.version%>.zip</a> 
+<a href="http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/ramaddaserver.zip/download">ramaddaserver.zip</a> 
 
 <p>
 <li> Unzip the file and consult the README.
@@ -67,9 +67,9 @@ Download the latest release from the
 <p>
 <li> Or, skip reading the documentation (like everyone else does) and jump right in and start RAMADDA. 
 
-Figure out where you want RAMADDA to store files in its <a href="#home">home directory</a> (default is <i>&lt;your home dir&gt;/.ramadda</i>). Then just run the script in the ramadda<%ramadda.version%> directory.
+Figure out where you want RAMADDA to store files in its <a href="#home">home directory</a> (default is <i>&lt;your home dir&gt;/.ramadda</i>). Then just run the script in the ramaddaserver directory.
 <pre>
-   cd ramadda<%ramadda.version%>
+   cd ramaddaserver
    sh ramadda.sh -Dramadda_home=&lt;/ramadda/home/dir&gt;
 </pre>
 
@@ -366,7 +366,7 @@ To build RAMADDA SourceForge SVN:
 svn checkout svn://svn.code.sf.net/p/ramadda/code/ ramadda-code
 </pre>
 
-<li> Build RAMADDA.  This creates a stand-alone version in dist/ramadda<%ramadda.version%>
+<li> Build RAMADDA.  This creates a stand-alone version in dist/ramaddaserver
 <pre>
 cd ramadda-code
 ant
@@ -374,7 +374,7 @@ ant
 
 <li> Run ramadda. This creates a ramadda home directory in: ~/.ramadda
 <pre>
-cd dist/ramadda<%ramadda.version%>
+cd dist/ramaddaserver
 sh ramadda.sh
 </pre>
 
