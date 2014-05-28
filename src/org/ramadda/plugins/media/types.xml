@@ -85,6 +85,10 @@
      <property name="icon" value="/icons/xls.png"/>
 </type>
 
+  <type name="type_document_csv"  description="CSV File" pattern="(.*\.csv)"  super="type_document"   >
+     <property name="icon" value="/icons/document-excel-csv.png"/>
+</type>
+
 
 
 </types>
