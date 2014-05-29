@@ -2286,6 +2286,11 @@ public class Repository extends RepositoryBase implements RequestHandler,
             manager.clearCache();
         }
         resources = new Hashtable();
+        try {
+            readGlobals();
+        } catch (Exception exc) {
+            getLogManager().logError("Error reading globals", exc);
+        }
     }
 
 
