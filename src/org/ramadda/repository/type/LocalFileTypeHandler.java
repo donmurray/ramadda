@@ -513,14 +513,27 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
                                    TypeHandler.TYPE_GROUP)
                                : getRepository().getTypeHandler(
                                    TypeHandler.TYPE_FILE));
-        Entry entry = (targetFile.isDirectory()
-                       ? (Entry) new Entry(synthId, handler, true)
-                       : new Entry(synthId, handler));
-
-        if (targetFile.isDirectory()) {
-            entry.setIcon(ICON_SYNTH_FILE);
-        }
         Entry  templateEntry = getEntryManager().getTemplateEntry(targetFile);
+        Entry entry = null;
+
+        
+        if (templateEntry != null) {
+            entry = templateEntry;
+            entry.setId(synthId);
+        }
+
+
+        if(entry == null) {
+            entry = (targetFile.isDirectory()
+                     ? (Entry) new Entry(synthId, handler, true)
+                     : new Entry(synthId, handler));
+            if (targetFile.isDirectory()) {
+                entry.setIcon(ICON_SYNTH_FILE);
+            }
+        }
+
+
+
         String name          = null;
         for (String pair : localFileInfo.getNames()) {
             boolean doPath = false;
@@ -564,17 +577,23 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
             //            System.err.println ("\tUsing other parent entry:" + parent);
         }
 
-        entry.initEntry(name, "", parent,
+
+
+        String desc = "";
+        Object[] values = null;
+        if (templateEntry != null) {
+            desc = templateEntry.getDescription();
+            name = templateEntry.getName();
+            values = entry.getTypeHandler().getEntryValues(entry);
+        }
+        entry.initEntry(name, desc, parent,
                         getUserManager().getLocalFileUser(),
                         new Resource(targetFile, (targetFile.isDirectory()
-                ? Resource.TYPE_LOCAL_DIRECTORY
-                : Resource.TYPE_LOCAL_FILE)), "", targetFile.lastModified(),
-                targetFile.lastModified(), targetFile.lastModified(),
-                targetFile.lastModified(), null);
-
+                                                  ? Resource.TYPE_LOCAL_DIRECTORY
+                                                  : Resource.TYPE_LOCAL_FILE)), "", targetFile.lastModified(),
+                        targetFile.lastModified(), targetFile.lastModified(),
+                        targetFile.lastModified(), values);
         //        System.err.println ("Done:" + entry);
-
-
         /*
         if ( !getRepository().getAccessManager().canDoAction(request, entry,
                                                              org.ramadda.repository.auth.Permission.ACTION_VIEW)) {
