@@ -955,11 +955,11 @@ public class Column implements DataTypes, Constants {
                 s = getRepository().getWikiManager().wikifyEntry(
                     getRepository().getTmpRequest(), entry, s, false, null,
                     null);
-            } else if (isEnumeration()) {
-                //                String label = enumMap.get(s);
-                //                if (label != null) {
-                //                    s = label;
-                //                }
+            } else if (isEnumeration() && !csv) {
+                String label = enumMap.get(s);
+                if (label != null) {
+                    s = label;
+                }
             }
             sb.append(s);
         }
