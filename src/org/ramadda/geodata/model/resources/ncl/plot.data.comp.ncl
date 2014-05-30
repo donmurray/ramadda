@@ -355,6 +355,15 @@ begin
 
 end
 
+undef ("cropImage")
+procedure cropImage(wksname:string)
+begin
+    imagename = wksname+".png"
+    tmpimagename = wksname+"_tmp.png"
+    system("%convert% -trim +repage -bordercolor white -border 10 "+imagename+" "+tmpimagename)
+    system("mv -f " + tmpimagename + " " + imagename)
+end
+
 ;*************************************************
 ; Procedure:  addLogo
 ;
@@ -387,13 +396,18 @@ procedure addAnnotation(wksname, text)
 begin
   datestr = systemfunc("date -u +'%Y-%m-%d %H:%M UTC' ")
   txres               = True
-  txres@txFontHeightF = 0.02 
+  txres@txFontHeightF = 0.012
   if ((.not. ismissing(text)) .and. (text .ne. "")) then
     plottext = "Plotted from " + text + " on "+datestr
   else
     plottext = "Plotted on "+datestr
   end if
-  gsn_text_ndc(wksname,plottext,0.5,0.025,txres)
+  ;gsn_text_ndc(wksname,plottext,0.5,0.025,txres)
+  imageFilePath = wksname + ".png"    
+  tmpFilePath = imageFilePath + ".tmp"    
+  system("%convert%" + " " + imageFilePath + "  -background white label:'" + plottext + "' -gravity Center -append " + tmpFilePath)
+  system("mv -f " + tmpFilePath + " " + imageFilePath)
+
 end
 
 ;*************************************************
@@ -515,18 +529,35 @@ begin
       
   else
 
-    rescf@gsnMaximize = True
+    wks_type="png"
+    if (.not. doPanel) then
+      rescf@gsnMaximize = True
+    else 
+      rescf@gsnMaximize = False
+    end if
     ratio = opts@ratio
     wks_type@wkWidth                     = 800
-    wks_type@wkHeight                    = 600
-;    rescf@vpXF = .075
-;    rescf@vpYF = .95
-;    rescf@vpWidthF = .85
-;    rescf@vpHeightF= .5*ratio
+    wks_type@wkHeight                    = 800
+    ;rescf@vpXF = .075
+    ;rescf@vpYF = .95
+    ;rescf@vpWidthF = .85
+    ;rescf@vpHeightF= .5*ratio
     rescf@cnLineLabelsOn=True
     rescf@cnLineLabelPlacementMode = "Computed"
     rescf@cnLineLabelAngleF=0
     rescf@cnConstFLabelFontHeightF=0.010
+
+    ; label bar
+    rescf@lbOrientation         = "Horizontal"   
+    rescf@pmLabelBarWidthF      = 0.4               ; default is shorter
+    rescf@pmLabelBarHeightF     = 0.075             ; default is taller
+
+    ; lable bar title
+    ;rescf@lbTitleFontHeightF = 0.013
+    ;rescf@lbTitlePosition = "Bottom"
+    ;rescf@lbTitleOffsetF = 0.005
+    ;rescf@lbBottomMarginF = 0.025
+
 
   end if
     
@@ -583,6 +614,7 @@ begin
     else 
       rescf@gsnLeftString = vartitle
     end if
+    ;rescf@lbTitleString = rescf@gsnLeftString
     if (cint .eq. 0) then
       symMinMaxPlt(mydata,20,False,rescf)
     end if
@@ -599,9 +631,9 @@ begin
         plots(0) = gsn_csm_contour_map_ce(wks,mydata,res2)
       end if
     end if
-    if (.not. doGoogle) then
-        addAnnotation(wks,opts@annotation)
-    end if
+    ;if (.not. doGoogle) then
+    ;    addAnnotation(wks,opts@annotation)
+    ;end if
     delete(mydata)
     delete(vartitle)
   else 
@@ -619,6 +651,7 @@ begin
       else 
         rescf@gsnLeftString = vartitle
       end if
+      ;rescf@lbTitleString = rescf@gsnLeftString
       if (isanom .and. cint .eq. 0) then
         symMinMaxPlt(mydata,20,False,rescf)
       end if
@@ -636,9 +669,9 @@ begin
           plots(0) = gsn_csm_contour_map_ce(wks,mydata,res2)
         end if
       end if
-      if (.not. doPanel) then
-        addAnnotation(wks,opts@annotation)
-      end if
+      ;if (.not. doPanel) then
+      ;  addAnnotation(wks,opts@annotation)
+      ;end if
       delete(mydata)
       do i = 1,numfiles-1
         nextdata = readdata(files(i),opts)
@@ -659,9 +692,9 @@ begin
             plots(i) = gsn_csm_contour_map_ce(wks,mydata,res2)
           end if
         end if
-        if (.not. doPanel) then
-          addAnnotation(wks,opts@annotation)
-        end if
+        ;if (.not. doPanel) then
+        ;  addAnnotation(wks,opts@annotation)
+        ;end if
         delete(mydata)
         delete(nextdata)
       end do
@@ -885,9 +918,18 @@ begin
       resP@gsnMaximize                = True    
       resP@gsnPanelLabelBar           = True    
       resP@txFontHeightF              = .20
-      resP@lbLabelFontHeightF         = 0.012
-      resP@pmLabelBarWidthF           = 0.60
-      resP@pmLabelBarHeightF          = 0.04
+
+      ; label bar
+      resP@lbOrientation         = "Horizontal"   
+      resP@pmLabelBarWidthF      = 0.4               ; default is shorter
+      resP@pmLabelBarHeightF     = 0.075             ; default is taller
+
+      ; label bar title
+      ;resP@lbTitleString = rescf@lbTitleString
+      ;resP@lbTitleFontHeightF = 0.013
+      ;resP@lbTitlePosition = "Bottom"
+      ;resP@lbTitleOffsetF = 0.005
+
       resP@gsnFrame = False ; Don't advance frame for annotation overlay
       resP@gsnPanelDebug = False ; set to True for debugging
 
@@ -904,14 +946,17 @@ begin
 
       ;---Panel the plot.
       gsn_panel(wks,plots,(/2,1/),resP)
-      addAnnotation(wks,opts@annotation)
+      ;addAnnotation(wks,opts@annotation)
       ;maximize_output(wks, False)
     else 
       draw(plots(0))
     end if
     frame(wks)
+    wksname = wks@name
     delete(wks)
     delete(plots)
+    cropImage(wksname)
+    addAnnotation(wksname, opts@annotation)
   end if
 
 end
