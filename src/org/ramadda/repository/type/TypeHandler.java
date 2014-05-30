@@ -2798,14 +2798,12 @@ public class TypeHandler extends RepositoryManager {
             Matcher matcher =
                 fieldFilePattern.matcher(entry.getResource().getPath());
             if ( !matcher.find()) {
-                System.err.println("no match:"
-                                   + entry.getResource().getPath());
-
+                //                System.err.println("no match:"  + entry.getResource().getPath());
                 return;
             }
             Object[] values = getEntryValues(entry);
 
-            System.err.println("match:" + entry.getResource().getPath());
+            //            System.err.println("match:" + entry.getResource().getPath());
             for (int i = 0; i < fieldPatternNames.size(); i++) {
                 String columnName = fieldPatternNames.get(i);
                 Column column     = getColumn(columnName);
