@@ -73,6 +73,9 @@ import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 
 /**
  * Provide the core services around the entry types.
@@ -190,6 +193,10 @@ public class TypeHandler extends RepositoryManager {
         "{{name box.class=entry-page-name}}\n{{description box.class=\"entry-page-description\"}}";
 
 
+    /** _more_          */
+    public static final String PROP_FIELD_FILE_PATTERN = "field_file_pattern";
+
+
     /** _more_ */
     public static final String PROP_CREATED_DISPLAY_MODE =
         "ramadda.created.display";
@@ -246,6 +253,17 @@ public class TypeHandler extends RepositoryManager {
      *   to use for a file
      */
     private String filePattern;
+
+    /**
+     *   the field_file_pattern attribute in types.xml. Used when trying to figure out what entry type
+     *   to use for a file and to set the entry values from
+     */
+    private Pattern fieldFilePattern;
+
+
+    /** _more_          */
+    private List<String> fieldPatternNames;
+
 
     /** the wiki tag in types.xml. If defined then use this as the default html display for entries of this type */
     private String wikiTemplate;
@@ -348,6 +366,16 @@ public class TypeHandler extends RepositoryManager {
                     ATTR_SUPERCATEGORY, superCategory);
             this.filePattern = Utils.getAttributeOrTag(entryNode,
                     ATTR_PATTERN, (String) null);
+            String tmp = Utils.getAttributeOrTag(entryNode,
+                             PROP_FIELD_FILE_PATTERN, (String) null);
+
+            if (tmp != null) {
+                fieldPatternNames = new ArrayList<String>();
+                filePattern = Utils.extractPatternNames(tmp,
+                        fieldPatternNames);
+                fieldFilePattern = Pattern.compile(this.filePattern);
+            }
+
 
 
             wikiTemplate = Utils.getAttributeOrTag(entryNode, ATTR_WIKI,
@@ -1293,6 +1321,8 @@ public class TypeHandler extends RepositoryManager {
         if (parent != null) {
             parent.initializeEntryFromXml(request, entry, node);
         }
+
+
     }
 
 
@@ -2764,6 +2794,31 @@ public class TypeHandler extends RepositoryManager {
         if (parent != null) {
             parent.initializeNewEntry(entry);
         }
+        if (fieldFilePattern != null) {
+            Matcher matcher =
+                fieldFilePattern.matcher(entry.getResource().getPath());
+            if ( !matcher.find()) {
+                System.err.println("no match:"
+                                   + entry.getResource().getPath());
+
+                return;
+            }
+            Object[] values = getEntryValues(entry);
+
+            System.err.println("match:" + entry.getResource().getPath());
+            for (int i = 0; i < fieldPatternNames.size(); i++) {
+                String columnName = fieldPatternNames.get(i);
+                Column column     = getColumn(columnName);
+                if (column == null) {
+                    System.err.println("Unknown column:" + columnName);
+
+                    continue;
+                }
+                String value = matcher.group(i + 1);
+                column.setValue(entry, values, value);
+            }
+        }
+
     }
 
     /**
