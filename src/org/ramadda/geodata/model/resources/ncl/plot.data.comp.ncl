@@ -358,8 +358,10 @@ end
 undef ("cropImage")
 procedure cropImage(wksname:string)
 begin
+    oldimagename = wksname+".000001.png"
     imagename = wksname+".png"
     tmpimagename = wksname+"_tmp.png"
+    system("mv -f "+oldimagename+" "+imagename)
     system("%convert% -trim +repage -bordercolor white -border 10 "+imagename+" "+tmpimagename)
     system("mv -f " + tmpimagename + " " + imagename)
 end

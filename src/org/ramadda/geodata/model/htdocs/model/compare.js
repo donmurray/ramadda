@@ -213,9 +213,8 @@ function CollectionForm(formId, type) {
                 var imagehtml = "";
                 for (var i = 0; i < imageEntries.length; i++) {
                     var entry = imageEntries[i];
-                    imagehtml += //HtmlUtil.href(entry.getResourceUrl(), 
-                            HtmlUtil.image(entry.getResourceUrl());
-                            //HtmlUtil.image(entry.getResourceUrl(), ["width", "500px"]));
+                    imagehtml += //HtmlUtil.image(entry.getResourceUrl());
+                            HtmlUtil.image(entry.getResourceUrl(), ["width", "500px"]);
                     imagehtml += "<br/>";
                     imagehtml += HtmlUtil.href(entry.getResourceUrl(), "Download image");
                 }

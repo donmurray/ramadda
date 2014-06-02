@@ -420,6 +420,7 @@ public class NCLModelPlotDataProcess extends DataProcess {
         String errorMsg = results[1];
         String outMsg   = results[0];
         // Check the version
+        /*
         if (suffix.equals("png")) {
             Matcher m = NCLOutputHandler.versionPattern.matcher(outMsg);
             if (m.find()) {
@@ -431,6 +432,7 @@ public class NCLModelPlotDataProcess extends DataProcess {
                 }
             }
         }
+        */
 
         if ( !outFile.exists()) {
             if (outMsg.length() > 0) {
