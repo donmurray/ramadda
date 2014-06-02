@@ -213,9 +213,10 @@ function CollectionForm(formId, type) {
                 var imagehtml = "";
                 for (var i = 0; i < imageEntries.length; i++) {
                     var entry = imageEntries[i];
-                    imagehtml += //HtmlUtil.image(entry.getResourceUrl());
-                            HtmlUtil.image(entry.getResourceUrl(), ["width", "500px"]);
-                    imagehtml += "<br/>";
+                    imagehtml += "<a class=\"popup_image\" href=\""+ entry.getResourceUrl()+"\">\n";
+                    imagehtml += HtmlUtil.image(entry.getResourceUrl(), ["width", "500px", "alt", "", "title", "foo"])+"\n";
+                    imagehtml += "</a>\n";
+                    imagehtml += "<br/>\n";
                     imagehtml += HtmlUtil.href(entry.getResourceUrl(), "Download image");
                 }
                 imagehtml += "<p/>";
@@ -397,6 +398,7 @@ function CollectionForm(formId, type) {
             }
         });
         this.init();
+        
 }
 
 
@@ -444,6 +446,3 @@ function NCLModelPlotDataProcess(formId) {
      var SUPER;
      RamaddaUtil.inherit(this, SUPER = new DataProcess(formId));
 }
-
-
-
