@@ -1,4 +1,4 @@
-<entry name="${name}">
+<entry name="${name}" type="group">
 <description><![CDATA[<wiki>
 <h2>${description}</h2>
 <p>
