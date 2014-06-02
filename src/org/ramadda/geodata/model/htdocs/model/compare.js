@@ -165,6 +165,14 @@ function CollectionForm(formId, type) {
                 } else {
                     outputDiv.html(html);
                 }
+                // Enable the image popup
+                if (images.length > 0) {
+                    $(document).ready(function() {
+                      $("a.popup_image").fancybox({
+                        'titleShow' : false
+                      });
+                    });
+                }
                 // Show GE plugin if we have KMZ
                 if (kmz != null) {
                     //if(!window.haveLoadedEarth) {
@@ -214,7 +222,7 @@ function CollectionForm(formId, type) {
                 for (var i = 0; i < imageEntries.length; i++) {
                     var entry = imageEntries[i];
                     imagehtml += "<a class=\"popup_image\" href=\""+ entry.getResourceUrl()+"\">\n";
-                    imagehtml += HtmlUtil.image(entry.getResourceUrl(), ["width", "500px", "alt", "", "title", "foo"])+"\n";
+                    imagehtml += HtmlUtil.image(entry.getResourceUrl(), ["width", "500px"])+"\n";
                     imagehtml += "</a>\n";
                     imagehtml += "<br/>\n";
                     imagehtml += HtmlUtil.href(entry.getResourceUrl(), "Download image");

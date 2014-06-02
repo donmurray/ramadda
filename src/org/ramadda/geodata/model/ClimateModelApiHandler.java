@@ -598,8 +598,8 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             getMapManager().addGoogleEarthImports(request, sb);
             sb.append(
                 "<script type=\"text/JavaScript\">google.load(\"earth\", \"1\");</script>\n");
-            sb.append(HtmlUtils.script(
-                "$(document).ready(function() {\n $(\"a.popup_image\").fancybox({\n 'titleShow' : false\n });\n });\n"));
+            //sb.append(HtmlUtils.script(
+            //    "$(document).ready(function() {\n $(\"a.popup_image\").fancybox({\n 'titleShow' : false\n });\n });\n"));
         } else {
             sb.append(HtmlUtils.form(getTimeSeriesUrlPath(), formAttrs));
             getWikiManager().addDisplayImports(request, sb);
