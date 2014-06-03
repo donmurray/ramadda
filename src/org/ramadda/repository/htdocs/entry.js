@@ -461,7 +461,11 @@ function Entry(props) {
                 return this.filename;
             }, 
             getResourceUrl : function () {
-                return  this.getRamadda().getRoot() + "/entry/get?entryid=" + this.id;
+                var rurl = this.getRamadda().getRoot() + "/entry/get";
+                if (this.getFilename() != null) {
+                    rurl += "/"+ this.getFilename();
+                }
+                return  rurl + "?entryid=" + this.id;
             },
             getLink : function (label) {
                 if(!label) label = this.getName();
