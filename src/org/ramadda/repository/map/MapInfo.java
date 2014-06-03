@@ -78,8 +78,11 @@ public class MapInfo {
     /** is the map for selection */
     private boolean forSelection = false;
 
-    /** _more_ */
+    /** list of map regions */
     private List<MapRegion> mapRegions = null;
+
+    /** default map region */
+    private String defaultMapRegion = null;
 
     /** the javascript buffer? */
     private StringBuilder jsBuffer = null;
@@ -491,6 +494,8 @@ public class MapInfo {
                   + "$('#" + getVariableName()
                   + "_mapToggle').hide(); } else {" + getVariableName()
                   + ".initMap(" + forSelection + ");}\n");
+            // Fire the map selection change to pick up the current map params
+            addJS("$('#" + getVariableName() + "_regions').change();");
         } else {
             retBuf.append(mapStuff);
             // this wasn't done in the initial making of the JS
@@ -545,7 +550,7 @@ public class MapInfo {
                                                + "_regionid")));
             widget.append(
                 HtmlUtils.select(
-                    "mapregion", values, (String) null,
+                    "mapregion", values, getDefaultMapRegion(),
                     HtmlUtils.id(regionSelectId)
                     + HtmlUtils.attr(
                         HtmlUtils.ATTR_ONCHANGE,
@@ -960,6 +965,23 @@ public class MapInfo {
         return mapRegions;
     }
 
+    /**
+     *  Set the DefaultMapRegion property.
+     *
+     *  @param The DefaultMapRegion
+     */
+    public void setDefaultMapRegion(String mapRegion) {
+        defaultMapRegion = mapRegion;
+    }
+    
+    /**
+     *  Get the DefaultMapRegion property.
+     *
+     *  @return The DefaultMapRegion
+     */
+    public String getDefaultMapRegion() {
+        return defaultMapRegion;
+    }
 
 
 }

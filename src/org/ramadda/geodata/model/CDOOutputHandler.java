@@ -856,6 +856,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
         }
 
         map.setMapRegions(getPageHandler().getMapRegions(mapRegionGroup));
+        map.setDefaultMapRegion(request.getString("mapregion", null));
 
         //map.addBox("", llr, new MapBoxProperties("blue", false, true));
         String[] points = new String[] { "" + llr.getLatMax(),
