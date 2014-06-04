@@ -74,10 +74,26 @@ label.selector {
 }
 
 .ui-button {
-    font-size: 105%;
+    font-size: 95%;
     font-weight: bold;
     padding: 0.2em .5em !important;
     border: 1px solid black;
     border-radius: 5px;
     background: lightblue;
+}
+
+.helptext {
+    font-size: 95%;
+    width: 500px;
+    margin-left: 4em;
+    border: 1px solid black;
+    padding: 1em;
+    /*
+    padding-left: 1em;
+    padding-right: 1em;
+    */
+    border-radius: 5px;
+    /*background-color: #CFF;*/
+    margin-top: 1em;
+    min-height: 550px;
 }

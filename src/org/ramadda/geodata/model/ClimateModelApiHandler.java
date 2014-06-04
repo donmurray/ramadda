@@ -616,8 +616,10 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
 
         String            formType  = "compare";
+        String helpFile = "/org/ramadda/geodata/model/htdocs/model/compare.html";
         if (type.equals(ARG_ACTION_TIMESERIES)) {
             formType = "timeseries";
+            helpFile = "/org/ramadda/geodata/model/htdocs/model/timeseries.html";
         }
         StringBuilder js =
             new StringBuilder("\n//collection form initialization\n");
@@ -818,6 +820,15 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                                            + "...")));
             sb.append("</td></tr></table>");
             sb.append(HtmlUtils.close("div"));  // titled_border_content
+            // Right column - help
+            sb.append("<td width=\"800px\">");
+            sb.append("<div id=\"" + formId + "_output\">");
+            try {
+                String helpText = getStorageManager().readSystemResource(helpFile);
+                sb.append(helpText);
+            } catch (Exception excp) {}
+            sb.append("</div>");
+            sb.append("</td>");
         } else {
             sb.append("<tr><td colspan=\"2\" align=\"center\">");
             sb.append(HtmlUtils.submit("Update Data Selection", ARG_ACTION_SEARCH,
@@ -877,7 +888,12 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             sb.append("</td>");
             // Right column - no data
             sb.append("<td width=\"800px\">");
-            sb.append("<div id=\"" + formId + "_output\"></div>");
+            sb.append("<div id=\"" + formId + "_output\">");
+            try {
+                String helpText = getStorageManager().readSystemResource(helpFile);
+                sb.append(helpText);
+            } catch (Exception excp) {}
+            sb.append("</div>");
             sb.append("</td>");
         }
         sb.append("\n</tr></table>");

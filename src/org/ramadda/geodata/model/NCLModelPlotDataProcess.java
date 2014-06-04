@@ -172,7 +172,7 @@ public class NCLModelPlotDataProcess extends DataProcess {
                     NCLOutputHandler.ARG_NCL_PLOTTYPE, "png",
                     RepositoryManager.getShouldButtonBeSelected(
                         request, NCLOutputHandler.ARG_NCL_PLOTTYPE, "png",
-                        true)) + Repository.msg("Map")
+                        true)) + Repository.msg("Map (Image)")
                                + HtmlUtils.radio(
                                    NCLOutputHandler.ARG_NCL_PLOTTYPE, "kmz",
                                    RepositoryManager.getShouldButtonBeSelected(

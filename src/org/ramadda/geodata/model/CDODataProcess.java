@@ -249,7 +249,7 @@ public abstract class CDODataProcess extends DataProcess {
                     RepositoryManager.getShouldButtonBeSelected(
                         request, CDOOutputHandler.ARG_CDO_STAT,
                         CDOOutputHandler.STAT_MEAN, true)) + Repository.msg(
-                            "Mean") + HtmlUtils.space(2)
+                            "Average") + HtmlUtils.space(2)
                                     + HtmlUtils.radio(
                                         CDOOutputHandler.ARG_CDO_STAT,
                                         CDOOutputHandler.STAT_ANOM,
