@@ -6,7 +6,7 @@
      <property name="form.url.show" value="true"/>
      <property name="form.datatype.show" value="false"/>
      <property name="form.altitude.show" value="false"/>
-     <property name="form.altitude.show.top" value="false"/>
+     <property name="form.altitude.top.show" value="false"/>
      <wiki><![CDATA[
 {{noheading}}
 <table width="100%">
@@ -50,7 +50,7 @@
      <property name="form.url.show" value="true"/>
      <property name="form.datatype.show" value="false"/>
      <property name="form.altitude.show" value="false"/>
-     <property name="form.altitude.show.top" value="false"/>
+     <property name="form.altitude.top.show" value="false"/>
      <property name="search.label" value="Search for Projects"/>
      <property name="search.tabs" value="list,timeline"/>
      <property name="search.metadatatypes" value="project_person"/>
@@ -116,7 +116,7 @@
      <property name="form.resource.show" value="false"/>
      <property name="form.datatype.show" value="false"/>
      <property name="form.altitude.show" value="true"/>
-     <property name="form.altitude.show.top" value="false"/>
+     <property name="form.altitude.top.show" value="false"/>
 
      <property name="search.label" value="Sites"/>
      <property name="search.tabs" value="map,list"/>
@@ -205,7 +205,7 @@
      <property name="form.resource.show" value="false"/>
      <property name="form.datatype.show" value="false"/>
      <property name="form.altitude.show" value="true"/>
-     <property name="form.altitude.show.top" value="false"/>
+     <property name="form.altitude.top.show" value="false"/>
 
      <property name="search.label" value="Search Visits"/>
      <property name="search.searchopen" value="true"/>
@@ -337,7 +337,7 @@
      <property name="form.resource.show" value="false"/>
      <property name="form.datatype.show" value="false"/>
      <property name="form.altitude.show" value="true"/>
-     <property name="form.altitude.show.top" value="true"/>
+     <property name="form.altitude.top.show" value="true"/>
    </type>
 
 
@@ -348,7 +348,7 @@
      <property name="form.url.show" value="false"/>
      <property name="form.datatype.show" value="false"/>
      <property name="form.altitude.show" value="false"/>
-     <property name="form.altitude.show.top" value="false"/>
+     <property name="form.altitude.top.show" value="false"/>
      <property name="form.area.show" value="false"/>
      <property name="search.label" value="Search for Experiments"/>
      <property name="search.tabs" value="list,timeline"/>
@@ -404,7 +404,7 @@
      <property name="form.resource.show" value="false"/>
      <property name="form.datatype.show" value="false"/>
      <property name="form.altitude.show" value="false"/>
-     <property name="form.altitude.show.top" value="false"/>
+     <property name="form.altitude.top.show" value="false"/>
      <column name="instrument_id" type="string"  label="Instrument ID"   />
      <column name="type" type="enumeration"  label="Instrument Type"   />
      <wiki><![CDATA[
@@ -451,7 +451,7 @@
      <property name="form.resource.show" value="false"/>
      <property name="form.datatype.show" value="false"/>
      <property name="form.altitude.show" value="false"/>
-     <property name="form.altitude.show.top" value="false"/>
+     <property name="form.altitude.top.show" value="false"/>
      <wiki><![CDATA[
 {{noheading}}
 
@@ -475,7 +475,7 @@
      <property name="form.resource.show" value="false"/>
      <property name="form.datatype.show" value="false"/>
      <property name="form.altitude.show" value="false"/>
-     <property name="form.altitude.show.top" value="false"/>
+     <property name="form.altitude.top.show" value="false"/>
    </type>
 
 
@@ -546,7 +546,7 @@
      <property name="form.resource.show" value="true"/>
      <property name="form.datatype.show" value="false"/>
      <property name="form.altitude.show" value="false"/>
-     <property name="form.altitude.show.top" value="false"/>
+     <property name="form.altitude.top.show" value="false"/>
      <column name="status" type="string"  label="Status"   />
      <column name="expected_users" type="string"  label="Expected Users"   changetype="true" size="2000"/>
      <wiki><![CDATA[
@@ -691,7 +691,7 @@ features
      <property name="form.datatype.show" value="false"/>
      <property name="form.datatype.show" value="false"/>
      <property name="form.altitude.show" value="true"/>
-     <property name="form.altitude.show.top" value="false"/>
+     <property name="form.altitude.top.show" value="false"/>
      <column name="equipment" label="Equipment"  type="enumerationplus"   values="file:/org/ramadda/geodata/fieldproject/resources/tls_equipment.txt"/>
    </type>
 
@@ -705,9 +705,11 @@ features
      <property name="form.url.show" value="true"/>
      <property name="form.datatype.show" value="false"/>
      <property name="form.altitude.show" value="false"/>
-     <property name="form.altitude.show.top" value="false"/>
+     <property name="form.altitude.top.show" value="false"/>
 
-     <column name="intended_use"  type="string"  rows="5" size="1000" label="Intended Use" columns="60"  cansearch="true"/>
+     <column name="intended_use"  type="string" rows="5" size="1000" label="Intended Use" columns="60"  cansearch="true"/>
+
+
      <column name="location"  type="string"  label="Where" rows="2" columns="60"  cansearch="true"/>
      <column name="notes" type="string"  label="Notes" rows="5" size="5000" changetype="true" columns="60" />
      <children><![CDATA[
@@ -758,6 +760,81 @@ features
 
 
 {{list includeicon="true" details="false" entries="siblings:type:project_casestudy,links"  message="" box.maxheight="200" box.class="entry-sidebox" prefix="==Related=="}}
+
+
+</td>
+</table>
+
+
+
+]]>
+</wiki>
+   </type>
+
+
+
+  <type name="project_learning_resource"  description="Learning Resource" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Science Project"      metadata="project_creator,enum_tag,content.keyword">
+     <property name="icon" value="/fieldproject/reports-stack.png"/>
+
+     <property name="form.file.show" value="false"/>
+     <property name="form.url.show" value="true"/>
+     <property name="form.datatype.show" value="false"/>
+     <property name="form.altitude.show" value="false"/>
+     <property name="form.altitude.top.show" value="false"/>
+     <column name="topic"  type="enumerationplus"  label="Topic"   cansearch="true"/>
+     <column name="grade_level"  type="enumerationplus"  values="graduate:Graduate,advanced_undergraduate:Advanced Undergradute,intro_undergraduate:Intro Undergradute,secondary:Secondary,elementary:Elementary" rows="5" size="1000" label="Grade Level" columns="60"  cansearch="true"/>
+
+     <column name="teacher_notes" type="string"  label="Notes for educators" rows="5" size="5000" columns="60" />
+     <column name="student_notes" type="string"  label="Notes for students" rows="5" size="5000" columns="60" />
+
+     <children><![CDATA[
+<entries>
+<entry  name="Data"  type="group"/>
+<entry  name="Documents"  type="group"/>
+</entries>
+]]>
+</children>
+
+     <wiki><![CDATA[
+{{noheading}}
+<table width="100%" cellspacing="10" >
+<tr valign=top>
+<td width="50%">
+<div class="wiki-h1">{{name}}</div>
+<div style="max-height: 400px; overflow-y: auto;">
+{{description wikify="true"}}
+</div>
+
+==Learning Resource==
+<table class="formtable">
+{{resource row.label="URL:"  message=""}}
+{{field name="topic" row.label="Topic:"}}
+{{field name="grade_level" row.label="Grade Level:"}}
+{{field name="student_notes" row.label="Notes for student:"}}
+{{field name="teacher_notes" row.label="Notes for teacher:"}}
+</table>
+
+{{tree title="Data" details="false" showtoggle="false" message="No data available" prefix="==Data=="}}
+
+
+</td><td>
+
+{{properties metadata.types="project_creator" message="" }}
+
+== Location and Time ==
+
+{{mapentry width="350" message=""}}
+
+<table class="formtable">
+{{daterange row.label="Date Range:" format="yyyy-MM-dd"}}
+</table>
+
+<p>
+
+{{properties metadata.types="!project_creator" message="" }}
+
+
+{{list includeicon="true" details="false" entries="siblings:type:project_learning_resource,links"  message="" box.maxheight="200" box.class="entry-sidebox" prefix="==Related=="}}
 
 
 </td>
