@@ -5,6 +5,7 @@ index.html
 -examples/folder.xml
 -examples/project.xml
 -examples/glossary.xml
+-examples/exampletypes.xml
 -examples/test.zip
 -repository.dummy_properties
 -map.html
@@ -33,6 +34,7 @@ index.html
 
 >title:Data ingest,  harvesters and import
 >>dataingest.html
+>>entrytypes.html
 >>entryxml.html
 >>harvesters.html
 

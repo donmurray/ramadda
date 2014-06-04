@@ -12,9 +12,17 @@ the order (1 based) of the metadata you see when you do an Add Property on an en
 -->
   <entry  type="group"  fromdate="2014-03-01 00:00:00 UTC" todate="2014-05-31 00:00:00 UTC" id="someid"  name="Example Folder" east="-99.844" north="39.621" south="24.186"  west="-118.125">
     <description encoded="false"><![CDATA[Some description]]></description>
+
 <!--
-Each of the attrs have an encoding flag. If true (unfortunately the default) then the text in the
-CDATA block is base64 encoded. The format that the export produces will base64 encode the values
+You can include any kind of metadata
+A simple way is to use attr1, attr2, etc attributes:
+--> 
+    <metadata type="project_person" attr1="john doe" attr2="some place" />
+
+<!--
+Or for more complex attributes use the attribute tag. 
+If encoded=true then the text in the CDATA block is assumed to be base64 encoded. 
+The format that the export produces will base64 encode the values
 -->
     <metadata inherited="false" type="project_pi">
       <attr index="1" encoded="false"><![CDATA[name]]></attr>

@@ -13,9 +13,18 @@ You can include html, etc
     <project_type encoded="false"><![CDATA[airborne]]></project_type>
     <location encoded="false"><![CDATA[some location]]></location>
     <notes encoded="false"><![CDATA[some notes]]></notes>
+
 <!--
 You can include any kind of metadata
+A simple way is to use attr1, attr2, etc attributes:
 --> 
+    <metadata type="project_person" attr1="john doe" attr2="some place" />
+
+<!--
+Or for more complex attributes use the attribute tag. If encoded =true then the text 
+is assumed to be base 64 encoded
+--> 
+
     <metadata inherited="false" type="project_person">
       <attr encoded="false" index="1"><![CDATA[name]]></attr>
       <attr encoded="false" index="2"><![CDATA[type]]></attr>
