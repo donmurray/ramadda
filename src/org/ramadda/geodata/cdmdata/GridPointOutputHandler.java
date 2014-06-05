@@ -300,11 +300,12 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
         LatLonPointImpl llp = null;
 
         if (request.defined(ARG_LOCATION_LATITUDE)) {
+            System.err.println("getting point");
+            System.err.println("latitude url arg:" +  request.getString(ARG_LOCATION_LATITUDE, "none"));
+            System.err.println("longitude url arg:" +  request.getString(ARG_LOCATION_LONGITUDE, "none"));
             llp = new LatLonPointImpl(
                 request.getLatOrLonValue(ARG_LOCATION_LATITUDE, deflat),
                 request.getLatOrLonValue(ARG_LOCATION_LONGITUDE, deflon));
-            System.err.println("latitude url arg:" +  request.getString(ARG_LOCATION_LATITUDE, "none"));
-            System.err.println("longitude url arg:" +  request.getString(ARG_LOCATION_LONGITUDE, "none"));
             System.err.println("latlon point:" + llp);
         }
         if (llp == null) {

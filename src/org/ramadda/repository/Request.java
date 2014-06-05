@@ -1855,16 +1855,21 @@ public class Request implements Constants, Cloneable {
      *
      */
     public double getLatOrLonValue(String from, double dflt) {
+        System.err.println("getLatOrLonValue url arg:" + from);
         if ( !defined(from)) {
+            System.err.println("\tnnot defined returning dflt:" + dflt);
             return dflt;
         }
         String llString = (String) getString(from, "").trim();
+        System.err.println("\tllstring:" + llString);
         if ((llString == null) || (llString.length() == 0)
                 || (llString.startsWith("${"))) {
             return dflt;
         }
 
-        return Misc.decodeLatLon(llString);
+        double result = Misc.decodeLatLon(llString);
+        System.err.println("\tdecoded value:" + result);
+        return result;
     }
 
 
@@ -2709,5 +2714,9 @@ public class Request implements Constants, Cloneable {
         return sessionHasBeenHandled;
     }
 
+    public static void main(String[]args) throws Exception {
+        System.err.println ("decode:" + Misc.decodeLatLon("-8.5132310362551"));
+        System.err.println ("decode:" + Misc.decodeLatLon("-12.801879882813"));
+    }
 
 }
