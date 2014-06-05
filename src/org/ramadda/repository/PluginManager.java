@@ -555,8 +555,8 @@ public class PluginManager extends RepositoryManager {
                 pluginStat("Api", file);
             }
             apiDefFiles.add(file);
-        } else if ((file.indexOf("types.xml") >= 0)
-                   || (file.indexOf("type.xml") >= 0)) {
+        } else if ((file.endsWith("types.xml"))
+                   || (file.endsWith("type.xml"))) {
             if (fromPlugin) {
                 pluginStat("Types", file);
             }
