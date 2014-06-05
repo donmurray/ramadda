@@ -656,7 +656,8 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                                       "application/atom+xml",
                                       OpenSearchUtil.ATTR_TEMPLATE, url });
 
-        return new Result(XmlUtil.toString(root), OpenSearchUtil.MIMETYPE);
+        String xml  = XmlUtil.getHeader() +XmlUtil.toString(root);
+        return new Result(xml, OpenSearchUtil.MIMETYPE);
     }
 
 
