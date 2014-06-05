@@ -90,7 +90,7 @@ Hide the bottom altitude
 If you want to have a simple container entry type then use the handler:
 -->
   <type name="example_container1"  description="Example container 1"  super="example_base" 
-        handler="org.ramadda.repository.type.GroupTypeHandler"
+        handler="org.ramadda.repository.type.GroupTypeHandler">
   </type>
 
 
@@ -107,7 +107,7 @@ and other attributes
 The type can be string, enumeration, enumerationplus
 -->
   <type name="example_file2"  description="Example file 2"  super="example_base" 
-        handler="org.ramadda.repository.type.GenericTypeHandler"
+        handler="org.ramadda.repository.type.GenericTypeHandler">
      <column name="some_attribute1" label="Some label" type="string" cansearch="true" />
 
 <!--   enumeration types can have a set of comma separated -->
@@ -130,7 +130,7 @@ The type can be string, enumeration, enumerationplus
 If you want to have a container entry type that has attributes then use the handler:
 -->
   <type name="example_container2"  description="Example container 2"  super="example_base" 
-        handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler"
+        handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler">
   </type>
 
 
