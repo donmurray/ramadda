@@ -5,7 +5,7 @@ index.html
 -examples/folder.xml
 -examples/project.xml
 -examples/glossary.xml
--examples/typesexample.xml
+-examples/exampletypes.xml.txt
 -examples/test.zip
 -repository.dummy_properties
 -map.html
