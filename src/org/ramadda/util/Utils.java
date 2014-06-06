@@ -457,24 +457,26 @@ public class Utils {
      */
     public static void main(String args[]) {
         List<String> patternNames = new ArrayList<String>();
-        String patternString = ".*(frequency_type:inst|tavg|const)(frequency:1|3|6|M|U|0)_(dimensions:2d|3d)_(group:...)_(horizontal_resolution:N|F|C)(vertical_location:x|p|v|e).*";
+        String patternString =
+            ".*(frequency_type:inst|tavg|const)(frequency:1|3|6|M|U|0)_(dimensions:2d|3d)_(group:...)_(horizontal_resolution:N|F|C)(vertical_location:x|p|v|e).*";
         //        String patternString = ".*(inst|tavg|const).*";
 
         patternString = extractPatternNames(patternString, patternNames);
         System.err.println("pattern names:" + patternNames);
 
-        Pattern filePattern   = Pattern.compile(patternString);
+        Pattern filePattern = Pattern.compile(patternString);
         for (String file : args) {
             Matcher matcher = filePattern.matcher(new File(file).getName());
             if ( !matcher.find()) {
-                System.err.println ("no match:" + file);
+                System.err.println("no match:" + file);
+
                 continue;
             }
-            System.err.println ("match:" + file);
+            System.err.println("match:" + file);
 
-            for(int i=0;i<patternNames.size();i++) {
-                Object value = matcher.group(i+1);
-                System.err.println ("\t" + patternNames.get(i) +"=" + value);
+            for (int i = 0; i < patternNames.size(); i++) {
+                Object value = matcher.group(i + 1);
+                System.err.println("\t" + patternNames.get(i) + "=" + value);
             }
 
         }
@@ -965,6 +967,87 @@ public class Utils {
     }
 
 
+    /**
+     * This method is taken from Unidatas ucar.unidata.util.Misc method.
+     * I moved it here to not have it use the parseNumber because that would use
+     * a DecimalFormat which was picking up the Locale
+     *
+     * Decodes a string representation of a latitude or longitude and
+     * returns a double version (in degrees).  Acceptible formats are:
+     * <pre>
+     * +/-  ddd:mm, ddd:mm:, ddd:mm:ss, ddd::ss, ddd.fffff ===>   [+/-] ddd.fffff
+     * +/-  ddd, ddd:, ddd::                               ===>   [+/-] ddd
+     * +/-  :mm, :mm:, :mm:ss, ::ss, .fffff                ===>   [+/-] .fffff
+     * +/-  :, ::                                          ===>       0.0
+     * Any of the above with N,S,E,W appended
+     * </pre>
+     *
+     * @param latlon  string representation of lat or lon
+     * @return the decoded value in degrees
+     */
+    public static double decodeLatLon(String latlon) {
+        // first check to see if there is a N,S,E,or W on this
+        latlon = latlon.trim();
+        int    dirIndex    = -1;
+        int    southOrWest = 1;
+        double value       = Double.NaN;
+        if (latlon.indexOf("S") > 0) {
+            southOrWest = -1;
+            dirIndex    = latlon.indexOf("S");
+        } else if (latlon.indexOf("W") > 0) {
+            southOrWest = -1;
+            dirIndex    = latlon.indexOf("W");
+        } else if (latlon.indexOf("N") > 0) {
+            dirIndex = latlon.indexOf("N");
+        } else if (latlon.endsWith("E")) {  // account for 9E-3, 9E-3E, etc
+            dirIndex = latlon.lastIndexOf("E");
+        }
+
+        if (dirIndex > 0) {
+            latlon = latlon.substring(0, dirIndex).trim();
+        }
+
+        // now see if this is a negative value
+        if (latlon.indexOf("-") == 0) {
+            southOrWest *= -1;
+            latlon      = latlon.substring(latlon.indexOf("-") + 1).trim();
+        }
+
+        if (latlon.indexOf(":") >= 0) {  //have something like DD:MM:SS, DD::, DD:MM:, etc
+            int    firstIdx = latlon.indexOf(":");
+            String hours    = latlon.substring(0, firstIdx);
+            String minutes  = latlon.substring(firstIdx + 1);
+            String seconds  = "";
+            if (minutes.indexOf(":") >= 0) {
+                firstIdx = minutes.indexOf(":");
+                String temp = minutes.substring(0, firstIdx);
+                seconds = minutes.substring(firstIdx + 1);
+                minutes = temp;
+            }
+            try {
+
+                value = (hours.equals("") == true)
+                        ? 0
+                        : Double.parseDouble(hours);
+                if ( !minutes.equals("")) {
+                    value += Double.parseDouble(minutes) / 60.;
+                }
+                if ( !seconds.equals("")) {
+                    value += Double.parseDouble(seconds) / 3600.;
+                }
+            } catch (NumberFormatException nfe) {
+                value = Double.NaN;
+            }
+        } else {  //have something like DD.ddd
+            try {
+                value = Double.parseDouble(latlon);
+            } catch (NumberFormatException nfe) {
+                value = Double.NaN;
+            }
+        }
+
+        return value * southOrWest;
+    }
 
 
 }
