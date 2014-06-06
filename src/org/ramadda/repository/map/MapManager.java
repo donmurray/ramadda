@@ -509,8 +509,8 @@ public class MapManager extends RepositoryManager {
                     if (toks.size() != 2) {
                         continue;
                     }
-                    double polyLat = Misc.decodeLatLon(toks.get(0));
-                    double polyLon = Misc.decodeLatLon(toks.get(1));
+                    double polyLat = Utils.decodeLatLon(toks.get(0));
+                    double polyLon = Utils.decodeLatLon(toks.get(1));
                     if (pointsSB.length() == 0) {
                         pointsSB.append("new Array(");
                     } else {

@@ -275,8 +275,8 @@ public class AtomOutputHandler extends OutputHandler {
                         if (toks.size() != 2) {
                             continue;
                         }
-                        double lat = Misc.decodeLatLon(toks.get(0));
-                        double lon = Misc.decodeLatLon(toks.get(1));
+                        double lat = Utils.decodeLatLon(toks.get(0));
+                        double lon = Utils.decodeLatLon(toks.get(1));
                         extra.append(lat);
                         extra.append(" ");
                         extra.append(lon);

@@ -1867,7 +1867,7 @@ public class Request implements Constants, Cloneable {
             return dflt;
         }
 
-        double result = Misc.decodeLatLon(llString);
+        double result = Utils.decodeLatLon(llString);
         System.err.println("\tdecoded value:" + result);
         return result;
     }
@@ -2715,8 +2715,8 @@ public class Request implements Constants, Cloneable {
     }
 
     public static void main(String[]args) throws Exception {
-        System.err.println ("decode:" + Misc.decodeLatLon("-8.5132310362551"));
-        System.err.println ("decode:" + Misc.decodeLatLon("-12.801879882813"));
+        System.err.println ("decode:" + Utils.decodeLatLon("-8.5132310362551"));
+        System.err.println ("decode:" + Utils.decodeLatLon("-12.801879882813"));
     }
 
 }

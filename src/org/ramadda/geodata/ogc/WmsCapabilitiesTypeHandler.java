@@ -26,6 +26,7 @@ import org.ramadda.repository.metadata.Metadata;
 import org.ramadda.repository.output.*;
 import org.ramadda.repository.type.*;
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Utils;
 
 import org.w3c.dom.*;
 
@@ -206,13 +207,13 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
             //            System.err.println("layer:" + name + " ll:" + llbbox + " ");
 
             if (llbbox != null) {
-                north = Misc.decodeLatLon(XmlUtil.getAttribute(llbbox,
+                north = Utils.decodeLatLon(XmlUtil.getAttribute(llbbox,
                         WmsUtils.ATTR_MAXY));
-                south = Misc.decodeLatLon(XmlUtil.getAttribute(llbbox,
+                south = Utils.decodeLatLon(XmlUtil.getAttribute(llbbox,
                         WmsUtils.ATTR_MINY));
-                west = Misc.decodeLatLon(XmlUtil.getAttribute(llbbox,
+                west = Utils.decodeLatLon(XmlUtil.getAttribute(llbbox,
                         WmsUtils.ATTR_MINX));
-                east = Misc.decodeLatLon(XmlUtil.getAttribute(llbbox,
+                east = Utils.decodeLatLon(XmlUtil.getAttribute(llbbox,
                         WmsUtils.ATTR_MAXX));
             }
 
@@ -221,13 +222,13 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
 
 
             if (gbbox != null) {
-                north = Misc.decodeLatLon(XmlUtil.getGrandChildText(gbbox,
+                north = Utils.decodeLatLon(XmlUtil.getGrandChildText(gbbox,
                         WmsUtils.TAG_NORTHBOUNDLATITUDE, ""));
-                south = Misc.decodeLatLon(XmlUtil.getGrandChildText(gbbox,
+                south = Utils.decodeLatLon(XmlUtil.getGrandChildText(gbbox,
                         WmsUtils.TAG_SOUTHBOUNDLATITUDE, ""));
-                east = Misc.decodeLatLon(XmlUtil.getGrandChildText(gbbox,
+                east = Utils.decodeLatLon(XmlUtil.getGrandChildText(gbbox,
                         WmsUtils.TAG_EASTBOUNDLONGITUDE, ""));
-                west = Misc.decodeLatLon(XmlUtil.getGrandChildText(gbbox,
+                west = Utils.decodeLatLon(XmlUtil.getGrandChildText(gbbox,
                         WmsUtils.TAG_WESTBOUNDLONGITUDE, ""));
             }
 

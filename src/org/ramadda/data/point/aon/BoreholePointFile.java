@@ -24,7 +24,10 @@ package org.ramadda.data.point.aon;
 import org.ramadda.data.point.*;
 import org.ramadda.data.point.text.*;
 
+import org.ramadda.util.Utils;
 import org.ramadda.data.record.*;
+
+
 
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
@@ -176,8 +179,8 @@ YEAR,DATE,0.0,0.25,0.5,0.75,1.0,2.0,3.0,4.0
             throw new IllegalArgumentException(
                 "Could not read location from:" + header.get(2));
         }
-        double lat = Misc.decodeLatLon(toks.get(1) + toks.get(0));
-        double lon = Misc.decodeLatLon(toks.get(3) + toks.get(2));
+        double lat = Utils.decodeLatLon(toks.get(1) + toks.get(0));
+        double lon = Utils.decodeLatLon(toks.get(3) + toks.get(2));
         setLocation(lat, lon, 0);
 
         //LOOK: this needs to be in the same order as the aontypes.xml defines in the point plugin

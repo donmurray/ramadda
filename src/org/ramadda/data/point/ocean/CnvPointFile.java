@@ -25,6 +25,7 @@ import org.ramadda.data.point.*;
 import org.ramadda.data.point.text.*;
 import org.ramadda.data.record.*;
 
+import org.ramadda.util.Utils;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 
@@ -205,7 +206,7 @@ public class CnvPointFile extends CsvFile {
         lls = lls.replace(":E", "E");
         lls = lls.replace(":W", "W");
 
-        return Misc.decodeLatLon(lls);
+        return Utils.decodeLatLon(lls);
     }
 
 

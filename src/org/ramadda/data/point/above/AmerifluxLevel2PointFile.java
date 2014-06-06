@@ -113,8 +113,8 @@ public class AmerifluxLevel2PointFile extends CsvFile {
         }
 
 
-        double lat       = Misc.decodeLatLon(latString);
-        double lon       = Misc.decodeLatLon(lonString);
+        double lat       = Utils.decodeLatLon(latString);
+        double lon       = Utils.decodeLatLon(lonString);
         double elevation = Double.parseDouble(elevationString);
         setLocation(lat, lon, elevation);
 

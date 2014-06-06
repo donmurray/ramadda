@@ -31,6 +31,7 @@ import org.ramadda.repository.output.OutputHandler;
 import org.ramadda.repository.output.OutputType;
 import org.ramadda.repository.output.PageStyle;
 
+import org.ramadda.util.Utils;
 import org.ramadda.util.CategoryBuffer;
 import org.ramadda.util.HtmlTemplate;
 import org.ramadda.util.HtmlUtils;
@@ -1107,10 +1108,10 @@ public class PageHandler extends RepositoryManager {
 
 
                 mapRegions.add(new MapRegion(toks.get(1), toks.get(0), group,
-                                             Misc.decodeLatLon(toks.get(2)),
-                                             Misc.decodeLatLon(toks.get(3)),
-                                             Misc.decodeLatLon(toks.get(4)),
-                                             Misc.decodeLatLon(toks.get(5))));
+                                             Utils.decodeLatLon(toks.get(2)),
+                                             Utils.decodeLatLon(toks.get(3)),
+                                             Utils.decodeLatLon(toks.get(4)),
+                                             Utils.decodeLatLon(toks.get(5))));
             }
 
         }

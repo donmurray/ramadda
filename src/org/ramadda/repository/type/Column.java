@@ -2131,10 +2131,10 @@ public class Column implements DataTypes, Constants {
                 double lat = Entry.NONGEO;
                 double lon = Entry.NONGEO;
                 if (Utils.stringDefined(latString)) {
-                    lat = Misc.decodeLatLon(latString);
+                    lat = Utils.decodeLatLon(latString);
                 }
                 if (Utils.stringDefined(lonString)) {
-                    lon = Misc.decodeLatLon(lonString);
+                    lon = Utils.decodeLatLon(lonString);
                 }
 
                 values[offset]     = lat;

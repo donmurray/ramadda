@@ -138,8 +138,8 @@ public class SwitchyardPointFile extends SingleSiteTextFile {
                     "Could not read location from:" + hdr);
             }
 
-            double lat = Misc.decodeLatLon(latString);
-            double lon = Misc.decodeLatLon(lonString);
+            double lat = Utils.decodeLatLon(latString);
+            double lon = Utils.decodeLatLon(lonString);
             setLocation(lat, lon, 0);
 
             String cast = StringUtil.findPattern(hdr, "\\s+Cast\\s+(\\d+).*");

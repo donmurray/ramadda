@@ -27,6 +27,7 @@ import org.ramadda.repository.Repository;
 import org.ramadda.repository.Request;
 import org.ramadda.repository.metadata.Metadata;
 import org.ramadda.repository.metadata.MetadataHandler;
+import org.ramadda.util.Utils;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.MapRegion;
 
@@ -232,8 +233,8 @@ public class MapInfo {
                     if (toks.size() != 2) {
                         continue;
                     }
-                    double lat = Misc.decodeLatLon(toks.get(0));
-                    double lon = Misc.decodeLatLon(toks.get(1));
+                    double lat = Utils.decodeLatLon(toks.get(0));
+                    double lon = Utils.decodeLatLon(toks.get(1));
                     points.add(new double[] { lat, lon });
                 }
                 this.addLines(entry.getId() + "_polygon", points);

@@ -765,8 +765,8 @@ public abstract class PointFile extends RecordFile implements Cloneable,
                 }
                 List<String> toks = StringUtil.split(line, ",", true, true);
                 Station station = new Station(toks.get(0), toks.get(1),
-                                      Misc.decodeLatLon(toks.get(2)),
-                                      Misc.decodeLatLon(toks.get(3)),
+                                      Utils.decodeLatLon(toks.get(2)),
+                                      Utils.decodeLatLon(toks.get(3)),
                                       Double.parseDouble(toks.get(4)));
 
                 /*
@@ -826,7 +826,7 @@ public abstract class PointFile extends RecordFile implements Cloneable,
      * @return _more_
      */
     public double decodeLatLon(String s) {
-        return Misc.decodeLatLon(s);
+        return Utils.decodeLatLon(s);
     }
 
     /**

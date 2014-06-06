@@ -23,6 +23,8 @@ package org.ramadda.data.tools;
 
 import org.apache.poi.hssf.usermodel.*;
 
+import org.ramadda.util.Utils;
+
 import ucar.unidata.util.*;
 import ucar.unidata.xml.XmlUtil;
 
@@ -195,8 +197,8 @@ public class ProcessXls {
         s = s.replaceAll("\"", "");
         s = s.replaceAll("[^0-9:\\.NSEWnsew]", ":");
 
-        //        System.out.println("s:" + s +" decoded:" + Misc.decodeLatLon(s));
-        return Misc.decodeLatLon(s);
+        //        System.out.println("s:" + s +" decoded:" + Utils.decodeLatLon(s));
+        return Utils.decodeLatLon(s);
     }
 
 

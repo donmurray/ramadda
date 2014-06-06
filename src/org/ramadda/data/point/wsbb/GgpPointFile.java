@@ -164,9 +164,9 @@ public class GgpPointFile extends CsvFile {
                     author = value;
                     author = author.replaceAll(",", " - ");
                 } else if (name.indexOf("Latitude") >= 0) {
-                    latitude = Misc.decodeLatLon(value);
+                    latitude = Utils.decodeLatLon(value);
                 } else if (name.indexOf("Longitude") >= 0) {
-                    longitude = Misc.decodeLatLon(value);
+                    longitude = Utils.decodeLatLon(value);
                 } else if (name.indexOf("Gravity Cal") >= 0) {
                     gravityCalibration = parseDouble(value);
                 } else if (name.indexOf("Pressure Cal") >= 0) {
