@@ -46,6 +46,8 @@ fi
 
 echo "Running RAMADDA: ${JAVA} -Xmx${JAVA_MEMORY} -XX:MaxPermSize=${JAVA_PERMGEN} -Dfile.encoding=utf-8 -jar ${RAMADDA_DIR}/lib/ramadda.jar -port ${RAMADDA_PORT} -Dramadda_home=${RAMADDA_HOME} $* "
 
+## Add -Djava.awt.headless=true if there are problems running remotely on a Mac
+
 ${JAVA} -Xmx${JAVA_MEMORY} -XX:MaxPermSize=${JAVA_PERMGEN} -Dfile.encoding=utf-8 -jar ${RAMADDA_DIR}/lib/ramadda.jar -port ${RAMADDA_PORT} -Dramadda_home=${RAMADDA_HOME} $* 
 
 
