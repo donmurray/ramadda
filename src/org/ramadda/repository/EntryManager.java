@@ -2488,8 +2488,9 @@ public class EntryManager extends RepositoryManager {
 
 
                 if (theDateRange[0] == null) {
-                    theDateRange[0] = theDateRange[1] =
-                        Utils.extractDate(theResource);
+                    //Don't try to extract the date from the name of the file
+                    //Its more trouble than worth due to bad matches
+                    //theDateRange[0] = theDateRange[1] =   Utils.extractDate(theResource);
                 }
 
                 //                System.err.println("date:" + theDateRange[0] + " " + theResource);
@@ -2682,6 +2683,16 @@ public class EntryManager extends RepositoryManager {
             throws Exception {
         File   newFile   = new File(theResource);
         String shortName = newFile.getName();
+
+        //Handle case sensitive first
+        for (TypeHandler otherTypeHandler :
+                getRepository().getTypeHandlers()) {
+            if (otherTypeHandler.canHandleResource(theResource, shortName)) {
+                return otherTypeHandler;
+            }
+        }
+
+        //now try any case
         for (TypeHandler otherTypeHandler :
                 getRepository().getTypeHandlers()) {
             if (otherTypeHandler.canHandleResource(theResource.toLowerCase(),

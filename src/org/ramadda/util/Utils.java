@@ -335,38 +335,41 @@ public class Utils {
      */
     public static Date extractDate(String s) {
         try {
+            String yyyy = "\\d\\d\\d\\d";
             String str = StringUtil.findPattern(s,
-                             "(\\d\\d\\d\\d-\\d\\d-\\d\\d)");
+                             "(" + yyyy + "-\\d\\d-\\d\\d)");
             if (str != null) {
+                //                System.err.println("pattern 1:" + str);
                 return DateUtil.parse(str);
             }
 
             str = StringUtil.findPattern(
-                s, "(\\d\\d\\d\\d\\d\\d\\d\\d-\\d\\d\\d\\d\\d\\d)");
+                s, "(" + yyyy + "\\d\\d\\d\\d-\\d\\d\\d\\d\\d\\d)");
             if (str != null) {
                 try {
+                    //                    System.err.println("pattern 2:" + str);
                     return new SimpleDateFormat("yyyyMMdd-HHmmss").parse(str);
                 } catch (Exception ignore) {}
             }
 
-            str = StringUtil.findPattern(
-                s, "(\\d\\d\\d\\d\\d\\d\\d\\d-\\d\\d\\d\\d)");
+            str = StringUtil.findPattern(s, "(" + yyyy
+                                         + "\\d\\d\\d\\d-\\d\\d\\d\\d)");
             if (str != null) {
                 try {
+                    //                   System.err.println("pattern 3:" + str);
                     return new SimpleDateFormat("yyyyMMdd-HHmm").parse(str);
                 } catch (Exception ignore) {}
             }
 
 
-            str = StringUtil.findPattern(
-                s, "[^\\d]*(\\d\\d\\d\\d\\d\\d\\d\\d)[^\\d]+");
+            str = StringUtil.findPattern(s, "[^\\d]*(" + yyyy
+                                         + "\\d\\d\\d\\d)[^\\d]+");
             if (str != null) {
                 try {
+                    //                    System.err.println("pattern 4:" + str);
                     return new SimpleDateFormat("yyyyMMdd").parse(str);
                 } catch (Exception ignore) {}
             }
-
-
 
             return null;
         } catch (Exception exc) {
@@ -456,12 +459,25 @@ public class Utils {
      * @param args _more_
      */
     public static void main(String args[]) {
+        for (String a : args) {
+            System.err.println("a:" + a + " date:" + extractDate(a));
+        }
+
+        if (true) {
+            return;
+        }
+
+
+        String name =
+            "a79126d2-e879-4354-95d7-78969009cd85_file_lt50480232011289pac01.hdf";
         List<String> patternNames = new ArrayList<String>();
         String patternString =
-            ".*(frequency_type:inst|tavg|const)(frequency:1|3|6|M|U|0)_(dimensions:2d|3d)_(group:...)_(horizontal_resolution:N|F|C)(vertical_location:x|p|v|e).*";
+            ".*l(sensor:.)(satellite:.)(wrs_path_number:\\d\\d\\d)(wrs_row_number:\\d\\d\\d)(year:\\d\\d\\d\\d)(day:\\d\\d\\d)(ground_station:...)(archive_version_number:\\d\\d)\\.hdf$";
         //        String patternString = ".*(inst|tavg|const).*";
 
+        args          = new String[] { name };
         patternString = extractPatternNames(patternString, patternNames);
+        System.err.println("pattern:" + patternString);
         System.err.println("pattern names:" + patternNames);
 
         Pattern filePattern = Pattern.compile(patternString);

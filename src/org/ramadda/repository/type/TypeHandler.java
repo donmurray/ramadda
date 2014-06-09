@@ -66,9 +66,13 @@ import java.sql.Statement;
 
 import java.text.DecimalFormat;
 
+import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+
+import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
@@ -193,7 +197,7 @@ public class TypeHandler extends RepositoryManager {
         "{{name box.class=entry-page-name}}\n{{description box.class=\"entry-page-description\"}}";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_FIELD_FILE_PATTERN = "field_file_pattern";
 
 
@@ -261,7 +265,7 @@ public class TypeHandler extends RepositoryManager {
     private Pattern fieldFilePattern;
 
 
-    /** _more_          */
+    /** _more_ */
     private List<String> fieldPatternNames;
 
 
@@ -1640,17 +1644,23 @@ public class TypeHandler extends RepositoryManager {
      * @return is this one of my files
      */
     public boolean canHandleResource(String fullPath, String name) {
-        if (filePattern != null) {
-            //If the pattern has file delimiters then use the whole path
-            if (filePattern.indexOf("/") >= 0) {
-                if (fullPath.toLowerCase().matches(filePattern)) {
-                    return true;
-                }
-            } else {
-                //Else, just use the name
-                if (name.toLowerCase().matches(filePattern)) {
-                    return true;
-                }
+        if (filePattern == null) {
+            return false;
+        }
+        //If the pattern has file delimiters then use the whole path
+        if (filePattern.indexOf("/") >= 0) {
+            if (fullPath.matches(filePattern)) {
+                return true;
+            }
+        } else {
+            if (fieldFilePattern != null) {
+                //                System.err.println ("checking pattern:" + filePattern +" name :" + name);
+            }
+
+            //Else, just use the name
+            if (name.matches(filePattern)) {
+                //                System.err.println ("matches");
+                return true;
             }
         }
 
@@ -2795,28 +2805,78 @@ public class TypeHandler extends RepositoryManager {
             parent.initializeNewEntry(entry);
         }
         if (fieldFilePattern != null) {
-            Matcher matcher =
-                fieldFilePattern.matcher(entry.getResource().getPath());
+            String  path    = entry.getResource().getPath();
+            Matcher matcher = fieldFilePattern.matcher(path);
             if ( !matcher.find()) {
-                //                System.err.println("no match:"  + entry.getResource().getPath());
-                return;
+                matcher = fieldFilePattern.matcher(path.toLowerCase());
+                if ( !matcher.find()) {
+                    //                System.err.println("no match:"  + entry.getResource().getPath());
+                    return;
+                }
             }
-            Object[] values = getEntryValues(entry);
+            Object[] values    = getEntryValues(entry);
+            String   year      = null;
+            String   month     = null;
+            String   day       = null;
+            String   julianDay = null;
 
             //            System.err.println("match:" + entry.getResource().getPath());
             for (int i = 0; i < fieldPatternNames.size(); i++) {
                 String columnName = fieldPatternNames.get(i);
+                String value      = matcher.group(i + 1);
                 Column column     = getColumn(columnName);
                 if (column == null) {
+                    if (columnName.equals("year")) {
+                        year = value;
+
+                        continue;
+                    }
+                    if (columnName.equals("month")) {
+                        month = value;
+
+                        continue;
+                    }
+                    if (columnName.equals("day")) {
+                        day = value;
+
+                        continue;
+                    }
+                    if (columnName.equals("julian_day")) {
+                        julianDay = value;
+
+                        continue;
+                    }
+
                     System.err.println("Unknown column:" + columnName);
 
                     continue;
                 }
-                String value = matcher.group(i + 1);
                 column.setValue(entry, values, value);
             }
-        }
 
+            if ((year != null) && entry.sameDate()) {
+                Date date = null;
+                if (month != null) {
+                    if (day != null) {
+                        date = new SimpleDateFormat("yyyy-MM-dd").parse(year
+                                + "-" + month + "-" + day);
+                    } else {
+                        date = new SimpleDateFormat("yyyy-MM").parse(year
+                                + "-" + month);
+                    }
+                } else if (julianDay != null) {
+                    GregorianCalendar gc = new GregorianCalendar();
+                    gc.set(GregorianCalendar.YEAR, Integer.parseInt(year));
+                    gc.set(GregorianCalendar.DAY_OF_YEAR,
+                           Integer.parseInt(julianDay));
+                    date = gc.getTime();
+                }
+                if (date != null) {
+                    entry.setStartDate(date.getTime());
+                    entry.setEndDate(date.getTime());
+                }
+            }
+        }
     }
 
     /**

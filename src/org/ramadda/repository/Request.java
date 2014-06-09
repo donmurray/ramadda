@@ -993,7 +993,7 @@ public class Request implements Constants, Cloneable {
                              HashSet<String> exceptValues,
                              String exceptArgsPattern) {
 
-        if(exceptArgs==null) {
+        if (exceptArgs == null) {
             exceptArgs = new HashSet<String>();
         }
         //Just in case, never want to let slip the passwords
@@ -1855,20 +1855,21 @@ public class Request implements Constants, Cloneable {
      *
      */
     public double getLatOrLonValue(String from, double dflt) {
-        System.err.println("getLatOrLonValue url arg:" + from);
+        //        System.err.println("getLatOrLonValue url arg:" + from);
         if ( !defined(from)) {
-            System.err.println("\tnnot defined returning dflt:" + dflt);
+            //            System.err.println("\tnnot defined returning dflt:" + dflt);
             return dflt;
         }
         String llString = (String) getString(from, "").trim();
-        System.err.println("\tllstring:" + llString);
+        //        System.err.println("\tllstring:" + llString);
         if ((llString == null) || (llString.length() == 0)
                 || (llString.startsWith("${"))) {
             return dflt;
         }
 
         double result = Utils.decodeLatLon(llString);
-        System.err.println("\tdecoded value:" + result);
+
+        //        System.err.println("\tdecoded value:" + result);
         return result;
     }
 
@@ -2714,9 +2715,18 @@ public class Request implements Constants, Cloneable {
         return sessionHasBeenHandled;
     }
 
-    public static void main(String[]args) throws Exception {
-        System.err.println ("decode:" + Utils.decodeLatLon("-8.5132310362551"));
-        System.err.println ("decode:" + Utils.decodeLatLon("-12.801879882813"));
+    /**
+     * _more_
+     *
+     * @param args _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void main(String[] args) throws Exception {
+        System.err.println("decode:"
+                           + Utils.decodeLatLon("-8.5132310362551"));
+        System.err.println("decode:"
+                           + Utils.decodeLatLon("-12.801879882813"));
     }
 
 }
