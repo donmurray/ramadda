@@ -416,12 +416,6 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
                 request.put(CdmConstants.ARG_FORMAT, FORMAT_JSON);
                 request.put(ARG_LOCATION_LATITUDE, "_LATITUDEMACRO_");
                 request.put(ARG_LOCATION_LONGITUDE, "_LONGITUDEMACRO_");
-
-                String jsonUrl = request.getRequestPath() + "/" + baseName
-                                 + suffix + "?" + request.getUrlArgs();
-                jsonUrl = jsonUrl.replace("_LATITUDEMACRO_", "${latitude}");
-                jsonUrl = jsonUrl.replace("_LONGITUDEMACRO_", "${longitude}");
-
                 StringBuffer html  = new StringBuffer();
                 html.append(getWikiManager().getStandardChartDisplay(request,  entry));
                 return new Result("Point as Grid Time Series", html);
