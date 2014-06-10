@@ -149,6 +149,44 @@ begin
 
 end
 
+
+;*****************************************************************
+; Function: set_kml_map_defaults
+;
+; Purpose:  Turn off map labelling, tickmarks, etc
+;
+; Params:   res - the map properites
+; (override kml_map_defaults in kml.ncl)
+;*****************************************************************
+undef("set_kml_map_defaults")
+procedure set_kml_map_defaults ( res:logical )
+begin
+
+  res@mpOutlineOn     = False
+  res@mpPerimOn       = False
+  res@mpGridAndLimbOn = False
+
+;  Keep the border on so we can use it for clipping
+;  res@tmXBBorderOn    = False
+;  res@tmXTBorderOn    = False
+;  res@tmYRBorderOn    = False
+;  res@tmYLBorderOn    = False
+
+  res@tmXBOn          = False
+  res@tmXTOn          = False
+  res@tmYROn          = False
+  res@tmYLOn          = False
+  res@gsnMaximize     = True
+
+  ;; Annotations
+  res@gsnLeftString = ""
+  res@gsnRightString = ""
+  res@tiMainString = ""
+
+end 
+
+
+
 ;**********************************************************
 ; Function: readdata
 ;
@@ -355,15 +393,44 @@ begin
 
 end
 
-undef ("cropImage")
-procedure cropImage(wksname:string)
+;**************************************************
+; Procedure:  cropKmlImage
+;
+; Purpose:  crop the extra white space around the image for KML
+;
+; Return:  the name of the resulting image
+;**************************************************
+undef ("cropKmlImage")
+function cropKmlImage(wksname:string, suffix:string)
 begin
-    oldimagename = wksname+".000001.png"
-    imagename = wksname+".png"
+    oldimagename = wksname+".000001"+suffix
+    imagename = wksname+suffix
     tmpimagename = wksname+"_tmp.png"
+    outimagename = wksname+".png"
+    system("mv -f "+oldimagename+" "+imagename)
+    system("%convert% -trim -shave 1x1 +repage "+imagename+" "+tmpimagename)
+    system("mv -f " + tmpimagename + " " + outimagename)
+    return outimagename
+end
+
+;**************************************************
+; Procedure:  cropImage
+;
+; Purpose:  crop the extra white space around the image
+;
+; Return:  the name of the resulting image
+;**************************************************
+undef ("cropImage")
+function cropImage(wksname:string, suffix:string)
+begin
+    oldimagename = wksname+".000001"+suffix
+    imagename = wksname+suffix
+    tmpimagename = wksname+"_tmp.png"
+    outimagename = wksname+".png"
     system("mv -f "+oldimagename+" "+imagename)
     system("%convert% -trim +repage -bordercolor white -border 10 "+imagename+" "+tmpimagename)
-    system("mv -f " + tmpimagename + " " + imagename)
+    system("mv -f " + tmpimagename + " " + outimagename)
+    return outimagename
 end
 
 ;*************************************************
@@ -380,7 +447,7 @@ procedure addLogo (imageFilePath:string, logoFilePath:string)
 begin
 
   tmpFilePath = imageFilePath + ".tmp"    
-  system("%convert%" + " " + imageFilePath + " " + logoFilePath + " -geometry +20+555 -composite " + tmpFilePath)
+  system("%convert% " + imageFilePath + " " + logoFilePath + " -geometry +20+555 -composite " + tmpFilePath)
   system("mv -f " + tmpFilePath + " " + imageFilePath)
 
 end
@@ -407,27 +474,201 @@ begin
   ;gsn_text_ndc(wksname,plottext,0.5,0.025,txres)
   imageFilePath = wksname + ".png"    
   tmpFilePath = imageFilePath + ".tmp"    
-  system("%convert%" + " " + imageFilePath + "  -background white label:'" + plottext + "' -gravity Center -append " + tmpFilePath)
+  system("%convert% " + imageFilePath + "  -background white label:'" + plottext + "' -gravity Center -append " + tmpFilePath)
   system("mv -f " + tmpFilePath + " " + imageFilePath)
 
 end
 
-;*************************************************
-; Procedure:  addOverlayToKml
+;************************************************************
 ;
-; Purpose:    add an overlay to the kml
-;
-; Params:     kml - the resource
-;             plot - the plot to use
-;             addLB - true to add the label bar
-;*************************************************
-undef ("addOverlayToKml")
-procedure addOverlayToKml(kml:logical, plot:graphic, addLB:logical)
+; based on the NCL example script lb_19.ncl by Mary Haley
+; 
+
+undef("make_kml_labelbar")
+function make_kml_labelbar (kml:string, name:string, wks:graphic,plot:graphic, res:logical)
+local kml, name, plot, res, cmap, levels, colors, font_height, \
+      labels, lbres, lbplot_name, lbplot_file, lbicon, lbwks, lbplot, \
+      lbcropbox, files, out, views, lbres, just_strs, lbar_x, lbar_y, lbar_h, lbar_w, \
+  lbar_orient, lbar_side, lbar_colors, lbar_labels, lbar_frac, lbar_ext, \
+  lbar_bot, lbar_top, lbar_rgt, lbar_lft, lbar_fh, lbar_aln, lbar_ljust, \
+  lbar_just, lbar_mnr, lbar_mjr, lbar_loff , lbid, nboxes, class_name, \
+  labebar_object
 begin
+;
+; This code attempts to see what kind of plot we have and
+; to extract the labelbar from it.
+;
+  class_name = NhlClassName(plot)
+  ;print(class_name)
+  if(class_name.eq."mapPlotClass") then
+    if(isatt(plot,"contour")) then
+      getvalues plot@contour
+        "pmAnnoViews" : views
+      end getvalues
+    else
+      if(isatt(plot,"vector")) then
+        getvalues plot@vector
+          "pmAnnoViews" : views
+        end getvalues
+      else
+        print("contour_labelbar: Error: can't determine type of plot")
+        return
+      end if
+    end if
+  else
+    getvalues plot
+      "pmAnnoViews" : views
+   end getvalues
+  end if
+  ;print(views)
+
+;---Error checking
+  if(all(ismissing(views))) then
+    print("contour_labelbar: Error: Couldn't extract labelbar associated with this plot")
+    return
+  end if
+
+;---Attempt to extract labelbar
+  labelbar_object = new(1,graphic)
+  do i=0,dimsizes(views)-1
+    if(NhlClassName(views(i)).eq."labelBarClass")  then
+      labelbar_obj = views(i)
+    end if
+  end do
+
+;---Error checking
+  if(ismissing(labelbar_obj)) then
+    print("contour_labelbar: Error: Couldn't extract labelbar associated with this plot")
+    return
+  end if
+  
+  getvalues wks
+    "wkColorMap"             : cmap
+  end getvalues
+
+  getvalues plot@contour
+    "cnLevels"               : levels
+    "cnFillColors"           : colors
+    "cnInfoLabelFontHeightF" : font_height
+  end getvalues
+
+  labels = "" + levels       ; Convert levels to a string array. This is
+                             ; not necessary, but it gets rid of the
+                             ; annoying error message about coercing types.
+
+;---Retrieve labelbar resources associated with plot so we can regenerate it.
+  getvalues labelbar_obj
+    "vpXF"                 : lbar_x
+    "vpYF"                 : lbar_y
+    "vpHeightF"            : lbar_h
+    "vpWidthF"             : lbar_w
+    "lbOrientation"        : lbar_orient
+    "lbLabelPosition"      : lbar_side
+    "lbFillColors"         : lbar_colors
+    "lbLabelStrings"       : lbar_labels
+    "lbBoxFractions"       : lbar_frac
+    "lbBoxMinorExtentF"    : lbar_ext
+    "lbBottomMarginF"      : lbar_bot
+    "lbTopMarginF"         : lbar_top
+    "lbRightMarginF"       : lbar_rgt
+    "lbLeftMarginF"        : lbar_lft
+    "lbLabelFontHeightF"   : lbar_fh
+    "lbLabelAlignment"     : lbar_aln
+    "lbLabelJust"          : lbar_ljust
+    "lbLabelFontColor"     : lbar_fc
+    "lbJustification"      : lbar_just
+    "lbBoxMinorExtentF"    : lbar_mnr
+    "lbBoxMajorExtentF"    : lbar_mjr
+    "lbLabelOffsetF"       : lbar_loff
+    "lbPerimOn"            : perim_on
+    "lbTitleOn"            : title_on
+    "lbMonoFillPattern"    : mono_fill_pattern
+    "lbBoxLinesOn"         : box_lines_on
+    "lbLabelsOn"           : labels_on
+  end getvalues
+
+;
+; Set some labelbar resources. Note: Not every single 
+; labelbar resource is retrieved and set here. If the
+; labelbar is not being recreated properly, then you
+; may need to add some more resources to the "getvalues"
+; block above, and then set them below.
+;
+  lbres                      = True
+
+;---Set width and height of labelbar itself
+  lbres@vpHeightF            = lbar_h
+  lbres@vpWidthF             = lbar_w
+
+
+; Allow more control over labelbars.
+  lbres@lbAutoManage         = False
+
+  lbres@lbOrientation        = lbar_orient
+  lbres@lbLabelPosition      = lbar_side
+  lbres@lbLabelFontHeightF   = lbar_fh
+  lbres@lbLabelFontColor     = lbar_fc
+;  print(lbar_fc)
+
+; Turn various features on and off.
+  lbres@lbLabelsOn           = labels_on
+  lbres@lbPerimOn            = perim_on
+  lbres@lbTitleOn            = title_on
+  lbres@lbMonoFillPattern    = mono_fill_pattern
+  lbres@lbBoxLinesOn         = box_lines_on
+  lbres@lbFillColors         = lbar_colors
+
+; Which point to position labelbar about.
+  lbres@lbJustification      = lbar_just
+  lbres@lbLabelAlignment     = lbar_aln
+  lbres@lbLabelJust          = lbar_ljust
+
+  lbres@lbLabelAutoStride    = True        ; NO LONGER NEEDED IN V6.1.0 
+
+;---Regenerate the labelbar
+  nboxes = dimsizes(lbar_colors)
+    
+  lbplot_name = wks@name  + "_lb"
+  lbplot_file = lbplot_name + ".png"
+  lbicon      = lbplot_name + ".png"
+
+  lbwks = gsn_open_wks("png",lbplot_name)
+  gsn_define_colormap(lbwks,cmap)
+  
+  
+    lbid = gsn_create_labelbar(lbwks,dimsizes(levels)+1,labels,lbres)
+    
+    lbplot = create "lbplot" mapPlotClass lbwks
+    "mpOutlineOn"     : False
+    "mpPerimOn"       : False
+    "mpGridAndLimbOn" : False
+    "tmXBBorderOn"    : False
+    "tmXTBorderOn"    : False
+    "tmYRBorderOn"    : False
+    "tmYLBorderOn"    : False
+    "tmXBOn"          : False                  
+    "tmXTOn"          : False
+    "tmYROn"          : False
+    "tmYLOn"          : False
+    end create
+      
+   annoid = gsn_add_annotation(lbplot,lbid,False)
+   draw(lbplot)
+   frame(lbwks)
+   
+   wksname = lbwks@name
+;   lbcropbox = kml_get_vp_cropbox(lbwks,lbid)
+   delete(lbwks)
+
+   lbicon = cropImage(wksname,".png")
+;   lbicon = kml_crop_plot(lbcropbox,res)
+
+;---Turn off the current labelbar so we can draw the one we just regenerated.
+  setvalues views(0)
+    "lbLabelBarOn" : False
+  end setvalues
+  return(lbicon)
 end
-
-
-
 ;************************************************
 ; Procedure: plotmap
 ;
@@ -468,6 +709,7 @@ begin
     centerLonF         = (opts@maxLon + opts@minLon)/2
     centerLatF         = (opts@maxLat + opts@minLat)/2
     rescf@mpCenterLonF         = centerLonF
+    usepolar = False ;; in case this is doGoogle
   else 
     if (opts@maxLat .gt. 0) then
       rescf@gsnPolar = "NH"
@@ -524,10 +766,26 @@ begin
   
   if (doGoogle) then
 
-    wks_type="ps"
-    kml_map_defaults(rescf) ; turn off many options
+    wks_type="png"
+    set_kml_map_defaults(rescf) ; turn off many options
     rescf@cnLinesOn = False ; turn off contour lines
-    rescf@lbLabelFontColor="SlateGray"
+    rescf@cnLineLabelsOn=False
+    ;rescf@lbLabelFontColor="SlateGray"
+    rescf@gsnMaximize = True
+    rescf@gsnPaperOrientation = "portrait"
+    rescf@gsnLeftString = ""
+    rescf@gsnCenterString = ""
+    rescf@gsnRightString = ""
+    rescf@gsnBoxMargin = 0.0
+    wks_type@wkWidth                     = 1600
+    wks_type@wkHeight                    = 1600
+
+    ; label bar
+    rescf@lbLabelBarOn = True;
+    rescf@lbLabelFontHeightF = 0.008;
+    rescf@lbOrientation         = "Horizontal"   
+    rescf@pmLabelBarWidthF      = 0.3               ; default is shorter
+    rescf@pmLabelBarHeightF     = 0.040             ; default is taller
       
   else
 
@@ -555,8 +813,8 @@ begin
     rescf@pmLabelBarHeightF     = 0.075             ; default is taller
 
     ; lable bar title
-    ;rescf@lbTitleFontHeightF = 0.013
-    ;rescf@lbTitlePosition = "Bottom"
+    rescf@lbTitleFontHeightF = 0.013
+    rescf@lbTitlePosition = "Bottom"
     ;rescf@lbTitleOffsetF = 0.005
     ;rescf@lbBottomMarginF = 0.025
 
@@ -616,7 +874,10 @@ begin
     else 
       rescf@gsnLeftString = vartitle
     end if
-    ;rescf@lbTitleString = rescf@gsnLeftString
+    if (doGoogle) then
+      set_kml_map_defaults(rescf) ; turn off many options
+      ;;rescf@lbTitleString = rescf@gsnLeftString
+    end if
     if (cint .eq. 0) then
       symMinMaxPlt(mydata,20,False,rescf)
     end if
@@ -701,10 +962,22 @@ begin
         delete(nextdata)
       end do
       delete(vartitle)
-    else
-      
+
+    else ;; doGoogle
+
       ;; Make the first plot to get the labelbar
       mydata = data(0,:,:)
+      ;; make title for labelbar
+      vartitle = mydata@long_name
+      if (isanom) then
+        vartitle = vartitle + " Anomaly"
+      end if 
+      if (.not. ismissing(opts@level)) then
+        vartitle = vartitle + " (" + level +" "+levelunit+ ")"
+      else 
+        vartitle = vartitle
+      end if
+      print(vartitle)
       if (isanom .and. cint .eq. 0) then
         symMinMaxPlt(mydata,20,False,rescf)
       end if
@@ -733,27 +1006,35 @@ begin
       kres@kmlScreenXYy = 1
       kres@kmlScreenXYxunits = "fraction"
       kres@kmlScreenXYyunits = "fraction"
-       
+
       ; crops the labelbar from the plot and converts it to a png
-      lbicon = kml_crop_labelbar(kml, "label bar", wks, gplot, kres)
-        
+      lbicon = make_kml_labelbar(kml, "label bar", wks, gplot, kres)
+
       ; add labelbar to KML document as a ScreenOverlay element
       kml = kml_add_screenoverlay ( kml, "Legend", lbicon, kres )
 
       ; add cropped labelbar filename to list of files to 
       ; be compressed in KMZ archive
       kml_add_kmzfile(kml,lbicon)
-         
+
+      ;Turn off the label bar for future plots
+      rescf@lbLabelBarOn = False         ; turn off label bar
 
       ; add a folder for the ground overlay(s)
       kml_folder = kml_open_folder(kml, "GroundOverlay Folder",False)
 
       ; get the latlon coordinates describing the corners of the groundoverlay plot
-      LatLonBox = kml_get_vp_latlonbox(gplot)
-      
+;;     LatLonBox = kml_get_vp_latlonbox(gplot)
+      LatLonBox = new(4,float)
+      LatLonBox(0) = stringtofloat(rescf@mpMaxLatF)
+      LatLonBox(1) = stringtofloat(rescf@mpMinLatF)
+      LatLonBox(2) = stringtofloat(rescf@mpMaxLonF)
+      LatLonBox(3) = stringtofloat(rescf@mpMinLonF)
+
       ; get the page coordinates of the actual map from the plot
-      cropbox = kml_get_vp_cropbox(wks,gplot)
+;      cropbox = kml_get_vp_cropbox(wks,gplot)
       
+      wksname = wks@name
       draw(gplot)
       frame(wks)
       ; "delete(wks)" can not be called within a function, 
@@ -763,7 +1044,8 @@ begin
       ;kres@kmlCropAlphaColor = "white"
       ; crops the groundoverlay map and converts it to png
       ; must "delete(wks)" before this command
-      icon = kml_crop_plot(cropbox, kres)
+      ;icon = kml_crop_plot(cropbox, kres)
+      icon = cropKmlImage(wksname, ".png")
       
       name="Plot 1"
       if ((.not. ismissing(plottitles(0))) .and. (plottitles(0) .ne. "")) then
@@ -805,10 +1087,16 @@ begin
           delete(nextdata)
           ; get the latlon coordinates describing the corners of the groundoverlay plot
           LatLonBox = kml_get_vp_latlonbox(gplot)
+          LatLonBox = new(4,float)
+          LatLonBox(0) = stringtofloat(rescf@mpMaxLatF)
+          LatLonBox(1) = stringtofloat(rescf@mpMinLatF)
+          LatLonBox(2) = stringtofloat(rescf@mpMaxLonF)
+          LatLonBox(3) = stringtofloat(rescf@mpMinLonF)
       
           ; get the page coordinates of the actual map from the plot
-          cropbox = kml_get_vp_cropbox(wks,gplot)
+          ;cropbox = kml_get_vp_cropbox(wks,gplot)
       
+          wksname = wks@name
           draw(gplot)
           frame(wks)
           ; "delete(wks)" can not be called within a function, 
@@ -817,7 +1105,8 @@ begin
         
           ; crops the groundoverlay map and converts it to png
           ; must "delete(wks)" before this command
-          icon = kml_crop_plot(cropbox, kres)
+          ;icon = kml_crop_plot(cropbox, kres)
+          icon = cropKmlImage(wksname, ".png")
       
           if ((.not. ismissing(plottitles(i))) .and. (plottitles(i) .ne. "")) then
             name        = plottitles(i)
@@ -850,6 +1139,7 @@ begin
   if (doGoogle) then
 
     if (dodiff) then
+      print("doGoogle, doDiff");
       kres = True
         
       kres@product_dir=opts@product_dir
@@ -870,7 +1160,7 @@ begin
       kres@kmlScreenXYyunits = "fraction"
        
       ; crops the labelbar from the plot and converts it to a png
-      lbicon = kml_crop_labelbar(kml, "label bar", wks, plots(0), kres)
+      lbicon = make_kml_labelbar(kml, "label bar", wks, plots(0), kres)
         
       ; add labelbar to KML document as a ScreenOverlay element
       kml = kml_add_screenoverlay ( kml, "Label Bar", lbicon, kres )
@@ -879,11 +1169,17 @@ begin
       kml_add_kmzfile(kml,lbicon)
          
       ; get the latlon coordinates describing the corners of the groundoverlay plot
-      LatLonBox = kml_get_vp_latlonbox(plots(0))
+      ;LatLonBox = kml_get_vp_latlonbox(plots(0))
+      LatLonBox = new(4,float)
+      LatLonBox(0) = stringtofloat(rescf@mpMaxLatF)
+      LatLonBox(1) = stringtofloat(rescf@mpMinLatF)
+      LatLonBox(2) = stringtofloat(rescf@mpMaxLonF)
+      LatLonBox(3) = stringtofloat(rescf@mpMinLonF)
       
       ; get the page coordinates of the actual map from the plot
-      cropbox = kml_get_vp_cropbox(wks,plots(0))
+      ;cropbox = kml_get_vp_cropbox(wks,plots(0))
       
+      wksname = wks@name
       draw(plots(0))
       frame(wks)
       ; "delete(wks)" can not be called within a function, need to find a work around for this
@@ -891,7 +1187,8 @@ begin
         
       ; crops the groundoverlay map and converts it to png
       ; must "delete(wks)" before this command
-      icon = kml_crop_plot(cropbox, kres)
+      ;icon = kml_crop_plot(cropbox, kres)
+      icon = cropKmlImage(wksname, ".png")
       
       ; add cropped map to KML document as a GroundOverlay element
       kml = kml_add_groundoverlay(kml, "GroundOverlay", icon, LatLonBox, 0, kres)
@@ -957,7 +1254,7 @@ begin
     wksname = wks@name
     delete(wks)
     delete(plots)
-    cropImage(wksname)
+    image = cropImage(wksname,".png")
     addAnnotation(wksname, opts@annotation)
   end if
 
