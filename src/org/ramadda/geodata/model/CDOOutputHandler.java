@@ -622,8 +622,6 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
                         : lev);
                 levels.add(new TwoFacedObject(label, String.valueOf(lev)));
             }
-            // So they are in the same order
-            Collections.sort(levels);
             varsb.append(HtmlUtils.select(levelArg, levels,
                                           request.getString(levelArg, null)));
             varsb.append(HtmlUtils.space(2));
