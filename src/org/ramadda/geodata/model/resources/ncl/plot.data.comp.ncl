@@ -327,7 +327,7 @@ begin
         vardata = short2flt(tmpdata(:,{stringtointeger(varlevel)},{minLat:maxLat},{minLon:maxLon}))
       end if
     else
-      if (varlevl .eq. "") then
+      if (varlevel .eq. "") then
         vardata = tmpdata(:,0,{minLat:maxLat},{minLon:maxLon})
       else
         vardata = tmpdata(:,{stringtointeger(varlevel)},{minLat:maxLat},{minLon:maxLon})
