@@ -22,6 +22,8 @@ package org.ramadda.geodata.model;
 
 
 import org.ramadda.data.process.DataProcessInput;
+import ucar.nc2.dt.GridDatatype;
+import ucar.nc2.dt.GridDatatype;
 import org.ramadda.data.process.DataProcessOperand;
 import org.ramadda.data.process.DataProcessOutput;
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
@@ -33,6 +35,7 @@ import org.ramadda.repository.type.GranuleTypeHandler;
 import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.util.HtmlUtils;
 
+import ucar.nc2.dt.GridDatatype;
 import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.time.Calendar;
 import ucar.nc2.time.CalendarDate;
@@ -213,6 +216,16 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             throws Exception {
 
         Entry oneOfThem = op.getEntries().get(0);
+        CdmDataOutputHandler dataOutputHandler =
+                getOutputHandler().getDataOutputHandler();
+        GridDataset dataset =
+                dataOutputHandler.getCdmManager().getGridDataset(oneOfThem,
+                    oneOfThem.getResource().getPath());
+        if (dataset == null || dataset.getGrids().isEmpty()) {
+            throw new Exception("No grids found");
+        }
+        String varname = ((GridDatatype) dataset.getGrids().get(0)).getName();
+
         Object[]      values     = oneOfThem.getValues();
         String tail =
             getOutputHandler().getStorageManager().getFileTail(oneOfThem);
@@ -253,7 +266,8 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                 commands, CdmDataOutputHandler.ARG_LEVEL);
         getOutputHandler().addDateSelectCommands(request, oneOfThem,
                 commands, opNum);
-        commands.add("-selname,"+values[4]);
+//        commands.add("-selname,"+values[4]);
+        commands.add("-selname,"+varname);
 
         System.err.println("cmds:" + commands);
 
@@ -280,7 +294,8 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                     commands, CdmDataOutputHandler.ARG_LEVEL);
             getOutputHandler().addMonthSelectCommands(request, climEntry,
                     commands);
-            commands.add("-selname,"+values[4]);
+            //commands.add("-selname,"+values[4]);
+            commands.add("-selname,"+varname);
 
             //System.err.println("clim cmds:" + commands);
 

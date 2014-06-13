@@ -197,7 +197,10 @@ public class NCLModelPlotDataProcess extends DataProcess {
                                            request, ARG_NCL_UNITS, "degC",
                                            false)) + Repository.msg(
                                                "Celsius")));
-        } else if (units.equals("kg m-2 s-1") || units.equals("mm/s")) {
+        } else if (units.equals("kg m-2 s-1") || 
+                units.equals("kg/m^2/s") ||
+                units.equals("m/day") ||
+                units.equals("mm/s")) {
             sb.append(
                 HtmlUtils.formEntry(
                     Repository.msgLabel("Output Units"),
@@ -409,6 +412,16 @@ public class NCLModelPlotDataProcess extends DataProcess {
         envMap.put("annotation",
                    repository.getProperty(Constants.PROP_REPOSITORY_NAME,
                                           ""));
+        String logo = repository.getProperty(Constants.PROP_LOGO_IMAGE, "");
+        if (!logo.isEmpty()) {
+            if (!logo.startsWith("http")) {
+                if (!logo.startsWith("/")) {
+                    logo = "/"+logo;
+                }
+                logo = request.getAbsoluteUrl(logo);
+            }
+            envMap.put("logo",logo);
+        }
 
 
         //System.err.println("cmds:" + commands);

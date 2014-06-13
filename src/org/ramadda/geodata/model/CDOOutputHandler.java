@@ -54,6 +54,7 @@ import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.time.Calendar;
 import ucar.nc2.time.CalendarDate;
 import ucar.nc2.time.CalendarDateFormatter;
+import ucar.nc2.units.SimpleUnit;
 
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
@@ -598,7 +599,11 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
 
         //varsb.append(HtmlUtils.select(ARG_CDO_PARAM, varList, request.getString(ARG_CDO_PARAM, null)));
         GridDatatype grid = grids.get(0);
-        varsb.append(grid.getDescription());
+        String longname = grid.getDescription();
+        if (longname == null || longname.isEmpty()) {
+            longname = grid.getName();
+        }
+        varsb.append(longname);
         if (grid.getZDimension() != null) {
             varsb.append(HtmlUtils.space(5));
             varsb.append(msgLabel("Level"));
@@ -617,10 +622,13 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
                         : lev);
                 levels.add(new TwoFacedObject(label, String.valueOf(lev)));
             }
+            // So they are in the same order
+            Collections.sort(levels);
             varsb.append(HtmlUtils.select(levelArg, levels,
                                           request.getString(levelArg, null)));
             varsb.append(HtmlUtils.space(2));
             varsb.append("hPa");
+            varsb.append(HtmlUtils.hidden(levelArg+"_unit", "hPa"));
         }
         sb.append(HtmlUtils.formEntry(msgLabel("Variable"),
                                       varsb.toString()));
@@ -1097,6 +1105,28 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
         if (request.defined(levelArg)) {
             String level = request.getString(levelArg);
             if (level != null) {
+                String levelUnit = request.getString(levelArg+"_unit","hPa");
+                String dataUnit = "hPa";
+                try {
+                    CdmDataOutputHandler dataOutputHandler = getDataOutputHandler();
+                    GridDataset dataset =
+                        dataOutputHandler.getCdmManager().getGridDataset(entry,
+                            entry.getResource().getPath());
+                    GridDatatype grid = dataset.getGrids().get(0);
+                    if (grid.getZDimension() != null) {
+                        GridCoordSystem      gcs    = grid.getCoordinateSystem();
+                        CoordinateAxis1D     zAxis  = gcs.getVerticalAxis();
+                        dataUnit   = zAxis.getUnitsString().toLowerCase();
+                    }
+                    if (!Misc.equals(levelUnit, dataUnit) && 
+                        SimpleUnit.isCompatible(levelUnit, dataUnit)) {
+                        SimpleUnit have = SimpleUnit.factory(levelUnit);
+                        SimpleUnit want = SimpleUnit.factory(dataUnit);
+                        level = String.valueOf(have.convertTo(Misc.parseDouble(level), want));
+                    }
+                } catch (Exception e) {
+                    System.err.println("can't convert level from " + levelUnit + " to " +dataUnit );
+                }
                 levSelect = OP_SELLEVEL + "," + level;
             }
         }

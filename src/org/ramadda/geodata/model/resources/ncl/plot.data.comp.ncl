@@ -91,6 +91,7 @@ begin
 
     ; precipitation
     if (unitsIn .eq. "kg m-2 s-1" .or. \
+        unitsIn .eq. "kg/m^2/s" .or. \
         unitsIn .eq. "mm/s") then
       if (unitsOut .eq. "mm/s") then
         ; just a name change
@@ -109,6 +110,16 @@ begin
       end if
       if (unitsOut .eq. "mm/day") then
         dataOut = dataIn*86400000 ; 86400*1000
+        dataOut@units = unitsOut
+      end if
+    end if
+    if (unitsIn .eq. "m/day") then
+      if (unitsOut .eq. "mm/s") then
+        dataOut = dataIn/86.4
+        dataOut@units = unitsOut
+      end if
+      if (unitsOut .eq. "mm/day") then
+        dataOut = dataIn*1000 
         dataOut@units = unitsOut
       end if
     end if
@@ -216,6 +227,8 @@ begin
   
   varname=opts@variable
   varlevel=opts@level
+  print(varlevel)
+  print("level is missing: "+ismissing(varlevel))
 
 ;--  Open the data file
   datafile = addfile(ncfile ,"r")  ; open input data file
@@ -308,16 +321,16 @@ begin
     end if
   else ; (time,level,lat,lon)
     if (vartype .eq. "short") then
-      if (ismissing(varlevel)) then
+      if (varlevel .eq. "") then
         vardata = short2flt(tmpdata(:,0,{minLat:maxLat},{minLon:maxLon}))
       else
-        vardata = short2flt(tmpdata(:,{varlevel},{minLat:maxLat},{minLon:maxLon}))
+        vardata = short2flt(tmpdata(:,{stringtointeger(varlevel)},{minLat:maxLat},{minLon:maxLon}))
       end if
     else
-      if (ismissing(varlevel)) then
+      if (varlevl .eq. "") then
         vardata = tmpdata(:,0,{minLat:maxLat},{minLon:maxLon})
       else
-        vardata = tmpdata(:,{varlevel},{minLat:maxLat},{minLon:maxLon})
+        vardata = tmpdata(:,{stringtointeger(varlevel)},{minLat:maxLat},{minLon:maxLon})
       end if
     end if
   end if
@@ -669,6 +682,75 @@ begin
   end setvalues
   return(lbicon)
 end
+
+undef("make_kml_image")
+function make_kml_image(kml:string, name:string, wks:graphic, plot:graphic, kres:logical, rescf:logical, makeLabelBar:logical)
+
+begin
+
+  if (makeLabelBar) then
+    ; position resources for ScreenOverlay element
+    kres@kmlOverlayXY = True
+    kres@kmlOverlayXYx = 0
+    kres@kmlOverlayXYy = 1
+    kres@kmlOverlayXYxunits = "fraction" ;
+    kres@kmlOverlayXYyunits = "fraction" ; pixels, or insetPixels
+    kres@kmlScreenXY = True
+    kres@kmlScreenXYx = 0
+    kres@kmlScreenXYy = 1
+    kres@kmlScreenXYxunits = "fraction"
+    kres@kmlScreenXYyunits = "fraction"
+  
+    ; crops the labelbar from the plot and converts it to a png
+    lbicon = make_kml_labelbar(kml, "label bar", wks, plot, kres)
+  
+    ; add labelbar to KML document as a ScreenOverlay element
+    kml = kml_add_screenoverlay ( kml, "Legend", lbicon, kres )
+
+    ; add cropped labelbar filename to list of files to 
+    ; be compressed in KMZ archive
+    kml_add_kmzfile(kml,lbicon)
+  
+    ;Turn off the label bar for future plots
+    rescf@lbLabelBarOn = False         ; turn off label bar
+  end if
+
+  ; add a folder for the ground overlay(s)
+  kml_folder = kml_open_folder(kml, "GroundOverlay Folder",False)
+
+  ; get the latlon coordinates describing the corners of the groundoverlay plot
+;;     LatLonBox = kml_get_vp_latlonbox(plot)
+;;  LatLonBox = new(4,float)
+;;  LatLonBox(0) = stringtofloat(rescf@mpMaxLatF)
+;;  LatLonBox(1) = stringtofloat(rescf@mpMinLatF)
+;;  LatLonBox(2) = stringtofloat(rescf@mpMaxLonF)
+;;  LatLonBox(3) = stringtofloat(rescf@mpMinLonF)
+
+  ; get the page coordinates of the actual map from the plot
+;      cropbox = kml_get_vp_cropbox(wks,plot)
+  
+  draw(plot)
+  frame(wks)
+  ; "delete(wks)" can not be called within a function, 
+  ;need to find a work around for this
+;;  wksname = wks@name
+;;  delete(wks)
+;;    
+;;  ;kres@kmlCropAlphaColor = "white"
+;;  ; crops the groundoverlay map and converts it to png
+;;  ; must "delete(wks)" before this command
+;;  ;icon = kml_crop_plot(cropbox, kres)
+;;  icon = cropKmlImage(wksname, ".png")
+;;  
+;;  ; add cropped map to KML document as a GroundOverlay element
+;;  kml = kml_add_groundoverlay(kml, name, icon, LatLonBox, 0, kres)
+;;    
+;;  ; add cropped map filename to list of files to be 
+;;  ; compressed in KMZ archive
+;;  kml_add_kmzfile(kml,icon)
+  return kml
+end
+
 ;************************************************
 ; Procedure: plotmap
 ;
@@ -763,6 +845,7 @@ begin
     rescf@cnMinLevelValF = opts@cmin
     rescf@cnMaxLevelValF = opts@cmax
   end if
+
   
   if (doGoogle) then
 
@@ -818,9 +901,14 @@ begin
     ;rescf@lbTitleOffsetF = 0.005
     ;rescf@lbBottomMarginF = 0.025
 
-
   end if
     
+  LatLonBox = new(4,float)
+  LatLonBox(0) = stringtofloat(rescf@mpMaxLatF)
+  LatLonBox(1) = stringtofloat(rescf@mpMinLatF)
+  LatLonBox(2) = stringtofloat(rescf@mpMaxLonF)
+  LatLonBox(3) = stringtofloat(rescf@mpMinLonF)
+
   wks = gsn_open_wks(wks_type,wks_name) 
   ;drawNDCGrid(wks)
   gsn_define_colormap(wks, opts@colormap)
@@ -865,11 +953,15 @@ begin
     end if
     rescf@tiMainString        = plottitle
     mydata = data(0,:,:)
-    vartitle = mydata@long_name
+    if (isatt(mydata,"long_name")) then
+      vartitle = mydata@long_name
+    else
+      vartitle = opts@variable
+    end if
     if (isanom) then
       vartitle = vartitle + " Anomaly"
     end if 
-    if (.not. ismissing(level)) then
+    if (.not. level .eq. "") then
       rescf@gsnLeftString = vartitle + " (" + level +" "+levelunit+ ")"
     else 
       rescf@gsnLeftString = vartitle
@@ -902,14 +994,18 @@ begin
   else 
     if (.not. doGoogle) then
       mydata = data(0,:,:)
-      vartitle = mydata@long_name
+      if (isatt(mydata,"long_name")) then
+        vartitle = mydata@long_name
+      else
+        vartitle = opts@variable
+      end if
       if (isanom) then
         vartitle = vartitle + " Anomaly"
       end if 
       if ((.not. ismissing(plottitles(0))) .and. (plottitles(0) .ne. "")) then
         rescf@tiMainString        = plottitles(0)
       end if
-      if (.not. ismissing(opts@level)) then
+      if (.not. (opts@level .eq. "")) then
         rescf@gsnLeftString = vartitle + " (" + level +" "+levelunit+ ")"
       else 
         rescf@gsnLeftString = vartitle
@@ -967,17 +1063,25 @@ begin
 
       ;; Make the first plot to get the labelbar
       mydata = data(0,:,:)
-      ;; make title for labelbar
-      vartitle = mydata@long_name
-      if (isanom) then
-        vartitle = vartitle + " Anomaly"
+;;      ;; make title for labelbar
+;;      vartitle = mydata@long_name
+;;      if (isanom) then
+;;        vartitle = vartitle + " Anomaly"
+;;      end if 
+;;      if (.not. (opts@level .eq. "")) then
+;;        vartitle = vartitle + " (" + level +" "+levelunit+ ")"
+;;      else 
+;;        vartitle = vartitle
+;;      end if
+;;      ;print(vartitle)
+
+      name="Plot 1"
+      if ((.not. ismissing(plottitles(0))) .and. (plottitles(0) .ne. "")) then
+        name        = plottitles(0)
+      else
+        name = "Plot 1"
       end if 
-      if (.not. ismissing(opts@level)) then
-        vartitle = vartitle + " (" + level +" "+levelunit+ ")"
-      else 
-        vartitle = vartitle
-      end if
-      print(vartitle)
+      
       if (isanom .and. cint .eq. 0) then
         symMinMaxPlt(mydata,20,False,rescf)
       end if
@@ -995,64 +1099,14 @@ begin
       kml = kml_open_document(wks_name, wks_name, kres) ; open new kml document
       kml = kml_add_lookat( kml, doubletofloat(centerLonF), doubletofloat(centerLatF), 0.0, 4616152, kres)
   
-      ; position resources for ScreenOverlay element
-      kres@kmlOverlayXY = True
-      kres@kmlOverlayXYx = 0
-      kres@kmlOverlayXYy = 1
-      kres@kmlOverlayXYxunits = "fraction" ;
-      kres@kmlOverlayXYyunits = "fraction" ; pixels, or insetPixels
-      kres@kmlScreenXY = True
-      kres@kmlScreenXYx = 0
-      kres@kmlScreenXYy = 1
-      kres@kmlScreenXYxunits = "fraction"
-      kres@kmlScreenXYyunits = "fraction"
-
-      ; crops the labelbar from the plot and converts it to a png
-      lbicon = make_kml_labelbar(kml, "label bar", wks, gplot, kres)
-
-      ; add labelbar to KML document as a ScreenOverlay element
-      kml = kml_add_screenoverlay ( kml, "Legend", lbicon, kres )
-
-      ; add cropped labelbar filename to list of files to 
-      ; be compressed in KMZ archive
-      kml_add_kmzfile(kml,lbicon)
-
-      ;Turn off the label bar for future plots
-      rescf@lbLabelBarOn = False         ; turn off label bar
-
-      ; add a folder for the ground overlay(s)
-      kml_folder = kml_open_folder(kml, "GroundOverlay Folder",False)
-
-      ; get the latlon coordinates describing the corners of the groundoverlay plot
-;;     LatLonBox = kml_get_vp_latlonbox(gplot)
-      LatLonBox = new(4,float)
-      LatLonBox(0) = stringtofloat(rescf@mpMaxLatF)
-      LatLonBox(1) = stringtofloat(rescf@mpMinLatF)
-      LatLonBox(2) = stringtofloat(rescf@mpMaxLonF)
-      LatLonBox(3) = stringtofloat(rescf@mpMinLonF)
-
-      ; get the page coordinates of the actual map from the plot
-;      cropbox = kml_get_vp_cropbox(wks,gplot)
-      
-      wksname = wks@name
-      draw(gplot)
-      frame(wks)
-      ; "delete(wks)" can not be called within a function, 
-      ;need to find a work around for this
-      delete(wks)
+      kml = make_kml_image(kml, name, wks, gplot, kres, rescf, True)
         
+      wksname = wks@name
+      delete(wks)
       ;kres@kmlCropAlphaColor = "white"
       ; crops the groundoverlay map and converts it to png
       ; must "delete(wks)" before this command
-      ;icon = kml_crop_plot(cropbox, kres)
       icon = cropKmlImage(wksname, ".png")
-      
-      name="Plot 1"
-      if ((.not. ismissing(plottitles(0))) .and. (plottitles(0) .ne. "")) then
-        name        = plottitles(0)
-      else
-        name = "Plot 1"
-      end if 
       
       ; add cropped map to KML document as a GroundOverlay element
       kml = kml_add_groundoverlay(kml, name, icon, LatLonBox, 0, kres)
@@ -1063,6 +1117,13 @@ begin
 
       if (numfiles .gt. 1) then
         do i = 1,numfiles-1
+
+          if ((.not. ismissing(plottitles(i))) .and. (plottitles(i) .ne. "")) then
+            name        = plottitles(i)
+          else
+            name = "Plot "+i
+          end if 
+      
           wks = gsn_open_wks(wks_type,wks_name+i) 
           ;drawNDCGrid(wks)
           gsn_define_colormap(wks, opts@colormap)
@@ -1085,34 +1146,15 @@ begin
           end if
           delete(mydata)
           delete(nextdata)
-          ; get the latlon coordinates describing the corners of the groundoverlay plot
-          LatLonBox = kml_get_vp_latlonbox(gplot)
-          LatLonBox = new(4,float)
-          LatLonBox(0) = stringtofloat(rescf@mpMaxLatF)
-          LatLonBox(1) = stringtofloat(rescf@mpMinLatF)
-          LatLonBox(2) = stringtofloat(rescf@mpMaxLonF)
-          LatLonBox(3) = stringtofloat(rescf@mpMinLonF)
-      
-          ; get the page coordinates of the actual map from the plot
-          ;cropbox = kml_get_vp_cropbox(wks,gplot)
-      
+
+          kml = make_kml_image(kml, name, wks, gplot, kres, rescf, False)
+
           wksname = wks@name
-          draw(gplot)
-          frame(wks)
-          ; "delete(wks)" can not be called within a function, 
-          ;need to find a work around for this
           delete(wks)
         
           ; crops the groundoverlay map and converts it to png
           ; must "delete(wks)" before this command
-          ;icon = kml_crop_plot(cropbox, kres)
           icon = cropKmlImage(wksname, ".png")
-      
-          if ((.not. ismissing(plottitles(i))) .and. (plottitles(i) .ne. "")) then
-            name        = plottitles(i)
-          else
-            name = "Plot "+i
-          end if 
       
           ; add cropped map to KML document as a GroundOverlay element
           kml = kml_add_groundoverlay(kml, name, icon, LatLonBox, 0, kres)
@@ -1146,43 +1188,19 @@ begin
   
       ; open a new KML document
       kml = kml_open_document(wks_name, wks_name, kres) ; open new kml document
+      kml = kml_add_lookat( kml, doubletofloat(centerLonF), doubletofloat(centerLatF), 0.0, 4616152, kres)
   
-      ; position resources for ScreenOverlay element
-      kres@kmlOverlayXY = True
-      kres@kmlOverlayXYx = 0
-      kres@kmlOverlayXYy = 1
-      kres@kmlOverlayXYxunits = "fraction" ;
-      kres@kmlOverlayXYyunits = "fraction" ; pixels, or insetPixels
-      kres@kmlScreenXY = True
-      kres@kmlScreenXYx = 0
-      kres@kmlScreenXYy = 1
-      kres@kmlScreenXYxunits = "fraction"
-      kres@kmlScreenXYyunits = "fraction"
-       
-      ; crops the labelbar from the plot and converts it to a png
-      lbicon = make_kml_labelbar(kml, "label bar", wks, plots(0), kres)
-        
-      ; add labelbar to KML document as a ScreenOverlay element
-      kml = kml_add_screenoverlay ( kml, "Label Bar", lbicon, kres )
-         
-      ; add cropped labelbar filename to list of files to be compressed in KMZ archive
-      kml_add_kmzfile(kml,lbicon)
-         
-      ; get the latlon coordinates describing the corners of the groundoverlay plot
-      ;LatLonBox = kml_get_vp_latlonbox(plots(0))
-      LatLonBox = new(4,float)
-      LatLonBox(0) = stringtofloat(rescf@mpMaxLatF)
-      LatLonBox(1) = stringtofloat(rescf@mpMinLatF)
-      LatLonBox(2) = stringtofloat(rescf@mpMaxLonF)
-      LatLonBox(3) = stringtofloat(rescf@mpMinLonF)
-      
-      ; get the page coordinates of the actual map from the plot
-      ;cropbox = kml_get_vp_cropbox(wks,plots(0))
-      
+      if ((.not. ismissing(plottitles(0))) .and. (plottitles(0) .ne. "")) then
+        name        = plottitles(0)
+      else
+        name = "Plot "+i
+      end if 
+
+      kml = make_kml_image(kml, name, wks, plots(0), kres, rescf, True)
+
+      ; "delete(wks)" can not be called within a function, 
+      ; need to find a work around for this
       wksname = wks@name
-      draw(plots(0))
-      frame(wks)
-      ; "delete(wks)" can not be called within a function, need to find a work around for this
       delete(wks)
         
       ; crops the groundoverlay map and converts it to png
@@ -1195,10 +1213,9 @@ begin
         
       ; add cropped map filename to list of files to be compressed in KMZ archive
       kml_add_kmzfile(kml,icon)
-  
-      ;kml = kml_add_lookat( kml, centerLonF, centerLatF, 0.0, 4616152, kres)
-        kml = kml_add_lookat( kml, doubletofloat(centerLonF), doubletofloat(centerLatF), 0.0, 4616152, kres)
         
+      kml_folder=kml_close_folder(kml) ; close the folder
+
       ; close kml document
       kml = kml_close_document(kml)
   
@@ -1274,7 +1291,13 @@ begin
     print("no variable")
     status_exit(-1)
   end if
-  level=stringtointeger(getenv("level"))
+
+  ; level
+  level = getenv("level")
+  if (ismissing(level)) then
+    level = ""
+  end if
+
   tmpfiles=getenv("ncfiles")
   if (ismissing(tmpfiles)) then 
     print("no files")
