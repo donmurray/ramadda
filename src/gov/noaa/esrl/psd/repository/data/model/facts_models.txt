@@ -1,3 +1,13 @@
+# Climate Models
 echam5:ECHAM5
 cam4:CAM4
 ccm4:CCM4
+geos-5:GEOS
+
+# Reanalyses
+20thC_ReanV2:20th Century Reanalysis V2
+cfsr:CFSR
+erainterim:ERA-Interim
+merra:MERRA
+ncep.reanalysis:NCEP/NCAR R1
+ncep.reanalysis2:NCEP/DOE R2
