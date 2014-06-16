@@ -336,7 +336,7 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
             } else if ( !getStorageManager().isLocalFileOk(rootDir)) {
                 String adminLink =
                     HtmlUtils.href(
-                                   getRepository().getUrlBase()
+                        getRepository().getUrlBase()
                         + "/userguide/admin.html#filesystemaccess", msg(
                             "More information"), " target=_HELP");
                 extraLabel =
@@ -475,8 +475,11 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
     public String makeEntryTypeSelector(Request request,
                                         TypeHandler typeHandler)
             throws Exception {
-        List<HtmlUtils.Selector> items =  getEntryManager().getTypeHandlerSelectors(true, false, null);
-        items.add(0, new HtmlUtils.Selector(msg("Find match"), TYPE_FINDMATCH, null));
+        List<HtmlUtils.Selector> items =
+            getEntryManager().getTypeHandlerSelectors(true, false, null);
+        items.add(0, new HtmlUtils.Selector(msg("Find match"),
+                                            TYPE_FINDMATCH, null));
+
         return repository.makeTypeSelect(items, request, false,
                                          getTypeHandler().getType(), false,
                                          null);
@@ -678,11 +681,15 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
             cnt++;
             //            System.err.println("found:" + entries.size() + " files in:"
             //                               + (t2 - t1) + "ms");
-            String logLink = HtmlUtils.href(getAdmin().URL_ADMIN_LOG +"?log=harvester.log", msg("Harvest details")) + "<br>";
+            String logLink = HtmlUtils.href(
+                                 getAdmin().URL_ADMIN_LOG
+                                 + "?log=harvester.log", msg(
+                                     "Harvest details")) + "<br>";
             if ( !getMonitor()) {
                 status.append("Done<br>");
                 status.append(logLink);
                 logHarvesterInfo("Ran one time only. Exiting loop");
+
                 break;
             }
 
@@ -1117,6 +1124,7 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
         TypeHandler typeHandler      = getTypeHandler();
         TypeHandler typeHandlerToUse = null;
 
+
         Entry       templateEntry    = getEntryManager().getTemplateEntry(f);
         if (templateEntry != null) {
             typeHandlerToUse = templateEntry.getTypeHandler();
@@ -1226,8 +1234,8 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
         }
 
         if (fromDate == null) {
-            fromDate = Utils.extractDate(applyMacros(name, createDate,
-                    fromDate, toDate, filename));
+            //Don't try to pull the date from the filename for now
+            //            fromDate = Utils.extractDate(applyMacros(name, createDate, fromDate, toDate, filename));
         }
         if (toDate == null) {
             toDate = fromDate;
@@ -1242,6 +1250,10 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
 
         groupName = groupName.replace("${dirgroup}", dirGroup);
 
+        if ((templateEntry != null) && templateEntry.hasDate()) {
+            fromDate = new Date(templateEntry.getStartDate());
+            toDate   = new Date(templateEntry.getEndDate());
+        }
 
 
         groupName = applyMacros(groupName, createDate, fromDate, toDate,
@@ -1249,6 +1261,32 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
         name = applyMacros(name, createDate, fromDate, toDate, filename);
         desc = applyMacros(desc, createDate, fromDate, toDate, filename);
         desc = desc.replace("${name}", name);
+
+        if (templateEntry != null) {
+            if (Utils.stringDefined(templateEntry.getName())) {
+                name = templateEntry.getName();
+            }
+            if (Utils.stringDefined(templateEntry.getDescription())) {
+                desc = templateEntry.getDescription();
+            }
+
+            Object[] templateValues = templateEntry.getValues();
+            if (templateValues != null) {
+                values = templateValues;
+                List<Column> columns =
+                    templateEntry.getTypeHandler().getColumns();
+                if (columns != null) {
+                    for (Column column : columns) {
+                        String s = column.getString(templateValues);
+                        if (s != null) {
+                            groupName = groupName.replace("${"
+                                    + column.getName() + "}", s);
+                        }
+                    }
+                }
+            }
+        }
+
 
         if (baseGroup != null) {
             groupName = baseGroup.getFullName() + Entry.PATHDELIMITER
@@ -1301,7 +1339,15 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
         }
 
 
-        Entry entry = typeHandlerToUse.createEntry(getRepository().getGUID());
+        System.err.println("Harvested file:" + f);
+        Entry entry = templateEntry;
+        if (entry == null) {
+            System.err.println("\tcreated new entry");
+            entry = typeHandlerToUse.createEntry(getRepository().getGUID());
+        } else {
+            System.err.println("\tcreated entry from entry.xml template");
+        }
+
         Resource resource;
         if (moveToStorage) {
             File fromFile = new File(fileName);
@@ -1320,11 +1366,15 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
         if (getGenerateMd5()) {
             resource.setMd5(IOUtil.getMd5(resource.getPath()));
         }
+        System.err.println("\tcalling initEntry");
         entry.initEntry(name, desc, group, getUser(), resource, "",
                         createDate.getTime(), createDate.getTime(),
                         fromDate.getTime(), toDate.getTime(), values);
+        System.err.println("\tdone");
 
-        Date date = Utils.extractDate(name);
+        Date date = null;
+        //Don't try to pull the date from the filename for now
+        //Date date = Utils.extractDate(name);
         if ((date != null) && !entry.hasDate()) {
             entry.setStartDate(date.getTime());
             entry.setEndDate(date.getTime());

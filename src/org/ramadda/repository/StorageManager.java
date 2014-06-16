@@ -427,10 +427,14 @@ public class StorageManager extends RepositoryManager {
                                       getRepositoryDir().toString()));
         sb.append(HtmlUtils.formEntry("Storage Directory:",
                                       getStorageDir().toString()));
-        String usage = getDiskUsage();
-        if (usage != null) {
-            sb.append(HtmlUtils.formEntry("Disk Usage:", usage));
-        }
+
+        /**
+         *  Don't do this since it can take quite a while
+         * String usage = getDiskUsage();
+         * if (usage != null) {
+         *   sb.append(HtmlUtils.formEntry("Disk Usage:", usage));
+         * }
+         */
 
     }
 
