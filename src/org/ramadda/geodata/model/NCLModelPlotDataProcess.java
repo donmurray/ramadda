@@ -182,7 +182,10 @@ public class NCLModelPlotDataProcess extends DataProcess {
                                            "Google Earth")));
         // units
         String units = grid.getUnitsString();
-        if (units.equals("K") || units.equals("degK")) {
+        if (units.equalsIgnoreCase("K") || 
+            units.equalsIgnoreCase("degK") ||
+            units.equalsIgnoreCase("Kelvins") ||
+            units.equalsIgnoreCase("Kelvin") ) {
             sb.append(
                 HtmlUtils.formEntry(
                     Repository.msgLabel("Plot Units"),
@@ -197,10 +200,10 @@ public class NCLModelPlotDataProcess extends DataProcess {
                                            request, ARG_NCL_UNITS, "degC",
                                            false)) + Repository.msg(
                                                "Celsius")));
-        } else if (units.equals("kg m-2 s-1") || 
-                units.equals("kg/m^2/s") ||
-                units.equals("m/day") ||
-                units.equals("mm/s")) {
+        } else if (units.equalsIgnoreCase("kg m-2 s-1") || 
+                units.equalsIgnoreCase("kg/m^2/s") ||
+                units.equalsIgnoreCase("m/day") ||
+                units.equalsIgnoreCase("mm/s")) {
             sb.append(
                 HtmlUtils.formEntry(
                     Repository.msgLabel("Output Units"),
