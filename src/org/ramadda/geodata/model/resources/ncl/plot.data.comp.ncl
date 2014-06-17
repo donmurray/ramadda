@@ -38,7 +38,10 @@ begin
   if ((unitsIn .ne. unitsOut) .and. (.not. ismissing(unitsOut) .and. unitsOut .ne. "")) then
 
     ; Temperature
-    if (unitsIn .eq. "K" .or. unitsIn .eq. "degK") then
+    if (unitsIn .eq. "K" .or. \
+        unitsIn .eq. "degK" .or. \
+        unitsIn .eq. "Kelvin" .or. \
+        unitsIn .eq. "Kelvins") then
       if (unitsOut .eq. "C" .or. \
           unitsOut .eq. "Cel" .or. \
           unitsOut .eq. "degC" .or. \
@@ -92,6 +95,7 @@ begin
     ; precipitation
     if (unitsIn .eq. "kg m-2 s-1" .or. \
         unitsIn .eq. "kg/m^2/s" .or. \
+        unitsIn .eq. "Kg/m^2/s" .or. \
         unitsIn .eq. "mm/s") then
       if (unitsOut .eq. "mm/s") then
         ; just a name change
@@ -227,8 +231,7 @@ begin
   
   varname=opts@variable
   varlevel=opts@level
-  print(varlevel)
-  print("level is missing: "+ismissing(varlevel))
+  ;print(varlevel)
 
 ;--  Open the data file
   datafile = addfile(ncfile ,"r")  ; open input data file
@@ -961,7 +964,7 @@ begin
     if (isanom) then
       vartitle = vartitle + " Anomaly"
     end if 
-    if (.not. level .eq. "") then
+    if (.not. (level .eq. "")) then
       rescf@gsnLeftString = vartitle + " (" + level +" "+levelunit+ ")"
     else 
       rescf@gsnLeftString = vartitle
