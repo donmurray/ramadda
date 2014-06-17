@@ -459,11 +459,13 @@ end
 ;             annotation   - the annotation
 ;*************************************************
 undef ("addLogo")
-procedure addLogo (imageFilePath:string, logoFilePath:string)
+procedure addLogo (wksname:string, logoFilePath:string)
+local imateFilePath, tmpFilePath
 begin
 
+  imageFilePath = wksname+".png"
   tmpFilePath = imageFilePath + ".tmp"    
-  system("%convert% " + imageFilePath + " " + logoFilePath + " -geometry +20+555 -composite " + tmpFilePath)
+  system("%convert% " + imageFilePath + " " + logoFilePath + " -gravity SouthWest -composite " + tmpFilePath)
   system("mv -f " + tmpFilePath + " " + imageFilePath)
 
 end
@@ -1261,6 +1263,9 @@ begin
     delete(plots)
     image = cropImage(wksname,".png")
     addAnnotation(wksname, opts@annotation)
+    if (isatt(opts,"logo") .and. .not. (opts@logo .eq. "")) then
+       addLogo(wksname, opts@logo)
+    end if
   end if
 
 end
@@ -1300,6 +1305,14 @@ begin
     titles = new((/numfiles/),string)
   else 
     titles=str_split(tmptitles,";")
+  end if
+  
+  ;logo
+  tmplogo=getenv("logo")
+  if (ismissing(tmplogo)) then 
+    logo = ""
+  else 
+    logo=tmplogo
   end if
   
   ; output variables
@@ -1388,6 +1401,7 @@ begin
   options@cmin=cmin
   options@cmax=cmax
   options@usepolar=usepolar
+  options@logo=logo
   
   plotmap(ncfiles, wks_name, "png", options)
   
