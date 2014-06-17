@@ -39,20 +39,6 @@
      <column name="ensemble" type="string"  label="Ensemble"/>
      <column name="variable" type="enumerationplus"  label="Variable"  xxxxxvalues="file:/org/ramadda/data/model/vars.txt"/>
    </type>
-   
-   <type name="psd_reanalysis_collection"  description="NOAA/ESRL/PSD Reanalysis Collection" super="climate_collection" category="Climate Data" handler="gov.noaa.esrl.psd.repository.data.model.PSDReanalysisCollectionTypeHandler" foruser="true">
-     <property name="icon" value="/noaa/noaa.gif"/>
-     <property name="granule_type" value="psd_reanalysis_file"/>
-     <property name="model.values" value="/gov/noaa/esrl/psd/repository/data/model/reanalysis_names.txt"/>
-     <property name="variable.values" value="/gov/noaa/esrl/psd/repository/data/model/reanalysis_vars.txt"/>
-   </type>
-
-
-  <type name="psd_reanalysis_file"  description="NOAA/ESRL/PSD Reanalysis File" super="climate_modelfile" foruser="true" handler="gov.noaa.esrl.psd.repository.data.model.PSDReanalysisFileTypeHandler" >
-     <property name="icon" value="/noaa/noaa.gif"/>
-     <property name="collection_type" value="psd_reanalysis_collection"/>
-   </type>
-   
 
 </types>
 
