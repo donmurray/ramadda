@@ -1,7 +1,7 @@
 ;************************************************
 ; Program: plot.data.comp.ncl
 ; Purpose: plot data comparisons using NCL 
-; Output:  map plot, kml or time series
+; Output:  map plot or kmz
 ; Author:  Don Murray, CU-CIRES
 ;***********************************************
 
@@ -716,24 +716,15 @@ begin
   
     ;Turn off the label bar for future plots
     rescf@lbLabelBarOn = False         ; turn off label bar
+
+    ; add a folder for the ground overlay(s)
+    kml_folder = kml_open_folder(kml, "GroundOverlay Folder",False)
+
   end if
 
-  ; add a folder for the ground overlay(s)
-  kml_folder = kml_open_folder(kml, "GroundOverlay Folder",False)
-
-  ; get the latlon coordinates describing the corners of the groundoverlay plot
-;;     LatLonBox = kml_get_vp_latlonbox(plot)
-;;  LatLonBox = new(4,float)
-;;  LatLonBox(0) = stringtofloat(rescf@mpMaxLatF)
-;;  LatLonBox(1) = stringtofloat(rescf@mpMinLatF)
-;;  LatLonBox(2) = stringtofloat(rescf@mpMaxLonF)
-;;  LatLonBox(3) = stringtofloat(rescf@mpMinLonF)
-
-  ; get the page coordinates of the actual map from the plot
-;      cropbox = kml_get_vp_cropbox(wks,plot)
-  
   draw(plot)
   frame(wks)
+
   ; "delete(wks)" can not be called within a function, 
   ;need to find a work around for this
 ;;  wksname = wks@name
@@ -752,6 +743,34 @@ begin
 ;;  ; compressed in KMZ archive
 ;;  kml_add_kmzfile(kml,icon)
   return kml
+end
+
+;************************************************
+; Procedure: set var title
+;
+; Purpose:  set the var title
+;
+; Params:  data  - the data files to plot
+;          opts - global options
+;          rescf - plot options
+;          isanom - is this an anomaly
+;***********************************************
+undef("setvartitle")
+function setvartitle(data:float, opts:logical, isanom:logical, levelunit:string)
+local vartitle
+begin
+  if (isatt(data,"long_name")) then
+    vartitle = data@long_name
+  else
+    vartitle = opts@variable
+  end if
+  if (isanom) then
+    vartitle = vartitle + " Anomaly"
+  end if 
+  if (.not. (opts@level .eq. "")) then
+    vartitle = vartitle + " (" + level +" "+levelunit+ ")"
+  end if
+  return vartitle
 end
 
 ;************************************************
@@ -956,19 +975,7 @@ begin
     end if
     rescf@tiMainString        = plottitle
     mydata = data(0,:,:)
-    if (isatt(mydata,"long_name")) then
-      vartitle = mydata@long_name
-    else
-      vartitle = opts@variable
-    end if
-    if (isanom) then
-      vartitle = vartitle + " Anomaly"
-    end if 
-    if (.not. (level .eq. "")) then
-      rescf@gsnLeftString = vartitle + " (" + level +" "+levelunit+ ")"
-    else 
-      rescf@gsnLeftString = vartitle
-    end if
+    rescf@gsnLeftString = setvartitle(mydata, opts, isanom, levelunit)
     if (doGoogle) then
       set_kml_map_defaults(rescf) ; turn off many options
       ;;rescf@lbTitleString = rescf@gsnLeftString
@@ -993,25 +1000,12 @@ begin
     ;    addAnnotation(wks,opts@annotation)
     ;end if
     delete(mydata)
-    delete(vartitle)
   else 
     if (.not. doGoogle) then
       mydata = data(0,:,:)
-      if (isatt(mydata,"long_name")) then
-        vartitle = mydata@long_name
-      else
-        vartitle = opts@variable
-      end if
-      if (isanom) then
-        vartitle = vartitle + " Anomaly"
-      end if 
+      rescf@gsnLeftString = setvartitle(mydata, opts, isanom, levelunit)
       if ((.not. ismissing(plottitles(0))) .and. (plottitles(0) .ne. "")) then
         rescf@tiMainString        = plottitles(0)
-      end if
-      if (.not. (opts@level .eq. "")) then
-        rescf@gsnLeftString = vartitle + " (" + level +" "+levelunit+ ")"
-      else 
-        rescf@gsnLeftString = vartitle
       end if
       ;rescf@lbTitleString = rescf@gsnLeftString
       if (isanom .and. cint .eq. 0) then
@@ -1038,6 +1032,7 @@ begin
       do i = 1,numfiles-1
         nextdata = readdata(files(i),opts)
         mydata = nextdata(0,:,:)
+        rescf@gsnLeftString = setvartitle(mydata, opts, isanom, levelunit)
         if ((.not. ismissing(plottitles(i))) .and. (plottitles(i) .ne. "")) then
           rescf@tiMainString        = plottitles(i)
         end if
@@ -1060,23 +1055,13 @@ begin
         delete(mydata)
         delete(nextdata)
       end do
-      delete(vartitle)
 
     else ;; doGoogle
 
       ;; Make the first plot to get the labelbar
       mydata = data(0,:,:)
 ;;      ;; make title for labelbar
-;;      vartitle = mydata@long_name
-;;      if (isanom) then
-;;        vartitle = vartitle + " Anomaly"
-;;      end if 
-;;      if (.not. (opts@level .eq. "")) then
-;;        vartitle = vartitle + " (" + level +" "+levelunit+ ")"
-;;      else 
-;;        vartitle = vartitle
-;;      end if
-;;      ;print(vartitle)
+;;      vartitle = setvartitle(mydata, opts, isanom, levelunit)
 
       name="Plot 1"
       if ((.not. ismissing(plottitles(0))) .and. (plottitles(0) .ne. "")) then
