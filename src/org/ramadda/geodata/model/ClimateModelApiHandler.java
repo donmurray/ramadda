@@ -80,6 +80,9 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
     /** collection 2 id */
     public static final String ARG_COLLECTION2 = "collection2";
 
+    /** collection frequencey*/
+    public static final String ARG_FREQUENCY = "frequency";
+
 
     /** shortcut to JQuery class */
     private static final JQuery JQ = null;
@@ -1139,6 +1142,17 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         List<Entry> collections =
             (List<Entry>) getEntryManager().getEntries(tmpRequest)[0];
+        if (request.defined(ARG_FREQUENCY)) {
+            String freak = request.getString(ARG_FREQUENCY);
+            List<Entry> subset = new ArrayList<Entry>();
+            for (Entry collection : collections) {
+                String efreak = collection.getValue(0,  null);
+                if (efreak != null && efreak.equalsIgnoreCase(freak)) {
+                    subset.add(collection);
+                }
+            }
+            collections = subset;
+        }
 
         return collections;
     }
