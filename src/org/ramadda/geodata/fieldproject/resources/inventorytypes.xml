@@ -81,6 +81,8 @@
      <property name="form.date.show" value="false"/>
      <property name="form.area.show" value="false"/>
      <wiki><![CDATA[
+== Vocabulary: {{name}} ==
+
 {{description}}
 {{display   
 type="entrylist"  
