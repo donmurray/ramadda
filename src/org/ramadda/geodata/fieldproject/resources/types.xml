@@ -338,6 +338,9 @@
      <property name="form.datatype.show" value="false"/>
      <property name="form.altitude.show" value="true"/>
      <property name="form.altitude.top.show" value="true"/>
+     <column name="data_type"  type="enumerationplus"  label="Data Type" values="grid:Gridded Data,observation:Observation,satellite:Satellite,remote_sensing:Remote Sensing,misc:Miscellaneous" cansearch="true"/>
+     <column name="data_level"  type="enumerationplus"  label="Data Level" values="na:NA,level0:Level 0,level1:Level 1,level2:Level 2,level3:Level 3" cansearch="true"/>
+     <column name="usage_notes" type="string"  label="Usage Notes" rows="5" size="5000" changetype="true"/>
    </type>
 
 
