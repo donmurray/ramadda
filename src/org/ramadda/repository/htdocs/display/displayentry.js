@@ -116,6 +116,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
 
     RamaddaUtil.initMembers(this, {
             showForm: true,            
+            showSearchSettings: true,            
             showEntries: true,
             showType: true,           
             formOpen: true,
@@ -489,8 +490,11 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 extra+= HtmlUtil.closeTag(TAG_TABLE);
                 extra+=    HtmlUtil.div([ATTR_ID,this.getDomId(ID_FIELDS)],"");
 
-                form += HtmlUtil.div([ATTR_CLASS, "display-search-extra"],
-                                     HtmlUtil.toggleBlock("Search Settings", HtmlUtil.div([ATTR_CLASS, "display-search-extra-inner"], extra), this.formOpen));
+                if(this.showSearchSettings) {
+                    form += HtmlUtil.div([ATTR_CLASS, "display-search-extra"],
+                                         HtmlUtil.toggleBlock("Search Settings", HtmlUtil.div([ATTR_CLASS, "display-search-extra-inner"], extra), this.formOpen));
+                }
+
                 //Hide the real submit button
                 form += "<input type=\"submit\" style=\"position:absolute;left:-9999px;width:1px;height:1px;\"/>";
                 form += HtmlUtil.closeTag("form");
