@@ -80,6 +80,23 @@
      <property name="form.datatype.show" value="false"/>
      <property name="form.date.show" value="false"/>
      <property name="form.area.show" value="false"/>
+     <wiki><![CDATA[
+{{description}}
+{{display   
+type="entrylist"  
+orientation="horizontal"
+layoutHere="true"   
+orientation="vertical"  
+showMetadata="true"
+innerHeight="200" 
+divid="listdiv" 
+entryParent="this"
+showType="false"
+formOpen="false"
+showSearchSettings="false"
+}}
+]]></wiki>
+
    </type>
 
 
