@@ -1139,20 +1139,14 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         Request tmpRequest = new Request(getRepository(), request.getUser());
 
         tmpRequest.put(ARG_TYPE, collectionType);
+        List<Clause> fclause = new ArrayList<Clause>();
+        if (request.defined(ARG_FREQUENCY)) {
+            tmpRequest.put(Column.ARG_SEARCH_PREFIX+collectionType+"."+ARG_FREQUENCY, 
+                    request.getString(ARG_FREQUENCY));
+        }
 
         List<Entry> collections =
             (List<Entry>) getEntryManager().getEntries(tmpRequest)[0];
-        if (request.defined(ARG_FREQUENCY)) {
-            String freak = request.getString(ARG_FREQUENCY);
-            List<Entry> subset = new ArrayList<Entry>();
-            for (Entry collection : collections) {
-                String efreak = collection.getValue(0,  null);
-                if (efreak != null && efreak.equalsIgnoreCase(freak)) {
-                    subset.add(collection);
-                }
-            }
-            collections = subset;
-        }
 
         return collections;
     }
