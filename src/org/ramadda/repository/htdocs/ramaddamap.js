@@ -35,6 +35,9 @@ var map_ms_shaded = "ms.shaded";
 var map_ms_hybrid = "ms.hybrid";
 var map_ms_aerial = "ms.aerial";
 
+// ESRI Maps
+var map_esri_topo = "esri.topo";
+
 // WMS maps
 var map_wms_openlayers = "wms:OpenLayers WMS,http://vmap0.tiles.osgeo.org/wms/vmap0,basic";
 
@@ -264,6 +267,14 @@ function RepositoryMap(mapId, params) {
                       wrapDateLine : wrapDatelineDefault
                   }));
             */
+            } else if (mapLayer == map_esri_topo) {
+                var layerURL = "http://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/${z}/${y}/${x}";
+                this.map.addLayer(new OpenLayers.Layer.XYZ(
+                        "ESRI - Topo", layerURL, {
+                            sphericalMercator : sphericalMercatorDefault,
+                            numZoomLevels : zoomLevelsDefault,
+                            wrapDateLine : wrapDatelineDefault
+                        }));
             } else {
                 var match = /wms:(.*),(.*),(.*)/.exec(mapLayer);
                 if (!match) {
@@ -336,11 +347,11 @@ function RepositoryMap(mapId, params) {
         }));*/
         
 
-        if (this.showZoomPanControl && !this.ZoomOnlyControl) {
+        if (this.showZoomPanControl && !this.showZoomOnlyControl) {
             this.map.addControl(new OpenLayers.Control.PanZoom());
         }
         if (this.showZoomOnlyControl && !this.showZoomPanControl) {
-            this.map.addControl(new OpenLayers.Control.ZoomPanel());
+            this.map.addControl(new OpenLayers.Control.Zoom());
         }
 
         if (this.showScaleLine) {

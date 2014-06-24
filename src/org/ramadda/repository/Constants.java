@@ -1615,11 +1615,14 @@ public interface Constants {
     public static final String PROP_HARVESTERS_ACTIVE =
         "ramadda.harvesters.active";
 
-    /** _more_ */
+    /** the url that the logo goes to when clicked */
     public static final String PROP_LOGO_URL = "ramadda.logo.url";
 
-    /** _more_ */
+    /** the logo image property */
     public static final String PROP_LOGO_IMAGE = "ramadda.logo.image";
+
+    /** The map layers property */
+    public static final String PROP_MAP_LAYERS = "ramadda.map.layers";
 
     /** _more_ */
     public static final String PROP_HTML_HEAD = "html.head";

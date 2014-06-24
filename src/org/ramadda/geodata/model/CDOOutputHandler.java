@@ -852,11 +852,17 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
         if ( !usePopup) {
             map = getRepository().getMapManager().createMap(request, 250,
                     150, true);
-            map.addProperty("mapLayers", Misc.newList("google.terrain"));
+            String maplayers = getRepository().getProperty(PROP_MAP_LAYERS, null);
+            if (maplayers != null) {
+                map.addProperty("mapLayers", Misc.newList(maplayers));
+            } else {
+                map.addProperty("mapLayers", Misc.newList("google.terrain"));
+            }
             // remove some of the widgets
             map.addProperty("showScaleLine", "false");
             map.addProperty("showLayerSwitcher", "false");
-            map.addProperty("showZoomPanelControl", "false");
+            map.addProperty("showZoomPanControl", "false");
+            map.addProperty("showZoomOnlyControl", "true");
         } else {
             map = getRepository().getMapManager().createMap(request, true);
         }
