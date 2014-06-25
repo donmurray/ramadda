@@ -1575,13 +1575,15 @@ public class Request implements Constants, Cloneable {
             if (authToken.trim().equals(sessionAuth)) {
                 return;
             }
-            //            System.err.println("bad auth token");
-            //            System.err.println("\tsession:" + mySessionId);
-            //            System.err.println("\tauth token:" + authToken);
-            //            System.err.println("\tsession hashed:"+ sessionAuth);
+            getRepository().getLogManager().logError("Request.ensureAuthToken: authToken != sessionAuth :" +
+                                                     "\n\tsession:" + mySessionId+
+                                                     "\n\tauth token:" + authToken +
+                                                     "\n\tsession hashed:"+ sessionAuth,null);
         }
 
-
+        getRepository().getLogManager().logError("Request.ensureAuthToken: something null :" +
+                                                 "\n\tsession:" + mySessionId+
+                                                 "\n\tauth token:" + authToken,null);
 
         throw new IllegalArgumentException("Bad authentication token");
     }
