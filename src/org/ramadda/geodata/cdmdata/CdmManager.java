@@ -690,7 +690,7 @@ public class CdmManager extends RepositoryManager {
             return true;
         }
         
-        if (entry.isType(TYPE_CLIMATE_MODEL_GRANULE)) {
+        if (entry.getTypeHandler().isType(TYPE_CLIMATE_MODEL_GRANULE)) {
         	return true;
         }
 
@@ -768,7 +768,8 @@ public class CdmManager extends RepositoryManager {
      * @return true if GrADS type
      */
     private boolean isCdmGrid(Entry e) {
-        return e.getType().equals(TYPE_CDM_GRID);
+        return e.getTypeHandler().isType(TYPE_CDM_GRID) || 
+                e.getTypeHandler().isType(TYPE_CLIMATE_MODEL_GRANULE);
     }
 
     /**
