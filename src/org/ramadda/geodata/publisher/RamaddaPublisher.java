@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -147,6 +147,9 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
     private InteractiveRepositoryClient repositoryClient;
 
 
+    /** _more_          */
+    private boolean isImport;
+
     /**
      * _more_
      */
@@ -292,15 +295,22 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                                        (int) dim.getHeight());
         descScroller.setPreferredSize(dim);
         JComponent dateComp = GuiUtils.hbox(fromDateFld, toDateFld);
-        comps = Misc.toList(new Component[] {
-            GuiUtils.rLabel("Name:"), nameFld,
-            GuiUtils.top(GuiUtils.rLabel("Description:")), descScroller,
-            GuiUtils.rLabel("Tags:"),
-            GuiUtils.centerRight(tagFld, new JLabel(" (optional)")),
-            GuiUtils.rLabel("Parent Folder:"), treeComp,
-            GuiUtils.top(GuiUtils.rLabel("Date Range:")), dateComp,
-            GuiUtils.rLabel("Lat/Lon Box:"), GuiUtils.left(bboxComp)
-        });
+        if (isImport) {
+            comps = Misc.toList(new Component[] {
+                GuiUtils.rLabel("Parent Folder:"),
+                treeComp, });
+
+        } else {
+            comps = Misc.toList(new Component[] {
+                GuiUtils.rLabel("Name:"), nameFld,
+                GuiUtils.top(GuiUtils.rLabel("Description:")), descScroller,
+                GuiUtils.rLabel("Tags:"),
+                GuiUtils.centerRight(tagFld, new JLabel(" (optional)")),
+                GuiUtils.rLabel("Parent Folder:"), treeComp,
+                GuiUtils.top(GuiUtils.rLabel("Date Range:")), dateComp,
+                GuiUtils.rLabel("Lat/Lon Box:"), GuiUtils.left(bboxComp)
+            });
+        }
     }
 
 
@@ -329,6 +339,10 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
             return;
         }
 
+
+        //Uncomment to test publishing an import
+        //        contentFile = "/Users/jeffmc/testloop.zip";
+
         try {
             boolean isBundle = ((contentFile == null)
                                 ? false
@@ -339,6 +353,12 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                               ? false
                               : getIdv().getArgsManager().isZidvFile(
                                   contentFile));
+
+
+            isImport = ((contentFile == null)
+                        ? false
+                        : contentFile.endsWith(".zip"));
+
 
             doMakeContents();
             List      myComps            = new ArrayList(comps);
@@ -376,7 +396,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
 
 
             boolean isImage = false;
-            if ((contentFile != null) && !isBundle) {
+            if ((contentFile != null) && !isBundle && !isImport) {
                 topComps.add(GuiUtils.rLabel("File:"));
                 JComponent extra;
                 if (ImageUtils.isImage(contentFile)) {
@@ -502,210 +522,231 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                     }
                 }
 
+                List<HttpFormEntry> entries = new ArrayList<HttpFormEntry>();
+                repositoryClient.addUrlArgs(entries);
+
+
                 GuiUtils.ProgressDialog dialog =
                     new GuiUtils.ProgressDialog("Publishing to RAMADDA");
-                List<String> files         = new ArrayList<String>();
-                List<String> zipEntryNames = new ArrayList<String>();
+                String bundleFile = null;
+                if (isImport) {
+                    FileInputStream fos = new FileInputStream(contentFile);
+                    entries.add(HttpFormEntry.hidden("group", parentId));
+                    entries.add(new HttpFormEntry(ARG_FILE, "entries.zip",
+                            IOUtil.readBytes(fos)));
+                    IOUtil.close(fos);
+                } else {
 
-                String       bundleFile    = null;
-                if (isBundle) {
-                    bundleFile  = contentFile;
-                    contentFile = null;
-                    files.add(bundleFile);
-                    zipEntryNames.add(IOUtil.getFileTail(bundleFile));
-                } else if (doBundleCbx.isSelected()) {
-                    String tmpFile = contentFile;
-                    if (tmpFile == null) {
-                        tmpFile = "publish.xidv";
-                    }
-                    bundleFile = getIdv().getObjectStore().getTmpFile(
-                        IOUtil.stripExtension(IOUtil.getFileTail(tmpFile))
-                        + (doZidvCbx.isSelected()
-                           ? ".zidv"
-                           : ".xidv"));
-                    getIdv().getPersistenceManager().doSave(bundleFile);
-                    files.add(bundleFile);
-                    zipEntryNames.add(IOUtil.getFileTail(bundleFile));
-                    if (contentFile != null) {
+                    List<String> files         = new ArrayList<String>();
+                    List<String> zipEntryNames = new ArrayList<String>();
+
+
+                    if (isBundle) {
+                        bundleFile  = contentFile;
+                        contentFile = null;
+                        files.add(bundleFile);
+                        zipEntryNames.add(IOUtil.getFileTail(bundleFile));
+                    } else if (doBundleCbx.isSelected()) {
+                        String tmpFile = contentFile;
+                        if (tmpFile == null) {
+                            tmpFile = "publish.xidv";
+                        }
+                        bundleFile =
+                            getIdv().getObjectStore().getTmpFile(
+                                IOUtil.stripExtension(
+                                    IOUtil.getFileTail(
+                                        tmpFile)) + (doZidvCbx.isSelected()
+                                ? ".zidv"
+                                : ".xidv"));
+                        getIdv().getPersistenceManager().doSave(bundleFile);
+                        files.add(bundleFile);
+                        zipEntryNames.add(IOUtil.getFileTail(bundleFile));
+                        if (contentFile != null) {
+                            files.add(contentFile);
+                            zipEntryNames.add(
+                                IOUtil.getFileTail(contentFile));
+                        }
+                    } else if (contentFile != null) {
                         files.add(contentFile);
                         zipEntryNames.add(IOUtil.getFileTail(contentFile));
                     }
-                } else if (contentFile != null) {
-                    files.add(contentFile);
-                    zipEntryNames.add(IOUtil.getFileTail(contentFile));
-                }
 
 
 
 
-                String   fromDate = formatDate(fromDateFld.getDate());
-                String   toDate   = formatDate(toDateFld.getDate());
-                int      cnt      = 0;
+                    String   fromDate = formatDate(fromDateFld.getDate());
+                    String   toDate   = formatDate(toDateFld.getDate());
+                    int      cnt      = 0;
 
 
-                Document doc      = XmlUtil.makeDocument();
-                //Create the top level node
-                Element root = XmlUtil.create(doc, TAG_ENTRIES);
-                List tags = StringUtil.split(tagFld.getText().trim(), ",",
-                                             true, true);
+                    Document doc      = XmlUtil.makeDocument();
+                    //Create the top level node
+                    Element root = XmlUtil.create(doc, TAG_ENTRIES);
+                    List tags = StringUtil.split(tagFld.getText().trim(),
+                                    ",", true, true);
 
-                String mainId    = (cnt++) + "";
-                String contentId = (cnt++) + "";
-                String mainFile;
-                if (bundleFile != null) {
-                    mainFile = bundleFile;
-                } else {
-                    mainFile    = contentFile;
-                    contentFile = null;
-                    contentId   = mainId;
-                }
-
-
-                String zidvFile = (isZidv
-                                   ? bundleFile
-                                   : null);
-                if (isZidv && !uploadZidvBundleCbx.isSelected()) {
-                    bundleFile = null;
-                    mainFile   = null;
-                }
-
-                List    attrs;
-                Element node = null;
-
-
-                if (mainFile != null) {
-                    attrs = Misc.toList(new String[] {
-                        ATTR_ID, mainId, ATTR_FILE,
-                        IOUtil.getFileTail(mainFile), ATTR_PARENT, parentId,
-                        ATTR_TYPE, "guess", ATTR_NAME,
-                        nameFld.getText().trim(), ATTR_DESCRIPTION,
-                        descFld.getText().trim(), ATTR_FROMDATE, fromDate,
-                        ATTR_TODATE, toDate
-                    });
-
-
-                    checkAndAdd(attrs, ATTR_NORTH, northFld);
-                    checkAndAdd(attrs, ATTR_SOUTH, southFld);
-                    checkAndAdd(attrs, ATTR_EAST, eastFld);
-                    checkAndAdd(attrs, ATTR_WEST, westFld);
-
-                    //Create the entry node
-                    node = XmlUtil.create(TAG_ENTRY, root, attrs);
-                    repositoryClient.addTags(node, tags);
-
-                    for (int i = 0; i < myDataSourcesCbx.size(); i++) {
-                        if (((JCheckBox) myDataSourcesCbx.get(
-                                i)).isSelected()) {
-                            String id = (String) myDataSourcesIds.get(i);
-                            repositoryClient.addAssociation(root, id, mainId,
-                                    "uses data");
-                        }
-                    }
-                }
-
-                if ((contentFile != null) && (node != null)) {
-                    if (isImage && doThumbnailCbx.isSelected()) {
-                        repositoryClient.addThumbnail(node,
-                                IOUtil.getFileTail(contentFile));
+                    String mainId    = (cnt++) + "";
+                    String contentId = (cnt++) + "";
+                    String mainFile;
+                    if (bundleFile != null) {
+                        mainFile = bundleFile;
                     } else {
-                        repositoryClient.addAttachment(node,
-                                IOUtil.getFileTail(contentFile));
+                        mainFile    = contentFile;
+                        contentFile = null;
+                        contentId   = mainId;
                     }
-                    if (false && isImage && doThumbnailCbx.isSelected()) {
-                        Image image = ImageUtils.readImage(contentFile);
-                        image = ImageUtils.resize(image, 75, -1);
-                        String filename = "thumb_"
-                                          + IOUtil.getFileTail(contentFile);
-                        String tmpFile =
-                            getIdv().getObjectStore().getTmpFile(filename);
-                        ImageUtils.writeImageToFile(image, tmpFile);
-                        repositoryClient.addThumbnail(node, filename);
-                        zipEntryNames.add(filename);
-                        files.add(tmpFile);
-                    }
-                }
-                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                ZipOutputStream       zos = new ZipOutputStream(bos);
-                for (int i = 0; i < files.size(); i++) {
-                    String file = files.get(i);
-                    String name = zipEntryNames.get(i);
-                    if (file == null) {
-                        continue;
-                    }
-                    zos.putNextEntry(new ZipEntry(name));
-                    byte[] bytes =
-                        IOUtil.readBytes(new FileInputStream(file));
-                    zos.write(bytes, 0, bytes.length);
-                    zos.closeEntry();
-                }
 
 
-                if ((zidvFile != null) && isZidv
-                        && uploadZidvDataCbx.isSelected()) {
-                    ZipInputStream zin = new ZipInputStream(
-                                             new FileInputStream(
-                                                 new File(zidvFile)));
-                    ZipEntry ze;
-                    SimpleDateFormat sdf =
-                        new SimpleDateFormat(DataSource.DATAPATH_DATE_FORMAT);
-                    while ((ze = zin.getNextEntry()) != null) {
-                        String entryName = ze.getName();
-                        String dateString =
-                            StringUtil.findPattern(entryName,
-                                "(" + DataSource.DATAPATH_DATE_PATTERN + ")");
-                        Date dttm = null;
-                        if (dateString != null) {
-                            dttm = sdf.parse(dateString);
+                    String zidvFile = (isZidv
+                                       ? bundleFile
+                                       : null);
+                    if (isZidv && !uploadZidvBundleCbx.isSelected()) {
+                        bundleFile = null;
+                        mainFile   = null;
+                    }
+
+                    List    attrs;
+                    Element node = null;
+
+
+                    if (mainFile != null) {
+                        attrs = Misc.toList(new String[] {
+                            ATTR_ID, mainId, ATTR_FILE,
+                            IOUtil.getFileTail(mainFile), ATTR_PARENT,
+                            parentId, ATTR_TYPE, "guess", ATTR_NAME,
+                            nameFld.getText().trim(), ATTR_DESCRIPTION,
+                            descFld.getText().trim(), ATTR_FROMDATE, fromDate,
+                            ATTR_TODATE, toDate
+                        });
+
+
+                        checkAndAdd(attrs, ATTR_NORTH, northFld);
+                        checkAndAdd(attrs, ATTR_SOUTH, southFld);
+                        checkAndAdd(attrs, ATTR_EAST, eastFld);
+                        checkAndAdd(attrs, ATTR_WEST, westFld);
+
+                        //Create the entry node
+                        node = XmlUtil.create(TAG_ENTRY, root, attrs);
+                        repositoryClient.addTags(node, tags);
+
+                        for (int i = 0; i < myDataSourcesCbx.size(); i++) {
+                            if (((JCheckBox) myDataSourcesCbx.get(
+                                    i)).isSelected()) {
+                                String id = (String) myDataSourcesIds.get(i);
+                                repositoryClient.addAssociation(root, id,
+                                        mainId, "uses data");
+                            }
                         }
-                        if (getIdv().getArgsManager().isBundleFile(
-                                entryName)) {
+                    }
+
+                    if ((contentFile != null) && (node != null)) {
+                        if (isImage && doThumbnailCbx.isSelected()) {
+                            repositoryClient.addThumbnail(node,
+                                    IOUtil.getFileTail(contentFile));
+                        } else {
+                            repositoryClient.addAttachment(node,
+                                    IOUtil.getFileTail(contentFile));
+                        }
+                        if (false && isImage && doThumbnailCbx.isSelected()) {
+                            Image image = ImageUtils.readImage(contentFile);
+                            image = ImageUtils.resize(image, 75, -1);
+                            String filename =
+                                "thumb_" + IOUtil.getFileTail(contentFile);
+                            String tmpFile =
+                                getIdv().getObjectStore().getTmpFile(
+                                    filename);
+                            ImageUtils.writeImageToFile(image, tmpFile);
+                            repositoryClient.addThumbnail(node, filename);
+                            zipEntryNames.add(filename);
+                            files.add(tmpFile);
+                        }
+                    }
+                    ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                    ZipOutputStream       zos = new ZipOutputStream(bos);
+                    for (int i = 0; i < files.size(); i++) {
+                        String file = files.get(i);
+                        String name = zipEntryNames.get(i);
+                        if (file == null) {
                             continue;
                         }
-                        dialog.setText("Adding " + entryName);
-                        zos.putNextEntry(new ZipEntry(entryName));
-                        byte[] bytes = IOUtil.readBytes(zin, null, false);
+                        zos.putNextEntry(new ZipEntry(name));
+                        byte[] bytes =
+                            IOUtil.readBytes(new FileInputStream(file));
                         zos.write(bytes, 0, bytes.length);
                         zos.closeEntry();
-                        String id = (cnt++) + "";
-                        attrs = Misc.toList(new String[] {
-                            ATTR_ID, id, ATTR_FILE, entryName, ATTR_PARENT,
-                            parentId, "type.guess", "true",
-                            //ATTR_TYPE, TYPE_FILE, 
-                            ATTR_NAME, entryName
-                        });
-                        if (dttm != null) {
-                            attrs.addAll(Misc.newList(ATTR_FROMDATE,
-                                    formatDate(dttm), ATTR_TODATE,
-                                    formatDate(dttm)));
-                        }
-                        node = XmlUtil.create(TAG_ENTRY, root, attrs);
                     }
+
+
+                    if ((zidvFile != null) && isZidv
+                            && uploadZidvDataCbx.isSelected()) {
+                        ZipInputStream zin = new ZipInputStream(
+                                                 new FileInputStream(
+                                                     new File(zidvFile)));
+                        ZipEntry ze;
+                        SimpleDateFormat sdf =
+                            new SimpleDateFormat(
+                                DataSource.DATAPATH_DATE_FORMAT);
+                        while ((ze = zin.getNextEntry()) != null) {
+                            String entryName = ze.getName();
+                            String dateString =
+                                StringUtil.findPattern(entryName,
+                                    "(" + DataSource.DATAPATH_DATE_PATTERN
+                                    + ")");
+                            Date dttm = null;
+                            if (dateString != null) {
+                                dttm = sdf.parse(dateString);
+                            }
+                            if (getIdv().getArgsManager().isBundleFile(
+                                    entryName)) {
+                                continue;
+                            }
+                            dialog.setText("Adding " + entryName);
+                            zos.putNextEntry(new ZipEntry(entryName));
+                            byte[] bytes = IOUtil.readBytes(zin, null, false);
+                            zos.write(bytes, 0, bytes.length);
+                            zos.closeEntry();
+                            String id = (cnt++) + "";
+                            attrs = Misc.toList(new String[] {
+                                ATTR_ID, id, ATTR_FILE, entryName,
+                                ATTR_PARENT, parentId, "type.guess", "true",
+                                //ATTR_TYPE, TYPE_FILE, 
+                                ATTR_NAME, entryName
+                            });
+                            if (dttm != null) {
+                                attrs.addAll(Misc.newList(ATTR_FROMDATE,
+                                        formatDate(dttm), ATTR_TODATE,
+                                        formatDate(dttm)));
+                            }
+                            node = XmlUtil.create(TAG_ENTRY, root, attrs);
+                        }
+                    }
+
+
+
+                    if ((addAssociationCbx != null)
+                            && addAssociationCbx.isSelected()) {
+                        repositoryClient.addAssociation(root, lastBundleId,
+                                contentId, "generated product");
+                    }
+
+
+                    String xml = XmlUtil.toString(root);
+                    //                System.out.println(xml);
+
+                    zos.putNextEntry(new ZipEntry("entries.xml"));
+                    byte[] bytes = xml.getBytes();
+                    zos.write(bytes, 0, bytes.length);
+                    zos.closeEntry();
+                    zos.close();
+                    bos.close();
+
+
+
+                    entries.add(new HttpFormEntry(ARG_FILE, "entries.zip",
+                            bos.toByteArray()));
+
                 }
 
-
-
-                if ((addAssociationCbx != null)
-                        && addAssociationCbx.isSelected()) {
-                    repositoryClient.addAssociation(root, lastBundleId,
-                            contentId, "generated product");
-                }
-
-
-                String xml = XmlUtil.toString(root);
-                //                System.out.println(xml);
-
-                zos.putNextEntry(new ZipEntry("entries.xml"));
-                byte[] bytes = xml.getBytes();
-                zos.write(bytes, 0, bytes.length);
-                zos.closeEntry();
-                zos.close();
-                bos.close();
-
-
-                List<HttpFormEntry> entries = new ArrayList<HttpFormEntry>();
-                repositoryClient.addUrlArgs(entries);
-                entries.add(new HttpFormEntry(ARG_FILE, "entries.zip",
-                        bos.toByteArray()));
 
 
                 dialog.setText("Posting to RAMADDA");
