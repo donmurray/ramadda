@@ -2804,7 +2804,6 @@ public class TypeHandler extends RepositoryManager {
         if (parent != null) {
             parent.initializeNewEntry(entry);
         }
-        System.err.println("TypeHandler:initializeNewEntry");
         if (fieldFilePattern != null) {
             String  path    = entry.getResource().getPath();
             Matcher matcher = fieldFilePattern.matcher(path);

@@ -91,6 +91,9 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
     /** attribute id */
     public static final String ATTR_FILEPATTERN = "filepattern";
 
+    /** _more_          */
+    public static final String ATTR_TOPPATTERN = "toppattern";
+
     /** attribute id */
     public static final String ATTR_NOTFILEPATTERN = "notfilepattern";
 
@@ -116,9 +119,15 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
     /** _more_ */
     private String filePatternString = ".*";
 
+    /** _more_          */
+    private String topPatternString = "";
+
 
     /** _more_ */
     private Pattern filePattern;
+
+    /** _more_ */
+    private Pattern topPattern;
 
     /** _more_ */
     private String notfilePatternString = "";
@@ -235,11 +244,16 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
                 filePatternString);
 
 
+        topPatternString = XmlUtil.getAttribute(element, ATTR_TOPPATTERN,
+                topPatternString);
+
+
         notfilePatternString = XmlUtil.getAttribute(element,
                 ATTR_NOTFILEPATTERN, notfilePatternString);
 
 
         filePattern    = null;
+        topPattern     = null;
         notfilePattern = null;
         sdf            = null;
         init();
@@ -269,6 +283,7 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
     public void applyState(Element element) throws Exception {
         super.applyState(element);
         element.setAttribute(ATTR_FILEPATTERN, filePatternString);
+        element.setAttribute(ATTR_TOPPATTERN, topPatternString);
         element.setAttribute(ATTR_NOTFILEPATTERN, notfilePatternString);
         element.setAttribute(ATTR_MOVETOSTORAGE, "" + moveToStorage);
         element.setAttribute(ATTR_DATEFORMAT, dateFormat);
@@ -292,6 +307,10 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
         filePatternString = request.getUnsafeString(ATTR_FILEPATTERN,
                 filePatternString);
         filePattern = null;
+
+        topPatternString = request.getUnsafeString(ATTR_TOPPATTERN,
+                topPatternString);
+        topPattern = null;
 
         notfilePatternString = request.getUnsafeString(ATTR_NOTFILEPATTERN,
                 notfilePatternString).trim();
@@ -378,17 +397,23 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
                     fileFieldExtra.toString()) + extraLabel));
 
 
-        sb.append(HtmlUtils.formEntry(msgLabel("That match pattern"),
+        sb.append(HtmlUtils.formEntry(msgLabel("Top directory pattern"),
+                                      HtmlUtils.input(ATTR_TOPPATTERN,
+                                          topPatternString,
+                                          HtmlUtils.SIZE_60)));
+
+        sb.append(HtmlUtils.formEntry(msgLabel("File pattern"),
                                       HtmlUtils.input(ATTR_FILEPATTERN,
                                           filePatternString,
                                           HtmlUtils.SIZE_60)));
 
-        sb.append(
-            HtmlUtils.formEntry(
-                msgLabel("Exclude files that match pattern"),
-                HtmlUtils.input(
-                    ATTR_NOTFILEPATTERN, notfilePatternString,
-                    HtmlUtils.SIZE_60)));
+        sb.append(HtmlUtils.formEntry(msgLabel("Exclude files that match"),
+                                      HtmlUtils.input(ATTR_NOTFILEPATTERN,
+                                          notfilePatternString,
+                                          HtmlUtils.SIZE_60)));
+
+
+
 
         sb.append(
             HtmlUtils.colspan(
@@ -522,6 +547,10 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
             notfilePattern = Pattern.compile(notfilePatternString);
         }
 
+        if ((topPattern == null) && (topPatternString.length() > 0)) {
+            topPattern = Pattern.compile(topPatternString);
+        }
+
 
 
 
@@ -652,7 +681,7 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
                 logHarvesterInfo("Root directory does not exist:" + rootDir);
             }
             dirs.add(new FileInfo(rootDir));
-            dirs.addAll(FileInfo.collectDirs(rootDir, this));
+            dirs.addAll(FileInfo.collectDirs(rootDir, this, topPattern));
         }
 
         logHarvesterInfo("Found " + dirs.size()
@@ -1339,13 +1368,12 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
         }
 
 
-        System.err.println("Harvested file:" + f);
+        //        System.err.println("Harvested file:" + f);
         Entry entry = templateEntry;
         if (entry == null) {
-            System.err.println("\tcreated new entry");
             entry = typeHandlerToUse.createEntry(getRepository().getGUID());
         } else {
-            System.err.println("\tcreated entry from entry.xml template");
+            //            System.err.println("\tcreated entry from entry.xml template");
         }
 
         Resource resource;
@@ -1366,11 +1394,11 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
         if (getGenerateMd5()) {
             resource.setMd5(IOUtil.getMd5(resource.getPath()));
         }
-        System.err.println("\tcalling initEntry");
+        //        System.err.println("\tcalling initEntry");
         entry.initEntry(name, desc, group, getUser(), resource, "",
                         createDate.getTime(), createDate.getTime(),
                         fromDate.getTime(), toDate.getTime(), values);
-        System.err.println("\tdone");
+        //        System.err.println("\tdone");
 
         Date date = null;
         //Don't try to pull the date from the filename for now

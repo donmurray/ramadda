@@ -427,8 +427,6 @@ public class Entry implements Cloneable {
         }
 
         if (template.hasDate()) {
-            System.err.println("Setting date from template:"
-                               + new Date(template.getStartDate()));
             setStartDate(template.getStartDate());
             setEndDate(template.getEndDate());
         }
