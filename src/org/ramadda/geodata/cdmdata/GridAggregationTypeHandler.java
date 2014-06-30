@@ -284,7 +284,7 @@ public class GridAggregationTypeHandler extends ExtensibleGroupTypeHandler {
                     + ncmlUtil);
         }
 
-        List<String> sortedChillens      = new ArrayList<String>();
+        List<Entry> sortedChillens      = new ArrayList<Entry>();
         boolean      childrenAggregation = false;
         List<Entry> childrenEntries =
             getRepository().getEntryManager().getChildren(request, entry);
@@ -404,16 +404,21 @@ public class GridAggregationTypeHandler extends ExtensibleGroupTypeHandler {
 
                 continue;
             }
-            sortedChillens.add(child.getResource().getPath());
+            //sortedChillens.add(child.getResource().getPath());
+            sortedChillens.add(child);
+            
         }
 
-        if (ncmlUtil.isJoinExisting() || ncmlUtil.isEnsemble()) {
-            Collections.sort(sortedChillens);
+        if (ncmlUtil.isJoinExisting()) {
+        	sortedChillens = getEntryUtil().sortEntriesOnDate(sortedChillens, false);
+        } else if (ncmlUtil.isEnsemble()) {
+        	sortedChillens = getEntryUtil().sortEntriesOnName(sortedChillens, false);
         }
         //        System.err.println("making ncml:");
         timestamp[0] = 0;
-        for (String s : sortedChillens) {
+        for (Entry child : sortedChillens) {
             //            System.err.println("   file:" + s);
+            String s = child.getResource().getPath();
             File f = new File(s);
             timestamp[0] = timestamp[0] ^ f.lastModified() ^ s.hashCode();
             sb.append(
