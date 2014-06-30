@@ -264,7 +264,9 @@ public class GridAggregationTypeHandler extends ExtensibleGroupTypeHandler {
                                           NcmlUtil.AGG_UNION, })));
         } else if (ncmlUtil.isJoinNew()) {
             //TODO here
-        } else if (ncmlUtil.isEnsemble()) {
+        }
+        else if (ncmlUtil.isEnsemble()) {
+          /* Ensemble is now handled below
             String ensembleDimName = "ens";
             ncmlUtil.addEnsembleVariables(sb, ensembleDimName);
             sb.append(XmlUtil.openTag(NcmlUtil.TAG_AGGREGATION,
@@ -279,6 +281,7 @@ public class GridAggregationTypeHandler extends ExtensibleGroupTypeHandler {
                                           NcmlUtil.ATTR_NAME,
                                           var })));
             }
+          */
         } else {
             throw new IllegalArgumentException("Unknown aggregation type:"
                     + ncmlUtil);
@@ -413,6 +416,20 @@ public class GridAggregationTypeHandler extends ExtensibleGroupTypeHandler {
         	sortedChillens = getEntryUtil().sortEntriesOnDate(sortedChillens, false);
         } else if (ncmlUtil.isEnsemble()) {
         	sortedChillens = getEntryUtil().sortEntriesOnName(sortedChillens, false);
+            String ensembleDimName = "ens";
+            ncmlUtil.addEnsembleVariables(sb, ensembleDimName, sortedChillens);
+            sb.append(XmlUtil.openTag(NcmlUtil.TAG_AGGREGATION,
+                                      XmlUtil.attrs(new String[] {
+                                          NcmlUtil.ATTR_DIMNAME,
+                                          ensembleDimName,
+                                          NcmlUtil.ATTR_TYPE,
+                                          NcmlUtil.AGG_JOINNEW })));
+            for (String var : fields) {
+                sb.append(XmlUtil.tag(NcmlUtil.TAG_VARIABLEAGG,
+                                      XmlUtil.attrs(new String[] {
+                                          NcmlUtil.ATTR_NAME,
+                                          var })));
+            }
         }
         //        System.err.println("making ncml:");
         timestamp[0] = 0;

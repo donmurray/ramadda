@@ -21,6 +21,12 @@
 package org.ramadda.geodata.cdmdata;
 
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.ramadda.repository.Entry;
+
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 
@@ -157,7 +163,6 @@ public class NcmlUtil {
                 XMLNS_XMLNS })));
     }
 
-
     /**
      * Add the ensemble variable and attributes
      *
@@ -165,12 +170,33 @@ public class NcmlUtil {
      * @param name  the name of the ensemble variable
      */
     public static void addEnsembleVariables(StringBuffer sb, String name) {
+        addEnsembleVariables(sb,name,null);
+    }
+
+    /**
+     * Add the ensemble variable and attributes
+     *
+     * @param sb the StringBuffer to add to
+     * @param name  the name of the ensemble variable
+     */
+    public static void addEnsembleVariables(StringBuffer sb, String name, List<Entry> entries) {
         /*
  <variable name='ens' type='String' shape='ens'>
    <attribute name='long_name' value='ensemble coordinate' />
    <attribute name='_CoordinateAxisType' value='Ensemble' />
+   <values>run1 run2 run3 run4 run5 run6 run7 run8</values>
  </variable>
         */
+        // Get the ensemble names from the entry names
+        String values = "";
+        if (entries != null && !entries.isEmpty()) {
+           StringBuilder buf = new StringBuilder();
+           for (Entry e : entries)  {
+               buf.append(e.getName());
+               buf.append(" ");
+           }
+           values = XmlUtil.tag("values", "", buf.toString().trim());
+        }
 
         sb.append(XmlUtil.tag(TAG_VARIABLE, XmlUtil.attrs(new String[] {
             ATTR_NAME, name, ATTR_TYPE, "String", ATTR_SHAPE, name
@@ -178,7 +204,8 @@ public class NcmlUtil {
                 "long_name", ATTR_VALUE,
                 "ensemble coordinate" })) + XmlUtil.tag(TAG_ATTRIBUTE,
                     XmlUtil.attrs(new String[] { ATTR_NAME,
-                "_CoordinateAxisType", ATTR_VALUE, "Ensemble" }))));
+                "_CoordinateAxisType", ATTR_VALUE, "Ensemble" }))
+                +values));
     }
 
 
