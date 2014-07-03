@@ -556,14 +556,16 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                     + HtmlUtils.select(
                         CDOOutputHandler.ARG_CDO_STARTYEAR
                         + yearNum, years, request.getString(
-                            CDOOutputHandler.ARG_CDO_STARTYEAR, years.get(
-                                0)),HtmlUtils.title("Select the starting year")) + HtmlUtils.space(3)
+                            CDOOutputHandler.ARG_CDO_STARTYEAR+yearNum, 
+                              request.getString(CDOOutputHandler.ARG_CDO_STARTYEAR,years.get(
+                                0))),HtmlUtils.title("Select the starting year")) + HtmlUtils.space(3)
                                      + Repository.msgLabel("End")
                                      + HtmlUtils.select(
                                          CDOOutputHandler.ARG_CDO_ENDYEAR
                                          + yearNum, years, request.getString(
-                                             CDOOutputHandler.ARG_CDO_ENDYEAR, years.get(
-                                                 endIndex)), HtmlUtils.title("Select the ending year")) + HtmlUtils.p()
+                                             CDOOutputHandler.ARG_CDO_ENDYEAR+yearNum, 
+                                               request.getString(CDOOutputHandler.ARG_CDO_ENDYEAR, years.get(
+                                                 endIndex))), HtmlUtils.title("Select the ending year")) + HtmlUtils.p()
                                                      + Repository.msgLabel(
                                                          "or List") + HtmlUtils.input(
                                                              CDOOutputHandler.ARG_CDO_YEARS
