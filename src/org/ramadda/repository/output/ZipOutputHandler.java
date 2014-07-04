@@ -152,11 +152,16 @@ public class ZipOutputHandler extends OutputHandler {
 
         if (state.entry != null) {
             if (getAccessManager().canDownload(request, state.entry)) {
+                /* don't add the .zip to the URL. This now gets set below in setReturnFilename
                 links.add(
                     makeLink(
                         request, state.entry, OUTPUT_ZIP,
                         "/" + IOUtil.stripExtension(state.entry.getName())
                         + ".zip"));
+                */
+                links.add(
+                    makeLink(
+                             request, state.entry, OUTPUT_ZIP));
             }
 
             return;
@@ -179,11 +184,16 @@ public class ZipOutputHandler extends OutputHandler {
 
         if (hasFile) {
             if (state.group != null) {
+                /* don't add the .zip to the URL. This now gets set below in setReturnFilename
                 links.add(
                     makeLink(
                         request, state.group, OUTPUT_ZIPGROUP,
                         "/" + IOUtil.stripExtension(state.group.getName())
                         + ".zip"));
+                */
+                links.add(
+                    makeLink(
+                             request, state.group, OUTPUT_ZIPGROUP));
             } else {
                 links.add(makeLink(request, state.group, OUTPUT_ZIP));
             }
@@ -192,10 +202,12 @@ public class ZipOutputHandler extends OutputHandler {
 
         if ((state.group != null) && hasGroup
                 && ( !state.group.isTopEntry() || state.group.isDummy())) {
+            /*
             links.add(makeLink(request, state.group, OUTPUT_ZIPTREE,
                                "/"
                                + IOUtil.stripExtension(state.group.getName())
-                               + ".zip"));
+                               + ".zip"));*/
+            links.add(makeLink(request, state.group, OUTPUT_ZIPTREE));
         }
 
     }
@@ -242,12 +254,7 @@ public class ZipOutputHandler extends OutputHandler {
                               List<Entry> entries)
             throws Exception {
 
-        if (group.isDummy()) {
-            request.setReturnFilename("Search_Results.zip");
-        }
-
         OutputType output = request.getOutput();
-        request.setReturnFilename(IOUtil.stripExtension(group.getName())+ ".zip");
         if (output.equals(OUTPUT_ZIPTREE)) {
             List<Entry> all = new ArrayList<Entry>();
             all.addAll(subGroups);
@@ -322,10 +329,16 @@ public class ZipOutputHandler extends OutputHandler {
         if ( !ok) {
             return new Result(
                 "Error",
-                new StringBuffer(
-                    "Size of request has exceeded maximum size"));
+                new StringBuffer(getPageHandler().showDialogError(
+                                                                  "Size of request has exceeded maximum size")));
         }
 
+        //Now set the return file name
+        if (prefix.length()==0) {
+            request.setReturnFilename("entry.zip");
+        } else {
+            request.setReturnFilename(prefix+ ".zip");
+        }
 
         Result     result         = new Result();
         FileWriter fileWriter     = null;
@@ -385,7 +398,6 @@ public class ZipOutputHandler extends OutputHandler {
         }
         if (doingFile) {
             IOUtil.close(os);
-
             return new Result(
                 "", getStorageManager().getFileInputStream(tmpFile),
                 getMimeType(OUTPUT_ZIP));
@@ -434,12 +446,12 @@ public class ZipOutputHandler extends OutputHandler {
         if (request.isAnonymous()) {
             sizeLimit = MEGA
                         * getRepository().getProperty(
-                            request.PROP_ZIPOUTPUT_ANONYMOUS_MAXSIZEMB, 100);
+                            request.PROP_ZIPOUTPUT_ANONYMOUS_MAXSIZEMB, 4000);
         } else {
             sizeLimit = MEGA
                         * getRepository().getProperty(
                             request.PROP_ZIPOUTPUT_REGISTERED_MAXSIZEMB,
-                            2000);
+                            8000);
         }
         for (Entry entry : entries) {
             //Not sure why I wasn't dealing with synthetic entries here
