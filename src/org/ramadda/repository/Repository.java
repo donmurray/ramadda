@@ -2873,7 +2873,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
         debugSession("RAMADDA.handleRequest:" + request.getRequestPath());
 
         Result result;
-        if ( !acceptRobots() && request.isRobot()) {
+        if ( !acceptRobots() && request.getIsRobot()) {
             return getNoRobotsResult(request);
         }
 
@@ -3794,7 +3794,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
     public List<Link> getOutputLinks(Request request,
                                      OutputHandler.State state)
             throws Exception {
-        boolean    isRobot = request.isRobot();
+        boolean    isRobot = request.getIsRobot();
         List<Link> links   = new ArrayList<Link>();
         for (OutputHandler outputHandler : outputHandlers) {
             if (isRobot && !outputHandler.allowRobots()) {

@@ -840,7 +840,7 @@ public class EntryManager extends RepositoryManager {
         OutputHandler outputHandler =
             getRepository().getOutputHandler(request);
 
-        if (request.isRobot()) {
+        if (request.getIsRobot()) {
             if ( !outputHandler.allowRobots()) {
                 return getRepository().getNoRobotsResult(request);
             }
@@ -3835,6 +3835,7 @@ public class EntryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processEntryGet(Request request) throws Exception {
+
         if (request.getCheckingAuthMethod()) {
             return new Result(AuthorizationMethod.AUTH_HTTP);
         }

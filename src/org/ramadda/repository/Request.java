@@ -146,6 +146,8 @@ public class Request implements Constants, Cloneable {
     /** _more_ */
     private boolean isMobile = false;
 
+    private boolean isRobot = false;
+
     /** _more_ */
     private boolean makeAbsoluteUrls = false;
 
@@ -204,6 +206,7 @@ public class Request implements Constants, Cloneable {
         this.parameters          = new Hashtable();
         this.originalParameters  = new Hashtable();
         this.isMobile            = that.isMobile;
+        this.isRobot             = that.isRobot;
         this.ip                  = that.ip;
         this.httpServletRequest  = that.httpServletRequest;
         this.httpServletResponse = that.httpServletResponse;
@@ -2159,6 +2162,7 @@ public class Request implements Constants, Cloneable {
         isMobile = (ua.indexOf("iphone") >= 0)
                    || (ua.indexOf("android") >= 0)
                    || (ua.indexOf("blackberry") >= 0);
+        isRobot = checkForRobot();
     }
 
     /**
@@ -2332,12 +2336,17 @@ public class Request implements Constants, Cloneable {
         return value;
     }
 
+    public boolean getIsRobot() {
+        return isRobot;
+    }
+
+
     /**
      * _more_
      *
      * @return _more_
      */
-    public boolean isRobot() {
+    private boolean checkForRobot() {
         String userAgent = getUserAgent();
         if (userAgent == null) {
             return false;

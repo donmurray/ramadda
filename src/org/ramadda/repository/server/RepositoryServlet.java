@@ -382,6 +382,8 @@ public class RepositoryServlet extends HttpServlet implements Constants {
                             repositoryResult.getMimeType());
                         OutputStream output = response.getOutputStream();
                         try {
+                            //                            System.err.println("SLEEP");
+                            //                            Misc.sleepSeconds(30);
                             IOUtils.copy(repositoryResult.getInputStream(),   output);
                             //IOUtil.writeTo(repositoryResult.getInputStream(),
                             //                               output);
