@@ -282,9 +282,10 @@ public class BulkDownloadOutputHandler extends OutputHandler {
             }
 
             if (entry.getResource().isUrl()) {
-                sb.append(cmd(command + " "
-                              + qt(entry.getResource().getPath())));
-
+                //Not sure what to do with external URLs
+                //For now skip them
+                //                sb.append(cmd(command + args + " " + outputArg + " "
+                //                              + qt(tmpFile) + " " + qt(entry.getResource().getPath())));
                 continue;
             } else if ( !getAccessManager().canDownload(request, entry)) {
                 continue;
