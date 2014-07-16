@@ -309,7 +309,9 @@ public class BulkDownloadOutputHandler extends OutputHandler {
             }
 
 
-            sb.append(cmd("echo " + qt("downloading " + destFile)));
+            long size = entry.getResource().getFileSize();
+            
+            sb.append(cmd("echo " + qt("downloading " + destFile +" (" + formatFileLength(size) + ")")));
 
             sb.append(cmd(command + args + " " + outputArg + " "
                           + qt(tmpFile) + " " + qt(path)));
