@@ -43,16 +43,16 @@ import java.util.List;
 
 
 /**
- * Produces a wget script to download files
+ * Produces a shell script to download files
  *
  *
  * @author RAMADDA Development Team
  * @version $Revision: 1.3 $
  */
-public class WgetOutputHandler extends OutputHandler {
+public class BulkDownloadOutputHandler extends OutputHandler {
 
 
-    /** The WGET output type */
+    /** The  output type */
     public static final OutputType OUTPUT_CURL =
         new OutputType("Bulk Download Script", "bulk.curl",
                        OutputType.TYPE_FILE, "", ICON_FETCH);
@@ -82,7 +82,7 @@ public class WgetOutputHandler extends OutputHandler {
      * @param element     the XML definition
      * @throws Exception  problem creating the handler
      */
-    public WgetOutputHandler(Repository repository, Element element)
+    public BulkDownloadOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
         addType(OUTPUT_CURL);
@@ -209,12 +209,6 @@ public class WgetOutputHandler extends OutputHandler {
         }
 
         StringBuffer sb = new StringBuffer();
-        System.err.println("RAMADDA: wget server name: "
-                           + request.getHttpServletRequest().getServerName()
-                           + " getServerPort:"
-                           + request.getHttpServletRequest().getServerPort()
-                           + " getLocalPort:"
-                           + request.getHttpServletRequest().getLocalPort());
         boolean recurse = request.get(ARG_RECURSE, true);
         subGroups.addAll(entries);
         process(request, sb, group, subGroups, recurse);
