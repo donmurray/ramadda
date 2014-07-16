@@ -231,10 +231,12 @@ public class BulkDownloadOutputHandler extends OutputHandler {
                         List<Entry> entries, boolean recurse)
             throws Exception {
         String command   = request.getString(ARG_COMMAND, COMMAND_CURL);
+        String args = command.equals(COMMAND_WGET)?"":
+            " --progress-bar ";
         String outputArg = command.equals(COMMAND_WGET)
                            ? "-O"
                            : command.equals(COMMAND_CURL)
-                             ? "-o"
+                             ? "-o "
                              : "";
         HashSet seen = new HashSet();
         for (Entry entry : entries) {
@@ -281,7 +283,9 @@ public class BulkDownloadOutputHandler extends OutputHandler {
             path = HtmlUtils.urlEncodeSpace(path);
             String tmpFile = destFile + ".tmp";
             sb.append("if ! test -e " + qt(destFile) + " ; then \n");
-            sb.append(cmd(command + " " + outputArg + " " + qt(tmpFile) + " "
+            sb.append(cmd("downloading "  + qt(destFile)));
+
+            sb.append(cmd(command + args + " " + outputArg + " " + qt(tmpFile) + " "
                           + qt(path)));
             sb.append("if [[ $? != 0 ]] ; then\n");
             sb.append(cmd("echo" + " "
