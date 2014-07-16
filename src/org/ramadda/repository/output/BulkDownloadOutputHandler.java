@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
 
 
 import java.util.ArrayList;
@@ -57,7 +58,7 @@ public class BulkDownloadOutputHandler extends OutputHandler {
         new OutputType("Bulk Download Script", "bulk.curl",
                        OutputType.TYPE_FILE, "", ICON_FETCH);
 
-    /** _more_          */
+    /** _more_ */
     public static final OutputType OUTPUT_WGET =
         new OutputType("Bulk Download Script", "bulk.wget",
                        OutputType.TYPE_FILE, "", ICON_FETCH);
@@ -65,6 +66,12 @@ public class BulkDownloadOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final String ARG_RECURSE = "recurse";
+
+    /** _more_          */
+    public static final String ARG_OVERWRITE = "overwrite";
+
+    /** _more_          */
+    public static final String ARG_OUTPUTS = "outputs";
 
     /** _more_ */
     public static final String ARG_COMMAND = "command";
@@ -208,10 +215,11 @@ public class BulkDownloadOutputHandler extends OutputHandler {
             request.setReturnFilename("Search_Results_download.sh");
         }
 
-        StringBuffer sb = new StringBuffer();
-        boolean recurse = request.get(ARG_RECURSE, true);
+        StringBuffer sb      = new StringBuffer();
+        boolean      recurse = request.get(ARG_RECURSE, true);
         subGroups.addAll(entries);
-        process(request, sb, group, subGroups, recurse);
+        boolean overwrite = request.get(ARG_OVERWRITE, false);
+        process(request, sb, group, subGroups, recurse, overwrite);
 
         return new Result("", sb, getMimeType(OUTPUT_CURL));
     }
@@ -224,21 +232,33 @@ public class BulkDownloadOutputHandler extends OutputHandler {
      * @param group _more_
      * @param entries _more_
      * @param recurse _more_
+     * @param overwrite _more_
      *
      * @throws Exception _more_
      */
     public void process(Request request, StringBuffer sb, Entry group,
-                        List<Entry> entries, boolean recurse)
+                        List<Entry> entries, boolean recurse,
+                        boolean overwrite)
             throws Exception {
-        String command   = request.getString(ARG_COMMAND, COMMAND_CURL);
-        String args = command.equals(COMMAND_WGET)?"":
-            " --progress-bar ";
-        String outputArg = command.equals(COMMAND_WGET)
-                           ? "-O"
-                           : command.equals(COMMAND_CURL)
-                             ? "-o "
-                             : "";
-        HashSet seen = new HashSet();
+
+        List<List<String>> outputPairs = new ArrayList<List<String>>();
+        for (String pair :
+                StringUtil.split(request.getString(ARG_OUTPUTS, ""), ",",
+                                 true, true)) {
+            outputPairs.add(StringUtil.splitUpTo(pair, ":", 2));
+        }
+
+
+        String  command   = request.getString(ARG_COMMAND, COMMAND_CURL);
+        String  args      = command.equals(COMMAND_WGET)
+                            ? ""
+                            : " --progress-bar ";
+        String  outputArg = command.equals(COMMAND_WGET)
+                            ? "-O"
+                            : command.equals(COMMAND_CURL)
+                              ? "-o "
+                              : "";
+        HashSet seen      = new HashSet();
         for (Entry entry : entries) {
             if (entry.isGroup()) {
                 if ( !recurse) {
@@ -255,7 +275,8 @@ public class BulkDownloadOutputHandler extends OutputHandler {
                     sb.append(cmd("mkdir " + qt(dirName)));
                     sb.append("fi\n");
                     sb.append(cmd("cd " + qt(dirName)));
-                    process(request, sb, entry, subEntries, recurse);
+                    process(request, sb, entry, subEntries, recurse,
+                            overwrite);
                     sb.append(cmd("cd .."));
                 }
             }
@@ -268,12 +289,12 @@ public class BulkDownloadOutputHandler extends OutputHandler {
             } else if ( !getAccessManager().canDownload(request, entry)) {
                 continue;
             }
-            String tail = getStorageManager().getFileTail(entry);
-            int cnt = 1;
+            String tail     = getStorageManager().getFileTail(entry);
+            int    cnt      = 1;
             String destFile = tail;
             //Handle duplicate file names
-            while(seen.contains(destFile)) {
-                destFile =  "v" + ( cnt++) + "_" + tail;
+            while (seen.contains(destFile)) {
+                destFile = "v" + (cnt++) + "_" + tail;
             }
             seen.add(destFile);
             String path = request.getAbsoluteUrl(
@@ -282,21 +303,48 @@ public class BulkDownloadOutputHandler extends OutputHandler {
 
             path = HtmlUtils.urlEncodeSpace(path);
             String tmpFile = destFile + ".tmp";
-            sb.append("if ! test -e " + qt(destFile) + " ; then \n");
-            sb.append(cmd("echo " + qt("downloading "  + destFile)));
+            if ( !overwrite) {
+                sb.append("if ! test -e " + qt(destFile) + " ; then \n");
+            }
 
-            sb.append(cmd(command + args + " " + outputArg + " " + qt(tmpFile) + " "
-                          + qt(path)));
+
+            sb.append(cmd("echo " + qt("downloading " + destFile)));
+
+            sb.append(cmd(command + args + " " + outputArg + " "
+                          + qt(tmpFile) + " " + qt(path)));
             sb.append("if [[ $? != 0 ]] ; then\n");
             sb.append(cmd("echo" + " "
                           + qt("file download failed for " + destFile)));
             sb.append("exit $?\n");
             sb.append("fi\n");
             sb.append(cmd("mv " + qt(tmpFile) + " " + qt(destFile)));
-            sb.append("else\n");
-            sb.append(cmd("echo " + qt("File " + destFile + " already exists")));
-            sb.append("fi\n");
+            for (List<String> pair : outputPairs) {
+                String output = pair.get(0);
+                String suffix = output;
+                if (pair.size() > 1) {
+                    suffix = pair.get(1);
+                }
+                String extraUrl = HtmlUtils.url(
+                                      getEntryManager().getFullEntryShowUrl(
+                                          request), ARG_ENTRYID,
+                                              entry.getId(), ARG_OUTPUT,
+                                              output);
+                sb.append(cmd("echo "
+                              + qt("downloading " + destFile + "."
+                                   + suffix)));
+                sb.append(cmd(command + args + " " + outputArg + " "
+                              + qt(destFile + "." + suffix) + " "
+                              + qt(extraUrl)));
+            }
+
+            if ( !overwrite) {
+                sb.append("else\n");
+                sb.append(cmd("echo "
+                              + qt("File " + destFile + " already exists")));
+                sb.append("fi\n");
+            }
         }
+
     }
 
     /**
