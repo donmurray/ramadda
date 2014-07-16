@@ -247,7 +247,6 @@ public class BulkDownloadOutputHandler extends OutputHandler {
                 if (dirName.length() == 0) {
                     dirName = entry.getId();
                 }
-                System.err.println("dirname:" + dirName);
                 if (subEntries.size() > 0) {
                     sb.append("if ! test -e " + qt(dirName) + " ; then \n");
                     sb.append(cmd("mkdir " + qt(dirName)));
