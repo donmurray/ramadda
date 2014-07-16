@@ -283,7 +283,7 @@ public class BulkDownloadOutputHandler extends OutputHandler {
             path = HtmlUtils.urlEncodeSpace(path);
             String tmpFile = destFile + ".tmp";
             sb.append("if ! test -e " + qt(destFile) + " ; then \n");
-            sb.append(cmd("downloading "  + qt(destFile)));
+            sb.append(cmd("echo " + qt("downloading "  + destFile)));
 
             sb.append(cmd(command + args + " " + outputArg + " " + qt(tmpFile) + " "
                           + qt(path)));
