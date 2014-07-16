@@ -236,6 +236,7 @@ public class BulkDownloadOutputHandler extends OutputHandler {
                            : command.equals(COMMAND_CURL)
                              ? "-o"
                              : "";
+        HashSet seen = new HashSet();
         for (Entry entry : entries) {
             if (entry.isGroup()) {
                 if ( !recurse) {
@@ -266,23 +267,30 @@ public class BulkDownloadOutputHandler extends OutputHandler {
                 continue;
             }
             String tail = getStorageManager().getFileTail(entry);
+            int cnt = 1;
+            String destFile = tail;
+            //Handle duplicate file names
+            while(seen.contains(destFile)) {
+                destFile =  "v" + ( cnt++) + "_" + tail;
+            }
+            seen.add(destFile);
             String path = request.getAbsoluteUrl(
                               getEntryManager().getEntryResourceUrl(
                                   request, entry));
 
             path = HtmlUtils.urlEncodeSpace(path);
-            String tmpFile = tail + ".tmp";
-            sb.append("if ! test -e " + qt(tail) + " ; then \n");
+            String tmpFile = destFile + ".tmp";
+            sb.append("if ! test -e " + qt(destFile) + " ; then \n");
             sb.append(cmd(command + " " + outputArg + " " + qt(tmpFile) + " "
                           + qt(path)));
             sb.append("if [[ $? != 0 ]] ; then\n");
             sb.append(cmd("echo" + " "
-                          + qt("file download failed for " + tail)));
+                          + qt("file download failed for " + destFile)));
             sb.append("exit $?\n");
             sb.append("fi\n");
-            sb.append(cmd("mv " + qt(tmpFile) + " " + qt(tail)));
+            sb.append(cmd("mv " + qt(tmpFile) + " " + qt(destFile)));
             sb.append("else\n");
-            sb.append(cmd("echo " + qt("File " + tail + " already exists")));
+            sb.append(cmd("echo " + qt("File " + destFile + " already exists")));
             sb.append("fi\n");
         }
     }
