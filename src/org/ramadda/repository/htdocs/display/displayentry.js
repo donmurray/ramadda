@@ -852,7 +852,49 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                             
                     });
             },
+            getEntriesTable:function (entries, columns, columnNames) {
+                console.log("columns:" + columns);
+                var html = "<table width=100% cellpadding=0 cellspacing=0 border=0>";
+                html += "<tr valign=bottom>";
+                for(var i=0;i<columnNames.length;i++) {
+                    html += HtmlUtil.td([ATTR_CLASS, "display-entrytable-header"],columnNames[i]);
+                }
+                html += "</tr>";
+
+                for(var i=0;i<entries.length;i++) {
+                    html += "<tr valign=bottom>";
+                    var entry = entries[i];
+                    for(var j=0;j<columns.length;j++) {
+                        var column = columns[j];
+                        var value = "";
+                        if(column == "name") {
+                            value =   HtmlUtil.tag(TAG_A,[ATTR_HREF, entry.getEntryUrl()],entry.getName());
+                        } else if(column == "description") {
+                            value = entry.getDescription();
+                        } else {
+                            value = entry.getColumnValue(column);
+                        }
+                        html += HtmlUtil.td([ATTR_CLASS, "display-entrytable-cell"],value);
+                    }
+                    html += "</tr>";
+                }
+                html += "</table>";
+                return html;
+            },
             getEntriesTree:function (entries) {
+                var columns = this.getProperty("columns",null);
+                if(columns!=null) {
+                    columns = columns.split(",");
+                    var columnNames = this.getProperty("columnNames",null);
+                    if(columnNames == null) {
+                        columnNames = columns;
+                    } else {
+                        columnNames = columnNames.split(",");
+                    }
+                    return this.getEntriesTable(entries, columns, columnNames);
+                }
+
+                
                 var html = "";
                 var rowClass = "entryrow_" + this.getId()
                 for(var i=0;i<entries.length;i++) {

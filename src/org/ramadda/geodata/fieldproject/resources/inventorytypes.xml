@@ -86,6 +86,8 @@
 {{description}}
 {{display   
 type="entrylist"  
+columns="name,description,unit"
+columnNames="Name,Description,Units"
 orientation="horizontal"
 layoutHere="true"   
 orientation="vertical"  
