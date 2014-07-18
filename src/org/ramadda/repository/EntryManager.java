@@ -3337,7 +3337,7 @@ public class EntryManager extends RepositoryManager {
 
 
         List<String[]> found = getDescendents(request, entries, connection,
-                                   true, true);
+                                   true, true, actionId);
         String query;
 
         query =
@@ -4531,10 +4531,11 @@ public class EntryManager extends RepositoryManager {
             Connection connection = getDatabaseManager().getConnection();
             connection.setAutoCommit(false);
             List<String[]> ids = getDescendents(request, entries, connection,
-                                     true, true);
+                                     true, true, actionId);
             getDatabaseManager().closeConnection(connection);
             Hashtable<String, Entry> oldIdToNewEntry = new Hashtable<String,
                                                            Entry>();
+
             for (int i = 0; i < ids.size(); i++) {
                 if ( !getActionManager().getActionOk(actionId)) {
                     return;
@@ -8959,6 +8960,7 @@ public class EntryManager extends RepositoryManager {
      * @param connection _more_
      * @param firstCall _more_
      * @param ignoreSynth _more_
+     * @param actionId _more_
      *
      * @return _more_
      * @throws Exception _more_
@@ -8967,10 +8969,20 @@ public class EntryManager extends RepositoryManager {
                                             List<Entry> entries,
                                             Connection connection,
                                             boolean firstCall,
-                                            boolean ignoreSynth)
+                                            boolean ignoreSynth,
+                                            Object actionId)
             throws Exception {
+        boolean        ok       = true;
         List<String[]> children = new ArrayList();
         for (Entry entry : entries) {
+            if ((actionId != null)
+                    && !getActionManager().getActionOk(actionId)) {
+                ok = false;
+            }
+            if ( !ok) {
+                break;
+            }
+
             if (firstCall) {
                 children.add(new String[] { entry.getId(),
                                             entry.getTypeHandler().getType(),
@@ -8988,6 +9000,12 @@ public class EntryManager extends RepositoryManager {
                 }
                 for (String childId :
                         getChildIds(request, (Entry) entry, null)) {
+                    if ((actionId != null)
+                            && !getActionManager().getActionOk(actionId)) {
+                        ok = false;
+
+                        break;
+                    }
                     Entry childEntry = getEntry(request, childId);
                     if (childEntry == null) {
                         continue;
@@ -8998,7 +9016,7 @@ public class EntryManager extends RepositoryManager {
                     if (childEntry.isGroup()) {
                         children.addAll(getDescendents(request,
                                 (List<Entry>) Misc.newList(childEntry),
-                                connection, false, ignoreSynth));
+                                connection, false, ignoreSynth, actionId));
                     }
                 }
 
@@ -9019,6 +9037,12 @@ public class EntryManager extends RepositoryManager {
             iter.setShouldCloseStatement(false);
             ResultSet results;
             while ((results = iter.getNext()) != null) {
+                if ((actionId != null)
+                        && !getActionManager().getActionOk(actionId)) {
+                    ok = false;
+
+                    break;
+                }
                 int    col       = 1;
                 String childId   = results.getString(col++);
                 String childType = results.getString(col++);
@@ -9037,7 +9061,7 @@ public class EntryManager extends RepositoryManager {
 
                 children.addAll(getDescendents(request,
                         (List<Entry>) Misc.newList(childEntry), connection,
-                        false, ignoreSynth));
+                        false, ignoreSynth, actionId));
             }
             getDatabaseManager().closeStatement(stmt);
         }
