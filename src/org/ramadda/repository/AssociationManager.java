@@ -258,17 +258,18 @@ public class AssociationManager extends RepositoryManager {
         Entry  toEntry   = (Entry) entries.get(toId);
         if (fromEntry == null) {
             fromEntry = getEntryManager().getEntry(request, fromId);
-            if (fromEntry == null) {
-                throw new RepositoryUtil.MissingEntryException(
-                    "Could not find from entry:" + fromId);
-            }
+        }
+
+        if (fromEntry == null) {
+            throw new RepositoryUtil.MissingEntryException(
+                "Could not find from entry:" + fromId);
         }
         if (toEntry == null) {
             toEntry = getEntryManager().getEntry(request, toId);
-            if (toEntry == null) {
-                throw new RepositoryUtil.MissingEntryException(
-                    "Could not find to entry:" + toId);
-            }
+        }
+        if (toEntry == null) {
+            throw new RepositoryUtil.MissingEntryException(
+                "Could not find to entry:" + toId);
         }
 
         return addAssociation(request, fromEntry, toEntry,
@@ -760,25 +761,46 @@ public class AssociationManager extends RepositoryManager {
         boolean      lastFromIsMe = false;
         boolean      lastToIsMe   = false;
         for (Association association : associations) {
-            Entry fromEntry = null;
-            Entry toEntry   = null;
-            List  cols;
-            if ((entry != null)
-                    && association.getFromId().equals(entry.getId())) {
+            Entry  fromEntry = null;
+            Entry  toEntry   = null;
+
+            String fromId    = association.getFromId();
+            String toId      = association.getToId();
+            List   cols      = null;
+            if (fromId.equals("this")) {
                 cols      = cols1;
                 fromEntry = entry;
-            } else {
-                fromEntry = getEntryManager().getEntry(request,
-                        association.getFromId());
-                cols = cols2;
             }
-            if ((entry != null)
-                    && association.getToId().equals(entry.getId())) {
+            if (toId.equals("this")) {
                 toEntry = entry;
-            } else {
-                toEntry = getEntryManager().getEntry(request,
-                        association.getToId());
+                cols    = cols2;
             }
+
+
+            if (fromEntry == null) {
+                if ((entry != null) && fromId.equals(entry.getId())) {
+                    cols      = cols1;
+                    fromEntry = entry;
+                } else {
+                    fromEntry = getEntryManager().getEntry(request,
+                            association.getFromId());
+                    cols = cols2;
+                }
+            }
+
+            if (toEntry == null) {
+                if ((entry != null)
+                        && association.getToId().equals(entry.getId())) {
+                    toEntry = entry;
+                } else {
+                    toEntry = getEntryManager().getEntry(request,
+                            association.getToId());
+                }
+            }
+
+            //            System.err.println("fromEntry:" + fromEntry +" id:" +fromId);
+            //            System.err.println("toEntry:" + toEntry +" id:" + toId);
+
             if ((fromEntry == null) || (toEntry == null)) {
                 continue;
             }

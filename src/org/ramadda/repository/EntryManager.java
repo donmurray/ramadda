@@ -5078,6 +5078,7 @@ public class EntryManager extends RepositoryManager {
             }
         }
 
+
         for (Element node : associationNodes) {
             String id =
                 getAssociationManager().processAssociationXml(request, node,
@@ -5158,7 +5159,6 @@ public class EntryManager extends RepositoryManager {
                                     Hashtable<String, File> files,
                                     boolean checkAccess, boolean internal)
             throws Exception {
-
 
         boolean doAnonymousUpload = false;
         String  name              = XmlUtil.getAttribute(node, ATTR_NAME, "");
@@ -7729,6 +7729,15 @@ public class EntryManager extends RepositoryManager {
         Element root =
             XmlUtil.getRoot(getStorageManager().readSystemResource(xmlFile));
 
+
+        List<Element> associationNodes = new ArrayList<Element>();
+        //xxxxxx
+        associationNodes.addAll((List<Element>) XmlUtil.findDescendants(root,
+                TAG_ASSOCIATION));
+
+        System.err.println("nodes:" + associationNodes.size());
+
+
         if (root.getTagName().equals(TAG_ENTRIES)) {
             //Look for the child entry
             Element child = XmlUtil.findChild(root, TAG_ENTRY);
@@ -7741,10 +7750,28 @@ public class EntryManager extends RepositoryManager {
         }
 
 
+        Entry entry = createEntryFromXml(new Request(getRepository(),
+                          getUserManager().getDefaultUser()), root,
+                              new Hashtable(), new Hashtable(), false,
+                              internal);
 
-        return createEntryFromXml(new Request(getRepository(),
-                getUserManager().getDefaultUser()), root, new Hashtable(),
-                    new Hashtable(), false, internal);
+        if (internal) {
+            for (Element assNode : associationNodes) {
+                String fromId = XmlUtil.getAttribute(assNode, ATTR_FROM);
+                String toId   = XmlUtil.getAttribute(assNode, ATTR_TO);
+                //                if(fromId.equals("this")) fromId  = entry.getId();
+                //                if(toId.equals("this")) toId  = entry.getId();
+                entry.addAssociation(
+                    new Association(
+                        getRepository().getGUID(),
+                        XmlUtil.getAttribute(assNode, ATTR_NAME, ""),
+                        XmlUtil.getAttribute(assNode, ATTR_TYPE, ""), fromId,
+                        toId));
+            }
+        }
+
+
+        return entry;
     }
 
 
