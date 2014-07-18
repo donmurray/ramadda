@@ -242,11 +242,14 @@
    background-color: #efefef;
    padding: 5px;
    border-bottom:1px #ccc solid; 
+   border-left:1px #ccc solid; 
 }
 
 .display-entrytable-cell {
    padding: 5px;
+   padding-top: 8px;
    border-bottom:1px #ccc solid; 
+   border-left:1px #ccc solid; 
 }
 
 

@@ -853,18 +853,25 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     });
             },
             getEntriesTable:function (entries, columns, columnNames) {
-                console.log("columns:" + columns);
-                var html = "<table width=100% cellpadding=0 cellspacing=0 border=0>";
-                html += "<tr valign=bottom>";
-                for(var i=0;i<columnNames.length;i++) {
-                    html += HtmlUtil.td([ATTR_CLASS, "display-entrytable-header"],columnNames[i]);
+                var columnWidths = this.getProperty("columnWidths",null);
+                if(columnWidths!=null) {
+                    columnWidths  = columnWidths.split(",");
                 }
-                html += "</tr>";
+                var html = HtmlUtil.openTag(TAG_TABLE,[ATTR_WIDTH,"100%","cellpadding", "0","cellspacing","0"]);
+                html += HtmlUtil.openTag(TAG_TR,["valign","top"]);
+                for(var i=0;i<columnNames.length;i++) {
+                    html += HtmlUtil.td([ATTR_ALIGN,"center", ATTR_CLASS, "display-entrytable-header"],columnNames[i]);
+                }
+                html += HtmlUtil.closeTag(TAG_TR);
 
                 for(var i=0;i<entries.length;i++) {
-                    html += "<tr valign=bottom>";
+                    html += HtmlUtil.openTag(TAG_TR,["valign","top"]);
                     var entry = entries[i];
                     for(var j=0;j<columns.length;j++) {
+                        var columnWidth = null;
+                        if(columnWidths!=null) {
+                            columnWidth= columnWidths[j];
+                        }
                         var column = columns[j];
                         var value = "";
                         if(column == "name") {
@@ -874,11 +881,17 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                         } else {
                             value = entry.getColumnValue(column);
                         }
-                        html += HtmlUtil.td([ATTR_CLASS, "display-entrytable-cell"],value);
+                        var attrs = [ATTR_CLASS, "display-entrytable-cell"];
+                        if(columnWidth!=null) {
+                            attrs.push(ATTR_WIDTH);
+                            attrs.push(columnWidth);
+                        }
+
+                        html += HtmlUtil.td(attrs,value);
                     }
-                    html += "</tr>";
+                    html += HtmlUtil.closeTag(TAG_TR);
                 }
-                html += "</table>";
+                html += HtmlUtil.closeTag(TAG_TABLE);
                 return html;
             },
             getEntriesTree:function (entries) {
