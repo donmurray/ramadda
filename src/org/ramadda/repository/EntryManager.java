@@ -4486,19 +4486,61 @@ public class EntryManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public Result processEntryCopy(Request request, Entry toGroup,
-                                   List<Entry> entries)
+    public Result processEntryCopy(final Request request,
+                                   final Entry toGroup,
+                                   final List<Entry> entries)
+            throws Exception {
+
+
+        final String link =
+            HtmlUtils.href(request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                            toGroup), "Continue");
+        ActionManager.Action action = new ActionManager.Action() {
+            public void run(Object actionId) throws Exception {
+                processEntryCopyAsynch(request, toGroup, entries, actionId,
+                                       link);
+            }
+        };
+
+
+        return getActionManager().doAction(request, action,
+                                           "Copying entries",
+                                           "Continue: " + link, toGroup);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param toGroup _more_
+     * @param entries _more_
+     * @param actionId _more_
+     * @param link _more_
+     *
+     * @throws Exception _more_
+     */
+    private void processEntryCopyAsynch(final Request request,
+                                        final Entry toGroup,
+                                        final List<Entry> entries,
+                                        Object actionId, String link)
             throws Exception {
         StringBuilder sb         = new StringBuilder();
-        Connection    connection = getDatabaseManager().getConnection();
-        connection.setAutoCommit(false);
-        List<Entry> newEntries = new ArrayList<Entry>();
+        List<Entry>   newEntries = new ArrayList<Entry>();
         try {
+            Connection connection = getDatabaseManager().getConnection();
+            connection.setAutoCommit(false);
             List<String[]> ids = getDescendents(request, entries, connection,
                                      true, true);
+            getDatabaseManager().closeConnection(connection);
             Hashtable<String, Entry> oldIdToNewEntry = new Hashtable<String,
                                                            Entry>();
             for (int i = 0; i < ids.size(); i++) {
+                if ( !getActionManager().getActionOk(actionId)) {
+                    return;
+                }
+
+
                 String[]    tuple          = ids.get(i);
                 String      id             = tuple[0];
                 Entry       oldEntry       = getEntry(request, id);
@@ -4540,16 +4582,29 @@ public class EntryManager extends RepositoryManager {
                 newEntry.setMetadata(newMetadata);
                 newEntries.add(newEntry);
             }
-            addNewEntries(request, newEntries);
 
-            return new Result(request.url(getRepository().URL_ENTRY_SHOW,
-                                          ARG_ENTRYID, toGroup.getId(),
-                                          ARG_MESSAGE,
-                                          getRepository().translate(request,
-                                              "Entries copied")));
-        } finally {
-            getDatabaseManager().closeConnection(connection);
+
+            int count = 0;
+            for (Entry newEntry : newEntries) {
+                if ( !getActionManager().getActionOk(actionId)) {
+                    return;
+                }
+                addNewEntry(request, newEntry);
+                count++;
+                getActionManager().setActionMessage(actionId,
+                        "Copied " + count + "/" + newEntries.size()
+                        + " entries");
+            }
+            getActionManager().setContinueHtml(actionId,
+                    count + " entries copied" + HtmlUtils.br() + "Continue: "
+                    + link);
+        } catch (Exception exc) {
+            getActionManager().setContinueHtml(actionId,
+                    "Error copying entries:" + exc);
+
+            return;
         }
+
     }
 
 
