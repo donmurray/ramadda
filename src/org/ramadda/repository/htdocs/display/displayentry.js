@@ -337,24 +337,25 @@ function RamaddaSearcher(displayManager, id, type, properties) {
 
              getResultsHeader: function(entries) {
                 var left = "Showing " + (this.searchSettings.skip+1) +"-" +(this.searchSettings.skip+Math.min(this.searchSettings.max, entries.length));
-                var right = [];
+                var nextPrev = [];
+                var lessMore = [];
                 if(this.searchSettings.skip>0) {
-                    right.push(HtmlUtil.onClick(this.getGet()+".loadPrevUrl();", "Previous",[ATTR_CLASS,"display-link"]));
+                    nextPrev.push(HtmlUtil.onClick(this.getGet()+".loadPrevUrl();", "Previous",[ATTR_CLASS,"display-link"]));
                 }
                 var addMore = false;
                 if(entries.length == this.searchSettings.getMax()) {
-                    right.push(HtmlUtil.onClick(this.getGet()+".loadNextUrl();", "Next",[ATTR_CLASS,"display-link"]));
+                    nextPrev.push(HtmlUtil.onClick(this.getGet()+".loadNextUrl();", "Next",[ATTR_CLASS,"display-link"]));
                     addMore = true;
                 }
-                right.push(HtmlUtil.onClick(this.getGet()+".loadLess();", HtmlUtil.image(ramaddaBaseUrl +"/icons/minus-small-white.png","View less"["border","0"]),[ATTR_CLASS,"display-link"]));
+
+                lessMore.push(HtmlUtil.onClick(this.getGet()+".loadLess();", HtmlUtil.image(ramaddaBaseUrl +"/icons/minus-small-white.png",[ATTR_ALT, "View less", ATTR_TITLE, "View less", "border","0"]),[ATTR_CLASS,"display-link"]));
                 if(addMore) {
-                    right.push(HtmlUtil.onClick(this.getGet()+".loadMore();", HtmlUtil.image(ramaddaBaseUrl +"/icons/plus-small-white.png","View more"["border","0"]),[ATTR_CLASS,"display-link"]));
+                    lessMore.push(HtmlUtil.onClick(this.getGet()+".loadMore();", HtmlUtil.image(ramaddaBaseUrl +"/icons/plus-small-white.png",[ATTR_ALT, "View more", ATTR_TITLE, "View more","border","0"]),[ATTR_CLASS,"display-link"]));
                 }
                 var results = "";
-                if(right.length>0)
-                    results = HtmlUtil.leftRight(left, HtmlUtil.join(right,  ""));
-                else
-                    results  =left;
+                results = HtmlUtil.join(nextPrev,  "") + "&nbsp;&nbsp;" +
+                    left + "&nbsp;&nbsp;" +
+                    HtmlUtil.join(lessMore,  "") ;
                 return results;
         },
         submitSearchForm: function() {
