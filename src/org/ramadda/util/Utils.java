@@ -459,8 +459,12 @@ public class Utils {
      * @param args _more_
      */
     public static void main(String args[]) {
+        String pattern = ".*l(.)(.)(\\d\\d\\d)(\\d\\d\\d)(\\d\\d\\d\\d)(\\d\\d\\d)(...)(\\d\\d)\\.hdf$";
+
+
+
         for (String a : args) {
-            System.err.println("a:" + a + " date:" + extractDate(a));
+            System.err.println("file:" + a + " " + a.toLowerCase().matches(pattern));
         }
 
         if (true) {

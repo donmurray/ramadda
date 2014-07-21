@@ -374,10 +374,11 @@ public class TypeHandler extends RepositoryManager {
                              PROP_FIELD_FILE_PATTERN, (String) null);
 
             if (tmp != null) {
-                fieldPatternNames = new ArrayList<String>();
-                filePattern = Utils.extractPatternNames(tmp,
+                this.fieldPatternNames = new ArrayList<String>();
+                this.filePattern = Utils.extractPatternNames(tmp,
                         fieldPatternNames);
-                fieldFilePattern = Pattern.compile(this.filePattern);
+                //                System.out.println("File pattern:" + filePattern);
+                this.fieldFilePattern = Pattern.compile(this.filePattern);
             }
 
 
@@ -1647,6 +1648,8 @@ public class TypeHandler extends RepositoryManager {
         if (filePattern == null) {
             return false;
         }
+        //        System.err.println("Pattern:" + filePattern + " name:" + name );
+
         //If the pattern has file delimiters then use the whole path
         if (filePattern.indexOf("/") >= 0) {
             if (fullPath.matches(filePattern)) {
@@ -1659,8 +1662,11 @@ public class TypeHandler extends RepositoryManager {
 
             //Else, just use the name
             if (name.matches(filePattern)) {
-                //                System.err.println ("matches");
                 return true;
+            } else if (name.toLowerCase().matches(filePattern)) {
+                return true;
+            } else {
+                //                System.err.println ("no match");
             }
         }
 
