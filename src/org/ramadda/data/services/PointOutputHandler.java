@@ -643,14 +643,17 @@ public class PointOutputHandler extends RecordOutputHandler {
                 if (request.defined(ARG_MAX)) {
                     visitInfo.setMax(request.get(ARG_MAX, 1000));
                 }
+
                 getRecordJobManager().visitSequential(request, pointEntries,
                         groupVisitor, visitInfo);
+
                 if ( !jobOK(jobId)) {
                     return result;
                 }
                 info.addStatusItem("Point reading complete");
                 info.setNumPoints(groupVisitor.getCount());
                 info.setCurrentStatus("Processing products...");
+
                 for (RecordVisitor visitor : visitors) {
                     if (visitor instanceof GridVisitor) {
                         GridVisitor gridVisitor = (GridVisitor) visitor;
@@ -679,7 +682,15 @@ public class PointOutputHandler extends RecordOutputHandler {
                 getRecordJobManager().setError(info, exc.toString());
             } catch (Exception noop) {}
             getLogManager().logError("processing point request", exc);
-
+            //Special handling for json requests
+            if (formats.size() == 1 && formats.contains(OUTPUT_JSON.getId())) {
+                String message = "Error processing request:" + exc;
+                String code = "error";
+                StringBuffer json = new StringBuffer();
+                json.append(Json.map("error",Json.quote(message),"errorcode", Json.quote(code)));
+                Result errorResult = new Result("", json, Json.MIMETYPE);
+                return errorResult;
+            }
             return makeRequestErrorResult(request, exc.getMessage());
         }
     }
