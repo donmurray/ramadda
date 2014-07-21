@@ -184,6 +184,12 @@ function PointData(name, recordFields, records, url, properties) {
                 console.log("loadPointJson url:" + url);
                 this.startLoading();
                 var jqxhr = $.getJSON( url, function(data) {
+                        if(data.error!=null) {
+                            var code = data.errorcode;
+                            if(code == null) code = "error";
+                            display.handleError(code, data.error);
+                            return;
+                        }
                         var newPointData =    makePointData(data);
                         pointData.initWith(newPointData);
                         display.pointDataLoaded(pointData, url, reload);

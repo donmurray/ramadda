@@ -128,7 +128,6 @@ function DisplayManager(argId,argProperties) {
                 if(closest!=null) {
                     this.handleEventRecordSelection(mapDisplay, pointData, indexObj.index);
                 }
-                console.log("notify");
                 this.notifyEvent("handleEventMapClick", mapDisplay, {mapDisplay:mapDisplay,lon:lon,lat:lat});
             },
             handleEventRecordSelection: function(source, pointData, index) {

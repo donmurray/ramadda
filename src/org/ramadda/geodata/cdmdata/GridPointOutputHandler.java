@@ -46,6 +46,7 @@ import org.ramadda.repository.output.OutputHandler;
 import org.ramadda.repository.output.OutputType;
 import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.util.HtmlUtils;
+
 import org.ramadda.util.Json;
 
 import org.w3c.dom.Element;
@@ -103,6 +104,7 @@ import ucar.unidata.util.TwoFacedObject;
 
 import java.awt.Color;
 import java.awt.image.BufferedImage;
+
 import java.io.*;
 
 
@@ -261,8 +263,8 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
                                            GridDataset gds, StringBuffer sb)
             throws Exception {
 
-        List      varNames = new ArrayList<String>();
-        Hashtable args     = request.getArgs();
+        List<String> varNames = new ArrayList<String>();
+        Hashtable    args     = request.getArgs();
         for (Enumeration keys = args.keys(); keys.hasMoreElements(); ) {
             String arg = (String) keys.nextElement();
             if (arg.startsWith(VAR_PREFIX) && request.get(arg, false)) {
@@ -271,17 +273,17 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
         }
 
         //For now add either the 2d or the 3d vars
-        if(varNames.size()==0)  {
-            List<GridDatatype> grids             = sortGrids(gds);
+        if (varNames.size() == 0) {
+            List<GridDatatype> grids = sortGrids(gds);
             for (GridDatatype grid : grids) {
-                VariableEnhanced var     = grid.getVariable();
+                VariableEnhanced var = grid.getVariable();
                 if (grid.getZDimension() == null) {
                     varNames.add(var.getShortName());
                 }
             }
-            if(varNames.size()==0)  {
+            if (varNames.size() == 0) {
                 for (GridDatatype grid : grids) {
-                    VariableEnhanced var     = grid.getVariable();
+                    VariableEnhanced var = grid.getVariable();
                     if (grid.getZDimension() != null) {
                         varNames.add(var.getShortName());
                     }
@@ -289,7 +291,7 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
             }
         }
 
-        System.err.println(varNames);
+        //        System.err.println(varNames);
         LatLonRect llr    = gds.getBoundingBox();
         double     deflat = 0;
         double     deflon = 0;
@@ -300,20 +302,25 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
         LatLonPointImpl llp = null;
 
         if (request.defined(ARG_LOCATION_LATITUDE)) {
-            System.err.println("getting point");
-            System.err.println("latitude url arg:" +  request.getString(ARG_LOCATION_LATITUDE, "none"));
-            System.err.println("longitude url arg:" +  request.getString(ARG_LOCATION_LONGITUDE, "none"));
+            /*            System.err.println("getting point");
+            System.err.println("latitude url arg:"
+                               + request.getString(ARG_LOCATION_LATITUDE,
+                                   "none"));
+            System.err.println("longitude url arg:"
+                               + request.getString(ARG_LOCATION_LONGITUDE,
+                                   "none"));
+            */
             llp = new LatLonPointImpl(
                 request.getLatOrLonValue(ARG_LOCATION_LATITUDE, deflat),
                 request.getLatOrLonValue(ARG_LOCATION_LONGITUDE, deflon));
-            System.err.println("latlon point:" + llp);
+            //            System.err.println("latlon point:" + llp);
         }
         if (llp == null) {
             llp = new LatLonPointImpl(deflat, deflon);
-            System.err.println("using default values:" + llp);
+            //            System.err.println("using default values:" + llp);
         }
 
-        double             levelVal   = request.get(ARG_LEVEL, Double.NaN);
+
 
         int                timeStride = 1;
         List<CalendarDate> allDates   =
@@ -321,20 +328,24 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
         CalendarDate[]     dates      = new CalendarDate[2];
         Calendar           cal        = null;
         String             calString  = request.getString(ARG_CALENDAR, null);
-        if (!allDates.isEmpty()) { // have to have some dates
+        if ( !allDates.isEmpty()) {  // have to have some dates
             if (calString == null) {
                 calString = allDates.get(0).getCalendar().toString();
             }
             if (request.defined(ARG_FROMDATE)) {
                 String fromDateString = request.getString(ARG_FROMDATE,
-                                            formatDate(request, allDates.get(0)));
-                dates[0] = CalendarDate.parseISOformat(calString, fromDateString);
+                                            formatDate(request,
+                                                allDates.get(0)));
+                dates[0] = CalendarDate.parseISOformat(calString,
+                        fromDateString);
             }
             if (request.defined(ARG_TODATE)) {
                 String toDateString = request.getString(ARG_TODATE,
                                           formatDate(request,
-                                              allDates.get(allDates.size() - 1)));
-                dates[1] = CalendarDate.parseISOformat(calString, toDateString);
+                                              allDates.get(allDates.size()
+                                                  - 1)));
+                dates[1] = CalendarDate.parseISOformat(calString,
+                        toDateString);
             }
         }
         //have to have both dates
@@ -354,194 +365,240 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
             sb.append(
                 getPageHandler().showDialogWarning("No variables selected"));
         } else {
-            //                System.err.println ("varNames:" + varNames);
             // modelled after thredds.server.ncSubset.controller.PointDataController
-            String format = request.getString(CdmConstants.ARG_FORMAT,
-                                SupportedFormat.NETCDF3.toString());
-
-            boolean doingJson = format.equals(FORMAT_JSON);
-            if (doingJson) {
-                format = FORMAT_CSV;
-                request.setCORSHeaderOnResponse();
-            }
-            SupportedFormat            sf   = getSupportedFormat(format);
-            PointDataRequestParamsBean pdrb =
-                new PointDataRequestParamsBean();
-            GridAsPointDataset gapds =
-                NcssRequestUtils.buildGridAsPointDataset(gds, varNames);
-            pdrb.setVar(varNames);
-            // accept uses the response type
-            pdrb.setAccept(
-                (format.equalsIgnoreCase(FORMAT_TIMESERIES_CHART)
-                 || format.equalsIgnoreCase(FORMAT_TIMESERIES_IMAGE))
-                ? SupportedFormat.CSV.getResponseContentType()
-                : sf.getResponseContentType());
-            pdrb.setPoint(true);
-            pdrb.setLatitude(llp.getLatitude());
-            pdrb.setLongitude(llp.getLongitude());
-            if (dates[0] != null) {
-                pdrb.setTime_start(dates[0].toString());
-                if (dates[1] != null) {
-                    pdrb.setTime_end(dates[1].toString());
-                } else {
-                    pdrb.setTime(pdrb.getTime_start());
-                }
-            } else {  // dates weren't specified
-                dates[0] = allDates.get(0);
-                dates[1] = allDates.get(allDates.size() - 1);
-                pdrb.setTemporal("all");
-            }
-            if (levelVal == levelVal) {
-                pdrb.setVertCoord(levelVal);
-            }
-            Map<String, List<String>> groupVars = groupVarsByVertLevels(gds,
-                                                      pdrb);
-
-            String suffix = SUFFIX_NC;
-            if (sf.equals(SupportedFormat.NETCDF4)) {
-                suffix = SUFFIX_NC4;
-            } else if (pdrb.getAccept()
-                    .equals(SupportedFormat.CSV
-                        .getResponseContentType()) || format
-                            .equals(FORMAT_TIMESERIES_CHART_DATA) || format
-                            .equals(FORMAT_TIMESERIES_IMAGE)) {
-                suffix = SUFFIX_CSV;
-            } else if (pdrb.getAccept().equals(
-                    SupportedFormat.XML.getResponseContentType())) {
-                suffix = SUFFIX_XML;
-            }
-
-            String baseName = IOUtil.stripExtension(entry.getName());
-            if (format.equalsIgnoreCase(FORMAT_TIMESERIES_CHART)) {
-                request.put(CdmConstants.ARG_FORMAT, FORMAT_JSON);
-                request.put(ARG_LOCATION_LATITUDE, "_LATITUDEMACRO_");
-                request.put(ARG_LOCATION_LONGITUDE, "_LONGITUDEMACRO_");
-                StringBuffer html  = new StringBuffer();
-                html.append(getWikiManager().getStandardChartDisplay(request,  entry));
-                return new Result("Point as Grid Time Series", html);
-            }
-
-            File tmpFile = getStorageManager().getTmpFile(request,
-                               "pointsubset" + suffix);
-
-            OutputStream outStream =
-                getStorageManager().getUncheckedFileOutputStream(tmpFile);
-            PointDataStream pds = PointDataStream.createPointDataStream(sf,
-                                      outStream);
-            List<CalendarDate> wantedDates =
-                NcssRequestUtils.wantedDates(gapds,
-                                             CalendarDateRange.of(dates[0],
-                                                 dates[1]), 0);
-
-            boolean allWritten = false;
-            allWritten = pds.stream(gds, llp, wantedDates, groupVars,
-                                    pdrb.getVertCoord());
-
-            File f = null;
-            if (allWritten) {
-                outStream.close();
-                f = tmpFile;
-                if (doingJson) {
-                    File jsonFile =
-                        getRepository().getStorageManager().getTmpFile(
-                            request, "subset.json");
-                    BufferedReader br = new BufferedReader(
-                                            new InputStreamReader(
-                                                new FileInputStream(f)));
-                    BufferedWriter bw = new BufferedWriter(
-                                            new OutputStreamWriter(
-                                                new FileOutputStream(
-                                                    jsonFile)));
-                    List<RecordField> fields = new ArrayList<RecordField>();
-                    for (int i = 0; i < varNames.size(); i++) {
-                        String var = (String) varNames.get(i);
-                        RecordField recordField = new RecordField(var, var,
-                                                      var, i, "");
-                        recordField.setChartable(true);
-                        fields.add(recordField);
+            try {
+                return processPointRequest(request, entry,  gds, varNames,  llp, dates, allDates );
+            } catch(Exception exc) {
+                if(request.getString(CdmConstants.ARG_FORMAT,
+                                     SupportedFormat.NETCDF3.toString()).equals(FORMAT_JSON)) {
+                    String message = "Error extracting data:" + exc;
+                    String code = "error";
+                    if(exc instanceof java.lang.ArrayIndexOutOfBoundsException && Misc.getStackTrace(exc).indexOf("ucar.nc2.dataset.CoordinateAxis1D.getCoordValue") >=0) {
+                        message = "Spatial coordinates are outside the domain of the data";
+                        code="spatial";
                     }
-                    RecordField.addJsonHeader(bw, entry.getName(), fields);
-
-                    String  line        = null;
-                    int     cnt         = 0;
-                    boolean hasVertical = (pdrb.getVertCoord() != null);
-
-                    //                    System.err.println ("has vert:" + hasVertical);
-                    //                    System.err.println ("vars:" + varNames.size() +" " + varNames);
-                    while ((line = br.readLine()) != null) {
-                        cnt++;
-                        List<String> toks = StringUtil.split(line, ",", true, true);
-                        if (cnt == 1) {
-                            //                            System.err.println ("line:" + line);
-                            //time/lat/lon  maybeZ vars
-                            if(toks.size() == 3 + 1 + varNames.size()) {
-                                hasVertical = true;
-                            }
-                            continue;
-                        }
-                        if (cnt > 2) {
-                            bw.append(",");
-                        }
-                        bw.append("\n");
-                        bw.append(Json.mapOpen());
-                        //       date            lat   lon   alt     value(s)
-                        // 2009-11-10T00:00:00Z,34.6,-101.1,100.0,207.89999389648438
-                        CalendarDate date =
-                            CalendarDate.parseISOformat(toks.get(0),
-                                toks.get(0));
-                        double lat = Double.parseDouble(toks.get(1));
-                        double lon = Double.parseDouble(toks.get(2));
-                        double alt = (hasVertical
-                                      ? Double.parseDouble(toks.get(3))
-                                      : Double.NaN);
-                        Json.addGeolocation(bw, lat, lon, alt);
-                        bw.append(",");
-                        bw.append(Json.attr(Json.FIELD_DATE,
-                                            date.getMillis()));
-                        bw.append(",");
-                        bw.append(Json.mapKey(Json.FIELD_VALUES));
-                        int startIdx = (hasVertical
-                                        ? 4
-                                        : 3);
-                        List<String> values = new ArrayList();
-                        for (int i = startIdx; i < toks.size(); i++) {
-                            double v = Double.parseDouble(toks.get(i));
-                            values.add(Json.formatNumber(v));
-                        }
-                        bw.append(Json.list(values));
-                        bw.append(Json.mapClose());
-                    }
-                    RecordField.addJsonFooter(bw);
-                    bw.close();
-                    f = jsonFile;
+                    //                    exc.printStackTrace();
+                    StringBuffer json = new StringBuffer();
+                    json.append(Json.map("error",Json.quote(message),"errorcode", Json.quote(code)));
+                    Result result = new Result("", json, Json.MIMETYPE);
+                    //                    result.setResponseCode(Result.RESPONSE_INTERNALERROR);
+                    return result;
                 }
-
-            } else {
-                //Something went wrong...
-                System.err.println("something went wrong");
+                throw exc;
             }
-
-            if (doingPublish(request)) {
-                return getEntryManager().processEntryPublish(request, f,
-                        (Entry) entry.clone(), entry, "point series of");
-            }
-            Result result = null;
-            if (format.equalsIgnoreCase(FORMAT_TIMESERIES_IMAGE)) {
-                result = outputTimeSeriesImage(request, entry, f);
-            } else {
-                result =
-                    new Result(getStorageManager().getFileInputStream(f),
-                               pdrb.getAccept());
-                //Set return filename sets the Content-Disposition http header so the browser saves the file
-                //with the correct name and suffix
-                result.setReturnFilename(baseName + "_pointsubset" + suffix);
-            }
-
-            return result;
         }
 
         return new Result("", sb);
     }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param gds _more_
+     * @param varNames _more_
+     * @param llp _more_
+     * @param dates _more_
+     * @param allDates _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Result processPointRequest(Request request, Entry entry,
+                                       GridDataset gds,
+                                       List<String> varNames,
+                                       LatLonPointImpl llp,
+                                       CalendarDate[] dates,
+                                       List<CalendarDate> allDates)
+            throws Exception {
+
+        double levelVal = request.get(ARG_LEVEL, Double.NaN);
+
+        String format = request.getString(CdmConstants.ARG_FORMAT,
+                                          SupportedFormat.NETCDF3.toString());
+        boolean doingJson = format.equals(FORMAT_JSON);
+
+        if (doingJson) {
+            format = FORMAT_CSV;
+            request.setCORSHeaderOnResponse();
+        }
+
+        SupportedFormat            sf   = getSupportedFormat(format);
+        PointDataRequestParamsBean pdrb = new PointDataRequestParamsBean();
+        GridAsPointDataset gapds =
+            NcssRequestUtils.buildGridAsPointDataset(gds, varNames);
+        pdrb.setVar(varNames);
+        // accept uses the response type
+        pdrb.setAccept((format.equalsIgnoreCase(FORMAT_TIMESERIES_CHART)
+                        || format.equalsIgnoreCase(FORMAT_TIMESERIES_IMAGE))
+                       ? SupportedFormat.CSV.getResponseContentType()
+                       : sf.getResponseContentType());
+        pdrb.setPoint(true);
+        pdrb.setLatitude(llp.getLatitude());
+        pdrb.setLongitude(llp.getLongitude());
+        if (dates[0] != null) {
+            pdrb.setTime_start(dates[0].toString());
+            if (dates[1] != null) {
+                pdrb.setTime_end(dates[1].toString());
+            } else {
+                pdrb.setTime(pdrb.getTime_start());
+            }
+        } else {  // dates weren't specified
+            dates[0] = allDates.get(0);
+            dates[1] = allDates.get(allDates.size() - 1);
+            pdrb.setTemporal("all");
+        }
+        if (levelVal == levelVal) {
+            pdrb.setVertCoord(levelVal);
+        }
+        Map<String, List<String>> groupVars = groupVarsByVertLevels(gds,
+                                                  pdrb);
+
+        String suffix = SUFFIX_NC;
+        if (sf.equals(SupportedFormat.NETCDF4)) {
+            suffix = SUFFIX_NC4;
+        } else if (pdrb.getAccept()
+                .equals(SupportedFormat.CSV
+                    .getResponseContentType()) || format
+                        .equals(FORMAT_TIMESERIES_CHART_DATA) || format
+                        .equals(FORMAT_TIMESERIES_IMAGE)) {
+            suffix = SUFFIX_CSV;
+        } else if (pdrb.getAccept().equals(
+                SupportedFormat.XML.getResponseContentType())) {
+            suffix = SUFFIX_XML;
+        }
+
+        String baseName = IOUtil.stripExtension(entry.getName());
+        if (format.equalsIgnoreCase(FORMAT_TIMESERIES_CHART)) {
+            request.put(CdmConstants.ARG_FORMAT, FORMAT_JSON);
+            request.put(ARG_LOCATION_LATITUDE, "_LATITUDEMACRO_");
+            request.put(ARG_LOCATION_LONGITUDE, "_LONGITUDEMACRO_");
+            StringBuffer html = new StringBuffer();
+            html.append(getWikiManager().getStandardChartDisplay(request,
+                    entry));
+
+            return new Result("Point as Grid Time Series", html);
+        }
+
+        File tmpFile = getStorageManager().getTmpFile(request,
+                           "pointsubset" + suffix);
+
+        OutputStream outStream =
+            getStorageManager().getUncheckedFileOutputStream(tmpFile);
+        PointDataStream pds = PointDataStream.createPointDataStream(sf,
+                                  outStream);
+        List<CalendarDate> wantedDates = NcssRequestUtils.wantedDates(gapds,
+                                             CalendarDateRange.of(dates[0],
+                                                 dates[1]), 0);
+
+        boolean allWritten = false;
+        allWritten = pds.stream(gds, llp, wantedDates, groupVars,
+                                pdrb.getVertCoord());
+
+        File f = null;
+        if (allWritten) {
+            outStream.close();
+            f = tmpFile;
+            if (doingJson) {
+                File jsonFile =
+                    getRepository().getStorageManager().getTmpFile(request,
+                        "subset.json");
+                BufferedReader br = new BufferedReader(
+                                        new InputStreamReader(
+                                            new FileInputStream(f)));
+                BufferedWriter bw = new BufferedWriter(
+                                        new OutputStreamWriter(
+                                            new FileOutputStream(jsonFile)));
+                List<RecordField> fields = new ArrayList<RecordField>();
+                for (int i = 0; i < varNames.size(); i++) {
+                    String var = (String) varNames.get(i);
+                    RecordField recordField = new RecordField(var, var, var,
+                                                  i, "");
+                    recordField.setChartable(true);
+                    fields.add(recordField);
+                }
+                RecordField.addJsonHeader(bw, entry.getName(), fields);
+
+                String  line        = null;
+                int     cnt         = 0;
+                boolean hasVertical = (pdrb.getVertCoord() != null);
+
+                //                    System.err.println ("has vert:" + hasVertical);
+                //                    System.err.println ("vars:" + varNames.size() +" " + varNames);
+                while ((line = br.readLine()) != null) {
+                    cnt++;
+                    List<String> toks = StringUtil.split(line, ",", true,
+                                            true);
+                    if (cnt == 1) {
+                        //                            System.err.println ("line:" + line);
+                        //time/lat/lon  maybeZ vars
+                        if (toks.size() == 3 + 1 + varNames.size()) {
+                            hasVertical = true;
+                        }
+
+                        continue;
+                    }
+                    if (cnt > 2) {
+                        bw.append(",");
+                    }
+                    bw.append("\n");
+                    bw.append(Json.mapOpen());
+                    //       date            lat   lon   alt     value(s)
+                    // 2009-11-10T00:00:00Z,34.6,-101.1,100.0,207.89999389648438
+                    CalendarDate date =
+                        CalendarDate.parseISOformat(toks.get(0), toks.get(0));
+                    double lat = Double.parseDouble(toks.get(1));
+                    double lon = Double.parseDouble(toks.get(2));
+                    double alt = (hasVertical
+                                  ? Double.parseDouble(toks.get(3))
+                                  : Double.NaN);
+                    Json.addGeolocation(bw, lat, lon, alt);
+                    bw.append(",");
+                    bw.append(Json.attr(Json.FIELD_DATE, date.getMillis()));
+                    bw.append(",");
+                    bw.append(Json.mapKey(Json.FIELD_VALUES));
+                    int          startIdx = (hasVertical
+                                             ? 4
+                                             : 3);
+                    List<String> values   = new ArrayList();
+                    for (int i = startIdx; i < toks.size(); i++) {
+                        double v = Double.parseDouble(toks.get(i));
+                        values.add(Json.formatNumber(v));
+                    }
+                    bw.append(Json.list(values));
+                    bw.append(Json.mapClose());
+                }
+                RecordField.addJsonFooter(bw);
+                bw.close();
+                f = jsonFile;
+            }
+
+        } else {
+            //Something went wrong...
+            System.err.println("something went wrong");
+        }
+
+        if (doingPublish(request)) {
+            return getEntryManager().processEntryPublish(request, f,
+                    (Entry) entry.clone(), entry, "point series of");
+        }
+        Result result = null;
+        if (format.equalsIgnoreCase(FORMAT_TIMESERIES_IMAGE)) {
+            result = outputTimeSeriesImage(request, entry, f);
+        } else {
+            result = new Result(getStorageManager().getFileInputStream(f),
+                                pdrb.getAccept());
+            //Set return filename sets the Content-Disposition http header so the browser saves the file
+            //with the correct name and suffix
+            result.setReturnFilename(baseName + "_pointsubset" + suffix);
+        }
+
+        return result;
+    }
+
+
 
 
     /**
@@ -576,6 +633,8 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
      * @param gds   GridDataSet
      * @param params list of parameter names
      * @return map by levels
+     *
+     * @throws Exception _more_
      */
     private Map<String, List<String>> groupVarsByVertLevels(GridDataset gds,
             PointDataRequestParamsBean params)
@@ -590,8 +649,8 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
 
             //Variables should have been checked before...  
             if (grid == null) {
-                throw new IllegalArgumentException("Variable: "
-                        + var + " is not contained in the requested dataset");
+                throw new IllegalArgumentException("Variable: " + var
+                        + " is not contained in the requested dataset");
             }
 
 
@@ -1380,6 +1439,7 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
         request.setCORSHeaderOnResponse();
         request.put(CdmConstants.ARG_FORMAT, FORMAT_JSON);
         request.put(ARG_OUTPUT, OUTPUT_GRIDASPOINT.getId());
+
         return outputGridAsPoint(request, entry);
     }
 

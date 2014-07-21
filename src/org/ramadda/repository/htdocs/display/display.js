@@ -135,6 +135,9 @@ function DisplayThing(argId, argProperties) {
                 return uid;
 
         },
+        handleError: function(code, message) {
+                alert("An error has occurred:" + message);
+        },
         toString: function() {
                 return "DisplayThing:" + this.getId();
          },
