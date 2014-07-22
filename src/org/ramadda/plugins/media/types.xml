@@ -59,7 +59,7 @@
      <wiki><![CDATA[
 {{noheading}}
 {{description}}
-{{imageplayer}}
+{{imageplayer show_sort_links="true"}}
 ]]>
 </wiki>
 </type>

@@ -707,7 +707,7 @@ public class ImageOutputHandler extends OutputHandler {
                 String title =
                     "<table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\">";
                 String dttm = getEntryUtil().formatDate(request, entry);
-                title += "<tr><td><b>Image:</b> " + entryUrl
+                title += "<tr><td> " + entryUrl
                          + "</td><td align=right>" + dttm;
                 title += "</table>";
                 title = title.replace("\"", "\\\"");
@@ -848,12 +848,12 @@ public class ImageOutputHandler extends OutputHandler {
                 firstImage = url;
             }
             String entryUrl = getEntryLink(request, entry);
+            String dttm = getEntryUtil().formatDate(request, entry);
             String title =
                 "<table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\">";
-            String dttm = getEntryUtil().formatDate(request, entry);
-            title += "<tr><td><b>Image:</b> " + entryUrl
-                     + "</td><td align=right>" + dttm;
-            title += "</table>";
+            title += "<tr><td><div class=\"imageplayer-title\">" + entryUrl
+                     + "</div></td><td align=right><div class=\"imageplayer-title-date\">" + dttm +
+                "</div></td></table>";
             title = title.replace("\"", "\\\"");
             sb.append(playerVar + ".addImage(" + HtmlUtils.quote(url) + ","
                       + HtmlUtils.quote(title) + ");\n");
@@ -879,6 +879,9 @@ public class ImageOutputHandler extends OutputHandler {
         String tmp = playerTemplate.replace("${imagelist}", sb.toString());
         tmp = tmp.replace("${imagehtml}", imageHtml);
         tmp = StringUtil.replace(tmp, "${root}", repository.getUrlBase());
+        sb = new StringBuilder();
+
+        sb.append(tmp);
         if (addHeader) {
             String fullUrl = "";
             if (width > 0) {
@@ -890,12 +893,9 @@ public class ImageOutputHandler extends OutputHandler {
                 fullUrl = HtmlUtils.href(request.getUrl(),
                                          msg("Use fixed width"));
             }
-            sb = new StringBuilder(HtmlUtils.leftRight(getSortLinks(request),
-                    fullUrl));
-        } else {
-            sb = new StringBuilder();
+            sb.append(HtmlUtils.leftRight(getSortLinks(request),
+                                          fullUrl));
         }
-        sb.append(tmp);
         finalSB.append(sb);
     }
 

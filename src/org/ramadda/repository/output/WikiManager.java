@@ -1753,7 +1753,9 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             if (height > 0) {
                 imageRequest.put(ARG_HEIGHT, "" + height);
             }
-            imageOutputHandler.makePlayer(imageRequest, children, sb, false);
+            imageOutputHandler.makePlayer(imageRequest, children, sb, 
+                                          Misc.getProperty(props, "show_sort_links",
+                                                           false));
 
             return sb.toString();
         } else if (theTag.equals(WIKI_TAG_GALLERY)) {

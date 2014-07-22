@@ -1084,6 +1084,25 @@ a.ramadda-menuitem-link {
 }
 
 
+.imageplayer-title {
+  padding: 5px;
+  color: #000;
+}
+
+
+.imageplayer-title a {
+  color: #000;
+}
+
+.imageplayer-title-date {
+  padding: 5px;
+   font-style:italic;
+}
+
+.imageplayer-block {
+   padding-left:5px;
+}
+
 a.image-link {
 //     font-size: 90%;
      color: #000;

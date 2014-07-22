@@ -1,7 +1,14 @@
 
 <style>
 
-.imageblock {
+.imageplayer {
+    background-color:#efefef;
+    background-color:#fff;
+}
+
+
+
+.imageplayer-block {
     ${imagestyle}
 //        height: 750px; 
 //	max-height: 750px; 
@@ -9,12 +16,7 @@
 	overflow-x: hidden;
 }
 
-.imageplayer {
-    background-color:#efefef;
-    background-color:#fff;
-}
-
-.imageplayer_icon {
+.imageplayer-icon {
 margin: 1px;
 padding:1px;
 width: 18px;
@@ -85,8 +87,8 @@ function ImagePlayer()  {
     this.images= new Array();
     this.normal_delay = 1000;
     this.delay = this.normal_delay;         //delay between frames in 1/100 seconds
-    this.end_dwell_multipler   = this.dwell_multipler;
-    this.start_dwell_multipler = this.dwell_multipler;
+    this.end_dwell_multipler   = dwell_multipler;
+    this.start_dwell_multipler = dwell_multipler;
     this.current_image = 0;
     this.direction =this.DIR_FORWARD;
     this.running = 0;
@@ -187,8 +189,12 @@ function ImagePlayer()  {
 
         this.displayImage();
         this.delay_time = this.delay;
-        if (this.current_image == first_selected_image) this.delay_time = this.start_dwell_multipler*this.delay;
-        if (this.current_image == last_selected_image)   this.delay_time = this.end_dwell_multipler*this.delay;
+        if (this.current_image == first_selected_image) {
+             this.delay_time = this.start_dwell_multipler*this.delay;
+        }
+        if (this.current_image == last_selected_image) {
+            this.delay_time = this.end_dwell_multipler*this.delay;
+        }
         setTimeout("${imagePlayerVar}.play(" +mytimestamp +")", this.delay_time);
     }
 
@@ -382,7 +388,7 @@ function noop() {
 <table style="border: 1px #aaa solid;" cellpadding="0" cellspacing="0" width="100%" class="imageplayer">
     <tr valign="bottom">
     <td width="150"> 
-<a href="JavaScript: noop()" onClick="${imagePlayerVar}.setImage(0,1)"><img class="imageplayer_icon"  border="0" SRC="${root}/imageplayer/control_rewind_blue.png" ALT="Got to first frame" title="Go to first frame"></A><a href="JavaScript: noop()" onClick="${imagePlayerVar}.setImage(${imagePlayerVar}.current_image-1,-1)"><img class="imageplayer_icon"   border="0" SRC="${root}/imageplayer/control_start_blue.png" ALT="One step back" TITLE="One step back"></A><a href="JavaScript: noop()" onClick="${imagePlayerVar}.startStop()"><img class="imageplayer_icon"   border="0" id="${imagePlayerPrefix}startstop" SRC="${root}/imageplayer/control_play_blue.png" ALT="Start/Stop" TITLE="Start/Stop"></A><a href="JavaScript: noop()" onClick="${imagePlayerVar}.setImage(${imagePlayerVar}.current_image+1,1)"><img class="imageplayer_icon"   border="0" SRC="${root}/imageplayer/control_end_blue.png" ALT="One step forward" TITLE="One step forward"></A><a href="JavaScript: noop()" onClick="${imagePlayerVar}.setImage(-1,-1)"><img class="imageplayer_icon"   border="0" SRC="${root}/imageplayer/control_fastforward_blue.png" ALT="Go to last frame" TITLE="Go to last frame"></A></td>
+<a href="JavaScript: noop()" onClick="${imagePlayerVar}.setImage(0,1)"><img class="imageplayer-icon"  border="0" SRC="${root}/imageplayer/control_rewind_blue.png" ALT="Got to first frame" title="Go to first frame"></A><a href="JavaScript: noop()" onClick="${imagePlayerVar}.setImage(${imagePlayerVar}.current_image-1,-1)"><img class="imageplayer-icon"   border="0" SRC="${root}/imageplayer/control_start_blue.png" ALT="One step back" TITLE="One step back"></A><a href="JavaScript: noop()" onClick="${imagePlayerVar}.startStop()"><img class="imageplayer-icon"   border="0" id="${imagePlayerPrefix}startstop" SRC="${root}/imageplayer/control_play_blue.png" ALT="Start/Stop" TITLE="Start/Stop"></A><a href="JavaScript: noop()" onClick="${imagePlayerVar}.setImage(${imagePlayerVar}.current_image+1,1)"><img class="imageplayer-icon"   border="0" SRC="${root}/imageplayer/control_end_blue.png" ALT="One step forward" TITLE="One step forward"></A><a href="JavaScript: noop()" onClick="${imagePlayerVar}.setImage(-1,-1)"><img class="imageplayer-icon"   border="0" SRC="${root}/imageplayer/control_fastforward_blue.png" ALT="Go to last frame" TITLE="Go to last frame"></A></td>
 
 <td  valign="bottom">
 <table  width="100%"><tr valign="bottom">
@@ -401,14 +407,13 @@ function noop() {
 <tr valign="top" >
 <td style="border-top: 1px #aaa solid;" colspan="2" valign=top>
    <div  id="${imagePlayerPrefix}header" style="margin:2">&nbsp;</div>
-   <div class="imageblock">
+   <div class="imageplayer-block">
 ${imagehtml}
    </div>
 </td>
 </tr>
 <tr>
 <td colspan="2">
-
 Loop Mode:
 <a href="JavaScript: noop()" onClick="${imagePlayerVar}.toggle_mode();">
 <img border=0 id="${imagePlayerPrefix}loopmode" SRC="${root}/imageplayer/button_norm.gif">
@@ -423,6 +428,7 @@ Start Dwell:
 End Dwell:
 <a href="JavaScript: noop()" onClick="${imagePlayerVar}.change_end_dwell(-dwell_step)"><img  border=0  SRC="${root}/imageplayer/bullet_arrow_down.png" ALT="Reduce end dwell" TITLE="Reduce end dwell"></A><a href="JavaScript: noop()" onClick="${imagePlayerVar}.change_end_dwell(dwell_step)"><img border=0  SRC="${root}/imageplayer/bullet_arrow_up.png" ALT="Increase end dwell" TITLE="Increase end dwell"></A>
 
+</td>
 </tr>
 </table>
 
