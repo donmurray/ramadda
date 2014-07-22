@@ -22,11 +22,10 @@ package org.ramadda.geodata.model;
 
 
 import org.ramadda.data.process.DataProcessInput;
-import ucar.nc2.dt.GridDatatype;
-import ucar.nc2.dt.GridDatatype;
 import org.ramadda.data.process.DataProcessOperand;
 import org.ramadda.data.process.DataProcessOutput;
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
+import org.ramadda.repository.Association;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
 import org.ramadda.repository.Request;
@@ -34,6 +33,9 @@ import org.ramadda.repository.Resource;
 import org.ramadda.repository.type.GranuleTypeHandler;
 import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.util.HtmlUtils;
+
+import ucar.nc2.dt.GridDatatype;
+import ucar.nc2.dt.GridDatatype;
 
 import ucar.nc2.dt.GridDatatype;
 import ucar.nc2.dt.grid.GridDataset;
@@ -217,16 +219,17 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
 
         Entry oneOfThem = op.getEntries().get(0);
         CdmDataOutputHandler dataOutputHandler =
-                getOutputHandler().getDataOutputHandler();
+            getOutputHandler().getDataOutputHandler();
         GridDataset dataset =
-                dataOutputHandler.getCdmManager().getGridDataset(oneOfThem,
-                    oneOfThem.getResource().getPath());
-        if (dataset == null || dataset.getGrids().isEmpty()) {
+            dataOutputHandler.getCdmManager().getGridDataset(oneOfThem,
+                oneOfThem.getResource().getPath());
+        if ((dataset == null) || dataset.getGrids().isEmpty()) {
             throw new Exception("No grids found");
         }
-        String varname = ((GridDatatype) dataset.getGrids().get(0)).getName();
+        String varname  =
+            ((GridDatatype) dataset.getGrids().get(0)).getName();
 
-        Object[]      values     = oneOfThem.getValues();
+        Object[] values = oneOfThem.getValues();
         String tail =
             getOutputHandler().getStorageManager().getFileTail(oneOfThem);
         String       id        = getRepository().getGUID();
@@ -239,7 +242,8 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         if (stat.equals(CDOOutputHandler.STAT_ANOM)) {
             System.err.println("Looking for climo");
             List<Entry> climo = findClimatology(request, oneOfThem);
-            if (climo == null || climo.isEmpty()) {
+            if ((climo == null) || climo.isEmpty()) {
+                System.err.println("Couldn't find one - making it");
                 climEntry = makeClimatology(request, oneOfThem, dpi, tail);
                 //throw new Exception("Unable to find climatology for "
                 //                    + oneOfThem.getName());
@@ -264,16 +268,68 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         commands.add("-remapbil,r360x180");
         getOutputHandler().addLevelSelectCommands(request, oneOfThem,
                 commands, CdmDataOutputHandler.ARG_LEVEL);
-        getOutputHandler().addDateSelectCommands(request, oneOfThem,
-                commands, opNum);
-//        commands.add("-selname,"+values[4]);
-        commands.add("-selname,"+varname);
+        // Handle the case where the months span the year end (e.g. DJF)
+        // Break it up into two requests
+        if (doMonthsSpanYearEnd(request, oneOfThem)) {
+            System.out.println("months span the year end");
+            for (int i = 0; i < 2; i++) {
+                List<String> savedCommands = new ArrayList(commands);
+                Request      newRequest    = request.cloneMe();
+                String       opStr         = (opNum == 0)
+                                             ? ""
+                                             : "" + (opNum + 1);
+                int oldStartYear = request.get(
+                                       CDOOutputHandler.ARG_CDO_STARTYEAR
+                                       + opStr, request.get(
+                                           CDOOutputHandler.ARG_CDO_STARTYEAR
+                                           + opStr, 1979));
+                int oldEndYear =
+                    request.get(CDOOutputHandler.ARG_CDO_ENDYEAR + opStr,
+                                request.get(CDOOutputHandler.ARG_CDO_ENDYEAR
+                                            + opStr, 1979));
+                if (i == 0) {
+                    newRequest.put(CDOOutputHandler.ARG_CDO_ENDMONTH, 12);
+                    newRequest.put(CDOOutputHandler.ARG_CDO_ENDYEAR + opStr,
+                                   Math.max(oldStartYear, oldEndYear - 1));
+                } else {
+                    newRequest.put(CDOOutputHandler.ARG_CDO_STARTMONTH, 1);
+                    newRequest.put(CDOOutputHandler.ARG_CDO_STARTYEAR
+                                   + opStr, Math.min(oldEndYear,
+                                       oldStartYear + 1));
+                }
+                File tmpFile = new File(outFile.toString() + "." + i);
+                getOutputHandler().addDateSelectCommands(newRequest,
+                        oneOfThem, savedCommands, opNum);
+                savedCommands.add("-selname," + varname);
+                System.err.println("cmds:" + savedCommands);
+                savedCommands.add(oneOfThem.getResource().getPath());
+                savedCommands.add(tmpFile.toString());
+                runProcess(savedCommands, dpi.getProcessDir(), tmpFile);
+            }
+            File tmpFile = new File(outFile.toString() + ".tmp");
+            commands = initCDOCommand();
+            commands.add("-mergetime");
+            commands.add(outFile.toString() + ".0");
+            commands.add(outFile.toString() + ".1");
+            commands.add(tmpFile.toString());
+            runProcess(commands, dpi.getProcessDir(), tmpFile);
+            commands = initCDOCommand();
+            commands.add("-timmean");
+            commands.add(tmpFile.toString());
+            commands.add(outFile.toString());
+            runProcess(commands, dpi.getProcessDir(), outFile);
 
-        System.err.println("cmds:" + commands);
+        } else {
+            getOutputHandler().addDateSelectCommands(request, oneOfThem,
+                    commands, opNum);
+            commands.add("-selname," + varname);
 
-        commands.add(oneOfThem.getResource().getPath());
-        commands.add(outFile.toString());
-        runProcess(commands, dpi.getProcessDir(), outFile);
+            System.err.println("cmds:" + commands);
+
+            commands.add(oneOfThem.getResource().getPath());
+            commands.add(outFile.toString());
+            runProcess(commands, dpi.getProcessDir(), outFile);
+        }
 
         if (climEntry != null) {
             String climName = IOUtil.stripExtension(tail) + "_" + id
@@ -294,8 +350,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                     commands, CdmDataOutputHandler.ARG_LEVEL);
             getOutputHandler().addMonthSelectCommands(request, climEntry,
                     commands);
-            //commands.add("-selname,"+values[4]);
-            commands.add("-selname,"+varname);
+            commands.add("-selname," + varname);
 
             //System.err.println("clim cmds:" + commands);
 
@@ -309,7 +364,10 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             File anomFile = new File(IOUtil.joinDir(dpi.getProcessDir(),
                                 anomName));
             commands = initCDOCommand();
-            commands.add("-ymonsub");
+            // We use sub instead of ymonsub because there is only one value in each file and
+            // CDO sets the time of the merged files to be the last time. 
+            //commands.add("-ymonsub");
+            commands.add("-sub");
             commands.add(outFile.toString());
             commands.add(climFile.toString());
             commands.add(anomFile.toString());
@@ -399,11 +457,69 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                                     false, true);
         Entry outputEntry = new Entry(myHandler, true, outputName.toString());
         outputEntry.setResource(resource);
+        // Add in lineage and associations
+        outputEntry.addAssociation(new Association(getRepository().getGUID(),
+                "generated product", "product generated from",
+                oneOfThem.getId(), outputEntry.getId()));
+        if (climEntry != null) {
+            outputEntry.addAssociation(
+                new Association(
+                    getRepository().getGUID(), "generated product",
+                    "product generated from", climEntry.getId(),
+                    outputEntry.getId()));
+        }
         getOutputHandler().getEntryManager().writeEntryXmlFile(request,
                 outputEntry);
 
         //return new DataProcessOperand(outputEntry.getName(), outputEntry);
         return new DataProcessOperand(outputName.toString(), outputEntry);
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param oneOfThem _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private boolean doMonthsSpanYearEnd(Request request, Entry oneOfThem)
+            throws Exception {
+        if (request.defined(CDOOutputHandler.ARG_CDO_MONTHS)
+                && request.getString(
+                    CDOOutputHandler.ARG_CDO_MONTHS).equalsIgnoreCase(
+                    "all")) {
+            return false;
+        }
+        // Can't handle years requests yet.
+        if (request.defined(CDOOutputHandler.ARG_CDO_YEARS)
+                || request.defined(CDOOutputHandler.ARG_CDO_YEARS + "1")) {
+            return false;
+        }
+        if (request.defined(CDOOutputHandler.ARG_CDO_STARTMONTH)
+                || request.defined(CDOOutputHandler.ARG_CDO_ENDMONTH)) {
+            int startMonth =
+                request.defined(CDOOutputHandler.ARG_CDO_STARTMONTH)
+                ? request.get(CDOOutputHandler.ARG_CDO_STARTMONTH, 1)
+                : 1;
+            int endMonth = request.defined(CDOOutputHandler.ARG_CDO_ENDMONTH)
+                           ? request.get(CDOOutputHandler.ARG_CDO_ENDMONTH,
+                                         startMonth)
+                           : startMonth;
+            // if they requested all months, no need to do a select on month
+            if ((startMonth == 1) && (endMonth == 12)) {
+                return false;
+            }
+            if (endMonth > startMonth) {
+                return false;
+            } else if (startMonth > endMonth) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**
@@ -550,29 +666,34 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                            ? years.size() - 1
                            : 0;
 
-            sb.append(
-                HtmlUtils.formEntry(
-                    Repository.msgLabel("Years"), yrLabel
-                    + HtmlUtils.select(
-                        CDOOutputHandler.ARG_CDO_STARTYEAR
-                        + yearNum, years, request.getString(
-                            CDOOutputHandler.ARG_CDO_STARTYEAR+yearNum, 
-                              request.getString(CDOOutputHandler.ARG_CDO_STARTYEAR,years.get(
-                                0))),HtmlUtils.title("Select the starting year")) + HtmlUtils.space(3)
-                                     + Repository.msgLabel("End")
-                                     + HtmlUtils.select(
-                                         CDOOutputHandler.ARG_CDO_ENDYEAR
-                                         + yearNum, years, request.getString(
-                                             CDOOutputHandler.ARG_CDO_ENDYEAR+yearNum, 
-                                               request.getString(CDOOutputHandler.ARG_CDO_ENDYEAR, years.get(
-                                                 endIndex))), HtmlUtils.title("Select the ending year")) + HtmlUtils.p()
-                                                     + Repository.msgLabel(
-                                                         "or List") + HtmlUtils.input(
-                                                             CDOOutputHandler.ARG_CDO_YEARS
-                                                                 + yearNum, request.getString(
-                                                                     CDOOutputHandler.ARG_CDO_YEARS
-                                                                         + yearNum, ""), 20, HtmlUtils.title(
-                                                                                 "Input a set of years separated by commas (e.g. 1980,1983,2012)"))));
+            sb.append(HtmlUtils
+                .formEntry(Repository.msgLabel("Years"), yrLabel
+                    + HtmlUtils
+                        .select(CDOOutputHandler.ARG_CDO_STARTYEAR
+                            + yearNum, years, request
+                                .getString(CDOOutputHandler.ARG_CDO_STARTYEAR
+                                    + yearNum, request
+                                        .getString(CDOOutputHandler
+                                            .ARG_CDO_STARTYEAR, years
+                                                .get(0))), HtmlUtils
+                                                    .title("Select the starting year")) + HtmlUtils
+                                                        .space(3) + Repository
+                                                            .msgLabel("End") + HtmlUtils
+                                                                .select(CDOOutputHandler
+                                                                    .ARG_CDO_ENDYEAR + yearNum, years, request
+                                                                        .getString(CDOOutputHandler
+                                                                            .ARG_CDO_ENDYEAR + yearNum, request
+                                                                                .getString(CDOOutputHandler
+                                                                                    .ARG_CDO_ENDYEAR, years
+                                                                                        .get(endIndex))), HtmlUtils
+                                                                                            .title("Select the ending year")) + HtmlUtils
+                                                                                                .p() + Repository
+                                                                                                    .msgLabel("or List") + HtmlUtils
+                                                                                                        .input(CDOOutputHandler
+                                                                                                            .ARG_CDO_YEARS + yearNum, request
+                                                                                                                .getString(CDOOutputHandler
+                                                                                                                    .ARG_CDO_YEARS + yearNum, ""), 20, HtmlUtils
+                                                                                                                        .title("Input a set of years separated by commas (e.g. 1980,1983,2012)"))));
             grid++;
         }
     }

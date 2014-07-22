@@ -28,6 +28,7 @@ import java.util.List;
 
 import org.ramadda.data.process.DataProcess;
 import org.ramadda.data.process.DataProcessInput;
+import org.ramadda.repository.Association;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
 import org.ramadda.repository.RepositoryManager;
@@ -165,6 +166,8 @@ public abstract class CDODataProcess extends DataProcess {
                                     false, true);
         Entry climEntry = new Entry(myHandler, true, climFile.toString());
         climEntry.setResource(resource);
+        climEntry.addAssociation(new Association(getRepository().getGUID(), "generated product",
+                "product generated from", entry.getId(), climEntry.getId()));
         return climEntry;
 
     }

@@ -758,7 +758,7 @@ end
 ;          isanom - is this an anomaly
 ;***********************************************
 undef("setvartitle")
-function setvartitle(data:float, opts:logical, isanom:logical, levelunit:string)
+function setvartitle(data:float, opts:logical, isanom:logical, level, levelunit:string)
 local vartitle
 begin
   if (isatt(data,"long_name")) then
@@ -953,7 +953,7 @@ begin
     levelunit = ""
   end if
   if (levelunit .eq. "Pa") then
-    level = level/100
+    level = stringtoint(level)/100
     levelunit = "hPa"
   end if
 
@@ -977,7 +977,7 @@ begin
     end if
     rescf@tiMainString        = plottitle
     mydata = data(0,:,:)
-    rescf@gsnLeftString = setvartitle(mydata, opts, isanom, levelunit)
+    rescf@gsnLeftString = setvartitle(mydata, opts, isanom, level, levelunit)
     if (doGoogle) then
       set_kml_map_defaults(rescf) ; turn off many options
       ;;rescf@lbTitleString = rescf@gsnLeftString
@@ -1005,7 +1005,7 @@ begin
   else 
     if (.not. doGoogle) then
       mydata = data(0,:,:)
-      rescf@gsnLeftString = setvartitle(mydata, opts, isanom, levelunit)
+      rescf@gsnLeftString = setvartitle(mydata, opts, isanom, level, levelunit)
       if ((.not. ismissing(plottitles(0))) .and. (plottitles(0) .ne. "")) then
         rescf@tiMainString        = plottitles(0)
       end if
@@ -1034,7 +1034,7 @@ begin
       do i = 1,numfiles-1
         nextdata = readdata(files(i),opts)
         mydata = nextdata(0,:,:)
-        rescf@gsnLeftString = setvartitle(mydata, opts, isanom, levelunit)
+        rescf@gsnLeftString = setvartitle(mydata, opts, isanom, level, levelunit)
         if ((.not. ismissing(plottitles(i))) .and. (plottitles(i) .ne. "")) then
           rescf@tiMainString        = plottitles(i)
         end if
@@ -1063,7 +1063,7 @@ begin
       ;; Make the first plot to get the labelbar
       mydata = data(0,:,:)
 ;;      ;; make title for labelbar
-;;      vartitle = setvartitle(mydata, opts, isanom, levelunit)
+;;      vartitle = setvartitle(mydata, opts, isanom, level, levelunit)
 
       name="Plot 1"
       if ((.not. ismissing(plottitles(0))) .and. (plottitles(0) .ne. "")) then
