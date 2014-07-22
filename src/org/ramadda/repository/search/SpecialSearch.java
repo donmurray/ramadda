@@ -1,4 +1,4 @@
-/*
+/**
 * Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
@@ -695,7 +695,8 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
             for (OutputType outputType : new OutputType[] {
                 KmlOutputHandler.OUTPUT_KML, ZipOutputHandler.OUTPUT_ZIPTREE,
                 AtomOutputHandler.OUTPUT_ATOM, JsonOutputHandler.OUTPUT_JSON,
-                CsvOutputHandler.OUTPUT_CSV, ZipOutputHandler.OUTPUT_EXPORT
+                CsvOutputHandler.OUTPUT_CSV, ZipOutputHandler.OUTPUT_EXPORT,
+                BulkDownloadOutputHandler.OUTPUT_CURL
             }) {
                 if (outputType.getIcon() != null) {
                     links.append(
