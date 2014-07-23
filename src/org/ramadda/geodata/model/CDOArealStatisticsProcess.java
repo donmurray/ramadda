@@ -45,6 +45,7 @@ import ucar.nc2.time.CalendarDate;
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.StringUtil;
 
 import ucar.visad.data.CalendarDateTime;
 
@@ -272,47 +273,105 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         // Break it up into two requests
         if (doMonthsSpanYearEnd(request, oneOfThem)) {
             System.out.println("months span the year end");
-            for (int i = 0; i < 2; i++) {
-                List<String> savedCommands = new ArrayList(commands);
-                Request      newRequest    = request.cloneMe();
-                String       opStr         = (opNum == 0)
-                                             ? ""
-                                             : "" + (opNum + 1);
-                int oldStartYear = request.get(
-                                       CDOOutputHandler.ARG_CDO_STARTYEAR
-                                       + opStr, request.get(
-                                           CDOOutputHandler.ARG_CDO_STARTYEAR
-                                           + opStr, 1979));
+            List<String> tmpFiles = new ArrayList<String>();
+            String       opStr    = (opNum == 0)
+                                    ? ""
+                                    : "" + (opNum + 1);
+            boolean      haveYears;
+            if (opNum == 0) {
+                haveYears = request.defined(CDOOutputHandler.ARG_CDO_YEARS);
+            } else {
+                haveYears = request.defined(CDOOutputHandler.ARG_CDO_YEARS
+                                            + opStr);
+                /*
+                        (request.defined(CDOOutputHandler.ARG_CDO_YEARS) &&
+                         !(request.defined(CDOOutputHandler.ARG_CDO_STARTYEAR+opStr) &&
+                           request.defined(CDOOutputHandler.ARG_CDO_ENDYEAR+opStr)));
+                           */
+            }
+            String        yearString = null;
+            List<Integer> years      = new ArrayList<Integer>();
+            if (haveYears) {
+                yearString = request.getString(
+                    CDOOutputHandler.ARG_CDO_YEARS + opStr,
+                    request.getString(CDOOutputHandler.ARG_CDO_YEARS, null));
+                if (yearString != null) {
+                    yearString = CDOOutputHandler.verifyYearsList(yearString);
+                }
+                List<String> yearList = StringUtil.split(yearString, ",",
+                                            true, true);
+                for (String year : yearList) {
+                    years.add(Integer.parseInt(year));
+                }
+            } else {
+                int oldStartYear =
+                    request.get(
+                        CDOOutputHandler.ARG_CDO_STARTYEAR + opStr,
+                        request.get(
+                            CDOOutputHandler.ARG_CDO_STARTYEAR, 1979));
                 int oldEndYear =
                     request.get(CDOOutputHandler.ARG_CDO_ENDYEAR + opStr,
-                                request.get(CDOOutputHandler.ARG_CDO_ENDYEAR
-                                            + opStr, 1979));
-                if (i == 0) {
-                    newRequest.put(CDOOutputHandler.ARG_CDO_ENDMONTH, 12);
-                    newRequest.put(CDOOutputHandler.ARG_CDO_ENDYEAR + opStr,
-                                   Math.max(oldStartYear, oldEndYear - 1));
-                } else {
-                    newRequest.put(CDOOutputHandler.ARG_CDO_STARTMONTH, 1);
-                    newRequest.put(CDOOutputHandler.ARG_CDO_STARTYEAR
-                                   + opStr, Math.min(oldEndYear,
-                                       oldStartYear + 1));
+                                request.get(CDOOutputHandler.ARG_CDO_ENDYEAR,
+                                            1979));
+                for (int i = oldStartYear; i < oldEndYear; i++) {
+                    years.add(oldStartYear + 1);
                 }
-                File tmpFile = new File(outFile.toString() + "." + i);
-                getOutputHandler().addDateSelectCommands(newRequest,
-                        oneOfThem, savedCommands, opNum);
-                savedCommands.add("-selname," + varname);
-                System.err.println("cmds:" + savedCommands);
-                savedCommands.add(oneOfThem.getResource().getPath());
-                savedCommands.add(tmpFile.toString());
-                runProcess(savedCommands, dpi.getProcessDir(), tmpFile);
             }
+            int yearNum = 0;
+            for (Integer year : years) {
+                for (int i = 0; i < 2; i++) {
+                    List<String> savedCommands = new ArrayList(commands);
+                    Request      newRequest    = request.cloneMe();
+                    newRequest.remove(CDOOutputHandler.ARG_CDO_YEARS);
+                    newRequest.remove(CDOOutputHandler.ARG_CDO_YEARS + opStr);
+                    /*
+                    int oldStartYear = request.get(
+                                           CDOOutputHandler.ARG_CDO_STARTYEAR
+                                           + opStr, request.get(
+                                               CDOOutputHandler.ARG_CDO_STARTYEAR
+                                               + opStr, 1979));
+                    int oldEndYear =
+                        request.get(CDOOutputHandler.ARG_CDO_ENDYEAR + opStr,
+                                    request.get(CDOOutputHandler.ARG_CDO_ENDYEAR
+                                                + opStr, 1979));
+                    */
+                    if (i == 0) {  // last half of previous year
+                        newRequest.put(CDOOutputHandler.ARG_CDO_ENDMONTH, 12);
+                        newRequest.put(CDOOutputHandler.ARG_CDO_STARTYEAR
+                                       + opStr, year - 1);
+                        newRequest.put(CDOOutputHandler.ARG_CDO_ENDYEAR
+                                       + opStr, year - 1);
+                    } else {  // first half of current year
+                        newRequest.put(CDOOutputHandler.ARG_CDO_STARTMONTH,
+                                       1);
+                        newRequest.put(CDOOutputHandler.ARG_CDO_STARTYEAR
+                                       + opStr, year);
+                        newRequest.put(CDOOutputHandler.ARG_CDO_ENDYEAR
+                                       + opStr, year);
+                    }
+                    File tmpFile = new File(outFile.toString() + "."
+                                            + yearNum);
+                    getOutputHandler().addDateSelectCommands(newRequest,
+                            oneOfThem, savedCommands, opNum);
+                    savedCommands.add("-selname," + varname);
+                    System.err.println("cmds:" + savedCommands);
+                    savedCommands.add(oneOfThem.getResource().getPath());
+                    savedCommands.add(tmpFile.toString());
+                    runProcess(savedCommands, dpi.getProcessDir(), tmpFile);
+                    tmpFiles.add(tmpFile.toString());
+                    yearNum++;
+                }
+            }
+            // merge the files together
             File tmpFile = new File(outFile.toString() + ".tmp");
             commands = initCDOCommand();
             commands.add("-mergetime");
-            commands.add(outFile.toString() + ".0");
-            commands.add(outFile.toString() + ".1");
+            for (String file : tmpFiles) {
+                commands.add(file);
+            }
             commands.add(tmpFile.toString());
             runProcess(commands, dpi.getProcessDir(), tmpFile);
+            // now take the mean of the merged files
             commands = initCDOCommand();
             commands.add("-timmean");
             commands.add(tmpFile.toString());
@@ -494,10 +553,10 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             return false;
         }
         // Can't handle years requests yet.
-        if (request.defined(CDOOutputHandler.ARG_CDO_YEARS)
-                || request.defined(CDOOutputHandler.ARG_CDO_YEARS + "1")) {
-            return false;
-        }
+        //if (request.defined(CDOOutputHandler.ARG_CDO_YEARS)
+        //        || request.defined(CDOOutputHandler.ARG_CDO_YEARS + "1")) {
+        //    return false;
+        //}
         if (request.defined(CDOOutputHandler.ARG_CDO_STARTMONTH)
                 || request.defined(CDOOutputHandler.ARG_CDO_ENDMONTH)) {
             int startMonth =

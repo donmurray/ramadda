@@ -1356,7 +1356,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      *
      * @return  the list of valid years
      */
-    private String verifyYearsList(String years) {
+    public static String verifyYearsList(String years) {
         List<String>  yearList = StringUtil.split(years, ",", true, true);
         List<Integer> newYears = new ArrayList<Integer>();
         // TODO: verify list of years by the data
