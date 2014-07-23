@@ -224,10 +224,13 @@ public class CsvOutputHandler extends OutputHandler {
                             } else {
                                 tmp += ",";
                             }
-                            tmp += column.getName()
-                                   + ((maxStringSize[col] > 0)
-                                      ? "(max:" + maxStringSize[col] + ")"
-                                      : "");
+                            tmp += column.getName();
+                            //Not sure why I was including the max column width in the name
+                            /*tmp += column.getName()
+                                  + ((maxStringSize[col] > 0)
+                                   ? "(max:" + maxStringSize[col] + ")"
+                                      : "");*/
+
                         }
                         if (tmp == null) {
                             tmp = "";
