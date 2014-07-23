@@ -34,7 +34,15 @@ LT50480232011289PAC01.hdf
      <column name="archive_version_number" label="Archive Version Number" type="int"  cansearch="true" />
   </type>
 
-  <type name="earth_satellite_modis"  description="Modis Satellite Data" foruser="true" super="earth_satellite">
+  <type name="earth_satellite_modis"  description="Modis Satellite Data" foruser="false" super="earth_satellite">
+     <column name="data_type" label="Earth Science Data Type" type="enumerationplus" values="" cansearch="true" />
+  </type>
+
+
+  <type name="earth_satellite_modis_terra"  description="Terra Modis Satellite Data" foruser="true" super="earth_satellite_modis"   field_file_pattern=".*(data_type:mod[^\.]+)\.a\d\d\d\d\d\d\d\..*\.hdf$">
+  </type>
+
+  <type name="earth_satellite_modis_aqua"  description="Aqua Modis Satellite Data" foruser="true" super="earth_satellite_modis" field_file_pattern=".*(data_type:myd[^\.]+)\.a\d\d\d\d\d\d\d\..*\.hdf$">
   </type>
 
   <type name="earth_satellite_aster"  description="Aster Satellite Data" foruser="true" super="earth_satellite">
