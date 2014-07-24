@@ -1084,8 +1084,8 @@ public class OutputHandler extends RepositoryManager {
         String[] order = {
             SORTBY_NAME, "true", msg("Name") + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),  "Sort by name A-Z", 
             SORTBY_NAME, "false", msg("Name")  + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)), "Sort by name Z-A", 
-            SORTBY_FROMDATE, "true",   msg("Date") + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),   "Sort by date older to newer", 
-            SORTBY_FROMDATE, "false", msg("Date")  + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),"Sort by date newer to older", 
+            SORTBY_FROMDATE, "false", msg("Date")  + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),"Sort by date newer to older", 
+            SORTBY_FROMDATE, "true",   msg("Date") + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),   "Sort by date older to newer", 
             SORTBY_CREATEDATE, "true",   msg("Created") + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),  "Sort by created date older to newer", 
             SORTBY_CREATEDATE, "false",  msg("Created")            + HtmlUtils.img(getRepository().iconUrl(ICON_DOWNARROW)),   "Sort by created date newer to older", 
             SORTBY_SIZE, "true",  msg("Size") + HtmlUtils.img(getRepository().iconUrl(ICON_UPARROW)),"Sort by size smallest to largest", 

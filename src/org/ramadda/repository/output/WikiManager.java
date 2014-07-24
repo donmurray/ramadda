@@ -157,7 +157,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                         + attrs(ATTR_WIDTH, "400",
                                                 ATTR_HEIGHT,
                                                 "270")), 
-                            new WikiTag(WIKI_TAG_PLAYER)),
+                            new WikiTag(WIKI_TAG_PLAYER, attrs("loopdelay","1000","loopstart","false"))),
         new WikiTagCategory("Misc",
                             new WikiTag(WIKI_TAG_CALENDAR, attrs(ATTR_DAY, "false")),
                             new WikiTag(WIKI_TAG_TIMELINE, attrs(ATTR_HEIGHT, "150")),
@@ -1736,6 +1736,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
         } else if (theTag.equals(WIKI_TAG_PLAYER)
                    || theTag.equals(WIKI_TAG_PLAYER_OLD)) {
+
             List<Entry> children = getEntries(request, originalEntry, entry,
                                        props, true);
             if (children.size() == 0) {
@@ -1749,13 +1750,22 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             if (width > 0) {
                 imageRequest.put(ARG_WIDTH, "" + width);
             }
+            boolean loopStart = Misc.getProperty(props, "loopstart", false);
+            if (loopStart) {
+                imageRequest.put("loopstart", "true");
+            }
+            int delay = Misc.getProperty(props, "loopdelay", 0);
+            if (delay > 0) {
+                imageRequest.put("loopdelay", "" + delay);
+            }
+
             int height = Misc.getProperty(props, ATTR_HEIGHT, 0);
             if (height > 0) {
                 imageRequest.put(ARG_HEIGHT, "" + height);
             }
-            imageOutputHandler.makePlayer(imageRequest, children, sb, 
-                                          Misc.getProperty(props, "show_sort_links",
-                                                           false));
+            imageOutputHandler.makePlayer(imageRequest, entry, children, sb,
+                                          Misc.getProperty(props,
+                                              "show_sort_links", false));
 
             return sb.toString();
         } else if (theTag.equals(WIKI_TAG_GALLERY)) {

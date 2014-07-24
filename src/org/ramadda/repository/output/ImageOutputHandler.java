@@ -27,6 +27,7 @@ import org.ramadda.repository.type.*;
 
 import org.ramadda.sql.SqlUtil;
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Json;
 
 
 import org.w3c.dom.*;
@@ -681,40 +682,17 @@ public class ImageOutputHandler extends OutputHandler {
             return new Result(group.getName(), sb, getMimeType(output));
 
         }
-        String playerPrefix = "imageplayer_" + HtmlUtils.blockCnt++;
-        String playerVar    = playerPrefix + "Var";
+
+        String playerPrefix = "";
+        String playerVar    = "";
+        int    col          = 0;
+        String firstImage   = "";
 
         if (output.equals(OUTPUT_PLAYER)) {
-            if ( !request.exists(ARG_ASCENDING)) {
-                entries = getEntryUtil().sortEntriesOnDate(entries, true);
-            }
-        }
-
-        int    col        = 0;
-        String firstImage = "";
-        if (output.equals(OUTPUT_PLAYER)) {
-            int cnt = 0;
-            for (int i = entries.size() - 1; i >= 0; i--) {
-                Entry  entry = entries.get(i);
-                String url   = getImageUrl(request, entry);
-                if (url == null) {
-                    continue;
-                }
-                if (cnt == 0) {
-                    firstImage = url;
-                }
-                String entryUrl = getEntryLink(request, entry);
-                String title =
-                    "<table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\">";
-                String dttm = getEntryUtil().formatDate(request, entry);
-                title += "<tr><td> " + entryUrl
-                         + "</td><td align=right>" + dttm;
-                title += "</table>";
-                title = title.replace("\"", "\\\"");
-                sb.append(playerVar + ".addImage(" + HtmlUtils.quote(url)
-                          + "," + HtmlUtils.quote(title) + ");\n");
-                cnt++;
-            }
+            sb = new StringBuilder();
+            makePlayer(request, group, entries, sb, true);
+            //            sb.append(tmp);
+            //            sb.append(HtmlUtils.leftRight(getSortLinks(request), fullUrl));
         } else if (output.equals(OUTPUT_SLIDESHOW)) {
             for (int i = entries.size() - 1; i >= 0; i--) {
                 Entry entry = entries.get(i);
@@ -744,56 +722,14 @@ public class ImageOutputHandler extends OutputHandler {
                           + HtmlUtils.quote(title) + ");\n");
 
             }
-        }
-
-
-        if (output.equals(OUTPUT_PLAYER)) {
-            String playerTemplate =
-                repository.getResource(PROP_HTML_IMAGEPLAYER);
-            playerTemplate =
-                playerTemplate.replaceAll("\\$\\{imagePlayerVar\\}",
-                                          playerVar);
-            playerTemplate =
-                playerTemplate.replaceAll("\\$\\{imagePlayerPrefix\\}",
-                                          playerPrefix);
-            String widthAttr = "";
-            int    width     = request.get(ARG_WIDTH, 600);
-            if (width > 0) {
-                widthAttr = HtmlUtils.attr(HtmlUtils.ATTR_WIDTH, "" + width);
-            }
-            String imageHtml = "<img id=\"" + playerPrefix
-                               + "animation\" border=\"0\" " + widthAttr
-                               + HtmlUtils.attr("SRC", firstImage)
-                               + " alt=\"image\">";
-
-            String tmp = playerTemplate.replace("${imagelist}",
-                             sb.toString());
-            tmp = tmp.replace("${imagehtml}", imageHtml);
-            tmp = StringUtil.replace(tmp, "${root}", repository.getUrlBase());
-            String imgstyle = request.getString(ARG_IMAGE_STYLE,
-                                  "height: 750px; max-height: 750px;");
-            tmp = StringUtil.replace(tmp, "${style}", imgstyle);
-            String fullUrl = "";
-            if (width > 0) {
-                request.put(ARG_WIDTH, "0");
-                fullUrl = HtmlUtils.href(request.getUrl(),
-                                         msg("Use image width"));
-            } else {
-                request.put(ARG_WIDTH, "600");
-                fullUrl = HtmlUtils.href(request.getUrl(),
-                                         msg("Use fixed width"));
-            }
-
-            sb = new StringBuilder();
-            sb.append(tmp);
-            sb.append(HtmlUtils.leftRight(getSortLinks(request), fullUrl));
-        } else if (output.equals(OUTPUT_SLIDESHOW)) {
             String template = repository.getResource(PROP_HTML_SLIDESHOW);
             template = template.replace("${imagelist}", sb.toString());
             template = StringUtil.replace(template, "${root}",
                                           repository.getUrlBase());
             sb = new StringBuilder(template);
         }
+
+
         StringBuilder finalSB = new StringBuilder();
         showNext(request, new ArrayList<Entry>(), entries, finalSB);
 
@@ -805,23 +741,24 @@ public class ImageOutputHandler extends OutputHandler {
     }
 
 
-
     /**
      * _more_
      *
      * @param request _more_
+     * @param mainEntry _more_
      * @param entries _more_
      * @param finalSB _more_
      * @param addHeader _more_
      *
      * @throws Exception _more_
      */
-    public void makePlayer(Request request, List<Entry> entries,
-                           Appendable finalSB, boolean addHeader)
+    public void makePlayer(Request request, Entry mainEntry,
+                           List<Entry> entries, Appendable finalSB,
+                           boolean addHeader)
             throws Exception {
+
         String        playerPrefix = "imageplayer_" + HtmlUtils.blockCnt++;
         String        playerVar    = playerPrefix + "Var";
-
 
         StringBuilder sb           = new StringBuilder();
         if (entries.size() == 0) {
@@ -848,12 +785,13 @@ public class ImageOutputHandler extends OutputHandler {
                 firstImage = url;
             }
             String entryUrl = getEntryLink(request, entry);
-            String dttm = getEntryUtil().formatDate(request, entry);
+            String dttm     = getEntryUtil().formatDate(request, entry);
             String title =
                 "<table width=\"100%\" cellspacing=\"0\" cellpadding=\"0\">";
-            title += "<tr><td><div class=\"imageplayer-title\">" + entryUrl
-                     + "</div></td><td align=right><div class=\"imageplayer-title-date\">" + dttm +
-                "</div></td></table>";
+            title +=
+                "<tr><td><div class=\"imageplayer-title\">" + entryUrl
+                + "</div></td><td align=right><div class=\"imageplayer-title-date\">"
+                + dttm + "</div></td></table>";
             title = title.replace("\"", "\\\"");
             sb.append(playerVar + ".addImage(" + HtmlUtils.quote(url) + ","
                       + HtmlUtils.quote(title) + ");\n");
@@ -866,6 +804,40 @@ public class ImageOutputHandler extends OutputHandler {
         playerTemplate =
             playerTemplate.replaceAll("\\$\\{imagePlayerPrefix\\}",
                                       playerPrefix);
+
+
+        List<String> playerArgs = new ArrayList<String>();
+
+        if (request.get("loopstart", false)) {
+            playerArgs.add("autostart");
+            playerArgs.add("true");
+        } else {
+            Object v = mainEntry.getTypeHandler().getEntryValue(mainEntry,
+                           "autostart");
+            if ((v != null) && v.toString().equals("true")) {
+                playerArgs.add("autostart");
+                playerArgs.add("true");
+            }
+        }
+
+        if (request.get("loopdelay", 0) > 0) {
+            playerArgs.add("delay");
+            playerArgs.add("" + request.get("loopdelay", 0));
+        } else {
+            Object v = mainEntry.getTypeHandler().getEntryValue(mainEntry,
+                           "delay");
+            if (v != null) {
+                int delay = new Integer(v.toString()).intValue();
+                if (delay > 0) {
+                    playerArgs.add("delay");
+                    playerArgs.add("" + delay);
+                }
+            }
+        }
+
+        playerTemplate = playerTemplate.replaceAll("\\$\\{imageArgs\\}",
+                Json.map(playerArgs));
+
         String widthAttr = "";
         int    width     = request.get(ARG_WIDTH, 600);
         if (width > 0) {
@@ -879,11 +851,14 @@ public class ImageOutputHandler extends OutputHandler {
         String tmp = playerTemplate.replace("${imagelist}", sb.toString());
         tmp = tmp.replace("${imagehtml}", imageHtml);
         tmp = StringUtil.replace(tmp, "${root}", repository.getUrlBase());
-        sb = new StringBuilder();
+        sb  = new StringBuilder();
+
+
 
         sb.append(tmp);
         if (addHeader) {
-            String fullUrl = "";
+            String fullUrl       = "";
+            String originalWidth = request.getString(ARG_WIDTH, null);
             if (width > 0) {
                 request.put(ARG_WIDTH, "0");
                 fullUrl = HtmlUtils.href(request.getUrl(),
@@ -893,10 +868,15 @@ public class ImageOutputHandler extends OutputHandler {
                 fullUrl = HtmlUtils.href(request.getUrl(),
                                          msg("Use fixed width"));
             }
-            sb.append(HtmlUtils.leftRight(getSortLinks(request),
-                                          fullUrl));
+            if (originalWidth != null) {
+                request.put(ARG_WIDTH, originalWidth);
+            } else {
+                request.remove(ARG_WIDTH);
+            }
+            sb.append(HtmlUtils.leftRight(getSortLinks(request), fullUrl));
         }
         finalSB.append(sb);
+
     }
 
 

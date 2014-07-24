@@ -76,7 +76,7 @@ delay_max = 6000;
 delay_min = 100;
 dwell_multipler = 3;
 
-function ImagePlayer()  {
+function ImagePlayer(args)  {
     this.prefix = "${imagePlayerPrefix}";
     this.DIR_FORWARD = 0;
     this.DIR_BACKWARD = 1;
@@ -85,16 +85,24 @@ function ImagePlayer()  {
 
 
     this.images= new Array();
-    this.normal_delay = 1000;
-    this.delay = this.normal_delay;         //delay between frames in 1/100 seconds
+    this.delay = 1000;
     this.end_dwell_multipler   = dwell_multipler;
     this.start_dwell_multipler = dwell_multipler;
     this.current_image = 0;
     this.direction =this.DIR_FORWARD;
+
+
     this.running = 0;
     this.timestamp=1;
     this.play_mode = this.MODE_NORMAL;  
  
+    if(args) {
+        $.extend(this, args);
+    }
+
+    if(this.delay == 0) {
+       this.delay = 1000;
+    }
 
     this.getId = function(name) {
         return "#" + this.prefix + name;
@@ -320,10 +328,12 @@ function ImagePlayer()  {
             //            alert('no images');
             return
         }
+/*
         if(!this.images[this.current_image].image) {
             this.images[this.current_image].image = new Image();
             this.images[this.current_image].image.src = this.images[this.current_image].url;
         }
+*/
         $(this.getId("animation")).attr("src",  this.images[this.current_image].url);
         this.setBoxes();
         var headerHtml;
@@ -434,7 +444,10 @@ End Dwell:
 
 
 <script language="JavaScript">
-  var ${imagePlayerVar} = new ImagePlayer();
+  var ${imagePlayerVar} = new ImagePlayer(${imageArgs});
   ${imagelist}
   ${imagePlayerVar}.displayImage();
+  if(${imagePlayerVar}.autostart) {  
+      ${imagePlayerVar}.start();
+  }
 </script>
