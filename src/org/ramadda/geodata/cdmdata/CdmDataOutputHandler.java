@@ -845,14 +845,14 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
 
 
     /**
-     * _more_
+     * Output the grid subset
      *
-     * @param request _more_
-     * @param entry _more_
+     * @param request the request
+     * @param entry the entry to subset
      *
-     * @return _more_
+     * @return  the Result
      *
-     * @throws Exception _more_
+     * @throws Exception some problem
      */
     public Result outputGridSubset(Request request, Entry entry)
             throws Exception {
@@ -886,9 +886,12 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
             }
         }
         //            System.err.println(varNames);
-        LatLonRect llr                 = null;
-        boolean    anySpatialDifferent = false;
-        boolean    haveAllSpatialArgs  = true;
+        GridDataset       gds = getCdmManager().getGridDataset(entry, path);
+        // initialize the bounds and date range to the defaults
+        LatLonRect        llr                 = gds.getBoundingBox();
+        CalendarDateRange cdr                 = gds.getCalendarDateRange();
+        boolean           anySpatialDifferent = false;
+        boolean           haveAllSpatialArgs  = true;
 
         for (String spatialArg : SPATIALARGS) {
             if ( !Misc.equals(request.getString(spatialArg, ""),
@@ -929,25 +932,37 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
         }
         boolean            includeLatLon = request.get(ARG_ADDLATLON, false);
         int                timeStride    = 1;
-        GridDataset        gds = getCdmManager().getGridDataset(entry, path);
         List<CalendarDate> allDates      = getGridDates(gds);
         CalendarDate[]     dates         = new CalendarDate[2];
-        Calendar           cal           = null;
-        String             calString = request.getString(ARG_CALENDAR, null);
-        if (!allDates.isEmpty()) {  // have some dates
+        if (cdr != null) {
+            dates[0] = cdr.getStart();
+            dates[1] = cdr.getEnd();
+        }
+        Calendar cal       = null;
+        String   calString = request.getString(ARG_CALENDAR, null);
+        if ( !allDates.isEmpty()) {  // have some dates
             if (calString == null) {
                 calString = allDates.get(0).getCalendar().toString();
             }
+            // have to check if defined, because no selection is ""
             if (request.defined(ARG_FROMDATE)) {
                 String fromDateString = request.getString(ARG_FROMDATE,
-                                            formatDate(request, allDates.get(0)));
-                dates[0] = CalendarDate.parseISOformat(calString, fromDateString);
+                                            formatDate(request,
+                                                allDates.get(0)));
+                dates[0] = CalendarDate.parseISOformat(calString,
+                        fromDateString);
+            } else {
+                dates[0] = allDates.get(0);
             }
             if (request.defined(ARG_TODATE)) {
                 String toDateString = request.getString(ARG_TODATE,
                                           formatDate(request,
-                                              allDates.get(allDates.size() - 1)));
-                dates[1] = CalendarDate.parseISOformat(calString, toDateString);
+                                              allDates.get(allDates.size()
+                                                  - 1)));
+                dates[1] = CalendarDate.parseISOformat(calString,
+                        toDateString);
+            } else {
+                dates[1] = allDates.get(allDates.size() - 1);
             }
         }
         //have to have both dates
