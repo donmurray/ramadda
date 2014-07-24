@@ -1,6 +1,6 @@
 
 
-The latest version is 
+The latest stable version is 1.6. The 1.7a version is the latest development but is generally pretty stable.
 
 repository.war: self contained war file for running under Tomcat, Glassfish, etc
 
