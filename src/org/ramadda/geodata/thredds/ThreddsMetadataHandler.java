@@ -21,26 +21,23 @@
 package org.ramadda.geodata.thredds;
 
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
+import org.ramadda.data.util.CdmUtil;
 
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
-import org.ramadda.data.util.CdmUtil;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
 import org.ramadda.repository.Request;
 import org.ramadda.repository.metadata.Metadata;
 import org.ramadda.repository.metadata.MetadataHandler;
 import org.ramadda.repository.metadata.MetadataTypeBase;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import ucar.ma2.Array;
 import ucar.ma2.IndexIterator;
 import ucar.ma2.MAMath;
+
 import ucar.nc2.Attribute;
 import ucar.nc2.Variable;
 import ucar.nc2.VariableSimpleIF;
@@ -53,16 +50,27 @@ import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.time.Calendar;
 import ucar.nc2.time.CalendarDate;
 import ucar.nc2.time.CalendarDateUnit;
+
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.util.CatalogUtil;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
+
 import visad.Unit;
 import visad.UnitException;
+
 import visad.data.units.NoSuchUnitException;
+
 import visad.jmet.MetUnits;
+
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
 
 
 /**
@@ -72,6 +80,9 @@ import visad.jmet.MetUnits;
  * @version $Revision: 1.3 $
  */
 public class ThreddsMetadataHandler extends MetadataHandler {
+
+    /** _more_          */
+    private static boolean debug = false;
 
     /** _more_ */
     public static final String TAG_VARIABLES = "variables";
@@ -433,25 +444,29 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 if (value == null) {
                     value = "" + attr.getNumericValue();
                 }
-                if (CdmUtil.ATTR_MAXLON.equals(name)) {
+                if (CdmUtil.ATTR_MAXLON.equals(name)
+                        || name.equals("EastBoundingCoordinate")) {
                     //                    System.err.println ("maxlon:" + value);
                     extra.put(ARG_MAXLON, new Double(value));
 
                     continue;
                 }
-                if (CdmUtil.ATTR_MINLON.equals(name)) {
+                if (CdmUtil.ATTR_MINLON.equals(name)
+                        || name.equals("WestBoundingCoordinate")) {
                     //                    System.err.println ("minlon:" + value);
                     extra.put(ARG_MINLON, new Double(value));
 
                     continue;
                 }
-                if (CdmUtil.ATTR_MAXLAT.equals(name)) {
+                if (CdmUtil.ATTR_MAXLAT.equals(name)
+                        || name.equals("NorthBoundingCoordinate")) {
                     //                    System.err.println ("maxlat:" + value);
                     extra.put(ARG_MAXLAT, new Double(value));
 
                     continue;
                 }
-                if (CdmUtil.ATTR_MINLAT.equals(name)) {
+                if (CdmUtil.ATTR_MINLAT.equals(name)
+                        || name.equals("SouthBoundingCoordinate")) {
                     //                    System.err.println ("minlat:" + value);
                     extra.put(ARG_MINLAT, new Double(value));
 
@@ -572,7 +587,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
             List<Variable> variables = dataset.getVariables();
-            //            System.err.println(entry.getResource());
+            System.err.println("ThreddsMetadataHandler:"
+                               + entry.getResource());
 
             for (Variable var : variables) {
                 if (var instanceof CoordinateAxis) {
@@ -722,6 +738,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
             }
 
+            //            System.err.println("\thave bounds:" + haveBounds);
+
+
             //If we didn't have a lat/lon coordinate axis then check projection
             //We do this here after because I've seen some point files that have an incorrect 360 bbox
             if ( !haveBounds) {
@@ -739,12 +758,13 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                             && (llr.getLonMin() == llr.getLonMin())) {
                         haveBounds = true;
                         if (extra.get(ARG_MINLAT) == null) {
-                            //                        System.err.println("\t"  +" bounds from cs:" + llr);
-                            //                        System.err.println("\t"  +" proj:" + proj);
+                            //                            System.err.println("\t"  +" bounds from cs:" + llr);
+                            //                            System.err.println("\t"  +" proj:" + proj);
                             extra.put(ARG_MINLAT, llr.getLatMin());
                             extra.put(ARG_MAXLAT, llr.getLatMax());
                             extra.put(ARG_MINLON, llr.getLonMin());
                             extra.put(ARG_MAXLON, llr.getLonMax());
+                            System.out.println(extra);
                         }
 
                         break;
