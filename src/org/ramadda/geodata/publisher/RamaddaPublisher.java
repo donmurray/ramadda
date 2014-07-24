@@ -474,16 +474,16 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                     if (bbox != null) {
                         southFld.setText(
                             getIdv().getDisplayConventions().formatLatLon(
-                                bbox.getY()));
+                                                                          Math.max(-90, bbox.getY())));
                         northFld.setText(
                             getIdv().getDisplayConventions().formatLatLon(
-                                (bbox.getY() + bbox.getHeight())));
+                                                                          Math.min(90, (bbox.getY() + bbox.getHeight()))));
                         westFld.setText(
                             getIdv().getDisplayConventions().formatLatLon(
-                                bbox.getX()));
+                                                                          Math.max(-180, Misc.normalizeLongitude(bbox.getX()))));
                         eastFld.setText(
                             getIdv().getDisplayConventions().formatLatLon(
-                                (bbox.getX() + bbox.getWidth())));
+                                                                          Math.min(180, Misc.normalizeLongitude(bbox.getX() + bbox.getWidth()))));
                     }
                 }
                 Animation anim = fromViewManager.getAnimation();
