@@ -129,6 +129,9 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class CdmDataOutputHandler extends OutputHandler implements CdmConstants {
 
+    private static final boolean debug = true;
+
+
     /** set of suffixes */
     private HashSet<String> suffixSet;
 
@@ -966,6 +969,11 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
             NetcdfCFWriter writer = new NetcdfCFWriter();
             File f = getRepository().getStorageManager().getTmpFile(request,
                          "subset" + ncVersion.getSuffix());
+
+            if(debug) {
+                System.err.println("CdmData.subset: " + " vars:" + varNames +" llr:" + llr);
+            }
+
             writer.makeFile(f.toString(), gds, varNames, llr, hStride,
                             zStride, ((dates[0] == null)
                                       ? null
