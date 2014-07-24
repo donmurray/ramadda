@@ -379,6 +379,18 @@ public class GenericTypeHandler extends TypeHandler {
     }
 
 
+@Override
+    public Object getEntryValue(Entry entry, String columnName) {
+        Object[] values = getEntryValues(entry);
+        if(values == null) return null;
+        Column column = findColumn(columnName);
+        if(column == null)  return null;
+        return column.getObject(values);
+    }
+
+
+
+
     /**
      * _more_
      *

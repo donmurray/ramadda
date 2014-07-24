@@ -614,6 +614,9 @@ public class TypeHandler extends RepositoryManager {
         return getEntryValues(entry)[index];
     }
 
+    public Object getEntryValue(Entry entry, String columnName) {
+        return null;
+    }
 
 
     /**
