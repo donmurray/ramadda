@@ -587,8 +587,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
             List<Variable> variables = dataset.getVariables();
-            System.err.println("ThreddsMetadataHandler:"
-                               + entry.getResource());
+            //            System.err.println("ThreddsMetadataHandler:"    + entry.getResource());
 
             for (Variable var : variables) {
                 if (var instanceof CoordinateAxis) {
