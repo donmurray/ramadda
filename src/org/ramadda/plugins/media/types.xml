@@ -62,6 +62,8 @@
 {{imageplayer show_sort_links="true"}}
 ]]>
 </wiki>
+     <column name="autostart" type="boolean" label="Auto Start"  default="false" showinhtml="false"/>
+     <column name="delay" type="int" label="Delay"  default="0" suffix="(milliseconds)" showinhtml="false"/>
 </type>
 
 
