@@ -26,6 +26,7 @@ LT50480232011289PAC01.hdf
 
   <type name="earth_satellite_landsat"  description="Landsat Satellite Data" foruser="true" super="earth_satellite"         
         field_file_pattern=".*l(sensor:.)(satellite:.)(wrs_path_number:\d\d\d)(wrs_row_number:\d\d\d)(year:\d\d\d\d)(julian_day:\d\d\d)(ground_station:...)(archive_version_number:\d\d)\.hdf$">
+     <property name="search.tabs" value="map,list,timeline"/>
      <column name="sensor" label="Sensor" type="enumerationplus" values="" cansearch="true" />
      <column name="satellite" label="Satellite" type="enumerationplus" values="" cansearch="true" />
      <column name="wrs_path_number" label="WRS Path" type="int"  cansearch="true" />
