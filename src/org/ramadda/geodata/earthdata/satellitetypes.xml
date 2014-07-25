@@ -36,6 +36,7 @@ LT50480232011289PAC01.hdf
   </type>
 
   <type name="earth_satellite_modis"  description="Modis Satellite Data" foruser="false" super="earth_satellite">
+     <property name="search.tabs" value="map,list,timeline"/>
      <column name="data_type" label="Earth Science Data Type" type="enumerationplus" values="" cansearch="true" />
   </type>
 
