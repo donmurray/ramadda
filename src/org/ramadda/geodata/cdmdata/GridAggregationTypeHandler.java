@@ -264,31 +264,30 @@ public class GridAggregationTypeHandler extends ExtensibleGroupTypeHandler {
                                           NcmlUtil.AGG_UNION, })));
         } else if (ncmlUtil.isJoinNew()) {
             //TODO here
-        }
-        else if (ncmlUtil.isEnsemble()) {
-          /* Ensemble is now handled below
-            String ensembleDimName = "ens";
-            ncmlUtil.addEnsembleVariables(sb, ensembleDimName);
-            sb.append(XmlUtil.openTag(NcmlUtil.TAG_AGGREGATION,
-                                      XmlUtil.attrs(new String[] {
-                                          NcmlUtil.ATTR_DIMNAME,
-                                          ensembleDimName,
-                                          NcmlUtil.ATTR_TYPE,
-                                          NcmlUtil.AGG_JOINNEW })));
-            for (String var : fields) {
-                sb.append(XmlUtil.tag(NcmlUtil.TAG_VARIABLEAGG,
-                                      XmlUtil.attrs(new String[] {
-                                          NcmlUtil.ATTR_NAME,
-                                          var })));
-            }
-          */
+        } else if (ncmlUtil.isEnsemble()) {
+            /* Ensemble is now handled below
+              String ensembleDimName = "ens";
+              ncmlUtil.addEnsembleVariables(sb, ensembleDimName);
+              sb.append(XmlUtil.openTag(NcmlUtil.TAG_AGGREGATION,
+                                        XmlUtil.attrs(new String[] {
+                                            NcmlUtil.ATTR_DIMNAME,
+                                            ensembleDimName,
+                                            NcmlUtil.ATTR_TYPE,
+                                            NcmlUtil.AGG_JOINNEW })));
+              for (String var : fields) {
+                  sb.append(XmlUtil.tag(NcmlUtil.TAG_VARIABLEAGG,
+                                        XmlUtil.attrs(new String[] {
+                                            NcmlUtil.ATTR_NAME,
+                                            var })));
+              }
+            */
         } else {
             throw new IllegalArgumentException("Unknown aggregation type:"
                     + ncmlUtil);
         }
 
         List<Entry> sortedChillens      = new ArrayList<Entry>();
-        boolean      childrenAggregation = false;
+        boolean     childrenAggregation = false;
         List<Entry> childrenEntries =
             getRepository().getEntryManager().getChildren(request, entry);
 
@@ -409,15 +408,18 @@ public class GridAggregationTypeHandler extends ExtensibleGroupTypeHandler {
             }
             //sortedChillens.add(child.getResource().getPath());
             sortedChillens.add(child);
-            
+
         }
 
         if (ncmlUtil.isJoinExisting()) {
-        	sortedChillens = getEntryUtil().sortEntriesOnDate(sortedChillens, false);
+            sortedChillens = getEntryUtil().sortEntriesOnDate(sortedChillens,
+                    false);
         } else if (ncmlUtil.isEnsemble()) {
-        	sortedChillens = getEntryUtil().sortEntriesOnName(sortedChillens, false);
+            sortedChillens = getEntryUtil().sortEntriesOnName(sortedChillens,
+                    false);
             String ensembleDimName = "ens";
-            ncmlUtil.addEnsembleVariables(sb, ensembleDimName, sortedChillens);
+            ncmlUtil.addEnsembleVariables(sb, ensembleDimName,
+                                          sortedChillens);
             sb.append(XmlUtil.openTag(NcmlUtil.TAG_AGGREGATION,
                                       XmlUtil.attrs(new String[] {
                                           NcmlUtil.ATTR_DIMNAME,
@@ -436,7 +438,7 @@ public class GridAggregationTypeHandler extends ExtensibleGroupTypeHandler {
         for (Entry child : sortedChillens) {
             //            System.err.println("   file:" + s);
             String s = child.getResource().getPath();
-            File f = new File(s);
+            File   f = new File(s);
             timestamp[0] = timestamp[0] ^ f.lastModified() ^ s.hashCode();
             sb.append(
                 XmlUtil.tag(
@@ -460,19 +462,18 @@ public class GridAggregationTypeHandler extends ExtensibleGroupTypeHandler {
 
 
     /**
-     * _more_
+     * Make a dummy Entry
      *
-     * @param dataFile _more_
+     * @param dataFile  the datafile
      *
-     * @return _more_
+     * @return  the dummy Entry
      *
-     * @throws Exception _more_
+     * @throws Exception  problem making Entry
      */
     private Entry makeDummyEntry(File dataFile) throws Exception {
-        Entry dummyEntry = new Entry();
-        dummyEntry.setTypeHandler(
-            getRepository().getTypeHandler(TypeHandler.TYPE_FILE));
-
+        Entry dummyEntry =
+            new Entry(getRepository().getTypeHandler(TypeHandler.TYPE_FILE),
+                      true, IOUtil.getFileTail(dataFile.toString()));
         dummyEntry.setResource(new Resource(dataFile,
                                             Resource.TYPE_LOCAL_FILE));
 
@@ -506,8 +507,6 @@ public class GridAggregationTypeHandler extends ExtensibleGroupTypeHandler {
      * @param request  the Request
      * @param entry    the Entry
      * @param services the list of services
-     *
-     * @return  the List of services
      */
     @Override
     public void getServices(Request request, Entry entry,

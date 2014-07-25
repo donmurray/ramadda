@@ -21,13 +21,14 @@
 package org.ramadda.geodata.cdmdata;
 
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.ramadda.repository.Entry;
 
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
+
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -100,7 +101,7 @@ public class NcmlUtil {
     /**
      * Create a new NcML utility with the aggregation type
      *
-     * @param aggType _more_
+     * @param aggType  the aggregation type
      */
     public NcmlUtil(String aggType) {
         this.aggType = aggType;
@@ -170,7 +171,7 @@ public class NcmlUtil {
      * @param name  the name of the ensemble variable
      */
     public static void addEnsembleVariables(StringBuffer sb, String name) {
-        addEnsembleVariables(sb,name,null);
+        addEnsembleVariables(sb, name, null);
     }
 
     /**
@@ -178,8 +179,10 @@ public class NcmlUtil {
      *
      * @param sb the StringBuffer to add to
      * @param name  the name of the ensemble variable
+     * @param entries list of Entry's
      */
-    public static void addEnsembleVariables(StringBuffer sb, String name, List<Entry> entries) {
+    public static void addEnsembleVariables(StringBuffer sb, String name,
+                                            List<Entry> entries) {
         /*
  <variable name='ens' type='String' shape='ens'>
    <attribute name='long_name' value='ensemble coordinate' />
@@ -189,23 +192,26 @@ public class NcmlUtil {
         */
         // Get the ensemble names from the entry names
         String values = "";
-        if (entries != null && !entries.isEmpty()) {
-           StringBuilder buf = new StringBuilder();
-           for (Entry e : entries)  {
-               buf.append(e.getName());
-               buf.append(" ");
-           }
-           values = XmlUtil.tag("values", "", buf.toString().trim());
+        if ((entries != null) && !entries.isEmpty()) {
+            StringBuilder buf    = new StringBuilder();
+            int           ensNum = 1;
+            for (Entry e : entries) {
+                // for now use integer ensemble numbers
+                //buf.append(e.getName());
+                //buf.append(" ");
+                buf.append(ensNum + " ");
+                ensNum++;
+            }
+            values = XmlUtil.tag("values", "", buf.toString().trim());
         }
 
         sb.append(XmlUtil.tag(TAG_VARIABLE, XmlUtil.attrs(new String[] {
-            ATTR_NAME, name, ATTR_TYPE, "String", ATTR_SHAPE, name
+            ATTR_NAME, name, ATTR_TYPE, "int", ATTR_SHAPE, name
         }), XmlUtil.tag(TAG_ATTRIBUTE, XmlUtil.attrs(new String[] { ATTR_NAME,
                 "long_name", ATTR_VALUE,
                 "ensemble coordinate" })) + XmlUtil.tag(TAG_ATTRIBUTE,
                     XmlUtil.attrs(new String[] { ATTR_NAME,
-                "_CoordinateAxisType", ATTR_VALUE, "Ensemble" }))
-                +values));
+                "_CoordinateAxisType", ATTR_VALUE, "Ensemble" })) + values));
     }
 
 
