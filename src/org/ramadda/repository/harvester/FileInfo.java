@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.regex.*;
 
+
 /**
  * Class FileInfo holds information about a file or directory
  *
@@ -229,12 +230,12 @@ public class FileInfo {
         List   tmp = addedFiles;
         if ((tmp != null) && (tmp.size() > 0)) {
             String fileBlock;
-            if(tmp.size()>50) {
-                return s +" Added " + tmp.size() +" files";
+            if (tmp.size() > 50) {
+                return s + " Added " + tmp.size() + " files";
             }
             fileBlock = HtmlUtils.insetDiv("Added files:<br>"
-                                   + StringUtil.join("<br>", tmp), 0, 10, 0,
-                                       0);
+                                           + StringUtil.join("<br>", tmp), 0,
+                                               10, 0, 0);
 
             return HtmlUtils.makeShowHideBlock(s, fileBlock, false);
         }
@@ -242,49 +243,6 @@ public class FileInfo {
         return s;
     }
 
-    /**
-     * _more_
-     *
-     * @param rootDir _more_
-     * @param harvester _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-
-    public static List<FileInfo> collectDirs(final File rootDir,
-                                             final Harvester harvester, final Pattern topDirPattern)
-            throws Exception {
-        final List<FileInfo> dirs       = new ArrayList();
-        IOUtil.FileViewer    fileViewer = new IOUtil.FileViewer() {
-            public int viewFile(File f) throws Exception {
-                if(f.getParentFile().equals(rootDir) && topDirPattern!=null) {
-                    Matcher matcher = topDirPattern.matcher(f.getName());
-                    if (!matcher.find()) {
-                        //                        System.err.println ("dir:" + f +" doesn't match");
-                        return DO_DONTRECURSE;
-                    }
-                    //                    System.err.println ("dir:" + f +" does match");
-                }
-
-                if (f.isDirectory()) {
-                    if (f.getName().startsWith(".")) {
-                        return DO_DONTRECURSE;
-                    }
-                    if ( !okToRecurse(f, harvester)) {
-                        return DO_DONTRECURSE;
-                    }
-                    dirs.add(new FileInfo(f, rootDir, true));
-                }
-
-                return DO_CONTINUE;
-            }
-        };
-        IOUtil.walkDirectory(rootDir, fileViewer);
-
-        return dirs;
-    }
 
     /**
      * _more_

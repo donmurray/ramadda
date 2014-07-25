@@ -91,7 +91,7 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
     /** attribute id */
     public static final String ATTR_FILEPATTERN = "filepattern";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TOPPATTERN = "toppattern";
 
     /** attribute id */
@@ -119,7 +119,7 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
     /** _more_ */
     private String filePatternString = ".*";
 
-    /** _more_          */
+    /** _more_ */
     private String topPatternString = "";
 
 
@@ -681,7 +681,10 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
                 logHarvesterInfo("Root directory does not exist:" + rootDir);
             }
             dirs.add(new FileInfo(rootDir));
-            dirs.addAll(FileInfo.collectDirs(rootDir, this, topPattern));
+            dirs.addAll(collectDirs(rootDir, this, topPattern, timestamp));
+            if ( !canContinueRunning(timestamp)) {
+                return;
+            }
         }
 
         logHarvesterInfo("Found " + dirs.size()
@@ -732,6 +735,63 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
         }
         logHarvesterInfo("***********  Done running **************");
     }
+
+
+    /**
+     * _more_
+     *
+     * @param rootDir _more_
+     * @param harvester _more_
+     * @param topDirPattern _more_
+     * @param timestamp _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public List<FileInfo> collectDirs(final File rootDir,
+                                      final Harvester harvester,
+                                      final Pattern topDirPattern,
+                                      final int timestamp)
+            throws Exception {
+        final List<FileInfo> dirs       = new ArrayList();
+        IOUtil.FileViewer    fileViewer = new IOUtil.FileViewer() {
+            public int viewFile(File f) throws Exception {
+                if ( !canContinueRunning(timestamp)) {
+                    return DO_STOP;
+                }
+                if (f.getParentFile().equals(rootDir)
+                        && (topDirPattern != null)) {
+                    Matcher matcher = topDirPattern.matcher(f.getName());
+                    if ( !matcher.find()) {
+                        //                        System.err.println ("dir:" + f +" doesn't match");
+                        return DO_DONTRECURSE;
+                    }
+                    //                    System.err.println ("dir:" + f +" does match");
+                }
+
+                if (f.isDirectory()) {
+                    if (f.getName().startsWith(".")) {
+                        return DO_DONTRECURSE;
+                    }
+                    if ( !FileInfo.okToRecurse(f, harvester)) {
+                        return DO_DONTRECURSE;
+                    }
+                    dirs.add(new FileInfo(f, rootDir, true));
+                    if (dirs.size() > 100) {
+                        logHarvesterInfo("Collected " + dirs.size()
+                                         + " dirs");
+                    }
+                }
+
+                return DO_CONTINUE;
+            }
+        };
+        IOUtil.walkDirectory(rootDir, fileViewer);
+
+        return dirs;
+    }
+
 
 
     /**
