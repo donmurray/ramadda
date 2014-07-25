@@ -543,6 +543,10 @@ sb.append(HtmlUtils.form(formUrl,
             lonMin = GeoUtils.normalizeLongitude360(lonMin);
             lonMax = GeoUtils.normalizeLongitude360(lonMax);
         }
+        // TODO: HACK!
+        if (lonMin == lonMax) {  // 360 got set to 0
+            lonMax+=360;
+        }
         envMap.put("maxLat",
                    request.getString(ARG_NCL_AREA_NORTH,
                                      String.valueOf(llb.getLatMax())));

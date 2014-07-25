@@ -277,10 +277,10 @@ begin
   
 ; if not passed in, then set from data
   if (noLatLon) then
-    minLon = minDLon
-    maxLon = maxDLon
-    minLat = minDLat
-    maxLat = maxDLat
+    minLon = doubletofloat(minDLon)
+    maxLon = doubletofloat(maxDLon)
+    minLat = doubletofloat(minDLat)
+    maxLat = doubletofloat(maxDLat)
   end if
   
 ; check for 0-360
@@ -1355,10 +1355,10 @@ begin
   
   ;
   ; Region parameters
-  minLat=stringtodouble(getenv("minLat"))
-  maxLat=stringtodouble(getenv("maxLat"))
-  minLon=stringtodouble(getenv("minLon"))
-  maxLon=stringtodouble(getenv("maxLon"))
+  minLat=stringtofloat(getenv("minLat"))
+  maxLat=stringtofloat(getenv("maxLat"))
+  minLon=stringtofloat(getenv("minLon"))
+  maxLon=stringtofloat(getenv("maxLon"))
   
   units=getenv("units")
   if (ismissing(units)) then
