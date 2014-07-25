@@ -319,8 +319,11 @@ public class Column implements DataTypes, Constants {
     /** _more_ */
     private String propertiesFile;
 
+    private int columnIndex;
+
     /** _more_ */
     private int offset;
+
 
     /** _more_ */
     private boolean canShow = true;
@@ -3046,6 +3049,24 @@ public class Column implements DataTypes, Constants {
 
         return new Double(attrValue).doubleValue();
     }
+
+/**
+Set the ColumnIndex property.
+
+@param value The new value for ColumnIndex
+**/
+public void setColumnIndex (int value) {
+	columnIndex = value;
+}
+
+/**
+Get the ColumnIndex property.
+
+@return The ColumnIndex
+**/
+public int getColumnIndex () {
+	return columnIndex;
+}
 
 
 

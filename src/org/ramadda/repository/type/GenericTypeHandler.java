@@ -243,6 +243,7 @@ public class GenericTypeHandler extends TypeHandler {
                     columnNode,
                     new Integer(valuesOffset + colNames.size() - 1) });
             columns.add(column);
+            column.setColumnIndex(columns.size()-1);
             if ((categoryColumn == null) && column.getIsCategory()) {
                 categoryColumn = column;
             }
@@ -338,8 +339,8 @@ public class GenericTypeHandler extends TypeHandler {
             }
         }
 
-        throw new IllegalArgumentException("Could not find column:"
-                                           + columnName);
+        return null;
+        //        throw new IllegalArgumentException("Could not find column:" + columnName);
     }
 
     /**
