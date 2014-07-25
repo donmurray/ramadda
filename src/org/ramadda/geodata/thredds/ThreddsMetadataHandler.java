@@ -47,9 +47,11 @@ import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.dataset.CoordinateAxis1D;
 import ucar.nc2.dataset.CoordinateSystem;
 import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.time.Calendar;
 import ucar.nc2.time.CalendarDate;
 import ucar.nc2.time.CalendarDateUnit;
+import ucar.nc2.units.DateRange;
 
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.ProjectionImpl;
@@ -81,7 +83,7 @@ import java.util.List;
  */
 public class ThreddsMetadataHandler extends MetadataHandler {
 
-    /** _more_          */
+    /** _more_ */
     private static boolean debug = false;
 
     /** _more_ */
@@ -423,6 +425,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         Metadata      metadata        = null;
         String        varName         = null;
         NetcdfDataset dataset         = null;
+        GridDataset   gds             = null;
         boolean       haveDate        = false;
         StringBuffer  descriptionAttr = new StringBuffer();
         try {
@@ -430,14 +433,27 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             super.getInitialMetadata(request, entry, metadataList, extra,
                                      shortForm);
 
-
             if ( !dataOutputHandler.getCdmManager().canLoadAsCdm(entry)) {
                 return;
             }
+            //            System.err.println("metadata harvest");
+
             String path = dataOutputHandler.getCdmManager().getPath(entry);
             dataset = NetcdfDataset.openDataset(path);
+
+            try {
+                gds = new GridDataset(dataset);
+            } catch (Exception ignore) {
+                //                System.err.println("Not a grid");
+            }
             boolean         haveBounds = false;
-            List<Attribute> attrs      = dataset.getGlobalAttributes();
+            List<Attribute> attrs      = null;
+            List            variables  = null;
+
+            attrs     = dataset.getGlobalAttributes();
+            variables = dataset.getVariables();
+
+
             for (Attribute attr : attrs) {
                 String name  = attr.getName();
                 String value = attr.getStringValue();
@@ -586,10 +602,11 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             }
 
 
-            List<Variable> variables = dataset.getVariables();
+
             //            System.err.println("ThreddsMetadataHandler:"    + entry.getResource());
 
-            for (Variable var : variables) {
+            for (Object obj : variables) {
+                VariableSimpleIF var = (VariableSimpleIF) obj;
                 if (var instanceof CoordinateAxis) {
                     boolean        axisWasRecognized = true;
                     CoordinateAxis ca                = (CoordinateAxis) var;
@@ -687,7 +704,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
                     //Also add in the standard name
                     ucar.nc2.Attribute att =
-                        var.findAttribute(NCATTR_STANDARD_NAME);
+                        var.findAttributeIgnoreCase(NCATTR_STANDARD_NAME);
 
                     if (att != null) {
                         varName = att.getStringValue();
@@ -740,6 +757,33 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             //            System.err.println("\thave bounds:" + haveBounds);
 
 
+
+            if (gds != null) {
+                gds.calcBounds();
+                DateRange dateRange = gds.getDateRange();
+                if (dateRange != null) {
+                    extra.put(ARG_FROMDATE, dateRange.getStart().getDate());
+                    extra.put(ARG_TODATE, dateRange.getEnd().getDate());
+                }
+
+                LatLonRect llr = gds.getBoundingBox();
+                if (llr != null) {
+                    if ((llr.getLatMin() == llr.getLatMin())
+                            && (llr.getLatMax() == llr.getLatMax())
+                            && (llr.getLonMax() == llr.getLonMax())
+                            && (llr.getLonMin() == llr.getLonMin())) {
+                        haveBounds = true;
+                        extra.put(ARG_MINLAT, llr.getLatMin());
+                        extra.put(ARG_MAXLAT, llr.getLatMax());
+                        extra.put(ARG_MINLON, llr.getLonMin());
+                        extra.put(ARG_MAXLON, llr.getLonMax());
+                    }
+                }
+            }
+
+
+
+
             //If we didn't have a lat/lon coordinate axis then check projection
             //We do this here after because I've seen some point files that have an incorrect 360 bbox
             if ( !haveBounds) {
@@ -778,6 +822,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             exc.printStackTrace();
         } finally {
             try {
+                if (gds != null) {
+                    gds.close();
+                }
                 if (dataset != null) {
                     dataset.close();
                 }
