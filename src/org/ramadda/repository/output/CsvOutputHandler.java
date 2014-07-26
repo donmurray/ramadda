@@ -123,6 +123,8 @@ public class CsvOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final String ARG_DELIMITER = "delimiter";
+    public static final String ARG_FIXEDWIDTH = "fixedwidth";
+    public static final String ARG_FULLHEADER = "fullheader";
 
 
     /**
@@ -139,6 +141,10 @@ public class CsvOutputHandler extends OutputHandler {
             throws Exception {
 
         String delimiter = request.getString(ARG_DELIMITER, ",");
+        boolean fixedWidth = request.get(ARG_FIXEDWIDTH, false);
+        boolean showFullHeader = request.get(ARG_FULLHEADER, false);
+        String filler = request.getString("filler"," ");
+
         String fieldsArg =
             request.getString(
                 ARG_FIELDS,
@@ -146,7 +152,6 @@ public class CsvOutputHandler extends OutputHandler {
         StringBuffer sb          = new StringBuffer();
         StringBuffer header      = new StringBuffer();
         List<String> toks = StringUtil.split(fieldsArg, ",", true, true);
-
         List<String> fieldNames  = new ArrayList<String>();
         List<String> fieldLabels = new ArrayList<String>();
         for (int i = 0; i < toks.size(); i++) {
@@ -168,6 +173,7 @@ public class CsvOutputHandler extends OutputHandler {
 
 
         int[] maxStringSize = null;
+        //        String[] paddingmaxStringSize = null;
         for (Entry entry : entries) {
             List<Column> columns = entry.getTypeHandler().getColumns();
             if (columns == null) {
@@ -195,14 +201,12 @@ public class CsvOutputHandler extends OutputHandler {
         }
 
         if (maxStringSize != null) {
-            //            for (int i = 0; i < maxStringSize.length; i++) {
-            //                System.err.println("i:" + i + " " + maxStringSize[i]);
-            //            }
+            for (int i = 0; i < maxStringSize.length; i++) {
+                System.err.println("i:" + i + " " + maxStringSize[i]);
+            }
         }
 
         Hashtable<String, Column> columnMap = null;
-
-
 
         for (Entry entry : entries) {
             if (sb.length() == 0) {
@@ -225,11 +229,11 @@ public class CsvOutputHandler extends OutputHandler {
                                 tmp += ",";
                             }
                             tmp += column.getName();
-                            //Not sure why I was including the max column width in the name
-                            /*tmp += column.getName()
-                                  + ((maxStringSize[col] > 0)
-                                   ? "(max:" + maxStringSize[col] + ")"
-                                      : "");*/
+                            if(fixedWidth) {
+                                tmp += ((maxStringSize[col] > 0)
+                                        ? "(max:" + maxStringSize[col] + ")"
+                                        : "");
+                            }
 
                         }
                         if (tmp == null) {
@@ -238,7 +242,9 @@ public class CsvOutputHandler extends OutputHandler {
                         headerString = headerString.replace(",fields", tmp);
                     }
                 }
-                //                sb.append("#fields=");
+                if(showFullHeader) {
+                    sb.append("#fields=");
+                }
                 sb.append(headerString);
                 sb.append("\n");
             }
@@ -308,11 +314,13 @@ public class CsvOutputHandler extends OutputHandler {
                             }
                             String s = sanitize(column.getString(values));
                             sb.append(s);
-                            if (column.isString()) {
-                                int length = s.length();
-                                while (length < maxStringSize[col]) {
-                                    sb.append(' ');
-                                    length++;
+                            if(fixedWidth) {
+                                if (column.isString()) {
+                                    int length = s.length();
+                                    while (length < maxStringSize[col]) {
+                                        sb.append(filler);
+                                        length++;
+                                    }
                                 }
                             }
                             cnt++;
@@ -337,6 +345,15 @@ public class CsvOutputHandler extends OutputHandler {
                     if (column != null) {
                         String s = sanitize(column.getString(values));
                         sb.append(s);
+                        if(fixedWidth) {
+                            if (column.isString()) {
+                                int length = s.length();
+                                while (length < maxStringSize[column.getColumnIndex()]) {
+                                    sb.append(filler);
+                                    length++;
+                                }
+                            }
+                        }
                     } else {
                         sb.append("unknown:" + field);
                     }
