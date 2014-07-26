@@ -45,6 +45,7 @@
 
   <type name="media_photoalbum"  description="Photo Album" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Information">
      <property name="icon" value="/media/pictures.png"/>
+     <property name="form.resource.show" value="false"/>
      <wiki><![CDATA[
 {{noheading}}
 {{description}}
@@ -55,6 +56,7 @@
 
 
   <type name="media_imageloop"  description="Image Loop" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Information">
+     <property name="form.resource.show" value="false"/>
      <property name="icon" value="/media/film.png"/>
      <wiki><![CDATA[
 {{noheading}}
