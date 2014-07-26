@@ -7,9 +7,65 @@
 }
 
 
+.imageplayer-buttons {
+    margin-left:4px;
+    padding: 2px;
+    padding-bottom: 4px;
+}
+
+.imageplayer-button {
+     margin: 0px;
+     margin-left: 2px;
+     margin-right: 2px;
+     padding: 0px;
+     margin-bottom: 2px;
+     font-family: monospace;
+}
+
+
+.imageplayer-title {
+  padding: 5px;
+  color: #000;
+}
+
+
+.imageplayer-title a {
+  color: #000;
+}
+
+.imageplayer-title-date {
+  padding: 5px;
+   font-style:italic;
+}
+
+
+
+.imageplayer-filler {
+   width:10px;
+   height: 20px;
+   border: 0px red solid;
+}
+
+.imageplayer-box-on, .imageplayer-box-off {
+     margin: 0px;
+     margin-left: 2px;
+     border: 1px #fff solid;
+}
+
+.imageplayer-box-on {
+     border: 1px #fff solid;
+     background-color: #00f;
+}
+
+.imageplayer-box-off {
+     background-color: #d3d3d3;
+//0cf;
+}
+
 
 .imageplayer-block {
-    ${imagestyle}
+   padding-left:10px;
+//   border: 1px #aaa solid;
 //        height: 750px; 
 //	max-height: 750px; 
 	overflow-y: auto;
@@ -124,12 +180,14 @@ function ImagePlayer(args)  {
     this.start = function() {
         this.running=1;
         $(this.getId("startstop")).attr("src",  icon_stop);
+        $(this.getId("startstopbuttonlabel")).html("Stop");
         this.timestamp++;
         setTimeout("${imagePlayerVar}.play(" + this.timestamp +")", this.delay);
     }
 
     this.stop = function() {
         $(this.getId("startstop")).attr("src", icon_start);
+        $(this.getId("startstopbuttonlabel")).html("Play");
         this.timestamp++;
         this.running = 0;
     }
@@ -272,6 +330,8 @@ function ImagePlayer(args)  {
             gotoalt=alt("Go to image " + i); 
             hidecolor = "blue";
             color = "blue";
+            var isActiveImage = false;
+
             if(this.images[i].ok==0) {
                 hidealt=alt("Use image  " + (i+1) +" in animation"); 
                 color = "red";
@@ -280,17 +340,18 @@ function ImagePlayer(args)  {
                 hidealt=alt("Don't use image  " + (i+1) +" in animation"); 
                 if(i == this.current_image) {
                     color = "green";
+                    isActiveImage = true;
                 }
             }
             width=10;
             while(width>2 && this.images.length*width >500) {
                 width--;
             }
-            imgAttrs = attr("border",0) + attr("width", width) + attr("height",10);
-            box = tag("A", attr2("href","JavaScript: noop()", "onClick", call("${imagePlayerVar}.setImage", i + ",-1")),
-                      span(attr("style", "background-color:" + color),img(icon_blank,imgAttrs + gotoalt)))+"&nbsp";
+            imgAttrs =  attr("class","imageplayer-filler");
+            var filler = span(attr("class", "imageplayer-box-" + (isActiveImage?"on":"off")),img(icon_blank,imgAttrs + gotoalt));
+            box = tag("A", attr2("href","JavaScript: noop()", "onClick", call("${imagePlayerVar}.setImage", i + ",-1")), filler);
             hidebox = tag("A", attr2("href","JavaScript: noop()", "onClick", call("${imagePlayerVar}.toggleImageOk",i)),
-                          span(attr("style", "background-color:" + hidecolor),img(icon_blank,imgAttrs + hidealt)))+"&nbsp;";
+                          span(attr("style", "xbackground-color:" + hidecolor),img(icon_blank,imgAttrs + hidealt)));
             boxes+=box;
             hideboxes+=hidebox;
         }
@@ -395,15 +456,16 @@ function noop() {
 </noscript>
 
 
-<table style="border: 1px #aaa solid;" cellpadding="0" cellspacing="0" width="100%" class="imageplayer">
-    <tr valign="bottom">
-    <td width="150"> 
-<a href="JavaScript: noop()" onClick="${imagePlayerVar}.setImage(0,1)"><img class="imageplayer-icon"  border="0" SRC="${root}/imageplayer/control_rewind_blue.png" ALT="Got to first frame" title="Go to first frame"></A><a href="JavaScript: noop()" onClick="${imagePlayerVar}.setImage(${imagePlayerVar}.current_image-1,-1)"><img class="imageplayer-icon"   border="0" SRC="${root}/imageplayer/control_start_blue.png" ALT="One step back" TITLE="One step back"></A><a href="JavaScript: noop()" onClick="${imagePlayerVar}.startStop()"><img class="imageplayer-icon"   border="0" id="${imagePlayerPrefix}startstop" SRC="${root}/imageplayer/control_play_blue.png" ALT="Start/Stop" TITLE="Start/Stop"></A><a href="JavaScript: noop()" onClick="${imagePlayerVar}.setImage(${imagePlayerVar}.current_image+1,1)"><img class="imageplayer-icon"   border="0" SRC="${root}/imageplayer/control_end_blue.png" ALT="One step forward" TITLE="One step forward"></A><a href="JavaScript: noop()" onClick="${imagePlayerVar}.setImage(-1,-1)"><img class="imageplayer-icon"   border="0" SRC="${root}/imageplayer/control_fastforward_blue.png" ALT="Go to last frame" TITLE="Go to last frame"></A></td>
 
-<td  valign="bottom">
-<table  width="100%"><tr valign="bottom">
+
+<table cellpadding="0" cellspacing="0" width="100%" class="imageplayer-outer">
+    <tr valign="bottom">
+    <td width="200"> 
+<div class="imageplayer-buttons"><button class="imageplayer-button"   title="Go to first frame"  onClick="${imagePlayerVar}.setImage(0,1)">&lt;&lt;</button><button class="imageplayer-button"  title="One step back" onClick="${imagePlayerVar}.setImage(${imagePlayerVar}.current_image-1,-1)">&lt;</button><button class="imageplayer-button"  title="Start/stop" id="${imagePlayerPrefix}startstopbutton"    onClick="${imagePlayerVar}.startStop()"><div  id="${imagePlayerPrefix}startstopbuttonlabel">Play</div></button><button class="imageplayer-button"  title="One step forward" onClick="${imagePlayerVar}.setImage(${imagePlayerVar}.current_image+1,1)">&gt;</button><button class="imageplayer-button"  title="Go to last frame" href="JavaScript: noop()" onClick="${imagePlayerVar}.setImage(-1,-1)">&gt;&gt;</button></div>
+</td>
+<td  valign="center">
+<table  border=0  width="100%" cellpadding=4 cellspacing=0><tr>
 <td>
-<div style="display:none;margin-bottom:2" id="${imagePlayerPrefix}hideboxes">&nbsp;</div>
 <div id="${imagePlayerPrefix}boxes">&nbsp;</div>
 </td>
 <td width="5%" align="right">
