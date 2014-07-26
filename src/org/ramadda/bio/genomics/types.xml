@@ -1,0 +1,30 @@
+<types>
+
+  <type name="bio_genomics"  description="Genomics Data" foruser="false"  category="Genomics">
+     <property name="icon" value="/genomics/dna.png"/>
+  </type>
+
+  <type name="bio_genomics_fasta"  description="FASTA File" foruser="true" super="bio_genomics">
+  </type>
+
+  <type name="bio_genomics_sequence"  description="Sequence Data" foruser="false" super="bio_genomics">
+  </type>
+
+  <type name="bio_genomics_sambam"  description="SAM/BAM Data" foruser="false" super="bio_genomics_sequence">
+  </type>
+
+
+  <type name="bio_genomics_sam"  description="SAM Data" foruser="true" super="bio_genomics_sambam">
+  </type>
+
+  <type name="bio_genomics_bam"  description="BAM Data" foruser="true" super="bio_genomics_sambam">
+  </type>
+
+
+<!--
+     <column name="data_type" label="Earth Science Data Type" type="enumerationplus" values="" cansearch="true" />
+-->
+
+
+
+</types>
