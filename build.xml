@@ -41,6 +41,7 @@
     <target name="plugins" depends="init,purgeplugins">
       <ant antfile="${src_dir}/org/ramadda/geodata/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/build.xml" inheritAll="false"/>
+      <ant antfile="${src_dir}/org/ramadda/bio/build.xml" inheritAll="false"/>
       <antcall target="allplugins.zip"/>
    </target>
 

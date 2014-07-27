@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+
+<project basedir="../../../../" default="plugins" name="Ramadda Plugins">
+
+    <target name="init">
+       <tstamp>
+         <format property="date" pattern="yyyy-MM-dd HH:mm z" timezone="UTC"/>
+       </tstamp>
+        <property name="src_dir" value="${basedir}/src"/>
+
+        <property name="dist_dir" value="${basedir}/dist"/>
+        <mkdir dir="${dist_dir}"/>
+
+        <property name="plugindest_dir" value="${dist_dir}/plugins"/>
+        <mkdir dir="${plugindest_dir}"/>
+
+        <property name="compile_dir" value="${src_dir}"/>
+    </target>
+
+    <target name="clean" depends="init" >
+        <delete>
+            <fileset dir="${compile_dir}" includes="**/*.class"/>
+        </delete>
+    </target>
+
+    <target name="plugins" depends="init">
+      <echo message="Building RAMADDA plugins"/>
+      <ant antfile="${src_dir}/org/ramadda/bio/genomics/build.xml" inheritAll="false"/>
+    </target>
+
+
+    <target name="allplugins" depends="init">
+      <antcall target="plugins"/>
+   </target>
+
+
+    
+</project>
