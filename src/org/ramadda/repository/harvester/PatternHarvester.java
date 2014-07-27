@@ -551,9 +551,6 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
             topPattern = Pattern.compile(topPatternString);
         }
 
-
-
-
         if ((filePattern == null) && (filePatternString != null)
                 && (filePatternString.length() > 0)) {
 
@@ -606,9 +603,10 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
             if (dt < 60) {
                 timeMsg = dt + " seconds ";
             } else {
-                double ePerM = (entryCnt /  ((double)dt / 60.0));
-                ePerM   = (int) ePerM;
-                timeMsg = ((int)(100* dt / 60.0))/100.0 + " minutes " + ePerM + " entries/minute";
+                double ePerM = (entryCnt / ((double) dt / 60.0));
+                ePerM = (int) ePerM;
+                timeMsg = ((int) (100 * dt / 60.0)) / 100.0 + " minutes "
+                          + ePerM + " entries/minute";
             }
             entryMsg.append("Found " + entryCnt + " file" + ((entryCnt == 1)
                     ? ""
@@ -759,7 +757,7 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
      * @throws Exception _more_
      */
     public List<FileInfo> collectDirs(final File rootDir,
-                                      final Harvester harvester,
+                                      final PatternHarvester harvester,
                                       final Pattern topDirPattern,
                                       final int timestamp)
             throws Exception {
@@ -769,21 +767,13 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
                 if ( !canContinueRunning(timestamp)) {
                     return DO_STOP;
                 }
-                if (f.getParentFile().equals(rootDir)
-                        && (topDirPattern != null)) {
-                    Matcher matcher = topDirPattern.matcher(f.getName());
-                    if ( !matcher.find()) {
-                        //                        System.err.println ("dir:" + f +" doesn't match");
-                        return DO_DONTRECURSE;
-                    }
-                    //                    System.err.println ("dir:" + f +" does match");
-                }
+
 
                 if (f.isDirectory()) {
                     if (f.getName().startsWith(".")) {
                         return DO_DONTRECURSE;
                     }
-                    if ( !FileInfo.okToRecurse(f, harvester)) {
+                    if ( !harvester.okToRecurse(f)) {
                         return DO_DONTRECURSE;
                     }
                     dirs.add(new FileInfo(f, rootDir, true));
@@ -801,6 +791,31 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
         return dirs;
     }
 
+
+    /**
+     * _more_
+     *
+     * @param f _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public boolean okToRecurse(File f) throws Exception {
+        List<File> rootDirs = getRootDirs();
+        if (topPattern != null) {
+            for (File rootDir : rootDirs) {
+                if (f.getParentFile().equals(rootDir)) {
+                    Matcher matcher = topPattern.matcher(f.getName());
+                    if ( !matcher.find()) {
+                        return false;
+                    }
+                }
+            }
+        }
+
+        return FileInfo.okToRecurse(f, this);
+    }
 
 
     /**
@@ -876,7 +891,7 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
                     //If this is a directory then check if we already have it 
                     //in the list. If not then add it to the main list and the local list
                     if ( !hasDir(f)) {
-                        if (FileInfo.okToRecurse(f, this)) {
+                        if (this.okToRecurse(f)) {
                             logHarvesterInfo("New directory:" + f);
                             tmpDirs.add(addDir(f, dirInfo.getRootDir()));
                         }
