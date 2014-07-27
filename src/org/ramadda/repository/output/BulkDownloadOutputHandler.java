@@ -252,7 +252,7 @@ public class BulkDownloadOutputHandler extends OutputHandler {
         String  command   = request.getString(ARG_COMMAND, COMMAND_CURL);
         String  args      = command.equals(COMMAND_WGET)
                             ? ""
-                            : " --progress-bar ";
+                            : " --progress-bar -k ";
         String  outputArg = command.equals(COMMAND_WGET)
                             ? "-O"
                             : command.equals(COMMAND_CURL)
