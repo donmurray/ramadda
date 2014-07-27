@@ -606,9 +606,9 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
             if (dt < 60) {
                 timeMsg = dt + " seconds ";
             } else {
-                double ePerM = (entryCnt / (double) (dt / 60.0));
+                double ePerM = (entryCnt /  ((double)dt / 60.0));
                 ePerM   = (int) ePerM;
-                timeMsg = (dt / 60) + " minutes " + ePerM + " entries/minute";
+                timeMsg = ((int)(100* dt / 60.0))/100.0 + " minutes " + ePerM + " entries/minute";
             }
             entryMsg.append("Found " + entryCnt + " file" + ((entryCnt == 1)
                     ? ""
