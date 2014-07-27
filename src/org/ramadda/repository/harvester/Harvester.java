@@ -169,6 +169,14 @@ public abstract class Harvester extends RepositoryManager {
     public static final String TYPE_FINDMATCH = "findmatch";
 
 
+    /** _more_          */
+    protected long startTime;
+
+    /** _more_          */
+    protected long endTime;
+
+
+
     /** _more_ */
     protected String baseGroupId = "";
 
@@ -892,13 +900,17 @@ public abstract class Harvester extends RepositoryManager {
      */
     public final void run() throws Exception {
         try {
-            if(active) {
-                logHarvesterError("Error: harvester is already running", null);
+            if (active) {
+                logHarvesterError("Error: harvester is already running",
+                                  null);
+
                 return;
             }
             error = new StringBuffer();
             setActive(true);
+            startTime = System.currentTimeMillis();
             runInner(++timestamp);
+            endTime = System.currentTimeMillis();
         } catch (Throwable exc) {
             logHarvesterError("Error in harvester.run", exc);
             error.append("Error: " + exc + "<br>"
@@ -958,7 +970,7 @@ public abstract class Harvester extends RepositoryManager {
      * @param e _more_
      */
     public void appendError(String e) {
-        if(this.error == null) {
+        if (this.error == null) {
             this.error = new StringBuffer();
         }
         this.error.append(e);

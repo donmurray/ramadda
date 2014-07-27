@@ -596,15 +596,24 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
             }
         }
 
-        String entryMsg = "";
+        StringBuffer entryMsg = new StringBuffer();
         if (entryCnt > 0) {
-            entryMsg = "Found " + entryCnt + " file" + ((entryCnt == 1)
-                    ? ""
-                    : "s") + "<br>" + "Found " + newEntryCnt + " new file"
-                           + ((newEntryCnt == 1)
-                              ? ""
-                              : "s") + "<br>";
+            long   dt      = ((getActive()
+                               ? System.currentTimeMillis()
+                               : endTime) - startTime) / 1000;
+            String timeMsg = "";
 
+            if (dt < 60) {
+                timeMsg = dt + " seconds ";
+            } else {
+                double ePerM = (entryCnt / (double) (dt / 60.0));
+                ePerM   = (int) ePerM;
+                timeMsg = (dt / 60) + " minutes " + ePerM + " entries/minute";
+            }
+            entryMsg.append("Found " + entryCnt + " file" + ((entryCnt == 1)
+                    ? ""
+                    : "s") + " (" + newEntryCnt + " new)" + " in " + timeMsg
+                           + "<br>");
         }
         List<File> rootDirs = getRootDirs();
 
@@ -986,6 +995,7 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
             return;
         }
         List<Entry> entriesToAdd = new ArrayList<Entry>();
+        status = new StringBuffer();
         status.append("Initializing " + entries.size() + " new "
                       + ((entries.size() > 1)
                          ? "entries"
@@ -1025,9 +1035,11 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
             }
         }
         currentStatus = "";
+        status        = new StringBuffer();
         logHarvesterInfo("Inserting " + entriesToAdd.size() + " new entries");
         status.append("Inserting entries<br>");
         getEntryManager().addNewEntries(getRequest(), entriesToAdd);
+        status.append("Done inserting entries<br>");
     }
 
     /**
