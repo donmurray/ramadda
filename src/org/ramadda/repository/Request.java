@@ -908,7 +908,7 @@ public class Request implements Constants, Cloneable {
      */
     public String getAbsoluteUrl(String url) {
         int port = getServerPort();
-        String protocol =StringUtil.split(httpServletRequest.getProtocol(),"/",true,true).get(0);
+        String protocol =StringUtil.split(httpServletRequest.getScheme(),"/",true,true).get(0);
         if (port == 80) {
             return protocol + "://" + getServerName()
                    + url;
