@@ -768,7 +768,6 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
                     return DO_STOP;
                 }
 
-
                 if (f.isDirectory()) {
                     if (f.getName().startsWith(".")) {
                         return DO_DONTRECURSE;
@@ -777,6 +776,9 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
                         return DO_DONTRECURSE;
                     }
                     dirs.add(new FileInfo(f, rootDir, true));
+                    status = new StringBuffer(
+                        "Looking for initial directory listing<br>Found:"
+                        + dirs.size() + " directories");
                     if (dirs.size() > 100) {
                         logHarvesterInfo("Collected " + dirs.size()
                                          + " dirs");
