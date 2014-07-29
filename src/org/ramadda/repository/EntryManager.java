@@ -7754,10 +7754,12 @@ public class EntryManager extends RepositoryManager {
 
                 changed = true;
             }
-            if (extra.get(ARG_FROMDATE) != null) {
-                theEntry.setStartDate(
-                    ((Date) extra.get(ARG_FROMDATE)).getTime());
-                theEntry.setEndDate(((Date) extra.get(ARG_TODATE)).getTime());
+            Date startDate = (Date) extra.get(ARG_FROMDATE);
+            Date endDate = (Date) extra.get(ARG_TODATE);
+            if (startDate != null) {
+                theEntry.setStartDate(startDate.getTime());
+                if(endDate==null) endDate = startDate;
+                theEntry.setEndDate(endDate.getTime());
                 changed = true;
             }
             if (changed) {
