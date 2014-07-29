@@ -492,16 +492,21 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     continue;
                 }
 
-                if (isStartTimeAttribute(name) || isEndTimeAttribute(name)) {
+                boolean isStartTime = isStartTimeAttribute(name);
+                boolean isEndTime = isEndTimeAttribute(name);
+                if(name.indexOf("Acquis")>=0) {
+                    System.err.println ("start time:" + isStartTime + "  " + name + " " + startTimeAttrs);
+                }
+                
+                if (isStartTime || isEndTime) {
                     Date date = getDate(value);
                     //                    System.err.println(name +" " + date);
-                    if (isEndTimeAttribute(name)) {
+                    if (isStartTime) {
                         extra.put(ARG_FROMDATE, date);
                     } else {
                         extra.put(ARG_TODATE, date);
                     }
                     haveDate = true;
-
                     continue;
                 }
                 if (shortForm) {
@@ -918,9 +923,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                             PROP_STARTTIME_ATTRIBUTES, ""), ",", true,
                                 true)) {
                 tmp.add(attr);
-
             }
             startTimeAttrs = tmp;
+            System.err.println("start time:" + startTimeAttrs);
         }
 
         return startTimeAttrs.contains(name);
