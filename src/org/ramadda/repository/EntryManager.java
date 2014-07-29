@@ -7791,7 +7791,7 @@ public class EntryManager extends RepositoryManager {
         associationNodes.addAll((List<Element>) XmlUtil.findDescendants(root,
                 TAG_ASSOCIATION));
 
-        System.err.println("nodes:" + associationNodes.size());
+        //        System.err.println("nodes:" + associationNodes.size());
 
 
         if (root.getTagName().equals(TAG_ENTRIES)) {
