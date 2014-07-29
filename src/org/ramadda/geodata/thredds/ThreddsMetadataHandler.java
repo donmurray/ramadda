@@ -48,11 +48,14 @@ import ucar.nc2.dataset.CoordinateAxis1D;
 import ucar.nc2.dataset.CoordinateSystem;
 import ucar.nc2.dataset.NetcdfDataset;
 import ucar.nc2.dt.grid.GridDataset;
+import ucar.nc2.dt.GridCoordSystem;
+
 import ucar.nc2.time.Calendar;
 import ucar.nc2.time.CalendarDate;
 import ucar.nc2.time.CalendarDateUnit;
 import ucar.nc2.units.DateRange;
 
+import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.geoloc.ProjectionImpl;
 import ucar.unidata.util.CatalogUtil;
@@ -425,7 +428,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         Metadata      metadata        = null;
         String        varName         = null;
         NetcdfDataset dataset         = null;
-        GridDataset   gds             = null;
+        GridDataset   gridDataset             = null;
         boolean       haveDate        = false;
         StringBuffer  descriptionAttr = new StringBuffer();
         try {
@@ -442,7 +445,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             dataset = NetcdfDataset.openDataset(path);
 
             try {
-                gds = new GridDataset(dataset);
+                gridDataset = new GridDataset(dataset);
             } catch (Exception ignore) {
                 //                System.err.println("Not a grid");
             }
@@ -493,9 +496,9 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                     Date date = getDate(value);
                     //                    System.err.println(name +" " + date);
                     if (isEndTimeAttribute(name)) {
-                        extra.put(ARG_TODATE, date);
-                    } else {
                         extra.put(ARG_FROMDATE, date);
+                    } else {
+                        extra.put(ARG_TODATE, date);
                     }
                     haveDate = true;
 
@@ -758,25 +761,40 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
 
 
-            if (gds != null) {
-                gds.calcBounds();
-                DateRange dateRange = gds.getDateRange();
+            if (gridDataset != null) {
+                gridDataset.calcBounds();
+                DateRange dateRange = gridDataset.getDateRange();
                 if (dateRange != null) {
                     extra.put(ARG_FROMDATE, dateRange.getStart().getDate());
                     extra.put(ARG_TODATE, dateRange.getEnd().getDate());
                 }
 
-                LatLonRect llr = gds.getBoundingBox();
+                LatLonRect llr = null;
+                for (ucar.nc2.dt.GridDataset.Gridset gridset : gridDataset.getGridsets()) {
+                    GridCoordSystem gridCoordSys = gridset.getGeoCoordSystem();
+                    llr = gridCoordSys.getLatLonBoundingBox();
+                    break;
+                }
+
                 if (llr != null) {
+                    System.err.println("llr:" + llr);
+                    System.err.println("crosses dateline:" + llr.crossDateline() +
+                                       " upperLeft:" + llr.getUpperLeftPoint().getLongitude() + 
+                                       " upperRight:" + llr.getUpperRightPoint().getLongitude());
+
+
+
                     if ((llr.getLatMin() == llr.getLatMin())
                             && (llr.getLatMax() == llr.getLatMax())
                             && (llr.getLonMax() == llr.getLonMax())
                             && (llr.getLonMin() == llr.getLonMin())) {
                         haveBounds = true;
+                        LatLonPointImpl ul = llr.getUpperLeftPoint();
+                        LatLonPointImpl lr = llr.getLowerRightPoint();
                         extra.put(ARG_MINLAT, llr.getLatMin());
                         extra.put(ARG_MAXLAT, llr.getLatMax());
-                        extra.put(ARG_MINLON, llr.getLonMin());
-                        extra.put(ARG_MAXLON, llr.getLonMax());
+                        extra.put(ARG_MINLON, ul.getLongitude());
+                        extra.put(ARG_MAXLON, lr.getLongitude());
                     }
                 }
             }
@@ -822,8 +840,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
             exc.printStackTrace();
         } finally {
             try {
-                if (gds != null) {
-                    gds.close();
+                if (gridDataset != null) {
+                    gridDataset.close();
                 }
                 if (dataset != null) {
                     dataset.close();
