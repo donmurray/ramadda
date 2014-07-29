@@ -494,9 +494,6 @@ public class ThreddsMetadataHandler extends MetadataHandler {
 
                 boolean isStartTime = isStartTimeAttribute(name);
                 boolean isEndTime = isEndTimeAttribute(name);
-                if(name.indexOf("Acquis")>=0) {
-                    System.err.println ("start time:" + isStartTime + "  " + name + " " + startTimeAttrs);
-                }
                 
                 if (isStartTime || isEndTime) {
                     Date date = getDate(value);
@@ -925,7 +922,6 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 tmp.add(attr);
             }
             startTimeAttrs = tmp;
-            System.err.println("start time:" + startTimeAttrs);
         }
 
         return startTimeAttrs.contains(name);
