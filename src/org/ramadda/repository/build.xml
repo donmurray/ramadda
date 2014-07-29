@@ -51,7 +51,7 @@
     </target>
 
     <target name="runserver" depends="init">
-      <java classname="org.ramadda.repository.server.JettyServer" maxmemory="512mb" fork="true">
+      <java classname="org.ramadda.repository.server.JettyServer" maxmemory="1024m" fork="true">
           <arg value="-port"/>
           <arg value="8080"/>
           <arg value="-Dramadda.cacheresources=false"/>
