@@ -7,13 +7,13 @@
      <property name="form.fromdate.label" value="Date"/>
   </type>
 
-  <type name="bio_genomics_fasta"  description="FASTA File" foruser="true" super="bio_genomics">
+  <type name="bio_genomics_fasta"  description="FASTA File" foruser="true" super="bio_genomics" handler="org.ramadda.bio.genomics.FastaTypeHandler" pattern=".*\.fa$">
   </type>
 
   <type name="bio_genomics_sequence"  description="Sequence Data" foruser="false" super="bio_genomics">
   </type>
 
-  <type name="bio_genomics_sambam"  description="SAM/BAM Data" foruser="false" super="bio_genomics_sequence">
+  <type name="bio_genomics_sambam"  description="SAM/BAM Data" foruser="false" super="bio_genomics_sequence" handler="org.ramadda.bio.genomics.SamTypeHandler">
   </type>
 
 
@@ -24,9 +24,18 @@
   </type>
 
 
+  <type name="bio_genomics_stockholm"  description="Stockholm File" foruser="true" super="bio_genomics" handler="org.ramadda.bio.genomics.StockholmTypeHandler" pattern=".*\.sto$">
+  </type>
+
+
 <!--
      <column name="data_type" label="Earth Science Data Type" type="enumerationplus" values="" cansearch="true" />
 -->
+
+
+  <type name="bio_genomics_hmmer_index"  description="HMMER Index File" foruser="true" super="bio_genomics" xxxhandler="org.ramadda.bio.genomics.StockholmTypeHandler" pattern=".*\.hmm$">
+     <property name="icon" value="/genomics/hmmer.png"/>
+  </type>
 
 
 
