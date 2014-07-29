@@ -828,13 +828,13 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
                 if (parentFile.equals(rootDir)) {
                     Matcher matcher = topPattern.matcher(f.getName());
                     if ( !matcher.find()) {
-                        System.err.println("No match:" + f);
+                        //                        System.err.println("No match:" + f);
                         return false;
                     } else {
-                        System.err.println("Match:" + f);
+                        //                        System.err.println("Match:" + f);
                     }
                 } else {
-                    System.err.println("Not parent:" + parentFile + " " + rootDir);
+                    //                    System.err.println("Not parent:" + parentFile + " " + rootDir);
                 }
             }
         }
