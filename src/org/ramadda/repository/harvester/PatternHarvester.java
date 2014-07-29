@@ -586,10 +586,24 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
             if (dirs.size() == 0) {
                 dirMsg = "No directories found<br>";
             } else {
-                dirMsg = "Scanning:" + dirs.size() + " directories";
-                String dirBlock = HtmlUtils.insetDiv(StringUtil.join("<br>",
-                                      dirs), 0, 10, 0, 0);
-                dirMsg = HtmlUtils.makeShowHideBlock(dirMsg, dirBlock, false);
+                List<FileInfo> dirsToUse = dirs;
+                dirMsg = "Scanning:" + dirsToUse.size() + " directories";
+                String suffix = "";
+                if (dirsToUse.size() > 50) {
+                    ArrayList<FileInfo> subset = new ArrayList<FileInfo>();
+                    while (subset.size() < 50) {
+                        subset.add(dirsToUse.get(subset.size()));
+                    }
+                    dirsToUse = subset;
+                    suffix = "<b>... and " + (dirs.size() - 50) + " more</b>";
+                }
+                StringBuffer dirBlock = new StringBuffer();
+
+                dirBlock.append(HtmlUtils.insetDiv(StringUtil.join("<br>",
+                        dirsToUse), 0, 10, 0, 0));
+                dirBlock.append(suffix);
+                dirMsg = HtmlUtils.makeShowHideBlock(dirMsg,
+                        dirBlock.toString(), false);
             }
         }
 
@@ -1479,11 +1493,14 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
         }
 
 
-
         if (getGenerateMd5()) {
             resource.setMd5(IOUtil.getMd5(resource.getPath()));
         }
         //        System.err.println("\tcalling initEntry");
+        Date now = new Date();
+        //We used to use the file create date as the entry create and change date. This is wrong so we now use the current time
+        createDate = now;
+
         entry.initEntry(name, desc, group, getUser(), resource, "",
                         createDate.getTime(), createDate.getTime(),
                         fromDate.getTime(), toDate.getTime(), values);
