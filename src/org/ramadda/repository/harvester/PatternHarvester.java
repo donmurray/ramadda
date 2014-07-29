@@ -694,6 +694,10 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
         long tt1 = System.currentTimeMillis();
         dirs = new ArrayList<FileInfo>();
 
+        //Call init so we get the filePattern, etc.
+        init();
+
+
         List<File> rootDirs = getRootDirs();
         for (File rootDir : rootDirs) {
             logHarvesterInfo("Looking for initial directory listing:"
@@ -702,7 +706,7 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
                 logHarvesterInfo("Root directory does not exist:" + rootDir);
             }
             dirs.add(new FileInfo(rootDir));
-            dirs.addAll(collectDirs(rootDir, this, topPattern, timestamp));
+            dirs.addAll(collectDirs(rootDir, topPattern, timestamp));
             if ( !canContinueRunning(timestamp)) {
                 return;
             }
@@ -771,7 +775,6 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
      * @throws Exception _more_
      */
     public List<FileInfo> collectDirs(final File rootDir,
-                                      final PatternHarvester harvester,
                                       final Pattern topDirPattern,
                                       final int timestamp)
             throws Exception {
@@ -786,7 +789,7 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
                     if (f.getName().startsWith(".")) {
                         return DO_DONTRECURSE;
                     }
-                    if ( !harvester.okToRecurse(f)) {
+                    if ( !okToRecurse(f)) {
                         return DO_DONTRECURSE;
                     }
                     dirs.add(new FileInfo(f, rootDir, true));
@@ -818,14 +821,20 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
      * @throws Exception _more_
      */
     public boolean okToRecurse(File f) throws Exception {
-        List<File> rootDirs = getRootDirs();
         if (topPattern != null) {
+            List<File> rootDirs = getRootDirs();
+            File parentFile = f.getParentFile();
             for (File rootDir : rootDirs) {
-                if (f.getParentFile().equals(rootDir)) {
+                if (parentFile.equals(rootDir)) {
                     Matcher matcher = topPattern.matcher(f.getName());
                     if ( !matcher.find()) {
+                        System.err.println("No match:" + f);
                         return false;
+                    } else {
+                        System.err.println("Match:" + f);
                     }
+                } else {
+                    System.err.println("Not parent:" + parentFile + " " + rootDir);
                 }
             }
         }
@@ -936,7 +945,6 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
                     entry = processFile(dirInfo, f);
                 } catch (Exception exc) {
                     logHarvesterError("Error creating entry:" + f, exc);
-
                     throw exc;
                 }
                 if (entry == null) {
@@ -1189,8 +1197,6 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
         String fileName = f.toString();
         fileName = fileName.replace("\\", "/");
 
-        //Call init so we get the filePattern
-        init();
 
 
         Matcher matcher = null;
