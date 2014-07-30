@@ -970,9 +970,8 @@ public class IdvOutputHandler extends OutputHandler implements IdvConstants {
         List<DataChoice> choices =
             (List<DataChoice>) dataSource.getDataChoices();
         for (DataChoice dataChoice : choices) {
-            idToChoice.put(dataChoice.getName(), dataChoice);
+            idToChoice.put(dataChoice.getDescription().toLowerCase(), dataChoice);
         }
-
 
         List params     = request.get(ARG_PARAM, new ArrayList());
         int  displayIdx = -1;
@@ -988,7 +987,8 @@ public class IdvOutputHandler extends OutputHandler implements IdvConstants {
             List<String> innerTabContents = new ArrayList<String>();
 
             StringBuffer tab              = new StringBuffer();
-            DataChoice   choice           = idToChoice.get(param);
+            DataChoice   choice           = idToChoice.get(param.toLowerCase());
+
             if (choice == null) {
                 continue;
             }
@@ -1442,7 +1442,7 @@ public class IdvOutputHandler extends OutputHandler implements IdvConstants {
                 cats.add(catName);
             }
             tfos.add(new TwoFacedObject("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-                                        + label, dataChoice.getName()));
+                                        + label, label));
         }
 
         for (String cat : cats) {
