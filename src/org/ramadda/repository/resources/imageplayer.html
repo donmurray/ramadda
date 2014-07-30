@@ -8,9 +8,11 @@
 
 
 .imageplayer-buttons {
+ 
     margin-left:4px;
     padding: 2px;
     padding-bottom: 4px;
+    padding-top: 10px;
 }
 
 .imageplayer-button {
@@ -19,9 +21,13 @@
      margin-right: 2px;
      padding: 0px;
      margin-bottom: 2px;
-     font-family: monospace;
+     font-size: 80%;
 }
 
+.imageplayer-button-play {
+     width: 50px;
+//     font-family: monospace;
+}
 
 .imageplayer-title {
   padding: 5px;
@@ -47,14 +53,15 @@
 }
 
 .imageplayer-box-on, .imageplayer-box-off {
-     margin: 0px;
+     display: inline-block;
      margin-left: 2px;
+     padding:0px;
      border: 1px #fff solid;
 }
 
 .imageplayer-box-on {
      border: 1px #fff solid;
-     background-color: #00f;
+     background-color: rgb(30, 144, 255);
 }
 
 .imageplayer-box-off {
@@ -117,10 +124,11 @@ focus()
 //============================================================
  
  
-function MyImage (url,label) {
+function MyImage (url,label, dttm) {
     this.url = url;
     this.label = label;
     this.image = null;
+    this.dttm = dttm;
     this.ok  =1;
 }
 
@@ -141,7 +149,7 @@ function ImagePlayer(args)  {
 
 
     this.images= new Array();
-    this.delay = 1000;
+    this.delay = 500;
     this.end_dwell_multipler   = dwell_multipler;
     this.start_dwell_multipler = dwell_multipler;
     this.current_image = 0;
@@ -157,15 +165,15 @@ function ImagePlayer(args)  {
     }
 
     if(this.delay == 0) {
-       this.delay = 1000;
+       this.delay = 500;
     }
 
     this.getId = function(name) {
         return "#" + this.prefix + name;
     }
 
-    this.addImage = function(url,label) {
-        this.images.push(new MyImage(url,label));
+    this.addImage = function(url,label, dttm) {
+        this.images.push(new MyImage(url,label,dttm));
     }
 
     this.startStop = function() {
@@ -327,7 +335,8 @@ function ImagePlayer(args)  {
         var boxes="";
         var hideboxes = "";
         for (var i = 0; i < this.images.length; i++) {
-            gotoalt=alt("Go to image " + i); 
+            var title = "Date:  " + this.images[i].dttm; 
+            gotoalt=alt(title);
             hidecolor = "blue";
             color = "blue";
             var isActiveImage = false;
@@ -343,13 +352,14 @@ function ImagePlayer(args)  {
                     isActiveImage = true;
                 }
             }
-            width=10;
+            width=14;
             while(width>2 && this.images.length*width >500) {
                 width--;
             }
-            imgAttrs =  attr("class","imageplayer-filler");
-            var filler = span(attr("class", "imageplayer-box-" + (isActiveImage?"on":"off")),img(icon_blank,imgAttrs + gotoalt));
+            imgAttrs =  attr("class","imageplayer-filler") + gotoalt;
+            var filler = HtmlUtil.div(["class", "imageplayer-box-" + (isActiveImage?"on":"off")],HtmlUtil.image(icon_blank,["width",width,"height","20","title",title,"alt", title]));
             box = tag("A", attr2("href","JavaScript: noop()", "onClick", call("${imagePlayerVar}.setImage", i + ",-1")), filler);
+
             hidebox = tag("A", attr2("href","JavaScript: noop()", "onClick", call("${imagePlayerVar}.toggleImageOk",i)),
                           span(attr("style", "xbackground-color:" + hidecolor),img(icon_blank,imgAttrs + hidealt)));
             boxes+=box;
@@ -398,8 +408,13 @@ function ImagePlayer(args)  {
         $(this.getId("animation")).attr("src",  this.images[this.current_image].url);
         this.setBoxes();
         var headerHtml;
-        if(this.images[this.current_image].label) {
-            headerHtml =  this.images[this.current_image].label;
+        var currentImage = this.images[this.current_image];
+        if(currentImage.label) {
+              headerHtml = "<table width=100%><tr><td><div class=\"imageplayer-title\">" + currentImage.label
+                + "</div></td><td align=right><div class=\"imageplayer-title-date\">"
+                                                                                     + currentImage.dttm + "</div></td></table>";
+
+//            headerHtml =  this.images[this.current_image].label;
         } else  {
             headerHtml =  "";
         }
@@ -460,8 +475,8 @@ function noop() {
 
 <table cellpadding="0" cellspacing="0" width="100%" class="imageplayer-outer">
     <tr valign="bottom">
-    <td width="200"> 
-<div class="imageplayer-buttons"><button class="imageplayer-button"   title="Go to first frame"  onClick="${imagePlayerVar}.setImage(0,1)">&lt;&lt;</button><button class="imageplayer-button"  title="One step back" onClick="${imagePlayerVar}.setImage(${imagePlayerVar}.current_image-1,-1)">&lt;</button><button class="imageplayer-button"  title="Start/stop" id="${imagePlayerPrefix}startstopbutton"    onClick="${imagePlayerVar}.startStop()"><div  id="${imagePlayerPrefix}startstopbuttonlabel">Play</div></button><button class="imageplayer-button"  title="One step forward" onClick="${imagePlayerVar}.setImage(${imagePlayerVar}.current_image+1,1)">&gt;</button><button class="imageplayer-button"  title="Go to last frame" href="JavaScript: noop()" onClick="${imagePlayerVar}.setImage(-1,-1)">&gt;&gt;</button></div>
+    <td width="250"> 
+<div class="imageplayer-buttons"><button class="imageplayer-button"   title="Go to first frame"  onClick="${imagePlayerVar}.setImage(0,1)">|&lt;&lt;</button><button class="imageplayer-button"  title="One step back" onClick="${imagePlayerVar}.setImage(${imagePlayerVar}.current_image-1,-1)">&lt;&lt;</button><button class="imageplayer-button imageplayer-button-play"  title="Start/stop" id="${imagePlayerPrefix}startstopbutton"    onClick="${imagePlayerVar}.startStop()"><div  id="${imagePlayerPrefix}startstopbuttonlabel">Play</div></button><button class="imageplayer-button"  title="One step forward" onClick="${imagePlayerVar}.setImage(${imagePlayerVar}.current_image+1,1)">&gt;&gt;</button><button class="imageplayer-button"  title="Go to last frame" href="JavaScript: noop()" onClick="${imagePlayerVar}.setImage(-1,-1)">&gt;&gt;|</button></div>
 </td>
 <td  valign="center">
 <table  border=0  width="100%" cellpadding=4 cellspacing=0><tr>

@@ -350,7 +350,7 @@ var HtmlUtil =  {
         if(inner!=null) {
             html += inner;
         }
-        html += "</" + tagName +">\n";
+        html += "</" + tagName +">";
         return html;
     },
     openTag : function(tagName, attrs) {

@@ -794,7 +794,7 @@ public class ImageOutputHandler extends OutputHandler {
                 + dttm + "</div></td></table>";
             title = title.replace("\"", "\\\"");
             sb.append(playerVar + ".addImage(" + HtmlUtils.quote(url) + ","
-                      + HtmlUtils.quote(title) + ");\n");
+                      + HtmlUtils.quote(title) + ", " + HtmlUtils.quote(dttm) + ");\n");
             cnt++;
         }
 
