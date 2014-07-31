@@ -684,7 +684,7 @@ public class PointOutputHandler extends RecordOutputHandler {
             getLogManager().logError("processing point request", exc);
             //Special handling for json requests
             if (formats.size() == 1 && formats.contains(OUTPUT_JSON.getId())) {
-                String message = "Error processing request:" + exc;
+                String message = "Error processing point request:" + exc;
                 String code = "error";
                 StringBuffer json = new StringBuffer();
                 json.append(Json.map("error",Json.quote(message),"errorcode", Json.quote(code)));
