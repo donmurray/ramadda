@@ -1,6 +1,6 @@
 <types>
 
-  <type name="type_esri_restfolder"  description="ESRI Rest Folder" category="GIS Data" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler">  
+  <type name="type_esri_restfolder"  description="ESRI Services Folder" category="GIS Data" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler">  
      <property name="icon" value="/ogc/folder_picture.png"/>
      <property name="form.date.show" value="false"/>
      <property name="form.file.show" value="false"/>

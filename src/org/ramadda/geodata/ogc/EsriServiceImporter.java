@@ -32,7 +32,9 @@ import org.ramadda.util.Utils;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.TwoFacedObject;
 
+import java.awt.geom.*;
 import java.io.InputStream;
+import java.net.URL;
 
 import java.util.ArrayList;
 
@@ -135,7 +137,12 @@ public class EsriServiceImporter extends ImportHandler {
                     url = url.substring(0, url.length() - 1);
                 }
 
-                processServiceList(request, parentEntry, actionId, entries,
+                //Make a top-level entry
+                String topName = new URL(url).getHost() +" rest services";
+                Entry topEntry =  makeEntry(request,  parentEntry, "type_esri_restfolder", topName, url);
+                entries.add(topEntry);
+
+                processServiceList(request, topEntry, actionId, entries,
                                    url, url);
 
                 if ( !okToContinue(actionId,
@@ -153,7 +160,7 @@ public class EsriServiceImporter extends ImportHandler {
                     + HtmlUtils.href(
                         request.url(
                             getRepository().URL_ENTRY_SHOW, ARG_ENTRYID,
-                            parentEntry.getId()), "Continue"));
+                            topEntry.getId()), "Continue"));
 
             }
         };
@@ -226,19 +233,8 @@ public class EsriServiceImporter extends ImportHandler {
                 String folder = folders.getString(i);
                 System.err.println("EsriServiceImporter: making folder:"
                                    + folder);
-                Entry folderEntry = getRepository().getTypeHandler(
-                                        "type_esri_restfolder").createEntry(
-                                        getRepository().getGUID());
-                Date   now = new Date();
                 String url = baseUrl + "/" + folder;
-                folderEntry.setResource(new Resource(url, Resource.TYPE_URL));
-                folderEntry.setCreateDate(now.getTime());
-                folderEntry.setChangeDate(now.getTime());
-                folderEntry.setStartDate(now.getTime());
-                folderEntry.setEndDate(now.getTime());
-                //                folderEntry.setDescription(description);
-                folderEntry.setName(getNameFromId(folder));
-                folderEntry.setParentEntryId(parentEntry.getId());
+                Entry folderEntry =  makeEntry(request,  parentEntry, "type_esri_restfolder",getNameFromId(folder), url);
                 entries.add(folderEntry);
                 processServiceList(request, folderEntry, actionId, entries,
                                    baseUrl, url);
@@ -260,6 +256,22 @@ public class EsriServiceImporter extends ImportHandler {
             }
         }
     }
+
+    private Entry makeEntry(Request request, Entry parentEntry, String type, String name, String url) throws Exception {
+        Entry entry = getRepository().getTypeHandler(type).createEntry(
+                                        getRepository().getGUID());
+        Date   now = new Date();
+        entry.setResource(new Resource(url, Resource.TYPE_URL));
+        entry.setCreateDate(now.getTime());
+        entry.setChangeDate(now.getTime());
+        entry.setStartDate(now.getTime());
+        entry.setEndDate(now.getTime());
+        entry.setName(name);
+        entry.setParentEntryId(parentEntry.getId());
+        return entry;
+
+    }
+
 
     /**
      * _more_
@@ -339,19 +351,9 @@ public class EsriServiceImporter extends ImportHandler {
             description = obj.getString(TAG_SERVICEDESCRIPTION);
         }
 
-        String wkid = null;
 
 
-        if (obj.has(TAG_FULLEXTENT)) {
-            JSONObject extent = obj.getJSONObject(TAG_FULLEXTENT);
-            if (extent.has(TAG_SPATIALREFERENCE)) {
-                JSONObject spatialReference =
-                    extent.getJSONObject(TAG_SPATIALREFERENCE);
-                if (spatialReference.has(TAG_WKID)) {
-                    wkid = spatialReference.get(TAG_WKID) + "";
-                }
-            }
-        }
+
 
         if (name.length() > Entry.MAX_NAME_LENGTH) {
             name = name.substring(0, 195) + "...";
@@ -367,28 +369,77 @@ public class EsriServiceImporter extends ImportHandler {
             entryType = "type_esri_imageserver";
         }
 
-        Entry entry = getRepository().getTypeHandler(entryType).createEntry(
-                          getRepository().getGUID());
+        Entry entry =  makeEntry(request,  parentEntry, entryType,name,url);
+
+        if (obj.has(TAG_FULLEXTENT)) {
+            JSONObject extent = obj.getJSONObject(TAG_FULLEXTENT);
+            if (extent.has(TAG_SPATIALREFERENCE)) {
+                JSONObject spatialReference =
+                    extent.getJSONObject(TAG_SPATIALREFERENCE);
+                if (spatialReference.has(TAG_WKID)) {
+                    String wkid =  spatialReference.get(TAG_WKID) + "";
+                    double[] bounds = getBounds(extent, wkid);
+                    if(bounds!=null && Math.abs(bounds[0])<360  && Math.abs(bounds[1])<360  && Math.abs(bounds[2])<360&& Math.abs(bounds[3])<360) {
+                        entry.setNorth(bounds[0]);
+                        entry.setWest(bounds[1]);
+                        entry.setSouth(bounds[2]);
+                        entry.setEast(bounds[3]);
+                        System.err.println("bounds:" + bounds[0] +" " + bounds[1] +" " + bounds[2] + " " + bounds[3]);
+                    }
+                }
+            }
+        }
+
+
+
         Object[] values = entry.getTypeHandler().getEntryValues(entry);
-
-
         values[0] = id;
-
-
-        Date now = new Date();
-        entry.setResource(new Resource(url, Resource.TYPE_URL));
-        entry.setCreateDate(now.getTime());
-        entry.setChangeDate(now.getTime());
-        entry.setStartDate(now.getTime());
-        entry.setEndDate(now.getTime());
-        entry.setDescription(description);
-        entry.setName(name);
-        entry.setParentEntryId(parentEntry.getId());
         entries.add(entry);
-
-
-
     }
 
 
+    private double[] getBounds(JSONObject extent, String wkid) throws Exception {
+        double xmin = extent.getDouble("xmin");
+        double xmax = extent.getDouble("xmax");
+        double ymin = extent.getDouble("ymin");
+        double ymax = extent.getDouble("ymax");
+        if(wkid.equals("102006")) {
+
+            wkid = "+proj=aea +lat_1=55 +lat_2=65 +lat_0=50 +lon_0=-154 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs";
+            System.err.println ("Changed to proj4");
+        }
+
+        if(wkid.equals("4326")) {
+        } else {
+            com.jhlabs.map.proj.Projection jhProjection;
+            try {
+                jhProjection  = com.jhlabs.map.proj.ProjectionFactory
+                    .getNamedPROJ4CoordinateSystem(wkid);
+                if(jhProjection!=null) {
+                    System.err.println("Good projection:" + wkid);
+                }
+            } catch(Exception exc) {
+                System.err.println("Bad projection:" + wkid+ " " + exc);
+                return null;
+            }
+            if(jhProjection == null) return null;
+            Point2D.Double dst = new Point2D.Double(0, 0);
+            Point2D.Double src = new Point2D.Double(xmin, ymax);
+            dst           = jhProjection.inverseTransform(src, dst);
+            xmin = src.getX();
+            ymax = src.getY();
+            
+            src = new Point2D.Double(xmax, ymin);
+            dst           = jhProjection.inverseTransform(src, dst);
+            xmax = src.getX();
+            ymin = src.getY();
+        }
+        double[] b =  new double[]{ymax,xmin,ymin,xmax};
+        if(Math.abs(b[0])<360  && Math.abs(b[1])<360  && Math.abs(b[2])<360&& Math.abs(b[3])<360) {
+            return b;
+        }
+        System.err.println("bad bounds:" + b[0] +" " + b[1] +" " + b[2] + " " + b[3]);
+
+        return null;
+    }
 }
