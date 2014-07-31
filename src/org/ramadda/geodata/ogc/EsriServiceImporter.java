@@ -48,6 +48,17 @@ import java.util.List;
  */
 public class EsriServiceImporter extends ImportHandler {
 
+    public static final String TAG_SERVICES = "services";
+    public static final String TAG_FOLDERS = "folders";
+    public static final String TAG_URL = "url";
+
+    public static final String TAG_DESCRIPTION = "description";
+    public static final String TAG_SERVICEDESCRIPTION = "serviceDescription";
+    public static final String TAG_FULLEXTENT =         "fullExtent";
+    public static final String TAG_SPATIALREFERENCE = "spatialReference";
+    public static final String TAG_WKID = "wkid";
+
+
     /** _more_ */
     public static final String TYPE_ESRI = "esriservice";
 
@@ -99,7 +110,13 @@ public class EsriServiceImporter extends ImportHandler {
         }
         StringBuffer sb      = new StringBuffer();
         List<Entry>  entries = new ArrayList<Entry>();
-        processServiceList(request, parentEntry, entries, url);
+
+        String[] toks =url.split("\\?");
+        url  = toks[0];
+        if(url.endsWith("/")) url = url.substring(0, url.length()-1);
+
+        processServiceList(request, parentEntry, entries, url,url);
+
         for (Entry entry : entries) {
             entry.setUser(request.getUser());
         }
@@ -110,6 +127,12 @@ public class EsriServiceImporter extends ImportHandler {
     }
 
 
+    private  JSONTokener getTokenizer(String url) throws Exception {
+        url = url +"?f=pjson";
+        String json = IOUtil.readContents(url.toString(), getClass());
+        JSONTokener tokenizer = new JSONTokener(json);
+        return tokenizer;
+    }
 
     /**
      * _more_
@@ -124,18 +147,53 @@ public class EsriServiceImporter extends ImportHandler {
      */
     private void processServiceList(Request request, Entry parentEntry,
                                     List<Entry> entries,
-                                    String esriServiceUrl)
+                                    String baseUrl,
+                                    String serviceUrl)
             throws Exception {
-        InputStream is        = IOUtil.getInputStream(esriServiceUrl);
-        JSONTokener tokenizer = new JSONTokener(is);
-        JSONObject  obj       = new JSONObject(tokenizer);
-        JSONArray   services  = obj.getJSONArray("services");
-        for (int i = 0; i < services.length(); i++) {
-            JSONObject service = services.getJSONObject(i);
-            processService(request, parentEntry, entries, service);
+        
+        System.err.println("EsriServiceImporter: url: " + serviceUrl);
+        JSONObject  obj       = new JSONObject(getTokenizer(serviceUrl));
+
+        if(obj.has(TAG_FOLDERS)) {
+            JSONArray   folders  = obj.getJSONArray(TAG_FOLDERS);
+            for (int i = 0; i < folders.length(); i++) {
+                String folder = folders.getString(i);
+                System.err.println("EsriServiceImporter: making folder:" + folder);
+                Entry folderEntry = getRepository().getTypeHandler(
+                                                                   "type_esri_restfolder").createEntry(
+                                                                                                       getRepository().getGUID());
+                Date now = new Date();
+                String url = baseUrl +"/" + folder;
+                folderEntry.setResource(new Resource(url, Resource.TYPE_URL));
+                folderEntry.setCreateDate(now.getTime());
+                folderEntry.setChangeDate(now.getTime());
+                folderEntry.setStartDate(now.getTime());
+                folderEntry.setEndDate(now.getTime());
+                //                folderEntry.setDescription(description);
+                folderEntry.setName(getNameFromId(folder));
+                folderEntry.setParentEntryId(parentEntry.getId());
+                entries.add(folderEntry);
+                processServiceList(request, folderEntry,
+                                   entries,
+                                   baseUrl, url);
+            }
         }
-        IOUtil.close(is);
+
+
+        if(obj.has(TAG_SERVICES)) {
+            JSONArray   services  = obj.getJSONArray(TAG_SERVICES);
+            for (int i = 0; i < services.length(); i++) {
+                JSONObject service = services.getJSONObject(i);
+                processService(request, parentEntry, entries, baseUrl, service);
+            }
+        }
     }
+
+    private String getNameFromId(String id) {
+        String[]toks = id.split("/");
+        return toks[toks.length-1];
+    }
+
 
     /**
      * _more_
@@ -149,44 +207,63 @@ public class EsriServiceImporter extends ImportHandler {
      * @throws Exception _more_
      */
     private void processService(Request request, Entry parentEntry,
-                                List<Entry> entries, JSONObject service)
+                                List<Entry> entries, 
+                                String baseUrl, 
+                                JSONObject service)
             throws Exception {
         String      id        = service.getString("name");
         String      type      = service.getString("type");
-        String      url       = service.getString("url");
+        String      url = null;
 
-        InputStream is        = IOUtil.getInputStream(url + "?f=pjson");
-        JSONTokener tokenizer = new JSONTokener(is);
-        JSONObject  obj       = new JSONObject(tokenizer);
-        String      name      = obj.getString("serviceDescription");
-        if ( !Utils.stringDefined(name)) {
-            name = id;
+        //        http://services.nationalmap.gov/arcgis/rest/services?f=pjson
+        if(service.has(TAG_URL)) {
+            url = service.getString(TAG_URL);
+        } else {
+            url = baseUrl +"/" + id +"/" + type;
         }
-        String description = obj.getString("description");
+        System.err.println ("EsriServiceImporter.processService:"  + url);
+
+        JSONObject  obj       = new JSONObject(getTokenizer(url));
+        String      name      = null;
+        if(obj.has(TAG_SERVICEDESCRIPTION)) {
+            obj.getString(TAG_SERVICEDESCRIPTION);
+        }
+        if ( !Utils.stringDefined(name)) {
+            name = getNameFromId(id);
+        }
+        String description = "";
+        if(obj.has(TAG_DESCRIPTION)) 
+            description  = obj.getString(TAG_DESCRIPTION);
+        else         if(obj.has(TAG_SERVICEDESCRIPTION)) 
+            description  = obj.getString(TAG_SERVICEDESCRIPTION);
+
         String wkid        = null;
-        if (obj.has("fullExtent")) {
-            JSONObject extent = obj.getJSONObject("fullExtent");
-            if (extent.has("spatialReference")) {
+
+
+        if (obj.has(TAG_FULLEXTENT)) {
+            JSONObject extent = obj.getJSONObject(TAG_FULLEXTENT);
+            if (extent.has(TAG_SPATIALREFERENCE)) {
                 JSONObject spatialReference =
-                    extent.getJSONObject("spatialReference");
-                if (spatialReference.has("wkid")) {
-                    wkid = spatialReference.get("wkid") + "";
+                    extent.getJSONObject(TAG_SPATIALREFERENCE);
+                if (spatialReference.has(TAG_WKID)) {
+                    wkid = spatialReference.get(TAG_WKID) + "";
                 }
             }
         }
 
-        /*        System.err.println(id + " " + name + " " + type + " " + url + "\n"
-                           + description);
-        */
+        if (name.length() > Entry.MAX_NAME_LENGTH) {
+            name = name.substring(0, 195) + "...";
+        }
 
-        IOUtil.close(is);
 
         Entry entry = getRepository().getTypeHandler(
                           "type_esri_restservice").createEntry(
                           getRepository().getGUID());
         Object[] values = entry.getTypeHandler().getEntryValues(entry);
 
+
         values[0] = id;
+        values[1] = type;
 
 
         Date now = new Date();

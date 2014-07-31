@@ -1,11 +1,19 @@
 <types>
 
+  <type name="type_esri_restfolder"  description="ESRI Rest Folder" category="GIS Data" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler">  
+     <property name="icon" value="/ogc/folder_picture.png"/>
+     <property name="form.date.show" value="false"/>
+     <property name="form.file.show" value="false"/>
+     <property name="form.datatype.show" value="false"/>
+   </type>
+
   <type name="type_esri_restservice"  description="ESRI Rest Service" category="GIS Data" >  
      <property name="icon" value="/ogc/esri.png"/>
      <property name="form.date.show" value="false"/>
      <property name="form.file.show" value="false"/>
      <property name="form.datatype.show" value="false"/>
      <column name="layer_id"  type="string" label="Layer ID"/>
+     <column name="service_type"  type="string" label="Service Type"/>
    </type>
 
 </types>
