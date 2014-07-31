@@ -60,6 +60,7 @@ public abstract class ImportHandler extends RepositoryManager {
     public void addImportTypes(List<TwoFacedObject> importTypes,
                                Appendable formBuffer) {}
 
+
     /**
      * _more_
      *
@@ -78,11 +79,35 @@ public abstract class ImportHandler extends RepositoryManager {
         return null;
     }
 
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param repository _more_
+     * @param uploadedFile _more_
+     * @param url _more_
+     * @param parentEntry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result handleUrlRequest(Request request, Repository repository,
+                                   String url, Entry parentEntry)
+            throws Exception {
+        return null;
+    }
+
+
+
     /**
      * _more_
      *
      *
      * @param request _more_
+     * @param parent _more_
      * @param fileName _more_
      * @param stream _more_
      *
@@ -90,8 +115,8 @@ public abstract class ImportHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public InputStream getStream(Request request, Entry parent, String fileName,
-                                 InputStream stream)
+    public InputStream getStream(Request request, Entry parent,
+                                 String fileName, InputStream stream)
             throws Exception {
         return null;
     }

@@ -4913,6 +4913,18 @@ public class EntryManager extends RepositoryManager {
 
         //Fetch the URL
         String url = request.getString(ARG_URL, null);
+        //Check the import handlers
+        for (ImportHandler importHandler :
+                getRepository().getImportHandlers()) {
+            Result result = importHandler.handleUrlRequest(request,
+                                getRepository(), url, parent);
+            if (result != null) {
+                return result;
+            }
+        }
+
+
+
         if (Utils.stringDefined(url)) {
             file = getStorageManager().fetchUrl(url).toString();
         }
@@ -7755,10 +7767,12 @@ public class EntryManager extends RepositoryManager {
                 changed = true;
             }
             Date startDate = (Date) extra.get(ARG_FROMDATE);
-            Date endDate = (Date) extra.get(ARG_TODATE);
+            Date endDate   = (Date) extra.get(ARG_TODATE);
             if (startDate != null) {
                 theEntry.setStartDate(startDate.getTime());
-                if(endDate==null) endDate = startDate;
+                if (endDate == null) {
+                    endDate = startDate;
+                }
                 theEntry.setEndDate(endDate.getTime());
                 changed = true;
             }
