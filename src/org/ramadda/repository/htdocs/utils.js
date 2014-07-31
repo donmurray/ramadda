@@ -45,6 +45,24 @@ function noop() {}
 
 
 var GuiUtils = {
+    handleError: function(error) {
+        console.log("Error:" +error);
+        alert("An error has occurred:" + error);
+        closeFormLoadingDialog ();
+    },
+    isJsonError: function(data) {
+        if(data == null) {
+            this.handleError("Null JSON data");
+            return true;
+        }
+        if(data.error!=null) {
+            var code = data.errorcode;
+            if(code == null) code = "error";
+            this.handleError(data.error);
+            return true;
+        }
+        return false;
+    },
     loadXML: function (url, callback,arg) {
         var req = false;
         if(window.XMLHttpRequest) {

@@ -544,12 +544,15 @@ function EntryList(ramadda, jsonUrl, listener) {
     this.url = jsonUrl;
     console.log("json:" + jsonUrl);
     var jqxhr = $.getJSON( jsonUrl, function(data) {
+            if(GuiUtils.isJsonError(data)) {
+                return;
+            }
             entryList.haveLoaded = true;
             entryList.createEntries(data);
         })
         .fail(function(jqxhr, textStatus, error) {
                 var err = textStatus + ", " + error;
-                //                alert("JSON error:" + err);
+                alert("An error has occurred:" + err);
                 console.log("JSON error:" +err);
             });
 }
