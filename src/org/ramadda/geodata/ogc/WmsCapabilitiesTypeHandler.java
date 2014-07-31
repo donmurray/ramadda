@@ -121,7 +121,7 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
         }
 
         entry.setName(XmlUtil.getGrandChildText(service, WmsUtils.TAG_TITLE,
-                                                entry.getName()).replaceAll("_"," "));
+                entry.getName()).replaceAll("_", " "));
         if (entry.getDescription().length() == 0) {
             entry.setDescription(XmlUtil.getGrandChildText(service,
                     WmsUtils.TAG_ABSTRACT, entry.getDescription()));
@@ -346,7 +346,7 @@ public class WmsCapabilitiesTypeHandler extends ExtensibleGroupTypeHandler {
             if (childrenEntries == null) {
                 return;
             }
-            entry.putProperty("entries",new ArrayList<Entry>());
+            entry.putProperty("entries", new ArrayList<Entry>());
             getEntryManager().addNewEntries(request, childrenEntries);
         } catch (Exception exc) {
             throw new RuntimeException(exc);
