@@ -105,8 +105,8 @@ public class EsriServiceImporter extends ImportHandler {
         }
         getEntryManager().addNewEntries(request, entries);
 
-        return getEntryManager().addEntryHeader(request, parentEntry,
-                new Result("", sb));
+        return new Result(request.entryUrl(getRepository().URL_ENTRY_SHOW, parentEntry));
+
     }
 
 
