@@ -7,13 +7,21 @@
      <property name="form.datatype.show" value="false"/>
    </type>
 
-  <type name="type_esri_restservice"  description="ESRI Rest Service" category="GIS Data" >  
+  <type name="type_esri_restservice"  description="ESRI Rest Service" category="GIS Data">  
      <property name="icon" value="/ogc/esri.png"/>
      <property name="form.date.show" value="false"/>
      <property name="form.file.show" value="false"/>
      <property name="form.datatype.show" value="false"/>
      <column name="layer_id"  type="string" label="Layer ID"/>
-     <column name="service_type"  type="string" label="Service Type"/>
+   </type>
+
+   <type name="type_esri_featureserver"  description="ESRI Feature Server" super="type_esri_restservice" >  
+   </type>
+
+   <type name="type_esri_mapserver"  description="ESRI Map Server" super="type_esri_restservice" >  
+   </type>
+
+   <type name="type_esri_imageserver"  description="ESRI Image Server" super="type_esri_restservice" >  
    </type>
 
 </types>
