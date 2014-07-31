@@ -104,6 +104,9 @@ function Ramadda(repositoryRoot) {
                 if(this.entryTypes == null) {
                     var theRamadda = this;
                     var jqxhr = $.getJSON(this.repositoryRoot +"/entry/types", function(data) {
+                            if(GuiUtils.isJsonError(data)) {
+                                return;
+                            }
                             theRamadda.entryTypes = [];
                             for(var i =0;i<data.length;i++) {
                                 var type = new EntryType(data[i]);
@@ -119,7 +122,7 @@ function Ramadda(repositoryRoot) {
                                 //                                console.log("Always:" +textStatus);
                         }).fail(function(jqxhr, textStatus, error) {
                             var err = textStatus + " --  " + error;
-                            console.log("JSON error:" +err);
+                            GuiUtils.handlerError(err);
                             });
                 }
                 return this.entryTypes;
@@ -128,12 +131,14 @@ function Ramadda(repositoryRoot) {
                 var url  = this.repositoryRoot +"/metadata/list?metadata.type=" + type.getType() +"&response=json";
                 console.log("getMetadata:" + type.getType() + " URL:" + url);
                 var jqxhr = $.getJSON(url, function(data) {
+                        if(GuiUtils.isJsonError(data)) {
+                            return;
+                        }
                         callback(type, data);
                     })
                     .fail(function(jqxhr, textStatus, error) {
                             var err = textStatus + ", " + error;
-                            //                            alert("JSON error:" + err);
-                            console.log("JSON error:" +err);
+                            GuiUtils.handlerError(err);
                         });
                 return null;
             },
@@ -207,14 +212,16 @@ function Ramadda(repositoryRoot) {
                 var ramadda = this;
                 var jsonUrl = this.getJsonUrl(id);
                 var jqxhr = $.getJSON( jsonUrl, function(data) {
+                        if(GuiUtils.isJsonError(data)) {
+                            return;
+                        }
                         var entryList =  createEntriesFromJson(data, ramadda);
                         console.log("got entry:" + entryList);
                         callback.call(data);
                     })
                     .fail(function(jqxhr, textStatus, error) {
                             var err = textStatus + ", " + error;
-                            //                            alert("JSON error:" + err);
-                            console.log("JSON error:" +err);
+                            GuiUtils.handlerError(err);
                         });
                 return null;
             }
@@ -552,8 +559,7 @@ function EntryList(ramadda, jsonUrl, listener) {
         })
         .fail(function(jqxhr, textStatus, error) {
                 var err = textStatus + ", " + error;
-                alert("An error has occurred:" + err);
-                console.log("JSON error:" +err);
+                GuiUtils.handlerError(err);
             });
 }
 
