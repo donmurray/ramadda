@@ -33,11 +33,11 @@
 -->
 
 
-  <type name="bio_genomics_sra"  description="Sequence Read Archive" foruser="true" super="bio_genomics"  pattern=".*\.sra$">
+  <type name="bio_genomics_sra"  description="Sequence Read Archive" foruser="true" super="bio_genomics"  pattern=".*\.sra$" handler="org.ramadda.bio.genomics.SraTypeHandler">
   </type>
 
 
-  <type name="bio_genomics_hmmer_index"  description="HMMER Index File" foruser="true" super="bio_genomics" xxxhandler="org.ramadda.bio.genomics.StockholmTypeHandler" pattern=".*\.hmm$">
+  <type name="bio_genomics_hmmer_index"  description="HMMER Index File" foruser="true" super="bio_genomics"  pattern=".*\.hmm$">
      <property name="icon" value="/genomics/hmmer.png"/>
   </type>
 

@@ -87,6 +87,7 @@ public class GenomicsOutputHandler extends OutputHandler {
         new OutputType("Genomics Test 1", "genomics_test1",
                        OutputType.TYPE_VIEW, "", "/genomics/dna.png");
 
+    /** _more_          */
     public static final OutputType OUTPUT_GENOMICS_TEST2 =
         new OutputType("Genomics Test 2", "genomics_test2",
                        OutputType.TYPE_VIEW, "", "/genomics/dna.png");
@@ -187,19 +188,24 @@ public class GenomicsOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param outputType _more_
      * @param entries _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Result outputEntries(Request request, OutputType outputType, 
+    public Result outputEntries(Request request, OutputType outputType,
                                 List<Entry> entries)
             throws Exception {
 
-        StringBuffer sb = new StringBuffer("Test output handler for genomics data");
-        if(outputType.equals(OUTPUT_GENOMICS_TEST1)) sb.append("Test 1<br>");
-        else if(outputType.equals(OUTPUT_GENOMICS_TEST2)) sb.append("Test 2<br>");
+        StringBuffer sb =
+            new StringBuffer("Test output handler for genomics data");
+        if (outputType.equals(OUTPUT_GENOMICS_TEST1)) {
+            sb.append("Test 1<br>");
+        } else if (outputType.equals(OUTPUT_GENOMICS_TEST2)) {
+            sb.append("Test 2<br>");
+        }
         for (Entry entry : entries) {
             if ( !entry.getTypeHandler().isType("bio_genomics")) {
                 continue;
@@ -208,6 +214,7 @@ public class GenomicsOutputHandler extends OutputHandler {
             sb.append(HtmlUtils.br());
         }
         Result result = new Result("", sb);
+
         return result;
     }
 
