@@ -33,7 +33,9 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.TwoFacedObject;
 
 import java.awt.geom.*;
+
 import java.io.InputStream;
+
 import java.net.URL;
 
 import java.util.ArrayList;
@@ -138,12 +140,14 @@ public class EsriServiceImporter extends ImportHandler {
                 }
 
                 //Make a top-level entry
-                String topName = new URL(url).getHost() +" rest services";
-                Entry topEntry =  makeEntry(request,  parentEntry, "type_esri_restfolder", topName, url);
+                String topName = new URL(url).getHost() + " rest services";
+                Entry topEntry = makeEntry(request, parentEntry,
+                                           "type_esri_restfolder", topName,
+                                           url);
                 entries.add(topEntry);
 
-                processServiceList(request, topEntry, actionId, entries,
-                                   url, url);
+                processServiceList(request, topEntry, actionId, entries, url,
+                                   url);
 
                 if ( !okToContinue(actionId,
                                    "Processed " + entries.size()
@@ -234,7 +238,9 @@ public class EsriServiceImporter extends ImportHandler {
                 System.err.println("EsriServiceImporter: making folder:"
                                    + folder);
                 String url = baseUrl + "/" + folder;
-                Entry folderEntry =  makeEntry(request,  parentEntry, "type_esri_restfolder",getNameFromId(folder), url);
+                Entry folderEntry = makeEntry(request, parentEntry,
+                                        "type_esri_restfolder",
+                                        getNameFromId(folder), url);
                 entries.add(folderEntry);
                 processServiceList(request, folderEntry, actionId, entries,
                                    baseUrl, url);
@@ -257,10 +263,25 @@ public class EsriServiceImporter extends ImportHandler {
         }
     }
 
-    private Entry makeEntry(Request request, Entry parentEntry, String type, String name, String url) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param parentEntry _more_
+     * @param type _more_
+     * @param name _more_
+     * @param url _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Entry makeEntry(Request request, Entry parentEntry, String type,
+                            String name, String url)
+            throws Exception {
         Entry entry = getRepository().getTypeHandler(type).createEntry(
-                                        getRepository().getGUID());
-        Date   now = new Date();
+                          getRepository().getGUID());
+        Date now = new Date();
         entry.setResource(new Resource(url, Resource.TYPE_URL));
         entry.setCreateDate(now.getTime());
         entry.setChangeDate(now.getTime());
@@ -268,6 +289,7 @@ public class EsriServiceImporter extends ImportHandler {
         entry.setEndDate(now.getTime());
         entry.setName(name);
         entry.setParentEntryId(parentEntry.getId());
+
         return entry;
 
     }
@@ -367,9 +389,13 @@ public class EsriServiceImporter extends ImportHandler {
             entryType = "type_esri_mapserver";
         } else if (type.equals("ImageServer")) {
             entryType = "type_esri_imageserver";
+        } else if (type.equals("GPServer")) {
+            entryType = "type_esri_gpserver";
+        } else if (type.equals("GeometryServer")) {
+            entryType = "type_esri_geometryserver";
         }
 
-        Entry entry =  makeEntry(request,  parentEntry, entryType,name,url);
+        Entry entry = makeEntry(request, parentEntry, entryType, name, url);
 
         if (obj.has(TAG_FULLEXTENT)) {
             JSONObject extent = obj.getJSONObject(TAG_FULLEXTENT);
@@ -377,14 +403,17 @@ public class EsriServiceImporter extends ImportHandler {
                 JSONObject spatialReference =
                     extent.getJSONObject(TAG_SPATIALREFERENCE);
                 if (spatialReference.has(TAG_WKID)) {
-                    String wkid =  spatialReference.get(TAG_WKID) + "";
+                    String   wkid   = spatialReference.get(TAG_WKID) + "";
                     double[] bounds = getBounds(extent, wkid);
-                    if(bounds!=null && Math.abs(bounds[0])<360  && Math.abs(bounds[1])<360  && Math.abs(bounds[2])<360&& Math.abs(bounds[3])<360) {
+                    if ((bounds != null) && (Math.abs(bounds[0]) < 360)
+                            && (Math.abs(bounds[1]) < 360)
+                            && (Math.abs(bounds[2]) < 360)
+                            && (Math.abs(bounds[3]) < 360)) {
                         entry.setNorth(bounds[0]);
                         entry.setWest(bounds[1]);
                         entry.setSouth(bounds[2]);
                         entry.setEast(bounds[3]);
-                        System.err.println("bounds:" + bounds[0] +" " + bounds[1] +" " + bounds[2] + " " + bounds[3]);
+                        //                        System.err.println("bounds:" + bounds[0] +" " + bounds[1] +" " + bounds[2] + " " + bounds[3]);
                     }
                 }
             }
@@ -398,47 +427,76 @@ public class EsriServiceImporter extends ImportHandler {
     }
 
 
-    private double[] getBounds(JSONObject extent, String wkid) throws Exception {
-        double xmin = extent.getDouble("xmin");
-        double xmax = extent.getDouble("xmax");
-        double ymin = extent.getDouble("ymin");
-        double ymax = extent.getDouble("ymax");
-        if(wkid.equals("102006")) {
-
-            wkid = "+proj=aea +lat_1=55 +lat_2=65 +lat_0=50 +lon_0=-154 +x_0=0 +y_0=0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs";
-            System.err.println ("Changed to proj4");
+    /**
+     * _more_
+     *
+     * @param extent _more_
+     * @param wkid _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private double[] getBounds(JSONObject extent, String wkid)
+            throws Exception {
+        double                         xmin         =
+            extent.getDouble("xmin");
+        double                         xmax         =
+            extent.getDouble("xmax");
+        double                         ymin         =
+            extent.getDouble("ymin");
+        double                         ymax         =
+            extent.getDouble("ymax");
+        com.jhlabs.map.proj.Projection jhProjection = null;
+        double                         scale        = 1.0;
+        if (wkid.equals("102006")) {
+            //            System.err.println ("Changed to proj4:" + wkid);
+            //+proj=aea +lat_1=50 +lat_2=70 +lat_0=40 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs 
+            //            scale = 0.017453292519943295;
+            jhProjection =
+                com.jhlabs.map.proj.ProjectionFactory.fromPROJ4Specification(
+                    new String[] {
+                "+proj=aea", "+lat_1=55", "+lat_2=65", "+lat_0=50",
+                "+lon_0=-154", "+x_0=0", "+y_0=0", "+ellps=GRS80",
+                "+datum=NAD83", "+units=m", "+no_defs"
+            });
         }
 
-        if(wkid.equals("4326")) {
-        } else {
-            com.jhlabs.map.proj.Projection jhProjection;
+        if (wkid.equals("4326")) {}
+        else if (jhProjection == null) {
             try {
-                jhProjection  = com.jhlabs.map.proj.ProjectionFactory
-                    .getNamedPROJ4CoordinateSystem(wkid);
-                if(jhProjection!=null) {
-                    System.err.println("Good projection:" + wkid);
+                jhProjection =
+                    com.jhlabs.map.proj.ProjectionFactory
+                        .getNamedPROJ4CoordinateSystem(wkid);
+                if (jhProjection != null) {
+                    //                    System.err.println("Good projection:" + wkid);
                 }
-            } catch(Exception exc) {
-                System.err.println("Bad projection:" + wkid+ " " + exc);
+            } catch (Exception exc) {
+                //                System.err.println("Bad projection:" + wkid+ " " + exc);
                 return null;
             }
-            if(jhProjection == null) return null;
+            if (jhProjection == null) {
+                return null;
+            }
+        }
+
+        if (jhProjection != null) {
             Point2D.Double dst = new Point2D.Double(0, 0);
             Point2D.Double src = new Point2D.Double(xmin, ymax);
-            dst           = jhProjection.inverseTransform(src, dst);
-            xmin = src.getX();
-            ymax = src.getY();
-            
-            src = new Point2D.Double(xmax, ymin);
-            dst           = jhProjection.inverseTransform(src, dst);
-            xmax = src.getX();
-            ymin = src.getY();
+            dst  = jhProjection.inverseTransform(src, dst);
+            xmin = scale * src.getX();
+            ymax = scale * src.getY();
+            src  = new Point2D.Double(xmax, ymin);
+            dst  = jhProjection.inverseTransform(src, dst);
+            xmax = scale * src.getX();
+            ymin = scale * src.getY();
         }
-        double[] b =  new double[]{ymax,xmin,ymin,xmax};
-        if(Math.abs(b[0])<360  && Math.abs(b[1])<360  && Math.abs(b[2])<360&& Math.abs(b[3])<360) {
+        double[] b = new double[] { ymax, xmin, ymin, xmax };
+        if ((Math.abs(b[0]) < 360) && (Math.abs(b[1]) < 360)
+                && (Math.abs(b[2]) < 360) && (Math.abs(b[3]) < 360)) {
             return b;
         }
-        System.err.println("bad bounds:" + b[0] +" " + b[1] +" " + b[2] + " " + b[3]);
+        //        System.err.println("bad bounds:" + b[0] +" " + b[1] +" " + b[2] + " " + b[3]);
 
         return null;
     }
