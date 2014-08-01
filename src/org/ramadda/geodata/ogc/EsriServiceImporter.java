@@ -142,7 +142,7 @@ public class EsriServiceImporter extends ImportHandler {
                 //Make a top-level entry
                 String topName = new URL(url).getHost() + " rest services";
                 Entry topEntry = makeEntry(request, parentEntry,
-                                           "type_esri_restfolder", topName,
+                                           "type_esri_restserver", topName,
                                            url);
                 entries.add(topEntry);
 
@@ -150,8 +150,7 @@ public class EsriServiceImporter extends ImportHandler {
                                    url);
 
                 if ( !okToContinue(actionId,
-                                   "Processed " + entries.size()
-                                   + " entries")) {
+                                   entries)) {
                     return;
                 }
                 for (Entry entry : entries) {
@@ -212,8 +211,7 @@ public class EsriServiceImporter extends ImportHandler {
                                     String baseUrl, String serviceUrl)
             throws Exception {
 
-        if ( !okToContinue(actionId,
-                           "Processed " + entries.size() + " entries")) {
+        if ( !okToContinue(actionId, entries)) {
             return;
         }
 
@@ -221,7 +219,7 @@ public class EsriServiceImporter extends ImportHandler {
         JSONObject obj = new JSONObject(getTokenizer(serviceUrl));
 
         if ( !okToContinue(actionId,
-                           "Processed " + entries.size() + " entries")) {
+                           entries)) {
             return;
         }
 
@@ -229,8 +227,7 @@ public class EsriServiceImporter extends ImportHandler {
             JSONArray folders = obj.getJSONArray(TAG_FOLDERS);
             for (int i = 0; i < folders.length(); i++) {
                 if ( !okToContinue(actionId,
-                                   "Processed " + entries.size()
-                                   + " entries")) {
+                                   entries)) {
                     return;
                 }
 
@@ -253,8 +250,7 @@ public class EsriServiceImporter extends ImportHandler {
             for (int i = 0; i < services.length(); i++) {
                 JSONObject service = services.getJSONObject(i);
                 if ( !okToContinue(actionId,
-                                   "Processed " + entries.size()
-                                   + " entries")) {
+                                   entries)) {
                     return;
                 }
                 processService(request, parentEntry, actionId, entries,
@@ -303,12 +299,13 @@ public class EsriServiceImporter extends ImportHandler {
      *
      * @return _more_
      */
-    private boolean okToContinue(Object actionId, String message) {
+    private boolean okToContinue(Object actionId, List<Entry> entries) {
         if ( !getRepository().getActionManager().getActionOk(actionId)) {
             return false;
         }
-        if (message != null) {
-            getActionManager().setActionMessage(actionId, message);
+
+        if(entries.size()>0) {
+            getActionManager().setActionMessage(actionId, "Processed:" + entries.size() +" entries. Last URL:" + entries.get(entries.size()-1).getResource().getPath());
         }
 
         return true;

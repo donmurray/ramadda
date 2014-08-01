@@ -1,5 +1,10 @@
 <types>
 
+  <type name="type_esri_restserver"  description="ESRI Web Server" category="GIS Data" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler">  
+     <property name="icon" value="/ogc/maps-stack.png"/>
+  </type>
+
+
   <type name="type_esri_restfolder"  description="ESRI Services Folder" category="GIS Data" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler">  
      <property name="icon" value="/ogc/folder_picture.png"/>
      <property name="form.date.show" value="false"/>
