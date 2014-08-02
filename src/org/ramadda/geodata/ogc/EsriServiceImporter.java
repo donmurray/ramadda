@@ -21,6 +21,10 @@
 package org.ramadda.geodata.ogc;
 
 
+import com.jhlabs.map.proj.Projection;
+import com.jhlabs.map.proj.ProjectionFactory;
+
+
 import org.json.*;
 
 import org.ramadda.repository.*;
@@ -77,6 +81,9 @@ public class EsriServiceImporter extends ImportHandler {
     /** _more_ */
     public static final String TAG_WKID = "wkid";
 
+    /** _more_          */
+    public static final String TAG_LATEST_WKID = "latestWkid";
+
 
     /** _more_ */
     public static final String TYPE_ESRI = "esriservice";
@@ -130,41 +137,46 @@ public class EsriServiceImporter extends ImportHandler {
 
         ActionManager.Action action = new ActionManager.Action() {
             public void run(Object actionId) throws Exception {
-                String       url     = theUrl;
-                StringBuffer sb      = new StringBuffer();
-                List<Entry>  entries = new ArrayList<Entry>();
-                String[]     toks    = url.split("\\?");
-                url = toks[0];
-                if (url.endsWith("/")) {
-                    url = url.substring(0, url.length() - 1);
+                try {
+                    String       url     = theUrl;
+                    StringBuffer sb      = new StringBuffer();
+                    List<Entry>  entries = new ArrayList<Entry>();
+                    String[]     toks    = url.split("\\?");
+                    url = toks[0];
+                    if (url.endsWith("/")) {
+                        url = url.substring(0, url.length() - 1);
+                    }
+
+                    //Make a top-level entry
+                    String topName = new URL(url).getHost()
+                                     + " rest services";
+                    Entry topEntry = makeEntry(request, parentEntry,
+                                         "type_esri_restserver", topName,
+                                         url);
+                    entries.add(topEntry);
+
+                    processServiceList(request, topEntry, actionId, entries,
+                                       url, url);
+
+                    if ( !okToContinue(actionId, entries)) {
+                        return;
+                    }
+                    for (Entry entry : entries) {
+                        entry.setUser(request.getUser());
+                    }
+                    getEntryManager().addNewEntries(request, entries);
+                    getActionManager().setContinueHtml(
+                        actionId,
+                        entries.size() + " entries created" + HtmlUtils.br()
+                        + HtmlUtils.href(
+                            request.url(
+                                getRepository().URL_ENTRY_SHOW, ARG_ENTRYID,
+                                topEntry.getId()), "Continue"));
+
+                } catch (Exception exc) {
+                    getActionManager().setContinueHtml(actionId,
+                            "Error:" + exc);
                 }
-
-                //Make a top-level entry
-                String topName = new URL(url).getHost() + " rest services";
-                Entry topEntry = makeEntry(request, parentEntry,
-                                           "type_esri_restserver", topName,
-                                           url);
-                entries.add(topEntry);
-
-                processServiceList(request, topEntry, actionId, entries, url,
-                                   url);
-
-                if ( !okToContinue(actionId,
-                                   entries)) {
-                    return;
-                }
-                for (Entry entry : entries) {
-                    entry.setUser(request.getUser());
-                }
-                getEntryManager().addNewEntries(request, entries);
-                getActionManager().setContinueHtml(
-                    actionId,
-                    entries.size() + " entries created" + HtmlUtils.br()
-                    + HtmlUtils.href(
-                        request.url(
-                            getRepository().URL_ENTRY_SHOW, ARG_ENTRYID,
-                            topEntry.getId()), "Continue"));
-
             }
         };
 
@@ -218,22 +230,19 @@ public class EsriServiceImporter extends ImportHandler {
         System.err.println("EsriServiceImporter: url: " + serviceUrl);
         JSONObject obj = new JSONObject(getTokenizer(serviceUrl));
 
-        if ( !okToContinue(actionId,
-                           entries)) {
+        if ( !okToContinue(actionId, entries)) {
             return;
         }
 
         if (obj.has(TAG_FOLDERS)) {
             JSONArray folders = obj.getJSONArray(TAG_FOLDERS);
             for (int i = 0; i < folders.length(); i++) {
-                if ( !okToContinue(actionId,
-                                   entries)) {
+                if ( !okToContinue(actionId, entries)) {
                     return;
                 }
 
                 String folder = folders.getString(i);
-                System.err.println("EsriServiceImporter: making folder:"
-                                   + folder);
+                //System.err.println("EsriServiceImporter: making folder:" + folder);
                 String url = baseUrl + "/" + folder;
                 Entry folderEntry = makeEntry(request, parentEntry,
                                         "type_esri_restfolder",
@@ -249,8 +258,7 @@ public class EsriServiceImporter extends ImportHandler {
             JSONArray services = obj.getJSONArray(TAG_SERVICES);
             for (int i = 0; i < services.length(); i++) {
                 JSONObject service = services.getJSONObject(i);
-                if ( !okToContinue(actionId,
-                                   entries)) {
+                if ( !okToContinue(actionId, entries)) {
                     return;
                 }
                 processService(request, parentEntry, actionId, entries,
@@ -295,7 +303,7 @@ public class EsriServiceImporter extends ImportHandler {
      * _more_
      *
      * @param actionId _more_
-     * @param message _more_
+     * @param entries _more_
      *
      * @return _more_
      */
@@ -304,8 +312,11 @@ public class EsriServiceImporter extends ImportHandler {
             return false;
         }
 
-        if(entries.size()>0) {
-            getActionManager().setActionMessage(actionId, "Processed:" + entries.size() +" entries. Last URL:" + entries.get(entries.size()-1).getResource().getPath());
+        if (entries.size() > 0) {
+            getActionManager().setActionMessage(actionId,
+                    "Processed:" + entries.size() + " entries. Last URL:"
+                    + entries.get(entries.size()
+                                  - 1).getResource().getPath());
         }
 
         return true;
@@ -353,7 +364,7 @@ public class EsriServiceImporter extends ImportHandler {
         } else {
             url = baseUrl + "/" + id + "/" + type;
         }
-        System.err.println("EsriServiceImporter.processService:" + url);
+        //        System.err.println("EsriServiceImporter.processService:" + url);
 
         JSONObject obj  = new JSONObject(getTokenizer(url));
         String     name = null;
@@ -400,7 +411,11 @@ public class EsriServiceImporter extends ImportHandler {
                 JSONObject spatialReference =
                     extent.getJSONObject(TAG_SPATIALREFERENCE);
                 if (spatialReference.has(TAG_WKID)) {
-                    String   wkid   = spatialReference.get(TAG_WKID) + "";
+                    String wkid = spatialReference.get(TAG_WKID) + "";
+                    if (spatialReference.has(TAG_LATEST_WKID)) {
+                        wkid = spatialReference.get(TAG_LATEST_WKID) + "";
+                    }
+
                     double[] bounds = getBounds(extent, wkid);
                     if ((bounds != null) && (Math.abs(bounds[0]) < 360)
                             && (Math.abs(bounds[1]) < 360)
@@ -436,65 +451,85 @@ public class EsriServiceImporter extends ImportHandler {
      */
     private double[] getBounds(JSONObject extent, String wkid)
             throws Exception {
-        double                         xmin         =
-            extent.getDouble("xmin");
-        double                         xmax         =
-            extent.getDouble("xmax");
-        double                         ymin         =
-            extent.getDouble("ymin");
-        double                         ymax         =
-            extent.getDouble("ymax");
-        com.jhlabs.map.proj.Projection jhProjection = null;
-        double                         scale        = 1.0;
-        if (wkid.equals("102006")) {
-            //            System.err.println ("Changed to proj4:" + wkid);
-            //+proj=aea +lat_1=50 +lat_2=70 +lat_0=40 +lon_0=-96 +x_0=0 +y_0=0 +datum=NAD83 +units=m +no_defs 
-            //            scale = 0.017453292519943295;
-            jhProjection =
-                com.jhlabs.map.proj.ProjectionFactory.fromPROJ4Specification(
-                    new String[] {
-                "+proj=aea", "+lat_1=55", "+lat_2=65", "+lat_0=50",
-                "+lon_0=-154", "+x_0=0", "+y_0=0", "+ellps=GRS80",
-                "+datum=NAD83", "+units=m", "+no_defs"
-            });
-        }
+        double                         xmin = extent.getDouble("xmin");
+        double                         xmax = extent.getDouble("xmax");
+        double                         ymin = extent.getDouble("ymin");
+        double                         ymax = extent.getDouble("ymax");
+        com.jhlabs.map.proj.Projection proj = null;
 
-        if (wkid.equals("4326")) {}
-        else if (jhProjection == null) {
+
+        wkid = wkid.trim();
+        if (wkid.equals("4326") || wkid.equals("4269") || wkid.equals("4269")
+                || wkid.equals("4617")) {}
+        else if (proj == null) {
             try {
-                jhProjection =
-                    com.jhlabs.map.proj.ProjectionFactory
-                        .getNamedPROJ4CoordinateSystem(wkid);
-                if (jhProjection != null) {
-                    //                    System.err.println("Good projection:" + wkid);
+                proj = com.jhlabs.map.proj.ProjectionFactory
+                    .getNamedPROJ4CoordinateSystem(wkid);
+                if (proj != null) {
+                    //                    System.err.println("Found projection:" + wkid);
+                } else {
+                    System.err.println("* could not find projection:" + wkid);
                 }
             } catch (Exception exc) {
-                //                System.err.println("Bad projection:" + wkid+ " " + exc);
+                System.err.println("Error making projection:" + wkid + " "
+                                   + exc);
+
                 return null;
             }
-            if (jhProjection == null) {
+            if (proj == null) {
                 return null;
             }
         }
 
-        if (jhProjection != null) {
+        String msg = "coords:" + xmin + " " + ymax + " " + xmax + " " + ymin;
+        if (proj != null) {
             Point2D.Double dst = new Point2D.Double(0, 0);
             Point2D.Double src = new Point2D.Double(xmin, ymax);
-            dst  = jhProjection.inverseTransform(src, dst);
-            xmin = scale * src.getX();
-            ymax = scale * src.getY();
+            dst  = proj.inverseTransform(src, dst);
+            xmin = dst.getX();
+            ymax = dst.getY();
             src  = new Point2D.Double(xmax, ymin);
-            dst  = jhProjection.inverseTransform(src, dst);
-            xmax = scale * src.getX();
-            ymin = scale * src.getY();
+            dst  = proj.inverseTransform(src, dst);
+            xmax = dst.getX();
+            ymin = dst.getY();
         }
         double[] b = new double[] { ymax, xmin, ymin, xmax };
         if ((Math.abs(b[0]) < 360) && (Math.abs(b[1]) < 360)
                 && (Math.abs(b[2]) < 360) && (Math.abs(b[3]) < 360)) {
             return b;
         }
-        //        System.err.println("bad bounds:" + b[0] +" " + b[1] +" " + b[2] + " " + b[3]);
+
+        System.err.println("** bad bounds  - projection: " + wkid + " "
+                           + b[0] + " " + b[1] + " " + b[2] + " " + b[3]);
+        System.err.println(msg);
 
         return null;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param args _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void main(String[] args) throws Exception {
+        com.jhlabs.map.proj.Projection proj =
+            com.jhlabs.map.proj.ProjectionFactory
+                .getNamedPROJ4CoordinateSystem(args[0]);
+
+        if (proj == null) {
+            System.err.println("no proj");
+
+            return;
+        }
+        Point2D.Double dst = new Point2D.Double(0, 0);
+        Point2D.Double src = new Point2D.Double(Double.parseDouble(args[1]),
+                                 Double.parseDouble(args[2]));
+        dst = proj.inverseTransform(src, dst);
+        System.err.println("dst:" + dst.getX() + " " + dst.getY());
+    }
+
+
 }
