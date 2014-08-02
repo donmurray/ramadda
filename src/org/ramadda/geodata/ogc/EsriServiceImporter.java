@@ -391,7 +391,6 @@ public class EsriServiceImporter extends ImportHandler {
         }
 
 
-
         if (name.length() > Entry.MAX_NAME_LENGTH) {
             name = name.substring(0, 195) + "...";
         }
@@ -412,6 +411,7 @@ public class EsriServiceImporter extends ImportHandler {
 
         Entry entry = makeEntry(request, parentEntry, entryType, name, url);
 
+        entry.setDescription(description.toString());
         Object[] values = entry.getTypeHandler().getEntryValues(entry);
         String wkid = null;
         if (obj.has(TAG_FULLEXTENT)) {
