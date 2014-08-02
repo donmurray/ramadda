@@ -60,6 +60,8 @@ public class EsriServiceImporter extends ImportHandler {
     /** _more_ */
     public static final String TAG_SERVICES = "services";
 
+    public static final String TAG_COPYRIGHT_TEXT = "copyrightText";
+
     /** _more_ */
     public static final String TAG_FOLDERS = "folders";
 
@@ -81,7 +83,7 @@ public class EsriServiceImporter extends ImportHandler {
     /** _more_ */
     public static final String TAG_WKID = "wkid";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_LATEST_WKID = "latestWkid";
 
 
@@ -366,22 +368,27 @@ public class EsriServiceImporter extends ImportHandler {
         }
         //        System.err.println("EsriServiceImporter.processService:" + url);
 
-        JSONObject obj  = new JSONObject(getTokenizer(url));
-        String     name = null;
+        JSONObject   obj         = new JSONObject(getTokenizer(url));
+        String       name        = null;
+        StringBuffer description = new StringBuffer();
         if (obj.has(TAG_SERVICEDESCRIPTION)) {
-            obj.getString(TAG_SERVICEDESCRIPTION);
+            description.append(obj.getString(TAG_SERVICEDESCRIPTION));
         }
         if ( !Utils.stringDefined(name)) {
             name = getNameFromId(id);
         }
-        String description = "";
         if (obj.has(TAG_DESCRIPTION)) {
-            description = obj.getString(TAG_DESCRIPTION);
-        } else if (obj.has(TAG_SERVICEDESCRIPTION)) {
-            description = obj.getString(TAG_SERVICEDESCRIPTION);
+            if (description.length() != 0) {
+                description.append("\n");
+            }
+            description.append(obj.getString(TAG_DESCRIPTION).trim());
         }
-
-
+        if (obj.has(TAG_SERVICEDESCRIPTION)) {
+            if (description.length() != 0) {
+                description.append("\n");
+            }
+            description.append(obj.getString(TAG_SERVICEDESCRIPTION).trim());
+        }
 
 
 
@@ -405,17 +412,17 @@ public class EsriServiceImporter extends ImportHandler {
 
         Entry entry = makeEntry(request, parentEntry, entryType, name, url);
 
+        String wkid = null;
         if (obj.has(TAG_FULLEXTENT)) {
             JSONObject extent = obj.getJSONObject(TAG_FULLEXTENT);
             if (extent.has(TAG_SPATIALREFERENCE)) {
                 JSONObject spatialReference =
                     extent.getJSONObject(TAG_SPATIALREFERENCE);
                 if (spatialReference.has(TAG_WKID)) {
-                    String wkid = spatialReference.get(TAG_WKID) + "";
+                    wkid = spatialReference.get(TAG_WKID) + "";
                     if (spatialReference.has(TAG_LATEST_WKID)) {
                         wkid = spatialReference.get(TAG_LATEST_WKID) + "";
                     }
-
                     double[] bounds = getBounds(extent, wkid);
                     if ((bounds != null) && (Math.abs(bounds[0]) < 360)
                             && (Math.abs(bounds[1]) < 360)
@@ -435,6 +442,13 @@ public class EsriServiceImporter extends ImportHandler {
 
         Object[] values = entry.getTypeHandler().getEntryValues(entry);
         values[0] = id;
+
+        if (spatialReference.has(TAG_COPYRIGHT_TEXT)) {
+            values[1] =  spatialReference.get(TAG_COPYRIGHT_TEXT) + "";
+        }
+        values[2] =  wkid;
+
+
         entries.add(entry);
     }
 

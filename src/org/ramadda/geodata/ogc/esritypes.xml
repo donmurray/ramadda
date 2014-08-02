@@ -18,6 +18,8 @@
      <property name="form.file.show" value="false"/>
      <property name="form.datatype.show" value="false"/>
      <column name="layer_id"  type="string" label="Layer ID"/>
+     <column name="copyright_text"  type="string" size="300" label="Copyright Text"/>
+     <column name="wkid"  type="string" label="Projection ID"/>
    </type>
 
    <type name="type_esri_featureserver"  description="ESRI Feature Server" super="type_esri_restservice" >  
