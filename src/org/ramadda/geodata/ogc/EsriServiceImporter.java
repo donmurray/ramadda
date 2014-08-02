@@ -412,6 +412,7 @@ public class EsriServiceImporter extends ImportHandler {
 
         Entry entry = makeEntry(request, parentEntry, entryType, name, url);
 
+        Object[] values = entry.getTypeHandler().getEntryValues(entry);
         String wkid = null;
         if (obj.has(TAG_FULLEXTENT)) {
             JSONObject extent = obj.getJSONObject(TAG_FULLEXTENT);
@@ -438,13 +439,9 @@ public class EsriServiceImporter extends ImportHandler {
             }
         }
 
-
-
-        Object[] values = entry.getTypeHandler().getEntryValues(entry);
         values[0] = id;
-
-        if (spatialReference.has(TAG_COPYRIGHT_TEXT)) {
-            values[1] =  spatialReference.get(TAG_COPYRIGHT_TEXT) + "";
+        if (obj.has(TAG_COPYRIGHT_TEXT)) {
+            values[1] =  obj.get(TAG_COPYRIGHT_TEXT) + "";
         }
         values[2] =  wkid;
 
