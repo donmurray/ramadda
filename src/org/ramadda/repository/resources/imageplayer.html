@@ -7,6 +7,10 @@
 }
 
 
+.imageplayer-images {
+    min-height: 200px; 
+}
+
 .imageplayer-buttons {
  
     margin-left:4px;
@@ -155,6 +159,8 @@ function ImagePlayer(args)  {
     this.current_image = 0;
     this.direction =this.DIR_FORWARD;
 
+    this.waitCnt = 0;
+    this.imageStepIsPending = false;
 
     this.running = 0;
     this.timestamp=1;
@@ -186,7 +192,10 @@ function ImagePlayer(args)  {
 
 
     this.start = function() {
-        this.running=1;
+        this.imageStepIsPending = false;
+        this.waitingForImageToLoad = false;
+        this.waitCnt= 0;
+        this.running=true;
         $(this.getId("startstop")).attr("src",  icon_stop);
         $(this.getId("startstopbuttonlabel")).html("Stop");
         this.timestamp++;
@@ -194,14 +203,31 @@ function ImagePlayer(args)  {
     }
 
     this.stop = function() {
+        this.imageStepIsPending = false;
+        this.waitingForImageToLoad = false;
+        this.waitCnt= 0;
         $(this.getId("startstop")).attr("src", icon_start);
         $(this.getId("startstopbuttonlabel")).html("Play");
         this.timestamp++;
-        this.running = 0;
+        this.running = false;
     }
  
 
     this.play = function(mytimestamp) {
+       if(this.waitingForImageToLoad) {
+           this.waitCnt ++;
+           var waitLabel = "Waiting ";
+           for(var i=0;i<this.waitCnt && i<5;i++) {
+               waitLabel+= ".";
+           }
+//           $(this.getId("waiting")).html(waitLabel);
+           this.imageStepIsPending = true;
+           console.log("play: still waiting for image to load");
+           setTimeout("${imagePlayerVar}.play(" +mytimestamp +")", 500);
+           return;
+       }
+       $(this.getId("waiting")).html("&nbsp;");
+       this.imageStepIsPending = false;
         if(mytimestamp!= this.timestamp) {
             return;
         }
@@ -260,8 +286,6 @@ function ImagePlayer(args)  {
         } else {
             this.current_image--;
         }
-
-        this.displayImage();
         this.delay_time = this.delay;
         if (this.current_image == first_selected_image) {
              this.delay_time = this.start_dwell_multipler*this.delay;
@@ -269,6 +293,8 @@ function ImagePlayer(args)  {
         if (this.current_image == last_selected_image) {
             this.delay_time = this.end_dwell_multipler*this.delay;
         }
+
+        this.displayImage();
         setTimeout("${imagePlayerVar}.play(" +mytimestamp +")", this.delay_time);
     }
 
@@ -394,6 +420,9 @@ function ImagePlayer(args)  {
         this.goToImage(value);
     }
 
+
+
+
     this.displayImage = function() {
         if(this.images.length==0) {
             //            alert('no images');
@@ -405,6 +434,8 @@ function ImagePlayer(args)  {
             this.images[this.current_image].image.src = this.images[this.current_image].url;
         }
 */
+
+        this.waitingForImageToLoad= true;
         $(this.getId("animation")).attr("src",  this.images[this.current_image].url);
         this.setBoxes();
         var headerHtml;
@@ -421,7 +452,25 @@ function ImagePlayer(args)  {
      
         $(this.getId("header")).html(this.images[this.current_image].label);
         $(this.getId("framenumber")).attr("value",  (this.current_image+1));
+
+
+
+
     }
+
+
+var theImagePlayer = this;
+
+$(this.getId("animation")).load(function() {
+      console.log("load ");
+      theImagePlayer.waitingForImageToLoad = false;
+      if(theImagePlayer.imageStepIsPending) {
+          theImagePlayer.imageStepIsPending = false;
+//          theImagePlayer.play();
+      }
+// Handler for .load() called.
+});
+
 }
 
 
@@ -473,7 +522,7 @@ function noop() {
 
 
 
-<table cellpadding="0" cellspacing="0" width="100%" class="imageplayer-outer">
+<table border=0 cellpadding="0" cellspacing="0" width="100%" class="imageplayer-outer">
     <tr valign="bottom">
     <td width="250"> 
 <div class="imageplayer-buttons"><button class="imageplayer-button"   title="Go to first frame"  onClick="${imagePlayerVar}.setImage(0,1)">|&lt;&lt;</button><button class="imageplayer-button"  title="One step back" onClick="${imagePlayerVar}.setImage(${imagePlayerVar}.current_image-1,-1)">&lt;&lt;</button><button class="imageplayer-button imageplayer-button-play"  title="Start/stop" id="${imagePlayerPrefix}startstopbutton"    onClick="${imagePlayerVar}.startStop()"><div  id="${imagePlayerPrefix}startstopbuttonlabel">Play</div></button><button class="imageplayer-button"  title="One step forward" onClick="${imagePlayerVar}.setImage(${imagePlayerVar}.current_image+1,1)">&gt;&gt;</button><button class="imageplayer-button"  title="Go to last frame" href="JavaScript: noop()" onClick="${imagePlayerVar}.setImage(-1,-1)">&gt;&gt;|</button></div>
@@ -482,6 +531,9 @@ function noop() {
 <table  border=0  width="100%" cellpadding=4 cellspacing=0><tr>
 <td>
 <div id="${imagePlayerPrefix}boxes">&nbsp;</div>
+</td>
+<td width=100 align=left>
+<div id="${imagePlayerPrefix}waiting">&nbsp;</div>
 </td>
 <td width="5%" align="right">
 <form method="POST" name="${imagePlayerPrefix}control_form" action="javascript:${imagePlayerVar}.frameNumberClicked();">

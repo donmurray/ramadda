@@ -794,7 +794,8 @@ public class ImageOutputHandler extends OutputHandler {
                 + dttm + "</div></td></table>";
             title = title.replace("\"", "\\\"");
             sb.append(playerVar + ".addImage(" + HtmlUtils.quote(url) + ","
-                      + HtmlUtils.quote(title) + ", " + HtmlUtils.quote(dttm) + ");\n");
+                      + HtmlUtils.quote(title) + ", " + HtmlUtils.quote(dttm)
+                      + ");\n");
             cnt++;
         }
 
@@ -843,10 +844,10 @@ public class ImageOutputHandler extends OutputHandler {
         if (width > 0) {
             widthAttr = HtmlUtils.attr(HtmlUtils.ATTR_WIDTH, "" + width);
         }
-        String imageHtml = "<IMG id=\"" + playerPrefix
-                           + "animation\" BORDER=\"0\" " + widthAttr
-                           + HtmlUtils.attr("SRC", firstImage)
-                           + " ALT=\"image\">";
+        String imageHtml = "<IMG class=\"imageplayer-image\" id=\""
+                           + playerPrefix + "animation\" BORDER=\"0\" "
+                           + widthAttr + HtmlUtils.attr("SRC", firstImage)
+                           + " ALT=\"Loading image\">";
 
         String tmp = playerTemplate.replace("${imagelist}", sb.toString());
         tmp = tmp.replace("${imagehtml}", imageHtml);
