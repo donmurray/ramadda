@@ -23,11 +23,9 @@ package org.ramadda.repository.type;
 
 import org.ramadda.repository.*;
 import org.ramadda.repository.database.*;
+import org.ramadda.repository.output.BulkDownloadOutputHandler;
 import org.ramadda.repository.output.ZipOutputHandler;
 import org.ramadda.repository.type.*;
-import org.ramadda.repository.type.Column;
-import org.ramadda.repository.type.ExtensibleGroupTypeHandler;
-import org.ramadda.repository.type.GenericTypeHandler;
 
 import org.ramadda.sql.Clause;
 import org.ramadda.sql.SqlUtil;
@@ -92,6 +90,10 @@ public class CollectionTypeHandler extends ExtensibleGroupTypeHandler {
 
     /** _more_ */
     public static final String REQUEST_DOWNLOAD = "download";
+    
+    /** _more_ */
+    public static final String REQUEST_BULKDOWNLOAD = "bulkdownload";
+
 
     /** _more_ */
     public static final String PROP_GRANULE_TYPE = "granule_type";
@@ -101,6 +103,8 @@ public class CollectionTypeHandler extends ExtensibleGroupTypeHandler {
     /** _more_ */
     private ZipOutputHandler zipOutputHandler;
 
+    /** _more_ */
+    private BulkDownloadOutputHandler bulkDownloadOutputHandler;
 
     /** _more_ */
     private String dbColumnCollectionId;
@@ -144,6 +148,21 @@ public class CollectionTypeHandler extends ExtensibleGroupTypeHandler {
         super.clearCache();
         cache      = new TTLCache<Object, Object>(60 * 60 * 1000);
         labelCache = new Hashtable<String, Properties>();
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public BulkDownloadOutputHandler getBulkDownloadOutputHandler() {
+        if (bulkDownloadOutputHandler == null) {
+            bulkDownloadOutputHandler =
+                (BulkDownloadOutputHandler) getRepository().getOutputHandler(
+                    org.ramadda.repository.output.BulkDownloadOutputHandler.class);
+        }
+
+        return bulkDownloadOutputHandler;
     }
 
 
@@ -643,10 +662,33 @@ public class CollectionTypeHandler extends ExtensibleGroupTypeHandler {
         if (what.equals(REQUEST_DOWNLOAD)) {
             return processDownloadRequest(request, entry);
         }
+        
+        if (what.equals(REQUEST_BULKDOWNLOAD)) {
+            return processBulkDownloadRequest(request, entry);
+        }
 
         return null;
     }
 
+    /**
+     * Process the bulk download script request
+     *
+     * @param request  the request
+     * @param entry    the entry
+     *
+     * @return the script
+     *
+     * @throws Exception problems
+     */
+    public Result processBulkDownloadRequest(Request request, Entry entry)
+            throws Exception {
+        request.setReturnFilename(entry.getName() + "_download.sh");
+        StringBuilder sb      = new StringBuilder();
+        BulkDownloadOutputHandler bdoh = getBulkDownloadOutputHandler();
+        bdoh.process(request, sb, entry, processSearch(request, entry, true),
+                                           false, true);
+        return new Result("", sb, bdoh.getMimeType(BulkDownloadOutputHandler.OUTPUT_CURL));
+    }
 
     /**
      * _more_

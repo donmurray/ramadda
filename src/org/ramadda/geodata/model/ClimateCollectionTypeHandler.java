@@ -168,8 +168,14 @@ public class ClimateCollectionTypeHandler extends CollectionTypeHandler {
                                           formId + "_do_download", js,
                                           HtmlUtils.call(formId
                                               + ".download", "event"));
+        String bdownloadButton = JQ.button("Get Download Script",
+                                          formId + "_do_bulkdownload", js,
+                                          HtmlUtils.call(formId
+                                              + ".bulkdownload", "event"));
         selectorSB.append(HtmlUtils.formEntry("",
-                searchButton + HtmlUtils.space(4) + downloadButton));
+                HtmlUtils.center(searchButton))); 
+        selectorSB.append(HtmlUtils.formEntry("", HtmlUtils.center(downloadButton +
+                HtmlUtils.space(4) + bdownloadButton)));
         selectorSB.append(HtmlUtils.formTableClose());
 
 
@@ -287,7 +293,7 @@ JQ.button(
         }
         if (what.equals(REQUEST_IMAGE) || what.equals(REQUEST_KMZ)
                 || what.equals(REQUEST_TIMESERIES)) {
-            return processDataRequest(request, entry, false);
+            return processDataRequest(request, entry, what);
         }
 
         return null;
@@ -332,7 +338,7 @@ JQ.button(
      * @throws Exception  on badness
      */
     public Result processDataRequest(Request request, Entry entry,
-                                     boolean doDownload)
+                                     String type)
             throws Exception {
         //        File   imageFile =     getStorageManager().getTmpFile(request, "test.png");
         //        BufferedImage image = new BufferedImage(600,400,BufferedImage.TYPE_INT_RGB);
@@ -386,10 +392,14 @@ JQ.button(
             }
         }
 
-        if (doDownload) {
+        if (type.equals(REQUEST_DOWNLOAD)) {
             return zipFiles(request,
                             IOUtil.stripExtension(entry.getName()) + ".zip",
                             files);
+        }
+
+        if (type.equals(REQUEST_BULKDOWNLOAD)) {
+            return processBulkDownloadRequest(request, entry);
         }
 
         //Make the image
@@ -418,7 +428,7 @@ JQ.button(
     @Override
     public Result processDownloadRequest(Request request, Entry entry)
             throws Exception {
-        return processDataRequest(request, entry, true);
+        return processDataRequest(request, entry, REQUEST_DOWNLOAD);
     }
 
 }

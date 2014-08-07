@@ -215,7 +215,7 @@ public class BulkDownloadOutputHandler extends OutputHandler {
             request.setReturnFilename("Search_Results_download.sh");
         }
 
-        StringBuffer sb      = new StringBuffer();
+        StringBuilder sb      = new StringBuilder();
         boolean      recurse = request.get(ARG_RECURSE, true);
         subGroups.addAll(entries);
         boolean overwrite = request.get(ARG_OVERWRITE, false);
@@ -236,7 +236,7 @@ public class BulkDownloadOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public void process(Request request, StringBuffer sb, Entry group,
+    public void process(Request request, StringBuilder sb, Entry group,
                         List<Entry> entries, boolean recurse,
                         boolean overwrite)
             throws Exception {

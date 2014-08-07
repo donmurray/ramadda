@@ -58,6 +58,12 @@ function SelectForm (formId, entryId, arg, outputDiv, selectValues) {
         return url;
     }
 
+    this.bulkdownload = function(event) {
+        var url = this.getUrl("bulkdownload");
+        event.preventDefault();
+        window.location.href = url;
+    }
+
     this.download = function(event) {
         var url = this.getUrl("download");
         event.preventDefault();
@@ -221,9 +227,11 @@ function SelectForm (formId, entryId, arg, outputDiv, selectValues) {
         //        this.totalSize
         var btns  =  $(':input[id*=\"' + this.id +'_do_\"]');
         if (hasSelectedEntries) {
-            btns.removeAttr('disabled').removeClass( 'ui-state-disabled' );
+            //btns.removeAttr('disabled').removeClass( 'ui-state-disabled' );
+            btns.show();
         } else {
-            btns.attr('disabled', 'disabled' ).addClass( 'ui-state-disabled' );
+            //btns.attr('disabled', 'disabled' ).addClass( 'ui-state-disabled' );
+            btns.hide();
         }
     }
 
