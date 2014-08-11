@@ -159,8 +159,13 @@ function ImagePlayer(args)  {
     this.current_image = 0;
     this.direction =this.DIR_FORWARD;
 
-    this.waitCnt = 0;
-    this.imageStepIsPending = false;
+    this.resetImageWait = function() {
+        this.imageStepIsPending = false;
+        this.waitingForImageToLoad = false;
+        this.waitCnt= 0;
+    }
+
+    this.resetImageWait();
 
     this.running = 0;
     this.timestamp=1;
@@ -192,9 +197,7 @@ function ImagePlayer(args)  {
 
 
     this.start = function() {
-        this.imageStepIsPending = false;
-        this.waitingForImageToLoad = false;
-        this.waitCnt= 0;
+        this.resetImageWait();
         this.running=true;
         $(this.getId("startstop")).attr("src",  icon_stop);
         $(this.getId("startstopbuttonlabel")).html("Stop");
@@ -203,9 +206,7 @@ function ImagePlayer(args)  {
     }
 
     this.stop = function() {
-        this.imageStepIsPending = false;
-        this.waitingForImageToLoad = false;
-        this.waitCnt= 0;
+        this.resetImageWait();
         $(this.getId("startstop")).attr("src", icon_start);
         $(this.getId("startstopbuttonlabel")).html("Play");
         this.timestamp++;
@@ -213,7 +214,13 @@ function ImagePlayer(args)  {
     }
  
 
+
     this.play = function(mytimestamp) {
+       if(this.waitingForImageToLoad && this.waitCnt>5) {
+           console.log("play: waited too many times:" + this.waitCnt);
+           this.resetImageWait();
+       }
+
        if(this.waitingForImageToLoad) {
            this.waitCnt ++;
            var waitLabel = "Waiting ";
@@ -222,13 +229,13 @@ function ImagePlayer(args)  {
            }
 //           $(this.getId("waiting")).html(waitLabel);
            this.imageStepIsPending = true;
-           console.log("play: still waiting for image to load");
-           setTimeout("${imagePlayerVar}.play(" +mytimestamp +")", 500);
+           console.log("play: still waiting for image to load -  # " + this.waitCnt);
+           setTimeout("${imagePlayerVar}.play(" +mytimestamp +")", 1000);
            return;
        }
        $(this.getId("waiting")).html("&nbsp;");
        this.imageStepIsPending = false;
-        if(mytimestamp!= this.timestamp) {
+       if(mytimestamp!= this.timestamp) {
             return;
         }
         if(this.direction == this.DIR_FORWARD) {
@@ -236,7 +243,6 @@ function ImagePlayer(args)  {
         } else {
             this.current_image--;
         }
-
 
         if (this.current_image >= this.images.length) {
             if (this.play_mode == this.MODE_NORMAL) {      
@@ -435,40 +441,25 @@ function ImagePlayer(args)  {
         }
 */
 
+        var currentImage = this.images[this.current_image];
         this.waitingForImageToLoad= true;
         $(this.getId("animation")).attr("src",  this.images[this.current_image].url);
         this.setBoxes();
-        var headerHtml;
-        var currentImage = this.images[this.current_image];
-        if(currentImage.label) {
-              headerHtml = "<table width=100%><tr><td><div class=\"imageplayer-title\">" + currentImage.label
-                + "</div></td><td align=right><div class=\"imageplayer-title-date\">"
-                                                                                     + currentImage.dttm + "</div></td></table>";
-
-//            headerHtml =  this.images[this.current_image].label;
-        } else  {
-            headerHtml =  "";
-        }
-     
         $(this.getId("header")).html(this.images[this.current_image].label);
         $(this.getId("framenumber")).attr("value",  (this.current_image+1));
-
-
-
-
     }
 
 
-var theImagePlayer = this;
+    var theImagePlayer = this;
 
-$(this.getId("animation")).load(function() {
-      console.log("load ");
+    $(this.getId("animation")).load(function() {
+      console.log("load: " + $(theImagePlayer.getId("animation")).attr("src"));
       theImagePlayer.waitingForImageToLoad = false;
+      theImagePlayer.waitCnt= 0;
       if(theImagePlayer.imageStepIsPending) {
           theImagePlayer.imageStepIsPending = false;
 //          theImagePlayer.play();
       }
-// Handler for .load() called.
 });
 
 }
