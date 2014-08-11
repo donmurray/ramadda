@@ -558,6 +558,12 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         StringBuilder    sb  = new StringBuilder();
         DataProcessInput dpi = new DataProcessInput(processDir, operands);
 
+        /*
+        if (request.defined(ARG_FREQUENCY)) {
+            sb.append(HtmlUtils.hidden(ARG_FREQUENCY, request.getString(ARG_FREQUENCY)));
+        }
+        */
+        
         if (request.exists(type)) {
             if (hasOperands) {
                 try {
@@ -597,14 +603,14 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         String formAttrs = HtmlUtils.attrs(ATTR_ID, formId);
         if (type.equals(ARG_ACTION_COMPARE)) {
-            sb.append(HtmlUtils.form(getCompareUrlPath(), formAttrs));
+            sb.append(HtmlUtils.form(getCompareUrlPath(request), formAttrs));
             getMapManager().addGoogleEarthImports(request, sb);
             sb.append(
                 "<script type=\"text/JavaScript\">google.load(\"earth\", \"1\");</script>\n");
             //sb.append(HtmlUtils.script(
             //    "$(document).ready(function() {\n $(\"a.popup_image\").fancybox({\n 'titleShow' : false\n });\n });\n"));
         } else {
-            sb.append(HtmlUtils.form(getTimeSeriesUrlPath(), formAttrs));
+            sb.append(HtmlUtils.form(getTimeSeriesUrlPath(request), formAttrs));
             getWikiManager().addDisplayImports(request, sb);
         }
 
@@ -626,10 +632,12 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         }
         StringBuilder js =
             new StringBuilder("\n//collection form initialization\n");
+        String frequency = getFrequencyArgs(request);
         js.append("var " + formId + " = new "
                   + HtmlUtils.call("CollectionForm",
                                    HtmlUtils.squote(formId),
-                                   HtmlUtils.squote(formType)));
+                                   HtmlUtils.squote(formType),
+                                   HtmlUtils.squote(frequency)));
 
 
 
@@ -684,7 +692,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                             msg("Making Time Series, Please Wait") + "...")));
             }
         } else {
-            sb.append("<td width=\"800px\" height=\"30px\">&nbsp;");
+            sb.append("<td width=\"800px\" class=\"model-header\" height=\"30px\">&nbsp;");
         }
         sb.append("</td>");
         sb.append("</tr>\n<tr valign=\"top\">");
@@ -920,6 +928,23 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
 
     /**
+     * Get the frequency arguments from the request
+     * @param request the Request
+     * @return empty string if not defined
+     */
+    private String getFrequencyArgs(Request request) {
+        // TODO Auto-generated method stub
+        StringBuilder args = new StringBuilder();
+        if (request.defined(ARG_FREQUENCY)) {
+            args.append(ARG_FREQUENCY);
+            args.append("=");
+            args.append(request.getString(ARG_FREQUENCY));
+        }
+        return args.toString();
+    }
+
+
+    /**
      * Find the entries
      *
      * @param request   the Request
@@ -1095,9 +1120,15 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
      *
      * @return  the main entry point
      */
-    private String getCompareUrlPath() {
+    private String getCompareUrlPath(Request request) {
         //Use the collection type in the path. This is defined in the api.xml file
-        return getRepository().getUrlBase() + "/model/compare";
+        StringBuilder base = new StringBuilder(getRepository().getUrlBase()); 
+        base.append("/model/compare");
+        if (request.defined(ARG_FREQUENCY)) {
+            base.append("?");
+            base.append(getFrequencyArgs(request));
+        }
+        return  base.toString();
     }
 
     /**
@@ -1105,9 +1136,10 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
      *
      * @return  the main entry point
      */
-    private String getTimeSeriesUrlPath() {
+    private String getTimeSeriesUrlPath(Request request) {
         //Use the collection type in the path. This is defined in the api.xml file
-        return getRepository().getUrlBase() + "/model/timeseries";
+        String base = getRepository().getUrlBase() + "/model/timeseries";
+        return base;
     }
 
 

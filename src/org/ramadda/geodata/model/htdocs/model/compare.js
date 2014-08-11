@@ -5,11 +5,11 @@ var TYPE_KMZ = "geo_kml";
 var TYPE_NC = "cdm_grid";
 var TYPE_TS = "type_single_point_grid_netcdf";
 
-function CollectionForm(formId, type) {
+function CollectionForm(formId, type, args) {
 
     RamaddaUtil.defineMembers(this, {
             formId:formId,
-            analysisUrl: ramaddaBaseUrl +"/model/" + type +"?",
+            analysisUrl: ramaddaBaseUrl +"/model/" + type +"?"+args,
             type:type,
             dataProcesses: [],
             init: function() {
