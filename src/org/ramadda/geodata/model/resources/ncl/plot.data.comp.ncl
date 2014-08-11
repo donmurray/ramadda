@@ -819,7 +819,7 @@ begin
   else 
     if (opts@maxLat .gt. 0) then
       rescf@gsnPolar = "NH"
-      res@mpCenterLonF = -90  ; center over US
+      rescf@mpCenterLonF = -90  ; center over US
     else
       rescf@gsnPolar = "SH"
     end if

@@ -218,8 +218,11 @@ public abstract class CDODataProcess extends DataProcess {
                               File outFile)
             throws Exception {
 
+        //System.out.println(commands);
+        long millis = System.currentTimeMillis();
         String[] results = getRepository().executeCommand(commands, null,
                                processDir, 60);
+        //System.out.println("processing took: " + (System.currentTimeMillis()-millis));
         String errorMsg = results[1];
         String outMsg   = results[0];
         if ( !outFile.exists()) {

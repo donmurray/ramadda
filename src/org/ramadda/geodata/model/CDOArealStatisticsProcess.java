@@ -281,6 +281,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         commands.add("-remapbil,r360x180");
         getOutputHandler().addLevelSelectCommands(request, oneOfThem,
                 commands, CdmDataOutputHandler.ARG_LEVEL);
+        commands.add("-selname," + varname);
         // Handle the case where the months span the year end (e.g. DJF)
         // Break it up into two requests
         if (doMonthsSpanYearEnd(request, oneOfThem)) {
@@ -352,7 +353,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                     File tmpFile = new File(outFile.toString() + "." + i);
                     getOutputHandler().addDateSelectCommands(newRequest,
                             oneOfThem, savedCommands, opNum);
-                    savedCommands.add("-selname," + varname);
+                    //savedCommands.add("-selname," + varname);
                     System.err.println("cmds:" + savedCommands);
                     savedCommands.add(oneOfThem.getResource().getPath());
                     savedCommands.add(tmpFile.toString());
@@ -392,7 +393,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                     File tmpFile = new File(outFile.toString() + "." + i);
                     getOutputHandler().addDateSelectCommands(newRequest,
                             oneOfThem, savedCommands, opNum);
-                    savedCommands.add("-selname," + varname);
+                    //savedCommands.add("-selname," + varname);
                     System.err.println("cmds:" + savedCommands);
                     savedCommands.add(oneOfThem.getResource().getPath());
                     savedCommands.add(tmpFile.toString());
@@ -419,7 +420,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         } else {
             getOutputHandler().addDateSelectCommands(request, oneOfThem,
                     commands, opNum);
-            commands.add("-selname," + varname);
+            //commands.add("-selname," + varname);
 
             System.err.println("cmds:" + commands);
 
@@ -445,9 +446,10 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             commands.add("-remapbil,r360x180");
             getOutputHandler().addLevelSelectCommands(request, climEntry,
                     commands, CdmDataOutputHandler.ARG_LEVEL);
+            commands.add("-selname," + varname);
             getOutputHandler().addMonthSelectCommands(request, climEntry,
                     commands);
-            commands.add("-selname," + varname);
+            //commands.add("-selname," + varname);
 
             //System.err.println("clim cmds:" + commands);
 
