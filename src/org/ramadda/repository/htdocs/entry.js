@@ -122,7 +122,7 @@ function Ramadda(repositoryRoot) {
                                 //                                console.log("Always:" +textStatus);
                         }).fail(function(jqxhr, textStatus, error) {
                             var err = textStatus + " --  " + error;
-                            GuiUtils.handlerError(err);
+                            GuiUtils.handleError(err);
                             });
                 }
                 return this.entryTypes;
@@ -138,7 +138,7 @@ function Ramadda(repositoryRoot) {
                     })
                     .fail(function(jqxhr, textStatus, error) {
                             var err = textStatus + ", " + error;
-                            GuiUtils.handlerError(err);
+                            GuiUtils.handleError(err);
                         });
                 return null;
             },
@@ -221,7 +221,7 @@ function Ramadda(repositoryRoot) {
                     })
                     .fail(function(jqxhr, textStatus, error) {
                             var err = textStatus + ", " + error;
-                            GuiUtils.handlerError(err);
+                            GuiUtils.handleError(err);
                         });
                 return null;
             }
@@ -559,7 +559,7 @@ function EntryList(ramadda, jsonUrl, listener) {
         })
         .fail(function(jqxhr, textStatus, error) {
                 var err = textStatus + ", " + error;
-                GuiUtils.handlerError(err);
+                GuiUtils.handleError(err);
             });
 }
 
