@@ -558,11 +558,6 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         StringBuilder    sb  = new StringBuilder();
         DataProcessInput dpi = new DataProcessInput(processDir, operands);
 
-        /*
-        if (request.defined(ARG_FREQUENCY)) {
-            sb.append(HtmlUtils.hidden(ARG_FREQUENCY, request.getString(ARG_FREQUENCY)));
-        }
-        */
         
         if (request.exists(type)) {
             if (hasOperands) {
@@ -663,6 +658,10 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                                        + fixedCollection.getName())));
             sb.append(HtmlUtils.hidden(ARG_COLLECTION,
                                        fixedCollection.getId()));
+        }
+        
+        if (request.defined(ARG_FREQUENCY)) {
+            sb.append(HtmlUtils.hidden(ARG_FREQUENCY, request.getString(ARG_FREQUENCY)));
         }
 
         sb.append("<table><tr valign=\"center\" align=\"left\">\n");
