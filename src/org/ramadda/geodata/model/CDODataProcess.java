@@ -234,7 +234,7 @@ public abstract class CDODataProcess extends DataProcess {
             }
             if ( !outFile.exists()) {
                 throw new IllegalArgumentException(
-                    "Humm, the CDO processing failed for some reason");
+                    "Error processing data.");
             }
         }
     }
