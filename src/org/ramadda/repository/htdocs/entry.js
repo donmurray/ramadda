@@ -558,7 +558,9 @@ function EntryList(ramadda, jsonUrl, listener) {
             entryList.createEntries(data);
         })
         .fail(function(jqxhr, textStatus, error) {
-                var err = textStatus + ", " + error;
+                //var err = textStatus + ", " + error;
+                console.log(textStatus + ", " + error);
+                var err = "Unable to complete request.";
                 GuiUtils.handleError(err);
             });
 }
