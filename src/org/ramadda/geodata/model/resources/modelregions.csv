@@ -1,7 +1,8 @@
 # the second line is the name of the group for each of these map regions values are: Name,ID,North,West,South,East
 model regions
 World,GBL,90,0,-90,360
-Northern Hemisphere,NH,90,-180,15,180
+Northern Hemisphere (0),NH,90,-180,15,180
+Northern Hemisphere (90W),NH270,90,-180,15,180
 Southern Hemisphere,SH,-15,-180,-90,180
 South Pacific,SP,0,95,-87.5,-85
 South Atlantic,SA,0,-85,-90,95

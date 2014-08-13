@@ -308,7 +308,7 @@ function CollectionForm(formId, type, args) {
             },
            //Get the list of metadata values for the given field and collection
                 updateFields:function(collection, collectionId, fieldIdx, fromInit) {
-                var url = this.analysisUrl +"json=test&thecollection=" + collectionId+"&field=" + fieldIdx;
+                var url = this.analysisUrl +"&json=test&thecollection=" + collectionId+"&field=" + fieldIdx;
                 //Assemble the other field values up to the currently selected field
                 for(var i=0;i<fieldIdx;i++) {
                     var val = this.getFieldSelect(collection, i).val();

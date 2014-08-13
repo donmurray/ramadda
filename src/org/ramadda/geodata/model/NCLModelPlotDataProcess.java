@@ -204,6 +204,8 @@ public class NCLModelPlotDataProcess extends DataProcess {
                 units.equalsIgnoreCase("kg/m^2/s") ||
                 units.equalsIgnoreCase("m/day") ||
                 units.equalsIgnoreCase("mm/s")) {
+            sb.append(HtmlUtils.hidden(ARG_NCL_UNITS, "mm/day"));
+            /*
             sb.append(
                 HtmlUtils.formEntry(
                     Repository.msgLabel("Output Units"),
@@ -218,6 +220,7 @@ public class NCLModelPlotDataProcess extends DataProcess {
                                            request, ARG_NCL_UNITS, "mm/day",
                                            true)) + Repository.msg(
                                                "mm/day")));
+                                               */
         }
         // TODO:  For now, don't get value from request.  May not
         // be valid if variable changes.
@@ -399,11 +402,22 @@ public class NCLModelPlotDataProcess extends DataProcess {
         }
 
         String mapid =
-            request.getString(NCLOutputHandler.ARG_NCL_AREA_REGIONID, "");
-        boolean usepolar = mapid.equalsIgnoreCase("NH")
-                           || mapid.equalsIgnoreCase("SH")
-                           || mapid.equalsIgnoreCase("ANT");
+            request.getString(NCLOutputHandler.ARG_NCL_AREA_REGIONID, "").toLowerCase().trim();
+        boolean usepolar = mapid.startsWith("nh")
+                           || mapid.startsWith("sh")
+                           || mapid.startsWith("ant");
         envMap.put("usepolar", Boolean.toString(usepolar));
+        if (usepolar) {
+            String center = "0";
+            if ((mapid.startsWith("nh") || mapid.startsWith("sh")) &&
+                    mapid.length() > 2) {
+                center = mapid.substring(2);
+            } else if (mapid.startsWith("ant") && mapid.length() > 3) {
+                center = mapid.substring(3);
+            }
+            //System.out.println("Map: "+mapid+", center: "+center);
+            envMap.put("meridian", center);
+        }
 
         boolean haveAnom = fileList.toString().indexOf("anom") >= 0;
         String  colormap = "rainbow";

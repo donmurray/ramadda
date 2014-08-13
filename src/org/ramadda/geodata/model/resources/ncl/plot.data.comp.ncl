@@ -819,10 +819,10 @@ begin
   else 
     if (opts@maxLat .gt. 0) then
       rescf@gsnPolar = "NH"
-      rescf@mpCenterLonF = -90  ; center over US
     else
       rescf@gsnPolar = "SH"
     end if
+    rescf@mpCenterLonF = opts@meridian  
     rescf@gsnAddCyclic          = True
   end if
 
@@ -940,7 +940,7 @@ begin
 
   ;; handle precip
   if (data@units .eq. "mm/day") then
-    if (.not. isanom) then
+    if (.not. isanom .and. .not. dodiff) then
       rescf@gsnSpreadColorEnd = -2
       newindex = NhlNewColor(wks,1.0,1.0,1.0)
       rescf@gsnCnMissingColor = newindex
@@ -991,7 +991,8 @@ begin
     else
       plots(0) = gsn_csm_contour_map_ce(wks,mydata,rescf)
     end if
-    if (cint .eq. 0) then
+    ;if (cint .eq. 0) then
+    if (rescf@cnMinLevelValF .eq. (-1*rescf@cnMaxLevelValF)) then 
       res2 = remove_middle_contours(plots(0), rescf, 1)
       if (usepolar) then
         plots(0) = gsn_csm_contour_map_polar(wks,mydata,res2)
@@ -1019,7 +1020,9 @@ begin
       else
         plots(0) = gsn_csm_contour_map_ce(wks,mydata,rescf)
       end if
-      if (isanom .and. cint .eq. 0) then
+      if (isanom .or. \
+       (isdefined(rescf@cnMinLevelValF) .and. isdefined(rescf@cnMaxLevelValF) \ 
+       .and. (rescf@cnMinLevelValF .eq. (-1*rescf@cnMaxLevelValF)))) then 
         res2 = remove_middle_contours(plots(0), rescf, 1)
         if (usepolar) then
           plot = gsn_csm_contour_map_polar(wks,mydata,res2)
@@ -1044,7 +1047,11 @@ begin
         else
           plots(i) = gsn_csm_contour_map_ce(wks,mydata,rescf)
         end if
-        if (isanom .and. cint .eq. 0) then
+        ;if (isanom .and. cint .eq. 0) then
+        ;if (isanom .or. (rescf@cnMinLevelValF .eq. rescf@cnMaxLevelValF)) then 
+        if (isanom .or. \
+          (isdefined(rescf@cnMinLevelValF) .and. isdefined(rescf@cnMaxLevelValF) \ 
+          .and. (rescf@cnMinLevelValF .eq. (-1*rescf@cnMaxLevelValF)))) then 
           res2 = remove_middle_contours(plots(i), rescf, 1)
           if (usepolar) then
             plots(i) = gsn_csm_contour_map_polar(wks,mydata,res2)
@@ -1077,7 +1084,11 @@ begin
         symMinMaxPlt(mydata,20,False,rescf)
       end if
       gplot = gsn_csm_contour_map_ce(wks,mydata,rescf)
-      if (isanom .and. cint .eq. 0) then
+      ;if (isanom) then
+      ;if (isanom .or. (rescf@cnMinLevelValF .eq. rescf@cnMaxLevelValF)) then 
+      if (isanom .or. \
+        (isdefined(rescf@cnMinLevelValF) .and. isdefined(rescf@cnMaxLevelValF)\ 
+       .and. (rescf@cnMinLevelValF .eq. (-1*rescf@cnMaxLevelValF)))) then 
         res2 = remove_middle_contours(gplot, rescf, 1)
         gplot = gsn_csm_contour_map_ce(wks,mydata,res2)
       end if
@@ -1121,7 +1132,7 @@ begin
         
           ;; handle precip
           if (data@units .eq. "mm/day") then
-            if (.not. isanom) then
+            if (.not. isanom .and. .not. dodiff) then
               rescf@gsnSpreadColorEnd = -2
               newindex = NhlNewColor(wks,1.0,1.0,1.0)
               rescf@gsnCnMissingColor = newindex
@@ -1131,7 +1142,10 @@ begin
           nextdata = readdata(files(i),opts)
           mydata = nextdata(0,:,:)
           gplot = gsn_csm_contour_map_ce(wks,mydata,rescf)
-          if (isanom .and. cint .eq. 0) then
+          ;if (isanom .and. cint .eq. 0) then
+          if (isanom .or. \
+            (isdefined(rescf@cnMinLevelValF) .and. isdefined(rescf@cnMaxLevelValF) \ 
+            .and. (rescf@cnMinLevelValF .eq. (-1*rescf@cnMaxLevelValF)))) then 
             res2 = remove_middle_contours(gplot, rescf, 1)
             gplot = gsn_csm_contour_map_ce(wks,mydata,res2)
           end if
@@ -1347,7 +1361,7 @@ begin
   
   colormap=getenv("colormap")
   if (ismissing(colormap)) then
-    if (isanom) then
+    if (isanom .or. outType .eq. "diff") then
       colormap = "testcmap"
     else
       colormap = "rainbow"
@@ -1376,6 +1390,7 @@ begin
   end if
   cmin=stringtofloat(getenv("cmin"))
   cmax=stringtofloat(getenv("cmax"))
+
   polar=getenv("usepolar")
   if (.not. ismissing(polar)) then
     usepolar = polar .eq. "true"
@@ -1383,6 +1398,16 @@ begin
     usepolar = False
   end if
   
+  temp = getenv("meridian")
+  if (.not. ismissing(temp)) then
+    meridian = stringtofloat(temp)
+  else
+    meridian = 0.
+  end if
+  if (meridian .gt. 180) then
+     meridian = meridian - 360
+  end if
+
   options = True
   options@plottype=plotType
   options@outtype=outType
@@ -1402,6 +1427,7 @@ begin
   options@cmin=cmin
   options@cmax=cmax
   options@usepolar=usepolar
+  options@meridian=meridian
   options@logo=logo
   
   plotmap(ncfiles, wks_name, "png", options)
