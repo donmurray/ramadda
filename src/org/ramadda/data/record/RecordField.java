@@ -60,7 +60,7 @@ public class RecordField {
     /** _more_ */
     public static final String PROP_ISTIME = "istime";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_SORTORDER = "sortorder";
 
 
@@ -114,7 +114,7 @@ public class RecordField {
     /** _more_ */
     private int sortOrder = 0;
 
-    /** _more_          */
+    /** _more_ */
     private int columnWidth = 0;
 
     /** _more_ */
@@ -202,6 +202,25 @@ public class RecordField {
     private double missingValue = Double.NaN;
 
 
+    /** _more_          */
+    public static final RecordField FIELD_LATITUDE =
+        new RecordField("recordLatitude", "Latitude", "", 0, "");
+
+    /** _more_          */
+    public static final RecordField FIELD_LONGITUDE =
+        new RecordField("recordLongitude", "Longitude", "", 0, "");
+
+    /** _more_          */
+    public static final RecordField FIELD_ELEVATION =
+        new RecordField("recordElevation", "Elevation", "", 0, "");
+
+    /** _more_          */
+    public static final RecordField FIELD_DATE =
+        new RecordField("recordDate", "Date", "", 0, "", TYPE_DATE, "Date",
+                        0, false, false);
+
+
+
     /**
      * _more_
      *
@@ -270,16 +289,21 @@ public class RecordField {
      * @param pw _more_
      * @param name _more_
      * @param fields _more_
+     * @param addGeolocation _more_
+     * @param addDate _more_
      *
      * @throws Exception _more_
      */
     public static void addJsonHeader(Appendable pw, String name,
-                                     List<RecordField> fields)
+                                     List<RecordField> fields,
+                                     boolean addGeolocation, boolean addDate)
             throws Exception {
         pw.append(Json.mapOpen());
         pw.append(Json.attr(Json.FIELD_NAME, name, true));
         pw.append(",\n");
-        pw.append(Json.attr(Json.FIELD_FIELDS, RecordField.getJson(fields)));
+        pw.append(Json.attr(Json.FIELD_FIELDS,
+                            RecordField.getJson(fields, addGeolocation,
+                                addDate)));
         pw.append(",\n");
         pw.append(Json.mapKey(Json.FIELD_DATA));
         pw.append(Json.listOpen());
@@ -301,15 +325,20 @@ public class RecordField {
      * _more_
      *
      * @param fields _more_
+     * @param addGeolocation _more_
+     * @param addDate _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public static String getJson(List<RecordField> fields) throws Exception {
+    public static String getJson(List<RecordField> fields,
+                                 boolean addGeolocation, boolean addDate)
+            throws Exception {
         Appendable   sb           = new StringBuffer();
         List<String> fieldStrings = new ArrayList<String>();
         int          headerCnt    = 0;
+        StringBuffer fieldSB;
         for (RecordField field : fields) {
             if (field.getSynthetic()) {
                 continue;
@@ -317,11 +346,30 @@ public class RecordField {
             if (field.getArity() > 1) {
                 continue;
             }
-            StringBuffer fieldSB = new StringBuffer();
+            fieldSB = new StringBuffer();
             field.addJson(fieldSB, headerCnt);
             fieldStrings.add(fieldSB.toString());
             headerCnt++;
         }
+        if (addGeolocation) {
+            fieldSB = new StringBuffer();
+            FIELD_LATITUDE.addJson(fieldSB, headerCnt++);
+            fieldStrings.add(fieldSB.toString());
+
+            fieldSB = new StringBuffer();
+            FIELD_LONGITUDE.addJson(fieldSB, headerCnt++);
+            fieldStrings.add(fieldSB.toString());
+
+            fieldSB = new StringBuffer();
+            FIELD_ELEVATION.addJson(fieldSB, headerCnt++);
+            fieldStrings.add(fieldSB.toString());
+        }
+        if (addDate) {
+            fieldSB = new StringBuffer();
+            FIELD_DATE.addJson(fieldSB, headerCnt++);
+            fieldStrings.add(fieldSB.toString());
+        }
+
 
         return Json.list(fieldStrings);
     }
@@ -358,6 +406,26 @@ public class RecordField {
         items.add("" + sortOrder);
         items.add("searchable");
         items.add("" + getSearchable());
+
+        if (name.equals(FIELD_LATITUDE.getName())) {
+            items.add("isLatitude");
+            items.add("true");
+        }
+        if (name.equals(FIELD_LONGITUDE.getName())) {
+            items.add("isLongitude");
+            items.add("true");
+        }
+        if (name.equals(FIELD_ELEVATION.getName())) {
+            items.add("isElevation");
+            items.add("true");
+        }
+
+        if (name.equals(FIELD_DATE.getName())) {
+            items.add("isDate");
+            items.add("true");
+        }
+
+
         sb.append(Json.map(items));
     }
 

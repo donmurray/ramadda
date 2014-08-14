@@ -311,6 +311,12 @@ as I think RAMADDA passes in NaN
 unit - the unit of the value
  */
 function RecordField(props) {
+    $.extend(this, {
+            isDate:false,
+            isLatitude:false,
+            isLongitude:false,
+            isElevation:false,
+        });
     $.extend(this, props);
     $.extend(this, {
              isNumeric: props.type == "double",
@@ -320,6 +326,18 @@ function RecordField(props) {
    RamaddaUtil.defineMembers(this, {
              getIndex: function() {
                  return this.index;
+             },
+             isFieldLatitude: function() {
+               return this.isLatitude;
+             },
+             isFieldLongitude: function() {
+               return this.isLongitude;
+             },
+             isFieldElevation: function() {
+               return this.isElevation;
+             },
+             isFieldDate: function() {
+               return this.isDate;
              },
              isChartable: function() {
                return this.chartable;
@@ -393,29 +411,70 @@ function PointRecord(lat, lon, elevation, time, data) {
 
 function makePointData(json) {
     var fields = [];
+    var latitudeIdx = -1;
+    var longitudeIdx = -1;
+    var elevationIdx = -1;
+    var dateIdx = -1;
+
     for(var i=0;i<json.fields.length;i++) {
         var field  = json.fields[i];
-        fields.push(new RecordField(field));
+        var recordField = new RecordField(field);
+        fields.push(recordField);
+        if(recordField.isFieldLatitude()) {
+            latitudeIdx = recordField.getIndex();
+            //            console.log("Latitude idx:" + latitudeIdx);
+        } else if(recordField.isFieldLongitude()) {
+            longitudeIdx = recordField.getIndex();
+            //            console.log("Longitude idx:" + longitudeIdx);
+        } else if(recordField.isFieldElevation()) {
+            elevationIdx = recordField.getIndex();
+            //            console.log("Elevation idx:" + elevationIdx);
+        } else if(recordField.isFieldDate()) {
+            dateIdx = recordField.getIndex();
+            //            console.log("Date idx:" + dateIdx);
+        }
+
     }
+
+
+
 
     var data =[];
 
     for(var i=0;i<json.data.length;i++) {
         var tuple = json.data[i];
+        var values = tuple.values;
         //lat,lon,alt,time,data values
-        var date  = tuple.date;
-        if(date!=0) {
-            date = new Date(date);
+        var date  = null;
+        if ((typeof tuple.date === 'undefined')) {
+            if(dateIdx>=0) {
+                date = new Date(values[dateIdx]);
+            }
+        } else {
+            if(tuple.date!=null && tuple.date!=0) {
+                date = new Date(tuple.date);
+            }
         }
         if ((typeof tuple.latitude === 'undefined')) {
-            tuple.latitude = NaN;
-            tuple.longitude = NaN;
+            if(latitudeIdx>=0) 
+                tuple.latitude = values[latitudeIdx];
+            else
+                tuple.latitude = NaN;
+        }
+        if ((typeof tuple.longitude === 'undefined')) {
+            if(longitudeIdx>=0) 
+                tuple.longitude = values[longitudeIdx];
+            else 
+                tuple.longitude = NaN;
         }
 
         if ((typeof tuple.elevation === 'undefined')) {
-            tuple.elevation = NaN;
+            if(elevationIdx>=0) 
+                tuple.elevation = values[elevationIdx];
+            else
+                tuple.elevation = NaN;
         }
-        var record = new PointRecord(tuple.latitude, tuple.longitude,tuple.elevation, date, tuple.values);
+        var record = new PointRecord(tuple.latitude, tuple.longitude,tuple.elevation, date, values);
         data.push(record);
     }
 

@@ -163,19 +163,19 @@ function Ramadda(repositoryRoot) {
                 if(settings.name!=null&& settings.name.length>0) 
                     url += "&name=" + settings.name;
                 if(settings.startDate && settings.startDate.length>0) {
-                    url += "&datadata.from=" + settings.startDate;
+                    url += "&starttime=" + settings.startDate;
                 }
                 if(settings.endDate && settings.endDate.length>0) {
-                    url += "&datadata.to=" + settings.endDate;
+                    url += "&endtime=" + settings.endDate;
                 }
                 if(!isNaN(settings.getNorth())) 
-                   url += "&area_north=" + settings.getNorth();
+                   url += "&maxlatitude=" + settings.getNorth();
                 if(!isNaN(settings.getWest())) 
-                   url += "&area_west=" + settings.getWest();
+                   url += "&minlongitude=" + settings.getWest();
                 if(!isNaN(settings.getSouth())) 
-                   url += "&area_south=" + settings.getSouth();
+                   url += "&minlatitude=" + settings.getSouth();
                 if(!isNaN(settings.getEast())) 
-                   url += "&area_east=" + settings.getEast();
+                   url += "&maxlongitude=" + settings.getEast();
 
                 for(var i =0;i<settings.metadata.length;i++) {
                     var metadata = settings.metadata[i];
