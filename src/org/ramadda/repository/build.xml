@@ -313,7 +313,10 @@
         <unjar src="${lib_dir}/smtp.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/gson-1.5.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/postgres.jar" dest="${tmpjar_dir}"/>
+<!--
         <unjar src="${lib_dir}/mysql.jar" dest="${tmpjar_dir}"/>
+-->
+        <unjar src="${lib_dir}/mysql-connector-java-5.1.32-bin.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/h2.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/derby.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/derbytools.jar" dest="${tmpjar_dir}"/>
