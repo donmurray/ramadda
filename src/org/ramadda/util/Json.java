@@ -92,7 +92,16 @@ public class Json {
         pw.append(attr(FIELD_ELEVATION, elevation));
     }
 
-
+    /**
+     * Create a JSON map
+     *
+     * @param values  key/value pairs { key1,value1,key2,value2 }
+     *
+     * @return  the map object { key1:value1, key2:value2 }
+     */
+    public static String mapAndQuote(String... values) {
+        return map(values, true);
+    }
 
 
     /**

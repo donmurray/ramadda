@@ -480,6 +480,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         if (json != null) {
             return processJsonRequest(request, json);
         }
+        boolean returnjson = request.get("returnjson", false);
 
         Hashtable<String, StringBuilder> extra = new Hashtable<String,
                                                      StringBuilder>();
@@ -557,7 +558,6 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         StringBuilder    sb  = new StringBuilder();
         DataProcessInput dpi = new DataProcessInput(processDir, operands);
-
         
         if (request.exists(type)) {
             if (hasOperands) {
@@ -568,13 +568,25 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                         return makeTimeSeries(request, dpi);
                     }
                 } catch (Exception exc) {
-                    sb.append(
-                        getPageHandler().showDialogError(
-                            "An error occurred:<br>" + exc.getMessage()));
+                    if (returnjson) {
+                        StringBuilder data = new StringBuilder();
+                        data.append(Json.mapAndQuote("error", exc.getMessage()));
+                        return new Result("", data, Json.MIMETYPE);
+                    } else {
+                        sb.append(
+                            getPageHandler().showDialogError(
+                                "An error occurred:<br>" + exc.getMessage()));
+                    }
                 }
             } else {
-                sb.append(
-                    getPageHandler().showDialogWarning("No fields selected"));
+                if (returnjson) {
+                    StringBuilder data = new StringBuilder();
+                    data.append(Json.map("error", "No fields selected."));
+                    return new Result("", data, Json.MIMETYPE);
+                } else {
+                    sb.append(
+                        getPageHandler().showDialogWarning("No fields selected"));
+                }
             }
         }
 
@@ -987,10 +999,12 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 clauses.add(Clause.eq(column.getName(), v));
             } else {
                 haveAllFields = false;
+                break;
             }
         }
         //If we have a fixed collection then don't do the search if no fields were selected
-        if ( !haveAllFields && request.defined(ARG_COLLECTION)) {
+        //if ( !haveAllFields && request.defined(ARG_COLLECTION)) {
+        if ( !haveAllFields ) {
             return new ArrayList<Entry>();
         }
 
