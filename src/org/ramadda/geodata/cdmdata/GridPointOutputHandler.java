@@ -543,7 +543,7 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
                     recordField.setChartable(true);
                     fields.add(recordField);
                 }
-                RecordField.addJsonHeader(bw, entry.getName(), fields);
+                RecordField.addJsonHeader(bw, entry.getName(), fields, false,false);
 
                 String  line        = null;
                 int     cnt         = 0;
