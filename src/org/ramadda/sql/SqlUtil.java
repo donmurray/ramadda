@@ -1702,6 +1702,9 @@ public class SqlUtil {
                     lastResultSet.close();
                 }
                 lastResultSet = stmt.getResultSet();
+                if(lastResultSet == null) {
+                    return null;
+                }
                 if (lastResultSet.next()) {
                     cnt++;
 
