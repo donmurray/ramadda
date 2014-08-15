@@ -437,6 +437,10 @@ public class Entry implements Cloneable {
         setWest(template.getWest());
         this.altitudeTop    = template.altitudeTop;
         this.altitudeBottom = template.altitudeBottom;
+
+        Object[] values = template.getValues();
+        this.values = values;
+
     }
 
     /**
