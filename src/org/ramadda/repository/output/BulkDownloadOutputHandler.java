@@ -68,6 +68,9 @@ public class BulkDownloadOutputHandler extends OutputHandler {
     public static final String ARG_RECURSE = "recurse";
 
     /** _more_ */
+    public static final String ARG_INCLUDEPARENT = "includeparent";
+
+    /** _more_ */
     public static final String ARG_OVERWRITE = "overwrite";
 
     /** _more_ */
@@ -218,28 +221,7 @@ public class BulkDownloadOutputHandler extends OutputHandler {
         StringBuilder sb      = new StringBuilder();
         boolean       recurse = request.get(ARG_RECURSE, true);
         subGroups.addAll(entries);
-        boolean overwrite = request.get(ARG_OVERWRITE, false);
-        process(request, sb, group, subGroups, recurse, overwrite);
-
-        return new Result("", sb, getMimeType(OUTPUT_CURL));
-    }
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param sb _more_
-     * @param group _more_
-     * @param entries _more_
-     * @param recurse _more_
-     * @param overwrite _more_
-     *
-     * @throws Exception _more_
-     */
-    public void process(Request request, StringBuilder sb, Entry group,
-                        List<Entry> entries, boolean recurse,
-                        boolean overwrite)
-            throws Exception {
+        boolean            overwrite = request.get(ARG_OVERWRITE, false);
 
         List<List<String>> outputPairs         =
             new ArrayList<List<String>>();
@@ -255,17 +237,46 @@ public class BulkDownloadOutputHandler extends OutputHandler {
             }
         }
 
+        CurlCommand command = new CurlCommand(request);
 
-        String  command   = request.getString(ARG_COMMAND, COMMAND_CURL);
-        String  args      = command.equals(COMMAND_WGET)
-                            ? ""
-                            : " --progress-bar -k ";
-        String  outputArg = command.equals(COMMAND_WGET)
-                            ? "-O"
-                            : command.equals(COMMAND_CURL)
-                              ? "-o "
-                              : "";
-        HashSet seen      = new HashSet();
+
+
+        if (request.get(ARG_INCLUDEPARENT, false)) {
+            writeGroupScript(request, group, sb, command, outputPairs,
+                             includeGroupOutputs);
+        }
+
+        process(request, sb, group, subGroups, recurse, overwrite, command,
+                outputPairs, includeGroupOutputs);
+        if (request.get(ARG_INCLUDEPARENT, false)) {
+            sb.append(cmd("cd .."));
+        }
+
+        return new Result("", sb, getMimeType(OUTPUT_CURL));
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     * @param group _more_
+     * @param entries _more_
+     * @param recurse _more_
+     * @param overwrite _more_
+     * @param command _more_
+     * @param outputPairs _more_
+     * @param includeGroupOutputs _more_
+     *
+     * @throws Exception _more_
+     */
+    public void process(Request request, StringBuilder sb, Entry group,
+                        List<Entry> entries, boolean recurse,
+                        boolean overwrite, CurlCommand command,
+                        List<List<String>> outputPairs,
+                        boolean includeGroupOutputs)
+            throws Exception {
+        HashSet seen = new HashSet();
         for (Entry entry : entries) {
             if (entry.isGroup()) {
                 if ( !recurse) {
@@ -273,48 +284,13 @@ public class BulkDownloadOutputHandler extends OutputHandler {
                 }
                 List<Entry> subEntries =
                     getEntryManager().getChildrenAll(request, entry);
-                String dirName = IOUtil.cleanFileName(entry.getName());
-                if (dirName.length() == 0) {
-                    dirName = entry.getId();
-                }
 
                 if (includeGroupOutputs || (subEntries.size() > 0)) {
-                    sb.append("if ! test -e " + qt(dirName) + " ; then \n");
-                    sb.append(cmd("mkdir " + qt(dirName)));
-                    sb.append("fi\n");
-                    sb.append(cmd("cd " + qt(dirName)));
-                    if (includeGroupOutputs) {
-                        for (List<String> pair : outputPairs) {
-                            String output = pair.get(0);
-                            String suffix = output;
-                            if (pair.size() > 1) {
-                                suffix = pair.get(1);
-                            }
-                            String destFile = "." + dirName;
-                            String extraUrl =
-                                HtmlUtils.url(
-                                    getEntryManager().getFullEntryShowUrl(
-                                        request), ARG_ENTRYID, entry.getId(),
-                                            ARG_OUTPUT, output);
-                            System.err.println("URL:" + extraUrl);
-                            String destOutputFile = destFile + "." + suffix;
-                            if (output.equals(XmlOutputHandler.OUTPUT_XMLENTRY
-                                    .getId())) {
-                                destOutputFile = ".this.ramadda.xml";
-                            }
-                            sb.append(cmd("echo "
-                                          + qt("downloading "
-                                              + destOutputFile)));
-
-                            sb.append(cmd(command + args + " " + outputArg
-                                          + " " + qt(destOutputFile) + " "
-                                          + qt(extraUrl)));
-                        }
-                    }
-
-
+                    writeGroupScript(request, entry, sb, command,
+                                     outputPairs, includeGroupOutputs);
                     process(request, sb, entry, subEntries, recurse,
-                            overwrite);
+                            overwrite, command, outputPairs,
+                            includeGroupOutputs);
                     sb.append(cmd("cd .."));
                 }
             }
@@ -322,8 +298,7 @@ public class BulkDownloadOutputHandler extends OutputHandler {
             if (entry.getResource().isUrl()) {
                 //Not sure what to do with external URLs
                 //For now skip them
-                //                sb.append(cmd(command + args + " " + outputArg + " "
-                //                              + qt(tmpFile) + " " + qt(entry.getResource().getPath())));
+                //command.append(sb, tmpFile, entry.getResource().getPath());
                 continue;
             } else if ( !getAccessManager().canDownload(request, entry)) {
                 continue;
@@ -355,8 +330,7 @@ public class BulkDownloadOutputHandler extends OutputHandler {
 
             sb.append(cmd("touch " + qt(tmpFile)));
 
-            sb.append(cmd(command + args + " " + outputArg + " "
-                          + qt(tmpFile) + " " + qt(path)));
+            command.append(sb, tmpFile, path);
             sb.append("if [[ $? != 0 ]] ; then\n");
             sb.append(cmd("echo" + " "
                           + qt("file download failed for " + destFile)));
@@ -383,8 +357,7 @@ public class BulkDownloadOutputHandler extends OutputHandler {
 
 
                 sb.append(cmd("echo " + qt("downloading " + destOutputFile)));
-                sb.append(cmd(command + args + " " + outputArg + " "
-                              + qt(destOutputFile) + " " + qt(extraUrl)));
+                command.append(sb, destOutputFile, extraUrl);
             }
 
             if ( !overwrite) {
@@ -400,11 +373,61 @@ public class BulkDownloadOutputHandler extends OutputHandler {
     /**
      * _more_
      *
+     * @param request _more_
+     * @param entry _more_
+     * @param sb _more_
+     * @param command _more_
+     * @param outputPairs _more_
+     * @param includeGroupOutputs _more_
+     *
+     * @throws Exception _more_
+     */
+    private void writeGroupScript(Request request, Entry entry,
+                                  StringBuilder sb, CurlCommand command,
+                                  List<List<String>> outputPairs,
+                                  boolean includeGroupOutputs)
+            throws Exception {
+        String dirName = IOUtil.cleanFileName(entry.getName());
+        if (dirName.length() == 0) {
+            dirName = entry.getId();
+        }
+        sb.append("if ! test -e " + qt(dirName) + " ; then \n");
+        sb.append(cmd("mkdir " + qt(dirName)));
+        sb.append("fi\n");
+        sb.append(cmd("cd " + qt(dirName)));
+        if (includeGroupOutputs) {
+            for (List<String> pair : outputPairs) {
+                String output = pair.get(0);
+                String suffix = output;
+                if (pair.size() > 1) {
+                    suffix = pair.get(1);
+                }
+                String destFile = "." + dirName;
+                String extraUrl = HtmlUtils.url(
+                                      getEntryManager().getFullEntryShowUrl(
+                                          request), ARG_ENTRYID,
+                                              entry.getId(), ARG_OUTPUT,
+                                              output);
+                String destOutputFile = destFile + "." + suffix;
+                if (output.equals(XmlOutputHandler.OUTPUT_XMLENTRY.getId())) {
+                    destOutputFile = ".this.ramadda.xml";
+                }
+                sb.append(cmd("echo " + qt("downloading " + destOutputFile)));
+
+                command.append(sb, destOutputFile, extraUrl);
+            }
+        }
+    }
+
+
+    /**
+     * _more_
+     *
      * @param s _more_
      *
      * @return _more_
      */
-    private String cmd(String s) {
+    private static String cmd(String s) {
         return s + ";\n";
     }
 
@@ -415,7 +438,7 @@ public class BulkDownloadOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    private String qt(String s) {
+    private static String qt(String s) {
         return "\"" + s + "\"";
     }
 
@@ -430,6 +453,55 @@ public class BulkDownloadOutputHandler extends OutputHandler {
         return "application/x-sh";
     }
 
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Fri, Aug 15, '14
+     * @author         Enter your name here...
+     */
+    public static final class CurlCommand {
+
+        /** _more_ */
+        String command;
+
+        /** _more_ */
+        String args;
+
+        /** _more_ */
+        String outputArg;
+
+        /**
+         * _more_
+         *
+         * @param request _more_
+         */
+        public CurlCommand(Request request) {
+            command   = request.getString(ARG_COMMAND, COMMAND_CURL);
+            args      = command.equals(COMMAND_WGET)
+                        ? ""
+                        : " --progress-bar -k ";
+            outputArg = command.equals(COMMAND_WGET)
+                        ? "-O"
+                        : command.equals(COMMAND_CURL)
+                          ? "-o "
+                          : "";
+        }
+
+        /**
+         * _more_
+         *
+         * @param sb _more_
+         * @param filename _more_
+         * @param url _more_
+         */
+        public void append(StringBuilder sb, String filename, String url) {
+            sb.append(cmd(command + args + " " + outputArg + " "
+                          + qt(filename) + " " + qt(url)));
+        }
+
+
+    }
 
 
 }
