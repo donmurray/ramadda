@@ -321,9 +321,8 @@ public class EntryManager extends RepositoryManager {
      */
     public String getFullEntryShowUrl(Request request) {
         if (request == null) {
-            request = new Request(getRepository(), null);
+            return getRepository().URL_ENTRY_SHOW.getFullUrl(null);
         }
-
         return request.getAbsoluteUrl(getRepository().URL_ENTRY_SHOW);
     }
 
@@ -8493,6 +8492,19 @@ public class EntryManager extends RepositoryManager {
     public Entry findEntryFromName(Request request, String name, User user,
                                    boolean createIfNeeded,
                                    String lastGroupType,
+                                   EntryInitializer initializer)
+            throws Exception {
+        return findEntryFromName(request, name, user,
+                                 createIfNeeded,
+                                 lastGroupType,
+                                 null,  initializer);
+    }
+
+
+    public Entry findEntryFromName(Request request, String name, User user,
+                                   boolean createIfNeeded,
+                                   String lastGroupType,
+                                   Entry templateEntry,
                                    EntryInitializer initializer)
             throws Exception {
         if (name == null) {
