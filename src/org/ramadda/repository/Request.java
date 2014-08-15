@@ -2342,6 +2342,10 @@ public class Request implements Constants, Cloneable {
         return isRobot;
     }
 
+    public boolean isRealRequest() {
+        return httpServletResponse!=null;
+    }
+
 
     /**
      * _more_

@@ -320,7 +320,7 @@ public class EntryManager extends RepositoryManager {
      * @return _more_
      */
     public String getFullEntryShowUrl(Request request) {
-        if (request == null) {
+        if (request == null || !request.isRealRequest()) {
             return getRepository().URL_ENTRY_SHOW.getFullUrl(null);
         }
         return request.getAbsoluteUrl(getRepository().URL_ENTRY_SHOW);
