@@ -67,10 +67,10 @@ public class BulkDownloadOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String ARG_RECURSE = "recurse";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_OVERWRITE = "overwrite";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_OUTPUTS = "outputs";
 
     /** _more_ */
@@ -216,7 +216,7 @@ public class BulkDownloadOutputHandler extends OutputHandler {
         }
 
         StringBuilder sb      = new StringBuilder();
-        boolean      recurse = request.get(ARG_RECURSE, true);
+        boolean       recurse = request.get(ARG_RECURSE, true);
         subGroups.addAll(entries);
         boolean overwrite = request.get(ARG_OVERWRITE, false);
         process(request, sb, group, subGroups, recurse, overwrite);
@@ -241,11 +241,18 @@ public class BulkDownloadOutputHandler extends OutputHandler {
                         boolean overwrite)
             throws Exception {
 
-        List<List<String>> outputPairs = new ArrayList<List<String>>();
+        List<List<String>> outputPairs         =
+            new ArrayList<List<String>>();
+        boolean            includeGroupOutputs = false;
         for (String pair :
                 StringUtil.split(request.getString(ARG_OUTPUTS, ""), ",",
                                  true, true)) {
             outputPairs.add(StringUtil.splitUpTo(pair, ":", 2));
+            String outputId = outputPairs.get(outputPairs.size()
+                                  - 1).get(0).toString();
+            if (outputId.equals(XmlOutputHandler.OUTPUT_XMLENTRY.getId())) {
+                includeGroupOutputs = true;
+            }
         }
 
 
@@ -270,11 +277,42 @@ public class BulkDownloadOutputHandler extends OutputHandler {
                 if (dirName.length() == 0) {
                     dirName = entry.getId();
                 }
-                if (subEntries.size() > 0) {
+
+                if (includeGroupOutputs || (subEntries.size() > 0)) {
                     sb.append("if ! test -e " + qt(dirName) + " ; then \n");
                     sb.append(cmd("mkdir " + qt(dirName)));
                     sb.append("fi\n");
                     sb.append(cmd("cd " + qt(dirName)));
+                    if (includeGroupOutputs) {
+                        for (List<String> pair : outputPairs) {
+                            String output = pair.get(0);
+                            String suffix = output;
+                            if (pair.size() > 1) {
+                                suffix = pair.get(1);
+                            }
+                            String destFile = "." + dirName;
+                            String extraUrl =
+                                HtmlUtils.url(
+                                    getEntryManager().getFullEntryShowUrl(
+                                        request), ARG_ENTRYID, entry.getId(),
+                                            ARG_OUTPUT, output);
+                            System.err.println("URL:" + extraUrl);
+                            String destOutputFile = destFile + "." + suffix;
+                            if (output.equals(XmlOutputHandler.OUTPUT_XMLENTRY
+                                    .getId())) {
+                                destOutputFile = ".this.ramadda.xml";
+                            }
+                            sb.append(cmd("echo "
+                                          + qt("downloading "
+                                              + destOutputFile)));
+
+                            sb.append(cmd(command + args + " " + outputArg
+                                          + " " + qt(destOutputFile) + " "
+                                          + qt(extraUrl)));
+                        }
+                    }
+
+
                     process(request, sb, entry, subEntries, recurse,
                             overwrite);
                     sb.append(cmd("cd .."));
@@ -310,8 +348,12 @@ public class BulkDownloadOutputHandler extends OutputHandler {
 
 
             long size = entry.getResource().getFileSize();
-            
-            sb.append(cmd("echo " + qt("downloading " + destFile +" (" + formatFileLength(size) + ")")));
+
+            sb.append(cmd("echo "
+                          + qt("downloading " + destFile + " ("
+                               + formatFileLength(size) + ")")));
+
+            sb.append(cmd("touch " + qt(tmpFile)));
 
             sb.append(cmd(command + args + " " + outputArg + " "
                           + qt(tmpFile) + " " + qt(path)));
@@ -332,12 +374,17 @@ public class BulkDownloadOutputHandler extends OutputHandler {
                                           request), ARG_ENTRYID,
                                               entry.getId(), ARG_OUTPUT,
                                               output);
-                sb.append(cmd("echo "
-                              + qt("downloading " + destFile + "."
-                                   + suffix)));
+                System.err.println("URL:" + extraUrl);
+                String destOutputFile = destFile + "." + suffix;
+
+                if (output.equals(XmlOutputHandler.OUTPUT_XMLENTRY.getId())) {
+                    destOutputFile = "." + destFile + ".ramadda.xml";
+                }
+
+
+                sb.append(cmd("echo " + qt("downloading " + destOutputFile)));
                 sb.append(cmd(command + args + " " + outputArg + " "
-                              + qt(destFile + "." + suffix) + " "
-                              + qt(extraUrl)));
+                              + qt(destOutputFile) + " " + qt(extraUrl)));
             }
 
             if ( !overwrite) {

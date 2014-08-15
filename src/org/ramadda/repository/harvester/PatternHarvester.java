@@ -822,8 +822,8 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
      */
     public boolean okToRecurse(File f) throws Exception {
         if (topPattern != null) {
-            List<File> rootDirs = getRootDirs();
-            File parentFile = f.getParentFile();
+            List<File> rootDirs   = getRootDirs();
+            File       parentFile = f.getParentFile();
             for (File rootDir : rootDirs) {
                 if (parentFile.equals(rootDir)) {
                     Matcher matcher = topPattern.matcher(f.getName());
@@ -945,6 +945,7 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
                     entry = processFile(dirInfo, f);
                 } catch (Exception exc) {
                     logHarvesterError("Error creating entry:" + f, exc);
+
                     throw exc;
                 }
                 if (entry == null) {
@@ -1117,10 +1118,17 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
                     getEntryManager().findGroupFromName(getRequest(),
                         parentGroup.getFullName() + Entry.PATHDELIMITER
                         + name, getUser(), false);
+
                 if (group == null) {
+                    if (template != null) {
+                        //System.err.println("Template value[0] = " + template.getValue(0) + " value[1]: " + template.getValue(1));
+                    } else {
+                        //System.err.println("No template for: " + file);
+                    }
                     group = getEntryManager().makeNewGroup(parentGroup, name,
                             getUser(), template);
 
+                    //                    System.err.println("group value[0] = " + group.getValue(0) + " value[1]: " + group.getValue(1));
                 }
                 parentGroup = group;
             }
@@ -1297,8 +1305,9 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
         String dirPath     = f.getParent().toString();
 
         File   dirPathFile = new File(dirPath);
-        //        Entry dirTemplateEntry = getEntryManager().getTemplateEntry(dirPathFile);
-        //        System.err.println("Entry:" + dirTemplateEntry);
+        Entry dirTemplateEntry =
+            getEntryManager().getTemplateEntry(dirPathFile);
+        //        System.err.println("Dir template Entry:" + dirTemplateEntry);
 
         dirPath =
             dirPath.substring(fileInfo.getRootDir().toString().length());
@@ -1445,13 +1454,15 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
         boolean createIfNeeded = !getTestMode();
         Entry group = getEntryManager().findEntryFromName(getRequest(),
                           groupName, getUser(), createIfNeeded,
-                          getLastGroupType(), this);
+                          getLastGroupType(), dirTemplateEntry, this);
+
 
         if (group == null) {
             logHarvesterInfo("Could not create group:" + groupName);
 
             return null;
         }
+        //        System.err.println("Harvester: created group:" + group);
 
 
         //If its just a placeholder then all we need to do is create the group and return
