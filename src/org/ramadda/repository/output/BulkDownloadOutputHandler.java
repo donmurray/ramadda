@@ -218,10 +218,32 @@ public class BulkDownloadOutputHandler extends OutputHandler {
             request.setReturnFilename("Search_Results_download.sh");
         }
 
-        StringBuilder sb      = new StringBuilder();
-        boolean       recurse = request.get(ARG_RECURSE, true);
+        StringBuilder sb = new StringBuilder();
         subGroups.addAll(entries);
-        boolean            overwrite = request.get(ARG_OVERWRITE, false);
+        boolean recurse   = request.get(ARG_RECURSE, true);
+        boolean overwrite = request.get(ARG_OVERWRITE, false);
+        process(request, sb, group, subGroups, recurse, overwrite);
+
+        return new Result("", sb, getMimeType(OUTPUT_CURL));
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     * @param group _more_
+     * @param entries _more_
+     * @param recurse _more_
+     * @param overwrite _more_
+     *
+     * @throws Exception _more_
+     */
+    public void process(Request request, StringBuilder sb, Entry group,
+                        List<Entry> entries, boolean recurse,
+                        boolean overwrite)
+            throws Exception {
 
         List<List<String>> outputPairs         =
             new ArrayList<List<String>>();
@@ -240,20 +262,18 @@ public class BulkDownloadOutputHandler extends OutputHandler {
         CurlCommand command = new CurlCommand(request);
 
 
-
         if (request.get(ARG_INCLUDEPARENT, false)) {
             writeGroupScript(request, group, sb, command, outputPairs,
                              includeGroupOutputs);
         }
 
-        process(request, sb, group, subGroups, recurse, overwrite, command,
+        process(request, sb, group, entries, recurse, overwrite, command,
                 outputPairs, includeGroupOutputs);
         if (request.get(ARG_INCLUDEPARENT, false)) {
             sb.append(cmd("cd .."));
         }
-
-        return new Result("", sb, getMimeType(OUTPUT_CURL));
     }
+
 
     /**
      * _more_
