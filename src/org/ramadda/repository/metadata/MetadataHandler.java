@@ -244,12 +244,15 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @param metadata _more_
      * @param entry _more_
+     * @param initializer _more_
      *
      * @throws Exception _more_
      */
-    public void newEntry(Metadata metadata, Entry entry) throws Exception {
+    public void initNewEntry(Metadata metadata, Entry entry,
+                             EntryInitializer initializer)
+            throws Exception {
         MetadataType type = getType(metadata.getType());
-        type.newEntry(metadata, entry);
+        type.initNewEntry(metadata, entry, initializer);
     }
 
 
@@ -314,6 +317,29 @@ public class MetadataHandler extends RepositoryManager {
             return;
         }
         type.getThumbnailUrls(request, entry, urls, metadata);
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param nameUrlPairs _more_
+     * @param metadata _more_
+     *
+     * @throws Exception _more_
+     */
+    public void getFileUrls(Request request, Entry entry,
+                            List<String[]> nameUrlPairs, Metadata metadata)
+            throws Exception {
+        MetadataType type = getType(metadata.getType());
+        if (type == null) {
+            return;
+        }
+        String[] nameUrl = type.getFileUrl(request, entry, metadata);
+        if (nameUrl != null) {
+            nameUrlPairs.add(nameUrl);
+        }
     }
 
 

@@ -277,11 +277,11 @@ public class MetadataManager extends RepositoryManager {
             handler.decorateEntry(request, entry, mine, metadata, forLink);
             if (forLink) {
                 //Only do the first one so we don't get multiple thumbnails
-                if(mine.length() > 0) {
+                if (mine.length() > 0) {
                     break;
                 }
-            }  else {
-                if(mine.length() > 0) {
+            } else {
+                if (mine.length() > 0) {
                     mine.append(HtmlUtils.br());
                 }
             }
@@ -289,6 +289,9 @@ public class MetadataManager extends RepositoryManager {
         }
         sb.append(mine);
     }
+
+
+
 
 
     /**
@@ -344,6 +347,27 @@ public class MetadataManager extends RepositoryManager {
             MetadataHandler handler = findMetadataHandler(metadata.getType());
             handler.getThumbnailUrls(request, entry, urls, metadata);
         }
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public List<String[]> getFilelUrls(Request request, Entry entry)
+            throws Exception {
+        List<String[]> nameUrlPairs = new ArrayList<String[]>();
+        for (Metadata metadata : getMetadata(entry)) {
+            MetadataHandler handler = findMetadataHandler(metadata.getType());
+            handler.getFileUrls(request, entry, nameUrlPairs, metadata);
+        }
+
+        return nameUrlPairs;
     }
 
 
@@ -937,13 +961,15 @@ public class MetadataManager extends RepositoryManager {
      * _more_
      *
      * @param entry _more_
+     * @param initializer _more_
      *
      * @throws Exception On badness
      */
-    public void newEntry(Entry entry) throws Exception {
+    public void initNewEntry(Entry entry, EntryInitializer initializer)
+            throws Exception {
         for (Metadata metadata : getMetadata(entry)) {
             MetadataHandler handler = findMetadataHandler(metadata.getType());
-            handler.newEntry(metadata, entry);
+            handler.initNewEntry(metadata, entry, initializer);
         }
     }
 
@@ -1097,6 +1123,7 @@ public class MetadataManager extends RepositoryManager {
         doMakeTagCloudOrList(request, metadataType, sb, doCloud, 0);
         if (request.responseInJson()) {
             request.setCORSHeaderOnResponse();
+
             return new Result("", sb, Json.MIMETYPE);
         }
 

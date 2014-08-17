@@ -405,19 +405,35 @@ public class MetadataType extends MetadataTypeBase {
      *
      * @param metadata _more_
      * @param entry _more_
+     * @param initializer _more_
      *
      * @throws Exception _more_
      */
-    public void newEntry(Metadata metadata, Entry entry) throws Exception {
+    public void initNewEntry(Metadata metadata, Entry entry,
+                             EntryInitializer initializer)
+            throws Exception {
         for (MetadataElement element : getChildren()) {
             if (element.getDataType().equals(element.DATATYPE_FILE)) {
                 String fileArg = metadata.getAttr(element.getIndex());
                 if ((fileArg == null) || (fileArg.length() == 0)) {
                     continue;
                 }
+                File sourceFile = new File(fileArg);
+                if ( !sourceFile.exists()) {
+                    if (initializer != null) {
+                        sourceFile = initializer.getMetadataFile(entry,
+                                fileArg);
+                        System.err.println("metadata file from initializer:"
+                                           + sourceFile);
+                    }
+                }
+                if ((sourceFile == null) || !sourceFile.exists()) {
+                    throw new IllegalArgumentException(
+                        "Missing metadata file:" + fileArg);
+                }
                 if ( !entry.getIsLocalFile()) {
                     fileArg = getStorageManager().copyToEntryDir(entry,
-                            new File(fileArg)).getName();
+                            sourceFile).getName();
                 }
                 metadata.setAttr(element.getIndex(), fileArg);
             }
@@ -466,8 +482,7 @@ public class MetadataType extends MetadataTypeBase {
                         (String) null);
             }
             if (fileArg == null) {
-                System.err.println("Could not find fileid:"
-                                   + XmlUtil.toString(attrNode));
+                //                System.err.println("Metadata: Could not find file id for entry: " + entry.getName() + " xml:" + XmlUtil.toString(attrNode));
 
                 continue;
             }

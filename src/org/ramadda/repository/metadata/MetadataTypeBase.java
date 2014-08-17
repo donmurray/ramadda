@@ -668,6 +668,80 @@ public class MetadataTypeBase extends RepositoryManager {
     /**
      * _more_
      *
+     * @param request _more_
+     * @param entry _more_
+     * @param metadata _more_
+     * @param matchFile _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String[] getFileUrl(Request request, Entry entry,
+                               Metadata metadata)
+            throws Exception {
+        for (MetadataElement element : getChildren()) {
+            if ( !element.getDataType().equals(element.TYPE_FILE)) {
+                continue;
+            }
+            String[] url = getFileUrl(request, entry, metadata, element);
+            if (url != null) {
+                return url;
+            }
+        }
+
+        return null;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param metadata _more_
+     * @param element _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String[] getFileUrl(Request request, Entry entry,
+                               Metadata metadata, MetadataElement element)
+            throws Exception {
+
+        File f = getFile(entry, metadata, element);
+        if (f == null) {
+            /*            String value = metadata.getAttr(element.getIndex());
+            if ((value != null) && value.startsWith("http")) {
+                return value;
+            }
+            */
+
+            return null;
+        }
+
+        //Get the partial file name
+        String tail = getStorageManager().getFileTail(f.toString());
+        tail = tail.replaceAll(" ", "_");
+        String path =
+            handler.getRepository().getMetadataManager().URL_METADATA_VIEW
+            + "/" + tail;
+        String url = HtmlUtils.url(path, ARG_ELEMENT,
+                                   element.getIndex() + "", ARG_ENTRYID,
+                                   metadata.getEntryId(), ARG_METADATA_ID,
+                                   metadata.getId());
+
+        //Get the full file name
+        return new String[] { IOUtil.getFileTail(f.toString()), url };
+    }
+
+
+
+
+    /**
+     * _more_
+     *
      * @param t _more_
      *
      * @return _more_
