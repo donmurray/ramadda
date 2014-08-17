@@ -373,6 +373,7 @@ public class BulkDownloadOutputHandler extends OutputHandler {
 
                 if (output.equals(XmlOutputHandler.OUTPUT_XMLENTRY.getId())) {
                     destOutputFile = "." + destFile + ".ramadda.xml";
+                    appendDownloadMetadata(request, entry, sb, command);
                 }
 
 
@@ -431,6 +432,7 @@ public class BulkDownloadOutputHandler extends OutputHandler {
                 String destOutputFile = destFile + "." + suffix;
                 if (output.equals(XmlOutputHandler.OUTPUT_XMLENTRY.getId())) {
                     destOutputFile = ".this.ramadda.xml";
+                    appendDownloadMetadata(request, entry, sb, command);
                 }
                 sb.append(cmd("echo " + qt("downloading " + destOutputFile)));
 
@@ -439,6 +441,26 @@ public class BulkDownloadOutputHandler extends OutputHandler {
         }
     }
 
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param sb _more_
+     * @param command _more_
+     *
+     * @throws Exception _more_
+     */
+    private void appendDownloadMetadata(Request request, Entry entry,
+                                        StringBuilder sb, CurlCommand command)
+            throws Exception {
+        for (String[] pair :
+                getMetadataManager().getFilelUrls(request, entry)) {
+            command.append(sb, "." + pair[0],
+                           request.getAbsoluteUrl(pair[1]));
+        }
+    }
 
     /**
      * _more_

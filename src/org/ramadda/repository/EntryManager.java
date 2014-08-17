@@ -320,9 +320,10 @@ public class EntryManager extends RepositoryManager {
      * @return _more_
      */
     public String getFullEntryShowUrl(Request request) {
-        if (request == null || !request.isRealRequest()) {
+        if ((request == null) || !request.isRealRequest()) {
             return getRepository().URL_ENTRY_SHOW.getFullUrl(null);
         }
+
         return request.getAbsoluteUrl(getRepository().URL_ENTRY_SHOW);
     }
 
@@ -5186,15 +5187,16 @@ public class EntryManager extends RepositoryManager {
         Entry  parentEntry = (Entry) entries.get(parentId);
         if (parentEntry == null) {
             parentEntry = (Entry) getEntry(request, parentId);
-            if (parentEntry == null) {
-                parentEntry = (Entry) findEntryFromName(request, parentId,
-                        request.getUser(), false);
-            }
-            if (parentEntry == null) {
-                throw new RepositoryUtil.MissingEntryException(
-                    "Could not find parent:" + parentId);
-            }
         }
+        if (parentEntry == null) {
+            parentEntry = (Entry) findEntryFromName(request, parentId,
+                    request.getUser(), false);
+        }
+        if (parentEntry == null) {
+            // Lets not check for now. Some entry xml doesn't have a parent
+            //            throw new RepositoryUtil.MissingEntryException("Could not find parent:" + parentId);
+        }
+
         Entry entry = createEntryFromXml(request, node, parentEntry, files,
                                          checkAccess, internal);
         String tmpid = XmlUtil.getAttribute(node, ATTR_ID, (String) null);
@@ -5259,7 +5261,7 @@ public class EntryManager extends RepositoryManager {
         }
 
 
-        if (checkAccess) {
+        if (checkAccess && (parentEntry != null)) {
             if ( !getAccessManager().canDoAction(request, parentEntry,
                     Permission.ACTION_NEW)) {
                 if (getAccessManager().canDoAction(request, parentEntry,
@@ -8494,17 +8496,29 @@ public class EntryManager extends RepositoryManager {
                                    String lastGroupType,
                                    EntryInitializer initializer)
             throws Exception {
-        return findEntryFromName(request, name, user,
-                                 createIfNeeded,
-                                 lastGroupType,
-                                 null,  initializer);
+        return findEntryFromName(request, name, user, createIfNeeded,
+                                 lastGroupType, null, initializer);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param name _more_
+     * @param user _more_
+     * @param createIfNeeded _more_
+     * @param lastGroupType _more_
+     * @param templateEntry _more_
+     * @param initializer _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Entry findEntryFromName(Request request, String name, User user,
                                    boolean createIfNeeded,
-                                   String lastGroupType,
-                                   Entry templateEntry,
+                                   String lastGroupType, Entry templateEntry,
                                    EntryInitializer initializer)
             throws Exception {
         if (name == null) {
@@ -8679,7 +8693,8 @@ public class EntryManager extends RepositoryManager {
         group.setDate(date.getTime());
         if (template != null) {
             group.initWith(template);
-            getRepository().getMetadataManager().newEntry(group);
+            getRepository().getMetadataManager().initNewEntry(group,
+                    initializer);
         }
         group.setParentEntry(parent);
         group.setUser(user);

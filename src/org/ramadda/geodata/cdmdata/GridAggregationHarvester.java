@@ -206,6 +206,7 @@ public class GridAggregationHarvester extends PatternHarvester {
      *
      * @param entry _more_
      */
+    @Override
     public void initEntry(Entry entry) {
         super.initEntry(entry);
         if (entry.getType().equals(

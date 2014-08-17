@@ -80,7 +80,7 @@ import java.util.regex.*;
  *
  * @version $Revision: 1.3 $
  */
-public class PatternHarvester extends Harvester implements EntryInitializer {
+public class PatternHarvester extends Harvester /*implements EntryInitializer*/ {
 
     /** attribute id */
     public static final String ATTR_TYPE = "type";
@@ -193,12 +193,6 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param entry _more_
-     */
-    public void initEntry(Entry entry) {}
 
     /**
      * _more_
@@ -1082,6 +1076,15 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
         status.append("Done inserting entries<br>");
     }
 
+
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     */
+    public void initEntry(Entry entry) {}
+
+
     /**
      * _more_
      *
@@ -1120,14 +1123,24 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
                         + name, getUser(), false);
 
                 if (group == null) {
+                    String groupType = TypeHandler.TYPE_GROUP;
                     if (template != null) {
-                        //System.err.println("Template value[0] = " + template.getValue(0) + " value[1]: " + template.getValue(1));
-                    } else {
-                        //System.err.println("No template for: " + file);
+                        groupType = template.getType();
                     }
-                    group = getEntryManager().makeNewGroup(parentGroup, name,
-                            getUser(), template);
+                    final File       dirFile     = file;
+                    EntryInitializer initializer = new EntryInitializer() {
+                        @Override
+                        public File getMetadataFile(Entry entry,
+                                String fileArg) {
+                            File f = new File(dirFile.toString()
+                                         + File.separator + "." + fileArg);
 
+                            return f;
+                        }
+                    };
+                    //                    group = getEntryManager().makeNewGroup(parentGroup, name, getUser(), template);
+                    group = getEntryManager().makeNewGroup(parentGroup, name,
+                            getUser(), template, groupType, initializer);
                     //                    System.err.println("group value[0] = " + group.getValue(0) + " value[1]: " + group.getValue(1));
                 }
                 parentGroup = group;
@@ -1451,10 +1464,17 @@ public class PatternHarvester extends Harvester implements EntryInitializer {
             return null;
         }
 
-        boolean createIfNeeded = !getTestMode();
+        boolean                createIfNeeded = !getTestMode();
+        final PatternHarvester theHarvester   = this;
         Entry group = getEntryManager().findEntryFromName(getRequest(),
                           groupName, getUser(), createIfNeeded,
-                          getLastGroupType(), dirTemplateEntry, this);
+                          getLastGroupType(), dirTemplateEntry,
+                          new EntryInitializer() {
+            @Override
+            public void initEntry(Entry entry) {
+                theHarvester.initEntry(entry);
+            }
+        });
 
 
         if (group == null) {
