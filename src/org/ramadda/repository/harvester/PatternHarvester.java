@@ -82,6 +82,8 @@ import java.util.regex.*;
  */
 public class PatternHarvester extends Harvester /*implements EntryInitializer*/ {
 
+
+
     /** attribute id */
     public static final String ATTR_TYPE = "type";
 
@@ -760,7 +762,6 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
      * _more_
      *
      * @param rootDir _more_
-     * @param harvester _more_
      * @param topDirPattern _more_
      * @param timestamp _more_
      *
@@ -1129,6 +1130,11 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
                     }
                     final File       dirFile     = file;
                     EntryInitializer initializer = new EntryInitializer() {
+
+                        /**
+                         *  This returns the file for the metadata attachment for the entr
+                         *  Look for .<attachment file name>
+                         */
                         @Override
                         public File getMetadataFile(Entry entry,
                                 String fileArg) {
@@ -1138,10 +1144,8 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
                             return f;
                         }
                     };
-                    //                    group = getEntryManager().makeNewGroup(parentGroup, name, getUser(), template);
                     group = getEntryManager().makeNewGroup(parentGroup, name,
                             getUser(), template, groupType, initializer);
-                    //                    System.err.println("group value[0] = " + group.getValue(0) + " value[1]: " + group.getValue(1));
                 }
                 parentGroup = group;
             }
@@ -1204,7 +1208,7 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
     public Entry processFile(FileInfo fileInfo, File f) throws Exception {
 
         //check if its a hidden file
-        boolean isPlaceholder = f.getName().equals(".placeholder");
+        boolean isPlaceholder = f.getName().equals(FILE_PLACEHOLDER);
 
         if (f.getName().startsWith(".") && !isPlaceholder) {
             //            logHarvesterInfo("File is hidden file:" + f);
@@ -1263,7 +1267,7 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
     public Entry harvestFile(FileInfo fileInfo, File f, Matcher matcher)
             throws Exception {
 
-        boolean isPlaceholder = f.getName().equals(".placeholder");
+        boolean isPlaceholder = f.getName().equals(FILE_PLACEHOLDER);
         String  fileName      = f.toString();
         fileName = fileName.replace("\\", "/");
 

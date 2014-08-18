@@ -79,6 +79,10 @@ import java.util.regex.*;
  */
 public abstract class Harvester extends RepositoryManager {
 
+    /** _more_          */
+    public static final String FILE_PLACEHOLDER = ".placeholder";
+
+
     /** _more_ */
     private static final boolean PRINT_DEBUG = false;
 
@@ -169,10 +173,10 @@ public abstract class Harvester extends RepositoryManager {
     public static final String TYPE_FINDMATCH = "findmatch";
 
 
-    /** _more_          */
+    /** _more_ */
     protected long startTime;
 
-    /** _more_          */
+    /** _more_ */
     protected long endTime;
 
 

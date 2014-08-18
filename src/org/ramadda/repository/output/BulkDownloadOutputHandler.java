@@ -27,6 +27,8 @@ import org.ramadda.repository.Repository;
 import org.ramadda.repository.Request;
 import org.ramadda.repository.Result;
 import org.ramadda.repository.auth.AuthorizationMethod;
+import org.ramadda.repository.harvester.Harvester;
+
 
 import org.ramadda.util.HtmlUtils;
 
@@ -417,6 +419,8 @@ public class BulkDownloadOutputHandler extends OutputHandler {
         sb.append("fi\n");
         sb.append(cmd("cd " + qt(dirName)));
         if (includeGroupOutputs) {
+            //Make a .placeholder file so we force the harvest of the directory
+            sb.append(cmd("touch " + qt(Harvester.FILE_PLACEHOLDER)));
             for (List<String> pair : outputPairs) {
                 String output = pair.get(0);
                 String suffix = output;
