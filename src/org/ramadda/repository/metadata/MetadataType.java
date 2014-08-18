@@ -423,8 +423,6 @@ public class MetadataType extends MetadataTypeBase {
                     if (initializer != null) {
                         sourceFile = initializer.getMetadataFile(entry,
                                 fileArg);
-                        System.err.println("metadata file from initializer:"
-                                           + sourceFile);
                     }
                 }
                 if ((sourceFile == null) || !sourceFile.exists()) {
