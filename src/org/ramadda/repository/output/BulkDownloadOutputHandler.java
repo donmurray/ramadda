@@ -370,7 +370,6 @@ public class BulkDownloadOutputHandler extends OutputHandler {
                                           request), ARG_ENTRYID,
                                               entry.getId(), ARG_OUTPUT,
                                               output);
-                System.err.println("URL:" + extraUrl);
                 String destOutputFile = destFile + "." + suffix;
 
                 if (output.equals(XmlOutputHandler.OUTPUT_XMLENTRY.getId())) {
