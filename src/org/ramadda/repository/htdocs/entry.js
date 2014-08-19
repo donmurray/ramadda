@@ -284,7 +284,7 @@ function EntryTypeColumn(props) {
 function EntryType(props) {
     //Make the Columns
     var columns = props.columns;
-    if(columns == null) colunms = [];
+    if(columns == null) columns = [];
     var myColumns = [];
     for(var i=0;i<columns.length;i++) {
         myColumns.push(new EntryTypeColumn(columns[i]));
@@ -296,7 +296,7 @@ function EntryType(props) {
             getIsGroup: function() {return this.isgroup;},
             getIcon: function() {return this.icon;},
             getLabel: function() {return this.label;},
-            getId: function() {return this.type;},
+            getId: function() {return this.id;},
             getCategory: function() {return this.category;},
             getEntryCount: function() {return this.entryCount;},
             getColumns: function() {return this.columns;},

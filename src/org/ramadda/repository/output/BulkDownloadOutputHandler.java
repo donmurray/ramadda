@@ -433,11 +433,14 @@ public class BulkDownloadOutputHandler extends OutputHandler {
                                               entry.getId(), ARG_OUTPUT,
                                               output);
                 String destOutputFile = destFile + "." + suffix;
+
+                String message = "downloading " + destOutputFile;
                 if (output.equals(XmlOutputHandler.OUTPUT_XMLENTRY.getId())) {
                     destOutputFile = ".this.ramadda.xml";
                     appendDownloadMetadata(request, entry, sb, command);
+                    message = "downloading metadata for " +  dirName;
                 }
-                sb.append(cmd("echo " + qt("downloading " + destOutputFile)));
+                sb.append(cmd("echo " + qt(message)));
 
                 command.append(sb, destOutputFile, extraUrl);
             }

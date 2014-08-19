@@ -485,7 +485,7 @@ public class TypeHandler extends RepositoryManager {
      */
     public String getJson(Request request) throws Exception {
         List<String> items = new ArrayList<String>();
-        items.add("type");
+        items.add("id");
         items.add(Json.quote(getType()));
         items.add("entryCount");
         int cnt = getEntryUtil().getEntryCount(this);

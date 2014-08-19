@@ -230,8 +230,10 @@ public class JsonOutputHandler extends OutputHandler {
         Json.quoteAttr(items, "id", entry.getId());
         Json.quoteAttr(items, "name", entry.getName());
         Json.quoteAttr(items, "description", entry.getDescription());
-        String typeJson = entry.getTypeHandler().getJson(request);
+        TypeHandler type = entry.getTypeHandler();
+        String typeJson = type.getJson(request);
         //        Json.quoteAttr(items, "type", entry.getType());
+        typeJson = Json.mapAndQuote("id",type.getType(),"name",type.getLabel());
         Json.attr(items, "type", typeJson);
 
         //
