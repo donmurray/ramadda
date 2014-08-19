@@ -296,7 +296,10 @@ function EntryType(props) {
             getIsGroup: function() {return this.isgroup;},
             getIcon: function() {return this.icon;},
             getLabel: function() {return this.label;},
-            getId: function() {return this.id;},
+                getId: function() {
+                if(this.type!=null) return this.type;
+                return this.id;
+            },
             getCategory: function() {return this.category;},
             getEntryCount: function() {return this.entryCount;},
             getColumns: function() {return this.columns;},
