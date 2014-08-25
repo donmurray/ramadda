@@ -2356,7 +2356,7 @@ public class UserManager extends RepositoryManager {
                 request.url(getRepositoryBase().URL_USER_HOME);
 
             if (makePopup) {
-                prefix.append(HtmlUtils.href(settingsUrl, label));
+                prefix.append(HtmlUtils.href(settingsUrl, label, HtmlUtils.cssClass("ramadda-user-settings-link")));
                 prefix.append(HtmlUtils.space(2));
             } else {
                 extras.add("");
