@@ -9,7 +9,7 @@
 name=OU-Libraries
 id=oulibraries
 ramadda.template.userlink.popup=true
-ramadda.template.link.wrapper = <a class="headerlink" href="${url}">${label}</a>
+ramadda.template.link.wrapper = <a href="${url}"><span class="headerlink">${label}</span></a>
 ramadda.template.link.separator=<span class="headerseparator">&nbsp;|&nbsp;</span>
 </properties>
 
@@ -31,7 +31,11 @@ margin-right:4px;
 }
 
 .headerlink a {
-color: white;
+  color: white;
+}
+
+.headerlink a:link {
+  color: white;
 }
 
 .headerlink {
