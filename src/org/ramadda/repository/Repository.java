@@ -60,6 +60,7 @@ import org.ramadda.repository.type.Column;
 import org.ramadda.repository.type.GroupTypeHandler;
 import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.repository.util.ServerInfo;
+import org.ramadda.util.StreamEater;
 import org.ramadda.sql.Clause;
 import org.ramadda.sql.SqlUtil;
 import org.ramadda.util.HtmlUtils;
@@ -5493,70 +5494,6 @@ public class Repository extends RepositoryBase implements RequestHandler,
 
         return new String[] { outBuf.toString(), errorBuf.toString() };
 
-    }
-
-    /**
-     * Class to eat a stream
-     */
-    class StreamEater extends Thread {
-
-        /** the input stream */
-        private InputStream in;
-
-        /** The place to write the lines to */
-        private PrintWriter pw;
-
-        /** The type name (for debugging) */
-        private String type;
-
-        /**
-         * A class for reading lines from an input stream in a thread
-         *
-         * @param in  InputStream
-         * @param pw  the writer for the output
-         */
-        StreamEater(InputStream in, PrintWriter pw) {
-            this(in, pw, "StreamEater");
-        }
-
-        /**
-         * A class for reading lines from an input stream in a thread
-         *
-         * @param in  InputStream
-         * @param pw  the writer for the output
-         * @param type a string for debugging
-         */
-        StreamEater(InputStream in, PrintWriter pw, String type) {
-            this.in   = in;
-            this.pw   = pw;
-            this.type = type;
-        }
-
-        /**
-         * Run the eater
-         */
-        @Override
-        public void run() {
-            BufferedReader br = null;
-            try {
-                br = new BufferedReader(new InputStreamReader(in));
-                String line = null;
-                while ((line = br.readLine()) != null) {
-                    pw.println(line);
-                    //System.out.println(line);
-                }
-                //System.out.println("Done reading " + type);
-            } catch (Exception e) {
-                e.printStackTrace();
-            } finally {
-                try {
-                    br.close();
-                    in.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
     }
 
 
