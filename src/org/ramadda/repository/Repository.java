@@ -3101,15 +3101,25 @@ public class Repository extends RepositoryBase implements RequestHandler,
         if ( !apiMethod.isRequestOk(request, this)) {
             throw new AccessException(msg("Incorrect access"), request);
         }
-
-        Result result = (Result) apiMethod.invoke(request);
-        if (result == null) {
-            return null;
+        Result result = null;
+        try {
+            result = (Result) apiMethod.invoke(request);
+        } catch (Exception exc) {
+            Throwable inner = LogUtil.getInnerException(exc);
+            if (inner instanceof RepositoryUtil.MissingEntryException) {
+                result = new Result(
+                    msg("Error"),
+                    new StringBuilder(
+                        getPageHandler().showDialogError(
+                            msgLabel("Entry not found") + "\""
+                            + inner.getMessage() + "\"")));
+                result.setResponseCode(Result.RESPONSE_NOTFOUND);
+            } else {
+                throw exc;
+            }
         }
-        //        getLogManager().logRequest(request, result.getResponseCode());
 
         return result;
-
     }
 
 

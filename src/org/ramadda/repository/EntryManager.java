@@ -3790,7 +3790,7 @@ public class EntryManager extends RepositoryManager {
         String id    = toks.get(toks.size() - 1);
         Entry  entry = getEntry(request, id);
         if (entry == null) {
-            throw new IllegalArgumentException(
+            throw new RepositoryUtil.MissingEntryException(
                 "Could not find entry from id:" + id);
         }
 
