@@ -35,9 +35,10 @@ import org.ramadda.util.CategoryBuffer;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.JQuery;
 
+import org.ramadda.util.TempDir;
+
 import org.ramadda.util.WikiUtil;
 import org.ramadda.util.XmlUtils;
-
 
 import org.w3c.dom.Element;
 
@@ -2236,8 +2237,59 @@ public class OutputHandler extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getProductDirName() {
+        return "products";
+    }
 
 
+    /** _more_ */
+    private TempDir productDir;
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public File getProductDir() throws Exception {
+        if (productDir == null) {
+            TempDir tempDir =
+                getStorageManager().makeTempDir(getProductDirName());
+            //keep things around for 7 day  
+            tempDir.setMaxAge(1000 * 60 * 60 * 24 * 7);
+            productDir = tempDir;
+        }
+
+        return productDir.getDir();
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param jobId _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public File getWorkDir(Object jobId) throws Exception {
+        if (jobId == null) {
+            jobId = getRepository().getGUID();
+        }
+        File theProductDir = new File(IOUtil.joinDir(getProductDir(),
+                                 jobId.toString()));
+        IOUtil.makeDir(theProductDir);
+
+        return theProductDir;
+    }
 
 
 
