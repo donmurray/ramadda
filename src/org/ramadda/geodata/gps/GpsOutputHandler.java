@@ -33,7 +33,7 @@ import org.ramadda.util.HtmlUtils;
 
 import org.ramadda.util.HttpFormField;
 
-import org.ramadda.util.TempDir;
+
 
 import org.w3c.dom.*;
 
@@ -177,8 +177,6 @@ public class GpsOutputHandler extends OutputHandler {
     /** file path to the teqc executable */
     private String runPkrPath;
 
-    /** _more_ */
-    private TempDir productDir;
 
 
     /** The output type */
@@ -236,42 +234,6 @@ public class GpsOutputHandler extends OutputHandler {
         addType(OUTPUT_GPS_CONTROLPOINTS);
         teqcPath   = getProperty(PROP_TEQC, null);
         runPkrPath = getProperty(PROP_RUNPKR, null);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    private File getProductDir() throws Exception {
-        if (productDir == null) {
-            TempDir tempDir = getStorageManager().makeTempDir("gpsproducts");
-            //keep things around for 7 day  
-            tempDir.setMaxAge(1000 * 60 * 60 * 24 * 7);
-            productDir = tempDir;
-        }
-
-        return productDir.getDir();
-    }
-
-    /**
-     * _more_
-     *
-     * @param jobId _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    private File getWorkDir(Object jobId) throws Exception {
-        File theProductDir = new File(IOUtil.joinDir(getProductDir(),
-                                 jobId.toString()));
-        IOUtil.makeDir(theProductDir);
-
-        return theProductDir;
     }
 
 
@@ -702,7 +664,7 @@ public class GpsOutputHandler extends OutputHandler {
         boolean anyOK = false;
         sb.append(msgHeader("Results"));
         sb.append("<ul>");
-        String uniqueId = getRepository().getGUID();
+        Object uniqueId = getRepository().getGUID();
         File   workDir  = getWorkDir(uniqueId);
 
         Hashtable<String, Entry> fileToEntryMap = new Hashtable<String,
