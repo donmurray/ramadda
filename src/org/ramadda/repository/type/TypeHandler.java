@@ -90,6 +90,18 @@ import java.util.regex.Pattern;
  */
 public class TypeHandler extends RepositoryManager {
 
+    /** _more_          */
+    private String[] FIELDS_ENTRY = {
+        ARG_NAME, ARG_DESCRIPTION, ARG_RESOURCE, ARG_CATEGORY, ARG_DATE,
+        ARG_LOCATION
+    };
+
+    /** _more_          */
+    private String[] FIELDS_NOENTRY = { ARG_RESOURCE, ARG_NAME,
+                                        ARG_DESCRIPTION };
+
+
+
     /** _more_ */
     public static final RequestArgument REQUESTARG_NORTH =
         new RequestArgument("ramadda.arg.area.north");
@@ -614,6 +626,14 @@ public class TypeHandler extends RepositoryManager {
         return getEntryValues(entry)[index];
     }
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param columnName _more_
+     *
+     * @return _more_
+     */
     public Object getEntryValue(Entry entry, String columnName) {
         return null;
     }
@@ -3143,7 +3163,7 @@ public class TypeHandler extends RepositoryManager {
         addBasicToEntryForm(request, sb, parentEntry, entry, formInfo);
         addSpecialToEntryForm(request, sb, parentEntry, entry, formInfo);
 
-        if (request.getUser().getAdmin()
+        if ((entry != null) && request.getUser().getAdmin()
                 && okToShowInForm(entry, "owner", true)) {
             sb.append(formEntry(request, msgLabel("Owner"),
                                 HtmlUtils.input(ARG_USER_ID, ((entry != null)
@@ -3465,12 +3485,10 @@ public class TypeHandler extends RepositoryManager {
         }
 
 
-        String[] whatList = {
-            ARG_NAME, ARG_DESCRIPTION, ARG_RESOURCE, ARG_CATEGORY, ARG_DATE,
-            ARG_LOCATION
-        };
-
-        String domId;
+        String[] whatList = (entry == null)
+                            ? FIELDS_NOENTRY
+                            : FIELDS_ENTRY;
+        String   domId;
         for (String what : whatList) {
             if (what.equals(ARG_NAME)) {
                 if ( !forUpload && okToShowInForm(entry, ARG_NAME)) {
