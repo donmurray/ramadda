@@ -256,23 +256,13 @@ public class NCLOutputHandler extends OutputHandler {
         }
     }
 
-    /**
-     * Get the product directory
-     *
-     * @return  the directory
-     *
-     * @throws Exception  problem getting directory
-     */
-    private File getProductDir() throws Exception {
-        if (productDir == null) {
-            TempDir tempDir = getStorageManager().makeTempDir("nclproducts");
-            //keep things around for 1 hour
-            tempDir.setMaxAge(1000 * 60 * 60 * 1);
-            productDir = tempDir;
-        }
 
-        return productDir.getDir();
+    @Override
+    public int getProductDirTTLHours() {
+        return 1;
     }
+
+
 
     /**
      * Get the data output handler

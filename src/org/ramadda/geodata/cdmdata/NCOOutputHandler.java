@@ -271,23 +271,6 @@ public class NCOOutputHandler extends OutputHandler implements DataProcessProvid
 
 
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    private File getProductDir() throws Exception {
-        if (productDir == null) {
-            TempDir tempDir = getStorageManager().makeTempDir("ncoproducts");
-            //keep things around for 1 hour
-            tempDir.setMaxAge(1000 * 60 * 60 * 1);
-            productDir = tempDir;
-        }
-
-        return productDir.getDir();
-    }
 
 
 
@@ -482,6 +465,14 @@ public class NCOOutputHandler extends OutputHandler implements DataProcessProvid
                                       HtmlUtils.select(ARG_NCO_FORMAT,
                                           formats)));
     }
+
+    @Override
+    public int getProductDirTTLHours() {
+        return 1;
+    }
+
+
+
 
     /**
      * _more_
