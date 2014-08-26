@@ -651,7 +651,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_CANCEL = "cancel";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_EXECUTE = "execute";
 
     /** _more_ */
@@ -930,6 +930,21 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_MAXLON = "maxlon";
+
+    //These can be used as well for search and subset. They are defined in the repository.properties 
+
+    /** _more_ */
+    public static final String ARG_MAXLATITUDE = "maxlatitude";
+
+    /** _more_ */
+    public static final String ARG_MINLATITUDE = "minlatitude";
+
+    /** _more_ */
+    public static final String ARG_MAXLONGITUDE = "maxlongitude";
+
+    /** _more_ */
+    public static final String ARG_MINLONGITUDE = "minlongitude";
+
 
     /** _more_ */
     public static final String ARG_MESSAGE = "message";
