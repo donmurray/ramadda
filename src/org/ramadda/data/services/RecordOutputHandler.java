@@ -252,26 +252,6 @@ public class RecordOutputHandler extends OutputHandler implements RecordConstant
 
 
 
-    /**
-     * Creates the directory in the ramadda home dir where we write products to
-     * It sets up a scour so files older than 7 days get removed
-     *
-     * @return The product dir
-     *
-     * @throws Exception On badness
-     */
-    public File getProductDir() throws Exception {
-        if (productDir == null) {
-            TempDir tempDir =
-                getStorageManager().makeTempDir(getProductDirName());
-            //keep things around for 7 day
-            int days = getProductDirTTL();
-            tempDir.setMaxAge(1000 * 60 * 60 * 24 * days);
-            productDir = tempDir;
-        }
-
-        return productDir.getDir();
-    }
 
     /**
      * _more_
@@ -291,13 +271,8 @@ public class RecordOutputHandler extends OutputHandler implements RecordConstant
         return "record";
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public int getProductDirTTL() {
-        return getRepository().getProperty(PROP_TTL, 7);
+    public int getProductDirTTLHours() {
+        return getRepository().getProperty(PROP_TTL, 7)*24;
     }
 
 
