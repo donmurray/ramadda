@@ -2263,11 +2263,20 @@ public class OutputHandler extends RepositoryManager {
             TempDir tempDir =
                 getStorageManager().makeTempDir(getProductDirName());
             //keep things around for 7 day  
-            tempDir.setMaxAge(1000 * 60 * 60 * 24 * 7);
+            tempDir.setMaxAge(1000 * 60 * 60 * getProductDirTTLHours());
             productDir = tempDir;
         }
 
         return productDir.getDir();
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public int getProductDirTTLHours() {
+        return 24 * 7;
     }
 
 
