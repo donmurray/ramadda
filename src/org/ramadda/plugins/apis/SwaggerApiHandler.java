@@ -364,7 +364,7 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                                        "data.gridaspoint", true));
 
 
-        parameters.add(SU.getParameter(ARG_VARIABLE, "Variable", null, true));
+        parameters.add(SU.getParameter(ARG_VARIABLE, "Comma separated list of grid variables", null, true));
         parameters.add(SU.getParameter("format", "Format", null, true,
                                        SU.TYPE_STRING, formats));
 
