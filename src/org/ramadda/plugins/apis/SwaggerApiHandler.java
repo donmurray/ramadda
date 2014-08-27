@@ -313,8 +313,11 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
 
         parameters.add(SU.getParameter(ARG_ENTRYID, "Entry ID", null, true));
 
+        List<String> formats = new ArrayList<String>();
+        formats.add("points.json");
+        formats.add("points.csv");
         parameters.add(SU.getParameter(RecordConstants.ARG_PRODUCT,
-                                       "Product type", null, true));
+                                       "Product type", "points.json", true,SU.TYPE_STRING, formats));
 
         parameters.add(SU.getParameter(RecordConstants.ARG_ASYNCH,
                                        "Asynchronous", null, false,
@@ -325,10 +328,21 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                                        "Skip factor", null, false,
                                        SU.TYPE_INTEGER));
 
+        parameters.add(SU.getParameter(ARG_MAXLATITUDE,
+                                       "Northern bounds", null, false, SU.TYPE_FLOAT ));
+        parameters.add(SU.getParameter(ARG_MINLONGITUDE,
+                                       "Western bounds", null, false, SU.TYPE_FLOAT ));
+        parameters.add(SU.getParameter(ARG_MINLATITUDE,
+                                       "Southern bounds", null, false, SU.TYPE_FLOAT ));
+        parameters.add(SU.getParameter(ARG_MAXLONGITUDE,
+                                       "Eastern bounds", null, false, SU.TYPE_FLOAT ));
+
+        /*
         parameters.add(SU.getParameter(ARG_AREA_NORTH, "Northern bounds"));
         parameters.add(SU.getParameter(ARG_AREA_WEST, "Western bounds"));
         parameters.add(SU.getParameter(ARG_AREA_SOUTH, "Southern bounds"));
         parameters.add(SU.getParameter(ARG_AREA_EAST, "Eastern bounds"));
+        */
 
         List<String> operations = new ArrayList<String>();
         operations.add(Json.map(SU.createOperation("Point data API",
