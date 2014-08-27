@@ -316,6 +316,10 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         List<String> formats = new ArrayList<String>();
         formats.add("points.json");
         formats.add("points.csv");
+        parameters.add(SU.getParameter(ARG_OUTPUT, "Output type  -don't change",
+                                       "points.product", true));
+
+
         parameters.add(SU.getParameter(RecordConstants.ARG_PRODUCT,
                                        "Product type", "points.json", true,SU.TYPE_STRING, formats));
 
@@ -350,7 +354,7 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                 new ArrayList<String>())));
 
         return Json.map(SU.createApi(getRepository().getUrlBase()
-                                     + "/point/data", operations));
+                                     + "/entry/show", operations));
     }
 
 
