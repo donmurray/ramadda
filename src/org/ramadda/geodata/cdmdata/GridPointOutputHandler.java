@@ -289,12 +289,21 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
 
         List<String> varNames = new ArrayList<String>();
         Hashtable    args     = request.getArgs();
+        //Look for both variable.<varname>=true  and variable=<varname> url arguments
         for (Enumeration keys = args.keys(); keys.hasMoreElements(); ) {
             String arg = (String) keys.nextElement();
             if (arg.startsWith(VAR_PREFIX) && request.get(arg, false)) {
                 varNames.add(arg.substring(VAR_PREFIX.length()));
             }
         }
+
+        List<String> selectedVars = request.get(ARG_VARIABLE,
+                                        new ArrayList<String>());
+        //Support a comma separated list
+        for (String var : selectedVars) {
+            varNames.addAll(StringUtil.split(var, ",", true, true));
+        }
+
 
         //For now add either the 2d or the 3d vars
         if (varNames.size() == 0) {
@@ -391,23 +400,32 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
         } else {
             // modelled after thredds.server.ncSubset.controller.PointDataController
             try {
-                return processPointRequest(request, entry,  gds, varNames,  llp, dates, allDates );
-            } catch(Exception exc) {
-                if(request.getString(CdmConstants.ARG_FORMAT,
-                                     SupportedFormat.NETCDF3.toString()).equals(FORMAT_JSON)) {
+                return processPointRequest(request, entry, gds, varNames,
+                                           llp, dates, allDates);
+            } catch (Exception exc) {
+                if (request.getString(
+                        CdmConstants.ARG_FORMAT,
+                        SupportedFormat.NETCDF3.toString()).equals(
+                            FORMAT_JSON)) {
                     String message = "Error extracting data:" + exc;
-                    String code = "error";
-                    if(exc instanceof java.lang.ArrayIndexOutOfBoundsException && Misc.getStackTrace(exc).indexOf("ucar.nc2.dataset.CoordinateAxis1D.getCoordValue") >=0) {
-                        message = "Spatial coordinates are outside the domain of the data";
-                        code="spatial";
+                    String code    = "error";
+                    if ((exc instanceof java.lang.ArrayIndexOutOfBoundsException)
+                            && (Misc.getStackTrace(exc).indexOf(
+                                "ucar.nc2.dataset.CoordinateAxis1D.getCoordValue") >= 0)) {
+                        message =
+                            "Spatial coordinates are outside the domain of the data";
+                        code = "spatial";
                     }
                     //                    exc.printStackTrace();
                     StringBuffer json = new StringBuffer();
-                    json.append(Json.map("error",Json.quote(message),"errorcode", Json.quote(code)));
+                    json.append(Json.map("error", Json.quote(message),
+                                         "errorcode", Json.quote(code)));
                     Result result = new Result("", json, Json.MIMETYPE);
+
                     //                    result.setResponseCode(Result.RESPONSE_INTERNALERROR);
                     return result;
                 }
+
                 throw exc;
             }
         }
@@ -543,7 +561,8 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
                     recordField.setChartable(true);
                     fields.add(recordField);
                 }
-                RecordField.addJsonHeader(bw, entry.getName(), fields, false,false);
+                RecordField.addJsonHeader(bw, entry.getName(), fields, false,
+                                          false);
 
                 String  line        = null;
                 int     cnt         = 0;
@@ -905,18 +924,19 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
                 }
             }
 
-            sbToUse.append(
-                HtmlUtils.row(
-                    HtmlUtils.cols(
-                        HtmlUtils.checkbox(
-                            ARG_VARIABLE + "." + var.getShortName(),
-                            HtmlUtils.VALUE_TRUE, (grids.size() == 1),
-                            HtmlUtils.id(cbxId) + call) + HtmlUtils.space(1)
-                                + var.getShortName() + HtmlUtils.space(1)
-                                + ((var.getUnitsString() != null)
-                                   ? "(" + var.getUnitsString() + ")"
-                                   : ""), "<i>" + var.getDescription()
-                                          + "</i>")));
+            sbToUse.append(HtmlUtils.row(HtmlUtils.cols(HtmlUtils.checkbox(
+            //                            ARG_VARIABLE + "." + var.getShortName(),
+            ARG_VARIABLE,
+            /*HtmlUtils.VALUE_TRUE,*/
+            var.getShortName(), (grids.size() == 1),
+                                HtmlUtils.id(cbxId)
+                                + call) + HtmlUtils.space(1)
+                                        + var.getShortName()
+                                        + HtmlUtils.space(1)
+                                        + ((var.getUnitsString() != null)
+                                           ? "(" + var.getUnitsString() + ")"
+                                           : ""), "<i>"
+                                           + var.getDescription() + "</i>")));
 
         }
         if (varSB2D.length() > 0) {
