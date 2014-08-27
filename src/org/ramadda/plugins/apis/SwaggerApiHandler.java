@@ -280,13 +280,13 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
 
 
         parameters.add(SU.getParameter(ARG_MAXLATITUDE,
-                                       "Northern bounds of search"));
+                                       "Northern bounds of search", null, false, SU.TYPE_FLOAT ));
         parameters.add(SU.getParameter(ARG_MINLONGITUDE,
-                                       "Western bounds of search"));
+                                       "Western bounds of search", null, false, SU.TYPE_FLOAT ));
         parameters.add(SU.getParameter(ARG_MINLATITUDE,
-                                       "Southern bounds of search"));
+                                       "Southern bounds of search", null, false, SU.TYPE_FLOAT ));
         parameters.add(SU.getParameter(ARG_MAXLONGITUDE,
-                                       "Eastern bounds of search"));
+                                       "Eastern bounds of search", null, false, SU.TYPE_FLOAT ));
 
         parameters.add(SU.getParameter(ARG_MAX, "Max number of results",
                                        null, false, SU.TYPE_INTEGER));
@@ -369,13 +369,13 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                                        SU.TYPE_STRING, formats));
 
         parameters.add(SU.getParameter(ARG_LOCATION_LATITUDE, "Latitude",
-                                       null, true));
+                                       null, true, SU.TYPE_FLOAT ));
         parameters.add(SU.getParameter(ARG_LOCATION_LONGITUDE, "Longitude",
-                                       null, true));
+                                       null, true, SU.TYPE_FLOAT ));
 
         parameters.add(SU.getParameter(ARG_FROMDATE, "From Date", null,
-                                       false));
-        parameters.add(SU.getParameter(ARG_TODATE, "To Date", null, false));
+                                       false, SU.TYPE_DATETIME));
+        parameters.add(SU.getParameter(ARG_TODATE, "To Date", null, false, SU.TYPE_DATETIME));
 
         List<String> operations = new ArrayList<String>();
         operations.add(Json.map(SU.createOperation("Grid point data API",
