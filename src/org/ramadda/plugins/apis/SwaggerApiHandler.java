@@ -21,9 +21,10 @@
 package org.ramadda.plugins.apis;
 
 
-import org.ramadda.repository.*;
-
 import org.ramadda.data.services.RecordConstants;
+
+
+import org.ramadda.repository.*;
 import org.ramadda.repository.type.*;
 import org.ramadda.repository.util.DateArgument;
 import org.ramadda.util.HtmlUtils;
@@ -87,6 +88,7 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         //        request.setResultFilename("ramaddaswagger.json");
         Result result = new Result("", json, Json.MIMETYPE);
         request.setCORSHeaderOnResponse();
+
         return result;
     }
 
@@ -124,6 +126,10 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         int          cnt  = 0;
         apis.add(Json.map(SU.ATTR_PATH, Json.quote("/point"),
                           SU.ATTR_DESCRIPTION, Json.quote("Point data API")));
+
+        apis.add(Json.map(SU.ATTR_PATH, Json.quote("/gridaspoint"),
+                          SU.ATTR_DESCRIPTION,
+                          Json.quote("Grid point data API")));
 
         for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
             if ( !typeHandler.getForUser()) {
@@ -212,7 +218,7 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                     type = SU.TYPE_INTEGER;
                 }
                 parameters.add(SU.getParameter(column.getSearchArg(),
-                        column.getLabel(), false, type));
+                        column.getLabel(), null, false, type));
             }
         }
 
@@ -249,23 +255,23 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         parameters.add(SU.getParameter(ARG_DESCRIPTION,
                                        "Search description"));
 
-        parameters.add(SU.getParameter(ARG_FROMDATE, "From date", false,
-                                       SU.TYPE_DATETIME));
-        parameters.add(SU.getParameter(ARG_TODATE, "To date", false,
+        parameters.add(SU.getParameter(ARG_FROMDATE, "From date", null,
+                                       false, SU.TYPE_DATETIME));
+        parameters.add(SU.getParameter(ARG_TODATE, "To date", null, false,
                                        SU.TYPE_DATETIME));
 
         parameters.add(SU.getParameter(DateArgument.ARG_CREATE.getFromArg(),
-                                       "Archive create date from", false,
-                                       SU.TYPE_DATETIME));
+                                       "Archive create date from", null,
+                                       false, SU.TYPE_DATETIME));
         parameters.add(SU.getParameter(DateArgument.ARG_CREATE.getToArg(),
-                                       "Archive create date to", false,
+                                       "Archive create date to", null, false,
                                        SU.TYPE_DATETIME));
 
         parameters.add(SU.getParameter(DateArgument.ARG_CHANGE.getFromArg(),
-                                       "Archive change date from", false,
-                                       SU.TYPE_DATETIME));
+                                       "Archive change date from", null,
+                                       false, SU.TYPE_DATETIME));
         parameters.add(SU.getParameter(DateArgument.ARG_CHANGE.getToArg(),
-                                       "Archive change date to", false,
+                                       "Archive change date to", null, false,
                                        SU.TYPE_DATETIME));
 
 
@@ -273,19 +279,19 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         parameters.add(SU.getParameter(ARG_FILESUFFIX, "File suffix"));
 
 
-        parameters.add(SU.getParameter(ARG_AREA_NORTH,
+        parameters.add(SU.getParameter(ARG_MAXLATITUDE,
                                        "Northern bounds of search"));
-        parameters.add(SU.getParameter(ARG_AREA_WEST,
+        parameters.add(SU.getParameter(ARG_MINLONGITUDE,
                                        "Western bounds of search"));
-        parameters.add(SU.getParameter(ARG_AREA_SOUTH,
+        parameters.add(SU.getParameter(ARG_MINLATITUDE,
                                        "Southern bounds of search"));
-        parameters.add(SU.getParameter(ARG_AREA_EAST,
+        parameters.add(SU.getParameter(ARG_MAXLONGITUDE,
                                        "Eastern bounds of search"));
 
         parameters.add(SU.getParameter(ARG_MAX, "Max number of results",
+                                       null, false, SU.TYPE_INTEGER));
+        parameters.add(SU.getParameter(ARG_SKIP, "Number to skip", null,
                                        false, SU.TYPE_INTEGER));
-        parameters.add(SU.getParameter(ARG_SKIP, "Number to skip", false,
-                                       SU.TYPE_INTEGER));
     }
 
 
@@ -305,29 +311,24 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
     private String getPointApi(Request request) throws Exception {
         List<String> parameters = new ArrayList<String>();
 
-        parameters.add(SU.getParameter(ARG_ENTRYID, "Entry ID", true));
+        parameters.add(SU.getParameter(ARG_ENTRYID, "Entry ID", null, true));
 
         parameters.add(SU.getParameter(RecordConstants.ARG_PRODUCT,
-                                       "Product type", true));
+                                       "Product type", null, true));
 
         parameters.add(SU.getParameter(RecordConstants.ARG_ASYNCH,
-                                       "Asynchronous", false,
+                                       "Asynchronous", null, false,
                                        SU.TYPE_BOOLEAN));
 
 
         parameters.add(SU.getParameter(RecordConstants.ARG_SKIP,
-                                       "Skip factor", false,
+                                       "Skip factor", null, false,
                                        SU.TYPE_INTEGER));
 
-
-        parameters.add(SU.getParameter(ARG_AREA_NORTH,
-                                       "Northern bounds of search"));
-        parameters.add(SU.getParameter(ARG_AREA_WEST,
-                                       "Western bounds of search"));
-        parameters.add(SU.getParameter(ARG_AREA_SOUTH,
-                                       "Southern bounds of search"));
-        parameters.add(SU.getParameter(ARG_AREA_EAST,
-                                       "Eastern bounds of search"));
+        parameters.add(SU.getParameter(ARG_AREA_NORTH, "Northern bounds"));
+        parameters.add(SU.getParameter(ARG_AREA_WEST, "Western bounds"));
+        parameters.add(SU.getParameter(ARG_AREA_SOUTH, "Southern bounds"));
+        parameters.add(SU.getParameter(ARG_AREA_EAST, "Eastern bounds"));
 
         List<String> operations = new ArrayList<String>();
         operations.add(Json.map(SU.createOperation("Point data API",
@@ -336,6 +337,53 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
 
         return Json.map(SU.createApi(getRepository().getUrlBase()
                                      + "/point/data", operations));
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private String getGridAsPointApi(Request request) throws Exception {
+        List<String> parameters = new ArrayList<String>();
+
+        parameters.add(SU.getParameter(ARG_ENTRYID, "Entry ID", null, true));
+
+        List<String> formats = new ArrayList<String>();
+        formats.add("csv");
+        formats.add("kml");
+        formats.add("json");
+
+
+        parameters.add(SU.getParameter(ARG_OUTPUT, "Variable",
+                                       "data.gridaspoint", true));
+
+
+        parameters.add(SU.getParameter(ARG_VARIABLE, "Variable", null, true));
+        parameters.add(SU.getParameter("format", "Format", null, true,
+                                       SU.TYPE_STRING, formats));
+
+        parameters.add(SU.getParameter(ARG_LOCATION_LATITUDE, "Latitude",
+                                       null, true));
+        parameters.add(SU.getParameter(ARG_LOCATION_LONGITUDE, "Longitude",
+                                       null, true));
+
+        parameters.add(SU.getParameter(ARG_FROMDATE, "From Date", null,
+                                       false));
+        parameters.add(SU.getParameter(ARG_TODATE, "To Date", null, false));
+
+        List<String> operations = new ArrayList<String>();
+        operations.add(Json.map(SU.createOperation("Grid point data API",
+                "API to extract time series from gridded  data",
+                "gridaspointdata", parameters, new ArrayList<String>())));
+
+        return Json.map(SU.createApi(getRepository().getUrlBase()
+                                     + "/entry/show", operations));
     }
 
 
@@ -357,6 +405,29 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                                              + "/point/data", new String[] {
                                                  "application/json",
                 "text/csv" }, apis);
+
+        return returnJson(request, new StringBuffer(Json.map(doc)));
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result processSwaggerGridAsPointRequest(Request request)
+            throws Exception {
+        List<String> apis = new ArrayList<String>();
+        apis.add(getGridAsPointApi(request));
+        //This is the api from the geodata/cdmdata plugin
+        List<String> doc = SU.createDocument(request.getAbsoluteUrl(""),
+                                             getRepository().getUrlBase()
+                                             + "/grid/json", new String[] {
+                                                 "application/json" }, apis);
 
         return returnJson(request, new StringBuffer(Json.map(doc)));
     }

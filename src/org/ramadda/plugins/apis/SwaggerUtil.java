@@ -44,6 +44,9 @@ public class SwaggerUtil {
     /** _more_ */
     public static final String ATTR_API_VERSION = "apiVersion";
 
+    /** _more_          */
+    public static final String ATTR_ALLOWABLEVALUES = "allowableValues";
+
     /** _more_ */
     public static final String ATTR_SWAGGER_VERSION = "swaggerVersion";
 
@@ -59,6 +62,9 @@ public class SwaggerUtil {
 
     /** _more_ */
     public static final String ATTR_DESCRIPTION = "description";
+
+    /** _more_          */
+    public static final String ATTR_DEFAULTVALUE = "defaultValue";
 
     /** _more_ */
     public static final String ATTR_SUMMARY = "summary";
@@ -143,19 +149,6 @@ public class SwaggerUtil {
     /** _more_ */
     public static final String TYPE_DATETIME = "dateTime";
 
-
-
-    /**
-     * _more_
-     *
-     * @param name _more_
-     * @param description _more_
-     *
-     * @return _more_
-     */
-    public static String getParameter(String name, String description) {
-        return getParameter(name, description, false);
-    }
 
 
 
@@ -285,13 +278,11 @@ public class SwaggerUtil {
      *
      * @param name _more_
      * @param description _more_
-     * @param required _more_
      *
      * @return _more_
      */
-    public static String getParameter(String name, String description,
-                                      boolean required) {
-        return getParameter(name, description, required, TYPE_STRING);
+    public static String getParameter(String name, String description) {
+        return getParameter(name, description, null, false);
     }
 
     /**
@@ -300,16 +291,88 @@ public class SwaggerUtil {
      * @param name _more_
      * @param description _more_
      * @param required _more_
+     *
+     * @return _more_
+     */
+    public static String getParameter(String name, String description,
+                                      boolean required) {
+        return getParameter(name, description, null, required);
+    }
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param description _more_
+     * @param dflt _more_
+     * @param required _more_
+     *
+     * @return _more_
+     */
+    public static String getParameter(String name, String description,
+                                      String dflt, boolean required) {
+        return getParameter(name, description, dflt, required, TYPE_STRING);
+    }
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param description _more_
+     * @param dflt _more_
+     * @param required _more_
      * @param type _more_
      *
      * @return _more_
      */
     public static String getParameter(String name, String description,
-                                      boolean required, String type) {
-        return Json.map(ATTR_NAME, Json.quote(name), ATTR_DESCRIPTION,
-                        Json.quote(description), ATTR_REQUIRED,
-                        "" + required, ATTR_TYPE, Json.quote(type),
-                        ATTR_PARAMTYPE, Json.quote("query"));
+                                      String dflt, boolean required,
+                                      String type) {
+        return getParameter(name, description, dflt, required, type, null);
+    }
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param description _more_
+     * @param dflt _more_
+     * @param required _more_
+     * @param type _more_
+     * @param values _more_
+     *
+     * @return _more_
+     */
+    public static String getParameter(String name, String description,
+                                      String dflt, boolean required,
+                                      String type, List<String> values) {
+        List<String> mapItems = new ArrayList<String>();
+        mapItems.add(ATTR_NAME);
+        mapItems.add(Json.quote(name));
+        mapItems.add(ATTR_DESCRIPTION);
+        mapItems.add(Json.quote(description));
+        mapItems.add(ATTR_TYPE);
+        mapItems.add(Json.quote(type));
+        if (dflt != null) {
+            mapItems.add(ATTR_DEFAULTVALUE);
+            mapItems.add(Json.quote(dflt));
+        }
+
+        mapItems.add(ATTR_REQUIRED);
+        mapItems.add("" + required);
+        mapItems.add(ATTR_PARAMTYPE);
+        mapItems.add(Json.quote("query"));
+        if (values != null) {
+            mapItems.add(ATTR_ALLOWABLEVALUES);
+            mapItems.add(Json.map("valueType", Json.quote("LIST"), "values",
+                                  Json.list(values, true)));
+        }
+
+        return Json.map(mapItems);
+
     }
 
 
