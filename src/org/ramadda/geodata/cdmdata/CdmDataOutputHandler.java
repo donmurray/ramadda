@@ -27,6 +27,7 @@ import opendap.servlet.GuardedDataset;
 import opendap.servlet.ReqState;
 
 
+
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Link;
 import org.ramadda.repository.PageHandler;
@@ -43,6 +44,7 @@ import org.ramadda.repository.output.OutputHandler;
 import org.ramadda.repository.output.OutputType;
 import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.SelectionRectangle;
 
 import org.w3c.dom.Element;
 
@@ -129,7 +131,8 @@ import javax.servlet.http.HttpServletRequest;
  */
 public class CdmDataOutputHandler extends OutputHandler implements CdmConstants {
 
-    private static final boolean debug = true;
+    /** _more_          */
+    private static final boolean debug = false;
 
 
     /** set of suffixes */
@@ -192,7 +195,6 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
     /** Grid subset Output Type */
     public static final OutputType OUTPUT_GRIDSUBSET =
         new OutputType("data.gridsubset", OutputType.TYPE_FEEDS);
-
 
 
     /** opendap counter */
@@ -669,18 +671,16 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
                 }
             }
 
-            sbToUse.append(
-                HtmlUtils.row(
-                    HtmlUtils.cols(
-                        HtmlUtils.checkbox(
-                            ARG_VARIABLE + "." + var.getShortName(),
-                            HtmlUtils.VALUE_TRUE, (grids.size() == 1),
-                            HtmlUtils.id(cbxId) + call) + HtmlUtils.space(1)
-                                + var.getShortName() + HtmlUtils.space(1)
-                                + ((var.getUnitsString() != null)
-                                   ? "(" + var.getUnitsString() + ")"
-                                   : ""), "<i>" + var.getDescription()
-                                          + "</i>")));
+            sbToUse.append(HtmlUtils.row(HtmlUtils.cols(HtmlUtils.checkbox(
+            //ARG_VARIABLE + "." + var.getShortName(),
+            ARG_VARIABLE, var.getShortName() /*HtmlUtils.VALUE_TRUE*/,
+                          (grids.size() == 1),
+                          HtmlUtils.id(cbxId) + call) + HtmlUtils.space(1)
+                              + var.getShortName() + HtmlUtils.space(1)
+                              + ((var.getUnitsString() != null)
+                                 ? "(" + var.getUnitsString() + ")"
+                                 : ""), "<i>" + var.getDescription()
+                                        + "</i>")));
 
         }
         if (varSB2D.length() > 0) {
@@ -885,8 +885,19 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
                 varNames.add(arg.substring(VAR_PREFIX.length()));
             }
         }
+
+
+        for (String v :
+                (List<String>) request.get(ARG_VARIABLE,
+                                           new ArrayList<String>())) {
+            varNames.addAll(StringUtil.split(v, ",", true, true));
+        }
+
+        //        System.err.println("vars:" + varNames);
+
+
         //            System.err.println(varNames);
-        GridDataset       gds = getCdmManager().getGridDataset(entry, path);
+        GridDataset gds = getCdmManager().getGridDataset(entry, path);
         // initialize the bounds and date range to the defaults
         LatLonRect        llr                 = gds.getBoundingBox();
         CalendarDateRange cdr                 = gds.getCalendarDateRange();
@@ -910,7 +921,13 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
             }
         }
 
-        if (haveAllSpatialArgs && anySpatialDifferent) {
+        SelectionRectangle bbox = TypeHandler.getSelectionBounds(request);
+
+        if (bbox.allDefined()) {
+            llr = new LatLonRect(new LatLonPointImpl(bbox.getNorth(),
+                    bbox.getWest()), new LatLonPointImpl(bbox.getSouth(),
+                        bbox.getEast()));
+        } else if (haveAllSpatialArgs && anySpatialDifferent) {
             llr = new LatLonRect(
                 new LatLonPointImpl(
                     request.getLatOrLonValue(ARG_AREA_NORTH, 90.0), request
@@ -985,8 +1002,9 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
             File f = getRepository().getStorageManager().getTmpFile(request,
                          "subset" + ncVersion.getSuffix());
 
-            if(debug) {
-                System.err.println("CdmData.subset: " + " vars:" + varNames +" llr:" + llr);
+            if (debug) {
+                System.err.println("CdmData.subset: " + " vars:" + varNames
+                                   + " llr:" + llr);
             }
 
             writer.makeFile(f.toString(), gds, varNames, llr, hStride,
