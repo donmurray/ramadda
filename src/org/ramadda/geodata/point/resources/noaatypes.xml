@@ -5,6 +5,7 @@ all point types need to have numberoofpoints and properties fields
 this gets it from the type_point super class
 --> 
   <type name="type_point_noaa"  description="" super="type_point" category="Point Data" foruser="false">
+     <property name="icon" value="/point/noaa.gif"/>
   </type>
 
 
@@ -16,7 +17,6 @@ this gets it from the type_point super class
 
 
   <type name="type_point_noaa_carbon"  super="type_point_noaa" description="NOAA Carbon Measurements"  handler="org.ramadda.data.services.PointTypeHandler">
-     <property name="icon" value="/point/noaa.gif"/>
 
      <property name="record.file.class" value="org.ramadda.data.point.noaa.NoaaCarbonPointFile"/>
      <column  name="site_id"  type="enumerationplus" label="Site ID" cansearch="true"/>
@@ -50,7 +50,21 @@ this gets it from the type_point super class
   </type>
 
 
-  <type name="type_point_ncdc_climate"  super="type_point_noaa" description="NCDC Climate Data"  handler="org.ramadda.data.services.PointTypeHandler">
+  <type name="type_point_noaa_madis"  super="type_point_noaa" description="NOAA MADIS Point Data"  handler="org.ramadda.data.services.PointTypeHandler">
+     <property name="record.file.class" value="org.ramadda.data.point.netcdf.NetcdfPointFile"/>
+     <property name="icon" value="/point/noaa.gif"/>
+<!--
+     <property name="record.file.class" value="org.ramadda.data.point.noaa.NoaaTowerPointFile"/>
+     <column  name="site_id"  type="enumerationplus" label="Site ID" cansearch="true"/>
+-->
+  </type>
+
+
+
+
+  <type name="type_point_ncdc_climate"  super="type_point_noaa" description="NC
+
+DC Climate Data"  handler="org.ramadda.data.services.PointTypeHandler">
      <property name="record.file.class" value="org.ramadda.data.point.noaa.NcdcClimatePointFile"/>
   </type>
 
