@@ -44,7 +44,7 @@ public class SwaggerUtil {
     /** _more_ */
     public static final String ATTR_API_VERSION = "apiVersion";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ALLOWABLEVALUES = "allowableValues";
 
     /** _more_ */
@@ -63,7 +63,7 @@ public class SwaggerUtil {
     /** _more_ */
     public static final String ATTR_DESCRIPTION = "description";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_DEFAULTVALUE = "defaultValue";
 
     /** _more_ */
@@ -228,6 +228,26 @@ public class SwaggerUtil {
     public static List<String> createOperation(String summary, String notes,
             String nickname, List<String> parameters,
             List<String> responseMessages) {
+        return createOperation(summary, notes, nickname, parameters,
+                               responseMessages, null);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param summary _more_
+     * @param notes _more_
+     * @param nickname _more_
+     * @param parameters _more_
+     * @param responseMessages _more_
+     * @param produces _more_
+     *
+     * @return _more_
+     */
+    public static List<String> createOperation(String summary, String notes,
+            String nickname, List<String> parameters,
+            List<String> responseMessages, String[] produces) {
         List<String> operation = new ArrayList<String>();
         initOperation(operation, summary, notes, nickname);
         operation.add(ATTR_RESPONSEMESSAGES);
@@ -235,6 +255,10 @@ public class SwaggerUtil {
         operation.add(ATTR_PARAMETERS);
         operation.add(Json.list(parameters));
 
+        if (produces != null) {
+            operation.add(ATTR_PRODUCES);
+            operation.add(Json.list(Misc.toList(produces), true));
+        }
 
         return operation;
     }

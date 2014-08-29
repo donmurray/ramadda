@@ -131,6 +131,10 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                           SU.ATTR_DESCRIPTION,
                           Json.quote("Grid point data API")));
 
+        apis.add(Json.map(SU.ATTR_PATH, Json.quote("/gridsubset"),
+                          SU.ATTR_DESCRIPTION,
+                          Json.quote("Grid subset API")));
+
         for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
             if ( !typeHandler.getForUser()) {
                 continue;
@@ -280,13 +284,17 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
 
 
         parameters.add(SU.getParameter(ARG_MAXLATITUDE,
-                                       "Northern bounds of search", null, false, SU.TYPE_FLOAT ));
+                                       "Northern bounds of search", null,
+                                       false, SU.TYPE_FLOAT));
         parameters.add(SU.getParameter(ARG_MINLONGITUDE,
-                                       "Western bounds of search", null, false, SU.TYPE_FLOAT ));
+                                       "Western bounds of search", null,
+                                       false, SU.TYPE_FLOAT));
         parameters.add(SU.getParameter(ARG_MINLATITUDE,
-                                       "Southern bounds of search", null, false, SU.TYPE_FLOAT ));
+                                       "Southern bounds of search", null,
+                                       false, SU.TYPE_FLOAT));
         parameters.add(SU.getParameter(ARG_MAXLONGITUDE,
-                                       "Eastern bounds of search", null, false, SU.TYPE_FLOAT ));
+                                       "Eastern bounds of search", null,
+                                       false, SU.TYPE_FLOAT));
 
         parameters.add(SU.getParameter(ARG_MAX, "Max number of results",
                                        null, false, SU.TYPE_INTEGER));
@@ -316,12 +324,14 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         List<String> formats = new ArrayList<String>();
         formats.add("points.json");
         formats.add("points.csv");
-        parameters.add(SU.getParameter(ARG_OUTPUT, "Output type  -don't change",
+        parameters.add(SU.getParameter(ARG_OUTPUT,
+                                       "Output type  -don't change",
                                        "points.product", true));
 
 
         parameters.add(SU.getParameter(RecordConstants.ARG_PRODUCT,
-                                       "Product type", "points.json", true,SU.TYPE_STRING, formats));
+                                       "Product type", "points.json", true,
+                                       SU.TYPE_STRING, formats));
 
         parameters.add(SU.getParameter(RecordConstants.ARG_ASYNCH,
                                        "Asynchronous", null, false,
@@ -332,14 +342,14 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                                        "Skip factor", null, false,
                                        SU.TYPE_INTEGER));
 
-        parameters.add(SU.getParameter(ARG_MAXLATITUDE,
-                                       "Northern bounds", null, false, SU.TYPE_FLOAT ));
-        parameters.add(SU.getParameter(ARG_MINLONGITUDE,
-                                       "Western bounds", null, false, SU.TYPE_FLOAT ));
-        parameters.add(SU.getParameter(ARG_MINLATITUDE,
-                                       "Southern bounds", null, false, SU.TYPE_FLOAT ));
-        parameters.add(SU.getParameter(ARG_MAXLONGITUDE,
-                                       "Eastern bounds", null, false, SU.TYPE_FLOAT ));
+        parameters.add(SU.getParameter(ARG_MAXLATITUDE, "Northern bounds",
+                                       null, false, SU.TYPE_FLOAT));
+        parameters.add(SU.getParameter(ARG_MINLONGITUDE, "Western bounds",
+                                       null, false, SU.TYPE_FLOAT));
+        parameters.add(SU.getParameter(ARG_MINLATITUDE, "Southern bounds",
+                                       null, false, SU.TYPE_FLOAT));
+        parameters.add(SU.getParameter(ARG_MAXLONGITUDE, "Eastern bounds",
+                                       null, false, SU.TYPE_FLOAT));
 
         /*
         parameters.add(SU.getParameter(ARG_AREA_NORTH, "Northern bounds"));
@@ -382,18 +392,22 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                                        "data.gridaspoint", true));
 
 
-        parameters.add(SU.getParameter(ARG_VARIABLE, "Comma separated list of grid variables", null, true));
+        parameters.add(
+            SU.getParameter(
+                ARG_VARIABLE, "Comma separated list of grid variables", null,
+                true));
         parameters.add(SU.getParameter("format", "Format", null, true,
                                        SU.TYPE_STRING, formats));
 
         parameters.add(SU.getParameter(ARG_LOCATION_LATITUDE, "Latitude",
-                                       null, true, SU.TYPE_FLOAT ));
+                                       null, true, SU.TYPE_FLOAT));
         parameters.add(SU.getParameter(ARG_LOCATION_LONGITUDE, "Longitude",
-                                       null, true, SU.TYPE_FLOAT ));
+                                       null, true, SU.TYPE_FLOAT));
 
         parameters.add(SU.getParameter(ARG_FROMDATE, "From Date", null,
                                        false, SU.TYPE_DATETIME));
-        parameters.add(SU.getParameter(ARG_TODATE, "To Date", null, false, SU.TYPE_DATETIME));
+        parameters.add(SU.getParameter(ARG_TODATE, "To Date", null, false,
+                                       SU.TYPE_DATETIME));
 
         List<String> operations = new ArrayList<String>();
         operations.add(Json.map(SU.createOperation("Grid point data API",
@@ -446,6 +460,90 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                                              getRepository().getUrlBase()
                                              + "/grid/json", new String[] {
                                                  "application/json" }, apis);
+
+        return returnJson(request, new StringBuffer(Json.map(doc)));
+    }
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private String getGridSubsetApi(Request request) throws Exception {
+        List<String> parameters = new ArrayList<String>();
+
+        parameters.add(SU.getParameter(ARG_ENTRYID, "Entry ID", null, true));
+
+
+        parameters.add(SU.getParameter(ARG_OUTPUT,
+                                       "Output id - don't change",
+                                       "data.gridsubset", true));
+
+        parameters.add(
+            SU.getParameter(
+                ARG_VARIABLE, "Comma separated list of grid variables", null,
+                true));
+
+
+
+        parameters.add(SU.getParameter(ARG_MAXLATITUDE,
+                                       "Northern bounds of subset", null,
+                                       false, SU.TYPE_FLOAT));
+        parameters.add(SU.getParameter(ARG_MINLONGITUDE,
+                                       "Western bounds of subset", null,
+                                       false, SU.TYPE_FLOAT));
+        parameters.add(SU.getParameter(ARG_MINLATITUDE,
+                                       "Southern bounds of subset", null,
+                                       false, SU.TYPE_FLOAT));
+        parameters.add(SU.getParameter(ARG_MAXLONGITUDE,
+                                       "Eastern bounds of subset", null,
+                                       false, SU.TYPE_FLOAT));
+
+        parameters.add(SU.getParameter(ARG_FROMDATE, "From Date", null,
+                                       false, SU.TYPE_DATETIME));
+        parameters.add(SU.getParameter(ARG_TODATE, "To Date", null, false,
+                                       SU.TYPE_DATETIME));
+
+        parameters.add(SU.getParameter("hstride", "Horizontal stride", null,
+                                       false, SU.TYPE_INTEGER));
+
+        List<String> operations = new ArrayList<String>();
+        operations.add(Json.map(SU.createOperation("Grid subset  API",
+                "API to subset a grid", "gridsubset", parameters,
+                new ArrayList<String>(),
+                new String[] { "application/x-netcdf" })));
+
+        return Json.map(SU.createApi(getRepository().getUrlBase()
+                                     + "/entry/show", operations));
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result processSwaggerGridSubsetRequest(Request request)
+            throws Exception {
+        List<String> apis = new ArrayList<String>();
+        apis.add(getGridSubsetApi(request));
+        //This is the api from the geodata/cdmdata plugin
+        List<String> doc =
+            SU.createDocument(request.getAbsoluteUrl(""),
+                              getRepository().getUrlBase() + "/grid/json",
+                              new String[] { "application/x-netcdf" }, apis);
 
         return returnJson(request, new StringBuffer(Json.map(doc)));
     }
