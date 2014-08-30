@@ -894,7 +894,7 @@ public class OutputHandler extends RepositoryManager {
                 ? HtmlUtils.squote(entry.getId())
                 : "null"));
         String clearEvent = HtmlUtils.call("clearSelect",
-                                           HtmlUtils.squote(selectorId));
+                                           HtmlUtils.squote(elementId));
         String link = HtmlUtils.mouseClickHref(event, label,
                           HtmlUtils.id(selectorId + "_selectlink"));
         if (addClear) {
@@ -2176,35 +2176,37 @@ public class OutputHandler extends RepositoryManager {
     public void addPublishWidget(Request request, Entry entry, Appendable sb,
                                  String header, boolean addNameField)
             throws Exception {
-        if ( !request.getUser().getAnonymous()) {
-            StringBuilder publishSB = new StringBuilder();
-            sb.append(HtmlUtils.hidden(ARG_PUBLISH_ENTRY + "_hidden", "",
-                                       HtmlUtils.id(ARG_PUBLISH_ENTRY
-                                           + "_hidden")));
-            sb.append(HtmlUtils.row(HtmlUtils.colspan(header, 2)));
-
-            String select = OutputHandler.getSelect(request,
-                                ARG_PUBLISH_ENTRY, "Select folder", false,
-                                null, entry);
-            String addMetadata = HtmlUtils.checkbox(ARG_METADATA_ADD,
-                                     HtmlUtils.VALUE_TRUE,
-                                     request.get(ARG_METADATA_ADD,
-                                         false)) + msg("Add properties");
-            sb.append(
-                HtmlUtils.formEntry(
-                    msgLabel("Folder"),
-                    HtmlUtils.disabledInput(
-                        ARG_PUBLISH_ENTRY, "",
-                        HtmlUtils.id(ARG_PUBLISH_ENTRY)
-                        + HtmlUtils.SIZE_60) + select + HtmlUtils.space(2)
-                                             + addMetadata));
-
-            if (addNameField) {
-                sb.append(HtmlUtils.formEntry(msgLabel("Name"),
-                        htmlInput(request, ARG_PUBLISH_NAME, "", 30)));
-            }
-
+        if (request.getUser().getAnonymous()) {
+            return;
         }
+
+        StringBuilder publishSB = new StringBuilder();
+        sb.append(HtmlUtils.hidden(ARG_PUBLISH_ENTRY + "_hidden", "",
+                                   HtmlUtils.id(ARG_PUBLISH_ENTRY
+                                       + "_hidden")));
+        sb.append(HtmlUtils.row(HtmlUtils.colspan(header, 2)));
+
+        String select = OutputHandler.getSelect(request, ARG_PUBLISH_ENTRY,
+                            "Select folder", false, null, entry);
+        String addMetadata = HtmlUtils.checkbox(ARG_METADATA_ADD,
+                                 HtmlUtils.VALUE_TRUE,
+                                 request.get(ARG_METADATA_ADD,
+                                             false)) + msg("Add properties");
+        sb.append(
+            HtmlUtils.formEntry(
+                msgLabel("Folder"),
+                HtmlUtils.disabledInput(
+                    ARG_PUBLISH_ENTRY, "",
+                    HtmlUtils.id(ARG_PUBLISH_ENTRY)
+                    + HtmlUtils.SIZE_60) + select + HtmlUtils.space(2)
+                                         + addMetadata));
+
+        if (addNameField) {
+            sb.append(HtmlUtils.formEntry(msgLabel("Name"),
+                                          htmlInput(request,
+                                              ARG_PUBLISH_NAME, "", 30)));
+        }
+
     }
 
     /**
