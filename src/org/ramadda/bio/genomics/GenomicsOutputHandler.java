@@ -109,8 +109,8 @@ public class GenomicsOutputHandler extends OutputHandler {
     public GenomicsOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
-        addType(OUTPUT_GENOMICS_TEST1);
-        addType(OUTPUT_GENOMICS_TEST2);
+        //        addType(OUTPUT_GENOMICS_TEST1);
+        //        addType(OUTPUT_GENOMICS_TEST2);
     }
 
     /**
@@ -125,6 +125,7 @@ public class GenomicsOutputHandler extends OutputHandler {
      */
     public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
+        if(true) return;
         for (Entry entry : state.getAllEntries()) {
             if (entry.getTypeHandler().isType("bio_genomics")) {
                 links.add(makeLink(request, state.getEntry(),

@@ -1,3 +1,30 @@
 <outputhandlers>
-  <outputhandler class="org.ramadda.bio.genomics.GenomicsOutputHandler" name="Biblio"/>
+  <outputhandler class="org.ramadda.bio.genomics.GenomicsOutputHandler" name="Genomics"/>
+
+  <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" label="SRA-to-FASTQ" id="sra_to_fastq" type="bio_sra" icon="/genomics/dna.png" pathProperty="bio.sratools" command="fastq-dump"  actionLabel="Convert SRA to FASTQ" destType="bio_fastq">
+   <arg>-O</arg>
+   <arg>${workdir}</arg>
+   <arg id="outputFile"  type="file" filename="${entry.filebase}.fastq" predefined="true"/>
+   <arg>${entry.file}</arg>
+   <message>This will convert the given SRA file to the FASTQ format</message>
+  </outputhandler>
+
+
+  <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" label="SRA-to-SAM" id="sra_to_sam" type="bio_sra" icon="/genomics/dna.png" pathProperty="bio.sratools" command="sam-dump"  actionLabel="Convert SRA to SAM" destType="bio_sam">
+   <arg>--output-file</arg>
+   <arg id="outputFile"  type="file" filename="${entry.filebase}.sam"/>
+   <arg>${entry.file}</arg>
+   <message>This will convert the given SRA file to the SAM format</message>
+  </outputhandler>
+
+
+  <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler"  label="Executable test 2" id="test_exec2" type="bio_fasta" icon="/genomics/dna.png" pathProperty="test_exec2_path" command="teqc"
+>
+<arg>-arg1</arg>
+<arg id="arg1value" label="Value 1" size="5"/>
+<arg id="arg2value" label="Value 2" type="enumeration"     values="foo,bar"/>
+<arg id="arg3value" label="Select an entry" type="entry"/>
+
+  </outputhandler>
+
 </outputhandlers>
