@@ -113,7 +113,7 @@ public class ExecutableOutputHandler extends OutputHandler {
     /** _more_ */
     private String entryType;
 
-    /** _more_          */
+    /** _more_ */
     private String destType;
 
     /** _more_ */
@@ -128,7 +128,7 @@ public class ExecutableOutputHandler extends OutputHandler {
     /** _more_ */
     private String actionLabel;
 
-    /** _more_          */
+    /** _more_ */
     private String message;
 
 
@@ -305,7 +305,6 @@ public class ExecutableOutputHandler extends OutputHandler {
         }
 
 
-
         Object       uniqueId = getRepository().getGUID();
         File         workDir  = getWorkDir(uniqueId);
         List<String> commands = new ArrayList<String>();
@@ -315,26 +314,11 @@ public class ExecutableOutputHandler extends OutputHandler {
         String     fileTail = getStorageManager().getFileTail(entry);
         for (Arg arg : args) {
             if (arg.isValueArg()) {
-                String value = arg.getValue();
-                value = value.replace("${workdir}", workDir.toString());
-                value = value.replace("${entry.file}",
-                                      entry.getResource().getPath());
-                value = value.replace("${entry.filebase}",
-                                      IOUtil.stripExtension(entry.getName()));
-                value = value.replace("${entry.filebase}",
-                                      IOUtil.stripExtension(fileTail));
-
+                String value = applyMacros(entry, workDir, arg.getValue());
                 commands.add(value);
             } else if (arg.isFile()) {
-                String filename = arg.getFileName();
-                filename =
-                    filename.replace("${entry.name}",
-                                     IOUtil.stripExtension(entry.getName()));
-                filename = filename.replace("${entry.file}",
-                                            entry.getResource().getPath());
-                filename = filename.replace("${entry.filebase}",
-                                            IOUtil.stripExtension(fileTail));
-
+                String filename = applyMacros(entry, workDir,
+                                      arg.getFileName());
                 String filePath = IOUtil.joinDir(workDir, filename);
                 files.add(new File(filePath));
                 if ( !arg.predefined) {
@@ -406,6 +390,28 @@ public class ExecutableOutputHandler extends OutputHandler {
 
         return new Result(outputType.getLabel(), sb);
     }
+
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param workDir _more_
+     * @param value _more_
+     *
+     * @return _more_
+     */
+    private String applyMacros(Entry entry, File workDir, String value) {
+        String fileTail = getStorageManager().getFileTail(entry);
+        value = value.replace("${workdir}", workDir.toString());
+        value = value.replace("${entry.file}", entry.getResource().getPath());
+        value = value.replace("${entry.filebase}",
+                              IOUtil.stripExtension(entry.getName()));
+        value = value.replace("${entry.filebase}",
+                              IOUtil.stripExtension(fileTail));
+
+        return value;
+    }
+
 
     /**
      * _more_
@@ -500,7 +506,7 @@ public class ExecutableOutputHandler extends OutputHandler {
         /** _more_ */
         private int size = 24;
 
-        /** _more_          */
+        /** _more_ */
         private boolean predefined = false;
 
         /** _more_ */
