@@ -353,7 +353,8 @@ public class PointFormHandler extends RecordFormHandler {
             throws Exception {
         boolean showUrl = request.get(ARG_SHOWURL, false);
 
-        sb.append(request.formPost(getRepository().URL_ENTRY_SHOW));
+        String formId   = HtmlUtils.getUniqueId("form_");
+        sb.append(request.formPost(getRepository().URL_ENTRY_SHOW, HtmlUtils.id(formId)));
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, group.getId()));
         sb.append(HtmlUtils.hidden(ARG_RECORDENTRY_CHECK, "true"));
 
@@ -413,7 +414,9 @@ public class PointFormHandler extends RecordFormHandler {
 
         addToGroupForm(request, group, sb, recordEntries, extra);
         sb.append(HtmlUtils.formTableClose());
+       
         sb.append(HtmlUtils.submit(msg("Get Data"), ARG_GETDATA));
+        OutputHandler.addUrlShowingForm(sb, formId, "[\".*OpenLayers_Control.*\"]");
         sb.append(HtmlUtils.formClose());
 
         return new Result("", sb);
@@ -454,14 +457,16 @@ public class PointFormHandler extends RecordFormHandler {
             throws Exception {
         RecordEntry recordEntry =
             getPointOutputHandler().doMakeEntry(request, entry);
-        sb.append(request.formPost(getRepository().URL_ENTRY_SHOW));
+        String formId   = HtmlUtils.getUniqueId("form_");
+        sb.append(request.formPost(getRepository().URL_ENTRY_SHOW, HtmlUtils.id(formId)));
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
-
         addToEntryForm(request, entry, sb, recordEntry);
         sb.append("<tr><td>");
         sb.append(HtmlUtils.submit(msg("Get Data"), ARG_GETDATA));
         sb.append("</td><td></td></tr>");
         sb.append(HtmlUtils.formTableClose());
+        OutputHandler.addUrlShowingForm(sb, formId, "[\".*OpenLayers_Control.*\"]");
+        sb.append(HtmlUtils.formClose());
 
         return new Result("", sb);
     }

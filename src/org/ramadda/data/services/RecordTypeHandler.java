@@ -340,7 +340,6 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
         } else {
             path = entry.getResource().getPath();
         }
-        System.err.println ("path:" + path);
         return path;
     }
 

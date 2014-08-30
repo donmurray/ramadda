@@ -758,8 +758,7 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
         String fileName = IOUtil.stripExtension(entry.getName())
                           + "_subset.nc";
 
-        String formId   = HtmlUtils.getUniqueId("form_");
-        String outputId = HtmlUtils.getUniqueId("output_");
+        String formId = HtmlUtils.getUniqueId("form_");
         sb.append(HtmlUtils.formPost(formUrl + "/" + fileName,
                                      HtmlUtils.id(formId)));
         sb.append(HtmlUtils.br());
@@ -838,13 +837,8 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
         sb.append("</ul>");
         sb.append(HtmlUtils.br());
         sb.append(HtmlUtils.submit(msg("Subset Grid")));
-        sb.append(HtmlUtils.div("", HtmlUtils.id(outputId)));
-        sb.append(
-            HtmlUtils.script(
-                HtmlUtils.call(
-                    "HtmlUtil.makeUrlShowingForm", HtmlUtils.quote(formId),
-                    HtmlUtils.quote(outputId),
-                    "[\".*OpenLayers_Control.*\",\".*original.*\"]")));
+        addUrlShowingForm(sb, formId,
+                          "[\".*OpenLayers_Control.*\",\".*original.*\"]");
         sb.append(HtmlUtils.formClose());
         getCdmManager().returnGridDataset(path, dataset);
 

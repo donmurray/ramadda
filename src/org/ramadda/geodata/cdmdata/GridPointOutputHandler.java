@@ -743,7 +743,9 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
         String formUrl  = request.url(getRepository().URL_ENTRY_SHOW);
         String fileName = IOUtil.stripExtension(entry.getName()) + "_point";
 
-        sb.append(HtmlUtils.form(formUrl + "/" + fileName));
+        String formId   = HtmlUtils.getUniqueId("form_");
+        sb.append(HtmlUtils.form(formUrl + "/" + fileName,
+                                 HtmlUtils.id(formId)));
         sb.append(HtmlUtils.br());
 
 
@@ -819,6 +821,7 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
 
         sb.append(HtmlUtils.submit("Get Point"));
         //sb.append(submitExtra);
+        addUrlShowingForm(sb, formId, "[\".*OpenLayers_Control.*\"]");
         sb.append(HtmlUtils.formClose());
 
         return makeLinksResult(request, msg("Grid At Point"), sb,

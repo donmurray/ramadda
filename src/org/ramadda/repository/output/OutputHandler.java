@@ -863,6 +863,28 @@ public class OutputHandler extends RepositoryManager {
     /**
      * _more_
      *
+     * @param sb _more_
+     * @param formId _more_
+     * @param skipList _more_
+     */
+    public static void addUrlShowingForm(StringBuffer sb, String formId,
+                                         String skipList) {
+        String outputId = HtmlUtils.getUniqueId("output_");
+        sb.append(HtmlUtils.div("", HtmlUtils.id(outputId)));
+        sb.append(
+            HtmlUtils.script(
+                HtmlUtils.call(
+                    "HtmlUtil.makeUrlShowingForm", HtmlUtils.quote(formId),
+                    HtmlUtils.quote(outputId), (skipList != null)
+                ? skipList
+                : "null")));
+    }
+
+
+
+    /**
+     * _more_
+     *
      * @param request _more_
      * @param elementId _more_
      * @param label _more_

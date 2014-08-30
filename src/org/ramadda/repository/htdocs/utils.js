@@ -439,8 +439,9 @@ var HtmlUtil =  {
         }
         var url = $("#" + formId).attr("action")+"?";
         var inputs = $("#" + formId +" :input");
+        var cnt = 0;
         inputs.each(function (i, item) {
-                if(item.name == "" || item.value == "") return;
+                if(item.name == "" || item.value == null || item.value == "") return;
                 if(item.type == "checkbox") {
                     if(!item.checked) {
                         return;
@@ -454,13 +455,13 @@ var HtmlUtil =  {
                         }
                     }
                 }
-                if(item.value!=null && item.value!="") {
-                    url += encodeURIComponent(item.name) + "=" + encodeURIComponent(item.value) + "&";
-                }
+                if(cnt>0) url += "&";
+                cnt++;
+                url += encodeURIComponent(item.name) + "=" + encodeURIComponent(item.value);
             });
         var base = window.location.protocol+ "://" + window.location.host;
         url = base + url;                        
-        $("#" + outputId).html("<br><a href=\"" + url +"\"</a>Service URL</a> --  " + url);
+        $("#" + outputId).html(HtmlUtil.div(["class","ramadda-form-url"],  HtmlUtil.href(url, HtmlUtil.image(ramaddaBaseUrl +"/icons/link.png")) +" " + url));
     },
     makeUrlShowingForm: function(formId, outputId, skip) {
         $("#" + formId +" :input").change(function() {
