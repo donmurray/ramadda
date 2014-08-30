@@ -87,7 +87,7 @@ public class GenomicsOutputHandler extends OutputHandler {
         new OutputType("Genomics Test 1", "genomics_test1",
                        OutputType.TYPE_VIEW, "", "/genomics/dna.png");
 
-    /** _more_          */
+    /** _more_ */
     public static final OutputType OUTPUT_GENOMICS_TEST2 =
         new OutputType("Genomics Test 2", "genomics_test2",
                        OutputType.TYPE_VIEW, "", "/genomics/dna.png");
@@ -125,7 +125,9 @@ public class GenomicsOutputHandler extends OutputHandler {
      */
     public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
-        if(true) return;
+        if (true) {
+            return;
+        }
         for (Entry entry : state.getAllEntries()) {
             if (entry.getTypeHandler().isType("bio_genomics")) {
                 links.add(makeLink(request, state.getEntry(),
@@ -145,9 +147,6 @@ public class GenomicsOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param outputType _more_
-     * @param group _more_
-     * @param subGroups _more_
-     * @param entries _more_
      * @param entry _more_
      *
      * @return _more_

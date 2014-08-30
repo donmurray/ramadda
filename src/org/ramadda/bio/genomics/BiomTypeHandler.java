@@ -25,12 +25,11 @@ import org.ramadda.repository.*;
 import org.ramadda.repository.metadata.*;
 import org.ramadda.repository.type.*;
 
-import org.ramadda.util.TempDir;
-
 import org.w3c.dom.*;
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.StringUtil;
+
 
 import ucar.unidata.xml.XmlUtil;
 
@@ -47,10 +46,9 @@ import javax.mail.internet.*;
  *
  *
  */
-public class SraTypeHandler extends GenomicsTypeHandler {
+public class BiomTypeHandler extends GenericTypeHandler {
 
-    /** _more_ */
-    public static final String PROP_SRA_BIN = "sra.bin";
+
 
     /**
      * _more_
@@ -60,7 +58,7 @@ public class SraTypeHandler extends GenomicsTypeHandler {
      *
      * @throws Exception _more_
      */
-    public SraTypeHandler(Repository repository, Element entryNode)
+    public BiomTypeHandler(Repository repository, Element entryNode)
             throws Exception {
         super(repository, entryNode);
     }
@@ -77,16 +75,10 @@ public class SraTypeHandler extends GenomicsTypeHandler {
     public void initializeNewEntry(Entry entry) throws Exception {
         super.initializeNewEntry(entry);
 
-        String path = getProperty(PROP_SRA_BIN, null);
-        if (path == null) {
-            return;
-        }
-
         //If the file for the entry does not exist then return
         if ( !entry.isFile()) {
             return;
         }
-
 
         /*
           entry.getFile().toString();

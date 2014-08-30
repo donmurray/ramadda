@@ -54,7 +54,7 @@ public class GenomicsTypeHandler extends GenericTypeHandler {
 
 
 
-    /** _more_          */
+    /** _more_ */
     private TempDir productDir;
 
     /**
