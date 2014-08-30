@@ -433,6 +433,41 @@ var HtmlUtil =  {
         return html;
     },
 
+    handleFormChangeShowUrl: function(formId, outputId, skip) {
+        if(skip == null) {
+            skip = [".*OpenLayers_Control.*"];
+        }
+        var url = $("#" + formId).attr("action")+"?";
+        var inputs = $("#" + formId +" :input");
+        inputs.each(function (i, item) {
+                if(item.name == "" || item.value == "") return;
+                if(item.type == "checkbox") {
+                    if(!item.checked) {
+                        return;
+                    }
+                } 
+                if(skip!=null) {
+                    for(var i=0;i<skip.length;i++) {
+                        var pattern = skip[i];
+                        if(item.name.match(pattern)) {
+                            return;
+                        }
+                    }
+                }
+                if(item.value!=null && item.value!="") {
+                    url += encodeURIComponent(item.name) + "=" + encodeURIComponent(item.value) + "&";
+                }
+            });
+        var base = window.location.protocol+ "://" + window.location.host;
+        url = base + url;                        
+        $("#" + outputId).html("<br><a href=\"" + url +"\"</a>Service URL</a> --  " + url);
+    },
+    makeUrlShowingForm: function(formId, outputId, skip) {
+        $("#" + formId +" :input").change(function() {
+                HtmlUtil.handleFormChangeShowUrl(formId, outputId, skip);
+            });
+        HtmlUtil.handleFormChangeShowUrl(formId, outputId, skip);
+    },
     input :   function(name, value, attrs) {
         return "<input " + HtmlUtil.attrs(attrs) + HtmlUtil.attrs(["name", name, "value",value]) +"/>";
     },
