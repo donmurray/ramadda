@@ -6,4 +6,13 @@
       <element id="minutes" name="Offset" datatype="double" suffix="(Minutes)"/>
     </type>
   </handler>
+
+  <handler category="Tags">
+    <type name="Document Comment" displaycategory="Comments" id="media_comment"  searchable="false" browsable="true">
+      <element name="Location"  searchable="false"/>
+      <element name="Comment"  searchable="false" rows="5"/>
+      <element name="Screen shot" datatype="file" thumbnail="false"/>
+      <template type="xxxhtml"><![CDATA[<b>${attr1}</b><br>${attr2}]]></template>
+    </type>
+</handler>
 </metadata>
