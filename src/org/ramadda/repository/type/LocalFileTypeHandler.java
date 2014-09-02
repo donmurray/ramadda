@@ -206,7 +206,21 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         //        System.err.println ("synthId:" + synthId);
         //        System.err.println ("child path:" + childPath);
 
+        if (childPath.exists()) {
+            getLogManager().logWarning(
+                "Server side files:  file does not exist:" + childPath);
+
+            return new ArrayList<String>();
+        }
+
         File[] files = childPath.listFiles();
+        if (files == null) {
+            getLogManager().logWarning(
+                "Server side files:  got a null file listing for:"
+                + childPath);
+
+            return new ArrayList<String>();
+        }
         //        files = IOUtil.sortFilesOnName(files);
 
         Metadata sortMetadata = null;
@@ -513,17 +527,17 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
                                    TypeHandler.TYPE_GROUP)
                                : getRepository().getTypeHandler(
                                    TypeHandler.TYPE_FILE));
-        Entry  templateEntry = getEntryManager().getTemplateEntry(targetFile);
-        Entry entry = null;
+        Entry templateEntry = getEntryManager().getTemplateEntry(targetFile);
+        Entry entry         = null;
 
-        
+
         if (templateEntry != null) {
             entry = templateEntry;
             entry.setId(synthId);
         }
 
 
-        if(entry == null) {
+        if (entry == null) {
             entry = (targetFile.isDirectory()
                      ? (Entry) new Entry(synthId, handler, true)
                      : new Entry(synthId, handler));
@@ -534,7 +548,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
 
 
 
-        String name          = null;
+        String name = null;
         for (String pair : localFileInfo.getNames()) {
             boolean doPath = false;
             if (pair.startsWith("path:")) {
@@ -579,20 +593,20 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
 
 
 
-        String desc = "";
+        String   desc   = "";
         Object[] values = null;
         if (templateEntry != null) {
-            desc = templateEntry.getDescription();
-            name = templateEntry.getName();
+            desc   = templateEntry.getDescription();
+            name   = templateEntry.getName();
             values = entry.getTypeHandler().getEntryValues(entry);
         }
         entry.initEntry(name, desc, parent,
                         getUserManager().getLocalFileUser(),
                         new Resource(targetFile, (targetFile.isDirectory()
-                                                  ? Resource.TYPE_LOCAL_DIRECTORY
-                                                  : Resource.TYPE_LOCAL_FILE)), "", targetFile.lastModified(),
-                        targetFile.lastModified(), targetFile.lastModified(),
-                        targetFile.lastModified(), values);
+                ? Resource.TYPE_LOCAL_DIRECTORY
+                : Resource.TYPE_LOCAL_FILE)), "", targetFile.lastModified(),
+                targetFile.lastModified(), targetFile.lastModified(),
+                targetFile.lastModified(), values);
         //        System.err.println ("Done:" + entry);
         /*
         if ( !getRepository().getAccessManager().canDoAction(request, entry,
