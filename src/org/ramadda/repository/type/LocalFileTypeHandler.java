@@ -206,7 +206,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         //        System.err.println ("synthId:" + synthId);
         //        System.err.println ("child path:" + childPath);
 
-        if (childPath.exists()) {
+        if (!childPath.exists()) {
             getLogManager().logWarning(
                 "Server side files:  file does not exist:" + childPath);
 
