@@ -1852,6 +1852,21 @@ public class Request implements Constants, Cloneable {
         return v;
     }
 
+    public double getLatOrLonValue(RequestArgument from, double dflt) {
+        if ( !defined(from)) {
+            return dflt;
+        }
+        String llString = (String) getString(from, "").trim();
+        if ((llString == null) || (llString.length() == 0)
+                || (llString.startsWith("${"))) {
+            return dflt;
+        }
+        double result = Utils.decodeLatLon(llString);
+        return result;
+    }
+
+
+
     /**
      * Get the value for a latitude or longitude property
      *
