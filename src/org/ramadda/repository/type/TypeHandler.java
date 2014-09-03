@@ -90,13 +90,13 @@ import java.util.regex.Pattern;
  */
 public class TypeHandler extends RepositoryManager {
 
-    /** _more_          */
+    /** _more_ */
     private String[] FIELDS_ENTRY = {
         ARG_NAME, ARG_DESCRIPTION, ARG_RESOURCE, ARG_CATEGORY, ARG_DATE,
         ARG_LOCATION
     };
 
-    /** _more_          */
+    /** _more_ */
     private String[] FIELDS_NOENTRY = { ARG_RESOURCE, ARG_NAME,
                                         ARG_DESCRIPTION };
 
@@ -117,6 +117,22 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     public static final RequestArgument REQUESTARG_EAST =
         new RequestArgument("ramadda.arg.area.east");
+
+    /** _more_          */
+    public static final RequestArgument REQUESTARG_LATITUDE =
+        new RequestArgument("ramadda.arg.latitude");
+
+    /** _more_          */
+    public static final RequestArgument REQUESTARG_LONGITUDE =
+        new RequestArgument("ramadda.arg.longitude");
+
+    /** _more_          */
+    public static final RequestArgument REQUESTARG_FROMDATE =
+        new RequestArgument("ramadda.arg.fromdate");
+
+    /** _more_          */
+    public static final RequestArgument REQUESTARG_TODATE =
+        new RequestArgument("ramadda.arg.todate");
 
     /** _more_ */
     public static final RequestArgument[] AREA_NWSE = { REQUESTARG_NORTH,
@@ -4182,8 +4198,6 @@ public class TypeHandler extends RepositoryManager {
          *           collectionSelect));
          * }
          */
-
-
 
 
         for (DateArgument arg : DateArgument.SEARCH_ARGS) {
