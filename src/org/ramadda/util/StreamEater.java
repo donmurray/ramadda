@@ -38,6 +38,10 @@ public class StreamEater extends Thread {
     /** The type name (for debugging) */
     private String type;
 
+    /** _more_          */
+    private boolean running = false;
+
+
     /**
      * A class for reading lines from an input stream in a thread
      *
@@ -66,6 +70,7 @@ public class StreamEater extends Thread {
      */
     @Override
     public void run() {
+        running = true;
         BufferedReader br = null;
         try {
             br = new BufferedReader(new InputStreamReader(in));
@@ -78,7 +83,9 @@ public class StreamEater extends Thread {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+            running = false;
             try {
+                pw.close();
                 br.close();
                 in.close();
             } catch (IOException e) {
@@ -86,4 +93,15 @@ public class StreamEater extends Thread {
             }
         }
     }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getRunning() {
+        return running;
+    }
+
 }
