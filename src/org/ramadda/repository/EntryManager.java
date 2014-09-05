@@ -59,7 +59,6 @@ import org.w3c.dom.NodeList;
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.JobManager;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
@@ -2193,8 +2192,8 @@ public class EntryManager extends RepositoryManager {
                     URLConnection connection = fromUrl.openConnection();
                     InputStream   fromStream = connection.getInputStream();
                     if (actionId != null) {
-                        JobManager.getManager().startLoad("File copy",
-                                actionId);
+                        ucar.unidata.util.JobManager.getManager().startLoad(
+                            "File copy", actionId);
                     }
                     int length = connection.getContentLength();
                     if (length > 0 & actionId != null) {
@@ -6790,7 +6789,10 @@ public class EntryManager extends RepositoryManager {
         newEntry.setResource(new Resource(newFile, Resource.TYPE_STOREDFILE));
         newEntry.setId(getRepository().getGUID());
         newEntry.setName(request.getString(ARG_PUBLISH_NAME,
-                                           "subset_" + newEntry.getName()));
+                                           newFile.getName()));
+        if ( !Utils.stringDefined(newEntry.getName())) {
+            newEntry.setName(newFile.getName());
+        }
         newEntry.clearMetadata();
         newEntry.setUser(request.getUser());
         if (request.get(ARG_METADATA_ADD, false)) {

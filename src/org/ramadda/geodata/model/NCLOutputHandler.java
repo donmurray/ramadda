@@ -574,7 +574,7 @@ sb.append(HtmlUtils.form(formUrl,
         //System.err.println("env:" + envMap);
 
         //Use new repository method to execute. This gets back [stdout,stderr]
-        String[] results = getRepository().executeCommand(commands, envMap,
+        String[] results = getRepository().getJobManager().executeCommand(commands, envMap,
                                getProductDir());
         String errorMsg = results[1];
         String outMsg   = results[0];

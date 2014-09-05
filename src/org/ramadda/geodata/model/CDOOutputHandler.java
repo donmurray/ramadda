@@ -941,7 +941,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
 
         commands.add(entry.getResource().getPath());
         commands.add(outFile.toString());
-        String[] results = getRepository().executeCommand(commands, null,
+        String[] results = getRepository().getJobManager().executeCommand(commands, null,
                                getProductDir());
         String errorMsg = results[1];
         String outMsg   = results[0];
@@ -1514,7 +1514,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
 
             commands.add(oneOfThem.getResource().getPath());
             commands.add(outFile.toString());
-            String[] results = getRepository().executeCommand(commands, null,
+            String[] results = getRepository().getJobManager().executeCommand(commands, null,
                                    getProductDir());
             String errorMsg = results[1];
             String outMsg   = results[0];

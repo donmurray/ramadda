@@ -64,6 +64,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
@@ -88,8 +89,16 @@ public class ExecutableOutputHandler extends OutputHandler {
     public static final String TAG_ARG = "arg";
 
     /** _more_ */
+    public static final String TAG_OUTPUT = "output";
 
+    /** _more_ */
+    public static final String TAG_COMMAND = "command";
+
+    /** _more_ */
     public static final String ATTR_ICON = "icon";
+
+    /** _more_ */
+    public static final String ATTR_CATEGORY = "category";
 
     /** _more_ */
     public static final String ATTR_VALUES = "values";
@@ -99,6 +108,9 @@ public class ExecutableOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final String ATTR_LABEL = "label";
+
+    /** _more_          */
+    public static final String ATTR_SUFFIX = "suffix";
 
     /** _more_ */
     public static final String ATTR_COMMAND = "command";
@@ -113,27 +125,34 @@ public class ExecutableOutputHandler extends OutputHandler {
     /** _more_ */
     private String entryType;
 
-    /** _more_ */
-    private String destType;
 
-    /** _more_ */
-    private String path;
+    /** _more_          */
+    private boolean enabled = false;
 
     /** _more_ */
     private String command;
 
-    /** _more_ */
-    private String fullPath;
+    /** _more_          */
+    private boolean doSingleArgCommand = false;
+
 
     /** _more_ */
     private String actionLabel;
 
-    /** _more_ */
-    private String message;
 
+
+
+    /** _more_ */
+    private String help;
+
+    /** _more_ */
+    private String pathProperty;
 
     /** _more_ */
     private List<Arg> args = new ArrayList<Arg>();
+
+    /** _more_ */
+    private List<Output> outputs = new ArrayList<Output>();
 
     /**
      * _more_
@@ -155,19 +174,26 @@ public class ExecutableOutputHandler extends OutputHandler {
      * @param element _more_
      */
     private void init(Element element) {
-        //command is required
-        command   = XmlUtil.getAttribute(element, ATTR_COMMAND);
+        command = XmlUtil.getAttribute(element, TAG_COMMAND, (String) null);
+        if (command == null) {
+            command = XmlUtil.getGrandChildText(element, TAG_COMMAND);
+            doSingleArgCommand = false;
+        } else {
+            doSingleArgCommand = true;
+
+        }
         entryType = XmlUtil.getAttribute(element, ATTR_TYPE, (String) null);
-        destType  = XmlUtil.getAttribute(element, "destType", (String) null);
 
 
-        //path is required
-        String pathProperty = XmlUtil.getAttribute(element,
-                                  ATTR_PATHPROPERTY);
+        pathProperty = XmlUtil.getAttribute(element, ATTR_PATHPROPERTY,
+                                            (String) null);
 
-        path = getProperty(pathProperty, null);
+        //Extract it from the command
+        if ((pathProperty == null) && command.startsWith("${")) {
+            pathProperty = command.substring(2, command.indexOf("}"));
+        }
 
-        if (path == null) {
+        if (getProperty(pathProperty, null) == null) {
             System.err.println(
                 "ExecutableOutputHandler: no path property defined:"
                 + pathProperty);
@@ -175,31 +201,37 @@ public class ExecutableOutputHandler extends OutputHandler {
             return;
         }
 
-        fullPath = IOUtil.joinDir(path, command);
-        if ( !new File(fullPath).exists()) {
-            throw new IllegalArgumentException(
-                "ExecutableOutputHandler: command does not exist:"
-                + fullPath);
-        }
+
         outputType = new OutputType(XmlUtil.getAttribute(element, ATTR_LABEL,
                 "Executable"), XmlUtil.getAttribute(element, ATTR_ID),
-                               OutputType.TYPE_OTHER, "",
-                               XmlUtil.getAttribute(element, ATTR_ICON,
-                                   (String) null));
+                               OutputType.TYPE_OTHER
+                               | OutputType.TYPE_IMPORTANT, "",
+                                   XmlUtil.getAttribute(element, ATTR_ICON,
+                                       (String) null));
+        addType(outputType);
+
         actionLabel = XmlUtil.getAttribute(element, ATTR_ACTIONLABEL,
                                            outputType.getLabel());
 
 
-        message = XmlUtil.getGrandChildText(element, "message", "");
-        addType(outputType);
+
+        help = XmlUtil.getGrandChildText(element, "help", "");
+
         NodeList children = XmlUtil.getElements(element, TAG_ARG);
         for (int i = 0; i < children.getLength(); i++) {
             Element node = (Element) children.item(i);
-            Arg     arg  = new Arg(node);
+            Arg     arg  = new Arg(node, i);
             args.add(arg);
         }
 
 
+        children = XmlUtil.getElements(element, TAG_OUTPUT);
+        for (int i = 0; i < children.getLength(); i++) {
+            Element node   = (Element) children.item(i);
+            Output  output = new Output(node);
+            outputs.add(output);
+        }
+        enabled = true;
 
     }
 
@@ -209,7 +241,7 @@ public class ExecutableOutputHandler extends OutputHandler {
      * @return _more_
      */
     public boolean isEnabled() {
-        return path != null;
+        return enabled;
     }
 
 
@@ -239,24 +271,6 @@ public class ExecutableOutputHandler extends OutputHandler {
 
 
 
-
-    /**
-     * _more_
-     *
-     * @param output _more_
-     *
-     * @return _more_
-     */
-    public String getMimeType(OutputType output) {
-        if (true) {
-            return super.getMimeType(output);
-        }
-        if (output.equals(outputType)) {
-            return repository.getMimeTypeFromSuffix(".rss");
-        } else {
-            return super.getMimeType(output);
-        }
-    }
 
 
     /**
@@ -298,35 +312,39 @@ public class ExecutableOutputHandler extends OutputHandler {
 
         StringBuffer sb = new StringBuffer();
         if ( !request.defined(ARG_EXECUTE)) {
-            sb.append(message);
+            sb.append(HtmlUtils.p());
+            sb.append(help);
+            sb.append(HtmlUtils.p());
             makeForm(request, entry, sb);
 
             return new Result(outputType.getLabel(), sb);
         }
 
-
         Object       uniqueId = getRepository().getGUID();
         File         workDir  = getWorkDir(uniqueId);
-        List<String> commands = new ArrayList<String>();
-        commands.add(fullPath);
+        String       cmd      = applyMacros(entry, workDir, command);
 
-        List<File> files    = new ArrayList<File>();
-        String     fileTail = getStorageManager().getFileTail(entry);
+        List<String> commands = new ArrayList<String>();
+        commands.add(cmd);
+
+        String fileTail = getStorageManager().getFileTail(entry);
         for (Arg arg : args) {
+            if (arg.getCategory() != null) {
+                continue;
+            }
+            String argValue = null;
             if (arg.isValueArg()) {
-                String value = applyMacros(entry, workDir, arg.getValue());
-                commands.add(value);
+                argValue = arg.getValue();
+            } else if (arg.isFlag()) {
+                if (request.get(arg.getName(), false)) {
+                    argValue = arg.getValue();
+                }
             } else if (arg.isFile()) {
                 String filename = applyMacros(entry, workDir,
                                       arg.getFileName());
-                String filePath = IOUtil.joinDir(workDir, filename);
-                files.add(new File(filePath));
-                if ( !arg.predefined) {
-                    commands.add(filePath);
-                    System.err.println("filePath:" + filePath);
-                }
+                argValue = IOUtil.joinDir(workDir, filename);
             } else if (arg.isEntry()) {
-                String entryId = request.getString(arg.getId() + "_hidden",
+                String entryId = request.getString(arg.getName() + "_hidden",
                                      (String) null);
                 Entry entryArg = getEntryManager().getEntry(request, entryId);
                 //TODO: Check for null, get the file
@@ -334,61 +352,139 @@ public class ExecutableOutputHandler extends OutputHandler {
                     throw new IllegalArgumentException(
                         "No entry  specified for:" + arg.getLabel());
                 }
-                commands.add(entryArg.getResource().getPath());
+                argValue = entryArg.getResource().getPath();
             } else {
-                String argValue = request.getString(arg.getId(),
-                                      (String) null);
-                if (argValue == null) {
-                    throw new IllegalArgumentException(
-                        "No argument specified for:" + arg.getLabel());
-                } else {
+                argValue = request.getString(arg.getName(), "");
+                if (arg.ifDefined && !Utils.stringDefined(argValue)) {
+                    continue;
+                }
+                //The value is the argument
+                if (Utils.stringDefined(arg.getValue())) {
+                    commands.add(arg.getValue());
+                }
+            }
+            if (argValue != null) {
+                argValue = applyMacros(entry, workDir, argValue);
+                if (doSingleArgCommand) {
                     commands.add(argValue);
+                } else {
+                    cmd = cmd.replace(macro(arg.getName()), argValue);
                 }
             }
         }
 
-        System.err.println("Executing: " + StringUtil.join(" ", commands));
-
-        String[] results  = getRepository().executeCommand(commands, workDir);
-        String   errorMsg = results[1];
-        String   outMsg   = results[0];
-
-        sb.append("stdout:" + outMsg);
-        if (Utils.stringDefined(errorMsg)) {
-            sb.append("\n");
-            sb.append(HtmlUtils.p());
-            sb.append("stderr:" + errorMsg);
+        String   errMsg = "";
+        String   outMsg = "";
+        String[] results;
+        File     stdoutFile = new File(IOUtil.joinDir(workDir, ".stdout"));
+        File     stderrFile = new File(IOUtil.joinDir(workDir, ".stderr"));
+        if (doSingleArgCommand) {
+            System.err.println("Executing: "
+                               + StringUtil.join(" ", commands));
+            results =
+                getRepository().getJobManager().executeCommand(commands,
+                    null, workDir, -1, new PrintWriter(stdoutFile),
+                    new PrintWriter(stderrFile));
+            if (stderrFile.exists()) {
+                errMsg = IOUtil.readContents(stderrFile);
+            }
+        } else {
+            System.err.println("Executing: " + cmd);
+            results = getRepository().getJobManager().executeCommand(command,
+                    workDir, -1);
+            outMsg = results[0];
+            errMsg = results[1];
         }
 
-        if (files.size() > 0) {
-            File file = files.get(0);
-            if ( !file.exists()) {
-                System.err.println(sb);
+        if (Utils.stringDefined(errMsg)) {
+            sb.append(
+                getPageHandler().showDialogError(
+                    "An error has occurred:<br>" + errMsg));
+            makeForm(request, entry, sb);
 
-                throw new IllegalArgumentException("No output file created");
+            return new Result(outputType.getLabel(), sb);
+        }
+
+        List<Entry>   newEntries = new ArrayList<Entry>();
+        List<File>    newFiles   = new ArrayList<File>();
+        HashSet<File> seen       = new HashSet<File>();
+        for (Output output : outputs) {
+            final String thePattern = output.getPattern();
+            File[]       files      = workDir.listFiles(new FileFilter() {
+                public boolean accept(File f) {
+                    if (thePattern == null) {
+                        return true;
+                    }
+                    String name = f.getName();
+                    if (name.startsWith(".")) {
+                        return false;
+                    }
+                    if (name.matches(thePattern)) {
+                        return true;
+                    }
+
+                    return false;
+                }
+            });
+
+            for (File file : files) {
+                if (seen.contains(file)) {
+                    continue;
+                }
+                seen.add(file);
+                newFiles.add(file);
+                //                System.err.println("FILE:" + file +" " + file.exists());
+                if (doingPublish(request)) {
+                    TypeHandler typeHandler =
+                        getRepository().getTypeHandler(output.getEntryType());
+                    Entry newEntry =
+                        typeHandler.createEntry(getRepository().getGUID());
+                    getEntryManager().processEntryPublish(request, files[0],
+                            newEntry, entry, "derived from");
+                    newEntries.add(newEntry);
+                }
             }
+        }
 
-            if (doingPublish(request)) {
-                TypeHandler typeHandler =
-                    getRepository().getTypeHandler((destType != null)
-                        ? destType
-                        : TypeHandler.TYPE_FILE);
-                Entry newEntry =
-                    typeHandler.createEntry(getRepository().getGUID());
 
-                return getEntryManager().processEntryPublish(request,
-                        files.get(0), newEntry, entry, "derived from");
+        if (newEntries.size() > 0) {
+            return new Result(
+                request.entryUrl(
+                    getRepository().URL_ENTRY_SHOW, newEntries.get(0)));
+        }
+
+        if (newFiles.size() == 0) {
+            for (File file : workDir.listFiles()) {
+                if (file.getName().startsWith(".")) {
+                    continue;
+                }
+                //                System.err.println("file:" + file +" " + file.exists());
+                newFiles.add(file);
             }
-
-
+        }
+        if (newFiles.size() >= 1) {
+            //TODO: handle multiple files by zipping them
+            File file = newFiles.get(0);
             request.setReturnFilename(file.getName());
 
             return new Result(getStorageManager().getFileInputStream(file),
                               "");
         }
 
+        return new Result(outputType.getLabel(),
+                          new StringBuffer("Error: no output files<br>"
+                                           + sb));
+    }
 
-        return new Result(outputType.getLabel(), sb);
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    private String macro(String s) {
+        return "${" + s + "}";
     }
 
     /**
@@ -401,12 +497,15 @@ public class ExecutableOutputHandler extends OutputHandler {
      * @return _more_
      */
     private String applyMacros(Entry entry, File workDir, String value) {
+        value = value.replace(macro(pathProperty),
+                              getProperty(pathProperty, ""));
         String fileTail = getStorageManager().getFileTail(entry);
-        value = value.replace("${workdir}", workDir.toString());
-        value = value.replace("${entry.file}", entry.getResource().getPath());
-        value = value.replace("${entry.filebase}",
+        value = value.replace(macro("workdir"), workDir.toString());
+        value = value.replace(macro("entry.file"),
+                              entry.getResource().getPath());
+        value = value.replace(macro("entry.filebase"),
                               IOUtil.stripExtension(entry.getName()));
-        value = value.replace("${entry.filebase}",
+        value = value.replace(macro("entry.filebase"),
                               IOUtil.stripExtension(fileTail));
 
         return value;
@@ -427,43 +526,201 @@ public class ExecutableOutputHandler extends OutputHandler {
         sb.append(request.form(getRepository().URL_ENTRY_SHOW));
         sb.append(HtmlUtils.hidden(ARG_OUTPUT, outputType.getId()));
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
-        sb.append(HtmlUtils.formTable());
+
+        sb.append(HtmlUtils.submit(actionLabel, ARG_EXECUTE,
+                                   makeButtonSubmitDialog(sb,
+                                       "Processing request...")));
+
+        int          blockCnt = 0;
+        StringBuffer catBuff  = null;
+        String       catLabel = null;
+        Arg          catArg   = null;
         for (Arg arg : args) {
+            if (arg.isCategory()) {
+                if (catBuff != null) {
+                    processCatBuff(request, sb, catArg, catBuff, ++blockCnt);
+                }
+                catArg  = arg;
+                catBuff = new StringBuffer(HtmlUtils.formTable());
+
+                continue;
+            }
+
             if (arg.isValueArg()) {
                 continue;
             }
+
+            if (catBuff == null) {
+                catBuff = new StringBuffer(HtmlUtils.formTable());
+                catArg  = null;
+            }
+
             String input = null;
             if (arg.isEnumeration()) {
-                input = HtmlUtils.select(arg.getId(), arg.getValues(),
+                input = HtmlUtils.select(arg.getName(), arg.getValues(),
                                          (List) null, "", 100);
+            } else if (arg.isFlag()) {
+                input = HtmlUtils.labeledCheckbox(arg.getName(), "true",
+                        request.get(arg.getName(), false), arg.getLabel());
+                catBuff.append(HtmlUtils.formEntry("", input));
+
+                continue;
             } else if (arg.isFile()) {
                 //noop
             } else if (arg.isEntry()) {
                 input = getSelect(
-                    request, arg.getId(), msg("Select"), true,
+                    request, arg.getName(), msg("Select"), true,
                     null) + HtmlUtils.hidden(
-                        arg.getId() + "_hidden", "",
+                        arg.getName() + "_hidden",
+                        request.getString(arg.getName() + "_hidden", ""),
                         HtmlUtils.id(
-                            arg.getId() + "_hidden")) + HtmlUtils.space(1)
+                            arg.getName() + "_hidden")) + HtmlUtils.space(1)
                                 + HtmlUtils.disabledInput(
-                                    arg.getId(), "",
+                                    arg.getName(),
+                                    request.getString(arg.getName(), ""),
                                     HtmlUtils.SIZE_60
-                                    + HtmlUtils.id(arg.getId()));
+                                    + HtmlUtils.id(arg.getName()));
 
             } else {
-                input = HtmlUtils.input(arg.getId(), "", arg.getSize());
+                input = HtmlUtils.input(arg.getName(),
+                                        request.getString(arg.getName(), ""),
+                                        arg.getSize());
             }
             if (input == null) {
                 continue;
             }
-            sb.append(HtmlUtils.formEntry(arg.getLabel(), input));
+            if (Utils.stringDefined(arg.getSuffix())) {
+                input = input + HtmlUtils.space(2) + arg.getSuffix();
+            }
+            catBuff.append(HtmlUtils.formEntry(msgLabel(arg.getLabel()),
+                    input));
         }
+
+        if (catBuff != null) {
+            processCatBuff(request, sb, catArg, catBuff, ++blockCnt);
+        }
+        sb.append(HtmlUtils.p());
+
+
+        sb.append(HtmlUtils.submit(actionLabel, ARG_EXECUTE,
+                                   makeButtonSubmitDialog(sb,
+                                       "Processing request...")));
+        sb.append(HtmlUtils.p());
+        sb.append(HtmlUtils.formTable());
         addPublishWidget(request, entry, sb,
-                         msg("Select a folder to publish to"));
+                         msg("Optionally, select a folder to publish to"));
 
         sb.append(HtmlUtils.formTableClose());
-        sb.append(HtmlUtils.submit(actionLabel, ARG_EXECUTE));
     }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     * @param catArg _more_
+     * @param catBuff _more_
+     * @param blockCnt _more_
+     */
+    private void processCatBuff(Request request, StringBuffer sb, Arg catArg,
+                                StringBuffer catBuff, int blockCnt) {
+        if (catArg != null) {
+            String html = header(catArg.getCategory());
+            String desc = catArg.getValue();
+            if (Utils.stringDefined(desc)) {
+                if (Utils.stringDefined(desc.trim())) {
+                    html += desc;
+                    html += HtmlUtils.br();
+                }
+            }
+            sb.append(html);
+        }
+        catBuff.append(HtmlUtils.formTableClose());
+        if (blockCnt == 1) {
+            sb.append(catBuff);
+        } else {
+            sb.append(HtmlUtils.makeShowHideBlock("More...",
+                    catBuff.toString(), blockCnt == 1));
+        }
+    }
+
+
+
+
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Thu, Sep 4, '14
+     * @author         Enter your name here...
+     */
+    public static class Output {
+
+        /** _more_ */
+        private String entryType;
+
+        /** _more_ */
+        private String pattern;
+
+        /** _more_ */
+        private boolean useStdout = false;
+
+        /** _more_ */
+        private String filename;
+
+        /**
+         * _more_
+         *
+         * @param node _more_
+         */
+        public Output(Element node) {
+            entryType = XmlUtil.getAttribute(node, ATTR_TYPE,
+                                             TypeHandler.TYPE_FILE);
+            pattern   = XmlUtil.getAttribute(node, "pattern", (String) null);
+            useStdout = XmlUtil.getAttribute(node, "stdout", useStdout);
+            filename  = XmlUtil.getAttribute(node, "filename", (String) null);
+        }
+
+
+        /**
+         *  Set the EntryType property.
+         *
+         *  @param value The new value for EntryType
+         */
+        public void setEntryType(String value) {
+            entryType = value;
+        }
+
+        /**
+         *  Get the EntryType property.
+         *
+         *  @return The EntryType
+         */
+        public String getEntryType() {
+            return entryType;
+        }
+
+        /**
+         *  Set the Pattern property.
+         *
+         *  @param value The new value for Pattern
+         */
+        public void setPattern(String value) {
+            pattern = value;
+        }
+
+        /**
+         *  Get the Pattern property.
+         *
+         *  @return The Pattern
+         */
+        public String getPattern() {
+            return pattern;
+        }
+
+
+    }
+
 
     /**
      * Class description
@@ -483,19 +740,33 @@ public class ExecutableOutputHandler extends OutputHandler {
         /** _more_ */
         private static final String TYPE_ENTRY = "entry";
 
+        /** _more_          */
+        private static final String TYPE_FLAG = "flag";
+
         /** _more_ */
         private static final String TYPE_FILE = "file";
 
+        /** _more_ */
+        private static final String TYPE_CATEGORY = "category";
 
+
+        /** _more_ */
+        private String name;
 
         /** _more_ */
         private String value;
 
-        /** _more_ */
-        private String id;
+        /** _more_          */
+        private boolean nameDefined = false;
+
+        /** _more_          */
+        private boolean ifDefined = false;
 
         /** _more_ */
         private String label;
+
+        /** _more_          */
+        private String suffix;
 
         /** _more_ */
         private String type;
@@ -506,25 +777,33 @@ public class ExecutableOutputHandler extends OutputHandler {
         /** _more_ */
         private int size = 24;
 
-        /** _more_ */
-        private boolean predefined = false;
 
         /** _more_ */
         private List<TwoFacedObject> values = new ArrayList<TwoFacedObject>();
+
 
         /**
          * _more_
          *
          * @param node _more_
+         * @param idx _more_
          */
-        public Arg(Element node) {
-            id         = XmlUtil.getAttribute(node, ATTR_ID, (String) null);
-            type       = XmlUtil.getAttribute(node, ATTR_TYPE, TYPE_STRING);
-            value      = XmlUtil.getChildText(node);
-            label      = XmlUtil.getAttribute(node, ATTR_LABEL, id);
-            fileName   = XmlUtil.getAttribute(node, "filename", "${src}");
-            predefined = XmlUtil.getAttribute(node, "predefined", false);
-            size       = XmlUtil.getAttribute(node, ATTR_SIZE, size);
+        public Arg(Element node, int idx) {
+            name = XmlUtil.getAttribute(node, ATTR_NAME, (String) null);
+            if (name == null) {
+                name        = "arg" + idx;
+                nameDefined = false;
+            } else {
+                nameDefined = true;
+            }
+
+            type      = XmlUtil.getAttribute(node, ATTR_TYPE, (String) null);
+            value     = XmlUtil.getChildText(node);
+            label     = XmlUtil.getAttribute(node, ATTR_LABEL, name);
+            suffix    = XmlUtil.getAttribute(node, ATTR_SUFFIX, "");
+            fileName  = XmlUtil.getAttribute(node, "filename", "${src}");
+            size      = XmlUtil.getAttribute(node, ATTR_SIZE, size);
+            ifDefined = XmlUtil.getAttribute(node, "ifdefined", ifDefined);
             for (String tok :
                     StringUtil.split(XmlUtil.getAttribute(node, ATTR_VALUES,
                         ""), ",", true, true)) {
@@ -542,6 +821,15 @@ public class ExecutableOutputHandler extends OutputHandler {
 
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public boolean isValueArg() {
+            return (type == null) && !isCategory() && !nameDefined
+                   && Utils.stringDefined(value);
+        }
 
         /**
          * _more_
@@ -550,6 +838,15 @@ public class ExecutableOutputHandler extends OutputHandler {
          */
         public boolean isEnumeration() {
             return type.equals(TYPE_ENUMERATION);
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public boolean isFlag() {
+            return type.equals(TYPE_FLAG);
         }
 
 
@@ -577,9 +874,10 @@ public class ExecutableOutputHandler extends OutputHandler {
          *
          * @return _more_
          */
-        public boolean isValueArg() {
-            return (id == null) && (value != null);
+        public boolean isCategory() {
+            return (type != null) && type.equals(TYPE_CATEGORY);
         }
+
 
         /**
          * Set the Value property.
@@ -599,22 +897,14 @@ public class ExecutableOutputHandler extends OutputHandler {
             return value;
         }
 
-        /**
-         * Set the Id property.
-         *
-         * @param value The new value for Id
-         */
-        public void setId(String value) {
-            id = value;
-        }
 
         /**
          * Get the Id property.
          *
          * @return The Id
          */
-        public String getId() {
-            return id;
+        public String getName() {
+            return name;
         }
 
         /**
@@ -633,6 +923,16 @@ public class ExecutableOutputHandler extends OutputHandler {
          */
         public String getLabel() {
             return label;
+        }
+
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public String getSuffix() {
+            return suffix;
         }
 
         /**
@@ -711,6 +1011,21 @@ public class ExecutableOutputHandler extends OutputHandler {
         }
 
 
+        /**
+         *  Get the Category property.
+         *
+         *  @return The Category
+         */
+        public String getCategory() {
+            if ( !isCategory()) {
+                return null;
+            }
+
+            return label;
+        }
+
+
+
 
 
     }
@@ -724,18 +1039,33 @@ public class ExecutableOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
-        List<String> commands = new ArrayList<String>();
-        commands.add("/Users/jeffmc/.ramadda/bin/test.sh");
-
-
-
-        ProcessBuilder pb = new ProcessBuilder(commands);
-        pb.directory(new File("."));
+        Process      process  = null;
         StringWriter outBuf   = new StringWriter();
         StringWriter errorBuf = new StringWriter();
-        Process      process  = pb.start();
 
-        // process the outputs in a thread
+        args = new String[] {
+            "/Users/jeffmc/software/sratoolkit.2.3.5-2-mac64/bin/fastq-dump -O /Users/jeffmc/.ramadda/tmp/products/6d9a0c4a-9ca4-479f-8bfd-2e0e27deb142 /Users/jeffmc/data/genomics/sra/test\\ file.sra" };
+
+        args = new String[] {
+            "/Users/jeffmc/software/sratoolkit.2.3.5-2-mac64/bin/fastq-dump",
+            "-O",
+            "/Users/jeffmc/.ramadda/tmp/products/6d9a0c4a-9ca4-479f-8bfd-2e0e27deb142",
+            "/Users/jeffmc/data/genomics/sra/test file.sra" };
+
+
+        if (args.length == 1) {
+            process = Runtime.getRuntime().exec(args[0]);
+        } else {
+            List<String> commands = new ArrayList<String>();
+            for (String arg : args) {
+                commands.add(arg);
+            }
+            System.err.println("Commands:" + commands);
+            ProcessBuilder pb = new ProcessBuilder(commands);
+            pb.directory(new File("."));
+            process = pb.start();
+        }
+
         StreamEater esg = new StreamEater(process.getErrorStream(),
                                           new PrintWriter(errorBuf));
         StreamEater isg = new StreamEater(process.getInputStream(),
@@ -743,9 +1073,8 @@ public class ExecutableOutputHandler extends OutputHandler {
         esg.start();
         isg.start();
         int exitCode = process.waitFor();
-        System.err.println("code:" + exitCode + " output:" + outBuf + " err:"
-                           + errorBuf);
-
+        System.err.println("err:" + errorBuf);
+        System.err.println("out:" + outBuf);
 
     }
 

@@ -315,7 +315,7 @@ public class StorageManager extends RepositoryManager {
         commands.add("-h");
         commands.add(getRepositoryDir().toString());
         try {
-            String[] results = getRepository().executeCommand(commands,
+            String[] results = getRepository().getJobManager().executeCommand(commands,
                                    getRepositoryDir());
 
             return results[0];

@@ -605,6 +605,13 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_LOCATION_LONGITUDE = "location.longitude";
 
+
+    /** _more_ */
+    public static final String ARG_LATITUDE = "latitude";
+
+    /** _more_ */
+    public static final String ARG_LONGITUDE = "longitude";
+
     /** _more_ */
     public static final String ARG_BBOX = "bbox";
 

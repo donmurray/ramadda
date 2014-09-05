@@ -334,18 +334,10 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
         }
         LatLonPointImpl llp = null;
 
-        if (request.defined(ARG_LOCATION_LATITUDE)) {
-            /*            System.err.println("getting point");
-            System.err.println("latitude url arg:"
-                               + request.getString(ARG_LOCATION_LATITUDE,
-                                   "none"));
-            System.err.println("longitude url arg:"
-                               + request.getString(ARG_LOCATION_LONGITUDE,
-                                   "none"));
-            */
+        if (request.defined(TypeHandler.REQUESTARG_LATITUDE)) {
             llp = new LatLonPointImpl(
-                request.getLatOrLonValue(ARG_LOCATION_LATITUDE, deflat),
-                request.getLatOrLonValue(ARG_LOCATION_LONGITUDE, deflon));
+                request.getLatOrLonValue(TypeHandler.REQUESTARG_LATITUDE, deflat),
+                request.getLatOrLonValue(TypeHandler.REQUESTARG_LONGITUDE, deflon));
             //            System.err.println("latlon point:" + llp);
         }
         if (llp == null) {
@@ -515,8 +507,8 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
         String baseName = IOUtil.stripExtension(entry.getName());
         if (format.equalsIgnoreCase(FORMAT_TIMESERIES_CHART)) {
             request.put(CdmConstants.ARG_FORMAT, FORMAT_JSON);
-            request.put(ARG_LOCATION_LATITUDE, "_LATITUDEMACRO_");
-            request.put(ARG_LOCATION_LONGITUDE, "_LONGITUDEMACRO_");
+            request.put(ARG_LATITUDE, "_LATITUDEMACRO_");
+            request.put(ARG_LONGITUDE, "_LONGITUDEMACRO_");
             StringBuffer html = new StringBuffer();
             html.append(getWikiManager().getStandardChartDisplay(request,
                     entry));

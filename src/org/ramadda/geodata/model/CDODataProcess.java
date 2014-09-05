@@ -220,7 +220,7 @@ public abstract class CDODataProcess extends DataProcess {
 
         //System.out.println(commands);
         long millis = System.currentTimeMillis();
-        String[] results = getRepository().executeCommand(commands, null,
+        String[] results = getRepository().getJobManager().executeCommand(commands, null,
                                processDir, 60);
         //System.out.println("processing took: " + (System.currentTimeMillis()-millis));
         String errorMsg = results[1];

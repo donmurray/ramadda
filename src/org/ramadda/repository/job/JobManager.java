@@ -38,6 +38,8 @@ import org.ramadda.sql.SqlUtil;
 
 
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.ProcessRunner;
+import org.ramadda.util.StreamEater;
 import org.ramadda.util.TTLCache;
 
 
@@ -56,15 +58,17 @@ import java.io.*;
 import java.sql.ResultSet;
 import java.sql.Statement;
 
-
-
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
 
 import java.util.Hashtable;
 import java.util.List;
+
+
+
+
+import java.util.Map;
 import java.util.concurrent.*;
 
 import java.util.zip.*;
@@ -643,6 +647,206 @@ public class JobManager extends RepositoryManager {
      * @param sb _more_
      */
     public void addHtmlHeader(Request request, StringBuffer sb) {}
+
+
+
+    /**
+     * Excecute a command
+     *
+     * @param commands     command parameters
+     * @param dir   the working directory
+     *
+     * @return the input and output streams
+     *
+     * @throws Exception  problem with execution
+     */
+    public String[] executeCommand(List<String> commands, File dir)
+            throws Exception {
+        return executeCommand(commands, null, dir);
+    }
+
+    /**
+     * Excecute a command
+     *
+     * @param commands     command parameters
+     * @param envVars      enviroment variables
+     * @param workingDir   the working directory
+     *
+     * @return the input and output streams
+     *
+     * @throws Exception  problem with execution
+     */
+    public String[] executeCommand(List<String> commands,
+                                   Map<String, String> envVars,
+                                   File workingDir)
+            throws Exception {
+        return executeCommand(commands, envVars, workingDir,
+                              -1 /* don't timeout*/);
+    }
+
+    /**
+     * Excecute a command
+     *
+     * @param commands     command parameters
+     * @param envVars      enviroment variables
+     * @param workingDir   the working directory
+     * @param timeOutInSeconds   number of seconds to allow process to finish
+     *                           before killing it. <= 0 to not time out.
+     *
+     * @return the input and output streams
+     *
+     * @throws Exception  problem with execution
+     */
+    public String[] executeCommand(List<String> commands,
+                                   Map<String, String> envVars,
+                                   File workingDir, int timeOutInSeconds)
+            throws Exception {
+
+        return executeCommand(commands, envVars, workingDir,
+                              timeOutInSeconds, null, null);
+    }
+
+    /**
+     * _more_
+     *
+     * @param commands _more_
+     * @param envVars _more_
+     * @param workingDir _more_
+     * @param timeOutInSeconds _more_
+     * @param stdOutPrintWriter _more_
+     * @param stdErrPrintWriter _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String[] executeCommand(List<String> commands,
+                                   Map<String, String> envVars,
+                                   File workingDir, int timeOutInSeconds,
+                                   PrintWriter stdOutPrintWriter,
+                                   PrintWriter stdErrPrintWriter)
+            throws Exception {
+        ProcessBuilder pb = new ProcessBuilder(commands);
+        if (envVars != null) {
+            Map<String, String> env = pb.environment();
+            //env.clear();
+            env.putAll(envVars);
+        }
+        pb.directory(workingDir);
+        StringWriter outBuf   = new StringWriter();
+        StringWriter errorBuf = new StringWriter();
+        Process      process  = pb.start();
+        // process the outputs in a thread
+        if (stdOutPrintWriter == null) {
+            stdOutPrintWriter = new PrintWriter(outBuf);
+        }
+        if (stdErrPrintWriter == null) {
+            stdErrPrintWriter = new PrintWriter(errorBuf);
+        }
+
+        StreamEater esg = new StreamEater(process.getErrorStream(),
+                                          stdErrPrintWriter);
+        StreamEater isg = new StreamEater(process.getInputStream(),
+                                          stdOutPrintWriter);
+        esg.start();
+        isg.start();
+        if (timeOutInSeconds <= 0) {
+            //TODO: check exit code and throw error?
+            int exitCode = process.waitFor();
+            //            System.err.println ("Exit code:" + exitCode);
+
+            if (exitCode != 0) {}
+        } else {
+            ProcessRunner runnable = new ProcessRunner(
+                                         process,
+                                         TimeUnit.SECONDS.toMillis(
+                                             timeOutInSeconds));
+            runnable.start();
+            try {
+                runnable.join(TimeUnit.SECONDS.toMillis(timeOutInSeconds));
+            } catch (InterruptedException ex) {
+                esg.interrupt();
+                isg.interrupt();
+                runnable.interrupt();
+            } finally {
+                process.destroy();
+            }
+            int result = runnable.getExitCode();
+            if (result == ProcessRunner.PROCESS_KILLED) {
+                throw new InterruptedException("Process timed out");
+            }
+        }
+
+        int cnt = 0;
+        while (esg.getRunning() && (cnt++ < 100)) {
+            Misc.sleep(100);
+        }
+
+        cnt = 0;
+        while (isg.getRunning() && (cnt++ < 100)) {
+            Misc.sleep(100);
+        }
+
+
+        return new String[] { outBuf.toString(), errorBuf.toString() };
+
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param command _more_
+     * @param workingDir _more_
+     * @param timeOutInSeconds _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String[] executeCommand(String command, File workingDir,
+                                   int timeOutInSeconds)
+            throws Exception {
+        StringWriter outBuf   = new StringWriter();
+        StringWriter errorBuf = new StringWriter();
+
+        Process process = Runtime.getRuntime().exec(command, null,
+                              workingDir);
+        // process the outputs in a thread
+        StreamEater esg = new StreamEater(process.getErrorStream(),
+                                          new PrintWriter(errorBuf));
+        StreamEater isg = new StreamEater(process.getInputStream(),
+                                          new PrintWriter(outBuf));
+        esg.start();
+        isg.start();
+        if (timeOutInSeconds <= 0) {
+            //TODO: check exit code and throw error?
+            int exitCode = process.waitFor();
+        } else {
+            ProcessRunner runnable = new ProcessRunner(
+                                         process,
+                                         TimeUnit.SECONDS.toMillis(
+                                             timeOutInSeconds));
+            runnable.start();
+            try {
+                runnable.join(TimeUnit.SECONDS.toMillis(timeOutInSeconds));
+            } catch (InterruptedException ex) {
+                esg.interrupt();
+                isg.interrupt();
+                runnable.interrupt();
+            } finally {
+                process.destroy();
+            }
+            int result = runnable.getExitCode();
+            if (result == ProcessRunner.PROCESS_KILLED) {
+                throw new InterruptedException("Process timed out");
+            }
+        }
+
+
+        return new String[] { outBuf.toString(), errorBuf.toString() };
+
+    }
 
 
 

@@ -561,7 +561,7 @@ public class NCOOutputHandler extends OutputHandler implements DataProcessProvid
 
         commands.add(entry.getResource().getPath());
         commands.add(outFile.toString());
-        String[] results = getRepository().executeCommand(commands,
+        String[] results = getRepository().getJobManager().executeCommand(commands,
                                getProductDir());
         String errorMsg = results[1];
         String outMsg   = results[0];

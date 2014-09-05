@@ -40,6 +40,7 @@ import org.ramadda.repository.database.DatabaseManager;
 import org.ramadda.repository.database.Tables;
 import org.ramadda.repository.ftp.FtpManager;
 import org.ramadda.repository.harvester.HarvesterManager;
+import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.map.MapManager;
 import org.ramadda.repository.metadata.ContentMetadataHandler;
 import org.ramadda.repository.metadata.Metadata;
@@ -60,7 +61,6 @@ import org.ramadda.repository.type.Column;
 import org.ramadda.repository.type.GroupTypeHandler;
 import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.repository.util.ServerInfo;
-import org.ramadda.util.StreamEater;
 import org.ramadda.sql.Clause;
 import org.ramadda.sql.SqlUtil;
 import org.ramadda.util.HtmlUtils;
@@ -69,6 +69,7 @@ import org.ramadda.util.MyTrace;
 
 import org.ramadda.util.ProcessRunner;
 import org.ramadda.util.PropertyProvider;
+import org.ramadda.util.StreamEater;
 import org.ramadda.util.Utils;
 
 import org.w3c.dom.Document;
@@ -229,6 +230,9 @@ public class Repository extends RepositoryBase implements RequestHandler,
 
     /** The SessionManager */
     private SessionManager sessionManager;
+
+    /** _more_          */
+    private JobManager jobManager;
 
     /** The WikiManager */
     private WikiManager wikiManager;
@@ -808,6 +812,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
             monitorManager         = null;
             sessionManager         = null;
             wikiManager            = null;
+            jobManager             = null;
             logManager             = null;
             entryManager           = null;
             commentManager         = null;
@@ -1795,6 +1800,29 @@ public class Repository extends RepositoryBase implements RequestHandler,
      */
     protected LogManager doMakeLogManager() {
         return new LogManager(this);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public JobManager getJobManager() {
+        if (jobManager == null) {
+            jobManager = doMakeJobManager();
+        }
+
+        return jobManager;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    protected JobManager doMakeJobManager() {
+        return new JobManager(this);
     }
 
     /**
@@ -5398,103 +5426,6 @@ public class Repository extends RepositoryBase implements RequestHandler,
         return getSystemMessage();
     }
 
-
-    /**
-     * Excecute a command
-     *
-     * @param commands     command parameters
-     * @param dir   the working directory
-     *
-     * @return the input and output streams
-     *
-     * @throws Exception  problem with execution
-     */
-    public String[] executeCommand(List<String> commands, File dir)
-            throws Exception {
-        return executeCommand(commands, null, dir);
-    }
-
-    /**
-     * Excecute a command
-     *
-     * @param commands     command parameters
-     * @param envVars      enviroment variables
-     * @param workingDir   the working directory
-     *
-     * @return the input and output streams
-     *
-     * @throws Exception  problem with execution
-     */
-    public String[] executeCommand(List<String> commands,
-                                   Map<String, String> envVars,
-                                   File workingDir)
-            throws Exception {
-        return executeCommand(commands, envVars, workingDir,
-                              -1 /* don't timeout*/);
-    }
-
-    /**
-     * Excecute a command
-     *
-     * @param commands     command parameters
-     * @param envVars      enviroment variables
-     * @param workingDir   the working directory
-     * @param timeOutInSeconds   number of seconds to allow process to finish
-     *                           before killing it. <= 0 to not time out.
-     *
-     * @return the input and output streams
-     *
-     * @throws Exception  problem with execution
-     */
-    public String[] executeCommand(List<String> commands,
-                                   Map<String, String> envVars,
-                                   File workingDir, int timeOutInSeconds)
-            throws Exception {
-        ProcessBuilder pb = new ProcessBuilder(commands);
-        if (envVars != null) {
-            Map<String, String> env = pb.environment();
-            //env.clear();
-            env.putAll(envVars);
-        }
-        pb.directory(workingDir);
-        StringWriter outBuf   = new StringWriter();
-        StringWriter errorBuf = new StringWriter();
-        Process      process  = pb.start();
-        // process the outputs in a thread
-        StreamEater esg = new StreamEater(process.getErrorStream(),
-                                          new PrintWriter(errorBuf));
-        StreamEater isg = new StreamEater(process.getInputStream(),
-                                          new PrintWriter(outBuf));
-        esg.start();
-        isg.start();
-        if (timeOutInSeconds <= 0) {
-            //TODO: check exit code and throw error?
-            int exitCode = process.waitFor();
-        } else {
-            ProcessRunner runnable = new ProcessRunner(
-                                         process,
-                                         TimeUnit.SECONDS.toMillis(
-                                             timeOutInSeconds));
-            runnable.start();
-            try {
-                runnable.join(TimeUnit.SECONDS.toMillis(timeOutInSeconds));
-            } catch (InterruptedException ex) {
-                esg.interrupt();
-                isg.interrupt();
-                runnable.interrupt();
-            } finally {
-                process.destroy();
-            }
-            int result = runnable.getExitCode();
-            if (result == ProcessRunner.PROCESS_KILLED) {
-                throw new InterruptedException("Process timed out");
-            }
-        }
-
-
-        return new String[] { outBuf.toString(), errorBuf.toString() };
-
-    }
 
 
 }

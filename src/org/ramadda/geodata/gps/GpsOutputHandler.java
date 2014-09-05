@@ -762,7 +762,7 @@ public class GpsOutputHandler extends OutputHandler {
             System.err.println("work dir:" + workDir + " rinex file:"
                                + rinexFile);
             System.err.println("args:" + args);
-            String[] results  = getRepository().executeCommand(args, workDir);
+            String[] results  = getRepository().getJobManager().executeCommand(args, workDir);
             String   errorMsg = results[1];
             String   outMsg   = results[0];
             sb.append("<li>");
