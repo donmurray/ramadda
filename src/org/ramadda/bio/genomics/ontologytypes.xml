@@ -13,6 +13,7 @@
 
 
   <type name="bio_ontology_assay" super="bio_ontology"  description="Assay"  handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler">
+     <property name="icon" value="/genomics/scanner.png"/>
    </type>
 
 
