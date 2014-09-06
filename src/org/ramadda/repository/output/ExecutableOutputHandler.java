@@ -113,6 +113,9 @@ public class ExecutableOutputHandler extends OutputHandler {
     public static final String ATTR_SUFFIX = "suffix";
 
     /** _more_ */
+    public static final String ATTR_GROUP = "group";
+
+    /** _more_ */
     public static final String ATTR_COMMAND = "command";
 
     /** _more_ */
@@ -329,7 +332,8 @@ public class ExecutableOutputHandler extends OutputHandler {
         List<String> commands = new ArrayList<String>();
         commands.add(cmd);
 
-        String fileTail = getStorageManager().getFileTail(entry);
+        String          fileTail  = getStorageManager().getFileTail(entry);
+        HashSet<String> seenGroup = new HashSet<String>();
         for (Arg arg : args) {
             if (arg.getCategory() != null) {
                 continue;
@@ -338,7 +342,16 @@ public class ExecutableOutputHandler extends OutputHandler {
             if (arg.isValueArg()) {
                 argValue = arg.getValue();
             } else if (arg.isFlag()) {
-                if (request.get(arg.getName(), false)) {
+                if (arg.getGroup() != null) {
+                    if ( !seenGroup.contains(arg.getGroup())) {
+                        argValue = request.getString(arg.getGroup(), null);
+                        if ((argValue != null) && (argValue.length() > 0)) {
+                            seenGroup.add(arg.getGroup());
+                        } else {
+                            argValue = null;
+                        }
+                    }
+                } else if (request.get(arg.getName(), false)) {
                     argValue = arg.getValue();
                 }
             } else if (arg.isFile()) {
@@ -381,8 +394,8 @@ public class ExecutableOutputHandler extends OutputHandler {
         File     stdoutFile = new File(IOUtil.joinDir(workDir, ".stdout"));
         File     stderrFile = new File(IOUtil.joinDir(workDir, ".stderr"));
         if (doSingleArgCommand) {
-            System.err.println("Executing: "
-                               + StringUtil.join(" ", commands));
+            System.err.println("Executing: " + commands);
+            //                               + StringUtil.join("-", commands));
             results =
                 getRepository().getJobManager().executeCommand(commands,
                     null, workDir, -1, new PrintWriter(stdoutFile),
@@ -599,8 +612,17 @@ public class ExecutableOutputHandler extends OutputHandler {
                 input = HtmlUtils.select(arg.getName(), arg.getValues(),
                                          (List) null, "", 100);
             } else if (arg.isFlag()) {
-                input = HtmlUtils.labeledCheckbox(arg.getName(), "true",
-                        request.get(arg.getName(), false), arg.getLabel());
+                if (arg.getGroup() != null) {
+                    boolean selected = request.getString(arg.getGroup(),
+                                           "").equals(arg.getValue());
+                    input = HtmlUtils.radio(arg.getGroup(), arg.getValue(),
+                                            selected) + HtmlUtils.space(2)
+                                                + arg.getLabel();
+                } else {
+                    input = HtmlUtils.labeledCheckbox(arg.getName(), "true",
+                            request.get(arg.getName(), false),
+                            arg.getLabel());
+                }
                 catBuff.append(HtmlUtils.formEntry("", input));
 
                 continue;
@@ -724,7 +746,7 @@ public class ExecutableOutputHandler extends OutputHandler {
         /** _more_ */
         private String filename;
 
-        /** _more_          */
+        /** _more_ */
         private boolean showResults = false;
 
         /**
@@ -818,6 +840,9 @@ public class ExecutableOutputHandler extends OutputHandler {
         private String value;
 
         /** _more_ */
+        private String group;
+
+        /** _more_ */
         private boolean nameDefined = false;
 
         /** _more_ */
@@ -859,6 +884,7 @@ public class ExecutableOutputHandler extends OutputHandler {
             }
 
             type      = XmlUtil.getAttribute(node, ATTR_TYPE, (String) null);
+            group     = XmlUtil.getAttribute(node, ATTR_GROUP, (String) null);
             value     = XmlUtil.getChildText(node);
             label     = XmlUtil.getAttribute(node, ATTR_LABEL, name);
             suffix    = XmlUtil.getAttribute(node, ATTR_SUFFIX, "");
@@ -937,6 +963,16 @@ public class ExecutableOutputHandler extends OutputHandler {
          */
         public boolean isCategory() {
             return (type != null) && type.equals(TYPE_CATEGORY);
+        }
+
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public String getGroup() {
+            return group;
         }
 
 

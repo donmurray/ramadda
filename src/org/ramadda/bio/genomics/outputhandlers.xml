@@ -10,7 +10,7 @@
   </outputhandler>
 
   <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" label="SRA-to-SAM" id="sra_to_sam" type="bio_sra" icon="/genomics/dna.png" command="${bio.sratools}/sam-dump"  actionLabel="Convert SRA to SAM" >
-   <help>This will convert the given SRA file to SAM format</help>
+   <help>Convert the given SRA file to SAM format</help>
 
    <arg type="flag" label="Output unaligned reads along with aligned reads">--unaligned</arg>
    <arg type="flag" label="Output only primary alignments ">--primary</arg>
@@ -43,6 +43,7 @@
 
 
   <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" label="Run HMMSTAT" id="hmmer_stat" type="bio_hmmer_index" icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmstat" >
+    <help>Run HMMSTAT</help>
     <arg type="flag" label="Compute score for E-value (E) for database of (Z) sequences">--eval2score</arg>
     <arg type="flag" label="Compute E-value for score (S) for database of (Z) sequences">--score2eval</arg>
     <arg type="int" size="5" label="Database size" suffix="Database size (in seqs) for --eval2score or --score2eval">-Z</arg>
@@ -52,23 +53,22 @@
     <arg type="float" size="5" label="Score input" suffix="For score2eval">-S</arg>
     <arg>${entry.file}</arg>
     <output showResults="true" stdout="true"/>
-    <help>This runs HMMSTAT</help>
   </outputhandler>
 
 
   <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" label="Run HMMEMIT" id="hmmer_emit" type="bio_hmmer_index" icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmemit" >
-    <arg type="int" size="5" label="Number of sequences" suffix="Number of sequences to sampl">-N</arg>
-    <arg type="flag" label="Emit alignment">-a</arg>
-    <arg type="flag" label="Emit simple majority-rule consensus sequence">-c</arg>
-    <arg type="flag" label="Emit fancier consensus sequence">-C</arg>
-    <arg type="flag" label="Sample sequences from profile, not core model">-p</arg>
+    <arg type="int" size="5" label="Number of sequences" suffix="Number of sequences to sample">-N</arg>
+    <arg type="flag" group="emitoptions" label="Emit alignment">-a</arg>
+    <arg type="flag" group="emitoptions" label="Emit simple majority-rule consensus sequence">-c</arg>
+    <arg type="flag" group="emitoptions" label="Emit fancier consensus sequence">-C</arg>
+    <arg type="flag" group="emitoptions" label="Sample sequences from profile, not core model">-p</arg>
 
     <arg type="category" label="Options controlling emission from profiles"></arg>
     <arg type="int" size="5" label="Expected length" suffix="Set expected length from profile to">-L</arg>
-    <arg type="flag" label="Configure profile in multihit local mode">--local</arg>
-    <arg type="flag" label="Configure profile in unilocal mode">--unilocal</arg>
-    <arg type="flag" label="Configure profile in multihit glocal mode">--glocal</arg>
-    <arg type="flag" label="Configure profile in unihit glocal mode">--uniglocal</arg>
+    <arg type="flag" group="configure_profile" label="Configure profile in multihit local mode">--local</arg>
+    <arg type="flag" group="configure_profile" label="Configure profile in unilocal mode">--unilocal</arg>
+    <arg type="flag" group="configure_profile" label="Configure profile in multihit glocal mode">--glocal</arg>
+    <arg type="flag" group="configure_profile" label="Configure profile in unihit glocal mode">--uniglocal</arg>
 
     <arg type="category" label="Options controlling fancy consensus emission"></arg>
     <arg type="float" size="5" label="Min L" suffix="Show consensus as 'any' (X/N) unless &gt;= this fraction">--minl</arg>
