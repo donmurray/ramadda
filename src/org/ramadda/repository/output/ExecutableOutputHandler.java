@@ -109,7 +109,7 @@ public class ExecutableOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String ATTR_LABEL = "label";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SUFFIX = "suffix";
 
     /** _more_ */
@@ -126,13 +126,14 @@ public class ExecutableOutputHandler extends OutputHandler {
     private String entryType;
 
 
-    /** _more_          */
+    /** _more_ */
     private boolean enabled = false;
+
 
     /** _more_ */
     private String command;
 
-    /** _more_          */
+    /** _more_ */
     private boolean doSingleArgCommand = false;
 
 
@@ -193,7 +194,8 @@ public class ExecutableOutputHandler extends OutputHandler {
             pathProperty = command.substring(2, command.indexOf("}"));
         }
 
-        if (getProperty(pathProperty, null) == null) {
+        if ((pathProperty == null)
+                || (getProperty(pathProperty, null) == null)) {
             System.err.println(
                 "ExecutableOutputHandler: no path property defined:"
                 + pathProperty);
@@ -405,27 +407,53 @@ public class ExecutableOutputHandler extends OutputHandler {
             return new Result(outputType.getLabel(), sb);
         }
 
-        List<Entry>   newEntries = new ArrayList<Entry>();
-        List<File>    newFiles   = new ArrayList<File>();
-        HashSet<File> seen       = new HashSet<File>();
+
+        StringBuffer  resultsSB   = new StringBuffer();
+
+        List<Entry>   newEntries  = new ArrayList<Entry>();
+        List<File>    newFiles    = new ArrayList<File>();
+        HashSet<File> seen        = new HashSet<File>();
+        boolean       showResults = false;
         for (Output output : outputs) {
+            if (output.showResults) {
+                showResults = true;
+                System.err.println("Showing results");
+                if (output.useStdout) {
+                    resultsSB.append(IOUtil.readContents(stdoutFile));
+                    System.err.println("resultssb: " + resultsSB);
+                } else {}
+
+                continue;
+            }
+
+
+            File[] files = null;
+            if (output.useStdout) {
+                String filename = applyMacros(entry, workDir,
+                                      output.filename);
+                File destFile = new File(IOUtil.joinDir(workDir, filename));
+                IOUtil.moveFile(stdoutFile, destFile);
+                files = new File[] { destFile };
+            }
             final String thePattern = output.getPattern();
-            File[]       files      = workDir.listFiles(new FileFilter() {
-                public boolean accept(File f) {
-                    if (thePattern == null) {
-                        return true;
-                    }
-                    String name = f.getName();
-                    if (name.startsWith(".")) {
+            if (files == null) {
+                files = workDir.listFiles(new FileFilter() {
+                    public boolean accept(File f) {
+                        if (thePattern == null) {
+                            return true;
+                        }
+                        String name = f.getName();
+                        if (name.startsWith(".")) {
+                            return false;
+                        }
+                        if (name.matches(thePattern)) {
+                            return true;
+                        }
+
                         return false;
                     }
-                    if (name.matches(thePattern)) {
-                        return true;
-                    }
-
-                    return false;
-                }
-            });
+                });
+            }
 
             for (File file : files) {
                 if (seen.contains(file)) {
@@ -439,6 +467,7 @@ public class ExecutableOutputHandler extends OutputHandler {
                         getRepository().getTypeHandler(output.getEntryType());
                     Entry newEntry =
                         typeHandler.createEntry(getRepository().getGUID());
+                    newEntry.setDate(new Date().getTime());
                     getEntryManager().processEntryPublish(request, files[0],
                             newEntry, entry, "derived from");
                     newEntries.add(newEntry);
@@ -451,6 +480,16 @@ public class ExecutableOutputHandler extends OutputHandler {
             return new Result(
                 request.entryUrl(
                     getRepository().URL_ENTRY_SHOW, newEntries.get(0)));
+        }
+
+        if (showResults) {
+            makeForm(request, entry, sb);
+            sb.append(header(msg("Results")));
+            sb.append("<pre>");
+            sb.append(resultsSB);
+            sb.append("</pre>");
+
+            return new Result(outputType.getLabel(), sb);
         }
 
         if (newFiles.size() == 0) {
@@ -523,6 +562,7 @@ public class ExecutableOutputHandler extends OutputHandler {
      */
     public void makeForm(Request request, Entry entry, StringBuffer sb)
             throws Exception {
+
         sb.append(request.form(getRepository().URL_ENTRY_SHOW));
         sb.append(HtmlUtils.hidden(ARG_OUTPUT, outputType.getId()));
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
@@ -533,15 +573,14 @@ public class ExecutableOutputHandler extends OutputHandler {
 
         int          blockCnt = 0;
         StringBuffer catBuff  = null;
-        String       catLabel = null;
         Arg          catArg   = null;
         for (Arg arg : args) {
             if (arg.isCategory()) {
-                if (catBuff != null) {
+                if ((catBuff != null) && (catBuff.length() > 0)) {
                     processCatBuff(request, sb, catArg, catBuff, ++blockCnt);
                 }
                 catArg  = arg;
-                catBuff = new StringBuffer(HtmlUtils.formTable());
+                catBuff = new StringBuffer();
 
                 continue;
             }
@@ -551,7 +590,7 @@ public class ExecutableOutputHandler extends OutputHandler {
             }
 
             if (catBuff == null) {
-                catBuff = new StringBuffer(HtmlUtils.formTable());
+                catBuff = new StringBuffer();
                 catArg  = null;
             }
 
@@ -596,21 +635,36 @@ public class ExecutableOutputHandler extends OutputHandler {
                     input));
         }
 
-        if (catBuff != null) {
+        if ((catBuff != null) && (catBuff.length() > 0)) {
             processCatBuff(request, sb, catArg, catBuff, ++blockCnt);
         }
-        sb.append(HtmlUtils.p());
 
-
-        sb.append(HtmlUtils.submit(actionLabel, ARG_EXECUTE,
-                                   makeButtonSubmitDialog(sb,
-                                       "Processing request...")));
+        if (blockCnt > 1) {
+            sb.append(HtmlUtils.p());
+            sb.append(HtmlUtils.submit(actionLabel, ARG_EXECUTE,
+                                       makeButtonSubmitDialog(sb,
+                                           "Processing request...")));
+        }
         sb.append(HtmlUtils.p());
         sb.append(HtmlUtils.formTable());
-        addPublishWidget(request, entry, sb,
-                         msg("Optionally, select a folder to publish to"));
+
+        boolean haveAnyOutputs = false;
+        for (Output output : outputs) {
+            if ( !output.showResults) {
+                haveAnyOutputs = true;
+
+                break;
+            }
+        }
+
+        if (haveAnyOutputs) {
+            addPublishWidget(
+                request, entry, sb,
+                msg("Optionally, select a folder to publish to"));
+        }
 
         sb.append(HtmlUtils.formTableClose());
+
     }
 
     /**
@@ -635,12 +689,14 @@ public class ExecutableOutputHandler extends OutputHandler {
             }
             sb.append(html);
         }
-        catBuff.append(HtmlUtils.formTableClose());
+        StringBuffer formSB = new StringBuffer(HtmlUtils.formTable());
+        formSB.append(catBuff);
+        formSB.append(HtmlUtils.formTableClose());
         if (blockCnt == 1) {
-            sb.append(catBuff);
+            sb.append(formSB);
         } else {
             sb.append(HtmlUtils.makeShowHideBlock("More...",
-                    catBuff.toString(), blockCnt == 1));
+                    formSB.toString(), blockCnt == 1));
         }
     }
 
@@ -668,6 +724,9 @@ public class ExecutableOutputHandler extends OutputHandler {
         /** _more_ */
         private String filename;
 
+        /** _more_          */
+        private boolean showResults = false;
+
         /**
          * _more_
          *
@@ -678,7 +737,9 @@ public class ExecutableOutputHandler extends OutputHandler {
                                              TypeHandler.TYPE_FILE);
             pattern   = XmlUtil.getAttribute(node, "pattern", (String) null);
             useStdout = XmlUtil.getAttribute(node, "stdout", useStdout);
-            filename  = XmlUtil.getAttribute(node, "filename", (String) null);
+            filename = XmlUtil.getAttribute(node, "filename", (String) null);
+            showResults = XmlUtil.getAttribute(node, "showResults",
+                    showResults);
         }
 
 
@@ -740,7 +801,7 @@ public class ExecutableOutputHandler extends OutputHandler {
         /** _more_ */
         private static final String TYPE_ENTRY = "entry";
 
-        /** _more_          */
+        /** _more_ */
         private static final String TYPE_FLAG = "flag";
 
         /** _more_ */
@@ -756,16 +817,16 @@ public class ExecutableOutputHandler extends OutputHandler {
         /** _more_ */
         private String value;
 
-        /** _more_          */
+        /** _more_ */
         private boolean nameDefined = false;
 
-        /** _more_          */
-        private boolean ifDefined = false;
+        /** _more_ */
+        private boolean ifDefined = true;
 
         /** _more_ */
         private String label;
 
-        /** _more_          */
+        /** _more_ */
         private String suffix;
 
         /** _more_ */
