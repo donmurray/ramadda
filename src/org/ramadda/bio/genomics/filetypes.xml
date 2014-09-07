@@ -20,22 +20,18 @@
   <type name="bio_sambam"  description="SAM/BAM Data" foruser="false" super="bio_sequence" handler="org.ramadda.bio.genomics.SamTypeHandler">
   </type>
 
-
   <type name="bio_sam"  description="SAM Data" foruser="true" super="bio_sambam">
   </type>
 
   <type name="bio_bam"  description="BAM Data" foruser="true" super="bio_sambam">
   </type>
 
-
   <type name="bio_stockholm"  description="Stockholm File" foruser="true" super="bio_genomics" handler="org.ramadda.bio.genomics.StockholmTypeHandler" pattern=".*\.sto$">
   </type>
-
 
 <!--
      <column name="data_type" label="Earth Science Data Type" type="enumerationplus" values="" cansearch="true" />
 -->
-
 
   <type name="bio_sra"  description="Sequence Read Archive" foruser="true" super="bio_genomics"  pattern=".*\.sra$" handler="org.ramadda.bio.genomics.SraTypeHandler">
   </type>
@@ -44,7 +40,6 @@
   <type name="bio_hmmer_index"  description="HMMER Index File" foruser="true" super="bio_genomics"  pattern=".*\.hmm$">
      <property name="icon" value="/genomics/hmmer.png"/>
   </type>
-
 
   <type name="bio_biom"  description="BIOM File" foruser="true" super="bio_genomics" handler="org.ramadda.bio.genomics.BiomTypeHandler" pattern=".*\.biom$">
   </type>
