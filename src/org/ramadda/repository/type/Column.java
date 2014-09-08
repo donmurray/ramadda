@@ -319,6 +319,7 @@ public class Column implements DataTypes, Constants {
     /** _more_ */
     private String propertiesFile;
 
+    /** _more_          */
     private int columnIndex;
 
     /** _more_ */
@@ -942,11 +943,17 @@ public class Column implements DataTypes, Constants {
                               + "</a>");
                 }
             }
+
+
         } else {
             String s = toString(values, offset);
             if (csv) {
                 s = s.replaceAll(",", "_COMMA_");
                 s = s.replaceAll("\n", " ");
+            } else {
+                if (isType(DATATYPE_LIST)) {
+                    s = s.replaceAll("\n", "<br>");
+                }
             }
             if (s.length() == 0) {
                 if ( !getShowEmpty()) {
@@ -3050,23 +3057,23 @@ public class Column implements DataTypes, Constants {
         return new Double(attrValue).doubleValue();
     }
 
-/**
-Set the ColumnIndex property.
+    /**
+     * Set the ColumnIndex property.
+     *
+     * @param value The new value for ColumnIndex
+     */
+    public void setColumnIndex(int value) {
+        columnIndex = value;
+    }
 
-@param value The new value for ColumnIndex
-**/
-public void setColumnIndex (int value) {
-	columnIndex = value;
-}
-
-/**
-Get the ColumnIndex property.
-
-@return The ColumnIndex
-**/
-public int getColumnIndex () {
-	return columnIndex;
-}
+    /**
+     * Get the ColumnIndex property.
+     *
+     * @return The ColumnIndex
+     */
+    public int getColumnIndex() {
+        return columnIndex;
+    }
 
 
 
