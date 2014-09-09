@@ -1,7 +1,7 @@
 <types>
 
   <type name="bio_ontology"  foruser="false" description="Bio Ontology" category="Bio">
-     <property name="icon" value="/genomics/dna.png"/>
+     <property name="icon" value="/biotypes/dna.png"/>
      <property name="form.resource.show" value="false"/>
      <property name="form.datatype.show" value="false"/>
      <property name="form.altitude.show" value="false"/>
@@ -13,23 +13,23 @@
 
 
   <type name="bio_ontology_assay" super="bio_ontology"  description="Assay" >
-     <property name="icon" value="/genomics/scanner.png"/>
+     <property name="icon" value="/biotypes/scanner.png"/>
    </type>
 
 
   <type name="bio_ontology_sample" super="bio_ontology"  description="Sample" >
-     <property name="icon" value="/genomics/pipette.png"/>
+     <property name="icon" value="/biotypes/pipette.png"/>
      <property name="form.fromdate.label" value="Sample Date"/>
    </type>
 
   <type name="bio_ontology_person" super="bio_ontology"  description="Person"  >
-     <property name="icon" value="/genomics/user.png"/>
+     <property name="icon" value="/biotypes/user.png"/>
      <property name="form.fromdate.label" value="Date of Birth"/>
      <column name="gender"  type="enumeration"  values="f:Female,m:Male" label="Gender" cansearch="true"/>
    </type>
 
   <type name="bio_ontology_cohort" super="bio_ontology"  description="Cohort"  handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" children="bio_ontology_person">
-     <property name="icon" value="/genomics/users.png"/>
+     <property name="icon" value="/biotypes/users.png"/>
    </type>
 
 
