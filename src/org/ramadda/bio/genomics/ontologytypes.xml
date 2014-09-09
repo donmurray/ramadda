@@ -1,6 +1,6 @@
 <types>
 
-  <type name="bio_ontology"  foruser="false" description="Bio Ontology" category="Genomics">
+  <type name="bio_ontology"  foruser="false" description="Bio Ontology" category="Bio">
      <property name="icon" value="/genomics/dna.png"/>
      <property name="form.resource.show" value="false"/>
      <property name="form.datatype.show" value="false"/>
