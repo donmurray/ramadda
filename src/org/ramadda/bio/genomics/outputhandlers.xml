@@ -1,51 +1,56 @@
 <outputhandlers>
 
-  <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" label="SRA-to-FASTQ" id="sra_to_fastq"  icon="/genomics/dna.png"  actionLabel="Convert SRA to FASTQ" command="${bio.sratools}/fastq-dump">
-    <help>This will convert the given SRA file to the FASTQ format</help>
-    <arg>-O</arg>
-    <arg>${workdir}</arg>
-    <arg>${entry.file}</arg>
-    <input type="bio_sra"/>
-    <output type="bio_fastq" pattern=".*\.fastq"/>
+  <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" >
+    <command command="${bio.sratools}/fastq-dump" label="Convert SRA to FASTQ" id="sra_to_fastq" icon="/genomics/dna.png">
+      <help>Convert the given SRA file to the FASTQ format</help>
+      <arg>-O</arg>
+      <arg>${workdir}</arg>
+      <arg>${entry.file}</arg>
+      <input type="bio_sra"/>
+      <output type="bio_fastq" pattern=".*\.fastq"/>
+    </command>
   </outputhandler>
 
-  <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" label="SRA-to-SAM" id="sra_to_sam"  icon="/genomics/dna.png" command="${bio.sratools}/sam-dump"  actionLabel="Convert SRA to SAM" >
-   <help>Convert the given SRA file to SAM format</help>
-    <input type="bio_sra"/>
+  <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" >
+    <command  id="sra_to_sam"  icon="/genomics/dna.png" command="${bio.sratools}/sam-dump"  label="Convert SRA to SAM" >
+     <help>Convert the given SRA file to SAM format</help>
+     <input type="bio_sra"/>
+     <arg type="flag" label="Output unaligned reads along with aligned reads">--unaligned</arg>
+     <arg type="flag" label="Output only primary alignments ">--primary</arg>
+     <arg type="string" label="Aligned region name" ifdefined="true" suffix="Filter by position on genome. Name can either be file specific name (ex: &quot;chr1&quot; or &quot;1&quot;). &quot;from&quot; and &quot;to&quot; (inclusive) are 1-based coordinates">--aligned-region</arg>
+     <arg type="string" label="Mate pair distance" ifdefined="true" suffix="&lt;from-to|'unknown'&gt;  Filter by distance between matepairs. Use &quot;unknown&quot; to find matepairs slit between the references. Use from-to (inclusive) to limit matepair distance on  the same reference ">--matepair-distance</arg>
 
-   <arg type="flag" label="Output unaligned reads along with aligned reads">--unaligned</arg>
-   <arg type="flag" label="Output only primary alignments ">--primary</arg>
-   <arg type="string" label="Aligned region name" ifdefined="true" suffix="Filter by position on genome. Name can either be file specific name (ex: &quot;chr1&quot; or &quot;1&quot;). &quot;from&quot; and &quot;to&quot; (inclusive) are 1-based coordinates">--aligned-region</arg>
-   <arg type="string" label="Mate pair distance" ifdefined="true" suffix="&lt;from-to|'unknown'&gt;  Filter by distance between matepairs. Use &quot;unknown&quot; to find matepairs slit between the references. Use from-to (inclusive) to limit matepair distance on  the same reference ">--matepair-distance</arg>
-
-   <arg type="category" label="Miscellaneous"></arg>
-   <arg type="flag" label="Print reference SEQ_ID in RNAME instead of NAME">--seqid</arg>
-   <arg type="flag" label="Do not output headers ">--no-header</arg>
-   <arg type="flag" label="Output reads for spots with no aligned reads">--unaligned-spots-only</arg>
-   <arg type="flag" label="Min. mapq an alignment has to have, to be printed ">--min-mapq</arg>
-   <arg type="flag" label="Modify cigar-string and output flags if rna-splicing detected">--rna-splicing</arg>
-   <arg type="flag" label="Disable Multithreading">--disable-multithreading</arg>
-   <arg type="flag" label="Reverse unaligned reads according to read type ">--reverse</arg>
-   <arg type="flag" label="Output '=' if base is identical to reference">--hide-identical</arg>
-
-   <arg>--output-file</arg>
-   <arg>${entry.filebase}.sam</arg>
-   <arg>${entry.file}</arg>
-   <output type="bio_sam" pattern=".*\.sam"/>
+     <arg type="category" label="Miscellaneous"></arg>
+     <arg type="flag" label="Print reference SEQ_ID in RNAME instead of NAME">--seqid</arg>
+     <arg type="flag" label="Do not output headers ">--no-header</arg>
+     <arg type="flag" label="Output reads for spots with no aligned reads">--unaligned-spots-only</arg>
+     <arg type="flag" label="Min. mapq an alignment has to have, to be printed ">--min-mapq</arg>
+     <arg type="flag" label="Modify cigar-string and output flags if rna-splicing detected">--rna-splicing</arg>
+     <arg type="flag" label="Disable Multithreading">--disable-multithreading</arg>
+     <arg type="flag" label="Reverse unaligned reads according to read type ">--reverse</arg>
+     <arg type="flag" label="Output '=' if base is identical to reference">--hide-identical</arg>
+     <arg>--output-file</arg>
+     <arg>${entry.filebase}.sam</arg>
+     <arg>${entry.file}</arg>
+     <output type="bio_sam" pattern=".*\.sam"/>
+   </command>
   </outputhandler>
 
 
-  <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" label="Convert HMMER File" id="hmmer_convert"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmconvert">
+  <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler">
+  <command label="Convert HMMER File" id="hmmer_convert"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmconvert" >
+    <help>This will convert the given HMMER binary file to text</help>
     <input type="bio_hmmer_index"/>
     <arg>${entry.file}</arg>
     <output type="bio_hmmer_index" stdout="true" filename="${entry.filebase}.hmm"/>
-    <help>This will convert the given HMMER binary file to text</help>
+   </command>
   </outputhandler>
 
 
-  <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" label="Run HMMSTAT" id="hmmer_stat"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmstat" >
-    <input type="bio_hmmer_index"/>
+  <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" >
+  <command label="Run HMMSTAT" id="hmmer_stat"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmstat" >
     <help>Run HMMSTAT</help>
+    <input type="bio_hmmer_index"/>
     <arg type="flag" label="Compute score for E-value (E) for database of (Z) sequences">--eval2score</arg>
     <arg type="flag" label="Compute E-value for score (S) for database of (Z) sequences">--score2eval</arg>
     <arg type="int" size="5" label="Database size" suffix="Database size (in seqs) for --eval2score or --score2eval">-Z</arg>
@@ -55,12 +60,14 @@
     <arg type="float" size="5" label="Score input" suffix="For score2eval">-S</arg>
     <arg>${entry.file}</arg>
     <output showResults="true" stdout="true"/>
+   </command>
   </outputhandler>
 
 
-  <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" label="Run HMMEMIT" id="hmmer_emit"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmemit" >
-    <input type="bio_hmmer_index"/>
+  <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" >
+  <command label="Run HMMEMIT" id="hmmer_emit"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmemit" >
     <help>This runs hmmemit</help>
+    <input type="bio_hmmer_index"/>
     <arg type="int" size="5" label="Number of sequences" suffix="Number of sequences to sample">-N</arg>
     <arg type="flag" group="emitoptions" label="Emit alignment">-a</arg>
     <arg type="flag" group="emitoptions" label="Emit simple majority-rule consensus sequence">-c</arg>
@@ -77,20 +84,27 @@
     <arg type="category" label="Options controlling fancy consensus emission"></arg>
     <arg type="float" size="5" label="Min L" suffix="Show consensus as 'any' (X/N) unless &gt;= this fraction">--minl</arg>
     <arg type="float" size="5" label="Min U" suffix="Show consensus as upper case if >= this fraction">--minu</arg>
-
     <arg>${entry.file}</arg>
     <output showResults="true" stdout="true"/>
+   </command>
   </outputhandler>
 
 
-
-  <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" label="Run HMMFETCH" id="hmmer_fetch"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmfetch" >
+  <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler">
+  <command label="Run HMMFETCH" id="hmmer_fetch"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmfetch" >
+    <help>This runs hmmfetch</help>
     <input type="bio_hmmer_index"/>
     <arg>${entry.file}</arg>
     <arg type="string" label="Key" size="35"></arg>
     <output type="bio_hmmer_index" stdout="true" filename="${entry.filebase}.hmm"/>
-    <help>This runs hmmfetch</help>
+   </command>
   </outputhandler>
+
+
+<!--
+  <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" commandId="sra_to_fastq" label="Test reference to other command"/>
+-->
+
 
 
 

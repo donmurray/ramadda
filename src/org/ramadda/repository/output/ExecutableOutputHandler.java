@@ -20,12 +20,14 @@
 
 package org.ramadda.repository.output;
 
+
 import org.ramadda.repository.*;
 import org.ramadda.repository.job.Command;
 import org.ramadda.repository.type.*;
 
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Utils;
+
 import org.w3c.dom.*;
 
 import ucar.unidata.util.IOUtil;
@@ -83,14 +85,27 @@ public class ExecutableOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     private void init(Element element) throws Exception {
-        command = new Command(getRepository(), element);
+        String commandId = XmlUtil.getAttribute(element, "commandId",
+                               (String) null);
+        if (commandId != null) {
+            command = getRepository().getJobManager().getCommand(commandId);
+        }
 
-        outputType = new OutputType(XmlUtil.getAttribute(element, ATTR_LABEL,
-                "Executable"), XmlUtil.getAttribute(element, ATTR_ID),
-                               OutputType.TYPE_OTHER
-                               | OutputType.TYPE_IMPORTANT, "",
-                                   XmlUtil.getAttribute(element, ATTR_ICON,
-                                       (String) null));
+        if (command == null) {
+            NodeList children = XmlUtil.getElements(element,
+                                    Command.TAG_COMMAND);
+            Element commandNode = element;
+            if (children.getLength() > 0) {
+                commandNode = (Element) children.item(0);
+            }
+            command = new Command(getRepository(), commandNode);
+        }
+
+        outputType = new OutputType(
+            XmlUtil.getAttribute(element, ATTR_LABEL, command.getLabel()),
+            XmlUtil.getAttribute(element, ATTR_ID, command.getId()),
+            OutputType.TYPE_OTHER | OutputType.TYPE_IMPORTANT, "",
+            XmlUtil.getAttribute(element, ATTR_ICON, command.getIcon()));
         addType(outputType);
 
 
@@ -170,6 +185,7 @@ public class ExecutableOutputHandler extends OutputHandler {
         StringBuffer sb = new StringBuffer();
         if ( !request.defined(ARG_EXECUTE)) {
             makeForm(request, entry, sb);
+
             return new Result(outputType.getLabel(), sb);
         }
 
@@ -233,7 +249,7 @@ public class ExecutableOutputHandler extends OutputHandler {
         }
 
         System.err.println("Commands:" + commands);
-        
+
 
         String   errMsg = "";
         String   outMsg = "";
@@ -408,7 +424,7 @@ public class ExecutableOutputHandler extends OutputHandler {
         sb.append(HtmlUtils.hidden(ARG_OUTPUT, outputType.getId()));
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
 
-        sb.append(HtmlUtils.submit(command.getActionLabel(), ARG_EXECUTE,
+        sb.append(HtmlUtils.submit(command.getLabel(), ARG_EXECUTE,
                                    makeButtonSubmitDialog(sb,
                                        "Processing request...")));
         int blockCnt = command.makeForm(request, entry, sb);
@@ -416,7 +432,7 @@ public class ExecutableOutputHandler extends OutputHandler {
 
         if (blockCnt > 1) {
             sb.append(HtmlUtils.p());
-            sb.append(HtmlUtils.submit(command.getActionLabel(), ARG_EXECUTE,
+            sb.append(HtmlUtils.submit(command.getLabel(), ARG_EXECUTE,
                                        makeButtonSubmitDialog(sb,
                                            "Processing request...")));
         }
@@ -427,6 +443,7 @@ public class ExecutableOutputHandler extends OutputHandler {
         for (Command.Output output : command.getOutputs()) {
             if ( !output.getShowResults()) {
                 haveAnyOutputs = true;
+
                 break;
             }
         }

@@ -90,25 +90,26 @@ public class Command extends RepositoryManager {
     public static final String TAG_ARG = "arg";
 
     /** _more_ */
+    public static final String ATTR_ID = "id";
+
+    /** _more_ */
+    public static final String ATTR_ICON = "icon";
+
+    /** _more_ */
     public static final String TAG_OUTPUT = "output";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_INPUT = "input";
 
     /** _more_ */
     public static final String TAG_COMMAND = "command";
 
-    /** _more_ */
-    public static final String ATTR_ICON = "icon";
 
     /** _more_ */
     public static final String ATTR_CATEGORY = "category";
 
     /** _more_ */
     public static final String ATTR_VALUES = "values";
-
-    /** _more_ */
-    public static final String ATTR_ACTIONLABEL = "actionLabel";
 
     /** _more_ */
     public static final String ATTR_LABEL = "label";
@@ -126,6 +127,12 @@ public class Command extends RepositoryManager {
     public static final String ATTR_PATHPROPERTY = "pathProperty";
 
     /** _more_ */
+    private String id;
+
+    /** _more_ */
+    private String icon;
+
+    /** _more_ */
     private String entryType;
 
 
@@ -141,7 +148,7 @@ public class Command extends RepositoryManager {
     private String help;
 
     /** _more_ */
-    private String actionLabel;
+    private String label;
 
 
     /** _more_ */
@@ -153,7 +160,7 @@ public class Command extends RepositoryManager {
     /** _more_ */
     private List<Input> inputs = new ArrayList<Input>();
 
-    /** _more_          */
+    /** _more_ */
     private List<Output> outputs = new ArrayList<Output>();
 
     /**
@@ -175,6 +182,8 @@ public class Command extends RepositoryManager {
      * @param element _more_
      */
     private void init(Element element) {
+        id   = XmlUtil.getAttribute(element, ATTR_ID);
+        icon = XmlUtil.getAttribute(element, ATTR_ICON, (String) null);
         command = XmlUtil.getAttribute(element, TAG_COMMAND, (String) null);
 
         pathProperty = XmlUtil.getAttribute(element, ATTR_PATHPROPERTY,
@@ -194,9 +203,9 @@ public class Command extends RepositoryManager {
             return;
         }
 
-        help        = XmlUtil.getGrandChildText(element, "help", "");
-        
-        actionLabel = XmlUtil.getAttribute(element, ATTR_ACTIONLABEL, XmlUtil.getAttribute(element, ATTR_LABEL, ""));
+        help  = XmlUtil.getGrandChildText(element, "help", "");
+
+        label = XmlUtil.getAttribute(element, ATTR_LABEL, "Command");
 
         NodeList children = XmlUtil.getElements(element, TAG_ARG);
         for (int i = 0; i < children.getLength(); i++) {
@@ -222,7 +231,27 @@ public class Command extends RepositoryManager {
         }
         enabled = true;
 
+        getRepository().getJobManager().addCommand(this);
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getIcon() {
+        return icon;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getId() {
+        return id;
+    }
+
 
     /**
      * _more_
@@ -273,9 +302,13 @@ public class Command extends RepositoryManager {
                                             selected) + HtmlUtils.space(2)
                                                 + arg.getLabel();
                 } else {
+                    String  label = arg.getLabel();
+                    if (Utils.stringDefined(arg.getSuffix())) {
+                        label += " -- " + arg.getSuffix();
+                    }
                     input = HtmlUtils.labeledCheckbox(arg.getName(), "true",
                             request.get(arg.getName(), false),
-                            arg.getLabel());
+                                                      label);
                 }
                 catBuff.append(HtmlUtils.formEntry("", input));
 
@@ -404,8 +437,9 @@ public class Command extends RepositoryManager {
                 return true;
             }
         }
+        //if(children.size()>0) {return children.get(0).isApplicable(entry);}
 
-        return false;
+        return true;
     }
 
 
@@ -433,8 +467,8 @@ public class Command extends RepositoryManager {
      *
      * @return _more_
      */
-    public String getActionLabel() {
-        return actionLabel;
+    public String getLabel() {
+        return label;
     }
 
 

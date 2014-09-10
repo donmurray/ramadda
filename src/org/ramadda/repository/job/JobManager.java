@@ -129,6 +129,15 @@ public class JobManager extends RepositoryManager {
     /** The singleton thread pool */
     private ExecutorService executor;
 
+
+    /** _more_ */
+    private Hashtable<String, Command> commandMap = new Hashtable<String,
+                                                        Command>();
+
+    /** _more_ */
+    private List<Command> commands = new ArrayList<Command>();
+
+
     /** _more_ */
     private Object MUTEX = new Object();
 
@@ -179,6 +188,46 @@ public class JobManager extends RepositoryManager {
             executor    = null;
             currentJobs = 0;
         }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public List<Command> getCommands() {
+        return commands;
+    }
+
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     */
+    public Command getCommand(String id) {
+        return commandMap.get(id);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param command _more_
+     *
+     * @return _more_
+     */
+    public Command addCommand(Command command) {
+        Command existingCommand = commandMap.get(command.getId());
+        if (existingCommand != null) {
+            return existingCommand;
+        }
+        commandMap.put(command.getId(), command);
+        commands.add(command);
+
+        return command;
     }
 
 
