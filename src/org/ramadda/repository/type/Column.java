@@ -483,7 +483,6 @@ public class Column implements DataTypes, Constants {
             String value = tok;
             if (tok.indexOf(":") >= 0) {
                 List<String> toks = StringUtil.splitUpTo(tok, ":", 2);
-
                 value = toks.get(0);
                 label = toks.get(1);
             } else if (tok.indexOf("=") >= 0) {

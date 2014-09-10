@@ -115,7 +115,7 @@ public class Command extends RepositoryManager {
     public static final String ATTR_LABEL = "label";
 
     /** _more_ */
-    public static final String ATTR_SUFFIX = "suffix";
+    public static final String ATTR_HELP = "help";
 
     /** _more_ */
     public static final String ATTR_GROUP = "group";
@@ -138,6 +138,9 @@ public class Command extends RepositoryManager {
 
     /** _more_ */
     private boolean enabled = false;
+
+    /** _more_          */
+    private boolean outputToStderr = false;
 
 
     /** _more_ */
@@ -180,12 +183,15 @@ public class Command extends RepositoryManager {
      * _more_
      *
      * @param element _more_
+     *
+     * @throws Exception _more_
      */
-    private void init(Element element) {
-        id   = XmlUtil.getAttribute(element, ATTR_ID);
+    private void init(Element element) throws Exception {
+        id = XmlUtil.getAttribute(element, ATTR_ID);
         icon = XmlUtil.getAttribute(element, ATTR_ICON, (String) null);
         command = XmlUtil.getAttribute(element, TAG_COMMAND, (String) null);
-
+        outputToStderr = XmlUtil.getAttribute(element, "outputToStderr",
+                outputToStderr);
         pathProperty = XmlUtil.getAttribute(element, ATTR_PATHPROPERTY,
                                             (String) null);
 
@@ -232,6 +238,76 @@ public class Command extends RepositoryManager {
         enabled = true;
 
         getRepository().getJobManager().addCommand(this);
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param workDir _more_
+     * @param commands _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addArgs(Request request, Entry entry, File workDir,
+                        List<String> commands)
+            throws Exception {
+        String cmd = applyMacros(entry, workDir, getCommand());
+        commands.add(cmd);
+        HashSet<String> seenGroup = new HashSet<String>();
+        for (Command.Arg arg : getArgs()) {
+            if (arg.getCategory() != null) {
+                continue;
+            }
+            String argValue = null;
+            if (arg.isValueArg()) {
+                argValue = arg.getValue();
+            } else if (arg.isFlag()) {
+                if (arg.getGroup() != null) {
+                    if ( !seenGroup.contains(arg.getGroup())) {
+                        argValue = request.getString(arg.getGroup(), null);
+                        if ((argValue != null) && (argValue.length() > 0)) {
+                            seenGroup.add(arg.getGroup());
+                        } else {
+                            argValue = null;
+                        }
+                    }
+                } else if (request.get(arg.getName(), false)) {
+                    argValue = arg.getValue();
+                }
+            } else if (arg.isFile()) {
+                String filename = applyMacros(entry, workDir,
+                                      arg.getFileName());
+                argValue = IOUtil.joinDir(workDir, filename);
+            } else if (arg.isEntry()) {
+                String entryId = request.getString(arg.getName() + "_hidden",
+                                     (String) null);
+                Entry entryArg = getEntryManager().getEntry(request, entryId);
+                //TODO: Check for null, get the file
+                if (entryArg == null) {
+                    throw new IllegalArgumentException(
+                        "No entry  specified for:" + arg.getLabel());
+                }
+                argValue = entryArg.getResource().getPath();
+            } else {
+                argValue = request.getString(arg.getName(), "");
+                if (arg.getIfDefined() && !Utils.stringDefined(argValue)) {
+                    continue;
+                }
+                if (Utils.stringDefined(arg.value)) {
+                    argValue = arg.value.replace("${value}", argValue);
+                }
+            }
+
+            if (Utils.stringDefined(argValue)) {
+                if (Utils.stringDefined(arg.prefix)) {
+                    commands.add(arg.prefix);
+                }
+                argValue = applyMacros(entry, workDir, argValue);
+                commands.add(argValue);
+            }
+        }
     }
 
     /**
@@ -302,13 +378,12 @@ public class Command extends RepositoryManager {
                                             selected) + HtmlUtils.space(2)
                                                 + arg.getLabel();
                 } else {
-                    String  label = arg.getLabel();
-                    if (Utils.stringDefined(arg.getSuffix())) {
-                        label += " -- " + arg.getSuffix();
+                    String label = arg.getLabel();
+                    if (Utils.stringDefined(arg.getHelp())) {
+                        label += " -- " + arg.getHelp();
                     }
                     input = HtmlUtils.labeledCheckbox(arg.getName(), "true",
-                            request.get(arg.getName(), false),
-                                                      label);
+                            request.get(arg.getName(), false), label);
                 }
                 catBuff.append(HtmlUtils.formEntry("", input));
 
@@ -337,8 +412,8 @@ public class Command extends RepositoryManager {
             if (input == null) {
                 continue;
             }
-            if (Utils.stringDefined(arg.getSuffix())) {
-                input = input + HtmlUtils.space(2) + arg.getSuffix();
+            if (Utils.stringDefined(arg.getHelp())) {
+                input = input + HtmlUtils.space(2) + arg.getHelp();
             }
             catBuff.append(HtmlUtils.formEntry(msgLabel(arg.getLabel()),
                     input));
@@ -401,6 +476,15 @@ public class Command extends RepositoryManager {
      *
      * @return _more_
      */
+    public boolean getOutputToStderr() {
+        return outputToStderr;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<Arg> getArgs() {
         return args;
     }
@@ -439,7 +523,7 @@ public class Command extends RepositoryManager {
         }
         //if(children.size()>0) {return children.get(0).isApplicable(entry);}
 
-        return true;
+        return false;
     }
 
 
@@ -707,6 +791,9 @@ public class Command extends RepositoryManager {
         /** _more_ */
         private String value;
 
+        /** _more_          */
+        private String prefix;
+
         /** _more_ */
         private String group;
 
@@ -720,7 +807,7 @@ public class Command extends RepositoryManager {
         private String label;
 
         /** _more_ */
-        private String suffix;
+        private String help;
 
         /** _more_ */
         private String type;
@@ -741,8 +828,10 @@ public class Command extends RepositoryManager {
          *
          * @param node _more_
          * @param idx _more_
+         *
+         * @throws Exception _more_
          */
-        public Arg(Element node, int idx) {
+        public Arg(Element node, int idx) throws Exception {
             name = XmlUtil.getAttribute(node, ATTR_NAME, (String) null);
             if (name == null) {
                 name        = "arg" + idx;
@@ -753,9 +842,10 @@ public class Command extends RepositoryManager {
 
             type      = XmlUtil.getAttribute(node, ATTR_TYPE, (String) null);
             group     = XmlUtil.getAttribute(node, ATTR_GROUP, (String) null);
-            value     = XmlUtil.getChildText(node);
+            value     = Utils.getAttributeOrTag(node, "value", "");
             label     = XmlUtil.getAttribute(node, ATTR_LABEL, name);
-            suffix    = XmlUtil.getAttribute(node, ATTR_SUFFIX, "");
+            prefix    = XmlUtil.getAttribute(node, "prefix", (String) null);
+            help      = Utils.getAttributeOrTag(node, "help", "");
             fileName  = XmlUtil.getAttribute(node, "filename", "${src}");
             size      = XmlUtil.getAttribute(node, ATTR_SIZE, size);
             ifDefined = XmlUtil.getAttribute(node, "ifdefined", ifDefined);
@@ -770,10 +860,9 @@ public class Command extends RepositoryManager {
                     label = toks.get(1);
                 } else {
                     label = value;
-                    values.add(new TwoFacedObject(label, value));
                 }
+                values.add(new TwoFacedObject(label, value));
             }
-
         }
 
         /**
@@ -802,7 +891,7 @@ public class Command extends RepositoryManager {
          * @return _more_
          */
         public boolean isEnumeration() {
-            return type.equals(TYPE_ENUMERATION);
+            return (type != null) && type.equals(TYPE_ENUMERATION);
         }
 
         /**
@@ -811,7 +900,7 @@ public class Command extends RepositoryManager {
          * @return _more_
          */
         public boolean isFlag() {
-            return type.equals(TYPE_FLAG);
+            return (type != null) && type.equals(TYPE_FLAG);
         }
 
 
@@ -822,7 +911,7 @@ public class Command extends RepositoryManager {
          * @return _more_
          */
         public boolean isFile() {
-            return type.equals(TYPE_FILE);
+            return (type != null) && type.equals(TYPE_FILE);
         }
 
         /**
@@ -831,7 +920,7 @@ public class Command extends RepositoryManager {
          * @return _more_
          */
         public boolean isEntry() {
-            return type.equals(TYPE_ENTRY);
+            return (type != null) && type.equals(TYPE_ENTRY);
         }
 
         /**
@@ -906,8 +995,8 @@ public class Command extends RepositoryManager {
          *
          * @return _more_
          */
-        public String getSuffix() {
-            return suffix;
+        public String getHelp() {
+            return help;
         }
 
         /**

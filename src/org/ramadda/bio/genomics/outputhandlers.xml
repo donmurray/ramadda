@@ -1,111 +1,130 @@
 <outputhandlers>
 
   <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" >
-    <command command="${bio.sratools}/fastq-dump" label="Convert SRA to FASTQ" id="sra_to_fastq" icon="/genomics/dna.png">
+    <command command="${bio.sratools}/fastq-dump" label="Convert SRA to FASTQ" id="bio_sra_to_fastq" icon="/genomics/dna.png">
       <help>Convert the given SRA file to the FASTQ format</help>
-      <arg>-O</arg>
-      <arg>${workdir}</arg>
-      <arg>${entry.file}</arg>
       <input type="bio_sra"/>
       <output type="bio_fastq" pattern=".*\.fastq"/>
+      <arg value="-O"/>
+      <arg value="${workdir}"/>
+      <arg value="${entry.file}"/>
     </command>
   </outputhandler>
 
   <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" >
-    <command  id="sra_to_sam"  icon="/genomics/dna.png" command="${bio.sratools}/sam-dump"  label="Convert SRA to SAM" >
+    <command  id="bio_sra_to_sam"  icon="/genomics/dna.png" command="${bio.sratools}/sam-dump"  label="Convert SRA to SAM" >
      <help>Convert the given SRA file to SAM format</help>
      <input type="bio_sra"/>
-     <arg type="flag" label="Output unaligned reads along with aligned reads">--unaligned</arg>
-     <arg type="flag" label="Output only primary alignments ">--primary</arg>
-     <arg type="string" label="Aligned region name" ifdefined="true" suffix="Filter by position on genome. Name can either be file specific name (ex: &quot;chr1&quot; or &quot;1&quot;). &quot;from&quot; and &quot;to&quot; (inclusive) are 1-based coordinates">--aligned-region</arg>
-     <arg type="string" label="Mate pair distance" ifdefined="true" suffix="&lt;from-to|'unknown'&gt;  Filter by distance between matepairs. Use &quot;unknown&quot; to find matepairs slit between the references. Use from-to (inclusive) to limit matepair distance on  the same reference ">--matepair-distance</arg>
+     <output type="bio_sam" pattern=".*\.sam"/>
+     <arg type="flag" label="Output unaligned reads along with aligned reads" value="--unaligned"></arg>
+     <arg type="flag" label="Output only primary alignments " value="--primary"></arg>
+     <arg type="string" label="Aligned region name" ifdefined="true" suffix="Filter by position on genome. Name can either be file specific name (ex: &quot;chr1&quot; or &quot;1&quot;). &quot;from&quot; and &quot;to&quot; (inclusive) are 1-based coordinates" prefix="--aligned-region"></arg>
+     <arg type="string" label="Mate pair distance" ifdefined="true" suffix="&lt;from-to|'unknown'&gt;  Filter by distance between matepairs. Use &quot;unknown&quot; to find matepairs slit between the references. Use from-to (inclusive) to limit matepair distance on  the same reference " prefix="--matepair-distance"></arg>
 
      <arg type="category" label="Miscellaneous"></arg>
-     <arg type="flag" label="Print reference SEQ_ID in RNAME instead of NAME">--seqid</arg>
-     <arg type="flag" label="Do not output headers ">--no-header</arg>
-     <arg type="flag" label="Output reads for spots with no aligned reads">--unaligned-spots-only</arg>
-     <arg type="flag" label="Min. mapq an alignment has to have, to be printed ">--min-mapq</arg>
-     <arg type="flag" label="Modify cigar-string and output flags if rna-splicing detected">--rna-splicing</arg>
-     <arg type="flag" label="Disable Multithreading">--disable-multithreading</arg>
-     <arg type="flag" label="Reverse unaligned reads according to read type ">--reverse</arg>
-     <arg type="flag" label="Output '=' if base is identical to reference">--hide-identical</arg>
-     <arg>--output-file</arg>
-     <arg>${entry.filebase}.sam</arg>
-     <arg>${entry.file}</arg>
-     <output type="bio_sam" pattern=".*\.sam"/>
+     <arg type="flag" label="Print reference SEQ_ID in RNAME instead of NAME" value="--seqid"></arg>
+     <arg type="flag" label="Do not output headers " value="--no-header"></arg>
+     <arg type="flag" label="Output reads for spots with no aligned reads" value="--unaligned-spots-only"></arg>
+     <arg type="flag" label="Min. mapq an alignment has to have, to be printed " value="--min-mapq"></arg>
+     <arg type="flag" label="Modify cigar-string and output flags if rna-splicing detected" value="--rna-splicing"></arg>
+     <arg type="flag" label="Disable Multithreading" value="--disable-multithreading"></arg>
+     <arg type="flag" label="Reverse unaligned reads according to read type " value="--reverse"></arg>
+     <arg type="flag" label="Output '=' if base is identical to reference" value="--hide-identical"></arg>
+     <arg value="--output-file"></arg>
+     <arg value="${entry.filebase}.sam"></arg>
+     <arg value="${entry.file}"></arg>
    </command>
   </outputhandler>
 
 
   <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler">
-  <command label="Convert HMMER File" id="hmmer_convert"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmconvert" >
+  <command label="Convert HMMER File" id="bio_hmmer_convert"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmconvert" >
     <help>This will convert the given HMMER binary file to text</help>
     <input type="bio_hmmer_index"/>
-    <arg>${entry.file}</arg>
+    <arg value="${entry.file}"></arg>
     <output type="bio_hmmer_index" stdout="true" filename="${entry.filebase}.hmm"/>
    </command>
   </outputhandler>
 
 
   <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" >
-  <command label="Run HMMSTAT" id="hmmer_stat"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmstat" >
+  <command label="Run HMMSTAT" id="bio_hmmer_stat"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmstat" >
     <help>Run HMMSTAT</help>
     <input type="bio_hmmer_index"/>
-    <arg type="flag" label="Compute score for E-value (E) for database of (Z) sequences">--eval2score</arg>
-    <arg type="flag" label="Compute E-value for score (S) for database of (Z) sequences">--score2eval</arg>
-    <arg type="int" size="5" label="Database size" suffix="Database size (in seqs) for --eval2score or --score2eval">-Z</arg>
-    <arg type="int" size="5" label="Database size (M bases)" suffix="Database size (M bases) (DNA only, if search on both strands)">--baseZ</arg>
-    <arg type="int" size="5" label="Database size (M bases)" suffix="Database size (M bases) (DNA only, if search on single strand)">--baseZ1</arg>
-    <arg type="float" size="5" label="E-value threshold" suffix="For eval2score">-E</arg>
-    <arg type="float" size="5" label="Score input" suffix="For score2eval">-S</arg>
-    <arg>${entry.file}</arg>
+    <arg type="flag" label="Compute score for E-value (E) for database of (Z) sequences" value="--eval2score"></arg>
+    <arg type="flag" label="Compute E-value for score (S) for database of (Z) sequences" value="--score2eval"></arg>
+    <arg type="int" size="5" label="Database size" suffix="Database size (in seqs) for --eval2score or --score2eval" prefix="-Z"></arg>
+    <arg type="int" size="5" label="Database size (M bases)" suffix="Database size (M bases) (DNA only, if search on both strands)" prefix="--baseZ"></arg>
+    <arg type="int" size="5" label="Database size (M bases)" suffix="Database size (M bases) (DNA only, if search on single strand)" prefix="--baseZ1"></arg>
+    <arg type="float" size="5" label="E-value threshold" suffix="For eval2score" prefix="-E"></arg>
+    <arg type="float" size="5" label="Score input" suffix="For score2eval" prefix="-S"></arg>
+    <arg value="${entry.file}"></arg>
     <output showResults="true" stdout="true"/>
    </command>
   </outputhandler>
 
 
   <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" >
-  <command label="Run HMMEMIT" id="hmmer_emit"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmemit" >
+  <command label="Run HMMEMIT" id="bio_hmmer_emit"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmemit" >
     <help>This runs hmmemit</help>
     <input type="bio_hmmer_index"/>
-    <arg type="int" size="5" label="Number of sequences" suffix="Number of sequences to sample">-N</arg>
-    <arg type="flag" group="emitoptions" label="Emit alignment">-a</arg>
-    <arg type="flag" group="emitoptions" label="Emit simple majority-rule consensus sequence">-c</arg>
-    <arg type="flag" group="emitoptions" label="Emit fancier consensus sequence">-C</arg>
-    <arg type="flag" group="emitoptions" label="Sample sequences from profile, not core model">-p</arg>
+    <arg type="int" size="5" label="Number of sequences" suffix="Number of sequences to sample" prefix="-N"></arg>
+    <arg type="flag" group="emitoptions" label="Emit alignment" value="-a"></arg>
+    <arg type="flag" group="emitoptions" label="Emit simple majority-rule consensus sequence" value="-c"></arg>
+    <arg type="flag" group="emitoptions" label="Emit fancier consensus sequence" value="-C"></arg>
+    <arg type="flag" group="emitoptions" label="Sample sequences from profile, not core model" value="-p"></arg>
 
-    <arg type="category" label="Options controlling emission from profiles"></arg>
-    <arg type="int" size="5" label="Expected length" suffix="Set expected length from profile to">-L</arg>
-    <arg type="flag" group="configure_profile" label="Configure profile in multihit local mode">--local</arg>
-    <arg type="flag" group="configure_profile" label="Configure profile in unilocal mode">--unilocal</arg>
-    <arg type="flag" group="configure_profile" label="Configure profile in multihit glocal mode">--glocal</arg>
-    <arg type="flag" group="configure_profile" label="Configure profile in unihit glocal mode">--uniglocal</arg>
+    <arg type="category" label="Options controlling emission from profiles"/>
+
+    <arg type="int" size="5" label="Expected length" suffix="Set expected length from profile to" prefix="-L"></arg>
+    <arg type="flag" group="configure_profile" label="Configure profile in multihit local mode" value="--local"></arg>
+    <arg type="flag" group="configure_profile" label="Configure profile in unilocal mode" value="--unilocal"></arg>
+    <arg type="flag" group="configure_profile" label="Configure profile in multihit glocal mode" value="--glocal"></arg>
+    <arg type="flag" group="configure_profile" label="Configure profile in unihit glocal mode" value="--uniglocal"></arg>
 
     <arg type="category" label="Options controlling fancy consensus emission"></arg>
-    <arg type="float" size="5" label="Min L" suffix="Show consensus as 'any' (X/N) unless &gt;= this fraction">--minl</arg>
-    <arg type="float" size="5" label="Min U" suffix="Show consensus as upper case if >= this fraction">--minu</arg>
-    <arg>${entry.file}</arg>
+    <arg type="float" size="5" label="Min L" suffix="Show consensus as 'any' (X/N) unless &gt;= this fraction" prefix="--minl"></arg>
+    <arg type="float" size="5" label="Min U" suffix="Show consensus as upper case if  prefix this fraction" prefix="--minu"/>
+    <arg value="${entry.file}"></arg>
     <output showResults="true" stdout="true"/>
    </command>
   </outputhandler>
 
 
   <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler">
-  <command label="Run HMMFETCH" id="hmmer_fetch"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmfetch" >
+  <command label="Run HMMFETCH" id="bio_hmmer_fetch"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmfetch" >
     <help>This runs hmmfetch</help>
     <input type="bio_hmmer_index"/>
-    <arg>${entry.file}</arg>
+    <arg value="${entry.file}"></arg>
     <arg type="string" label="Key" size="35"></arg>
     <output type="bio_hmmer_index" stdout="true" filename="${entry.filebase}.hmm"/>
    </command>
   </outputhandler>
 
 
-<!--
-  <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" commandId="sra_to_fastq" label="Test reference to other command"/>
--->
+  <outputhandler class="org.ramadda.repository.output.ExecutableOutputHandler" >
+    <command command="${bio.picard}" label="Convert FASTQ to SAM" id="bio_fastq_to_sam"  outputToStderr="true" icon="/genomics/picard.png">
+      <help>Run Picard to convert FASTQ to SAM</help>
+      <input type="bio_fastq"/>
+      <output type="bio_sam" pattern=".*\.sam"/>
+      <arg value="FastqToSam.jar"></arg>
+      <arg value="FASTQ=${entry.file}"></arg>
+      <arg value="OUTPUT=${entry.filebase}.sam"></arg>
+      <arg label="Sample Name" required="true" type="string" size="60" value="SAMPLE_NAME=${value}">
+        <help>Sample name to insert into the read group header  Required.</help>
+      </arg>
+      <arg type="enumeration" label="Quality Format" values=":NA,Solexa,Illumina,Standard" value="QUALITY_FORMAT=${value}">
+<suffix><![CDATA[
+A value describing how the quality values are encoded in the fastq.  Either Solexa for 
+pre-pipeline 1.3 style scores (solexa scaling + 66), Illumina for pipeline 1.3 and above 
+(phred scaling + 64) or Standard for phred scaled scores with a character shift of 33.  
+If this value is not specified, the quality format will be detected automatically.  
+Default value: null. Possible values: {Solexa, Illumina, Standard} 
+]]></suffix>
+</arg>
+    </command>
 
-
+  </outputhandler>
 
 
 </outputhandlers>

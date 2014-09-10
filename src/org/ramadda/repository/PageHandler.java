@@ -2221,6 +2221,8 @@ public class PageHandler extends RepositoryManager {
      * @return _more_
      */
     public static String getDialogString(String s) {
+        s  = s.replaceAll("<pre>","_PREOPEN_");
+        s  = s.replaceAll("</pre>","_PRECLOSE_");
         s = HtmlUtils.entityEncode(s);
         s = s.replace("&#60;msg&#32;", "<msg ");
         s = s.replace("&#32;msg&#62;", " msg>");
@@ -2228,7 +2230,10 @@ public class PageHandler extends RepositoryManager {
         s = s.replace("&#60;p&#62;", "<p>");
         s = s.replace("&#60;br&#62;", "<br>");
         s = s.replace("&#38;nbsp&#59;", "&nbsp;");
+        s  = s.replaceAll("_PREOPEN_","<pre>");
+        s  = s.replaceAll("_PRECLOSE_", "</pre>");
 
+        System.err.println("s:" + s);
         return s;
     }
 

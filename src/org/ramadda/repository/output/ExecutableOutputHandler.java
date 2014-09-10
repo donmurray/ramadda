@@ -191,63 +191,8 @@ public class ExecutableOutputHandler extends OutputHandler {
 
         Object       uniqueId = getRepository().getGUID();
         File         workDir  = getWorkDir(uniqueId);
-        String       cmd = applyMacros(entry, workDir, command.getCommand());
-
         List<String> commands = new ArrayList<String>();
-        commands.add(cmd);
-
-        String          fileTail  = getStorageManager().getFileTail(entry);
-        HashSet<String> seenGroup = new HashSet<String>();
-        for (Command.Arg arg : command.getArgs()) {
-            if (arg.getCategory() != null) {
-                continue;
-            }
-            String argValue = null;
-            if (arg.isValueArg()) {
-                argValue = arg.getValue();
-            } else if (arg.isFlag()) {
-                if (arg.getGroup() != null) {
-                    if ( !seenGroup.contains(arg.getGroup())) {
-                        argValue = request.getString(arg.getGroup(), null);
-                        if ((argValue != null) && (argValue.length() > 0)) {
-                            seenGroup.add(arg.getGroup());
-                        } else {
-                            argValue = null;
-                        }
-                    }
-                } else if (request.get(arg.getName(), false)) {
-                    argValue = arg.getValue();
-                }
-            } else if (arg.isFile()) {
-                String filename = applyMacros(entry, workDir,
-                                      arg.getFileName());
-                argValue = IOUtil.joinDir(workDir, filename);
-            } else if (arg.isEntry()) {
-                String entryId = request.getString(arg.getName() + "_hidden",
-                                     (String) null);
-                Entry entryArg = getEntryManager().getEntry(request, entryId);
-                //TODO: Check for null, get the file
-                if (entryArg == null) {
-                    throw new IllegalArgumentException(
-                        "No entry  specified for:" + arg.getLabel());
-                }
-                argValue = entryArg.getResource().getPath();
-            } else {
-                argValue = request.getString(arg.getName(), "");
-                if (arg.getIfDefined() && !Utils.stringDefined(argValue)) {
-                    continue;
-                }
-                //The value is the argument
-                if (Utils.stringDefined(arg.getValue())) {
-                    commands.add(arg.getValue());
-                }
-            }
-            if (argValue != null) {
-                argValue = applyMacros(entry, workDir, argValue);
-                commands.add(argValue);
-            }
-        }
-
+        command.addArgs(request, entry, workDir, commands);
         System.err.println("Commands:" + commands);
 
 
@@ -263,17 +208,27 @@ public class ExecutableOutputHandler extends OutputHandler {
             errMsg = IOUtil.readContents(stderrFile);
         }
 
+        StringBuffer resultsSB = new StringBuffer();
+        System.err.println(" to stderr:" + command.getOutputToStderr());
+        System.err.println("err:" + errMsg);
+
+        if (Utils.stringDefined(errMsg)) {
+            if (command.getOutputToStderr()) {
+                resultsSB.append(errMsg);
+                resultsSB.append("\n");
+                errMsg = null;
+            }
+        }
+
+
         if (Utils.stringDefined(errMsg)) {
             sb.append(
                 getPageHandler().showDialogError(
-                    "An error has occurred:<br>" + errMsg));
+                    "An error has occurred:<pre>" + errMsg + "</pre>"));
             makeForm(request, entry, sb);
 
             return new Result(outputType.getLabel(), sb);
         }
-
-
-        StringBuffer  resultsSB   = new StringBuffer();
 
         List<Entry>   newEntries  = new ArrayList<Entry>();
         List<File>    newFiles    = new ArrayList<File>();
@@ -282,10 +237,8 @@ public class ExecutableOutputHandler extends OutputHandler {
         for (Command.Output output : command.getOutputs()) {
             if (output.getShowResults()) {
                 showResults = true;
-                System.err.println("Showing results");
                 if (output.getUseStdout()) {
                     resultsSB.append(IOUtil.readContents(stdoutFile));
-                    System.err.println("resultssb: " + resultsSB);
                 } else {}
 
                 continue;
@@ -375,6 +328,10 @@ public class ExecutableOutputHandler extends OutputHandler {
                               "");
         }
 
+        sb.append("<pre>");
+        sb.append(resultsSB);
+        sb.append("</pre>");
+
         return new Result(outputType.getLabel(),
                           new StringBuffer("Error: no output files<br>"
                                            + sb));
@@ -420,7 +377,7 @@ public class ExecutableOutputHandler extends OutputHandler {
         sb.append(command.getHelp());
         sb.append(HtmlUtils.p());
 
-        sb.append(request.form(getRepository().URL_ENTRY_SHOW));
+        request.uploadFormWithAuthToken(sb, getRepository().URL_ENTRY_SHOW);
         sb.append(HtmlUtils.hidden(ARG_OUTPUT, outputType.getId()));
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
 
