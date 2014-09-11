@@ -24,6 +24,7 @@ package org.ramadda.repository;
 import org.python.util.PythonInterpreter;
 
 import org.ramadda.repository.auth.AccessException;
+import org.ramadda.repository.job.JobManager;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.TempDir;
 
@@ -315,10 +316,10 @@ public class StorageManager extends RepositoryManager {
         commands.add("-h");
         commands.add(getRepositoryDir().toString());
         try {
-            String[] results = getRepository().getJobManager().executeCommand(commands,
+            JobManager.CommandResults results = getRepository().getJobManager().executeCommand(commands,
                                    getRepositoryDir());
 
-            return results[0];
+            return results.getStdoutMsg();
         } catch (Exception exc) {
             return null;
         }

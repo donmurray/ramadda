@@ -21,7 +21,9 @@
 package org.ramadda.geodata.model;
 
 
+
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
+import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Link;
 import org.ramadda.repository.Repository;
@@ -574,10 +576,10 @@ sb.append(HtmlUtils.form(formUrl,
         //System.err.println("env:" + envMap);
 
         //Use new repository method to execute. This gets back [stdout,stderr]
-        String[] results = getRepository().getJobManager().executeCommand(commands, envMap,
+        JobManager.CommandResults results = getRepository().getJobManager().executeCommand(commands, envMap,
                                getProductDir());
-        String errorMsg = results[1];
-        String outMsg   = results[0];
+        String errorMsg = results.getStderrMsg();
+        String outMsg   = results.getStdoutMsg();
         // Check the version
         if (suffix.equals("png")) {
             Matcher m = versionPattern.matcher(outMsg);

@@ -25,6 +25,7 @@ package org.ramadda.geodata.gps;
 
 
 import org.ramadda.repository.*;
+import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.auth.*;
 import org.ramadda.repository.output.*;
 import org.ramadda.repository.type.*;
@@ -762,9 +763,9 @@ public class GpsOutputHandler extends OutputHandler {
             System.err.println("work dir:" + workDir + " rinex file:"
                                + rinexFile);
             System.err.println("args:" + args);
-            String[] results  = getRepository().getJobManager().executeCommand(args, workDir);
-            String   errorMsg = results[1];
-            String   outMsg   = results[0];
+            JobManager.CommandResults  results  = getRepository().getJobManager().executeCommand(args, workDir);
+            String   errorMsg = results.getStderrMsg();
+            String   outMsg   = results.getStdoutMsg();
             sb.append("<li>");
             sb.append(rawEntry.getName());
 

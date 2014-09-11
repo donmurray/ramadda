@@ -26,7 +26,7 @@ import org.ramadda.data.process.DataProcessInput;
 import org.ramadda.data.process.DataProcessOutput;
 import org.ramadda.data.process.DataProcessProvider;
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
-
+import org.ramadda.repository.job.JobManager;
 
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Link;
@@ -941,10 +941,10 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
 
         commands.add(entry.getResource().getPath());
         commands.add(outFile.toString());
-        String[] results = getRepository().getJobManager().executeCommand(commands, null,
+        JobManager.CommandResults results = getRepository().getJobManager().executeCommand(commands, null,
                                getProductDir());
-        String errorMsg = results[1];
-        String outMsg   = results[0];
+        String errorMsg = results.getStderrMsg();
+        String outMsg   = results.getStdoutMsg();
         if ( !outFile.exists()) {
             if (outMsg.length() > 0) {
                 throw new IllegalArgumentException(outMsg);
@@ -1514,10 +1514,10 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
 
             commands.add(oneOfThem.getResource().getPath());
             commands.add(outFile.toString());
-            String[] results = getRepository().getJobManager().executeCommand(commands, null,
+            JobManager.CommandResults results = getRepository().getJobManager().executeCommand(commands, null,
                                    getProductDir());
-            String errorMsg = results[1];
-            String outMsg   = results[0];
+            String errorMsg = results.getStderrMsg();
+            String outMsg   = results.getStdoutMsg();
             if ( !outFile.exists()) {
                 if (outMsg.length() > 0) {
                     throw new IllegalArgumentException(outMsg);

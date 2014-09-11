@@ -29,6 +29,7 @@ import java.util.List;
 import org.ramadda.data.process.DataProcess;
 import org.ramadda.data.process.DataProcessInput;
 import org.ramadda.repository.Association;
+import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
 import org.ramadda.repository.RepositoryManager;
@@ -220,11 +221,11 @@ public abstract class CDODataProcess extends DataProcess {
 
         //System.out.println(commands);
         long millis = System.currentTimeMillis();
-        String[] results = getRepository().getJobManager().executeCommand(commands, null,
+        JobManager.CommandResults results = getRepository().getJobManager().executeCommand(commands, null,
                                processDir, 60);
         //System.out.println("processing took: " + (System.currentTimeMillis()-millis));
-        String errorMsg = results[1];
-        String outMsg   = results[0];
+        String errorMsg = results.getStderrMsg();
+        String outMsg   = results.getStdoutMsg();
         if ( !outFile.exists()) {
             if (outMsg.length() > 0) {
                 throw new IllegalArgumentException(outMsg);

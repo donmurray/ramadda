@@ -709,7 +709,7 @@ public class JobManager extends RepositoryManager {
      *
      * @throws Exception  problem with execution
      */
-    public String[] executeCommand(List<String> commands, File dir)
+    public CommandResults executeCommand(List<String> commands, File dir)
             throws Exception {
         return executeCommand(commands, null, dir);
     }
@@ -725,9 +725,9 @@ public class JobManager extends RepositoryManager {
      *
      * @throws Exception  problem with execution
      */
-    public String[] executeCommand(List<String> commands,
-                                   Map<String, String> envVars,
-                                   File workingDir)
+    public CommandResults executeCommand(List<String> commands,
+                                         Map<String, String> envVars,
+                                         File workingDir)
             throws Exception {
         return executeCommand(commands, envVars, workingDir,
                               -1 /* don't timeout*/);
@@ -746,9 +746,10 @@ public class JobManager extends RepositoryManager {
      *
      * @throws Exception  problem with execution
      */
-    public String[] executeCommand(List<String> commands,
-                                   Map<String, String> envVars,
-                                   File workingDir, int timeOutInSeconds)
+    public CommandResults executeCommand(List<String> commands,
+                                         Map<String, String> envVars,
+                                         File workingDir,
+                                         int timeOutInSeconds)
             throws Exception {
 
         return executeCommand(commands, envVars, workingDir,
@@ -769,11 +770,12 @@ public class JobManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public String[] executeCommand(List<String> commands,
-                                   Map<String, String> envVars,
-                                   File workingDir, int timeOutInSeconds,
-                                   PrintWriter stdOutPrintWriter,
-                                   PrintWriter stdErrPrintWriter)
+    public CommandResults executeCommand(List<String> commands,
+                                         Map<String, String> envVars,
+                                         File workingDir,
+                                         int timeOutInSeconds,
+                                         PrintWriter stdOutPrintWriter,
+                                         PrintWriter stdErrPrintWriter)
             throws Exception {
         ProcessBuilder pb = new ProcessBuilder(commands);
         if (envVars != null) {
@@ -799,9 +801,10 @@ public class JobManager extends RepositoryManager {
                                           stdOutPrintWriter);
         esg.start();
         isg.start();
+        int exitCode = 0;
         if (timeOutInSeconds <= 0) {
             //TODO: check exit code and throw error?
-            int exitCode = process.waitFor();
+            exitCode = process.waitFor();
             //            System.err.println ("Exit code:" + exitCode);
 
             if (exitCode != 0) {}
@@ -820,8 +823,8 @@ public class JobManager extends RepositoryManager {
             } finally {
                 process.destroy();
             }
-            int result = runnable.getExitCode();
-            if (result == ProcessRunner.PROCESS_KILLED) {
+            exitCode = runnable.getExitCode();
+            if (exitCode == ProcessRunner.PROCESS_KILLED) {
                 throw new InterruptedException("Process timed out");
             }
         }
@@ -837,8 +840,8 @@ public class JobManager extends RepositoryManager {
         }
 
 
-        return new String[] { outBuf.toString(), errorBuf.toString() };
-
+        return new CommandResults(outBuf.toString(), errorBuf.toString(),
+                                  exitCode);
     }
 
 
@@ -853,8 +856,8 @@ public class JobManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public String[] executeCommand(String command, File workingDir,
-                                   int timeOutInSeconds)
+    public CommandResults executeCommand(String command, File workingDir,
+                                         int timeOutInSeconds)
             throws Exception {
         StringWriter outBuf   = new StringWriter();
         StringWriter errorBuf = new StringWriter();
@@ -868,9 +871,10 @@ public class JobManager extends RepositoryManager {
                                           new PrintWriter(outBuf));
         esg.start();
         isg.start();
+        int exitCode = 0;
         if (timeOutInSeconds <= 0) {
             //TODO: check exit code and throw error?
-            int exitCode = process.waitFor();
+            exitCode = process.waitFor();
         } else {
             ProcessRunner runnable = new ProcessRunner(
                                          process,
@@ -886,18 +890,77 @@ public class JobManager extends RepositoryManager {
             } finally {
                 process.destroy();
             }
-            int result = runnable.getExitCode();
-            if (result == ProcessRunner.PROCESS_KILLED) {
+            exitCode = runnable.getExitCode();
+            if (exitCode == ProcessRunner.PROCESS_KILLED) {
                 throw new InterruptedException("Process timed out");
             }
         }
 
-
-        return new String[] { outBuf.toString(), errorBuf.toString() };
+        return new CommandResults(outBuf.toString(), errorBuf.toString(),
+                                  exitCode);
 
     }
 
 
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Thu, Sep 11, '14
+     * @author         Enter your name here...    
+     */
+    public static class CommandResults {
 
+        /** _more_          */
+        private String stdoutMsg;
+
+        /** _more_          */
+        private String stderrMsg;
+
+        /** _more_          */
+        private int exitCode;
+
+        /**
+         * _more_
+         *
+         * @param stdoutMsg _more_
+         * @param stderrMsg _more_
+         * @param exitCode _more_
+         */
+        public CommandResults(String stdoutMsg, String stderrMsg,
+                              int exitCode) {
+            this.stdoutMsg = stdoutMsg;
+            this.stderrMsg = stderrMsg;
+            this.exitCode  = exitCode;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public String getStderrMsg() {
+            return stderrMsg;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public String getStdoutMsg() {
+            return stdoutMsg;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public int getExitCode() {
+            return exitCode;
+        }
+
+    }
 
 }

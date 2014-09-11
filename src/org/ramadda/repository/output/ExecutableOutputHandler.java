@@ -23,6 +23,7 @@ package org.ramadda.repository.output;
 
 import org.ramadda.repository.*;
 import org.ramadda.repository.job.Command;
+import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.type.*;
 
 import org.ramadda.util.HtmlUtils;
@@ -198,10 +199,9 @@ public class ExecutableOutputHandler extends OutputHandler {
 
         String   errMsg = "";
         String   outMsg = "";
-        String[] results;
         File     stdoutFile = new File(IOUtil.joinDir(workDir, ".stdout"));
         File     stderrFile = new File(IOUtil.joinDir(workDir, ".stderr"));
-        results = getRepository().getJobManager().executeCommand(commands,
+        JobManager.CommandResults results = getRepository().getJobManager().executeCommand(commands,
                 null, workDir, -1, new PrintWriter(stdoutFile),
                 new PrintWriter(stderrFile));
         if (stderrFile.exists()) {

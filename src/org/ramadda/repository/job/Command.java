@@ -92,6 +92,12 @@ public class Command extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_ID = "id";
 
+    /** _more_          */
+    public static final String ATTR_PRIMARY = "primary";
+
+    /** _more_          */
+    public static final String ATTR_ENTRY_TYPE = "entryType";
+
     /** _more_ */
     public static final String ATTR_ICON = "icon";
 
@@ -139,7 +145,7 @@ public class Command extends RepositoryManager {
     /** _more_ */
     private boolean enabled = false;
 
-    /** _more_          */
+    /** _more_ */
     private boolean outputToStderr = false;
 
 
@@ -161,7 +167,7 @@ public class Command extends RepositoryManager {
     private List<Arg> args = new ArrayList<Arg>();
 
     /** _more_ */
-    private List<Input> inputs = new ArrayList<Input>();
+    private List<Arg> inputs = new ArrayList<Arg>();
 
     /** _more_ */
     private List<Output> outputs = new ArrayList<Output>();
@@ -218,16 +224,10 @@ public class Command extends RepositoryManager {
             Element node = (Element) children.item(i);
             Arg     arg  = new Arg(node, i);
             args.add(arg);
+            if (arg.isEntry()) {
+                inputs.add(arg);
+            }
         }
-
-
-        children = XmlUtil.getElements(element, TAG_INPUT);
-        for (int i = 0; i < children.getLength(); i++) {
-            Element node  = (Element) children.item(i);
-            Input   input = new Input(node);
-            inputs.add(input);
-        }
-
 
         children = XmlUtil.getElements(element, TAG_OUTPUT);
         for (int i = 0; i < children.getLength(); i++) {
@@ -245,18 +245,20 @@ public class Command extends RepositoryManager {
      *
      * @param request _more_
      * @param entry _more_
+     * @param primaryEntry _more_
      * @param workDir _more_
      * @param commands _more_
      *
      * @throws Exception _more_
      */
-    public void addArgs(Request request, Entry entry, File workDir,
+    public void addArgs(Request request, Entry primaryEntry, File workDir,
                         List<String> commands)
             throws Exception {
-        String cmd = applyMacros(entry, workDir, getCommand());
+        String cmd = applyMacros(primaryEntry, workDir, getCommand());
         commands.add(cmd);
         HashSet<String> seenGroup = new HashSet<String>();
         for (Command.Arg arg : getArgs()) {
+            Entry currentEntry = primaryEntry;
             if (arg.getCategory() != null) {
                 continue;
             }
@@ -277,19 +279,31 @@ public class Command extends RepositoryManager {
                     argValue = arg.getValue();
                 }
             } else if (arg.isFile()) {
-                String filename = applyMacros(entry, workDir,
-                                      arg.getFileName());
-                argValue = IOUtil.joinDir(workDir, filename);
+                //TODO:
+                //                String filename = applyMacros(currentEntry, workDir,
+                //arg.getFileName());
+                //argValue = IOUtil.joinDir(workDir, filename);
             } else if (arg.isEntry()) {
-                String entryId = request.getString(arg.getName() + "_hidden",
-                                     (String) null);
-                Entry entryArg = getEntryManager().getEntry(request, entryId);
-                //TODO: Check for null, get the file
-                if (entryArg == null) {
-                    throw new IllegalArgumentException(
-                        "No entry  specified for:" + arg.getLabel());
+                if (arg.isPrimaryEntry()) {
+                    currentEntry = primaryEntry;
                 }
-                argValue = entryArg.getResource().getPath();
+
+                if (currentEntry == null) {
+                    String entryId = request.getString(arg.getName()
+                                         + "_hidden", (String) null);
+                    Entry entryArg = getEntryManager().getEntry(request,
+                                         entryId);
+                    //TODO: Check for null, get the file
+                    if ((entryArg == null) && arg.isRequired()) {
+                        throw new IllegalArgumentException(
+                            "No entry  specified for:" + arg.getLabel());
+                    }
+                    currentEntry = entryArg;
+                }
+                argValue = arg.getValue();
+                if ( !Utils.stringDefined(argValue)) {
+                    argValue = currentEntry.getResource().getPath();
+                }
             } else {
                 argValue = request.getString(arg.getName(), "");
                 if (arg.getIfDefined() && !Utils.stringDefined(argValue)) {
@@ -300,11 +314,16 @@ public class Command extends RepositoryManager {
                 }
             }
 
-            if (Utils.stringDefined(argValue)) {
+            if ((argValue == null) && arg.isRequired()) {
+                throw new IllegalArgumentException("No entry  specified for:"
+                        + arg.getLabel());
+            }
+
+            if (Utils.stringDefined(argValue) || arg.isRequired()) {
                 if (Utils.stringDefined(arg.prefix)) {
                     commands.add(arg.prefix);
                 }
-                argValue = applyMacros(entry, workDir, argValue);
+                argValue = applyMacros(currentEntry, workDir, argValue);
                 commands.add(argValue);
             }
         }
@@ -334,13 +353,14 @@ public class Command extends RepositoryManager {
      *
      * @param request _more_
      * @param entry _more_
+     * @param primaryEntry _more_
      * @param sb _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public int makeForm(Request request, Entry entry, StringBuffer sb)
+    public int makeForm(Request request, Entry primaryEntry, StringBuffer sb)
             throws Exception {
 
         int          blockCnt = 0;
@@ -391,18 +411,22 @@ public class Command extends RepositoryManager {
             } else if (arg.isFile()) {
                 //noop
             } else if (arg.isEntry()) {
-                input = OutputHandler.getSelect(
-                    request, arg.getName(), msg("Select"), true,
-                    null) + HtmlUtils.hidden(
-                        arg.getName() + "_hidden",
-                        request.getString(arg.getName() + "_hidden", ""),
-                        HtmlUtils.id(
-                            arg.getName() + "_hidden")) + HtmlUtils.space(1)
-                                + HtmlUtils.disabledInput(
+                if ((primaryEntry != null) && arg.isPrimaryEntry()) {
+                    continue;
+                } else {
+                    input = OutputHandler.getSelect(
+                        request, arg.getName(), msg("Select"), true,
+                        arg.getEntryType()) + HtmlUtils.hidden(
+                            arg.getName() + "_hidden",
+                            request.getString(arg.getName() + "_hidden", ""),
+                            HtmlUtils.id(
+                                arg.getName() + "_hidden")) + HtmlUtils.space(
+                                    1) + HtmlUtils.disabledInput(
                                     arg.getName(),
                                     request.getString(arg.getName(), ""),
                                     HtmlUtils.SIZE_60
                                     + HtmlUtils.id(arg.getName()));
+                }
 
             } else {
                 input = HtmlUtils.input(arg.getName(),
@@ -504,7 +528,7 @@ public class Command extends RepositoryManager {
      *
      * @return _more_
      */
-    public List<Input> getInputs() {
+    public List<Arg> getInputs() {
         return inputs;
     }
 
@@ -516,7 +540,7 @@ public class Command extends RepositoryManager {
      * @return _more_
      */
     public boolean isApplicable(Entry entry) {
-        for (Input input : inputs) {
+        for (Arg input : inputs) {
             if (input.isApplicable(entry)) {
                 return true;
             }
@@ -595,55 +619,6 @@ public class Command extends RepositoryManager {
 
 
 
-    /**
-     * Class description
-     *
-     *
-     * @version        $version$, Thu, Sep 4, '14
-     * @author         Enter your name here...
-     */
-    public static class Input {
-
-        /** _more_ */
-        private String entryType;
-
-        /**
-         * _more_
-         *
-         * @param node _more_
-         */
-        public Input(Element node) {
-            entryType = XmlUtil.getAttribute(node, ATTR_TYPE,
-                                             TypeHandler.TYPE_FILE);
-        }
-
-
-
-        /**
-         * _more_
-         *
-         * @param entry _more_
-         *
-         * @return _more_
-         */
-        public boolean isApplicable(Entry entry) {
-            return entry.isType(entryType);
-        }
-
-
-        /**
-         *  Get the EntryType property.
-         *
-         *  @return The EntryType
-         */
-        public String getEntryType() {
-            return entryType;
-        }
-
-    }
-
-
-
 
 
     /**
@@ -669,6 +644,8 @@ public class Command extends RepositoryManager {
 
         /** _more_ */
         private boolean showResults = false;
+
+
 
         /**
          * _more_
@@ -791,7 +768,7 @@ public class Command extends RepositoryManager {
         /** _more_ */
         private String value;
 
-        /** _more_          */
+        /** _more_ */
         private String prefix;
 
         /** _more_ */
@@ -811,6 +788,15 @@ public class Command extends RepositoryManager {
 
         /** _more_ */
         private String type;
+
+        /** _more_          */
+        private String entryType;
+
+        /** _more_          */
+        private boolean isPrimaryEntry = false;
+
+        /** _more_          */
+        private boolean required = false;
 
         /** _more_ */
         private String fileName;
@@ -840,8 +826,15 @@ public class Command extends RepositoryManager {
                 nameDefined = true;
             }
 
-            type      = XmlUtil.getAttribute(node, ATTR_TYPE, (String) null);
+            type = XmlUtil.getAttribute(node, ATTR_TYPE, (String) null);
+            entryType = XmlUtil.getAttribute(node, ATTR_ENTRY_TYPE,
+                                             (String) null);
+            isPrimaryEntry = XmlUtil.getAttribute(node, ATTR_PRIMARY,
+                    isPrimaryEntry);
+
+
             group     = XmlUtil.getAttribute(node, ATTR_GROUP, (String) null);
+            required  = XmlUtil.getAttribute(node, "required", required);
             value     = Utils.getAttributeOrTag(node, "value", "");
             label     = XmlUtil.getAttribute(node, ATTR_LABEL, name);
             prefix    = XmlUtil.getAttribute(node, "prefix", (String) null);
@@ -864,6 +857,32 @@ public class Command extends RepositoryManager {
                 values.add(new TwoFacedObject(label, value));
             }
         }
+
+        /**
+         * _more_
+         *
+         * @param entry _more_
+         *
+         * @return _more_
+         */
+        public boolean isApplicable(Entry entry) {
+            if (entryType != null) {
+                return entry.isType(entryType);
+            }
+
+            return false;
+        }
+
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public boolean isRequired() {
+            return required;
+        }
+
 
         /**
          * _more_
@@ -928,6 +947,15 @@ public class Command extends RepositoryManager {
          *
          * @return _more_
          */
+        public boolean isPrimaryEntry() {
+            return isPrimaryEntry;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean isCategory() {
             return (type != null) && type.equals(TYPE_CATEGORY);
         }
@@ -940,6 +968,15 @@ public class Command extends RepositoryManager {
          */
         public String getGroup() {
             return group;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public String getEntryType() {
+            return entryType;
         }
 
 

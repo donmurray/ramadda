@@ -26,6 +26,7 @@ import org.ramadda.data.process.DataProcessInput;
 import org.ramadda.data.process.DataProcessOperand;
 import org.ramadda.data.process.DataProcessOutput;
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
+import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.Constants;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
@@ -445,10 +446,10 @@ public class NCLModelPlotDataProcess extends DataProcess {
         System.err.println("env:" + envMap);
 
         //Use new repository method to execute. This gets back [stdout,stderr]
-        String[] results = repository.getJobManager().executeCommand(commands, envMap,
+        JobManager.CommandResults results = repository.getJobManager().executeCommand(commands, envMap,
                                input.getProcessDir(), 60);
-        String errorMsg = results[1];
-        String outMsg   = results[0];
+        String errorMsg = results.getStderrMsg();
+        String outMsg   = results.getStdoutMsg();
         // Check the version
         /*
         if (suffix.equals("png")) {
