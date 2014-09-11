@@ -769,6 +769,10 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                 throw new IllegalStateException(
                     "DatabaseManager: dataSource is null");
             }
+            System.err.println("wait:" + tmpDataSource.getMaxWaitMillis());
+            System.err.println("max total:" +  tmpDataSource.getMaxTotal());
+            System.err.println("active:" + tmpDataSource.getNumActive());
+            System.err.println("idle:" +tmpDataSource.getNumIdle());
             connection = tmpDataSource.getConnection();
         }
         synchronized (connectionInfos) {
