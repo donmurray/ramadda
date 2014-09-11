@@ -21,7 +21,7 @@
 package org.ramadda.repository.database;
 
 
-import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbcp2.BasicDataSource;
 
 
 
@@ -278,20 +278,23 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             scourMessages = new ArrayList<String>();
             totalScours   = 0;
 
+
             BasicDataSource ds = new BasicDataSource();
 
-            ds.setMaxActive(
-                getRepository().getProperty(PROP_DB_POOL_MAXACTIVE, 100));
-            ds.setMaxIdle(getRepository().getProperty(PROP_DB_POOL_MAXIDLE,
-                    100));
+            //            ds.setMaxActive(getRepository().getProperty(PROP_DB_POOL_MAXACTIVE, 100));
+            //            ds.setMaxIdle(getRepository().getProperty(PROP_DB_POOL_MAXIDLE,100));
+            ds.setMaxTotal(getRepository().getProperty(PROP_DB_POOL_MAXACTIVE,100));
 
             ds.setRemoveAbandonedTimeout(60 * 10);
-            ds.setRemoveAbandoned(false);
+            //            ds.setRemoveAbandoned(false);
+            ds.setRemoveAbandonedOnBorrow(false);
 
             String userName = (String) getRepository().getProperty(
                                   PROP_DB_USER.replace("${db}", db));
             String password = (String) getRepository().getProperty(
                                   PROP_DB_PASSWORD.replace("${db}", db));
+
+
             connectionURL = getStorageManager().localizePath(
                 (String) getRepository().getProperty(
                     PROP_DB_URL.replace("${db}", db)));
@@ -435,8 +438,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         StringBuffer    poolSB = new StringBuffer();
         poolSB.append("&nbsp;&nbsp;#active:" + bds.getNumActive()
                       + "<br>&nbsp;&nbsp;#idle:" + bds.getNumIdle()
-                      + "<br>&nbsp;&nbsp;max active: " + bds.getMaxActive()
-                      + "<br>&nbsp;&nbsp;max idle:" + bds.getMaxIdle());
+                      //                      + "<br>&nbsp;&nbsp;max active: " + bds.getMaxActive()
+                      //                      + "<br>&nbsp;&nbsp;max idle:" + bds.getMaxIdle());
+                      + "<br>&nbsp;&nbsp;max active: " + bds.getMaxTotal());
 
         poolSB.append("<br># of open selects:" + numberOfSelects.getCount());
         poolSB.append("<br>");
