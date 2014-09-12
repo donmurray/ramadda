@@ -1039,7 +1039,11 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
         if (request.get(ARG_ALLENTRIES, false)) {
+            String entryType = request.getString(ARG_ENTRYTYPE,(String) null);
             for (Entry entry : entries) {
+                if(Utils.stringDefined(entryType) && !entry.getTypeHandler().isType(entryType)) {
+                    continue;
+                }
                 sb.append(getSelectLink(request, entry, target));
             }
         }

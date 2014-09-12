@@ -909,12 +909,13 @@ public class OutputHandler extends RepositoryManager {
                                           HtmlUtils.squote(selectorId),
                                           HtmlUtils.squote(elementId),
                                           HtmlUtils.squote("" + allEntries),
-                                          (type == null)
+                                          (type == null
                                           ? "null"
-                                          : HtmlUtils.squote(type)) + ","
-                                              + ((entry != null)
-                ? HtmlUtils.squote(entry.getId())
-                : "null"));
+                                           : HtmlUtils.squote(type)),
+                                                      (entry != null
+                                                       ? HtmlUtils.squote(entry.getId())
+                                                       : "null"),
+                                                      HtmlUtils.squote(request.getString(ARG_ENTRYTYPE,""))));
         String clearEvent = HtmlUtils.call("clearSelect",
                                            HtmlUtils.squote(elementId));
         String link = HtmlUtils.mouseClickHref(event, label,
@@ -953,6 +954,7 @@ public class OutputHandler extends RepositoryManager {
             ARG_NOREDIRECT, "true", ARG_OUTPUT,
             request.getString(ARG_OUTPUT, "inline"), ATTR_TARGET, target,
             ARG_ALLENTRIES, request.getString(ARG_ALLENTRIES, "true"),
+            ARG_ENTRYTYPE, request.getString(ARG_ENTRYTYPE, ""),
             ARG_SELECTTYPE, request.getString(ARG_SELECTTYPE, "")
         });
 
