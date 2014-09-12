@@ -285,9 +285,13 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             //            ds.setMaxIdle(getRepository().getProperty(PROP_DB_POOL_MAXIDLE,100));
             ds.setMaxTotal(getRepository().getProperty(PROP_DB_POOL_MAXACTIVE,100));
 
-            ds.setRemoveAbandonedTimeout(60 * 10);
-            //            ds.setRemoveAbandoned(false);
-            ds.setRemoveAbandonedOnBorrow(false);
+            //30 second time out
+            ds.setMaxWaitMillis(1000*30);
+            //60 seconds
+            ds.setRemoveAbandonedTimeout(60);
+            //            ds.setRemoveAbandoned(true);
+            ds.setRemoveAbandonedOnBorrow(true);
+            ds.setRemoveAbandonedOnMaintenance(true);
 
             String userName = (String) getRepository().getProperty(
                                   PROP_DB_USER.replace("${db}", db));
@@ -580,7 +584,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
          * @return _more_
          */
         public String toString() {
-            return "info:" + connection + " ";
+            //            return "info:" + connection + " ";
+            //            return "info:" + msg +"\n" + where + " ";
+            return  where;
         }
 
 
@@ -769,10 +775,10 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                 throw new IllegalStateException(
                     "DatabaseManager: dataSource is null");
             }
-            System.err.println("wait:" + tmpDataSource.getMaxWaitMillis());
-            System.err.println("max total:" +  tmpDataSource.getMaxTotal());
-            System.err.println("active:" + tmpDataSource.getNumActive());
-            System.err.println("idle:" +tmpDataSource.getNumIdle());
+            openCnt--;
+            /*
+            System.err.println("");
+            */
             connection = tmpDataSource.getConnection();
         }
         synchronized (connectionInfos) {
@@ -784,7 +790,15 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         return connection;
     }
 
-
+    public void printIt() {
+        System.err.println("active:" + dataSource.getNumActive());
+        System.err.println("idle:" +dataSource.getNumIdle());
+        //        System.err.println ("Open cnt:" + openCnt);
+        for (ConnectionInfo info : getConnectionInfos()) {
+            System.out.println("*******************");
+            System.out.println(info);
+        }
+    }
 
 
     /**
@@ -802,7 +816,6 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                             || info.connection.equals(connection)) {
                         connectionInfos.remove(info);
                         gotOne = true;
-
                         break;
                     }
                 }
@@ -819,6 +832,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
 
             try {
                 synchronized (CONNECTION_MUTEX) {
+                    openCnt--;
+                    //                    System.err.println("close:" + (openCnt)); 
                     connection.close();
                 }
             } catch (Exception ignore) {}
@@ -828,6 +843,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         }
     }
 
+    public static int openCnt = 0;
 
 
     /**
@@ -872,8 +888,11 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         } catch (Throwable ignore) {}
 
         if (connection != null) {
+            //            System.err.println( "CONNECTION: Closing connection");
             closeConnection(connection);
         } else {
+            //            Misc.printStack("statement with no connection");
+            //                new IllegalArgumentException());
             //            getLogManager().logError(
             //                "CONNECTION: Tried to close a statement with no connection",
             //                new IllegalArgumentException());
@@ -2515,6 +2534,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
          *
          * @throws SQLException _more_
          */
+        @Override
         protected void close(Statement statement) throws SQLException {
             databaseManager.closeAndReleaseConnection(statement);
         }

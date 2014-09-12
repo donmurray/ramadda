@@ -4526,6 +4526,9 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @throws Exception _more_
      */
     public Result processInfo(Request request) throws Exception {
+        getDatabaseManager().printIt();
+
+
         if (request.getString(ARG_RESPONSE, "").equals(RESPONSE_XML)) {
             Document doc  = XmlUtil.makeDocument();
             Element  info = getServerInfo().toXml(this, doc);

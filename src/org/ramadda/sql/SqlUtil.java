@@ -1672,29 +1672,26 @@ public class SqlUtil {
                 if (lastResultSet == null) {
                     lastResultSet = stmt.getResultSet();
                     if (lastResultSet == null) {
+                        checkClose();
                         return null;
                     }
                     if ( !lastResultSet.next()) {
                         checkClose();
-
                         return null;
                     }
                     //Run through the offset
                     while (offset-- > 0) {
                         if ( !lastResultSet.next()) {
                             checkClose();
-
                             return null;
                         }
                     }
                     cnt++;
-
                     return lastResultSet;
                 }
 
                 if (lastResultSet.next()) {
                     cnt++;
-
                     return lastResultSet;
                 }
 
@@ -1703,6 +1700,7 @@ public class SqlUtil {
                 }
                 lastResultSet = stmt.getResultSet();
                 if(lastResultSet == null) {
+                    checkClose();
                     return null;
                 }
                 if (lastResultSet.next()) {
