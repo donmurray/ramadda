@@ -496,61 +496,7 @@ public class HtmlUtils {
      *
      * @return _more_
      */
-    public static String comma(String s1, String s2) {
-        return comma(new String[] { s1, s2 });
-    }
-
-    /**
-     * _more_
-     *
-     * @param s1 _more_
-     * @param s2 _more_
-     * @param s3 _more_
-     *
-     * @return _more_
-     */
-    public static String comma(String s1, String s2, String s3) {
-        return comma(new String[] { s1, s2, s3 });
-    }
-
-    /**
-     * _more_
-     *
-     * @param s1 _more_
-     * @param s2 _more_
-     * @param s3 _more_
-     * @param s4 _more_
-     *
-     * @return _more_
-     */
-    public static String comma(String s1, String s2, String s3, String s4) {
-        return comma(new String[] { s1, s2, s3, s4 });
-    }
-
-    /**
-     * _more_
-     *
-     * @param s1 _more_
-     * @param s2 _more_
-     * @param s3 _more_
-     * @param s4 _more_
-     * @param s5 _more_
-     *
-     * @return _more_
-     */
-    public static String comma(String s1, String s2, String s3, String s4,
-                               String s5) {
-        return comma(new String[] { s1, s2, s3, s4, s5 });
-    }
-
-    /**
-     * _more_
-     *
-     * @param s _more_
-     *
-     * @return _more_
-     */
-    public static String comma(String[] s) {
+    public static String comma(String... s) {
         return StringUtil.join(",", s);
     }
 
