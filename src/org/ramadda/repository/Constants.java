@@ -587,6 +587,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_ALLENTRIES = "allentries";
 
+    public static final String ARG_ENTRYTYPE = "entrytype";
+
     /** _more_ */
     public static final String ARG_ANCESTOR = "ancestor";
 

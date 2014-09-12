@@ -725,10 +725,11 @@ function  handleFolderList(request, uid) {
 
 var selectors = new Array();
 
-function Selector(event, selectorId, elementId, allEntries, selecttype, localeId) {
+function Selector(event, selectorId, elementId, allEntries, selecttype, localeId, entryType) {
     this.id  = selectorId;
     this.elementId  = elementId;
     this.localeId = localeId;
+    this.entryType = entryType;
     this.allEntries = allEntries;
     this.selecttype = selecttype;
     this.textComp = GuiUtils.getDomObject(this.elementId);
@@ -762,8 +763,11 @@ function Selector(event, selectorId, elementId, allEntries, selecttype, localeId
                 collision: "none none"
                 });
         url = ramaddaBaseUrl +"/entry/show?output=selectxml&selecttype=" + this.selecttype+"&allentries=" + this.allEntries+"&target=" + this.id+"&noredirect=true&firstclick=true";
-        if(localeId) {
-            url = url+"&localeid=" + localeId;
+        if(this.localeId) {
+            url = url+"&localeid=" + this.localeId;
+        }
+        if(this.entryType) {
+            url = url+"&entrytype=" + this.entryType;
         }
         GuiUtils.loadXML( url, handleSelect,this.id);
         return false;
@@ -790,9 +794,9 @@ function selectCancel() {
 }
 
 
-function selectCreate(event, selectorId,elementId, allEntries,selecttype, localeId) {
+function selectCreate(event, selectorId,elementId, allEntries,selecttype, localeId, entryType) {
     if(!selectors[selectorId]) {
-        selectors[selectorId] = new Selector(event,selectorId, elementId,allEntries,selecttype,localeId);
+        selectors[selectorId] = new Selector(event,selectorId, elementId,allEntries,selecttype,localeId,entryType);
     } else {
         //Don:  alert('have selector'):
         selectors[selectorId].handleClick(event);
@@ -800,8 +804,8 @@ function selectCreate(event, selectorId,elementId, allEntries,selecttype, locale
 }
 
 
-function selectInitialClick(event, selectorId, elementId, allEntries, selecttype, localeId) {
-    selectCreate(event, selectorId, elementId, allEntries, selecttype, localeId);
+function selectInitialClick(event, selectorId, elementId, allEntries, selecttype, localeId, entryType) {
+    selectCreate(event, selectorId, elementId, allEntries, selecttype, localeId, entryType);
     return false;
 }
 

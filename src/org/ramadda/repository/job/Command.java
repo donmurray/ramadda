@@ -286,6 +286,8 @@ public class Command extends RepositoryManager {
             } else if (arg.isEntry()) {
                 if (arg.isPrimaryEntry()) {
                     currentEntry = primaryEntry;
+                } else {
+                    currentEntry = null;
                 }
 
                 if (currentEntry == null) {
@@ -293,10 +295,12 @@ public class Command extends RepositoryManager {
                                          + "_hidden", (String) null);
                     Entry entryArg = getEntryManager().getEntry(request,
                                          entryId);
-                    //TODO: Check for null, get the file
-                    if ((entryArg == null) && arg.isRequired()) {
-                        throw new IllegalArgumentException(
-                            "No entry  specified for:" + arg.getLabel());
+                    if (entryArg == null) {
+                        if(arg.isRequired()) {
+                            throw new IllegalArgumentException(
+                                                               "No entry  specified for:" + arg.getLabel());
+                        }
+                        continue;
                     }
                     currentEntry = entryArg;
                 }
@@ -366,6 +370,7 @@ public class Command extends RepositoryManager {
         int          blockCnt = 0;
         StringBuffer catBuff  = null;
         Command.Arg  catArg   = null;
+        boolean anyRequired = false;
         for (Command.Arg arg : getArgs()) {
             if (arg.isCategory()) {
                 if ((catBuff != null) && (catBuff.length() > 0)) {
@@ -386,27 +391,26 @@ public class Command extends RepositoryManager {
                 catArg  = null;
             }
 
-            String input = null;
+            StringBuffer input = new StringBuffer();
             if (arg.isEnumeration()) {
-                input = HtmlUtils.select(arg.getName(), arg.getValues(),
-                                         (List) null, "", 100);
+                input.append(HtmlUtils.select(arg.getName(), arg.getValues(),
+                                              (List) null, "", 100));
             } else if (arg.isFlag()) {
                 if (arg.getGroup() != null) {
                     boolean selected = request.getString(arg.getGroup(),
                                            "").equals(arg.getValue());
-                    input = HtmlUtils.radio(arg.getGroup(), arg.getValue(),
+                    input.append(HtmlUtils.radio(arg.getGroup(), arg.getValue(),
                                             selected) + HtmlUtils.space(2)
-                                                + arg.getLabel();
+                            + arg.getLabel());
                 } else {
                     String label = arg.getLabel();
                     if (Utils.stringDefined(arg.getHelp())) {
                         label += " -- " + arg.getHelp();
                     }
-                    input = HtmlUtils.labeledCheckbox(arg.getName(), "true",
-                            request.get(arg.getName(), false), label);
+                    input.append(HtmlUtils.labeledCheckbox(arg.getName(), "true",
+                                                           request.get(arg.getName(), false), label));
                 }
-                catBuff.append(HtmlUtils.formEntry("", input));
-
+                catBuff.append(HtmlUtils.formEntry("", input.toString()));
                 continue;
             } else if (arg.isFile()) {
                 //noop
@@ -414,37 +418,52 @@ public class Command extends RepositoryManager {
                 if ((primaryEntry != null) && arg.isPrimaryEntry()) {
                     continue;
                 } else {
-                    input = OutputHandler.getSelect(
+                    if(arg.getEntryType()!=null) {
+                        request.put(ARG_ENTRYTYPE,arg.getEntryType());
+                    }
+                    input.append(OutputHandler.getSelect(
                         request, arg.getName(), msg("Select"), true,
-                        arg.getEntryType()) + HtmlUtils.hidden(
-                            arg.getName() + "_hidden",
-                            request.getString(arg.getName() + "_hidden", ""),
-                            HtmlUtils.id(
-                                arg.getName() + "_hidden")) + HtmlUtils.space(
-                                    1) + HtmlUtils.disabledInput(
+                        null));
+                    input.append(HtmlUtils.hidden(
+                                                  arg.getName() + "_hidden",
+                                                  request.getString(arg.getName() + "_hidden", ""),
+                                                  HtmlUtils.id(
+                                                               arg.getName() + "_hidden")));
+                    input.append(HtmlUtils.space(1));
+                    input.append(HtmlUtils.disabledInput(
                                     arg.getName(),
                                     request.getString(arg.getName(), ""),
                                     HtmlUtils.SIZE_60
-                                    + HtmlUtils.id(arg.getName()));
+                                    + HtmlUtils.id(arg.getName())));
+                    request.remove(ARG_ENTRYTYPE);
                 }
 
             } else {
-                input = HtmlUtils.input(arg.getName(),
+                input.append(HtmlUtils.input(arg.getName(),
                                         request.getString(arg.getName(), ""),
-                                        arg.getSize());
+                                             arg.getSize()));
             }
-            if (input == null) {
+            if (input.length()==0) {
                 continue;
             }
+            if(arg.isRequired()) {
+                anyRequired = true;
+                input.append(HtmlUtils.space(1));
+                input.append("<span class=ramadda-required-label>*</span>");
+            }
+                                  
             if (Utils.stringDefined(arg.getHelp())) {
-                input = input + HtmlUtils.space(2) + arg.getHelp();
+                input.append(HtmlUtils.space(2) + arg.getHelp());
             }
             catBuff.append(HtmlUtils.formEntry(msgLabel(arg.getLabel()),
-                    input));
+                                               input.toString()));
         }
 
         if ((catBuff != null) && (catBuff.length() > 0)) {
             processCatBuff(request, sb, catArg, catBuff, ++blockCnt);
+        }
+        if(anyRequired) {
+            sb.append("<span class=ramadda-required-label>* required</span>");
         }
 
         return blockCnt;
@@ -605,14 +624,16 @@ public class Command extends RepositoryManager {
     public String applyMacros(Entry entry, File workDir, String value) {
         value = value.replace(macro(pathProperty),
                               getProperty(pathProperty, ""));
-        String fileTail = getStorageManager().getFileTail(entry);
         value = value.replace(macro("workdir"), workDir.toString());
-        value = value.replace(macro("entry.file"),
-                              entry.getResource().getPath());
-        value = value.replace(macro("entry.filebase"),
-                              IOUtil.stripExtension(entry.getName()));
-        value = value.replace(macro("entry.filebase"),
-                              IOUtil.stripExtension(fileTail));
+        if(entry!=null) {
+            String fileTail = getStorageManager().getFileTail(entry);
+            value = value.replace(macro("entry.file"),
+                                  entry.getResource().getPath());
+            value = value.replace(macro("entry.filebase"),
+                                  IOUtil.stripExtension(entry.getName()));
+            value = value.replace(macro("entry.filebase"),
+                                  IOUtil.stripExtension(fileTail));
+        }
 
         return value;
     }
