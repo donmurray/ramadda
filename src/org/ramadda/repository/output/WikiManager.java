@@ -3375,7 +3375,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 if (theEntry.getType().equals(TYPE_WIKIPAGE)) {
                     String url =
                         request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                         theEntry, ARG_OUTPUT, OUTPUT_WIKI);
+                                         theEntry, ARG_OUTPUT, OUTPUT_WIKI.toString());
 
                     return getEntryManager().getTooltipLink(request,
                             theEntry, label, url);

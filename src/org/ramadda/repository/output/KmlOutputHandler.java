@@ -222,7 +222,7 @@ public class KmlOutputHandler extends OutputHandler {
                                  request.url(
                                      repository.URL_ENTRY_SHOW, ARG_ENTRYID,
                                      childGroup.getId(), ARG_OUTPUT,
-                                     OUTPUT_KML));
+                                     OUTPUT_KML.toString()));
                 Element link = KmlUtil.networkLink(defaultFolder,
                                    childGroup.getName(), url);
                 if (childGroup.getDescription().length() > 0) {
@@ -241,7 +241,7 @@ public class KmlOutputHandler extends OutputHandler {
                 request.remove(ARG_SKIP);
                 String url = request.url(repository.URL_ENTRY_SHOW,
                                          ARG_ENTRYID, group.getId(),
-                                         ARG_OUTPUT, OUTPUT_KML, ARG_SKIP,
+                                         ARG_OUTPUT, OUTPUT_KML.toString(), ARG_SKIP,
                                          "" + (skip + max), ARG_MAX,
                                          "" + max);
 
@@ -459,7 +459,7 @@ public class KmlOutputHandler extends OutputHandler {
             return request.getAbsoluteUrl(
                 request.url(
                     request.getRepository().URL_ENTRY_SHOW, ARG_ENTRYID,
-                    entry.getId(), ARG_OUTPUT, OUTPUT_KML, ARG_VISIBLE,
+                    entry.getId(), ARG_OUTPUT, OUTPUT_KML.toString(), ARG_VISIBLE,
                     "true"));
         }
         if ( !isKml(entry)) {

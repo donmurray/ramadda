@@ -42,6 +42,9 @@ input, password, fileinput,textarea {
 }
 
 
+
+
+
 .input:focus, .textarea:focus {
   background: #fffeec;
   border : 1px #000 solid;
@@ -814,6 +817,29 @@ a.ramadda-heading-2-link {
 
 a.ramadda-heading-2-link:visited {
    text-decoration: none;
+}
+
+
+.inputform {
+  background: #fffeec;
+  padding:10px;
+  padding-right:50px;
+  border-bottom: 1px #ccc solid;
+  border-top: 1px #ccc solid;
+  border: 1px #ccc solid;
+   margin-left: 10px;
+   margin-right: 10px;
+}
+ 
+.inputform .ramadda-heading-1 {
+  border-top-left-radius: 6px;
+  border-bottom: 1px #aaa solid;
+  margin-top:5px;
+  padding:5px;
+  padding-left:8px;
+  padding-bottom:0px;
+//  background-color : #f6f6f6;
+//  font-weight: normal;
 }
 
 

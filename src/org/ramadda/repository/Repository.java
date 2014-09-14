@@ -1422,8 +1422,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
                 boolean required = XmlUtil.getAttribute(node, ARG_REQUIRED,
                                        true);
                 try {
-                    Class c = Misc.findClass(XmlUtil.getAttribute(node,
-                                  ATTR_CLASS));
+                    Class c = Misc.findClass(XmlUtil.getAttributeFromTree(node,
+                                                                  ATTR_CLASS));
 
                     Constructor ctor = Misc.findConstructor(c,
                                            new Class[] { Repository.class,

@@ -685,7 +685,7 @@ public class OutputHandler extends RepositoryManager {
             throws Exception {
         links.add(new Link(request.entryUrl(getRepository().URL_ENTRY_SHOW,
                                             entry, ARG_OUTPUT,
-                                            type), iconUrl(type.getIcon()),
+                                            type.toString()), iconUrl(type.getIcon()),
                                                 type.getLabel(), type));
 
     }
@@ -1048,7 +1048,7 @@ public class OutputHandler extends RepositoryManager {
         List<Link> links = new ArrayList<Link>();
 
         link = new Link(request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                         entry, ARG_OUTPUT, output,
+                                         entry, ARG_OUTPUT, output.toString(),
                                          ARG_PREVIOUS,
                                          "true"), iconUrl(ICON_LEFT),
                                              "View Previous Entry");
@@ -1057,7 +1057,7 @@ public class OutputHandler extends RepositoryManager {
         link.setLinkType(OutputType.TYPE_VIEW);
         links.add(link);
         link = new Link(request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                         entry, ARG_OUTPUT, output, ARG_NEXT,
+                                         entry, ARG_OUTPUT, output.toString(), ARG_NEXT,
                                          "true"), iconUrl(ICON_RIGHT),
                                              "View Next Entry");
         link.setLinkType(OutputType.TYPE_VIEW);

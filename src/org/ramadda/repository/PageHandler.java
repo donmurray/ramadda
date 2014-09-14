@@ -2644,7 +2644,7 @@ public class PageHandler extends RepositoryManager {
         String treeLink = HtmlUtils.href(
                               request.entryUrl(
                                   getRepository().URL_ENTRY_SHOW, entry,
-                                  ARG_OUTPUT, output), HtmlUtils.img(
+                                  ARG_OUTPUT, output.toString()), HtmlUtils.img(
                                       iconUrl(output.getIcon()),
                                       output.getLabel()));
 

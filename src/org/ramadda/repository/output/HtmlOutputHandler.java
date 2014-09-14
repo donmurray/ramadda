@@ -250,7 +250,7 @@ public class HtmlOutputHandler extends OutputHandler {
             String link = HtmlUtils.href(
                               request.entryUrl(
                                   getRepository().URL_ENTRY_SHOW, entry,
-                                  ARG_OUTPUT, output), HtmlUtils.img(
+                                  ARG_OUTPUT, output.toString()), HtmlUtils.img(
                                       iconUrl(output.getIcon()),
                                       output.getLabel()));
             sb.append("<td align=center>");
@@ -1399,7 +1399,7 @@ public class HtmlOutputHandler extends OutputHandler {
             sb.append("<td valign=bottom align=center width=" + width
                       + "% >");
             String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                          entry, ARG_OUTPUT, OUTPUT_GRID);
+                                          entry, ARG_OUTPUT, OUTPUT_GRID.toString());
             List<String> urls = new ArrayList<String>();
             getMetadataManager().getThumbnailUrls(request, entry, urls);
             if (urls.size() > 0) {
@@ -1978,7 +1978,7 @@ public class HtmlOutputHandler extends OutputHandler {
             tmp, "${loadurl}",
             request.url(
                 getRepository().URL_ENTRY_GETENTRIES, ARG_ENTRYIDS, "%ids%",
-                ARG_OUTPUT, OUTPUT_HTML));
+                ARG_OUTPUT, OUTPUT_HTML.toString()));
 
         return tmp;
 

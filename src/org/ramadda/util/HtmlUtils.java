@@ -1224,7 +1224,7 @@ public class HtmlUtils {
      *
      * @return _more_
      */
-    public static String url(String path, String[] args) {
+    public static String url(String path, String...args) {
         return url(path, args, true);
     }
 

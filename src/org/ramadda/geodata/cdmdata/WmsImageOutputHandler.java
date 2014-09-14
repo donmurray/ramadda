@@ -264,7 +264,7 @@ public class WmsImageOutputHandler extends OutputHandler {
         String url = request.getAbsoluteUrl(
                          request.entryUrl(
                              getRepository().URL_ENTRY_SHOW, entry,
-                             ARG_OUTPUT, OUTPUT_WMS_CAPABILITIES));
+                             ARG_OUTPUT, OUTPUT_WMS_CAPABILITIES.toString()));
         String wms = wmsTemplate;
         wms = wms.replace("${url}", XmlUtil.encodeString(url));
         wms = wms.replace("${title}", XmlUtil.encodeString(entry.getName()));

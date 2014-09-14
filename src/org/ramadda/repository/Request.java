@@ -386,17 +386,6 @@ public class Request implements Constants, Cloneable {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param theUrl _more_
-     * @param entry _more_
-     *
-     * @return _more_
-     */
-    public String entryUrl(RequestUrl theUrl, Entry entry) {
-        return entryUrl(theUrl, entry, ARG_ENTRYID);
-    }
 
     /**
      * _more_
@@ -488,6 +477,19 @@ public class Request implements Constants, Cloneable {
      *
      * @param theUrl _more_
      * @param entry _more_
+     *
+     * @return _more_
+     */
+    public String entryUrl(RequestUrl theUrl, Entry entry) {
+        return entryUrl(theUrl, entry, ARG_ENTRYID);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param theUrl _more_
+     * @param entry _more_
      * @param arg _more_
      *
      * @return _more_
@@ -517,22 +519,6 @@ public class Request implements Constants, Cloneable {
         return checkUrl(HtmlUtils.url(url, arg, entry.getId()));
     }
 
-    /**
-     * _more_
-     *
-     * @param theUrl _more_
-     * @param entry _more_
-     * @param arg1 _more_
-     * @param value1 _more_
-     *
-     * @return _more_
-     */
-    public String entryUrl(RequestUrl theUrl, Entry entry, String arg1,
-                           Object value1) {
-        return checkUrl(HtmlUtils.url(entryUrl(theUrl, entry), arg1, value1));
-    }
-
-
 
     /**
      * _more_
@@ -557,29 +543,9 @@ public class Request implements Constants, Cloneable {
      *
      * @return _more_
      */
-    public String entryUrl(RequestUrl theUrl, Entry entry, String[] args) {
+    public String entryUrl(RequestUrl theUrl, Entry entry, String... args) {
         return checkUrl(HtmlUtils.url(entryUrl(theUrl, entry), args));
     }
-
-    /**
-     * _more_
-     *
-     * @param theUrl _more_
-     * @param entry _more_
-     * @param arg1 _more_
-     * @param value1 _more_
-     * @param arg2 _more_
-     * @param value2 _more_
-     *
-     * @return _more_
-     */
-    public String entryUrl(RequestUrl theUrl, Entry entry, String arg1,
-                           Object value1, String arg2, Object value2) {
-        return checkUrl(HtmlUtils.url(entryUrl(theUrl, entry), arg1, value1,
-                                      arg2, value2));
-    }
-
-
 
 
     /**
@@ -727,72 +693,14 @@ public class Request implements Constants, Cloneable {
      * @param theUrl _more_
      * @param arg1 _more_
      * @param value1 _more_
-     *
-     * @return _more_
-     */
-    public String url(RequestUrl theUrl, String arg1, Object value1) {
-        return checkUrl(HtmlUtils.url(url(theUrl), arg1, value1));
-    }
-
-    /**
-     * _more_
-     *
-     * @param theUrl _more_
-     * @param arg1 _more_
-     * @param value1 _more_
      * @param arg2 _more_
      * @param value2 _more_
      *
      * @return _more_
      */
-    public String url(RequestUrl theUrl, String arg1, Object value1,
-                      String arg2, Object value2) {
-        return checkUrl(HtmlUtils.url(url(theUrl), arg1, value1, arg2,
-                                      value2));
+    public String url(RequestUrl theUrl, String... args) {
+        return checkUrl(HtmlUtils.url(url(theUrl), args));
     }
-
-    /**
-     * _more_
-     *
-     * @param theUrl _more_
-     * @param arg1 _more_
-     * @param value1 _more_
-     * @param arg2 _more_
-     * @param value2 _more_
-     * @param arg3 _more_
-     * @param value3 _more_
-     *
-     * @return _more_
-     */
-    public String url(RequestUrl theUrl, String arg1, Object value1,
-                      String arg2, Object value2, String arg3,
-                      Object value3) {
-        return checkUrl(HtmlUtils.url(url(theUrl), arg1, value1, arg2,
-                                      value2, arg3, value3));
-    }
-
-    /**
-     * _more_
-     *
-     * @param theUrl _more_
-     * @param arg1 _more_
-     * @param value1 _more_
-     * @param arg2 _more_
-     * @param value2 _more_
-     * @param arg3 _more_
-     * @param value3 _more_
-     * @param arg4 _more_
-     * @param value4 _more_
-     *
-     * @return _more_
-     */
-    public String url(RequestUrl theUrl, String arg1, Object value1,
-                      String arg2, Object value2, String arg3, Object value3,
-                      String arg4, Object value4) {
-        return checkUrl(HtmlUtils.url(url(theUrl), arg1, value1, arg2,
-                                      value2, arg3, value3, arg4, value4));
-    }
-
 
 
     /**
@@ -1591,26 +1499,6 @@ public class Request implements Constants, Cloneable {
                                                  "\n\tauth token:" + authToken,null);
 
         throw new IllegalArgumentException("Bad authentication token");
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param keys _more_
-     * @param dflt _more_
-     *
-     * @return _more_
-     */
-    public String xxxgetString(String[] keys, String dflt) {
-        for (String key : keys) {
-            String value = getString(key, (String) null);
-            if (value != null) {
-                return value;
-            }
-        }
-
-        return dflt;
     }
 
 

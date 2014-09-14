@@ -92,10 +92,10 @@ public class Command extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_ID = "id";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_PRIMARY = "primary";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ENTRY_TYPE = "entryType";
 
     /** _more_ */
@@ -159,9 +159,19 @@ public class Command extends RepositoryManager {
     /** _more_ */
     private String label;
 
-
     /** _more_ */
     private String pathProperty;
+
+    /** _more_          */
+    private Command parent;
+
+    /** _more_          */
+    private List<Command> children;
+
+    private String linkId;
+
+    /** _more_          */
+    private Command link;
 
     /** _more_ */
     private List<Arg> args = new ArrayList<Arg>();
@@ -181,21 +191,57 @@ public class Command extends RepositoryManager {
      */
     public Command(Repository repository, Element element) throws Exception {
         super(repository);
-        init(element);
+        init(null, element, null);
     }
 
 
     /**
      * _more_
      *
+     * @param repository _more_
+     * @param parent _more_
      * @param element _more_
      *
      * @throws Exception _more_
      */
-    private void init(Element element) throws Exception {
-        id = XmlUtil.getAttribute(element, ATTR_ID);
-        icon = XmlUtil.getAttribute(element, ATTR_ICON, (String) null);
-        command = XmlUtil.getAttribute(element, TAG_COMMAND, (String) null);
+    public Command(Repository repository, Command parent, Element element, int index)
+            throws Exception {
+        super(repository);
+        init(parent, element, "command_" + index);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getUrlArg() {
+        if (parent != null) {
+            return parent.getUrlArg() + "_" + id;
+        }
+
+        return id;
+    }
+
+    /**
+     * _more_
+     *
+     *
+     * @param parent _more_
+     * @param element _more_
+     *
+     * @throws Exception _more_
+     */
+    private void init(Command parent, Element element, String dfltId) throws Exception {
+        this.parent = parent;
+        id          = XmlUtil.getAttribute(element, ATTR_ID, dfltId);
+        icon = XmlUtil.getAttributeFromTree(element, ATTR_ICON,
+                                            (String) null);
+        linkId= XmlUtil.getAttribute(element, "link",
+                                     (String) null);
+        command = XmlUtil.getAttributeFromTree(element, TAG_COMMAND,
+                (String) null);
         outputToStderr = XmlUtil.getAttribute(element, "outputToStderr",
                 outputToStderr);
         pathProperty = XmlUtil.getAttribute(element, ATTR_PATHPROPERTY,
@@ -206,12 +252,11 @@ public class Command extends RepositoryManager {
             pathProperty = command.substring(2, command.indexOf("}"));
         }
 
-        if ((pathProperty == null)
+        if (linkId == null && (pathProperty == null)
                 || (getProperty(pathProperty, null) == null)) {
             System.err.println(
                 "ExecutableOutputHandler: no path property defined:"
                 + pathProperty);
-
             return;
         }
 
@@ -219,25 +264,51 @@ public class Command extends RepositoryManager {
 
         label = XmlUtil.getAttribute(element, ATTR_LABEL, "Command");
 
-        NodeList children = XmlUtil.getElements(element, TAG_ARG);
-        for (int i = 0; i < children.getLength(); i++) {
-            Element node = (Element) children.item(i);
-            Arg     arg  = new Arg(node, i);
+
+        NodeList nodes = XmlUtil.getElements(element, TAG_ARG);
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element node = (Element) nodes.item(i);
+            Arg     arg  = new Arg(this, node, i);
             args.add(arg);
             if (arg.isEntry()) {
                 inputs.add(arg);
             }
         }
 
-        children = XmlUtil.getElements(element, TAG_OUTPUT);
-        for (int i = 0; i < children.getLength(); i++) {
-            Element node   = (Element) children.item(i);
+
+        nodes = XmlUtil.getElements(element, TAG_COMMAND);
+        if (nodes.getLength() > 0) {
+            children = new ArrayList<Command>();
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Element node = (Element) nodes.item(i);
+                children.add(new Command(getRepository(), this, node, i));
+            }
+        }
+
+        nodes = XmlUtil.getElements(element, TAG_OUTPUT);
+        for (int i = 0; i < nodes.getLength(); i++) {
+            Element node   = (Element) nodes.item(i);
             Output  output = new Output(node);
             outputs.add(output);
         }
         enabled = true;
 
         getRepository().getJobManager().addCommand(this);
+    }
+
+    private void initCommand() {
+        if(link!=null) return;
+        if(linkId!=null) {
+            link = getRepository().getJobManager().getCommand(linkId);
+        }
+    }
+
+    public Command getCommandToUse() {
+        initCommand();
+        if(link!=null) {
+            return link;
+        }
+        return this;
     }
 
     /**
@@ -248,13 +319,24 @@ public class Command extends RepositoryManager {
      * @param primaryEntry _more_
      * @param workDir _more_
      * @param commands _more_
+     * @param forDisplay _more_
      *
      * @throws Exception _more_
      */
     public void addArgs(Request request, Entry primaryEntry, File workDir,
-                        List<String> commands)
+                        List<String> commands, boolean forDisplay)
             throws Exception {
-        String cmd = applyMacros(primaryEntry, workDir, getCommand());
+        getCommandToUse().addArgsInner(request, primaryEntry, workDir, commands, forDisplay);
+    }
+
+
+    private void addArgsInner(Request request, Entry primaryEntry, File workDir,
+                        List<String> commands, boolean forDisplay)
+            throws Exception {
+
+
+        String cmd = applyMacros(primaryEntry, workDir, getCommand(),
+                                 forDisplay);
         commands.add(cmd);
         HashSet<String> seenGroup = new HashSet<String>();
         for (Command.Arg arg : getArgs()) {
@@ -275,13 +357,13 @@ public class Command extends RepositoryManager {
                             argValue = null;
                         }
                     }
-                } else if (request.get(arg.getName(), false)) {
+                } else if (request.get(arg.getUrlArg(), false)) {
                     argValue = arg.getValue();
                 }
             } else if (arg.isFile()) {
                 //TODO:
                 //                String filename = applyMacros(currentEntry, workDir,
-                //arg.getFileName());
+                //arg.getFileName(), forDisplay);
                 //argValue = IOUtil.joinDir(workDir, filename);
             } else if (arg.isEntry()) {
                 if (arg.isPrimaryEntry()) {
@@ -291,15 +373,16 @@ public class Command extends RepositoryManager {
                 }
 
                 if (currentEntry == null) {
-                    String entryId = request.getString(arg.getName()
+                    String entryId = request.getString(arg.getUrlArg()
                                          + "_hidden", (String) null);
                     Entry entryArg = getEntryManager().getEntry(request,
                                          entryId);
                     if (entryArg == null) {
-                        if(arg.isRequired()) {
+                        if (arg.isRequired()) {
                             throw new IllegalArgumentException(
-                                                               "No entry  specified for:" + arg.getLabel());
+                                "No entry  specified for:" + arg.getLabel());
                         }
+
                         continue;
                     }
                     currentEntry = entryArg;
@@ -309,7 +392,7 @@ public class Command extends RepositoryManager {
                     argValue = currentEntry.getResource().getPath();
                 }
             } else {
-                argValue = request.getString(arg.getName(), "");
+                argValue = request.getString(arg.getUrlArg(), "");
                 if (arg.getIfDefined() && !Utils.stringDefined(argValue)) {
                     continue;
                 }
@@ -327,7 +410,8 @@ public class Command extends RepositoryManager {
                 if (Utils.stringDefined(arg.prefix)) {
                     commands.add(arg.prefix);
                 }
-                argValue = applyMacros(currentEntry, workDir, argValue);
+                argValue = applyMacros(currentEntry, workDir, argValue,
+                                       forDisplay);
                 commands.add(argValue);
             }
         }
@@ -339,6 +423,7 @@ public class Command extends RepositoryManager {
      * @return _more_
      */
     public String getIcon() {
+        if(linkId!=null) getCommandToUse().getIcon();
         return icon;
     }
 
@@ -348,6 +433,7 @@ public class Command extends RepositoryManager {
      * @return _more_
      */
     public String getId() {
+        if(linkId!=null) getCommandToUse().getId();
         return id;
     }
 
@@ -366,11 +452,26 @@ public class Command extends RepositoryManager {
      */
     public int makeForm(Request request, Entry primaryEntry, StringBuffer sb)
             throws Exception {
+        initCommand();
+        if(link!=null) {
+            return link.makeForm(request, primaryEntry, sb);
+        }
+        if(children!=null) {
+            int cnt = 0;
+            for(Command child: children) {
+                cnt+=child.makeForm(request, primaryEntry, sb);
+            }
+            return cnt;
+        }
+        return makeFormInner(request, primaryEntry, sb);
+    }
 
-        int          blockCnt = 0;
-        StringBuffer catBuff  = null;
-        Command.Arg  catArg   = null;
-        boolean anyRequired = false;
+    private  int makeFormInner(Request request, Entry primaryEntry, StringBuffer sb)
+            throws Exception {
+        int          blockCnt    = 0;
+        StringBuffer catBuff     = null;
+        Command.Arg  catArg      = null;
+        boolean      anyRequired = false;
         for (Command.Arg arg : getArgs()) {
             if (arg.isCategory()) {
                 if ((catBuff != null) && (catBuff.length() > 0)) {
@@ -391,26 +492,30 @@ public class Command extends RepositoryManager {
                 catArg  = null;
             }
 
-            StringBuffer input = new StringBuffer();
+            String       tooltip = arg.getPrefix();
+            StringBuffer input   = new StringBuffer();
             if (arg.isEnumeration()) {
-                input.append(HtmlUtils.select(arg.getName(), arg.getValues(),
-                                              (List) null, "", 100));
+                input.append(HtmlUtils.select(arg.getUrlArg(),
+                        arg.getValues(), (List) null, "", 100));
             } else if (arg.isFlag()) {
                 if (arg.getGroup() != null) {
                     boolean selected = request.getString(arg.getGroup(),
                                            "").equals(arg.getValue());
-                    input.append(HtmlUtils.radio(arg.getGroup(), arg.getValue(),
-                                            selected) + HtmlUtils.space(2)
-                            + arg.getLabel());
+                    input.append(HtmlUtils.radio(arg.getGroup(),
+                            arg.getValue(), selected) + HtmlUtils.space(2)
+                                + arg.getHelp());
                 } else {
-                    String label = arg.getLabel();
-                    if (Utils.stringDefined(arg.getHelp())) {
-                        label += " -- " + arg.getHelp();
-                    }
-                    input.append(HtmlUtils.labeledCheckbox(arg.getName(), "true",
-                                                           request.get(arg.getName(), false), label));
+                    input.append(HtmlUtils.labeledCheckbox(arg.getUrlArg(),
+                            "true", request.get(arg.getUrlArg(), false),
+                            arg.getHelp()));
                 }
-                catBuff.append(HtmlUtils.formEntry("", input.toString()));
+                if(Utils.stringDefined(arg.getLabel())) {
+                    catBuff.append(HtmlUtils.formEntry(arg.getLabel() + ":",
+                                                       input.toString()));
+                } else {
+                    catBuff.append(HtmlUtils.formEntry("",
+                                                       input.toString()));
+                }
                 continue;
             } else if (arg.isFile()) {
                 //noop
@@ -418,51 +523,57 @@ public class Command extends RepositoryManager {
                 if ((primaryEntry != null) && arg.isPrimaryEntry()) {
                     continue;
                 } else {
-                    if(arg.getEntryType()!=null) {
-                        request.put(ARG_ENTRYTYPE,arg.getEntryType());
+                    if (arg.getEntryType() != null) {
+                        request.put(ARG_ENTRYTYPE, arg.getEntryType());
                     }
-                    input.append(OutputHandler.getSelect(
-                        request, arg.getName(), msg("Select"), true,
-                        null));
-                    input.append(HtmlUtils.hidden(
-                                                  arg.getName() + "_hidden",
-                                                  request.getString(arg.getName() + "_hidden", ""),
-                                                  HtmlUtils.id(
-                                                               arg.getName() + "_hidden")));
+                    input.append(OutputHandler.getSelect(request,
+                            arg.getUrlArg(), msg("Select"), true, null));
+                    input.append(
+                        HtmlUtils.hidden(
+                            arg.getUrlArg() + "_hidden",
+                            request.getString(
+                                arg.getUrlArg() + "_hidden",
+                                ""), HtmlUtils.id(
+                                    arg.getUrlArg() + "_hidden")));
                     input.append(HtmlUtils.space(1));
-                    input.append(HtmlUtils.disabledInput(
-                                    arg.getName(),
-                                    request.getString(arg.getName(), ""),
-                                    HtmlUtils.SIZE_60
-                                    + HtmlUtils.id(arg.getName())));
+                    input.append(HtmlUtils.disabledInput(arg.getUrlArg(),
+                            request.getString(arg.getUrlArg(), ""),
+                            HtmlUtils.SIZE_60
+                            + HtmlUtils.id(arg.getUrlArg())));
                     request.remove(ARG_ENTRYTYPE);
                 }
 
             } else {
-                input.append(HtmlUtils.input(arg.getName(),
-                                        request.getString(arg.getName(), ""),
-                                             arg.getSize()));
+                String extra = HtmlUtils.attr(HtmlUtils.ATTR_SIZE,
+                                   "" + arg.getSize());
+                if (arg.placeHolder != null) {
+                    extra += HtmlUtils.attr("placeholder", arg.placeHolder);
+                }
+                input.append(
+                    HtmlUtils.input(
+                        arg.getUrlArg(),
+                        request.getString(arg.getUrlArg(), ""), extra));
             }
-            if (input.length()==0) {
+            if (input.length() == 0) {
                 continue;
             }
-            if(arg.isRequired()) {
+            if (arg.isRequired()) {
                 anyRequired = true;
                 input.append(HtmlUtils.space(1));
                 input.append("<span class=ramadda-required-label>*</span>");
             }
-                                  
+
             if (Utils.stringDefined(arg.getHelp())) {
                 input.append(HtmlUtils.space(2) + arg.getHelp());
             }
             catBuff.append(HtmlUtils.formEntry(msgLabel(arg.getLabel()),
-                                               input.toString()));
+                    input.toString()));
         }
 
         if ((catBuff != null) && (catBuff.length() > 0)) {
             processCatBuff(request, sb, catArg, catBuff, ++blockCnt);
         }
-        if(anyRequired) {
+        if (anyRequired) {
             sb.append("<span class=ramadda-required-label>* required</span>");
         }
 
@@ -495,11 +606,11 @@ public class Command extends RepositoryManager {
         StringBuffer formSB = new StringBuffer(HtmlUtils.formTable());
         formSB.append(catBuff);
         formSB.append(HtmlUtils.formTableClose());
-        if (blockCnt == 1) {
+        if (true || (blockCnt == 1)) {
             sb.append(formSB);
         } else {
-            sb.append(HtmlUtils.makeShowHideBlock("More...",
-                    formSB.toString(), blockCnt == 1));
+            sb.append(HtmlUtils.makeShowHideBlock("", formSB.toString(),
+                    true || (blockCnt == 1)));
         }
     }
 
@@ -511,6 +622,7 @@ public class Command extends RepositoryManager {
      * @return _more_
      */
     public boolean isEnabled() {
+        if(linkId!=null) return getCommandToUse().isEnabled();
         return enabled;
     }
 
@@ -559,6 +671,7 @@ public class Command extends RepositoryManager {
      * @return _more_
      */
     public boolean isApplicable(Entry entry) {
+        if(linkId!=null) return getCommandToUse().isApplicable(entry);
         for (Arg input : inputs) {
             if (input.isApplicable(entry)) {
                 return true;
@@ -576,6 +689,7 @@ public class Command extends RepositoryManager {
      * @return _more_
      */
     public String getCommand() {
+        if(linkId!=null) getCommandToUse().getCommand();
         return command;
     }
 
@@ -586,6 +700,7 @@ public class Command extends RepositoryManager {
      *
      */
     public String getHelp() {
+        if(linkId!=null) getCommandToUse().getHelp();
         return help;
     }
 
@@ -595,6 +710,7 @@ public class Command extends RepositoryManager {
      * @return _more_
      */
     public String getLabel() {
+        if(linkId!=null) getCommandToUse().getLabel();
         return label;
     }
 
@@ -618,19 +734,26 @@ public class Command extends RepositoryManager {
      * @param entry _more_
      * @param workDir _more_
      * @param value _more_
+     * @param forDisplay _more_
      *
      * @return _more_
      */
-    public String applyMacros(Entry entry, File workDir, String value) {
+    public String applyMacros(Entry entry, File workDir, String value,
+                              boolean forDisplay) {
         value = value.replace(macro(pathProperty),
                               getProperty(pathProperty, ""));
-        value = value.replace(macro("workdir"), workDir.toString());
-        if(entry!=null) {
+
+        value = value.replace(macro("workdir"), forDisplay
+                ? "&lt;working directory&gt;"
+                : workDir.toString());
+        if (entry != null) {
             String fileTail = getStorageManager().getFileTail(entry);
-            value = value.replace(macro("entry.file"),
-                                  entry.getResource().getPath());
-            value = value.replace(macro("entry.filebase"),
-                                  IOUtil.stripExtension(entry.getName()));
+            value = value.replace(macro("entry.file"), forDisplay
+                    ? getStorageManager().getFileTail(entry)
+                    : entry.getResource().getPath());
+            //? not sure what the macros should be
+            //            value = value.replace(macro("entry.filebase"),
+            //                                  IOUtil.stripExtension(entry.getName()));
             value = value.replace(macro("entry.filebase"),
                                   IOUtil.stripExtension(fileTail));
         }
@@ -770,6 +893,12 @@ public class Command extends RepositoryManager {
         /** _more_ */
         private static final String TYPE_ENUMERATION = "enumeration";
 
+        /** _more_          */
+        private static final String TYPE_INT = "int";
+
+        /** _more_          */
+        private static final String TYPE_FLOAT = "float";
+
         /** _more_ */
         private static final String TYPE_ENTRY = "entry";
 
@@ -782,6 +911,9 @@ public class Command extends RepositoryManager {
         /** _more_ */
         private static final String TYPE_CATEGORY = "category";
 
+
+        /** _more_          */
+        private Command command;
 
         /** _more_ */
         private String name;
@@ -811,19 +943,22 @@ public class Command extends RepositoryManager {
         private String type;
 
         /** _more_          */
+        private String placeHolder;
+
+        /** _more_ */
         private String entryType;
 
-        /** _more_          */
+        /** _more_ */
         private boolean isPrimaryEntry = false;
 
-        /** _more_          */
+        /** _more_ */
         private boolean required = false;
 
         /** _more_ */
         private String fileName;
 
         /** _more_ */
-        private int size = 24;
+        private int size;
 
 
         /** _more_ */
@@ -833,34 +968,52 @@ public class Command extends RepositoryManager {
         /**
          * _more_
          *
+         *
+         * @param command _more_
          * @param node _more_
          * @param idx _more_
          *
          * @throws Exception _more_
          */
-        public Arg(Element node, int idx) throws Exception {
-            name = XmlUtil.getAttribute(node, ATTR_NAME, (String) null);
-            if (name == null) {
-                name        = "arg" + idx;
-                nameDefined = false;
-            } else {
-                nameDefined = true;
-            }
+        public Arg(Command command, Element node, int idx) throws Exception {
+            this.command = command;
 
             type = XmlUtil.getAttribute(node, ATTR_TYPE, (String) null);
             entryType = XmlUtil.getAttribute(node, ATTR_ENTRY_TYPE,
                                              (String) null);
+
+            placeHolder = XmlUtil.getAttribute(node, "placeHolder",
+                    (String) null);
             isPrimaryEntry = XmlUtil.getAttribute(node, ATTR_PRIMARY,
                     isPrimaryEntry);
 
+            prefix   = XmlUtil.getAttribute(node, "prefix", (String) null);
+            value    = Utils.getAttributeOrTag(node, "value", "");
+            name = XmlUtil.getAttribute(node, ATTR_NAME, (String) null);
+            nameDefined = name!=null;
+            if (name == null && prefix!=null) {
+                name = prefix.replaceAll("-","");
+            }
+            if (name == null && Utils.stringDefined(value)) {
+                name = value.replaceAll("-","");
+            }
+            if (name == null) {
+                name = "arg" + idx;
+            }
 
-            group     = XmlUtil.getAttribute(node, ATTR_GROUP, (String) null);
-            required  = XmlUtil.getAttribute(node, "required", required);
-            value     = Utils.getAttributeOrTag(node, "value", "");
-            label     = XmlUtil.getAttribute(node, ATTR_LABEL, name);
-            prefix    = XmlUtil.getAttribute(node, "prefix", (String) null);
-            help      = Utils.getAttributeOrTag(node, "help", "");
-            fileName  = XmlUtil.getAttribute(node, "filename", "${src}");
+
+            group    = XmlUtil.getAttribute(node, ATTR_GROUP, (String) null);
+            required = XmlUtil.getAttribute(node, "required", required);
+            label    = XmlUtil.getAttribute(node, ATTR_LABEL, name);
+            help     = Utils.getAttributeOrTag(node, "help", "");
+            fileName = XmlUtil.getAttribute(node, "filename", "${src}");
+            if (isInt()) {
+                size = 5;
+            } else if (isFloat()) {
+                size = 10;
+            } else {
+                size = 24;
+            }
             size      = XmlUtil.getAttribute(node, ATTR_SIZE, size);
             ifDefined = XmlUtil.getAttribute(node, "ifdefined", ifDefined);
             for (String tok :
@@ -878,6 +1031,16 @@ public class Command extends RepositoryManager {
                 values.add(new TwoFacedObject(label, value));
             }
         }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public String getUrlArg() {
+            return command.getUrlArg() + "_" + name;
+        }
+
 
         /**
          * _more_
@@ -968,6 +1131,24 @@ public class Command extends RepositoryManager {
          *
          * @return _more_
          */
+        public boolean isInt() {
+            return (type != null) && type.equals(TYPE_INT);
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public boolean isFloat() {
+            return (type != null) && type.equals(TYPE_FLOAT);
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public boolean isPrimaryEntry() {
             return isPrimaryEntry;
         }
@@ -988,8 +1169,22 @@ public class Command extends RepositoryManager {
          * @return _more_
          */
         public String getGroup() {
-            return group;
+            if (group == null) {
+                return null;
+            }
+
+            return command.getUrlArg() + "_" + group;
         }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public String getPrefix() {
+            return prefix;
+        }
+
 
         /**
          * _more_

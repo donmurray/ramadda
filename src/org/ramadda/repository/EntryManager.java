@@ -7806,10 +7806,8 @@ public class EntryManager extends RepositoryManager {
 
 
         List<Element> associationNodes = new ArrayList<Element>();
-        //xxxxxx
         associationNodes.addAll((List<Element>) XmlUtil.findDescendants(root,
                 TAG_ASSOCIATION));
-
         //        System.err.println("nodes:" + associationNodes.size());
 
 

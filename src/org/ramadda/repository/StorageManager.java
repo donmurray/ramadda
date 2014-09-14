@@ -1005,6 +1005,24 @@ public class StorageManager extends RepositoryManager {
     }
 
 
+    public String getProcessDirEntryId(File processDir) {
+        return getProcessDirEntryId(processDir.getName());
+    }
+
+        /*
+    public String getProcessDirEntryUrl(Request request, File processDir) {
+        String processEntryId =
+            getStorageManager().getProcessDirEntryId(processId);
+
+        String entryUrl =
+            HtmlUtils.url(
+                request.entryUrl(getRepository().URL_ENTRY_SHOW
+                ARG_ENTRYID,
+                processEntryId);
+        return entryUrl;
+    }
+        */
+
     /**
      * _more_
      *

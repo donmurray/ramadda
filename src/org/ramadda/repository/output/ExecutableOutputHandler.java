@@ -31,6 +31,7 @@ import org.ramadda.util.Utils;
 
 import org.w3c.dom.*;
 
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.xml.XmlUtil;
 
@@ -50,6 +51,9 @@ import java.util.List;
  * @author RAMADDA Development Team
  */
 public class ExecutableOutputHandler extends OutputHandler {
+
+    public static final String ARG_SHOWCOMMAND = "showcommand";
+
 
     /** _more_ */
     public static final String ATTR_ICON = "icon";
@@ -184,19 +188,29 @@ public class ExecutableOutputHandler extends OutputHandler {
             throws Exception {
 
         StringBuffer sb = new StringBuffer();
-        if ( !request.defined(ARG_EXECUTE)) {
+        if ( !request.defined(ARG_EXECUTE) && !request.defined(ARG_SHOWCOMMAND)) {
             makeForm(request, entry, sb);
 
             return new Result(outputType.getLabel(), sb);
         }
 
-        Object       uniqueId = getRepository().getGUID();
-        File         workDir  = getWorkDir(uniqueId);
+        //        Object       uniqueId = getRepository().getGUID();
+        //        File         workDir  = getWorkDir(uniqueId);
+        File         workDir = getStorageManager().createProcessDir();
+
+        boolean forDisplay = request.exists(ARG_SHOWCOMMAND);
         List<String> commands = new ArrayList<String>();
-        command.addArgs(request, entry, workDir, commands);
+        command.addArgs(request, entry, workDir, commands, forDisplay);
         System.err.println("Commands:" + commands);
 
-
+        if(forDisplay) {
+            sb.append(HtmlUtils.p());
+            sb.append("Command line:");
+            commands.set(0, IOUtil.getFileTail(commands.get(0)));
+            sb.append(HtmlUtils.pre(StringUtil.join(" ", commands)));
+            makeForm(request, entry, sb);
+            return new Result(outputType.getLabel(), sb);
+        }
         String   errMsg = "";
         String   outMsg = "";
         File     stdoutFile = new File(IOUtil.joinDir(workDir, ".stdout"));
@@ -248,7 +262,7 @@ public class ExecutableOutputHandler extends OutputHandler {
             File[] files = null;
             if (output.getUseStdout()) {
                 String filename = applyMacros(entry, workDir,
-                                      output.getFilename());
+                                              output.getFilename(), forDisplay);
                 File destFile = new File(IOUtil.joinDir(workDir, filename));
                 IOUtil.moveFile(stdoutFile, destFile);
                 files = new File[] { destFile };
@@ -357,8 +371,8 @@ public class ExecutableOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    private String applyMacros(Entry entry, File workDir, String value) {
-        return command.applyMacros(entry, workDir, value);
+    private String applyMacros(Entry entry, File workDir, String value, boolean forDisplay) {
+        return command.applyMacros(entry, workDir, value, forDisplay);
     }
 
 
@@ -377,24 +391,36 @@ public class ExecutableOutputHandler extends OutputHandler {
         sb.append(command.getHelp());
         sb.append(HtmlUtils.p());
 
-        request.uploadFormWithAuthToken(sb, getRepository().URL_ENTRY_SHOW);
+        String formId = HtmlUtils.getUniqueId("form_");
+        request.uploadFormWithAuthToken(sb, getRepository().URL_ENTRY_SHOW, HtmlUtils.id(formId));
         sb.append(HtmlUtils.hidden(ARG_OUTPUT, outputType.getId()));
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
 
+        StringBuffer extraSubmit = new StringBuffer(HtmlUtils.space(2));
+        extraSubmit.append(HtmlUtils.submit(msg("Show Command"), ARG_SHOWCOMMAND,""));
+
+        StringBuffer formSB  = new StringBuffer();
+        int blockCnt = command.makeForm(request, entry, formSB);
+        if(blockCnt>0) {
+            sb.append("<div class=inputform>");
+            sb.append(formSB);
+            sb.append("</div>");
+        }
+        /*
         sb.append(HtmlUtils.submit(command.getLabel(), ARG_EXECUTE,
                                    makeButtonSubmitDialog(sb,
                                        "Processing request...")));
-        int blockCnt = command.makeForm(request, entry, sb);
+        */
 
 
-        if (blockCnt > 1) {
-            sb.append(HtmlUtils.p());
-            sb.append(HtmlUtils.submit(command.getLabel(), ARG_EXECUTE,
-                                       makeButtonSubmitDialog(sb,
-                                           "Processing request...")));
-        }
+        sb.append(HtmlUtils.p());
+        sb.append(HtmlUtils.submit(command.getLabel(), ARG_EXECUTE,
+                                   makeButtonSubmitDialog(sb,
+                                                          "Processing request...")));
+        sb.append(extraSubmit);
         sb.append(HtmlUtils.p());
         sb.append(HtmlUtils.formTable());
+
 
         boolean haveAnyOutputs = false;
         for (Command.Output output : command.getOutputs()) {
@@ -412,6 +438,10 @@ public class ExecutableOutputHandler extends OutputHandler {
         }
 
         sb.append(HtmlUtils.formTableClose());
+        addUrlShowingForm(sb,  formId,null);
+
+
+
 
     }
 

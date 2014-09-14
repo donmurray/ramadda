@@ -409,7 +409,7 @@ public class CatalogOutputHandler extends OutputHandler {
                     request.remove(ARG_SKIP);
                     String url = request.url(repository.URL_ENTRY_SHOW,
                                              ARG_ENTRYID, group.getId(),
-                                             ARG_OUTPUT, OUTPUT_CATALOG,
+                                             ARG_OUTPUT, OUTPUT_CATALOG.toString(),
                                              ARG_SKIP, "" + (skip + max),
                                              ARG_MAX, "" + max);
 
@@ -433,7 +433,7 @@ public class CatalogOutputHandler extends OutputHandler {
                         != null)) {
                 String urlPath = HtmlUtils.url("/latest", ARG_ENTRYID,
                                      group.getId(), ARG_LATESTOPENDAP,
-                                     "true", ARG_OUTPUT, OUTPUT_CATALOG);
+                                     "true", ARG_OUTPUT, OUTPUT_CATALOG.toString());
                 addService(catalogInfo, SERVICE_LATEST,
                            getEntryManager().getFullEntryShowUrl(request),
                            "Resolver");
@@ -785,7 +785,7 @@ public class CatalogOutputHandler extends OutputHandler {
             String url = request.entryUrl(
                              getRepository().URL_ENTRY_SHOW, entry,
                              ARG_OUTPUT,
-                             WmsImageOutputHandler.OUTPUT_WMS_CAPABILITIES);
+                             WmsImageOutputHandler.OUTPUT_WMS_CAPABILITIES.toString());
             Element ref = XmlUtil.create(catalogInfo.doc,
                                          CatalogUtil.TAG_CATALOGREF, parent,
                                          new String[] {
@@ -936,7 +936,7 @@ public class CatalogOutputHandler extends OutputHandler {
             } else {
                 String url =  /* "http://localhost:8080"+*/
                     request.url(repository.URL_ENTRY_SHOW, ARG_ENTRYID,
-                                group.getId(), ARG_OUTPUT, OUTPUT_CATALOG);
+                                group.getId(), ARG_OUTPUT, OUTPUT_CATALOG.toString());
 
                 Element ref = XmlUtil.create(catalogInfo.doc,
                                              CatalogUtil.TAG_CATALOGREF,
