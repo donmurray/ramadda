@@ -724,22 +724,7 @@ public class CollectionTypeHandler extends ExtensibleGroupTypeHandler {
     public Result zipFiles(Request request, String zipFileName,
                            List<File> files)
             throws Exception {
-        request.setReturnFilename(zipFileName);
-        Result result = new Result();
-        result.setNeedToWrite(false);
-        OutputStream os = request.getHttpServletResponse().getOutputStream();
-        request.getHttpServletResponse().setContentType("application/zip");
-        ZipOutputStream zos = new ZipOutputStream(os);
-        for (File f : files) {
-            zos.putNextEntry(new ZipEntry(f.getName()));
-            InputStream fis = getStorageManager().getFileInputStream(f);
-            IOUtil.writeTo(fis, zos);
-            zos.closeEntry();
-            IOUtil.close(fis);
-        }
-        IOUtil.close(zos);
-
-        return result;
+        return getRepository().zipFiles(request, zipFileName, files);
     }
 
 

@@ -316,8 +316,9 @@ public class StorageManager extends RepositoryManager {
         commands.add("-h");
         commands.add(getRepositoryDir().toString());
         try {
-            JobManager.CommandResults results = getRepository().getJobManager().executeCommand(commands,
-                                   getRepositoryDir());
+            JobManager.CommandResults results =
+                getRepository().getJobManager().executeCommand(commands,
+                    getRepositoryDir());
 
             return results.getStdoutMsg();
         } catch (Exception exc) {
@@ -1005,23 +1006,35 @@ public class StorageManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param processDir _more_
+     *
+     * @return _more_
+     */
     public String getProcessDirEntryId(File processDir) {
         return getProcessDirEntryId(processDir.getName());
     }
 
-        /*
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param processDir _more_
+     *
+     * @return _more_
+     */
     public String getProcessDirEntryUrl(Request request, File processDir) {
-        String processEntryId =
-            getStorageManager().getProcessDirEntryId(processId);
+        String processEntryId = getProcessDirEntryId(processDir);
 
         String entryUrl =
-            HtmlUtils.url(
-                request.entryUrl(getRepository().URL_ENTRY_SHOW
-                ARG_ENTRYID,
-                processEntryId);
+            HtmlUtils.url(request.url(getRepository().URL_ENTRY_SHOW,
+                                      ARG_ENTRYID, processEntryId));
+
         return entryUrl;
     }
-        */
+
 
     /**
      * _more_

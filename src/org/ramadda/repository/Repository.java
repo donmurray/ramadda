@@ -86,7 +86,6 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlEncoder;
 import ucar.unidata.xml.XmlUtil;
 
-
 import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -94,6 +93,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
@@ -119,6 +119,9 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+
+
+import java.util.zip.*;
 
 
 
@@ -231,7 +234,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
     /** The SessionManager */
     private SessionManager sessionManager;
 
-    /** _more_          */
+    /** _more_ */
     private JobManager jobManager;
 
     /** The WikiManager */
@@ -1422,8 +1425,9 @@ public class Repository extends RepositoryBase implements RequestHandler,
                 boolean required = XmlUtil.getAttribute(node, ARG_REQUIRED,
                                        true);
                 try {
-                    Class c = Misc.findClass(XmlUtil.getAttributeFromTree(node,
-                                                                  ATTR_CLASS));
+                    Class c =
+                        Misc.findClass(XmlUtil.getAttributeFromTree(node,
+                            ATTR_CLASS));
 
                     Constructor ctor = Misc.findConstructor(c,
                                            new Class[] { Repository.class,
@@ -2886,6 +2890,40 @@ public class Repository extends RepositoryBase implements RequestHandler,
 
         return result;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param zipFileName _more_
+     * @param files _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result zipFiles(Request request, String zipFileName,
+                           List<File> files)
+            throws Exception {
+        request.setReturnFilename(zipFileName);
+        Result result = new Result();
+        result.setNeedToWrite(false);
+        OutputStream os = request.getHttpServletResponse().getOutputStream();
+        request.getHttpServletResponse().setContentType("application/zip");
+        ZipOutputStream zos = new ZipOutputStream(os);
+        for (File f : files) {
+            zos.putNextEntry(new ZipEntry(f.getName()));
+            InputStream fis = getStorageManager().getFileInputStream(f);
+            IOUtil.writeTo(fis, zos);
+            zos.closeEntry();
+            IOUtil.close(fis);
+        }
+        IOUtil.close(zos);
+
+        return result;
+    }
+
 
 
     /**
