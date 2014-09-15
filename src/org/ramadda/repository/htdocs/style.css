@@ -1910,6 +1910,11 @@ a.toggleblocklabellink:visited {
    overflow-y: auto;
 }
 
+.command-output {
+   max-height: 200px; 
+   overflow-y: auto;
+  border : 1px black solid;
+}
 
 .innernote {
    padding-top:10px;

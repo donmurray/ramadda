@@ -237,11 +237,12 @@ public class ExecutableOutputHandler extends OutputHandler {
 
 
         if (forDisplay || commandInfo.getResultsShownAsText()) {
-            sb.append(header(msg("Results")));
+            sb.append(HtmlUtils.b(msg("Results")));
+            sb.append("<div class=command-output>");
             sb.append("<pre>");
             sb.append(commandInfo.getResults());
             sb.append("</pre>");
-            sb.append(HtmlUtils.hr());
+            sb.append("</div>");
             makeForm(request, entry, sb);
             return new Result(outputType.getLabel(), sb);
         }
