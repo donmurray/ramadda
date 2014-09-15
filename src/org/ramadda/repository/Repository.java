@@ -1420,12 +1420,12 @@ public class Repository extends RepositoryBase implements RequestHandler,
             Element root = XmlUtil.getRoot(commandFile, getClass());
 
             NodeList nodes = XmlUtil.getElements(root,
-                                    Command.TAG_COMMAND);
+                                                 Command.TAG_COMMAND);
 
             for (int i = 0; i < nodes.getLength(); i++) {
                Element node = (Element) nodes.item(i);
-               //This adds itself to the JobManager list of commands
-               new  Command(this, node);
+               Command command =  new  Command(this, node);
+               getJobManager().addCommand(command);
             }
         }
 

@@ -296,7 +296,6 @@ public class Command extends RepositoryManager {
         }
 
 
-
         nodes = XmlUtil.getElements(element, TAG_OUTPUT);
         for (int i = 0; i < nodes.getLength(); i++) {
             Element node   = (Element) nodes.item(i);
@@ -304,8 +303,6 @@ public class Command extends RepositoryManager {
             outputs.add(output);
         }
         enabled = true;
-
-        getRepository().getJobManager().addCommand(this);
     }
 
     /**

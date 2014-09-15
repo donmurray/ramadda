@@ -224,9 +224,9 @@ public class JobManager extends RepositoryManager {
         if (existingCommand != null) {
             return existingCommand;
         }
+        System.err.println ("JobManager.addCommand:"+ command.getId());
         commandMap.put(command.getId(), command);
         commands.add(command);
-
         return command;
     }
 

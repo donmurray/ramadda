@@ -112,6 +112,7 @@ public class ExecutableOutputHandler extends OutputHandler {
                 commandNode = (Element) children.item(0);
             }
             command = new Command(getRepository(), commandNode);
+            getRepository().getJobManager().addCommand(command);
         }
 
 
