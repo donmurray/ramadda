@@ -162,6 +162,8 @@ public class Command extends RepositoryManager {
     /** _more_ */
     private String pathProperty;
 
+    private String path;
+
     /** _more_ */
     private Command parent;
 
@@ -275,13 +277,12 @@ public class Command extends RepositoryManager {
                     && command.startsWith("${")) {
                 pathProperty = command.substring(2, command.indexOf("}"));
             }
-            if ((pathProperty == null)
-                    || (getProperty(pathProperty, null) == null)) {
-                System.err.println("Command: no path property defined:"
-                                   + pathProperty);
-
+            if (pathProperty == null
+                || (path = getRepository().getPropertyFromTree(pathProperty, null)) == null) {
+                System.err.println("Command: no path property defined:" + pathProperty);
                 return;
             }
+            //            System.err.println("Command path:"+ pathProperty +":" + getProperty(pathProperty, null));
         }
 
 
@@ -951,7 +952,6 @@ public class Command extends RepositoryManager {
                             newEntry, entry, "derived from");
                 } else {
                     newEntry.setId(getEntryManager().getProcessFileTypeHandler().getSynthId(getEntryManager().getProcessEntry(),info.getWorkDir().toString(),file));
-                    System.err.println("id:" + newEntry.getId());
                 }
                 info.addEntry(newEntry);
             }
@@ -985,7 +985,7 @@ public class Command extends RepositoryManager {
     public String applyMacros(Entry entry, File workDir, String value,
                               boolean forDisplay) {
         value = value.replace(macro(pathProperty),
-                              getProperty(pathProperty, ""));
+                              path==null?"":path);
 
         value = value.replace(macro("workdir"), forDisplay
                 ? "&lt;working directory&gt;"
