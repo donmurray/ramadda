@@ -7,7 +7,7 @@
      <property name="form.fromdate.label" value="Date"/>
   </type>
 
-  <type name="bio_fasta"  description="FASTA File" foruser="true" super="bio_genomics" handler="org.ramadda.bio.genomics.FastaTypeHandler" pattern=".*\.fa$">
+  <type name="bio_fasta"  description="FASTA File" foruser="true" super="bio_genomics" handler="org.ramadda.bio.genomics.FastaTypeHandler" pattern=".*(\.fa|\.fasta)$">
   </type>
 
 
