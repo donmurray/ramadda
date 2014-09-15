@@ -435,7 +435,7 @@ var HtmlUtil =  {
 
     handleFormChangeShowUrl: function(formId, outputId, skip) {
         if(skip == null) {
-            skip = [".*OpenLayers_Control.*"];
+            skip = [".*OpenLayers_Control.*","authtoken"];
         }
         var url = $("#" + formId).attr("action")+"?";
         var inputs = $("#" + formId +" :input");

@@ -40,6 +40,7 @@ import org.ramadda.repository.database.DatabaseManager;
 import org.ramadda.repository.database.Tables;
 import org.ramadda.repository.ftp.FtpManager;
 import org.ramadda.repository.harvester.HarvesterManager;
+import org.ramadda.repository.job.Command;
 import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.map.MapManager;
 import org.ramadda.repository.metadata.ContentMetadataHandler;
@@ -72,6 +73,7 @@ import org.ramadda.util.PropertyProvider;
 import org.ramadda.util.StreamEater;
 import org.ramadda.util.Utils;
 
+import org.w3c.dom.NodeList;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -1410,6 +1412,24 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @throws Exception _more_
      */
     private void loadOutputHandlers() throws Exception {
+        for(String commandFile:getPluginManager().getAllFiles()) {
+            if(!commandFile.endsWith("commands.xml")) continue;
+            if (getPluginManager().haveSeen("commands:" + commandFile)) {
+                continue;
+            }
+            Element root = XmlUtil.getRoot(commandFile, getClass());
+
+            NodeList nodes = XmlUtil.getElements(root,
+                                    Command.TAG_COMMAND);
+
+            for (int i = 0; i < nodes.getLength(); i++) {
+               Element node = (Element) nodes.item(i);
+               //This adds itself to the JobManager list of commands
+               new  Command(this, node);
+            }
+        }
+
+
         for (String file : getPluginManager().getOutputDefFiles()) {
             file = getStorageManager().localizePath(file);
             if (getPluginManager().haveSeen("outputhandler:" + file)) {

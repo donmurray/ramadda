@@ -16,7 +16,7 @@ Convert SRA data into ABI format (csfasta / qual)
       <arg type="string" label="Spot Groups" prefix="--spot-groups" help="Filter by spot group (read group): name[,...]."/>
       <arg type="string" label="Minimum spot id" prefix="--minSpotId" placeHolder="&lt;row id&gt;"/>
       <arg type="string" label="Maximum spot id" prefix="--maxSpotId" placeHolder="&lt;row id&gt;"/>
-      <arg type="enumeration" label="Read filter" values=":none,pass,reject,criteria,redacted" prefix="--read-filter" help="Split into files by filter value."/>
+      <arg type="enumeration" label="Read filter" values=":-none-,pass,reject,criteria,redacted" prefix="--read-filter" help="Split into files by filter value."/>
       <arg type="flag" label="" help="Do not output reads consisting mostly of dots." value="--noDotReads"/>
       <arg type="flag" label="" help="Do not clip quality left and right for spot." value="--noclip"/>
       <arg type="category" label="Workflow and piping"/>

@@ -31,8 +31,9 @@ import org.ramadda.util.Utils;
 
 import org.w3c.dom.*;
 
-import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.IOUtil;
+
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 import java.io.*;
@@ -52,8 +53,11 @@ import java.util.List;
  */
 public class ExecutableOutputHandler extends OutputHandler {
 
+    /** _more_          */
     public static final String ARG_SHOWCOMMAND = "showcommand";
 
+    /** _more_          */
+    public static final String ARG_GOTOPRODUCTS = "gotoproducts";
 
     /** _more_ */
     public static final String ATTR_ICON = "icon";
@@ -94,7 +98,11 @@ public class ExecutableOutputHandler extends OutputHandler {
                                (String) null);
         if (commandId != null) {
             command = getRepository().getJobManager().getCommand(commandId);
+            if (command == null) {
+                throw new IllegalStateException ("ExecutableOutputHandler: could not find command:" + commandId);
+            }
         }
+
 
         if (command == null) {
             NodeList children = XmlUtil.getElements(element,
@@ -105,6 +113,8 @@ public class ExecutableOutputHandler extends OutputHandler {
             }
             command = new Command(getRepository(), commandNode);
         }
+
+
 
         outputType = new OutputType(
             XmlUtil.getAttribute(element, ATTR_LABEL, command.getLabel()),
@@ -188,7 +198,8 @@ public class ExecutableOutputHandler extends OutputHandler {
             throws Exception {
 
         StringBuffer sb = new StringBuffer();
-        if ( !request.defined(ARG_EXECUTE) && !request.defined(ARG_SHOWCOMMAND)) {
+        if ( !request.defined(ARG_EXECUTE)
+                && !request.defined(ARG_SHOWCOMMAND)) {
             makeForm(request, entry, sb);
 
             return new Result(outputType.getLabel(), sb);
@@ -197,158 +208,75 @@ public class ExecutableOutputHandler extends OutputHandler {
         //        Object       uniqueId = getRepository().getGUID();
         //        File         workDir  = getWorkDir(uniqueId);
         File         workDir = getStorageManager().createProcessDir();
-
-        boolean forDisplay = request.exists(ARG_SHOWCOMMAND);
-        List<String> commands = new ArrayList<String>();
-        command.addArgs(request, entry, workDir, commands, forDisplay);
-        System.err.println("Commands:" + commands);
-
-        if(forDisplay) {
-            sb.append(HtmlUtils.p());
-            sb.append("Command line:");
-            commands.set(0, IOUtil.getFileTail(commands.get(0)));
-            sb.append(HtmlUtils.pre(StringUtil.join(" ", commands)));
-            makeForm(request, entry, sb);
-            return new Result(outputType.getLabel(), sb);
-        }
-        String   errMsg = "";
-        String   outMsg = "";
-        File     stdoutFile = new File(IOUtil.joinDir(workDir, ".stdout"));
-        File     stderrFile = new File(IOUtil.joinDir(workDir, ".stderr"));
-        JobManager.CommandResults results = getRepository().getJobManager().executeCommand(commands,
-                null, workDir, -1, new PrintWriter(stdoutFile),
-                new PrintWriter(stderrFile));
-        if (stderrFile.exists()) {
-            errMsg = IOUtil.readContents(stderrFile);
-        }
-
-        StringBuffer resultsSB = new StringBuffer();
-        System.err.println(" to stderr:" + command.getOutputToStderr());
-        System.err.println("err:" + errMsg);
-
-        if (Utils.stringDefined(errMsg)) {
-            if (command.getOutputToStderr()) {
-                resultsSB.append(errMsg);
-                resultsSB.append("\n");
-                errMsg = null;
-            }
-        }
+        StringBuffer xml     = new StringBuffer();
+        xml.append(XmlUtil.tag("entry",
+                               XmlUtil.attrs("type", "group", "name",
+                                             "Processing Results")));
+        IOUtil.writeFile(new File(IOUtil.joinDir(workDir,
+                ".this.ramadda.xml")), xml.toString());
 
 
-        if (Utils.stringDefined(errMsg)) {
+        boolean      forDisplay = request.exists(ARG_SHOWCOMMAND);
+
+        Command.CommandInfo commandInfo = new Command.CommandInfo(workDir, forDisplay);
+        commandInfo.setPublish(doingPublish(request));
+        if(!command.evaluate(request,entry,commandInfo)) {
             sb.append(
                 getPageHandler().showDialogError(
-                    "An error has occurred:<pre>" + errMsg + "</pre>"));
+                                                 "An error has occurred:<pre>" + commandInfo.getError() + "</pre>"));
             makeForm(request, entry, sb);
-
             return new Result(outputType.getLabel(), sb);
         }
 
-        List<Entry>   newEntries  = new ArrayList<Entry>();
-        List<File>    newFiles    = new ArrayList<File>();
-        HashSet<File> seen        = new HashSet<File>();
-        boolean       showResults = false;
-        for (Command.Output output : command.getOutputs()) {
-            if (output.getShowResults()) {
-                showResults = true;
-                if (output.getUseStdout()) {
-                    resultsSB.append(IOUtil.readContents(stdoutFile));
-                } else {}
 
-                continue;
-            }
-
-
-            File[] files = null;
-            if (output.getUseStdout()) {
-                String filename = applyMacros(entry, workDir,
-                                              output.getFilename(), forDisplay);
-                File destFile = new File(IOUtil.joinDir(workDir, filename));
-                IOUtil.moveFile(stdoutFile, destFile);
-                files = new File[] { destFile };
-            }
-            final String thePattern = output.getPattern();
-            if (files == null) {
-                files = workDir.listFiles(new FileFilter() {
-                    public boolean accept(File f) {
-                        if (thePattern == null) {
-                            return true;
-                        }
-                        String name = f.getName();
-                        if (name.startsWith(".")) {
-                            return false;
-                        }
-                        if (name.matches(thePattern)) {
-                            return true;
-                        }
-
-                        return false;
-                    }
-                });
-            }
-
-            for (File file : files) {
-                if (seen.contains(file)) {
-                    continue;
-                }
-                seen.add(file);
-                newFiles.add(file);
-                //                System.err.println("FILE:" + file +" " + file.exists());
-                if (doingPublish(request)) {
-                    TypeHandler typeHandler =
-                        getRepository().getTypeHandler(output.getEntryType());
-                    Entry newEntry =
-                        typeHandler.createEntry(getRepository().getGUID());
-                    newEntry.setDate(new Date().getTime());
-                    getEntryManager().processEntryPublish(request, files[0],
-                            newEntry, entry, "derived from");
-                    newEntries.add(newEntry);
-                }
-            }
-        }
-
-
-        if (newEntries.size() > 0) {
+        if (commandInfo.getPublish() && commandInfo.getEntries().size() > 0) {
             return new Result(
                 request.entryUrl(
-                    getRepository().URL_ENTRY_SHOW, newEntries.get(0)));
+                    getRepository().URL_ENTRY_SHOW, commandInfo.getEntries().get(0)));
         }
 
-        if (showResults) {
-            makeForm(request, entry, sb);
+
+        if (forDisplay || commandInfo.getResultsShownAsText()) {
             sb.append(header(msg("Results")));
             sb.append("<pre>");
-            sb.append(resultsSB);
+            sb.append(commandInfo.getResults());
             sb.append("</pre>");
-
+            sb.append(HtmlUtils.hr());
+            makeForm(request, entry, sb);
             return new Result(outputType.getLabel(), sb);
         }
 
-        if (newFiles.size() == 0) {
-            for (File file : workDir.listFiles()) {
-                if (file.getName().startsWith(".")) {
-                    continue;
-                }
-                //                System.err.println("file:" + file +" " + file.exists());
-                newFiles.add(file);
-            }
-        }
-        if (newFiles.size() >= 1) {
-            //TODO: handle multiple files by zipping them
-            File file = newFiles.get(0);
-            request.setReturnFilename(file.getName());
 
+        //Redirect to the products entry 
+        if (request.get(ARG_GOTOPRODUCTS, false)) {
+            return new Result(
+                              getStorageManager().getProcessDirEntryUrl(request, commandInfo.getWorkDir()));
+        }
+
+
+
+        if (commandInfo.getEntries().size() > 1) {
+            List<File> files  = new ArrayList<File>();
+            for(Entry newEntry: commandInfo.getEntries()) {
+                files.add(newEntry.getFile());
+            }
+            return getRepository().zipFiles(request, "results.zip", files);
+        }
+        if (commandInfo.getEntries().size() == 1) {
+            File file = commandInfo.getEntries().get(0).getFile();
+            request.setReturnFilename(file.getName());
             return new Result(getStorageManager().getFileInputStream(file),
                               "");
         }
 
+        sb.append("Error: no output files<br>");
         sb.append("<pre>");
-        sb.append(resultsSB);
+        sb.append(commandInfo.getResults());
         sb.append("</pre>");
+        sb.append(HtmlUtils.hr());
+        makeForm(request, entry, sb);
+        return new Result(outputType.getLabel(),sb);
 
-        return new Result(outputType.getLabel(),
-                          new StringBuffer("Error: no output files<br>"
-                                           + sb));
     }
 
     /**
@@ -368,10 +296,12 @@ public class ExecutableOutputHandler extends OutputHandler {
      * @param entry _more_
      * @param workDir _more_
      * @param value _more_
+     * @param forDisplay _more_
      *
      * @return _more_
      */
-    private String applyMacros(Entry entry, File workDir, String value, boolean forDisplay) {
+    private String applyMacros(Entry entry, File workDir, String value,
+                               boolean forDisplay) {
         return command.applyMacros(entry, workDir, value, forDisplay);
     }
 
@@ -392,16 +322,21 @@ public class ExecutableOutputHandler extends OutputHandler {
         sb.append(HtmlUtils.p());
 
         String formId = HtmlUtils.getUniqueId("form_");
-        request.uploadFormWithAuthToken(sb, getRepository().URL_ENTRY_SHOW, HtmlUtils.id(formId));
+        request.uploadFormWithAuthToken(sb, getRepository().URL_ENTRY_SHOW,
+                                        HtmlUtils.id(formId));
         sb.append(HtmlUtils.hidden(ARG_OUTPUT, outputType.getId()));
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
 
         StringBuffer extraSubmit = new StringBuffer(HtmlUtils.space(2));
-        extraSubmit.append(HtmlUtils.submit(msg("Show Command"), ARG_SHOWCOMMAND,""));
+        extraSubmit.append(HtmlUtils.submit(msg("Show Command"),
+                                            ARG_SHOWCOMMAND, ""));
+        extraSubmit.append(HtmlUtils.space(2));
+        extraSubmit.append(HtmlUtils.labeledCheckbox(ARG_GOTOPRODUCTS,
+                "true", false, "Go to products page"));
 
-        StringBuffer formSB  = new StringBuffer();
-        int blockCnt = command.makeForm(request, entry, formSB);
-        if(blockCnt>0) {
+        StringBuffer formSB   = new StringBuffer();
+        int          blockCnt = command.makeForm(request, entry, formSB);
+        if (blockCnt > 0) {
             sb.append("<div class=inputform>");
             sb.append(formSB);
             sb.append("</div>");
@@ -416,7 +351,7 @@ public class ExecutableOutputHandler extends OutputHandler {
         sb.append(HtmlUtils.p());
         sb.append(HtmlUtils.submit(command.getLabel(), ARG_EXECUTE,
                                    makeButtonSubmitDialog(sb,
-                                                          "Processing request...")));
+                                       "Processing request...")));
         sb.append(extraSubmit);
         sb.append(HtmlUtils.p());
         sb.append(HtmlUtils.formTable());
@@ -438,7 +373,7 @@ public class ExecutableOutputHandler extends OutputHandler {
         }
 
         sb.append(HtmlUtils.formTableClose());
-        addUrlShowingForm(sb,  formId,null);
+        addUrlShowingForm(sb, formId, null);
 
 
 

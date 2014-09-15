@@ -18,14 +18,20 @@
 
 
 
-  <outputhandler commandId="bio_picard_fastq_to_sam"/>
+<!-- Picard outputs -->
+  <outputhandler commandId="bio_picard_fastqtosam"/>
+  <outputhandler commandId="bio_picard_samtofastq"/>
+
+  <outputhandler commandId="bio_picard_collectalignmentsummarymetrics"/>
+  <outputhandler commandId="bio_picard_addorreplacegroups"/>
 
 
+<!-- Test outputs -->
   <outputhandler>
     <command label="sra to fastq to sam" id="bio_sra_fastq_sam">
          <help>Run sra to fastq then fastq to sam</help>
         <command link="bio_sra_to_fastq" />
-        <command link="bio_fastq_to_sam"/>
+        <command link="bio_picard_fastqtosam"/>
     </command>
   </outputhandler>
 
