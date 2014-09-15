@@ -387,6 +387,7 @@ public class HtmlUtils {
     public static final String CLASS_FILEINPUT = "fileinput";
 
     /** _more_ */
+
     public static final String CLASS_FORMLABEL = "formlabel";
 
     /** _more_ */
@@ -2886,13 +2887,12 @@ public class HtmlUtils {
      *
      * @return _more_
      */
-    public static String formEntryTop(String col1, String left,
-                                      String right) {
-        return tag(TAG_TR, /*attrs(ATTR_VALIGN, VALUE_TOP)*/ "",
-                   col(col1, attrs(ATTR_ALIGN, VALUE_RIGHT, ATTR_CLASS,  CLASS_FORMLABEL))
-                   + col(left,
-                         "",/*attrs(ATTR_ALIGN, VALUE_RIGHT, ATTR_CLASS,
-                              CLASS_FORMLABEL_TOP)*/) + col(right));
+    public static String formEntryTop(String label, String col1,
+                                      String col2) {
+        return tag(TAG_TR, attrs(ATTR_VALIGN, VALUE_TOP),
+                   col(label, attrs(ATTR_ALIGN, VALUE_RIGHT, ATTR_CLASS,  CLASS_FORMLABEL_TOP))
+                   + col(col1, "" /*attrs(ATTR_ALIGN, VALUE_RIGHT, ATTR_CLASS, CLASS_FORMLABEL_TOP)*/) + 
+                   col(col2));
     }
 
 

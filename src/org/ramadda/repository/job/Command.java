@@ -588,12 +588,10 @@ public class Command extends RepositoryManager {
                     input.append(HtmlUtils.checkbox(arg.getUrlArg(),
                                                     "true", request.get(arg.getUrlArg(), false)));
                 }
-                if (Utils.stringDefined(arg.getLabel())) {
-                    catBuff.append(HtmlUtils.formEntryTop(arg.getLabel() + ":",input.toString(), arg.getHelp()));
-                } else {
-                    catBuff.append(HtmlUtils.formEntryTop("",input.toString(), arg.getHelp()));
-                }
 
+                input.append(HtmlUtils.space(2));
+                input.append(arg.getHelp());
+                catBuff.append(HtmlUtils.formEntry("",input.toString(), 2));
                 continue;
             } else if (arg.isFile()) {
                 //noop
@@ -641,7 +639,7 @@ public class Command extends RepositoryManager {
                 input.append("<span class=ramadda-required-label>*</span>");
             }
 
-            catBuff.append(HtmlUtils.formEntryTop(msgLabel(arg.getLabel()),input.toString(),arg.getHelp()));
+            makeFormEntry(catBuff, arg.getLabel(),input.toString(),arg.getHelp());
         }
 
         if ((catBuff != null) && (catBuff.length() > 0)) {
@@ -654,6 +652,12 @@ public class Command extends RepositoryManager {
         return blockCnt;
 
     }
+
+
+    private void makeFormEntry(StringBuffer sb, String label, String col1, String help) {
+        sb.append(HtmlUtils.formEntryTop(Utils.stringDefined(label)?msgLabel(label):"",col1, HtmlUtils.div(help,  HtmlUtils.cssClass("command-form-help"))));
+    }
+
 
     /**
      * _more_

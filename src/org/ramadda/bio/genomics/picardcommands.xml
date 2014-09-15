@@ -38,16 +38,16 @@ Run Picard to convert SAM to FASTQ
       <arg value="INPUT=${entry.file}"  type="entry" entryType="bio_sambam" primary="true"></arg>
       <arg value="FASTQ=${entry.filebase}.fastq"></arg>
 
-<arg type="enumeration" values=":-default-,true,false,null" value="RE_REVERSE=${value}" label="Re-Reverse" help="Re-reverse bases and qualities of reads with negative strand flag set before writing them to fastq Default value: true. This option can be set to 'null' to clear the default value."/>
-<arg type="enumeration" values=":-default-,true,false,null" value="INTERLEAVE=${value}" label="Interleave" help="Will generate an interleaved fastq if paired, each line will have /1 or /2 to describe which end it came from Default value: false. This option can be set to 'null' to clear the default value."/>
-<arg type="enumeration" values=":-default-,true,false,null" value="INCLUDE_NON_PF_READS=${value}" label="Include non-pf" help="Include non-PF reads from the SAM file into the output FASTQ files. PF means 'passes filtering'. Reads whose 'not passing quality controls' flag is set are non-PF reads. Default value: false. This option can be set to 'null' to clear the default value."/>
+<arg type="enumeration" values=":-default-,true,false,null" value="RE_REVERSE=${value}" label="Re-Reverse" help="Re-reverse bases and qualities of reads with negative strand flag set before writing them to fastq Default value: true."/>
+<arg type="enumeration" values=":-default-,true,false,null" value="INTERLEAVE=${value}" label="Interleave" help="Will generate an interleaved fastq if paired, each line will have /1 or /2 to describe which end it came from Default value: false."/>
+<arg type="enumeration" values=":-default-,true,false,null" value="INCLUDE_NON_PF_READS=${value}" label="Include non-pf" help="Include non-PF reads from the SAM file into the output FASTQ files. PF means 'passes filtering'. Reads whose 'not passing quality controls' flag is set are non-PF reads. Default value: false."/>
 <arg type="string"  value="CLIPPING_ATTRIBUTE=${value}" label="Clipping attribute" help="The attribute that stores the position at which the SAM record should be clipped."/>
 <arg type="string" value="CLIPPING_ACTION=${value}" label="Clipping action" help="The action that should be taken with clipped reads: 'X' means the reads and qualities should be trimmed at the clipped position; 'N' means the bases should be changed to Ns in the clipped region; and any integer means that the base qualities should be set to that value in the clipped region."/>
-<arg type="int" value="READ1_TRIM=${value}" label="Read 1 trim" help="The number of bases to trim from the beginning of read 1. Default value: 0. This option can be set to 'null' to clear the default value."/>
+<arg type="int" value="READ1_TRIM=${value}" label="Read 1 trim" help="The number of bases to trim from the beginning of read 1. Default value: 0."/>
 <arg type="int" value="READ1_MAX_BASES_TO_WRITE=${value}" label="Read 1 max bases" help="The maximum number of bases to write from read 1 after trimming. If there are fewer than this many bases left after trimming, all will be written. If this value is null then all bases left after trimming will be written."/>
-<arg type="int" value="READ2_TRIM=${value}" label="Read 2 trim" help="The number of bases to trim from the beginning of read 2. Default value: 0. This option can be set to 'null' to clear the default value."/>
+<arg type="int" value="READ2_TRIM=${value}" label="Read 2 trim" help="The number of bases to trim from the beginning of read 2. Default value: 0."/>
 <arg type="int" value="READ2_MAX_BASES_TO_WRITE=${value}" label="Read 2 max bases" help="The maximum number of bases to write from read 2 after trimming. If there are fewer than this many bases left after trimming, all will be written. If this value is null then all bases left after trimming will be written."/>
-<arg type="enumeration" values=":-default-,true,false" value="INCLUDE_NON_PRIMARY_ALIGNMENTS=${value}" label="Include non-primary" help="If true, include non-primary alignments in the output. Support of non-primary alignments in SamToFastq is not comprehensive, so there may be exceptions if this is set to true and there are paired reads with non-primary alignments. Default value: false. This option can be set to 'null' to clear the default value."/>
+<arg type="enumeration" values=":-default-,true,false" value="INCLUDE_NON_PRIMARY_ALIGNMENTS=${value}" label="Include non-primary" help="If true, include non-primary alignments in the output. Support of non-primary alignments in SamToFastq is not comprehensive, so there may be exceptions if this is set to true and there are paired reads with non-primary alignments. Default value: false."/>
     </command>
 
 
@@ -63,12 +63,12 @@ Reads a SAM or BAM file and writes a file containing summary alignment metrics.
       <arg value="CollectAlignmentSummaryMetrics.jar"></arg>
       <arg value="INPUT=${entry.file}"  type="entry" entryType="bio_sambam" primary="true"></arg>
       <arg value="OUTPUT=${entry.filebase}.txt"></arg>
-      <arg type="int" label="Max insert size" value="MAX_INSERT_SIZE=${value}" help="Paired end reads above this insert size will be considered chimeric along with inter-chromosomal pairs. Default value: 100000. This option can be set to 'null' to clear the default value."/>
-      <arg type="string" size="60"  value="ADAPTER_SEQUENCE=${value}" label="Adapter Sequence" help="List of adapter sequences to use when processing the alignment metrics This option may be specified 0 or more times. This option can be set to 'null' to clear the default list."/>
-      <arg type="enumeration" size="60" label="Metric accumulation"  value="METRIC_ACCUMULATION_LEVEL=${value}" help="The level(s) at which to accumulate metrics. Possible values: {ALL_READS, SAMPLE, LIBRARY, READ_GROUP} This option may be specified 0 or more times. This option can be set to 'null' to clear the default list." values=":-none-,ALL_READS,SAMPLE,LIBRARY,READ_GROUP"/>
-      <arg type="enumeration" values=":default,true,false"  label="Is Bisulfite" value="IS_BISULFITE_SEQUENCED=${value}" help="Whether the SAM or BAM file consists of bisulfite sequenced reads. Default value: false. This option can be set to 'null' to clear the default value."/>
-      <arg type="enumeration" values="default,true,false"  label="Assume sorted" value="ASSUME_SORTED=${value}" help="If true (default), then the sort order in the header file will be ignored. Default value: true. This option can be set to 'null' to clear the default value."/>
-      <arg type="int"  label="Stop after" value="STOP_AFTER=${value}" help="Stop after processing N reads, mainly for debugging. Default value: 0. This option can be set to 'null' to clear the default value. "/>
+      <arg type="int" label="Max insert size" value="MAX_INSERT_SIZE=${value}" help="Paired end reads above this insert size will be considered chimeric along with inter-chromosomal pairs. Default value: 100000."/>
+      <arg type="string" size="60"  value="ADAPTER_SEQUENCE=${value}" label="Adapter Sequence" help="List of adapter sequences to use when processing the alignment metrics This option may be specified 0 or more times."/>
+      <arg type="enumeration" size="60" label="Metric accumulation"  value="METRIC_ACCUMULATION_LEVEL=${value}" help="The level(s) at which to accumulate metrics. Possible values: {ALL_READS, SAMPLE, LIBRARY, READ_GROUP} This option may be specified 0 or more times." values=":-none-,ALL_READS,SAMPLE,LIBRARY,READ_GROUP"/>
+      <arg type="enumeration" values=":default,true,false,null"  label="Is Bisulfite" value="IS_BISULFITE_SEQUENCED=${value}" help="Whether the SAM or BAM file consists of bisulfite sequenced reads. Default value: false."/>
+      <arg type="enumeration" values="default,true,false,null"  label="Assume sorted" value="ASSUME_SORTED=${value}" help="If true (default), then the sort order in the header file will be ignored."/>
+      <arg type="int"  label="Stop after" value="STOP_AFTER=${value}" help="Stop after processing N reads, mainly for debugging. Default value: 0. "/>
     </command>
 
 
@@ -88,11 +88,11 @@ Replaces all read groups in the INPUT file with a new read group and assigns all
       <arg value="AddOrReplaceReadGroups.jar"></arg>
       <arg value="INPUT=${entry.file}"  type="entry" entryType="bio_sambam" primary="true"></arg>
       <arg value="OUTPUT=${entry.filebase}.sam"></arg>
-<arg  value="RGID=${value}" size="60" label="Read Group ID" help="Default value: 1. This option can be set to 'null' to clear the default value."/>
+<arg  type="string" value="RGID=${value}" size="60" label="Read Group ID" help="Default value: 1."/>
 <arg label="Sort Order" type="enumeration" values=":-none-,unsorted, queryname, coordinate" value="SORT_ORDER=${value}"/>
 
 <arg type="Category" value="Read Group"/>
-<arg type="string" value="RGID=${value}" size="60" label="ID" help="Default value: 1. This option can be set to 'null' to clear the default value."/>
+<arg type="string" value="RGID=${value}" size="60" label="ID" help="Default value: 1."/>
 <arg type="string" required="true" value="RGLB=${value}" size="60" label="Library"/>
 <arg type="string" required="true" value="RGPL=${value}" size="60" label="Platform" help="e.g. illumina, solid"/>
 <arg type="string" required="true" value="RGPU=${value}" size="60" label="Platform unit" help="e.g. run barcode"/>
