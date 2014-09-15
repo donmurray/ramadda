@@ -28,7 +28,7 @@
      <column name="gender"  type="enumeration"  values="f:Female,m:Male" label="Gender" cansearch="true"/>
    </type>
 
-  <type name="bio_ontology_cohort" super="bio_ontology"  description="Cohort"  handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" children="bio_ontology_person">
+  <type name="bio_ontology_cohort" super="bio_ontology"  description="Cohort"  handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" childtypes="bio_ontology_person">
      <property name="icon" value="/biotypes/users.png"/>
    </type>
 
