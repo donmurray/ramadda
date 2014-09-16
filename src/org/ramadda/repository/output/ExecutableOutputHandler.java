@@ -53,6 +53,8 @@ import java.util.List;
  */
 public class ExecutableOutputHandler extends OutputHandler {
 
+    public static final String ARG_ASYNCH = "asynch";
+
     /** _more_          */
     public static final String ARG_SHOWCOMMAND = "showcommand";
 
@@ -194,33 +196,55 @@ public class ExecutableOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public Result outputEntry(Request request, OutputType outputType,
-                              Entry entry)
+    public Result outputEntry(final Request request, OutputType outputType,
+                              final Entry entry)
             throws Exception {
 
         StringBuffer sb = new StringBuffer();
         if ( !request.defined(ARG_EXECUTE)
                 && !request.defined(ARG_SHOWCOMMAND)) {
             makeForm(request, entry, sb);
-
             return new Result(outputType.getLabel(), sb);
         }
 
         //        Object       uniqueId = getRepository().getGUID();
         //        File         workDir  = getWorkDir(uniqueId);
         File         workDir = getStorageManager().createProcessDir();
+
+        boolean      forDisplay = request.exists(ARG_SHOWCOMMAND);
+
+        final Command.CommandInfo commandInfo = new Command.CommandInfo(workDir, forDisplay);
+        commandInfo.setPublish(doingPublish(request));
+
+
         StringBuffer xml     = new StringBuffer();
         xml.append(XmlUtil.tag("entry",
                                XmlUtil.attrs("type", "group", "name",
                                              "Processing Results")));
         IOUtil.writeFile(new File(IOUtil.joinDir(workDir,
-                ".this.ramadda.xml")), xml.toString());
+                                                 ".this.ramadda.xml")), xml.toString());
+        boolean asynchronous  = request.get(ARG_ASYNCH, false);
 
 
-        boolean      forDisplay = request.exists(ARG_SHOWCOMMAND);
 
-        Command.CommandInfo commandInfo = new Command.CommandInfo(workDir, forDisplay);
-        commandInfo.setPublish(doingPublish(request));
+        if(asynchronous) {
+            ActionManager.Action action = new ActionManager.Action() {
+                public void run(Object actionId) throws Exception {
+                    if(!command.evaluate(request,entry,commandInfo)) {
+                    }
+
+
+                    String url = getStorageManager().getProcessDirEntryUrl(request, commandInfo.getWorkDir());
+                    getActionManager().setContinueHtml(actionId,
+                                                       HtmlUtils.href(url,
+                                                                      msg("Continue")));
+                }
+            };
+            return getActionManager().doAction(request, action,
+                                               outputType.getLabel(), "");
+
+        }
+
         if(!command.evaluate(request,entry,commandInfo)) {
             sb.append(
                 getPageHandler().showDialogError(
@@ -229,15 +253,14 @@ public class ExecutableOutputHandler extends OutputHandler {
             return new Result(outputType.getLabel(), sb);
         }
 
-        System.err.println ("params:" + commandInfo.getParams());
-
-        System.err.println ("entries:" + commandInfo.getEntries());
-
+        //        System.err.println ("params:" + commandInfo.getParams());
+        //        System.err.println ("entries:" + commandInfo.getEntries());
         if (commandInfo.getPublish() && commandInfo.getEntries().size() > 0) {
             return new Result(
                 request.entryUrl(
                     getRepository().URL_ENTRY_SHOW, commandInfo.getEntries().get(0)));
         }
+
 
 
         if (forDisplay || commandInfo.getResultsShownAsText()) {
@@ -338,6 +361,12 @@ public class ExecutableOutputHandler extends OutputHandler {
         extraSubmit.append(HtmlUtils.space(2));
         extraSubmit.append(HtmlUtils.labeledCheckbox(ARG_GOTOPRODUCTS,
                 "true", false, "Go to products page"));
+        extraSubmit.append(HtmlUtils.space(2));
+        extraSubmit.append(HtmlUtils.formEntry("",
+                                             HtmlUtils.checkbox(ARG_ASYNCH,
+                                                 "true", true) + " "
+                                                     + msg("Asynchronous")));
+
 
         StringBuffer formSB   = new StringBuffer();
         int          blockCnt = command.makeForm(request, entry, formSB);

@@ -88,6 +88,8 @@ import java.util.zip.*;
  */
 public class Command extends RepositoryManager {
 
+    private static  CommandUtil dummyToForceCompile;
+
     /** _more_          */
     public static boolean debug = false;
 

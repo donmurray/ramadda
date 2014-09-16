@@ -26,7 +26,6 @@ Default value: null. Possible values: {Solexa, Illumina, Standard}
 </arg>
     </command>
 
-
     <command  label="Convert SAM to FASTQ" id="bio_picard_samtofastq">
       <help><![CDATA[
 Run Picard to convert SAM to FASTQ
