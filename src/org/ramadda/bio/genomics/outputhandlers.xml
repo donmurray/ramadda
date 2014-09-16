@@ -1,7 +1,6 @@
 <outputhandlers class="org.ramadda.repository.output.ExecutableOutputHandler" icon="/genomics/dna.png">
 
 <!-- HMMER outputs -->
-
   <outputhandler commandId="bio_hmmer_convert"/>
   <outputhandler commandId="bio_hmmer_stat"/>
   <outputhandler commandId="bio_hmmer_emit"/>
@@ -16,8 +15,6 @@
   <outputhandler commandId="bio_sra_stat" />
   <outputhandler commandId="bio_sra_pileup" />
 
-
-
 <!-- Picard outputs -->
   <outputhandler commandId="bio_picard_fastqtosam"/>
   <outputhandler commandId="bio_picard_samtofastq"/>
@@ -25,10 +22,27 @@
   <outputhandler commandId="bio_picard_collectalignmentsummarymetrics"/>
   <outputhandler commandId="bio_picard_addorreplacegroups"/>
 
-
 <!-- Test outputs -->
   <outputhandler>
-    <command label="sra to fastq to sam" id="bio_sra_fastq_sam">
+    <command label="Test command" id="test" serial="false" cleanup="false">
+        <help>Run Test</help>
+        <command command="java:org.ramadda.repository.job.TestCommand:evaluate"/>
+        <command command="/Users/jeffmc/bin/test.sh">
+          <arg value="${entry.file}"   type="entry" primary="true"></arg>
+          <arg value="${entry.filebase}"></arg>
+          <output pattern=".*\.test"/>
+        </command>
+        <command command="/Users/jeffmc/bin/test2.sh">
+          <arg value="${entry.file}"   type="entry" primary="true"></arg>
+          <arg value="${entry.filebase}"></arg>
+          <output pattern=".*\.test2"/>
+        </command>
+    </command>
+  </outputhandler>
+
+
+  <outputhandler>
+    <command label="sra to fastq to sam" id="bio_sra_fastq_sam" serial="true">
          <help>Run sra to fastq then fastq to sam</help>
         <command link="bio_sra_to_fastq" />
         <command link="bio_picard_fastqtosam"/>
