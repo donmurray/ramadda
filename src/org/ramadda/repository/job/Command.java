@@ -50,6 +50,8 @@ import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 
+import java.lang.reflect.Method;
+
 import java.io.*;
 
 import java.io.File;
@@ -86,6 +88,8 @@ import java.util.zip.*;
  */
 public class Command extends RepositoryManager {
 
+    public static boolean debug = false;
+
     /** _more_ */
     public static final String TAG_ARG = "arg";
 
@@ -97,6 +101,8 @@ public class Command extends RepositoryManager {
 
     /** _more_ */
     public static final String ATTR_ENTRY_TYPE = "entryType";
+
+    public static final String ATTR_ENTRY_PATTERN = "entryPattern";
 
     /** _more_ */
     public static final String ATTR_ICON = "icon";
@@ -148,10 +154,14 @@ public class Command extends RepositoryManager {
     /** _more_ */
     private boolean outputToStderr = false;
 
+    private boolean cleanup = false;
+
 
     /** _more_ */
     private String command;
 
+    private Object commandObject;
+    private Method commandMethod;
 
     /** _more_ */
     private String help;
@@ -162,13 +172,13 @@ public class Command extends RepositoryManager {
     /** _more_ */
     private String pathProperty;
 
-    private String path;
-
     /** _more_ */
     private Command parent;
 
     /** _more_ */
     private List<Command> children;
+
+    public boolean serial;
 
     /** _more_          */
     private String linkId;
@@ -185,6 +195,8 @@ public class Command extends RepositoryManager {
     /** _more_ */
     private List<Output> outputs = new ArrayList<Output>();
 
+
+
     /**
      * _more_
      *
@@ -196,6 +208,7 @@ public class Command extends RepositoryManager {
         super(repository);
         init(null, element, null);
     }
+
 
 
     /**
@@ -216,6 +229,7 @@ public class Command extends RepositoryManager {
     }
 
 
+
     /**
      * _more_
      *
@@ -229,6 +243,9 @@ public class Command extends RepositoryManager {
         return id;
     }
 
+    private static void debug(String msg) {
+        if(debug) System.err.println(msg);
+    }
     /**
      * _more_
      *
@@ -243,18 +260,25 @@ public class Command extends RepositoryManager {
             throws Exception {
         this.parent = parent;
         id          = XmlUtil.getAttribute(element, ATTR_ID, dfltId);
+
         if (id == null) {
             throw new IllegalStateException("Command: no id defined in: "
                                             + XmlUtil.toString(element));
         }
+        entryType = XmlUtil.getAttribute(element, ATTR_ENTRY_TYPE,(String) null);
+
         icon = XmlUtil.getAttributeFromTree(element, ATTR_ICON,
                                             (String) null);
         outputToStderr = XmlUtil.getAttributeFromTree(element, "outputToStderr",
                 outputToStderr);
 
+        cleanup = XmlUtil.getAttributeFromTree(element, "cleanup",
+                                               true);
+
         linkId = XmlUtil.getAttribute(element, "link", (String) null);
         help   = XmlUtil.getGrandChildText(element, "help", "");
         label  = XmlUtil.getAttribute(element, ATTR_LABEL, (String) null);
+        serial  = XmlUtil.getAttribute(element, "serial",true);
 
         NodeList nodes;
 
@@ -273,18 +297,38 @@ public class Command extends RepositoryManager {
                     (String) null);
 
             //Extract it from the command
-            if ((pathProperty == null) && (command != null)
-                    && command.startsWith("${")) {
-                pathProperty = command.substring(2, command.indexOf("}"));
+            if (pathProperty == null && command != null) {
+                int index = command.indexOf("${");
+                if(index>=0) {
+                    pathProperty = command.substring(index+2, command.indexOf("}"));
+                }
             }
-            if (pathProperty == null
-                || (path = getRepository().getPropertyFromTree(pathProperty, null)) == null) {
-                System.err.println("Command: no path property defined:" + pathProperty);
+            if (pathProperty != null) {
+                String pathPropertyValue = getRepository().getPropertyFromTree(pathProperty, null);
+                if(pathPropertyValue!=null) {
+                    if(command == null) {
+                        command  = pathPropertyValue;
+                    } else {
+                        command = command.replace(macro(pathProperty), pathPropertyValue);
+                    }
+                }
+            }
+            if(command == null || command.indexOf("${") >=0) {
+                System.err.println("Command: no command defined:" + command +" path:" + pathProperty);
                 return;
             }
-            //            System.err.println("Command path:"+ pathProperty +":" + getProperty(pathProperty, null));
         }
 
+        //Look for:
+        //java:<class>:<method>
+        if(command!=null && command.startsWith("java:")) {
+            List<String> toks = StringUtil.split(command,":");
+            commandObject = Misc.findClass(toks.get(1)).newInstance();
+            Class[] paramTypes = new Class[] { Request.class,Entry.class,CommandInfo.class,List.class};
+            commandMethod =  Misc.findMethod(commandObject.getClass(), toks.get(2),
+                                             paramTypes);
+            System.err.println("Object:" + commandObject);
+        }
 
         nodes = XmlUtil.getElements(element, TAG_ARG);
         for (int i = 0; i < nodes.getLength(); i++) {
@@ -382,7 +426,6 @@ public class Command extends RepositoryManager {
                               File workDir, List<String> commands,
                               boolean forDisplay)
             throws Exception {
-
 
         String cmd = applyMacros(primaryEntry, workDir, getCommand(),
                                  forDisplay);
@@ -702,7 +745,12 @@ public class Command extends RepositoryManager {
         if (linkId != null) {
             return getCommandToUse().isEnabled();
         }
-
+        if (haveChildren()) {
+            for (Command child : children) {
+                if(!child.isEnabled()) return false;
+            }
+            return true;
+        }
         return enabled;
     }
 
@@ -762,8 +810,14 @@ public class Command extends RepositoryManager {
                 return true;
             }
         }
-
-        return false;
+        if(inputs.size()>0) {
+            return false;
+        }
+        if(entryType!=null) {
+            return entry.getTypeHandler().isType(entryType);
+        }
+        //        return false;
+        return true;
     }
 
 
@@ -827,15 +881,57 @@ public class Command extends RepositoryManager {
             throws Exception {
 
         if (haveChildren()) {
+            HashSet<File> existingFiles = new HashSet<File>();
+            HashSet<File> newFiles = new HashSet<File>();
+            for(File f: info.getWorkDir().listFiles()) {
+                existingFiles.add(f);
+            }
+            List<Entry> myEntries = new ArrayList<Entry>();
+            CommandInfo childCommandInfo = null;
             for (Command child : children) {
-                if ( !child.evaluate(request, entry, info)) {
+                Entry primaryEntryForChild = entry;
+                if(serial) {
+                    if(childCommandInfo!=null) {
+                        List<Entry> lastEntries = childCommandInfo.getEntries();
+                        if(lastEntries!=null && lastEntries.size()>0) {
+                            primaryEntryForChild = lastEntries.get(0);
+                        }
+                    }
+                }
+
+                childCommandInfo = new CommandInfo(info);
+                childCommandInfo.setEntries(new ArrayList<Entry>());
+                if ( !child.evaluate(request, primaryEntryForChild, childCommandInfo)) {
                     return false;
                 }
+                if(!serial) {
+                    myEntries.addAll(childCommandInfo.getEntries());
+                }
             }
+
+            //If we are  serial then we only add the last command's entry (or add them all?)
+            if(serial && childCommandInfo!=null) {
+                myEntries.addAll(childCommandInfo.getEntries());
+            }
+            for(Entry newEntry: myEntries) {
+                newFiles.add(newEntry.getFile());
+                info.addEntry(newEntry);
+            }
+            if(cleanup) {
+                for(File f: info.getWorkDir().listFiles()) {
+                    if(f.getName().startsWith(".")) continue;
+                    if(existingFiles.contains(f) || newFiles.contains(f)) {
+                        continue;
+                    }
+                    System.err.println ("deleting:" + f);
+                    f.delete();
+                }
+            }
+
+
             if (info.getForDisplay()) {
                 return true;
             }
-
             return true;
         }
 
@@ -922,11 +1018,12 @@ public class Command extends RepositoryManager {
                         if (name.matches(thePattern)) {
                             return true;
                         }
-
                         return false;
                     }
                 });
             }
+            
+
 
             for (File file : files) {
                 if (seen.contains(file)) {
@@ -935,8 +1032,9 @@ public class Command extends RepositoryManager {
                 seen.add(file);
                 StringBuffer entryXml = new StringBuffer();
                 entryXml.append(XmlUtil.tag("entry",
-                                            XmlUtil.attrs("type",
-                                                output.getEntryType())));
+                                            XmlUtil.attrs("name", file.getName(), 
+                                                          "type",
+                                                          output.getEntryType()!=null?output.getEntryType():TypeHandler.TYPE_FILE)));
                 IOUtil.writeFile(getEntryManager().getEntryXmlFile(file),
                                  entryXml.toString());
 
@@ -957,6 +1055,16 @@ public class Command extends RepositoryManager {
             }
         }
         return true;
+    }
+
+
+    public void getAllOutputs(List<Command.Output> outputs) {
+        if (haveChildren()) {
+            for (Command child : children) {
+                child.getAllOutputs(outputs);
+            }
+        }
+        outputs.addAll(this.getOutputs());
     }
 
 
@@ -984,8 +1092,6 @@ public class Command extends RepositoryManager {
      */
     public String applyMacros(Entry entry, File workDir, String value,
                               boolean forDisplay) {
-        value = value.replace(macro(pathProperty),
-                              path==null?"":path);
 
         value = value.replace(macro("workdir"), forDisplay
                 ? "&lt;working directory&gt;"
@@ -1191,6 +1297,8 @@ public class Command extends RepositoryManager {
         /** _more_ */
         private String entryType;
 
+        private String entryPattern;
+
         /** _more_ */
         private boolean isPrimaryEntry = false;
 
@@ -1224,6 +1332,9 @@ public class Command extends RepositoryManager {
             type = XmlUtil.getAttribute(node, ATTR_TYPE, (String) null);
             entryType = XmlUtil.getAttribute(node, ATTR_ENTRY_TYPE,
                                              (String) null);
+
+            entryPattern = XmlUtil.getAttribute(node, ATTR_ENTRY_PATTERN,
+                                                (String) null);
 
             placeHolder = XmlUtil.getAttribute(node, "placeHolder",
                     (String) null);
@@ -1297,8 +1408,10 @@ public class Command extends RepositoryManager {
             if (entryType != null) {
                 return entry.getTypeHandler().isType(entryType);
             }
-
-            return false;
+            if (entryPattern != null) {
+                return entry.getResource().getPath().matches(entryPattern);
+            }
+            return true;
         }
 
 
@@ -1311,6 +1424,10 @@ public class Command extends RepositoryManager {
             return required;
         }
 
+
+        public String toString() {
+            return getName() +" " + getLabel();
+        }
 
         /**
          * _more_
@@ -1620,6 +1737,15 @@ public class Command extends RepositoryManager {
         private boolean resultsShownAsText = false;
 
 
+        public CommandInfo(CommandInfo commandInfo) {
+            this.workDir = commandInfo.workDir;
+            this.forDisplay =commandInfo.forDisplay;
+            this.publish = commandInfo.publish;
+            this.results = commandInfo.results;
+            this.error= commandInfo.error;
+            this.entries = commandInfo.entries;
+            this.resultsShownAsText = commandInfo.resultsShownAsText;
+        }
 
         /**
          * _more_
@@ -1650,6 +1776,10 @@ public class Command extends RepositoryManager {
          */
         public List<Entry> getEntries() {
             return entries;
+        }
+
+        public void setEntries(List<Entry>entries) {
+            this.entries = entries;
         }
 
         /**

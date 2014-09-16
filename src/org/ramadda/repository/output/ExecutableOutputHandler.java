@@ -229,6 +229,7 @@ public class ExecutableOutputHandler extends OutputHandler {
             return new Result(outputType.getLabel(), sb);
         }
 
+        System.err.println ("entries:" + commandInfo.getEntries());
 
         if (commandInfo.getPublish() && commandInfo.getEntries().size() > 0) {
             return new Result(
@@ -360,10 +361,12 @@ public class ExecutableOutputHandler extends OutputHandler {
 
 
         boolean haveAnyOutputs = false;
-        for (Command.Output output : command.getOutputs()) {
+        List<Command.Output> outputs = new ArrayList<Command.Output>();
+
+        command.getAllOutputs(outputs);
+        for (Command.Output output : outputs) {
             if ( !output.getShowResults()) {
                 haveAnyOutputs = true;
-
                 break;
             }
         }
