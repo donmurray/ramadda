@@ -20,7 +20,7 @@
   <type name="bio_sambam"  description="SAM/BAM Data" foruser="false" super="bio_sequence" handler="org.ramadda.bio.genomics.SamTypeHandler">
   </type>
 
-  <type name="bio_sam"  description="SAM Data" foruser="true" super="bio_sambam">
+  <type name="bio_sam"  description="SAM Data" foruser="true" super="bio_sambam" pattern=".*\.sam$">
   </type>
 
   <type name="bio_bam"  description="BAM Data" foruser="true" super="bio_sambam">

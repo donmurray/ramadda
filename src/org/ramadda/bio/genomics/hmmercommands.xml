@@ -1,12 +1,20 @@
 <commands>
   <command label="Convert HMMER File" id="bio_hmmer_convert"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmconvert" >
-    <help>This will convert the given HMMER binary file to text</help>
+<help><![CDATA[
+This will convert the given HMMER binary file to text
+<br>
+Documentation at <a target="_help" href="http://hmmer.janelia.org/">http://hmmer.janelia.org</a>
+]]></help>
     <arg value="${entry.file}" type="entry" entryType="bio_hmmer_index" primary="true"></arg>
     <output type="bio_hmmer_index" stdout="true" filename="${entry.filebase}.hmm"/>
    </command>
 
   <command label="Run HMMSTAT" id="bio_hmmer_stat"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmstat" >
-    <help>Run HMMSTAT</help>
+    <help><![CDATA[
+Run HMMSTAT
+<br>
+Documentation at <a target="_help" href="http://hmmer.janelia.org/">http://hmmer.janelia.org</a>
+]]></help>
     <arg type="flag" label="" help="Compute score for E-value (E) for database of (Z) sequences" value="--eval2score"></arg>
     <arg type="flag" label="" help="Compute E-value for score (S) for database of (Z) sequences" value="--score2eval"></arg>
     <arg type="int" size="5" label="Database size" help="Database size (in seqs) for --eval2score or --score2eval" prefix="-Z"></arg>
@@ -19,7 +27,11 @@
    </command>
 
   <command label="Run HMMEMIT" id="bio_hmmer_emit"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmemit" >
-    <help>This runs hmmemit</help>
+    <help><![CDATA[
+Run HMMEMIT
+<br>
+Documentation at <a target="_help" href="http://hmmer.janelia.org/">http://hmmer.janelia.org</a>
+]]></help>
     <arg type="int" size="5" label="Number of sequences" help="Number of sequences to sample" prefix="-N"></arg>
     <arg type="flag" group="emitoptions" label="" help="Emit alignment" value="-a"></arg>
     <arg type="flag" group="emitoptions" label="" help="Emit simple majority-rule consensus sequence" value="-c"></arg>
@@ -42,7 +54,11 @@
    </command>
 
   <command label="Run HMMFETCH" id="bio_hmmer_fetch"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmfetch" >
-    <help>This runs hmmfetch</help>
+    <help><![CDATA[
+Run HMMFETCH
+<br>
+Documentation at <a target="_help" href="http://hmmer.janelia.org/">http://hmmer.janelia.org</a>
+]]></help>
     <arg value="${entry.file}"  type="entry" entryType="bio_hmmer_index" primary="true"></arg>
     <arg type="string" label="Key" size="35" required="true"></arg>
     <output type="bio_hmmer_index" stdout="true" filename="${entry.filebase}.hmm"/>
