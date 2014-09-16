@@ -229,6 +229,8 @@ public class ExecutableOutputHandler extends OutputHandler {
             return new Result(outputType.getLabel(), sb);
         }
 
+        System.err.println ("params:" + commandInfo.getParams());
+
         System.err.println ("entries:" + commandInfo.getEntries());
 
         if (commandInfo.getPublish() && commandInfo.getEntries().size() > 0) {
