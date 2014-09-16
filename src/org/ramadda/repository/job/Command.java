@@ -54,7 +54,8 @@ import java.io.*;
 import java.io.File;
 
 
-import java.lang.reflect.Method;
+import java.lang.reflect.*;
+
 
 
 
@@ -88,9 +89,10 @@ import java.util.zip.*;
  */
 public class Command extends RepositoryManager {
 
-    private static  CommandUtil dummyToForceCompile;
-
     /** _more_          */
+    private static CommandUtil dummyToForceCompile;
+
+    /** _more_ */
     public static boolean debug = false;
 
     /** _more_ */
@@ -105,7 +107,7 @@ public class Command extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_ENTRY_TYPE = "entryType";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ENTRY_PATTERN = "entryPattern";
 
     /** _more_ */
@@ -158,17 +160,17 @@ public class Command extends RepositoryManager {
     /** _more_ */
     private boolean outputToStderr = false;
 
-    /** _more_          */
+    /** _more_ */
     private boolean cleanup = false;
 
 
     /** _more_ */
     private String command;
 
-    /** _more_          */
+    /** _more_ */
     private Object commandObject;
 
-    /** _more_          */
+    /** _more_ */
     private Method commandMethod;
 
     /** _more_ */
@@ -186,7 +188,7 @@ public class Command extends RepositoryManager {
     /** _more_ */
     private List<Command> children;
 
-    /** _more_          */
+    /** _more_ */
     public boolean serial;
 
     /** _more_ */
@@ -217,7 +219,6 @@ public class Command extends RepositoryManager {
         super(repository);
         init(null, element, null);
     }
-
 
 
     /**
@@ -836,6 +837,28 @@ public class Command extends RepositoryManager {
     /**
      * _more_
      *
+     * @param args _more_
+     */
+    public void collectArgs(List<Arg> args) {
+        if (linkId != null) {
+            getCommandToUse().collectArgs(args);
+
+            return;
+        }
+        if (haveChildren()) {
+            for (Command child : children) {
+                child.collectArgs(args);
+            }
+        }
+
+        args.addAll(this.args);
+    }
+
+
+
+    /**
+     * _more_
+     *
      * @return _more_
      */
     public boolean getOutputToStderr() {
@@ -1403,7 +1426,7 @@ public class Command extends RepositoryManager {
         /** _more_ */
         private String entryType;
 
-        /** _more_          */
+        /** _more_ */
         private String entryPattern;
 
         /** _more_ */
@@ -1462,7 +1485,6 @@ public class Command extends RepositoryManager {
             if (name == null) {
                 name = "arg" + idx;
             }
-
 
             group    = XmlUtil.getAttribute(node, ATTR_GROUP, (String) null);
             required = XmlUtil.getAttribute(node, "required", required);
@@ -1836,7 +1858,7 @@ public class Command extends RepositoryManager {
         /** _more_ */
         private boolean forDisplay = false;
 
-        /** _more_          */
+        /** _more_ */
         private boolean publish = false;
 
         /** _more_ */
@@ -1848,10 +1870,10 @@ public class Command extends RepositoryManager {
         /** _more_ */
         private List<Entry> entries = new ArrayList<Entry>();
 
-        /** _more_          */
+        /** _more_ */
         private boolean resultsShownAsText = false;
 
-        /** _more_          */
+        /** _more_ */
         private Hashtable<String, String> params = new Hashtable<String,
                                                        String>();
 

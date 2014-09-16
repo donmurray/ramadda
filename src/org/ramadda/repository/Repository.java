@@ -73,9 +73,10 @@ import org.ramadda.util.PropertyProvider;
 import org.ramadda.util.StreamEater;
 import org.ramadda.util.Utils;
 
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+
+import org.w3c.dom.NodeList;
 
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.Counter;
@@ -1412,20 +1413,30 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @throws Exception _more_
      */
     private void loadOutputHandlers() throws Exception {
-        for(String commandFile:getPluginManager().getAllFiles()) {
-            if(!commandFile.endsWith("commands.xml")) continue;
+        for (String commandFile : getPluginManager().getAllFiles()) {
+            if ( !commandFile.endsWith("commands.xml")) {
+                continue;
+            }
             if (getPluginManager().haveSeen("commands:" + commandFile)) {
                 continue;
             }
-            Element root = XmlUtil.getRoot(commandFile, getClass());
+            Element  root  = XmlUtil.getRoot(commandFile, getClass());
 
-            NodeList nodes = XmlUtil.getElements(root,
-                                                 Command.TAG_COMMAND);
+            NodeList nodes = XmlUtil.getElements(root, Command.TAG_COMMAND);
 
             for (int i = 0; i < nodes.getLength(); i++) {
-               Element node = (Element) nodes.item(i);
-               Command command =  new  Command(this, node);
-               getJobManager().addCommand(command);
+                Element node = (Element) nodes.item(i);
+                Constructor ctor =
+                    Misc.findConstructor(Misc.findClass(XmlUtil.getAttribute(node,
+                        "handler",
+                        "org.ramadda.repository.job.Command")), new Class[] {
+                            Repository.class,
+                            Element.class });
+                Command command = (Command) ctor.newInstance(new Object[] {
+                                      this,
+                                      node });
+                //               Command command =  new Command(this, node);
+                getJobManager().addCommand(command);
             }
         }
 

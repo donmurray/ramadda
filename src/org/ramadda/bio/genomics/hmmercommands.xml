@@ -22,7 +22,7 @@ Documentation at <a target="_help" href="http://hmmer.janelia.org/">http://hmmer
     <arg type="int" size="5" label="Database size (M bases)" help="Database size (M bases) (DNA only, if search on single strand)" prefix="--baseZ1"></arg>
     <arg type="float" size="5" label="E-value threshold" help="For eval2score" prefix="-E"></arg>
     <arg type="float" size="5" label="Score input" help="For score2eval" prefix="-S"></arg>
-    <arg value="${entry.file}"   type="entry" entryType="bio_hmmer_index" primary="true"></arg>
+    <arg name="inputentry" value="${entry.file}"   type="entry" entryType="bio_hmmer_index" primary="true"></arg>
     <output showResults="true" stdout="true"/>
    </command>
 
