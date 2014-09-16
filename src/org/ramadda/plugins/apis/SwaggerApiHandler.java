@@ -25,6 +25,8 @@ import org.ramadda.data.services.RecordConstants;
 
 
 import org.ramadda.repository.*;
+import org.ramadda.repository.output.*;
+import org.ramadda.repository.job.Command;
 import org.ramadda.repository.type.*;
 import org.ramadda.repository.util.DateArgument;
 import org.ramadda.util.HtmlUtils;
@@ -135,6 +137,22 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                           SU.ATTR_DESCRIPTION,
                           Json.quote("Grid subset API")));
 
+        for(OutputHandler outputHandler: getRepository().getOutputHandlers()) {
+            if(!(outputHandler instanceof ExecutableOutputHandler)) {
+                continue;
+            }
+            Command command = ((ExecutableOutputHandler)outputHandler).getCommand();
+            if(!command.isEnabled()) continue;
+
+            String url = "/command/" + command.getId();
+            apis.add(Json.map(SU.ATTR_PATH, Json.quote(url),
+                              SU.ATTR_DESCRIPTION,
+                              Json.quote(" API for "  + command.getLabel())));
+
+
+
+        }
+
         for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
             if ( !typeHandler.getForUser()) {
                 continue;
@@ -190,6 +208,112 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
 
         return returnJson(request, new StringBuffer(Json.map(doc)));
     }
+
+
+    public Result processSwaggerCommandRequest(Request request)
+            throws Exception {
+        List<String> toks = StringUtil.split(request.getRequestPath(), "/",
+                                             true, true);
+        String       type        = toks.get(toks.size() - 1);
+        Command command = getRepository().getJobManager().getCommand(type);
+
+        List<String> apis        = new ArrayList<String>();
+        apis.add(getCommandApi(request, command));
+
+        List<String> doc =
+            SU.createDocument(request.getAbsoluteUrl(""),
+                              getRepository().URL_ENTRY_SHOW.toString(),
+                              new String[] { }, apis);
+
+        return returnJson(request, new StringBuffer(Json.map(doc)));
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param typeHandler _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private String getCommandApi(Request request, Command command)
+            throws Exception {
+        List<String> parameters = new ArrayList<String>();
+        parameters.add(SU.getParameter(ARG_OUTPUT,
+                                       "Output type  -don't change",
+                                       command.getId(), true));
+
+        List<Command.Arg> args  = new ArrayList<Command.Arg>();
+        //TODO: We get everything including intermediate entries
+        command.collectArgs(args);
+        for(Command.Arg arg: args) {
+            if(arg.isValueArg()) {
+                continue;
+            }
+            String type = SU.TYPE_STRING;
+            if(arg.isInt()) type = SU.TYPE_INTEGER;
+            else if(arg.isFloat()) type = SU.TYPE_FLOAT;
+            //TODO: enums
+            if(arg.isFlag()) {
+                if (arg.getGroup() != null) {
+                    parameters.add(SU.getParameter(arg.getGroup(),
+                                                   arg.getLabel(), null, arg.isRequired(), type));
+                } else {
+                    parameters.add(SU.getParameter(arg.getUrlArg(),
+                                                   arg.getLabel(), null, arg.isRequired(), type));
+                }
+            } else {
+                String label = arg.getLabel();
+                String urlArg = arg.getUrlArg();
+                if(arg.isEntry()) {
+                    label = "Entry ID";
+                    //TODO: Not sure what to do here as this is most likely an intermediate arg
+                    if(arg.isPrimaryEntry()) {
+                        urlArg = ARG_ENTRYID;
+                    } else {
+                        continue;
+                    }
+                }
+                parameters.add(SU.getParameter(urlArg,
+                                               label, null, arg.isPrimaryEntry() || arg.isRequired(), type));
+            }
+        }
+
+          
+        /*
+        List<Column> columns = typeHandler.getColumns();
+        if (columns != null) {
+            for (Column column : columns) {
+                if ( !column.getCanSearch()) {
+                    continue;
+                }
+
+                String type = SU.TYPE_STRING;
+                if (column.isEnumeration()) {
+                    //TODO: list the enums
+                } else if (column.isBoolean()) {
+                    type = SU.TYPE_BOOLEAN;
+                } else if (column.isDouble()) {
+                    type = SU.TYPE_DOUBLE;
+                } else if (column.isNumeric()) {
+                    type = SU.TYPE_INTEGER;
+                }
+                parameters.add(SU.getParameter(column.getSearchArg(),
+                        column.getLabel(), null, false, type));
+            }
+        }
+        */
+
+        List<String> operations = new ArrayList<String>();
+        operations.add(Json.map(SU.createOperation("API for " + command.getLabel(), "API to call: " + command.getLabel(), command.getId(), parameters, new ArrayList<String>())));
+
+        return Json.map(SU.createApi(getRepository().URL_ENTRY_SHOW.toString(), operations));
+    }
+
+
+
 
     /**
      * _more_
