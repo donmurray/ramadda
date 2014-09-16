@@ -324,10 +324,9 @@ public class Command extends RepositoryManager {
         if(command!=null && command.startsWith("java:")) {
             List<String> toks = StringUtil.split(command,":");
             commandObject = Misc.findClass(toks.get(1)).newInstance();
-            Class[] paramTypes = new Class[] { Request.class,Entry.class,CommandInfo.class,List.class};
+            Class[] paramTypes = new Class[] { Request.class,Entry.class,Command.class, CommandInfo.class,List.class};
             commandMethod =  Misc.findMethod(commandObject.getClass(), toks.get(2),
                                              paramTypes);
-            System.err.println("Object:" + commandObject);
         }
 
         nodes = XmlUtil.getElements(element, TAG_ARG);
@@ -564,9 +563,15 @@ public class Command extends RepositoryManager {
         if (haveChildren()) {
             int cnt = 0;
             for (Command child : children) {
-                sb.append(header("Command: " + child.getLabel()));
-                sb.append(HtmlUtils.p());
-                cnt += child.makeForm(request, primaryEntry, sb);
+                StringBuffer tmpSB  = new StringBuffer();
+                int blockCnt = child.makeForm(request, primaryEntry, tmpSB);
+                cnt+=blockCnt;
+                if(blockCnt>0) {
+                    sb.append(header("Command: " + child.getLabel()));
+                    sb.append(HtmlUtils.p());
+                    sb.append(tmpSB);
+                }
+
             }
 
             return cnt;
@@ -958,18 +963,22 @@ public class Command extends RepositoryManager {
         String errMsg = "";
         String outMsg = "";
         File stdoutFile = new File(IOUtil.joinDir(info.getWorkDir(),
-                              "." + getId() + ".stdout"));
+                                                  "." + getId() + ".stdout"));
         File stderrFile = new File(IOUtil.joinDir(info.getWorkDir(),
-                              "." + getId() + ".stderr"));
+                                                  "." + getId() + ".stderr"));
 
-        JobManager.CommandResults results =
-            getRepository().getJobManager().executeCommand(commands, null,
-                info.getWorkDir(), -1, new PrintWriter(stdoutFile),
-                new PrintWriter(stderrFile));
+
+        if(commandObject!=null) {
+            commandMethod.invoke(commandObject, new Object[]{request, entry, this, info,commands});
+        } else {
+            JobManager.CommandResults results =
+                getRepository().getJobManager().executeCommand(commands, null,
+                                                               info.getWorkDir(), -1, new PrintWriter(stdoutFile),
+                                                               new PrintWriter(stderrFile));
+        }
         if (stderrFile.exists()) {
             errMsg = IOUtil.readContents(stderrFile);
         }
-
         if (Utils.stringDefined(errMsg)) {
             if (getOutputToStderr()) {
                 info.getResults().append(errMsg);
@@ -978,6 +987,8 @@ public class Command extends RepositoryManager {
                 info.getError().append(errMsg);
             }
         }
+
+
 
         if (info.getError().length() > 0) {
             return false;
@@ -1098,6 +1109,7 @@ public class Command extends RepositoryManager {
                 : workDir.toString());
         if (entry != null) {
             String fileTail = getStorageManager().getFileTail(entry);
+            value = value.replace(macro("entry.id"), entry.getId());
             value = value.replace(macro("entry.file"), forDisplay
                     ? getStorageManager().getFileTail(entry)
                     : entry.getResource().getPath());

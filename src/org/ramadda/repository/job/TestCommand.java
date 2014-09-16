@@ -20,75 +20,39 @@
 
 package org.ramadda.repository.job;
 
-
 import org.ramadda.repository.*;
-import org.ramadda.repository.auth.*;
-import org.ramadda.repository.output.OutputHandler;
-import org.ramadda.repository.type.*;
-
-import org.ramadda.sql.SqlUtil;
-import org.ramadda.util.HtmlUtils;
-
-import org.ramadda.util.RssUtil;
-import org.ramadda.util.StreamEater;
-import org.ramadda.util.Utils;
-
-
-import org.w3c.dom.*;
-
-import ucar.unidata.ui.ImageUtils;
-import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.Misc;
-
-
-import ucar.unidata.util.StringBufferCollection;
-
-
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
-import ucar.unidata.xml.XmlUtil;
-
-
-import java.lang.reflect.Method;
-
-import java.io.*;
-
 import java.io.File;
 
-
-
-import java.net.*;
-
-
-
-import java.text.SimpleDateFormat;
-
 import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashSet;
-import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
-
-
-
-import java.util.regex.*;
-
-import java.util.zip.*;
-
 
 /**
  *
- *
- *
  * @author RAMADDA Development Team
- * @version $Revision: 1.3 $
  */
 public class TestCommand {
-    public boolean evaluate(Request request, Entry entry, Command.CommandInfo info, List<String> commands) {
-        return true;
+    public static final String COMMAND_CP = "cp";
+    public static final String COMMAND_MV = "mv";
+
+    public boolean evaluate(Request request, Entry entry, Command command, Command.CommandInfo info, List<String> commands) throws Exception {
+        if(commands.size()<=1) return true;
+        
+        String task = commands.get(1);
+        if(task.equals(COMMAND_MV)) {
+            File entryFile = new File(commands.get(2));
+            if (!IOUtil.isADescendent(info.getWorkDir(), entryFile)) {
+                throw new IllegalArgumentException("Cannot move the entry file. Can only move temp files");
+            }
+            String newName = commands.get(3);
+            IOUtil.moveFile(entryFile, new File(IOUtil.joinDir(info.getWorkDir(), newName)));
+        } else if(task.equals(COMMAND_CP)) {
+            File entryFile = new File(commands.get(2));
+            String newName = commands.get(3);
+            IOUtil.copyFile(entryFile, new File(IOUtil.joinDir(info.getWorkDir(), newName)));
+        }
+
+        return false;
     }
 
 }
