@@ -37,11 +37,11 @@ import java.util.List;
  */
 public class CommandUtil {
 
-    /** _more_          */
+    /** _more_ */
     public static final String COMMAND_CP = "cp";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String COMMAND_MV = "mv";
 
     /**
@@ -64,7 +64,7 @@ public class CommandUtil {
      * @throws Exception _more_
      */
     public boolean evaluate(Request request, Entry entry, Command command,
-                            Command.CommandInfo info, List<String> commands)
+                            CommandInfo info, List<String> commands)
             throws Exception {
         if (commands.size() <= 1) {
             return true;

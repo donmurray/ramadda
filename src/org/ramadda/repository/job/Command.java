@@ -28,19 +28,23 @@ import org.ramadda.repository.type.*;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Utils;
 
+
+
+
+import org.w3c.dom.*;
+
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
-
-
-
-import org.w3c.dom.*;
 import java.io.*;
+
 import java.lang.reflect.*;
+
 import java.net.*;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
@@ -63,7 +67,7 @@ import java.util.zip.*;
  */
 public class Command extends RepositoryManager {
 
-    /** _more_          */
+    /** _more_ */
     private static CommandUtil dummyToForceCompile;
 
     /** _more_ */
@@ -178,7 +182,8 @@ public class Command extends RepositoryManager {
     private List<Arg> inputs = new ArrayList<Arg>();
 
     /** _more_ */
-    private List<Output> outputs = new ArrayList<Output>();
+    private List<OutputDefinition> outputs =
+        new ArrayList<OutputDefinition>();
 
 
 
@@ -349,8 +354,8 @@ public class Command extends RepositoryManager {
 
         nodes = XmlUtil.getElements(element, TAG_OUTPUT);
         for (int i = 0; i < nodes.getLength(); i++) {
-            Element node   = (Element) nodes.item(i);
-            Output  output = new Output(node);
+            Element          node   = (Element) nodes.item(i);
+            OutputDefinition output = new OutputDefinition(node);
             outputs.add(output);
         }
         enabled = true;
@@ -853,7 +858,7 @@ public class Command extends RepositoryManager {
      *
      * @return _more_
      */
-    public List<Output> getOutputs() {
+    public List<OutputDefinition> getOutputs() {
         return outputs;
     }
 
@@ -953,8 +958,11 @@ public class Command extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public boolean evaluate(Request request, Entry entry, CommandInfo info)
+    public CommandOutput evaluate(Request request, Entry entry,
+                                  CommandInfo info)
             throws Exception {
+
+        CommandOutput myOutput = new CommandOutput();
 
         if (haveChildren()) {
             HashSet<File> existingFiles = new HashSet<File>();
@@ -962,14 +970,12 @@ public class Command extends RepositoryManager {
             for (File f : info.getWorkDir().listFiles()) {
                 existingFiles.add(f);
             }
-            List<Entry> myEntries        = new ArrayList<Entry>();
-            CommandInfo childCommandInfo = null;
+            CommandOutput childOutput = null;
             for (Command child : children) {
                 Entry primaryEntryForChild = entry;
                 if (serial) {
-                    if (childCommandInfo != null) {
-                        List<Entry> lastEntries =
-                            childCommandInfo.getEntries();
+                    if (childOutput != null) {
+                        List<Entry> lastEntries = childOutput.getEntries();
                         if ((lastEntries != null)
                                 && (lastEntries.size() > 0)) {
                             primaryEntryForChild = lastEntries.get(0);
@@ -977,24 +983,30 @@ public class Command extends RepositoryManager {
                     }
                 }
 
-                childCommandInfo = new CommandInfo(info);
-                childCommandInfo.setEntries(new ArrayList<Entry>());
-                if ( !child.evaluate(request, primaryEntryForChild,
-                                     childCommandInfo)) {
-                    return false;
+                childOutput = child.evaluate(request, primaryEntryForChild,
+                                             info);
+                if ( !childOutput.isOk()) {
+                    return childOutput;
                 }
                 if ( !serial) {
-                    myEntries.addAll(childCommandInfo.getEntries());
+                    if (childOutput.getResultsShownAsText()) {
+                        myOutput.setResultsShownAsText(true);
+                    }
+                    myOutput.getEntries().addAll(childOutput.getEntries());
+                    myOutput.append(childOutput.getResults());
                 }
             }
 
             //If we are  serial then we only add the last command's entry (or add them all?)
-            if (serial && (childCommandInfo != null)) {
-                myEntries.addAll(childCommandInfo.getEntries());
+            if (serial && (childOutput != null)) {
+                myOutput.getEntries().addAll(childOutput.getEntries());
+                if (childOutput.getResultsShownAsText()) {
+                    myOutput.setResultsShownAsText(true);
+                }
+                myOutput.append(childOutput.getResults());
             }
-            for (Entry newEntry : myEntries) {
+            for (Entry newEntry : myOutput.getEntries()) {
                 newFiles.add(newEntry.getFile());
-                info.addEntry(newEntry);
             }
             if (cleanup) {
                 for (File f : info.getWorkDir().listFiles()) {
@@ -1008,13 +1020,11 @@ public class Command extends RepositoryManager {
                     f.delete();
                 }
             }
-
-
             if (info.getForDisplay()) {
-                return true;
+                return myOutput;
             }
 
-            return true;
+            return myOutput;
         }
 
         List<String> commands = new ArrayList<String>();
@@ -1027,14 +1037,12 @@ public class Command extends RepositoryManager {
         }
         System.err.println("Commands:" + commands);
 
-
         if (info.getForDisplay()) {
-            info.getResults().append(HtmlUtils.br());
+            myOutput.append(HtmlUtils.br());
             commands.set(0, IOUtil.getFileTail(commands.get(0)));
-            info.getResults().append(HtmlUtils.pre(StringUtil.join(" ",
-                    commands)));
+            myOutput.append(HtmlUtils.pre(StringUtil.join(" ", commands)));
 
-            return true;
+            return myOutput;
         }
 
         String errMsg = "";
@@ -1059,25 +1067,23 @@ public class Command extends RepositoryManager {
         }
         if (Utils.stringDefined(errMsg)) {
             if (getOutputToStderr()) {
-                info.getResults().append(errMsg);
-                info.getResults().append("\n");
+                myOutput.append(errMsg);
+                myOutput.append("\n");
             } else {
-                info.getError().append(errMsg);
+                //If there is an error then
+                myOutput.setOk(false);
+                myOutput.append(errMsg);
+
+                return myOutput;
             }
         }
 
-
-
-        if (info.getError().length() > 0) {
-            return false;
-        }
-
         HashSet<File> seen = new HashSet<File>();
-        for (Command.Output output : getOutputs()) {
+        for (OutputDefinition output : getOutputs()) {
             if (output.getShowResults()) {
-                info.setResultsShownAsText(true);
+                myOutput.setResultsShownAsText(true);
                 if (output.getUseStdout()) {
-                    info.getResults().append(IOUtil.readContents(stdoutFile));
+                    myOutput.append(IOUtil.readContents(stdoutFile));
                 } else {}
 
                 continue;
@@ -1147,11 +1153,11 @@ public class Command extends RepositoryManager {
                             .getSynthId(getEntryManager().getProcessEntry(),
                                         info.getWorkDir().toString(), file));
                 }
-                info.addEntry(newEntry);
+                myOutput.addEntry(newEntry);
             }
         }
 
-        return true;
+        return myOutput;
     }
 
 
@@ -1160,7 +1166,7 @@ public class Command extends RepositoryManager {
      *
      * @param outputs _more_
      */
-    public void getAllOutputs(List<Command.Output> outputs) {
+    public void getAllOutputs(List<OutputDefinition> outputs) {
         if (haveChildren()) {
             for (Command child : children) {
                 child.getAllOutputs(outputs);
@@ -1217,118 +1223,6 @@ public class Command extends RepositoryManager {
 
 
 
-
-    /**
-     * Class description
-     *
-     *
-     * @version        $version$, Thu, Sep 4, '14
-     * @author         Enter your name here...
-     */
-    public static class Output {
-
-        /** _more_ */
-        private String entryType;
-
-        /** _more_ */
-        private String pattern;
-
-        /** _more_ */
-        private boolean useStdout = false;
-
-        /** _more_ */
-        private String filename;
-
-        /** _more_ */
-        private boolean showResults = false;
-
-
-
-        /**
-         * _more_
-         *
-         * @param node _more_
-         */
-        public Output(Element node) {
-            entryType = XmlUtil.getAttribute(node, ATTR_TYPE,
-                                             TypeHandler.TYPE_FILE);
-            pattern   = XmlUtil.getAttribute(node, "pattern", (String) null);
-            useStdout = XmlUtil.getAttribute(node, "stdout", useStdout);
-            filename = XmlUtil.getAttribute(node, "filename", (String) null);
-            showResults = XmlUtil.getAttribute(node, "showResults",
-                    showResults);
-        }
-
-
-        /**
-         *  Set the EntryType property.
-         *
-         *  @param value The new value for EntryType
-         */
-        public void setEntryType(String value) {
-            entryType = value;
-        }
-
-        /**
-         *  Get the EntryType property.
-         *
-         *  @return The EntryType
-         */
-        public String getEntryType() {
-            return entryType;
-        }
-
-        /**
-         *  Set the Pattern property.
-         *
-         *  @param value The new value for Pattern
-         */
-        public void setPattern(String value) {
-            pattern = value;
-        }
-
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public String getFilename() {
-            return filename;
-        }
-
-
-        /**
-         *  Get the Pattern property.
-         *
-         *  @return The Pattern
-         */
-        public String getPattern() {
-            return pattern;
-        }
-
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public boolean getShowResults() {
-            return showResults;
-        }
-
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public boolean getUseStdout() {
-            return useStdout;
-        }
-
-
-
-
-
-    }
 
 
     /**
@@ -1817,190 +1711,5 @@ public class Command extends RepositoryManager {
 
     }
 
-    /**
-     * Class description
-     *
-     *
-     * @version        $version$, Mon, Sep 15, '14
-     * @author         Enter your name here...
-     */
-    public static class CommandInfo {
-
-        /** _more_ */
-        private File workDir;
-
-        /** _more_ */
-        private boolean forDisplay = false;
-
-        /** _more_ */
-        private boolean publish = false;
-
-        /** _more_ */
-        private StringBuffer results;
-
-        /** _more_ */
-        private StringBuffer error;
-
-        /** _more_ */
-        private List<Entry> entries = new ArrayList<Entry>();
-
-        /** _more_ */
-        private boolean resultsShownAsText = false;
-
-        /** _more_ */
-        private Hashtable<String, String> params = new Hashtable<String,
-                                                       String>();
-
-        /**
-         * _more_
-         *
-         * @param commandInfo _more_
-         */
-        public CommandInfo(CommandInfo commandInfo) {
-            this.workDir            = commandInfo.workDir;
-            this.forDisplay         = commandInfo.forDisplay;
-            this.publish            = commandInfo.publish;
-            this.results            = commandInfo.results;
-            this.error              = commandInfo.error;
-            this.entries            = commandInfo.entries;
-            this.resultsShownAsText = commandInfo.resultsShownAsText;
-        }
-
-        /**
-         * _more_
-         *
-         * @param workDir _more_
-         * @param forDisplay _more_
-         */
-        public CommandInfo(File workDir, boolean forDisplay) {
-            this.workDir    = workDir;
-            this.forDisplay = forDisplay;
-            this.results    = new StringBuffer();
-            this.error      = new StringBuffer();
-        }
-
-
-        /**
-         * _more_
-         *
-         * @param key _more_
-         * @param value _more_
-         */
-        public void addParam(String key, String value) {
-            params.put(key, value);
-        }
-
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public Hashtable<String, String> getParams() {
-            return params;
-        }
-
-        /**
-         * _more_
-         *
-         * @param entry _more_
-         */
-        public void addEntry(Entry entry) {
-            entries.add(entry);
-        }
-
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public List<Entry> getEntries() {
-            return entries;
-        }
-
-        /**
-         * _more_
-         *
-         * @param entries _more_
-         */
-        public void setEntries(List<Entry> entries) {
-            this.entries = entries;
-        }
-
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public StringBuffer getResults() {
-            return results;
-        }
-
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public StringBuffer getError() {
-            return error;
-        }
-
-        /**
-         * Set the Publish property.
-         *
-         * @param value The new value for Publish
-         */
-        public void setPublish(boolean value) {
-            publish = value;
-        }
-
-        /**
-         * Get the Publish property.
-         *
-         * @return The Publish
-         */
-        public boolean getPublish() {
-            return publish;
-        }
-
-
-        /**
-         * Set the ResultsShownAsText property.
-         *
-         * @param value The new value for ResultsShownAsText
-         */
-        public void setResultsShownAsText(boolean value) {
-            resultsShownAsText = value;
-        }
-
-        /**
-         * Get the ResultsShownAsText property.
-         *
-         * @return The ResultsShownAsText
-         */
-        public boolean getResultsShownAsText() {
-            return resultsShownAsText;
-        }
-
-
-
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public File getWorkDir() {
-            return workDir;
-        }
-
-        /**
-         * _more_
-         *
-         * @return _more_
-         */
-        public boolean getForDisplay() {
-            return forDisplay;
-        }
-
-    }
 
 }

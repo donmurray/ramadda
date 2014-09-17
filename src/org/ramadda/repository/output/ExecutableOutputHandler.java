@@ -23,7 +23,10 @@ package org.ramadda.repository.output;
 
 import org.ramadda.repository.*;
 import org.ramadda.repository.job.Command;
+import org.ramadda.repository.job.CommandInfo;
+import org.ramadda.repository.job.CommandOutput;
 import org.ramadda.repository.job.JobManager;
+import org.ramadda.repository.job.OutputDefinition;
 import org.ramadda.repository.type.*;
 
 import org.ramadda.util.HtmlUtils;
@@ -53,7 +56,7 @@ import java.util.List;
  */
 public class ExecutableOutputHandler extends OutputHandler {
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_ASYNCH = "asynch";
 
     /** _more_ */
@@ -221,12 +224,12 @@ public class ExecutableOutputHandler extends OutputHandler {
 
         //        Object       uniqueId = getRepository().getGUID();
         //        File         workDir  = getWorkDir(uniqueId);
-        File workDir = getStorageManager().createProcessDir();
+        File              workDir     =
+            getStorageManager().createProcessDir();
 
-        boolean forDisplay = request.exists(ARG_SHOWCOMMAND);
+        boolean           forDisplay  = request.exists(ARG_SHOWCOMMAND);
 
-        final Command.CommandInfo commandInfo =
-            new Command.CommandInfo(workDir, forDisplay);
+        final CommandInfo commandInfo = new CommandInfo(workDir, forDisplay);
         commandInfo.setPublish(doingPublish(request));
 
 
@@ -241,13 +244,16 @@ public class ExecutableOutputHandler extends OutputHandler {
         if (asynchronous) {
             ActionManager.Action action = new ActionManager.Action() {
                 public void run(Object actionId) throws Exception {
+                    CommandOutput output = null;
                     try {
-                        if ( !command.evaluate(request, entry, commandInfo)) {
+                        output = command.evaluate(request, entry,
+                                commandInfo);
+                        if ( !output.isOk()) {
                             getActionManager().setContinueHtml(
                                 actionId,
                                 getPageHandler().showDialogError(
                                     "An error has occurred:<pre>"
-                                    + commandInfo.getError() + "</pre>"));
+                                    + output.getResults() + "</pre>"));
 
                             return;
 
@@ -264,11 +270,12 @@ public class ExecutableOutputHandler extends OutputHandler {
                     String url =
                         getStorageManager().getProcessDirEntryUrl(request,
                             commandInfo.getWorkDir());
-                    if(commandInfo.getPublish()&& commandInfo.getEntries().size()>0) {
+                    if (commandInfo.getPublish()
+                            && (output.getEntries().size() > 0)) {
                         url = request.entryUrl(
-                                               getRepository().URL_ENTRY_SHOW,
-                                               commandInfo.getEntries().get(0));
-                    } 
+                            getRepository().URL_ENTRY_SHOW,
+                            output.getEntries().get(0));
+                    }
                     getActionManager().setContinueHtml(actionId,
                             HtmlUtils.href(url, msg("Continue")));
                 }
@@ -278,11 +285,12 @@ public class ExecutableOutputHandler extends OutputHandler {
                     outputType.getLabel(), "");
 
         }
+        CommandOutput output = command.evaluate(request, entry, commandInfo);
 
-        if ( !command.evaluate(request, entry, commandInfo)) {
+        if ( !output.isOk()) {
             sb.append(
                 getPageHandler().showDialogError(
-                    "An error has occurred:<pre>" + commandInfo.getError()
+                    "An error has occurred:<pre>" + output.getResults()
                     + "</pre>"));
             makeForm(request, entry, sb);
 
@@ -291,20 +299,19 @@ public class ExecutableOutputHandler extends OutputHandler {
 
         //        System.err.println ("params:" + commandInfo.getParams());
         //        System.err.println ("entries:" + commandInfo.getEntries());
-        if (commandInfo.getPublish()
-                && (commandInfo.getEntries().size() > 0)) {
+        if (commandInfo.getPublish() && (output.getEntries().size() > 0)) {
             return new Result(
                 request.entryUrl(
                     getRepository().URL_ENTRY_SHOW,
-                    commandInfo.getEntries().get(0)));
+                    output.getEntries().get(0)));
         }
 
 
-        if (forDisplay || commandInfo.getResultsShownAsText()) {
+        if (forDisplay || output.getResultsShownAsText()) {
             sb.append(HtmlUtils.b(msg("Results")));
             sb.append("<div class=command-output>");
             sb.append("<pre>");
-            sb.append(commandInfo.getResults());
+            sb.append(output.getResults());
             sb.append("</pre>");
             sb.append("</div>");
             makeForm(request, entry, sb);
@@ -322,16 +329,16 @@ public class ExecutableOutputHandler extends OutputHandler {
 
 
 
-        if (commandInfo.getEntries().size() > 1) {
+        if (output.getEntries().size() > 1) {
             List<File> files = new ArrayList<File>();
-            for (Entry newEntry : commandInfo.getEntries()) {
+            for (Entry newEntry : output.getEntries()) {
                 files.add(newEntry.getFile());
             }
 
             return getRepository().zipFiles(request, "results.zip", files);
         }
-        if (commandInfo.getEntries().size() == 1) {
-            File file = commandInfo.getEntries().get(0).getFile();
+        if (output.getEntries().size() == 1) {
+            File file = output.getEntries().get(0).getFile();
             request.setReturnFilename(file.getName());
 
             return new Result(getStorageManager().getFileInputStream(file),
@@ -340,7 +347,7 @@ public class ExecutableOutputHandler extends OutputHandler {
 
         sb.append("Error: no output files<br>");
         sb.append("<pre>");
-        sb.append(commandInfo.getResults());
+        sb.append(output.getResults());
         sb.append("</pre>");
         sb.append(HtmlUtils.hr());
         makeForm(request, entry, sb);
@@ -404,11 +411,11 @@ public class ExecutableOutputHandler extends OutputHandler {
         extraSubmit.append(HtmlUtils.labeledCheckbox(ARG_GOTOPRODUCTS,
                 "true", false, "Go to products page"));
 
-        boolean              haveAnyOutputs = false;
-        List<Command.Output> outputs        = new ArrayList<Command.Output>();
+        boolean                haveAnyOutputs = false;
+        List<OutputDefinition> outputs = new ArrayList<OutputDefinition>();
 
         command.getAllOutputs(outputs);
-        for (Command.Output output : outputs) {
+        for (OutputDefinition output : outputs) {
             if ( !output.getShowResults()) {
                 haveAnyOutputs = true;
 
@@ -420,8 +427,9 @@ public class ExecutableOutputHandler extends OutputHandler {
         if (haveAnyOutputs) {
             extraSubmit.append(HtmlUtils.space(2));
             extraSubmit.append(HtmlUtils.formEntry("",
-                                                   HtmlUtils.checkbox(ARG_ASYNCH, "true", request.get(ARG_ASYNCH, false)) + " "
-                    + msg("Asynchronous")));
+                    HtmlUtils.checkbox(ARG_ASYNCH, "true",
+                                       request.get(ARG_ASYNCH, false)) + " "
+                                           + msg("Asynchronous")));
         }
 
         StringBuffer formSB   = new StringBuffer();
@@ -453,17 +461,19 @@ public class ExecutableOutputHandler extends OutputHandler {
         if (haveAnyOutputs) {
             addPublishWidget(
                 request, entry, etc,
-                msg("Optionally, select a folder to publish to"),true,false);
+                msg("Optionally, select a folder to publish to"), true,
+                false);
         }
 
         etc.append(HtmlUtils.formTableClose());
 
         etc.append(HtmlUtils.p());
-        etc.append(HtmlUtils.submit(msg("Show Command"),
-                                   ARG_SHOWCOMMAND, ""));
+        etc.append(HtmlUtils.submit(msg("Show Command"), ARG_SHOWCOMMAND,
+                                    ""));
         addUrlShowingForm(etc, formId, null);
         etc.append(HtmlUtils.br());
-        sb.append(HtmlUtils.makeShowHideBlock("Options...", etc.toString(), false));
+        sb.append(HtmlUtils.makeShowHideBlock("Options...", etc.toString(),
+                false));
 
 
 

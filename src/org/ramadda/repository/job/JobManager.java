@@ -227,6 +227,7 @@ public class JobManager extends RepositoryManager {
         //        System.err.println ("JobManager.addCommand:"+ command.getId());
         commandMap.put(command.getId(), command);
         commands.add(command);
+
         return command;
     }
 
@@ -907,17 +908,17 @@ public class JobManager extends RepositoryManager {
      *
      *
      * @version        $version$, Thu, Sep 11, '14
-     * @author         Enter your name here...    
+     * @author         Enter your name here...
      */
     public static class CommandResults {
 
-        /** _more_          */
+        /** _more_ */
         private String stdoutMsg;
 
-        /** _more_          */
+        /** _more_ */
         private String stderrMsg;
 
-        /** _more_          */
+        /** _more_ */
         private int exitCode;
 
         /**
