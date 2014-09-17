@@ -29,13 +29,13 @@ import java.util.List;
 import org.ramadda.data.process.DataProcess;
 import org.ramadda.data.process.DataProcessInput;
 import org.ramadda.repository.Association;
-import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
 import org.ramadda.repository.RepositoryManager;
 import org.ramadda.repository.Request;
 import org.ramadda.repository.Resource;
 import org.ramadda.repository.database.Tables;
+import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.type.CollectionTypeHandler;
 import org.ramadda.repository.type.Column;
 import org.ramadda.repository.type.GranuleTypeHandler;
@@ -47,11 +47,7 @@ import ucar.unidata.util.IOUtil;
 
 
 /**
- * Class description
- *
- *
- * @version        $version$, Thu, Mar 20, '14
- * @author         Enter your name here...
+ * Base class for CDO data processes
  */
 public abstract class CDODataProcess extends DataProcess {
 
@@ -151,28 +147,37 @@ public abstract class CDODataProcess extends DataProcess {
      * Make a climatology for the given entry
      * @param request the request
      * @param entry the entry
+     * @param dpi _more_
+     * @param tail _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
      */
-    protected Entry makeClimatology(Request request, Entry entry, DataProcessInput dpi, String tail) 
-      throws Exception {
+    protected Entry makeClimatology(Request request, Entry entry,
+                                    DataProcessInput dpi, String tail)
+            throws Exception {
         String climName = IOUtil.stripExtension(tail) + "_clim.nc";
         File climFile = new File(IOUtil.joinDir(dpi.getProcessDir(),
                             climName));
-        List<String> commands  = initCDOCommand();
+        List<String> commands = initCDOCommand();
         commands.add("ymonmean");
         commands.add(entry.getResource().getPath());
         commands.add(climFile.toString());
         runProcess(commands, dpi.getProcessDir(), climFile);
         Resource resource = new Resource(climFile, Resource.TYPE_LOCAL_FILE);
-        TypeHandler myHandler = getRepository().getTypeHandler("file",
-                                    false, true);
+        TypeHandler myHandler = getRepository().getTypeHandler("file", false,
+                                    true);
         Entry climEntry = new Entry(myHandler, true, climFile.toString());
         climEntry.setResource(resource);
-        climEntry.addAssociation(new Association(getRepository().getGUID(), "generated product",
-                "product generated from", entry.getId(), climEntry.getId()));
+        climEntry.addAssociation(new Association(getRepository().getGUID(),
+                "generated product", "product generated from", entry.getId(),
+                climEntry.getId()));
+
         return climEntry;
 
     }
-    
+
     /**
      * Get the repository
      *
@@ -221,8 +226,9 @@ public abstract class CDODataProcess extends DataProcess {
 
         //System.out.println(commands);
         long millis = System.currentTimeMillis();
-        JobManager.CommandResults results = getRepository().getJobManager().executeCommand(commands, null,
-                               processDir, 60);
+        JobManager.CommandResults results =
+            getRepository().getJobManager().executeCommand(commands, null,
+                processDir, 60);
         //System.out.println("processing took: " + (System.currentTimeMillis()-millis));
         String errorMsg = results.getStderrMsg();
         String outMsg   = results.getStdoutMsg();
@@ -234,8 +240,7 @@ public abstract class CDODataProcess extends DataProcess {
                 throw new IllegalArgumentException(errorMsg);
             }
             if ( !outFile.exists()) {
-                throw new IllegalArgumentException(
-                    "Error processing data.");
+                throw new IllegalArgumentException("Error processing data.");
             }
         }
     }
@@ -257,15 +262,15 @@ public abstract class CDODataProcess extends DataProcess {
                         request, CDOOutputHandler.ARG_CDO_STAT,
                         CDOOutputHandler.STAT_MEAN, true)) + Repository.msg(
                             "Average") + HtmlUtils.space(2)
-                                    + HtmlUtils.radio(
-                                        CDOOutputHandler.ARG_CDO_STAT,
-                                        CDOOutputHandler.STAT_ANOM,
-                                        RepositoryManager.getShouldButtonBeSelected(
-                                            request,
-                                            CDOOutputHandler.ARG_CDO_STAT,
-                                            CDOOutputHandler.STAT_ANOM,
-                                            false)) + Repository.msg(
-                                                "Anomaly")));
+                                       + HtmlUtils.radio(
+                                           CDOOutputHandler.ARG_CDO_STAT,
+                                           CDOOutputHandler.STAT_ANOM,
+                                           RepositoryManager.getShouldButtonBeSelected(
+                                               request,
+                                                   CDOOutputHandler.ARG_CDO_STAT,
+                                                       CDOOutputHandler.STAT_ANOM,
+                                                           false)) + Repository.msg(
+                                                               "Anomaly")));
     }
 
 }
