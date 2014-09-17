@@ -1,4 +1,5 @@
 function D3Graph(div, nodes, links,width,height) {
+
     this.findNode =  function (value, field) {
         if(!field) {
             field = "nodeid";
@@ -209,7 +210,6 @@ function D3Graph(div, nodes, links,width,height) {
         .distance(150)
         .charge(-100)
         .size([width, height]);
-
 
     this.force.nodes(nodes);
     for(var i in links) {
