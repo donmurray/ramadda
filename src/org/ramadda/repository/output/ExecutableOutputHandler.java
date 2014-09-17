@@ -264,6 +264,11 @@ public class ExecutableOutputHandler extends OutputHandler {
                     String url =
                         getStorageManager().getProcessDirEntryUrl(request,
                             commandInfo.getWorkDir());
+                    if(commandInfo.getPublish()&& commandInfo.getEntries().size()>0) {
+                        url = request.entryUrl(
+                                               getRepository().URL_ENTRY_SHOW,
+                                               commandInfo.getEntries().get(0));
+                    } 
                     getActionManager().setContinueHtml(actionId,
                             HtmlUtils.href(url, msg("Continue")));
                 }
@@ -392,9 +397,9 @@ public class ExecutableOutputHandler extends OutputHandler {
         sb.append(HtmlUtils.hidden(ARG_OUTPUT, outputType.getId()));
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
 
-        StringBuffer extraSubmit = new StringBuffer(HtmlUtils.space(2));
-        extraSubmit.append(HtmlUtils.submit(msg("Show Command"),
-                                            ARG_SHOWCOMMAND, ""));
+
+
+        StringBuffer extraSubmit = new StringBuffer();
         extraSubmit.append(HtmlUtils.space(2));
         extraSubmit.append(HtmlUtils.labeledCheckbox(ARG_GOTOPRODUCTS,
                 "true", false, "Go to products page"));
@@ -415,7 +420,7 @@ public class ExecutableOutputHandler extends OutputHandler {
         if (haveAnyOutputs) {
             extraSubmit.append(HtmlUtils.space(2));
             extraSubmit.append(HtmlUtils.formEntry("",
-                    HtmlUtils.checkbox(ARG_ASYNCH, "true", true) + " "
+                                                   HtmlUtils.checkbox(ARG_ASYNCH, "true", request.get(ARG_ASYNCH, false)) + " "
                     + msg("Asynchronous")));
         }
 
@@ -437,19 +442,30 @@ public class ExecutableOutputHandler extends OutputHandler {
         sb.append(HtmlUtils.submit(command.getLabel(), ARG_EXECUTE,
                                    makeButtonSubmitDialog(sb,
                                        "Processing request...")));
-        sb.append(extraSubmit);
-        sb.append(HtmlUtils.p());
-        sb.append(HtmlUtils.formTable());
+        StringBuffer etc = new StringBuffer();
+
+        etc.append(HtmlUtils.br());
+        etc.append(extraSubmit);
+        etc.append(HtmlUtils.p());
+        etc.append(HtmlUtils.formTable());
 
 
         if (haveAnyOutputs) {
             addPublishWidget(
-                request, entry, sb,
-                msg("Optionally, select a folder to publish to"));
+                request, entry, etc,
+                msg("Optionally, select a folder to publish to"),true,false);
         }
 
-        sb.append(HtmlUtils.formTableClose());
-        addUrlShowingForm(sb, formId, null);
+        etc.append(HtmlUtils.formTableClose());
+
+        etc.append(HtmlUtils.p());
+        etc.append(HtmlUtils.submit(msg("Show Command"),
+                                   ARG_SHOWCOMMAND, ""));
+        addUrlShowingForm(etc, formId, null);
+        etc.append(HtmlUtils.br());
+        sb.append(HtmlUtils.makeShowHideBlock("Options...", etc.toString(), false));
+
+
 
 
 

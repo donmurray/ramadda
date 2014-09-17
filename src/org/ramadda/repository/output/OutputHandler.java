@@ -2200,6 +2200,12 @@ public class OutputHandler extends RepositoryManager {
     public void addPublishWidget(Request request, Entry entry, Appendable sb,
                                  String header, boolean addNameField)
             throws Exception {
+        addPublishWidget(request, entry,sb, header, addNameField, true);
+    }
+
+    public void addPublishWidget(Request request, Entry entry, Appendable sb,
+                                 String header, boolean addNameField, boolean addMetadataField)
+            throws Exception {
         if (request.getUser().getAnonymous()) {
             return;
         }
@@ -2212,7 +2218,7 @@ public class OutputHandler extends RepositoryManager {
 
         String select = OutputHandler.getSelect(request, ARG_PUBLISH_ENTRY,
                             "Select folder", false, null, entry);
-        String addMetadata = HtmlUtils.checkbox(ARG_METADATA_ADD,
+        String addMetadata = !addMetadataField?"":HtmlUtils.checkbox(ARG_METADATA_ADD,
                                  HtmlUtils.VALUE_TRUE,
                                  request.get(ARG_METADATA_ADD,
                                              false)) + msg("Add properties");
