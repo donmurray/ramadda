@@ -1429,7 +1429,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
                 Constructor ctor =
                     Misc.findConstructor(Misc.findClass(XmlUtil.getAttribute(node,
                         "handler",
-                        "org.ramadda.repository.job.Command")), new Class[] {
+                        "org.ramadda.data.process.Command")), new Class[] {
                             Repository.class,
                             Element.class });
                 Command command = (Command) ctor.newInstance(new Object[] {
