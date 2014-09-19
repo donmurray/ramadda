@@ -644,7 +644,6 @@ public class Command extends RepositoryManager {
                 }
                 catArg  = arg;
                 catBuff = new StringBuffer();
-
                 continue;
             }
 
@@ -657,75 +656,14 @@ public class Command extends RepositoryManager {
                 catArg  = null;
             }
 
-            String       tooltip = arg.getPrefix();
-            StringBuffer input   = new StringBuffer();
-            if (arg.isEnumeration()) {
-                input.append(HtmlUtils.select(arg.getUrlArg(),
-                        arg.getValues(), (List) null, "", 100));
-            } else if (arg.isFlag()) {
-                if (arg.getGroup() != null) {
-                    boolean selected = request.getString(arg.getGroup(),
-                                           "").equals(arg.getValue());
-                    input.append(HtmlUtils.radio(arg.getGroup(),
-                            arg.getValue(), selected));
-                } else {
-                    input.append(HtmlUtils.checkbox(arg.getUrlArg(), "true",
-                            request.get(arg.getUrlArg(), false)));
-                }
-
-                input.append(HtmlUtils.space(2));
-                input.append(arg.getHelp());
-                catBuff.append(HtmlUtils.formEntry("", input.toString(), 2));
-
-                continue;
-            } else if (arg.isFile()) {
-                //noop
-            } else if (arg.isEntry()) {
-                if ((primaryEntry != null) && arg.isPrimaryEntry()) {
-                    continue;
-                } else {
-                    if (arg.getEntryType() != null) {
-                        request.put(ARG_ENTRYTYPE, arg.getEntryType());
-                    }
-                    input.append(OutputHandler.getSelect(request,
-                            arg.getUrlArg(), msg("Select"), true, null));
-                    input.append(
-                        HtmlUtils.hidden(
-                            arg.getUrlArg() + "_hidden",
-                            request.getString(
-                                arg.getUrlArg() + "_hidden",
-                                ""), HtmlUtils.id(
-                                    arg.getUrlArg() + "_hidden")));
-                    input.append(HtmlUtils.space(1));
-                    input.append(HtmlUtils.disabledInput(arg.getUrlArg(),
-                            request.getString(arg.getUrlArg(), ""),
-                            HtmlUtils.SIZE_60
-                            + HtmlUtils.id(arg.getUrlArg())));
-                    request.remove(ARG_ENTRYTYPE);
-                }
-
-            } else {
-                String extra = HtmlUtils.attr(HtmlUtils.ATTR_SIZE,
-                                   "" + arg.getSize());
-                if (arg.placeHolder != null) {
-                    extra += HtmlUtils.attr("placeholder", arg.placeHolder);
-                }
-                input.append(
-                    HtmlUtils.input(
-                        arg.getUrlArg(),
-                        request.getString(arg.getUrlArg(), ""), extra));
-            }
-            if (input.length() == 0) {
-                continue;
-            }
             if (arg.isRequired()) {
                 anyRequired = true;
-                input.append(HtmlUtils.space(1));
-                input.append("<span class=ramadda-required-label>*</span>");
             }
+            addArgToForm(request, primaryEntry, catBuff, arg);
 
-            makeFormEntry(catBuff, arg.getLabel(), input.toString(),
-                          arg.getHelp());
+
+
+
         }
 
         if ((catBuff != null) && (catBuff.length() > 0)) {
@@ -749,6 +687,79 @@ public class Command extends RepositoryManager {
     }
 
 
+    public void addArgToForm(Request request, Entry primaryEntry,
+                             Appendable catBuff, Arg arg) throws Exception {
+        String       tooltip = arg.getPrefix();
+        StringBuffer input   = new StringBuffer();
+        if (arg.isEnumeration()) {
+            input.append(HtmlUtils.select(arg.getUrlArg(),
+                                          arg.getValues(), (List) null, "", 100));
+        } else if (arg.isFlag()) {
+            if (arg.getGroup() != null) {
+                boolean selected = request.getString(arg.getGroup(),
+                                                     "").equals(arg.getValue());
+                input.append(HtmlUtils.radio(arg.getGroup(),
+                                             arg.getValue(), selected));
+            } else {
+                input.append(HtmlUtils.checkbox(arg.getUrlArg(), "true",
+                                                request.get(arg.getUrlArg(), false)));
+            }
+
+            input.append(HtmlUtils.space(2));
+            input.append(arg.getHelp());
+            catBuff.append(HtmlUtils.formEntry("", input.toString(), 2));
+
+            return;
+        } else if (arg.isFile()) {
+            //noop
+        } else if (arg.isEntry()) {
+            if ((primaryEntry != null) && arg.isPrimaryEntry()) {
+                return;
+            } else {
+                if (arg.getEntryType() != null) {
+                    request.put(ARG_ENTRYTYPE, arg.getEntryType());
+                }
+                input.append(OutputHandler.getSelect(request,
+                                                     arg.getUrlArg(), msg("Select"), true, null));
+                input.append(
+                             HtmlUtils.hidden(
+                                              arg.getUrlArg() + "_hidden",
+                                              request.getString(
+                                                                arg.getUrlArg() + "_hidden",
+                                                                ""), HtmlUtils.id(
+                                                                                  arg.getUrlArg() + "_hidden")));
+                input.append(HtmlUtils.space(1));
+                input.append(HtmlUtils.disabledInput(arg.getUrlArg(),
+                                                     request.getString(arg.getUrlArg(), ""),
+                                                     HtmlUtils.SIZE_60
+                                                     + HtmlUtils.id(arg.getUrlArg())));
+                request.remove(ARG_ENTRYTYPE);
+            }
+
+        } else {
+            String extra = HtmlUtils.attr(HtmlUtils.ATTR_SIZE,
+                                          "" + arg.getSize());
+            if (arg.placeHolder != null) {
+                extra += HtmlUtils.attr("placeholder", arg.placeHolder);
+            }
+            input.append(
+                         HtmlUtils.input(
+                                         arg.getUrlArg(),
+                                         request.getString(arg.getUrlArg(), ""), extra));
+        }
+        if (input.length() == 0) {
+            return;
+        }
+        if (arg.isRequired()) {
+            input.append(HtmlUtils.space(1));
+            input.append("<span class=ramadda-required-label>*</span>");
+        }
+
+        makeFormEntry(catBuff, arg.getLabel(), input.toString(),
+                      arg.getHelp());
+    }
+
+
     /**
      * _more_
      *
@@ -757,8 +768,8 @@ public class Command extends RepositoryManager {
      * @param col1 _more_
      * @param help _more_
      */
-    private void makeFormEntry(StringBuffer sb, String label, String col1,
-                               String help) {
+    private void makeFormEntry(Appendable sb, String label, String col1,
+                               String help) throws Exception {
         sb.append(HtmlUtils.formEntryTop(Utils.stringDefined(label)
                                          ? msgLabel(label)
                                          : "", col1,
