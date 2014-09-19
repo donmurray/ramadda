@@ -94,7 +94,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                             new WikiTag(WIKI_TAG_LINK),
                             new WikiTag(WIKI_TAG_HTML),
                             new WikiTag(WIKI_TAG_SIMPLE, attrs(ATTR_TEXTPOSITION, POS_LEFT)),
-                            new WikiTag(WIKI_TAG_IMPORT),
+                            new WikiTag(WIKI_TAG_IMPORT, attrs(ARG_OUTPUT,"")),
                             new WikiTag(WIKI_TAG_FIELD, attrs("name", ""))),
         new WikiTagCategory("Layout", 
                             new WikiTag(WIKI_TAG_LINKS, attrs(

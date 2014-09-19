@@ -575,6 +575,10 @@ public class Command extends RepositoryManager {
     }
 
 
+    public void initFormJS(Request request, Appendable js, String formVar) throws Exception {
+    }
+
+
     /**
      * _more_
      *
@@ -586,8 +590,8 @@ public class Command extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public int makeForm(Request request, Entry primaryEntry, StringBuffer sb)
-            throws Exception {
+    public int makeForm(Request request, Entry primaryEntry, Appendable sb)
+        throws Exception {
         initCommand();
         if (link != null) {
             return link.makeForm(request, primaryEntry, sb);
@@ -600,8 +604,8 @@ public class Command extends RepositoryManager {
                 int blockCnt = child.makeForm(request, primaryEntry, tmpSB);
                 cnt += blockCnt;
                 if (blockCnt > 0) {
-                    sb.append(header("Command: " + child.getLabel()));
                     sb.append(HtmlUtils.p());
+                    sb.append(header(child.getLabel()));
                     sb.append(tmpSB);
                 }
 
@@ -625,9 +629,10 @@ public class Command extends RepositoryManager {
      * @throws Exception _more_
      */
     private int makeFormInner(Request request, Entry primaryEntry,
-                              StringBuffer sb)
+                              Appendable sb)
             throws Exception {
 
+        StringBuffer formSB = new StringBuffer();
         int          blockCnt    = 0;
         StringBuffer catBuff     = null;
         Command.Arg  catArg      = null;
@@ -635,7 +640,7 @@ public class Command extends RepositoryManager {
         for (Command.Arg arg : getArgs()) {
             if (arg.isCategory()) {
                 if ((catBuff != null) && (catBuff.length() > 0)) {
-                    processCatBuff(request, sb, catArg, catBuff, ++blockCnt);
+                    processCatBuff(request, formSB, catArg, catBuff, ++blockCnt);
                 }
                 catArg  = arg;
                 catBuff = new StringBuffer();
@@ -724,11 +729,20 @@ public class Command extends RepositoryManager {
         }
 
         if ((catBuff != null) && (catBuff.length() > 0)) {
-            processCatBuff(request, sb, catArg, catBuff, ++blockCnt);
+            processCatBuff(request, formSB, catArg, catBuff, ++blockCnt);
         }
         if (anyRequired) {
-            sb.append("<span class=ramadda-required-label>* required</span>");
+            formSB.append("<span class=ramadda-required-label>* required</span>");
         }
+
+        sb.append(HtmlUtils.p());
+        if(Utils.stringDefined(getHelp())) {
+            sb.append(HtmlUtils.div(getHelp(), HtmlUtils.cssClass("command-help")));
+        }
+        if (blockCnt > 0) {
+            sb.append(HtmlUtils.div(formSB.toString(), HtmlUtils.cssClass("command-form")));
+        }
+
 
         return blockCnt;
 
@@ -964,12 +978,12 @@ public class Command extends RepositoryManager {
 
         CommandOutput myOutput = new CommandOutput();
 
+        HashSet<File> existingFiles = new HashSet<File>();
+        for (File f : info.getWorkDir().listFiles()) {
+            existingFiles.add(f);
+        }
+        HashSet<File> newFiles      = new HashSet<File>();
         if (haveChildren()) {
-            HashSet<File> existingFiles = new HashSet<File>();
-            HashSet<File> newFiles      = new HashSet<File>();
-            for (File f : info.getWorkDir().listFiles()) {
-                existingFiles.add(f);
-            }
             CommandOutput childOutput = null;
             for (Command child : children) {
                 Entry primaryEntryForChild = entry;
@@ -1073,7 +1087,6 @@ public class Command extends RepositoryManager {
                 //If there is an error then
                 myOutput.setOk(false);
                 myOutput.append(errMsg);
-
                 return myOutput;
             }
         }

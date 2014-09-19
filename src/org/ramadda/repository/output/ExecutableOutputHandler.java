@@ -394,9 +394,7 @@ public class ExecutableOutputHandler extends OutputHandler {
      */
     public void makeForm(Request request, Entry entry, StringBuffer sb)
             throws Exception {
-        sb.append(HtmlUtils.p());
-        sb.append(command.getHelp());
-        sb.append(HtmlUtils.p());
+
 
         String formId = HtmlUtils.getUniqueId("form_");
         request.uploadFormWithAuthToken(sb, getRepository().URL_ENTRY_SHOW,
@@ -423,7 +421,6 @@ public class ExecutableOutputHandler extends OutputHandler {
             }
         }
 
-
         if (haveAnyOutputs) {
             extraSubmit.append(HtmlUtils.space(2));
             extraSubmit.append(HtmlUtils.formEntry("",
@@ -432,19 +429,7 @@ public class ExecutableOutputHandler extends OutputHandler {
                                            + msg("Asynchronous")));
         }
 
-        StringBuffer formSB   = new StringBuffer();
-        int          blockCnt = command.makeForm(request, entry, formSB);
-        if (blockCnt > 0) {
-            sb.append("<div class=inputform>");
-            sb.append(formSB);
-            sb.append("</div>");
-        }
-        /*
-        sb.append(HtmlUtils.submit(command.getLabel(), ARG_EXECUTE,
-                                   makeButtonSubmitDialog(sb,
-                                       "Processing request...")));
-        */
-
+        command.makeForm(request, entry, sb);
 
         sb.append(HtmlUtils.p());
         sb.append(HtmlUtils.submit(command.getLabel(), ARG_EXECUTE,
@@ -476,7 +461,7 @@ public class ExecutableOutputHandler extends OutputHandler {
                 false));
 
 
-
+        sb.append(HtmlUtils.formClose());
 
 
 
