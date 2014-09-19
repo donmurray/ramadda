@@ -40,7 +40,7 @@ import org.ramadda.repository.database.DatabaseManager;
 import org.ramadda.repository.database.Tables;
 import org.ramadda.repository.ftp.FtpManager;
 import org.ramadda.repository.harvester.HarvesterManager;
-import org.ramadda.repository.job.Command;
+import org.ramadda.data.process.Command;
 import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.map.MapManager;
 import org.ramadda.repository.metadata.ContentMetadataHandler;
