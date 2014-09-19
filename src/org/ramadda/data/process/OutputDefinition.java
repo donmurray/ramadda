@@ -18,7 +18,7 @@
 * DEALINGS IN THE SOFTWARE.
 */
 
-package org.ramadda.repository.job;
+package org.ramadda.data.process;
 
 
 import org.ramadda.repository.*;

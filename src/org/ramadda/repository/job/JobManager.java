@@ -21,6 +21,7 @@
 package org.ramadda.repository.job;
 
 
+import org.ramadda.data.process.Command;
 import org.ramadda.data.record.*;
 import org.ramadda.data.record.filter.*;
 

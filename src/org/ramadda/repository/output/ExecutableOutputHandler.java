@@ -22,11 +22,11 @@ package org.ramadda.repository.output;
 
 
 import org.ramadda.repository.*;
-import org.ramadda.repository.job.Command;
-import org.ramadda.repository.job.CommandInfo;
-import org.ramadda.repository.job.CommandOutput;
+import org.ramadda.data.process.Command;
+import org.ramadda.data.process.CommandInfo;
+import org.ramadda.data.process.CommandOutput;
+import org.ramadda.data.process.OutputDefinition;
 import org.ramadda.repository.job.JobManager;
-import org.ramadda.repository.job.OutputDefinition;
 import org.ramadda.repository.type.*;
 
 import org.ramadda.util.HtmlUtils;

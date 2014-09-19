@@ -18,10 +18,11 @@
 * DEALINGS IN THE SOFTWARE.
 */
 
-package org.ramadda.repository.job;
+package org.ramadda.data.process;
 
 
 import org.ramadda.repository.*;
+import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.auth.*;
 import org.ramadda.repository.output.OutputHandler;
 import org.ramadda.repository.type.*;
@@ -325,7 +326,7 @@ public class Command extends RepositoryManager {
         //Look for:
         //java:<class>:<method>
         if ((command != null) && command.equals("util")) {
-            command = "java:org.ramadda.repository.job.CommandUtil:evaluate";
+            command = "java:org.ramadda.data.process.CommandUtil:evaluate";
         }
 
         if ((command != null) && command.startsWith("java:")) {
