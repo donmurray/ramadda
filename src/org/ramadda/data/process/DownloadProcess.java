@@ -43,8 +43,8 @@ public class DownloadProcess extends DataProcess {
      * @param id       the unique id for this DataProcess
      * @param label    the label for this DataProcess
      */
-    public DownloadProcess(String id, String label) {
-        super(id, label);
+    public DownloadProcess(Repository repository, String id, String label) {
+        super(repository, id, label);
     }
 
     /**
@@ -56,7 +56,7 @@ public class DownloadProcess extends DataProcess {
      *
      * @throws Exception  problem adding to the form
      */
-    public void addToForm(Request request, DataProcessInput input,
+    public void addToForm(Request request, CommandInput input,
                           StringBuilder sb)
             throws Exception {}
 
@@ -72,7 +72,7 @@ public class DownloadProcess extends DataProcess {
      * @throws Exception  problem processing
      */
     public DataProcessOutput processRequest(Request request,
-                                            DataProcessInput input) {
+                                            CommandInput input) {
         return null;
     }
 
@@ -83,7 +83,7 @@ public class DownloadProcess extends DataProcess {
      * @param dpi _more_
      * @return true if we can handle
      */
-    public boolean canHandle(DataProcessInput dpi) {
+    public boolean canHandle(CommandInput dpi) {
         return (dpi != null) && !dpi.getOperands().isEmpty();
     }
 

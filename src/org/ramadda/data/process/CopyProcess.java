@@ -57,8 +57,8 @@ public class CopyProcess extends DataProcess {
      * @param id       the unique id for this DataProcess
      * @param label    the label for this DataProcess
      */
-    public CopyProcess(String id, String label) {
-        super(id, label);
+    public CopyProcess(Repository repository, String id, String label) {
+        super(repository, id, label);
     }
 
     /**
@@ -70,7 +70,7 @@ public class CopyProcess extends DataProcess {
      *
      * @throws Exception  problem adding to the form
      */
-    public void addToForm(Request request, DataProcessInput input,
+    public void addToForm(Request request, CommandInput input,
                           StringBuilder sb)
             throws Exception {}
 
@@ -86,11 +86,11 @@ public class CopyProcess extends DataProcess {
      * @throws Exception  problem processing
      */
     public DataProcessOutput processRequest(Request request,
-                                            DataProcessInput dpi)
+                                            CommandInput dpi)
             throws Exception {
         File        baseDir = dpi.getProcessDir();
         List<Entry> results = new ArrayList<Entry>();
-        for (DataProcessOperand op : dpi.getOperands()) {
+        for (CommandOperand op : dpi.getOperands()) {
             for (Entry e : op.getEntries()) {
                 File f       = e.getFile();
                 File newFile = new File(IOUtil.joinDir(baseDir, f.getName()));
@@ -102,7 +102,7 @@ public class CopyProcess extends DataProcess {
             }
         }
 
-        return new DataProcessOutput(new DataProcessOperand("Copied Entries",
+        return new DataProcessOutput(new CommandOperand("Copied Entries",
                 results));
     }
 
@@ -113,7 +113,7 @@ public class CopyProcess extends DataProcess {
      * @param dpi _more_
      * @return true if we can handle
      */
-    public boolean canHandle(DataProcessInput dpi) {
+    public boolean canHandle(CommandInput dpi) {
         return (dpi != null) && !dpi.getOperands().isEmpty();
     }
 
