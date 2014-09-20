@@ -26,7 +26,7 @@ import org.ramadda.data.services.RecordConstants;
 
 import org.ramadda.repository.*;
 import org.ramadda.repository.output.*;
-import org.ramadda.repository.job.Command;
+import org.ramadda.data.process.Command;
 import org.ramadda.repository.type.*;
 import org.ramadda.repository.util.DateArgument;
 import org.ramadda.util.HtmlUtils;
