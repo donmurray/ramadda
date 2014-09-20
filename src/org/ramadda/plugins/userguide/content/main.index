@@ -51,6 +51,7 @@ index.html
 >>database.html
 >>readonly.html
 >>plugins.html
+>>commands.xml
 >>templates.html
 >>admin.html
 >>adminusers.html
@@ -58,6 +59,7 @@ index.html
 >>backups.html
 >>remoteservers.html
 >>subrepositories.html
+
 
 
 >developer/main.index
