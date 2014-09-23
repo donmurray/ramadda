@@ -24,6 +24,8 @@ package org.ramadda.geodata.cdmdata;
 import org.ramadda.data.process.*;
 
 
+import org.ramadda.data.process.Service;
+
 import org.ramadda.repository.*;
 import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.output.*;
@@ -56,7 +58,7 @@ import java.util.List;
  *
  * @author Jeff McWhirter/ramadda.org
  */
-public class NCOOutputHandler extends OutputHandler implements DataProcessProvider {
+public class NCOOutputHandler extends OutputHandler implements ServiceProvider {
 
 
     /** _more_ */
@@ -227,20 +229,25 @@ public class NCOOutputHandler extends OutputHandler implements DataProcessProvid
         return ncwaPath != null;
     }
 
+    /** _more_          */
+    private List<Service> services;
+
     /**
-     *  The DataProcessProvider method. Just adds this
+     *  The ServiceProvider method. Just adds this
      *
      * @return _more_
      */
-    public List<DataProcess> getDataProcesses() {
-        List<DataProcess> processes = new ArrayList<DataProcess>();
-        //TODO: put this back
-        //        if(isEnabled()) {
-        if (true) {
-            processes.add(new NCODataProcess(getRepository()));
+    public List<Service> getServices() {
+        if (services == null) {
+            services = new ArrayList<Service>();
+            //TODO: put this back
+            //        if(isEnabled()) {
+            if (true) {
+                services.add(new NCODataProcess(getRepository()));
+            }
         }
 
-        return processes;
+        return services;
     }
 
 
@@ -464,6 +471,11 @@ public class NCOOutputHandler extends OutputHandler implements DataProcessProvid
                                           formats)));
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     @Override
     public int getProductDirTTLHours() {
         return 1;
@@ -559,8 +571,9 @@ public class NCOOutputHandler extends OutputHandler implements DataProcessProvid
 
         commands.add(entry.getResource().getPath());
         commands.add(outFile.toString());
-        JobManager.CommandResults results = getRepository().getJobManager().executeCommand(commands,
-                               getProductDir());
+        JobManager.CommandResults results =
+            getRepository().getJobManager().executeCommand(commands,
+                getProductDir());
         String errorMsg = results.getStderrMsg();
         String outMsg   = results.getStdoutMsg();
         if (outMsg.length() > 0) {
@@ -597,10 +610,12 @@ public class NCOOutputHandler extends OutputHandler implements DataProcessProvid
      * @version        $version$, Fri, Aug 23, '13
      * @author         Enter your name here...
      */
-    protected class NCODataProcess extends DataProcess {
+    protected class NCODataProcess extends Service {
 
         /**
          * _more_
+         *
+         * @param repository _more_
          */
         public NCODataProcess(Repository repository) {
             super(repository, "NCO", "NCO Weighted Average");
@@ -613,14 +628,19 @@ public class NCOOutputHandler extends OutputHandler implements DataProcessProvid
          * @param input     the Entry
          * @param sb        the form HTML
          *
+         *
+         * @return _more_
          * @throws Exception  on badness
          */
-        public void addToForm(Request request, DataProcessInput input,
-                              StringBuilder sb)
+        @Override
+        public int addToForm(Request request, ServiceInput input,
+                             Appendable sb)
                 throws Exception {
             sb.append(HtmlUtils.formTable());
             sb.append(HtmlUtils.formEntry(msgLabel("CDO Stuff"), "widgets"));
             sb.append(HtmlUtils.formTableClose());
+
+            return 1;
         }
 
 
@@ -628,14 +648,16 @@ public class NCOOutputHandler extends OutputHandler implements DataProcessProvid
          * _more_
          *
          * @param request _more_
+         * @param info _more_
          * @param dpi _more_
          *
          * @return _more_
          *
          * @throws Exception _more_
          */
-        public DataProcessOutput processRequest(Request request,
-                DataProcessInput dpi)
+        @Override
+        public ServiceOutput evaluate(Request request, ServiceInfo info,
+                                      ServiceInput dpi)
                 throws Exception {
             Resource r = new Resource(
                              dpi.getOperands().get(0).getEntries().get(
@@ -643,7 +665,7 @@ public class NCOOutputHandler extends OutputHandler implements DataProcessProvid
             Entry out = new Entry();
             out.setResource(r);
 
-            return new DataProcessOutput(out);
+            return new ServiceOutput(out);
         }
 
         /**
@@ -653,7 +675,8 @@ public class NCOOutputHandler extends OutputHandler implements DataProcessProvid
          *
          * @return _more_
          */
-        public boolean canHandle(DataProcessInput dpi) {
+        @Override
+        public boolean canHandle(ServiceInput dpi) {
             if ( !isEnabled()) {
                 return false;
             }

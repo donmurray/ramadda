@@ -28,7 +28,7 @@ import org.ramadda.repository.Constants;
  */
 public interface CdmConstants {
 
-    /** _more_          */
+    /** _more_ */
     public static final String ICON_OPENDAP = "/cdmdata/opendap.gif";
 
     /** CSV format */

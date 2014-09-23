@@ -182,7 +182,8 @@ public class CdmManager extends RepositoryManager {
     public static final String CDMMANAGER_ID = "cdmmanager";
 
     /** climate model file type */
-	private static final String TYPE_CLIMATE_MODEL_GRANULE = "climate_modelfile";
+    private static final String TYPE_CLIMATE_MODEL_GRANULE =
+        "climate_modelfile";
 
 
     /**
@@ -689,9 +690,9 @@ public class CdmManager extends RepositoryManager {
         if (entry.isType(OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
             return true;
         }
-        
+
         if (entry.getTypeHandler().isType(TYPE_CLIMATE_MODEL_GRANULE)) {
-        	return true;
+            return true;
         }
 
         if (isGrads(entry)) {
@@ -768,8 +769,8 @@ public class CdmManager extends RepositoryManager {
      * @return true if GrADS type
      */
     private boolean isCdmGrid(Entry e) {
-        return e.getTypeHandler().isType(TYPE_CDM_GRID) || 
-                e.getTypeHandler().isType(TYPE_CLIMATE_MODEL_GRANULE);
+        return e.getTypeHandler().isType(TYPE_CDM_GRID)
+               || e.getTypeHandler().isType(TYPE_CLIMATE_MODEL_GRANULE);
     }
 
     /**

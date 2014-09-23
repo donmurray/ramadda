@@ -335,9 +335,11 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
         LatLonPointImpl llp = null;
 
         if (request.defined(TypeHandler.REQUESTARG_LATITUDE)) {
-            llp = new LatLonPointImpl(
-                request.getLatOrLonValue(TypeHandler.REQUESTARG_LATITUDE, deflat),
-                request.getLatOrLonValue(TypeHandler.REQUESTARG_LONGITUDE, deflon));
+            llp = new LatLonPointImpl(request
+                .getLatOrLonValue(TypeHandler.REQUESTARG_LATITUDE,
+                                  deflat), request
+                                      .getLatOrLonValue(TypeHandler
+                                          .REQUESTARG_LONGITUDE, deflon));
             //            System.err.println("latlon point:" + llp);
         }
         if (llp == null) {

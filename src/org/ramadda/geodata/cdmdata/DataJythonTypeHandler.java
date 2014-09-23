@@ -102,7 +102,7 @@ public class DataJythonTypeHandler extends JythonTypeHandler {
      * @return _more_
      */
     public JythonTypeHandler.ProcessInfo doMakeProcessInfo() {
-        return new DataProcessInfo();
+        return new MyProcessInfo();
     }
 
     /**
@@ -123,8 +123,8 @@ public class DataJythonTypeHandler extends JythonTypeHandler {
             throws Exception {
         super.processEntry(request, interp, info, processInfo, theEntry);
         CdmDataOutputHandler dataOutputHandler = getDataOutputHandler();
-        DataProcessInfo      dataProcessInfo   =
-            (DataProcessInfo) processInfo;
+        MyProcessInfo      dataProcessInfo   =
+            (MyProcessInfo) processInfo;
 
         String path = dataOutputHandler.getCdmManager().getPath(theEntry);
         if (path != null) {
@@ -173,8 +173,8 @@ public class DataJythonTypeHandler extends JythonTypeHandler {
             throws Exception {
         super.cleanup(request, entry, interp, processInfo);
         CdmDataOutputHandler dataOutputHandler = getDataOutputHandler();
-        DataProcessInfo      dataProcessInfo   =
-            (DataProcessInfo) processInfo;
+        MyProcessInfo      dataProcessInfo   =
+            (MyProcessInfo) processInfo;
         for (DataSource dataSource : dataProcessInfo.dataSources) {
             dataSource.doRemove();
         }
@@ -202,8 +202,7 @@ public class DataJythonTypeHandler extends JythonTypeHandler {
      * @version        Enter version here..., Mon, May 3, '10
      * @author         Enter your name here...
      */
-    public static class DataProcessInfo extends JythonTypeHandler
-        .ProcessInfo {
+    private static class MyProcessInfo extends JythonTypeHandler.ProcessInfo {
 
         /** _more_ */
         List<String> ncPaths = new ArrayList<String>();
