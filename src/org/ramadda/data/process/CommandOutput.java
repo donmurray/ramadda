@@ -79,6 +79,14 @@ public class CommandOutput {
     /** _more_ */
     private List<Entry> entries = new ArrayList<Entry>();
 
+
+    /** empty output id */
+    public int DATAPROCESS_OUTPUT_EMPTY = 0;
+
+    /** operand output id */
+    public int DATAPROCESS_OUTPUT_OPERAND = 1;
+
+
     /**
      * _more_
      */
@@ -94,6 +102,42 @@ public class CommandOutput {
         this.ok = ok;
         this.results.append(message);
     }
+
+    /**
+     * Create a DataProcessOutput from the file
+     *
+     * @param file  the associated file
+     *
+     * @param entry _more_
+     */
+    public CommandOutput(Entry entry) {
+        addEntry(entry);
+    }
+
+    /**
+     * Create the DataProcessOutput from data operand
+     *
+     * @param operand the operand
+     */
+    public CommandOutput(CommandOperand operand) {
+        entries.addAll(operand.getEntries());
+    }
+
+
+
+    public CommandOutput(List<CommandOperand> operands) {
+        for(CommandOperand op: operands) {
+            entries.addAll(op.getEntries());
+        }
+    }
+
+
+    /*
+    public CommandOutput(List<Entry> entries) {
+        this.entries.addAll(entries);
+    }
+    */
+
 
     /**
      * _more_
@@ -112,6 +156,45 @@ public class CommandOutput {
     public List<Entry> getEntries() {
         return entries;
     }
+
+
+    /**
+     * Get the operands
+     *
+     * @return the operands or an empty list
+     */
+    public List<CommandOperand> getOperands() {
+        List<CommandOperand> operands  =  new ArrayList<CommandOperand>();
+        for(Entry entry: entries) {
+            operands.add(new CommandOperand(entry.getName(), entry));
+        }
+
+        return operands;
+    }
+
+    /**
+     * Get the DataProcessOutput type
+     *
+     * @return
+     */
+    public int getDataProcessOutputType() {
+        if (entries.isEmpty()) {
+            return DATAPROCESS_OUTPUT_EMPTY;
+        }
+
+        return DATAPROCESS_OUTPUT_OPERAND;
+    }
+
+    /**
+     * Check if this has output
+     *
+     * @return  true if output type is not EMPTY
+     */
+    public boolean hasOutput() {
+        return getDataProcessOutputType() != DATAPROCESS_OUTPUT_EMPTY;
+    }
+
+
 
     /**
      * _more_

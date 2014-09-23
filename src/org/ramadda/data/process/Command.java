@@ -200,6 +200,14 @@ public class Command extends RepositoryManager {
         init(null, element, null);
     }
 
+    public Command(Repository repository, String id, String label) {
+        super(repository);
+        this.id = id;
+        this.label = label;
+    }
+
+
+
 
     /**
      * _more_
@@ -591,18 +599,18 @@ public class Command extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public int makeForm(Request request, Entry primaryEntry, Appendable sb)
+    public int addToForm(Request request, CommandInput input, Appendable sb)
         throws Exception {
         initCommand();
         if (link != null) {
-            return link.makeForm(request, primaryEntry, sb);
+            return link.addToForm(request, input, sb);
         }
 
         if (haveChildren()) {
             int cnt = 0;
             for (Command child : children) {
                 StringBuffer tmpSB = new StringBuffer();
-                int blockCnt = child.makeForm(request, primaryEntry, tmpSB);
+                int blockCnt = child.addToForm(request, input, tmpSB);
                 cnt += blockCnt;
                 if (blockCnt > 0) {
                     sb.append(HtmlUtils.p());
@@ -615,7 +623,7 @@ public class Command extends RepositoryManager {
             return cnt;
         }
 
-        return makeFormInner(request, primaryEntry, sb);
+        return addToFormInner(request, input, sb);
     }
 
     /**
@@ -629,7 +637,7 @@ public class Command extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    private int makeFormInner(Request request, Entry primaryEntry,
+    private int addToFormInner(Request request, CommandInput input,
                               Appendable sb)
             throws Exception {
 
@@ -660,7 +668,7 @@ public class Command extends RepositoryManager {
             if (arg.isRequired()) {
                 anyRequired = true;
             }
-            addArgToForm(request, primaryEntry, catBuff, arg);
+            addArgToForm(request, input, catBuff, arg);
 
 
 
@@ -688,49 +696,52 @@ public class Command extends RepositoryManager {
     }
 
 
-    public void addArgToForm(Request request, Entry primaryEntry,
+    public void addArgToForm(Request request, CommandInput input,
                              Appendable catBuff, Arg arg) throws Exception {
         String       tooltip = arg.getPrefix();
-        StringBuffer input   = new StringBuffer();
+        StringBuffer inputHtml   = new StringBuffer();
         if (arg.isEnumeration()) {
-            input.append(HtmlUtils.select(arg.getUrlArg(),
+            inputHtml.append(HtmlUtils.select(arg.getUrlArg(),
                                           arg.getValues(), (List) null, "", 100));
         } else if (arg.isFlag()) {
             if (arg.getGroup() != null) {
                 boolean selected = request.getString(arg.getGroup(),
                                                      "").equals(arg.getValue());
-                input.append(HtmlUtils.radio(arg.getGroup(),
+                inputHtml.append(HtmlUtils.radio(arg.getGroup(),
                                              arg.getValue(), selected));
             } else {
-                input.append(HtmlUtils.checkbox(arg.getUrlArg(), "true",
+                inputHtml.append(HtmlUtils.checkbox(arg.getUrlArg(), "true",
                                                 request.get(arg.getUrlArg(), false)));
             }
 
-            input.append(HtmlUtils.space(2));
-            input.append(arg.getHelp());
-            catBuff.append(HtmlUtils.formEntry("", input.toString(), 2));
+            inputHtml.append(HtmlUtils.space(2));
+            inputHtml.append(arg.getHelp());
+            catBuff.append(HtmlUtils.formEntry("", inputHtml.toString(), 2));
 
             return;
         } else if (arg.isFile()) {
             //noop
         } else if (arg.isEntry()) {
+            List<Entry> entries = input.getEntries();
+            Entry primaryEntry = (entries.size()==0?null:entries.get(0));
+
             if ((primaryEntry != null) && arg.isPrimaryEntry()) {
                 return;
             } else {
                 if (arg.getEntryType() != null) {
                     request.put(ARG_ENTRYTYPE, arg.getEntryType());
                 }
-                input.append(OutputHandler.getSelect(request,
+                inputHtml.append(OutputHandler.getSelect(request,
                                                      arg.getUrlArg(), msg("Select"), true, null));
-                input.append(
+                inputHtml.append(
                              HtmlUtils.hidden(
                                               arg.getUrlArg() + "_hidden",
                                               request.getString(
                                                                 arg.getUrlArg() + "_hidden",
                                                                 ""), HtmlUtils.id(
                                                                                   arg.getUrlArg() + "_hidden")));
-                input.append(HtmlUtils.space(1));
-                input.append(HtmlUtils.disabledInput(arg.getUrlArg(),
+                inputHtml.append(HtmlUtils.space(1));
+                inputHtml.append(HtmlUtils.disabledInput(arg.getUrlArg(),
                                                      request.getString(arg.getUrlArg(), ""),
                                                      HtmlUtils.SIZE_60
                                                      + HtmlUtils.id(arg.getUrlArg())));
@@ -743,20 +754,20 @@ public class Command extends RepositoryManager {
             if (arg.placeHolder != null) {
                 extra += HtmlUtils.attr("placeholder", arg.placeHolder);
             }
-            input.append(
+            inputHtml.append(
                          HtmlUtils.input(
                                          arg.getUrlArg(),
                                          request.getString(arg.getUrlArg(), ""), extra));
         }
-        if (input.length() == 0) {
+        if (inputHtml.length() == 0) {
             return;
         }
         if (arg.isRequired()) {
-            input.append(HtmlUtils.space(1));
-            input.append("<span class=ramadda-required-label>*</span>");
+            inputHtml.append(HtmlUtils.space(1));
+            inputHtml.append("<span class=ramadda-required-label>*</span>");
         }
 
-        makeFormEntry(catBuff, arg.getLabel(), input.toString(),
+        makeFormEntry(catBuff, arg.getLabel(), inputHtml.toString(),
                       arg.getHelp());
     }
 
@@ -898,6 +909,20 @@ public class Command extends RepositoryManager {
         return inputs;
     }
 
+
+    /**
+     * Can we handle this type of DataProcessInput?
+     *
+     * @param dpi DataProcessInput
+     * @return true if we can handle
+     */
+    public  boolean canHandle(CommandInput dpi) {
+        List<Entry> entries = dpi.getEntries();
+        if(entries.size()==0) return false;
+        return isApplicable(entries.get(0));
+    }
+
+
     /**
      * _more_
      *
@@ -984,8 +1009,7 @@ public class Command extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public CommandOutput evaluate(Request request, Entry entry,
-                                  CommandInfo info)
+    public CommandOutput evaluate(Request request, CommandInfo info, CommandInput input)
             throws Exception {
 
         CommandOutput myOutput = new CommandOutput();
@@ -994,6 +1018,8 @@ public class Command extends RepositoryManager {
         for (File f : info.getWorkDir().listFiles()) {
             existingFiles.add(f);
         }
+        Entry entry = input.getEntries().get(0);
+
         HashSet<File> newFiles      = new HashSet<File>();
         if (haveChildren()) {
             CommandOutput childOutput = null;
@@ -1009,8 +1035,7 @@ public class Command extends RepositoryManager {
                     }
                 }
 
-                childOutput = child.evaluate(request, primaryEntryForChild,
-                                             info);
+                childOutput = child.evaluate(request, info, input);
                 if ( !childOutput.isOk()) {
                     return childOutput;
                 }
