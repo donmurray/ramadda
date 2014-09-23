@@ -21,7 +21,7 @@
 package org.ramadda.repository.job;
 
 
-import org.ramadda.data.process.Command;
+import org.ramadda.data.process.Service;
 import org.ramadda.data.record.*;
 import org.ramadda.data.record.filter.*;
 
@@ -132,11 +132,11 @@ public class JobManager extends RepositoryManager {
 
 
     /** _more_ */
-    private Hashtable<String, Command> commandMap = new Hashtable<String,
-                                                        Command>();
+    private Hashtable<String, Service> commandMap = new Hashtable<String,
+                                                        Service>();
 
     /** _more_ */
-    private List<Command> commands = new ArrayList<Command>();
+    private List<Service> commands = new ArrayList<Service>();
 
 
     /** _more_ */
@@ -197,7 +197,7 @@ public class JobManager extends RepositoryManager {
      *
      * @return _more_
      */
-    public List<Command> getCommands() {
+    public List<Service> getServices() {
         return commands;
     }
 
@@ -208,7 +208,7 @@ public class JobManager extends RepositoryManager {
      *
      * @return _more_
      */
-    public Command getCommand(String id) {
+    public Service getService(String id) {
         return commandMap.get(id);
     }
 
@@ -220,12 +220,12 @@ public class JobManager extends RepositoryManager {
      *
      * @return _more_
      */
-    public Command addCommand(Command command) {
-        Command existingCommand = commandMap.get(command.getId());
-        if (existingCommand != null) {
-            return existingCommand;
+    public Service addService(Service command) {
+        Service existingService = commandMap.get(command.getId());
+        if (existingService != null) {
+            return existingService;
         }
-        //        System.err.println ("JobManager.addCommand:"+ command.getId());
+        //        System.err.println ("JobManager.addService:"+ command.getId());
         commandMap.put(command.getId(), command);
         commands.add(command);
 

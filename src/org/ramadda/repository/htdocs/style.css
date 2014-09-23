@@ -1882,7 +1882,7 @@ a.toggleblocklabellink:visited {
 }
 
 
-.command-form {
+.service-form {
   background: #fffeec;
   padding:10px;
   padding-right:50px;
@@ -1893,7 +1893,7 @@ a.toggleblocklabellink:visited {
    margin-right: 10px;
 }
  
-.command-form .ramadda-heading-1 {
+.service-form .ramadda-heading-1 {
   border-top-left-radius: 6px;
   border-bottom: 1px #aaa solid;
   margin-top:5px;
@@ -1904,17 +1904,17 @@ a.toggleblocklabellink:visited {
 //  font-weight: normal;
 }
 
-.command-help {
+.service-help {
   padding-left:8px;
 }
 
-.command-form-help  {
+.service-form-help  {
    max-width: 600px; 
    max-height: 100px; 
    overflow-y: auto;
 }
 
-.command-output {
+.service-output {
    max-height: 200px; 
    overflow-y: auto;
   border : 1px black solid;

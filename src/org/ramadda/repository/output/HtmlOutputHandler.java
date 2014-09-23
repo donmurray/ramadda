@@ -215,7 +215,7 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public String getHtmlHeader(Request request, Entry entry) {
+    public String getHtmlHeader(Request request, Entry entry) throws Exception {
         if (entry.isDummy() || !entry.isGroup()) {
             return "";
         }
@@ -234,13 +234,13 @@ public class HtmlOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public String makeHtmlHeader(Request request, Entry entry, String title) {
+    public String makeHtmlHeader(Request request, Entry entry, String title) throws Exception {
         OutputType[] types = new OutputType[] { OUTPUT_INFO, OUTPUT_TABLE,
         /*OUTPUT_GRID,*/
         OUTPUT_TREEVIEW, CalendarOutputHandler.OUTPUT_TIMELINE,
                 CalendarOutputHandler.OUTPUT_CALENDAR };
-        StringBuffer sb =
-            new StringBuffer(
+        Appendable sb =
+            new StringBuilder(
                 "<table border=0 cellspacing=0 cellpadding=0><tr>");
         String selected = request.getString(ARG_OUTPUT, OUTPUT_INFO.getId());
         if (title.length() > 0) {
@@ -544,7 +544,7 @@ public class HtmlOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     private void handleDefaultWiki(Request request, Entry entry,
-                                   StringBuffer sb, List<Entry> folders,
+                                   Appendable sb, List<Entry> folders,
                                    List<Entry> files)
             throws Exception {
         String wikiTemplate = getWikiText(request, entry);

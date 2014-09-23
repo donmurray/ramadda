@@ -40,7 +40,7 @@ import org.ramadda.repository.database.DatabaseManager;
 import org.ramadda.repository.database.Tables;
 import org.ramadda.repository.ftp.FtpManager;
 import org.ramadda.repository.harvester.HarvesterManager;
-import org.ramadda.data.process.Command;
+import org.ramadda.data.process.Service;
 import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.map.MapManager;
 import org.ramadda.repository.metadata.ContentMetadataHandler;
@@ -1414,29 +1414,29 @@ public class Repository extends RepositoryBase implements RequestHandler,
      */
     private void loadOutputHandlers() throws Exception {
         for (String commandFile : getPluginManager().getAllFiles()) {
-            if ( !commandFile.endsWith("commands.xml")) {
+            if ( !commandFile.endsWith("services.xml")) {
                 continue;
             }
-            if (getPluginManager().haveSeen("commands:" + commandFile)) {
+            if (getPluginManager().haveSeen("services:" + commandFile)) {
                 continue;
             }
             Element  root  = XmlUtil.getRoot(commandFile, getClass());
 
-            NodeList nodes = XmlUtil.getElements(root, Command.TAG_COMMAND);
+            NodeList nodes = XmlUtil.getElements(root, Service.TAG_SERVICE);
 
             for (int i = 0; i < nodes.getLength(); i++) {
                 Element node = (Element) nodes.item(i);
                 Constructor ctor =
                     Misc.findConstructor(Misc.findClass(XmlUtil.getAttribute(node,
                         "handler",
-                        "org.ramadda.data.process.Command")), new Class[] {
+                        "org.ramadda.data.process.Service")), new Class[] {
                             Repository.class,
                             Element.class });
-                Command command = (Command) ctor.newInstance(new Object[] {
+                Service command = (Service) ctor.newInstance(new Object[] {
                                       this,
                                       node });
-                //               Command command =  new Command(this, node);
-                getJobManager().addCommand(command);
+                //               Service command =  new Service(this, node);
+                getJobManager().addService(command);
             }
         }
 

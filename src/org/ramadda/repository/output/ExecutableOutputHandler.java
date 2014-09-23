@@ -22,9 +22,10 @@ package org.ramadda.repository.output;
 
 
 import org.ramadda.repository.*;
-import org.ramadda.data.process.Command;
-import org.ramadda.data.process.CommandInfo;
-import org.ramadda.data.process.CommandOutput;
+import org.ramadda.data.process.Service;
+import org.ramadda.data.process.ServiceInfo;
+import org.ramadda.data.process.ServiceInput;
+import org.ramadda.data.process.ServiceOutput;
 import org.ramadda.data.process.OutputDefinition;
 import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.type.*;
@@ -76,7 +77,7 @@ public class ExecutableOutputHandler extends OutputHandler {
     private OutputType outputType;
 
     /** _more_ */
-    private Command command;
+    private Service command;
 
     /**
      * _more_
@@ -103,7 +104,7 @@ public class ExecutableOutputHandler extends OutputHandler {
         String commandId = XmlUtil.getAttribute(element, "commandId",
                                (String) null);
         if (commandId != null) {
-            command = getRepository().getJobManager().getCommand(commandId);
+            command = getRepository().getJobManager().getService(commandId);
             if (command == null) {
                 throw new IllegalStateException(
                     "ExecutableOutputHandler: could not find command:"
@@ -114,13 +115,13 @@ public class ExecutableOutputHandler extends OutputHandler {
 
         if (command == null) {
             NodeList children = XmlUtil.getElements(element,
-                                    Command.TAG_COMMAND);
+                                    Service.TAG_SERVICE);
             Element commandNode = element;
             if (children.getLength() > 0) {
                 commandNode = (Element) children.item(0);
             }
-            command = new Command(getRepository(), commandNode);
-            getRepository().getJobManager().addCommand(command);
+            command = new Service(getRepository(), commandNode);
+            getRepository().getJobManager().addService(command);
         }
 
 
@@ -149,7 +150,7 @@ public class ExecutableOutputHandler extends OutputHandler {
      *
      * @return _more_
      */
-    public Command getCommand() {
+    public Service getService() {
         return command;
     }
 
@@ -229,9 +230,9 @@ public class ExecutableOutputHandler extends OutputHandler {
 
         boolean           forDisplay  = request.exists(ARG_SHOWCOMMAND);
 
-        final CommandInfo commandInfo = new CommandInfo(workDir, forDisplay);
-        commandInfo.setPublish(doingPublish(request));
-
+        final ServiceInput serviceInput  = new ServiceInput(entry);
+        final ServiceInfo serviceInfo = new ServiceInfo(workDir, forDisplay);
+        serviceInfo.setPublish(doingPublish(request));
 
         StringBuffer xml = new StringBuffer();
         xml.append(XmlUtil.tag("entry",
@@ -244,10 +245,12 @@ public class ExecutableOutputHandler extends OutputHandler {
         if (asynchronous) {
             ActionManager.Action action = new ActionManager.Action() {
                 public void run(Object actionId) throws Exception {
-                    CommandOutput output = null;
+                    ServiceOutput output = null;
                     try {
-                        output = command.evaluate(request, entry,
-                                commandInfo);
+                        //TODO:
+                        //    public ServiceOutput evaluate(Request request, ServiceInfo info, ServiceInput input)
+                        //                        output = command.evaluate(request, entry,
+                        output = command.evaluate(request, serviceInfo, serviceInput);
                         if ( !output.isOk()) {
                             getActionManager().setContinueHtml(
                                 actionId,
@@ -269,8 +272,8 @@ public class ExecutableOutputHandler extends OutputHandler {
                     }
                     String url =
                         getStorageManager().getProcessDirEntryUrl(request,
-                            commandInfo.getWorkDir());
-                    if (commandInfo.getPublish()
+                            serviceInfo.getWorkDir());
+                    if (serviceInfo.getPublish()
                             && (output.getEntries().size() > 0)) {
                         url = request.entryUrl(
                             getRepository().URL_ENTRY_SHOW,
@@ -285,7 +288,8 @@ public class ExecutableOutputHandler extends OutputHandler {
                     outputType.getLabel(), "");
 
         }
-        CommandOutput output = command.evaluate(request, entry, commandInfo);
+        ServiceOutput output = command.evaluate(request, serviceInfo, serviceInput);
+        //command.evaluate(request, entry, serviceInfo);
 
         if ( !output.isOk()) {
             sb.append(
@@ -297,9 +301,9 @@ public class ExecutableOutputHandler extends OutputHandler {
             return new Result(outputType.getLabel(), sb);
         }
 
-        //        System.err.println ("params:" + commandInfo.getParams());
-        //        System.err.println ("entries:" + commandInfo.getEntries());
-        if (commandInfo.getPublish() && (output.getEntries().size() > 0)) {
+        //        System.err.println ("params:" + serviceInfo.getParams());
+        //        System.err.println ("entries:" + serviceInfo.getEntries());
+        if (serviceInfo.getPublish() && (output.getEntries().size() > 0)) {
             return new Result(
                 request.entryUrl(
                     getRepository().URL_ENTRY_SHOW,
@@ -324,7 +328,7 @@ public class ExecutableOutputHandler extends OutputHandler {
         if (request.get(ARG_GOTOPRODUCTS, false)) {
             return new Result(
                 getStorageManager().getProcessDirEntryUrl(
-                    request, commandInfo.getWorkDir()));
+                    request, serviceInfo.getWorkDir()));
         }
 
 
@@ -429,7 +433,8 @@ public class ExecutableOutputHandler extends OutputHandler {
                                            + msg("Asynchronous")));
         }
 
-        command.makeForm(request, entry, sb);
+
+        command.addToForm(request, new ServiceInput(entry), sb);
 
         sb.append(HtmlUtils.p());
         sb.append(HtmlUtils.submit(command.getLabel(), ARG_EXECUTE,
@@ -453,7 +458,7 @@ public class ExecutableOutputHandler extends OutputHandler {
         etc.append(HtmlUtils.formTableClose());
 
         etc.append(HtmlUtils.p());
-        etc.append(HtmlUtils.submit(msg("Show Command"), ARG_SHOWCOMMAND,
+        etc.append(HtmlUtils.submit(msg("Show Service"), ARG_SHOWCOMMAND,
                                     ""));
         addUrlShowingForm(etc, formId, null);
         etc.append(HtmlUtils.br());
