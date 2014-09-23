@@ -22,18 +22,18 @@ package org.ramadda.geodata.model;
 
 
 import org.ramadda.data.process.Service;
-import org.ramadda.data.process.ServiceInput;
 import org.ramadda.data.process.ServiceInfo;
+import org.ramadda.data.process.ServiceInput;
 import org.ramadda.data.process.ServiceOperand;
 import org.ramadda.data.process.ServiceOutput;
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
-import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.Constants;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
 import org.ramadda.repository.RepositoryManager;
 import org.ramadda.repository.Request;
 import org.ramadda.repository.Resource;
+import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.util.GeoUtils;
 import org.ramadda.util.HtmlUtils;
@@ -119,8 +119,7 @@ public class NCLModelPlotDataProcess extends Service {
      */
     public void initFormJS(Request request, Appendable js, String formVar)
             throws Exception {
-        js.append(formVar
-                  + ".addService(new NCLModelPlotService());\n");
+        js.append(formVar + ".addService(new NCLModelPlotService());\n");
     }
 
 
@@ -131,12 +130,14 @@ public class NCLModelPlotDataProcess extends Service {
      * @param input    the process input
      * @param sb       the form
      *
+     *
+     * @return _more_
      * @throws Exception  problem getting the information for the form
      */
     @Override
-        public int addToForm(Request request, ServiceInput input,
-                          Appendable sb)
+    public int addToForm(Request request, ServiceInput input, Appendable sb)
             throws Exception {
+
         sb.append(HtmlUtils.formTable());
         Entry first = input.getEntries().get(0);
 
@@ -181,10 +182,9 @@ public class NCLModelPlotDataProcess extends Service {
                                            "Google Earth")));
         // units
         String units = grid.getUnitsString();
-        if (units.equalsIgnoreCase("K") || 
-            units.equalsIgnoreCase("degK") ||
-            units.equalsIgnoreCase("Kelvins") ||
-            units.equalsIgnoreCase("Kelvin") ) {
+        if (units.equalsIgnoreCase("K") || units.equalsIgnoreCase("degK")
+                || units.equalsIgnoreCase("Kelvins")
+                || units.equalsIgnoreCase("Kelvin")) {
             sb.append(
                 HtmlUtils.formEntry(
                     Repository.msgLabel("Plot Units"),
@@ -199,10 +199,10 @@ public class NCLModelPlotDataProcess extends Service {
                                            request, ARG_NCL_UNITS, "degC",
                                            false)) + Repository.msg(
                                                "Celsius")));
-        } else if (units.equalsIgnoreCase("kg m-2 s-1") || 
-                units.equalsIgnoreCase("kg/m^2/s") ||
-                units.equalsIgnoreCase("m/day") ||
-                units.equalsIgnoreCase("mm/s")) {
+        } else if (units.equalsIgnoreCase("kg m-2 s-1")
+                   || units.equalsIgnoreCase("kg/m^2/s")
+                   || units.equalsIgnoreCase("m/day")
+                   || units.equalsIgnoreCase("mm/s")) {
             sb.append(HtmlUtils.hidden(ARG_NCL_UNITS, "mm/day"));
             /*
             sb.append(
@@ -244,13 +244,16 @@ public class NCLModelPlotDataProcess extends Service {
                 + Repository.msgLabel("Override Contour Defaults")
                 + "</div>", contourSB.toString()));
         sb.append(HtmlUtils.formTableClose());
+
         return 1;
+
     }
 
     /**
      * Process the request
      *
      * @param request  the request
+     * @param info _more_
      * @param input    the ServiceInput
      *
      * @return  the output
@@ -258,16 +261,16 @@ public class NCLModelPlotDataProcess extends Service {
      * @throws Exception  problems generating the output
      */
     @Override
-     public ServiceOutput evaluate(Request request,ServiceInfo info, 
-                                            ServiceInput input)
+    public ServiceOutput evaluate(Request request, ServiceInfo info,
+                                  ServiceInput input)
             throws Exception {
 
-        List<Entry>              outputEntries = new ArrayList<Entry>();
+        List<Entry>          outputEntries = new ArrayList<Entry>();
         List<ServiceOperand> ops           = input.getOperands();
-        StringBuffer             fileList      = new StringBuffer();
-        StringBuffer             nameList      = new StringBuffer();
-        Entry                    inputEntry    = null;
-        boolean                  haveOne       = false;
+        StringBuffer         fileList      = new StringBuffer();
+        StringBuffer         nameList      = new StringBuffer();
+        Entry                inputEntry    = null;
+        boolean              haveOne       = false;
         for (ServiceOperand op : ops) {
 
             List<Entry> opEntries = op.getEntries();
@@ -402,17 +405,17 @@ public class NCLModelPlotDataProcess extends Service {
         }
 
         String mapid =
-            request.getString(NCLOutputHandler.ARG_NCL_AREA_REGIONID, "").toLowerCase().trim();
-        boolean usepolar = mapid.startsWith("nh")
-                           || mapid.startsWith("sh")
+            request.getString(NCLOutputHandler.ARG_NCL_AREA_REGIONID,
+                              "").toLowerCase().trim();
+        boolean usepolar = mapid.startsWith("nh") || mapid.startsWith("sh")
                            || mapid.startsWith("ant");
         envMap.put("usepolar", Boolean.toString(usepolar));
         if (usepolar) {
             String center = "0";
-            if ((mapid.startsWith("nh") || mapid.startsWith("sh")) &&
-                    mapid.length() > 2) {
+            if ((mapid.startsWith("nh") || mapid.startsWith("sh"))
+                    && (mapid.length() > 2)) {
                 center = mapid.substring(2);
-            } else if (mapid.startsWith("ant") && mapid.length() > 3) {
+            } else if (mapid.startsWith("ant") && (mapid.length() > 3)) {
                 center = mapid.substring(3);
             }
             //System.out.println("Map: "+mapid+", center: "+center);
@@ -426,18 +429,19 @@ public class NCLModelPlotDataProcess extends Service {
         }
         envMap.put("colormap", colormap);
         envMap.put("anom", Boolean.toString(haveAnom));
-        envMap.put("annotation",
-                   getRepository().getProperty(Constants.PROP_REPOSITORY_NAME,
-                                          ""));
-        String logo = getRepository().getProperty(Constants.PROP_LOGO_IMAGE, "");
-        if (!logo.isEmpty()) {
-            if (!logo.startsWith("http")) {
-                if (!logo.startsWith("/")) {
-                    logo = "/"+logo;
+        envMap.put(
+            "annotation",
+            getRepository().getProperty(Constants.PROP_REPOSITORY_NAME, ""));
+        String logo = getRepository().getProperty(Constants.PROP_LOGO_IMAGE,
+                          "");
+        if ( !logo.isEmpty()) {
+            if ( !logo.startsWith("http")) {
+                if ( !logo.startsWith("/")) {
+                    logo = "/" + logo;
                 }
                 logo = request.getAbsoluteUrl(logo);
             }
-            envMap.put("logo",logo);
+            envMap.put("logo", logo);
         }
 
 
@@ -445,8 +449,9 @@ public class NCLModelPlotDataProcess extends Service {
         System.err.println("env:" + envMap);
 
         //Use new repository method to execute. This gets back [stdout,stderr]
-        JobManager.CommandResults results = getRepository().getJobManager().executeCommand(commands, envMap,
-                               input.getProcessDir(), 60);
+        JobManager.CommandResults results =
+            getRepository().getJobManager().executeCommand(commands, envMap,
+                input.getProcessDir(), 60);
         String errorMsg = results.getStderrMsg();
         String outMsg   = results.getStdoutMsg();
         // Check the version
@@ -481,16 +486,15 @@ public class NCLModelPlotDataProcess extends Service {
             outType = "geo_kml";
         }
         Resource resource = new Resource(outFile, Resource.TYPE_LOCAL_FILE);
-        TypeHandler myHandler = getRepository().getTypeHandler(outType, false,
-                                    true);
+        TypeHandler myHandler = getRepository().getTypeHandler(outType,
+                                    false, true);
         Entry outputEntry = new Entry(myHandler, true, outFile.toString());
         outputEntry.setResource(resource);
         nclOutputHandler.getEntryManager().writeEntryXmlFile(request,
                 outputEntry);
         outputEntries.add(outputEntry);
-        ServiceOutput dpo =
-            new ServiceOutput(new ServiceOperand("Plot of "
-                + nameList, outputEntries));
+        ServiceOutput dpo = new ServiceOutput(new ServiceOperand("Plot of "
+                                + nameList, outputEntries));
 
         return dpo;
 

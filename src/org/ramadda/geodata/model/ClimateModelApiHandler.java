@@ -80,7 +80,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
     /** collection 2 id */
     public static final String ARG_COLLECTION2 = "collection2";
 
-    /** collection frequencey*/
+    /** collection frequencey */
     public static final String ARG_FREQUENCY = "frequency";
 
 
@@ -162,7 +162,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         //This finds the selected processes
         List<Service> processesToRun = getServices(request,
-                                               ARG_ACTION_COMPARE);
+                                           ARG_ACTION_COMPARE);
 
         //This is the dir under <home>/process
         File processDir = null;
@@ -171,14 +171,12 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             processDir = getStorageManager().createProcessDir();
         }
 
-        List<ServiceOutput> outputs   =
-            new ArrayList<ServiceOutput>();
+        List<ServiceOutput> outputs   = new ArrayList<ServiceOutput>();
         ServiceInput        nextInput = dpi;
         for (Service process : processesToRun) {
             System.err.println("MODEL: applying process: "
                                + process.getLabel());
-            ServiceOutput output = process.evaluate(request, null,
-                                                    nextInput);
+            ServiceOutput output = process.evaluate(request, null, nextInput);
             outputs.add(output);
 
             //make a new input for the next process
@@ -299,7 +297,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         //This finds the selected processes
         List<Service> processesToRun = getServices(request,
-                                               ARG_ACTION_TIMESERIES);
+                                           ARG_ACTION_TIMESERIES);
 
         //This is the dir under <home>/process
         File processDir = null;
@@ -308,14 +306,12 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             processDir = getStorageManager().createProcessDir();
         }
 
-        List<ServiceOutput> outputs   =
-            new ArrayList<ServiceOutput>();
+        List<ServiceOutput> outputs   = new ArrayList<ServiceOutput>();
         ServiceInput        nextInput = dpi;
         for (Service process : processesToRun) {
             System.err.println("MODEL: applying process: "
                                + process.getLabel());
-            ServiceOutput output = process.evaluate(request, null,
-                                           nextInput);
+            ServiceOutput output = process.evaluate(request, null, nextInput);
             outputs.add(output);
 
             //make a new input for the next process
@@ -480,10 +476,10 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         Hashtable<String, StringBuilder> extra = new Hashtable<String,
                                                      StringBuilder>();
-        List<ServiceOperand> operands =
-            new ArrayList<ServiceOperand>();
+        List<ServiceOperand> operands = new ArrayList<ServiceOperand>();
 
-        File processDir = getStorageManager().createProcessDir();
+        File processDir               =
+            getStorageManager().createProcessDir();
 
         //If we are searching or comparing then find the selected entries
         if (request.exists(ARG_ACTION_SEARCH) || request.exists(type)) {
@@ -552,9 +548,9 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
 
 
-        StringBuilder    sb  = new StringBuilder();
-        ServiceInput dpi = new ServiceInput(processDir, operands);
-        
+        StringBuilder sb  = new StringBuilder();
+        ServiceInput  dpi = new ServiceInput(processDir, operands);
+
         if (request.exists(type)) {
             if (hasOperands) {
                 try {
@@ -566,7 +562,9 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 } catch (Exception exc) {
                     if (returnjson) {
                         StringBuilder data = new StringBuilder();
-                        data.append(Json.mapAndQuote("error", exc.getMessage()));
+                        data.append(Json.mapAndQuote("error",
+                                exc.getMessage()));
+
                         return new Result("", data, Json.MIMETYPE);
                     } else {
                         sb.append(
@@ -578,10 +576,12 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 if (returnjson) {
                     StringBuilder data = new StringBuilder();
                     data.append(Json.map("error", "No fields selected."));
+
                     return new Result("", data, Json.MIMETYPE);
                 } else {
                     sb.append(
-                        getPageHandler().showDialogWarning("No fields selected"));
+                        getPageHandler().showDialogWarning(
+                            "No fields selected"));
                 }
             }
         }
@@ -613,7 +613,8 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             //sb.append(HtmlUtils.script(
             //    "$(document).ready(function() {\n $(\"a.popup_image\").fancybox({\n 'titleShow' : false\n });\n });\n"));
         } else {
-            sb.append(HtmlUtils.form(getTimeSeriesUrlPath(request), formAttrs));
+            sb.append(HtmlUtils.form(getTimeSeriesUrlPath(request),
+                                     formAttrs));
             getWikiManager().addDisplayImports(request, sb);
         }
 
@@ -627,11 +628,13 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         List<Service> processes = getServices(request, type);
 
 
-        String            formType  = "compare";
-        String helpFile = "/org/ramadda/geodata/model/htdocs/model/compare.html";
+        String        formType  = "compare";
+        String helpFile =
+            "/org/ramadda/geodata/model/htdocs/model/compare.html";
         if (type.equals(ARG_ACTION_TIMESERIES)) {
             formType = "timeseries";
-            helpFile = "/org/ramadda/geodata/model/htdocs/model/timeseries.html";
+            helpFile =
+                "/org/ramadda/geodata/model/htdocs/model/timeseries.html";
         }
         StringBuilder js =
             new StringBuilder("\n//collection form initialization\n");
@@ -667,9 +670,10 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             sb.append(HtmlUtils.hidden(ARG_COLLECTION,
                                        fixedCollection.getId()));
         }
-        
+
         if (request.defined(ARG_FREQUENCY)) {
-            sb.append(HtmlUtils.hidden(ARG_FREQUENCY, request.getString(ARG_FREQUENCY)));
+            sb.append(HtmlUtils.hidden(ARG_FREQUENCY,
+                                       request.getString(ARG_FREQUENCY)));
         }
 
         sb.append("<table><tr valign=\"center\" align=\"left\">\n");
@@ -699,7 +703,8 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                             msg("Making Time Series, Please Wait") + "...")));
             }
         } else {
-            sb.append("<td width=\"800px\" class=\"model-header\" height=\"30px\">&nbsp;");
+            sb.append(
+                "<td width=\"800px\" class=\"model-header\" height=\"30px\">&nbsp;");
         }
         sb.append("</td>");
         sb.append("</tr>\n<tr valign=\"top\">");
@@ -842,14 +847,16 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             sb.append("<td width=\"800px\">");
             sb.append("<div id=\"" + formId + "_output\">");
             try {
-                String helpText = getStorageManager().readSystemResource(helpFile);
+                String helpText =
+                    getStorageManager().readSystemResource(helpFile);
                 sb.append(helpText);
             } catch (Exception excp) {}
             sb.append("</div>");
             sb.append("</td>");
         } else {
             sb.append("<tr><td colspan=\"2\" align=\"center\">");
-            sb.append(HtmlUtils.submit("Update Data Selection", ARG_ACTION_SEARCH,
+            sb.append(HtmlUtils.submit("Update Data Selection",
+                                       ARG_ACTION_SEARCH,
                                        HtmlUtils.id(formId + "_submit")
                                        + makeButtonSubmitDialog(sb,
                                            msg("Searching for new data")
@@ -908,7 +915,8 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             sb.append("<td width=\"800px\">");
             sb.append("<div id=\"" + formId + "_output\">");
             try {
-                String helpText = getStorageManager().readSystemResource(helpFile);
+                String helpText =
+                    getStorageManager().readSystemResource(helpFile);
                 sb.append(helpText);
             } catch (Exception excp) {}
             sb.append("</div>");
@@ -947,6 +955,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             args.append("=");
             args.append(request.getString(ARG_FREQUENCY));
         }
+
         return args.toString();
     }
 
@@ -995,12 +1004,13 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 clauses.add(Clause.eq(column.getName(), v));
             } else {
                 haveAllFields = false;
+
                 break;
             }
         }
         //If we have a fixed collection then don't do the search if no fields were selected
         //if ( !haveAllFields && request.defined(ARG_COLLECTION)) {
-        if ( !haveAllFields ) {
+        if ( !haveAllFields) {
             return new ArrayList<Entry>();
         }
 
@@ -1127,27 +1137,33 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
     /**
      *  return the main entry point URL
      *
+     *
+     * @param request _more_
      * @return  the main entry point
      */
     private String getCompareUrlPath(Request request) {
         //Use the collection type in the path. This is defined in the api.xml file
-        StringBuilder base = new StringBuilder(getRepository().getUrlBase()); 
+        StringBuilder base = new StringBuilder(getRepository().getUrlBase());
         base.append("/model/compare");
         if (request.defined(ARG_FREQUENCY)) {
             base.append("?");
             base.append(getFrequencyArgs(request));
         }
-        return  base.toString();
+
+        return base.toString();
     }
 
     /**
      *  return the main entry point URL
      *
+     *
+     * @param request _more_
      * @return  the main entry point
      */
     private String getTimeSeriesUrlPath(Request request) {
         //Use the collection type in the path. This is defined in the api.xml file
         String base = getRepository().getUrlBase() + "/model/timeseries";
+
         return base;
     }
 
@@ -1182,8 +1198,8 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         tmpRequest.put(ARG_TYPE, collectionType);
         List<Clause> fclause = new ArrayList<Clause>();
         if (request.defined(ARG_FREQUENCY)) {
-            tmpRequest.put(Column.ARG_SEARCH_PREFIX+collectionType+"."+ARG_FREQUENCY, 
-                    request.getString(ARG_FREQUENCY));
+            tmpRequest.put(Column.ARG_SEARCH_PREFIX + collectionType + "."
+                           + ARG_FREQUENCY, request.getString(ARG_FREQUENCY));
         }
 
         List<Entry> collections =

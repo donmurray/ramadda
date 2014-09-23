@@ -130,7 +130,7 @@ public class ClimateCollectionTypeHandler extends CollectionTypeHandler {
         StringBuilder sb = new StringBuilder();
         sb.append(entry.getDescription());
         StringBuilder js     = new StringBuilder();
-        String       formId = openForm(request, entry, sb, js);
+        String        formId = openForm(request, entry, sb, js);
 
         addSelectorWidgets(request, entry, sb, js, formId);
         addProcessWidgets(request, entry, sb, js, formId);
@@ -169,13 +169,14 @@ public class ClimateCollectionTypeHandler extends CollectionTypeHandler {
                                           HtmlUtils.call(formId
                                               + ".download", "event"));
         String bdownloadButton = JQ.button("Get Download Script",
-                                          formId + "_do_bulkdownload", js,
-                                          HtmlUtils.call(formId
-                                              + ".bulkdownload", "event"));
+                                           formId + "_do_bulkdownload", js,
+                                           HtmlUtils.call(formId
+                                               + ".bulkdownload", "event"));
         selectorSB.append(HtmlUtils.formEntry("",
-                HtmlUtils.center(searchButton))); 
-        selectorSB.append(HtmlUtils.formEntry("", HtmlUtils.center(downloadButton +
-                HtmlUtils.space(4) + bdownloadButton)));
+                HtmlUtils.center(searchButton)));
+        selectorSB.append(HtmlUtils.formEntry("",
+                HtmlUtils.center(downloadButton + HtmlUtils.space(4)
+                                 + bdownloadButton)));
         selectorSB.append(HtmlUtils.formTableClose());
 
 
@@ -230,8 +231,8 @@ JQ.button(
                             "Time Series", formId + "_do_timeseries", js,
                             HtmlUtils.call(
                                 formId + ".makeTimeSeries", "event"));
-        List<String> processTabs   = new ArrayList<String>();
-        List<String> processTitles = new ArrayList<String>();
+        List<String>  processTabs   = new ArrayList<String>();
+        List<String>  processTitles = new ArrayList<String>();
 
         StringBuilder settingsSB    = new StringBuilder();
         settingsSB.append(HtmlUtils.radio(ARG_DATA_PROCESS_ID, "none", true));
@@ -309,8 +310,7 @@ JQ.button(
      *
      * @throws Exception _more_
      */
-    public List<Service> getServicesToRun(Request request)
-            throws Exception {
+    public List<Service> getServicesToRun(Request request) throws Exception {
         List<Service> processesToRun = new ArrayList<Service>();
         String selectedProcess = request.getString(ARG_DATA_PROCESS_ID,
                                      (String) null);
@@ -331,7 +331,7 @@ JQ.button(
      *
      * @param request  the Request
      * @param entry    the Entry
-     * @param doDownload  true to download the result
+     * @param type _more_
      *
      * @return  the Result of the Request
      *
@@ -349,9 +349,9 @@ JQ.button(
 
         List<File>  files   = new ArrayList<File>();
         //Process each one in turn
-        boolean           didProcess     = false;
+        boolean       didProcess     = false;
         List<Service> processesToRun = getServicesToRun(request);
-        File              processDir = getStorageManager().createProcessDir();
+        File          processDir     = getStorageManager().createProcessDir();
         for (Service process : processesToRun) {
             System.err.println("MODEL: applying process: "
                                + process.getLabel());

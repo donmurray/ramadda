@@ -98,15 +98,17 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
      * @param input _more_
      * @param sb _more_
      *
+     *
+     * @return _more_
      * @throws Exception _more_
      */
     @Override
-    public int addToForm(Request request, ServiceInput input,
-                          Appendable sb)
+    public int addToForm(Request request, ServiceInput input, Appendable sb)
             throws Exception {
         sb.append(HtmlUtils.formTable());
         makeInputForm(request, input, sb);
         sb.append(HtmlUtils.formTableClose());
+
         return 1;
     }
 
@@ -155,6 +157,7 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
      * _more_
      *
      * @param request _more_
+     * @param info _more_
      * @param input _more_
      *
      * @return _more_
@@ -162,17 +165,15 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
      * @throws Exception _more_
      */
     @Override
-    public ServiceOutput evaluate(Request request,
-                                  ServiceInfo info,
+    public ServiceOutput evaluate(Request request, ServiceInfo info,
                                   ServiceInput input)
             throws Exception {
         if ( !canHandle(input)) {
             throw new Exception("Illegal data type");
         }
 
-        List<ServiceOperand> outputEntries =
-            new ArrayList<ServiceOperand>();
-        int opNum = 0;
+        List<ServiceOperand> outputEntries = new ArrayList<ServiceOperand>();
+        int                  opNum         = 0;
         for (ServiceOperand op : input.getOperands()) {
             Entry oneOfThem = op.getEntries().get(0);
             Entry collection = GranuleTypeHandler.getCollectionEntry(request,
@@ -225,19 +226,26 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
      *
      * @param request  the Request
      * @param sb       the HTML
-    public void addStatsWidget(Request request, Appendable sb) throws Exception {
-        sb.append(
-            HtmlUtils.formEntry(
-                Repository.msgLabel("Statistic"),
-                HtmlUtils.radio(
-                    CDOOutputHandler.ARG_CDO_STAT,
-                    CDOOutputHandler.STAT_MEAN, true) + Repository.msg(
-                        "Mean") + HtmlUtils.space(2)
-                                + HtmlUtils.radio(
-                                    CDOOutputHandler.ARG_CDO_STAT,
-                                    CDOOutputHandler.STAT_ANOM,
-                                    false) + Repository.msg("Anomaly")));
-    }
+     * public void addStatsWidget(Request request, Appendable sb) throws Exception {
+     *   sb.append(
+     *       HtmlUtils.formEntry(
+     *           Repository.msgLabel("Statistic"),
+     *           HtmlUtils.radio(
+     *               CDOOutputHandler.ARG_CDO_STAT,
+     *               CDOOutputHandler.STAT_MEAN, true) + Repository.msg(
+     *                   "Mean") + HtmlUtils.space(2)
+     *                           + HtmlUtils.radio(
+     *                               CDOOutputHandler.ARG_CDO_STAT,
+     *                               CDOOutputHandler.STAT_ANOM,
+     *                               false) + Repository.msg("Anomaly")));
+     * }
+     * @param dpi _more_
+     * @param op _more_
+     * @param opNum _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
      */
 
 
@@ -346,7 +354,7 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
         }
 
         StringBuilder outputName = new StringBuilder();
-        Object[]     values     = oneOfThem.getValues();
+        Object[]      values     = oneOfThem.getValues();
         // values = collection,model,experiment,ens,var
         // model
         outputName.append(values[1].toString().toUpperCase());

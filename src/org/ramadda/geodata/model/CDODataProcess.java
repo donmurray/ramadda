@@ -21,11 +21,6 @@
 package org.ramadda.geodata.model;
 
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-
 import org.ramadda.data.process.DataProcess;
 import org.ramadda.data.process.ServiceInput;
 import org.ramadda.repository.Association;
@@ -44,6 +39,13 @@ import org.ramadda.sql.Clause;
 import org.ramadda.util.HtmlUtils;
 
 import ucar.unidata.util.IOUtil;
+
+
+import java.io.File;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 
 /**
@@ -73,7 +75,7 @@ public abstract class CDODataProcess extends DataProcess {
     public CDODataProcess(Repository repository, String id, String label)
             throws Exception {
         super(repository, id, label);
-        outputHandler   = new CDOOutputHandler(repository);
+        outputHandler = new CDOOutputHandler(repository);
     }
 
 
@@ -239,8 +241,11 @@ public abstract class CDODataProcess extends DataProcess {
      *
      * @param request  the Request
      * @param sb       the HTML
+     *
+     * @throws Exception _more_
      */
-    public void addStatsWidget(Request request, Appendable sb) throws Exception {
+    public void addStatsWidget(Request request, Appendable sb)
+            throws Exception {
         sb.append(
             HtmlUtils.formEntry(
                 Repository.msgLabel("Statistic"),

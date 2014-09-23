@@ -21,13 +21,6 @@
 package org.ramadda.geodata.model;
 
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.ImportHandler;
 import org.ramadda.repository.Repository;
@@ -38,6 +31,15 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
+
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 
 /**
@@ -138,7 +140,7 @@ public class OpendapImporter extends ImportHandler {
                 String pattern =
                     line
                     .substring(ClimateModelFileTypeHandler.PROP_FILE_PATTERN
-                        .length()+1);
+                        .length() + 1);
                 if ( !pattern.isEmpty()) {
                     filepattern  = pattern;
                     patternNames = new ArrayList<String>();
@@ -160,20 +162,20 @@ public class OpendapImporter extends ImportHandler {
             //String  file       = IOUtil.getFileTail(name);
             // if it comes from RAMADDA, strip off the /entry.das
             name = name.replaceAll("/entry.das", "");
-            
+
             String  file       = IOUtil.getFileTail(name);
             String  model      = "";
             String  experiment = "";
             String  ensemble   = "mean";
             String  variable   = "";
-            Matcher matcher          = myPattern.matcher(file);
+            Matcher matcher    = myPattern.matcher(file);
             if ( !matcher.find()) {
                 System.err.println("no match for: " + file);
 
                 // TODO:  should we continue?
                 continue;
             }
-            
+
             for (int dataIdx = 0; dataIdx < patternNames.size(); dataIdx++) {
                 String dataName = patternNames.get(dataIdx);
                 if ( !Utils.stringDefined(dataName)) {
@@ -181,13 +183,13 @@ public class OpendapImporter extends ImportHandler {
                 }
                 String value = (String) matcher.group(dataIdx + 1);
                 if (dataName.equals("model")) {
-                      model = value;
+                    model = value;
                 } else if (dataName.equals("experiment")) {
-                      experiment = value;
+                    experiment = value;
                 } else if (dataName.equals("ensemble")) {
-                      ensemble = value;
+                    ensemble = value;
                 } else if (dataName.equals("variable")) {
-                      variable = value;
+                    variable = value;
                 }
             }
 

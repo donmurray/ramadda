@@ -21,8 +21,10 @@
 package org.ramadda.geodata.model;
 
 
-import org.ramadda.data.process.ServiceInput;
 import org.ramadda.data.process.ServiceInfo;
+
+
+import org.ramadda.data.process.ServiceInput;
 import org.ramadda.data.process.ServiceOperand;
 import org.ramadda.data.process.ServiceOutput;
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
@@ -101,15 +103,17 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @param input    the ServiceInput
      * @param sb       the form
      *
+     *
+     * @return _more_
      * @throws Exception  problem adding to the form
      */
-@Override
-    public int addToForm(Request request, ServiceInput input,
-                          Appendable sb)
+    @Override
+    public int addToForm(Request request, ServiceInput input, Appendable sb)
             throws Exception {
         sb.append(HtmlUtils.formTable());
         makeInputForm(request, input, sb);
         sb.append(HtmlUtils.formTableClose());
+
         return 1;
     }
 
@@ -156,13 +160,14 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * Process the request
      *
      * @param request  The request
+     * @param info _more_
      * @param input  the  data process input
      *
      * @return  the processed data
      *
      * @throws Exception  problem processing
      */
-@Override
+    @Override
     public ServiceOutput evaluate(Request request, ServiceInfo info,
                                   ServiceInput input)
             throws Exception {
@@ -171,9 +176,8 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             throw new Exception("Illegal data type");
         }
 
-        List<ServiceOperand> outputEntries =
-            new ArrayList<ServiceOperand>();
-        int opNum = 0;
+        List<ServiceOperand> outputEntries = new ArrayList<ServiceOperand>();
+        int                  opNum         = 0;
         for (ServiceOperand op : input.getOperands()) {
             Entry oneOfThem = op.getEntries().get(0);
             Entry collection = GranuleTypeHandler.getCollectionEntry(request,
@@ -687,8 +691,11 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      *
      * @param request  the Request
      * @param sb       the HTML
+     *
+     * @throws Exception _more_
      */
-    public void addStatsWidget(Request request, Appendable sb) throws Exception {
+    public void addStatsWidget(Request request, Appendable sb)
+            throws Exception {
 
         sb.append(
             HtmlUtils.hidden(
@@ -745,9 +752,12 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @param request  the Request
      * @param sb       the StringBuilder to add to
      * @param grids    list of grids to use
+     *
+     * @throws Exception _more_
      */
     private void makeYearsWidget(Request request, Appendable sb,
-                                 List<GridDataset> grids) throws Exception {
+                                 List<GridDataset> grids)
+            throws Exception {
         int grid = 0;
         for (GridDataset dataset : grids) {
             List<CalendarDate> dates =

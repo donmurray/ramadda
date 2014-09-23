@@ -23,13 +23,13 @@ package org.ramadda.geodata.model;
 
 
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
-import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Link;
 import org.ramadda.repository.Repository;
 import org.ramadda.repository.Request;
 import org.ramadda.repository.Result;
 import org.ramadda.repository.StorageManager;
+import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.map.MapBoxProperties;
 import org.ramadda.repository.map.MapInfo;
 import org.ramadda.repository.output.OutputHandler;
@@ -259,6 +259,11 @@ public class NCLOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     @Override
     public int getProductDirTTLHours() {
         return 1;
@@ -537,7 +542,7 @@ sb.append(HtmlUtils.form(formUrl,
         }
         // TODO: HACK!
         if (lonMin == lonMax) {  // 360 got set to 0
-            lonMax+=360;
+            lonMax += 360;
         }
         envMap.put("maxLat",
                    request.getString(ARG_NCL_AREA_NORTH,
@@ -576,8 +581,9 @@ sb.append(HtmlUtils.form(formUrl,
         //System.err.println("env:" + envMap);
 
         //Use new repository method to execute. This gets back [stdout,stderr]
-        JobManager.CommandResults results = getRepository().getJobManager().executeCommand(commands, envMap,
-                               getProductDir());
+        JobManager.CommandResults results =
+            getRepository().getJobManager().executeCommand(commands, envMap,
+                getProductDir());
         String errorMsg = results.getStderrMsg();
         String outMsg   = results.getStdoutMsg();
         // Check the version

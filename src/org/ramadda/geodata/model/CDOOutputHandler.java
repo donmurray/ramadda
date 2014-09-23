@@ -27,7 +27,6 @@ import org.ramadda.data.process.ServiceInput;
 import org.ramadda.data.process.ServiceOutput;
 import org.ramadda.data.process.ServiceProvider;
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
-import org.ramadda.repository.job.JobManager;
 
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Link;
@@ -36,6 +35,7 @@ import org.ramadda.repository.Repository;
 import org.ramadda.repository.Request;
 import org.ramadda.repository.Resource;
 import org.ramadda.repository.Result;
+import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.map.MapBoxProperties;
 import org.ramadda.repository.map.MapInfo;
 import org.ramadda.repository.output.OutputHandler;
@@ -386,6 +386,11 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     @Override
     public int getProductDirTTLHours() {
         return 1;
@@ -490,7 +495,7 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
             //values[3] = experiment;
             //values[4] = member;
             //values[5] = frequency;
-            Object[]     values = entry.getValues();
+            Object[]      values = entry.getValues();
             StringBuilder header = new StringBuilder();
             header.append("Model: ");
             header.append(values[2]);
@@ -538,8 +543,11 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
      *
      * @param request  the Request
      * @param sb       the HTML
+     *
+     * @throws Exception _more_
      */
-    public void addStatsWidget(Request request, Appendable sb) throws Exception {
+    public void addStatsWidget(Request request, Appendable sb)
+            throws Exception {
         sb.append(
             HtmlUtils.formEntry(
                 msgLabel("Statistic"),
@@ -560,9 +568,12 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
      * @param request  the Request
      * @param sb       the HTML
      * @param dataset  the dataset
+     *
+     * @throws Exception _more_
      */
     public void addVarLevelWidget(Request request, Appendable sb,
-                                  GridDataset dataset) throws Exception {
+                                  GridDataset dataset)
+            throws Exception {
         addVarLevelWidget(request, sb, dataset, ARG_CDO_LEVEL);
     }
 
@@ -573,11 +584,14 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
      * @param sb       the HTML
      * @param dataset  the dataset
      * @param levelArg the level argument
+     *
+     * @throws Exception _more_
      */
     public void addVarLevelWidget(Request request, Appendable sb,
-                                  GridDataset dataset, String levelArg) throws Exception {
+                                  GridDataset dataset, String levelArg)
+            throws Exception {
         List<GridDatatype> grids = dataset.getGrids();
-        StringBuilder       varsb = new StringBuilder();
+        StringBuilder      varsb = new StringBuilder();
         //TODO: handle multiple variables
         //List<TwoFacedObject> varList = new ArrayList<TwoFacedObject>(grids.size());
         //for (GridDatatype grid : dataset.getGrids()) {
@@ -585,9 +599,9 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
         //}
 
         //varsb.append(HtmlUtils.select(ARG_CDO_PARAM, varList, request.getString(ARG_CDO_PARAM, null)));
-        GridDatatype grid = grids.get(0);
-        String longname = grid.getDescription();
-        if (longname == null || longname.isEmpty()) {
+        GridDatatype grid     = grids.get(0);
+        String       longname = grid.getDescription();
+        if ((longname == null) || longname.isEmpty()) {
             longname = grid.getName();
         }
         varsb.append(longname);
@@ -613,7 +627,7 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
                                           request.getString(levelArg, null)));
             varsb.append(HtmlUtils.space(2));
             varsb.append("hPa");
-            varsb.append(HtmlUtils.hidden(levelArg+"_unit", "hPa"));
+            varsb.append(HtmlUtils.hidden(levelArg + "_unit", "hPa"));
         }
         sb.append(HtmlUtils.formEntry(msgLabel("Variable"),
                                       varsb.toString()));
@@ -625,8 +639,11 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
      *
      * @param request  the Request
      * @param sb       the StringBuilder to add to
+     *
+     * @throws Exception _more_
      */
-    private void addInfoWidget(Request request, Appendable sb) throws Exception {
+    private void addInfoWidget(Request request, Appendable sb)
+            throws Exception {
         sb.append(
             HtmlUtils.formEntry(
                 msgLabel("Months"),
@@ -642,9 +659,12 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
      * @param sb       the HTML page
      * @param dataset  the GridDataset
      * @param useYYMM  true to provide month/year widgets, otherwise straight dates
+     *
+     * @throws Exception _more_
      */
     public void addTimeWidget(Request request, Appendable sb,
-                              GridDataset dataset, boolean useYYMM) throws Exception {
+                              GridDataset dataset, boolean useYYMM)
+            throws Exception {
         List<CalendarDate> dates = CdmDataOutputHandler.getGridDates(dataset);
         if ( !dates.isEmpty()) {
             CalendarDate cd  = dates.get(0);
@@ -699,9 +719,12 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
      * @param request  the Request
      * @param sb       the HTML
      * @param dates    the list of Dates
+     *
+     * @throws Exception _more_
      */
     private void makeTimesWidget(Request request, Appendable sb,
-                                 List<CalendarDate> dates) throws Exception {
+                                 List<CalendarDate> dates)
+            throws Exception {
         List formattedDates = new ArrayList();
         formattedDates.add(new TwoFacedObject("---", ""));
         for (CalendarDate date : dates) {
@@ -733,9 +756,12 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
      * @param request  the Request
      * @param sb       the StringBuilder to add to
      * @param dates    the list of dates (just in case)
+     *
+     * @throws Exception _more_
      */
     public static void makeMonthsWidget(Request request, Appendable sb,
-                                        List<CalendarDate> dates) throws Exception {
+                                        List<CalendarDate> dates)
+            throws Exception {
         /*
         HtmlUtils.radio(ARG_CDO_MONTHS, "all", request.get(ARG_CDO_MONTHS, true))+msg("All")+
         HtmlUtils.space(2)+
@@ -748,9 +774,9 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
                 msgLabel("Start")
                 + HtmlUtils.select(
                     ARG_CDO_STARTMONTH, MONTHS,
-                    request.getString(
-                        ARG_CDO_STARTMONTH, null), HtmlUtils.title("Select the starting month")) 
-                        + HtmlUtils.space(2)
+                    request.getString(ARG_CDO_STARTMONTH, null),
+                    HtmlUtils.title(
+                        "Select the starting month")) + HtmlUtils.space(2)
                             + msgLabel("End")
                             + HtmlUtils.select(
                                 ARG_CDO_ENDMONTH, MONTHS,
@@ -758,7 +784,8 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
                                     ARG_CDO_ENDMONTH,
                                     MONTHS.get(
                                         MONTHS.size()
-                                        - 1).getId().toString()), HtmlUtils.title("Select the ending month"))));
+                                        - 1).getId().toString()), HtmlUtils.title(
+                                            "Select the ending month"))));
     }
 
     /**
@@ -767,9 +794,12 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
      * @param request  the Request
      * @param sb       the StringBuilder to add to
      * @param dates    the list of dates
+     *
+     * @throws Exception _more_
      */
     private void makeYearsWidget(Request request, Appendable sb,
-                                 List<CalendarDate> dates) throws Exception {
+                                 List<CalendarDate> dates)
+            throws Exception {
         SortedSet<String> uniqueYears =
             Collections.synchronizedSortedSet(new TreeSet<String>());
         if ((dates != null) && !dates.isEmpty()) {
@@ -796,14 +826,17 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
                 msgLabel("Start")
                 + HtmlUtils.select(
                     ARG_CDO_STARTYEAR, years,
-                    request.getString(
-                        ARG_CDO_STARTYEAR, years.get(0)), HtmlUtils.title("Select the starting year")) + HtmlUtils.space(
-                            3) + msgLabel("End")
-                               + HtmlUtils.select(
-                                   ARG_CDO_ENDYEAR, years,
-                                   request.getString(
-                                       ARG_CDO_ENDYEAR,
-                                       years.get(years.size() - 1)), HtmlUtils.title("Select the ending year"))));
+                    request.getString(ARG_CDO_STARTYEAR, years.get(0)),
+                    HtmlUtils.title(
+                        "Select the starting year")) + HtmlUtils.space(3)
+                            + msgLabel("End")
+                            + HtmlUtils.select(
+                                ARG_CDO_ENDYEAR, years,
+                                request.getString(
+                                    ARG_CDO_ENDYEAR,
+                                    years.get(
+                                        years.size() - 1)), HtmlUtils.title(
+                                            "Select the ending year"))));
     }
 
     /**
@@ -812,9 +845,11 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
      * @param request   The request
      * @param sb        the HTML
      * @param llr       the lat/lon rectangle
+     *
+     * @throws Exception _more_
      */
-    public void addMapWidget(Request request, Appendable sb,
-                             LatLonRect llr) throws Exception {
+    public void addMapWidget(Request request, Appendable sb, LatLonRect llr)
+            throws Exception {
         addMapWidget(request, sb, llr, false);
     }
 
@@ -825,21 +860,25 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
      * @param sb        the HTML
      * @param llr       the lat/lon rectangle
      * @param usePopup  use a popup
+     *
+     * @throws Exception _more_
      */
-    public void addMapWidget(Request request, Appendable sb,
-                             LatLonRect llr, boolean usePopup) throws Exception {
+    public void addMapWidget(Request request, Appendable sb, LatLonRect llr,
+                             boolean usePopup)
+            throws Exception {
 
         //TODO: This should be a parameter to the method.
         //If its null then all map regions are used 
         //If non-null then only map regions with the group
         //String mapRegionGroup = null;
-        String mapRegionGroup = "model regions";
+        String  mapRegionGroup = "model regions";
 
         MapInfo map;
         if ( !usePopup) {
             map = getRepository().getMapManager().createMap(request, 250,
                     150, true);
-            String maplayers = getRepository().getProperty(PROP_MAP_LAYERS, null);
+            String maplayers = getRepository().getProperty(PROP_MAP_LAYERS,
+                                   null);
             if (maplayers != null) {
                 map.addProperty("mapLayers", Misc.newList(maplayers));
             } else {
@@ -942,8 +981,9 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
 
         commands.add(entry.getResource().getPath());
         commands.add(outFile.toString());
-        JobManager.CommandResults results = getRepository().getJobManager().executeCommand(commands, null,
-                               getProductDir());
+        JobManager.CommandResults results =
+            getRepository().getJobManager().executeCommand(commands, null,
+                getProductDir());
         String errorMsg = results.getStderrMsg();
         String outMsg   = results.getStdoutMsg();
         if ( !outFile.exists()) {
@@ -1052,13 +1092,13 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
                     "180"));
             // TODO: do we need to do this?  CDO seems to handle 
             // the -180 to 180 vs 0 to 360 subsetting okay.
-//            if (origLonMin < 0) {  // -180 to 180
-//                lonMin = GeoUtils.normalizeLongitude(lonMin);
-//                lonMax = GeoUtils.normalizeLongitude(lonMax);
-//            } else {               // 0-360
-//                lonMin = GeoUtils.normalizeLongitude360(lonMin);
-//                lonMax = GeoUtils.normalizeLongitude360(lonMax);
-//            }
+            //            if (origLonMin < 0) {  // -180 to 180
+            //                lonMin = GeoUtils.normalizeLongitude(lonMin);
+            //                lonMax = GeoUtils.normalizeLongitude(lonMax);
+            //            } else {               // 0-360
+            //                lonMin = GeoUtils.normalizeLongitude360(lonMin);
+            //                lonMax = GeoUtils.normalizeLongitude360(lonMax);
+            //            }
             llSelect = OP_SELLLBOX + "," + String.valueOf(lonMin) + ","
                        + String.valueOf(lonMax) + ","
             //+ request.getString(ARG_CDO_AREA_WEST, "-180") + ","
@@ -1096,27 +1136,31 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
         if (request.defined(levelArg)) {
             String level = request.getString(levelArg);
             if (level != null) {
-                String levelUnit = request.getString(levelArg+"_unit","hPa");
+                String levelUnit = request.getString(levelArg + "_unit",
+                                       "hPa");
                 String dataUnit = "hPa";
                 try {
-                    CdmDataOutputHandler dataOutputHandler = getDataOutputHandler();
+                    CdmDataOutputHandler dataOutputHandler =
+                        getDataOutputHandler();
                     GridDataset dataset =
-                        dataOutputHandler.getCdmManager().getGridDataset(entry,
-                            entry.getResource().getPath());
+                        dataOutputHandler.getCdmManager().getGridDataset(
+                            entry, entry.getResource().getPath());
                     GridDatatype grid = dataset.getGrids().get(0);
                     if (grid.getZDimension() != null) {
-                        GridCoordSystem      gcs    = grid.getCoordinateSystem();
-                        CoordinateAxis1D     zAxis  = gcs.getVerticalAxis();
-                        dataUnit   = zAxis.getUnitsString().toLowerCase();
+                        GridCoordSystem  gcs   = grid.getCoordinateSystem();
+                        CoordinateAxis1D zAxis = gcs.getVerticalAxis();
+                        dataUnit = zAxis.getUnitsString().toLowerCase();
                     }
-                    if (!Misc.equals(levelUnit, dataUnit) && 
-                        SimpleUnit.isCompatible(levelUnit, dataUnit)) {
+                    if ( !Misc.equals(levelUnit, dataUnit)
+                            && SimpleUnit.isCompatible(levelUnit, dataUnit)) {
                         SimpleUnit have = SimpleUnit.factory(levelUnit);
                         SimpleUnit want = SimpleUnit.factory(dataUnit);
-                        level = String.valueOf(have.convertTo(Misc.parseDouble(level), want));
+                        level = String.valueOf(
+                            have.convertTo(Misc.parseDouble(level), want));
                     }
                 } catch (Exception e) {
-                    System.err.println("can't convert level from " + levelUnit + " to " +dataUnit );
+                    System.err.println("can't convert level from "
+                                       + levelUnit + " to " + dataUnit);
                 }
                 levSelect = OP_SELLEVEL + "," + level;
             }
@@ -1154,7 +1198,8 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
             if ((startMonth == 1) && (endMonth == 12)) {
                 return;
             }
-            StringBuilder buf = new StringBuilder(OP_SELMON + "," + startMonth);
+            StringBuilder buf = new StringBuilder(OP_SELMON + ","
+                                    + startMonth);
             if (endMonth > startMonth) {
                 buf.append("/");
                 buf.append(endMonth);
@@ -1403,6 +1448,8 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
 
         /**
          * Area statistics Service
+         *
+         * @param repository _more_
          */
         public CDOAreaStatistics(Repository repository) {
             super(repository, "CDO_AREA_STATS", "Area Statistics");
@@ -1415,10 +1462,13 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
          * @param input    the ServiceInput
          * @param sb       the form
          *
+         *
+         * @return _more_
          * @throws Exception  problem adding to the form
          */
+        @Override
         public int addToForm(Request request, ServiceInput input,
-                              Appendable sb)
+                             Appendable sb)
                 throws Exception {
             sb.append(HtmlUtils.formTable());
             Entry first = input.getEntries().get(0);
@@ -1428,7 +1478,7 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
                 //values[3] = experiment;
                 //values[4] = member;
                 //values[5] = frequency;
-                Object[]     values = first.getValues();
+                Object[]      values = first.getValues();
                 StringBuilder header = new StringBuilder();
                 header.append("Model: ");
                 header.append(values[2]);
@@ -1466,6 +1516,7 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
             }
             addMapWidget(request, sb, llr);
             sb.append(HtmlUtils.formTableClose());
+
             return 1;
         }
 
@@ -1475,6 +1526,7 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
          * Process the request
          *
          * @param request  The request
+         * @param info _more_
          * @param input  the  data process input
          *
          * @return  the processed data
@@ -1482,8 +1534,8 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
          * @throws Exception  problem processing
          */
         @Override
-    public ServiceOutput evaluate(Request request, ServiceInfo info,
-                ServiceInput input)
+        public ServiceOutput evaluate(Request request, ServiceInfo info,
+                                      ServiceInput input)
                 throws Exception {
 
             Entry  oneOfThem = input.getEntries().get(0);
@@ -1517,8 +1569,9 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
 
             commands.add(oneOfThem.getResource().getPath());
             commands.add(outFile.toString());
-            JobManager.CommandResults results = getRepository().getJobManager().executeCommand(commands, null,
-                                   getProductDir());
+            JobManager.CommandResults results =
+                getRepository().getJobManager().executeCommand(commands,
+                    null, getProductDir());
             String errorMsg = results.getStderrMsg();
             String outMsg   = results.getStdoutMsg();
             if ( !outFile.exists()) {
