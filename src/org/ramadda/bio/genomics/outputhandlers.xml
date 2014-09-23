@@ -1,4 +1,4 @@
-<outputhandlers class="org.ramadda.repository.output.ExecutableOutputHandler" icon="/genomics/dna.png">
+<outputhandlers class="org.ramadda.repository.output.ServiceOutputHandler" icon="/genomics/dna.png">
 
 <!-- HMMER outputs -->
   <outputhandler commandId="bio_hmmer_convert"/>

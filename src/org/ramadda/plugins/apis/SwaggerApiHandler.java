@@ -138,10 +138,10 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                           Json.quote("Grid subset API")));
 
         for(OutputHandler outputHandler: getRepository().getOutputHandlers()) {
-            if(!(outputHandler instanceof ExecutableOutputHandler)) {
+            if(!(outputHandler instanceof ServiceOutputHandler)) {
                 continue;
             }
-            Service service = ((ExecutableOutputHandler)outputHandler).getService();
+            Service service = ((ServiceOutputHandler)outputHandler).getService();
             if(!service.isEnabled()) continue;
 
             String url = "/service/" + service.getId();

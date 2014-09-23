@@ -55,7 +55,7 @@ import java.util.List;
  *
  * @author RAMADDA Development Team
  */
-public class ExecutableOutputHandler extends OutputHandler {
+public class ServiceOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final String ARG_ASYNCH = "asynch";
@@ -86,7 +86,7 @@ public class ExecutableOutputHandler extends OutputHandler {
      * @param element _more_
      * @throws Exception _more_
      */
-    public ExecutableOutputHandler(Repository repository, Element element)
+    public ServiceOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
         init(element);
@@ -107,7 +107,7 @@ public class ExecutableOutputHandler extends OutputHandler {
             command = getRepository().getJobManager().getService(commandId);
             if (command == null) {
                 throw new IllegalStateException(
-                    "ExecutableOutputHandler: could not find command:"
+                    "ServiceOutputHandler: could not find command:"
                     + commandId);
             }
         }
