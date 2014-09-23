@@ -66,7 +66,7 @@ import java.util.zip.*;
  * @version        $version$, Mon, Sep 15, '14
  * @author         Enter your name here...
  */
-public class CommandInfo {
+public class ServiceInfo {
 
     /** _more_ */
     private File workDir;
@@ -87,7 +87,7 @@ public class CommandInfo {
      *
      * @param commandInfo _more_
      */
-    public CommandInfo(CommandInfo commandInfo) {
+    public ServiceInfo(ServiceInfo commandInfo) {
         this.workDir    = commandInfo.workDir;
         this.forDisplay = commandInfo.forDisplay;
         this.publish    = commandInfo.publish;
@@ -99,7 +99,7 @@ public class CommandInfo {
      * @param workDir _more_
      * @param forDisplay _more_
      */
-    public CommandInfo(File workDir, boolean forDisplay) {
+    public ServiceInfo(File workDir, boolean forDisplay) {
         this.workDir    = workDir;
         this.forDisplay = forDisplay;
     }

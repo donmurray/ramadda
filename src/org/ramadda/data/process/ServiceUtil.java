@@ -35,7 +35,7 @@ import java.util.List;
  *
  * @author RAMADDA Development Team
  */
-public class CommandUtil {
+public class ServiceUtil {
 
     /** _more_ */
     public static final String COMMAND_CP = "cp";
@@ -47,7 +47,7 @@ public class CommandUtil {
     /**
      * _more_
      */
-    public CommandUtil() {}
+    public ServiceUtil() {}
 
 
     /**
@@ -63,8 +63,8 @@ public class CommandUtil {
      *
      * @throws Exception _more_
      */
-    public boolean evaluate(Request request, Entry entry, Command command,
-                            CommandInfo info, List<String> commands)
+    public boolean evaluate(Request request, Entry entry, Service command,
+                            ServiceInfo info, List<String> commands)
             throws Exception {
         if (commands.size() <= 1) {
             return true;

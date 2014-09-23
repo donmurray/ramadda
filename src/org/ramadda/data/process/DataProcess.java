@@ -31,19 +31,14 @@ import org.ramadda.repository.Result;
 /**
  * A class for holding process information
  */
-public abstract class DataProcess {
+public  class DataProcess extends Service {
 
-    /** the data process id */
-    private String dataProcessId;
-
-    /** the data process label */
-    private String dataProcessLabel;
 
     /**
      * Default ctor
      */
     public DataProcess() {
-        this("foo", "bar");
+        this(null, "foo", "bar");
     }
 
     /**
@@ -52,78 +47,10 @@ public abstract class DataProcess {
      * @param id       the unique id for this DataProcess
      * @param label    the label for this DataProcess
      */
-    public DataProcess(String id, String label) {
-        this.dataProcessId    = id;
-        this.dataProcessLabel = label;
-    }
-
-    /**
-     * Add to form
-     *
-     * @param request  the Request
-     * @param input    the DataProcessInput
-     * @param sb       the form
-     *
-     * @throws Exception  problem adding to the form
-     */
-    public abstract void addToForm(Request request, DataProcessInput input,
-                                   StringBuilder sb)
-     throws Exception;
-
-
-    public void initFormJS(Request request, Appendable js, String formVar) throws Exception {
+    public DataProcess(Repository repository, String id, String label) {
+        super(repository, id,label);
     }
 
 
-    /**
-     * Process the request
-     *
-     * @param request  The request
-     * @param input  the input
-     *
-     * @return  the processed data
-     *
-     * @throws Exception  problem processing
-     */
-    public abstract DataProcessOutput processRequest(Request request,
-            DataProcessInput input)
-     throws Exception;
-
-    /**
-     * Get the DataProcess id
-     *
-     * @return  the ID
-     */
-    public String getDataProcessId() {
-        return dataProcessId;
-    }
-
-    /**
-     * Get the label for this process
-     *
-     * @return the label
-     */
-    public String getDataProcessLabel() {
-        return dataProcessLabel;
-    }
-
-    /**
-     * Can we handle this type of DataProcessInput?
-     *
-     * @param dpi DataProcessInput
-     * @return true if we can handle
-     */
-    public abstract boolean canHandle(DataProcessInput dpi);
-
-    /**
-     * Is this process enabled?
-     *
-     * subclasses can override
-     *
-     * @return true
-     */
-    public boolean isEnabled() {
-        return true;
-    }
 
 }

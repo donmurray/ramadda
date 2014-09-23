@@ -22,29 +22,19 @@ package org.ramadda.data.process;
 
 
 import org.ramadda.repository.Entry;
-
-import ucar.unidata.util.Misc;
-
 import java.util.List;
-
 
 /**
  * Class to hold a set of entries for a DataProcessInput or Output
  */
-public class DataProcessOperand {
-
-    /** The list of entries for this operand */
-    private List<Entry> entries;
-
-    /** the description */
-    private String description;
+public class DataProcessOperand   extends ServiceOperand {
 
     /**
      * Create an operand from the entry
      * @param entry the entry
      */
     public DataProcessOperand(Entry entry) {
-        this(Misc.newList(entry));
+        super(entry);
     }
 
     /**
@@ -54,7 +44,7 @@ public class DataProcessOperand {
      * @param entry _more_
      */
     public DataProcessOperand(String description, Entry entry) {
-        this(description, Misc.newList(entry));
+        super(description, entry);
     }
 
     /**
@@ -64,7 +54,7 @@ public class DataProcessOperand {
      * @param entries      the entries
      */
     public DataProcessOperand(List<Entry> entries) {
-        this("", entries);
+        super(entries);
     }
 
     /**
@@ -74,44 +64,8 @@ public class DataProcessOperand {
      * @param entries      the entries
      */
     public DataProcessOperand(String description, List<Entry> entries) {
-        this.description = description;
-        this.entries     = entries;
+        super(description, entries);
     }
 
-    /**
-     * Get the entries
-     *
-     * @return  the entries
-     */
-    public List<Entry> getEntries() {
-        return entries;
-    }
-
-    /**
-     * Set the entries
-     *
-     * @param newEntries  the new entries
-     */
-    public void setEntries(List<Entry> newEntries) {
-        entries = newEntries;
-    }
-
-    /**
-     * Get the description of this operand
-     *
-     * @return  the description
-     */
-    public String getDescription() {
-        return description;
-    }
-
-    /**
-     * Set the description of the operand
-     *
-     * @param description  the description
-     */
-    public void setDescription(String description) {
-        this.description = description;
-    }
 
 }

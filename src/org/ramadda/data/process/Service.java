@@ -66,16 +66,18 @@ import java.util.zip.*;
  * @author RAMADDA Development Team
  * @version $Revision: 1.3 $
  */
-public class Command extends RepositoryManager {
+public class Service extends RepositoryManager {
 
     /** _more_ */
-    private static CommandUtil dummyToForceCompile;
+    private static ServiceUtil dummyToForceCompile;
 
     /** _more_ */
     public static boolean debug = false;
 
     /** _more_ */
     public static final String TAG_ARG = "arg";
+
+    public static final String ATTR_COMMAND = "command";
 
     /** _more_ */
     public static final String ATTR_ID = "id";
@@ -99,7 +101,7 @@ public class Command extends RepositoryManager {
     public static final String TAG_INPUT = "input";
 
     /** _more_ */
-    public static final String TAG_COMMAND = "command";
+    public static final String TAG_SERVICE = "service";
 
 
     /** _more_ */
@@ -118,7 +120,7 @@ public class Command extends RepositoryManager {
     public static final String ATTR_GROUP = "group";
 
     /** _more_ */
-    public static final String ATTR_COMMAND = "command";
+    public static final String ATTR_SERVICE = "service";
 
     /** _more_ */
     public static final String ATTR_PATHPROPERTY = "pathProperty";
@@ -162,10 +164,10 @@ public class Command extends RepositoryManager {
     private String pathProperty;
 
     /** _more_ */
-    private Command parent;
+    private Service parent;
 
     /** _more_ */
-    private List<Command> children;
+    private List<Service> children;
 
     /** _more_ */
     public boolean serial;
@@ -174,7 +176,7 @@ public class Command extends RepositoryManager {
     private String linkId;
 
     /** _more_ */
-    private Command link;
+    private Service link;
 
     /** _more_ */
     private List<Arg> args = new ArrayList<Arg>();
@@ -195,12 +197,12 @@ public class Command extends RepositoryManager {
      * @param element _more_
      * @throws Exception _more_
      */
-    public Command(Repository repository, Element element) throws Exception {
+    public Service(Repository repository, Element element) throws Exception {
         super(repository);
         init(null, element, null);
     }
 
-    public Command(Repository repository, String id, String label) {
+    public Service(Repository repository, String id, String label) {
         super(repository);
         this.id = id;
         this.label = label;
@@ -219,11 +221,11 @@ public class Command extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public Command(Repository repository, Command parent, Element element,
+    public Service(Repository repository, Service parent, Element element,
                    int index)
             throws Exception {
         super(repository);
-        init(parent, element, "command_" + index);
+        init(parent, element, "service_" + index);
     }
 
 
@@ -262,14 +264,14 @@ public class Command extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    private void init(Command parent, Element element, String dfltId)
+    private void init(Service parent, Element element, String dfltId)
             throws Exception {
 
         this.parent = parent;
         id          = XmlUtil.getAttribute(element, ATTR_ID, dfltId);
 
         if (id == null) {
-            throw new IllegalStateException("Command: no id defined in: "
+            throw new IllegalStateException("Service: no id defined in: "
                                             + XmlUtil.toString(element));
         }
         entryType = XmlUtil.getAttribute(element, ATTR_ENTRY_TYPE,
@@ -289,16 +291,16 @@ public class Command extends RepositoryManager {
 
         NodeList nodes;
 
-        nodes = XmlUtil.getElements(element, TAG_COMMAND);
+        nodes = XmlUtil.getElements(element, TAG_SERVICE);
         for (int i = 0; i < nodes.getLength(); i++) {
             Element node = (Element) nodes.item(i);
-            addChild(new Command(getRepository(), this, node, i));
+            addChild(new Service(getRepository(), this, node, i));
         }
 
         if (linkId != null) {
-            initCommand();
+            initService();
         } else if (children == null) {
-            command = XmlUtil.getAttributeFromTree(element, TAG_COMMAND,
+            command = XmlUtil.getAttributeFromTree(element, ATTR_COMMAND,
                     (String) null);
             pathProperty = XmlUtil.getAttribute(element, ATTR_PATHPROPERTY,
                     (String) null);
@@ -324,7 +326,7 @@ public class Command extends RepositoryManager {
                 }
             }
             if ((command == null) || (command.indexOf("${") >= 0)) {
-                System.err.println("Command: no command defined:" + command
+                System.err.println("Service: no command defined:" + command
                                    + " path:" + pathProperty);
 
                 return;
@@ -334,18 +336,18 @@ public class Command extends RepositoryManager {
         //Look for:
         //java:<class>:<method>
         if ((command != null) && command.equals("util")) {
-            command = "java:org.ramadda.data.process.CommandUtil:evaluate";
+            command = "java:org.ramadda.data.process.ServiceUtil:evaluate";
         }
 
         if ((command != null) && command.startsWith("java:")) {
             List<String> toks      = StringUtil.split(command, ":");
             String       className = toks.get(1);
             if (className.trim().length() == 0) {
-                className = "org.ramadda.repository.job.CommandUtil";
+                className = "org.ramadda.repository.job.ServiceUtil";
             }
             commandObject = Misc.findClass(className).newInstance();
             Class[] paramTypes = new Class[] { Request.class, Entry.class,
-                    Command.class, CommandInfo.class, List.class };
+                    Service.class, ServiceInfo.class, List.class };
             commandMethod = Misc.findMethod(commandObject.getClass(),
                                             toks.get(2), paramTypes);
         }
@@ -374,13 +376,12 @@ public class Command extends RepositoryManager {
     /**
      * _more_
      *
-     * @param command _more_
      */
-    private void addChild(Command command) {
+    private void addChild(Service service) {
         if (children == null) {
-            children = new ArrayList<Command>();
+            children = new ArrayList<Service>();
         }
-        children.add(command);
+        children.add(service);
     }
 
     /**
@@ -395,12 +396,12 @@ public class Command extends RepositoryManager {
     /**
      * _more_
      */
-    private void initCommand() {
+    private void initService() {
         if (link != null) {
             return;
         }
         if (linkId != null) {
-            link = getRepository().getJobManager().getCommand(linkId);
+            link = getRepository().getJobManager().getService(linkId);
         }
     }
 
@@ -409,8 +410,8 @@ public class Command extends RepositoryManager {
      *
      * @return _more_
      */
-    public Command getCommandToUse() {
-        initCommand();
+    public Service getServiceToUse() {
+        initService();
         if (link != null) {
             return link;
         }
@@ -424,16 +425,15 @@ public class Command extends RepositoryManager {
      * @param request _more_
      * @param primaryEntry _more_
      * @param info _more_
-     * @param commands _more_
      * @param forDisplay _more_
      *
      * @throws Exception _more_
      */
     public void addArgs(Request request, Entry primaryEntry,
-                        CommandInfo info, List<String> commands,
+                        ServiceInfo info, List<String> commands,
                         boolean forDisplay)
             throws Exception {
-        getCommandToUse().addArgsInner(request, primaryEntry, info, commands,
+        getServiceToUse().addArgsInner(request, primaryEntry, info, commands,
                                        forDisplay);
     }
 
@@ -450,7 +450,7 @@ public class Command extends RepositoryManager {
      * @throws Exception _more_
      */
     private void addArgsInner(Request request, Entry primaryEntry,
-                              CommandInfo info, List<String> commands,
+                              ServiceInfo info, List<String> commands,
                               boolean forDisplay)
             throws Exception {
 
@@ -459,7 +459,7 @@ public class Command extends RepositoryManager {
                                  forDisplay);
         commands.add(cmd);
         HashSet<String> seenGroup = new HashSet<String>();
-        for (Command.Arg arg : getArgs()) {
+        for (Service.Arg arg : getArgs()) {
             Entry currentEntry = primaryEntry;
             if (arg.getCategory() != null) {
                 continue;
@@ -575,7 +575,7 @@ public class Command extends RepositoryManager {
      * @return _more_
      */
     public String getId() {
-        initCommand();
+        initService();
         if (link != null) {
             return link.getId();
         }
@@ -599,16 +599,16 @@ public class Command extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public int addToForm(Request request, CommandInput input, Appendable sb)
+    public int addToForm(Request request, ServiceInput input, Appendable sb)
         throws Exception {
-        initCommand();
+        initService();
         if (link != null) {
             return link.addToForm(request, input, sb);
         }
 
         if (haveChildren()) {
             int cnt = 0;
-            for (Command child : children) {
+            for (Service child : children) {
                 StringBuffer tmpSB = new StringBuffer();
                 int blockCnt = child.addToForm(request, input, tmpSB);
                 cnt += blockCnt;
@@ -637,16 +637,16 @@ public class Command extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    private int addToFormInner(Request request, CommandInput input,
+    private int addToFormInner(Request request, ServiceInput input,
                               Appendable sb)
             throws Exception {
 
         StringBuffer formSB = new StringBuffer();
         int          blockCnt    = 0;
         StringBuffer catBuff     = null;
-        Command.Arg  catArg      = null;
+        Service.Arg  catArg      = null;
         boolean      anyRequired = false;
-        for (Command.Arg arg : getArgs()) {
+        for (Service.Arg arg : getArgs()) {
             if (arg.isCategory()) {
                 if ((catBuff != null) && (catBuff.length() > 0)) {
                     processCatBuff(request, formSB, catArg, catBuff, ++blockCnt);
@@ -684,10 +684,10 @@ public class Command extends RepositoryManager {
 
         sb.append(HtmlUtils.p());
         if(Utils.stringDefined(getHelp())) {
-            sb.append(HtmlUtils.div(getHelp(), HtmlUtils.cssClass("command-help")));
+            sb.append(HtmlUtils.div(getHelp(), HtmlUtils.cssClass("service-help")));
         }
         if (blockCnt > 0) {
-            sb.append(HtmlUtils.div(formSB.toString(), HtmlUtils.cssClass("command-form")));
+            sb.append(HtmlUtils.div(formSB.toString(), HtmlUtils.cssClass("service-form")));
         }
 
 
@@ -696,7 +696,7 @@ public class Command extends RepositoryManager {
     }
 
 
-    public void addArgToForm(Request request, CommandInput input,
+    public void addArgToForm(Request request, ServiceInput input,
                              Appendable catBuff, Arg arg) throws Exception {
         String       tooltip = arg.getPrefix();
         StringBuffer inputHtml   = new StringBuffer();
@@ -788,7 +788,7 @@ public class Command extends RepositoryManager {
                                          HtmlUtils.div(
                                              help,
                                              HtmlUtils.cssClass(
-                                                 "command-form-help"))));
+                                                 "service-form-help"))));
     }
 
 
@@ -802,7 +802,7 @@ public class Command extends RepositoryManager {
      * @param blockCnt _more_
      */
     private void processCatBuff(Request request, StringBuffer sb,
-                                Command.Arg catArg, StringBuffer catBuff,
+                                Service.Arg catArg, StringBuffer catBuff,
                                 int blockCnt) {
         if (catArg != null) {
             String html = header(catArg.getCategory());
@@ -835,10 +835,10 @@ public class Command extends RepositoryManager {
      */
     public boolean isEnabled() {
         if (linkId != null) {
-            return getCommandToUse().isEnabled();
+            return getServiceToUse().isEnabled();
         }
         if (haveChildren()) {
-            for (Command child : children) {
+            for (Service child : children) {
                 if ( !child.isEnabled()) {
                     return false;
                 }
@@ -857,12 +857,12 @@ public class Command extends RepositoryManager {
      */
     public void collectArgs(List<Arg> args) {
         if (linkId != null) {
-            getCommandToUse().collectArgs(args);
+            getServiceToUse().collectArgs(args);
 
             return;
         }
         if (haveChildren()) {
-            for (Command child : children) {
+            for (Service child : children) {
                 child.collectArgs(args);
             }
         }
@@ -916,7 +916,7 @@ public class Command extends RepositoryManager {
      * @param dpi DataProcessInput
      * @return true if we can handle
      */
-    public  boolean canHandle(CommandInput dpi) {
+    public  boolean canHandle(ServiceInput dpi) {
         List<Entry> entries = dpi.getEntries();
         if(entries.size()==0) return false;
         return isApplicable(entries.get(0));
@@ -932,7 +932,7 @@ public class Command extends RepositoryManager {
      */
     public boolean isApplicable(Entry entry) {
         if (linkId != null) {
-            return getCommandToUse().isApplicable(entry);
+            return getServiceToUse().isApplicable(entry);
         }
         if (haveChildren()) {
             return children.get(0).isApplicable(entry);
@@ -960,7 +960,7 @@ public class Command extends RepositoryManager {
      */
     public String getCommand() {
         if (linkId != null) {
-            getCommandToUse().getCommand();
+            getServiceToUse().getCommand();
         }
 
         return command;
@@ -974,7 +974,7 @@ public class Command extends RepositoryManager {
      */
     public String getHelp() {
         if (linkId != null) {
-            getCommandToUse().getHelp();
+            getServiceToUse().getHelp();
         }
 
         return help;
@@ -986,7 +986,7 @@ public class Command extends RepositoryManager {
      * @return _more_
      */
     public String getLabel() {
-        initCommand();
+        initService();
         if (label != null) {
             return label;
         }
@@ -1009,10 +1009,10 @@ public class Command extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public CommandOutput evaluate(Request request, CommandInfo info, CommandInput input)
+    public ServiceOutput evaluate(Request request, ServiceInfo info, ServiceInput input)
             throws Exception {
 
-        CommandOutput myOutput = new CommandOutput();
+        ServiceOutput myOutput = new ServiceOutput();
 
         HashSet<File> existingFiles = new HashSet<File>();
         for (File f : info.getWorkDir().listFiles()) {
@@ -1022,8 +1022,8 @@ public class Command extends RepositoryManager {
 
         HashSet<File> newFiles      = new HashSet<File>();
         if (haveChildren()) {
-            CommandOutput childOutput = null;
-            for (Command child : children) {
+            ServiceOutput childOutput = null;
+            for (Service child : children) {
                 Entry primaryEntryForChild = entry;
                 if (serial) {
                     if (childOutput != null) {
@@ -1086,7 +1086,7 @@ public class Command extends RepositoryManager {
             this.addArgs(request, entry, info, commands,
                          info.getForDisplay());
         }
-        System.err.println("Commands:" + commands);
+        System.err.println("Services:" + commands);
 
         if (info.getForDisplay()) {
             myOutput.append(HtmlUtils.br());
@@ -1218,7 +1218,7 @@ public class Command extends RepositoryManager {
      */
     public void getAllOutputs(List<OutputDefinition> outputs) {
         if (haveChildren()) {
-            for (Command child : children) {
+            for (Service child : children) {
                 child.getAllOutputs(outputs);
             }
         }
@@ -1309,7 +1309,7 @@ public class Command extends RepositoryManager {
         private static final String TYPE_CATEGORY = "category";
 
         /** _more_ */
-        private Command command;
+        private Service command;
 
         /** _more_ */
         private String name;
@@ -1374,7 +1374,7 @@ public class Command extends RepositoryManager {
          *
          * @throws Exception _more_
          */
-        public Arg(Command command, Element node, int idx) throws Exception {
+        public Arg(Service command, Element node, int idx) throws Exception {
             this.command = command;
 
             type = XmlUtil.getAttribute(node, ATTR_TYPE, (String) null);

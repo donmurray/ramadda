@@ -37,13 +37,18 @@ import java.util.List;
  *
  *
  */
-public class CommandInput {
+public class ServiceInput {
 
     /** the process directory for this input */
     private File processDir;
 
     /** The operands for this input */
-    private List<CommandOperand> operands;
+    private List<ServiceOperand> operands;
+
+    public ServiceInput(Entry entry) {
+        this(new ServiceOperand(entry));
+    }
+
 
     /**
      * Create a data process input
@@ -52,7 +57,7 @@ public class CommandInput {
      *
      * @param operand _more_
      */
-    public CommandInput(CommandOperand operand) {
+    public ServiceInput(ServiceOperand operand) {
         this(null, Misc.newList(operand));
     }
 
@@ -64,7 +69,7 @@ public class CommandInput {
      * @param processDir _more_
      * @param operand _more_
      */
-    public CommandInput(File processDir, CommandOperand operand) {
+    public ServiceInput(File processDir, ServiceOperand operand) {
         this(processDir, Misc.newList(operand));
     }
 
@@ -73,19 +78,19 @@ public class CommandInput {
      *
      * @param operands  the operands for this process
      */
-    public CommandInput(List<CommandOperand> operands) {
+    public ServiceInput(List<ServiceOperand> operands) {
         // TODO: should we call this with a default directory?
         this(null, operands);
     }
 
     /**
-     * Create a CommandInput from a list of operands
+     * Create a ServiceInput from a list of operands
      *
      *
      * @param dir process directory
      * @param operands the operands
      */
-    public CommandInput(File dir, List<CommandOperand> operands) {
+    public ServiceInput(File dir, List<ServiceOperand> operands) {
 
         this.processDir = dir;
         this.operands   = operands;
@@ -96,7 +101,7 @@ public class CommandInput {
     public List<Entry> getEntries() {
         List<Entry> entries = new ArrayList<Entry>();
         if(operands == null) return entries;
-        for(CommandOperand op: operands) {
+        for(ServiceOperand op: operands) {
             entries.addAll(op.getEntries());
         }
         return entries;
@@ -109,7 +114,7 @@ public class CommandInput {
      *
      * @return the list of operands
      */
-    public List<CommandOperand> getOperands() {
+    public List<ServiceOperand> getOperands() {
         return operands;
     }
 
@@ -134,14 +139,14 @@ public class CommandInput {
     }
 
     /**
-     * Create a CommandInput from a CommandOutput
+     * Create a ServiceInput from a ServiceOutput
      * @param output  the output
-     * @return a new CommandInput
+     * @return a new ServiceInput
      */
-    public CommandInput makeInput(CommandOutput output) {
-        return new CommandInput(
+    public ServiceInput makeInput(ServiceOutput output) {
+        return new ServiceInput(
             this.getProcessDir(),
-            new ArrayList<CommandOperand>(output.getOperands()));
+            new ArrayList<ServiceOperand>(output.getOperands()));
     }
 
 }

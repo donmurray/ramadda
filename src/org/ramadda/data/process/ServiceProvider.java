@@ -21,52 +21,18 @@
 package org.ramadda.data.process;
 
 
-import org.ramadda.repository.Entry;
-
-import ucar.unidata.util.Misc;
-
-import java.util.ArrayList;
 import java.util.List;
 
 
+
 /**
- * A class to hold DataProcess output
  */
-public class DataProcessOutput extends ServiceOutput {
+public interface ServiceProvider {
 
     /**
-     * Default ctor
-     */
-    public DataProcessOutput() {}
-
-    /**
-     * Create a DataProcessOutput from the file
+     * Get the DataProcesses that this supports
      *
-     * @param file  the associated file
-     *
-     * @param entry _more_
+     * @return the list of DataProcesses
      */
-    public DataProcessOutput(Entry entry) {
-        super(entry);
-    }
-
-    /**
-     * Create the DataProcessOutput from data operand
-     *
-     * @param operand the operand
-     */
-    public DataProcessOutput(ServiceOperand operand) {
-        super(operand);
-    }
-
-    public DataProcessOutput(List<ServiceOperand> operands) {
-        super(operands);
-    }
-
-/*
-    public DataProcessOutput(List<Entry> entries) {
-        super(entries);
-    }
-*/
+    public List<Service> getServices();
 }
-

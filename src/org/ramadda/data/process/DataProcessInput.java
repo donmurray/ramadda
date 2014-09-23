@@ -22,6 +22,7 @@ package org.ramadda.data.process;
 
 
 
+import org.ramadda.repository.Entry;
 import ucar.unidata.util.Misc;
 
 
@@ -36,13 +37,7 @@ import java.util.List;
  *
  *
  */
-public class DataProcessInput {
-
-    /** the process directory for this input */
-    private File processDir;
-
-    /** The operands for this input */
-    private List<DataProcessOperand> operands;
+public class DataProcessInput extends ServiceInput {
 
     /**
      * Create a data process input
@@ -51,8 +46,8 @@ public class DataProcessInput {
      *
      * @param operand _more_
      */
-    public DataProcessInput(DataProcessOperand operand) {
-        this(null, Misc.newList(operand));
+    public DataProcessInput(ServiceOperand operand) {
+        super(operand);
     }
 
     /**
@@ -63,8 +58,8 @@ public class DataProcessInput {
      * @param processDir _more_
      * @param operand _more_
      */
-    public DataProcessInput(File processDir, DataProcessOperand operand) {
-        this(processDir, Misc.newList(operand));
+    public DataProcessInput(File processDir, ServiceOperand operand) {
+        super(processDir, operand);
     }
 
     /**
@@ -72,9 +67,9 @@ public class DataProcessInput {
      *
      * @param operands  the operands for this process
      */
-    public DataProcessInput(List<DataProcessOperand> operands) {
+    public DataProcessInput(List<ServiceOperand> operands) {
         // TODO: should we call this with a default directory?
-        this(null, operands);
+        super((File)null, operands);
     }
 
     /**
@@ -84,52 +79,9 @@ public class DataProcessInput {
      * @param dir process directory
      * @param operands the operands
      */
-    public DataProcessInput(File dir, List<DataProcessOperand> operands) {
-
-        this.processDir = dir;
-        this.operands   = operands;
-
+    public DataProcessInput(File dir, List<ServiceOperand> operands) {
+        super(dir, operands);
     }
 
-
-    /**
-     * Get the operands
-     *
-     * @return the list of operands
-     */
-    public List<DataProcessOperand> getOperands() {
-        return operands;
-    }
-
-    /**
-     * Get the process directory
-     *
-     * @return  the process directory
-     */
-    public File getProcessDir() {
-        return processDir;
-    }
-
-
-    /**
-     *  Does this input have any operands?
-     *  return true if it has operands
-     *
-     * @return _more_
-     */
-    public boolean hasOperands() {
-        return (operands != null) && !operands.isEmpty();
-    }
-
-    /**
-     * Create a DataProcessInput from a DataProcessOutput
-     * @param output  the output
-     * @return a new DataProcessInput
-     */
-    public DataProcessInput makeInput(DataProcessOutput output) {
-        return new DataProcessInput(
-            this.getProcessDir(),
-            new ArrayList<DataProcessOperand>(output.getOperands()));
-    }
 
 }

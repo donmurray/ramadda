@@ -90,7 +90,7 @@ public class OutputDefinition {
      * @param node _more_
      */
     public OutputDefinition(Element node) {
-        entryType = XmlUtil.getAttribute(node, Command.ATTR_TYPE,
+        entryType = XmlUtil.getAttribute(node, Service.ATTR_TYPE,
                                          TypeHandler.TYPE_FILE);
         pattern     = XmlUtil.getAttribute(node, "pattern", (String) null);
         useStdout   = XmlUtil.getAttribute(node, "stdout", useStdout);

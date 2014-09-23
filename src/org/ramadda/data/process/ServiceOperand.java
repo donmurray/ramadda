@@ -29,9 +29,9 @@ import java.util.List;
 
 
 /**
- * Class to hold a set of entries for a CommandInput or Output
+ * Class to hold a set of entries for a ServiceInput or Output
  */
-public class CommandOperand {
+public class ServiceOperand {
 
     /** The list of entries for this operand */
     private List<Entry> entries;
@@ -43,7 +43,7 @@ public class CommandOperand {
      * Create an operand from the entry
      * @param entry the entry
      */
-    public CommandOperand(Entry entry) {
+    public ServiceOperand(Entry entry) {
         this(Misc.newList(entry));
     }
 
@@ -53,7 +53,7 @@ public class CommandOperand {
      * @param description _more_
      * @param entry _more_
      */
-    public CommandOperand(String description, Entry entry) {
+    public ServiceOperand(String description, Entry entry) {
         this(description, Misc.newList(entry));
     }
 
@@ -63,7 +63,7 @@ public class CommandOperand {
      * @param description  the description
      * @param entries      the entries
      */
-    public CommandOperand(List<Entry> entries) {
+    public ServiceOperand(List<Entry> entries) {
         this("", entries);
     }
 
@@ -73,7 +73,7 @@ public class CommandOperand {
      * @param description  the description
      * @param entries      the entries
      */
-    public CommandOperand(String description, List<Entry> entries) {
+    public ServiceOperand(String description, List<Entry> entries) {
         this.description = description;
         this.entries     = entries;
     }
