@@ -953,9 +953,9 @@ public class Service extends RepositoryManager {
 
 
     /**
-     * Can we handle this type of DataProcessInput?
+     * Can we handle this type of ServiceInput?
      *
-     * @param dpi DataProcessInput
+     * @param dpi ServiceInput
      * @return true if we can handle
      */
     public boolean canHandle(ServiceInput dpi) {

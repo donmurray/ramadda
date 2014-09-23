@@ -21,7 +21,7 @@
 package org.ramadda.geodata.model;
 
 
-import org.ramadda.data.process.DataProcess;
+import org.ramadda.data.process.Service;
 import org.ramadda.data.process.ServiceInput;
 import org.ramadda.repository.Association;
 import org.ramadda.repository.Entry;
@@ -51,7 +51,7 @@ import java.util.List;
 /**
  * Base class for CDO data processes
  */
-public abstract class CDODataProcess extends DataProcess {
+public abstract class CDODataProcess extends Service {
 
     /** months */
     protected static final String[] MONTHS = {

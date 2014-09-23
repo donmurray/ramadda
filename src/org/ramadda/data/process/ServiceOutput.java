@@ -81,10 +81,10 @@ public class ServiceOutput {
 
 
     /** empty output id */
-    public int DATAPROCESS_OUTPUT_EMPTY = 0;
+    public int SERVICE_OUTPUT_EMPTY = 0;
 
     /** operand output id */
-    public int DATAPROCESS_OUTPUT_OPERAND = 1;
+    public int SERVICE_OUTPUT_OPERAND = 1;
 
 
     /**
@@ -104,7 +104,7 @@ public class ServiceOutput {
     }
 
     /**
-     * Create a DataProcessOutput from the file
+     * Create a ServiceOutput from the file
      *
      * @param file  the associated file
      *
@@ -115,7 +115,7 @@ public class ServiceOutput {
     }
 
     /**
-     * Create the DataProcessOutput from data operand
+     * Create the ServiceOutput from data operand
      *
      * @param operand the operand
      */
@@ -178,16 +178,16 @@ public class ServiceOutput {
     }
 
     /**
-     * Get the DataProcessOutput type
+     * Get the ServiceOutput type
      *
      * @return
      */
-    public int getDataProcessOutputType() {
+    public int getServiceOutputType() {
         if (entries.isEmpty()) {
-            return DATAPROCESS_OUTPUT_EMPTY;
+            return SERVICE_OUTPUT_EMPTY;
         }
 
-        return DATAPROCESS_OUTPUT_OPERAND;
+        return SERVICE_OUTPUT_OPERAND;
     }
 
     /**
@@ -196,7 +196,7 @@ public class ServiceOutput {
      * @return  true if output type is not EMPTY
      */
     public boolean hasOutput() {
-        return getDataProcessOutputType() != DATAPROCESS_OUTPUT_EMPTY;
+        return getServiceOutputType() != SERVICE_OUTPUT_EMPTY;
     }
 
 
