@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -31,7 +31,7 @@ import org.ramadda.repository.Result;
 /**
  * A class for holding process information
  */
-public  class DataProcess extends Service {
+public class DataProcess extends Service {
 
 
     /**
@@ -44,11 +44,13 @@ public  class DataProcess extends Service {
     /**
      * Create a DataProcess
      *
+     *
+     * @param repository _more_
      * @param id       the unique id for this DataProcess
      * @param label    the label for this DataProcess
      */
     public DataProcess(Repository repository, String id, String label) {
-        super(repository, id,label);
+        super(repository, id, label);
     }
 
 

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -23,6 +23,7 @@ package org.ramadda.data.process;
 
 
 import org.ramadda.repository.Entry;
+
 import ucar.unidata.util.Misc;
 
 
@@ -45,6 +46,11 @@ public class ServiceInput {
     /** The operands for this input */
     private List<ServiceOperand> operands;
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     */
     public ServiceInput(Entry entry) {
         this(new ServiceOperand(entry));
     }
@@ -98,12 +104,20 @@ public class ServiceInput {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<Entry> getEntries() {
         List<Entry> entries = new ArrayList<Entry>();
-        if(operands == null) return entries;
-        for(ServiceOperand op: operands) {
+        if (operands == null) {
+            return entries;
+        }
+        for (ServiceOperand op : operands) {
             entries.addAll(op.getEntries());
         }
+
         return entries;
     }
 

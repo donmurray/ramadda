@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -23,6 +23,7 @@ package org.ramadda.data.process;
 
 
 import org.ramadda.repository.Entry;
+
 import ucar.unidata.util.Misc;
 
 
@@ -69,7 +70,7 @@ public class DataProcessInput extends ServiceInput {
      */
     public DataProcessInput(List<ServiceOperand> operands) {
         // TODO: should we call this with a default directory?
-        super((File)null, operands);
+        super((File) null, operands);
     }
 
     /**

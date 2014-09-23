@@ -125,8 +125,13 @@ public class ServiceOutput {
 
 
 
+    /**
+     * _more_
+     *
+     * @param operands _more_
+     */
     public ServiceOutput(List<ServiceOperand> operands) {
-        for(ServiceOperand op: operands) {
+        for (ServiceOperand op : operands) {
             entries.addAll(op.getEntries());
         }
     }
@@ -164,8 +169,8 @@ public class ServiceOutput {
      * @return the operands or an empty list
      */
     public List<ServiceOperand> getOperands() {
-        List<ServiceOperand> operands  =  new ArrayList<ServiceOperand>();
-        for(Entry entry: entries) {
+        List<ServiceOperand> operands = new ArrayList<ServiceOperand>();
+        for (Entry entry : entries) {
             operands.add(new ServiceOperand(entry.getName(), entry));
         }
 
