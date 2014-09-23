@@ -21,10 +21,10 @@
 package org.ramadda.geodata.model;
 
 
-import org.ramadda.data.process.DataProcess;
-import org.ramadda.data.process.DataProcessInput;
-import org.ramadda.data.process.DataProcessOperand;
-import org.ramadda.data.process.DataProcessOutput;
+import org.ramadda.data.process.Service;
+import org.ramadda.data.process.ServiceInput;
+import org.ramadda.data.process.ServiceOperand;
+import org.ramadda.data.process.ServiceOutput;
 //import org.ramadda.geodata.cdmdata.CDOOutputHandler;
 import org.ramadda.geodata.cdmdata.NCOOutputHandler;
 import org.ramadda.repository.Entry;
@@ -56,7 +56,7 @@ public class ClimateCollectionTypeHandler extends CollectionTypeHandler {
     public static final String ARG_DATA_PROCESS_ID = "data_process_id";
 
     /** list of data processes */
-    private List<DataProcess> processes = new ArrayList<DataProcess>();
+    private List<Service> processes = new ArrayList<Service>();
 
     /** NCL output handler */
     private NCLOutputHandler nclOutputHandler;
@@ -82,9 +82,9 @@ public class ClimateCollectionTypeHandler extends CollectionTypeHandler {
                                         Element entryNode)
             throws Exception {
         super(repository, entryNode);
-        //processes.addAll(new CDOOutputHandler(repository).getDataProcesses());
+        //processes.addAll(new CDOOutputHandler(repository).getServices());
         processes.add(new CDOArealStatisticsProcess(repository));
-        //        processes.addAll(new NCOOutputHandler(repository).getDataProcesses());
+        //        processes.addAll(new NCOOutputHandler(repository).getServices());
         nclOutputHandler = new NCLOutputHandler(repository);
     }
 
@@ -94,7 +94,7 @@ public class ClimateCollectionTypeHandler extends CollectionTypeHandler {
      *
      * @return _more_
      */
-    public List<DataProcess> getDataProcesses() {
+    public List<Service> getServices() {
         return processes;
     }
 
@@ -242,20 +242,20 @@ JQ.button(
         processTitles.add(msg("Settings"));
         processTabs.add(HtmlUtils.div(settingsSB.toString(),
                                       HtmlUtils.style("min-height:200px;")));
-        for (DataProcess process : processes) {
+        for (Service process : processes) {
             //TODO: add radio buttons
             StringBuilder tmpSB = new StringBuilder();
             tmpSB.append(HtmlUtils.radio(ARG_DATA_PROCESS_ID,
-                                         process.getDataProcessId(), false));
+                                         process.getId(), false));
             tmpSB.append(HtmlUtils.space(1));
             tmpSB.append(msg("Select"));
             tmpSB.append(HtmlUtils.br());
-            DataProcessOperand op = new DataProcessOperand(entry);
-            process.addToForm(request, new DataProcessInput(op), tmpSB);
+            ServiceOperand op = new ServiceOperand(entry);
+            process.addToForm(request, new ServiceInput(op), tmpSB);
             processTabs.add(
                 HtmlUtils.div(
                     tmpSB.toString(), HtmlUtils.style("min-height:200px;")));
-            processTitles.add(process.getDataProcessLabel());
+            processTitles.add(process.getLabel());
         }
 
         sb.append(
@@ -309,14 +309,14 @@ JQ.button(
      *
      * @throws Exception _more_
      */
-    public List<DataProcess> getDataProcessesToRun(Request request)
+    public List<Service> getServicesToRun(Request request)
             throws Exception {
-        List<DataProcess> processesToRun = new ArrayList<DataProcess>();
+        List<Service> processesToRun = new ArrayList<Service>();
         String selectedProcess = request.getString(ARG_DATA_PROCESS_ID,
                                      (String) null);
         if (selectedProcess != null) {
-            for (DataProcess process : processes) {
-                if (process.getDataProcessId().equals(selectedProcess)) {
+            for (Service process : processes) {
+                if (process.getId().equals(selectedProcess)) {
                     processesToRun.add(process);
                 }
             }
@@ -350,17 +350,18 @@ JQ.button(
         List<File>  files   = new ArrayList<File>();
         //Process each one in turn
         boolean           didProcess     = false;
-        List<DataProcess> processesToRun = getDataProcessesToRun(request);
+        List<Service> processesToRun = getServicesToRun(request);
         File              processDir = getStorageManager().createProcessDir();
-        for (DataProcess process : processesToRun) {
+        for (Service process : processesToRun) {
             System.err.println("MODEL: applying process: "
-                               + process.getDataProcessLabel());
-            DataProcessOperand op  = new DataProcessOperand(entries);
-            DataProcessInput   dpi = new DataProcessInput(processDir, op);
+                               + process.getLabel());
+            ServiceOperand op  = new ServiceOperand(entries);
+            ServiceInput   dpi = new ServiceInput(processDir, op);
             didProcess = true;
-            DataProcessOutput output = process.processRequest(request, dpi);
+            //TODO:
+            ServiceOutput output = process.evaluate(request, null, dpi);
             if (output.hasOutput()) {
-                for (DataProcessOperand oper : output.getOperands()) {
+                for (ServiceOperand oper : output.getOperands()) {
                     for (Entry outEntry : oper.getEntries()) {
                         if (outEntry.getResource().isFile()) {
                             files.add(outEntry.getResource().getTheFile());

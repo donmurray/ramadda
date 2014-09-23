@@ -112,13 +112,41 @@ public class HtmlDocTypeHandler extends GenericTypeHandler {
     @Override
     public Result getHtmlDisplay(Request request, Entry entry)
             throws Exception {
-        if ( !(entry.getValue(0) + "").equals("full")) {
+        String style =entry.getValue(0,"none");
+        if (style.equals("none")) {
+            return null;
+        }
+        if (style.equals("frame")) {
+            String url = null;
+            if(entry.getResource().isUrl()) {
+                url = entry.getResource().getPath();
+            } else if(entry.isFile()) {
+                url = entry.getTypeHandler().getEntryResourceUrl(request,
+                                                                 entry);
+            } else {
+                return null;
+            }
+            StringBuffer sb = new StringBuffer();
+            sb.append(
+                    HtmlUtils.tag(
+                        HtmlUtils.TAG_IFRAME,
+                        HtmlUtils.attr(HtmlUtils.ATTR_SRC, url)
+                        + HtmlUtils.attr(HtmlUtils.ATTR_WIDTH, "100%")
+                        + HtmlUtils.attr(
+                            HtmlUtils.ATTR_HEIGHT, "300"), "Need frames"));
+            return new Result("",sb);
+        }
+
+        if(entry.getResource().isUrl()) {
             return null;
         }
 
-        return getEntryManager().addHeaderToAncillaryPage(request,
-                new Result(BLANK,
-                           new StringBuilder(getContent(request, entry))));
+        if (style.equals("full")) {
+            return getEntryManager().addHeaderToAncillaryPage(request,
+                                                              new Result(BLANK,
+                                                                         new StringBuilder(getContent(request, entry))));
+        }
+        return null;
 
     }
 

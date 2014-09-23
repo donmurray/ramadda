@@ -21,10 +21,11 @@
 package org.ramadda.geodata.model;
 
 
-import org.ramadda.data.process.DataProcess;
-import org.ramadda.data.process.DataProcessInput;
-import org.ramadda.data.process.DataProcessOutput;
-import org.ramadda.data.process.DataProcessProvider;
+import org.ramadda.data.process.Service;
+import org.ramadda.data.process.ServiceInfo;
+import org.ramadda.data.process.ServiceInput;
+import org.ramadda.data.process.ServiceOutput;
+import org.ramadda.data.process.ServiceProvider;
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
 import org.ramadda.repository.job.JobManager;
 
@@ -85,7 +86,7 @@ import java.util.TreeSet;
 /**
  * Interface to the Climate Data Operators (CDO) package
  */
-public class CDOOutputHandler extends OutputHandler implements DataProcessProvider {
+public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
 
     /** CDO program path */
     private static final String PROP_CDO_PATH = "cdo.path";
@@ -316,16 +317,16 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
     }
 
     /**
-     *  The DataProcessProvider method. Just adds this
+     *  The ServiceProvider method. Just adds this
      *
-     * @return List of DataProcesses
+     * @return List of Services
      */
-    public List<DataProcess> getDataProcesses() {
-        List<DataProcess> processes = new ArrayList<DataProcess>();
+    public List<Service> getServices() {
+        List<Service> processes = new ArrayList<Service>();
         //TODO: put this back
         if (isEnabled()) {
             //if (true) {
-            processes.add(new CDOAreaStatistics());
+            processes.add(new CDOAreaStatistics(getRepository()));
         }
 
         return processes;
@@ -333,20 +334,20 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
 
 
     /**
-     * Get the DataProcess id
+     * Get the service id
      *
      * @return the ID
      */
-    public String getDataProcessId() {
+    public String getId() {
         return "CDO";
     }
 
     /**
-     * Get the label for the DataProcess
+     * Get the label for the service
      *
      * @return the label
      */
-    public String getDataProcessLabel() {
+    public String getLabel() {
         return "Climate Data Operator";
     }
 
@@ -440,7 +441,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      *
      * @throws Exception problems
      */
-    private void addForm(Request request, Entry entry, StringBuilder sb)
+    private void addForm(Request request, Entry entry, Appendable sb)
             throws Exception {
 
         String formUrl = request.url(getRepository().URL_ENTRY_SHOW);
@@ -480,7 +481,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      *
      * @throws Exception  on badness
      */
-    public void addToForm(Request request, Entry entry, StringBuilder sb)
+    public void addToForm(Request request, Entry entry, Appendable sb)
             throws Exception {
         //sb.append(HtmlUtils.formTable());
         if (entry.getType().equals("noaa_climate_modelfile")) {
@@ -538,7 +539,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param request  the Request
      * @param sb       the HTML
      */
-    public void addStatsWidget(Request request, StringBuilder sb) {
+    public void addStatsWidget(Request request, Appendable sb) throws Exception {
         sb.append(
             HtmlUtils.formEntry(
                 msgLabel("Statistic"),
@@ -560,7 +561,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param sb       the HTML
      * @param dataset  the dataset
      */
-    public void addVarLevelWidget(Request request, StringBuilder sb,
+    public void addVarLevelWidget(Request request, Appendable sb,
                                   GridDataset dataset) throws Exception {
         addVarLevelWidget(request, sb, dataset, ARG_CDO_LEVEL);
     }
@@ -573,7 +574,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param dataset  the dataset
      * @param levelArg the level argument
      */
-    public void addVarLevelWidget(Request request, StringBuilder sb,
+    public void addVarLevelWidget(Request request, Appendable sb,
                                   GridDataset dataset, String levelArg) throws Exception {
         List<GridDatatype> grids = dataset.getGrids();
         StringBuilder       varsb = new StringBuilder();
@@ -625,7 +626,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param request  the Request
      * @param sb       the StringBuilder to add to
      */
-    private void addInfoWidget(Request request, StringBuilder sb) throws Exception {
+    private void addInfoWidget(Request request, Appendable sb) throws Exception {
         sb.append(
             HtmlUtils.formEntry(
                 msgLabel("Months"),
@@ -642,7 +643,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param dataset  the GridDataset
      * @param useYYMM  true to provide month/year widgets, otherwise straight dates
      */
-    public void addTimeWidget(Request request, StringBuilder sb,
+    public void addTimeWidget(Request request, Appendable sb,
                               GridDataset dataset, boolean useYYMM) throws Exception {
         List<CalendarDate> dates = CdmDataOutputHandler.getGridDates(dataset);
         if ( !dates.isEmpty()) {
@@ -699,7 +700,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param sb       the HTML
      * @param dates    the list of Dates
      */
-    private void makeTimesWidget(Request request, StringBuilder sb,
+    private void makeTimesWidget(Request request, Appendable sb,
                                  List<CalendarDate> dates) throws Exception {
         List formattedDates = new ArrayList();
         formattedDates.add(new TwoFacedObject("---", ""));
@@ -733,7 +734,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param sb       the StringBuilder to add to
      * @param dates    the list of dates (just in case)
      */
-    public static void makeMonthsWidget(Request request, StringBuilder sb,
+    public static void makeMonthsWidget(Request request, Appendable sb,
                                         List<CalendarDate> dates) throws Exception {
         /*
         HtmlUtils.radio(ARG_CDO_MONTHS, "all", request.get(ARG_CDO_MONTHS, true))+msg("All")+
@@ -767,7 +768,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param sb       the StringBuilder to add to
      * @param dates    the list of dates
      */
-    private void makeYearsWidget(Request request, StringBuilder sb,
+    private void makeYearsWidget(Request request, Appendable sb,
                                  List<CalendarDate> dates) throws Exception {
         SortedSet<String> uniqueYears =
             Collections.synchronizedSortedSet(new TreeSet<String>());
@@ -812,8 +813,8 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param sb        the HTML
      * @param llr       the lat/lon rectangle
      */
-    public void addMapWidget(Request request, StringBuilder sb,
-                             LatLonRect llr) {
+    public void addMapWidget(Request request, Appendable sb,
+                             LatLonRect llr) throws Exception {
         addMapWidget(request, sb, llr, false);
     }
 
@@ -825,8 +826,8 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param llr       the lat/lon rectangle
      * @param usePopup  use a popup
      */
-    public void addMapWidget(Request request, StringBuilder sb,
-                             LatLonRect llr, boolean usePopup) {
+    public void addMapWidget(Request request, Appendable sb,
+                             LatLonRect llr, boolean usePopup) throws Exception {
 
         //TODO: This should be a parameter to the method.
         //If its null then all map regions are used 
@@ -932,10 +933,10 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
         //   - month range
         //   - year or time range
 
-        addStatCommands(request, entry, commands);
-        addLevelSelectCommands(request, entry, commands);
-        addAreaSelectCommands(request, entry, commands);
-        addDateSelectCommands(request, entry, commands);
+        addStatServices(request, entry, commands);
+        addLevelSelectServices(request, entry, commands);
+        addAreaSelectServices(request, entry, commands);
+        addDateSelectServices(request, entry, commands);
 
         System.err.println("cmds:" + commands);
 
@@ -1012,7 +1013,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param entry    the Entry
      * @param commands commands to add to
      */
-    public void addAreaSelectCommands(Request request, Entry entry,
+    public void addAreaSelectServices(Request request, Entry entry,
                                       List<String> commands) {
         boolean anySpatialDifferent = false;
         boolean haveAllSpatialArgs  = true;
@@ -1076,9 +1077,9 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param entry    the Entry
      * @param commands list of commands
      */
-    public void addLevelSelectCommands(Request request, Entry entry,
+    public void addLevelSelectServices(Request request, Entry entry,
                                        List<String> commands) {
-        addLevelSelectCommands(request, entry, commands, ARG_CDO_LEVEL);
+        addLevelSelectServices(request, entry, commands, ARG_CDO_LEVEL);
     }
 
     /**
@@ -1088,7 +1089,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param commands the list of commands
      * @param levelArg  the level argument
      */
-    public void addLevelSelectCommands(Request request, Entry entry,
+    public void addLevelSelectServices(Request request, Entry entry,
                                        List<String> commands,
                                        String levelArg) {
         String levSelect = null;
@@ -1132,7 +1133,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param commands  list of commands
      * @throws Exception  on badness
      */
-    public void addMonthSelectCommands(Request request, Entry entry,
+    public void addMonthSelectServices(Request request, Entry entry,
                                        List<String> commands)
             throws Exception {
 
@@ -1183,10 +1184,10 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      *
      * @throws Exception  on badness
      */
-    public void addDateSelectCommands(Request request, Entry entry,
+    public void addDateSelectServices(Request request, Entry entry,
                                       List<String> commands)
             throws Exception {
-        addDateSelectCommands(request, entry, commands, 0);
+        addDateSelectServices(request, entry, commands, 0);
     }
 
     /**
@@ -1198,7 +1199,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      *
      * @throws Exception  on badness
      */
-    public void addDateSelectCommands(Request request, Entry entry,
+    public void addDateSelectServices(Request request, Entry entry,
                                       List<String> commands, int dateCounter)
             throws Exception {
 
@@ -1246,7 +1247,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
                 }
             }
         } else {                                // month and year
-            addMonthSelectCommands(request, entry, commands);
+            addMonthSelectServices(request, entry, commands);
             if (dateCounterString.isEmpty()) {  // first time through
                 String yearString = null;
                 if (request.defined(ARG_CDO_YEARS)) {
@@ -1367,7 +1368,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      * @param entry    the entry
      * @param commands list of commands
      */
-    public void addStatCommands(Request request, Entry entry,
+    public void addStatServices(Request request, Entry entry,
                                 List<String> commands) {
         if (request.defined(ARG_CDO_PERIOD)
                 && request.defined(ARG_CDO_STAT)) {
@@ -1398,29 +1399,29 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
      *
      *
      */
-    protected class CDOAreaStatistics extends DataProcess {
+    protected class CDOAreaStatistics extends Service {
 
         /**
-         * Area statistics DataProcess
+         * Area statistics Service
          */
-        public CDOAreaStatistics() {
-            super("CDO_AREA_STATS", "Area Statistics");
+        public CDOAreaStatistics(Repository repository) {
+            super(repository, "CDO_AREA_STATS", "Area Statistics");
         }
 
         /**
          * Add to form
          *
          * @param request  the Request
-         * @param input    the DataProcessInput
+         * @param input    the ServiceInput
          * @param sb       the form
          *
          * @throws Exception  problem adding to the form
          */
-        public void addToForm(Request request, DataProcessInput input,
-                              StringBuilder sb)
+        public int addToForm(Request request, ServiceInput input,
+                              Appendable sb)
                 throws Exception {
             sb.append(HtmlUtils.formTable());
-            Entry first = input.getOperands().get(0).getEntries().get(0);
+            Entry first = input.getEntries().get(0);
             if (first.getType().equals("noaa_climate_modelfile")) {
                 //values[1] = var;
                 //values[2] = model;
@@ -1465,6 +1466,7 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
             }
             addMapWidget(request, sb, llr);
             sb.append(HtmlUtils.formTableClose());
+            return 1;
         }
 
 
@@ -1479,11 +1481,12 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
          *
          * @throws Exception  problem processing
          */
-        public DataProcessOutput processRequest(Request request,
-                DataProcessInput input)
+        @Override
+    public ServiceOutput evaluate(Request request, ServiceInfo info,
+                ServiceInput input)
                 throws Exception {
 
-            Entry  oneOfThem = input.getOperands().get(0).getEntries().get(0);
+            Entry  oneOfThem = input.getEntries().get(0);
             String tail      = getStorageManager().getFileTail(oneOfThem);
             String id        = getRepository().getGUID();
             String newName   = IOUtil.stripExtension(tail) + "_" + id + ".nc";
@@ -1505,10 +1508,10 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
             //   - month range
             //   - year or time range
 
-            addStatCommands(request, oneOfThem, commands);
-            addLevelSelectCommands(request, oneOfThem, commands);
-            addAreaSelectCommands(request, oneOfThem, commands);
-            addDateSelectCommands(request, oneOfThem, commands);
+            addStatServices(request, oneOfThem, commands);
+            addLevelSelectServices(request, oneOfThem, commands);
+            addAreaSelectServices(request, oneOfThem, commands);
+            addDateSelectServices(request, oneOfThem, commands);
 
             System.err.println("cmds:" + commands);
 
@@ -1536,19 +1539,19 @@ public class CDOOutputHandler extends OutputHandler implements DataProcessProvid
             out.setResource(r);
 
             if (doingPublish(request)) {
-                return new DataProcessOutput(out);
+                return new ServiceOutput(out);
             }
 
-            return new DataProcessOutput(out);
+            return new ServiceOutput(out);
         }
 
         /**
-         * Can we handle this type of DataProcessInput?
+         * Can we handle this type of ServiceInput?
          *
-         * @param dpi  the DataProcessInput to check
+         * @param dpi  the ServiceInput to check
          * @return true if we can handle
          */
-        public boolean canHandle(DataProcessInput dpi) {
+        public boolean canHandle(ServiceInput dpi) {
             return isEnabled();
         }
     }

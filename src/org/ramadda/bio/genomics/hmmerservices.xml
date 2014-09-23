@@ -1,5 +1,5 @@
-<commands>
-  <command label="Convert HMMER File" id="bio_hmmer_convert"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmconvert" >
+<services>
+  <service label="Convert HMMER File" id="bio_hmmer_convert"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmconvert" >
 <help><![CDATA[
 This will convert the given HMMER binary file to text
 <br>
@@ -7,9 +7,9 @@ Documentation at <a target="_help" href="http://hmmer.janelia.org/">http://hmmer
 ]]></help>
     <arg value="${entry.file}" type="entry" entryType="bio_hmmer_index" primary="true"></arg>
     <output type="bio_hmmer_index" stdout="true" filename="${entry.filebase}.hmm"/>
-   </command>
+   </service>
 
-  <command label="Run HMMSTAT" id="bio_hmmer_stat"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmstat" >
+  <service label="Run HMMSTAT" id="bio_hmmer_stat"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmstat" >
     <help><![CDATA[
 Run HMMSTAT
 <br>
@@ -24,9 +24,9 @@ Documentation at <a target="_help" href="http://hmmer.janelia.org/">http://hmmer
     <arg type="float" size="5" label="Score input" help="For score2eval" prefix="-S"></arg>
     <arg name="inputentry" value="${entry.file}"   type="entry" entryType="bio_hmmer_index" primary="true"></arg>
     <output showResults="true" stdout="true"/>
-   </command>
+   </service>
 
-  <command label="Run HMMEMIT" id="bio_hmmer_emit"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmemit" >
+  <service label="Run HMMEMIT" id="bio_hmmer_emit"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmemit" >
     <help><![CDATA[
 Run HMMEMIT
 <br>
@@ -51,9 +51,9 @@ Documentation at <a target="_help" href="http://hmmer.janelia.org/">http://hmmer
     <arg type="float" size="5" label="Min U" help="Show consensus as upper case if  prefix this fraction" prefix="--minu"/>
     <arg value="${entry.file}"  type="entry" entryType="bio_hmmer_index" primary="true"></arg>
     <output showResults="true" stdout="true"/>
-   </command>
+   </service>
 
-  <command label="Run HMMFETCH" id="bio_hmmer_fetch"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmfetch" >
+  <service label="Run HMMFETCH" id="bio_hmmer_fetch"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmfetch" >
     <help><![CDATA[
 Run HMMFETCH
 <br>
@@ -62,6 +62,6 @@ Documentation at <a target="_help" href="http://hmmer.janelia.org/">http://hmmer
     <arg value="${entry.file}"  type="entry" entryType="bio_hmmer_index" primary="true"></arg>
     <arg type="string" label="Key" size="35" required="true"></arg>
     <output type="bio_hmmer_index" stdout="true" filename="${entry.filebase}.hmm"/>
-   </command>
+   </service>
 
-</commands>
+</services>

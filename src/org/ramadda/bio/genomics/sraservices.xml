@@ -1,5 +1,5 @@
-<commands icon="/genomics/dna.png">
-    <command command="${bio.sratools}/abi-dump" label="Convert SRA to ABI format" id="bio_sra_to_abi" >
+<services icon="/genomics/dna.png">
+    <service command="${bio.sratools}/abi-dump" label="Convert SRA to ABI format" id="bio_sra_to_abi" >
       <help><![CDATA[
 Convert SRA data into ABI format (csfasta / qual)
 <br>
@@ -21,10 +21,10 @@ Convert SRA data into ABI format (csfasta / qual)
       <arg type="flag" label="" help="Do not clip quality left and right for spot." value="--noclip"/>
       <arg type="category" label="Workflow and piping"/>
       <arg type="flag" label="" help="Split into files by spot group (read group)." value="--spot-group"/>
-    </command>
+    </service>
 
 
-    <command command="${bio.sratools}/fastq-dump" label="Convert SRA to FASTQ" id="bio_sra_to_fastq" >
+    <service command="${bio.sratools}/fastq-dump" label="Convert SRA to FASTQ" id="bio_sra_to_fastq" >
       <help><![CDATA[
 Convert the given SRA file to the FASTQ format
 <br>
@@ -56,11 +56,11 @@ Convert the given SRA file to the FASTQ format
 
 
       <arg value="${entry.file}" type="entry" entryType="bio_sra" primary="true"/>
-    </command>
+    </service>
 
 
 
-    <command command="${bio.sratools}/illuma-dump" label="Convert SRA to ILLUMA format" id="bio_sra_to_illuma" >
+    <service command="${bio.sratools}/illuma-dump" label="Convert SRA to ILLUMA format" id="bio_sra_to_illuma" >
       <help><![CDATA[
 Convert SRA data into ILLUMA format (csfasta / qual)
 <br>
@@ -81,13 +81,13 @@ Convert SRA data into ILLUMA format (csfasta / qual)
       <arg type="category" label="Workflow and piping"/>
       <arg type="flag" label="" help="Split into files by spot group (read group)." value="--spot-group"/>
       <arg value="${entry.file}" type="entry" entryType="bio_sra" primary="true"/>
-    </command>
+    </service>
 
 
 
 
 
-    <command  id="bio_sra_to_sam"  command="${bio.sratools}/sam-dump"  label="Convert SRA to SAM" >
+    <service  id="bio_sra_to_sam"  command="${bio.sratools}/sam-dump"  label="Convert SRA to SAM" >
      <help>
 <![CDATA[
 Convert the given SRA file to SAM format
@@ -112,11 +112,11 @@ Convert the given SRA file to SAM format
      <arg value="--output-file"></arg>
      <arg type="entry" entryType="bio_sra" primary="true" value="${entry.filebase}.sam"></arg>
      <arg type="entry" entryType="bio_sra" primary="true" value="${entry.file}"></arg>
-   </command>
+   </service>
 
 
 
-    <command command="${bio.sratools}/sff-dump" label="Convert SRA to SFF format" id="bio_sra_to_sff" >
+    <service command="${bio.sratools}/sff-dump" label="Convert SRA to SFF format" id="bio_sra_to_sff" >
       <help><![CDATA[
 Convert SRA data into SFF format
 <br>
@@ -134,12 +134,12 @@ Convert SRA data into SFF format
       <arg type="string" label="Maximum spot id" prefix="--maxSpotId" placeHolder="&lt;row id&gt;"/>
       <arg type="string" label="Read filter" prefix="--read-filter" help="Split into files by filter value: pass|reject|criteria|redacted."/>
       <arg value="${entry.file}" type="entry" entryType="bio_sra" primary="true"/>
-    </command>
+    </service>
 
 
 
 
-    <command command="${bio.sratools}/sra-stat" label="SRA stats" id="bio_sra_stat" >
+    <service command="${bio.sratools}/sra-stat" label="SRA stats" id="bio_sra_stat" >
       <help><![CDATA[
 Show SRA stats
 <br>
@@ -156,13 +156,13 @@ Show SRA stats
       <arg type="string" placeHolder="&lt;row-id&gt;" label="End spot id" help="ending spot id, default is max" value="--stop"/>
       <arg type="flag"   label="Quick mode" help="get statistics from metadata; do not scan the table " value="--quick"/>
       <arg value="${entry.file}" type="entry" entryType="bio_sra" primary="true"/>
-    </command>
+    </service>
 
 
 
 
 
-    <command command="${bio.sratools}/sra-pileup" label="SRA pileup" id="bio_sra_pileup" >
+    <service command="${bio.sratools}/sra-pileup" label="SRA pileup" id="bio_sra_pileup" >
       <help><![CDATA[
 Generate pileup statistics on aligned SRA data 
 <br>
@@ -182,6 +182,6 @@ Generate pileup statistics on aligned SRA data
 
       <arg type="string" placeHolder="&lt;min. mapq&gt;" label="Min mapping quality" help="Minimum mapping quality, alignments with a lower mapq will be ignored (default=0). " value="--minmapq"/>
       <arg value="${entry.file}" type="entry" entryType="bio_sra" primary="true"/>
-    </command>
+    </service>
 
-</commands>
+</services>

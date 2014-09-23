@@ -1,10 +1,10 @@
-<commands command="${bio.picard}" outputToStderr="true" icon="/genomics/picard.png">
+<services command="${bio.picard}" outputToStderr="true" icon="/genomics/picard.png">
 
-    <command  label="Convert FASTQ to SAM" id="bio_picard_fastqtosam">
+    <service  label="Convert FASTQ to SAM" id="bio_picard_fastqtosam" outputToStderr="true">
       <help><![CDATA[
 Run Picard to convert FASTQ to SAM
 <br>
-<a href="http://picard.sourceforge.net/command-line-overview.shtml#FastqToSam" target="_help">Documentation</a>
+<a href="http://picard.sourceforge.net/service-line-overview.shtml#FastqToSam" target="_help">Documentation</a>
 ]]></help>
       <output type="bio_sam" pattern=".*\.sam"/>
       <arg value="FastqToSam.jar"></arg>
@@ -20,16 +20,16 @@ pre-pipeline 1.3 style scores (solexa scaling + 66), Illumina for pipeline 1.3 a
 (phred scaling + 64) or Standard for phred scaled scores with a character shift of 33.  
 If this value is not specified, the quality format will be detected automatically.  
 <br>
-<a target="_help" href="http://picard.sourceforge.net/command-line-overview.shtml#FastqToSam">Documentation</a>
+<a target="_help" href="http://picard.sourceforge.net/service-line-overview.shtml#FastqToSam">Documentation</a>
 ]]></help>
 </arg>
-    </command>
+    </service>
 
-    <command  label="Convert SAM to FASTQ" id="bio_picard_samtofastq">
+    <service  label="Convert SAM to FASTQ" id="bio_picard_samtofastq">
       <help><![CDATA[
 Run Picard to convert SAM to FASTQ
 <br>
-<a href="http://picard.sourceforge.net/command-line-overview.shtml#SamToFastq" target="_help">Documentation</a>
+<a href="http://picard.sourceforge.net/service-line-overview.shtml#SamToFastq" target="_help">Documentation</a>
 ]]></help>
       <output type="bio_fastq" pattern=".*\.fastq"/>
       <arg value="SamToFastq.jar"></arg>
@@ -46,16 +46,16 @@ Run Picard to convert SAM to FASTQ
 <arg type="int" value="READ2_TRIM=${value}" label="Read 2 trim" help="The number of bases to trim from the beginning of read 2. Default value: 0."/>
 <arg type="int" value="READ2_MAX_BASES_TO_WRITE=${value}" label="Read 2 max bases" help="The maximum number of bases to write from read 2 after trimming. If there are fewer than this many bases left after trimming, all will be written. If this value is null then all bases left after trimming will be written."/>
 <arg type="enumeration" values=":-default-,true,false" value="INCLUDE_NON_PRIMARY_ALIGNMENTS=${value}" label="Include non-primary" help="If true, include non-primary alignments in the output. Support of non-primary alignments in SamToFastq is not comprehensive, so there may be exceptions if this is set to true and there are paired reads with non-primary alignments. Default value: false."/>
-    </command>
+    </service>
 
 
 
 
-    <command  label="Alignment Summary Statistics" id="bio_picard_collectalignmentsummarymetrics">
+    <service  label="Alignment Summary Statistics" id="bio_picard_collectalignmentsummarymetrics">
       <help><![CDATA[
 Reads a SAM or BAM file and writes a file containing summary alignment metrics. 
 <br>
-<a href="http://picard.sourceforge.net/command-line-overview.shtml#CollectAlignmentSummaryMetrics" target="_help">Documentation</a>
+<a href="http://picard.sourceforge.net/service-line-overview.shtml#CollectAlignmentSummaryMetrics" target="_help">Documentation</a>
 ]]></help>
       <output type="bio_sam" pattern=".*\.sam"/>
       <arg value="CollectAlignmentSummaryMetrics.jar"></arg>
@@ -67,7 +67,7 @@ Reads a SAM or BAM file and writes a file containing summary alignment metrics.
       <arg type="enumeration" values=":default,true,false,null"  label="Is Bisulfite" value="IS_BISULFITE_SEQUENCED=${value}" help="Whether the SAM or BAM file consists of bisulfite sequenced reads. Default value: false."/>
       <arg type="enumeration" values="default,true,false,null"  label="Assume sorted" value="ASSUME_SORTED=${value}" help="If true (default), then the sort order in the header file will be ignored."/>
       <arg type="int"  label="Stop after" value="STOP_AFTER=${value}" help="Stop after processing N reads, mainly for debugging. Default value: 0. "/>
-    </command>
+    </service>
 
 
 
@@ -75,11 +75,11 @@ Reads a SAM or BAM file and writes a file containing summary alignment metrics.
 
 
 
-    <command command="${bio.picard}" label="Add Or Replace Read Groups" id="bio_picard_addorreplacegroups"  >
+    <service command="${bio.picard}" label="Add Or Replace Read Groups" id="bio_picard_addorreplacegroups"  >
       <help><![CDATA[
 Replaces all read groups in the INPUT file with a new read group and assigns all reads to this read group in the OUTPUT
 <br>
-<a target="_help" href="http://picard.sourceforge.net/command-line-overview.shtml#AddOrReplaceReadGroups">Documentation</a>
+<a target="_help" href="http://picard.sourceforge.net/service-line-overview.shtml#AddOrReplaceReadGroups">Documentation</a>
 ]]></help>
       <output type="bio_sam" pattern=".*\.sam"/>
       <output type="bio_bam" pattern=".*\.bam"/>
@@ -99,10 +99,10 @@ Replaces all read groups in the INPUT file with a new read group and assigns all
 <arg type="string" value="RGDS=${value}" size="60" label="Description"/>
 <arg type="string" value="RGDT=${value}" size="60" label="Run date" help="Iso8601 Date" />
 <arg type="int" value="RGPI=${value}" size="8"  label="Predicted insert size"/>
-    </command>
+    </service>
 
 
 
 
 
-</commands>
+</services>

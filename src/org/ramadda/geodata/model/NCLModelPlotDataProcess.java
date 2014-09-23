@@ -21,10 +21,11 @@
 package org.ramadda.geodata.model;
 
 
-import org.ramadda.data.process.DataProcess;
-import org.ramadda.data.process.DataProcessInput;
-import org.ramadda.data.process.DataProcessOperand;
-import org.ramadda.data.process.DataProcessOutput;
+import org.ramadda.data.process.Service;
+import org.ramadda.data.process.ServiceInput;
+import org.ramadda.data.process.ServiceInfo;
+import org.ramadda.data.process.ServiceOperand;
+import org.ramadda.data.process.ServiceOutput;
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
 import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.Constants;
@@ -59,13 +60,11 @@ import java.util.regex.Matcher;
 /**
  * Map plotting process using NCL
  */
-public class NCLModelPlotDataProcess extends DataProcess {
+public class NCLModelPlotDataProcess extends Service {
 
     /** The nclOutputHandler */
     NCLOutputHandler nclOutputHandler;
 
-    /** the repository */
-    Repository repository;
 
     /** output type */
     public final static String ARG_NCL_OUTPUT = "ncl.output";
@@ -105,8 +104,7 @@ public class NCLModelPlotDataProcess extends DataProcess {
     public NCLModelPlotDataProcess(Repository repository, String id,
                                    String label)
             throws Exception {
-        super(id, label);
-        this.repository  = repository;
+        super(repository, id, label);
         nclOutputHandler = new NCLOutputHandler(repository);
     }
 
@@ -122,7 +120,7 @@ public class NCLModelPlotDataProcess extends DataProcess {
     public void initFormJS(Request request, Appendable js, String formVar)
             throws Exception {
         js.append(formVar
-                  + ".addDataProcess(new NCLModelPlotDataProcess());\n");
+                  + ".addService(new NCLModelPlotService());\n");
     }
 
 
@@ -136,11 +134,11 @@ public class NCLModelPlotDataProcess extends DataProcess {
      * @throws Exception  problem getting the information for the form
      */
     @Override
-    public void addToForm(Request request, DataProcessInput input,
-                          StringBuilder sb)
+        public int addToForm(Request request, ServiceInput input,
+                          Appendable sb)
             throws Exception {
         sb.append(HtmlUtils.formTable());
-        Entry first = input.getOperands().get(0).getEntries().get(0);
+        Entry first = input.getEntries().get(0);
 
         CdmDataOutputHandler dataOutputHandler =
             nclOutputHandler.getDataOutputHandler();
@@ -246,30 +244,31 @@ public class NCLModelPlotDataProcess extends DataProcess {
                 + Repository.msgLabel("Override Contour Defaults")
                 + "</div>", contourSB.toString()));
         sb.append(HtmlUtils.formTableClose());
+        return 1;
     }
 
     /**
      * Process the request
      *
      * @param request  the request
-     * @param input    the DataProcessInput
+     * @param input    the ServiceInput
      *
      * @return  the output
      *
      * @throws Exception  problems generating the output
      */
     @Override
-    public DataProcessOutput processRequest(Request request,
-                                            DataProcessInput input)
+     public ServiceOutput evaluate(Request request,ServiceInfo info, 
+                                            ServiceInput input)
             throws Exception {
 
         List<Entry>              outputEntries = new ArrayList<Entry>();
-        List<DataProcessOperand> ops           = input.getOperands();
+        List<ServiceOperand> ops           = input.getOperands();
         StringBuffer             fileList      = new StringBuffer();
         StringBuffer             nameList      = new StringBuffer();
         Entry                    inputEntry    = null;
         boolean                  haveOne       = false;
-        for (DataProcessOperand op : ops) {
+        for (ServiceOperand op : ops) {
 
             List<Entry> opEntries = op.getEntries();
             inputEntry = opEntries.get(0);
@@ -286,7 +285,7 @@ public class NCLModelPlotDataProcess extends DataProcess {
             }
         }
 
-        String wksName = repository.getGUID();
+        String wksName = getRepository().getGUID();
         String plotType =
             request.getString(NCLOutputHandler.ARG_NCL_PLOTTYPE, "png");
         if (plotType.equals("image")) {
@@ -428,9 +427,9 @@ public class NCLModelPlotDataProcess extends DataProcess {
         envMap.put("colormap", colormap);
         envMap.put("anom", Boolean.toString(haveAnom));
         envMap.put("annotation",
-                   repository.getProperty(Constants.PROP_REPOSITORY_NAME,
+                   getRepository().getProperty(Constants.PROP_REPOSITORY_NAME,
                                           ""));
-        String logo = repository.getProperty(Constants.PROP_LOGO_IMAGE, "");
+        String logo = getRepository().getProperty(Constants.PROP_LOGO_IMAGE, "");
         if (!logo.isEmpty()) {
             if (!logo.startsWith("http")) {
                 if (!logo.startsWith("/")) {
@@ -446,7 +445,7 @@ public class NCLModelPlotDataProcess extends DataProcess {
         System.err.println("env:" + envMap);
 
         //Use new repository method to execute. This gets back [stdout,stderr]
-        JobManager.CommandResults results = repository.getJobManager().executeCommand(commands, envMap,
+        JobManager.CommandResults results = getRepository().getJobManager().executeCommand(commands, envMap,
                                input.getProcessDir(), 60);
         String errorMsg = results.getStderrMsg();
         String outMsg   = results.getStdoutMsg();
@@ -482,15 +481,15 @@ public class NCLModelPlotDataProcess extends DataProcess {
             outType = "geo_kml";
         }
         Resource resource = new Resource(outFile, Resource.TYPE_LOCAL_FILE);
-        TypeHandler myHandler = repository.getTypeHandler(outType, false,
+        TypeHandler myHandler = getRepository().getTypeHandler(outType, false,
                                     true);
         Entry outputEntry = new Entry(myHandler, true, outFile.toString());
         outputEntry.setResource(resource);
         nclOutputHandler.getEntryManager().writeEntryXmlFile(request,
                 outputEntry);
         outputEntries.add(outputEntry);
-        DataProcessOutput dpo =
-            new DataProcessOutput(new DataProcessOperand("Plot of "
+        ServiceOutput dpo =
+            new ServiceOutput(new ServiceOperand("Plot of "
                 + nameList, outputEntries));
 
         return dpo;
@@ -542,12 +541,12 @@ public class NCLModelPlotDataProcess extends DataProcess {
     }
 
     /**
-     * Can we handle this type of DataProcessInput?
+     * Can we handle this type of ServiceInput?
      *
-     * @param dpi  the DataProcessInput
+     * @param dpi  the ServiceInput
      * @return true if we can handle
      */
-    public boolean canHandle(DataProcessInput dpi) {
+    public boolean canHandle(ServiceInput dpi) {
         if ( !nclOutputHandler.isEnabled()) {
             return false;
         }
@@ -556,7 +555,7 @@ public class NCLModelPlotDataProcess extends DataProcess {
             return false;
         }
 
-        for (DataProcessOperand op : dpi.getOperands()) {
+        for (ServiceOperand op : dpi.getOperands()) {
             List<Entry> entries = op.getEntries();
             // TODO: change this when we can handle more than one entry (e.g. daily data)
             if (entries.isEmpty() || (entries.size() > 1)) {

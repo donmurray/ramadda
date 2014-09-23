@@ -26,7 +26,7 @@ import org.ramadda.data.services.RecordConstants;
 
 import org.ramadda.repository.*;
 import org.ramadda.repository.output.*;
-import org.ramadda.data.process.Command;
+import org.ramadda.data.process.Service;
 import org.ramadda.repository.type.*;
 import org.ramadda.repository.util.DateArgument;
 import org.ramadda.util.HtmlUtils;
@@ -141,13 +141,13 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
             if(!(outputHandler instanceof ExecutableOutputHandler)) {
                 continue;
             }
-            Command command = ((ExecutableOutputHandler)outputHandler).getCommand();
-            if(!command.isEnabled()) continue;
+            Service service = ((ExecutableOutputHandler)outputHandler).getService();
+            if(!service.isEnabled()) continue;
 
-            String url = "/command/" + command.getId();
+            String url = "/service/" + service.getId();
             apis.add(Json.map(SU.ATTR_PATH, Json.quote(url),
                               SU.ATTR_DESCRIPTION,
-                              Json.quote(" API for "  + command.getLabel())));
+                              Json.quote(" API for "  + service.getLabel())));
 
 
 
@@ -210,15 +210,15 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
     }
 
 
-    public Result processSwaggerCommandRequest(Request request)
+    public Result processSwaggerServiceRequest(Request request)
             throws Exception {
         List<String> toks = StringUtil.split(request.getRequestPath(), "/",
                                              true, true);
         String       type        = toks.get(toks.size() - 1);
-        Command command = getRepository().getJobManager().getCommand(type);
+        Service service = getRepository().getJobManager().getService(type);
 
         List<String> apis        = new ArrayList<String>();
-        apis.add(getCommandApi(request, command));
+        apis.add(getServiceApi(request, service));
 
         List<String> doc =
             SU.createDocument(request.getAbsoluteUrl(""),
@@ -238,17 +238,17 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
      *
      * @throws Exception _more_
      */
-    private String getCommandApi(Request request, Command command)
+    private String getServiceApi(Request request, Service service)
             throws Exception {
         List<String> parameters = new ArrayList<String>();
         parameters.add(SU.getParameter(ARG_OUTPUT,
                                        "Output type  -don't change",
-                                       command.getId(), true));
+                                       service.getId(), true));
 
-        List<Command.Arg> args  = new ArrayList<Command.Arg>();
+        List<Service.Arg> args  = new ArrayList<Service.Arg>();
         //TODO: We get everything including intermediate entries
-        command.collectArgs(args);
-        for(Command.Arg arg: args) {
+        service.collectArgs(args);
+        for(Service.Arg arg: args) {
             if(arg.isValueArg()) {
                 continue;
             }
@@ -307,7 +307,7 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         */
 
         List<String> operations = new ArrayList<String>();
-        operations.add(Json.map(SU.createOperation("API for " + command.getLabel(), "API to call: " + command.getLabel(), command.getId(), parameters, new ArrayList<String>())));
+        operations.add(Json.map(SU.createOperation("API for " + service.getLabel(), "API to call: " + service.getLabel(), service.getId(), parameters, new ArrayList<String>())));
 
         return Json.map(SU.createApi(getRepository().URL_ENTRY_SHOW.toString(), operations));
     }

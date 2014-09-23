@@ -21,10 +21,10 @@
 package org.ramadda.geodata.model;
 
 
-import org.ramadda.data.process.DataProcess;
-import org.ramadda.data.process.DataProcessInput;
-import org.ramadda.data.process.DataProcessOperand;
-import org.ramadda.data.process.DataProcessOutput;
+import org.ramadda.data.process.Service;
+import org.ramadda.data.process.ServiceInput;
+import org.ramadda.data.process.ServiceOperand;
+import org.ramadda.data.process.ServiceOutput;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
 import org.ramadda.repository.RepositoryManager;
@@ -123,12 +123,12 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
      *
      * @throws Exception problem generating list
      */
-    private List<DataProcess> getDataProcesses(Request request, String action)
+    private List<Service> getServices(Request request, String action)
             throws Exception {
-        //return getTypeHandler().getDataProcessesToRun(request);
-        List<DataProcess> processes = new ArrayList<DataProcess>();
+        //return getTypeHandler().getServicesToRun(request);
+        List<Service> processes = new ArrayList<Service>();
         if (action.equals(ARG_ACTION_COMPARE)) {
-            DataProcess process = new CDOArealStatisticsProcess(repository);
+            Service process = new CDOArealStatisticsProcess(repository);
             if (process.isEnabled()) {
                 processes.add(process);
             }
@@ -137,7 +137,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 processes.add(process);
             }
         } else if (action.equals(ARG_ACTION_TIMESERIES)) {
-            DataProcess process = new CDOTimeSeriesProcess(repository);
+            Service process = new CDOTimeSeriesProcess(repository);
             if (process.isEnabled()) {
                 processes.add(process);
             }
@@ -157,11 +157,11 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
      *
      * @throws Exception  problems processing the input
      */
-    public Result doCompare(Request request, DataProcessInput dpi)
+    public Result doCompare(Request request, ServiceInput dpi)
             throws Exception {
 
         //This finds the selected processes
-        List<DataProcess> processesToRun = getDataProcesses(request,
+        List<Service> processesToRun = getServices(request,
                                                ARG_ACTION_COMPARE);
 
         //This is the dir under <home>/process
@@ -171,14 +171,14 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             processDir = getStorageManager().createProcessDir();
         }
 
-        List<DataProcessOutput> outputs   =
-            new ArrayList<DataProcessOutput>();
-        DataProcessInput        nextInput = dpi;
-        for (DataProcess process : processesToRun) {
+        List<ServiceOutput> outputs   =
+            new ArrayList<ServiceOutput>();
+        ServiceInput        nextInput = dpi;
+        for (Service process : processesToRun) {
             System.err.println("MODEL: applying process: "
-                               + process.getDataProcessLabel());
-            DataProcessOutput output = process.processRequest(request,
-                                           nextInput);
+                               + process.getLabel());
+            ServiceOutput output = process.evaluate(request, null,
+                                                    nextInput);
             outputs.add(output);
 
             //make a new input for the next process
@@ -194,18 +194,16 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         List<File> files     = new ArrayList<File>();
         File       lastFile  = null;
         Entry      lastEntry = null;
-        for (DataProcessOutput dpo : outputs) {
-            for (DataProcessOperand op : dpo.getOperands()) {
-                for (Entry granule : op.getEntries()) {
-                    if (granule.isFile()) {
-                        lastFile = granule.getFile();
-                        if (IOUtil.hasSuffix(lastFile.toString(), "kmz")) {
-                            anyKMZ = true;
-                        }
-                        files.add(lastFile);
+        for (ServiceOutput dpo : outputs) {
+            for (Entry granule : dpo.getEntries()) {
+                if (granule.isFile()) {
+                    lastFile = granule.getFile();
+                    if (IOUtil.hasSuffix(lastFile.toString(), "kmz")) {
+                        anyKMZ = true;
                     }
-                    lastEntry = granule;
+                    files.add(lastFile);
                 }
+                lastEntry = granule;
             }
         }
 
@@ -221,7 +219,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             dpiDesc.append("Analysis of ");
         }
         int cntr = 0;
-        for (DataProcessOperand dpo : dpi.getOperands()) {
+        for (ServiceOperand dpo : dpi.getOperands()) {
             if (cntr > 0) {
                 dpiDesc.append(" and ");
             }
@@ -296,11 +294,11 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
      *
      * @throws Exception  problems processing the input
      */
-    public Result makeTimeSeries(Request request, DataProcessInput dpi)
+    public Result makeTimeSeries(Request request, ServiceInput dpi)
             throws Exception {
 
         //This finds the selected processes
-        List<DataProcess> processesToRun = getDataProcesses(request,
+        List<Service> processesToRun = getServices(request,
                                                ARG_ACTION_TIMESERIES);
 
         //This is the dir under <home>/process
@@ -310,13 +308,13 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             processDir = getStorageManager().createProcessDir();
         }
 
-        List<DataProcessOutput> outputs   =
-            new ArrayList<DataProcessOutput>();
-        DataProcessInput        nextInput = dpi;
-        for (DataProcess process : processesToRun) {
+        List<ServiceOutput> outputs   =
+            new ArrayList<ServiceOutput>();
+        ServiceInput        nextInput = dpi;
+        for (Service process : processesToRun) {
             System.err.println("MODEL: applying process: "
-                               + process.getDataProcessLabel());
-            DataProcessOutput output = process.processRequest(request,
+                               + process.getLabel());
+            ServiceOutput output = process.evaluate(request, null,
                                            nextInput);
             outputs.add(output);
 
@@ -333,18 +331,16 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         List<File> files     = new ArrayList<File>();
         File       lastFile  = null;
         Entry      lastEntry = null;
-        for (DataProcessOutput dpo : outputs) {
-            for (DataProcessOperand op : dpo.getOperands()) {
-                for (Entry granule : op.getEntries()) {
-                    if (granule.isFile()) {
-                        lastFile = granule.getFile();
-                        if (IOUtil.hasSuffix(lastFile.toString(), "kmz")) {
-                            anyKMZ = true;
-                        }
-                        files.add(lastFile);
+        for (ServiceOutput dpo : outputs) {
+            for (Entry granule : dpo.getEntries()) {
+                if (granule.isFile()) {
+                    lastFile = granule.getFile();
+                    if (IOUtil.hasSuffix(lastFile.toString(), "kmz")) {
+                        anyKMZ = true;
                     }
-                    lastEntry = granule;
+                    files.add(lastFile);
                 }
+                lastEntry = granule;
             }
         }
 
@@ -360,7 +356,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             dpiDesc.append("Analysis of ");
         }
         int cntr = 0;
-        for (DataProcessOperand dpo : dpi.getOperands()) {
+        for (ServiceOperand dpo : dpi.getOperands()) {
             if (cntr > 0) {
                 dpiDesc.append(" and ");
             }
@@ -457,7 +453,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
     public Result handleRequest(Request request, String type)
             throws Exception {
 
-        if (getDataProcesses(request, type).isEmpty()) {
+        if (getServices(request, type).isEmpty()) {
             throw new RuntimeException(
                 "Data processes for model comparison are not configured.");
         }
@@ -484,8 +480,8 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         Hashtable<String, StringBuilder> extra = new Hashtable<String,
                                                      StringBuilder>();
-        List<DataProcessOperand> operands =
-            new ArrayList<DataProcessOperand>();
+        List<ServiceOperand> operands =
+            new ArrayList<ServiceOperand>();
 
         File processDir = getStorageManager().createProcessDir();
 
@@ -520,7 +516,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
                     continue;
                 }
-                operands.add(new DataProcessOperand(entries.get(0).getName(),
+                operands.add(new ServiceOperand(entries.get(0).getName(),
                         entries));
 
                 tmp.append(
@@ -557,7 +553,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
 
         StringBuilder    sb  = new StringBuilder();
-        DataProcessInput dpi = new DataProcessInput(processDir, operands);
+        ServiceInput dpi = new ServiceInput(processDir, operands);
         
         if (request.exists(type)) {
             if (hasOperands) {
@@ -628,7 +624,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                                         collection.getId()));
         }
 
-        List<DataProcess> processes = getDataProcesses(request, type);
+        List<Service> processes = getServices(request, type);
 
 
         String            formType  = "compare";
@@ -649,7 +645,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
 
 
-        for (DataProcess process : processes) {
+        for (Service process : processes) {
             process.initFormJS(request, js, formId);
         }
 
@@ -868,14 +864,14 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
             boolean      first         = true;
 
-            for (DataProcess process : processes) {
+            for (Service process : processes) {
                 StringBuilder tmpSB = new StringBuilder();
                 if (processes.size() > 1) {
                     /*
                 tmpSB.append(
                     HtmlUtils.radio(
                         ClimateCollectionTypeHandler.ARG_DATA_PROCESS_ID,
-                        process.getDataProcessId(), first));
+                        process.getId(), first));
                 tmpSB.append(HtmlUtils.space(1));
                 tmpSB.append(msg("Select"));
                 tmpSB.append(HtmlUtils.br());
@@ -884,12 +880,12 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                     tmpSB.append(
                         HtmlUtils.hidden(
                             ClimateCollectionTypeHandler.ARG_DATA_PROCESS_ID,
-                            process.getDataProcessId()));
+                            process.getId()));
                 }
                 if (process.canHandle(dpi)) {
                     process.addToForm(request, dpi, tmpSB);
                     processTabs.add(tmpSB.toString());
-                    processTitles.add(process.getDataProcessLabel());
+                    processTitles.add(process.getLabel());
                     first = false;
                 }
             }

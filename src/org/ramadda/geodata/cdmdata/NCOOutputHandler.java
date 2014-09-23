@@ -21,10 +21,7 @@
 package org.ramadda.geodata.cdmdata;
 
 
-import org.ramadda.data.process.DataProcess;
-import org.ramadda.data.process.DataProcessInput;
-import org.ramadda.data.process.DataProcessOutput;
-import org.ramadda.data.process.DataProcessProvider;
+import org.ramadda.data.process.*;
 
 
 import org.ramadda.repository.*;
@@ -240,7 +237,7 @@ public class NCOOutputHandler extends OutputHandler implements DataProcessProvid
         //TODO: put this back
         //        if(isEnabled()) {
         if (true) {
-            processes.add(new NCODataProcess());
+            processes.add(new NCODataProcess(getRepository()));
         }
 
         return processes;
@@ -605,8 +602,8 @@ public class NCOOutputHandler extends OutputHandler implements DataProcessProvid
         /**
          * _more_
          */
-        public NCODataProcess() {
-            super("NCO", "NCO Weighted Average");
+        public NCODataProcess(Repository repository) {
+            super(repository, "NCO", "NCO Weighted Average");
         }
 
         /**

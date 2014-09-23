@@ -152,7 +152,7 @@ public class NCLOutputHandler extends OutputHandler {
 
     /** NCL version regex */
     private static final String NCL_VERSION_REGEX =
-        "NCAR Command Language Version (\\d+.\\d+.\\d+)";
+        "NCAR Service Language Version (\\d+.\\d+.\\d+)";
 
     /** NCL version pattern */
     public static final Pattern versionPattern =

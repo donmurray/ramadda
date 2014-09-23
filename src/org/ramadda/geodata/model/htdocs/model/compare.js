@@ -11,7 +11,7 @@ function CollectionForm(formId, type, args) {
             formId:formId,
             analysisUrl: ramaddaBaseUrl +"/model/" + type +"?"+args,
             type:type,
-            dataProcesses: [],
+            services: [],
             init: function() {
                 var collectionForm = this;
                 for(var i=1;i<=2;i++) {
@@ -291,8 +291,8 @@ function CollectionForm(formId, type, args) {
                         return collectionForm.fieldChanged(collection, fieldIdx);
                     });
             },
-            addDataProcess: function(dataProcess) {
-                this.dataProcesses.push(dataProcess);
+            addService: function(service) {
+                this.services.push(service);
             },
            //Gets called when the collection select widget is changed
             collectionChanged: function  (collection, selectId) {
@@ -410,7 +410,7 @@ function CollectionForm(formId, type, args) {
 }
 
 
-function DataProcess(formId) {
+function RamaddaService(formId) {
     RamaddaUtil.defineMembers(this, {
             formId:formId
         });
@@ -440,17 +440,17 @@ var ARG_CDO_AREA_WEST = ARG_CDO_AREA + "_west";
 
 
 
-function CDOTimeSeriesProcess(formId) {
+function CDOTimeSeriesService(formId) {
      var SUPER;
-     RamaddaUtil.inherit(this, SUPER = new DataProcess(formId));
+     RamaddaUtil.inherit(this, SUPER = new RamaddaService(formId));
 }
 
-function CDOArealStatisticsProcess(formId) {
+function CDOArealStatisticsService(formId) {
      var SUPER;
-     RamaddaUtil.inherit(this, SUPER = new DataProcess(formId));
+     RamaddaUtil.inherit(this, SUPER = new RamaddaService(formId));
 }
 
-function NCLModelPlotDataProcess(formId) {
+function NCLModelPlotService(formId) {
      var SUPER;
-     RamaddaUtil.inherit(this, SUPER = new DataProcess(formId));
+     RamaddaUtil.inherit(this, SUPER = new RamaddaService(formId));
 }

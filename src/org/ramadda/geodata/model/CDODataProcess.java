@@ -27,7 +27,7 @@ import java.util.HashSet;
 import java.util.List;
 
 import org.ramadda.data.process.DataProcess;
-import org.ramadda.data.process.DataProcessInput;
+import org.ramadda.data.process.ServiceInput;
 import org.ramadda.repository.Association;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
@@ -60,8 +60,6 @@ public abstract class CDODataProcess extends DataProcess {
     /** the type handler associated with this */
     private CDOOutputHandler outputHandler;
 
-    /** the associated repository */
-    private Repository repository;
 
     /**
      * _more_
@@ -74,8 +72,7 @@ public abstract class CDODataProcess extends DataProcess {
      */
     public CDODataProcess(Repository repository, String id, String label)
             throws Exception {
-        super(id, label);
-        this.repository = repository;
+        super(repository, id, label);
         outputHandler   = new CDOOutputHandler(repository);
     }
 
@@ -155,12 +152,12 @@ public abstract class CDODataProcess extends DataProcess {
      * @throws Exception _more_
      */
     protected Entry makeClimatology(Request request, Entry entry,
-                                    DataProcessInput dpi, String tail)
+                                    ServiceInput dpi, String tail)
             throws Exception {
         String climName = IOUtil.stripExtension(tail) + "_clim.nc";
         File climFile = new File(IOUtil.joinDir(dpi.getProcessDir(),
                             climName));
-        List<String> commands = initCDOCommand();
+        List<String> commands = initCDOService();
         commands.add("ymonmean");
         commands.add(entry.getResource().getPath());
         commands.add(climFile.toString());
@@ -178,14 +175,6 @@ public abstract class CDODataProcess extends DataProcess {
 
     }
 
-    /**
-     * Get the repository
-     *
-     * @return the repository
-     */
-    protected Repository getRepository() {
-        return repository;
-    }
 
     /**
      * Get the output handler
@@ -201,14 +190,14 @@ public abstract class CDODataProcess extends DataProcess {
      *
      * @return  the initial list of CDO commands
      */
-    protected List<String> initCDOCommand() {
-        List<String> newCommands = new ArrayList<String>();
-        newCommands.add(getOutputHandler().getCDOPath());
-        newCommands.add("-L");
-        newCommands.add("-s");
-        newCommands.add("-O");
+    protected List<String> initCDOService() {
+        List<String> newServices = new ArrayList<String>();
+        newServices.add(getOutputHandler().getCDOPath());
+        newServices.add("-L");
+        newServices.add("-s");
+        newServices.add("-O");
 
-        return newCommands;
+        return newServices;
     }
 
     /**
@@ -251,7 +240,7 @@ public abstract class CDODataProcess extends DataProcess {
      * @param request  the Request
      * @param sb       the HTML
      */
-    public void addStatsWidget(Request request, StringBuilder sb) {
+    public void addStatsWidget(Request request, Appendable sb) throws Exception {
         sb.append(
             HtmlUtils.formEntry(
                 Repository.msgLabel("Statistic"),

@@ -21,9 +21,10 @@
 package org.ramadda.geodata.model;
 
 
-import org.ramadda.data.process.DataProcessInput;
-import org.ramadda.data.process.DataProcessOperand;
-import org.ramadda.data.process.DataProcessOutput;
+import org.ramadda.data.process.ServiceInput;
+import org.ramadda.data.process.ServiceInfo;
+import org.ramadda.data.process.ServiceOperand;
+import org.ramadda.data.process.ServiceOutput;
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
 import org.ramadda.repository.Association;
 import org.ramadda.repository.Entry;
@@ -61,7 +62,7 @@ import java.util.TreeSet;
 
 
 /**
- * DataProcess for area statistics using CDO
+ * Service for area statistics using CDO
  */
 public class CDOArealStatisticsProcess extends CDODataProcess {
 
@@ -86,10 +87,10 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      *
      * @throws Exception _more_
      */
-    public void initFormJS(Request request, StringBuilder js, String formVar)
+    public void initFormJS(Request request, Appendable js, String formVar)
             throws Exception {
         js.append(formVar
-                  + ".addDataProcess(new CDOArealStatisticsProcess());\n");
+                  + ".addService(new CDOArealStatisticsService());\n");
     }
 
 
@@ -97,32 +98,34 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * Add to form
      *
      * @param request  the Request
-     * @param input    the DataProcessInput
+     * @param input    the ServiceInput
      * @param sb       the form
      *
      * @throws Exception  problem adding to the form
      */
-    public void addToForm(Request request, DataProcessInput input,
-                          StringBuilder sb)
+@Override
+    public int addToForm(Request request, ServiceInput input,
+                          Appendable sb)
             throws Exception {
         sb.append(HtmlUtils.formTable());
         makeInputForm(request, input, sb);
         sb.append(HtmlUtils.formTableClose());
+        return 1;
     }
 
     /**
      * Make the input form
      *
      * @param request  the Request
-     * @param input    the DataProcessInput
+     * @param input    the ServiceInput
      * @param sb       the StringBuilder
      *
      * @throws Exception  problem making stuff
      */
-    private void makeInputForm(Request request, DataProcessInput input,
-                               StringBuilder sb)
+    private void makeInputForm(Request request, ServiceInput input,
+                               Appendable sb)
             throws Exception {
-        Entry first = input.getOperands().get(0).getEntries().get(0);
+        Entry first = input.getEntries().get(0);
 
         CdmDataOutputHandler dataOutputHandler =
             getOutputHandler().getDataOutputHandler();
@@ -159,18 +162,19 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      *
      * @throws Exception  problem processing
      */
-    public DataProcessOutput processRequest(Request request,
-                                            DataProcessInput input)
+@Override
+    public ServiceOutput evaluate(Request request, ServiceInfo info,
+                                  ServiceInput input)
             throws Exception {
 
         if ( !canHandle(input)) {
             throw new Exception("Illegal data type");
         }
 
-        List<DataProcessOperand> outputEntries =
-            new ArrayList<DataProcessOperand>();
+        List<ServiceOperand> outputEntries =
+            new ArrayList<ServiceOperand>();
         int opNum = 0;
-        for (DataProcessOperand op : input.getOperands()) {
+        for (ServiceOperand op : input.getOperands()) {
             Entry oneOfThem = op.getEntries().get(0);
             Entry collection = GranuleTypeHandler.getCollectionEntry(request,
                                    oneOfThem);
@@ -185,20 +189,20 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             opNum++;
         }
 
-        return new DataProcessOutput(outputEntries);
+        return new ServiceOutput(outputEntries);
     }
 
     /**
      * Process the daily data request
      *
      * @param request  the request
-     * @param dpi      the DataProcessInput
+     * @param dpi      the ServiceInput
      *
      * @return  some output
      *
      * @throws Exception problem processing the daily data
      */
-    private Entry processDailyRequest(Request request, DataProcessInput dpi)
+    private Entry processDailyRequest(Request request, ServiceInput dpi)
             throws Exception {
         throw new Exception("can't handle daily data yet");
     }
@@ -207,7 +211,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * Process the monthly request
      *
      * @param request  the request
-     * @param dpi      the DataProcessInput
+     * @param dpi      the ServiceInput
      * @param op       the operand
      * @param opNum    the operand number
      *
@@ -215,8 +219,8 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      *
      * @throws Exception Problem processing the monthly request
      */
-    private DataProcessOperand processMonthlyRequest(Request request,
-            DataProcessInput dpi, DataProcessOperand op, int opNum)
+    private ServiceOperand processMonthlyRequest(Request request,
+            ServiceInput dpi, ServiceOperand op, int opNum)
             throws Exception {
 
         Entry oneOfThem = op.getEntries().get(0);
@@ -248,7 +252,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         String       id        = getRepository().getGUID();
         String       newName = IOUtil.stripExtension(tail) + "_" + id + ".nc";
         File outFile = new File(IOUtil.joinDir(dpi.getProcessDir(), newName));
-        List<String> commands  = initCDOCommand();
+        List<String> commands  = initCDOService();
 
         String       stat = request.getString(CDOOutputHandler.ARG_CDO_STAT);
         Entry        climEntry = null;
@@ -275,11 +279,11 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         //   - month range
         //   - year or time range
         //   - variable
-        getOutputHandler().addStatCommands(request, oneOfThem, commands);
-        getOutputHandler().addAreaSelectCommands(request, oneOfThem,
+        getOutputHandler().addStatServices(request, oneOfThem, commands);
+        getOutputHandler().addAreaSelectServices(request, oneOfThem,
                 commands);
         commands.add("-remapbil,r360x180");
-        getOutputHandler().addLevelSelectCommands(request, oneOfThem,
+        getOutputHandler().addLevelSelectServices(request, oneOfThem,
                 commands, CdmDataOutputHandler.ARG_LEVEL);
         commands.add("-selname," + varname);
         // Handle the case where the months span the year end (e.g. DJF)
@@ -318,7 +322,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                     years.add(Integer.parseInt(year));
                 }
                 for (int i = 0; i < 2; i++) {
-                    List<String> savedCommands = new ArrayList(commands);
+                    List<String> savedServices = new ArrayList(commands);
                     Request      newRequest    = request.cloneMe();
                     newRequest.remove(CDOOutputHandler.ARG_CDO_STARTYEAR);
                     newRequest.remove(CDOOutputHandler.ARG_CDO_ENDYEAR);
@@ -351,13 +355,13 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                                        + opStr, yearsToUse);
                     }
                     File tmpFile = new File(outFile.toString() + "." + i);
-                    getOutputHandler().addDateSelectCommands(newRequest,
-                            oneOfThem, savedCommands, opNum);
-                    //savedCommands.add("-selname," + varname);
-                    System.err.println("cmds:" + savedCommands);
-                    savedCommands.add(oneOfThem.getResource().getPath());
-                    savedCommands.add(tmpFile.toString());
-                    runProcess(savedCommands, dpi.getProcessDir(), tmpFile);
+                    getOutputHandler().addDateSelectServices(newRequest,
+                            oneOfThem, savedServices, opNum);
+                    //savedServices.add("-selname," + varname);
+                    System.err.println("cmds:" + savedServices);
+                    savedServices.add(oneOfThem.getResource().getPath());
+                    savedServices.add(tmpFile.toString());
+                    runProcess(savedServices, dpi.getProcessDir(), tmpFile);
                     tmpFiles.add(tmpFile.toString());
                 }
             } else {
@@ -371,7 +375,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                                 request.get(CDOOutputHandler.ARG_CDO_ENDYEAR,
                                             1979));
                 for (int i = 0; i < 2; i++) {
-                    List<String> savedCommands = new ArrayList(commands);
+                    List<String> savedServices = new ArrayList(commands);
                     Request      newRequest    = request.cloneMe();
                     // just in case
                     newRequest.remove(CDOOutputHandler.ARG_CDO_YEARS);
@@ -391,19 +395,19 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                                        + opStr, endYear);
                     }
                     File tmpFile = new File(outFile.toString() + "." + i);
-                    getOutputHandler().addDateSelectCommands(newRequest,
-                            oneOfThem, savedCommands, opNum);
-                    //savedCommands.add("-selname," + varname);
-                    System.err.println("cmds:" + savedCommands);
-                    savedCommands.add(oneOfThem.getResource().getPath());
-                    savedCommands.add(tmpFile.toString());
-                    runProcess(savedCommands, dpi.getProcessDir(), tmpFile);
+                    getOutputHandler().addDateSelectServices(newRequest,
+                            oneOfThem, savedServices, opNum);
+                    //savedServices.add("-selname," + varname);
+                    System.err.println("cmds:" + savedServices);
+                    savedServices.add(oneOfThem.getResource().getPath());
+                    savedServices.add(tmpFile.toString());
+                    runProcess(savedServices, dpi.getProcessDir(), tmpFile);
                     tmpFiles.add(tmpFile.toString());
                 }
             }
             // merge the files together
             File tmpFile = new File(outFile.toString() + ".tmp");
-            commands = initCDOCommand();
+            commands = initCDOService();
             commands.add("-mergetime");
             for (String file : tmpFiles) {
                 commands.add(file);
@@ -411,14 +415,14 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             commands.add(tmpFile.toString());
             runProcess(commands, dpi.getProcessDir(), tmpFile);
             // now take the mean of the merged files
-            commands = initCDOCommand();
+            commands = initCDOService();
             commands.add("-timmean");
             commands.add(tmpFile.toString());
             commands.add(outFile.toString());
             runProcess(commands, dpi.getProcessDir(), outFile);
 
         } else {
-            getOutputHandler().addDateSelectCommands(request, oneOfThem,
+            getOutputHandler().addDateSelectServices(request, oneOfThem,
                     commands, opNum);
             //commands.add("-selname," + varname);
 
@@ -434,20 +438,20 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                               + "_clim.nc";
             File climFile = new File(IOUtil.joinDir(dpi.getProcessDir(),
                                 climName));
-            commands = initCDOCommand();
+            commands = initCDOService();
 
             // Select order (left to right) - operations go right to left:
             //   - region
             //   - level
             //   - month range
-            getOutputHandler().addStatCommands(request, climEntry, commands);
-            getOutputHandler().addAreaSelectCommands(request, climEntry,
+            getOutputHandler().addStatServices(request, climEntry, commands);
+            getOutputHandler().addAreaSelectServices(request, climEntry,
                     commands);
             commands.add("-remapbil,r360x180");
-            getOutputHandler().addLevelSelectCommands(request, climEntry,
+            getOutputHandler().addLevelSelectServices(request, climEntry,
                     commands, CdmDataOutputHandler.ARG_LEVEL);
             commands.add("-selname," + varname);
-            getOutputHandler().addMonthSelectCommands(request, climEntry,
+            getOutputHandler().addMonthSelectServices(request, climEntry,
                     commands);
             //commands.add("-selname," + varname);
 
@@ -462,7 +466,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                               + "_anom.nc";
             File anomFile = new File(IOUtil.joinDir(dpi.getProcessDir(),
                                 anomName));
-            commands = initCDOCommand();
+            commands = initCDOService();
             // We use sub instead of ymonsub because there is only one value in each file and
             // CDO sets the time of the merged files to be the last time. 
             //commands.add("-ymonsub");
@@ -579,8 +583,8 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         getOutputHandler().getEntryManager().writeEntryXmlFile(request,
                 outputEntry);
 
-        //return new DataProcessOperand(outputEntry.getName(), outputEntry);
-        return new DataProcessOperand(outputName.toString(), outputEntry);
+        //return new ServiceOperand(outputEntry.getName(), outputEntry);
+        return new ServiceOperand(outputName.toString(), outputEntry);
     }
 
     /**
@@ -657,11 +661,12 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      *
      * @return true if we can, otherwise false
      */
-    public boolean canHandle(DataProcessInput input) {
+    public boolean canHandle(ServiceInput input) {
         if ( !getOutputHandler().isEnabled()) {
             return false;
         }
-        for (DataProcessOperand op : input.getOperands()) {
+
+        for (ServiceOperand op : input.getOperands()) {
             List<Entry> entries = op.getEntries();
             // TODO: change this when we can handle more than one entry (e.g. daily data)
             if (entries.isEmpty() || (entries.size() > 1)) {
@@ -683,7 +688,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @param request  the Request
      * @param sb       the HTML
      */
-    public void addStatsWidget(Request request, StringBuilder sb) {
+    public void addStatsWidget(Request request, Appendable sb) throws Exception {
 
         sb.append(
             HtmlUtils.hidden(
@@ -712,12 +717,12 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      *
      * @throws Exception  problem making datasets
      */
-    public void addTimeWidget(Request request, StringBuilder sb,
-                              DataProcessInput input)
+    public void addTimeWidget(Request request, Appendable sb,
+                              ServiceInput input)
             throws Exception {
 
         List<GridDataset> grids = new ArrayList<GridDataset>();
-        for (DataProcessOperand op : input.getOperands()) {
+        for (ServiceOperand op : input.getOperands()) {
             Entry first = op.getEntries().get(0);
             CdmDataOutputHandler dataOutputHandler =
                 getOutputHandler().getDataOutputHandler();
@@ -741,8 +746,8 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @param sb       the StringBuilder to add to
      * @param grids    list of grids to use
      */
-    private void makeYearsWidget(Request request, StringBuilder sb,
-                                 List<GridDataset> grids) {
+    private void makeYearsWidget(Request request, Appendable sb,
+                                 List<GridDataset> grids) throws Exception {
         int grid = 0;
         for (GridDataset dataset : grids) {
             List<CalendarDate> dates =

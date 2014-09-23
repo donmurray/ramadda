@@ -21,10 +21,11 @@
 package org.ramadda.geodata.model;
 
 
-import org.ramadda.data.process.DataProcess;
-import org.ramadda.data.process.DataProcessInput;
-import org.ramadda.data.process.DataProcessOperand;
-import org.ramadda.data.process.DataProcessOutput;
+import org.ramadda.data.process.Service;
+import org.ramadda.data.process.ServiceInfo;
+import org.ramadda.data.process.ServiceInput;
+import org.ramadda.data.process.ServiceOperand;
+import org.ramadda.data.process.ServiceOutput;
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
@@ -87,7 +88,7 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
      */
     public void initFormJS(Request request, Appendable js, String formVar)
             throws Exception {
-        js.append(formVar + ".addDataProcess(new CDOTimeSeriesProcess());\n");
+        js.append(formVar + ".addService(new CDOTimeSeriesService());\n");
     }
 
     /**
@@ -100,25 +101,26 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
      * @throws Exception _more_
      */
     @Override
-    public void addToForm(Request request, DataProcessInput input,
-                          StringBuilder sb)
+    public int addToForm(Request request, ServiceInput input,
+                          Appendable sb)
             throws Exception {
         sb.append(HtmlUtils.formTable());
         makeInputForm(request, input, sb);
         sb.append(HtmlUtils.formTableClose());
+        return 1;
     }
 
     /**
      * Make the input form
      *
      * @param request  the Request
-     * @param input    the DataProcessInput
+     * @param input    the ServiceInput
      * @param sb       the StringBuilder
      *
      * @throws Exception  problem making stuff
      */
-    private void makeInputForm(Request request, DataProcessInput input,
-                               StringBuilder sb)
+    private void makeInputForm(Request request, ServiceInput input,
+                               Appendable sb)
             throws Exception {
         Entry first = input.getOperands().get(0).getEntries().get(0);
 
@@ -160,17 +162,18 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
      * @throws Exception _more_
      */
     @Override
-    public DataProcessOutput processRequest(Request request,
-                                            DataProcessInput input)
+    public ServiceOutput evaluate(Request request,
+                                  ServiceInfo info,
+                                  ServiceInput input)
             throws Exception {
         if ( !canHandle(input)) {
             throw new Exception("Illegal data type");
         }
 
-        List<DataProcessOperand> outputEntries =
-            new ArrayList<DataProcessOperand>();
+        List<ServiceOperand> outputEntries =
+            new ArrayList<ServiceOperand>();
         int opNum = 0;
-        for (DataProcessOperand op : input.getOperands()) {
+        for (ServiceOperand op : input.getOperands()) {
             Entry oneOfThem = op.getEntries().get(0);
             Entry collection = GranuleTypeHandler.getCollectionEntry(request,
                                    oneOfThem);
@@ -185,7 +188,7 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
             opNum++;
         }
 
-        return new DataProcessOutput(outputEntries);
+        return new ServiceOutput(outputEntries);
     }
 
     /**
@@ -196,12 +199,12 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
      * @return _more_
      */
     @Override
-    public boolean canHandle(DataProcessInput dpi) {
+    public boolean canHandle(ServiceInput dpi) {
         // TODO Auto-generated method stub
         if ( !getOutputHandler().isEnabled()) {
             return false;
         }
-        for (DataProcessOperand op : dpi.getOperands()) {
+        for (ServiceOperand op : dpi.getOperands()) {
             List<Entry> entries = op.getEntries();
             // TODO: change this when we can handle more than one entry (e.g. daily data)
             //if (entries.isEmpty() || (entries.size() > 1)) {
@@ -222,7 +225,7 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
      *
      * @param request  the Request
      * @param sb       the HTML
-    public void addStatsWidget(Request request, StringBuffer sb) {
+    public void addStatsWidget(Request request, Appendable sb) throws Exception {
         sb.append(
             HtmlUtils.formEntry(
                 Repository.msgLabel("Statistic"),
@@ -242,7 +245,7 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
      * Process the monthly request
      *
      * @param request  the request
-     * @param dpi      the DataProcessInput
+     * @param dpi      the ServiceInput
      * @param op       the operand
      * @param opNum    the operand number
      *
@@ -250,8 +253,8 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
      *
      * @throws Exception Problem processing the monthly request
      */
-    private DataProcessOperand processMonthlyRequest(Request request,
-            DataProcessInput dpi, DataProcessOperand op, int opNum)
+    private ServiceOperand processMonthlyRequest(Request request,
+            ServiceInput dpi, ServiceOperand op, int opNum)
             throws Exception {
 
         Entry oneOfThem = op.getEntries().get(0);
@@ -260,7 +263,7 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
         String       id        = getRepository().getGUID();
         String       newName = IOUtil.stripExtension(tail) + "_" + id + ".nc";
         File outFile = new File(IOUtil.joinDir(dpi.getProcessDir(), newName));
-        List<String> commands  = initCDOCommand();
+        List<String> commands  = initCDOService();
 
         String       stat = request.getString(CDOOutputHandler.ARG_CDO_STAT);
         Entry        climEntry = null;
@@ -288,12 +291,12 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
         //   - region
         //   - month range
         //   - year or time range
-        getOutputHandler().addStatCommands(request, oneOfThem, commands);
-        getOutputHandler().addLevelSelectCommands(request, oneOfThem,
+        getOutputHandler().addStatServices(request, oneOfThem, commands);
+        getOutputHandler().addLevelSelectServices(request, oneOfThem,
                 commands, CdmDataOutputHandler.ARG_LEVEL);
-        getOutputHandler().addAreaSelectCommands(request, oneOfThem,
+        getOutputHandler().addAreaSelectServices(request, oneOfThem,
                 commands);
-        getOutputHandler().addDateSelectCommands(request, oneOfThem,
+        getOutputHandler().addDateSelectServices(request, oneOfThem,
                 commands, opNum);
 
         System.err.println("cmds:" + commands);
@@ -307,19 +310,19 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
                               + "_clim.nc";
             File climFile = new File(IOUtil.joinDir(dpi.getProcessDir(),
                                 climName));
-            commands = initCDOCommand();
+            commands = initCDOService();
 
             commands.add("-fldavg");
             // Select order (left to right) - operations go right to left:
             //   - level
             //   - region
             //   - month range
-            getOutputHandler().addStatCommands(request, climEntry, commands);
-            getOutputHandler().addLevelSelectCommands(request, climEntry,
+            getOutputHandler().addStatServices(request, climEntry, commands);
+            getOutputHandler().addLevelSelectServices(request, climEntry,
                     commands, CdmDataOutputHandler.ARG_LEVEL);
-            getOutputHandler().addAreaSelectCommands(request, climEntry,
+            getOutputHandler().addAreaSelectServices(request, climEntry,
                     commands);
-            getOutputHandler().addMonthSelectCommands(request, climEntry,
+            getOutputHandler().addMonthSelectServices(request, climEntry,
                     commands);
 
             //System.err.println("clim cmds:" + commands);
@@ -333,7 +336,7 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
                               + "_anom.nc";
             File anomFile = new File(IOUtil.joinDir(dpi.getProcessDir(),
                                 anomName));
-            commands = initCDOCommand();
+            commands = initCDOService();
             commands.add("-ymonsub");
             commands.add(outFile.toString());
             commands.add(climFile.toString());
@@ -418,7 +421,7 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
         getOutputHandler().getEntryManager().writeEntryXmlFile(request,
                 outputEntry);
 
-        //return new DataProcessOperand(outputEntry.getName(), outputEntry);
-        return new DataProcessOperand(outputName.toString(), outputEntry);
+        //return new ServiceOperand(outputEntry.getName(), outputEntry);
+        return new ServiceOperand(outputName.toString(), outputEntry);
     }
 }
