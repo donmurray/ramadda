@@ -609,7 +609,7 @@ public class Service extends RepositoryManager {
         if (haveChildren()) {
             int cnt = 0;
             for (Service child : children) {
-                StringBuffer tmpSB = new StringBuffer();
+                StringBuilder tmpSB = new StringBuilder();
                 int blockCnt = child.addToForm(request, input, tmpSB);
                 cnt += blockCnt;
                 if (blockCnt > 0) {
@@ -641,9 +641,9 @@ public class Service extends RepositoryManager {
                               Appendable sb)
             throws Exception {
 
-        StringBuffer formSB = new StringBuffer();
+        StringBuilder formSB = new StringBuilder();
         int          blockCnt    = 0;
-        StringBuffer catBuff     = null;
+        StringBuilder catBuff     = null;
         Service.Arg  catArg      = null;
         boolean      anyRequired = false;
         for (Service.Arg arg : getArgs()) {
@@ -652,7 +652,7 @@ public class Service extends RepositoryManager {
                     processCatBuff(request, formSB, catArg, catBuff, ++blockCnt);
                 }
                 catArg  = arg;
-                catBuff = new StringBuffer();
+                catBuff = new StringBuilder();
                 continue;
             }
 
@@ -661,7 +661,7 @@ public class Service extends RepositoryManager {
             }
 
             if (catBuff == null) {
-                catBuff = new StringBuffer();
+                catBuff = new StringBuilder();
                 catArg  = null;
             }
 
@@ -699,7 +699,7 @@ public class Service extends RepositoryManager {
     public void addArgToForm(Request request, ServiceInput input,
                              Appendable catBuff, Arg arg) throws Exception {
         String       tooltip = arg.getPrefix();
-        StringBuffer inputHtml   = new StringBuffer();
+        StringBuilder inputHtml   = new StringBuilder();
         if (arg.isEnumeration()) {
             inputHtml.append(HtmlUtils.select(arg.getUrlArg(),
                                           arg.getValues(), (List) null, "", 100));
@@ -801,9 +801,9 @@ public class Service extends RepositoryManager {
      * @param catBuff _more_
      * @param blockCnt _more_
      */
-    private void processCatBuff(Request request, StringBuffer sb,
-                                Service.Arg catArg, StringBuffer catBuff,
-                                int blockCnt) {
+    private void processCatBuff(Request request, Appendable sb,
+                                Service.Arg catArg, Appendable catBuff,
+                                int blockCnt) throws Exception {
         if (catArg != null) {
             String html = header(catArg.getCategory());
             String desc = catArg.getValue();
@@ -815,7 +815,7 @@ public class Service extends RepositoryManager {
             }
             sb.append(html);
         }
-        StringBuffer formSB = new StringBuffer(HtmlUtils.formTable());
+        StringBuilder formSB = new StringBuilder(HtmlUtils.formTable());
         formSB.append(catBuff);
         formSB.append(HtmlUtils.formTableClose());
         if (true || (blockCnt == 1)) {
@@ -1176,7 +1176,7 @@ public class Service extends RepositoryManager {
                     continue;
                 }
                 seen.add(file);
-                StringBuffer entryXml = new StringBuffer();
+                StringBuilder entryXml = new StringBuilder();
                 entryXml.append(XmlUtil.tag("entry",
                                             XmlUtil.attrs("name",
                                                 file.getName(), "type",

@@ -74,7 +74,7 @@ public class ServiceOutput {
     private boolean resultsShownAsText = false;
 
     /** _more_ */
-    private StringBuffer results = new StringBuffer();
+    private StringBuilder results = new StringBuilder();
 
     /** _more_ */
     private List<Entry> entries = new ArrayList<Entry>();
