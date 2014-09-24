@@ -1,0 +1,71 @@
+<outputhandlers class="org.ramadda.repository.output.ServiceOutputHandler" icon="/icons/pdf.png" command="${media.pdfbox.path}/pdfbox.sh">
+  <outputhandler>
+   <service id="media.pdfbox.extracttext" label="Extract text from PDF" >
+<help><![CDATA[
+Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#extractText" target="_help">Extract Text</a>
+]]></help>
+          <arg value="ExtractText"/>
+          <arg value="${entry.file}" type="entry" entryType="type_document_pdf" primary="true"></arg>
+          <arg value="${entry.filebase}.txt"></arg>
+          <output type="file" pattern=".*\.txt"/>
+    </service>
+  </outputhandler>
+
+  <outputhandler>
+   <service id="media.pdfbox.extractimages" label="Extract images from PDF">
+
+<process_description><![CDATA[<wiki>
+{{gallery}}
+]]></process_description>
+
+<help><![CDATA[
+Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#pdfToImage" target="_help">Extract Images</a>
+]]></help>
+          <arg value="ExtractImages"/>
+          <arg value="${entry.file}" type="entry" entryType="type_document_pdf" primary="true" copy="true"></arg>
+          <output type="file" pattern=".*\.jpg"/>
+    </service>
+  </outputhandler>
+
+  <outputhandler>
+   <service id="media.pdfbox.pdftoimage" label="Make images from PDF" outputToStderr="true">
+<process_description><![CDATA[<wiki>
+{{gallery}}
+]]></process_description>
+
+<help><![CDATA[
+Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#pdfToImage" target="_help">PDF to image</a>
+]]></help>
+          <arg value="PDFToImage"/>
+          <arg value="${entry.file}" type="entry" entryType="type_document_pdf" primary="true" copy="true"></arg>
+          <output type="file" pattern=".*\.jpg"/>
+    </service>
+  </outputhandler>
+
+  <outputhandler>
+   <service id="media.pdfbox.pdfsplit" label="Split PDF" outputToStderr="true">
+<help><![CDATA[
+Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#pdfSplit" target="_help">PDF Split</a>
+]]></help>
+          <arg value="PDFSplit"/>
+          <arg value="${entry.file}" type="entry" entryType="type_document_pdf" primary="true" copy="true"></arg>
+          <arg type="int" prefix="-split" label="Split" help="Number of pages of very splitted part of the PDF"/>
+          <output type="type_document_pdf" pattern=".*\.pdf"/>
+    </service>
+  </outputhandler>
+
+  <outputhandler>
+   <service id="media.pdfbox.texttopdf" label="Text to PDF" outputToStderr="true">
+<help><![CDATA[
+Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#textToPDF" target="_help">Text to PDF</a>
+]]></help>
+          <arg value="TextToPDF"/>
+          <arg value="${entry.filebase}.pdf"></arg>
+          <arg value="${entry.file}" type="entry" entryType="file" entryPattern=".*\.txt" primary="true" ></arg>
+          <output type="type_document_pdf" pattern=".*\.pdf"/>
+    </service>
+  </outputhandler>
+
+
+
+</outputhandlers>
