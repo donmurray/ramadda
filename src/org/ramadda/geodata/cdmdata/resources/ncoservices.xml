@@ -13,9 +13,9 @@ sqrt:Square root of the mean,
 ttl:Sum of values
 </values>
 </arg>
-          <arg type="enumeration" name="nco.variable" label="Variable" multiple="true" size="5" prefix="--variable" addAll="true" valuesProperty="varNames"/>
+          <arg type="enumeration" name="nco.variable" label="Variable" multiple="true" multipleJoin="," size="5" prefix="--variable" addAll="true" valuesProperty="varNames"/>
           <arg type="flag" name="nco.variable.exclude" label="Exclude" help="Exclude selected variables" value="--exclude" sameRow="true" depends="nco.variable"></arg>
-          <arg type="enumeration" name="nco.coord" label="Averaging Dimensions" help="" multiple="true" size="5" prefix="--average" addAll="true" valuesProperty="coordNames"/>
+          <arg type="enumeration" name="nco.coord" label="Averaging Dimensions" help="" multiple="true" multipleJoin="," size="5" prefix="--average" addAll="true" valuesProperty="coordNames"/>
           <arg type="enumeration" name="nco.mask.variable" label="Mask" help="" prefix="--mask_variable" addNone="true" valuesProperty="varNames"/>
           <arg type="enumeration" name="nco.mask.comp" label="" help="" sameRow="true"  prefix="--mask_comparator" depends="nco.mask.variable" >
 <values>eq:=,ne:!=,gt:&gt;,lt:&lt;,ge:&gt;=,le:&lt;=</values>

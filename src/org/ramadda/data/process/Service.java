@@ -80,10 +80,10 @@ public class Service extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_COMMAND = "command";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_CLEANUP = "cleanup";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LINK = "link";
 
     /** _more_ */
@@ -123,7 +123,7 @@ public class Service extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_HELP = "help";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SERIAL = "serial";
 
     /** _more_ */
@@ -478,9 +478,7 @@ public class Service extends RepositoryManager {
         for (Service.Arg arg : getArgs()) {
             if (arg.depends != null) {
                 if ( !definedArgs.contains(arg.depends)) {
-                    System.err.println("Dependency:" + arg.getName() + " "
-                                       + arg.depends);
-
+                    //                    System.err.println("Dependency:" + arg.getName() + " " + arg.depends);
                     continue;
                 }
             }
@@ -545,6 +543,10 @@ public class Service extends RepositoryManager {
                 if (arg.isMultiple()) {
                     values = request.get(arg.getUrlArg(),
                                          new ArrayList<String>());
+                    if (arg.multipleJoin != null) {
+                        argValue = StringUtil.join(arg.multipleJoin, values);
+                        values   = null;
+                    }
                 } else {
                     argValue = request.getString(arg.getUrlArg(), "");
                 }
@@ -755,18 +757,19 @@ public class Service extends RepositoryManager {
     public void addArgToForm(Request request, ServiceInput input,
                              CatBuff catBuff, Arg arg)
             throws Exception {
+
         String        tooltip   = arg.getPrefix();
         StringBuilder inputHtml = new StringBuilder();
         if (arg.isEnumeration()) {
             List<TwoFacedObject> values = arg.getValues();
-            if (values.size() == 0 && arg.valuesProperty!=null) {
-                values =
-                    (List<TwoFacedObject>) input.getProperty(arg.valuesProperty, values);
+            if ((values.size() == 0) && (arg.valuesProperty != null)) {
+                values = (List<TwoFacedObject>) input.getProperty(
+                    arg.valuesProperty, values);
             }
             if (values.size() == 0) {
                 values =
                     (List<TwoFacedObject>) input.getProperty(arg.getUrlArg()
-                                                             + ".values", values);
+                        + ".values", values);
             }
 
             if (arg.addAll) {
@@ -858,6 +861,7 @@ public class Service extends RepositoryManager {
                            arg.getHelp());
         }
         //        makeFormEntry(catBuff, arg.getLabel(), inputHtml.toString(), arg.getHelp());
+
 
     }
 
@@ -1538,6 +1542,9 @@ public class Service extends RepositoryManager {
         /** _more_ */
         private boolean multiple = false;
 
+        /** _more_          */
+        private String multipleJoin;
+
         /** _more_ */
         private boolean sameRow = false;
 
@@ -1553,13 +1560,13 @@ public class Service extends RepositoryManager {
 
 
 
-        /** _more_          */
+        /** _more_ */
         private String depends;
 
-        /** _more_          */
+        /** _more_ */
         private boolean addAll;
 
-        /** _more_          */
+        /** _more_ */
         private boolean addNone;
 
         /** _more_ */
@@ -1587,6 +1594,7 @@ public class Service extends RepositoryManager {
         /** _more_ */
         private List<TwoFacedObject> values = new ArrayList<TwoFacedObject>();
 
+        /** _more_          */
         private String valuesProperty;
 
 
@@ -1635,9 +1643,10 @@ public class Service extends RepositoryManager {
                 name = "arg" + idx;
             }
 
-            group    = XmlUtil.getAttribute(node, ATTR_GROUP, (String) null);
+            group = XmlUtil.getAttribute(node, ATTR_GROUP, (String) null);
             required = XmlUtil.getAttribute(node, "required", required);
-            valuesProperty= XmlUtil.getAttribute(node, "valuesProperty", (String) null);
+            valuesProperty = XmlUtil.getAttribute(node, "valuesProperty",
+                    (String) null);
             label    = XmlUtil.getAttribute(node, ATTR_LABEL, name);
             help     = Utils.getAttributeOrTag(node, "help", "");
             fileName = XmlUtil.getAttribute(node, "filename", "${src}");
@@ -1651,8 +1660,10 @@ public class Service extends RepositoryManager {
             size      = XmlUtil.getAttribute(node, ATTR_SIZE, size);
             ifDefined = XmlUtil.getAttribute(node, "ifdefined", ifDefined);
             multiple  = XmlUtil.getAttribute(node, "multiple", multiple);
-            sameRow   = XmlUtil.getAttribute(node, "sameRow", sameRow);
-            size      = XmlUtil.getAttribute(node, "size", size);
+            multipleJoin = XmlUtil.getAttribute(node, "multipleJoin",
+                    (String) null);
+            sameRow = XmlUtil.getAttribute(node, "sameRow", sameRow);
+            size    = XmlUtil.getAttribute(node, "size", size);
             for (String tok :
                     StringUtil.split(Utils.getAttributeOrTag(node,
                         ATTR_VALUES, ""), ",", true, true)) {
