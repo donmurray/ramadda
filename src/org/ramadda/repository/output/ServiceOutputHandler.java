@@ -76,7 +76,7 @@ public class ServiceOutputHandler extends OutputHandler {
     private OutputType outputType;
 
     /** _more_ */
-    private Service command;
+    private Service service;
 
     /**
      * _more_
@@ -100,35 +100,35 @@ public class ServiceOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     private void init(Element element) throws Exception {
-        String commandId = XmlUtil.getAttribute(element, "commandId",
+        String serviceId = XmlUtil.getAttribute(element, "serviceId",
                                (String) null);
-        if (commandId != null) {
-            command = getRepository().getJobManager().getService(commandId);
-            if (command == null) {
+        if (serviceId != null) {
+            service = getRepository().getJobManager().getService(serviceId);
+            if (service == null) {
                 throw new IllegalStateException(
-                    "ServiceOutputHandler: could not find command:"
-                    + commandId);
+                    "ServiceOutputHandler: could not find service:"
+                    + serviceId);
             }
         }
 
 
-        if (command == null) {
+        if (service == null) {
             NodeList children = XmlUtil.getElements(element,
                                     Service.TAG_SERVICE);
-            Element commandNode = element;
+            Element serviceNode = element;
             if (children.getLength() > 0) {
-                commandNode = (Element) children.item(0);
+                serviceNode = (Element) children.item(0);
             }
-            command = getRepository().makeService(commandNode, true);
+            service = getRepository().makeService(serviceNode, true);
         }
 
 
 
         outputType = new OutputType(
-            XmlUtil.getAttribute(element, ATTR_LABEL, command.getLabel()),
-            XmlUtil.getAttribute(element, ATTR_ID, command.getId()),
+            XmlUtil.getAttribute(element, ATTR_LABEL, service.getLabel()),
+            XmlUtil.getAttribute(element, ATTR_ID, service.getId()),
             OutputType.TYPE_OTHER | OutputType.TYPE_IMPORTANT, "",
-            XmlUtil.getAttribute(element, ATTR_ICON, command.getIcon()));
+            XmlUtil.getAttribute(element, ATTR_ICON, service.getIcon()));
         addType(outputType);
 
 
@@ -140,7 +140,7 @@ public class ServiceOutputHandler extends OutputHandler {
      * @return _more_
      */
     public boolean isEnabled() {
-        return command.isEnabled();
+        return service.isEnabled();
     }
 
     /**
@@ -149,7 +149,7 @@ public class ServiceOutputHandler extends OutputHandler {
      * @return _more_
      */
     public Service getService() {
-        return command;
+        return service;
     }
 
     /**
@@ -167,7 +167,7 @@ public class ServiceOutputHandler extends OutputHandler {
             return;
         }
         if (state.getEntry() != null) {
-            if (command.isApplicable(state.getEntry())) {
+            if (service.isApplicable(state.getEntry())) {
                 links.add(makeLink(request, state.getEntry(), outputType
                 // ,    "/" + IOUtil.stripExtension(state.getEntry().getName())+ ".rss"
                 ));
@@ -246,8 +246,8 @@ public class ServiceOutputHandler extends OutputHandler {
                     try {
                         //TODO:
                         //    public ServiceOutput evaluate(Request request,  ServiceInput input)
-                        //                        output = command.evaluate(request, entry,
-                        output = command.evaluate(request,  serviceInput);
+                        //                        output = service.evaluate(request, entry,
+                        output = service.evaluate(request,  serviceInput);
                         if ( !output.isOk()) {
                             getActionManager().setContinueHtml(
                                 actionId,
@@ -285,7 +285,7 @@ public class ServiceOutputHandler extends OutputHandler {
                     outputType.getLabel(), "");
 
         }
-        ServiceOutput output = command.evaluate(request,  serviceInput);
+        ServiceOutput output = service.evaluate(request,  serviceInput);
 
         if ( !output.isOk()) {
             sb.append(
@@ -307,7 +307,7 @@ public class ServiceOutputHandler extends OutputHandler {
 
         if (serviceInput.getForDisplay() || output.getResultsShownAsText()) {
             sb.append(HtmlUtils.b(msg("Results")));
-            sb.append("<div class=command-output>");
+            sb.append("<div class=service-output>");
             sb.append("<pre>");
             sb.append(output.getResults());
             sb.append("</pre>");
@@ -385,7 +385,7 @@ public class ServiceOutputHandler extends OutputHandler {
         boolean                haveAnyOutputs = false;
         List<OutputDefinition> outputs = new ArrayList<OutputDefinition>();
 
-        command.getAllOutputs(outputs);
+        service.getAllOutputs(outputs);
         for (OutputDefinition output : outputs) {
             if ( !output.getShowResults()) {
                 haveAnyOutputs = true;
@@ -403,10 +403,10 @@ public class ServiceOutputHandler extends OutputHandler {
         }
 
 
-        command.addToForm(request, new ServiceInput(entry), sb);
+        service.addToForm(request, new ServiceInput(entry), sb);
 
         sb.append(HtmlUtils.p());
-        sb.append(HtmlUtils.submit(command.getLabel(), ARG_EXECUTE,
+        sb.append(HtmlUtils.submit(service.getLabel(), ARG_EXECUTE,
                                    makeButtonSubmitDialog(sb,
                                        "Processing request...")));
         StringBuffer etc = new StringBuffer();

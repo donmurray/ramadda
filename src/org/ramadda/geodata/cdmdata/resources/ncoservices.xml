@@ -1,6 +1,4 @@
-<outputhandlers class="org.ramadda.repository.output.ServiceOutputHandler" icon="/genomics/dna.png">
-
-  <outputhandler>
+  <services>
     <service label="NCO Weighted Average" id="nco.ncwa" command="${nco.path}/ncwa" handler="org.ramadda.geodata.cdmdata.NetcdfService">
           <arg type="enumeration" name="nco.operation" prefix="--operation" label="Operation" help="">
 <values>
@@ -34,7 +32,4 @@ ttl:Sum of values
           <arg value="${entry.filebase}_nco.nc"></arg>
           <output pattern=".*\.nc"/>
     </service>
- </outputhandler>
-
-
-</outputhandlers>
+</services>

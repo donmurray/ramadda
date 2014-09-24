@@ -6,4 +6,5 @@
   <outputhandler class="org.ramadda.geodata.cdmdata.CdmDataOutputHandler" name="CDM Data" required="true"/>
   <outputhandler class="org.ramadda.geodata.cdmdata.GridPointOutputHandler" name="Grid as point Data" required="true"/>
   <outputhandler class="org.ramadda.geodata.cdmdata.LdmOutputHandler" name="LDM Insert"/>
+  <outputhandlers class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="nco.ncwa"/>
 </outputhandlers>
