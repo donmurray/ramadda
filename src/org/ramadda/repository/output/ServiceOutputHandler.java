@@ -232,9 +232,13 @@ public class ServiceOutputHandler extends OutputHandler {
         serviceInput.setForDisplay(request.exists(ARG_SHOWCOMMAND));
 
         StringBuffer xml = new StringBuffer();
+        String desc = service.getProcessDescription();
+        if(desc == null)desc = "";
         xml.append(XmlUtil.tag("entry",
                                XmlUtil.attrs("type", "group", "name",
-                                             "Processing Results")));
+                                             "Processing Results"),
+                               XmlUtil.tag("description","",XmlUtil.getCdata(desc))));
+
         IOUtil.writeFile(new File(IOUtil.joinDir(workDir,
                 ".this.ramadda.xml")), xml.toString());
         boolean asynchronous = request.get(ARG_ASYNCH, false);

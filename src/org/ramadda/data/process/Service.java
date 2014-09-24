@@ -166,6 +166,9 @@ public class Service extends RepositoryManager {
     /** _more_ */
     private String help;
 
+    /** _more_          */
+    private String processDesc;
+
     /** _more_ */
     private String label;
 
@@ -299,10 +302,12 @@ public class Service extends RepositoryManager {
                 "outputToStderr", outputToStderr);
 
         cleanup = XmlUtil.getAttributeFromTree(element, ATTR_CLEANUP, true);
-        linkId  = XmlUtil.getAttribute(element, ATTR_LINK, (String) null);
-        help    = XmlUtil.getGrandChildText(element, ATTR_HELP, "");
-        label   = XmlUtil.getAttribute(element, ATTR_LABEL, (String) null);
-        serial  = XmlUtil.getAttribute(element, ATTR_SERIAL, true);
+        linkId = XmlUtil.getAttribute(element, ATTR_LINK, (String) null);
+        help   = XmlUtil.getGrandChildText(element, ATTR_HELP, "");
+        processDesc = XmlUtil.getGrandChildText(element,
+                "process_description", "");
+        label  = XmlUtil.getAttribute(element, ATTR_LABEL, (String) null);
+        serial = XmlUtil.getAttribute(element, ATTR_SERIAL, true);
 
         NodeList nodes;
 
@@ -536,8 +541,24 @@ public class Service extends RepositoryManager {
                                    entryArg.getId());
                 }
                 argValue = arg.getValue();
+                if (argValue.equals("${entry.file}")) {
+                    argValue = null;
+                }
                 if ( !Utils.stringDefined(argValue)) {
-                    argValue = currentEntry.getResource().getPath();
+                    if (arg.copy) {
+                        File newFile =
+                            new File(
+                                IOUtil.joinDir(
+                                    input.getProcessDir(),
+                                    getStorageManager().getFileTail(
+                                        currentEntry)));
+                        if ( !newFile.exists()) {
+                            IOUtil.copyFile(currentEntry.getFile(), newFile);
+                        }
+                        argValue = newFile.toString();
+                    } else {
+                        argValue = currentEntry.getResource().getPath();
+                    }
                 }
             } else {
                 if (arg.isMultiple()) {
@@ -556,6 +577,7 @@ public class Service extends RepositoryManager {
                 values.add(argValue);
             }
 
+
             int argCnt = 0;
             if (values != null) {
                 for (String value : values) {
@@ -564,13 +586,14 @@ public class Service extends RepositoryManager {
                     }
                     argCnt++;
                     input.addParam(argKey, value);
-                    if (Utils.stringDefined(arg.value)) {
+                    if ( !arg.isEntry() && Utils.stringDefined(arg.value)) {
                         value = arg.value.replace("${value}", value);
                     }
                     if (Utils.stringDefined(value) || arg.isRequired()) {
                         if (Utils.stringDefined(arg.prefix)) {
                             commands.add(arg.prefix);
                         }
+
                         value = applyMacros(currentEntry, workDir, value,
                                             input.getForDisplay());
                         commands.add(value);
@@ -1097,6 +1120,19 @@ public class Service extends RepositoryManager {
      *
      * @return _more_
      */
+    public String getProcessDescription() {
+        if (linkId != null) {
+            getServiceToUse().getProcessDescription();
+        }
+
+        return processDesc;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getLabel() {
         initService();
         if (label != null) {
@@ -1542,7 +1578,7 @@ public class Service extends RepositoryManager {
         /** _more_ */
         private boolean multiple = false;
 
-        /** _more_          */
+        /** _more_ */
         private String multipleJoin;
 
         /** _more_ */
@@ -1584,6 +1620,9 @@ public class Service extends RepositoryManager {
         /** _more_ */
         private boolean required = false;
 
+        /** _more_          */
+        private boolean copy = false;
+
         /** _more_ */
         private String fileName;
 
@@ -1594,7 +1633,7 @@ public class Service extends RepositoryManager {
         /** _more_ */
         private List<TwoFacedObject> values = new ArrayList<TwoFacedObject>();
 
-        /** _more_          */
+        /** _more_ */
         private String valuesProperty;
 
 
@@ -1645,6 +1684,7 @@ public class Service extends RepositoryManager {
 
             group = XmlUtil.getAttribute(node, ATTR_GROUP, (String) null);
             required = XmlUtil.getAttribute(node, "required", required);
+            copy     = XmlUtil.getAttribute(node, "copy", false);
             valuesProperty = XmlUtil.getAttribute(node, "valuesProperty",
                     (String) null);
             label    = XmlUtil.getAttribute(node, ATTR_LABEL, name);
@@ -1698,14 +1738,19 @@ public class Service extends RepositoryManager {
          * @return _more_
          */
         public boolean isApplicable(Entry entry) {
+            boolean defaultReturn = true;
+
             if (entryType != null) {
-                return entry.getTypeHandler().isType(entryType);
+                if ( !entry.getTypeHandler().isType(entryType)) {
+                    return false;
+                }
+                defaultReturn = false;
             }
             if (entryPattern != null) {
                 return entry.getResource().getPath().matches(entryPattern);
             }
 
-            return true;
+            return defaultReturn;
         }
 
 
