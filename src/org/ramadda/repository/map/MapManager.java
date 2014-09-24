@@ -135,6 +135,13 @@ public class MapManager extends RepositoryManager {
         MapInfo mapInfo = new MapInfo(request, getRepository(), width,
                                       height, forSelection);
 
+        String maplayers = getRepository().getProperty(PROP_MAP_LAYERS,
+                                                       null);
+        if (maplayers != null) {
+            mapInfo.addProperty("mapLayers", StringUtil.split(maplayers,";",true,true));
+        }
+
+
         mapInfo.addProperty(
             "defaultMapLayer",
             Json.quote(
