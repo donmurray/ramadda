@@ -28,6 +28,8 @@ import org.apache.commons.fileupload.disk.*;
 
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
 
+import org.apache.commons.io.IOUtils;
+
 import org.ramadda.repository.*;
 
 import ucar.unidata.util.IOUtil;
@@ -62,7 +64,6 @@ import java.util.StringTokenizer;
 import javax.servlet.*;
 import javax.servlet.http.*;
 
-import org.apache.commons.io.IOUtils;
 
 /**
  *
@@ -93,7 +94,7 @@ public class RepositoryServlet extends HttpServlet implements Constants {
      * _more_
      */
     public RepositoryServlet() {
-        System.err.println("RepositoryServlet:ctor");
+        //        System.err.println("RepositoryServlet:ctor");
     }
 
     /**
@@ -377,14 +378,15 @@ public class RepositoryServlet extends HttpServlet implements Constants {
                     try {
 
                         response.setStatus(
-                                           repositoryResult.getResponseCode());
+                            repositoryResult.getResponseCode());
                         response.setContentType(
                             repositoryResult.getMimeType());
                         OutputStream output = response.getOutputStream();
                         try {
                             //                            System.err.println("SLEEP");
                             //                            Misc.sleepSeconds(30);
-                            IOUtils.copy(repositoryResult.getInputStream(),   output);
+                            IOUtils.copy(repositoryResult.getInputStream(),
+                                         output);
                             //IOUtil.writeTo(repositoryResult.getInputStream(),
                             //                               output);
                         } finally {
@@ -540,10 +542,20 @@ public class RepositoryServlet extends HttpServlet implements Constants {
             byte[] bytes = item.get();
             //Don't do this for now since it screws up utf-8 character encodings
             //String value = item.getString();
-            String value = new String(bytes);
-            //            if(name.startsWith("desc")) {
-            //                System.err.println ("value:" + value);
-            //            }
+            String value    = new String(bytes);
+            Object existing = formArgs.get(name);
+            if (existing != null) {
+                if (existing instanceof List) {
+                    ((List) existing).add(value);
+                } else {
+                    List newList = new ArrayList();
+                    formArgs.put(name, newList);
+                    newList.add(existing);
+                    newList.add(value);
+                }
+
+                return;
+            }
             formArgs.put(name, value);
         }
 
