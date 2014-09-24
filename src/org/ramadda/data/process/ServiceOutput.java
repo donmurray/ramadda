@@ -106,7 +106,6 @@ public class ServiceOutput {
     /**
      * Create a ServiceOutput from the file
      *
-     * @param file  the associated file
      *
      * @param entry _more_
      */

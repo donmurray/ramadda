@@ -23,7 +23,6 @@ package org.ramadda.repository.output;
 
 import org.ramadda.repository.*;
 import org.ramadda.data.process.Service;
-import org.ramadda.data.process.ServiceInfo;
 import org.ramadda.data.process.ServiceInput;
 import org.ramadda.data.process.ServiceOutput;
 import org.ramadda.data.process.OutputDefinition;
@@ -120,8 +119,7 @@ public class ServiceOutputHandler extends OutputHandler {
             if (children.getLength() > 0) {
                 commandNode = (Element) children.item(0);
             }
-            command = new Service(getRepository(), commandNode);
-            getRepository().getJobManager().addService(command);
+            command = getRepository().makeService(commandNode, true);
         }
 
 
@@ -228,11 +226,10 @@ public class ServiceOutputHandler extends OutputHandler {
         File              workDir     =
             getStorageManager().createProcessDir();
 
-        boolean           forDisplay  = request.exists(ARG_SHOWCOMMAND);
 
-        final ServiceInput serviceInput  = new ServiceInput(entry);
-        final ServiceInfo serviceInfo = new ServiceInfo(workDir, forDisplay);
-        serviceInfo.setPublish(doingPublish(request));
+        final ServiceInput serviceInput  = new ServiceInput(workDir, entry);
+        serviceInput.setPublish(doingPublish(request));
+        serviceInput.setForDisplay(request.exists(ARG_SHOWCOMMAND));
 
         StringBuffer xml = new StringBuffer();
         xml.append(XmlUtil.tag("entry",
@@ -248,9 +245,9 @@ public class ServiceOutputHandler extends OutputHandler {
                     ServiceOutput output = null;
                     try {
                         //TODO:
-                        //    public ServiceOutput evaluate(Request request, ServiceInfo info, ServiceInput input)
+                        //    public ServiceOutput evaluate(Request request,  ServiceInput input)
                         //                        output = command.evaluate(request, entry,
-                        output = command.evaluate(request, serviceInfo, serviceInput);
+                        output = command.evaluate(request,  serviceInput);
                         if ( !output.isOk()) {
                             getActionManager().setContinueHtml(
                                 actionId,
@@ -272,8 +269,8 @@ public class ServiceOutputHandler extends OutputHandler {
                     }
                     String url =
                         getStorageManager().getProcessDirEntryUrl(request,
-                            serviceInfo.getWorkDir());
-                    if (serviceInfo.getPublish()
+                                                                  serviceInput.getProcessDir());
+                    if (serviceInput.getPublish()
                             && (output.getEntries().size() > 0)) {
                         url = request.entryUrl(
                             getRepository().URL_ENTRY_SHOW,
@@ -288,8 +285,7 @@ public class ServiceOutputHandler extends OutputHandler {
                     outputType.getLabel(), "");
 
         }
-        ServiceOutput output = command.evaluate(request, serviceInfo, serviceInput);
-        //command.evaluate(request, entry, serviceInfo);
+        ServiceOutput output = command.evaluate(request,  serviceInput);
 
         if ( !output.isOk()) {
             sb.append(
@@ -301,9 +297,7 @@ public class ServiceOutputHandler extends OutputHandler {
             return new Result(outputType.getLabel(), sb);
         }
 
-        //        System.err.println ("params:" + serviceInfo.getParams());
-        //        System.err.println ("entries:" + serviceInfo.getEntries());
-        if (serviceInfo.getPublish() && (output.getEntries().size() > 0)) {
+        if (serviceInput.getPublish() && (output.getEntries().size() > 0)) {
             return new Result(
                 request.entryUrl(
                     getRepository().URL_ENTRY_SHOW,
@@ -311,7 +305,7 @@ public class ServiceOutputHandler extends OutputHandler {
         }
 
 
-        if (forDisplay || output.getResultsShownAsText()) {
+        if (serviceInput.getForDisplay() || output.getResultsShownAsText()) {
             sb.append(HtmlUtils.b(msg("Results")));
             sb.append("<div class=command-output>");
             sb.append("<pre>");
@@ -328,7 +322,7 @@ public class ServiceOutputHandler extends OutputHandler {
         if (request.get(ARG_GOTOPRODUCTS, false)) {
             return new Result(
                 getStorageManager().getProcessDirEntryUrl(
-                    request, serviceInfo.getWorkDir()));
+                    request, serviceInput.getProcessDir()));
         }
 
 
@@ -360,31 +354,6 @@ public class ServiceOutputHandler extends OutputHandler {
 
     }
 
-    /**
-     * _more_
-     *
-     * @param s _more_
-     *
-     * @return _more_
-     */
-    private String macro(String s) {
-        return "${" + s + "}";
-    }
-
-    /**
-     * _more_
-     *
-     * @param entry _more_
-     * @param workDir _more_
-     * @param value _more_
-     * @param forDisplay _more_
-     *
-     * @return _more_
-     */
-    private String applyMacros(Entry entry, File workDir, String value,
-                               boolean forDisplay) {
-        return command.applyMacros(entry, workDir, value, forDisplay);
-    }
 
 
     /**

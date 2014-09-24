@@ -21,8 +21,6 @@
 package org.ramadda.geodata.model;
 
 
-import org.ramadda.data.process.ServiceInfo;
-
 
 import org.ramadda.data.process.ServiceInput;
 import org.ramadda.data.process.ServiceOperand;
@@ -168,8 +166,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @throws Exception  problem processing
      */
     @Override
-    public ServiceOutput evaluate(Request request, ServiceInfo info,
-                                  ServiceInput input)
+    public ServiceOutput evaluate(Request request, ServiceInput input)
             throws Exception {
 
         if ( !canHandle(input)) {

@@ -648,7 +648,6 @@ public class NCOOutputHandler extends OutputHandler implements ServiceProvider {
          * _more_
          *
          * @param request _more_
-         * @param info _more_
          * @param dpi _more_
          *
          * @return _more_
@@ -656,8 +655,7 @@ public class NCOOutputHandler extends OutputHandler implements ServiceProvider {
          * @throws Exception _more_
          */
         @Override
-        public ServiceOutput evaluate(Request request, ServiceInfo info,
-                                      ServiceInput dpi)
+        public ServiceOutput evaluate(Request request, ServiceInput dpi)
                 throws Exception {
             Resource r = new Resource(
                              dpi.getOperands().get(0).getEntries().get(

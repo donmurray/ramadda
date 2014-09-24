@@ -56,7 +56,7 @@ public class ServiceUtil {
      * @param request _more_
      * @param entry _more_
      * @param command _more_
-     * @param info _more_
+     * @param input _more_
      * @param commands _more_
      *
      * @return _more_
@@ -64,7 +64,7 @@ public class ServiceUtil {
      * @throws Exception _more_
      */
     public boolean evaluate(Request request, Entry entry, Service command,
-                            ServiceInfo info, List<String> commands)
+                            ServiceInput input, List<String> commands)
             throws Exception {
         if (commands.size() <= 1) {
             return true;
@@ -73,19 +73,19 @@ public class ServiceUtil {
         String task = commands.get(1);
         if (task.equals(COMMAND_MV)) {
             File entryFile = new File(commands.get(2));
-            if ( !IOUtil.isADescendent(info.getWorkDir(), entryFile)) {
+            if ( !IOUtil.isADescendent(input.getProcessDir(), entryFile)) {
                 throw new IllegalArgumentException(
                     "Cannot move the entry file. Can only move temp files");
             }
             String newName = commands.get(3);
             IOUtil.moveFile(entryFile,
-                            new File(IOUtil.joinDir(info.getWorkDir(),
+                            new File(IOUtil.joinDir(input.getProcessDir(),
                                 newName)));
         } else if (task.equals(COMMAND_CP)) {
             File   entryFile = new File(commands.get(2));
             String newName   = commands.get(3);
             IOUtil.copyFile(entryFile,
-                            new File(IOUtil.joinDir(info.getWorkDir(),
+                            new File(IOUtil.joinDir(input.getProcessDir(),
                                 newName)));
         }
 

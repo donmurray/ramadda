@@ -77,7 +77,7 @@ public class Service extends RepositoryManager {
     /** _more_ */
     public static final String TAG_ARG = "arg";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_COMMAND = "command";
 
     /** _more_ */
@@ -355,7 +355,7 @@ public class Service extends RepositoryManager {
             }
             commandObject = Misc.findClass(className).newInstance();
             Class[] paramTypes = new Class[] { Request.class, Entry.class,
-                    Service.class, ServiceInfo.class, List.class };
+                    Service.class, ServiceInput.class, List.class };
             commandMethod = Misc.findMethod(commandObject.getClass(),
                                             toks.get(2), paramTypes);
         }
@@ -434,18 +434,16 @@ public class Service extends RepositoryManager {
      *
      * @param request _more_
      * @param primaryEntry _more_
-     * @param info _more_
+     * @param input _more_
      * @param commands _more_
-     * @param forDisplay _more_
      *
      * @throws Exception _more_
      */
     public void addArgs(Request request, Entry primaryEntry,
-                        ServiceInfo info, List<String> commands,
-                        boolean forDisplay)
+                        ServiceInput input, List<String> commands)
             throws Exception {
-        getServiceToUse().addArgsInner(request, primaryEntry, info, commands,
-                                       forDisplay);
+        getServiceToUse().addArgsInner(request, primaryEntry, input,
+                                       commands);
     }
 
 
@@ -454,20 +452,18 @@ public class Service extends RepositoryManager {
      *
      * @param request _more_
      * @param primaryEntry _more_
-     * @param info _more_
+     * @param input _more_
      * @param commands _more_
-     * @param forDisplay _more_
      *
      * @throws Exception _more_
      */
     private void addArgsInner(Request request, Entry primaryEntry,
-                              ServiceInfo info, List<String> commands,
-                              boolean forDisplay)
+                              ServiceInput input, List<String> commands)
             throws Exception {
 
-        File workDir = info.getWorkDir();
+        File workDir = input.getProcessDir();
         String cmd = applyMacros(primaryEntry, workDir, getCommand(),
-                                 forDisplay);
+                                 input.getForDisplay());
         commands.add(cmd);
         HashSet<String> seenGroup = new HashSet<String>();
         for (Service.Arg arg : getArgs()) {
@@ -475,33 +471,29 @@ public class Service extends RepositoryManager {
             if (arg.getCategory() != null) {
                 continue;
             }
-            String argValue = null;
-            String argKey   = null;
+            String       argValue = null;
+            String       argKey   = arg.getUrlArg();
+            List<String> values   = null;
             if (arg.isValueArg()) {
                 argValue = arg.getValue();
             } else if (arg.isFlag()) {
                 if (arg.getGroup() != null) {
                     if ( !seenGroup.contains(arg.getGroup())) {
                         argValue = request.getString(arg.getGroup(), null);
-                        if ((argValue != null) && (argValue.length() > 0)) {
+                        if (Utils.stringDefined(argValue)) {
                             seenGroup.add(arg.getGroup());
                         } else {
                             argValue = null;
                         }
-                        if (argValue != null) {
-                            info.addParam(arg.getGroup(), argValue);
-                        }
+                        argKey = arg.getGroup();
                     }
                 } else if (request.get(arg.getUrlArg(), false)) {
                     argValue = arg.getValue();
-                    if (argValue != null) {
-                        info.addParam(arg.getUrlArg(), argValue);
-                    }
                 }
             } else if (arg.isFile()) {
                 //TODO:
                 //                String filename = applyMacros(currentEntry, workDir,
-                //arg.getFileName(), forDisplay);
+                //arg.getFileName(), input.getForDisplay());
                 //argValue = IOUtil.joinDir(workDir, filename);
             } else if (arg.isEntry()) {
                 if (arg.isPrimaryEntry()) {
@@ -524,39 +516,51 @@ public class Service extends RepositoryManager {
                         continue;
                     }
                     currentEntry = entryArg;
-                    info.addParam(arg.getUrlArg() + "_hidden",
-                                  entryArg.getId());
+                    input.addParam(arg.getUrlArg() + "_hidden",
+                                   entryArg.getId());
                 }
                 argValue = arg.getValue();
                 if ( !Utils.stringDefined(argValue)) {
                     argValue = currentEntry.getResource().getPath();
                 }
             } else {
-                argValue = request.getString(arg.getUrlArg(), "");
-                if (arg.getIfDefined() && !Utils.stringDefined(argValue)) {
-                    continue;
+                if (arg.isMultiple()) {
+                    values = request.get(arg.getUrlArg(),
+                                         new ArrayList<String>());
+                } else {
+                    argValue = request.getString(arg.getUrlArg(), "");
                 }
-                info.addParam(arg.getUrlArg(), argValue);
-                if (Utils.stringDefined(arg.value)) {
-                    argValue = arg.value.replace("${value}", argValue);
-                }
-
+            }
+            if ((values == null) && (argValue != null)) {
+                values = new ArrayList<String>();
+                values.add(argValue);
             }
 
-            if ((argValue == null) && arg.isRequired()) {
+            int argCnt = 0;
+            if (values != null) {
+                for (String value : values) {
+                    if (arg.getIfDefined() && !Utils.stringDefined(value)) {
+                        continue;
+                    }
+                    argCnt++;
+                    input.addParam(argKey, value);
+                    if (Utils.stringDefined(arg.value)) {
+                        value = arg.value.replace("${value}", value);
+                    }
+                    if (Utils.stringDefined(value) || arg.isRequired()) {
+                        if (Utils.stringDefined(arg.prefix)) {
+                            commands.add(arg.prefix);
+                        }
+                        value = applyMacros(currentEntry, workDir, value,
+                                            input.getForDisplay());
+                        commands.add(value);
+                    }
+                }
+            }
+
+            if ((argCnt == 0) && arg.isRequired()) {
                 throw new IllegalArgumentException("No entry  specified for:"
                         + arg.getLabel());
-            }
-
-            if (Utils.stringDefined(argValue) || arg.isRequired()) {
-                if (Utils.stringDefined(arg.prefix)) {
-                    commands.add(arg.prefix);
-                }
-                argValue = applyMacros(currentEntry, workDir, argValue,
-                                       forDisplay);
-
-
-                commands.add(argValue);
             }
         }
     }
@@ -612,7 +616,6 @@ public class Service extends RepositoryManager {
      * _more_
      *
      * @param request _more_
-     * @param primaryEntry _more_
      * @param input _more_
      * @param sb _more_
      *
@@ -651,7 +654,6 @@ public class Service extends RepositoryManager {
      * _more_
      *
      * @param request _more_
-     * @param primaryEntry _more_
      * @param input _more_
      * @param sb _more_
      *
@@ -665,7 +667,7 @@ public class Service extends RepositoryManager {
 
         StringBuilder formSB      = new StringBuilder();
         int           blockCnt    = 0;
-        StringBuilder catBuff     = null;
+        CatBuff       catBuff     = null;
         Service.Arg   catArg      = null;
         boolean       anyRequired = false;
         for (Service.Arg arg : getArgs()) {
@@ -675,7 +677,7 @@ public class Service extends RepositoryManager {
                                    ++blockCnt);
                 }
                 catArg  = arg;
-                catBuff = new StringBuilder();
+                catBuff = new CatBuff();
 
                 continue;
             }
@@ -685,7 +687,7 @@ public class Service extends RepositoryManager {
             }
 
             if (catBuff == null) {
-                catBuff = new StringBuilder();
+                catBuff = new CatBuff();
                 catArg  = null;
             }
 
@@ -693,10 +695,6 @@ public class Service extends RepositoryManager {
                 anyRequired = true;
             }
             addArgToForm(request, input, catBuff, arg);
-
-
-
-
         }
 
         if ((catBuff != null) && (catBuff.length() > 0)) {
@@ -734,13 +732,25 @@ public class Service extends RepositoryManager {
      * @throws Exception _more_
      */
     public void addArgToForm(Request request, ServiceInput input,
-                             Appendable catBuff, Arg arg)
+                             CatBuff catBuff, Arg arg)
             throws Exception {
         String        tooltip   = arg.getPrefix();
         StringBuilder inputHtml = new StringBuilder();
         if (arg.isEnumeration()) {
-            inputHtml.append(HtmlUtils.select(arg.getUrlArg(),
-                    arg.getValues(), (List) null, "", 100));
+            List<TwoFacedObject> values = arg.getValues();
+            if (values.size() == 0) {
+                values =
+                    (List<TwoFacedObject>) input.getProperty(arg.getUrlArg()
+                        + ".values", values);
+            }
+            String extra = "";
+            if (arg.isMultiple()) {
+                extra = " MULTIPLE SIZE=" + ((arg.getSize() > 0)
+                                             ? arg.getSize()
+                                             : 4) + " ";
+            }
+            inputHtml.append(HtmlUtils.select(arg.getUrlArg(), values,
+                    (List) null, extra, 100));
         } else if (arg.isFlag()) {
             if (arg.getGroup() != null) {
                 boolean selected = request.getString(arg.getGroup(),
@@ -754,7 +764,11 @@ public class Service extends RepositoryManager {
 
             inputHtml.append(HtmlUtils.space(2));
             inputHtml.append(arg.getHelp());
-            catBuff.append(HtmlUtils.formEntry("", inputHtml.toString(), 2));
+            if (arg.sameRow) {
+                catBuff.appendToCurrentRow(inputHtml.toString());
+            } else {
+                catBuff.addRow("", inputHtml.toString(), null);
+            }
 
             return;
         } else if (arg.isFile()) {
@@ -803,8 +817,14 @@ public class Service extends RepositoryManager {
             inputHtml.append("<span class=ramadda-required-label>*</span>");
         }
 
-        makeFormEntry(catBuff, arg.getLabel(), inputHtml.toString(),
-                      arg.getHelp());
+        if (arg.sameRow) {
+            catBuff.appendToCurrentRow(inputHtml.toString());
+        } else {
+            catBuff.addRow(arg.getLabel(), inputHtml.toString(),
+                           arg.getHelp());
+        }
+        //        makeFormEntry(catBuff, arg.getLabel(), inputHtml.toString(), arg.getHelp());
+
     }
 
 
@@ -821,13 +841,14 @@ public class Service extends RepositoryManager {
     private void makeFormEntry(Appendable sb, String label, String col1,
                                String help)
             throws Exception {
+        String extra = "";
+        if (help != null) {
+            extra = HtmlUtils.div(help,
+                                  HtmlUtils.cssClass("service-form-help"));
+        }
         sb.append(HtmlUtils.formEntryTop(Utils.stringDefined(label)
                                          ? msgLabel(label)
-                                         : "", col1,
-                                         HtmlUtils.div(
-                                             help,
-                                             HtmlUtils.cssClass(
-                                                 "service-form-help"))));
+                                         : "", col1, extra));
     }
 
 
@@ -843,7 +864,7 @@ public class Service extends RepositoryManager {
      * @throws Exception _more_
      */
     private void processCatBuff(Request request, Appendable sb,
-                                Service.Arg catArg, Appendable catBuff,
+                                Service.Arg catArg, CatBuff catBuff,
                                 int blockCnt)
             throws Exception {
         if (catArg != null) {
@@ -858,7 +879,7 @@ public class Service extends RepositoryManager {
             sb.append(html);
         }
         StringBuilder formSB = new StringBuilder(HtmlUtils.formTable());
-        formSB.append(catBuff);
+        catBuff.addToForm(formSB);
         formSB.append(HtmlUtils.formTableClose());
         if (true || (blockCnt == 1)) {
             sb.append(formSB);
@@ -1047,22 +1068,19 @@ public class Service extends RepositoryManager {
      * _more_
      *
      * @param request _more_
-     * @param entry _more_
-     * @param info _more_
      * @param input _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public ServiceOutput evaluate(Request request, ServiceInfo info,
-                                  ServiceInput input)
+    public ServiceOutput evaluate(Request request, ServiceInput input)
             throws Exception {
 
         ServiceOutput myOutput      = new ServiceOutput();
 
         HashSet<File> existingFiles = new HashSet<File>();
-        for (File f : info.getWorkDir().listFiles()) {
+        for (File f : input.getProcessDir().listFiles()) {
             existingFiles.add(f);
         }
         Entry         entry    = input.getEntries().get(0);
@@ -1082,7 +1100,7 @@ public class Service extends RepositoryManager {
                     }
                 }
 
-                childOutput = child.evaluate(request, info, input);
+                childOutput = child.evaluate(request, input);
                 if ( !childOutput.isOk()) {
                     return childOutput;
                 }
@@ -1103,11 +1121,12 @@ public class Service extends RepositoryManager {
                 }
                 myOutput.append(childOutput.getResults());
             }
+
             for (Entry newEntry : myOutput.getEntries()) {
                 newFiles.add(newEntry.getFile());
             }
             if (cleanup) {
-                for (File f : info.getWorkDir().listFiles()) {
+                for (File f : input.getProcessDir().listFiles()) {
                     if (f.getName().startsWith(".")) {
                         continue;
                     }
@@ -1118,7 +1137,7 @@ public class Service extends RepositoryManager {
                     f.delete();
                 }
             }
-            if (info.getForDisplay()) {
+            if (input.getForDisplay()) {
                 return myOutput;
             }
 
@@ -1127,38 +1146,35 @@ public class Service extends RepositoryManager {
 
         List<String> commands = new ArrayList<String>();
         if (link != null) {
-            link.addArgs(request, entry, info, commands,
-                         info.getForDisplay());
+            link.addArgs(request, entry, input, commands);
         } else {
-            this.addArgs(request, entry, info, commands,
-                         info.getForDisplay());
+            this.addArgs(request, entry, input, commands);
         }
-        System.err.println("Services:" + commands);
+        System.err.println("Command:" + commands);
 
-        if (info.getForDisplay()) {
-            myOutput.append(HtmlUtils.br());
+        if (input.getForDisplay()) {
             commands.set(0, IOUtil.getFileTail(commands.get(0)));
             myOutput.append(HtmlUtils.pre(StringUtil.join(" ", commands)));
-
+            myOutput.append("\n");
             return myOutput;
         }
 
         String errMsg = "";
         String outMsg = "";
-        File stdoutFile = new File(IOUtil.joinDir(info.getWorkDir(),
+        File stdoutFile = new File(IOUtil.joinDir(input.getProcessDir(),
                               "." + getId() + ".stdout"));
-        File stderrFile = new File(IOUtil.joinDir(info.getWorkDir(),
+        File stderrFile = new File(IOUtil.joinDir(input.getProcessDir(),
                               "." + getId() + ".stderr"));
 
 
         if (commandObject != null) {
             commandMethod.invoke(commandObject, new Object[] { request, entry,
-                    this, info, commands });
+                    this, input, commands });
         } else {
             JobManager.CommandResults results =
                 getRepository().getJobManager().executeCommand(commands,
-                    null, info.getWorkDir(), -1, new PrintWriter(stdoutFile),
-                    new PrintWriter(stderrFile));
+                    null, input.getProcessDir(), -1,
+                    new PrintWriter(stdoutFile), new PrintWriter(stderrFile));
         }
         if (stderrFile.exists()) {
             errMsg = IOUtil.readContents(stderrFile);
@@ -1189,17 +1205,17 @@ public class Service extends RepositoryManager {
 
             File[] files = null;
             if (output.getUseStdout()) {
-                String filename = applyMacros(entry, info.getWorkDir(),
+                String filename = applyMacros(entry, input.getProcessDir(),
                                       output.getFilename(),
-                                      info.getForDisplay());
-                File destFile = new File(IOUtil.joinDir(info.getWorkDir(),
-                                    filename));
+                                      input.getForDisplay());
+                File destFile =
+                    new File(IOUtil.joinDir(input.getProcessDir(), filename));
                 IOUtil.moveFile(stdoutFile, destFile);
                 files = new File[] { destFile };
             }
             final String thePattern = output.getPattern();
             if (files == null) {
-                files = info.getWorkDir().listFiles(new FileFilter() {
+                files = input.getProcessDir().listFiles(new FileFilter() {
                     public boolean accept(File f) {
                         if (thePattern == null) {
                             return true;
@@ -1242,14 +1258,15 @@ public class Service extends RepositoryManager {
                 newEntry.setDate(new Date().getTime());
                 newEntry.setName(file.getName());
                 newEntry.setResource(new Resource(file, Resource.TYPE_FILE));
-                if (info.getPublish()) {
+                if (input.getPublish()) {
                     getEntryManager().processEntryPublish(request, files[0],
                             newEntry, entry, "derived from");
                 } else {
                     newEntry
                         .setId(getEntryManager().getProcessFileTypeHandler()
                             .getSynthId(getEntryManager().getProcessEntry(),
-                                        info.getWorkDir().toString(), file));
+                                        input.getProcessDir().toString(),
+                                        file));
                 }
                 myOutput.addEntry(newEntry);
             }
@@ -1319,7 +1336,90 @@ public class Service extends RepositoryManager {
     }
 
 
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Tue, Sep 23, '14
+     * @author         Enter your name here...
+     */
+    private class CatBuff {
 
+        /** _more_ */
+        List<List<StringBuilder>> rows = new ArrayList<List<StringBuilder>>();
+
+        /**
+         * _more_
+         *
+         * @param label _more_
+         * @param value _more_
+         * @param value2 _more_
+         *
+         * @return _more_
+         */
+        public List<StringBuilder> addRow(String label, String value,
+                                          String value2) {
+            List<StringBuilder> row = new ArrayList<StringBuilder>();
+            row.add(new StringBuilder(label));
+            row.add(new StringBuilder(value));
+            if (value2 != null) {
+                row.add(new StringBuilder(value2));
+            }
+            rows.add(row);
+
+            return row;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public int length() {
+            return rows.size();
+        }
+
+        /**
+         * _more_
+         *
+         * @param row _more_
+         */
+        public void addRow(List<StringBuilder> row) {
+            rows.add(row);
+        }
+
+        /**
+         * _more_
+         *
+         * @param v _more_
+         */
+        public void appendToCurrentRow(String v) {
+            List<StringBuilder> row = rows.get(rows.size() - 1);
+            row.get(1).append(v);
+        }
+
+
+
+        /**
+         * _more_
+         *
+         * @param sb _more_
+         *
+         * @throws Exception _more_
+         */
+        public void addToForm(Appendable sb) throws Exception {
+            for (List<StringBuilder> row : rows) {
+                String label  = row.get(0).toString();
+                String value  = row.get(1).toString();
+                String value2 = ((row.size() > 2)
+                                 ? row.get(2).toString()
+                                 : null);
+                makeFormEntry(sb, label, value, value2);
+            }
+        }
+
+
+    }
 
 
 
@@ -1376,6 +1476,14 @@ public class Service extends RepositoryManager {
 
         /** _more_ */
         private boolean ifDefined = true;
+
+
+        /** _more_ */
+        private boolean multiple = false;
+
+        /** _more_ */
+        private boolean sameRow = false;
+
 
         /** _more_ */
         private String label;
@@ -1466,9 +1574,12 @@ public class Service extends RepositoryManager {
             }
             size      = XmlUtil.getAttribute(node, ATTR_SIZE, size);
             ifDefined = XmlUtil.getAttribute(node, "ifdefined", ifDefined);
+            multiple  = XmlUtil.getAttribute(node, "multiple", multiple);
+            sameRow   = XmlUtil.getAttribute(node, "sameRow", sameRow);
+            size      = XmlUtil.getAttribute(node, "size", size);
             for (String tok :
-                    StringUtil.split(XmlUtil.getAttribute(node, ATTR_VALUES,
-                        ""), ",", true, true)) {
+                    StringUtil.split(Utils.getAttributeOrTag(node,
+                        ATTR_VALUES, ""), ",", true, true)) {
                 List<String> toks  = StringUtil.splitUpTo(tok, ":", 2);
 
                 String       value = toks.get(0);
@@ -1518,6 +1629,15 @@ public class Service extends RepositoryManager {
          */
         public boolean isRequired() {
             return required;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public boolean isMultiple() {
+            return multiple;
         }
 
 

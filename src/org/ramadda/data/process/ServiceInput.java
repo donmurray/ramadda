@@ -21,15 +21,15 @@
 package org.ramadda.data.process;
 
 
-
 import org.ramadda.repository.Entry;
 
 import ucar.unidata.util.Misc;
 
-
 import java.io.File;
 
+
 import java.util.ArrayList;
+import java.util.Hashtable;
 import java.util.List;
 
 
@@ -46,6 +46,19 @@ public class ServiceInput {
     /** The operands for this input */
     private List<ServiceOperand> operands;
 
+    /** _more_ */
+    private Hashtable properties = new Hashtable();
+
+    /** _more_ */
+    private boolean publish = false;
+
+    /** _more_ */
+    private boolean forDisplay = false;
+
+    /** _more_ */
+    private List<String[]> params = new ArrayList<String[]>();
+
+
     /**
      * _more_
      *
@@ -56,10 +69,10 @@ public class ServiceInput {
     }
 
 
+
     /**
      * Create a data process input
      *
-     * @param operands  the operands for this process
      *
      * @param operand _more_
      */
@@ -68,9 +81,18 @@ public class ServiceInput {
     }
 
     /**
+     * _more_
+     *
+     * @param processDir _more_
+     * @param entry _more_
+     */
+    public ServiceInput(File processDir, Entry entry) {
+        this(processDir, Misc.newList(new ServiceOperand(entry)));
+    }
+
+    /**
      * Create a data process input
      *
-     * @param operands  the operands for this process
      *
      * @param processDir _more_
      * @param operand _more_
@@ -103,6 +125,62 @@ public class ServiceInput {
 
     }
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param value _more_
+     */
+    public void putProperty(Object key, Object value) {
+        properties.put(key, value);
+    }
+
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
+    public Object getProperty(Object key) {
+        return getProperty(key, null);
+    }
+
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
+    public Object getProperty(Object key, Object dflt) {
+        Object value = properties.get(key);
+        if (value == null) {
+            return dflt;
+        }
+
+        return value;
+    }
+
+    /**
+     * _more_
+     *
+     * @param key _more_
+     * @param value _more_
+     */
+    public void addParam(String key, String value) {
+        params.add(new String[] { key, value });
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public List<String[]> getParams() {
+        return params;
+    }
 
     /**
      * _more_
@@ -158,9 +236,58 @@ public class ServiceInput {
      * @return a new ServiceInput
      */
     public ServiceInput makeInput(ServiceOutput output) {
-        return new ServiceInput(
-            this.getProcessDir(),
-            new ArrayList<ServiceOperand>(output.getOperands()));
+        ServiceInput input = new ServiceInput(
+                                 this.getProcessDir(),
+                                 new ArrayList<ServiceOperand>(
+                                     output.getOperands()));
+        input.setPublish(getPublish());
+        input.setForDisplay(getForDisplay());
+        input.params     = params;
+        input.properties = properties;
+
+        return input;
     }
+
+
+    /**
+     * Set the Publish property.
+     *
+     * @param value The new value for Publish
+     */
+    public void setPublish(boolean value) {
+        publish = value;
+    }
+
+    /**
+     * Get the Publish property.
+     *
+     * @return The Publish
+     */
+    public boolean getPublish() {
+        return publish;
+    }
+
+
+    /**
+     * Set the ForDisplay property.
+     *
+     * @param value The new value for ForDisplay
+     */
+    public void setForDisplay(boolean value) {
+        forDisplay = value;
+    }
+
+    /**
+     * Get the ForDisplay property.
+     *
+     * @return The ForDisplay
+     */
+    public boolean getForDisplay() {
+        return forDisplay;
+    }
+
+
+
+
 
 }

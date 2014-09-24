@@ -359,7 +359,7 @@ JQ.button(
             ServiceInput   dpi = new ServiceInput(processDir, op);
             didProcess = true;
             //TODO:
-            ServiceOutput output = process.evaluate(request, null, dpi);
+            ServiceOutput output = process.evaluate(request, dpi);
             if (output.hasOutput()) {
                 for (ServiceOperand oper : output.getOperands()) {
                     for (Entry outEntry : oper.getEntries()) {

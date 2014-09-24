@@ -22,7 +22,6 @@ package org.ramadda.geodata.model;
 
 
 import org.ramadda.data.process.Service;
-import org.ramadda.data.process.ServiceInfo;
 import org.ramadda.data.process.ServiceInput;
 import org.ramadda.data.process.ServiceOperand;
 import org.ramadda.data.process.ServiceOutput;
@@ -261,8 +260,7 @@ public class NCLModelPlotDataProcess extends Service {
      * @throws Exception  problems generating the output
      */
     @Override
-    public ServiceOutput evaluate(Request request, ServiceInfo info,
-                                  ServiceInput input)
+    public ServiceOutput evaluate(Request request, ServiceInput input)
             throws Exception {
 
         List<Entry>          outputEntries = new ArrayList<Entry>();

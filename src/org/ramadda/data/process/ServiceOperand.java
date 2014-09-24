@@ -60,7 +60,6 @@ public class ServiceOperand {
     /**
      * Create an operand with a description and list of entries
      *
-     * @param description  the description
      * @param entries      the entries
      */
     public ServiceOperand(List<Entry> entries) {

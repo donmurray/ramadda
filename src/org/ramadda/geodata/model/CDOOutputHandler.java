@@ -22,7 +22,6 @@ package org.ramadda.geodata.model;
 
 
 import org.ramadda.data.process.Service;
-import org.ramadda.data.process.ServiceInfo;
 import org.ramadda.data.process.ServiceInput;
 import org.ramadda.data.process.ServiceOutput;
 import org.ramadda.data.process.ServiceProvider;
@@ -1534,8 +1533,7 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
          * @throws Exception  problem processing
          */
         @Override
-        public ServiceOutput evaluate(Request request, ServiceInfo info,
-                                      ServiceInput input)
+        public ServiceOutput evaluate(Request request, ServiceInput input)
                 throws Exception {
 
             Entry  oneOfThem = input.getEntries().get(0);

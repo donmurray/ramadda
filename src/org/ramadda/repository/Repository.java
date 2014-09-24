@@ -1426,17 +1426,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
 
             for (int i = 0; i < nodes.getLength(); i++) {
                 Element node = (Element) nodes.item(i);
-                Constructor ctor =
-                    Misc.findConstructor(Misc.findClass(XmlUtil.getAttribute(node,
-                        "handler",
-                        "org.ramadda.data.process.Service")), new Class[] {
-                            Repository.class,
-                            Element.class });
-                Service command = (Service) ctor.newInstance(new Object[] {
-                                      this,
-                                      node });
-                //               Service command =  new Service(this, node);
-                getJobManager().addService(command);
+                makeService(node, true);
             }
         }
 
@@ -1485,6 +1475,23 @@ public class Repository extends RepositoryBase implements RequestHandler,
                 }
             }
         }
+    }
+
+    public Service makeService(Element node, boolean addToGlobals) throws Exception {
+        Constructor ctor =
+            Misc.findConstructor(Misc.findClass(XmlUtil.getAttribute(node,
+                                                                     "handler",
+                                                                     "org.ramadda.data.process.Service")), new Class[] {
+                                     Repository.class,
+                                     Element.class });
+        Service command = (Service) ctor.newInstance(new Object[] {
+                this,
+                node });
+        //               Service command =  new Service(this, node);
+        if(addToGlobals) {
+            getJobManager().addService(command);
+        }
+        return command;
     }
 
 
