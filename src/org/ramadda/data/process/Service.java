@@ -80,6 +80,12 @@ public class Service extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_COMMAND = "command";
 
+    /** _more_          */
+    public static final String ATTR_CLEANUP = "cleanup";
+
+    /** _more_          */
+    public static final String ATTR_LINK = "link";
+
     /** _more_ */
     public static final String ATTR_ID = "id";
 
@@ -117,6 +123,9 @@ public class Service extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_HELP = "help";
 
+    /** _more_          */
+    public static final String ATTR_SERIAL = "serial";
+
     /** _more_ */
     public static final String ATTR_GROUP = "group";
 
@@ -144,7 +153,6 @@ public class Service extends RepositoryManager {
 
     /** _more_ */
     private boolean cleanup = false;
-
 
     /** _more_ */
     private String command;
@@ -290,12 +298,11 @@ public class Service extends RepositoryManager {
         outputToStderr = XmlUtil.getAttributeFromTree(element,
                 "outputToStderr", outputToStderr);
 
-        cleanup = XmlUtil.getAttributeFromTree(element, "cleanup", true);
-
-        linkId  = XmlUtil.getAttribute(element, "link", (String) null);
-        help    = XmlUtil.getGrandChildText(element, "help", "");
+        cleanup = XmlUtil.getAttributeFromTree(element, ATTR_CLEANUP, true);
+        linkId  = XmlUtil.getAttribute(element, ATTR_LINK, (String) null);
+        help    = XmlUtil.getGrandChildText(element, ATTR_HELP, "");
         label   = XmlUtil.getAttribute(element, ATTR_LABEL, (String) null);
-        serial  = XmlUtil.getAttribute(element, "serial", true);
+        serial  = XmlUtil.getAttribute(element, ATTR_SERIAL, true);
 
         NodeList nodes;
 
@@ -465,8 +472,19 @@ public class Service extends RepositoryManager {
         String cmd = applyMacros(primaryEntry, workDir, getCommand(),
                                  input.getForDisplay());
         commands.add(cmd);
-        HashSet<String> seenGroup = new HashSet<String>();
+        HashSet<String> seenGroup   = new HashSet<String>();
+        HashSet<String> definedArgs = new HashSet<String>();
+
         for (Service.Arg arg : getArgs()) {
+            if (arg.depends != null) {
+                if ( !definedArgs.contains(arg.depends)) {
+                    System.err.println("Dependency:" + arg.getName() + " "
+                                       + arg.depends);
+
+                    continue;
+                }
+            }
+
             Entry currentEntry = primaryEntry;
             if (arg.getCategory() != null) {
                 continue;
@@ -558,6 +576,9 @@ public class Service extends RepositoryManager {
                 }
             }
 
+            if (argCnt != 0) {
+                definedArgs.add(arg.getName());
+            }
             if ((argCnt == 0) && arg.isRequired()) {
                 throw new IllegalArgumentException("No entry  specified for:"
                         + arg.getLabel());
@@ -738,11 +759,24 @@ public class Service extends RepositoryManager {
         StringBuilder inputHtml = new StringBuilder();
         if (arg.isEnumeration()) {
             List<TwoFacedObject> values = arg.getValues();
+            if (values.size() == 0 && arg.valuesProperty!=null) {
+                values =
+                    (List<TwoFacedObject>) input.getProperty(arg.valuesProperty, values);
+            }
             if (values.size() == 0) {
                 values =
                     (List<TwoFacedObject>) input.getProperty(arg.getUrlArg()
-                        + ".values", values);
+                                                             + ".values", values);
             }
+
+            if (arg.addAll) {
+                values = new ArrayList<TwoFacedObject>(values);
+                values.add(0, new TwoFacedObject("--all--", ""));
+            } else if (arg.addNone) {
+                values = new ArrayList<TwoFacedObject>(values);
+                values.add(0, new TwoFacedObject("--none--", ""));
+            }
+
             String extra = "";
             if (arg.isMultiple()) {
                 extra = " MULTIPLE SIZE=" + ((arg.getSize() > 0)
@@ -941,6 +975,10 @@ public class Service extends RepositoryManager {
      * @return _more_
      */
     public boolean getOutputToStderr() {
+        if (linkId != null) {
+            return getServiceToUse().getOutputToStderr();
+        }
+
         return outputToStderr;
     }
 
@@ -959,6 +997,10 @@ public class Service extends RepositoryManager {
      * @return _more_
      */
     public List<OutputDefinition> getOutputs() {
+        if (linkId != null) {
+            return getServiceToUse().getOutputs();
+        }
+
         return outputs;
     }
 
@@ -1088,6 +1130,7 @@ public class Service extends RepositoryManager {
         HashSet<File> newFiles = new HashSet<File>();
         if (haveChildren()) {
             ServiceOutput childOutput = null;
+            ServiceInput  childInput  = input;
             for (Service child : children) {
                 Entry primaryEntryForChild = entry;
                 if (serial) {
@@ -1100,7 +1143,7 @@ public class Service extends RepositoryManager {
                     }
                 }
 
-                childOutput = child.evaluate(request, input);
+                childOutput = child.evaluate(request, childInput);
                 if ( !childOutput.isOk()) {
                     return childOutput;
                 }
@@ -1110,6 +1153,9 @@ public class Service extends RepositoryManager {
                     }
                     myOutput.getEntries().addAll(childOutput.getEntries());
                     myOutput.append(childOutput.getResults());
+                } else {
+                    childInput = childInput.makeInput(childOutput);
+
                 }
             }
 
@@ -1156,6 +1202,7 @@ public class Service extends RepositoryManager {
             commands.set(0, IOUtil.getFileTail(commands.get(0)));
             myOutput.append(HtmlUtils.pre(StringUtil.join(" ", commands)));
             myOutput.append("\n");
+
             return myOutput;
         }
 
@@ -1192,9 +1239,14 @@ public class Service extends RepositoryManager {
             }
         }
 
-        HashSet<File> seen = new HashSet<File>();
+        boolean       setResultsFromStdout = true;
+
+        HashSet<File> seen                 = new HashSet<File>();
+
+
         for (OutputDefinition output : getOutputs()) {
             if (output.getShowResults()) {
+                setResultsFromStdout = false;
                 myOutput.setResultsShownAsText(true);
                 if (output.getUseStdout()) {
                     myOutput.append(IOUtil.readContents(stdoutFile));
@@ -1205,6 +1257,7 @@ public class Service extends RepositoryManager {
 
             File[] files = null;
             if (output.getUseStdout()) {
+                setResultsFromStdout = false;
                 String filename = applyMacros(entry, input.getProcessDir(),
                                       output.getFilename(),
                                       input.getForDisplay());
@@ -1270,6 +1323,10 @@ public class Service extends RepositoryManager {
                 }
                 myOutput.addEntry(newEntry);
             }
+        }
+
+        if (setResultsFromStdout) {
+            myOutput.append(IOUtil.readContents(stdoutFile));
         }
 
         return myOutput;
@@ -1494,6 +1551,17 @@ public class Service extends RepositoryManager {
         /** _more_ */
         private String type;
 
+
+
+        /** _more_          */
+        private String depends;
+
+        /** _more_          */
+        private boolean addAll;
+
+        /** _more_          */
+        private boolean addNone;
+
         /** _more_ */
         private String placeHolder;
 
@@ -1519,6 +1587,8 @@ public class Service extends RepositoryManager {
         /** _more_ */
         private List<TwoFacedObject> values = new ArrayList<TwoFacedObject>();
 
+        private String valuesProperty;
+
 
         /**
          * _more_
@@ -1534,6 +1604,11 @@ public class Service extends RepositoryManager {
             this.command = command;
 
             type = XmlUtil.getAttribute(node, ATTR_TYPE, (String) null);
+            depends = XmlUtil.getAttribute(node, "depends", (String) null);
+            addAll       = XmlUtil.getAttribute(node, "addAll", false);
+            addNone      = XmlUtil.getAttribute(node, "addNone", false);
+
+
             entryType = XmlUtil.getAttribute(node, ATTR_ENTRY_TYPE,
                                              (String) null);
 
@@ -1562,6 +1637,7 @@ public class Service extends RepositoryManager {
 
             group    = XmlUtil.getAttribute(node, ATTR_GROUP, (String) null);
             required = XmlUtil.getAttribute(node, "required", required);
+            valuesProperty= XmlUtil.getAttribute(node, "valuesProperty", (String) null);
             label    = XmlUtil.getAttribute(node, ATTR_LABEL, name);
             help     = Utils.getAttributeOrTag(node, "help", "");
             fileName = XmlUtil.getAttribute(node, "filename", "${src}");

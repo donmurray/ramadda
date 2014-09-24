@@ -26,7 +26,6 @@ import org.ramadda.data.process.ServiceInput;
 import org.ramadda.data.process.ServiceOperand;
 import org.ramadda.data.process.ServiceOutput;
 //import org.ramadda.geodata.cdmdata.CDOOutputHandler;
-import org.ramadda.geodata.cdmdata.NCOOutputHandler;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
 import org.ramadda.repository.Request;
@@ -84,7 +83,6 @@ public class ClimateCollectionTypeHandler extends CollectionTypeHandler {
         super(repository, entryNode);
         //processes.addAll(new CDOOutputHandler(repository).getServices());
         processes.add(new CDOArealStatisticsProcess(repository));
-        //        processes.addAll(new NCOOutputHandler(repository).getServices());
         nclOutputHandler = new NCLOutputHandler(repository);
     }
 
