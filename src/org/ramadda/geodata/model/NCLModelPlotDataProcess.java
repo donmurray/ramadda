@@ -21,6 +21,14 @@
 package org.ramadda.geodata.model;
 
 
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+
 import org.ramadda.data.process.Service;
 import org.ramadda.data.process.ServiceInput;
 import org.ramadda.data.process.ServiceOperand;
@@ -39,21 +47,10 @@ import org.ramadda.util.HtmlUtils;
 
 import ucar.nc2.dt.GridDatatype;
 import ucar.nc2.dt.grid.GridDataset;
-
+import ucar.nc2.units.SimpleUnit;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
-
-
-import java.io.File;
-
-import java.util.ArrayList;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.regex.Matcher;
 
 
 /**
@@ -181,9 +178,7 @@ public class NCLModelPlotDataProcess extends Service {
                                            "Google Earth")));
         // units
         String units = grid.getUnitsString();
-        if (units.equalsIgnoreCase("K") || units.equalsIgnoreCase("degK")
-                || units.equalsIgnoreCase("Kelvins")
-                || units.equalsIgnoreCase("Kelvin")) {
+        if (SimpleUnit.isCompatible(units,  "K")) {
             sb.append(
                 HtmlUtils.formEntry(
                     Repository.msgLabel("Plot Units"),
@@ -198,27 +193,9 @@ public class NCLModelPlotDataProcess extends Service {
                                            request, ARG_NCL_UNITS, "degC",
                                            false)) + Repository.msg(
                                                "Celsius")));
-        } else if (units.equalsIgnoreCase("kg m-2 s-1")
-                   || units.equalsIgnoreCase("kg/m^2/s")
-                   || units.equalsIgnoreCase("m/day")
-                   || units.equalsIgnoreCase("mm/s")) {
+        } else if (SimpleUnit.isCompatible(units,  "kg m-2 s-1") ||
+                   SimpleUnit.isCompatible(units,  "mm/day")) {
             sb.append(HtmlUtils.hidden(ARG_NCL_UNITS, "mm/day"));
-            /*
-            sb.append(
-                HtmlUtils.formEntry(
-                    Repository.msgLabel("Output Units"),
-                    HtmlUtils.radio(
-                        ARG_NCL_UNITS, "mm/s",
-                        RepositoryManager.getShouldButtonBeSelected(
-                            request, ARG_NCL_UNITS, "mm/s",
-                            true)) + Repository.msg("mm/s")
-                                   + HtmlUtils.radio(
-                                       ARG_NCL_UNITS, "mm/day",
-                                       RepositoryManager.getShouldButtonBeSelected(
-                                           request, ARG_NCL_UNITS, "mm/day",
-                                           true)) + Repository.msg(
-                                               "mm/day")));
-                                               */
         }
         // TODO:  For now, don't get value from request.  May not
         // be valid if variable changes.
