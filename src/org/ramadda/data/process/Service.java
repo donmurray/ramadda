@@ -1066,14 +1066,17 @@ public class Service extends RepositoryManager {
      * @return _more_
      */
     public boolean isApplicable(Entry entry) {
+
         if (linkId != null) {
             return getServiceToUse().isApplicable(entry);
         }
         if (haveChildren()) {
             return children.get(0).isApplicable(entry);
         }
+
         for (Arg input : inputs) {
-            if (input.isApplicable(entry)) {
+            boolean debug =false;
+            if (input.isApplicable(entry, debug)) {
                 return true;
             }
         }
@@ -1737,14 +1740,16 @@ public class Service extends RepositoryManager {
          *
          * @return _more_
          */
-        public boolean isApplicable(Entry entry) {
+        public boolean isApplicable(Entry entry, boolean debug) {
             boolean defaultReturn = true;
 
             if (entryType != null) {
                 if ( !entry.getTypeHandler().isType(entryType)) {
                     return false;
                 }
-                defaultReturn = false;
+                if (entryPattern== null) {
+                    return true;
+                }
             }
             if (entryPattern != null) {
                 return entry.getResource().getPath().matches(entryPattern);
