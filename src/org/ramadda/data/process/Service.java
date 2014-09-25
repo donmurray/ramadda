@@ -77,6 +77,9 @@ public class Service extends RepositoryManager {
     /** _more_ */
     public static final String TAG_ARG = "arg";
 
+    public static final String TAG_PARAMS = "params";
+    public static final String TAG_PARAM = "param";
+
     /** _more_ */
     public static final String ATTR_COMMAND = "command";
 
@@ -109,6 +112,8 @@ public class Service extends RepositoryManager {
 
     /** _more_ */
     public static final String TAG_SERVICE = "service";
+
+    public static final String TAG_SERVICES = "services";
 
 
     /** _more_ */
@@ -201,6 +206,8 @@ public class Service extends RepositoryManager {
         new ArrayList<OutputDefinition>();
 
 
+    private Hashtable paramValues = new Hashtable();
+
 
     /**
      * _more_
@@ -249,6 +256,9 @@ public class Service extends RepositoryManager {
 
 
 
+    public static final String ARG_DELIMITER = ".";
+
+
     /**
      * _more_
      *
@@ -256,10 +266,13 @@ public class Service extends RepositoryManager {
      */
     public String getUrlArg() {
         if (parent != null) {
-            return parent.getUrlArg() + "_" + id;
+            return parent.getUrlArg() + ARG_DELIMITER + id;
         }
-
         return id;
+    }
+
+    public String getUrlArg(String name) {
+        return getUrlArg() +ARG_DELIMITER + name;
     }
 
     /**
@@ -309,7 +322,35 @@ public class Service extends RepositoryManager {
         label  = XmlUtil.getAttribute(element, ATTR_LABEL, (String) null);
         serial = XmlUtil.getAttribute(element, ATTR_SERIAL, true);
 
+
+
+
         NodeList nodes;
+
+        Element params = XmlUtil.findChild(element,TAG_PARAMS);
+
+        if(params!=null) {
+            nodes = XmlUtil.getElements(params, TAG_PARAM);
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Element node = (Element) nodes.item(i);
+                String name = XmlUtil.getAttribute(node, "name");
+                String value = XmlUtil.getChildText(node);
+                Object v = paramValues.get(name);
+                if(v == null) {
+                    paramValues.put(name, value);
+                } else if(v instanceof List) {
+                    ((List)v).add(value);
+                } else {
+                    List newList = new ArrayList();
+                    newList.add(v);
+                    newList.add(value);
+                    paramValues.put(name, newList);
+                }
+            }
+            System.err.println ("paramValues:" + paramValues);
+        }
+
+
 
         nodes = XmlUtil.getElements(element, TAG_SERVICE);
         for (int i = 0; i < nodes.getLength(); i++) {
@@ -392,6 +433,57 @@ public class Service extends RepositoryManager {
         enabled = true;
 
     }
+
+    public Request makeRequest(Request request) {
+        if(paramValues.size()==0) return request;
+        request= request.cloneMe();
+        for (Enumeration keys = paramValues.keys(); keys.hasMoreElements(); ) {
+            String id = (String) keys.nextElement();
+            Object value = paramValues.get(id);
+            if(!request.defined(id)) {
+                request.put(id,value);
+            }
+        }
+        System.err.println ("makeRequest:" + request);
+        return request;
+
+    }
+
+
+    public boolean getRequestValue(Request request, ServiceInput input, String argName, boolean dflt) {
+        String v = getRequestValue(request,  input, argName, (String) null);
+        if(v == null) return dflt;
+        return v.equals("true");
+    }
+
+
+    public boolean getRequestValue(Request request, String argName, boolean dflt) {
+        return getRequestValue(request, null, argName, dflt);
+    }
+
+    public String getRequestValue(Request request, String argName, String dflt) {
+        return getRequestValue(request, null, argName, dflt);
+    }
+
+
+    public String getRequestValue(Request request, ServiceInput input, String argName, String dflt) {
+        String fullArg = getUrlArg(argName);
+        if (request.defined(fullArg)) {
+            if(debug) System.err.println ("got full");
+            String value = request.getString(fullArg, dflt);
+            if(input!=null) input.addParam(fullArg,value);
+            return value;
+        }
+        if (request.defined(argName)) {
+            if(debug) System.err.println ("got partial");
+            String value =  request.getString(argName, dflt);
+            if(input!=null) input.addParam(argName,value);
+            return value;
+        }
+        if(debug) System.err.println (argName +" " +"not defined " + fullArg);
+        return dflt;
+    }
+
 
     /**
      * _more_
@@ -493,22 +585,20 @@ public class Service extends RepositoryManager {
                 continue;
             }
             String       argValue = null;
-            String       argKey   = arg.getUrlArg();
             List<String> values   = null;
             if (arg.isValueArg()) {
                 argValue = arg.getValue();
             } else if (arg.isFlag()) {
                 if (arg.getGroup() != null) {
                     if ( !seenGroup.contains(arg.getGroup())) {
-                        argValue = request.getString(arg.getGroup(), null);
+                        argValue = getRequestValue(request, input, arg.getGroup(), (String) null);
                         if (Utils.stringDefined(argValue)) {
                             seenGroup.add(arg.getGroup());
                         } else {
                             argValue = null;
                         }
-                        argKey = arg.getGroup();
                     }
-                } else if (request.get(arg.getUrlArg(), false)) {
+                } else if (getRequestValue(request, input, arg.getName(), false)) {
                     argValue = arg.getValue();
                 }
             } else if (arg.isFile()) {
@@ -523,9 +613,9 @@ public class Service extends RepositoryManager {
                     currentEntry = null;
                 }
 
+                String argName  = arg.getName() + "_hidden";
                 if (currentEntry == null) {
-                    String entryId = request.getString(arg.getUrlArg()
-                                         + "_hidden", (String) null);
+                    String entryId =  getRequestValue(request, input, argName, null); 
                     Entry entryArg = getEntryManager().getEntry(request,
                                          entryId);
                     if (entryArg == null) {
@@ -537,8 +627,7 @@ public class Service extends RepositoryManager {
                         continue;
                     }
                     currentEntry = entryArg;
-                    input.addParam(arg.getUrlArg() + "_hidden",
-                                   entryArg.getId());
+                    //                    input.addParam(getUrlArg(argName), entryArg.getId());
                 }
                 argValue = arg.getValue();
                 if (argValue.equals("${entry.file}")) {
@@ -569,7 +658,7 @@ public class Service extends RepositoryManager {
                         values   = null;
                     }
                 } else {
-                    argValue = request.getString(arg.getUrlArg(), "");
+                    argValue = getRequestValue(request, input, arg.getName(),"");
                 }
             }
             if ((values == null) && (argValue != null)) {
@@ -585,7 +674,6 @@ public class Service extends RepositoryManager {
                         continue;
                     }
                     argCnt++;
-                    input.addParam(argKey, value);
                     if ( !arg.isEntry() && Utils.stringDefined(arg.value)) {
                         value = arg.value.replace("${value}", value);
                     }
@@ -610,6 +698,25 @@ public class Service extends RepositoryManager {
             }
         }
     }
+
+    public String getLinkXml(ServiceInput input) {
+        StringBuffer sb = new StringBuffer();
+        sb.append(XmlUtil.openTag(TAG_SERVICES));
+        sb.append(XmlUtil.openTag(TAG_SERVICE,
+                                  XmlUtil.attrs(ATTR_LINK, getId())));
+        sb.append(XmlUtil.openTag(TAG_PARAMS));
+
+        for(String[] param: input.getParams()) {
+            sb.append(XmlUtil.tag(TAG_PARAM, XmlUtil.attrs(ATTR_NAME, param[0]),
+                                  XmlUtil.getCdata(param[1])));
+        }
+
+        sb.append(XmlUtil.closeTag(TAG_PARAMS));
+        sb.append(XmlUtil.closeTag(TAG_SERVICE));
+        sb.append(XmlUtil.closeTag(TAG_SERVICES));
+        return sb.toString();
+    }
+
 
     /**
      * _more_
@@ -636,10 +743,11 @@ public class Service extends RepositoryManager {
      * @return _more_
      */
     public String getId() {
+        /*
         initService();
         if (link != null) {
             return link.getId();
-        }
+            }*/
 
         return id;
     }
@@ -671,6 +779,8 @@ public class Service extends RepositoryManager {
      */
     public int addToForm(Request request, ServiceInput input, Appendable sb)
             throws Exception {
+        request = makeRequest(request);
+
         initService();
         if (link != null) {
             return link.addToForm(request, input, sb);
@@ -813,13 +923,13 @@ public class Service extends RepositoryManager {
                     (List) null, extra, 100));
         } else if (arg.isFlag()) {
             if (arg.getGroup() != null) {
-                boolean selected = request.getString(arg.getGroup(),
-                                       "").equals(arg.getValue());
-                inputHtml.append(HtmlUtils.radio(arg.getGroup(),
-                        arg.getValue(), selected));
+                boolean selected = getRequestValue(request, arg.getGroup(),
+                                                   "").equals(arg.getValue());
+                inputHtml.append(HtmlUtils.radio(getUrlArg(arg.getGroup()),
+                                                 arg.getValue(), selected));
             } else {
                 inputHtml.append(HtmlUtils.checkbox(arg.getUrlArg(), "true",
-                        request.get(arg.getUrlArg(), false)));
+                                                    getRequestValue(request, arg.getName(), false)));
             }
 
             inputHtml.append(HtmlUtils.space(2));
@@ -847,17 +957,16 @@ public class Service extends RepositoryManager {
                 }
                 inputHtml.append(OutputHandler.getSelect(request,
                         arg.getUrlArg(), msg("Select"), true, null));
-                inputHtml.append(HtmlUtils.hidden(arg.getUrlArg()
-                        + "_hidden", request.getString(arg.getUrlArg()
-                            + "_hidden", ""), HtmlUtils.id(arg.getUrlArg()
-                                         + "_hidden")));
+                String argName  = arg.getName() + "_hidden";
+                inputHtml.append(HtmlUtils.hidden(getUrlArg(argName), 
+                                                  getRequestValue(request, argName, ""), 
+                                                  HtmlUtils.id(getUrlArg(argName))));
                 inputHtml.append(HtmlUtils.space(1));
                 inputHtml.append(HtmlUtils.disabledInput(arg.getUrlArg(),
-                        request.getString(arg.getUrlArg(), ""),
+                                                         getRequestValue(request, arg.getName(), ""),
                         HtmlUtils.SIZE_60 + HtmlUtils.id(arg.getUrlArg())));
                 request.remove(ARG_ENTRYTYPE);
             }
-
         } else {
             String extra = HtmlUtils.attr(HtmlUtils.ATTR_SIZE,
                                           "" + arg.getSize());
@@ -866,7 +975,7 @@ public class Service extends RepositoryManager {
             }
             inputHtml.append(
                 HtmlUtils.input(
-                    arg.getUrlArg(), request.getString(arg.getUrlArg(), ""),
+                                arg.getUrlArg(), getRequestValue(request, arg.getName(), ""),
                     extra));
         }
         if (inputHtml.length() == 0) {
@@ -1138,13 +1247,12 @@ public class Service extends RepositoryManager {
      */
     public String getLabel() {
         initService();
-        if (label != null) {
+        if (Utils.stringDefined(label)) {
             return label;
         }
         if (link != null) {
             return link.getLabel();
         }
-
         return id.replaceAll("_", " ");
     }
 
@@ -1161,6 +1269,8 @@ public class Service extends RepositoryManager {
      */
     public ServiceOutput evaluate(Request request, ServiceInput input)
             throws Exception {
+
+        request = makeRequest(request);
 
         ServiceOutput myOutput      = new ServiceOutput();
 
@@ -1557,7 +1667,7 @@ public class Service extends RepositoryManager {
         private static final String TYPE_CATEGORY = "category";
 
         /** _more_ */
-        private Service command;
+        private Service service;
 
         /** _more_ */
         private String name;
@@ -1644,14 +1754,14 @@ public class Service extends RepositoryManager {
          * _more_
          *
          *
-         * @param command _more_
+         * @param service _more_
          * @param node _more_
          * @param idx _more_
          *
          * @throws Exception _more_
          */
-        public Arg(Service command, Element node, int idx) throws Exception {
-            this.command = command;
+        public Arg(Service service, Element node, int idx) throws Exception {
+            this.service = service;
 
             type = XmlUtil.getAttribute(node, ATTR_TYPE, (String) null);
             depends = XmlUtil.getAttribute(node, "depends", (String) null);
@@ -1729,7 +1839,7 @@ public class Service extends RepositoryManager {
          * @return _more_
          */
         public String getUrlArg() {
-            return command.getUrlArg() + "_" + name;
+            return service.getUrlArg() + ARG_DELIMITER + name;
         }
 
 
@@ -1892,7 +2002,7 @@ public class Service extends RepositoryManager {
                 return null;
             }
 
-            return command.getUrlArg() + "_" + group;
+            return service.getUrlArg() + "_" + group;
         }
 
         /**

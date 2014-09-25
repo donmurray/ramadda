@@ -11,9 +11,9 @@ Convert SRA data into ABI format (csfasta / qual)
       <arg value="${workdir}"/>
       <arg value="${entry.file}" type="entry" entryType="bio_sra" primary="true"/>
       <arg type="category" label="Data formatting"/>
-      <arg type="flag" label="Original format" value="--origfmt" help="Excludes SRR accession on defline (read id)."/>
+      <arg name="origfmt" type="flag" label="Original format" value="--origfmt" help="Excludes SRR accession on defline (read id)."/>
       <arg type="category" label="Filtering"/>
-      <arg type="string" label="Spot Groups" prefix="--spot-groups" help="Filter by spot group (read group): name[,...]."/>
+      <arg name="spotgroups" type="string" label="Spot Groups" prefix="--spot-groups" help="Filter by spot group (read group): name[,...]."/>
       <arg type="string" label="Minimum spot id" prefix="--minSpotId" placeHolder="&lt;row id&gt;"/>
       <arg type="string" label="Maximum spot id" prefix="--maxSpotId" placeHolder="&lt;row id&gt;"/>
       <arg type="enumeration" label="Read filter" values=":-none-,pass,reject,criteria,redacted" prefix="--read-filter" help="Split into files by filter value."/>

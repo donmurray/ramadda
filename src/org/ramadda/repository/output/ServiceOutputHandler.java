@@ -301,6 +301,9 @@ public class ServiceOutputHandler extends OutputHandler {
             return new Result(outputType.getLabel(), sb);
         }
 
+        System.out.println(service.getLinkXml(serviceInput));
+
+
         if (serviceInput.getPublish() && (output.getEntries().size() > 0)) {
             return new Result(
                 request.entryUrl(
