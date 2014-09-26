@@ -903,7 +903,7 @@ public class OutputHandler extends RepositoryManager {
             throws Exception {
 
 
-        String selectorId = elementId + "_" + type;
+        String selectorId = elementId + (type==null?"_type":"_" + type);
         String event = HtmlUtils.call("selectInitialClick",
                                       HtmlUtils.comma("event",
                                           HtmlUtils.squote(selectorId),
@@ -917,7 +917,7 @@ public class OutputHandler extends RepositoryManager {
                                                        : "null"),
                                                       HtmlUtils.squote(request.getString(ARG_ENTRYTYPE,""))));
         String clearEvent = HtmlUtils.call("clearSelect",
-                                           HtmlUtils.squote(elementId));
+                                           HtmlUtils.squote(selectorId));
         String link = HtmlUtils.mouseClickHref(event, label,
                           HtmlUtils.id(selectorId + "_selectlink"));
         if (addClear) {

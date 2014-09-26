@@ -81,6 +81,11 @@
 -->
  </type>
 
+  <type name="type_service_workflow"  description="Service Workflow File" super="file" 
+        handler="org.ramadda.data.process.WorkflowTypeHandler">
+     <property name="icon" value="/icons/script_gear.png"/>
+</type>
+
 
 
 </types>

@@ -5,7 +5,7 @@ This will convert the given HMMER binary file to text
 <br>
 Documentation at <a target="_help" href="http://hmmer.janelia.org/">http://hmmer.janelia.org</a>
 ]]></help>
-    <arg value="${entry.file}" type="entry" entryType="bio_hmmer_index" primary="true"></arg>
+    <arg label="HMMER File" value="${entry.file}" type="entry" entryType="bio_hmmer_index" primary="true"></arg>
     <output type="bio_hmmer_index" stdout="true" filename="${entry.filebase}.hmm"/>
    </service>
 
@@ -22,7 +22,8 @@ Documentation at <a target="_help" href="http://hmmer.janelia.org/">http://hmmer
     <arg type="int" size="5" label="Database size (M bases)" help="Database size (M bases) (DNA only, if search on single strand)" prefix="--baseZ1"></arg>
     <arg type="float" size="5" label="E-value threshold" help="For eval2score" prefix="-E"></arg>
     <arg type="float" size="5" label="Score input" help="For score2eval" prefix="-S"></arg>
-    <arg name="inputentry" value="${entry.file}"   type="entry" entryType="bio_hmmer_index" primary="true"></arg>
+    <arg type="category" label="Input File"/>
+    <arg label="HMMER File"  value="${entry.file}"   type="entry" entryType="bio_hmmer_index" primary="true"></arg>
     <output showResults="true" stdout="true"/>
    </service>
 
@@ -32,15 +33,15 @@ Run HMMEMIT
 <br>
 Documentation at <a target="_help" href="http://hmmer.janelia.org/">http://hmmer.janelia.org</a>
 ]]></help>
-    <arg type="int" size="5" label="Number of sequences" help="Number of sequences to sample" prefix="-N"></arg>
-    <arg type="flag" group="emitoptions" label="" help="Emit alignment" value="-a"></arg>
-    <arg type="flag" group="emitoptions" label="" help="Emit simple majority-rule consensus sequence" value="-c"></arg>
-    <arg type="flag" group="emitoptions" label="" help="Emit fancier consensus sequence" value="-C"></arg>
-    <arg type="flag" group="emitoptions" label="" help="Sample sequences from profile, not core model" value="-p"></arg>
+    <arg name="number_sequences" type="int" size="5" label="Number of sequences" help="Number of sequences to sample" prefix="-N"></arg>
+    <arg name="emit_1" type="flag" group="emitoptions" label="" help="Emit alignment" value="-a"></arg>
+    <arg name="emit_2" type="flag" group="emitoptions" label="" help="Emit simple majority-rule consensus sequence" value="-c"></arg>
+    <arg name="emit_3" type="flag" group="emitoptions" label="" help="Emit fancier consensus sequence" value="-C"></arg>
+    <arg name="emit_4" type="flag" group="emitoptions" label="" help="Sample sequences from profile, not core model" value="-p"></arg>
 
     <arg type="category" label="Options controlling emission from profiles"/>
 
-    <arg type="int" size="5" label="Expected length" help="Set expected length from profile to" prefix="-L"></arg>
+    <arg name="expected_length" type="int" size="5" label="Expected length" help="Set expected length from profile to" prefix="-L"></arg>
     <arg type="flag" group="configure_profile" label="" help="Configure profile in multihit local mode" value="--local"></arg>
     <arg type="flag" group="configure_profile" label="" help="Configure profile in unilocal mode" value="--unilocal"></arg>
     <arg type="flag" group="configure_profile" label="" help="Configure profile in multihit glocal mode" value="--glocal"></arg>
@@ -49,7 +50,9 @@ Documentation at <a target="_help" href="http://hmmer.janelia.org/">http://hmmer
     <arg type="category" label="Options controlling fancy consensus emission"></arg>
     <arg type="float" size="5" label="Min L" help="Show consensus as 'any' (X/N) unless &gt;= this fraction" prefix="--minl"></arg>
     <arg type="float" size="5" label="Min U" help="Show consensus as upper case if  prefix this fraction" prefix="--minu"/>
-    <arg value="${entry.file}"  type="entry" entryType="bio_hmmer_index" primary="true"></arg>
+
+    <arg type="category" label="Input File"/>
+    <arg label="HMMER File"  value="${entry.file}"  type="entry" entryType="bio_hmmer_index" primary="true"></arg>
     <output showResults="true" stdout="true"/>
    </service>
 
@@ -59,7 +62,7 @@ Run HMMFETCH
 <br>
 Documentation at <a target="_help" href="http://hmmer.janelia.org/">http://hmmer.janelia.org</a>
 ]]></help>
-    <arg value="${entry.file}"  type="entry" entryType="bio_hmmer_index" primary="true"></arg>
+    <arg label="HMMER File" value="${entry.file}"  type="entry" entryType="bio_hmmer_index" primary="true"></arg>
     <arg type="string" label="Key" size="35" required="true"></arg>
     <output type="bio_hmmer_index" stdout="true" filename="${entry.filebase}.hmm"/>
    </service>

@@ -69,7 +69,13 @@ import java.util.zip.*;
 public class Service extends RepositoryManager {
 
     /** _more_ */
+    public static final String ARG_SERVICEFORM = "serviceform";
+
+    /** _more_ */
     private static ServiceUtil dummyToForceCompile;
+
+    /** _more_ */
+    private static WorkflowTypeHandler dummy2ToForceCompile;
 
     /** _more_ */
     public static boolean debug = false;
@@ -77,7 +83,10 @@ public class Service extends RepositoryManager {
     /** _more_ */
     public static final String TAG_ARG = "arg";
 
+    /** _more_ */
     public static final String TAG_PARAMS = "params";
+
+    /** _more_ */
     public static final String TAG_PARAM = "param";
 
     /** _more_ */
@@ -113,6 +122,7 @@ public class Service extends RepositoryManager {
     /** _more_ */
     public static final String TAG_SERVICE = "service";
 
+    /** _more_ */
     public static final String TAG_SERVICES = "services";
 
 
@@ -171,7 +181,7 @@ public class Service extends RepositoryManager {
     /** _more_ */
     private String help;
 
-    /** _more_          */
+    /** _more_ */
     private String processDesc;
 
     /** _more_ */
@@ -206,6 +216,7 @@ public class Service extends RepositoryManager {
         new ArrayList<OutputDefinition>();
 
 
+    /** _more_ */
     private Hashtable paramValues = new Hashtable();
 
 
@@ -256,6 +267,7 @@ public class Service extends RepositoryManager {
 
 
 
+    /** _more_ */
     public static final String ARG_DELIMITER = ".";
 
 
@@ -268,11 +280,19 @@ public class Service extends RepositoryManager {
         if (parent != null) {
             return parent.getUrlArg() + ARG_DELIMITER + id;
         }
+
         return id;
     }
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     *
+     * @return _more_
+     */
     public String getUrlArg(String name) {
-        return getUrlArg() +ARG_DELIMITER + name;
+        return getUrlArg() + ARG_DELIMITER + name;
     }
 
     /**
@@ -327,19 +347,19 @@ public class Service extends RepositoryManager {
 
         NodeList nodes;
 
-        Element params = XmlUtil.findChild(element,TAG_PARAMS);
+        Element  params = XmlUtil.findChild(element, TAG_PARAMS);
 
-        if(params!=null) {
+        if (params != null) {
             nodes = XmlUtil.getElements(params, TAG_PARAM);
             for (int i = 0; i < nodes.getLength(); i++) {
-                Element node = (Element) nodes.item(i);
-                String name = XmlUtil.getAttribute(node, "name");
-                String value = XmlUtil.getChildText(node);
-                Object v = paramValues.get(name);
-                if(v == null) {
+                Element node  = (Element) nodes.item(i);
+                String  name  = XmlUtil.getAttribute(node, "name");
+                String  value = XmlUtil.getChildText(node);
+                Object  v     = paramValues.get(name);
+                if (v == null) {
                     paramValues.put(name, value);
-                } else if(v instanceof List) {
-                    ((List)v).add(value);
+                } else if (v instanceof List) {
+                    ((List) v).add(value);
                 } else {
                     List newList = new ArrayList();
                     newList.add(v);
@@ -347,7 +367,6 @@ public class Service extends RepositoryManager {
                     paramValues.put(name, newList);
                 }
             }
-            System.err.println ("paramValues:" + paramValues);
         }
 
 
@@ -434,53 +453,115 @@ public class Service extends RepositoryManager {
 
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
     public Request makeRequest(Request request) {
-        if(paramValues.size()==0) return request;
-        request= request.cloneMe();
-        for (Enumeration keys = paramValues.keys(); keys.hasMoreElements(); ) {
-            String id = (String) keys.nextElement();
+        if (paramValues.size() == 0) {
+            return request;
+        }
+        request = request.cloneMe();
+        for (Enumeration keys =
+                paramValues.keys(); keys.hasMoreElements(); ) {
+            String id    = (String) keys.nextElement();
             Object value = paramValues.get(id);
-            if(!request.defined(id)) {
-                request.put(id,value);
+            if ( !request.defined(id)) {
+                request.put(id, value);
             }
         }
-        System.err.println ("makeRequest:" + request);
-        return request;
 
+        return request;
     }
 
 
-    public boolean getRequestValue(Request request, ServiceInput input, String argName, boolean dflt) {
-        String v = getRequestValue(request,  input, argName, (String) null);
-        if(v == null) return dflt;
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param input _more_
+     * @param argName _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
+    public boolean getRequestValue(Request request, ServiceInput input,
+                                   String argName, boolean dflt) {
+        String v = getRequestValue(request, input, argName, (String) null);
+        if (v == null) {
+            return dflt;
+        }
+
         return v.equals("true");
     }
 
 
-    public boolean getRequestValue(Request request, String argName, boolean dflt) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param argName _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
+    public boolean getRequestValue(Request request, String argName,
+                                   boolean dflt) {
         return getRequestValue(request, null, argName, dflt);
     }
 
-    public String getRequestValue(Request request, String argName, String dflt) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param argName _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
+    public String getRequestValue(Request request, String argName,
+                                  String dflt) {
         return getRequestValue(request, null, argName, dflt);
     }
 
 
-    public String getRequestValue(Request request, ServiceInput input, String argName, String dflt) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param input _more_
+     * @param argName _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
+    public String getRequestValue(Request request, ServiceInput input,
+                                  String argName, String dflt) {
         String fullArg = getUrlArg(argName);
+
         if (request.defined(fullArg)) {
-            if(debug) System.err.println ("got full");
             String value = request.getString(fullArg, dflt);
-            if(input!=null) input.addParam(fullArg,value);
+            if (input != null) {
+                input.addParam(fullArg, value);
+            }
+            debug("getRequestValue: full arg: " + argName + "=" + value);
+
             return value;
         }
         if (request.defined(argName)) {
-            if(debug) System.err.println ("got partial");
-            String value =  request.getString(argName, dflt);
-            if(input!=null) input.addParam(argName,value);
+            String value = request.getString(argName, dflt);
+            if (input != null) {
+                input.addParam(argName, value);
+            }
+            debug("getRequestValue: part arg: " + argName + "=" + value);
+
             return value;
         }
-        if(debug) System.err.println (argName +" " +"not defined " + fullArg);
+        debug("getRequestValue: no value: " + argName);
+
         return dflt;
     }
 
@@ -569,9 +650,10 @@ public class Service extends RepositoryManager {
         String cmd = applyMacros(primaryEntry, workDir, getCommand(),
                                  input.getForDisplay());
         commands.add(cmd);
-        HashSet<String> seenGroup   = new HashSet<String>();
-        HashSet<String> definedArgs = new HashSet<String>();
+        HashSet<String> seenGroup    = new HashSet<String>();
+        HashSet<String> definedArgs  = new HashSet<String>();
 
+        Entry           currentEntry = primaryEntry;
         for (Service.Arg arg : getArgs()) {
             if (arg.depends != null) {
                 if ( !definedArgs.contains(arg.depends)) {
@@ -580,7 +662,6 @@ public class Service extends RepositoryManager {
                 }
             }
 
-            Entry currentEntry = primaryEntry;
             if (arg.getCategory() != null) {
                 continue;
             }
@@ -591,14 +672,16 @@ public class Service extends RepositoryManager {
             } else if (arg.isFlag()) {
                 if (arg.getGroup() != null) {
                     if ( !seenGroup.contains(arg.getGroup())) {
-                        argValue = getRequestValue(request, input, arg.getGroup(), (String) null);
+                        argValue = getRequestValue(request, input,
+                                arg.getGroup(), (String) null);
                         if (Utils.stringDefined(argValue)) {
                             seenGroup.add(arg.getGroup());
                         } else {
                             argValue = null;
                         }
                     }
-                } else if (getRequestValue(request, input, arg.getName(), false)) {
+                } else if (getRequestValue(request, input, arg.getName(),
+                                           false)) {
                     argValue = arg.getValue();
                 }
             } else if (arg.isFile()) {
@@ -613,13 +696,15 @@ public class Service extends RepositoryManager {
                     currentEntry = null;
                 }
 
-                String argName  = arg.getName() + "_hidden";
+                String argName = arg.getName() + "_hidden";
                 if (currentEntry == null) {
-                    String entryId =  getRequestValue(request, input, argName, null); 
+                    String entryId = getRequestValue(request, input, argName,
+                                         null);
+
                     Entry entryArg = getEntryManager().getEntry(request,
                                          entryId);
                     if (entryArg == null) {
-                        if (arg.isRequired()) {
+                        if (arg.isRequired() || arg.isPrimaryEntry()) {
                             throw new IllegalArgumentException(
                                 "No entry  specified for:" + arg.getLabel());
                         }
@@ -627,7 +712,8 @@ public class Service extends RepositoryManager {
                         continue;
                     }
                     currentEntry = entryArg;
-                    //                    input.addParam(getUrlArg(argName), entryArg.getId());
+                } else {
+                    input.addParam(getUrlArg(argName), currentEntry.getId());
                 }
                 argValue = arg.getValue();
                 if (argValue.equals("${entry.file}")) {
@@ -658,7 +744,8 @@ public class Service extends RepositoryManager {
                         values   = null;
                     }
                 } else {
-                    argValue = getRequestValue(request, input, arg.getName(),"");
+                    argValue = getRequestValue(request, input, arg.getName(),
+                            "");
                 }
             }
             if ((values == null) && (argValue != null)) {
@@ -699,21 +786,40 @@ public class Service extends RepositoryManager {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param input _more_
+     *
+     * @return _more_
+     */
     public String getLinkXml(ServiceInput input) {
+        initService();
+        if (link != null) {
+            return link.getLinkXml(input);
+        }
+
+
         StringBuffer sb = new StringBuffer();
         sb.append(XmlUtil.openTag(TAG_SERVICES));
+        sb.append("\n");
         sb.append(XmlUtil.openTag(TAG_SERVICE,
-                                  XmlUtil.attrs(ATTR_LINK, getId())));
+                                  XmlUtil.attrs(ATTR_LINK, getId(), ATTR_ID,
+                                      "service")));
+        sb.append("\n");
         sb.append(XmlUtil.openTag(TAG_PARAMS));
+        sb.append("\n");
 
-        for(String[] param: input.getParams()) {
-            sb.append(XmlUtil.tag(TAG_PARAM, XmlUtil.attrs(ATTR_NAME, param[0]),
+        for (String[] param : input.getParams()) {
+            sb.append(XmlUtil.tag(TAG_PARAM,
+                                  XmlUtil.attrs(ATTR_NAME, param[0]),
                                   XmlUtil.getCdata(param[1])));
         }
 
         sb.append(XmlUtil.closeTag(TAG_PARAMS));
         sb.append(XmlUtil.closeTag(TAG_SERVICE));
         sb.append(XmlUtil.closeTag(TAG_SERVICES));
+
         return sb.toString();
     }
 
@@ -773,26 +879,28 @@ public class Service extends RepositoryManager {
      * @param input _more_
      * @param sb _more_
      *
-     * @return _more_
      *
      * @throws Exception _more_
      */
-    public int addToForm(Request request, ServiceInput input, Appendable sb)
+    public void addToForm(Request request, ServiceInput input, Appendable sb)
             throws Exception {
-        request = makeRequest(request);
+        boolean comingFromForm = request.get(ARG_SERVICEFORM, false);
+        if ( !comingFromForm) {
+            request = makeRequest(request);
+        }
 
         initService();
         if (link != null) {
-            return link.addToForm(request, input, sb);
+            link.addToForm(request, input, sb);
+
+            return;
         }
 
         if (haveChildren()) {
-            int cnt = 0;
             for (Service child : children) {
                 StringBuilder tmpSB = new StringBuilder();
-                int blockCnt        = child.addToForm(request, input, tmpSB);
-                cnt += blockCnt;
-                if (blockCnt > 0) {
+                child.addToForm(request, input, tmpSB);
+                if (tmpSB.length() > 0) {
                     sb.append(HtmlUtils.p());
                     sb.append(header(child.getLabel()));
                     sb.append(tmpSB);
@@ -800,10 +908,10 @@ public class Service extends RepositoryManager {
 
             }
 
-            return cnt;
+            return;
         }
 
-        return addToFormInner(request, input, sb);
+        addToFormInner(request, input, sb);
     }
 
     /**
@@ -813,12 +921,11 @@ public class Service extends RepositoryManager {
      * @param input _more_
      * @param sb _more_
      *
-     * @return _more_
-     *
+     * 
      * @throws Exception _more_
      */
-    private int addToFormInner(Request request, ServiceInput input,
-                               Appendable sb)
+    private void addToFormInner(Request request, ServiceInput input,
+                                Appendable sb)
             throws Exception {
 
         StringBuilder formSB      = new StringBuilder();
@@ -826,31 +933,40 @@ public class Service extends RepositoryManager {
         CatBuff       catBuff     = null;
         Service.Arg   catArg      = null;
         boolean       anyRequired = false;
-        for (Service.Arg arg : getArgs()) {
-            if (arg.isCategory()) {
-                if ((catBuff != null) && (catBuff.length() > 0)) {
-                    processCatBuff(request, formSB, catArg, catBuff,
-                                   ++blockCnt);
+        for (int argType = 0; argType <= 1; argType++) {
+            for (Service.Arg arg : getArgs()) {
+                if ((argType == 0) && !arg.isEntry()) {
+                    continue;
                 }
-                catArg  = arg;
-                catBuff = new CatBuff();
+                if ((argType == 1) && arg.isEntry()) {
+                    continue;
+                }
 
-                continue;
-            }
+                if (arg.isCategory()) {
+                    if ((catBuff != null) && (catBuff.length() > 0)) {
+                        processCatBuff(request, formSB, catArg, catBuff,
+                                       ++blockCnt);
+                    }
+                    catArg  = arg;
+                    catBuff = new CatBuff();
 
-            if (arg.isValueArg()) {
-                continue;
-            }
+                    continue;
+                }
 
-            if (catBuff == null) {
-                catBuff = new CatBuff();
-                catArg  = null;
-            }
+                if (arg.isValueArg()) {
+                    continue;
+                }
 
-            if (arg.isRequired()) {
-                anyRequired = true;
+                if (catBuff == null) {
+                    catBuff = new CatBuff();
+                    catArg  = null;
+                }
+
+                if (arg.isRequired()) {
+                    anyRequired = true;
+                }
+                addArgToForm(request, input, catBuff, arg);
             }
-            addArgToForm(request, input, catBuff, arg);
         }
 
         if ((catBuff != null) && (catBuff.length() > 0)) {
@@ -870,9 +986,6 @@ public class Service extends RepositoryManager {
             sb.append(HtmlUtils.div(formSB.toString(),
                                     HtmlUtils.cssClass("service-form")));
         }
-
-
-        return blockCnt;
 
     }
 
@@ -924,12 +1037,12 @@ public class Service extends RepositoryManager {
         } else if (arg.isFlag()) {
             if (arg.getGroup() != null) {
                 boolean selected = getRequestValue(request, arg.getGroup(),
-                                                   "").equals(arg.getValue());
+                                       "").equals(arg.getValue());
                 inputHtml.append(HtmlUtils.radio(getUrlArg(arg.getGroup()),
-                                                 arg.getValue(), selected));
+                        arg.getValue(), selected));
             } else {
                 inputHtml.append(HtmlUtils.checkbox(arg.getUrlArg(), "true",
-                                                    getRequestValue(request, arg.getName(), false)));
+                        getRequestValue(request, arg.getName(), false)));
             }
 
             inputHtml.append(HtmlUtils.space(2));
@@ -955,16 +1068,32 @@ public class Service extends RepositoryManager {
                 if (arg.getEntryType() != null) {
                     request.put(ARG_ENTRYTYPE, arg.getEntryType());
                 }
-                inputHtml.append(OutputHandler.getSelect(request,
-                        arg.getUrlArg(), msg("Select"), true, null));
-                String argName  = arg.getName() + "_hidden";
-                inputHtml.append(HtmlUtils.hidden(getUrlArg(argName), 
-                                                  getRequestValue(request, argName, ""), 
-                                                  HtmlUtils.id(getUrlArg(argName))));
+                String elementId = HtmlUtils.getUniqueId("select_");
+                inputHtml.append(OutputHandler.getSelect(request, elementId,
+                        msg("Select"), true, null));
+                String argName    = arg.getName() + "_hidden";
+
+                String entryId    = getRequestValue(request, argName, "");
+
+                String entryLabel = "";
+
+                if (Utils.stringDefined(entryId)) {
+                    Entry entryArg = getEntryManager().getEntry(request,
+                                         entryId);
+                    if (entryArg != null) {
+                        entryLabel = entryArg.getName();
+                    }
+                }
+
+                inputHtml.append(HtmlUtils.hidden(getUrlArg(argName),
+                        entryId, HtmlUtils.id(elementId + "_hidden")));
                 inputHtml.append(HtmlUtils.space(1));
                 inputHtml.append(HtmlUtils.disabledInput(arg.getUrlArg(),
-                                                         getRequestValue(request, arg.getName(), ""),
-                        HtmlUtils.SIZE_60 + HtmlUtils.id(arg.getUrlArg())));
+                        entryLabel,
+                        HtmlUtils.SIZE_60 + HtmlUtils.id(elementId)));
+                //                inputHtml.append(HtmlUtils.disabledInput(arg.getUrlArg(),
+                //                                                         getRequestValue(request, arg.getName(), ""),
+                //                                                         HtmlUtils.SIZE_60 + HtmlUtils.id(elementId)));
                 request.remove(ARG_ENTRYTYPE);
             }
         } else {
@@ -973,10 +1102,9 @@ public class Service extends RepositoryManager {
             if (arg.placeHolder != null) {
                 extra += HtmlUtils.attr("placeholder", arg.placeHolder);
             }
-            inputHtml.append(
-                HtmlUtils.input(
-                                arg.getUrlArg(), getRequestValue(request, arg.getName(), ""),
-                    extra));
+            inputHtml.append(HtmlUtils.input(arg.getUrlArg(),
+                                             getRequestValue(request,
+                                                 arg.getName(), ""), extra));
         }
         if (inputHtml.length() == 0) {
             return;
@@ -1184,7 +1312,7 @@ public class Service extends RepositoryManager {
         }
 
         for (Arg input : inputs) {
-            boolean debug =false;
+            boolean debug = false;
             if (input.isApplicable(entry, debug)) {
                 return true;
             }
@@ -1253,6 +1381,7 @@ public class Service extends RepositoryManager {
         if (link != null) {
             return link.getLabel();
         }
+
         return id.replaceAll("_", " ");
     }
 
@@ -1270,7 +1399,10 @@ public class Service extends RepositoryManager {
     public ServiceOutput evaluate(Request request, ServiceInput input)
             throws Exception {
 
-        request = makeRequest(request);
+        boolean comingFromForm = request.get(ARG_SERVICEFORM, false);
+        if ( !comingFromForm) {
+            request = makeRequest(request);
+        }
 
         ServiceOutput myOutput      = new ServiceOutput();
 
@@ -1278,7 +1410,10 @@ public class Service extends RepositoryManager {
         for (File f : input.getProcessDir().listFiles()) {
             existingFiles.add(f);
         }
-        Entry         entry    = input.getEntries().get(0);
+        List<Entry>   entries  = input.getEntries();
+        Entry         entry    = ((entries.size() > 0)
+                                  ? entries.get(0)
+                                  : null);
 
         HashSet<File> newFiles = new HashSet<File>();
         if (haveChildren()) {
@@ -1367,6 +1502,7 @@ public class Service extends RepositoryManager {
                               "." + getId() + ".stderr"));
 
 
+        System.out.println(getLinkXml(input));
         if (commandObject != null) {
             commandMethod.invoke(commandObject, new Object[] { request, entry,
                     this, input, commands });
@@ -1484,6 +1620,25 @@ public class Service extends RepositoryManager {
 
         return myOutput;
     }
+
+
+
+    /**
+     * _more_
+     */
+    public void ensureSafeServices() {
+        if (command != null) {
+            throw new IllegalArgumentException(
+                "Service cannot have a command:" + command);
+        }
+        if (haveChildren()) {
+            for (Service child : children) {
+                child.ensureSafeServices();
+            }
+        }
+    }
+
+
 
 
     /**
@@ -1733,7 +1888,7 @@ public class Service extends RepositoryManager {
         /** _more_ */
         private boolean required = false;
 
-        /** _more_          */
+        /** _more_ */
         private boolean copy = false;
 
         /** _more_ */
@@ -1780,10 +1935,14 @@ public class Service extends RepositoryManager {
             isPrimaryEntry = XmlUtil.getAttribute(node, ATTR_PRIMARY,
                     isPrimaryEntry);
 
-            prefix      = XmlUtil.getAttribute(node, "prefix", (String) null);
-            value       = Utils.getAttributeOrTag(node, "value", "");
-            name        = XmlUtil.getAttribute(node, ATTR_NAME,
-                    (String) null);
+            prefix = XmlUtil.getAttribute(node, "prefix", (String) null);
+            value  = Utils.getAttributeOrTag(node, "value", "");
+            name   = XmlUtil.getAttribute(node, ATTR_NAME, (String) null);
+
+            if ((name == null) && isEntry() && isPrimaryEntry) {
+                name = "input_file";
+            }
+
             nameDefined = name != null;
             if ((name == null) && (prefix != null)) {
                 name = prefix.replaceAll("-", "");
@@ -1847,6 +2006,7 @@ public class Service extends RepositoryManager {
          * _more_
          *
          * @param entry _more_
+         * @param debug _more_
          *
          * @return _more_
          */
@@ -1857,7 +2017,7 @@ public class Service extends RepositoryManager {
                 if ( !entry.getTypeHandler().isType(entryType)) {
                     return false;
                 }
-                if (entryPattern== null) {
+                if (entryPattern == null) {
                     return true;
                 }
             }
@@ -1998,11 +2158,21 @@ public class Service extends RepositoryManager {
          * @return _more_
          */
         public String getGroup() {
+            return group;
+        }
+
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public String getGroupUrlArg() {
             if (group == null) {
                 return null;
             }
 
-            return service.getUrlArg() + "_" + group;
+            return service.getUrlArg() + ARG_DELIMITER + group;
         }
 
         /**

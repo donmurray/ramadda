@@ -746,7 +746,9 @@ function Selector(event, selectorId, elementId, allEntries, selecttype, localeId
 
     this.clearInput = function() {	
         this.getHiddenComponent().val("");
-        this.getTextComponent().val("");
+        this.getHiddenComponent().html("FOOAXS");
+        this.getTextComponent().val("");        
+        this.getTextComponent().html("hello there");
     }
 
 
@@ -784,6 +786,7 @@ function selectClick(id,entryId,value) {
         insertTagsInner(selector.elementId, selector.textComp.obj, entryId," ","importtype");
     } else { 
         selector.getHiddenComponent().val(entryId);
+        //        selector.getHiddenComponent().html(entryId);
         selector.getTextComponent().val(value);
     }
     selectCancel();
@@ -812,6 +815,7 @@ function selectInitialClick(event, selectorId, elementId, allEntries, selecttype
 
 function clearSelect(id) {
     selector = selectors[id];
+
     if(selector) {
         selector.clearInput();
     } else {

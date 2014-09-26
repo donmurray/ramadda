@@ -21,11 +21,13 @@
 package org.ramadda.repository.output;
 
 
-import org.ramadda.repository.*;
+import org.ramadda.data.process.OutputDefinition;
 import org.ramadda.data.process.Service;
 import org.ramadda.data.process.ServiceInput;
 import org.ramadda.data.process.ServiceOutput;
-import org.ramadda.data.process.OutputDefinition;
+
+
+import org.ramadda.repository.*;
 import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.type.*;
 
@@ -65,6 +67,11 @@ public class ServiceOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String ARG_GOTOPRODUCTS = "gotoproducts";
 
+
+
+    /** _more_          */
+    public static final String ARG_WRITEWORKFLOW = "writeworkflow";
+
     /** _more_ */
     public static final String ATTR_ICON = "icon";
 
@@ -89,6 +96,21 @@ public class ServiceOutputHandler extends OutputHandler {
             throws Exception {
         super(repository, element);
         init(element);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param service _more_
+     *
+     * @throws Exception _more_
+     */
+    public ServiceOutputHandler(Repository repository, Service service)
+            throws Exception {
+        super(repository, "");
+        this.service = service;
     }
 
 
@@ -198,6 +220,10 @@ public class ServiceOutputHandler extends OutputHandler {
 
 
 
+
+
+
+
     /**
      * _more_
      *
@@ -213,31 +239,56 @@ public class ServiceOutputHandler extends OutputHandler {
                               final Entry entry)
             throws Exception {
 
-        StringBuffer sb = new StringBuffer();
         if ( !request.defined(ARG_EXECUTE)
                 && !request.defined(ARG_SHOWCOMMAND)) {
-            makeForm(request, entry, sb);
+            StringBuffer sb = new StringBuffer();
+            makeForm(request, service, entry, entry, outputType, sb);
 
             return new Result(outputType.getLabel(), sb);
         }
 
-        //        Object       uniqueId = getRepository().getGUID();
-        //        File         workDir  = getWorkDir(uniqueId);
-        File              workDir     =
-            getStorageManager().createProcessDir();
+        return evaluateService(request, outputType, entry, entry, service);
+    }
 
 
-        final ServiceInput serviceInput  = new ServiceInput(workDir, entry);
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param outputType _more_
+     * @param baseEntry _more_
+     * @param entry _more_
+     * @param service _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result evaluateService(final Request request,
+                                  OutputType outputType,
+                                  final Entry baseEntry, final Entry entry,
+                                  final Service service)
+            throws Exception {
+
+        StringBuffer       sb           = new StringBuffer();
+        File               workDir = getStorageManager().createProcessDir();
+
+        final ServiceInput serviceInput = (entry != null)
+                                          ? new ServiceInput(workDir, entry)
+                                          : new ServiceInput(workDir);
         serviceInput.setPublish(doingPublish(request));
         serviceInput.setForDisplay(request.exists(ARG_SHOWCOMMAND));
 
-        StringBuffer xml = new StringBuffer();
-        String desc = service.getProcessDescription();
-        if(desc == null)desc = "";
-        xml.append(XmlUtil.tag("entry",
-                               XmlUtil.attrs("type", "group", "name",
-                                             "Processing Results"),
-                               XmlUtil.tag("description","",XmlUtil.getCdata(desc))));
+        StringBuffer xml  = new StringBuffer();
+        String       desc = service.getProcessDescription();
+        if (desc == null) {
+            desc = "";
+        }
+        xml.append(
+            XmlUtil.tag(
+                "entry",
+                XmlUtil.attrs("type", "group", "name", "Processing Results"),
+                XmlUtil.tag("description", "", XmlUtil.getCdata(desc))));
 
         IOUtil.writeFile(new File(IOUtil.joinDir(workDir,
                 ".this.ramadda.xml")), xml.toString());
@@ -251,7 +302,7 @@ public class ServiceOutputHandler extends OutputHandler {
                         //TODO:
                         //    public ServiceOutput evaluate(Request request,  ServiceInput input)
                         //                        output = service.evaluate(request, entry,
-                        output = service.evaluate(request,  serviceInput);
+                        output = service.evaluate(request, serviceInput);
                         if ( !output.isOk()) {
                             getActionManager().setContinueHtml(
                                 actionId,
@@ -273,7 +324,7 @@ public class ServiceOutputHandler extends OutputHandler {
                     }
                     String url =
                         getStorageManager().getProcessDirEntryUrl(request,
-                                                                  serviceInput.getProcessDir());
+                            serviceInput.getProcessDir());
                     if (serviceInput.getPublish()
                             && (output.getEntries().size() > 0)) {
                         url = request.entryUrl(
@@ -289,19 +340,30 @@ public class ServiceOutputHandler extends OutputHandler {
                     outputType.getLabel(), "");
 
         }
-        ServiceOutput output = service.evaluate(request,  serviceInput);
+        ServiceOutput output = service.evaluate(request, serviceInput);
 
         if ( !output.isOk()) {
             sb.append(
                 getPageHandler().showDialogError(
                     "An error has occurred:<pre>" + output.getResults()
                     + "</pre>"));
-            makeForm(request, entry, sb);
+            makeForm(request, service, baseEntry, entry, outputType, sb);
 
             return new Result(outputType.getLabel(), sb);
         }
 
-        System.out.println(service.getLinkXml(serviceInput));
+        if (request.get(ARG_WRITEWORKFLOW, false)) {
+            String workflowXml = service.getLinkXml(serviceInput);
+            File workflowFile = new File(IOUtil.joinDir(workDir,
+                                    "serviceworkflow.xml"));
+            IOUtil.writeFile(workflowFile, workflowXml.toString());
+            workflowXml =
+                "<entry type=\"type_service_workflow\" name=\"Service workflow\" />";
+            IOUtil.writeFile(getEntryManager().getEntryXmlFile(workflowFile),
+                             workflowXml.toString());
+
+        }
+
 
 
         if (serviceInput.getPublish() && (output.getEntries().size() > 0)) {
@@ -319,10 +381,12 @@ public class ServiceOutputHandler extends OutputHandler {
             sb.append(output.getResults());
             sb.append("</pre>");
             sb.append("</div>");
-            makeForm(request, entry, sb);
+            makeForm(request, service, baseEntry, entry, outputType, sb);
 
             return new Result(outputType.getLabel(), sb);
         }
+
+
 
 
         //Redirect to the products entry 
@@ -355,9 +419,10 @@ public class ServiceOutputHandler extends OutputHandler {
         sb.append(output.getResults());
         sb.append("</pre>");
         sb.append(HtmlUtils.hr());
-        makeForm(request, entry, sb);
+        makeForm(request, service, baseEntry, entry, outputType, sb);
 
         return new Result(outputType.getLabel(), sb);
+
 
     }
 
@@ -367,27 +432,35 @@ public class ServiceOutputHandler extends OutputHandler {
      * _more_
      *
      * @param request _more_
+     * @param service _more_
+     * @param baseEntry _more_
      * @param entry _more_
+     * @param outputType _more_
      * @param sb _more_
      *
      * @throws Exception _more_
      */
-    public void makeForm(Request request, Entry entry, StringBuffer sb)
+    public void makeForm(Request request, Service service, Entry baseEntry,
+                         Entry entry, OutputType outputType, Appendable sb)
             throws Exception {
-
 
         String formId = HtmlUtils.getUniqueId("form_");
         request.uploadFormWithAuthToken(sb, getRepository().URL_ENTRY_SHOW,
                                         HtmlUtils.id(formId));
+
         sb.append(HtmlUtils.hidden(ARG_OUTPUT, outputType.getId()));
-        sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
+        sb.append(HtmlUtils.hidden(ARG_ENTRYID, baseEntry.getId()));
 
 
 
         StringBuffer extraSubmit = new StringBuffer();
         extraSubmit.append(HtmlUtils.space(2));
         extraSubmit.append(HtmlUtils.labeledCheckbox(ARG_GOTOPRODUCTS,
-                "true", false, "Go to products page"));
+                "true", request.get(ARG_GOTOPRODUCTS, false),
+                "Go to products page"));
+        extraSubmit.append(HtmlUtils.labeledCheckbox(ARG_WRITEWORKFLOW,
+                "true", request.get(ARG_WRITEWORKFLOW, false),
+                "Write workflow"));
 
         boolean                haveAnyOutputs = false;
         List<OutputDefinition> outputs = new ArrayList<OutputDefinition>();
@@ -410,25 +483,26 @@ public class ServiceOutputHandler extends OutputHandler {
         }
 
 
-        service.addToForm(request, new ServiceInput(entry), sb);
 
+        service.addToForm(request, (entry != null)
+                                   ? new ServiceInput(entry)
+                                   : new ServiceInput(), sb);
+
+        sb.append(HtmlUtils.hidden(Service.ARG_SERVICEFORM, "true"));
         sb.append(HtmlUtils.p());
         sb.append(HtmlUtils.submit(service.getLabel(), ARG_EXECUTE,
                                    makeButtonSubmitDialog(sb,
                                        "Processing request...")));
         StringBuffer etc = new StringBuffer();
-
-        etc.append(HtmlUtils.br());
         etc.append(extraSubmit);
         etc.append(HtmlUtils.p());
         etc.append(HtmlUtils.formTable());
 
 
         if (haveAnyOutputs) {
-            addPublishWidget(
-                request, entry, etc,
-                msg("Optionally, select a folder to publish to"), true,
-                false);
+            addPublishWidget(request, entry, etc,
+                             msg("Select a folder to publish to"), true,
+                             false);
         }
 
         etc.append(HtmlUtils.formTableClose());

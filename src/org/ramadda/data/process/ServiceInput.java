@@ -58,6 +58,12 @@ public class ServiceInput {
     /** _more_ */
     private List<String[]> params = new ArrayList<String[]>();
 
+    /**
+     * _more_
+     */
+    public ServiceInput() {
+        this.operands = new ArrayList<ServiceOperand>();
+    }
 
     /**
      * _more_
@@ -119,10 +125,18 @@ public class ServiceInput {
      * @param operands the operands
      */
     public ServiceInput(File dir, List<ServiceOperand> operands) {
-
         this.processDir = dir;
         this.operands   = operands;
+    }
 
+    /**
+     * _more_
+     *
+     * @param dir _more_
+     */
+    public ServiceInput(File dir) {
+        this.processDir = dir;
+        this.operands   = new ArrayList<ServiceOperand>();
     }
 
     /**
