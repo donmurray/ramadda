@@ -921,7 +921,7 @@ public class Service extends RepositoryManager {
      * @param input _more_
      * @param sb _more_
      *
-     * 
+     *
      * @throws Exception _more_
      */
     private void addToFormInner(Request request, ServiceInput input,
@@ -1032,8 +1032,10 @@ public class Service extends RepositoryManager {
                                              ? arg.getSize()
                                              : 4) + " ";
             }
+
+            List selected = request.get(arg.getUrlArg(), new ArrayList());
             inputHtml.append(HtmlUtils.select(arg.getUrlArg(), values,
-                    (List) null, extra, 100));
+                    selected, extra, 100));
         } else if (arg.isFlag()) {
             if (arg.getGroup() != null) {
                 boolean selected = getRequestValue(request, arg.getGroup(),

@@ -1,10 +1,9 @@
 <outputhandlers>
   <outputhandler class="org.ramadda.geodata.cdmdata.WmsImageOutputHandler" name="WMS"/>
-<!--
-  <outputhandler class="org.ramadda.geodata.cdmdata.LasOutputHandler" name="LAS XML"/>
--->
   <outputhandler class="org.ramadda.geodata.cdmdata.CdmDataOutputHandler" name="CDM Data" required="true"/>
   <outputhandler class="org.ramadda.geodata.cdmdata.GridPointOutputHandler" name="Grid as point Data" required="true"/>
   <outputhandler class="org.ramadda.geodata.cdmdata.LdmOutputHandler" name="LDM Insert"/>
   <outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="nco.ncwa" icon="/cdmdata/nco.png"/>
+
+  <outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="cdo.info"/>
 </outputhandlers>

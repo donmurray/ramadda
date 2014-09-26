@@ -1,0 +1,13 @@
+  <services icon="/cdmdata/cdo.png" command="${cdo.path}" handler="org.ramadda.geodata.cdmdata.NetcdfService">
+
+    <service label="CDO Info" id="cdo.info"   outputToStderr="true">
+<help><![CDATA[
+Run <a href="https://code.zmaw.de/projects/cdo/embedded/1.6.4/cdo.html#x1-400002.1.2" target="_help">CDO SINFO</a>
+]]></help>
+          <arg type="enumeration" label="Operator" values="sinfo:Short Information, showformat:Show file format,showcode:Show code numbers,showname:Show variable names,showstdname:Show standard names,showlevel:Show levels,showltype:Show GRIB level types,showyear:Show years,showmon:Show months,showdate:Show date information,showtime:Show time,showtimestamp:Show timestamp,,griddes:Grid Description,infop,sinfoc,sinfon,sinfop,seinfo,seinfop,seinfon" />
+          <arg value="${entry.file}"   type="entry" primary="true" entryPattern="(.*\.nc|.*\.grb|.*\.grib)"></arg>
+          <output showResults="true" stdout="true"/>
+    </service>
+</services>
+
+
