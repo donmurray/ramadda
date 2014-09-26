@@ -99,28 +99,30 @@ public class NetcdfService extends Service {
             throws Exception {
         List<Entry>          entries           = input.getEntries();
         Entry                entry             = ((entries.size() == 0)
-                ? null
-                : entries.get(0));
-        CdmDataOutputHandler dataOutputHandler = getDataOutputHandler();
-        NetcdfDataset dataset =
-            NetcdfDataset.openDataset(entry.getResource().getPath());
-        List<Variable>       variables  = dataset.getVariables();
-        List<TwoFacedObject> coordNames = new ArrayList<TwoFacedObject>();
-        List<TwoFacedObject> varNames   = new ArrayList<TwoFacedObject>();
-        for (Variable var : variables) {
-            if (var instanceof CoordinateAxis) {
-                coordNames.add(new TwoFacedObject(var.getName(),
-                        var.getShortName()));
+                                                  ? null
+                                                  : entries.get(0));
+        if(entry!=null) {
+            CdmDataOutputHandler dataOutputHandler = getDataOutputHandler();
+            NetcdfDataset dataset =
+                NetcdfDataset.openDataset(entry.getResource().getPath());
+            List<Variable>       variables  = dataset.getVariables();
+            List<TwoFacedObject> coordNames = new ArrayList<TwoFacedObject>();
+            List<TwoFacedObject> varNames   = new ArrayList<TwoFacedObject>();
+            for (Variable var : variables) {
+                if (var instanceof CoordinateAxis) {
+                    coordNames.add(new TwoFacedObject(var.getName(),
+                                                      var.getShortName()));
+                }
+                varNames.add(new TwoFacedObject(var.getName(),
+                                                var.getShortName()));
             }
-            varNames.add(new TwoFacedObject(var.getName(),
-                                            var.getShortName()));
+
+            dataset.close();
+
+
+            input.putProperty("varNames", varNames);
+            input.putProperty("coordNames", coordNames);
         }
-
-        dataset.close();
-
-
-        input.putProperty("varNames", varNames);
-        input.putProperty("coordNames", coordNames);
 
         super.addToForm(request, input, sb);
     }
