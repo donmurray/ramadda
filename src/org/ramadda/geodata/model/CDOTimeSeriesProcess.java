@@ -98,17 +98,14 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
      * @param sb _more_
      *
      *
-     * @return _more_
      * @throws Exception _more_
      */
     @Override
-    public int addToForm(Request request, ServiceInput input, Appendable sb)
+    public void addToForm(Request request, ServiceInput input, Appendable sb)
             throws Exception {
         sb.append(HtmlUtils.formTable());
         makeInputForm(request, input, sb);
         sb.append(HtmlUtils.formTableClose());
-
-        return 1;
     }
 
     /**

@@ -72,6 +72,13 @@ public class NetcdfService extends Service {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public CdmDataOutputHandler getDataOutputHandler() throws Exception {
         return (CdmDataOutputHandler) getRepository().getOutputHandler(
             CdmDataOutputHandler.OUTPUT_OPENDAP.toString());
@@ -85,12 +92,10 @@ public class NetcdfService extends Service {
      * @param input _more_
      * @param sb _more_
      *
-     * @return _more_
-     *
      * @throws Exception _more_
      */
     @Override
-    public int addToForm(Request request, ServiceInput input, Appendable sb)
+    public void addToForm(Request request, ServiceInput input, Appendable sb)
             throws Exception {
         List<Entry>          entries           = input.getEntries();
         Entry                entry             = ((entries.size() == 0)
@@ -117,7 +122,7 @@ public class NetcdfService extends Service {
         input.putProperty("varNames", varNames);
         input.putProperty("coordNames", coordNames);
 
-        return super.addToForm(request, input, sb);
+        super.addToForm(request, input, sb);
     }
 
 }

@@ -127,11 +127,10 @@ public class NCLModelPlotDataProcess extends Service {
      * @param sb       the form
      *
      *
-     * @return _more_
      * @throws Exception  problem getting the information for the form
      */
     @Override
-    public int addToForm(Request request, ServiceInput input, Appendable sb)
+    public void addToForm(Request request, ServiceInput input, Appendable sb)
             throws Exception {
 
         sb.append(HtmlUtils.formTable());
@@ -221,7 +220,6 @@ public class NCLModelPlotDataProcess extends Service {
                 + "</div>", contourSB.toString()));
         sb.append(HtmlUtils.formTableClose());
 
-        return 1;
 
     }
 

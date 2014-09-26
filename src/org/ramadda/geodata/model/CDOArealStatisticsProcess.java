@@ -101,18 +101,14 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @param input    the ServiceInput
      * @param sb       the form
      *
-     *
-     * @return _more_
      * @throws Exception  problem adding to the form
      */
     @Override
-    public int addToForm(Request request, ServiceInput input, Appendable sb)
+    public void addToForm(Request request, ServiceInput input, Appendable sb)
             throws Exception {
         sb.append(HtmlUtils.formTable());
         makeInputForm(request, input, sb);
         sb.append(HtmlUtils.formTableClose());
-
-        return 1;
     }
 
     /**

@@ -1462,11 +1462,10 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
          * @param sb       the form
          *
          *
-         * @return _more_
          * @throws Exception  problem adding to the form
          */
         @Override
-        public int addToForm(Request request, ServiceInput input,
+        public void addToForm(Request request, ServiceInput input,
                              Appendable sb)
                 throws Exception {
             sb.append(HtmlUtils.formTable());
@@ -1515,8 +1514,6 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
             }
             addMapWidget(request, sb, llr);
             sb.append(HtmlUtils.formTableClose());
-
-            return 1;
         }
 
 
