@@ -49,7 +49,7 @@ Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#pdfSplit" target="_
 ]]></help>
           <arg value="PDFSplit"/>
           <arg value="${entry.file}" type="entry" entryType="type_document_pdf" primary="true" copy="true"></arg>
-          <arg type="int" prefix="-split" label="Split" help="Number of pages of very splitted part of the PDF"/>
+          <arg type="int" prefix="-split" label="Split" help="Number of pages per splitted part of the PDF"/>
           <output type="type_document_pdf" pattern=".*\.pdf"/>
     </service>
   </outputhandler>

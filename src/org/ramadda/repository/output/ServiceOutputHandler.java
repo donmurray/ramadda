@@ -372,6 +372,7 @@ public class ServiceOutputHandler extends OutputHandler {
 
         }
 
+        writeProcessEntryXml(request,  service, serviceInput.getProcessDir(), service.getProcessDescription());
 
 
         if (serviceInput.getPublish() && (output.getEntries().size() > 0)) {
@@ -379,6 +380,16 @@ public class ServiceOutputHandler extends OutputHandler {
                 request.entryUrl(
                     getRepository().URL_ENTRY_SHOW,
                     output.getEntries().get(0)));
+        }
+
+        if (output.getResultsShownAsText()) {
+            sb.append(HtmlUtils.b(msg("Results")));
+            sb.append("<div class=service-output>");
+            sb.append("<pre>"); 
+            sb.append(output.getResults());
+            sb.append("</pre>");
+            sb.append("</div>");
+            writeProcessEntryXml(request,  service, serviceInput.getProcessDir(), sb.toString());
         }
 
 
@@ -389,16 +400,6 @@ public class ServiceOutputHandler extends OutputHandler {
 
         //Redirect to the products entry 
         if (gotoProducts) {
-            if (output.getResultsShownAsText()) {
-                sb.append(HtmlUtils.b(msg("Results")));
-                sb.append("<div class=service-output>");
-                sb.append("<pre>"); 
-                sb.append(output.getResults());
-                sb.append("</pre>");
-                sb.append("</div>");
-                writeProcessEntryXml(request,  service, serviceInput.getProcessDir(), sb.toString());
-            }
-
             return new Result(
                               getStorageManager().getProcessDirEntryUrl(
                                                                         request, serviceInput.getProcessDir()));
@@ -408,6 +409,7 @@ public class ServiceOutputHandler extends OutputHandler {
 
 
         if (serviceInput.getForDisplay() || output.getResultsShownAsText()) {
+            sb = new StringBuffer();
             sb.append(HtmlUtils.b(msg("Results")));
             sb.append("<div class=service-output>");
             sb.append("<pre>"); 
@@ -478,16 +480,7 @@ public class ServiceOutputHandler extends OutputHandler {
 
 
 
-        StringBuffer extraSubmit = new StringBuffer();
-        extraSubmit.append(HtmlUtils.space(2));
-        extraSubmit.append(HtmlUtils.labeledCheckbox(ARG_GOTOPRODUCTS,
-                "true", request.get(ARG_GOTOPRODUCTS, true),
-                "Go to products page"));
-        extraSubmit.append(HtmlUtils.labeledCheckbox(ARG_WRITEWORKFLOW,
-                "true", request.get(ARG_WRITEWORKFLOW, false),
-                "Write workflow"));
-
-        boolean                haveAnyOutputs = false;
+        boolean   haveAnyOutputs = false;
         List<OutputDefinition> outputs = new ArrayList<OutputDefinition>();
 
         service.getAllOutputs(outputs);
@@ -498,6 +491,17 @@ public class ServiceOutputHandler extends OutputHandler {
                 break;
             }
         }
+
+
+        StringBuffer extraSubmit = new StringBuffer();
+        extraSubmit.append(HtmlUtils.space(2));
+        extraSubmit.append(HtmlUtils.labeledCheckbox(ARG_GOTOPRODUCTS,
+                "true", request.get(ARG_GOTOPRODUCTS, haveAnyOutputs),
+                "Go to products page"));
+        extraSubmit.append(HtmlUtils.labeledCheckbox(ARG_WRITEWORKFLOW,
+                "true", request.get(ARG_WRITEWORKFLOW, false),
+                "Write workflow"));
+
 
         if (haveAnyOutputs) {
             extraSubmit.append(HtmlUtils.space(2));

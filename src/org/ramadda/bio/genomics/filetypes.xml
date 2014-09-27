@@ -45,6 +45,19 @@
   </type>
 
 
+  <type name="bio_bed"  description="BED format" foruser="true" super="bio_genomics" pattern=".*\.bed$">
+  </type>
 
+  <type name="bio_gff"  description="General Feature Format" foruser="true" super="bio_genomics" pattern=".*\.gff$">
+  </type>
+
+  <type name="bio_gtf"  description="Gene Transfer Format" foruser="true" super="bio_genomics" pattern=".*\.gtf$">
+  </type>
+
+  <type name="bio_maf"  description="Multiple Alignment Format" foruser="true" super="bio_genomics"  pattern=".*\.maf$">
+  </type>
+
+  <type name="bio_wig"  description="Wiggle (WIG) Format" foruser="true" super="bio_genomics"  pattern=".*\.wig$">
+  </type>
 
 </types>

@@ -625,10 +625,10 @@ public class Service extends RepositoryManager {
      * @throws Exception _more_
      */
     public void addArgs(Request request, Entry primaryEntry,
-                        ServiceInput input, List<String> commands)
+                        ServiceInput input, List<String> commands,List<File> filesToDelete)
             throws Exception {
         getServiceToUse().addArgsInner(request, primaryEntry, input,
-                                       commands);
+                                       commands, filesToDelete);
     }
 
 
@@ -643,7 +643,7 @@ public class Service extends RepositoryManager {
      * @throws Exception _more_
      */
     private void addArgsInner(Request request, Entry primaryEntry,
-                              ServiceInput input, List<String> commands)
+                              ServiceInput input, List<String> commands, List<File> filesToDelete)
             throws Exception {
 
         File workDir = input.getProcessDir();
@@ -729,6 +729,7 @@ public class Service extends RepositoryManager {
                                         currentEntry)));
                         if ( !newFile.exists()) {
                             IOUtil.copyFile(currentEntry.getFile(), newFile);
+                            filesToDelete.add(newFile);
                         }
                         argValue = newFile.toString();
                     } else {
@@ -1408,6 +1409,8 @@ public class Service extends RepositoryManager {
 
         ServiceOutput myOutput      = new ServiceOutput();
 
+        List<File> filesToDelete = new ArrayList<File>();
+
         HashSet<File> existingFiles = new HashSet<File>();
         for (File f : input.getProcessDir().listFiles()) {
             existingFiles.add(f);
@@ -1461,6 +1464,10 @@ public class Service extends RepositoryManager {
             for (Entry newEntry : myOutput.getEntries()) {
                 newFiles.add(newEntry.getFile());
             }
+
+
+
+
             if (cleanup) {
                 for (File f : input.getProcessDir().listFiles()) {
                     if (f.getName().startsWith(".")) {
@@ -1482,9 +1489,9 @@ public class Service extends RepositoryManager {
 
         List<String> commands = new ArrayList<String>();
         if (link != null) {
-            link.addArgs(request, entry, input, commands);
+            link.addArgs(request, entry, input, commands, filesToDelete);
         } else {
-            this.addArgs(request, entry, input, commands);
+            this.addArgs(request, entry, input, commands, filesToDelete);
         }
         System.err.println("Command:" + commands);
 
@@ -1504,7 +1511,7 @@ public class Service extends RepositoryManager {
                               "." + getId() + ".stderr"));
 
 
-        System.out.println(getLinkXml(input));
+        //        System.out.println(getLinkXml(input));
         if (commandObject != null) {
             commandMethod.invoke(commandObject, new Object[] { request, entry,
                     this, input, commands });
@@ -1533,6 +1540,13 @@ public class Service extends RepositoryManager {
         boolean       setResultsFromStdout = true;
 
         HashSet<File> seen                 = new HashSet<File>();
+
+
+        for(File f: filesToDelete) {
+            System.err.println ("delete:" + f);
+            f.delete();
+        }
+
 
 
         for (OutputDefinition output : getOutputs()) {
