@@ -1,26 +1,23 @@
-<outputhandlers class="org.ramadda.repository.output.ServiceOutputHandler" icon="/icons/png.png" >
+<outputhandlers class="org.ramadda.repository.output.ServiceOutputHandler" icon="/icons/png.png"  entryType="type_image" entryPattern="(.*\.png|.*\.gif|.*\.jpg|.*\.jpeg|.*\.tiff)">
 
   <outputhandler>
    <service id="imagemagick.convert.type" label="Convert Image" command="${media.imagemagick.path}/convert">
-<help><![CDATA[
+<description><![CDATA[
 Runs ImageMagick convert
-]]></help>
-          <arg value="${entry.file}" type="entry" entryType="type_image" primary="true"></arg>
+]]></description>
+          <arg value="${entry.file}" type="entry"  primary="true"></arg>
           <arg type="int" prefix="-resize" name="resize" label="Resize" help=" percent" value="${value}%"  />
           <arg type="enumeration" name="newtype" label="Convert to" values="png,gif,jpg,tiff" value="${entry.filebase}.${value}"  />
           <output type="type_image" pattern=".*"/>
     </service>
   </outputhandler>
 
-
-
-
   <outputhandler>
    <service id="imagemagick.polaroid" label="Polaroid image" command="${media.imagemagick.path}/convert">
-<help><![CDATA[
+<description><![CDATA[
 Runs ImageMagick polaroid conversion
-]]></help>
-          <arg value="${entry.file}" type="entry" entryType="type_image" primary="true"></arg>
+]]></description>
+          <arg value="${entry.file}" type="entry"  primary="true"></arg>
 
           <arg prefix="-bordercolor" label="Border color" />
           <arg prefix="-background" label="Background color" />
@@ -34,10 +31,10 @@ Runs ImageMagick polaroid conversion
 
   <outputhandler>
    <service id="imagemagick.identify" label="Identify image" command="${media.imagemagick.path}/identify">
-<help><![CDATA[
+<description><![CDATA[
 Runs ImageMagick identify
-]]></help>
-          <arg value="${entry.file}" type="entry" entryType="type_image" primary="true"></arg>
+]]></description>
+          <arg value="${entry.file}" type="entry" primary="true"></arg>
           <output showResults="true" stdout="true"/>
     </service>
   </outputhandler>

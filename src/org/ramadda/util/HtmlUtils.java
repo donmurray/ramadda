@@ -492,8 +492,8 @@ public class HtmlUtils {
     /**
      * _more_
      *
-     * @param s1 _more_
-     * @param s2 _more_
+     *
+     * @param s _more_
      *
      * @return _more_
      */
@@ -1225,7 +1225,7 @@ public class HtmlUtils {
      *
      * @return _more_
      */
-    public static String url(String path, String...args) {
+    public static String url(String path, String... args) {
         return url(path, args, true);
     }
 
@@ -2829,6 +2829,25 @@ public class HtmlUtils {
      * _more_
      *
      * @param left _more_
+     * @param right _more_
+     * @param rightColSpan _more_
+     *
+     * @return _more_
+     */
+    public static String formEntryTop(String left, String right,
+                                      int rightColSpan) {
+        return tag(TAG_TR, "",
+                   tag(TAG_TD,
+                       attrs(ATTR_ALIGN, VALUE_RIGHT, ATTR_CLASS,
+                             CLASS_FORMLABEL_TOP), left) + tag(TAG_TD,
+                                 attr("colspan", "" + rightColSpan), right));
+
+    }
+
+    /**
+     * _more_
+     *
+     * @param left _more_
      * @param cols _more_
      *
      * @return _more_
@@ -2872,7 +2891,9 @@ public class HtmlUtils {
     public static String formEntryTop(String left, String right,
                                       String trExtra, boolean dummy) {
         left = div(left, cssClass(CLASS_FORMLABEL_TOP));
-        String label = tag(TAG_TD, attrs(ATTR_ALIGN, VALUE_RIGHT, ATTR_CLASS,  CLASS_FORMLABEL), left);
+        String label = tag(TAG_TD,
+                           attrs(ATTR_ALIGN, VALUE_RIGHT, ATTR_CLASS,
+                                 CLASS_FORMLABEL), left);
 
         // attrs(ATTR_VALIGN, VALUE_TOP)
         return tag(TAG_TR, trExtra, label + tag(TAG_TD, "", right));
@@ -2881,18 +2902,20 @@ public class HtmlUtils {
     /**
      * _more_
      *
+     *
+     * @param label _more_
      * @param col1 _more_
-     * @param left _more_
-     * @param right _more_
+     * @param col2 _more_
      *
      * @return _more_
      */
     public static String formEntryTop(String label, String col1,
                                       String col2) {
         return tag(TAG_TR, attrs(ATTR_VALIGN, VALUE_TOP),
-                   col(label, attrs(ATTR_ALIGN, VALUE_RIGHT, ATTR_CLASS,  CLASS_FORMLABEL_TOP))
-                   + col(col1, "" /*attrs(ATTR_ALIGN, VALUE_RIGHT, ATTR_CLASS, CLASS_FORMLABEL_TOP)*/) + 
-                   col(col2));
+                col(label,
+                    attrs(ATTR_ALIGN, VALUE_RIGHT, ATTR_CLASS,
+                        CLASS_FORMLABEL_TOP)) + col(col1,
+                            "" /*attrs(ATTR_ALIGN, VALUE_RIGHT, ATTR_CLASS, CLASS_FORMLABEL_TOP)*/) + col(col2));
     }
 
 

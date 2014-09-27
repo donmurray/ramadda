@@ -185,6 +185,8 @@ public class ServiceOutputHandler extends OutputHandler {
      */
     public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
+
+
         if ( !isEnabled()) {
             return;
         }
@@ -239,8 +241,7 @@ public class ServiceOutputHandler extends OutputHandler {
                               final Entry entry)
             throws Exception {
 
-        if ( !request.defined(ARG_EXECUTE)
-                && !request.defined(ARG_SHOWCOMMAND)) {
+        if ( !request.defined(ARG_EXECUTE)) {
             StringBuffer sb = new StringBuffer();
             makeForm(request, service, entry, entry, outputType, sb);
 
@@ -295,7 +296,7 @@ public class ServiceOutputHandler extends OutputHandler {
                                           ? new ServiceInput(workDir, entry)
                                           : new ServiceInput(workDir);
         serviceInput.setPublish(doingPublish(request));
-        serviceInput.setForDisplay(request.exists(ARG_SHOWCOMMAND));
+        serviceInput.setForDisplay(request.get(ARG_SHOWCOMMAND, false));
 
 
         boolean asynchronous = request.get(ARG_ASYNCH, false);
@@ -398,8 +399,10 @@ public class ServiceOutputHandler extends OutputHandler {
         boolean gotoProducts = request.get(ARG_GOTOPRODUCTS, false);
 
 
+        
+
         //Redirect to the products entry 
-        if (gotoProducts) {
+        if (gotoProducts && !serviceInput.getForDisplay() ) {
             return new Result(
                               getStorageManager().getProcessDirEntryUrl(
                                                                         request, serviceInput.getProcessDir()));
@@ -493,19 +496,23 @@ public class ServiceOutputHandler extends OutputHandler {
         }
 
 
-        StringBuffer extraSubmit = new StringBuffer();
-        extraSubmit.append(HtmlUtils.space(2));
-        extraSubmit.append(HtmlUtils.labeledCheckbox(ARG_GOTOPRODUCTS,
+        List<String> extraSubmit = new ArrayList<String>();
+        extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_GOTOPRODUCTS,
                 "true", request.get(ARG_GOTOPRODUCTS, haveAnyOutputs),
                 "Go to products page"));
-        extraSubmit.append(HtmlUtils.labeledCheckbox(ARG_WRITEWORKFLOW,
+        extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_WRITEWORKFLOW,
                 "true", request.get(ARG_WRITEWORKFLOW, false),
                 "Write workflow"));
 
+        extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_SHOWCOMMAND,
+                "true", request.get(ARG_SHOWCOMMAND, false),
+                                                     "Show Command"));
+
+        
+
 
         if (haveAnyOutputs) {
-            extraSubmit.append(HtmlUtils.space(2));
-            extraSubmit.append(HtmlUtils.formEntry("",
+            extraSubmit.add(HtmlUtils.formEntry("",
                     HtmlUtils.checkbox(ARG_ASYNCH, "true",
                                        request.get(ARG_ASYNCH, false)) + " "
                                            + msg("Asynchronous")));
@@ -518,16 +525,15 @@ public class ServiceOutputHandler extends OutputHandler {
                                    : new ServiceInput(), sb);
 
         sb.append(HtmlUtils.hidden(Service.ARG_SERVICEFORM, "true"));
-        sb.append(HtmlUtils.p());
-        sb.append(HtmlUtils.submit(service.getLabel(), ARG_EXECUTE,
+        StringBuilder  buttons = new StringBuilder();
+        
+        buttons.append(HtmlUtils.submit(msg("Execute"), ARG_EXECUTE,
                                    makeButtonSubmitDialog(sb,
-                                       "Processing request...")));
+                                                          "Processing request...")));
         StringBuffer etc = new StringBuffer();
-        etc.append(extraSubmit);
+        etc.append(StringUtil.join("<p>", extraSubmit));
         etc.append(HtmlUtils.p());
         etc.append(HtmlUtils.formTable());
-
-
         if (haveAnyOutputs) {
             addPublishWidget(request, entry, etc,
                              msg("Select a folder to publish to"), true,
@@ -535,15 +541,11 @@ public class ServiceOutputHandler extends OutputHandler {
         }
 
         etc.append(HtmlUtils.formTableClose());
-
-        etc.append(HtmlUtils.p());
-        etc.append(HtmlUtils.submit(msg("Show Service"), ARG_SHOWCOMMAND,
-                                    ""));
-        addUrlShowingForm(etc, formId, null);
-        etc.append(HtmlUtils.br());
-        sb.append(HtmlUtils.makeShowHideBlock("Options...", etc.toString(),
+        addUrlShowingForm(etc, formId, null); 
+        buttons.append(HtmlUtils.makeShowHideBlock("Options...", HtmlUtils.insetDiv(etc.toString(), 0,20,0,0),
                 false));
 
+        sb.append(HtmlUtils.div(buttons.toString(), HtmlUtils.cssClass("service-form-buttons")));
 
         sb.append(HtmlUtils.formClose());
 

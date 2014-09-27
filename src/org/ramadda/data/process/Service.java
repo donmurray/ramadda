@@ -137,6 +137,7 @@ public class Service extends RepositoryManager {
 
     /** _more_ */
     public static final String ATTR_HELP = "help";
+    public static final String ATTR_DESCRIPTION = "description";
 
     /** _more_ */
     public static final String ATTR_SERIAL = "serial";
@@ -179,7 +180,7 @@ public class Service extends RepositoryManager {
     private Method commandMethod;
 
     /** _more_ */
-    private String help;
+    private String description;
 
     /** _more_ */
     private String processDesc;
@@ -336,7 +337,8 @@ public class Service extends RepositoryManager {
 
         cleanup = XmlUtil.getAttributeFromTree(element, ATTR_CLEANUP, true);
         linkId = XmlUtil.getAttribute(element, ATTR_LINK, (String) null);
-        help   = XmlUtil.getGrandChildText(element, ATTR_HELP, "");
+        description   = XmlUtil.getGrandChildText(element, ATTR_DESCRIPTION, XmlUtil.getGrandChildText(element, ATTR_HELP, ""));
+
         processDesc = XmlUtil.getGrandChildText(element,
                 "process_description", "");
         label  = XmlUtil.getAttribute(element, ATTR_LABEL, (String) null);
@@ -405,6 +407,7 @@ public class Service extends RepositoryManager {
                     }
                 }
             }
+
             if ((command == null) || (command.indexOf("${") >= 0)) {
                 System.err.println("Service: no command defined:" + command
                                    + " path:" + pathProperty);
@@ -600,14 +603,15 @@ public class Service extends RepositoryManager {
         }
     }
 
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public Service getServiceToUse() {
+    public boolean haveLink() {
         initService();
-        if (link != null) {
+        return link!=null;
+        
+    }
+
+
+    public Service getServiceToUse() {
+        if (haveLink()) {
             return link;
         }
 
@@ -795,8 +799,7 @@ public class Service extends RepositoryManager {
      * @return _more_
      */
     public String getLinkXml(ServiceInput input) {
-        initService();
-        if (link != null) {
+        if (haveLink()) {
             return link.getLinkXml(input);
         }
 
@@ -851,8 +854,7 @@ public class Service extends RepositoryManager {
      */
     public String getId() {
         /*
-        initService();
-        if (link != null) {
+        if (haveLink()) {
             return link.getId();
             }*/
 
@@ -890,10 +892,8 @@ public class Service extends RepositoryManager {
             request = makeRequest(request);
         }
 
-        initService();
-        if (link != null) {
+        if (haveLink()) {
             link.addToForm(request, input, sb);
-
             return;
         }
 
@@ -978,15 +978,19 @@ public class Service extends RepositoryManager {
                 "<span class=ramadda-required-label>* required</span>");
         }
 
-        sb.append(HtmlUtils.p());
-        if (Utils.stringDefined(getHelp())) {
-            sb.append(HtmlUtils.div(getHelp(),
-                                    HtmlUtils.cssClass("service-help")));
+        sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV, HtmlUtils.cssClass("service-form")));
+        
+        sb.append(HtmlUtils.div(getLabel(),
+                                HtmlUtils.cssClass("service-form-header")));
+        if (Utils.stringDefined(getDescription())) {
+            sb.append(HtmlUtils.div(getDescription(),
+                                    HtmlUtils.cssClass("service-form-description")));
         }
-        if (blockCnt > 0) {
+        if (formSB.length() > 0) {
             sb.append(HtmlUtils.div(formSB.toString(),
-                                    HtmlUtils.cssClass("service-form")));
+                                    HtmlUtils.cssClass("service-form-contents")));
         }
+        sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
 
     }
 
@@ -1142,14 +1146,19 @@ public class Service extends RepositoryManager {
     private void makeFormEntry(Appendable sb, String label, String col1,
                                String help)
             throws Exception {
-        String extra = "";
         if (help != null) {
-            extra = HtmlUtils.div(help,
+            help = HtmlUtils.div(help,
                                   HtmlUtils.cssClass("service-form-help"));
+            sb.append(HtmlUtils.formEntryTop(Utils.stringDefined(label)
+                                             ? msgLabel(label)
+                                             : "", col1, help));
+
+        } else {
+            sb.append(HtmlUtils.formEntryTop(Utils.stringDefined(label)
+                                             ? msgLabel(label)
+                                             : "", col1, 2));
         }
-        sb.append(HtmlUtils.formEntryTop(Utils.stringDefined(label)
-                                         ? msgLabel(label)
-                                         : "", col1, extra));
+
     }
 
 
@@ -1198,8 +1207,8 @@ public class Service extends RepositoryManager {
      * @return _more_
      */
     public boolean isEnabled() {
-        if (linkId != null) {
-            return getServiceToUse().isEnabled();
+        if (haveLink()) {
+            return link.isEnabled();
         }
         if (haveChildren()) {
             for (Service child : children) {
@@ -1220,9 +1229,8 @@ public class Service extends RepositoryManager {
      * @param args _more_
      */
     public void collectArgs(List<Arg> args) {
-        if (linkId != null) {
-            getServiceToUse().collectArgs(args);
-
+        if (haveLink()) {
+            link.collectArgs(args);
             return;
         }
         if (haveChildren()) {
@@ -1242,8 +1250,8 @@ public class Service extends RepositoryManager {
      * @return _more_
      */
     public boolean getOutputToStderr() {
-        if (linkId != null) {
-            return getServiceToUse().getOutputToStderr();
+        if (haveLink()) {
+            return link.getOutputToStderr();
         }
 
         return outputToStderr;
@@ -1264,8 +1272,8 @@ public class Service extends RepositoryManager {
      * @return _more_
      */
     public List<OutputDefinition> getOutputs() {
-        if (linkId != null) {
-            return getServiceToUse().getOutputs();
+        if (haveLink()) {
+            return link.getOutputs();
         }
 
         return outputs;
@@ -1293,7 +1301,6 @@ public class Service extends RepositoryManager {
         if (entries.size() == 0) {
             return false;
         }
-
         return isApplicable(entries.get(0));
     }
 
@@ -1306,13 +1313,14 @@ public class Service extends RepositoryManager {
      * @return _more_
      */
     public boolean isApplicable(Entry entry) {
-
-        if (linkId != null) {
-            return getServiceToUse().isApplicable(entry);
+        if (haveLink()) {
+            return link.isApplicable(entry);
         }
         if (haveChildren()) {
             return children.get(0).isApplicable(entry);
         }
+
+        //        System.err.println("isApplicable:" + getLabel() +" " + command);
 
         for (Arg input : inputs) {
             boolean debug = false;
@@ -1337,8 +1345,8 @@ public class Service extends RepositoryManager {
      * @return _more_
      */
     public String getCommand() {
-        if (linkId != null) {
-            getServiceToUse().getCommand();
+        if (haveLink()) {
+            return link.getCommand();
         }
 
         return command;
@@ -1350,12 +1358,12 @@ public class Service extends RepositoryManager {
      * @return _more_
      *
      */
-    public String getHelp() {
-        if (linkId != null) {
-            getServiceToUse().getHelp();
+    public String getDescription() {
+        if (haveLink()) {
+            link.getDescription();
         }
 
-        return help;
+        return description;
     }
 
     /**
@@ -1364,11 +1372,13 @@ public class Service extends RepositoryManager {
      * @return _more_
      */
     public String getProcessDescription() {
-        if (linkId != null) {
-            getServiceToUse().getProcessDescription();
+        if(Utils.stringDefined(processDesc)) {
+            return processDesc;
         }
-
-        return processDesc;
+        if (haveLink()) {
+            return link.getProcessDescription();
+        }
+        return null;
     }
 
     /**
@@ -1377,11 +1387,10 @@ public class Service extends RepositoryManager {
      * @return _more_
      */
     public String getLabel() {
-        initService();
         if (Utils.stringDefined(label)) {
             return label;
         }
-        if (link != null) {
+        if (haveLink()) {
             return link.getLabel();
         }
 
@@ -1582,7 +1591,7 @@ public class Service extends RepositoryManager {
                         if (name.startsWith(".")) {
                             return false;
                         }
-                        if (name.matches(thePattern)) {
+                        if (name.toLowerCase().matches(thePattern)) {
                             return true;
                         }
 
@@ -1940,11 +1949,11 @@ public class Service extends RepositoryManager {
             addNone      = XmlUtil.getAttribute(node, "addNone", false);
 
 
-            entryType = XmlUtil.getAttribute(node, ATTR_ENTRY_TYPE,
-                                             (String) null);
+            entryType = XmlUtil.getAttributeFromTree(node, ATTR_ENTRY_TYPE,
+                                                     (String) null);
 
-            entryPattern = XmlUtil.getAttribute(node, ATTR_ENTRY_PATTERN,
-                    (String) null);
+            entryPattern = XmlUtil.getAttributeFromTree(node, ATTR_ENTRY_PATTERN,
+                                                        (String) null);
 
             placeHolder = XmlUtil.getAttribute(node, "placeHolder",
                     (String) null);
@@ -2029,16 +2038,22 @@ public class Service extends RepositoryManager {
         public boolean isApplicable(Entry entry, boolean debug) {
             boolean defaultReturn = true;
 
+            if(debug) System.err.println (getName() +" entrytype:" + entryType +" pattern:" + entryPattern);
             if (entryType != null) {
                 if ( !entry.getTypeHandler().isType(entryType)) {
+                    if(debug) System.err.println (" entry is not type");
                     return false;
                 }
                 if (entryPattern == null) {
+                    if(debug) System.err.println ("has entry type:" + entryType);
                     return true;
                 }
             }
             if (entryPattern != null) {
-                return entry.getResource().getPath().matches(entryPattern);
+                if(entry.getResource().getPath().toLowerCase().matches(entryPattern)) {
+                    return true;
+                }
+                return false;
             }
 
             return defaultReturn;

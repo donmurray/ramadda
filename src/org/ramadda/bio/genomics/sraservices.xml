@@ -1,10 +1,10 @@
 <services icon="/genomics/dna.png">
     <service command="${bio.sratools}/abi-dump" label="Convert SRA to ABI format" id="bio_sra_to_abi" >
-      <help><![CDATA[
+      <description><![CDATA[
 Convert SRA data into ABI format (csfasta / qual)
 <br>
 <a target="_help" href="http://www.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=toolkit_doc&f=abi-dump">Documentation at NCBI</a>
-]]></help>
+]]></description>
       <output type="bio_fasta" pattern=".*\.csfasta"/>
       <output type="file" pattern=".*\.qual"/>
       <arg value="-O"/>
@@ -25,11 +25,11 @@ Convert SRA data into ABI format (csfasta / qual)
 
 
     <service command="${bio.sratools}/fastq-dump" label="Convert SRA to FASTQ" id="bio_sra_to_fastq" >
-      <help><![CDATA[
+      <description><![CDATA[
 Convert the given SRA file to the FASTQ format
 <br>
 <a target="_help" href="http://www.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=toolkit_doc&f=fastq-dump">Documentation at NCBI</a>
-]]></help>
+]]></description>
       <output type="bio_fastq" pattern=".*\.fastq"/>
       <arg value="-O"/>
       <arg value="${workdir}"/>
@@ -61,11 +61,11 @@ Convert the given SRA file to the FASTQ format
 
 
     <service command="${bio.sratools}/illuma-dump" label="Convert SRA to ILLUMA format" id="bio_sra_to_illuma" >
-      <help><![CDATA[
+      <description><![CDATA[
 Convert SRA data into ILLUMA format (csfasta / qual)
 <br>
 <a target="_help" href="http://www.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=toolkit_doc&f=illuma-dump">Documentation at NCBI</a>
-]]></help>
+]]></description>
       <output type="file" pattern=".*"/>
       <arg value="-O"/>
       <arg value="${workdir}"/>
@@ -88,12 +88,12 @@ Convert SRA data into ILLUMA format (csfasta / qual)
 
 
     <service  id="bio_sra_to_sam"  command="${bio.sratools}/sam-dump"  label="Convert SRA to SAM" >
-     <help>
+     <description>
 <![CDATA[
 Convert the given SRA file to SAM format
 <br>
 <a target="_help" href="http://www.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=toolkit_doc&f=sam-dump">Documentation at NCBI</a>
-]]></help>
+]]></description>
      <output type="bio_sam" pattern=".*\.sam"/>
      <arg type="flag" label="" help="Output unaligned reads along with aligned reads" value="--unaligned"></arg>
      <arg type="flag" label="" help="Output only primary alignments " value="--primary"></arg>
@@ -120,11 +120,11 @@ Convert the given SRA file to SAM format
 
 
     <service command="${bio.sratools}/sff-dump" label="Convert SRA to SFF format" id="bio_sra_to_sff" >
-      <help><![CDATA[
+      <description><![CDATA[
 Convert SRA data into SFF format
 <br>
 <a target="_help" href="http://www.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=toolkit_doc&f=sff-dump">Documentation at NCBI</a>
-]]></help>
+]]></description>
       <output type="file" pattern=".*"/>
       <arg value="-O"/>
       <arg value="${workdir}"/>
@@ -143,11 +143,11 @@ Convert SRA data into SFF format
 
 
     <service command="${bio.sratools}/sra-stat" label="SRA stats" id="bio_sra_stat" >
-      <help><![CDATA[
+      <description><![CDATA[
 Show SRA stats
 <br>
 <a target="_help" href="http://www.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=toolkit_doc&f=sra-stat">Documentation at NCBI</a>
-]]></help>
+]]></description>
      <output showResults="true" stdout="true"/>
       <arg type="category" label="Output formatting"/>
       <arg type="flag" label="Statistics" help="Calculate READ_LEN average and standard deviation " value="--statistics"/>
@@ -166,11 +166,11 @@ Show SRA stats
 
 
     <service command="${bio.sratools}/sra-pileup" label="SRA pileup" id="bio_sra_pileup" >
-      <help><![CDATA[
+      <description><![CDATA[
 Generate pileup statistics on aligned SRA data 
 <br>
 <a target="_help" href="http://www.ncbi.nlm.nih.gov/Traces/sra/sra.cgi?view=toolkit_doc&f=sra-pileup">Documentation at NCBI</a>
-]]></help>
+]]></description>
       <output type="file" pattern=".*"/>
       <arg type="category" label="Data Formatting"/>
       <arg type="flag"  label="Sequence name" help="Use the original sequence-names (ex: chr1) instead of matching accessions. " value="--seqname"/>

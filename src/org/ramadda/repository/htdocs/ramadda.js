@@ -746,9 +746,7 @@ function Selector(event, selectorId, elementId, allEntries, selecttype, localeId
 
     this.clearInput = function() {	
         this.getHiddenComponent().val("");
-        this.getHiddenComponent().html("FOOAXS");
         this.getTextComponent().val("");        
-        this.getTextComponent().html("hello there");
     }
 
 
@@ -786,7 +784,6 @@ function selectClick(id,entryId,value) {
         insertTagsInner(selector.elementId, selector.textComp.obj, entryId," ","importtype");
     } else { 
         selector.getHiddenComponent().val(entryId);
-        //        selector.getHiddenComponent().html(entryId);
         selector.getTextComponent().val(value);
     }
     selectCancel();
@@ -819,6 +816,7 @@ function clearSelect(id) {
     if(selector) {
         selector.clearInput();
     } else {
+        //        console.log("No selector");
         //In case the user never clicked select
         var textComp = GuiUtils.getDomObject(id);
         var hiddenComp = GuiUtils.getDomObject(id+"_hidden");

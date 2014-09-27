@@ -1883,19 +1883,48 @@ a.toggleblocklabellink:visited {
 
 
 .service-form {
-  background: #fffeec;
-  padding:10px;
-  padding-right:50px;
-  border-bottom: 1px #ccc solid;
-  border-top: 1px #ccc solid;
-  border: 1px #ccc solid;
-   margin-left: 10px;
-   margin-right: 10px;
+  margin:5px;
+//  border: 1px #ccc solid;
+  border-top: 0px #888 solid;
 }
+
  
+.service-form-header {
+   border: 1px #ccc solid;
+   background-color:#DFE5F9;
+   font-weight: bold;
+   padding:5px;
+   padding-left:10px;
+}
+
+ 
+
+
+.service-form-description  {
+   border: 1px #ccc solid;
+   border-top: 0px;
+   border-bottom: 1px #ccc solid;
+//   background: #fffeec;
+   padding:5px;
+   max-height: 100px; 
+   overflow-y: auto;
+   padding-left:10px;
+
+}
+
+.service-form-contents {
+  border: 1px #ccc solid;
+  border-top: 0px;
+//  background: #fffeec;
+  padding:5px;
+  padding-left:10px;
+  padding-right:50px;
+}
+
+
 .service-form .ramadda-heading-1 {
   border-top-left-radius: 6px;
-  border-bottom: 1px #aaa solid;
+  border-bottom: 1px #ccc solid;
   margin-top:5px;
   padding:5px;
   padding-left:8px;
@@ -1904,15 +1933,18 @@ a.toggleblocklabellink:visited {
 //  font-weight: normal;
 }
 
-.service-help {
-  padding-left:8px;
+
+.service-form-buttons {
+  margin:5px;
+  padding-top:5px;
+//  padding-left:10px;
+//  padding-right:50px;
 }
 
-.service-form-help  {
-   max-width: 600px; 
-   max-height: 100px; 
-   overflow-y: auto;
+.service-form-help {
+  padding-left:4px;
 }
+
 
 .service-output {
    max-height: 200px; 
