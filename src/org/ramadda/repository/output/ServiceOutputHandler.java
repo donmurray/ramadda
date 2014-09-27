@@ -251,6 +251,24 @@ public class ServiceOutputHandler extends OutputHandler {
     }
 
 
+
+    private void writeProcessEntryXml(Request request, Service service, File processDir, String desc)
+        throws Exception {
+        StringBuffer xml  = new StringBuffer();
+        if (desc == null) {
+            desc = "";
+        }
+        xml.append(
+            XmlUtil.tag(
+                "entry",
+                XmlUtil.attrs("type", "group", "name", "Processing Results"),
+                XmlUtil.tag("description", "", XmlUtil.getCdata(desc))));
+
+        IOUtil.writeFile(new File(IOUtil.joinDir(processDir,
+                ".this.ramadda.xml")), xml.toString());
+    }
+
+
     /**
      * _more_
      *
@@ -279,19 +297,7 @@ public class ServiceOutputHandler extends OutputHandler {
         serviceInput.setPublish(doingPublish(request));
         serviceInput.setForDisplay(request.exists(ARG_SHOWCOMMAND));
 
-        StringBuffer xml  = new StringBuffer();
-        String       desc = service.getProcessDescription();
-        if (desc == null) {
-            desc = "";
-        }
-        xml.append(
-            XmlUtil.tag(
-                "entry",
-                XmlUtil.attrs("type", "group", "name", "Processing Results"),
-                XmlUtil.tag("description", "", XmlUtil.getCdata(desc))));
 
-        IOUtil.writeFile(new File(IOUtil.joinDir(workDir,
-                ".this.ramadda.xml")), xml.toString());
         boolean asynchronous = request.get(ARG_ASYNCH, false);
 
         if (asynchronous) {
@@ -322,9 +328,11 @@ public class ServiceOutputHandler extends OutputHandler {
 
                         return;
                     }
+                    writeProcessEntryXml(request,  service, serviceInput.getProcessDir(), service.getProcessDescription());
+
                     String url =
                         getStorageManager().getProcessDirEntryUrl(request,
-                            serviceInput.getProcessDir());
+                                                                  serviceInput.getProcessDir());
                     if (serviceInput.getPublish()
                             && (output.getEntries().size() > 0)) {
                         url = request.entryUrl(
@@ -374,10 +382,35 @@ public class ServiceOutputHandler extends OutputHandler {
         }
 
 
+
+
+        boolean gotoProducts = request.get(ARG_GOTOPRODUCTS, false);
+
+
+        //Redirect to the products entry 
+        if (gotoProducts) {
+            if (output.getResultsShownAsText()) {
+                sb.append(HtmlUtils.b(msg("Results")));
+                sb.append("<div class=service-output>");
+                sb.append("<pre>"); 
+                sb.append(output.getResults());
+                sb.append("</pre>");
+                sb.append("</div>");
+                writeProcessEntryXml(request,  service, serviceInput.getProcessDir(), sb.toString());
+            }
+
+            return new Result(
+                              getStorageManager().getProcessDirEntryUrl(
+                                                                        request, serviceInput.getProcessDir()));
+        }
+
+
+
+
         if (serviceInput.getForDisplay() || output.getResultsShownAsText()) {
             sb.append(HtmlUtils.b(msg("Results")));
             sb.append("<div class=service-output>");
-            sb.append("<pre>");
+            sb.append("<pre>"); 
             sb.append(output.getResults());
             sb.append("</pre>");
             sb.append("</div>");
@@ -387,14 +420,6 @@ public class ServiceOutputHandler extends OutputHandler {
         }
 
 
-
-
-        //Redirect to the products entry 
-        if (request.get(ARG_GOTOPRODUCTS, false)) {
-            return new Result(
-                getStorageManager().getProcessDirEntryUrl(
-                    request, serviceInput.getProcessDir()));
-        }
 
 
 
@@ -456,7 +481,7 @@ public class ServiceOutputHandler extends OutputHandler {
         StringBuffer extraSubmit = new StringBuffer();
         extraSubmit.append(HtmlUtils.space(2));
         extraSubmit.append(HtmlUtils.labeledCheckbox(ARG_GOTOPRODUCTS,
-                "true", request.get(ARG_GOTOPRODUCTS, false),
+                "true", request.get(ARG_GOTOPRODUCTS, true),
                 "Go to products page"));
         extraSubmit.append(HtmlUtils.labeledCheckbox(ARG_WRITEWORKFLOW,
                 "true", request.get(ARG_WRITEWORKFLOW, false),
