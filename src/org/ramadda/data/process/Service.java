@@ -803,6 +803,9 @@ public class Service extends RepositoryManager {
                     argValue = argValue.replace("${entry.file}", filePath);
                     values.add(argValue);
                 }
+            } else {
+                argValue = getRequestValue(request, input, arg.getName(),
+                                           (String) null);
             }
 
 
@@ -1123,18 +1126,18 @@ public class Service extends RepositoryManager {
                                              : 4) + " ";
             }
 
-            List selected = request.get(arg.getUrlArg(), new ArrayList());
+            List selected = request.get(arg.getUrlArg(), Misc.newList(arg.dflt));
             inputHtml.append(HtmlUtils.select(arg.getUrlArg(), values,
                     selected, extra, 100));
         } else if (arg.isFlag()) {
             if (arg.getGroup() != null) {
                 boolean selected = getRequestValue(request, arg.getGroup(),
-                                       "").equals(arg.getValue());
+                                                   arg.dflt).equals(arg.getValue());
                 inputHtml.append(HtmlUtils.radio(getUrlArg(arg.getGroup()),
                         arg.getValue(), selected));
             } else {
                 inputHtml.append(HtmlUtils.checkbox(arg.getUrlArg(), "true",
-                        getRequestValue(request, arg.getName(), false)));
+                                                    getRequestValue(request, arg.getName(), arg.dflt.equals("true"))));
             }
 
             inputHtml.append(HtmlUtils.space(2));
@@ -1196,7 +1199,7 @@ public class Service extends RepositoryManager {
             }
             inputHtml.append(HtmlUtils.input(arg.getUrlArg(),
                                              getRequestValue(request,
-                                                 arg.getName(), ""), extra));
+                                                 arg.getName(), arg.dflt), extra));
         }
         if (inputHtml.length() == 0) {
             return;
@@ -1880,10 +1883,12 @@ public class Service extends RepositoryManager {
                     ? getStorageManager().getFileTail(entry)
                     : entry.getResource().getPath());
             //? not sure what the macros should be
-            //            value = value.replace(macro("entry.filebase"),
+            //            value = value.replace(macro("entry.file.base"),
             //                                  IOUtil.stripExtension(entry.getName()));
-            value = value.replace(macro("entry.filebase"),
+            value = value.replace(macro("entry.file.base"),
                                   IOUtil.stripExtension(fileTail));
+            value = value.replace(macro("entry.file.suffix"),
+                                  IOUtil.getFileExtension(fileTail).replace(".",""));
         }
 
         return value;
@@ -2016,8 +2021,11 @@ public class Service extends RepositoryManager {
         /** _more_ */
         private String name;
 
+
         /** _more_ */
         private String value;
+
+        private String dflt;
 
         /** _more_ */
         private String prefix;
@@ -2129,6 +2137,7 @@ public class Service extends RepositoryManager {
 
             prefix = XmlUtil.getAttribute(node, "prefix", (String) null);
             value  = Utils.getAttributeOrTag(node, "value", "");
+            dflt  = Utils.getAttributeOrTag(node, "default", "");
             name   = XmlUtil.getAttribute(node, ATTR_NAME, (String) null);
 
             if ((name == null) && isEntry() && isPrimaryEntry) {
@@ -2205,17 +2214,17 @@ public class Service extends RepositoryManager {
          */
         public boolean isApplicable(Entry entry, boolean debug) {
             boolean defaultReturn = true;
+            //            debug  = true;
 
             if (debug) {
                 System.err.println(getName() + " entrytype:" + entryType
                                    + " pattern:" + entryPattern);
             }
             if (entryType != null) {
-                if ( !entry.getTypeHandler().isType(entryType)) {
+                if (!entry.getTypeHandler().isType(entryType)) {
                     if (debug) {
                         System.err.println(" entry is not type");
                     }
-
                     return false;
                 }
                 if (entryPattern == null) {

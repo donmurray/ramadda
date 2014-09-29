@@ -5,8 +5,8 @@
 Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#extractText" target="_help">Extract Text</a>
 ]]></description>
           <arg value="ExtractText"/>
-          <arg value="${entry.file}" type="entry" entryType="type_document_pdf" primary="true"></arg>
-          <arg value="${file}" file="${entry.filebase}.txt"></arg>
+          <arg value="${entry.file}" type="entry" entryType="type_document_pdf" primary="true" label="Input PDF File" ></arg>
+          <arg value="${file}" file="${entry.file.base}.txt"></arg>
           <output type="file" pattern=".*\.txt"/>
     </service>
   </outputhandler>
@@ -22,7 +22,7 @@ Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#extractText" target
 Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#pdfToImage" target="_help">Extract Images</a>
 ]]></description>
           <arg value="ExtractImages"/>
-          <arg value="${entry.file}" type="entry" entryType="type_document_pdf" primary="true" copy="true"></arg>
+          <arg value="${entry.file}" type="entry" entryType="type_document_pdf" primary="true" copy="true" label="Input PDF File"></arg>
           <output type="file" pattern=".*\.jpg"/>
     </service>
   </outputhandler>
@@ -37,7 +37,7 @@ Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#pdfToImage" target=
 Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#pdfToImage" target="_help">PDF to image</a>
 ]]></description>
           <arg value="PDFToImage"/>
-          <arg value="${entry.file}" type="entry" entryType="type_document_pdf" primary="true" copy="true"></arg>
+          <arg value="${entry.file}" type="entry" entryType="type_document_pdf" primary="true" copy="true" label="Input PDF File"></arg>
           <output type="file" pattern=".*\.jpg"/>
     </service>
   </outputhandler>
@@ -48,7 +48,7 @@ Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#pdfToImage" target=
 Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#pdfSplit" target="_help">PDF Split</a>
 ]]></description>
           <arg value="PDFSplit"/>
-          <arg value="${entry.file}" type="entry" entryType="type_document_pdf" primary="true" copy="true"></arg>
+          <arg value="${entry.file}" type="entry" entryType="type_document_pdf" primary="true" copy="true" label="Input PDF File"></arg>
           <arg type="int" prefix="-split" label="Split" help="Number of pages per splitted part of the PDF"/>
           <output type="type_document_pdf" pattern=".*\.pdf"/>
     </service>
@@ -60,8 +60,8 @@ Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#pdfSplit" target="_
 Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#textToPDF" target="_help">Text to PDF</a>
 ]]></description>
           <arg value="TextToPDF"/>
-          <arg value="${file}" file="${entry.filebase}.pdf"></arg>
-          <arg value="${entry.file}" type="entry" entryType="file" entryPattern=".*\.txt" primary="true" ></arg>
+          <arg value="${file}" file="${entry.file.base}.pdf"></arg>
+          <arg value="${entry.file}" type="entry" entryType="file" entryPattern=".*\.txt" primary="true" label="Input PDF File"></arg>
           <output type="type_document_pdf" pattern=".*\.pdf"/>
     </service>
   </outputhandler>
@@ -72,7 +72,7 @@ Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#textToPDF" target="
 Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#textToPDF" target="_help">PDFMerger</a>
 ]]></description>
           <arg value="PDFMerger"/>
-          <arg value="${entry.file}" multiple="true" type="entry" entryType="type_document_pdf" entryPattern=".*\.pdf" primary="true"></arg>
+          <arg value="${entry.file}" multiple="true" type="entry" entryType="type_document_pdf" entryPattern=".*\.pdf" primary="true" label="Input PDF File"></arg>
           <arg value="merged.pdf"></arg>
 
           <output type="type_document_pdf" pattern=".*\.pdf"/>

@@ -6,7 +6,7 @@ This will convert the given HMMER binary file to text
 Documentation available at <a target="_help" href="http://hmmer.janelia.org/">http://hmmer.janelia.org</a>
 ]]></description>
     <arg label="HMMER File" value="${entry.file}" type="entry" entryType="bio_hmmer_index" primary="true"></arg>
-    <output type="bio_hmmer_index" stdout="true" filename="${entry.filebase}.hmm"/>
+    <output type="bio_hmmer_index" stdout="true" filename="${entry.file.base}.hmm"/>
    </service>
 
   <service label="Run HMMSTAT" id="bio_hmmer_stat"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmstat" >
@@ -58,7 +58,7 @@ HMMFETCH documentation available at <a target="_help" href="http://hmmer.janelia
 ]]></description>
     <arg label="HMMER File" value="${entry.file}"  type="entry" entryType="bio_hmmer_index" primary="true"></arg>
     <arg type="string" label="Key" size="35" required="true"></arg>
-    <output type="bio_hmmer_index" stdout="true" filename="${entry.filebase}.hmm"/>
+    <output type="bio_hmmer_index" stdout="true" filename="${entry.file.base}.hmm"/>
    </service>
 
 </services>
