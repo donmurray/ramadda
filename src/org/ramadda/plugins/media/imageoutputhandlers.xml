@@ -7,7 +7,7 @@ Runs ImageMagick convert
 ]]></description>
           <arg value="${entry.file}" type="entry"  primary="true"></arg>
           <arg type="int" prefix="-resize" name="resize" label="Resize" help=" percent" value="${value}%"  />
-          <arg type="enumeration" name="newtype" label="Convert to" values="png,gif,jpg,tiff" value="${entry.filebase}.${value}"  />
+          <arg type="enumeration" name="newtype" label="Convert to" values="png,gif,jpg,tiff" value="${file}"  file="${entry.filebase}.${value}" />
           <output type="type_image" pattern=".*"/>
     </service>
   </outputhandler>
@@ -23,7 +23,7 @@ Runs ImageMagick polaroid conversion
           <arg prefix="-background" label="Background color" />
 
           <arg value="+polaroid"/>
-          <arg value="${entry.filebase}_polaroid.png"  />
+          <arg value="${file}" file="${entry.filebase}_polaroid.png"  />
           <output type="type_image" pattern=".*"/>
     </service>
   </outputhandler>

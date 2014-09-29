@@ -110,7 +110,8 @@ Convert the given SRA file to SAM format
      <arg type="flag" label="" help="Reverse unaligned reads according to read type " value="--reverse"></arg>
      <arg type="flag" label="" help="Output '=' if base is identical to reference" value="--hide-identical"></arg>
      <arg value="--output-file"></arg>
-     <arg label="SRA File" type="entry" entryType="bio_sra" primary="true" value="${entry.filebase}.sam"></arg>
+     <arg label="SRA File" type="entry" entryType="bio_sra" primary="true" 
+          value="${file}" file="${entry.filebase}.sam"></arg>
      <arg value="${entry.file}"></arg>
 <!--
      <arg type="entry" entryType="bio_sra" primary="true" value="${entry.file}"></arg>

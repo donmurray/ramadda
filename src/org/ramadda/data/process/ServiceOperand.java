@@ -25,6 +25,7 @@ import org.ramadda.repository.Entry;
 
 import ucar.unidata.util.Misc;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -76,6 +77,23 @@ public class ServiceOperand {
         this.description = description;
         this.entries     = entries;
     }
+
+    /**
+     * _more_
+     *
+     * @param entries _more_
+     *
+     * @return _more_
+     */
+    public static List<ServiceOperand> makeOperands(List<Entry> entries) {
+        List<ServiceOperand> operands = new ArrayList<ServiceOperand>();
+        for (Entry entry : entries) {
+            operands.add(new ServiceOperand(entry));
+        }
+
+        return operands;
+    }
+
 
     /**
      * Get the entries

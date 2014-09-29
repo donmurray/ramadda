@@ -29,7 +29,7 @@ ttl:Sum of values
 <values>3:Classic Format,4:NetCDF 4 Format,6:NetCDF 3 64-bit Format</values>
 </arg>
           <arg value="${entry.file}"   type="entry" primary="true" entryPattern=".*\.nc"></arg>
-          <arg value="${entry.filebase}_nco.nc"></arg>
+          <arg value="${file}" file="${entry.filebase}_nco.nc"></arg>
           <output pattern=".*\.nc"/>
     </service>
 </services>

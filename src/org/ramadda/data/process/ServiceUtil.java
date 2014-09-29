@@ -54,7 +54,6 @@ public class ServiceUtil {
      * _more_
      *
      * @param request _more_
-     * @param entry _more_
      * @param command _more_
      * @param input _more_
      * @param commands _more_
@@ -63,7 +62,7 @@ public class ServiceUtil {
      *
      * @throws Exception _more_
      */
-    public boolean evaluate(Request request, Entry entry, Service command,
+    public boolean evaluate(Request request, Service command,
                             ServiceInput input, List<String> commands)
             throws Exception {
         if (commands.size() <= 1) {

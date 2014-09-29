@@ -97,6 +97,20 @@ public class ServiceInput {
     }
 
     /**
+     * _more_
+     *
+     * @param processDir _more_
+     * @param entry _more_
+     * @param entries _more_
+     * @param dummy _more_
+     */
+    public ServiceInput(File processDir, List<Entry> entries, boolean dummy) {
+        this(processDir, ServiceOperand.makeOperands(entries));
+    }
+
+
+
+    /**
      * Create a data process input
      *
      *
