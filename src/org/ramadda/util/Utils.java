@@ -459,12 +459,14 @@ public class Utils {
      * @param args _more_
      */
     public static void main(String args[]) {
-        String pattern = ".*l(.)(.)(\\d\\d\\d)(\\d\\d\\d)(\\d\\d\\d\\d)(\\d\\d\\d)(...)(\\d\\d)\\.hdf$";
+        String pattern =
+            ".*l(.)(.)(\\d\\d\\d)(\\d\\d\\d)(\\d\\d\\d\\d)(\\d\\d\\d)(...)(\\d\\d)\\.hdf$";
 
 
 
         for (String a : args) {
-            System.err.println("file:" + a + " " + a.toLowerCase().matches(pattern));
+            System.err.println("file:" + a + " "
+                               + a.toLowerCase().matches(pattern));
         }
 
         if (true) {
@@ -1067,6 +1069,22 @@ public class Utils {
         }
 
         return value * southOrWest;
+    }
+
+    /**
+     * _more_
+     *
+     * @param list _more_
+     * @param index _more_
+     *
+     * @return _more_
+     */
+    public static Object safeGet(List list, int index) {
+        if ((list == null) || (index >= list.size())) {
+            return null;
+        }
+
+        return list.get(index);
     }
 
 
