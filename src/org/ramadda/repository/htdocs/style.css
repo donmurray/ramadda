@@ -1947,9 +1947,10 @@ a.toggleblocklabellink:visited {
 
 
 .service-output {
+   margin-left:10px;
    max-height: 200px; 
    overflow-y: auto;
-  border : 1px black solid;
+   border : 1px #ccc solid;
 }
 
 .innernote {

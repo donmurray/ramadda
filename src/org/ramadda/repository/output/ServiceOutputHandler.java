@@ -82,7 +82,7 @@ public class ServiceOutputHandler extends OutputHandler {
     /** _more_ */
     private OutputType outputType;
 
-    /** _more_          */
+    /** _more_ */
     private OutputType groupOutputType;
 
     /** _more_ */
@@ -423,12 +423,18 @@ public class ServiceOutputHandler extends OutputHandler {
 
                 return new Result(outputType.getLabel(), sb);
             }
-
             outputEntries.addAll(output.getEntries());
             if (serviceInput.getForDisplay()) {
                 sb.append(output.getResults());
                 sb.append("\n");
             } else if (output.getResultsShownAsText()) {
+                for (Entry entry : serviceInput.getEntries()) {
+                    sb.append(
+                        HtmlUtils.href(
+                            getEntryManager().getEntryURL(request, entry),
+                            entry.getName()));
+                    sb.append(HtmlUtils.br());
+                }
                 sb.append("<div class=service-output>");
                 sb.append("<pre>");
                 sb.append(output.getResults());
@@ -461,7 +467,6 @@ public class ServiceOutputHandler extends OutputHandler {
         }
 
 
-
         //Redirect to the products dir entry 
         if (request.get(ARG_GOTOPRODUCTS, false) && !forDisplay) {
             return new Result(processDirUrl);
@@ -483,13 +488,16 @@ public class ServiceOutputHandler extends OutputHandler {
                               "");
         }
 
-        sb.append("Error: no output files<br>");
-        sb.append("<pre>");
-        for (ServiceOutput output : outputs) {
-            sb.append(output.getResults());
+
+        if ( !outputs.get(0).getResultsShownAsText()) {
+            sb.append("Error: no output files<br>");
+            sb.append("<pre>");
+            for (ServiceOutput output : outputs) {
+                sb.append(output.getResults());
+            }
+            sb.append("</pre>");
+            sb.append(HtmlUtils.hr());
         }
-        sb.append("</pre>");
-        sb.append(HtmlUtils.hr());
         makeForm(request, service, baseEntry, entries, outputType, sb);
 
         return new Result(outputType.getLabel(), sb);
@@ -517,7 +525,8 @@ public class ServiceOutputHandler extends OutputHandler {
             return output;
         }
         writeWorkflow(request, serviceInput);
-        writeProcessEntryXml(request, service, serviceInput.getProcessDir(),  "");
+        writeProcessEntryXml(request, service, serviceInput.getProcessDir(),
+                             "");
 
         return output;
 
@@ -662,8 +671,10 @@ public class ServiceOutputHandler extends OutputHandler {
             throws Exception {
 
         String pdesc = service.getProcessDescription();
-        if(Utils.stringDefined(pdesc)) {
-            desc = pdesc.replace("{{description}}", desc==null?"":desc);
+        if (Utils.stringDefined(pdesc)) {
+            desc = pdesc.replace("{{description}}", (desc == null)
+                    ? ""
+                    : desc);
         }
         StringBuffer xml = new StringBuffer();
         if (desc == null) {
