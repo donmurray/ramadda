@@ -82,6 +82,9 @@ public class ServiceOutputHandler extends OutputHandler {
     /** _more_ */
     private OutputType outputType;
 
+    /** _more_          */
+    private OutputType groupOutputType;
+
     /** _more_ */
     private Service service;
 
@@ -152,6 +155,13 @@ public class ServiceOutputHandler extends OutputHandler {
             OutputType.TYPE_OTHER | OutputType.TYPE_IMPORTANT, "",
             XmlUtil.getAttribute(element, ATTR_ICON, service.getIcon()));
         addType(outputType);
+        groupOutputType = new OutputType(XmlUtil.getAttribute(element,
+                ATTR_LABEL,
+                service.getLabel()), XmlUtil.getAttribute(element, ATTR_ID,
+                    service.getId()), OutputType.TYPE_OTHER, "",
+                                      XmlUtil.getAttribute(element,
+                                          ATTR_ICON, service.getIcon()));
+        addType(groupOutputType);
 
 
     }
@@ -192,7 +202,18 @@ public class ServiceOutputHandler extends OutputHandler {
         }
         if (state.group != null) {
             if (service.isApplicable(state.entries)) {
-                links.add(makeLink(request, state.getEntry(), outputType));
+                links.add(makeLink(request, state.getEntry(),
+                                   groupOutputType));
+            }
+            if (state.entries != null) {
+                for (Entry entry : state.entries) {
+                    if (service.isApplicable(entry)) {
+                        links.add(makeLink(request, state.getEntry(),
+                                           groupOutputType));
+
+                        return;
+                    }
+                }
             }
 
             return;
@@ -285,33 +306,6 @@ public class ServiceOutputHandler extends OutputHandler {
 
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param service _more_
-     * @param processDir _more_
-     * @param desc _more_
-     *
-     * @throws Exception _more_
-     */
-    private void writeProcessEntryXml(Request request, Service service,
-                                      File processDir, String desc)
-            throws Exception {
-        StringBuffer xml = new StringBuffer();
-        if (desc == null) {
-            desc = "";
-        }
-        xml.append(
-            XmlUtil.tag(
-                "entry",
-                XmlUtil.attrs("type", "group", "name", "Processing Results"),
-                XmlUtil.tag("description", "", XmlUtil.getCdata(desc))));
-
-        IOUtil.writeFile(new File(IOUtil.joinDir(processDir,
-                ".this.ramadda.xml")), xml.toString());
-    }
-
 
     /**
      * _more_
@@ -333,15 +327,34 @@ public class ServiceOutputHandler extends OutputHandler {
                                   final Service service)
             throws Exception {
 
-        StringBuffer       sb           = new StringBuffer();
-        File               workDir = getStorageManager().createProcessDir();
 
-        final ServiceInput serviceInput = (entries != null)
-                                          ? new ServiceInput(workDir,
-                                              entries, true)
-                                          : new ServiceInput(workDir);
-        serviceInput.setPublish(doingPublish(request));
-        serviceInput.setForDisplay(request.get(ARG_SHOWCOMMAND, false));
+        File workDir = getStorageManager().createProcessDir();
+        final String processDirUrl =
+            getStorageManager().getProcessDirEntryUrl(request, workDir);
+
+        final List<ServiceInput> serviceInputs =
+            new ArrayList<ServiceInput>();
+
+
+        final boolean forDisplay   = request.get(ARG_SHOWCOMMAND, false);
+        final boolean doingPublish = doingPublish(request);
+        if (service.requiresMultipleEntries()) {
+            ServiceInput serviceInput = new ServiceInput(workDir, entries,
+                                            true);
+            serviceInput.setPublish(doingPublish(request));
+            serviceInput.setForDisplay(forDisplay);
+            serviceInputs.add(serviceInput);
+        } else {
+            for (Entry entry : entries) {
+                if ( !service.isApplicable(entry)) {
+                    continue;
+                }
+                ServiceInput serviceInput = new ServiceInput(workDir, entry);
+                serviceInput.setPublish(doingPublish(request));
+                serviceInput.setForDisplay(forDisplay);
+                serviceInputs.add(serviceInput);
+            }
+        }
 
 
         boolean asynchronous = request.get(ARG_ASYNCH, false);
@@ -349,40 +362,39 @@ public class ServiceOutputHandler extends OutputHandler {
         if (asynchronous) {
             ActionManager.Action action = new ActionManager.Action() {
                 public void run(Object actionId) throws Exception {
-                    ServiceOutput output = null;
-                    try {
-                        output = service.evaluate(request, serviceInput);
-                        if ( !output.isOk()) {
+                    List<ServiceOutput> outputs =
+                        new ArrayList<ServiceOutput>();
+                    List<Entry> outputEntries = new ArrayList<Entry>();
+                    for (ServiceInput serviceInput : serviceInputs) {
+                        try {
+                            ServiceOutput output = evaluateService(request,
+                                                       service, serviceInput);
+                            if ( !output.isOk()) {
+                                getActionManager().setContinueHtml(
+                                    actionId,
+                                    getPageHandler().showDialogError(
+                                        "An error has occurred:<pre>"
+                                        + output.getResults() + "</pre>"));
+
+                                return;
+                            }
+                            outputEntries.addAll(output.getEntries());
+                        } catch (Exception exc) {
                             getActionManager().setContinueHtml(
                                 actionId,
                                 getPageHandler().showDialogError(
-                                    "An error has occurred:<pre>"
-                                    + output.getResults() + "</pre>"));
+                                    "An error has occurred:<pre>" + exc
+                                    + "</pre>"));
 
                             return;
-
                         }
-                    } catch (Exception exc) {
-                        getActionManager().setContinueHtml(
-                            actionId,
-                            getPageHandler().showDialogError(
-                                "An error has occurred:<pre>" + exc
-                                + "</pre>"));
-
-                        return;
                     }
-                    writeProcessEntryXml(request, service,
-                                         serviceInput.getProcessDir(),
-                                         service.getProcessDescription());
 
-                    String url =
-                        getStorageManager().getProcessDirEntryUrl(request,
-                            serviceInput.getProcessDir());
-                    if (serviceInput.getPublish()
-                            && (output.getEntries().size() > 0)) {
+                    String url = processDirUrl;
+                    if (doingPublish && (outputEntries.size() > 0)) {
                         url = request.entryUrl(
                             getRepository().URL_ENTRY_SHOW,
-                            output.getEntries().get(0));
+                            outputEntries.get(0));
                     }
                     getActionManager().setContinueHtml(actionId,
                             HtmlUtils.href(url, msg("Continue")));
@@ -391,99 +403,81 @@ public class ServiceOutputHandler extends OutputHandler {
 
             return getActionManager().doAction(request, action,
                     outputType.getLabel(), "");
-
-        }
-        ServiceOutput output = service.evaluate(request, serviceInput);
-
-        if ( !output.isOk()) {
-            sb.append(
-                getPageHandler().showDialogError(
-                    "An error has occurred:<pre>" + output.getResults()
-                    + "</pre>"));
-            makeForm(request, service, baseEntry, entries, outputType, sb);
-
-            return new Result(outputType.getLabel(), sb);
         }
 
-        if (request.get(ARG_WRITEWORKFLOW, false)) {
-            String workflowXml = service.getLinkXml(serviceInput);
-            File workflowFile = new File(IOUtil.joinDir(workDir,
-                                    "serviceworkflow.xml"));
-            IOUtil.writeFile(workflowFile, workflowXml.toString());
-            workflowXml =
-                "<entry type=\"type_service_workflow\" name=\"Service workflow\" />";
-            IOUtil.writeFile(getEntryManager().getEntryXmlFile(workflowFile),
-                             workflowXml.toString());
+        StringBuffer        sb            = new StringBuffer();
+        List<Entry>         outputEntries = new ArrayList<Entry>();
+        List<ServiceOutput> outputs       = new ArrayList<ServiceOutput>();
+        for (ServiceInput serviceInput : serviceInputs) {
+            ServiceOutput output = evaluateService(request, service,
+                                       serviceInput);
+            outputs.add(output);
 
+            if ( !output.isOk()) {
+                sb.append(
+                    getPageHandler().showDialogError(
+                        "An error has occurred:<pre>" + output.getResults()
+                        + "</pre>\nEntries: " + serviceInput.getEntries()));
+                makeForm(request, service, baseEntry, entries, outputType,
+                         sb);
+
+                return new Result(outputType.getLabel(), sb);
+            }
+
+            outputEntries.addAll(output.getEntries());
+            if (serviceInput.getForDisplay()) {
+                sb.append(output.getResults());
+                sb.append("\n");
+            } else if (output.getResultsShownAsText()) {
+                sb.append("<div class=service-output>");
+                sb.append("<pre>");
+                sb.append(output.getResults());
+                sb.append("</pre>");
+                sb.append("</div>");
+            }
         }
 
-        writeProcessEntryXml(request, service, serviceInput.getProcessDir(),
-                             service.getProcessDescription());
+        if (forDisplay) {
+            StringBuffer commands = new StringBuffer();
+            commands.append("<div class=service-output>");
+            commands.append("<pre>");
+            commands.append(sb);
+            commands.append("</pre>");
+            commands.append("</div>");
+            makeForm(request, service, baseEntry, entries, outputType,
+                     commands);
+
+            return new Result(outputType.getLabel(), commands);
+        }
 
 
-        if (serviceInput.getPublish() && (output.getEntries().size() > 0)) {
+        writeProcessEntryXml(request, service, workDir, sb.toString());
+
+
+        if (doingPublish(request) && (outputEntries.size() > 0)) {
             return new Result(
                 request.entryUrl(
-                    getRepository().URL_ENTRY_SHOW,
-                    output.getEntries().get(0)));
-        }
-
-        if (output.getResultsShownAsText()) {
-            sb.append(HtmlUtils.b(msg("Results")));
-            sb.append("<div class=service-output>");
-            sb.append("<pre>");
-            sb.append(output.getResults());
-            sb.append("</pre>");
-            sb.append("</div>");
-            writeProcessEntryXml(request, service,
-                                 serviceInput.getProcessDir(), sb.toString());
+                    getRepository().URL_ENTRY_SHOW, outputEntries.get(0)));
         }
 
 
 
 
-        boolean gotoProducts = request.get(ARG_GOTOPRODUCTS, false);
-
-
-
-
-        //Redirect to the products entry 
-        if (gotoProducts && !serviceInput.getForDisplay()) {
-            return new Result(
-                getStorageManager().getProcessDirEntryUrl(
-                    request, serviceInput.getProcessDir()));
+        //Redirect to the products dir entry 
+        if (request.get(ARG_GOTOPRODUCTS, false) && !forDisplay) {
+            return new Result(processDirUrl);
         }
 
-
-
-
-        if (serviceInput.getForDisplay() || output.getResultsShownAsText()) {
-            sb = new StringBuffer();
-            sb.append(HtmlUtils.b(msg("Results")));
-            sb.append("<div class=service-output>");
-            sb.append("<pre>");
-            sb.append(output.getResults());
-            sb.append("</pre>");
-            sb.append("</div>");
-            makeForm(request, service, baseEntry, entries, outputType, sb);
-
-            return new Result(outputType.getLabel(), sb);
-        }
-
-
-
-
-
-        if (output.getEntries().size() > 1) {
+        if (outputEntries.size() > 1) {
             List<File> files = new ArrayList<File>();
-            for (Entry newEntry : output.getEntries()) {
+            for (Entry newEntry : outputEntries) {
                 files.add(newEntry.getFile());
             }
 
             return getRepository().zipFiles(request, "results.zip", files);
         }
-        if (output.getEntries().size() == 1) {
-            File file = output.getEntries().get(0).getFile();
+        if (outputEntries.size() == 1) {
+            File file = outputEntries.get(0).getFile();
             request.setReturnFilename(file.getName());
 
             return new Result(getStorageManager().getFileInputStream(file),
@@ -492,7 +486,9 @@ public class ServiceOutputHandler extends OutputHandler {
 
         sb.append("Error: no output files<br>");
         sb.append("<pre>");
-        sb.append(output.getResults());
+        for (ServiceOutput output : outputs) {
+            sb.append(output.getResults());
+        }
         sb.append("</pre>");
         sb.append(HtmlUtils.hr());
         makeForm(request, service, baseEntry, entries, outputType, sb);
@@ -502,6 +498,32 @@ public class ServiceOutputHandler extends OutputHandler {
 
     }
 
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param service _more_
+     * @param serviceInput _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private ServiceOutput evaluateService(Request request, Service service,
+                                          ServiceInput serviceInput)
+            throws Exception {
+        ServiceOutput output = service.evaluate(request, serviceInput);
+        if ( !output.isOk()) {
+            return output;
+        }
+        writeWorkflow(request, serviceInput);
+        writeProcessEntryXml(request, service, serviceInput.getProcessDir(),
+                             service.getProcessDescription());
+
+        return output;
+
+    }
 
 
     /**
@@ -599,6 +621,60 @@ public class ServiceOutputHandler extends OutputHandler {
 
     }
 
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param serviceInput _more_
+     *
+     * @throws Exception _more_
+     */
+    private void writeWorkflow(Request request, ServiceInput serviceInput)
+            throws Exception {
+        if (request.get(ARG_WRITEWORKFLOW, false)) {
+
+            String workflowXml = service.getLinkXml(serviceInput);
+            File workflowFile =
+                new File(IOUtil.joinDir(serviceInput.getProcessDir(),
+                                        "serviceworkflow.xml"));
+            IOUtil.writeFile(workflowFile, workflowXml.toString());
+            workflowXml =
+                "<entry type=\"type_service_workflow\" name=\"Service workflow\" />";
+            IOUtil.writeFile(getEntryManager().getEntryXmlFile(workflowFile),
+                             workflowXml.toString());
+
+        }
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param service _more_
+     * @param processDir _more_
+     * @param desc _more_
+     *
+     * @throws Exception _more_
+     */
+    private void writeProcessEntryXml(Request request, Service service,
+                                      File processDir, String desc)
+            throws Exception {
+        StringBuffer xml = new StringBuffer();
+        if (desc == null) {
+            desc = "";
+        }
+        xml.append(
+            XmlUtil.tag(
+                "entry",
+                XmlUtil.attrs("type", "group", "name", "Processing Results"),
+                XmlUtil.tag("description", "", XmlUtil.getCdata(desc))));
+
+        IOUtil.writeFile(new File(IOUtil.joinDir(processDir,
+                ".this.ramadda.xml")), xml.toString());
+    }
 
 
 }

@@ -58,6 +58,10 @@ public class ServiceInput {
     /** _more_ */
     private List<String[]> params = new ArrayList<String[]>();
 
+    /** _more_          */
+    private Service sourceService;
+
+
     /**
      * _more_
      */
@@ -312,6 +316,24 @@ public class ServiceInput {
      */
     public boolean getForDisplay() {
         return forDisplay;
+    }
+
+    /**
+     *  Set the SourceService property.
+     *
+     *  @param value The new value for SourceService
+     */
+    public void setSourceService(Service value) {
+        sourceService = value;
+    }
+
+    /**
+     *  Get the SourceService property.
+     *
+     *  @return The SourceService
+     */
+    public Service getSourceService() {
+        return sourceService;
     }
 
 

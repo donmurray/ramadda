@@ -90,7 +90,7 @@ public class WorkflowTypeHandler extends GenericTypeHandler {
 
         Service service = getRepository().makeService(root, false);
 
-        //IMPORTANT! Do this because we don't allow a service xml entry file to have commands
+        //IMPORTANT! Always do this because we don't allow a service xml entry file to have commands
         service.ensureSafeServices();
 
         ServiceOutputHandler soh = new ServiceOutputHandler(repository,

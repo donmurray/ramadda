@@ -87,6 +87,9 @@ public class ServiceOperand {
      */
     public static List<ServiceOperand> makeOperands(List<Entry> entries) {
         List<ServiceOperand> operands = new ArrayList<ServiceOperand>();
+        if (entries == null) {
+            return operands;
+        }
         for (Entry entry : entries) {
             operands.add(new ServiceOperand(entry));
         }

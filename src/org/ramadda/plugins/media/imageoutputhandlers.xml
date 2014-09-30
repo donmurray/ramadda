@@ -5,7 +5,7 @@
 <description><![CDATA[
 Runs ImageMagick convert
 ]]></description>
-          <arg value="${entry.file}" type="entry"  primary="true"></arg>
+          <arg value="${entry.file}" type="entry"  label="Input Image" primary="true"></arg>
           <arg type="int" prefix="-resize" name="resize" label="Resize" help=" percent" value="${value}%"  />
           <arg type="enumeration" name="newtype" label="Convert to" values="png,gif,jpg,tiff" value="${file}"  file="${entry.file.base}.${value}" />
           <output type="type_image" pattern=".*"/>
@@ -14,13 +14,12 @@ Runs ImageMagick convert
 
 
 
-
   <outputhandler>
    <service id="imagemagick.animate" label="Make animated GIF" command="${media.imagemagick.path}/convert">
    <description><![CDATA[Makes animated GIF using ImageMagick]]></description>
    <arg type="int" label="Delay" help="Ticks" default="50" prefix="-delay"/>
    <arg type="enumeration" label="Loop" values="0:no loop,1:loop"  prefix="-loop"/>
-   <arg value="${entry.file}" multiple="true" type="entry"  primary="true"></arg>
+   <arg value="${entry.file}" multiple="true" type="entry"   label="Input Image" primary="true"></arg>
 <!--
           <arg type="string" label="Filename" name="filename" default="animation"  prefix="-loop"/>
 -->
@@ -34,7 +33,7 @@ Runs ImageMagick convert
    <service id="imagemagick.strip" label="Strip EXIF Metadata" command="${media.imagemagick.path}/convert">
 <description><![CDATA[Strips out EXIF metadata from image using ImageMagick -strip]]></description>
           <arg value="-strip"/>
-          <arg value="${entry.file}" type="entry"  primary="true"></arg>
+          <arg value="${entry.file}" type="entry"   label="Input Image" primary="true"></arg>
           <arg value="${file}" file="${entry.file.base}_stripped.${entry.file.suffix}"  />
           <output type="type_image" pattern=".*"/>
     </service>
@@ -46,16 +45,28 @@ Runs ImageMagick convert
 <description><![CDATA[
 Runs ImageMagick polaroid conversion
 ]]></description>
-          <arg value="${entry.file}" type="entry"  primary="true"></arg>
+          <arg value="${entry.file}" type="entry"   label="Input Image" primary="true"></arg>
 
-          <arg prefix="-bordercolor" label="Border color" />
-          <arg prefix="-background" label="Background color" />
+          <arg name="bordercolor" prefix="-bordercolor" label="Border color" />
+          <arg name="background" prefix="-background" label="Background color" />
 
           <arg value="+polaroid"/>
           <arg value="${file}" file="${entry.file.base}_polaroid.png"  />
-          <output type="type_image" pattern=".*"/>
+          <output type="type_image" pattern=".*_polaroid.png"/>
     </service>
   </outputhandler>
+
+
+  <outputhandler>
+   <service id="imagemagick.convert.test" label="Test Convert Image" command="${media.imagemagick.path}/convert">
+       <service link="imagemagick.convert.type"><param name="newtype">png</param><param name="resize">50</param></service>
+       <service link="imagemagick.polaroid"><param name="bordercolor">red</param><param name="background">green</param></service>
+       <output type="type_image" pattern=".*"/>
+    </service>
+  </outputhandler>
+
+
+
 
 
   <outputhandler>
@@ -63,7 +74,7 @@ Runs ImageMagick polaroid conversion
 <description><![CDATA[
 Runs ImageMagick identify
 ]]></description>
-          <arg value="${entry.file}" type="entry" primary="true"></arg>
+          <arg value="${entry.file}" type="entry"  label="Input Image" primary="true"></arg>
           <output showResults="true" stdout="true"/>
     </service>
   </outputhandler>
