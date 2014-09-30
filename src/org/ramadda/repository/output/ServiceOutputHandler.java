@@ -462,7 +462,6 @@ public class ServiceOutputHandler extends OutputHandler {
 
 
 
-
         //Redirect to the products dir entry 
         if (request.get(ARG_GOTOPRODUCTS, false) && !forDisplay) {
             return new Result(processDirUrl);
@@ -518,8 +517,7 @@ public class ServiceOutputHandler extends OutputHandler {
             return output;
         }
         writeWorkflow(request, serviceInput);
-        writeProcessEntryXml(request, service, serviceInput.getProcessDir(),
-                             service.getProcessDescription());
+        writeProcessEntryXml(request, service, serviceInput.getProcessDir(),  "");
 
         return output;
 
@@ -662,6 +660,11 @@ public class ServiceOutputHandler extends OutputHandler {
     private void writeProcessEntryXml(Request request, Service service,
                                       File processDir, String desc)
             throws Exception {
+
+        String pdesc = service.getProcessDescription();
+        if(Utils.stringDefined(pdesc)) {
+            desc = pdesc.replace("{{description}}", desc==null?"":desc);
+        }
         StringBuffer xml = new StringBuffer();
         if (desc == null) {
             desc = "";

@@ -15,6 +15,7 @@ Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#extractText" target
    <service id="media.pdfbox.extractimages" label="Extract images from PDF">
 
 <process_description><![CDATA[<wiki>
+{{description}}
 {{gallery}}
 ]]></process_description>
 
@@ -30,6 +31,7 @@ Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#pdfToImage" target=
   <outputhandler>
    <service id="media.pdfbox.pdftoimage" label="Make images from PDF" outputToStderr="true">
 <process_description><![CDATA[<wiki>
+{{description}}
 {{gallery}}
 ]]></process_description>
 
