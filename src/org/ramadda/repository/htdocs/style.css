@@ -1912,6 +1912,19 @@ a.toggleblocklabellink:visited {
 
 }
 
+
+
+.service-form-entries {
+  border: 1px #ccc solid;
+  border-top: 0px;
+//  background: #fffeec;
+  padding:5px;
+  padding-left:10px;
+  padding-right:50px;
+}
+
+
+
 .service-form-contents {
   border: 1px #ccc solid;
   border-top: 0px;

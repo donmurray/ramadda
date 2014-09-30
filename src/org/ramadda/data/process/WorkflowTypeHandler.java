@@ -49,7 +49,7 @@ import java.util.List;
  *
  *
  */
-public class WorkflowTypeHandler extends GenericTypeHandler {
+public class WorkflowTypeHandler extends TypeHandler {
 
 
 
@@ -80,19 +80,7 @@ public class WorkflowTypeHandler extends GenericTypeHandler {
     @Override
     public Result getHtmlDisplay(Request request, Entry entry)
             throws Exception {
-        Element root = XmlUtil.getRoot(
-                           getStorageManager().getFileInputStream(
-                               entry.getFile().toString()));
-
-        if (root.getTagName().equals(Service.TAG_SERVICES)) {
-            root = XmlUtil.findChild(root, Service.TAG_SERVICE);
-        }
-
-        Service service = getRepository().makeService(root, false);
-
-        //IMPORTANT! Always do this because we don't allow a service xml entry file to have commands
-        service.ensureSafeServices();
-
+        Service service = getService(request, entry);
         ServiceOutputHandler soh = new ServiceOutputHandler(repository,
                                        service);
         StringBuilder sb = new StringBuilder();
@@ -107,5 +95,23 @@ public class WorkflowTypeHandler extends GenericTypeHandler {
         return soh.evaluateService(request, HtmlOutputHandler.OUTPUT_HTML,
                                    entry, null, service);
     }
+
+    public Service getService(Request request, Entry entry) throws Exception {
+        Element root = XmlUtil.getRoot(
+                           getStorageManager().getFileInputStream(
+                               entry.getFile().toString()));
+
+        if (root.getTagName().equals(Service.TAG_SERVICES)) {
+            root = XmlUtil.findChild(root, Service.TAG_SERVICE);
+        }
+
+        Service service = getRepository().makeService(root, false);
+
+        //IMPORTANT! Always do this because we don't allow a service xml entry file to have commands
+        service.ensureSafeServices();
+        return service;
+
+    }
+
 
 }

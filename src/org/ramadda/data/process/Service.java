@@ -69,6 +69,9 @@ import java.util.zip.*;
 public class Service extends RepositoryManager {
 
     /** _more_ */
+    public static boolean debug = false;
+
+    /** _more_ */
     public static final String ARG_SERVICEFORM = "serviceform";
 
     /** _more_ */
@@ -77,8 +80,6 @@ public class Service extends RepositoryManager {
     /** _more_ */
     private static WorkflowTypeHandler dummy2ToForceCompile;
 
-    /** _more_ */
-    public static boolean debug = false;
 
     /** _more_ */
     public static final String TAG_ARG = "arg";
@@ -174,7 +175,6 @@ public class Service extends RepositoryManager {
 
     /** _more_ */
     private boolean outputToStderr = false;
-
 
     /** _more_ */
     private boolean cleanup = false;
@@ -645,12 +645,16 @@ public class Service extends RepositoryManager {
     /**
      * _more_
      */
-    private void initService() {
+    private void initService()  {
         if (link != null) {
             return;
         }
         if (linkId != null) {
-            link = getRepository().getJobManager().getService(linkId);
+            try {
+                link = getRepository().getJobManager().getService(linkId);
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
         }
     }
 
@@ -661,7 +665,6 @@ public class Service extends RepositoryManager {
      */
     public boolean haveLink() {
         initService();
-
         return link != null;
 
     }
@@ -1030,6 +1033,8 @@ public class Service extends RepositoryManager {
                                 Appendable sb)
             throws Exception {
 
+
+
         StringBuilder formSB      = new StringBuilder();
         int           blockCnt    = 0;
         CatBuff       catBuff     = null;
@@ -1090,6 +1095,24 @@ public class Service extends RepositoryManager {
                     getDescription(),
                     HtmlUtils.cssClass("service-form-description")));
         }
+        List<Entry> entries = input.getEntries();
+        if(false && entries.size()>1) {
+            StringBuffer entriesSB = new StringBuffer();
+            for (Entry entry : entries) {
+                if(!isApplicable(entry)) continue;
+                entriesSB.append(
+                                 HtmlUtils.href(
+                                                getEntryManager().getEntryURL(request, entry),
+                                                entry.getName(), " target=\"_help\" "));
+                entriesSB.append(HtmlUtils.br());
+            }
+            sb.append(
+                HtmlUtils.div(
+                              entriesSB.toString(),
+                    HtmlUtils.cssClass("service-form-entries")));
+        }
+
+
         if (formSB.length() > 0) {
             sb.append(
                 HtmlUtils.div(
@@ -2265,14 +2288,14 @@ public class Service extends RepositoryManager {
             if (entryType != null) {
                 if ( !entry.getTypeHandler().isType(entryType)) {
                     if (debug) {
-                        System.err.println(" entry is not type");
+                        System.err.println("\tentry is not type");
                     }
 
                     return false;
                 }
                 if (entryPattern == null) {
                     if (debug) {
-                        System.err.println("has entry type:" + entryType);
+                        System.err.println("\thas entry type:" + entryType);
                     }
 
                     return true;

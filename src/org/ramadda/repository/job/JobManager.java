@@ -22,6 +22,7 @@ package org.ramadda.repository.job;
 
 
 import org.ramadda.data.process.Service;
+import org.ramadda.data.process.WorkflowTypeHandler;
 import org.ramadda.data.record.*;
 import org.ramadda.data.record.filter.*;
 
@@ -132,11 +133,11 @@ public class JobManager extends RepositoryManager {
 
 
     /** _more_ */
-    private Hashtable<String, Service> commandMap = new Hashtable<String,
+    private Hashtable<String, Service> serviceMap = new Hashtable<String,
                                                         Service>();
 
     /** _more_ */
-    private List<Service> commands = new ArrayList<Service>();
+    private List<Service> services = new ArrayList<Service>();
 
 
     /** _more_ */
@@ -198,7 +199,7 @@ public class JobManager extends RepositoryManager {
      * @return _more_
      */
     public List<Service> getServices() {
-        return commands;
+        return services;
     }
 
     /**
@@ -208,28 +209,38 @@ public class JobManager extends RepositoryManager {
      *
      * @return _more_
      */
-    public Service getService(String id) {
-        return commandMap.get(id);
+    public Service getService(String id) throws Exception {
+        Service service =  serviceMap.get(id);
+        if(service!=null) return service;
+        Request request = getRepository().getTmpRequest();
+        Entry workflowEntry = getEntryManager().getEntry(
+                                                         request, id);
+        if(workflowEntry !=null && (workflowEntry.getTypeHandler() instanceof WorkflowTypeHandler)) {
+            WorkflowTypeHandler workflow= (WorkflowTypeHandler)workflowEntry.getTypeHandler();
+            return workflow.getService(request, workflowEntry);
+        }
+        return null;
+        
     }
 
 
     /**
      * _more_
      *
-     * @param command _more_
+     * @param service _more_
      *
      * @return _more_
      */
-    public Service addService(Service command) {
-        Service existingService = commandMap.get(command.getId());
+    public Service addService(Service service) {
+        Service existingService = serviceMap.get(service.getId());
         if (existingService != null) {
             return existingService;
         }
-        //        System.err.println ("JobManager.addService:"+ command.getId());
-        commandMap.put(command.getId(), command);
-        commands.add(command);
+        //        System.err.println ("JobManager.addService:"+ service.getId());
+        serviceMap.put(service.getId(), service);
+        services.add(service);
 
-        return command;
+        return service;
     }
 
 
