@@ -290,11 +290,11 @@ public class KmlOutputHandler extends OutputHandler {
                 continue;
             }
 
-            List<Service> services = new ArrayList<Service>();
-            entry.getTypeHandler().getServices(request, entry, services);
+            List<ServiceInfo> services = new ArrayList<ServiceInfo>();
+            entry.getTypeHandler().getServiceInfos(request, entry, services);
 
-            for (Service service : services) {
-                if (service.isType(Service.TYPE_KML)) {
+            for (ServiceInfo service : services) {
+                if (service.isType(ServiceInfo.TYPE_KML)) {
                     KmlUtil.networkLink(parentFolder, service.getName(),
                                         service.getUrl());
                 }

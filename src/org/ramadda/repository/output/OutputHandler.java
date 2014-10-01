@@ -600,10 +600,10 @@ public class OutputHandler extends RepositoryManager {
      *
      * @param request   the Request
      * @param entry     the Entry
-     * @param services  the list of Services to add to
+     * @param services  the list of ServiceInfos to add to
      */
-    public void getServices(Request request, Entry entry,
-                            List<Service> services) {}
+    public void getServiceInfos(Request request, Entry entry,
+                            List<ServiceInfo> services) {}
 
 
     /**

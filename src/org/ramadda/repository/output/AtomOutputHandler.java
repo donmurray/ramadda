@@ -228,9 +228,9 @@ public class AtomOutputHandler extends OutputHandler {
             }
 
             TypeHandler   typeHandler = entry.getTypeHandler();
-            List<Service> services    = new ArrayList<Service>();
-            typeHandler.getServices(request, entry, services);
-            for (Service service : services) {
+            List<ServiceInfo> services    = new ArrayList<ServiceInfo>();
+            typeHandler.getServiceInfos(request, entry, services);
+            for (ServiceInfo service : services) {
                 String url      = service.getUrl();
                 String relType  = service.getType();
                 String name     = service.getName();

@@ -24,6 +24,10 @@ package org.ramadda.repository.type;
 import org.ramadda.repository.*;
 import org.ramadda.repository.auth.*;
 import org.ramadda.repository.database.*;
+import org.ramadda.data.process.Service;
+import org.ramadda.data.process.ServiceInput;
+import org.ramadda.data.process.ServiceOutput;
+
 
 import org.ramadda.repository.map.*;
 
@@ -327,6 +331,7 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     private List<String[]> requiredMetadata = new ArrayList<String[]>();
 
+    private List<Service> services = new ArrayList<Service>();
 
     /**
      * ctor
@@ -430,6 +435,14 @@ public class TypeHandler extends RepositoryManager {
                     XmlUtil.getAttribute(metadataNode, ATTR_ID),
                     XmlUtil.getAttribute(metadataNode, "label",
                                          (String) null) });
+            }
+
+
+            List serviceNodes = XmlUtil.findChildren(entryNode,
+                                                     Service.TAG_SERVICE);
+            for (int i = 0; i < serviceNodes.size(); i++) {
+                Element node = (Element) serviceNodes.get(i);
+                services.add(new Service(getRepository(), node));
             }
 
             this.metadataTypes =
@@ -1926,10 +1939,10 @@ public class TypeHandler extends RepositoryManager {
      * @param services _more_
      *
      */
-    public void getServices(Request request, Entry entry,
-                            List<Service> services) {
+    public void getServiceInfos(Request request, Entry entry,
+                                List<ServiceInfo> services) {
         for (OutputHandler handler : getRepository().getOutputHandlers()) {
-            handler.getServices(request, entry, services);
+            handler.getServiceInfos(request, entry, services);
         }
     }
 
@@ -2922,6 +2935,28 @@ public class TypeHandler extends RepositoryManager {
                 }
             }
         }
+
+        for(Service service: services) {
+            if(!service.isEnabled()) {
+                continue;
+            }
+            System.err.println ("service:" + service.getId());
+            File workDir = getStorageManager().createProcessDir();
+            ServiceInput serviceInput = new ServiceInput(workDir, entry);
+            ServiceOutput output = service.evaluate(getRepository().getTmpRequest(), serviceInput);
+            if ( !output.isOk()) {
+                System.err.println ("not ok");
+                continue;
+            }
+            handleServiceResults(entry, service, output);
+            System.err.println ("results:" + output.getResults());
+        }
+
+
+
+    }
+
+    public void handleServiceResults(Entry entry, Service service, ServiceOutput output) throws Exception {
     }
 
     /**

@@ -309,11 +309,11 @@ public class JsonOutputHandler extends OutputHandler {
 
 
         TypeHandler   typeHandler = entry.getTypeHandler();
-        List<Service> services    = new ArrayList<Service>();
-        typeHandler.getServices(request, entry, services);
-        List<String> jsonServices = new ArrayList<String>();
-        for (Service service : services) {
-            jsonServices.add(Json.map("url", Json.quote(service.getUrl()),
+        List<ServiceInfo> services    = new ArrayList<ServiceInfo>();
+        typeHandler.getServiceInfos(request, entry, services);
+        List<String> jsonServiceInfos = new ArrayList<String>();
+        for (ServiceInfo service : services) {
+            jsonServiceInfos.add(Json.map("url", Json.quote(service.getUrl()),
                                       "relType",
                                       Json.quote(service.getType()), "name",
                                       Json.quote(service.getName()),
@@ -322,8 +322,8 @@ public class JsonOutputHandler extends OutputHandler {
         }
 
         items.add("services");
-        items.add(Json.list(jsonServices));
-        //        System.err.println("services:" + Json.list(jsonServices));
+        items.add(Json.list(jsonServiceInfos));
+        //        System.err.println("services:" + Json.list(jsonServiceInfos));
 
         Resource resource = entry.getResource();
         if (resource != null) {

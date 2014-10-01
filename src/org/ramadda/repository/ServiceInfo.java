@@ -27,7 +27,7 @@ package org.ramadda.repository;
  * @author RAMADDA Development Team
  * @version $Revision: 1.3 $
  */
-public class Service {
+public class ServiceInfo {
 
     /** _more_ */
     public static final String TYPE_KML = "kml";
@@ -65,7 +65,7 @@ public class Service {
      * @param name _more_
      * @param url _more_
      */
-    public Service(String type, String name, String url) {
+    public ServiceInfo(String type, String name, String url) {
         this(type, name, url, null);
     }
 
@@ -77,7 +77,7 @@ public class Service {
      * @param url _more_
      * @param icon _more_
      */
-    public Service(String type, String name, String url, String icon) {
+    public ServiceInfo(String type, String name, String url, String icon) {
         this(type, name, url, icon, null);
     }
 
@@ -90,7 +90,7 @@ public class Service {
      * @param icon _more_
      * @param mimeType _more_
      */
-    public Service(String type, String name, String url, String icon,
+    public ServiceInfo(String type, String name, String url, String icon,
                    String mimeType) {
         this.type     = type;
         this.name     = name;
