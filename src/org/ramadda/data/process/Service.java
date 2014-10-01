@@ -232,6 +232,7 @@ public class Service extends RepositoryManager {
     private Hashtable paramValues = new Hashtable();
 
 
+
     /**
      * _more_
      *
@@ -687,14 +688,12 @@ public class Service extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void addArgs(Request request, ServiceInput input,
+    public HashSet<String> addArgs(Request request, ServiceInput input,
                         List<String> commands, List<File> filesToDelete)
             throws Exception {
 
         if (haveLink()) {
-            link.addArgs(request, input, commands, filesToDelete);
-
-            return;
+            return link.addArgs(request, input, commands, filesToDelete);
         }
 
         List<Entry> inputEntries = input.getEntries();
@@ -706,13 +705,11 @@ public class Service extends RepositoryManager {
                                  input.getForDisplay());
         commands.add(cmd);
         
-        System.err.println("service:" + getClass().getName());
-
         addExtraArgs(request, input, commands, true);
 
 
         HashSet<String> seenGroup       = new HashSet<String>();
-        HashSet<String> definedArgs     = new HashSet<String>();
+        HashSet<String>definedArgs     = new HashSet<String>();
 
 
         boolean         haveSeenAnEntry = false;
@@ -900,7 +897,7 @@ public class Service extends RepositoryManager {
         }
 
         addExtraArgs(request, input, commands,false);
-
+        return definedArgs;
     }
 
     public void addExtraArgs(Request request, ServiceInput input, List<String> args, boolean start) throws Exception {}
@@ -1005,7 +1002,9 @@ public class Service extends RepositoryManager {
         boolean comingFromForm = request.get(ARG_SERVICEFORM, false);
         if ( !comingFromForm) {
             request = makeRequest(request);
+
         }
+
 
         if (haveLink()) {
             link.addToForm(request, input, sb);
@@ -1521,6 +1520,9 @@ public class Service extends RepositoryManager {
         if ( !requiresMultipleEntries()) {
             return false;
         }
+        if(entries == null) {
+            return false;
+        }
         int cnt = 0;
         for (Entry entry : entries) {
             if (isApplicableInner(entry)) {
@@ -1660,6 +1662,7 @@ public class Service extends RepositoryManager {
             throws Exception {
 
         boolean comingFromForm = request.get(ARG_SERVICEFORM, false);
+
         if ( !comingFromForm) {
             request = makeRequest(request);
         }
@@ -1740,10 +1743,11 @@ public class Service extends RepositoryManager {
 
         Entry        currentEntry = (Entry) Utils.safeGet(entries, 0);
         List<String> commands     = new ArrayList<String>();
+        HashSet<String>definedArgs     = null;
         if (link != null) {
-            link.addArgs(request, input, commands, filesToDelete);
+            definedArgs  = link.addArgs(request, input, commands, filesToDelete);
         } else {
-            this.addArgs(request, input, commands, filesToDelete);
+            definedArgs = this.addArgs(request, input, commands, filesToDelete);
         }
         System.err.println("Command:" + commands);
 
@@ -1801,7 +1805,21 @@ public class Service extends RepositoryManager {
 
 
 
+
         for (OutputDefinition output : getOutputs()) {
+            String depends = output.getDepends();
+            if (depends != null) {
+                if(depends.startsWith("!")) {
+                    if (definedArgs.contains(depends.substring(1))) {
+                        continue;
+                    }
+                } else {
+                        if (!definedArgs.contains(depends)) {
+                            continue;
+                        }
+                }
+            }
+
             if (output.getShowResults()) {
                 setResultsFromStdout = false;
                 myOutput.setResultsShownAsText(true);
@@ -1983,7 +2001,21 @@ public class Service extends RepositoryManager {
         value = value.replace("${workdir}", forDisplay
                                             ? "&lt;working directory&gt;"
                                             : workDir.toString());
+        //        System.err.println("Apply macros:" +entry);
         if (entry != null) {
+            List<Column> columns = entry.getTypeHandler().getColumns();
+            if (columns != null) {
+                for(Column column: columns) {
+                    Object columnValue = entry.getTypeHandler().getEntryValue(entry, column.getName());
+                    if(columnValue!=null) {
+                        value = value.replace("${entry.attr." + column.getName() +"}", ""+columnValue);
+                    } else {
+                        value = value.replace("${entry.attr." + column.getName() +"}", "");
+                    }
+                }
+            }
+
+
             String fileTail = getStorageManager().getFileTail(entry);
             value = value.replace("${entry.id}", entry.getId());
             value = value.replace("${entry.file}", forDisplay

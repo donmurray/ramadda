@@ -73,6 +73,9 @@ public class OutputDefinition {
     /** _more_ */
     private String pattern;
 
+    private String depends;
+    private boolean  notDepends;
+
     /** _more_ */
     private boolean useStdout = false;
 
@@ -95,6 +98,7 @@ public class OutputDefinition {
         pattern     = XmlUtil.getAttribute(node, "pattern", (String) null);
         useStdout   = XmlUtil.getAttribute(node, "stdout", useStdout);
         filename    = XmlUtil.getAttribute(node, "filename", (String) null);
+        depends     = XmlUtil.getAttribute(node, "depends", (String) null);
         showResults = XmlUtil.getAttribute(node, "showResults", showResults);
     }
 
@@ -162,4 +166,24 @@ public class OutputDefinition {
     public boolean getUseStdout() {
         return useStdout;
     }
+
+    /**
+       Set the Depends property.
+
+       @param value The new value for Depends
+    **/
+    public void setDepends (String value) {
+	depends = value;
+    }
+
+    /**
+       Get the Depends property.
+
+       @return The Depends
+    **/
+    public String getDepends () {
+	return depends;
+    }
+
+
 }

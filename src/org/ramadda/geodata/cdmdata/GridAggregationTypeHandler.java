@@ -509,9 +509,9 @@ public class GridAggregationTypeHandler extends ExtensibleGroupTypeHandler {
      * @param services the list of services
      */
     @Override
-    public void getServices(Request request, Entry entry,
-                            List<Service> services) {
-        super.getServices(request, entry, services);
+    public void getServiceInfos(Request request, Entry entry,
+                            List<ServiceInfo> services) {
+        super.getServiceInfos(request, entry, services);
 
         /*
         String url =

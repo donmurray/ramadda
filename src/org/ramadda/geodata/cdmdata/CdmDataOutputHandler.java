@@ -34,7 +34,7 @@ import org.ramadda.repository.PageHandler;
 import org.ramadda.repository.Repository;
 import org.ramadda.repository.Request;
 import org.ramadda.repository.Result;
-import org.ramadda.repository.Service;
+import org.ramadda.repository.ServiceInfo;
 import org.ramadda.repository.auth.AccessException;
 import org.ramadda.repository.auth.AuthorizationMethod;
 import org.ramadda.repository.auth.Permission;
@@ -1567,9 +1567,9 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
      * @param services  the list of services
      */
     @Override
-    public void getServices(Request request, Entry entry,
-                            List<Service> services) {
-        super.getServices(request, entry, services);
+    public void getServiceInfos(Request request, Entry entry,
+                            List<ServiceInfo> services) {
+        super.getServiceInfos(request, entry, services);
         if ( !getCdmManager().canLoadAsCdm(entry)) {
             return;
         }
@@ -1582,7 +1582,7 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
             }, false);
 
             services.add(
-                new Service(
+                new ServiceInfo(
                     "grid.point.json",
                     "Point time series - " + entry.getName(),
                     request.getAbsoluteUrl(url),
@@ -1591,7 +1591,7 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
 
         String url = getAbsoluteOpendapUrl(request, entry);
         services.add(
-            new Service(
+            new ServiceInfo(
                 "opendap", "OPeNDAP Link", url,
                 request.getAbsoluteUrl(iconUrl(ICON_OPENDAP))));
     }

@@ -450,9 +450,9 @@ public class PointTypeHandler extends RecordTypeHandler {
      *
      */
     @Override
-    public void getServices(Request request, Entry entry,
-                            List<Service> services) {
-        super.getServices(request, entry, services);
+    public void getServiceInfos(Request request, Entry entry,
+                            List<ServiceInfo> services) {
+        super.getServiceInfos(request, entry, services);
         String url;
         String dfltBbox = entry.getWest() + "," + entry.getSouth() + ","
                           + entry.getEast() + "," + entry.getNorth();
@@ -492,7 +492,7 @@ public class PointTypeHandler extends RecordTypeHandler {
          *       //                ARG_BBOX,  macro(ARG_BBOX),
          *       //                ARG_DEFAULTBBOX, dfltBbox
          *   }, false);
-         *   services.add(new Service(product, name,
+         *   services.add(new ServiceInfo(product, name,
          *                            request.getAbsoluteUrl(url), icon));
          * }
          *

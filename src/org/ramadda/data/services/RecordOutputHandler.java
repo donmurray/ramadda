@@ -849,8 +849,8 @@ public class RecordOutputHandler extends OutputHandler implements RecordConstant
      * @param entry _more_
      * @param services _more_
      */
-    public void getServices(Request request, Entry entry,
-                            List<Service> services) {}
+    public void getServiceInfos(Request request, Entry entry,
+                            List<ServiceInfo> services) {}
 
 
     /**

@@ -624,8 +624,8 @@ public class CatalogOutputHandler extends OutputHandler {
         path = path.replace("\\", "/");
 
         int           cnt      = 0;
-        List<Service> services = new ArrayList<Service>();
-        entry.getTypeHandler().getServices(request, entry, services);
+        List<ServiceInfo> services = new ArrayList<ServiceInfo>();
+        entry.getTypeHandler().getServiceInfos(request, entry, services);
         boolean didOpendap = false;
 
         if (canDataLoad(request, entry)
@@ -663,7 +663,7 @@ public class CatalogOutputHandler extends OutputHandler {
         }
 
 
-        for (Service service : services) {
+        for (ServiceInfo service : services) {
             String url  = service.getUrl();
             String type = service.getType();
             String name = service.getName();

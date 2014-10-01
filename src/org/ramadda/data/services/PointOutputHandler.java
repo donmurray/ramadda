@@ -2113,9 +2113,9 @@ public class PointOutputHandler extends RecordOutputHandler {
      * @param entry _more_
      * @param services _more_
      */
-    public void getServices(Request request, Entry entry,
-                            List<Service> services) {
-        super.getServices(request, entry, services);
+    public void getServiceInfos(Request request, Entry entry,
+                            List<ServiceInfo> services) {
+        super.getServiceInfos(request, entry, services);
         if ( !canHandleEntry(entry)) {
             return;
         }
@@ -2163,7 +2163,7 @@ public class PointOutputHandler extends RecordOutputHandler {
                 //                ARG_DEFAULTBBOX, dfltBbox
             }, false);
             url+= extraArgs;
-            services.add(new Service(product, name,
+            services.add(new ServiceInfo(product, name,
                                      request.getAbsoluteUrl(url), icon));
         }
     }

@@ -497,10 +497,10 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
      *
      */
     @Override
-    public void getServices(Request request, Entry entry,
-                            List<Service> services) {
-        super.getServices(request, entry, services);
-        getRecordOutputHandler().getServices(request, entry, services);
+    public void getServiceInfos(Request request, Entry entry,
+                            List<ServiceInfo> services) {
+        super.getServiceInfos(request, entry, services);
+        getRecordOutputHandler().getServiceInfos(request, entry, services);
     }
 
 

@@ -99,9 +99,9 @@ public class MapTypeHandler extends ExtensibleGroupTypeHandler {
      *
      */
     @Override
-    public void getServices(Request request, Entry entry,
-                            List<Service> services) {
-        super.getServices(request, entry, services);
+    public void getServiceInfos(Request request, Entry entry,
+                            List<ServiceInfo> services) {
+        super.getServiceInfos(request, entry, services);
         /*
         String url =
             HtmlUtils.url(request.entryUrl(getRepository().URL_ENTRY_SHOW,
@@ -111,7 +111,7 @@ public class MapTypeHandler extends ExtensibleGroupTypeHandler {
             macro(LidarOutputHandler.ARG_LIDAR_SKIP), ARG_BBOX,
             macro(ARG_BBOX),
         }, false);
-        services.add(new Service("pointcloud", "Point Cloud",
+        services.add(new ServiceInfo("pointcloud", "Point Cloud",
         request.getAbsoluteUrl(url),
                                  getIconUrl(LidarOutputHandler.ICON_POINTS)));
         */
