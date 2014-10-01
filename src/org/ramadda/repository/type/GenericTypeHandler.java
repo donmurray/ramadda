@@ -1093,8 +1093,10 @@ public class GenericTypeHandler extends TypeHandler {
                                         " class=\"formgroupheader\" "), " colspan=2 ")));
                     }
                     StringBuilder tmpSb = new StringBuilder();
-                    formatColumnHtmlValue(request, entry, column, tmpSb,
-                                          values);
+                    if(values!=null) {
+                        formatColumnHtmlValue(request, entry, column, tmpSb,
+                                              values);
+                    }
                     if ( !column.getShowEmpty() && (tmpSb.length() == 0)) {
                         continue;
                     }

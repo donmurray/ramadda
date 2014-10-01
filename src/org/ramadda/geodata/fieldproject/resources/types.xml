@@ -80,15 +80,7 @@
 </table>
 
 {{properties metadata.types="!project_pi" message="" }}
-
-
-
-
-
-
 {{links entry="Links" message=""}}
-
-
 </td>
 <td width="50%">
 {{properties metadata.types="project_pi" message="" }}
@@ -96,17 +88,9 @@
 <p>
 {{mapentry width="350" message=""}}
 <p>
-
 {{tree title="Data" details="false" showtoggle="false" message="" prefix="==Data=="}}
-
 </td></tr>
-
-
 </table>
-
-
-
-
 ]]>
 </wiki>
    </type>

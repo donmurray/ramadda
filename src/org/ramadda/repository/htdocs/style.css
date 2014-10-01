@@ -1959,10 +1959,27 @@ a.toggleblocklabellink:visited {
 }
 
 
+.service-output-header {
+   margin-top: 10px;
+   border: 1px #ccc solid;
+   background-color:#DFE5F9;
+   font-weight: bold;
+   padding:5px;
+   padding-left:10px;
+}
+
+
 .service-output {
    margin-left:10px;
-   max-height: 200px; 
+   max-height: 400px; 
    overflow-y: auto;
+   border : 1px #ccc solid;
+}
+
+.service-output-large {
+   margin-left:10px;
+//   max-height: 200px; 
+//   overflow-y: auto;
    border : 1px #ccc solid;
 }
 

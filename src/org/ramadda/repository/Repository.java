@@ -1479,7 +1479,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
 
     public Service makeService(Element node, boolean addToGlobals) throws Exception {
         Constructor ctor =
-            Misc.findConstructor(Misc.findClass(XmlUtil.getAttribute(node,
+            Misc.findConstructor(Misc.findClass(XmlUtil.getAttributeFromTree(node,
                                                                      "handler",
                                                                      "org.ramadda.data.process.Service")), new Class[] {
                                      Repository.class,

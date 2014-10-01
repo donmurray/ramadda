@@ -176,6 +176,8 @@ public class Service extends RepositoryManager {
     /** _more_ */
     private boolean outputToStderr = false;
 
+    private boolean ignoreStderr = false;
+
     /** _more_ */
     private boolean cleanup = false;
 
@@ -343,6 +345,9 @@ public class Service extends RepositoryManager {
                                             (String) null);
         outputToStderr = XmlUtil.getAttributeFromTree(element,
                 "outputToStderr", outputToStderr);
+
+        ignoreStderr = XmlUtil.getAttributeFromTree(element,
+                                                    "ignoreStderr", ignoreStderr);
 
         cleanup = XmlUtil.getAttributeFromTree(element, ATTR_CLEANUP, true);
         linkId = XmlUtil.getAttribute(element, ATTR_LINK, (String) null);
@@ -700,6 +705,12 @@ public class Service extends RepositoryManager {
         String cmd = applyMacros(currentEntry, workDir, getCommand(),
                                  input.getForDisplay());
         commands.add(cmd);
+        
+        System.err.println("service:" + getClass().getName());
+
+        addExtraArgs(request, input, commands, true);
+
+
         HashSet<String> seenGroup       = new HashSet<String>();
         HashSet<String> definedArgs     = new HashSet<String>();
 
@@ -888,8 +899,12 @@ public class Service extends RepositoryManager {
             }
         }
 
+        addExtraArgs(request, input, commands,false);
 
     }
+
+    public void addExtraArgs(Request request, ServiceInput input, List<String> args, boolean start) throws Exception {}
+
 
     /**
      * _more_
@@ -1438,6 +1453,14 @@ public class Service extends RepositoryManager {
         return outputToStderr;
     }
 
+    public boolean getIgnoreStderr() {
+        if (haveLink()) {
+            return link.getIgnoreStderr();
+        }
+
+        return ignoreStderr;
+    }
+
     /**
      * _more_
      *
@@ -1757,7 +1780,7 @@ public class Service extends RepositoryManager {
             if (getOutputToStderr()) {
                 myOutput.append(errMsg);
                 myOutput.append("\n");
-            } else {
+            } else if(!getIgnoreStderr()){
                 //If there is an error then
                 myOutput.setOk(false);
                 myOutput.append(errMsg);
@@ -1871,6 +1894,29 @@ public class Service extends RepositoryManager {
         return myOutput;
     }
 
+
+
+    public void addOutput(Request request, ServiceInput input, ServiceOutput output, Appendable sb) throws Exception {
+        if(haveLink()) {
+            link.addOutput(request,  input, output,  sb);
+            return;
+        }
+
+
+        sb.append(HtmlUtils.br());
+        for (Entry entry : input.getEntries()) {
+            sb.append(
+                      HtmlUtils.href(
+                                     getEntryManager().getEntryURL(request, entry),
+                                     entry.getName()));
+            sb.append(HtmlUtils.br());
+        }
+        sb.append("<div class=service-output>");
+        sb.append("<pre>");
+        sb.append(output.getResults());
+        sb.append("</pre>");
+        sb.append("</div>");
+    }
 
 
     /**

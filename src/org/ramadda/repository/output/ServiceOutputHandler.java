@@ -345,14 +345,16 @@ public class ServiceOutputHandler extends OutputHandler {
             serviceInput.setForDisplay(forDisplay);
             serviceInputs.add(serviceInput);
         } else {
-            for (Entry entry : entries) {
-                if ( !service.isApplicable(entry)) {
-                    continue;
+            if(entries!=null) {
+                for (Entry entry : entries) {
+                    if ( !service.isApplicable(entry)) {
+                        continue;
+                    }
+                    ServiceInput serviceInput = new ServiceInput(workDir, entry);
+                    serviceInput.setPublish(doingPublish(request));
+                    serviceInput.setForDisplay(forDisplay);
+                    serviceInputs.add(serviceInput);
                 }
-                ServiceInput serviceInput = new ServiceInput(workDir, entry);
-                serviceInput.setPublish(doingPublish(request));
-                serviceInput.setForDisplay(forDisplay);
-                serviceInputs.add(serviceInput);
             }
         }
 
@@ -428,18 +430,7 @@ public class ServiceOutputHandler extends OutputHandler {
                 sb.append(output.getResults());
                 sb.append("\n");
             } else if (output.getResultsShownAsText()) {
-                for (Entry entry : serviceInput.getEntries()) {
-                    sb.append(
-                        HtmlUtils.href(
-                            getEntryManager().getEntryURL(request, entry),
-                            entry.getName()));
-                    sb.append(HtmlUtils.br());
-                }
-                sb.append("<div class=service-output>");
-                sb.append("<pre>");
-                sb.append(output.getResults());
-                sb.append("</pre>");
-                sb.append("</div>");
+                service.addOutput(request, serviceInput, output, sb);
             }
         }
 
@@ -489,7 +480,7 @@ public class ServiceOutputHandler extends OutputHandler {
         }
 
 
-        if ( !outputs.get(0).getResultsShownAsText()) {
+        if (outputs.size()>0 &&  !outputs.get(0).getResultsShownAsText()) {
             sb.append("Error: no output files<br>");
             sb.append("<pre>");
             for (ServiceOutput output : outputs) {
@@ -498,9 +489,16 @@ public class ServiceOutputHandler extends OutputHandler {
             sb.append("</pre>");
             sb.append(HtmlUtils.hr());
         }
-        makeForm(request, service, baseEntry, entries, outputType, sb);
+        Appendable results = new StringBuilder();
 
-        return new Result(outputType.getLabel(), sb);
+        makeForm(request, service, baseEntry, entries, outputType, results);
+        if(sb.length()>0) {
+            results.append(HtmlUtils.div(msg("Results"),
+                                         HtmlUtils.cssClass("service-output-header")));
+            results.append(sb);
+        }
+
+        return new Result(outputType.getLabel(), results);
 
 
     }

@@ -869,7 +869,8 @@ public class Column implements DataTypes, Constants {
             if (csv) {
                 sb.append(toString(values, offset));
             } else {
-                double v = (Double) values[offset];
+                Double v = (Double) values[offset];
+                if(v == null) return;
                 if ((v == dfltDouble) && !getShowEmpty()) {
                     return;
                 }
