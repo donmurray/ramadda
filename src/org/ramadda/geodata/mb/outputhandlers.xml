@@ -1,3 +1,4 @@
 <outputhandlers>
   <outputhandler  class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="mb.mbinfo"/>
+  <outputhandler  class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="mb.mblist"/>
 </outputhandlers>

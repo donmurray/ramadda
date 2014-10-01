@@ -1,5 +1,4 @@
 <types>
-
   <type name="type_mb"  description="MB Bathymetry" handler="org.ramadda.geodata.mb.MbTypeHandler" category="Oceanography" pattern=".*\.mb[0-9]+">
      <property name="icon" value="/mb/mb.png"/>
      <property name="form.altitude.show" value="true"/>
@@ -14,5 +13,41 @@
     </service>
 
    </type>
+
+  <type name="type_mb_point_basic"  
+        super="type_point" 
+        icon="/mb/mb.png"
+        description="Basic MB point file"  
+        handler="org.ramadda.data.services.PointTypeHandler">
+    <property name="icon" value="/mb/mb.png"/>
+    <property name="record.file.class" value="org.ramadda.data.point.text.CsvFile"/>
+<property name="record.properties">
+delimiter=tab
+fields=time[format="yyyy/MM/dd/HH/mm/ss"],longitude[unit="degrees"],latitude[unit="degrees"],depth[chartable="true" searchable="true"],amplitude[chartable="true" searchable="true"]
+</property>
+
+<wiki>
+<![CDATA[
+<div class="wiki-h2">{{name}} </div>
+
+<table width=100% cellpadding=5>
+<tr valign=top>
+<td width="30%">
+{{description}}
+{{information  details="false"  }}
+
+
+</td>
+<td width="70%">
+{{displaygroup layoutType="columns"}}
+{{display type="map"  height="300"  width="300" column="1" layoutHere="false" }}
+{{display row="0" fields="depth" title="Depth"  height="150" column="0" layoutHere="false"}}
+{{display row="0" fields="amplitude" title="Amplitude"  height="150" column="0" layoutHere="false"}}
+</td>
+</tr></table>
+]]></wiki>
+
+</type>
+
 
 </types>
