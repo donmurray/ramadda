@@ -894,7 +894,7 @@ function RepositoryMap(mapId, params) {
             }
         }
         if (!iconUrl) {
-            iconUrl = 'http://www.openlayers.org/dev/img/marker.png';
+            iconUrl = ramaddaBaseUrl + '/icons/marker.png';
         }
         var sz = new OpenLayers.Size(size, size);
         var calculateOffset = function(size) {
