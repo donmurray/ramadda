@@ -1,0 +1,12 @@
+  <services icon="/mb/mb.png" entryType="type_mb">
+    <service label="MBInfo" id="mb.mbinfo" command="${mb.mbinfo}" xhandler="org.ramadda.geodata.mb.MbService">
+      <description>Runs MBSstem mbinfo program</description>
+          <arg name="xml" type="flag" value="-X2" label="As XML" help="Output XML"/>
+          <arg value="-F"/>
+          <arg value="${entry.attr.format}"/>
+          <arg value="-I"/>
+          <arg value="${entry.file}"   type="entry" primary="true" ></arg>
+          <output showResults="true" stdout="true" depends="!xml"/>
+          <output type="file" stdout="true" pattern=".*" depends="xml" filename="${entry.file.base}.xml"/>
+    </service>
+</services>

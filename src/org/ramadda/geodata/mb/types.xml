@@ -1,0 +1,18 @@
+<types>
+
+  <type name="type_mb"  description="MB Bathymetry" handler="org.ramadda.geodata.mb.MbTypeHandler" category="Oceanography" pattern=".*\.mb[0-9]+">
+     <property name="icon" value="/mb/mb.png"/>
+     <property name="form.altitude.show" value="true"/>
+     <column name="format" label="Format"  type="enumerationplus"   values="file:/org/ramadda/geodata/mb/mbtypes.txt"/>
+     <column name="number_of_records" label="Number of records"  type="int"/>
+     <column name="total_track_length" label="Track length"  type="double"/>
+
+    <service link="mb.mbinfo" id="initmb">
+      <params>
+          <param name="mb.mbinfo.xml">true</param>
+      </params>
+    </service>
+
+   </type>
+
+</types>
