@@ -27,6 +27,7 @@
     <target name="plugins" depends="init">
       <echo message="Building RAMADDA plugins"/>
       <ant antfile="${src_dir}/org/ramadda/bio/biotypes/build.xml" inheritAll="false"/>
+      <ant antfile="${src_dir}/org/ramadda/bio/dicom/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/bio/genomics/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/bio/taxonomy/build.xml" inheritAll="false"/>
     </target>
