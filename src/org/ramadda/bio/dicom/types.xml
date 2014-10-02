@@ -5,6 +5,7 @@
      <property name="form.area.show" value="false"/>
      <property name="form.todate.show" value="false"/>
      <property name="form.fromdate.label" value="Date"/>
+     <service link="bio.dicom.makethumbnail" id="dicomimage"/>
   </type>
 
 </types>

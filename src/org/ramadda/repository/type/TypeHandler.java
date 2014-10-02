@@ -2940,7 +2940,6 @@ public class TypeHandler extends RepositoryManager {
             if(!service.isEnabled()) {
                 continue;
             }
-            System.err.println ("service:" + service.getId());
             File workDir = getStorageManager().createProcessDir();
             ServiceInput serviceInput = new ServiceInput(workDir, entry);
             ServiceOutput output = service.evaluate(getRepository().getTmpRequest(), serviceInput);

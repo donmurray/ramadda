@@ -1,9 +1,16 @@
 <services icon="/dicom/document-film.png">
   <service label="Run  dcm2txt" id="bio_dicom_text"   command="${bio.dicom.dcm4che}/dcm2txt" >
-<description><![CDATA[
-Run dcm2txt
-]]></description>
+<description><![CDATA[Run dcm2txt]]></description>
     <arg label="DICOM File" value="${entry.file}" type="entry" entryType="bio_dicom" primary="true"></arg>
     <output showResults="true" stdout="true"/>
    </service>
+
+   <service id="bio.dicom.makethumbnail" label="Make thumbnail" command="${media.imagemagick.path}/convert">
+        <description><![CDATA[Generate an image from a DICOM file using ImageMagick convert]]></description>
+        <arg value="${entry.file}" type="entry"  label="Input DICOM file" primary="true" entryType="bio_dicom"></arg>
+        <arg value="${entry.file.base}.png"/>
+        <output type="type_image" pattern=".*"/>
+    </service>
+
+
 </services>
