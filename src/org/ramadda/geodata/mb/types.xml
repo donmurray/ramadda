@@ -30,21 +30,21 @@ fields=time[format="yyyy/MM/dd/HH/mm/ss"],longitude[unit="degrees"],latitude[uni
 <![CDATA[
 <div class="wiki-h2">{{name}} </div>
 
+{{description}}
+
 <table width=100% cellpadding=5>
 <tr valign=top>
-<td width="30%">
-{{description}}
-{{information  details="false"  }}
-
-
-</td>
-<td width="70%">
+<td width="100%">
 {{displaygroup layoutType="columns"}}
-{{display type="map"  height="300"  width="300" column="1" layoutHere="false" }}
+{{display type="map"  height="300"  width="400" column="1" layoutHere="false" defaultMapLayer="google.satellite"}}
 {{display row="0" fields="depth" title="Depth"  height="150" column="0" layoutHere="false"}}
 {{display row="0" fields="amplitude" title="Amplitude"  height="150" column="0" layoutHere="false"}}
 </td>
 </tr></table>
+
+{{information}}
+
+
 ]]></wiki>
 
 </type>

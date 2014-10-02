@@ -40,6 +40,7 @@
         category="Documents" 
         pattern=".*\.mov">
      <property name="icon" value="/icons/mov.png"/>
+     <service link="media.qttools.thumbnail" id="initmov"/>
 </type>
 
 

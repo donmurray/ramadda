@@ -260,6 +260,9 @@ public class Service extends RepositoryManager {
 
 
 
+    public String toString() {
+        return getLabel() + " " + getId();
+    }
 
     /**
      * _more_
@@ -1056,11 +1059,14 @@ public class Service extends RepositoryManager {
         boolean       anyRequired = false;
         for (int argType = 0; argType <= 1; argType++) {
             for (Service.Arg arg : getArgs()) {
-                if ((argType == 0) && !arg.isEntry()) {
-                    continue;
-                }
-                if ((argType == 1) && arg.isEntry()) {
-                    continue;
+                if (argType == 0) {
+                    if(!arg.isEntry() && !arg.first) {
+                        continue;
+                    }
+                } else {
+                    if(arg.isEntry() || arg.first) {
+                        continue;
+                    }
                 }
 
                 if (arg.isCategory()) {
@@ -1850,12 +1856,12 @@ public class Service extends RepositoryManager {
             if (files == null) {
                 files = input.getProcessDir().listFiles(new FileFilter() {
                     public boolean accept(File f) {
-                        if (thePattern == null) {
-                            return true;
-                        }
                         String name = f.getName();
                         if (name.startsWith(".")) {
                             return false;
+                        }
+                        if (thePattern == null) {
+                            return true;
                         }
                         if (name.toLowerCase().matches(thePattern)) {
                             return true;
@@ -1921,13 +1927,23 @@ public class Service extends RepositoryManager {
         }
 
 
-        sb.append(HtmlUtils.br());
+
+
+        int cnt =0;
         for (Entry entry : input.getEntries()) {
+            if(cnt++ == 0) {
+                sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
+                                         HtmlUtils.cssClass("service-output-header")));
+            } else {
+                sb.append(HtmlUtils.br());
+            }
             sb.append(
                       HtmlUtils.href(
                                      getEntryManager().getEntryURL(request, entry),
                                      entry.getName()));
-            sb.append(HtmlUtils.br());
+        }
+        if(cnt>0) {
+            sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
         }
         sb.append("<div class=service-output>");
         sb.append("<pre>");
@@ -2181,12 +2197,15 @@ public class Service extends RepositoryManager {
         /** _more_ */
         private boolean nameDefined = false;
 
+
         /** _more_ */
         private boolean ifDefined = true;
 
 
         /** _more_ */
         private boolean multiple = false;
+
+        private boolean first = false;
 
         /** _more_ */
         private String multipleJoin;
@@ -2316,6 +2335,7 @@ public class Service extends RepositoryManager {
             size      = XmlUtil.getAttribute(node, ATTR_SIZE, size);
             ifDefined = XmlUtil.getAttribute(node, "ifdefined", ifDefined);
             multiple  = XmlUtil.getAttribute(node, "multiple", multiple);
+            first  = XmlUtil.getAttribute(node, "first", false);
             multipleJoin = XmlUtil.getAttribute(node, "multipleJoin",
                     (String) null);
             sameRow = XmlUtil.getAttribute(node, "sameRow", sameRow);

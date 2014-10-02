@@ -494,8 +494,11 @@ public class ServiceOutputHandler extends OutputHandler {
         makeForm(request, service, baseEntry, entries, outputType, results);
         if(sb.length()>0) {
             results.append(HtmlUtils.div(msg("Results"),
-                                         HtmlUtils.cssClass("service-output-header")));
+                                         HtmlUtils.cssClass("service-results-header")));
+            results.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
+                                          HtmlUtils.cssClass("service-results")));
             results.append(sb);
+            results.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
         }
 
         return new Result(outputType.getLabel(), results);

@@ -112,40 +112,43 @@ public class HtmlDocTypeHandler extends GenericTypeHandler {
     @Override
     public Result getHtmlDisplay(Request request, Entry entry)
             throws Exception {
-        String style =entry.getValue(0,"none");
+        String style = entry.getValue(0, "none");
         if (style.equals("none")) {
             return null;
         }
         if (style.equals("frame")) {
             String url = null;
-            if(entry.getResource().isUrl()) {
+            if (entry.getResource().isUrl()) {
                 url = entry.getResource().getPath();
-            } else if(entry.isFile()) {
+            } else if (entry.isFile()) {
                 url = entry.getTypeHandler().getEntryResourceUrl(request,
-                                                                 entry);
+                        entry);
             } else {
                 return null;
             }
             StringBuffer sb = new StringBuffer();
             sb.append(
-                    HtmlUtils.tag(
-                        HtmlUtils.TAG_IFRAME,
-                        HtmlUtils.attr(HtmlUtils.ATTR_SRC, url)
-                        + HtmlUtils.attr(HtmlUtils.ATTR_WIDTH, "100%")
-                        + HtmlUtils.attr(
-                            HtmlUtils.ATTR_HEIGHT, "300"), "Need frames"));
-            return new Result("",sb);
+                HtmlUtils.tag(
+                    HtmlUtils.TAG_IFRAME,
+                    HtmlUtils.attr(HtmlUtils.ATTR_SRC, url)
+                    + HtmlUtils.attr(HtmlUtils.ATTR_WIDTH, "100%")
+                    + HtmlUtils.attr(
+                        HtmlUtils.ATTR_HEIGHT, "300"), "Need frames"));
+
+            return new Result("", sb);
         }
 
-        if(entry.getResource().isUrl()) {
+        if (entry.getResource().isUrl()) {
             return null;
         }
 
         if (style.equals("full")) {
             return getEntryManager().addHeaderToAncillaryPage(request,
-                                                              new Result(BLANK,
-                                                                         new StringBuilder(getContent(request, entry))));
+                    new Result(BLANK,
+                               new StringBuilder(getContent(request,
+                                   entry))));
         }
+
         return null;
 
     }

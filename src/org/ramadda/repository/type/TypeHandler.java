@@ -2956,7 +2956,34 @@ public class TypeHandler extends RepositoryManager {
 
     }
 
-    public void handleServiceResults(Entry entry, Service service, ServiceOutput output) throws Exception {
+
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param service _more_
+     * @param output _more_
+     *
+     * @throws Exception _more_
+     */
+    public void handleServiceResults(Entry entry, Service service,
+                                         ServiceOutput output)
+        throws Exception {
+        List<Entry> entries = output.getEntries();
+        if (entries.size() == 0) {
+            return;
+        }
+        Entry serviceEntry = entries.get(0);
+        if (serviceEntry.getResource().isImage()) {
+            String fileName = getStorageManager().copyToEntryDir(entry,
+                                                                 serviceEntry.getFile()).getName();
+            Metadata metadata =
+                new Metadata(getRepository().getGUID(), entry.getId(),
+                             (ContentMetadataHandler.TYPE_THUMBNAIL), false,
+                             fileName, null, null, null, null);
+
+            entry.addMetadata(metadata);
+        }
     }
 
     /**
