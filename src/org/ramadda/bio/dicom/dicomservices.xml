@@ -1,0 +1,9 @@
+<services icon="/dicom/document-film.png">
+  <service label="Run  dcm2txt" id="bio_dicom_text"   command="${bio.dicom.dcm4che}/dcm2txt" >
+<description><![CDATA[
+Run dcm2txt
+]]></description>
+    <arg label="DICOM File" value="${entry.file}" type="entry" entryType="bio_dicom" primary="true"></arg>
+    <output showResults="true" stdout="true"/>
+   </service>
+</services>
