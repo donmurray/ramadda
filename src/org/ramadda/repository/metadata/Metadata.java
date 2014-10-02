@@ -399,7 +399,9 @@ public class Metadata implements Constants {
                 return result;
             }
 
-            result = o1.attr2.compareTo(o2.attr2);
+            if(o1.attr2!=null && o2.attr2!=null) {
+                result = o1.attr2.compareTo(o2.attr2);
+            }
 
             return result;
         }
