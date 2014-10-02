@@ -2947,8 +2947,8 @@ public class TypeHandler extends RepositoryManager {
                 System.err.println ("not ok");
                 continue;
             }
-            handleServiceResults(entry, service, output);
-            System.err.println ("results:" + output.getResults());
+            //Defer to the entry's type handler
+            entry.getTypeHandler().handleServiceResults(entry, service, output);
         }
 
 

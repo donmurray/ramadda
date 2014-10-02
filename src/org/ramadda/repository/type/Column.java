@@ -291,6 +291,10 @@ public class Column implements DataTypes, Constants {
                                                     String>();
 
 
+    /** _more_          */
+    private String alias;
+
+
 
     /** _more_ */
     private String dflt;
@@ -319,7 +323,7 @@ public class Column implements DataTypes, Constants {
     /** _more_ */
     private String propertiesFile;
 
-    /** _more_          */
+    /** _more_ */
     private int columnIndex;
 
     /** _more_ */
@@ -402,6 +406,7 @@ public class Column implements DataTypes, Constants {
 
         showEmpty      = getAttributeOrTag(element, "showempty", true);
         dflt           = getAttributeOrTag(element, ATTR_DEFAULT, "").trim();
+        alias          = getAttributeOrTag(element, "alias", (String) null);
         isIndex        = getAttributeOrTag(element, ATTR_ISINDEX, false);
         isCategory     = getAttributeOrTag(element, ATTR_ISCATEGORY, false);
         canSearch      = getAttributeOrTag(element, ATTR_CANSEARCH, false);
@@ -870,7 +875,9 @@ public class Column implements DataTypes, Constants {
                 sb.append(toString(values, offset));
             } else {
                 Double v = (Double) values[offset];
-                if(v == null) return;
+                if (v == null) {
+                    return;
+                }
                 if ((v == dfltDouble) && !getShowEmpty()) {
                     return;
                 }
@@ -3075,6 +3082,24 @@ public class Column implements DataTypes, Constants {
         return columnIndex;
     }
 
+
+    /**
+     *  Set the Alias property.
+     *
+     *  @param value The new value for Alias
+     */
+    public void setAlias(String value) {
+        alias = value;
+    }
+
+    /**
+     *  Get the Alias property.
+     *
+     *  @return The Alias
+     */
+    public String getAlias() {
+        return alias;
+    }
 
 
 }
