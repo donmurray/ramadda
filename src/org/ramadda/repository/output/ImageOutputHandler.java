@@ -690,7 +690,7 @@ public class ImageOutputHandler extends OutputHandler {
 
         if (output.equals(OUTPUT_PLAYER)) {
             sb = new StringBuilder();
-            makePlayer(request, group, entries, sb, true);
+            makePlayer(request, group, entries, sb, true, true);
             //            sb.append(tmp);
             //            sb.append(HtmlUtils.leftRight(getSortLinks(request), fullUrl));
         } else if (output.equals(OUTPUT_SLIDESHOW)) {
@@ -749,12 +749,13 @@ public class ImageOutputHandler extends OutputHandler {
      * @param entries _more_
      * @param finalSB _more_
      * @param addHeader _more_
+     * @param checkSort _more_
      *
      * @throws Exception _more_
      */
     public void makePlayer(Request request, Entry mainEntry,
                            List<Entry> entries, Appendable finalSB,
-                           boolean addHeader)
+                           boolean addHeader, boolean checkSort)
             throws Exception {
 
         String        playerPrefix = "imageplayer_" + HtmlUtils.blockCnt++;
@@ -767,7 +768,7 @@ public class ImageOutputHandler extends OutputHandler {
             return;
         }
 
-        if ( !request.exists(ARG_ASCENDING)) {
+        if (checkSort && !request.exists(ARG_ASCENDING)) {
             entries = getEntryUtil().sortEntriesOnDate(entries, true);
         }
 

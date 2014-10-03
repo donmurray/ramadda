@@ -1765,7 +1765,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             }
             imageOutputHandler.makePlayer(imageRequest, entry, children, sb,
                                           Misc.getProperty(props,
-                                              "show_sort_links", false));
+                                              "show_sort_links",
+                                                  false), false);
 
             return sb.toString();
         } else if (theTag.equals(WIKI_TAG_GALLERY)) {
@@ -2348,6 +2349,10 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             } else if (sort.equals(SORT_NAME)) {
                 entries = getEntryUtil().sortEntriesOnName(entries,
                         !ascending);
+            } else if (sort.startsWith("number:")) {
+                entries = getEntryUtil().sortEntriesOnPattern(entries,
+                        ascending, sort.substring(7));
+
             } else {
                 throw new IllegalArgumentException("Unknown sort:" + sort);
             }
@@ -3375,7 +3380,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 if (theEntry.getType().equals(TYPE_WIKIPAGE)) {
                     String url =
                         request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                         theEntry, ARG_OUTPUT, OUTPUT_WIKI.toString());
+                                         theEntry, ARG_OUTPUT,
+                                         OUTPUT_WIKI.toString());
 
                     return getEntryManager().getTooltipLink(request,
                             theEntry, label, url);

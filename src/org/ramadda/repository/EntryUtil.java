@@ -30,10 +30,13 @@ import org.ramadda.sql.Clause;
 import org.ramadda.sql.SqlUtil;
 
 
+
+
 import org.ramadda.util.TTLCache;
 import org.ramadda.util.TTLObject;
 
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -95,6 +98,60 @@ public class EntryUtil extends RepositoryManager {
                 Entry e1     = (Entry) o1;
                 Entry e2     = (Entry) o2;
                 int   result = e1.getName().compareToIgnoreCase(e2.getName());
+                if (descending) {
+                    if (result >= 1) {
+                        return -1;
+                    } else if (result <= -1) {
+                        return 1;
+                    }
+
+                    return 0;
+                }
+
+                return result;
+            }
+            public boolean equals(Object obj) {
+                return obj == this;
+            }
+        };
+        Object[] array = entries.toArray();
+        Arrays.sort(array, comp);
+
+        return (List<Entry>) Misc.toList(array);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param entries _more_
+     * @param descending _more_
+     * @param pattern _more_
+     *
+     * @return _more_
+     */
+    public List<Entry> sortEntriesOnPattern(List<Entry> entries,
+                                            final boolean descending,
+                                            final String pattern) {
+        Comparator comp = new Comparator() {
+            public int compare(Object o1, Object o2) {
+                Entry  e1 = (Entry) o1;
+                Entry  e2 = (Entry) o2;
+                String v1 = StringUtil.findPattern(e1.getName(), pattern);
+                String v2 = StringUtil.findPattern(e2.getName(), pattern);
+                if ((v1 == null) || (v2 == null)) {
+                    //                    System.err.println("no v:" + v1 +" " + v2);
+                    return 0;
+                }
+
+                double dv1    = Double.parseDouble(v1);
+                double dv2    = Double.parseDouble(v2);
+                int    result = (dv1 < dv2)
+                                ? -1
+                                : (dv1 == dv2)
+                                  ? 0
+                                  : 1;
+
                 if (descending) {
                     if (result >= 1) {
                         return -1;
