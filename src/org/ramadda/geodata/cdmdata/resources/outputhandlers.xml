@@ -6,4 +6,7 @@
   <outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="nco.ncwa" icon="/cdmdata/nco.png"/>
 
   <outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="cdo.info"/>
+
+  <outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="h5.ls"/>
+
 </outputhandlers>

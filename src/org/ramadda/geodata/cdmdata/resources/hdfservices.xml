@@ -1,0 +1,17 @@
+  <services icon="/cdmdata/hdf.png"  xhandler="org.ramadda.geodata.cdmdata.NetcdfService">
+
+
+    <service label="H5 LS" id="h5.ls"   outputToStderr="true" command="${geo.hdf5.path}/h5ls">
+<help><![CDATA[
+Run h5ls
+]]></help>
+          <arg value="${entry.file}"   type="entry" primary="true" entryType="geo_hdf5"></arg>
+          <arg value="-r"/>
+          <arg type="flag" help="Verbose" value="-v"/>
+          <arg type="flag" help="Label members of compound datasets" value="-l"/>
+          <arg type="flag" help="Print full path names instead of base names" value="-f"/>
+          <output showResults="true" stdout="true"/>
+    </service>
+</services>
+
+

@@ -64,6 +64,13 @@
 </type>
 
 
+
+  <type name="geo_hdf5"  description="HDF5 File" handler="org.ramadda.repository.type.GenericTypeHandler" category="Geoscience Data" pattern=".*\.h5">
+     <property name="icon" value="/cdmdata/hdf.png"/>
+   </type>
+
+
+
   <type name="gradsbinary"  description="GrADS Binary File" handler="org.ramadda.repository.type.GenericTypeHandler" category="Geoscience Data">
      <metadata id="content.attachment" label="GrADS Data Descriptor File"/>
      <property name="icon" value="/cdmdata/cola.gif"/>
