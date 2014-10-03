@@ -19,13 +19,17 @@
         <description><![CDATA[Generate an image from a DICOM file using ImageMagick convert]]></description>
 <process_description><![CDATA[<wiki>
 {{description}}
-{{gallery sort="name"}}
 
-{{imageplayer  sort="name"}}
+{{imageplayer sort="number:.*_(.*).png"}}
+
+== All Files ==
+{{tree sort="number:.*_(.*).png"}}
+
+
 
 ]]></process_description>
         <arg value="${entry.file}" type="entry"  label="Input DICOM file" primary="true" entryType="bio_dicom"></arg>
-        <arg value="${entry.file.base}.png"/>
+        <arg value="${entry.file.base}_%d.png"/>
         <output type="type_image" pattern=".*"/>
     </service>
 
