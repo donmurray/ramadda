@@ -43,6 +43,7 @@ import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.ProcessRunner;
 import org.ramadda.util.StreamEater;
 import org.ramadda.util.TTLCache;
+import org.ramadda.util.Utils;
 
 
 import org.w3c.dom.*;
@@ -80,6 +81,15 @@ import java.util.zip.*;
 /**
  */
 public class JobManager extends RepositoryManager {
+
+    /** _more_ */
+    public final RequestUrl URL_SERVICES_LIST = new RequestUrl(this,
+                                                   "/services/list");
+
+    /** _more_ */
+    public final RequestUrl URL_SERVICES_VIEW = new RequestUrl(this,
+                                                   "/services/view");
+
 
     /** _more_ */
     private long myTime = System.currentTimeMillis();
@@ -650,6 +660,62 @@ public class JobManager extends RepositoryManager {
     }
 
 
+    public Result processServicesList(Request request)
+            throws Exception {
+        StringBuffer sb  = new StringBuffer();
+        addHtmlHeader(request, sb);
+        sb.append(HtmlUtils.p());
+        sb.append(header(msg("Services")));
+        sb.append(HtmlUtils.p());
+        sb.append("\n");
+        String urlBase = getRepository().getUrlBase();
+        for(Service service: getServices()) {
+            String img = "";
+            if(service.getIcon()!=null) {
+                img = HtmlUtils.img(iconUrl(service.getIcon()));
+            } else {
+                img = HtmlUtils.img(iconUrl("/icons/cog.png"));
+            }
+            sb.append(HtmlUtils.space(1) +" " + img  + " " + HtmlUtils.href(HtmlUtils.url(
+                                                                                          urlBase +"/services/view",ARG_SERVICEID, service.getId()),
+                                                                            service.getLabel()));
+            
+            if(Utils.stringDefined(service.getDescription())) {
+                sb.append(HtmlUtils.br());
+                sb.append(service.getDescription());
+            }
+            sb.append(HtmlUtils.br());
+            sb.append("\n");
+        }
+        //        sb.append("</dl>");
+
+        return new Result(msg("Services"), sb);
+    }
+
+
+    public Result processServicesView(Request request)
+            throws Exception {
+        StringBuilder sb = new StringBuilder();
+        addHtmlHeader(request, sb);
+        Service service = getService(request.getString(ARG_SERVICEID, ""));
+        if(service == null) {
+            sb.append(getPageHandler().showDialogError("No service found:" + request.getString(ARG_SERVICEID, "")));
+            return new Result(msg("Services"), sb);
+        }
+
+        ServiceOutputHandler soh = new ServiceOutputHandler(getRepository(),
+                                       service);
+        if ( !request.defined(soh.ARG_EXECUTE)
+                && !request.defined(soh.ARG_SHOWCOMMAND)) {
+            String extra = HtmlUtils.hidden(ARG_SERVICEID, service.getId());
+            soh.makeForm(request, service, null, null,
+                         URL_SERVICES_VIEW,HtmlOutputHandler.OUTPUT_HTML, sb, extra);
+            return new Result("", sb);
+        }
+
+        return new Result(msg("Services"), sb);
+    }
+
     /**
      * _more_
      *
@@ -708,7 +774,7 @@ public class JobManager extends RepositoryManager {
      * @param request _more_
      * @param sb _more_
      */
-    public void addHtmlHeader(Request request, StringBuffer sb) {}
+    public void addHtmlHeader(Request request, Appendable sb) throws Exception {}
 
 
 

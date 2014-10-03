@@ -551,13 +551,24 @@ public class ServiceOutputHandler extends OutputHandler {
                          Appendable sb)
             throws Exception {
 
+        makeForm(request, service, baseEntry, entries, getRepository().URL_ENTRY_SHOW, outputType, sb, "");
+    }
+
+    public void makeForm(Request request, Service service, Entry baseEntry,
+                         List<Entry> entries, RequestUrl url, OutputType outputType,
+                         Appendable sb, String extraForm)
+            throws Exception {
+
         String formId = HtmlUtils.getUniqueId("form_");
-        request.uploadFormWithAuthToken(sb, getRepository().URL_ENTRY_SHOW,
+        request.uploadFormWithAuthToken(sb, url,
                                         HtmlUtils.id(formId));
 
-        sb.append(HtmlUtils.hidden(ARG_OUTPUT, outputType.getId()));
-        sb.append(HtmlUtils.hidden(ARG_ENTRYID, baseEntry.getId()));
+        if(baseEntry!=null) {
+            sb.append(HtmlUtils.hidden(ARG_OUTPUT, outputType.getId()));
+            sb.append(HtmlUtils.hidden(ARG_ENTRYID, baseEntry.getId()));
+        }
 
+        sb.append(extraForm);
 
 
         boolean                haveAnyOutputs = false;

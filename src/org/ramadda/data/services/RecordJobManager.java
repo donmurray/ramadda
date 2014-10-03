@@ -675,7 +675,8 @@ public class RecordJobManager extends JobManager implements RecordConstants {
      * @param request _more_
      * @param sb _more_
      */
-    public void addHtmlHeader(Request request, StringBuffer sb) {
+@Override
+    public void addHtmlHeader(Request request, Appendable sb) throws Exception {
         try {
             //            getRecordOutputHandler().makeApiHeader(request, sb);
         } catch (Exception exc) {

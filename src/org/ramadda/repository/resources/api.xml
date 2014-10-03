@@ -162,6 +162,12 @@
   </group>
 
 
+  <group handler="jobmanager" admin="false">
+      <api request="/services/list"     method="processServicesList" />
+      <api request="/services/view"     method="processServicesView" />
+  </group>
+
+
   <group handler="org.ramadda.repository.services.OaiManager">
       <api request="/oai/*"           method="processRequest"          admin="false" />
   </group>
