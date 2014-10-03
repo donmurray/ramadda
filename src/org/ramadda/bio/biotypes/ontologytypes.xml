@@ -22,6 +22,16 @@
      <property name="form.fromdate.label" value="Sample Date"/>
    </type>
 
+  <type name="bio_ontology_study"  description="Study" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Bio">
+     <property name="icon" value="/biotypes/report_magnify.png"/>
+  </type>
+
+  <type name="bio_ontology_series"  description="Series" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Bio">
+     <property name="icon" value="/biotypes/images.png"/>
+  </type>
+
+
+
   <type name="bio_ontology_person" super="bio_ontology"  description="Person"  >
      <property name="icon" value="/biotypes/user.png"/>
      <property name="form.fromdate.label" value="Date of Birth"/>
