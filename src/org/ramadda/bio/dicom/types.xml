@@ -26,7 +26,7 @@ StationName
   <type name="bio_dicom_xml"  description="DICOM Text File"  category="Bio">
 <!--
      <property name="icon" value="/dicom/document-film.png"/>
-->
+-->
      <property name="form.area.show" value="false"/>
      <property name="form.todate.show" value="false"/>
      <property name="form.fromdate.label" value="Date"/>
