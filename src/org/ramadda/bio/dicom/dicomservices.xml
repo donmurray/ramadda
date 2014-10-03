@@ -15,6 +15,18 @@
    </service>
 
 
+
+   <service id="bio.dicom.image" label="Make images" command="${media.imagemagick.path}/convert">
+        <description><![CDATA[Generate an image from a DICOM file using ImageMagick convert]]></description>
+        <arg value="${entry.file}" type="entry"  label="Input DICOM file" primary="true" entryType="bio_dicom"></arg>
+        <arg value="${entry.file.base}.png"/>
+        <output type="type_image" pattern=".*"/>
+    </service>
+
+
+
+
+
    <service id="bio.dicom.makethumbnail" label="Make thumbnail" command="${media.imagemagick.path}/convert">
         <description><![CDATA[Generate an image from a DICOM file using ImageMagick convert]]></description>
         <arg value="${entry.file}" type="entry"  label="Input DICOM file" primary="true" entryType="bio_dicom"></arg>

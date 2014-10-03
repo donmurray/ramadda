@@ -1,3 +1,4 @@
 <outputhandlers class="org.ramadda.repository.output.ServiceOutputHandler">
   <outputhandler serviceId="bio.dicom.txt"/>
+  <outputhandler serviceId="bio.dicom.image"/>
 </outputhandlers>
