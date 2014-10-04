@@ -73,8 +73,11 @@ public class OutputDefinition {
     /** _more_ */
     private String pattern;
 
+    /** _more_ */
     private String depends;
-    private boolean  notDepends;
+
+    /** _more_ */
+    private boolean notDepends;
 
     /** _more_ */
     private boolean useStdout = false;
@@ -168,21 +171,21 @@ public class OutputDefinition {
     }
 
     /**
-       Set the Depends property.
-
-       @param value The new value for Depends
-    **/
-    public void setDepends (String value) {
-	depends = value;
+     *  Set the Depends property.
+     *
+     *  @param value The new value for Depends
+     */
+    public void setDepends(String value) {
+        depends = value;
     }
 
     /**
-       Get the Depends property.
-
-       @return The Depends
-    **/
-    public String getDepends () {
-	return depends;
+     *  Get the Depends property.
+     *
+     *  @return The Depends
+     */
+    public String getDepends() {
+        return depends;
     }
 
 

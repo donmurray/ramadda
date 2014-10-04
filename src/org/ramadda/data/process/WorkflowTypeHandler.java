@@ -84,17 +84,28 @@ public class WorkflowTypeHandler extends TypeHandler {
         ServiceOutputHandler soh = new ServiceOutputHandler(repository,
                                        service);
         StringBuilder sb = new StringBuilder();
-        if (!soh.doExecute(request)) {
+        if ( !soh.doExecute(request)) {
             soh.makeForm(request, service, entry, null,
                          HtmlOutputHandler.OUTPUT_HTML, sb);
 
             return new Result("", sb);
         }
 
-        return soh.evaluateService(request, getRepository().URL_ENTRY_SHOW, HtmlOutputHandler.OUTPUT_HTML,
-                                   entry, null, service,"");
+        return soh.evaluateService(request, getRepository().URL_ENTRY_SHOW,
+                                   HtmlOutputHandler.OUTPUT_HTML, entry,
+                                   null, service, "");
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Service getService(Request request, Entry entry) throws Exception {
         Element root = XmlUtil.getRoot(
                            getStorageManager().getFileInputStream(
@@ -108,6 +119,7 @@ public class WorkflowTypeHandler extends TypeHandler {
 
         //IMPORTANT! Always do this because we don't allow a service xml entry file to have commands
         service.ensureSafeServices();
+
         return service;
 
     }

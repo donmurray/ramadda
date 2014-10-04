@@ -58,7 +58,7 @@ public class ServiceInput {
     /** _more_ */
     private List<String[]> params = new ArrayList<String[]>();
 
-    /** _more_          */
+    /** _more_ */
     private Service sourceService;
 
 
@@ -104,7 +104,6 @@ public class ServiceInput {
      * _more_
      *
      * @param processDir _more_
-     * @param entry _more_
      * @param entries _more_
      * @param dummy _more_
      */

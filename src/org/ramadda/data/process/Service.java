@@ -176,6 +176,7 @@ public class Service extends RepositoryManager {
     /** _more_ */
     private boolean outputToStderr = false;
 
+    /** _more_ */
     private boolean ignoreStderr = false;
 
     /** _more_ */
@@ -193,6 +194,7 @@ public class Service extends RepositoryManager {
     /** _more_ */
     private String description;
 
+    /** _more_ */
     private String category;
 
     /** _more_ */
@@ -233,6 +235,7 @@ public class Service extends RepositoryManager {
     /** _more_ */
     private Hashtable paramValues = new Hashtable();
 
+    /** _more_ */
     private Element element;
 
     /**
@@ -262,6 +265,11 @@ public class Service extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
         return getLabel() + " " + getId();
     }
@@ -338,10 +346,15 @@ public class Service extends RepositoryManager {
             throws Exception {
 
         this.element = element;
-        this.parent = parent;
-        id          = XmlUtil.getAttribute(element, ATTR_ID, dfltId);
+        this.parent  = parent;
+        id           = XmlUtil.getAttribute(element, ATTR_ID, dfltId);
+        if (id == null) {
+            id = "dummy";
+        }
+
 
         if (id == null) {
+
             throw new IllegalStateException("Service: no id defined in: "
                                             + XmlUtil.toString(element));
         }
@@ -353,11 +366,12 @@ public class Service extends RepositoryManager {
         outputToStderr = XmlUtil.getAttributeFromTree(element,
                 "outputToStderr", outputToStderr);
 
-        ignoreStderr = XmlUtil.getAttributeFromTree(element,
-                                                    "ignoreStderr", ignoreStderr);
+        ignoreStderr = XmlUtil.getAttributeFromTree(element, "ignoreStderr",
+                ignoreStderr);
 
         cleanup = XmlUtil.getAttributeFromTree(element, ATTR_CLEANUP, true);
-        category = XmlUtil.getAttributeFromTree(element, "category", (String) null);
+        category = XmlUtil.getAttributeFromTree(element, "category",
+                (String) null);
         linkId = XmlUtil.getAttribute(element, ATTR_LINK, (String) null);
         description = XmlUtil.getGrandChildText(element, ATTR_DESCRIPTION,
                 XmlUtil.getGrandChildText(element, ATTR_HELP, ""));
@@ -432,7 +446,9 @@ public class Service extends RepositoryManager {
             }
 
             if ((command == null) || (command.indexOf("${") >= 0)) {
-                System.err.println("Service: no command defined:" + XmlUtil.toString(element)+ " path:" + pathProperty);
+                System.err.println("Service: no command defined:"
+                                   + XmlUtil.toString(element) + " path:"
+                                   + pathProperty);
 
                 return;
             }
@@ -660,14 +676,14 @@ public class Service extends RepositoryManager {
     /**
      * _more_
      */
-    private void initService()  {
+    private void initService() {
         if (link != null) {
             return;
         }
         if (linkId != null) {
             try {
                 link = getRepository().getJobManager().getService(linkId);
-            } catch(Exception exc) {
+            } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
         }
@@ -680,6 +696,7 @@ public class Service extends RepositoryManager {
      */
     public boolean haveLink() {
         initService();
+
         return link != null;
 
     }
@@ -690,15 +707,17 @@ public class Service extends RepositoryManager {
      * _more_
      *
      * @param request _more_
-     * @param primaryEntry _more_
      * @param input _more_
      * @param commands _more_
      * @param filesToDelete _more_
      *
+     *
+     * @return _more_
      * @throws Exception _more_
      */
     public HashSet<String> addArgs(Request request, ServiceInput input,
-                        List<String> commands, List<File> filesToDelete)
+                                   List<String> commands,
+                                   List<File> filesToDelete)
             throws Exception {
 
         if (haveLink()) {
@@ -713,12 +732,12 @@ public class Service extends RepositoryManager {
         String cmd = applyMacros(currentEntry, workDir, getCommand(),
                                  input.getForDisplay());
         commands.add(cmd);
-        
+
         addExtraArgs(request, input, commands, true);
 
 
         HashSet<String> seenGroup       = new HashSet<String>();
-        HashSet<String>definedArgs     = new HashSet<String>();
+        HashSet<String> definedArgs     = new HashSet<String>();
 
 
         boolean         haveSeenAnEntry = false;
@@ -905,11 +924,24 @@ public class Service extends RepositoryManager {
             }
         }
 
-        addExtraArgs(request, input, commands,false);
+        addExtraArgs(request, input, commands, false);
+
         return definedArgs;
     }
 
-    public void addExtraArgs(Request request, ServiceInput input, List<String> args, boolean start) throws Exception {}
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param input _more_
+     * @param args _more_
+     * @param start _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addExtraArgs(Request request, ServiceInput input,
+                             List<String> args, boolean start)
+            throws Exception {}
 
 
     /**
@@ -949,13 +981,19 @@ public class Service extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getCategory() {
-        if(category!=null) {
+        if (category != null) {
             return category;
         }
         if (haveLink()) {
             return link.getCategory();
         }
+
         return "Services";
     }
 
@@ -976,7 +1014,7 @@ public class Service extends RepositoryManager {
             return children.get(0).getIcon();
         }
 
-        return null;
+        return "/icons/cog.png";
     }
 
     /**
@@ -1077,11 +1115,11 @@ public class Service extends RepositoryManager {
         for (int argType = 0; argType <= 1; argType++) {
             for (Service.Arg arg : getArgs()) {
                 if (argType == 0) {
-                    if(!arg.isEntry() && !arg.first) {
+                    if ( !arg.isEntry() && !arg.first) {
                         continue;
                     }
                 } else {
-                    if(arg.isEntry() || arg.first) {
+                    if (arg.isEntry() || arg.first) {
                         continue;
                     }
                 }
@@ -1133,19 +1171,21 @@ public class Service extends RepositoryManager {
                     HtmlUtils.cssClass("service-form-description")));
         }
         List<Entry> entries = input.getEntries();
-        if(false && entries.size()>1) {
+        if (false && (entries.size() > 1)) {
             StringBuffer entriesSB = new StringBuffer();
             for (Entry entry : entries) {
-                if(!isApplicable(entry)) continue;
+                if ( !isApplicable(entry)) {
+                    continue;
+                }
                 entriesSB.append(
-                                 HtmlUtils.href(
-                                                getEntryManager().getEntryURL(request, entry),
-                                                entry.getName(), " target=\"_help\" "));
+                    HtmlUtils.href(
+                        getEntryManager().getEntryURL(request, entry),
+                        entry.getName(), " target=\"_help\" "));
                 entriesSB.append(HtmlUtils.br());
             }
             sb.append(
                 HtmlUtils.div(
-                              entriesSB.toString(),
+                    entriesSB.toString(),
                     HtmlUtils.cssClass("service-form-entries")));
         }
 
@@ -1475,6 +1515,11 @@ public class Service extends RepositoryManager {
         return outputToStderr;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean getIgnoreStderr() {
         if (haveLink()) {
             return link.getIgnoreStderr();
@@ -1543,7 +1588,7 @@ public class Service extends RepositoryManager {
         if ( !requiresMultipleEntries()) {
             return false;
         }
-        if(entries == null) {
+        if (entries == null) {
             return false;
         }
         int cnt = 0;
@@ -1764,13 +1809,15 @@ public class Service extends RepositoryManager {
             return myOutput;
         }
 
-        Entry        currentEntry = (Entry) Utils.safeGet(entries, 0);
-        List<String> commands     = new ArrayList<String>();
-        HashSet<String>definedArgs     = null;
+        Entry           currentEntry = (Entry) Utils.safeGet(entries, 0);
+        List<String>    commands     = new ArrayList<String>();
+        HashSet<String> definedArgs  = null;
         if (link != null) {
-            definedArgs  = link.addArgs(request, input, commands, filesToDelete);
+            definedArgs = link.addArgs(request, input, commands,
+                                       filesToDelete);
         } else {
-            definedArgs = this.addArgs(request, input, commands, filesToDelete);
+            definedArgs = this.addArgs(request, input, commands,
+                                       filesToDelete);
         }
         System.err.println("Command:" + commands);
 
@@ -1807,7 +1854,7 @@ public class Service extends RepositoryManager {
             if (getOutputToStderr()) {
                 myOutput.append(errMsg);
                 myOutput.append("\n");
-            } else if(!getIgnoreStderr()){
+            } else if ( !getIgnoreStderr()) {
                 //If there is an error then
                 myOutput.setOk(false);
                 myOutput.append(errMsg);
@@ -1832,14 +1879,14 @@ public class Service extends RepositoryManager {
         for (OutputDefinition output : getOutputs()) {
             String depends = output.getDepends();
             if (depends != null) {
-                if(depends.startsWith("!")) {
+                if (depends.startsWith("!")) {
                     if (definedArgs.contains(depends.substring(1))) {
                         continue;
                     }
                 } else {
-                        if (!definedArgs.contains(depends)) {
-                            continue;
-                        }
+                    if ( !definedArgs.contains(depends)) {
+                        continue;
+                    }
                 }
             }
 
@@ -1937,29 +1984,42 @@ public class Service extends RepositoryManager {
 
 
 
-    public void addOutput(Request request, ServiceInput input, ServiceOutput output, Appendable sb) throws Exception {
-        if(haveLink()) {
-            link.addOutput(request,  input, output,  sb);
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param input _more_
+     * @param output _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addOutput(Request request, ServiceInput input,
+                          ServiceOutput output, Appendable sb)
+            throws Exception {
+        if (haveLink()) {
+            link.addOutput(request, input, output, sb);
+
             return;
         }
 
 
 
 
-        int cnt =0;
+        int cnt = 0;
         for (Entry entry : input.getEntries()) {
-            if(cnt++ == 0) {
-                sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
-                                         HtmlUtils.cssClass("service-output-header")));
+            if (cnt++ == 0) {
+                sb.append(
+                    HtmlUtils.open(
+                        HtmlUtils.TAG_DIV,
+                        HtmlUtils.cssClass("service-output-header")));
             } else {
                 sb.append(HtmlUtils.br());
             }
-            sb.append(
-                      HtmlUtils.href(
-                                     getEntryManager().getEntryURL(request, entry),
-                                     entry.getName()));
+            sb.append(HtmlUtils.href(getEntryManager().getEntryURL(request,
+                    entry), entry.getName()));
         }
-        if(cnt>0) {
+        if (cnt > 0) {
             sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
         }
         sb.append("<div class=service-output>");
@@ -2038,12 +2098,16 @@ public class Service extends RepositoryManager {
         if (entry != null) {
             List<Column> columns = entry.getTypeHandler().getColumns();
             if (columns != null) {
-                for(Column column: columns) {
-                    Object columnValue = entry.getTypeHandler().getEntryValue(entry, column.getName());
-                    if(columnValue!=null) {
-                        value = value.replace("${entry.attr." + column.getName() +"}", ""+columnValue);
+                for (Column column : columns) {
+                    Object columnValue =
+                        entry.getTypeHandler().getEntryValue(entry,
+                            column.getName());
+                    if (columnValue != null) {
+                        value = value.replace("${entry.attr."
+                                + column.getName() + "}", "" + columnValue);
                     } else {
-                        value = value.replace("${entry.attr." + column.getName() +"}", "");
+                        value = value.replace("${entry.attr."
+                                + column.getName() + "}", "");
                     }
                 }
             }
@@ -2199,7 +2263,7 @@ public class Service extends RepositoryManager {
         /** _more_ */
         private String value;
 
-        /** _more_          */
+        /** _more_ */
         private String dflt;
 
         /** _more_ */
@@ -2222,6 +2286,7 @@ public class Service extends RepositoryManager {
         /** _more_ */
         private boolean multiple = false;
 
+        /** _more_ */
         private boolean first = false;
 
         /** _more_ */
@@ -2352,7 +2417,7 @@ public class Service extends RepositoryManager {
             size      = XmlUtil.getAttribute(node, ATTR_SIZE, size);
             ifDefined = XmlUtil.getAttribute(node, "ifdefined", ifDefined);
             multiple  = XmlUtil.getAttribute(node, "multiple", multiple);
-            first  = XmlUtil.getAttribute(node, "first", false);
+            first     = XmlUtil.getAttribute(node, "first", false);
             multipleJoin = XmlUtil.getAttribute(node, "multipleJoin",
                     (String) null);
             sameRow = XmlUtil.getAttribute(node, "sameRow", sameRow);
@@ -2746,6 +2811,11 @@ public class Service extends RepositoryManager {
 
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public Element getElement() {
         return element;
     }
