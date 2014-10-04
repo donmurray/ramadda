@@ -296,7 +296,6 @@ public class ServiceOutputHandler extends OutputHandler {
         if ( !request.defined(ARG_EXECUTE)) {
             StringBuffer sb = new StringBuffer();
             makeForm(request, service, entry, entries, outputType, sb);
-
             return new Result(outputType.getLabel(), sb);
         }
 
