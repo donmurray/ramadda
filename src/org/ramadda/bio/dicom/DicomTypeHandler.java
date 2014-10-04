@@ -118,7 +118,6 @@ public class DicomTypeHandler extends GenericTypeHandler {
                         getRepository().getProperty("dicom.metadata", ""));
         for (String tok : StringUtil.split(metadataString, ",", true, true)) {
             Tag tag = getTag(tok);
-            System.err.println("Dicom:tag=" + tag);
             metadataTags.add(tag.id);
         }
     }

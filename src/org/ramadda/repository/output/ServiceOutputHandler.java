@@ -300,23 +300,34 @@ public class ServiceOutputHandler extends OutputHandler {
             return new Result(outputType.getLabel(), sb);
         }
 
-        return evaluateService(request, getRepository().URL_ENTRY_SHOW, outputType, entry, entries, service,"");
+        return evaluateService(request, getRepository().URL_ENTRY_SHOW,
+                               outputType, entry, entries, service, "");
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
     public boolean doExecute(Request request) {
-        return request.defined(ARG_EXECUTE) || request.defined(ARG_SHOWCOMMAND);
+        return request.defined(ARG_EXECUTE)
+               || request.defined(ARG_SHOWCOMMAND);
     }
 
     /**
      * _more_
      *
      * @param request _more_
+     * @param requestUrl _more_
      * @param outputType _more_
      * @param baseEntry _more_
      * @param entries _more_
      * @param service _more_
+     * @param extraForm _more_
      *
      * @return _more_
      *
@@ -327,13 +338,14 @@ public class ServiceOutputHandler extends OutputHandler {
                                   OutputType outputType,
                                   final Entry baseEntry,
                                   final List<Entry> entries,
-                                  final Service service, 
-                                  String extraForm)
+                                  final Service service, String extraForm)
             throws Exception {
 
 
-        String actionName  =outputType!=null?outputType.getLabel():"Run service";
-        File workDir = getStorageManager().createProcessDir();
+        String actionName = (outputType != null)
+                            ? outputType.getLabel()
+                            : "Run service";
+        File   workDir    = getStorageManager().createProcessDir();
         final String processDirUrl =
             getStorageManager().getProcessDirEntryUrl(request, workDir);
 
@@ -349,14 +361,15 @@ public class ServiceOutputHandler extends OutputHandler {
             serviceInput.setPublish(doingPublish(request));
             serviceInput.setForDisplay(forDisplay);
             serviceInputs.add(serviceInput);
-        
+
         } else {
-            if(entries!=null) {
+            if (entries != null) {
                 for (Entry entry : entries) {
                     if ( !service.isApplicable(entry)) {
                         continue;
                     }
-                    ServiceInput serviceInput = new ServiceInput(workDir, entry);
+                    ServiceInput serviceInput = new ServiceInput(workDir,
+                                                    entry);
                     serviceInput.setPublish(doingPublish(request));
                     serviceInput.setForDisplay(forDisplay);
                     serviceInputs.add(serviceInput);
@@ -364,7 +377,7 @@ public class ServiceOutputHandler extends OutputHandler {
             }
         }
 
-        if(serviceInputs.size() == 0) {
+        if (serviceInputs.size() == 0) {
             ServiceInput serviceInput = new ServiceInput(workDir);
             serviceInput.setPublish(doingPublish(request));
             serviceInput.setForDisplay(forDisplay);
@@ -408,7 +421,7 @@ public class ServiceOutputHandler extends OutputHandler {
                     String url = processDirUrl;
                     if (doingPublish && (outputEntries.size() > 0)) {
                         url = request.entryUrl(
-                                               getRepository().URL_ENTRY_SHOW,
+                            getRepository().URL_ENTRY_SHOW,
                             outputEntries.get(0));
                     }
                     getActionManager().setContinueHtml(actionId,
@@ -416,8 +429,8 @@ public class ServiceOutputHandler extends OutputHandler {
                 }
             };
 
-            return getActionManager().doAction(request, action,
-                                               actionName, "");
+            return getActionManager().doAction(request, action, actionName,
+                    "");
         }
 
         StringBuffer        sb            = new StringBuffer();
@@ -425,7 +438,7 @@ public class ServiceOutputHandler extends OutputHandler {
         List<ServiceOutput> outputs       = new ArrayList<ServiceOutput>();
         for (ServiceInput serviceInput : serviceInputs) {
             ServiceOutput output = evaluateService(request, service,
-                                                   serviceInput);
+                                       serviceInput);
             outputs.add(output);
 
             if ( !output.isOk()) {
@@ -433,8 +446,9 @@ public class ServiceOutputHandler extends OutputHandler {
                     getPageHandler().showDialogError(
                         "An error has occurred:<pre>" + output.getResults()
                         + "</pre>"));
-                makeForm(request, service, baseEntry, entries,requestUrl, outputType,
-                         sb,extraForm);
+                makeForm(request, service, baseEntry, entries, requestUrl,
+                         outputType, sb, extraForm);
+
                 return new Result(actionName, sb);
             }
             outputEntries.addAll(output.getEntries());
@@ -453,8 +467,8 @@ public class ServiceOutputHandler extends OutputHandler {
             commands.append(sb);
             commands.append("</pre>");
             commands.append("</div>");
-            makeForm(request, service, baseEntry, entries, requestUrl, outputType,
-                     commands,extraForm);
+            makeForm(request, service, baseEntry, entries, requestUrl,
+                     outputType, commands, extraForm);
 
             return new Result(actionName, commands);
         }
@@ -492,7 +506,7 @@ public class ServiceOutputHandler extends OutputHandler {
         }
 
 
-        if (outputs.size()>0 &&  !outputs.get(0).getResultsShownAsText()) {
+        if ((outputs.size() > 0) && !outputs.get(0).getResultsShownAsText()) {
             sb.append("Error: no output files<br>");
             sb.append("<pre>");
             for (ServiceOutput output : outputs) {
@@ -503,12 +517,17 @@ public class ServiceOutputHandler extends OutputHandler {
         }
         Appendable results = new StringBuilder();
 
-        makeForm(request, service, baseEntry, entries, requestUrl, outputType, results,extraForm);
-        if(sb.length()>0) {
-            results.append(HtmlUtils.div(msg("Results"),
-                                         HtmlUtils.cssClass("service-results-header")));
-            results.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
-                                          HtmlUtils.cssClass("service-results")));
+        makeForm(request, service, baseEntry, entries, requestUrl,
+                 outputType, results, extraForm);
+        if (sb.length() > 0) {
+            results.append(
+                HtmlUtils.div(
+                    msg("Results"),
+                    HtmlUtils.cssClass("service-results-header")));
+            results.append(
+                HtmlUtils.open(
+                    HtmlUtils.TAG_DIV,
+                    HtmlUtils.cssClass("service-results")));
             results.append(sb);
             results.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
         }
@@ -534,18 +553,18 @@ public class ServiceOutputHandler extends OutputHandler {
                                           ServiceInput serviceInput)
             throws Exception {
         ServiceOutput output;
-        
+
         try {
             output = service.evaluate(request, serviceInput);
             if ( !output.isOk()) {
                 return output;
             }
             writeWorkflow(request, serviceInput);
-            writeProcessEntryXml(request, service, serviceInput.getProcessDir(),
-                                 "");
+            writeProcessEntryXml(request, service,
+                                 serviceInput.getProcessDir(), "");
 
             return output;
-        } catch(Exception exc) {
+        } catch (Exception exc) {
             return new ServiceOutput(false, exc.toString());
         }
 
@@ -569,26 +588,43 @@ public class ServiceOutputHandler extends OutputHandler {
                          Appendable sb)
             throws Exception {
 
-        makeForm(request, service, baseEntry, entries, getRepository().URL_ENTRY_SHOW, outputType, sb, "");
+        makeForm(request, service, baseEntry, entries,
+                 getRepository().URL_ENTRY_SHOW, outputType, sb, "");
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param service _more_
+     * @param baseEntry _more_
+     * @param entries _more_
+     * @param url _more_
+     * @param outputType _more_
+     * @param sb _more_
+     * @param extraForm _more_
+     *
+     * @throws Exception _more_
+     */
     public void makeForm(Request request, Service service, Entry baseEntry,
-                         List<Entry> entries, RequestUrl url, OutputType outputType,
-                         Appendable sb, String extraForm)
+                         List<Entry> entries, RequestUrl url,
+                         OutputType outputType, Appendable sb,
+                         String extraForm)
             throws Exception {
 
+        sb.append("\n");
+        sb.append(HtmlUtils.comment("Begin service form"));
         String formId = HtmlUtils.getUniqueId("form_");
-        request.uploadFormWithAuthToken(sb, url,
-                                        HtmlUtils.id(formId));
+        request.uploadFormWithAuthToken(sb, url, HtmlUtils.id(formId));
 
-        if(baseEntry!=null) {
+        if (baseEntry != null) {
             sb.append(HtmlUtils.hidden(ARG_ENTRYID, baseEntry.getId()));
         }
-        if(outputType!=null) {
+        if (outputType != null) {
             sb.append(HtmlUtils.hidden(ARG_OUTPUT, outputType.getId()));
         }
 
-        if(extraForm!=null) {
+        if (extraForm != null) {
             sb.append(extraForm);
         }
 
@@ -617,22 +653,17 @@ public class ServiceOutputHandler extends OutputHandler {
                 request.get(ARG_SHOWCOMMAND, false), "Show Command"));
 
 
-
-
         if (haveAnyOutputs) {
-            extraSubmit.add(HtmlUtils.formEntry("",
-                    HtmlUtils.checkbox(ARG_ASYNCH, "true",
-                                       request.get(ARG_ASYNCH, false)) + " "
-                                           + msg("Asynchronous")));
+            extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_ASYNCH, "true",
+                    request.get(ARG_ASYNCH, false), msg("Asynchronous")));
         }
-
-
 
         service.addToForm(request, (entries != null)
                                    ? new ServiceInput(null, entries, true)
                                    : new ServiceInput(), sb);
 
         sb.append(HtmlUtils.hidden(Service.ARG_SERVICEFORM, "true"));
+
         StringBuilder buttons = new StringBuilder();
 
         buttons.append(HtmlUtils.submit(msg("Execute"), ARG_EXECUTE,
@@ -647,18 +678,21 @@ public class ServiceOutputHandler extends OutputHandler {
                              msg("Select a folder to publish to"), true,
                              false);
         }
-
         etc.append(HtmlUtils.formTableClose());
+
         addUrlShowingForm(etc, formId, null);
         buttons.append(HtmlUtils.makeShowHideBlock("Options...",
                 HtmlUtils.insetDiv(etc.toString(), 0, 20, 0, 0), false));
+
 
         sb.append(HtmlUtils.div(buttons.toString(),
                                 HtmlUtils.cssClass("service-form-buttons")));
 
         sb.append(HtmlUtils.formClose());
 
-
+        sb.append("\n");
+        sb.append(HtmlUtils.comment("end service form"));
+        sb.append("\n");
 
     }
 

@@ -1106,7 +1106,6 @@ public class Service extends RepositoryManager {
             throws Exception {
 
 
-
         StringBuilder formSB      = new StringBuilder();
         int           blockCnt    = 0;
         CatBuff       catBuff     = null;
@@ -1158,6 +1157,7 @@ public class Service extends RepositoryManager {
             formSB.append(
                 "<span class=ramadda-required-label>* required</span>");
         }
+
 
         sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
                                  HtmlUtils.cssClass("service-form")));
