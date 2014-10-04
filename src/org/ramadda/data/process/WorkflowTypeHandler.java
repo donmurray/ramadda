@@ -84,16 +84,15 @@ public class WorkflowTypeHandler extends TypeHandler {
         ServiceOutputHandler soh = new ServiceOutputHandler(repository,
                                        service);
         StringBuilder sb = new StringBuilder();
-        if ( !request.defined(soh.ARG_EXECUTE)
-                && !request.defined(soh.ARG_SHOWCOMMAND)) {
+        if (!soh.doExecute(request)) {
             soh.makeForm(request, service, entry, null,
                          HtmlOutputHandler.OUTPUT_HTML, sb);
 
             return new Result("", sb);
         }
 
-        return soh.evaluateService(request, HtmlOutputHandler.OUTPUT_HTML,
-                                   entry, null, service);
+        return soh.evaluateService(request, getRepository().URL_ENTRY_SHOW, HtmlOutputHandler.OUTPUT_HTML,
+                                   entry, null, service,"");
     }
 
     public Service getService(Request request, Entry entry) throws Exception {
