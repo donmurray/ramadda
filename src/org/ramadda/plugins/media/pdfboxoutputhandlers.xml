@@ -1,4 +1,4 @@
-<outputhandlers class="org.ramadda.repository.output.ServiceOutputHandler" icon="/icons/pdf.png" command="${media.pdfbox.path}">
+<outputhandlers class="org.ramadda.repository.output.ServiceOutputHandler" icon="/icons/pdf.png" command="${media.pdfbox.path}" category="Documents and Images">
   <outputhandler>
    <service id="media.pdfbox.extracttext" label="Extract text from PDF" >
 <description><![CDATA[

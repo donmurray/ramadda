@@ -1,4 +1,4 @@
-<services  command="${gps.teqc}" icon="/gps/unavco.png" handler="org.ramadda.geodata.gps.GpsService">
+<services  command="${gps.teqc}" icon="/gps/unavco.png" handler="org.ramadda.geodata.gps.GpsService" category="Earth Science Data">
    <service id="gps.teqc.torinex" label="Convert to RINEX">
    <description><![CDATA[Converts raw GPS files to RINEX using  Unavco's teqc program]]></description>
    <arg value="+out" />

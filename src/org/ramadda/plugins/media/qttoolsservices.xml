@@ -1,4 +1,4 @@
-<services  icon="/icons/mov.png">
+<services  icon="/icons/mov.png" category="Documents and Images">
    <service id="media.qttools.info" label="Show movie info" command="${media.qtools.path}/qt_info">
 <description><![CDATA[
 Show movie file information using  <a href="http://www.omino.com/sw/qt_tools/man/qt_info.html" target="_help">QTTools</a>

@@ -193,6 +193,8 @@ public class Service extends RepositoryManager {
     /** _more_ */
     private String description;
 
+    private String category;
+
     /** _more_ */
     private String processDesc;
 
@@ -231,7 +233,7 @@ public class Service extends RepositoryManager {
     /** _more_ */
     private Hashtable paramValues = new Hashtable();
 
-
+    private Element element;
 
     /**
      * _more_
@@ -335,6 +337,7 @@ public class Service extends RepositoryManager {
     private void init(Service parent, Element element, String dfltId)
             throws Exception {
 
+        this.element = element;
         this.parent = parent;
         id          = XmlUtil.getAttribute(element, ATTR_ID, dfltId);
 
@@ -354,6 +357,7 @@ public class Service extends RepositoryManager {
                                                     "ignoreStderr", ignoreStderr);
 
         cleanup = XmlUtil.getAttributeFromTree(element, ATTR_CLEANUP, true);
+        category = XmlUtil.getAttributeFromTree(element, "category", (String) null);
         linkId = XmlUtil.getAttribute(element, ATTR_LINK, (String) null);
         description = XmlUtil.getGrandChildText(element, ATTR_DESCRIPTION,
                 XmlUtil.getGrandChildText(element, ATTR_HELP, ""));
@@ -473,6 +477,9 @@ public class Service extends RepositoryManager {
         enabled = true;
 
     }
+
+
+
 
     /**
      * _more_
@@ -939,6 +946,17 @@ public class Service extends RepositoryManager {
         sb.append(XmlUtil.closeTag(TAG_SERVICES));
 
         return sb.toString();
+    }
+
+
+    public String getCategory() {
+        if(category!=null) {
+            return category;
+        }
+        if (haveLink()) {
+            return link.getCategory();
+        }
+        return "Services";
     }
 
 
@@ -2728,5 +2746,7 @@ public class Service extends RepositoryManager {
 
     }
 
-
+    public Element getElement() {
+        return element;
+    }
 }

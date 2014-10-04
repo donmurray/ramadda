@@ -40,6 +40,7 @@ import org.ramadda.sql.SqlUtil;
 
 
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.CategoryBuffer;
 import org.ramadda.util.ProcessRunner;
 import org.ramadda.util.StreamEater;
 import org.ramadda.util.TTLCache;
@@ -662,12 +663,13 @@ public class JobManager extends RepositoryManager {
 
     public Result processServicesList(Request request)
             throws Exception {
-        StringBuffer sb  = new StringBuffer();
-        addHtmlHeader(request, sb);
+        StringBuffer sb  = new StringBuffer("\n");
         sb.append(HtmlUtils.p());
         sb.append(header(msg("Services")));
         sb.append(HtmlUtils.p());
         sb.append("\n");
+        sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV, HtmlUtils.cssClass("service-list")));
+        CategoryBuffer  cb = new CategoryBuffer();
         String urlBase = getRepository().getUrlBase();
         for(Service service: getServices()) {
             String img = "";
@@ -676,19 +678,32 @@ public class JobManager extends RepositoryManager {
             } else {
                 img = HtmlUtils.img(iconUrl("/icons/cog.png"));
             }
-            sb.append(HtmlUtils.space(1) +" " + img  + " " + HtmlUtils.href(HtmlUtils.url(
-                                                                                          urlBase +"/services/view",ARG_SERVICEID, service.getId()),
-                                                                            service.getLabel()));
+            StringBuffer serviceSB = new StringBuffer();
+
+            serviceSB.append(HtmlUtils.open(HtmlUtils.TAG_DIV, HtmlUtils.cssClass("service-list-service")));
+            serviceSB.append(img);
+            serviceSB.append(" ");
+            serviceSB.append(HtmlUtils.href(HtmlUtils.url(
+                                                          urlBase +"/services/view",ARG_SERVICEID, service.getId()),
+                                            service.getLabel()));
             
             if(Utils.stringDefined(service.getDescription())) {
-                sb.append(HtmlUtils.br());
-                sb.append(service.getDescription());
+                serviceSB.append(HtmlUtils.div(service.getDescription(),HtmlUtils.cssClass("service-list-description")));
             }
-            sb.append(HtmlUtils.br());
-            sb.append("\n");
+            serviceSB.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
+            serviceSB.append("\n");
+            cb.append(service.getCategory(), serviceSB.toString());
         }
-        //        sb.append("</dl>");
 
+
+        for(String category:cb.getCategories()) {
+            sb.append(HtmlUtils.div(category, HtmlUtils.cssClass("service-list-header")));
+            sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV, HtmlUtils.cssClass("service-list-category")));
+            sb.append(cb.get(category).toString());
+            sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
+        }
+
+        sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
         return new Result(msg("Services"), sb);
     }
 
@@ -705,15 +720,16 @@ public class JobManager extends RepositoryManager {
 
         ServiceOutputHandler soh = new ServiceOutputHandler(getRepository(),
                                        service);
-        if ( !request.defined(soh.ARG_EXECUTE)
-                && !request.defined(soh.ARG_SHOWCOMMAND)) {
-            String extra = HtmlUtils.hidden(ARG_SERVICEID, service.getId());
+        String extra = HtmlUtils.hidden(ARG_SERVICEID, service.getId());
+        if (!soh.doExecute(request)) {
             soh.makeForm(request, service, null, null,
-                         URL_SERVICES_VIEW,HtmlOutputHandler.OUTPUT_HTML, sb, extra);
+                         URL_SERVICES_VIEW,null, sb, extra);
             return new Result("", sb);
         }
 
-        return new Result(msg("Services"), sb);
+        return soh.evaluateService(request, URL_SERVICES_VIEW, null,
+                                   null, null, service,
+                                   extra);
     }
 
     /**

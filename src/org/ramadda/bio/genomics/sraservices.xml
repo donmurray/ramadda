@@ -1,4 +1,4 @@
-<services icon="/genomics/dna.png">
+<services icon="/genomics/dna.png" category="Genomics">
     <service command="${bio.sratools}/abi-dump" label="Convert SRA to ABI format" id="bio_sra_to_abi" >
       <description><![CDATA[
 Convert SRA data into ABI format (csfasta / qual)

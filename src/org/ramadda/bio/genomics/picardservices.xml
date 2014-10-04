@@ -1,4 +1,4 @@
-<services command="${bio.picard}" outputToStderr="true" icon="/genomics/picard.png">
+<services command="${bio.picard}" outputToStderr="true" icon="/genomics/picard.png" category="Genomics">
 
     <service  label="Convert FASTQ to SAM" id="bio_picard_fastqtosam" outputToStderr="true">
       <description><![CDATA[

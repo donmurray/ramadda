@@ -1,4 +1,4 @@
-  <services icon="/cdmdata/cdo.png" command="${cdo.path}" handler="org.ramadda.geodata.cdmdata.NetcdfService">
+  <services icon="/cdmdata/cdo.png" command="${cdo.path}" handler="org.ramadda.geodata.cdmdata.NetcdfService" category="Earth Science Data">
 
     <service label="CDO Info" id="cdo.info"   outputToStderr="true">
 <help><![CDATA[

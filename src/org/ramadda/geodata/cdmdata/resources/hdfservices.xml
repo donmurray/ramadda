@@ -1,4 +1,4 @@
-  <services icon="/cdmdata/hdf.png"  xhandler="org.ramadda.geodata.cdmdata.NetcdfService">
+  <services icon="/cdmdata/hdf.png"  xhandler="org.ramadda.geodata.cdmdata.NetcdfService" category="Earth Science Data">
 
 
     <service label="H5 LS" id="h5.ls"   outputToStderr="true" command="${geo.hdf5.path}/h5ls">

@@ -1,21 +1,7 @@
-<services icon="/dicom/document-film.png">
-
-  <service label="Run  dcm2txt" id="bio.dicom.txt"   command="${bio.dicom.dcm4che}/dcm2txt" >
-<description><![CDATA[Run dcm2txt]]></description>
-    <arg label="DICOM File" value="${entry.file}" type="entry" entryType="bio_dicom" primary="true"></arg>
-    <output showResults="true" stdout="true"/>
-   </service>
+<services icon="/dicom/document-film.png" category="Medical Imagery">
 
 
-  <service label="Run  dcm2xml" id="bio.dicom.xml"   command="${bio.dicom.dcm4che}/dcm2xml" >
-<description><![CDATA[Run dcm2xml]]></description>
-    <arg label="DICOM File" value="${entry.file}" type="entry" entryType="bio_dicom" primary="true"></arg>
-    <arg value="-X"/>
-    <output type="bio_dicom_xml" pattern=".*\.xml" stdout="true" filename="${entry.file.base}.xml"/>
-   </service>
-
-
-   <service id="bio.dicom.image" label="Make images" command="${media.imagemagick.path}/convert">
+   <service id="bio.dicom.image" label="Make images from DICOM" command="${media.imagemagick.path}/convert">
         <description><![CDATA[Generate an image from a DICOM file using ImageMagick convert]]></description>
 <process_description><![CDATA[<wiki>
 {{description}}
@@ -32,6 +18,23 @@
         <arg value="${entry.file.base}_%d.png"/>
         <output type="type_image" pattern=".*"/>
     </service>
+
+
+
+
+  <service label="View DICOM attributes" id="bio.dicom.txt"   command="${bio.dicom.dcm4che}/dcm2txt" >
+<description><![CDATA[Show attributes contained in a DICOM file]]></description>
+    <arg label="DICOM File" value="${entry.file}" type="entry" entryType="bio_dicom" primary="true"></arg>
+    <output showResults="true" stdout="true"/>
+   </service>
+
+
+  <service label="View DICOM XML" id="bio.dicom.xml"   command="${bio.dicom.dcm4che}/dcm2xml" >
+<description><![CDATA[Run dcm2xml]]></description>
+    <arg label="DICOM File" value="${entry.file}" type="entry" entryType="bio_dicom" primary="true"></arg>
+    <arg value="-X"/>
+    <output type="bio_dicom_xml" pattern=".*\.xml" stdout="true" filename="${entry.file.base}.xml"/>
+   </service>
 
 
 

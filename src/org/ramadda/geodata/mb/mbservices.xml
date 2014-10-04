@@ -1,6 +1,6 @@
-  <services icon="/mb/mb.png" entryType="type_mb">
+  <services icon="/mb/mb.png" entryType="type_mb" category="Oceanography">
     <service label="MBInfo" id="mb.mbinfo" command="${geo.mb.path}/mbinfo" xhandler="org.ramadda.geodata.mb.MbService">
-      <description>Runs MBSstem mbinfo program</description>
+      <description>Runs MB System mbinfo program</description>
           <arg name="xml" type="flag" value="-X2" label="As XML" help="Output XML"/>
           <arg value="-F"/>
           <arg value="${entry.attr.format}"/>
@@ -11,7 +11,7 @@
     </service>
 
 <service label="MBList" id="mb.mblist" command="${geo.mb.path}/mblist" xhandler="org.ramadda.geodata.mb.MbService">
-      <description>Runs MBSstem mblist program</description>
+      <description>Runs MB System mblist program</description>
       <arg value="-F"/>
       <arg value="${entry.attr.format}"/>
       <arg value="-F"/>

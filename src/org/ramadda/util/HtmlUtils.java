@@ -887,9 +887,9 @@ public class HtmlUtils {
                        attrs(ATTR_BORDER, "0", ATTR_SRC, path, ATTR_TITLE,
                              title, ATTR_ALT, title) + " " + extra);
         }
-
-        return tag(TAG_IMG,
-                   attrs(ATTR_BORDER, "0", ATTR_SRC, path) + " " + extra);
+        String img =  tag(TAG_IMG,
+                          attrs(ATTR_BORDER, "0", ATTR_SRC, path) + " " + extra);
+        return img;
     }
 
     /**

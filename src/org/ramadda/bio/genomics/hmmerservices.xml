@@ -1,4 +1,4 @@
-<services>
+<services category="Genomics">
   <service label="Convert HMMER File" id="bio_hmmer_convert"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmconvert" >
 <description><![CDATA[
 This will convert the given HMMER binary file to text
