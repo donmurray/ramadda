@@ -9,4 +9,13 @@ Run gdal_translate to make an image from a geotiff
 <arg value="${file}" file="${entry.file.base}.png"></arg>
           <output pattern=".*\.png" type="type_image"/>
     </service>
+
+    <service label="GDAL Info" id="gdal.info" command="${geo.gdal.path}/gdalinfo" xoutputToStderr="true">
+<description>
+Run gdalinfo
+</description>
+<arg value="${entry.file}"   type="entry" primary="true" entryPattern="(.*\.tif|.*\.tiff)"></arg>
+   <output showResults="true" stdout="true"/>
+    </service>
+
 </services>
