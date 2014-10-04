@@ -175,6 +175,7 @@ public class Service extends RepositoryManager {
 
     /** _more_ */
     private boolean outputToStderr = false;
+    private boolean immediate = false;
 
     /** _more_ */
     private boolean ignoreStderr = false;
@@ -365,6 +366,9 @@ public class Service extends RepositoryManager {
                                             (String) null);
         outputToStderr = XmlUtil.getAttributeFromTree(element,
                 "outputToStderr", outputToStderr);
+
+        immediate = XmlUtil.getAttributeFromTree(element,
+                "immediate", false);
 
         ignoreStderr = XmlUtil.getAttributeFromTree(element, "ignoreStderr",
                 ignoreStderr);
@@ -701,7 +705,9 @@ public class Service extends RepositoryManager {
 
     }
 
-
+    public boolean getImmediate() {
+        return immediate;
+    }
 
     /**
      * _more_
@@ -1392,13 +1398,13 @@ public class Service extends RepositoryManager {
             throws Exception {
         if (catArg != null) {
             String html = header(catArg.getCategory());
+            /*
             String desc = catArg.getValue();
             if (Utils.stringDefined(desc)) {
-                if (Utils.stringDefined(desc.trim())) {
-                    html += desc;
-                    html += HtmlUtils.br();
-                }
+                html += desc;
+                html += HtmlUtils.br();
             }
+            */
             sb.append(html);
         }
         StringBuilder formSB = new StringBuilder(HtmlUtils.formTable());
