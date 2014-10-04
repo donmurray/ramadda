@@ -1,0 +1,10 @@
+<types>
+
+  <type name="geo_gdal" foruser="false" >
+     <service link="gdal.tiff2image"/>
+  </type>
+
+  <type name="geo_geotiff"  description="GeoTIFF"  super="geo_gdal" pattern="(.*\.tif|.*\.tiff)">
+  </type>
+
+</types>
