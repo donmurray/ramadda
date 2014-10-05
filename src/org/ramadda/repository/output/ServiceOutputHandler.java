@@ -58,8 +58,12 @@ import java.util.List;
  */
 public class ServiceOutputHandler extends OutputHandler {
 
+    public static final String PROP_PROCESSDIR = "processdir";
+
     /** _more_ */
     public static final String ARG_ASYNCH = "asynch";
+
+    public static final String ARG_NEWDIRECTORY = "newdirectory";
 
     /** _more_ */
     public static final String ARG_SHOWCOMMAND = "showcommand";
@@ -340,11 +344,24 @@ public class ServiceOutputHandler extends OutputHandler {
                                   final Service service, String extraForm)
             throws Exception {
 
-
         String actionName = (outputType != null)
                             ? outputType.getLabel()
                             : "Run service";
-        File   workDir    = getStorageManager().createProcessDir();
+        File   workDir = null;
+        System.err.println ("evaluateService");
+        String currentDir = (String) getSessionManager().getSessionProperty(request,
+                                                                            PROP_PROCESSDIR, null);
+
+        if(currentDir!=null) {
+            workDir = new File(currentDir);
+        } 
+
+
+        if(request.get(ARG_NEWDIRECTORY, false) || workDir == null || !workDir.exists()) {
+            workDir = getStorageManager().createProcessDir();
+            getSessionManager().putSessionProperty(request,PROP_PROCESSDIR, workDir.toString());
+        }
+
         final String processDirUrl =
             getStorageManager().getProcessDirEntryUrl(request, workDir);
 
@@ -642,6 +659,10 @@ public class ServiceOutputHandler extends OutputHandler {
 
 
         List<String> extraSubmit = new ArrayList<String>();
+        extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_NEWDIRECTORY, "true",
+                                                  request.get(ARG_NEWDIRECTORY, false),
+                                                  "Create new processing folder"));
+
         extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_GOTOPRODUCTS, "true",
                 request.get(ARG_GOTOPRODUCTS, haveAnyOutputs),
                 "Go to products page"));

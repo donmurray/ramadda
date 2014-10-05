@@ -35,6 +35,7 @@ import java.util.Enumeration;
 import org.w3c.dom.*;
 
 import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
@@ -908,26 +909,57 @@ public class Service extends RepositoryManager {
                         }
 
                         if (arg.file != null) {
+                            //                            System.err.println ("file:" + arg.file + " " + arg.filePattern);
                             String fileName = applyMacros(currentEntry,
                                                           entryMap, 
                                                           workDir, arg.file,
                                                           input.getForDisplay());
 
 
+                            fileName = fileName.replace("${value}", originalValue);
                             File destFile = new File(IOUtil.joinDir(workDir,
-                                                fileName));
+                                                                    fileName));
                             int cnt = 0;
+
+                            //                            System.err.println("dest file:" + destFile+" " + destFile.exists());
                             while (destFile.exists()) {
                                 cnt++;
                                 destFile = new File(IOUtil.joinDir(workDir,
                                         cnt + "_" + fileName));
                             }
 
+                            if(arg.filePattern!=null) {
+                                String basePattern = applyMacros(currentEntry,
+                                                                 entryMap, 
+                                                                 workDir, arg.filePattern,
+                                                                 input.getForDisplay());
+
+
+                                basePattern = basePattern.replace("${value}", originalValue);
+
+                                String pattern  = basePattern.replace("${unique}", "");
+                                File[] files = workDir.listFiles((FileFilter)new PatternFileFilter(pattern));
+                                //                                System.err.println("pattern:"+ pattern + " " + files.length);
+                                destFile = new File(IOUtil.joinDir(workDir, fileName));
+                                while(files.length>0) {
+                                    cnt++;
+                                    pattern  = basePattern.replace("${unique}", cnt+"");
+                                    files = workDir.listFiles((FileFilter)new PatternFileFilter(pattern));
+                                    //                                    System.err.println("pattern:"+ pattern + " " + files.length);
+                                    destFile = new File(IOUtil.joinDir(workDir,
+                                                                       cnt + "_" + fileName));
+                                }
+                            }
+
+                            //                            System.err.println("dest file after:" + destFile);
                             value = arg.value.replace("${value}", value);
 
                             value = value.replace("${file}",
                                     destFile.getName());
+                            value = value.replace("${file.base}",
+                                                  IOUtil.stripExtension(destFile.getName()));
                             value = value.replace("${value}", originalValue);
+                            //                            System.err.println("new value:" + value);
                         }
                         value = applyMacros(currentEntry, entryMap, workDir, value,
                                             input.getForDisplay());
@@ -2314,6 +2346,8 @@ public class Service extends RepositoryManager {
         /** _more_ */
         private String file;
 
+        private String filePattern;
+
         /** _more_ */
         private boolean nameDefined = false;
 
@@ -2439,6 +2473,7 @@ public class Service extends RepositoryManager {
 
             group = XmlUtil.getAttribute(node, ATTR_GROUP, (String) null);
             file = XmlUtil.getAttribute(node, ATTR_FILE, (String) null);
+            filePattern = XmlUtil.getAttribute(node, "filePattern", (String) null);
             required = XmlUtil.getAttribute(node, "required", required);
             copy     = XmlUtil.getAttribute(node, "copy", false);
             valuesProperty = XmlUtil.getAttribute(node, "valuesProperty",

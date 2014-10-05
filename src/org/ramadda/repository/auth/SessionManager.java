@@ -306,13 +306,11 @@ public class SessionManager extends RepositoryManager {
         String id = request.getSessionId();
         if (id == null) {
             request.putExtraProperty(key, value);
-
             return;
         }
         UserSession session = getSession(id);
         if (session == null) {
             request.putExtraProperty(key, value);
-
             return;
         }
         session.putProperty(key, value);

@@ -17,12 +17,17 @@ Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#extractText" target
 <process_description><![CDATA[<wiki>
 {{description}}
 {{gallery}}
+
+----
+{{tree}}
 ]]></process_description>
 
 <description><![CDATA[
 Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#pdfToImage" target="_help">Extract Images</a>
 ]]></description>
           <arg value="ExtractImages"/>
+          <arg value="-prefix"/>
+          <arg value="${file}"  file="${entry.file.base}.jpg"/>
           <arg value="${entry.file}" type="entry" entryType="type_document_pdf" primary="true" copy="true" label="Input PDF File"></arg>
           <output type="file" pattern=".*\.jpg"/>
     </service>
@@ -33,12 +38,17 @@ Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#pdfToImage" target=
 <process_description><![CDATA[<wiki>
 {{description}}
 {{gallery}}
+
+----
+{{tree}}
 ]]></process_description>
 
 <description><![CDATA[
 Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#pdfToImage" target="_help">PDF to image</a>
 ]]></description>
           <arg value="PDFToImage"/>
+          <arg value="-outputPrefix"/>
+          <arg value="${file.base}"  file="${entry.file.base}.jpg" filePattern=".*${unique}${entry.file.base}[0-9]+.jpg"/>
           <arg value="${entry.file}" type="entry" entryType="type_document_pdf" primary="true" copy="true" label="Input PDF File"></arg>
           <output type="file" pattern=".*\.jpg"/>
     </service>
