@@ -37,6 +37,7 @@ Create proof sheet image using  <a href="http://www.omino.com/sw/qt_tools/man/qt
           <arg type="int" label="Time code font size" default="0" value="--timecode=${value}"/>
           <arg type="int"  label="Spacing" default="2" value="--spacing=${value}"/>
           <arg value="${entry.file}" type="entry" entryType="media_video_quicktime" primary="true" label="Input Quicktime File" ></arg>
+          <arg value="${entry.file.base}.png"/>
           <output type="type_image" />
     </service>
 

@@ -231,6 +231,10 @@ public class ServiceInput {
     }
 
 
+    public void  setEntries( List<Entry> entries) {
+        operands = ServiceOperand.makeOperands(entries);
+    }
+
 
     /**
      * Get the operands

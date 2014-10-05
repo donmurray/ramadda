@@ -5,7 +5,7 @@
           <arg value="-F"/>
           <arg value="${entry.attr.format}"/>
           <arg value="-I"/>
-          <arg value="${entry.file}"   type="entry" primary="true" ></arg>
+          <arg label="Input MB bathymetry file" value="${entry.file}"   type="entry" primary="true" ></arg>
           <output showResults="true" stdout="true" depends="!xml"/>
           <output type="file" stdout="true" pattern=".*" depends="xml" filename="${entry.file.base}.xml"/>
     </service>
@@ -17,7 +17,7 @@
       <arg value="-F"/>
       <arg value="TXYZB"/>
       <arg value="-I"/>
-      <arg value="${entry.file}"   type="entry" primary="true" ></arg>
+      <arg label="Input MB bathymetry file" value="${entry.file}"   type="entry" primary="true" ></arg>
       <output type="type_mb_point_basic" stdout="true" filename="${entry.file.base}.txt">
       </output>
     </service>

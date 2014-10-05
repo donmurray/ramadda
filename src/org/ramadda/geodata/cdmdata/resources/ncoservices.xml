@@ -31,7 +31,7 @@ ttl:Sum of values
      <arg type="enumeration" name="nco.format" label="NetCDF Format" value="-${value}">
 <values>3:Classic Format,4:NetCDF 4 Format,6:NetCDF 3 64-bit Format</values>
 </arg>
-          <arg value="${entry.file}"   type="entry" primary="true" entryPattern=".*\.nc"></arg>
+          <arg label="Input NetCDF File" value="${entry.file}"   type="entry" primary="true" entryPattern=".*\.nc"></arg>
           <arg value="${file}" file="${entry.file.base}_nco.nc"></arg>
           <output pattern=".*\.nc"/>
     </service>

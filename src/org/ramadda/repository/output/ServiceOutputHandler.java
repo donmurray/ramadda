@@ -381,7 +381,6 @@ public class ServiceOutputHandler extends OutputHandler {
             serviceInput.setPublish(doingPublish(request));
             serviceInput.setForDisplay(forDisplay);
             serviceInputs.add(serviceInput);
-            serviceInputs.add(serviceInput);
         }
 
         boolean asynchronous = request.get(ARG_ASYNCH, false);
@@ -437,7 +436,7 @@ public class ServiceOutputHandler extends OutputHandler {
         List<ServiceOutput> outputs       = new ArrayList<ServiceOutput>();
         for (ServiceInput serviceInput : serviceInputs) {
             ServiceOutput output = evaluateService(request, service,
-                                       serviceInput);
+                                                   serviceInput);
             outputs.add(output);
 
             if ( !output.isOk()) {
@@ -564,6 +563,7 @@ public class ServiceOutputHandler extends OutputHandler {
 
             return output;
         } catch (Exception exc) {
+            exc.printStackTrace();
             return new ServiceOutput(false, exc.toString());
         }
 

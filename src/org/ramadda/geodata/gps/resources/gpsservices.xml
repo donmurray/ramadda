@@ -2,8 +2,8 @@
    <service id="gps.teqc.torinex" label="Convert to RINEX">
    <description><![CDATA[Converts raw GPS files to RINEX using  Unavco's teqc program]]></description>
    <arg value="+out" />
-   <arg type="entry" entryType="project_gps_raw" value="${workdir}/${entry.file.base}.rinex"   primary="true"/>
-   <arg value="${entry.file}" type="entry"  entryType="project_gps_raw" label="Input GPS File" primary="true"></arg>
+   <arg value="${workdir}/${input_file.file.base}.rinex"/>
+   <arg name="input_file" value="${entry.file}" type="entry"  entryType="project_gps_raw" label="Input GPS File" primary="true"/>
    <output type="project_gps_rinex" pattern=".*"/>
    </service>
 

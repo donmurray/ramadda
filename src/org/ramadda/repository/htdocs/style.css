@@ -1887,14 +1887,14 @@ a.toggleblocklabellink:visited {
 }
 
 .service-list-header, .service-results-header, .service-form-header {
-   border-top-left-radius: 4px;
-   border-top-right-radius: 4px;
+   border-top-left-radius: 6px;
+   border-top-right-radius: 6px;
    border: 1px #D1DEE4 solid;
    background-color:#E6F1F6;
    font-weight: bold;
    padding-top:5px;
-   padding-bottom:2px;
-   padding-left:8px;
+   padding-bottom:0px;
+   padding-left:6px;
    margin-top: 15px;
 }
 
@@ -1999,6 +1999,7 @@ a.toggleblocklabellink:visited {
    margin-top: 6px;
    margin-left:10px;
    margin-right:10px;
+   border-bottom : 1px #D1DEE4 solid;
 }
 
 .service-output {
@@ -2006,14 +2007,14 @@ a.toggleblocklabellink:visited {
    margin-right:10px;
    max-height: 400px; 
    overflow-y: auto;
-   border-top : 1px #D1DEE4 solid;
+//   border-top : 1px #D1DEE4 solid;
 }
 
 .service-output-large {
    margin-left:10px;
 //   max-height: 200px; 
 //   overflow-y: auto;
-   border-top : 1px #ccc solid;
+//   border-top : 1px #ccc solid;
 }
 
 .innernote {

@@ -29,7 +29,7 @@ import org.ramadda.repository.type.*;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Utils;
 
-
+import java.util.Enumeration;
 
 
 import org.w3c.dom.*;
@@ -723,30 +723,82 @@ public class Service extends RepositoryManager {
      */
     public HashSet<String> addArgs(Request request, ServiceInput input,
                                    List<String> commands,
-                                   List<File> filesToDelete)
+                                   List<File> filesToDelete,        
+                                   List<Entry> allEntries)
+
+
             throws Exception {
 
         if (haveLink()) {
-            return link.addArgs(request, input, commands, filesToDelete);
+            return link.addArgs(request, input, commands, filesToDelete,allEntries);
         }
 
         List<Entry> inputEntries = input.getEntries();
 
-
-        Entry       currentEntry = (Entry) Utils.safeGet(inputEntries, 0);
         File        workDir      = input.getProcessDir();
-        String cmd = applyMacros(currentEntry, workDir, getCommand(),
+        HashSet<String> seenGroup       = new HashSet<String>();
+        HashSet<String> definedArgs     = new HashSet<String>();
+
+
+        Hashtable<String,List<Entry>> entryMap = new Hashtable<String,List<Entry>>();
+
+        boolean         haveSeenAnEntry = false;
+
+        for (Service.Arg arg : getArgs()) {
+            if (!arg.isEntry()) {
+                continue;
+            }
+            String      argName = arg.getName() + "_hidden";
+            List<Entry> entries = new ArrayList<Entry>();
+            List<String> entryIds = getRequestValue(request, input,
+                                                    argName, new ArrayList<String>());
+            for (String entryId : entryIds) {
+                Entry entry = getEntryManager().getEntry(request,
+                                                         entryId);
+                if (entry == null) {
+                    System.err.println("Bad entry:" + entryId);
+
+                    throw new IllegalArgumentException(
+                                                       "Could not find entry for arg:" + arg.getLabel()
+                                                       + " entry id:" + entryId);
+                }
+                entries.add(entry);
+            }
+            if (entries.size() == 0) {
+                if (!haveSeenAnEntry) {
+                    for (Entry entry : input.getEntries()) {
+                        if (arg.isApplicable(entry, false)) {
+                            entries.add(entry);
+                        }
+                    }
+                }
+                for (Entry entry : entries) {
+                    if ( !getEntryManager().isSynthEntry(entry.getId())) {
+                        input.addParam(getUrlArg(argName), entry.getId());
+                    }
+                }
+            }
+            allEntries.addAll(entries);
+            entryMap.put(arg.getName(), entries);
+            haveSeenAnEntry = true;
+        }
+
+
+
+        if(inputEntries.size()==0) {
+            inputEntries = allEntries;
+            input.setEntries(allEntries);
+        }
+
+        Entry currentEntry = (Entry) Utils.safeGet(inputEntries, 0);
+
+        String cmd = applyMacros(currentEntry, entryMap, workDir, getCommand(),
                                  input.getForDisplay());
         commands.add(cmd);
 
         addExtraArgs(request, input, commands, true);
 
 
-        HashSet<String> seenGroup       = new HashSet<String>();
-        HashSet<String> definedArgs     = new HashSet<String>();
-
-
-        boolean         haveSeenAnEntry = false;
 
         for (Service.Arg arg : getArgs()) {
             if (arg.depends != null) {
@@ -780,49 +832,11 @@ public class Service extends RepositoryManager {
                 }
             } else if (arg.isFile()) {
                 //TODO:
-                //                String filename = applyMacros(currentEntry, workDir,
+                //                String filename = applyMacros(currentEntry, entryMap, workDir,
                 //arg.getFileName(), input.getForDisplay());
                 //argValue = IOUtil.joinDir(workDir, filename);
             } else if (arg.isEntry()) {
-                String      argName = arg.getName() + "_hidden";
-                List<Entry> entries = new ArrayList<Entry>();
-
-
-                List<String> entryIds = getRequestValue(request, input,
-                                            argName, new ArrayList<String>());
-                for (String entryId : entryIds) {
-                    Entry entry = getEntryManager().getEntry(request,
-                                      entryId);
-                    if (entry == null) {
-                        System.err.println("Bad entry:" + entryId);
-
-                        throw new IllegalArgumentException(
-                            "Could not find entry for arg:" + arg.getLabel()
-                            + " entry id:" + entryId);
-                    }
-                    entries.add(entry);
-                }
-
-
-                if (entries.size() == 0) {
-                    if ( !haveSeenAnEntry) {
-                        for (Entry entry : input.getEntries()) {
-                            if (arg.isApplicable(entry, false)) {
-                                entries.add(entry);
-                            }
-                        }
-                    } else if (currentEntry != null) {
-                        entries.add(currentEntry);
-                    }
-                    for (Entry entry : entries) {
-                        if ( !getEntryManager().isSynthEntry(entry.getId())) {
-                            input.addParam(getUrlArg(argName), entry.getId());
-                        }
-                    }
-                }
-
-                haveSeenAnEntry = true;
-
+                List<Entry> entries =  entryMap.get(arg.getName());
                 if ( !arg.isMultiple() && (entries.size() > 1)) {
                     throw new IllegalArgumentException(
                         "Too many entries specified for arg:"
@@ -895,8 +909,9 @@ public class Service extends RepositoryManager {
 
                         if (arg.file != null) {
                             String fileName = applyMacros(currentEntry,
-                                                  workDir, arg.file,
-                                                  input.getForDisplay());
+                                                          entryMap, 
+                                                          workDir, arg.file,
+                                                          input.getForDisplay());
 
 
                             File destFile = new File(IOUtil.joinDir(workDir,
@@ -914,7 +929,7 @@ public class Service extends RepositoryManager {
                                     destFile.getName());
                             value = value.replace("${value}", originalValue);
                         }
-                        value = applyMacros(currentEntry, workDir, value,
+                        value = applyMacros(currentEntry, entryMap, workDir, value,
                                             input.getForDisplay());
                         commands.add(value);
                     }
@@ -1168,7 +1183,7 @@ public class Service extends RepositoryManager {
         sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
                                  HtmlUtils.cssClass("service-form")));
 
-        sb.append(HtmlUtils.div(getLabel(),
+        sb.append(HtmlUtils.div(HtmlUtils.img(iconUrl(getIcon())) +" " + getLabel(),
                                 HtmlUtils.cssClass("service-form-header")));
         if (Utils.stringDefined(getDescription())) {
             sb.append(
@@ -1287,40 +1302,41 @@ public class Service extends RepositoryManager {
                     && (input.getSourceService().getOutputs().size() > 0)) {
                 return;
             }
-            if ((primaryEntry != null) && arg.isPrimaryEntry()) {
+            if (primaryEntry != null && arg.isPrimaryEntry()) {
                 return;
-            } else {
-                if (arg.getEntryType() != null) {
-                    request.put(ARG_ENTRYTYPE, arg.getEntryType());
-                }
-                String elementId = HtmlUtils.getUniqueId("select_");
-                inputHtml.append(OutputHandler.getSelect(request, elementId,
-                        msg("Select"), true, null));
-                String argName    = arg.getName() + "_hidden";
+            } 
 
-                String entryId    = getRequestValue(request, argName, "");
-
-                String entryLabel = "";
-
-                if (Utils.stringDefined(entryId)) {
-                    Entry entryArg = getEntryManager().getEntry(request,
-                                         entryId);
-                    if (entryArg != null) {
-                        entryLabel = entryArg.getName();
-                    }
-                }
-
-                inputHtml.append(HtmlUtils.hidden(getUrlArg(argName),
-                        entryId, HtmlUtils.id(elementId + "_hidden")));
-                inputHtml.append(HtmlUtils.space(1));
-                inputHtml.append(HtmlUtils.disabledInput(arg.getUrlArg(),
-                        entryLabel,
-                        HtmlUtils.SIZE_60 + HtmlUtils.id(elementId)));
-                //                inputHtml.append(HtmlUtils.disabledInput(arg.getUrlArg(),
-                //                                                         getRequestValue(request, arg.getName(), ""),
-                //                                                         HtmlUtils.SIZE_60 + HtmlUtils.id(elementId)));
-                request.remove(ARG_ENTRYTYPE);
+            if (arg.getEntryType() != null) {
+                request.put(ARG_ENTRYTYPE, arg.getEntryType());
             }
+            String elementId = HtmlUtils.getUniqueId("select_");
+            inputHtml.append(OutputHandler.getSelect(request, elementId,
+                                                     msg("Select"), true, null));
+            String argName    = arg.getName() + "_hidden";
+
+            String entryId    = getRequestValue(request, argName, "");
+
+            String entryLabel = "";
+
+            if (Utils.stringDefined(entryId)) {
+                Entry entryArg = getEntryManager().getEntry(request,
+                                                            entryId);
+                if (entryArg != null) {
+                    entryLabel = entryArg.getName();
+                }
+            }
+
+            inputHtml.append(HtmlUtils.hidden(getUrlArg(argName),
+                                              entryId, HtmlUtils.id(elementId + "_hidden")));
+            inputHtml.append(HtmlUtils.space(1));
+            inputHtml.append(HtmlUtils.disabledInput(arg.getUrlArg(),
+                                                     entryLabel,
+                                                     HtmlUtils.SIZE_60 + HtmlUtils.id(elementId)));
+            //                inputHtml.append(HtmlUtils.disabledInput(arg.getUrlArg(),
+            //                                                         getRequestValue(request, arg.getName(), ""),
+            //                                                         HtmlUtils.SIZE_60 + HtmlUtils.id(elementId)));
+            request.remove(ARG_ENTRYTYPE);
+
         } else {
             String extra = HtmlUtils.attr(HtmlUtils.ATTR_SIZE,
                                           "" + arg.getSize());
@@ -1815,16 +1831,18 @@ public class Service extends RepositoryManager {
             return myOutput;
         }
 
-        Entry           currentEntry = (Entry) Utils.safeGet(entries, 0);
+
         List<String>    commands     = new ArrayList<String>();
-        HashSet<String> definedArgs  = null;
-        if (link != null) {
-            definedArgs = link.addArgs(request, input, commands,
-                                       filesToDelete);
-        } else {
-            definedArgs = this.addArgs(request, input, commands,
-                                       filesToDelete);
+        List<Entry> allEntries = new ArrayList<Entry>();
+        HashSet<String> definedArgs  =   this.addArgs(request, input, commands,
+                                                      filesToDelete, allEntries);
+
+        if(entries.size()==0) {
+            entries = allEntries;
         }
+
+        Entry           currentEntry = (Entry) Utils.safeGet(entries, 0);
+
         System.err.println("Command:" + commands);
 
         if (input.getForDisplay()) {
@@ -1910,18 +1928,20 @@ public class Service extends RepositoryManager {
             if (output.getUseStdout()) {
                 setResultsFromStdout = false;
                 String filename = applyMacros(currentEntry,
-                                      input.getProcessDir(),
-                                      output.getFilename(),
-                                      input.getForDisplay());
+                                              null, 
+                                              input.getProcessDir(),
+                                              output.getFilename(),
+                                              input.getForDisplay());
                 File destFile =
                     new File(IOUtil.joinDir(input.getProcessDir(), filename));
                 IOUtil.moveFile(stdoutFile, destFile);
                 files = new File[] { destFile };
             }
             final String thePattern = applyMacros(currentEntry,
-                                          input.getProcessDir(),
-                                          output.getPattern(),
-                                          input.getForDisplay());
+                                                  null, 
+                                                  input.getProcessDir(),
+                                                  output.getPattern(),
+                                                  input.getForDisplay());
 
             if (files == null) {
                 files = input.getProcessDir().listFiles(new FileFilter() {
@@ -2005,12 +2025,8 @@ public class Service extends RepositoryManager {
             throws Exception {
         if (haveLink()) {
             link.addOutput(request, input, output, sb);
-
             return;
         }
-
-
-
 
         int cnt = 0;
         for (Entry entry : input.getEntries()) {
@@ -2091,50 +2107,67 @@ public class Service extends RepositoryManager {
      *
      * @return _more_
      */
-    public String applyMacros(Entry entry, File workDir, String value,
+    public String applyMacros(Entry entry, 
+                              Hashtable<String,List<Entry>> entryMap, File workDir, String value,
                               boolean forDisplay) {
 
         if (value == null) {
             return null;
         }
+
         value = value.replace("${workdir}", forDisplay
                                             ? "&lt;working directory&gt;"
                                             : workDir.toString());
-        //        System.err.println("Apply macros:" +entry);
-        if (entry != null) {
-            List<Column> columns = entry.getTypeHandler().getColumns();
-            if (columns != null) {
-                for (Column column : columns) {
-                    Object columnValue =
-                        entry.getTypeHandler().getEntryValue(entry,
-                            column.getName());
-                    if (columnValue != null) {
-                        value = value.replace("${entry.attr."
-                                + column.getName() + "}", "" + columnValue);
-                    } else {
-                        value = value.replace("${entry.attr."
-                                + column.getName() + "}", "");
-                    }
+        if(entryMap!=null) {
+            for (Enumeration keys = entryMap.keys(); keys.hasMoreElements(); ) {
+                String id = (String) keys.nextElement();
+                for(Entry otherEntry:entryMap.get(id)) {
+                    value =  applyMacros(otherEntry, id, value, forDisplay);
                 }
             }
-
-
-            String fileTail = getStorageManager().getFileTail(entry);
-            value = value.replace("${entry.id}", entry.getId());
-            value = value.replace("${entry.file}", forDisplay
-                    ? getStorageManager().getFileTail(entry)
-                    : entry.getResource().getPath());
-            //? not sure what the macros should be
-            //            value = value.replace(macro("entry.file.base"),
-            //                                  IOUtil.stripExtension(entry.getName()));
-            value = value.replace("${entry.file.base}",
-                                  IOUtil.stripExtension(fileTail));
-            value =
-                value.replace("${entry.file.suffix}",
-                              IOUtil.getFileExtension(fileTail).replace(".",
-                                  ""));
         }
 
+        //        System.err.println("Apply macros:" +entry);
+        if (entry != null) {
+            value =  applyMacros(entry, "entry", value, forDisplay);
+        }
+
+        return value;
+    }
+
+
+    private String applyMacros(Entry entry, String id, String value, boolean forDisplay) {
+        List<Column> columns = entry.getTypeHandler().getColumns();
+        if (columns != null) {
+            for (Column column : columns) {
+                Object columnValue =
+                    entry.getTypeHandler().getEntryValue(entry,
+                                                         column.getName());
+                if (columnValue != null) {
+                    value = value.replace("${" + id +".attr."
+                                          + column.getName() + "}", "" + columnValue);
+                } else {
+                    value = value.replace("${" + id +".attr."
+                                          + column.getName() + "}", "");
+                }
+            }
+        }
+
+
+        String fileTail = getStorageManager().getFileTail(entry);
+        value = value.replace("${" + id +".id}", entry.getId());
+        value = value.replace("${" + id +".file}", forDisplay
+                              ? getStorageManager().getFileTail(entry)
+                              : entry.getResource().getPath());
+        //? not sure what the macros should be
+        //            value = value.replace(macro("entry.file.base"),
+        //                                  IOUtil.stripExtension(entry.getName()));
+        value = value.replace("${" + id +".file.base}",
+                              IOUtil.stripExtension(fileTail));
+        value =
+            value.replace("${" + id +".file.suffix}",
+                          IOUtil.getFileExtension(fileTail).replace(".",
+                                                                    ""));
         return value;
     }
 
