@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -57,11 +57,11 @@ import java.util.Properties;
 public class MetametaFieldTypeHandler extends MetametaFieldTypeHandlerBase {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String HELP_POINT =
         "format=<i>date format</i><br>timezone=<i>timezone</i><br>utcoffset=<i>utc offset</i><br>chartable/searchable=true<br>value=<i>default value</i><br>pattern=<i>header pattern</i><br>precision=<br>isdate/istime=true<br>";
 
-    /** _more_          */
+    /** _more_ */
     public static final String HELP_ENTRY =
         "cansearch,canshow,canlist=true|false<br>group=<i>Field display group</i><br>isindex=true<br>suffix=label to show after form<br>";
 
@@ -167,7 +167,7 @@ public class MetametaFieldTypeHandler extends MetametaFieldTypeHandlerBase {
             List<Entry> siblings = getEntryManager().getChildrenAll(request,
                                        parent);
             for (Entry sibling : siblings) {
-                if (sibling.isType(TYPE)) {
+                if (sibling.getTypeHandler().isType(TYPE)) {
                     int siblingIndex = ((Integer) getEntryValue(sibling,
                                            0)).intValue();
                     maxIndex = Math.max(maxIndex, siblingIndex);
