@@ -662,7 +662,7 @@ public class Service extends RepositoryManager {
      *
      * @param service _more_
      */
-    private void addChild(Service service) {
+    public void addChild(Service service) {
         if (children == null) {
             children = new ArrayList<Service>();
         }
@@ -2099,6 +2099,29 @@ public class Service extends RepositoryManager {
         }
     }
 
+    public void setDescription(String d) {
+        description  = d;
+    }
+
+
+    /**
+       Set the Serial property.
+
+       @param value The new value for Serial
+    **/
+    public void setSerial (boolean value) {
+	serial = value;
+    }
+
+    /**
+       Get the Serial property.
+
+       @return The Serial
+    **/
+    public boolean getSerial () {
+	return serial;
+    }
+
 
 
 
@@ -2732,6 +2755,8 @@ public class Service extends RepositoryManager {
         public String getEntryType() {
             return entryType;
         }
+
+
 
 
         /**

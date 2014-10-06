@@ -77,21 +77,24 @@ public class ServiceContainerTypeHandler extends ServiceTypeHandler {
      *
      * @throws Exception _more_
      */
-    public void getServiceXml(Request request, Entry entry, Appendable sb)
+@Override
+    public Service getService(Request request, Entry entry)
             throws Exception {
+        Service service  = new Service(getRepository(), entry.getId(),entry.getName());
+        service.setDescription(entry.getDescription());
+        service.setSerial(entry.getValue(0,"true").equals("true"));
+        
         List<Entry> children = getEntryManager().getChildren(request, entry);
-        sb.append(XmlUtil.openTag("service",
-                                  XmlUtil.attrs("serial",
-                                      entry.getValue(0, "true"))));
         for (Entry child : children) {
             if ( !child.getTypeHandler().isType("type_service")) {
                 continue;
             }
             ServiceTypeHandler childTypeHandler =
                 (ServiceTypeHandler) child.getTypeHandler();
-            childTypeHandler.getServiceXml(request, entry, sb);
+            Service childService =   childTypeHandler.getService(request, entry);
+            service.addChild(childService);
         }
-        sb.append(XmlUtil.closeTag("service"));
+        return service;
     }
 
 
