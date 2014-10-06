@@ -353,8 +353,8 @@ public class EntryUtil extends RepositoryManager {
                 Entry   e1 = (Entry) o1;
                 Entry   e2 = (Entry) o2;
                 int     result;
-                boolean isType1 = e1.isType(type);
-                boolean isType2 = e2.isType(type);
+                boolean isType1 = e1.getTypeHandler().isType(type);
+                boolean isType2 = e2.getTypeHandler().isType(type);
                 if (isType1 && isType2) {
                     Integer i1 =
                         (Integer) e1.getTypeHandler().getEntryValue(e1,
@@ -496,7 +496,7 @@ public class EntryUtil extends RepositoryManager {
     public List<Entry> getEntriesOfType(List<Entry> entries, String type) {
         List<Entry> result = new ArrayList<Entry>();
         for (Entry entry : entries) {
-            if (entry.isType(type)) {
+            if (entry.getTypeHandler().isType(type)) {
                 result.add(entry);
             }
         }

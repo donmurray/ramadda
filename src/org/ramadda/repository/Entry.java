@@ -718,17 +718,6 @@ public class Entry implements Cloneable {
         return typeHandler.getType();
     }
 
-    /**
-     * Is this Entry of the type specified
-     *
-     * @param type  the type to check
-     *
-     * @return true if it is one
-     */
-    public boolean isType(String type) {
-        return getType().equals(type);
-    }
-
 
     /**
      * Get the Type property.

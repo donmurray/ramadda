@@ -687,7 +687,7 @@ public class CdmManager extends RepositoryManager {
      */
     public boolean canLoadAsCdm(Entry entry) {
 
-        if (entry.isType(OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
+        if (entry.getTypeHandler().isType(OpendapLinkTypeHandler.TYPE_OPENDAPLINK)) {
             return true;
         }
 

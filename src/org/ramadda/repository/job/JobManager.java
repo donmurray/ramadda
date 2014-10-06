@@ -22,7 +22,7 @@ package org.ramadda.repository.job;
 
 
 import org.ramadda.data.process.Service;
-import org.ramadda.data.process.WorkflowTypeHandler;
+import org.ramadda.data.process.ServiceTypeHandler;
 import org.ramadda.data.record.*;
 import org.ramadda.data.record.filter.*;
 
@@ -224,11 +224,11 @@ public class JobManager extends RepositoryManager {
         Service service =  serviceMap.get(id);
         if(service!=null) return service;
         Request request = getRepository().getTmpRequest();
-        Entry workflowEntry = getEntryManager().getEntry(
+        Entry serviceEntry = getEntryManager().getEntry(
                                                          request, id);
-        if(workflowEntry !=null && (workflowEntry.getTypeHandler() instanceof WorkflowTypeHandler)) {
-            WorkflowTypeHandler workflow= (WorkflowTypeHandler)workflowEntry.getTypeHandler();
-            return workflow.getService(request, workflowEntry);
+        if(serviceEntry !=null && (serviceEntry.getTypeHandler() instanceof ServiceTypeHandler)) {
+            ServiceTypeHandler serviceType= (ServiceTypeHandler)serviceEntry.getTypeHandler();
+            return serviceType.getService(request, serviceEntry);
         }
         return null;
         

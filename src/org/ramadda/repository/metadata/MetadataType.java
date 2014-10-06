@@ -185,7 +185,7 @@ public class MetadataType extends MetadataTypeBase {
      */
     public boolean isForEntry(Entry entry) {
         if (entryType != null) {
-            return entry.isType(entryType);
+            return entry.getTypeHandler().isType(entryType);
         }
 
         return getHandler().isForEntry(entry);
