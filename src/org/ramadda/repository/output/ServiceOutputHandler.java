@@ -735,7 +735,7 @@ public class ServiceOutputHandler extends OutputHandler {
                                         "serviceworkflow.xml"));
             IOUtil.writeFile(workflowFile, workflowXml.toString());
             workflowXml =
-                "<entry type=\"type_service_workflow\" name=\"Service workflow\" />";
+                "<entry type=\"type_service_file\" name=\"Service workflow\" />";
             IOUtil.writeFile(getEntryManager().getEntryXmlFile(workflowFile),
                              workflowXml.toString());
 

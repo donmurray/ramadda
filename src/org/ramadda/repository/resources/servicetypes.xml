@@ -1,0 +1,27 @@
+<types>
+  <type name="type_service" foruser="false" description="Service"  category="Services">
+     <property name="icon" value="/icons/cog.png"/>
+     <property name="form.date.show" value="false"/>
+     <property name="form.area.show" value="false"/>
+  </type>
+
+  <type name="type_service_group"  description="Service Group"  
+        handler="org.ramadda.data.process.ServiceContainerTypeHandler">
+     <property name="form.resource.show" value="false"/>
+     <property name="icon" value="/icons/folder-open-image.png"/>
+     <column name="serial"  type="boolean" default="true"   label="Serial"  showinhtml="true"/>
+  </type>
+
+  <type name="type_service_link"  description="Service Link"  
+        handler="org.ramadda.data.process.ServiceLinkTypeHandler">
+     <property name="form.resource.show" value="false"/>
+     <property name="icon" value="/icons/link.png"/>
+     <column name="service_id"  type="string"     label="Service"  showinhtml="true"/>
+  </type>
+
+  <type name="type_service_file" description="Service Xml File"  
+        handler="org.ramadda.data.process.ServiceFileTypeHandler">
+     <property name="icon" value="/icons/cog.png"/>
+  </type>
+
+</types>
