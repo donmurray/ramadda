@@ -55,6 +55,8 @@ import java.util.List;
  */
 public class ServiceLinkTypeHandler extends ServiceTypeHandler {
 
+    /** _more_ */
+    public static final int IDX_LINK_ID = IDX_LAST + 1;
 
     /**
      * _more_
@@ -150,8 +152,10 @@ public class ServiceLinkTypeHandler extends ServiceTypeHandler {
      */
     @Override
     public Service getService(Request request, Entry entry) throws Exception {
+        System.err.println("c:" + getColumns());
+
         return getRepository().getJobManager().getService(
-            (String) entry.getValue(0));
+            entry.getValue(IDX_LINK_ID, ""));
     }
 
 

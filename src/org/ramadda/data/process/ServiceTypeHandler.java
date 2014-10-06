@@ -49,7 +49,26 @@ import java.util.List;
  *
  *
  */
-public class ServiceTypeHandler extends ExtensibleGroupTypeHandler {
+public class ServiceTypeHandler extends OrderedGroupTypeHandler {
+
+    /** _more_ */
+    public static final String TYPE_SERVICE = "type_service";
+
+    /** _more_ */
+    public static final int IDX_SORT_ORDER = 0;
+
+    /** _more_ */
+    public static final int IDX_LAST = 0;
+
+
+    /** _more_ */
+    private static final ServiceLinkTypeHandler dummy1 = null;
+
+    /** _more_ */
+    private static final ServiceFileTypeHandler dummy2 = null;
+
+    /** _more_ */
+    private static final ServiceContainerTypeHandler dummy3 = null;
 
 
     /**
@@ -65,6 +84,46 @@ public class ServiceTypeHandler extends ExtensibleGroupTypeHandler {
         super(repository, entryNode);
     }
 
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getChildType() {
+        return TYPE_SERVICE;
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     */
+    @Override
+    public List<Entry> postProcessEntries(Request request,
+                                          List<Entry> entries) {
+        List<Entry> sorted =
+            getEntryManager().getEntryUtil().sortEntriesOnField(entries,
+                false, TYPE_SERVICE, 0);
+
+        return sorted;
+    }
+
+
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getListTitle() {
+        return "Services";
+    }
 
 
     /**
@@ -90,6 +149,10 @@ public class ServiceTypeHandler extends ExtensibleGroupTypeHandler {
         ServiceOutputHandler soh = new ServiceOutputHandler(repository,
                                        service);
         StringBuilder sb = new StringBuilder();
+
+        subGroups.addAll(entries);
+        addListForm(request, entry, subGroups, sb);
+
         if ( !soh.doExecute(request)) {
             soh.makeForm(request, service, entry, entries,
                          HtmlOutputHandler.OUTPUT_HTML, sb);

@@ -1,4 +1,4 @@
-/**
+/*
 * Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
@@ -23,10 +23,12 @@ package org.ramadda.data.process;
 
 import org.ramadda.repository.*;
 import org.ramadda.repository.type.*;
+
 import org.w3c.dom.*;
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.xml.XmlUtil;
+
 
 /**
  *
@@ -50,8 +52,22 @@ public class ServiceFileTypeHandler extends ServiceTypeHandler {
 
 
 
-    public void getServiceXml(Request request, Entry entry, Appendable appendable) throws Exception {
-        appendable.append(IOUtil.readContents(getStorageManager().getFileInputStream(entry.getFile().toString())));
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param appendable _more_
+     *
+     * @throws Exception _more_
+     */
+    public void getServiceXml(Request request, Entry entry,
+                              Appendable appendable)
+            throws Exception {
+        appendable.append(
+            IOUtil.readContents(
+                getStorageManager().getFileInputStream(
+                    entry.getFile().toString())));
     }
 
 

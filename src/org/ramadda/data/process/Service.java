@@ -29,14 +29,12 @@ import org.ramadda.repository.type.*;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Utils;
 
-import java.util.Enumeration;
-
 
 import org.w3c.dom.*;
 
 import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.PatternFileFilter;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
@@ -49,6 +47,8 @@ import java.net.*;
 
 import java.util.ArrayList;
 import java.util.Date;
+
+import java.util.Enumeration;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
@@ -176,6 +176,8 @@ public class Service extends RepositoryManager {
 
     /** _more_ */
     private boolean outputToStderr = false;
+
+    /** _more_          */
     private boolean immediate = false;
 
     /** _more_ */
@@ -368,8 +370,7 @@ public class Service extends RepositoryManager {
         outputToStderr = XmlUtil.getAttributeFromTree(element,
                 "outputToStderr", outputToStderr);
 
-        immediate = XmlUtil.getAttributeFromTree(element,
-                "immediate", false);
+        immediate = XmlUtil.getAttributeFromTree(element, "immediate", false);
 
         ignoreStderr = XmlUtil.getAttributeFromTree(element, "ignoreStderr",
                 ignoreStderr);
@@ -706,6 +707,11 @@ public class Service extends RepositoryManager {
 
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean getImmediate() {
         return immediate;
     }
@@ -717,6 +723,7 @@ public class Service extends RepositoryManager {
      * @param input _more_
      * @param commands _more_
      * @param filesToDelete _more_
+     * @param allEntries _more_
      *
      *
      * @return _more_
@@ -724,49 +731,48 @@ public class Service extends RepositoryManager {
      */
     public HashSet<String> addArgs(Request request, ServiceInput input,
                                    List<String> commands,
-                                   List<File> filesToDelete,        
+                                   List<File> filesToDelete,
                                    List<Entry> allEntries)
-
-
             throws Exception {
 
         if (haveLink()) {
-            return link.addArgs(request, input, commands, filesToDelete,allEntries);
+            return link.addArgs(request, input, commands, filesToDelete,
+                                allEntries);
         }
 
-        List<Entry> inputEntries = input.getEntries();
+        List<Entry>     inputEntries = input.getEntries();
 
-        File        workDir      = input.getProcessDir();
-        HashSet<String> seenGroup       = new HashSet<String>();
-        HashSet<String> definedArgs     = new HashSet<String>();
+        File            workDir      = input.getProcessDir();
+        HashSet<String> seenGroup    = new HashSet<String>();
+        HashSet<String> definedArgs  = new HashSet<String>();
 
 
-        Hashtable<String,List<Entry>> entryMap = new Hashtable<String,List<Entry>>();
+        Hashtable<String, List<Entry>> entryMap = new Hashtable<String,
+                                                      List<Entry>>();
 
-        boolean         haveSeenAnEntry = false;
+        boolean haveSeenAnEntry = false;
 
         for (Service.Arg arg : getArgs()) {
-            if (!arg.isEntry()) {
+            if ( !arg.isEntry()) {
                 continue;
             }
             String      argName = arg.getName() + "_hidden";
             List<Entry> entries = new ArrayList<Entry>();
-            List<String> entryIds = getRequestValue(request, input,
-                                                    argName, new ArrayList<String>());
+            List<String> entryIds = getRequestValue(request, input, argName,
+                                        new ArrayList<String>());
             for (String entryId : entryIds) {
-                Entry entry = getEntryManager().getEntry(request,
-                                                         entryId);
+                Entry entry = getEntryManager().getEntry(request, entryId);
                 if (entry == null) {
                     System.err.println("Bad entry:" + entryId);
 
                     throw new IllegalArgumentException(
-                                                       "Could not find entry for arg:" + arg.getLabel()
-                                                       + " entry id:" + entryId);
+                        "Could not find entry for arg:" + arg.getLabel()
+                        + " entry id:" + entryId);
                 }
                 entries.add(entry);
             }
             if (entries.size() == 0) {
-                if (!haveSeenAnEntry) {
+                if ( !haveSeenAnEntry) {
                     for (Entry entry : input.getEntries()) {
                         if (arg.isApplicable(entry, false)) {
                             entries.add(entry);
@@ -786,15 +792,15 @@ public class Service extends RepositoryManager {
 
 
 
-        if(inputEntries.size()==0) {
+        if (inputEntries.size() == 0) {
             inputEntries = allEntries;
             input.setEntries(allEntries);
         }
 
         Entry currentEntry = (Entry) Utils.safeGet(inputEntries, 0);
 
-        String cmd = applyMacros(currentEntry, entryMap, workDir, getCommand(),
-                                 input.getForDisplay());
+        String cmd = applyMacros(currentEntry, entryMap, workDir,
+                                 getCommand(), input.getForDisplay());
         commands.add(cmd);
 
         addExtraArgs(request, input, commands, true);
@@ -837,7 +843,7 @@ public class Service extends RepositoryManager {
                 //arg.getFileName(), input.getForDisplay());
                 //argValue = IOUtil.joinDir(workDir, filename);
             } else if (arg.isEntry()) {
-                List<Entry> entries =  entryMap.get(arg.getName());
+                List<Entry> entries = entryMap.get(arg.getName());
                 if ( !arg.isMultiple() && (entries.size() > 1)) {
                     throw new IllegalArgumentException(
                         "Too many entries specified for arg:"
@@ -911,14 +917,15 @@ public class Service extends RepositoryManager {
                         if (arg.file != null) {
                             //                            System.err.println ("file:" + arg.file + " " + arg.filePattern);
                             String fileName = applyMacros(currentEntry,
-                                                          entryMap, 
-                                                          workDir, arg.file,
-                                                          input.getForDisplay());
+                                                  entryMap, workDir,
+                                                  arg.file,
+                                                  input.getForDisplay());
 
 
-                            fileName = fileName.replace("${value}", originalValue);
+                            fileName = fileName.replace("${value}",
+                                    originalValue);
                             File destFile = new File(IOUtil.joinDir(workDir,
-                                                                    fileName));
+                                                fileName));
                             int cnt = 0;
 
                             //                            System.err.println("dest file:" + destFile+" " + destFile.exists());
@@ -928,26 +935,37 @@ public class Service extends RepositoryManager {
                                         cnt + "_" + fileName));
                             }
 
-                            if(arg.filePattern!=null) {
-                                String basePattern = applyMacros(currentEntry,
-                                                                 entryMap, 
-                                                                 workDir, arg.filePattern,
-                                                                 input.getForDisplay());
+                            if (arg.filePattern != null) {
+                                String basePattern =
+                                    applyMacros(currentEntry, entryMap,
+                                        workDir, arg.filePattern,
+                                        input.getForDisplay());
 
 
-                                basePattern = basePattern.replace("${value}", originalValue);
+                                basePattern = basePattern.replace("${value}",
+                                        originalValue);
 
-                                String pattern  = basePattern.replace("${unique}", "");
-                                File[] files = workDir.listFiles((FileFilter)new PatternFileFilter(pattern));
+                                String pattern =
+                                    basePattern.replace("${unique}", "");
+                                File[] files =
+                                    workDir.listFiles(
+                                        (FileFilter) new PatternFileFilter(
+                                            pattern));
                                 //                                System.err.println("pattern:"+ pattern + " " + files.length);
-                                destFile = new File(IOUtil.joinDir(workDir, fileName));
-                                while(files.length>0) {
+                                destFile = new File(IOUtil.joinDir(workDir,
+                                        fileName));
+                                while (files.length > 0) {
                                     cnt++;
-                                    pattern  = basePattern.replace("${unique}", cnt+"");
-                                    files = workDir.listFiles((FileFilter)new PatternFileFilter(pattern));
+                                    pattern =
+                                        basePattern.replace("${unique}",
+                                            cnt + "");
+                                    files = workDir.listFiles(
+                                        (FileFilter) new PatternFileFilter(
+                                            pattern));
                                     //                                    System.err.println("pattern:"+ pattern + " " + files.length);
-                                    destFile = new File(IOUtil.joinDir(workDir,
-                                                                       cnt + "_" + fileName));
+                                    destFile =
+                                        new File(IOUtil.joinDir(workDir,
+                                            cnt + "_" + fileName));
                                 }
                             }
 
@@ -956,13 +974,14 @@ public class Service extends RepositoryManager {
 
                             value = value.replace("${file}",
                                     destFile.getName());
-                            value = value.replace("${file.base}",
-                                                  IOUtil.stripExtension(destFile.getName()));
+                            value = value.replace(
+                                "${file.base}",
+                                IOUtil.stripExtension(destFile.getName()));
                             value = value.replace("${value}", originalValue);
                             //                            System.err.println("new value:" + value);
                         }
-                        value = applyMacros(currentEntry, entryMap, workDir, value,
-                                            input.getForDisplay());
+                        value = applyMacros(currentEntry, entryMap, workDir,
+                                            value, input.getForDisplay());
                         commands.add(value);
                     }
                 }
@@ -1215,8 +1234,10 @@ public class Service extends RepositoryManager {
         sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
                                  HtmlUtils.cssClass("service-form")));
 
-        sb.append(HtmlUtils.div(HtmlUtils.img(iconUrl(getIcon())) +" " + getLabel(),
-                                HtmlUtils.cssClass("service-form-header")));
+        sb.append(
+            HtmlUtils.div(
+                HtmlUtils.img(iconUrl(getIcon())) + " " + getLabel(),
+                HtmlUtils.cssClass("service-form-header")));
         if (Utils.stringDefined(getDescription())) {
             sb.append(
                 HtmlUtils.div(
@@ -1334,16 +1355,16 @@ public class Service extends RepositoryManager {
                     && (input.getSourceService().getOutputs().size() > 0)) {
                 return;
             }
-            if (primaryEntry != null && arg.isPrimaryEntry()) {
+            if ((primaryEntry != null) && arg.isPrimaryEntry()) {
                 return;
-            } 
+            }
 
             if (arg.getEntryType() != null) {
                 request.put(ARG_ENTRYTYPE, arg.getEntryType());
             }
             String elementId = HtmlUtils.getUniqueId("select_");
             inputHtml.append(OutputHandler.getSelect(request, elementId,
-                                                     msg("Select"), true, null));
+                    msg("Select"), true, null));
             String argName    = arg.getName() + "_hidden";
 
             String entryId    = getRequestValue(request, argName, "");
@@ -1351,19 +1372,17 @@ public class Service extends RepositoryManager {
             String entryLabel = "";
 
             if (Utils.stringDefined(entryId)) {
-                Entry entryArg = getEntryManager().getEntry(request,
-                                                            entryId);
+                Entry entryArg = getEntryManager().getEntry(request, entryId);
                 if (entryArg != null) {
                     entryLabel = entryArg.getName();
                 }
             }
 
-            inputHtml.append(HtmlUtils.hidden(getUrlArg(argName),
-                                              entryId, HtmlUtils.id(elementId + "_hidden")));
+            inputHtml.append(HtmlUtils.hidden(getUrlArg(argName), entryId,
+                    HtmlUtils.id(elementId + "_hidden")));
             inputHtml.append(HtmlUtils.space(1));
             inputHtml.append(HtmlUtils.disabledInput(arg.getUrlArg(),
-                                                     entryLabel,
-                                                     HtmlUtils.SIZE_60 + HtmlUtils.id(elementId)));
+                    entryLabel, HtmlUtils.SIZE_60 + HtmlUtils.id(elementId)));
             //                inputHtml.append(HtmlUtils.disabledInput(arg.getUrlArg(),
             //                                                         getRequestValue(request, arg.getName(), ""),
             //                                                         HtmlUtils.SIZE_60 + HtmlUtils.id(elementId)));
@@ -1387,12 +1406,15 @@ public class Service extends RepositoryManager {
             inputHtml.append(HtmlUtils.space(1));
             inputHtml.append("<span class=ramadda-required-label>*</span>");
         }
+        if (Utils.stringDefined(arg.getHelp())) {
+            inputHtml.append(HtmlUtils.space(2));
+            inputHtml.append(arg.getHelp());
+        }
 
         if (arg.sameRow) {
             catBuff.appendToCurrentRow(inputHtml.toString());
         } else {
-            catBuff.addRow(arg.getLabel(), inputHtml.toString(),
-                           arg.getHelp());
+            catBuff.addRow(arg.getLabel(), inputHtml.toString(), null);
         }
         //        makeFormEntry(catBuff, arg.getLabel(), inputHtml.toString(), arg.getHelp());
 
@@ -1864,16 +1886,16 @@ public class Service extends RepositoryManager {
         }
 
 
-        List<String>    commands     = new ArrayList<String>();
-        List<Entry> allEntries = new ArrayList<Entry>();
-        HashSet<String> definedArgs  =   this.addArgs(request, input, commands,
-                                                      filesToDelete, allEntries);
+        List<String> commands   = new ArrayList<String>();
+        List<Entry>  allEntries = new ArrayList<Entry>();
+        HashSet<String> definedArgs = this.addArgs(request, input, commands,
+                                          filesToDelete, allEntries);
 
-        if(entries.size()==0) {
+        if (entries.size() == 0) {
             entries = allEntries;
         }
 
-        Entry           currentEntry = (Entry) Utils.safeGet(entries, 0);
+        Entry currentEntry = (Entry) Utils.safeGet(entries, 0);
 
         System.err.println("Command:" + commands);
 
@@ -1959,21 +1981,19 @@ public class Service extends RepositoryManager {
             File[] files = null;
             if (output.getUseStdout()) {
                 setResultsFromStdout = false;
-                String filename = applyMacros(currentEntry,
-                                              null, 
-                                              input.getProcessDir(),
-                                              output.getFilename(),
-                                              input.getForDisplay());
+                String filename = applyMacros(currentEntry, null,
+                                      input.getProcessDir(),
+                                      output.getFilename(),
+                                      input.getForDisplay());
                 File destFile =
                     new File(IOUtil.joinDir(input.getProcessDir(), filename));
                 IOUtil.moveFile(stdoutFile, destFile);
                 files = new File[] { destFile };
             }
-            final String thePattern = applyMacros(currentEntry,
-                                                  null, 
-                                                  input.getProcessDir(),
-                                                  output.getPattern(),
-                                                  input.getForDisplay());
+            final String thePattern = applyMacros(currentEntry, null,
+                                          input.getProcessDir(),
+                                          output.getPattern(),
+                                          input.getForDisplay());
 
             if (files == null) {
                 files = input.getProcessDir().listFiles(new FileFilter() {
@@ -2057,6 +2077,7 @@ public class Service extends RepositoryManager {
             throws Exception {
         if (haveLink()) {
             link.addOutput(request, input, output, sb);
+
             return;
         }
 
@@ -2099,27 +2120,32 @@ public class Service extends RepositoryManager {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param d _more_
+     */
     public void setDescription(String d) {
-        description  = d;
+        description = d;
     }
 
 
     /**
-       Set the Serial property.
-
-       @param value The new value for Serial
-    **/
-    public void setSerial (boolean value) {
-	serial = value;
+     *  Set the Serial property.
+     *
+     *  @param value The new value for Serial
+     */
+    public void setSerial(boolean value) {
+        serial = value;
     }
 
     /**
-       Get the Serial property.
-
-       @return The Serial
-    **/
-    public boolean getSerial () {
-	return serial;
+     *  Get the Serial property.
+     *
+     *  @return The Serial
+     */
+    public boolean getSerial() {
+        return serial;
     }
 
 
@@ -2156,14 +2182,16 @@ public class Service extends RepositoryManager {
      * _more_
      *
      * @param entry _more_
+     * @param entryMap _more_
      * @param workDir _more_
      * @param value _more_
      * @param forDisplay _more_
      *
      * @return _more_
      */
-    public String applyMacros(Entry entry, 
-                              Hashtable<String,List<Entry>> entryMap, File workDir, String value,
+    public String applyMacros(Entry entry,
+                              Hashtable<String, List<Entry>> entryMap,
+                              File workDir, String value,
                               boolean forDisplay) {
 
         if (value == null) {
@@ -2173,36 +2201,49 @@ public class Service extends RepositoryManager {
         value = value.replace("${workdir}", forDisplay
                                             ? "&lt;working directory&gt;"
                                             : workDir.toString());
-        if(entryMap!=null) {
-            for (Enumeration keys = entryMap.keys(); keys.hasMoreElements(); ) {
+        if (entryMap != null) {
+            for (Enumeration keys =
+                    entryMap.keys(); keys.hasMoreElements(); ) {
                 String id = (String) keys.nextElement();
-                for(Entry otherEntry:entryMap.get(id)) {
-                    value =  applyMacros(otherEntry, id, value, forDisplay);
+                for (Entry otherEntry : entryMap.get(id)) {
+                    value = applyMacros(otherEntry, id, value, forDisplay);
                 }
             }
         }
 
         //        System.err.println("Apply macros:" +entry);
         if (entry != null) {
-            value =  applyMacros(entry, "entry", value, forDisplay);
+            value = applyMacros(entry, "entry", value, forDisplay);
         }
 
         return value;
     }
 
 
-    private String applyMacros(Entry entry, String id, String value, boolean forDisplay) {
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param id _more_
+     * @param value _more_
+     * @param forDisplay _more_
+     *
+     * @return _more_
+     */
+    private String applyMacros(Entry entry, String id, String value,
+                               boolean forDisplay) {
         List<Column> columns = entry.getTypeHandler().getColumns();
         if (columns != null) {
             for (Column column : columns) {
                 Object columnValue =
                     entry.getTypeHandler().getEntryValue(entry,
-                                                         column.getName());
+                        column.getName());
                 if (columnValue != null) {
-                    value = value.replace("${" + id +".attr."
-                                          + column.getName() + "}", "" + columnValue);
+                    value = value.replace("${" + id + ".attr."
+                                          + column.getName() + "}", ""
+                                              + columnValue);
                 } else {
-                    value = value.replace("${" + id +".attr."
+                    value = value.replace("${" + id + ".attr."
                                           + column.getName() + "}", "");
                 }
             }
@@ -2210,19 +2251,19 @@ public class Service extends RepositoryManager {
 
 
         String fileTail = getStorageManager().getFileTail(entry);
-        value = value.replace("${" + id +".id}", entry.getId());
-        value = value.replace("${" + id +".file}", forDisplay
-                              ? getStorageManager().getFileTail(entry)
-                              : entry.getResource().getPath());
+        value = value.replace("${" + id + ".id}", entry.getId());
+        value = value.replace("${" + id + ".file}", forDisplay
+                ? getStorageManager().getFileTail(entry)
+                : entry.getResource().getPath());
         //? not sure what the macros should be
         //            value = value.replace(macro("entry.file.base"),
         //                                  IOUtil.stripExtension(entry.getName()));
-        value = value.replace("${" + id +".file.base}",
+        value = value.replace("${" + id + ".file.base}",
                               IOUtil.stripExtension(fileTail));
-        value =
-            value.replace("${" + id +".file.suffix}",
-                          IOUtil.getFileExtension(fileTail).replace(".",
-                                                                    ""));
+        value = value.replace("${" + id + ".file.suffix}",
+                              IOUtil.getFileExtension(fileTail).replace(".",
+                                  ""));
+
         return value;
     }
 
@@ -2369,6 +2410,7 @@ public class Service extends RepositoryManager {
         /** _more_ */
         private String file;
 
+        /** _more_          */
         private String filePattern;
 
         /** _more_ */
@@ -2496,7 +2538,8 @@ public class Service extends RepositoryManager {
 
             group = XmlUtil.getAttribute(node, ATTR_GROUP, (String) null);
             file = XmlUtil.getAttribute(node, ATTR_FILE, (String) null);
-            filePattern = XmlUtil.getAttribute(node, "filePattern", (String) null);
+            filePattern = XmlUtil.getAttribute(node, "filePattern",
+                    (String) null);
             required = XmlUtil.getAttribute(node, "required", required);
             copy     = XmlUtil.getAttribute(node, "copy", false);
             valuesProperty = XmlUtil.getAttribute(node, "valuesProperty",
