@@ -78,9 +78,6 @@ public class Service extends RepositoryManager {
     /** _more_ */
     private static ServiceUtil dummyToForceCompile;
 
-    /** _more_ */
-    private static WorkflowTypeHandler dummy2ToForceCompile;
-
 
     /** _more_ */
     public static final String TAG_ARG = "arg";
