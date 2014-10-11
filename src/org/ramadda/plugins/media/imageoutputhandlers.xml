@@ -23,7 +23,10 @@ Runs ImageMagick convert
   <outputhandler>
    <service id="imagemagick.animate" label="Make animated GIF" command="${media.imagemagick.path}/convert">
    <description><![CDATA[Makes animated GIF using ImageMagick]]></description>
-   <process_description><![CDATA[<wiki>{{description}}{{gallery}}]]></process_description>
+   <process_description><![CDATA[<wiki>{{description}}{{gallery}}
+----
+{{tree}}
+]]></process_description>
 
    <arg type="int" label="Delay" help="Ticks" default="50" prefix="-delay"/>
    <arg type="enumeration" label="Loop" values="0:no loop,1:loop"  prefix="-loop"/>
@@ -40,7 +43,11 @@ Runs ImageMagick convert
   <outputhandler>
    <service id="imagemagick.strip" label="Strip EXIF Metadata" command="${media.imagemagick.path}/convert">
      <description><![CDATA[Strips out EXIF metadata from image using ImageMagick -strip]]></description>
-     <process_description><![CDATA[<wiki>{{description}}{{gallery}}]]></process_description>
+     <process_description><![CDATA[<wiki>
+{{description}}{{gallery}}
+----
+{{tree}}
+]]></process_description>
           <arg value="-strip"/>
           <arg value="${entry.file}" type="entry"   label="Input Image" primary="true"></arg>
           <arg value="${file}" file="${entry.file.base}_stripped.${entry.file.suffix}"  />
@@ -52,7 +59,11 @@ Runs ImageMagick convert
   <outputhandler>
    <service id="imagemagick.polaroid" label="Polaroid image" command="${media.imagemagick.path}/convert">
 <description><![CDATA[Runs ImageMagick polaroid conversion]]></description>
-   <process_description><![CDATA[<wiki>{{description}}{{gallery}}]]></process_description>
+   <process_description><![CDATA[
+<wiki>{{description}} {{gallery}}
+----
+{{tree}}
+]]></process_description>
           <arg value="${entry.file}" type="entry"   label="Input Image" primary="true"></arg>
 
           <arg name="bordercolor" prefix="-bordercolor" label="Border color" />
