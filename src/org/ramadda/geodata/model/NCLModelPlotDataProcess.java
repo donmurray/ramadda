@@ -130,7 +130,7 @@ public class NCLModelPlotDataProcess extends Service {
      * @throws Exception  problem getting the information for the form
      */
     @Override
-    public void addToForm(Request request, ServiceInput input, Appendable sb)
+        public void addToForm(Request request, ServiceInput input, Appendable sb, String argPrefix, String label)
             throws Exception {
 
         sb.append(HtmlUtils.formTable());
@@ -235,8 +235,8 @@ public class NCLModelPlotDataProcess extends Service {
      * @throws Exception  problems generating the output
      */
     @Override
-    public ServiceOutput evaluate(Request request, ServiceInput input)
-            throws Exception {
+    public ServiceOutput evaluate(Request request, ServiceInput input, String argPrefix)
+           throws Exception {
 
         List<Entry>          outputEntries = new ArrayList<Entry>();
         List<ServiceOperand> ops           = input.getOperands();

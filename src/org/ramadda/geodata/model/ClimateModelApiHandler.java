@@ -176,7 +176,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         for (Service process : processesToRun) {
             System.err.println("MODEL: applying process: "
                                + process.getLabel());
-            ServiceOutput output = process.evaluate(request, nextInput);
+            ServiceOutput output = process.evaluate(request, nextInput, null);
             outputs.add(output);
 
             //make a new input for the next process
@@ -311,7 +311,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         for (Service process : processesToRun) {
             System.err.println("MODEL: applying process: "
                                + process.getLabel());
-            ServiceOutput output = process.evaluate(request, nextInput);
+            ServiceOutput output = process.evaluate(request, nextInput, null);
             outputs.add(output);
 
             //make a new input for the next process
@@ -890,7 +890,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                             process.getId()));
                 }
                 if (process.canHandle(dpi)) {
-                    process.addToForm(request, dpi, tmpSB);
+                    process.addToForm(request, dpi, tmpSB, null, null);
                     processTabs.add(tmpSB.toString());
                     processTitles.add(process.getLabel());
                     first = false;

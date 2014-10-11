@@ -104,10 +104,10 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @throws Exception  problem adding to the form
      */
     @Override
-    public void addToForm(Request request, ServiceInput input, Appendable sb)
+        public void addToForm(Request request, ServiceInput input, Appendable sb, String argPrefix, String label)
             throws Exception {
         sb.append(HtmlUtils.formTable());
-        makeInputForm(request, input, sb);
+        makeInputForm(request, input, sb, argPrefix);
         sb.append(HtmlUtils.formTableClose());
     }
 
@@ -121,7 +121,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @throws Exception  problem making stuff
      */
     private void makeInputForm(Request request, ServiceInput input,
-                               Appendable sb)
+                               Appendable sb, String argPrefix)
             throws Exception {
         Entry first = input.getEntries().get(0);
 
@@ -162,7 +162,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @throws Exception  problem processing
      */
     @Override
-    public ServiceOutput evaluate(Request request, ServiceInput input)
+     public ServiceOutput evaluate(Request request, ServiceInput input, String argPrefix)
             throws Exception {
 
         if ( !canHandle(input)) {

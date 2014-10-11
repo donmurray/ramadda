@@ -28,6 +28,7 @@ import org.ramadda.repository.output.ServiceOutputHandler;
 import org.ramadda.repository.type.*;
 
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Utils;
 
 
 import org.w3c.dom.*;
@@ -58,7 +59,10 @@ public class ServiceTypeHandler extends OrderedGroupTypeHandler {
     public static final int IDX_SORT_ORDER = 0;
 
     /** _more_ */
-    public static final int IDX_LAST = 0;
+    public static final int IDX_PARAMETERS = 1;
+
+    /** _more_ */
+    public static final int IDX_LAST = 1;
 
 
     /** _more_ */
@@ -142,7 +146,6 @@ public class ServiceTypeHandler extends OrderedGroupTypeHandler {
                                  List<Entry> subGroups, List<Entry> entries)
             throws Exception {
         Service service = getService(request, entry);
-        System.err.println("service:" + service);
         if (service == null) {
             return null;
         }
@@ -152,6 +155,23 @@ public class ServiceTypeHandler extends OrderedGroupTypeHandler {
 
         subGroups.addAll(entries);
         addListForm(request, entry, subGroups, sb);
+
+        String params = entry.getValue(IDX_PARAMETERS,"");
+
+        if(Utils.stringDefined(params)) {
+            Element root = XmlUtil.getRoot(params);
+            NodeList nodes = XmlUtil.getElements(root, Service.TAG_PARAM);
+            if(nodes.getLength()>0) {
+                request = request.cloneMe();
+            }
+            for (int i = 0; i < nodes.getLength(); i++) {
+                Element node  = (Element) nodes.item(i);
+                request.put(XmlUtil.getAttribute(node,Service.ATTR_NAME),
+                            XmlUtil.getChildText(node));
+            }
+            System.err.println("params:" + params);
+        }
+
 
         if ( !soh.doExecute(request)) {
             soh.makeForm(request, service, entry, entries,
@@ -234,9 +254,12 @@ public class ServiceTypeHandler extends OrderedGroupTypeHandler {
         }
         Service service = getRepository().makeService(root, false);
 
+        service.setServiceEntry(entry);
         //IMPORTANT! Always do this because we don't allow a service xml entry file to have commands
         service.ensureSafeServices();
-
+        if(Utils.stringDefined(entry.getLabel())) {
+            service.setLabel(entry.getLabel());
+        }
         return service;
 
     }

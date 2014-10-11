@@ -273,7 +273,6 @@ public class Column implements DataTypes, Constants {
     private boolean canSearch;
 
 
-
     /** _more_ */
     private boolean advancedSearch;
 
@@ -2126,7 +2125,7 @@ public class Column implements DataTypes, Constants {
     public void setValue(Request request, Entry entry, Object[] values)
             throws Exception {
 
-        if ( !addToForm) {
+        if ( !addToForm || !editable) {
             //            System.err.println ("not adding to form" );
             return;
         }
@@ -2958,6 +2957,10 @@ public class Column implements DataTypes, Constants {
      */
     public boolean getEditable() {
         return editable;
+    }
+
+    public boolean getAddToForm() {
+        return addToForm;
     }
 
     /**

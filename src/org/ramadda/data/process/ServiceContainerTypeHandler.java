@@ -82,8 +82,7 @@ public class ServiceContainerTypeHandler extends ServiceTypeHandler {
      */
     @Override
     public Service getService(Request request, Entry entry) throws Exception {
-        Service service = new Service(getRepository(), entry.getId(),
-                                      entry.getName());
+        Service service = new Service(getRepository(), entry);
         service.setDescription(entry.getDescription());
         service.setSerial(entry.getValue(IDX_SERIAL, "true").equals("true"));
 

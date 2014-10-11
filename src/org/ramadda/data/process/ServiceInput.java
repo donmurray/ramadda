@@ -29,6 +29,7 @@ import java.io.File;
 
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 
@@ -60,6 +61,9 @@ public class ServiceInput {
 
     /** _more_ */
     private Service sourceService;
+
+    /** _more_ */
+    private HashSet<File> seenFiles = new HashSet<File>();
 
 
     /**
@@ -130,9 +134,18 @@ public class ServiceInput {
      * @param operands  the operands for this process
      */
     public ServiceInput(List<ServiceOperand> operands) {
-        // TODO: should we call this with a default directory?
         this(null, operands);
     }
+
+    /**
+     * _more_
+     *
+     * @param dir _more_
+     */
+    public ServiceInput(File dir) {
+        this(dir, (List<ServiceOperand>) null);
+    }
+
 
     /**
      * Create a ServiceInput from a list of operands
@@ -143,18 +156,16 @@ public class ServiceInput {
      */
     public ServiceInput(File dir, List<ServiceOperand> operands) {
         this.processDir = dir;
-        this.operands   = operands;
+        this.operands   = (operands != null)
+                          ? operands
+                          : new ArrayList<ServiceOperand>();
+        if (processDir != null) {
+            for (File f : processDir.listFiles()) {
+                seenFiles.add(f);
+            }
+        }
     }
 
-    /**
-     * _more_
-     *
-     * @param dir _more_
-     */
-    public ServiceInput(File dir) {
-        this.processDir = dir;
-        this.operands   = new ArrayList<ServiceOperand>();
-    }
 
     /**
      * _more_
@@ -200,8 +211,11 @@ public class ServiceInput {
      * @param key _more_
      * @param value _more_
      */
-    public void addParam(String key, String value) {
+    public void addParam(String key, String prefix, String value) {
         params.add(new String[] { key, value });
+        if(prefix!=null && key.startsWith(prefix)) {
+            params.add(new String[] { key.substring(prefix.length()+1), value });
+        }
     }
 
     /**
@@ -212,6 +226,27 @@ public class ServiceInput {
     public List<String[]> getParams() {
         return params;
     }
+
+    /**
+     * _more_
+     *
+     * @param f _more_
+     */
+    public void addSeenFile(File f) {
+        seenFiles.add(f);
+    }
+
+    /**
+     * _more_
+     *
+     * @param f _more_
+     *
+     * @return _more_
+     */
+    public boolean haveSeenFile(File f) {
+        return seenFiles.contains(f);
+    }
+
 
     /**
      * _more_
@@ -280,10 +315,13 @@ public class ServiceInput {
                                  this.getProcessDir(),
                                  new ArrayList<ServiceOperand>(
                                      output.getOperands()));
-        input.setPublish(getPublish());
-        input.setForDisplay(getForDisplay());
-        input.params     = params;
-        input.properties = properties;
+
+        input.setPublish(this.getPublish());
+        input.setForDisplay(this.getForDisplay());
+        input.params     = this.params;
+        input.properties = this.properties;
+        //Keep the same reference to the list of seen files
+        input.seenFiles = this.seenFiles;
 
         return input;
     }

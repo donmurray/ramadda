@@ -2942,9 +2942,9 @@ public class TypeHandler extends RepositoryManager {
             }
             File workDir = getStorageManager().createProcessDir();
             ServiceInput serviceInput = new ServiceInput(workDir, entry);
-            ServiceOutput output = service.evaluate(getRepository().getTmpRequest(), serviceInput);
+            ServiceOutput output = service.evaluate(getRepository().getTmpRequest(), serviceInput, null);
             if ( !output.isOk()) {
-                System.err.println ("not ok");
+                System.err.println ("service not ok");
                 continue;
             }
             //Defer to the entry's type handler
@@ -3237,6 +3237,7 @@ public class TypeHandler extends RepositoryManager {
                                Entry parentEntry, Entry entry,
                                FormInfo formInfo)
             throws Exception {
+
         addBasicToEntryForm(request, sb, parentEntry, entry, formInfo);
         addSpecialToEntryForm(request, sb, parentEntry, entry, formInfo);
 

@@ -58,11 +58,13 @@ import java.util.List;
  */
 public class ServiceOutputHandler extends OutputHandler {
 
+    /** _more_          */
     public static final String PROP_PROCESSDIR = "processdir";
 
     /** _more_ */
     public static final String ARG_ASYNCH = "asynch";
 
+    /** _more_          */
     public static final String ARG_NEWDIRECTORY = "newdirectory";
 
     /** _more_ */
@@ -300,6 +302,7 @@ public class ServiceOutputHandler extends OutputHandler {
         if ( !request.defined(ARG_EXECUTE)) {
             StringBuffer sb = new StringBuffer();
             makeForm(request, service, entry, entries, outputType, sb);
+
             return new Result(outputType.getLabel(), sb);
         }
 
@@ -320,6 +323,31 @@ public class ServiceOutputHandler extends OutputHandler {
         return request.defined(ARG_EXECUTE)
                || request.defined(ARG_SHOWCOMMAND);
     }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public File getCurrentProcessingDir(Request request) throws Exception {
+        String currentDir =
+            (String) getSessionManager().getSessionProperty(request,
+                PROP_PROCESSDIR, null);
+        if (currentDir == null) {
+            return null;
+        }
+        File f = new File(currentDir);
+        if ( !f.exists()) {
+            return null;
+        }
+
+        return f;
+    }
+
 
     /**
      * _more_
@@ -347,23 +375,20 @@ public class ServiceOutputHandler extends OutputHandler {
         String actionName = (outputType != null)
                             ? outputType.getLabel()
                             : "Run service";
-        File   workDir = null;
-        System.err.println ("evaluateService");
-        String currentDir = (String) getSessionManager().getSessionProperty(request,
-                                                                            PROP_PROCESSDIR, null);
-
-        if(currentDir!=null) {
-            workDir = new File(currentDir);
-        } 
+        File   workDir    = getCurrentProcessingDir(request);
 
 
-        if(request.get(ARG_NEWDIRECTORY, false) || workDir == null || !workDir.exists()) {
+        if (request.get(ARG_NEWDIRECTORY, false) || (workDir == null)
+                || !workDir.exists()) {
             workDir = getStorageManager().createProcessDir();
-            getSessionManager().putSessionProperty(request,PROP_PROCESSDIR, workDir.toString());
+            getSessionManager().putSessionProperty(request, PROP_PROCESSDIR,
+                    workDir.toString());
         }
 
         final String processDirUrl =
             getStorageManager().getProcessDirEntryUrl(request, workDir);
+
+
 
         final List<ServiceInput> serviceInputs =
             new ArrayList<ServiceInput>();
@@ -410,8 +435,7 @@ public class ServiceOutputHandler extends OutputHandler {
                     List<Entry> outputEntries = new ArrayList<Entry>();
                     for (ServiceInput serviceInput : serviceInputs) {
                         try {
-                            ServiceOutput output = evaluateService(request,
-                                                       service, serviceInput);
+                            ServiceOutput output = evaluateService(request, service, serviceInput);
                             if ( !output.isOk()) {
                                 getActionManager().setContinueHtml(
                                     actionId,
@@ -453,7 +477,7 @@ public class ServiceOutputHandler extends OutputHandler {
         List<ServiceOutput> outputs       = new ArrayList<ServiceOutput>();
         for (ServiceInput serviceInput : serviceInputs) {
             ServiceOutput output = evaluateService(request, service,
-                                                   serviceInput);
+                                       serviceInput);
             outputs.add(output);
 
             if ( !output.isOk()) {
@@ -570,7 +594,7 @@ public class ServiceOutputHandler extends OutputHandler {
         ServiceOutput output;
 
         try {
-            output = service.evaluate(request, serviceInput);
+            output = service.evaluate(request, serviceInput, null);
             if ( !output.isOk()) {
                 return output;
             }
@@ -581,6 +605,7 @@ public class ServiceOutputHandler extends OutputHandler {
             return output;
         } catch (Exception exc) {
             exc.printStackTrace();
+
             return new ServiceOutput(false, exc.toString());
         }
 
@@ -658,10 +683,26 @@ public class ServiceOutputHandler extends OutputHandler {
         }
 
 
-        List<String> extraSubmit = new ArrayList<String>();
+        List<String> extraSubmit  = new ArrayList<String>();
+
+
+        String       extraDirHtml = "";
+        File         currentDir   = getCurrentProcessingDir(request);
+        if (currentDir != null) {
+            extraDirHtml = HtmlUtils.space(2)
+                           + HtmlUtils.href(
+                               getStorageManager().getProcessDirEntryUrl(
+                                   request, currentDir), msg(
+                                   "View directory"), HtmlUtils.attrs(
+                                   "target", "_view"));
+
+        }
+
+
+
         extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_NEWDIRECTORY, "true",
-                                                  request.get(ARG_NEWDIRECTORY, false),
-                                                  "Create new processing folder"));
+                request.get(ARG_NEWDIRECTORY, false),
+                msg("Create new processing folder") + extraDirHtml));
 
         extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_GOTOPRODUCTS, "true",
                 request.get(ARG_GOTOPRODUCTS, haveAnyOutputs),
@@ -679,8 +720,8 @@ public class ServiceOutputHandler extends OutputHandler {
         }
 
         service.addToForm(request, (entries != null)
-                                   ? new ServiceInput(null, entries, true)
-                                   : new ServiceInput(), sb);
+                          ? new ServiceInput(null, entries, true)
+                          : new ServiceInput(), sb,null, null);
 
         sb.append(HtmlUtils.hidden(Service.ARG_SERVICEFORM, "true"));
 

@@ -71,5 +71,28 @@ public class ServiceFileTypeHandler extends ServiceTypeHandler {
     }
 
 
+    @Override
+    public void initializeNewEntry(Entry entry) throws Exception {
+        super.initializeNewEntry(entry);
+        Element root = XmlUtil.getRoot(IOUtil.readContents(
+                                                           getStorageManager().getFileInputStream(
+                                                                                                  entry.getFile().toString())));
+        Element service;
+        if(root.getTagName().equals(Service.TAG_SERVICE)) {
+            service = root;
+        } else {
+            service = XmlUtil.findChild(root, Service.TAG_SERVICE);
+        }
+        /*
+<params>
+<param  name="17ae4559-9ae0-499d-93b0-1295d00b4b60.imagemagick.convert.type.input_file_hidden" ><![CDATA[58607c20-77e3-4c70-8f96-c9307f6ec835]]></param>
+        */
 
+        String paramsXml = "";
+        Element params = XmlUtil.findChild(service, Service.TAG_PARAMS);
+        if(params!=null) {
+            paramsXml  = XmlUtil.toString(params);
+        }
+        entry.getTypeHandler().getEntryValues(entry)[IDX_PARAMETERS] = paramsXml;
+    }
 }

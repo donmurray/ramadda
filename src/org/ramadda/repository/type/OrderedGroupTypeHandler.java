@@ -135,6 +135,7 @@ public abstract class OrderedGroupTypeHandler extends ExtensibleGroupTypeHandler
                             List<Entry> entries, Appendable sb)
             throws Exception {
 
+
         sb.append(request.form(getRepository().URL_ENTRY_ACCESS));
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, parent.getId()));
         if (entries.size() > 0) {
@@ -155,8 +156,13 @@ public abstract class OrderedGroupTypeHandler extends ExtensibleGroupTypeHandler
             }
             sb.append("</td><td>");
             cnt++;
+
+            String url = null;
+            if(getAccessManager().canEditEntry(request, entry)) {
+                url = request.entryUrl(getRepository().URL_ENTRY_FORM, entry);
+            }
             EntryLink link = getEntryManager().getAjaxLink(request, entry,
-                                 entry.getName());
+                                                           getEntryDisplayName(entry), url);
             addListLink(request, entry, link, sb);
             sb.append("</td></tr>");
         }

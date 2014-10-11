@@ -362,7 +362,13 @@ public class EntryUtil extends RepositoryManager {
                     Integer i2 =
                         (Integer) e2.getTypeHandler().getEntryValue(e2,
                             sortOrderFieldIndex);
-                    result = i1.compareTo(i2);
+                    if(i1<0 && i2>=0) {
+                        result = 1;
+                    } else  if(i2<0 && i1>=0) {
+                        result = -1;
+                    } else {
+                        result = i1.compareTo(i2);
+                    }
                 } else if (isType1) {
                     result = -1;
                 } else if (isType2) {

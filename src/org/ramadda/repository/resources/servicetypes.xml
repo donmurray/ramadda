@@ -3,7 +3,8 @@
      <property name="icon" value="/icons/cog.png"/>
      <property name="form.date.show" value="false"/>
      <property name="form.area.show" value="false"/>
-     <column name="sort_order"  type="int" default="0"   label="Sort order"  showinhtml="false"/>
+     <column name="sort_order"  type="int" default="-1"   label="Sort order"  showinhtml="false" editable="false" addtoform="false" />
+     <column name="parameters"  type="string" size="5000"    label="Parameters"  showinhtml="false" editable="false" addtoform="false" />
   </type>
 
   <type name="type_service_group"  description="Service Group"  super="type_service" 

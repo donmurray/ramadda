@@ -26,9 +26,10 @@ import org.ramadda.repository.metadata.*;
 import org.ramadda.repository.output.HtmlOutputHandler;
 import org.ramadda.repository.output.ServiceOutputHandler;
 import org.ramadda.repository.type.*;
-import org.ramadda.util.FormInfo;
 
+import org.ramadda.util.FormInfo;
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Utils;
 
 
 import org.w3c.dom.*;
@@ -70,6 +71,9 @@ public class ServiceLinkTypeHandler extends ServiceTypeHandler {
             throws Exception {
         super(repository, entryNode);
     }
+
+
+
 
 
     /**
@@ -114,6 +118,28 @@ public class ServiceLinkTypeHandler extends ServiceTypeHandler {
     /**
      * _more_
      *
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
+    @Override
+    public void initializeNewEntry(Entry entry) throws Exception {
+        super.initializeNewEntry(entry);
+
+        if ( !Utils.stringDefined(entry.getName())) {
+            Service service = getService(getRepository().getTmpRequest(),
+                                         entry);
+            if (service != null) {
+                entry.setName(service.getLabel());
+            }
+        }
+    }
+
+
+
+    /**
+     * _more_
+     *
      * @param request _more_
      * @param entry _more_
      * @param column _more_
@@ -152,10 +178,14 @@ public class ServiceLinkTypeHandler extends ServiceTypeHandler {
      */
     @Override
     public Service getService(Request request, Entry entry) throws Exception {
-        System.err.println("c:" + getColumns());
+        Service service = new Service(getRepository(), entry.getId(),
+                                      entry.getName());
+        service.setLinkId(entry.getValue(IDX_LINK_ID, ""));
 
-        return getRepository().getJobManager().getService(
-            entry.getValue(IDX_LINK_ID, ""));
+        if(Utils.stringDefined(entry.getLabel())) {
+            service.setLabel(entry.getLabel());
+        }
+        return service;
     }
 
 

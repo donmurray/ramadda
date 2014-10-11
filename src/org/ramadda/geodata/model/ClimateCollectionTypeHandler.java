@@ -250,7 +250,7 @@ JQ.button(
             tmpSB.append(msg("Select"));
             tmpSB.append(HtmlUtils.br());
             ServiceOperand op = new ServiceOperand(entry);
-            process.addToForm(request, new ServiceInput(op), tmpSB);
+            process.addToForm(request, new ServiceInput(op), tmpSB, null, null);
             processTabs.add(
                 HtmlUtils.div(
                     tmpSB.toString(), HtmlUtils.style("min-height:200px;")));
@@ -357,7 +357,7 @@ JQ.button(
             ServiceInput   dpi = new ServiceInput(processDir, op);
             didProcess = true;
             //TODO:
-            ServiceOutput output = process.evaluate(request, dpi);
+            ServiceOutput output = process.evaluate(request, dpi, null);
             if (output.hasOutput()) {
                 for (ServiceOperand oper : output.getOperands()) {
                     for (Entry outEntry : oper.getEntries()) {

@@ -1466,7 +1466,7 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
          */
         @Override
         public void addToForm(Request request, ServiceInput input,
-                             Appendable sb)
+                              Appendable sb, String argPrefix, String label)
                 throws Exception {
             sb.append(HtmlUtils.formTable());
             Entry first = input.getEntries().get(0);
@@ -1530,8 +1530,8 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
          * @throws Exception  problem processing
          */
         @Override
-        public ServiceOutput evaluate(Request request, ServiceInput input)
-                throws Exception {
+        public ServiceOutput evaluate(Request request, ServiceInput input, String argPrefix)
+               throws Exception {
 
             Entry  oneOfThem = input.getEntries().get(0);
             String tail      = getStorageManager().getFileTail(oneOfThem);

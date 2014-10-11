@@ -27,6 +27,7 @@ import org.ramadda.data.services.RecordConstants;
 import org.ramadda.repository.*;
 import org.ramadda.repository.output.*;
 import org.ramadda.data.process.Service;
+import org.ramadda.data.process.ServiceArg;
 import org.ramadda.repository.type.*;
 import org.ramadda.repository.util.DateArgument;
 import org.ramadda.util.HtmlUtils;
@@ -245,10 +246,10 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                                        "Output type  -don't change",
                                        service.getId(), true));
 
-        List<Service.Arg> args  = new ArrayList<Service.Arg>();
+        List<ServiceArg> args  = new ArrayList<ServiceArg>();
         //TODO: We get everything including intermediate entries
         service.collectArgs(args);
-        for(Service.Arg arg: args) {
+        for(ServiceArg arg: args) {
             if(arg.isValueArg()) {
                 continue;
             }
@@ -261,12 +262,12 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                     parameters.add(SU.getParameter(arg.getGroup(),
                                                    arg.getLabel(), null, arg.isRequired(), type));
                 } else {
-                    parameters.add(SU.getParameter(arg.getUrlArg(),
+                    parameters.add(SU.getParameter(service.getUrlArg(null, arg.getName()),
                                                    arg.getLabel(), null, arg.isRequired(), type));
                 }
             } else {
                 String label = arg.getLabel();
-                String urlArg = arg.getUrlArg();
+                String urlArg = service.getUrlArg(null, arg.getName());
                 if(arg.isEntry()) {
                     label = "Entry ID";
                     //TODO: Not sure what to do here as this is most likely an intermediate arg

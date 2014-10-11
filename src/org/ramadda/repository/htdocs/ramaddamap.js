@@ -278,7 +278,7 @@ function RepositoryMap(mapId, params) {
             } else {
                 var match = /wms:(.*),(.*),(.*)/.exec(mapLayer);
                 if (!match) {
-                    alert("no match " + mapLayer);
+                    alert("no match for map layer:" + mapLayer);
                     continue;
                 }
                 this.addWMSLayer(match[1], match[2], match[3]);

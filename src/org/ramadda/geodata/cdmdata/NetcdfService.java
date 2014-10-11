@@ -95,8 +95,8 @@ public class NetcdfService extends Service {
      * @throws Exception _more_
      */
     @Override
-    public void addToForm(Request request, ServiceInput input, Appendable sb)
-            throws Exception {
+        public void addToForm(Request request, ServiceInput input, Appendable sb, String argPrefix,String label)
+        throws Exception {
         List<Entry>          entries           = input.getEntries();
         Entry                entry             = ((entries.size() == 0)
                                                   ? null
@@ -124,7 +124,7 @@ public class NetcdfService extends Service {
             input.putProperty("coordNames", coordNames);
         }
 
-        super.addToForm(request, input, sb);
+        super.addToForm(request, input, sb, argPrefix, label);
     }
 
 }
