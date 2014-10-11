@@ -690,11 +690,11 @@ public class ServiceOutputHandler extends OutputHandler {
         File         currentDir   = getCurrentProcessingDir(request);
         if (currentDir != null) {
             extraDirHtml = HtmlUtils.space(2)
-                           + HtmlUtils.href(
+                           + "(" + HtmlUtils.href(
                                getStorageManager().getProcessDirEntryUrl(
                                    request, currentDir), msg(
-                                   "View directory"), HtmlUtils.attrs(
-                                   "target", "_view"));
+                                   "View current"), HtmlUtils.attrs(
+                                   "target", "_view")) +")";
 
         }
 
@@ -711,7 +711,7 @@ public class ServiceOutputHandler extends OutputHandler {
                 request.get(ARG_WRITEWORKFLOW, false), "Write workflow"));
 
         extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_SHOWCOMMAND, "true",
-                request.get(ARG_SHOWCOMMAND, false), "Show Command"));
+                request.get(ARG_SHOWCOMMAND, false), "Show command"));
 
 
         if (haveAnyOutputs) {

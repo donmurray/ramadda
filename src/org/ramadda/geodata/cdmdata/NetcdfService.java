@@ -95,16 +95,36 @@ public class NetcdfService extends Service {
      * @throws Exception _more_
      */
     @Override
-        public void addToForm(Request request, ServiceInput input, Appendable sb, String argPrefix,String label)
+   public void addToForm(Request request, ServiceInput input, Appendable sb, String argPrefix,String label)
         throws Exception {
+
+
+
         List<Entry>          entries           = input.getEntries();
         Entry                entry             = ((entries.size() == 0)
                                                   ? null
                                                   : entries.get(0));
+        if(entry==null) {
+            for(ServiceArg inputArg: getInputs()) {
+                if(inputArg.isEntry()) {
+                    entry  =  getEntry(request,  argPrefix,  inputArg);
+                    break;
+                }
+            }            
+        }
+
+
         if(entry!=null) {
-            CdmDataOutputHandler dataOutputHandler = getDataOutputHandler();
-            NetcdfDataset dataset =
-                NetcdfDataset.openDataset(entry.getResource().getPath());
+            addMetadata(request, input, entry.getResource().getPath());
+        }
+
+        super.addToForm(request, input, sb, argPrefix, label);
+    }
+
+    private void addMetadata(Request request, ServiceInput input, String path) throws Exception {
+        CdmDataOutputHandler dataOutputHandler = getDataOutputHandler();
+        NetcdfDataset dataset =
+            NetcdfDataset.openDataset(path);
             List<Variable>       variables  = dataset.getVariables();
             List<TwoFacedObject> coordNames = new ArrayList<TwoFacedObject>();
             List<TwoFacedObject> varNames   = new ArrayList<TwoFacedObject>();
@@ -118,13 +138,9 @@ public class NetcdfService extends Service {
             }
 
             dataset.close();
-
-
             input.putProperty("varNames", varNames);
             input.putProperty("coordNames", coordNames);
-        }
 
-        super.addToForm(request, input, sb, argPrefix, label);
     }
 
 }

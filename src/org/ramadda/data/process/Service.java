@@ -493,8 +493,14 @@ public class Service extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     */
     public void putParamValue(String name, Object value) {
-        Object  v     = paramValues.get(name);
+        Object v = paramValues.get(name);
         if (v == null) {
             paramValues.put(name, value);
         } else if (v instanceof List) {
@@ -606,7 +612,7 @@ public class Service extends RepositoryManager {
         if (request.defined(fullArg)) {
             String value = request.getString(fullArg, dflt);
             if (input != null) {
-                input.addParam(fullArg, argPrefix,  value);
+                input.addParam(fullArg, argPrefix, value);
             }
             debug("getRequestValue: full arg: " + fullArg + "=" + value);
 
@@ -615,7 +621,7 @@ public class Service extends RepositoryManager {
         if (request.defined(argName)) {
             String value = request.getString(argName, dflt);
             if (input != null) {
-                input.addParam(argName,  null, value);
+                input.addParam(argName, null, value);
             }
             debug("getRequestValue: part arg: " + argName + "=" + value);
 
@@ -641,13 +647,13 @@ public class Service extends RepositoryManager {
     public List<String> getRequestValue(Request request, ServiceInput input,
                                         String argPrefix, String argName,
                                         List<String> dflt) {
-        String       fullArg = getUrlArg(argPrefix,argName);
+        String       fullArg = getUrlArg(argPrefix, argName);
         List<String> results = null;
         if (request.defined(fullArg)) {
             results = request.get(fullArg, results);
             if (input != null) {
                 for (String value : results) {
-                    input.addParam(fullArg,  argPrefix, value);
+                    input.addParam(fullArg, argPrefix, value);
                 }
             }
 
@@ -798,7 +804,8 @@ public class Service extends RepositoryManager {
                 }
                 for (Entry entry : entries) {
                     if ( !getEntryManager().isSynthEntry(entry.getId())) {
-                        input.addParam(getUrlArg(argPrefix, argName), argPrefix, entry.getId());
+                        input.addParam(getUrlArg(argPrefix, argName),
+                                       argPrefix, entry.getId());
                     }
                 }
             }
@@ -1181,6 +1188,7 @@ public class Service extends RepositoryManager {
      * @param input _more_
      * @param sb _more_
      * @param argPrefix _more_
+     * @param label _more_
      *
      *
      * @throws Exception _more_
@@ -1198,7 +1206,10 @@ public class Service extends RepositoryManager {
         String myPrefix = getPrefix(argPrefix);
 
         if (haveLink()) {
+            System.err.println("Link:" + link + " "
+                               + link.getClass().getName());
             link.addToForm(request, input, sb, myPrefix, getLabel());
+
             return;
         }
 
@@ -1219,7 +1230,7 @@ public class Service extends RepositoryManager {
 
             return;
         }
-        if(!Utils.stringDefined(label)) {
+        if ( !Utils.stringDefined(label)) {
             label = getLabel();
         }
 
@@ -1233,12 +1244,14 @@ public class Service extends RepositoryManager {
      * @param prefix _more_
      * @param input _more_
      * @param sb _more_
+     * @param label _more_
      *
      *
      * @throws Exception _more_
      */
     private void addToFormInner(Request request, String prefix,
-                                ServiceInput input, Appendable sb, String label)
+                                ServiceInput input, Appendable sb,
+                                String label)
             throws Exception {
 
 
@@ -1347,7 +1360,6 @@ public class Service extends RepositoryManager {
      * _more_
      *
      * @param request _more_
-     * @param prefix _more_
      * @param argPrefix _more_
      * @param input _more_
      * @param catBuff _more_
@@ -1359,7 +1371,6 @@ public class Service extends RepositoryManager {
                              ServiceInput input, CatBuff catBuff,
                              ServiceArg arg)
             throws Exception {
-
 
 
         String        tooltip    = arg.getPrefix();
@@ -1400,8 +1411,8 @@ public class Service extends RepositoryManager {
                 boolean selected =
                     getRequestValue(request, argPrefix, arg.getGroup(),
                                     arg.getDefault()).equals(arg.getValue());
-                inputHtml.append(HtmlUtils.radio(getUrlArg(argPrefix, arg.getGroup()),
-                        arg.getValue(), selected));
+                inputHtml.append(HtmlUtils.radio(getUrlArg(argPrefix,
+                        arg.getGroup()), arg.getValue(), selected));
             } else {
                 inputHtml.append(HtmlUtils.checkbox(argUrlName, "true",
                         getRequestValue(request, argPrefix, arg.getName(),
@@ -1439,21 +1450,20 @@ public class Service extends RepositoryManager {
             String elementId = HtmlUtils.getUniqueId("select_");
             inputHtml.append(OutputHandler.getSelect(request, elementId,
                     msg("Select"), true, null));
-            String argName    = arg.getName() + "_hidden";
-
-            String entryId = getRequestValue(request, argPrefix, argName, "");
 
             String entryLabel = "";
 
-            if (Utils.stringDefined(entryId)) {
-                Entry entryArg = getEntryManager().getEntry(request, entryId);
-                if (entryArg != null) {
-                    entryLabel = entryArg.getName();
-                }
+            String entryId    = "";
+
+            String argName    = arg.getName() + "_hidden";
+            Entry  entryArg   = getEntry(request, argPrefix, arg);
+            if (entryArg != null) {
+                entryLabel = entryArg.getName();
+                entryId    = entryArg.getId();
             }
 
-            inputHtml.append(HtmlUtils.hidden(getUrlArg(argPrefix, argName), entryId,
-                    HtmlUtils.id(elementId + "_hidden")));
+            inputHtml.append(HtmlUtils.hidden(getUrlArg(argPrefix, argName),
+                    entryId, HtmlUtils.id(elementId + "_hidden")));
             inputHtml.append(HtmlUtils.space(1));
             inputHtml.append(HtmlUtils.disabledInput(argUrlName, entryLabel,
                     HtmlUtils.SIZE_60 + HtmlUtils.id(elementId)));
@@ -1495,6 +1505,29 @@ public class Service extends RepositoryManager {
         //        makeFormEntry(catBuff, arg.getLabel(), inputHtml.toString(), arg.getHelp());
 
 
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param argPrefix _more_
+     * @param arg _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Entry getEntry(Request request, String argPrefix, ServiceArg arg)
+            throws Exception {
+        String argName = arg.getName() + "_hidden";
+        String entryId = getRequestValue(request, argPrefix, argName, "");
+        if (Utils.stringDefined(entryId)) {
+            return getEntryManager().getEntry(request, entryId);
+        }
+
+        return null;
     }
 
 
@@ -1868,6 +1901,11 @@ public class Service extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param l _more_
+     */
     public void setLabel(String l) {
         label = l;
     }
