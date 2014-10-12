@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Commands</title>
+<title>Service Integration Framework</title>
   <link rel="stylesheet" type="text/css" href="./default.css" title="Style">
 
 </head>
@@ -14,7 +14,7 @@
 </td>
 <td width=30%>&nbsp;</td>
 </tr></table>
-<div class="pagetitle">14.4 Commands</div>
+<div class="pagetitle">14.4 Service Integration Framework</div>
 
 <style type="text/css">
 pre {
@@ -26,9 +26,153 @@ pre {
 
 
 
+RAMADDA supports 
 
 
-<a name="run"></a><div class="pagesubtitle">14.4.0 Run Settings</div> 
+
+<a name="run"></a><div class="pagesubtitle">14.4.0 Service XML</div> 
+A service is defined in XML and provided to RAMADDA as a plugin. 
+There are numerous examples in plugins available
+at <a href="http://sourceforge.net/p/ramadda/code/HEAD/tree/src/org/ramadda/">http://sourceforge.net/p/ramadda/code/HEAD/tree/src/org/ramadda/</a>
+
+
+<pre>
+media.pdfbox.path=/Users/jeffmc/.ramadda/bin/pdfbox.sh
+</pre>
+
+Here is an example 
+<blockquote><pre>&lt;outputhandlers <span class="xmlattr">class</span>="org.ramadda.repository.output.ServiceOutputHandler&quot; <span class="xmlattr">icon</span>="/icons/pdf.png&quot; <span class="xmlattr">command</span>="${media.pdfbox.path}&quot; <span class="xmlattr">category</span>="Documents and Images&quot;&gt;
+  &lt;outputhandler&gt;
+   &lt;service <span class="xmlattr">id</span>="media.pdfbox.extracttext&quot; <span class="xmlattr">label</span>="Extract text from PDF&quot; &gt;
+&lt;description&gt;<span class="xmlcdata">&lt;![CDATA[
+Runs PDFBox  &lt;a <span class="xmlattr">href</span>="https://pdfbox.apache.org/commandline/#extractText&quot; <span class="xmlattr">target</span>="_help&quot;&gt;Extract Text&lt;/a&gt;
+]]&gt;</span>&lt;/description&gt;
+          &lt;arg <span class="xmlattr">value</span>="ExtractText&quot;/&gt;
+          &lt;arg <span class="xmlattr">value</span>="${entry.file}&quot; <span class="xmlattr">type</span>="entry&quot; <span class="xmlattr">entryType</span>="type_document_pdf&quot; <span class="xmlattr">primary</span>="true&quot; <span class="xmlattr">label</span>="Input PDF File&quot; &gt;&lt;/arg&gt;
+          &lt;arg <span class="xmlattr">value</span>="${file}&quot; <span class="xmlattr">file</span>="${entry.file.base}.txt&quot;&gt;&lt;/arg&gt;
+          &lt;output <span class="xmlattr">type</span>="file&quot; <span class="xmlattr">pattern</span>=".*\.txt&quot;/&gt;
+    &lt;/service&gt;
+  &lt;/outputhandler&gt;
+
+  &lt;outputhandler&gt;
+   &lt;service <span class="xmlattr">id</span>="media.pdfbox.extractimages&quot; <span class="xmlattr">label</span>="Extract images from PDF&quot;&gt;
+
+&lt;process_description&gt;<span class="xmlcdata">&lt;![CDATA[&lt;wiki&gt;
+{{description}}
+{{gallery}}
+
+----
+{{tree}}
+]]&gt;</span>&lt;/process_description&gt;
+
+&lt;description&gt;<span class="xmlcdata">&lt;![CDATA[
+Runs PDFBox  &lt;a <span class="xmlattr">href</span>="https://pdfbox.apache.org/commandline/#pdfToImage&quot; <span class="xmlattr">target</span>="_help&quot;&gt;Extract Images&lt;/a&gt;
+]]&gt;</span>&lt;/description&gt;
+          &lt;arg <span class="xmlattr">value</span>="ExtractImages&quot;/&gt;
+          &lt;arg <span class="xmlattr">value</span>="-prefix&quot;/&gt;
+          &lt;arg <span class="xmlattr">value</span>="${file}&quot;  <span class="xmlattr">file</span>="${entry.file.base}.jpg&quot;/&gt;
+          &lt;arg <span class="xmlattr">value</span>="${entry.file}&quot; <span class="xmlattr">type</span>="entry&quot; <span class="xmlattr">entryType</span>="type_document_pdf&quot; <span class="xmlattr">primary</span>="true&quot; <span class="xmlattr">copy</span>="true&quot; <span class="xmlattr">label</span>="Input PDF File&quot;&gt;&lt;/arg&gt;
+          &lt;output <span class="xmlattr">type</span>="file&quot; <span class="xmlattr">pattern</span>=".*\.jpg&quot;/&gt;
+    &lt;/service&gt;
+  &lt;/outputhandler&gt;
+
+  &lt;outputhandler&gt;
+   &lt;service <span class="xmlattr">id</span>="media.pdfbox.pdftoimage&quot; <span class="xmlattr">label</span>="Make images from PDF&quot; <span class="xmlattr">outputToStderr</span>="true&quot;&gt;
+&lt;process_description&gt;<span class="xmlcdata">&lt;![CDATA[&lt;wiki&gt;
+{{description}}
+{{gallery}}
+
+----
+{{tree}}
+]]&gt;</span>&lt;/process_description&gt;
+
+&lt;description&gt;<span class="xmlcdata">&lt;![CDATA[
+Runs PDFBox  &lt;a <span class="xmlattr">href</span>="https://pdfbox.apache.org/commandline/#pdfToImage&quot; <span class="xmlattr">target</span>="_help&quot;&gt;PDF to image&lt;/a&gt;
+]]&gt;</span>&lt;/description&gt;
+          &lt;arg <span class="xmlattr">value</span>="PDFToImage&quot;/&gt;
+          &lt;arg <span class="xmlattr">value</span>="-outputPrefix&quot;/&gt;
+          &lt;arg <span class="xmlattr">value</span>="${file.base}&quot;  <span class="xmlattr">file</span>="${entry.file.base}.jpg&quot; <span class="xmlattr">filePattern</span>=".*${unique}${entry.file.base}[0-9]+.jpg&quot;/&gt;
+          &lt;arg <span class="xmlattr">value</span>="${entry.file}&quot; <span class="xmlattr">type</span>="entry&quot; <span class="xmlattr">entryType</span>="type_document_pdf&quot; <span class="xmlattr">primary</span>="true&quot; <span class="xmlattr">copy</span>="true&quot; <span class="xmlattr">label</span>="Input PDF File&quot;&gt;&lt;/arg&gt;
+          &lt;output <span class="xmlattr">type</span>="file&quot; <span class="xmlattr">pattern</span>=".*\.jpg&quot;/&gt;
+    &lt;/service&gt;
+  &lt;/outputhandler&gt;
+
+  &lt;outputhandler&gt;
+   &lt;service <span class="xmlattr">id</span>="media.pdfbox.pdfsplit&quot; <span class="xmlattr">label</span>="Split PDF&quot; <span class="xmlattr">outputToStderr</span>="true&quot;&gt;
+&lt;description&gt;<span class="xmlcdata">&lt;![CDATA[
+Runs PDFBox  &lt;a <span class="xmlattr">href</span>="https://pdfbox.apache.org/commandline/#pdfSplit&quot; <span class="xmlattr">target</span>="_help&quot;&gt;PDF Split&lt;/a&gt;
+]]&gt;</span>&lt;/description&gt;
+          &lt;arg <span class="xmlattr">value</span>="PDFSplit&quot;/&gt;
+          &lt;arg <span class="xmlattr">value</span>="${entry.file}&quot; <span class="xmlattr">type</span>="entry&quot; <span class="xmlattr">entryType</span>="type_document_pdf&quot; <span class="xmlattr">primary</span>="true&quot; <span class="xmlattr">copy</span>="true&quot; <span class="xmlattr">label</span>="Input PDF File&quot;&gt;&lt;/arg&gt;
+          &lt;arg <span class="xmlattr">type</span>="int&quot; <span class="xmlattr">prefix</span>="-split&quot; <span class="xmlattr">label</span>="Split&quot; <span class="xmlattr">help</span>="Number of pages per splitted part of the PDF&quot;/&gt;
+          &lt;output <span class="xmlattr">type</span>="type_document_pdf&quot; <span class="xmlattr">pattern</span>=".*\.pdf&quot;/&gt;
+    &lt;/service&gt;
+  &lt;/outputhandler&gt;
+
+  &lt;outputhandler&gt;
+   &lt;service <span class="xmlattr">id</span>="media.pdfbox.texttopdf&quot; <span class="xmlattr">label</span>="Text to PDF&quot; <span class="xmlattr">outputToStderr</span>="true&quot;&gt;
+&lt;description&gt;<span class="xmlcdata">&lt;![CDATA[
+Runs PDFBox  &lt;a <span class="xmlattr">href</span>="https://pdfbox.apache.org/commandline/#textToPDF&quot; <span class="xmlattr">target</span>="_help&quot;&gt;Text to PDF&lt;/a&gt;
+]]&gt;</span>&lt;/description&gt;
+          &lt;arg <span class="xmlattr">value</span>="TextToPDF&quot;/&gt;
+          &lt;arg <span class="xmlattr">value</span>="${file}&quot; <span class="xmlattr">file</span>="${entry.file.base}.pdf&quot;&gt;&lt;/arg&gt;
+          &lt;arg <span class="xmlattr">value</span>="${entry.file}&quot; <span class="xmlattr">type</span>="entry&quot; <span class="xmlattr">entryType</span>="file&quot; <span class="xmlattr">entryPattern</span>=".*\.txt&quot; <span class="xmlattr">primary</span>="true&quot; <span class="xmlattr">label</span>="Input PDF File&quot;&gt;&lt;/arg&gt;
+          &lt;output <span class="xmlattr">type</span>="type_document_pdf&quot; <span class="xmlattr">pattern</span>=".*\.pdf&quot;/&gt;
+    &lt;/service&gt;
+  &lt;/outputhandler&gt;
+
+  &lt;outputhandler&gt;
+   &lt;service <span class="xmlattr">id</span>="media.pdfbox.merge&quot; <span class="xmlattr">label</span>="Merge PDF Files&quot; <span class="xmlattr">outputToStderr</span>="true&quot;&gt;
+&lt;description&gt;<span class="xmlcdata">&lt;![CDATA[
+Runs PDFBox  &lt;a <span class="xmlattr">href</span>="https://pdfbox.apache.org/commandline/#textToPDF&quot; <span class="xmlattr">target</span>="_help&quot;&gt;PDFMerger&lt;/a&gt;
+]]&gt;</span>&lt;/description&gt;
+          &lt;arg <span class="xmlattr">value</span>="PDFMerger&quot;/&gt;
+          &lt;arg <span class="xmlattr">value</span>="${entry.file}&quot; <span class="xmlattr">multiple</span>="true&quot; <span class="xmlattr">type</span>="entry&quot; <span class="xmlattr">entryType</span>="type_document_pdf&quot; <span class="xmlattr">entryPattern</span>=".*\.pdf&quot; <span class="xmlattr">primary</span>="true&quot; <span class="xmlattr">label</span>="Input PDF File&quot;&gt;&lt;/arg&gt;
+          &lt;arg <span class="xmlattr">value</span>="merged.pdf&quot;&gt;&lt;/arg&gt;
+
+          &lt;output <span class="xmlattr">type</span>="type_document_pdf&quot; <span class="xmlattr">pattern</span>=".*\.pdf&quot;/&gt;
+    &lt;/service&gt;
+  &lt;/outputhandler&gt;
+
+
+
+&lt;/outputhandlers&gt;
+
+
+<a name="configuration"></a><div class="pagesubtitle">14.4.1 Configuration</div> 
+
+
+<pre>
+media.qtools.path=/usr/local/bin
+media.pdfbox.path=/Users/jeffmc/.ramadda/bin/pdfbox.sh
+media.imagemagick.path=/opt/local/bin
+
+
+geo.gdal.path=/usr/local/bin
+
+
+geo.hdf5.path=/opt/local/bin
+nco.path=/opt/local/bin
+cdo.path=/opt/local/bin/cdo
+ncl.ncarg_root=/Users/jeffmc/bin/dummy.sh
+ncl.convert.path=/Users/jeffmc/bin/dummy.sh
+
+#MBsystem bathymetry
+geo.mb.path=/usr/local/bin
+
+#Bio
+bio.dicom.dcm4che=/Users/jeffmc/software/dcm4che-2.0.28/bin
+bio.sratools=/Users/jeffmc/software/sratoolkit.2.3.5-2/bin
+bio.hmmertools=/Users/jeffmc/software/hmmer-3.1b1-macosx-intel/binaries
+bio.picard=/Users/jeffmc/software/picard-tools-1.119/picard.sh
+bio.gatk=/Users/jeffmc/software/gatk/gatk.sh
+bio.bedtools=/Users/jeffmc/software/bedtools2/bin
+
+
+
+
+
+
 
 
 

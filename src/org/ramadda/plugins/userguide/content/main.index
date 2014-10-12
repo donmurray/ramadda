@@ -8,6 +8,8 @@ index.html
 -examples/exampletypes.xml.txt
 -examples/test.zip
 -repository.dummy_properties
+-examples/pdfboxoutputhandlers_ex.xml
+-examples/pdfbox.sh
 -map.html
 >overview.html
 >user.html

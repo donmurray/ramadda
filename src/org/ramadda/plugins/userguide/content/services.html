@@ -1,9 +1,58 @@
-[ht::head {Commands}]
-
+[ht::head {Service Integration Framework}]
 <%nochildlist%>
 
+RAMADDA supports 
 
-<subhead  id="run"  intoc="false">Run Settings</subhead>
+
+
+<subhead  id="run"  intoc="false">Service XML</subhead>
+A service is defined in XML and provided to RAMADDA as a plugin. 
+There are numerous examples in plugins available
+at <a href="http://sourceforge.net/p/ramadda/code/HEAD/tree/src/org/ramadda/">http://sourceforge.net/p/ramadda/code/HEAD/tree/src/org/ramadda/</a>
+
+
+<pre>
+media.pdfbox.path=/Users/jeffmc/.ramadda/bin/pdfbox.sh
+</pre>
+
+Here is an example 
+[importxml examples/pdfboxoutputhandlers_ex.xml]
+
+
+<subhead  id="configuration"  intoc="false">Configuration</subhead>
+
+
+<pre>
+media.qtools.path=/usr/local/bin
+media.pdfbox.path=/Users/jeffmc/.ramadda/bin/pdfbox.sh
+media.imagemagick.path=/opt/local/bin
+
+
+geo.gdal.path=/usr/local/bin
+
+
+geo.hdf5.path=/opt/local/bin
+nco.path=/opt/local/bin
+cdo.path=/opt/local/bin/cdo
+ncl.ncarg_root=/Users/jeffmc/bin/dummy.sh
+ncl.convert.path=/Users/jeffmc/bin/dummy.sh
+
+#MBsystem bathymetry
+geo.mb.path=/usr/local/bin
+
+#Bio
+bio.dicom.dcm4che=/Users/jeffmc/software/dcm4che-2.0.28/bin
+bio.sratools=/Users/jeffmc/software/sratoolkit.2.3.5-2/bin
+bio.hmmertools=/Users/jeffmc/software/hmmer-3.1b1-macosx-intel/binaries
+bio.picard=/Users/jeffmc/software/picard-tools-1.119/picard.sh
+bio.gatk=/Users/jeffmc/software/gatk/gatk.sh
+bio.bedtools=/Users/jeffmc/software/bedtools2/bin
+
+
+
+
+
+
 
 
 [ht::foot]
