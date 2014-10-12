@@ -1,6 +1,6 @@
 <types>
 
-  <type name="geo_gdal" foruser="false" handler="org.ramadda.geodata.earthdata.GdalTypeHandler">
+  <type name="geo_gdal" foruser="false" handler="org.ramadda.geodata.earthdata.GdalTypeHandler" category="Geospatial">
      <service link="gdal.tiff2image"/>
      <service link="gdal.info"/>
   </type>
