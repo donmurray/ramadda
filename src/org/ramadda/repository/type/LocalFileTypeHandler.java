@@ -206,7 +206,7 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         //        System.err.println ("synthId:" + synthId);
         //        System.err.println ("child path:" + childPath);
 
-        if (!childPath.exists()) {
+        if ( !childPath.exists()) {
             getLogManager().logWarning(
                 "Server side files:  file does not exist:" + childPath);
 
@@ -596,8 +596,12 @@ public class LocalFileTypeHandler extends GenericTypeHandler {
         String   desc   = "";
         Object[] values = null;
         if (templateEntry != null) {
-            desc   = templateEntry.getDescription();
-            name   = templateEntry.getName();
+            if (Utils.stringDefined(templateEntry.getDescription())) {
+                desc = templateEntry.getDescription();
+            }
+            if (Utils.stringDefined(templateEntry.getName())) {
+                name = templateEntry.getName();
+            }
             values = entry.getTypeHandler().getEntryValues(entry);
         }
         entry.initEntry(name, desc, parent,
