@@ -214,8 +214,11 @@ public class HtmlOutputHandler extends OutputHandler {
      * @param entry _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public String getHtmlHeader(Request request, Entry entry) throws Exception {
+    public String getHtmlHeader(Request request, Entry entry)
+            throws Exception {
         if (entry.isDummy() || !entry.isGroup()) {
             return "";
         }
@@ -233,8 +236,11 @@ public class HtmlOutputHandler extends OutputHandler {
      * @param title _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public String makeHtmlHeader(Request request, Entry entry, String title) throws Exception {
+    public String makeHtmlHeader(Request request, Entry entry, String title)
+            throws Exception {
         OutputType[] types = new OutputType[] { OUTPUT_INFO, OUTPUT_TABLE,
         /*OUTPUT_GRID,*/
         OUTPUT_TREEVIEW, CalendarOutputHandler.OUTPUT_TIMELINE,
@@ -250,7 +256,8 @@ public class HtmlOutputHandler extends OutputHandler {
             String link = HtmlUtils.href(
                               request.entryUrl(
                                   getRepository().URL_ENTRY_SHOW, entry,
-                                  ARG_OUTPUT, output.toString()), HtmlUtils.img(
+                                  ARG_OUTPUT,
+                                  output.toString()), HtmlUtils.img(
                                       iconUrl(output.getIcon()),
                                       output.getLabel()));
             sb.append("<td align=center>");
@@ -1039,9 +1046,11 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
         if (request.get(ARG_ALLENTRIES, false)) {
-            String entryType = request.getString(ARG_ENTRYTYPE,(String) null);
+            String entryType = request.getString(ARG_ENTRYTYPE,
+                                   (String) null);
             for (Entry entry : entries) {
-                if(Utils.stringDefined(entryType) && !entry.getTypeHandler().isType(entryType)) {
+                if (Utils.stringDefined(entryType)
+                        && !entry.getTypeHandler().isType(entryType)) {
                     continue;
                 }
                 sb.append(getSelectLink(request, entry, target));
@@ -1223,7 +1232,7 @@ public class HtmlOutputHandler extends OutputHandler {
         List<Entry>  allEntries = new ArrayList<Entry>();
         allEntries.addAll(subGroups);
         allEntries.addAll(entries);
-        makeTreeView(request, allEntries, sb);
+        makeTreeView(request, allEntries, sb, 750, 500);
 
         return makeLinksResult(request, msg("Tree View"), sb,
                                new State(group, subGroups, entries));
@@ -1399,7 +1408,8 @@ public class HtmlOutputHandler extends OutputHandler {
             sb.append("<td valign=bottom align=center width=" + width
                       + "% >");
             String url = request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                          entry, ARG_OUTPUT, OUTPUT_GRID.toString());
+                                          entry, ARG_OUTPUT,
+                                          OUTPUT_GRID.toString());
             List<String> urls = new ArrayList<String>();
             getMetadataManager().getThumbnailUrls(request, entry, urls);
             if (urls.size() > 0) {
@@ -1456,11 +1466,13 @@ public class HtmlOutputHandler extends OutputHandler {
      * @param request _more_
      * @param children _more_
      * @param sb _more_
+     * @param width _more_
+     * @param height _more_
      *
      * @throws Exception _more_
      */
     public void makeTreeView(Request request, List<Entry> children,
-                             Appendable sb)
+                             Appendable sb, int width, int height)
             throws Exception {
         request.put(ARG_TREEVIEW, "true");
         StringBuffer listSB = new StringBuffer();
@@ -1475,9 +1487,10 @@ public class HtmlOutputHandler extends OutputHandler {
                 HtmlUtils.id("treeview_header")), gotoHtml)));
         sb.append("</tr><tr valign=\"top\">");
         sb.append(HtmlUtils.col(listSB.toString()));
-        sb.append(
-            HtmlUtils.col(
-                "<iframe id=\"treeview_view\" src=\"" + getRepository().getUrlBase()+"/blank\" width=\"750\" height=\"500\"></iframe>"));
+        sb.append(HtmlUtils.col("<iframe id=\"treeview_view\" src=\""
+                                + getRepository().getUrlBase()
+                                + "/blank\" width=\"" + width
+                                + "\" height=\"" + height + "\"></iframe>"));
         sb.append("</tr></table>");
         request.remove(ARG_TREEVIEW);
     }

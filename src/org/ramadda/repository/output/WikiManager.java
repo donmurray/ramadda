@@ -107,7 +107,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                                              ATTR_TAG, WIKI_TAG_HTML, ATTR_SHOWLINK, "true", ATTR_INCLUDEICON, "false") + ATTRS_LAYOUT), 
                             new WikiTag(WIKI_TAG_TREE, attrs(
                                                              ATTR_DETAILS, "true")), 
-                            new WikiTag(WIKI_TAG_TREEVIEW), 
+                            new WikiTag(WIKI_TAG_TREEVIEW, attrs(ATTR_WIDTH,"750", ATTR_HEIGHT,"500")), 
                             new WikiTag(WIKI_TAG_ACCORDIAN, attrs(
                                                                  ATTR_TAG, WIKI_TAG_HTML, ATTR_SHOWLINK, "true", ATTR_INCLUDEICON, "false") + ATTRS_LAYOUT), 
                             new WikiTag(WIKI_TAG_GRID), 
@@ -1827,12 +1827,16 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             }
 
         } else if (theTag.equals(WIKI_TAG_TREEVIEW)) {
+            int width  = Misc.getProperty(props, ATTR_WIDTH, 750);
+            int height = Misc.getProperty(props, ATTR_HEIGHT, 500);
+
             List<Entry> children = getEntries(request, originalEntry, entry,
                                        props);
             if (children.size() == 0) {
                 return null;
             }
-            getHtmlOutputHandler().makeTreeView(request, children, sb);
+            getHtmlOutputHandler().makeTreeView(request, children, sb, width,
+                    height);
 
             return sb.toString();
         } else if (theTag.equals(WIKI_TAG_LINKS)
@@ -2226,7 +2230,9 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         }
 
         //If there is a max property then clone the request and set the max
-        int max = Misc.getProperty(props, attrPrefix + ATTR_MAX, -1);
+        //For some reason we are using both count and max as attrs
+        int count = Misc.getProperty(props, attrPrefix + ATTR_COUNT, -1);
+        int max   = Misc.getProperty(props, attrPrefix + ATTR_MAX, count);
         if (max > 0) {
             request = request.cloneMe();
             request.put(ARG_MAX, "" + max);
@@ -2413,12 +2419,12 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         }
 
 
-        int count = Misc.getProperty(props, attrPrefix + ATTR_COUNT, -1);
-        if (count > 0) {
+
+        if (max > 0) {
             List<Entry> tmp = new ArrayList<Entry>();
             for (Entry child : entries) {
                 tmp.add(child);
-                if (tmp.size() >= count) {
+                if (tmp.size() >= max) {
                     break;
                 }
             }
