@@ -165,7 +165,6 @@ public class Service extends RepositoryManager {
     /** _more_ */
     private String entryType;
 
-
     /** _more_ */
     private boolean enabled = false;
 
@@ -299,34 +298,6 @@ public class Service extends RepositoryManager {
 
 
 
-
-
-    /**
-     * _more_
-     *
-     * @param link _more_
-     */
-    public void setLinkId(String link) {
-        linkId = link;
-        initService();
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param prefix _more_
-     * @param tail _more_
-     *
-     * @return _more_
-     */
-    public String getUrlArg(String prefix, String tail) {
-        return prefix + ARG_DELIMITER + tail;
-    }
-
-
-
-
     /**
      * _more_
      *
@@ -358,12 +329,6 @@ public class Service extends RepositoryManager {
             id = "dummy";
         }
 
-
-        if (id == null) {
-
-            throw new IllegalStateException("Service: no id defined in: "
-                                            + XmlUtil.toString(element));
-        }
         entryType = XmlUtil.getAttribute(element, ATTR_ENTRY_TYPE,
                                          (String) null);
 
@@ -390,8 +355,6 @@ public class Service extends RepositoryManager {
         serial = XmlUtil.getAttribute(element, ATTR_SERIAL, true);
 
 
-
-
         NodeList nodes;
 
         Element  params = XmlUtil.findChild(element, TAG_PARAMS);
@@ -407,16 +370,16 @@ public class Service extends RepositoryManager {
         }
 
 
-
         nodes = XmlUtil.getElements(element, TAG_SERVICE);
         for (int i = 0; i < nodes.getLength(); i++) {
             Element node = (Element) nodes.item(i);
             addChild(new Service(getRepository(), this, node, i));
         }
 
-        if (linkId != null) {
-            initService();
-        } else if (children == null) {
+
+
+
+        if (linkId == null && !haveChildren()) {
             command = XmlUtil.getAttributeFromTree(element, ATTR_COMMAND,
                     (String) null);
             pathProperty = XmlUtil.getAttribute(element, ATTR_PATHPROPERTY,
@@ -488,6 +451,9 @@ public class Service extends RepositoryManager {
             OutputDefinition output = new OutputDefinition(node);
             outputs.add(output);
         }
+
+
+
         enabled = true;
 
     }
@@ -702,7 +668,7 @@ public class Service extends RepositoryManager {
     /**
      * _more_
      */
-    private void initService() {
+    private void initLinkedService() {
         if (link != null) {
             return;
         }
@@ -715,14 +681,43 @@ public class Service extends RepositoryManager {
         }
     }
 
+
+
+    /**
+     * _more_
+     *
+     * @param link _more_
+     */
+    public void setLinkId(String link) {
+        linkId = link;
+        initLinkedService();
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param prefix _more_
+     * @param tail _more_
+     *
+     * @return _more_
+     */
+    public String getUrlArg(String prefix, String tail) {
+        return prefix + ARG_DELIMITER + tail;
+    }
+
+
+
+
+
+
     /**
      * _more_
      *
      * @return _more_
      */
     public boolean haveLink() {
-        initService();
-
+        initLinkedService();
         return link != null;
 
     }
