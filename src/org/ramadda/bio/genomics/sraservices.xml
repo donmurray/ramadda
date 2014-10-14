@@ -60,7 +60,7 @@ Convert the given SRA file to the FASTQ format
 
 
 
-    <service command="${service.sratools}/illuma-dump" label="Convert SRA to ILLUMA format" id="bio_sra_to_illuma" >
+    <service command="${service.sratools}/illumina-dump" label="Convert SRA to ILLUMA format" id="bio_sra_to_illuma" >
       <description><![CDATA[
 Convert SRA data into ILLUMA format (csfasta / qual)
 <br>

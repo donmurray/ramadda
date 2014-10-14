@@ -380,6 +380,7 @@ public class Service extends RepositoryManager {
         if ((linkId == null) && !haveChildren()) {
             command = XmlUtil.getAttributeFromTree(element, ATTR_COMMAND,
                     (String) null);
+
             pathProperty = XmlUtil.getAttribute(element, ATTR_PATHPROPERTY,
                     (String) null);
 
@@ -395,6 +396,7 @@ public class Service extends RepositoryManager {
                 String pathPropertyValue =
                     getRepository().getPropertyFromTree(pathProperty, null);
                 if (pathPropertyValue != null) {
+                    pathPropertyValue  = getStorageManager().localizePath(pathPropertyValue);
                     if (command == null) {
                         command = pathPropertyValue;
                     } else {
