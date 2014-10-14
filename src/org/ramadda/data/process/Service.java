@@ -405,12 +405,17 @@ public class Service extends RepositoryManager {
             }
 
             if ((command == null) || (command.indexOf("${") >= 0)) {
-                System.err.println("Service: no command defined:"
+                getLogManager().logError("Service: no command defined:"
                                    + XmlUtil.toString(element) + " path:"
                                    + pathProperty);
 
                 return;
             }
+            if(!new File(command).exists()) {
+                getLogManager().logError("Service: command file does not exist:" + command);
+                return;
+            }
+
         }
 
         //Look for:
