@@ -396,7 +396,8 @@ public class Service extends RepositoryManager {
                 String pathPropertyValue =
                     getRepository().getPropertyFromTree(pathProperty, null);
                 if (pathPropertyValue != null) {
-                    pathPropertyValue  = getStorageManager().localizePath(pathPropertyValue);
+                    pathPropertyValue =
+                        getStorageManager().localizePath(pathPropertyValue);
                     if (command == null) {
                         command = pathPropertyValue;
                     } else {
@@ -408,13 +409,15 @@ public class Service extends RepositoryManager {
 
             if ((command == null) || (command.indexOf("${") >= 0)) {
                 getLogManager().logError("Service: no command defined:"
-                                   + XmlUtil.toString(element) + " path:"
-                                   + pathProperty);
+                                         + XmlUtil.toString(element)
+                                         + " path:" + pathProperty);
 
                 return;
             }
-            if(!new File(command).exists()) {
-                getLogManager().logError("Service: command file does not exist:" + command);
+            if ( !new File(command).exists()) {
+                getLogManager().logError(
+                    "Service: command file does not exist:" + command);
+
                 return;
             }
 
@@ -825,6 +828,17 @@ public class Service extends RepositoryManager {
 
         return link != null;
 
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Service getLink() {
+        initLinkedService();
+
+        return link;
     }
 
     /**

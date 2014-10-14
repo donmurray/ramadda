@@ -130,7 +130,11 @@ public class ServiceLinkTypeHandler extends ServiceTypeHandler {
             Service service = getService(getRepository().getTmpRequest(),
                                          entry);
             if (service != null) {
-                entry.setName(service.getLabel());
+                if (service.getLink() != null) {
+                    entry.setName(service.getLink().getLabel());
+                } else {
+                    entry.setName(service.getLabel());
+                }
             }
         }
     }
