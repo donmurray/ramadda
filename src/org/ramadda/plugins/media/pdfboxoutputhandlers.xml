@@ -12,7 +12,7 @@ Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#extractText" target
   </outputhandler>
 
   <outputhandler>
-   <service id="media.pdfbox.extractimages" label="Extract images from PDF">
+   <service id="media_pdfbox_extractimages" label="Extract images from PDF">
 
 <process_description><![CDATA[<wiki>
 {{description}}
@@ -34,7 +34,7 @@ Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#pdfToImage" target=
   </outputhandler>
 
   <outputhandler>
-   <service id="media.pdfbox.pdftoimage" label="Make images from PDF" outputToStderr="true">
+   <service id="media_pdfbox_pdftoimage" label="Make images from PDF" outputToStderr="true">
 <process_description><![CDATA[<wiki>
 {{description}}
 {{gallery}}
@@ -55,7 +55,7 @@ Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#pdfToImage" target=
   </outputhandler>
 
   <outputhandler>
-   <service id="media.pdfbox.pdfsplit" label="Split PDF" outputToStderr="true">
+   <service id="media_pdfbox_pdfsplit" label="Split PDF" outputToStderr="true">
 <description><![CDATA[
 Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#pdfSplit" target="_help">PDF Split</a>
 ]]></description>
@@ -67,7 +67,7 @@ Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#pdfSplit" target="_
   </outputhandler>
 
   <outputhandler>
-   <service id="media.pdfbox.texttopdf" label="Text to PDF" outputToStderr="true">
+   <service id="media_pdfbox_texttopdf" label="Text to PDF" outputToStderr="true">
 <description><![CDATA[
 Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#textToPDF" target="_help">Text to PDF</a>
 ]]></description>
@@ -79,7 +79,7 @@ Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#textToPDF" target="
   </outputhandler>
 
   <outputhandler>
-   <service id="media.pdfbox.merge" label="Merge PDF Files" outputToStderr="true">
+   <service id="media_pdfbox_merge" label="Merge PDF Files" outputToStderr="true">
 <description><![CDATA[
 Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#textToPDF" target="_help">PDFMerger</a>
 ]]></description>
