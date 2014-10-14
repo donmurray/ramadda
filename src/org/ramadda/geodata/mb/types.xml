@@ -6,7 +6,7 @@
      <column name="number_of_records" label="Number of records"  type="int"/>
      <column name="total_track_length" label="Track length"  type="double"/>
 
-    <service link="mb.mbinfo" id="initmb">
+    <service link="geo_mb_mbinfo" id="initmb">
       <params>
           <param name="mb.mbinfo.xml">true</param>
       </params>

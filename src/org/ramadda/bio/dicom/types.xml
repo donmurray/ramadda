@@ -6,8 +6,8 @@
      <property name="form.area.show" value="false"/>
      <property name="form.todate.show" value="false"/>
      <property name="form.fromdate.label" value="Date"/>
-     <service link="bio.dicom.makethumbnail" id="dicomimage"/>
-     <service link="bio.dicom.xml" id="dicomxml"/>
+     <service link="bio_dicom_makethumbnail" id="dicomimage"/>
+     <service link="bio_dicom_xml" id="dicomxml"/>
   </type>
 
 

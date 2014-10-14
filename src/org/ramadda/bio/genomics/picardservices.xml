@@ -1,4 +1,4 @@
-<services command="${bio.picard}" outputToStderr="true" icon="/genomics/picard.png" category="Genomics">
+<services command="${service.picard}" outputToStderr="true" icon="/genomics/picard.png" category="Genomics">
 
     <service  label="Convert FASTQ to SAM" id="bio_picard_fastqtosam" outputToStderr="true">
       <description><![CDATA[
@@ -75,7 +75,7 @@ Reads a SAM or BAM file and writes a file containing summary alignment metrics.
 
 
 
-    <service command="${bio.picard}" label="Add Or Replace Read Groups" id="bio_picard_addorreplacegroups"  >
+    <service command="${service.picard}" label="Add Or Replace Read Groups" id="bio_picard_addorreplacegroups"  >
       <description><![CDATA[
 Replaces all read groups in the INPUT file with a new read group and assigns all reads to this read group in the OUTPUT
 <br>

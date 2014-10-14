@@ -1,7 +1,10 @@
 [ht::head {Service Integration Framework}]
 <%nochildlist%>
 
-RAMADDA supports 
+The Service Integration Framework makes it easy to integrate command line  tools that are installed  on the server
+as services that operate on  data and content with  RAMADDA. 
+
+See <a href="http://ramadda.org/alias/services">ramadda.org</a> for examples.
 
 
 
@@ -15,17 +18,31 @@ at <a href="http://sourceforge.net/p/ramadda/code/HEAD/tree/src/org/ramadda/">ht
 media.pdfbox.path=/Users/jeffmc/.ramadda/bin/pdfbox.sh
 </pre>
 
-Here is an example 
-[importxml examples/pdfboxoutputhandlers_ex.xml]
+The most compact way to specify a service is to do it as a output handler xml.
+Below is an example. Remove the "_ex1" so you have an outputhandlers.xml plugin file.
+[importxml examples/outputhandlers_ex1.xml]
+
+Then have an outputhandlers.xml that references the services that are defined in a separate services.xml file
+[importxml examples/outputhandlers_ex2.xml]
+
+
+We'll 
+
+[importxml examples/services_ex1.xml]
+
+
 
 
 <subhead  id="configuration"  intoc="false">Configuration</subhead>
 
 
+
 <pre>
-media.qtools.path=/usr/local/bin
-media.pdfbox.path=/Users/jeffmc/.ramadda/bin/pdfbox.sh
+#where imagemagick convert is 
 media.imagemagick.path=/opt/local/bin
+#PDFbox see <a href="examples/pdfbox.sh">pdfbox.sh</a>)
+media.pdfbox.path=/Users/jeffmc/.ramadda/bin/pdfbox.sh
+media.qtools.path=/usr/local/bin
 
 
 geo.gdal.path=/usr/local/bin
@@ -47,6 +64,16 @@ bio.hmmertools=/Users/jeffmc/software/hmmer-3.1b1-macosx-intel/binaries
 bio.picard=/Users/jeffmc/software/picard-tools-1.119/picard.sh
 bio.gatk=/Users/jeffmc/software/gatk/gatk.sh
 bio.bedtools=/Users/jeffmc/software/bedtools2/bin
+
+
+
+<a name="pdfbox"></a>
+<a href="https://pdfbox.apache.org/">PDF Box</a>
+To enable operations on PDF files using Apache's  <a href="https://pdfbox.apache.org/">PDF Box</a>
+<a href="https://pdfbox.apache.org/download.cgi">install it on the server. To isolate direct Java calls
+we use the <a href="examples/pdfbox.sh">pdfbox.sh</a>. Copy it to the PDF Box install directory, make it executable
+
+<pre>media.pdfbox.path=&lt;install dir&gt;/pdfbox.sh</pre>
 
 
 

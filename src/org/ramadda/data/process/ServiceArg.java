@@ -287,6 +287,53 @@ public class ServiceArg implements Constants {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param xml _more_
+     *
+     * @throws Exception _more_
+     */
+    public void toXml(Appendable xml) throws Exception {
+        StringBuilder attrs = new StringBuilder();
+        Service.attr(attrs, Service.ATTR_TYPE, type);
+        Service.attr(attrs, "depends", depends);
+        Service.attr(attrs, "addAll", addAll);
+        Service.attr(attrs, "addNone", addNone);
+        Service.attr(attrs, Service.ATTR_ENTRY_TYPE, entryType);
+        Service.attr(attrs, Service.ATTR_ENTRY_PATTERN, entryPattern);
+        Service.attr(attrs, "placeHolder", placeHolder);
+        Service.attr(attrs, Service.ATTR_PRIMARY, isPrimaryEntry);
+        Service.attr(attrs, "prefix", prefix);
+        Service.attr(attrs, "value", value);
+        Service.attr(attrs, "default", dflt);
+        Service.attr(attrs, Service.ATTR_NAME, name);
+        Service.attr(attrs, Service.ATTR_GROUP, group);
+        Service.attr(attrs, Service.ATTR_FILE, file);
+        Service.attr(attrs, "filePattern", filePattern);
+        Service.attr(attrs, "required", required);
+        Service.attr(attrs, "copy", copy);
+        Service.attr(attrs, "valuesProperty", valuesProperty);
+        Service.attr(attrs, Service.ATTR_LABEL, label);
+        Service.attr(attrs, "help", help);
+        Service.attr(attrs, "filename", fileName);
+        Service.attr(attrs, Service.ATTR_SIZE, size);
+        Service.attr(attrs, "ifdefined", ifDefined);
+        Service.attr(attrs, "multiple", multiple);
+        Service.attr(attrs, "first", first);
+        Service.attr(attrs, "multipleJoin", multipleJoin);
+        Service.attr(attrs, "sameRow", sameRow);
+        Service.attr(attrs, "size", size);
+        if (values.size() > 0) {
+            List<String> valueAttrs = new ArrayList<String>();
+            for (TwoFacedObject tfo : values) {
+                valueAttrs.add(tfo.getId() + ":" + tfo.getLabel());
+            }
+            Service.attr(attrs, "values", StringUtil.join(",", valueAttrs));
+        }
+
+        xml.append(XmlUtil.tag(Service.TAG_ARG, attrs.toString()));
+    }
 
     /**
      * _more_

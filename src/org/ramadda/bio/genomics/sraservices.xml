@@ -1,5 +1,5 @@
 <services icon="/genomics/dna.png" category="Genomics">
-    <service command="${bio.sratools}/abi-dump" label="Convert SRA to ABI format" id="bio_sra_to_abi" >
+    <service command="${service.sratools}/abi-dump" label="Convert SRA to ABI format" id="bio_sra_to_abi" >
       <description><![CDATA[
 Convert SRA data into ABI format (csfasta / qual)
 <br>
@@ -24,7 +24,7 @@ Convert SRA data into ABI format (csfasta / qual)
     </service>
 
 
-    <service command="${bio.sratools}/fastq-dump" label="Convert SRA to FASTQ" id="bio_sra_to_fastq" >
+    <service command="${service.sratools}/fastq-dump" label="Convert SRA to FASTQ" id="bio_sra_to_fastq" >
       <description><![CDATA[
 Convert the given SRA file to the FASTQ format
 <br>
@@ -60,7 +60,7 @@ Convert the given SRA file to the FASTQ format
 
 
 
-    <service command="${bio.sratools}/illuma-dump" label="Convert SRA to ILLUMA format" id="bio_sra_to_illuma" >
+    <service command="${service.sratools}/illuma-dump" label="Convert SRA to ILLUMA format" id="bio_sra_to_illuma" >
       <description><![CDATA[
 Convert SRA data into ILLUMA format (csfasta / qual)
 <br>
@@ -87,7 +87,7 @@ Convert SRA data into ILLUMA format (csfasta / qual)
 
 
 
-    <service  id="bio_sra_to_sam"  command="${bio.sratools}/sam-dump"  label="Convert SRA to SAM" >
+    <service  id="bio_sra_to_sam"  command="${service.sratools}/sam-dump"  label="Convert SRA to SAM" >
      <description>
 <![CDATA[
 Convert the given SRA file to SAM format
@@ -120,7 +120,7 @@ Convert the given SRA file to SAM format
 
 
 
-    <service command="${bio.sratools}/sff-dump" label="Convert SRA to SFF format" id="bio_sra_to_sff" >
+    <service command="${service.sratools}/sff-dump" label="Convert SRA to SFF format" id="bio_sra_to_sff" >
       <description><![CDATA[
 Convert SRA data into SFF format
 <br>
@@ -143,7 +143,7 @@ Convert SRA data into SFF format
 
 
 
-    <service command="${bio.sratools}/sra-stat" label="SRA stats" id="bio_sra_stat" >
+    <service command="${service.sratools}/sra-stat" label="SRA stats" id="bio_sra_stat" >
       <description><![CDATA[
 Show SRA stats
 <br>
@@ -166,7 +166,7 @@ Show SRA stats
 
 
 
-    <service command="${bio.sratools}/sra-pileup" label="SRA pileup" id="bio_sra_pileup" >
+    <service command="${service.sratools}/sra-pileup" label="SRA pileup" id="bio_sra_pileup" >
       <description><![CDATA[
 Generate pileup statistics on aligned SRA data 
 <br>

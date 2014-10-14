@@ -1,6 +1,6 @@
-<outputhandlers class="org.ramadda.repository.output.ServiceOutputHandler" icon="/icons/pdf.png" command="${media.pdfbox.path}" category="Documents and Images">
+<outputhandlers class="org.ramadda.repository.output.ServiceOutputHandler" icon="/icons/pdf.png" command="${service.pdfbox}" category="Documents and Images">
   <outputhandler>
-   <service id="media.pdfbox.extracttext" label="Extract text from PDF" >
+   <service id="media_pdfbox_extracttext" label="Extract text from PDF" >
 <description><![CDATA[
 Runs PDFBox  <a href="https://pdfbox.apache.org/commandline/#extractText" target="_help">Extract Text</a>
 ]]></description>

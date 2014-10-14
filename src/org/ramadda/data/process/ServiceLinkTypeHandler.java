@@ -182,9 +182,10 @@ public class ServiceLinkTypeHandler extends ServiceTypeHandler {
                                       entry.getName());
         service.setLinkId(entry.getValue(IDX_LINK_ID, ""));
 
-        if(Utils.stringDefined(entry.getLabel())) {
+        if (Utils.stringDefined(entry.getLabel())) {
             service.setLabel(entry.getLabel());
         }
+
         return service;
     }
 

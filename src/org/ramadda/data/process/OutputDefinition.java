@@ -107,6 +107,24 @@ public class OutputDefinition {
 
 
     /**
+     * _more_
+     *
+     * @param xml _more_
+     *
+     * @throws Exception _more_
+     */
+    public void toXml(Appendable xml) throws Exception {
+        StringBuilder attrs = new StringBuilder();
+        Service.attr(attrs, "pattern", pattern);
+        Service.attr(attrs, "stdout", useStdout);
+        Service.attr(attrs, "filename", filename);
+        Service.attr(attrs, "depends", depends);
+        Service.attr(attrs, "showResults", showResults);
+        xml.append(XmlUtil.tag(Service.TAG_OUTPUT, attrs.toString()));
+    }
+
+
+    /**
      *  Set the EntryType property.
      *
      *  @param value The new value for EntryType

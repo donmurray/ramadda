@@ -1,5 +1,5 @@
 <services category="Genomics">
-  <service label="Convert HMMER File" id="bio_hmmer_convert"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmconvert" >
+`  <service label="Convert HMMER File" id="bio_hmmer_convert"  icon="/genomics/hmmer.png"   command="${service.hmmertools}/hmmconvert" >
 <description><![CDATA[
 This will convert the given HMMER binary file to text
 <br>
@@ -9,7 +9,7 @@ Documentation available at <a target="_help" href="http://hmmer.janelia.org/">ht
     <output type="bio_hmmer_index" stdout="true" filename="${entry.file.base}.hmm"/>
    </service>
 
-  <service label="Run HMMSTAT" id="bio_hmmer_stat"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmstat" >
+  <service label="Run HMMSTAT" id="bio_hmmer_stat"  icon="/genomics/hmmer.png"   command="${service.hmmertools}/hmmstat" >
     <description><![CDATA[
 HMMSTAT documentation available at <a target="_help" href="http://hmmer.janelia.org/">http://hmmer.janelia.org</a>
 ]]></description>
@@ -25,7 +25,7 @@ HMMSTAT documentation available at <a target="_help" href="http://hmmer.janelia.
     <output showResults="true" stdout="true"/>
    </service>
 
-  <service label="Run HMMEMIT" id="bio_hmmer_emit"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmemit" >
+  <service label="Run HMMEMIT" id="bio_hmmer_emit"  icon="/genomics/hmmer.png"   command="${service.hmmertools}/hmmemit" >
     <description><![CDATA[
 HMMEMIT documentation available at <a target="_help" href="http://hmmer.janelia.org/">http://hmmer.janelia.org</a>
 ]]></description>
@@ -52,7 +52,7 @@ HMMEMIT documentation available at <a target="_help" href="http://hmmer.janelia.
     <output showResults="true" stdout="true"/>
    </service>
 
-  <service label="Run HMMFETCH" id="bio_hmmer_fetch"  icon="/genomics/hmmer.png"   command="${bio.hmmertools}/hmmfetch" >
+  <service label="Run HMMFETCH" id="bio_hmmer_fetch"  icon="/genomics/hmmer.png"   command="${service.hmmertools}/hmmfetch" >
     <description><![CDATA[
 HMMFETCH documentation available at <a target="_help" href="http://hmmer.janelia.org/">http://hmmer.janelia.org</a>
 ]]></description>

@@ -209,12 +209,13 @@ public class ServiceInput {
      * _more_
      *
      * @param key _more_
+     * @param prefix _more_
      * @param value _more_
      */
     public void addParam(String key, String prefix, String value) {
         params.add(new String[] { key, value });
-        if(prefix!=null && key.startsWith(prefix)) {
-            params.add(new String[] { key.substring(prefix.length()+1), value });
+        if ((prefix != null) && key.startsWith(prefix)) {
+            //            params.add(new String[] { key.substring(prefix.length()+1), value });
         }
     }
 

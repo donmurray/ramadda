@@ -1,7 +1,7 @@
 <outputhandlers class="org.ramadda.repository.output.ServiceOutputHandler" icon="/icons/png.png"  xxxentryType="type_image" entryPattern="(.*\.png|.*\.gif|.*\.jpg|.*\.jpeg|.*\.tiff)" category="Documents and Images">
 
   <outputhandler>
-   <service id="imagemagick.convert.type" label="Convert Image" command="${media.imagemagick.path}/convert">
+   <service id="imagemagick_convert" label="Convert Image" command="${service.imagemagick}/convert">
 <description><![CDATA[
 Runs ImageMagick convert
 ]]></description>
@@ -13,6 +13,8 @@ Runs ImageMagick convert
 ]]></process_description>
           <arg value="${entry.file}" type="entry"  label="Input Image" primary="true"></arg>
           <arg type="int" prefix="-resize" name="resize" label="Resize" help=" percent" value="${value}%"  />
+          <arg type="string" prefix="-bordercolor" default="" name="bordercolor" label="Border Color"  help="e.g., white, red, blue, ..."/>
+          <arg type="int" prefix="-border" name="border" label="Border Size" />
           <arg type="enumeration" name="newtype" label="Convert to" values="png,gif,jpg,tiff" value="${file}"  file="${entry.file.base}.${value}" />
           <output type="type_image" pattern=".*"/>
     </service>
@@ -21,7 +23,7 @@ Runs ImageMagick convert
 
 
   <outputhandler>
-   <service id="imagemagick.animate" label="Make animated GIF" command="${media.imagemagick.path}/convert">
+   <service id="imagemagick_animate" label="Make animated GIF" command="${service.imagemagick}/convert">
    <description><![CDATA[Makes animated GIF using ImageMagick]]></description>
    <process_description><![CDATA[<wiki>{{description}}{{gallery}}
 ----
@@ -41,7 +43,7 @@ Runs ImageMagick convert
 
 
   <outputhandler>
-   <service id="imagemagick.strip" label="Strip EXIF Metadata" command="${media.imagemagick.path}/convert">
+   <service id="imagemagick_strip" label="Strip EXIF Metadata" command="${service.imagemagick}/convert">
      <description><![CDATA[Strips out EXIF metadata from image using ImageMagick -strip]]></description>
      <process_description><![CDATA[<wiki>
 {{description}}{{gallery}}
@@ -57,7 +59,7 @@ Runs ImageMagick convert
 
 
   <outputhandler>
-   <service id="imagemagick.polaroid" label="Polaroid image" command="${media.imagemagick.path}/convert">
+   <service id="imagemagick_polaroid" label="Polaroid image" command="${service.imagemagick}/convert">
 <description><![CDATA[Runs ImageMagick polaroid conversion]]></description>
    <process_description><![CDATA[
 <wiki>{{description}} {{gallery}}
@@ -82,7 +84,7 @@ Runs ImageMagick convert
 
 
   <outputhandler>
-   <service id="imagemagick.identify" label="Identify image" command="${media.imagemagick.path}/identify">
+   <service id="imagemagick_identify" label="Identify image" command="${service.imagemagick}/identify">
 <description><![CDATA[Runs ImageMagick identify]]></description>
           <arg value="${entry.file}" type="entry"  label="Input Image" primary="true"></arg>
           <output showResults="true" stdout="true"/>
@@ -93,7 +95,7 @@ Runs ImageMagick convert
 
 
   <outputhandler>
-   <service id="imagemagick.convert.test" label="Test Convert Image" command="${media.imagemagick.path}/convert">
+   <service id="imagemagick_convert_test" label="Test Convert Image" command="${service.imagemagick}/convert">
        <service link="imagemagick.convert.type"><param name="newtype">png</param><param name="resize">50</param></service>
        <service link="imagemagick.polaroid"><param name="bordercolor">red</param><param name="background">green</param></service>
        <output type="type_image" pattern=".*"/>

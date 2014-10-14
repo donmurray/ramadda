@@ -1,6 +1,6 @@
 <outputhandlers>
-<outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="media.qttools.export"/>
-<outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="media.qttools.info"/>
-<outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="media.qttools.proofsheet"/>
-<outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="media.qttools.thumbnail"/>
+<outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="media_qttools_export"/>
+<outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="media_qttools_info"/>
+<outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="media_qttools_proofsheet"/>
+<outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="media_qttools_thumbnail"/>
 </outputhandlers>

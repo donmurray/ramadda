@@ -1,12 +1,9 @@
 <outputhandlers>
-  <outputhandler class="org.ramadda.geodata.cdmdata.WmsImageOutputHandler" name="WMS"/>
-  <outputhandler class="org.ramadda.geodata.cdmdata.CdmDataOutputHandler" name="CDM Data" required="true"/>
-  <outputhandler class="org.ramadda.geodata.cdmdata.GridPointOutputHandler" name="Grid as point Data" required="true"/>
-  <outputhandler class="org.ramadda.geodata.cdmdata.LdmOutputHandler" name="LDM Insert"/>
-  <outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="nco.ncwa" icon="/cdmdata/nco.png"/>
-
-  <outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="cdo.info"/>
-
-  <outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="h5.ls"/>
-
+  <outputhandler class="org.ramadda.geodata.cdmdata.WmsImageOutputHandler"/>
+  <outputhandler class="org.ramadda.geodata.cdmdata.CdmDataOutputHandler" required="true"/>
+  <outputhandler class="org.ramadda.geodata.cdmdata.GridPointOutputHandler" required="true"/>
+  <outputhandler class="org.ramadda.geodata.cdmdata.LdmOutputHandler"/>
+  <outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="geo_nco_ncwa" />
+  <outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="geo_cdo_info"/>
+  <outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="geo_h5_ls"/>
 </outputhandlers>

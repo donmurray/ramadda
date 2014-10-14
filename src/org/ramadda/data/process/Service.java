@@ -326,7 +326,7 @@ public class Service extends RepositoryManager {
         this.parent  = parent;
         id           = XmlUtil.getAttribute(element, ATTR_ID, dfltId);
         if (id == null) {
-            id = "dummy";
+            //            id = "dummy";
         }
 
         entryType = XmlUtil.getAttribute(element, ATTR_ENTRY_TYPE,
@@ -377,9 +377,7 @@ public class Service extends RepositoryManager {
         }
 
 
-
-
-        if (linkId == null && !haveChildren()) {
+        if ((linkId == null) && !haveChildren()) {
             command = XmlUtil.getAttributeFromTree(element, ATTR_COMMAND,
                     (String) null);
             pathProperty = XmlUtil.getAttribute(element, ATTR_PATHPROPERTY,
@@ -458,6 +456,103 @@ public class Service extends RepositoryManager {
 
     }
 
+
+    /**
+     * _more_
+     *
+     * @param xml _more_
+     * @param input _more_
+     *
+     * @throws Exception _more_
+     */
+    public void toXml(Appendable xml, ServiceInput input) throws Exception {
+        StringBuilder attrs = new StringBuilder();
+        attr(attrs, ATTR_ENTRY_TYPE, entryType);
+        attr(attrs, ATTR_ICON, icon);
+        attr(attrs, "outputToStderr", outputToStderr);
+        attr(attrs, "immediate", immediate);
+        attr(attrs, "ignoreStderr", ignoreStderr);
+        attr(attrs, ATTR_CLEANUP, cleanup);
+        attr(attrs, "category", category);
+        attr(attrs, ATTR_LINK, linkId);
+        attr(attrs, ATTR_LABEL, label);
+        attr(attrs, ATTR_SERIAL, serial);
+        xml.append(XmlUtil.openTag(TAG_SERVICE, attrs.toString()));
+        if (Utils.stringDefined(description)) {
+            xml.append(XmlUtil.openTag(ATTR_DESCRIPTION));
+            xml.append(XmlUtil.getCdata(description));
+            xml.append(XmlUtil.closeTag(ATTR_DESCRIPTION));
+        }
+        if (Utils.stringDefined(processDesc)) {
+            xml.append(XmlUtil.openTag("process_description"));
+            xml.append(XmlUtil.getCdata(processDesc));
+            xml.append(XmlUtil.closeTag("process_description"));
+        }
+        if (haveChildren()) {
+            for (Service child : children) {
+                child.toXml(xml, null);
+            }
+        }
+        for (ServiceArg arg : getArgs()) {
+            arg.toXml(xml);
+        }
+
+
+        for (OutputDefinition output : outputs) {
+            output.toXml(xml);
+        }
+
+        if (input != null) {
+            writeParamsXml(input, xml);
+        }
+
+        xml.append(XmlUtil.closeTag(TAG_SERVICE));
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param xml _more_
+     * @param name _more_
+     * @param value _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void attr(Appendable xml, String name, boolean value)
+            throws Exception {
+        attr(xml, name, value + "");
+    }
+
+    /**
+     * _more_
+     *
+     * @param xml _more_
+     * @param name _more_
+     * @param value _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void attr(Appendable xml, String name, int value)
+            throws Exception {
+        attr(xml, name, value + "");
+    }
+
+    /**
+     * _more_
+     *
+     * @param xml _more_
+     * @param name _more_
+     * @param value _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void attr(Appendable xml, String name, String value)
+            throws Exception {
+        if (Utils.stringDefined(value)) {
+            xml.append(XmlUtil.attr(name, value));
+        }
+    }
 
     /**
      * _more_
@@ -703,7 +798,9 @@ public class Service extends RepositoryManager {
      * @return _more_
      */
     public String getUrlArg(String prefix, String tail) {
-        return prefix + ARG_DELIMITER + tail;
+        return ((prefix == null)
+                ? tail
+                : prefix + ARG_DELIMITER + tail);
     }
 
 
@@ -718,6 +815,7 @@ public class Service extends RepositoryManager {
      */
     public boolean haveLink() {
         initLinkedService();
+
         return link != null;
 
     }
@@ -1041,8 +1139,10 @@ public class Service extends RepositoryManager {
      * @param input _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public String getLinkXml(ServiceInput input) {
+    public String getLinkXml(ServiceInput input) throws Exception {
         if (haveLink()) {
             return link.getLinkXml(input);
         }
@@ -1052,8 +1152,27 @@ public class Service extends RepositoryManager {
         sb.append(XmlUtil.openTag(TAG_SERVICES));
         sb.append("\n");
         sb.append(XmlUtil.openTag(TAG_SERVICE,
-                                  XmlUtil.attrs(ATTR_LINK, getId(), ATTR_ID,
-                                      "service")));
+                                  XmlUtil.attrs(ATTR_LINK, getId())));
+
+        writeParamsXml(input, sb);
+
+        sb.append(XmlUtil.closeTag(TAG_SERVICE));
+        sb.append(XmlUtil.closeTag(TAG_SERVICES));
+
+        return sb.toString();
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param input _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    public void writeParamsXml(ServiceInput input, Appendable sb)
+            throws Exception {
         sb.append("\n");
         sb.append(XmlUtil.openTag(TAG_PARAMS));
         sb.append("\n");
@@ -1065,10 +1184,7 @@ public class Service extends RepositoryManager {
         }
 
         sb.append(XmlUtil.closeTag(TAG_PARAMS));
-        sb.append(XmlUtil.closeTag(TAG_SERVICE));
-        sb.append(XmlUtil.closeTag(TAG_SERVICES));
 
-        return sb.toString();
     }
 
 
@@ -1199,6 +1315,8 @@ public class Service extends RepositoryManager {
         }
 
         String myPrefix = getPrefix(argPrefix);
+        System.err.println("addToForm argPrefix:" + argPrefix + " myPrefix:"
+                           + myPrefix);
 
         if (haveLink()) {
             System.err.println("Link:" + link + " "
@@ -1397,8 +1515,13 @@ public class Service extends RepositoryManager {
                                              : 4) + " ";
             }
 
-            List selected = request.get(argUrlName,
-                                        Misc.newList(arg.getDefault()));
+            List selected = request.get(argUrlName, new ArrayList<String>());
+            //                                        request.get(arg.getName(),
+            //                                                    Misc.newList(arg.getDefault())));
+            System.err.println("arg.name:" + arg.getName());
+            System.err.println("argUrlName:" + argUrlName);
+            System.err.println("selected:" + selected);
+            System.err.println("request:" + request);
             inputHtml.append(HtmlUtils.select(argUrlName, values, selected,
                     extra, 100));
         } else if (arg.isFlag()) {

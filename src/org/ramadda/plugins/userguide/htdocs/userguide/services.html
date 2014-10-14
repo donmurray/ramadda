@@ -40,103 +40,126 @@ at <a href="http://sourceforge.net/p/ramadda/code/HEAD/tree/src/org/ramadda/">ht
 media.pdfbox.path=/Users/jeffmc/.ramadda/bin/pdfbox.sh
 </pre>
 
-Here is an example 
-<blockquote><pre>&lt;outputhandlers <span class="xmlattr">class</span>="org.ramadda.repository.output.ServiceOutputHandler&quot; <span class="xmlattr">icon</span>="/icons/pdf.png&quot; <span class="xmlattr">command</span>="${media.pdfbox.path}&quot; <span class="xmlattr">category</span>="Documents and Images&quot;&gt;
-  &lt;outputhandler&gt;
-   &lt;service <span class="xmlattr">id</span>="media.pdfbox.extracttext&quot; <span class="xmlattr">label</span>="Extract text from PDF&quot; &gt;
-&lt;description&gt;<span class="xmlcdata">&lt;![CDATA[
-Runs PDFBox  &lt;a <span class="xmlattr">href</span>="https://pdfbox.apache.org/commandline/#extractText&quot; <span class="xmlattr">target</span>="_help&quot;&gt;Extract Text&lt;/a&gt;
-]]&gt;</span>&lt;/description&gt;
-          &lt;arg <span class="xmlattr">value</span>="ExtractText&quot;/&gt;
-          &lt;arg <span class="xmlattr">value</span>="${entry.file}&quot; <span class="xmlattr">type</span>="entry&quot; <span class="xmlattr">entryType</span>="type_document_pdf&quot; <span class="xmlattr">primary</span>="true&quot; <span class="xmlattr">label</span>="Input PDF File&quot; &gt;&lt;/arg&gt;
-          &lt;arg <span class="xmlattr">value</span>="${file}&quot; <span class="xmlattr">file</span>="${entry.file.base}.txt&quot;&gt;&lt;/arg&gt;
-          &lt;output <span class="xmlattr">type</span>="file&quot; <span class="xmlattr">pattern</span>=".*\.txt&quot;/&gt;
+The most compact way to specify a service is to do it as a output handler xml.
+Below is an example. Remove the "_ex1" so you have an outputhandlers.xml plugin file.
+<blockquote><pre>&lt;outputhandlers&gt;
+<span class="xmlcomment">&lt;!--
+We can have any number of outputhandler definitions here
+We are specifying the class as org.ramadda.repository.output.ServiceOutputHandler
+--&gt;</span>
+  &lt;outputhandler <span class="xmlattr">class</span>="org.ramadda.repository.output.ServiceOutputHandler&quot; <span class="xmlattr">category</span>="Test Output&quot;&gt;
+<span class="xmlcomment">&lt;!-- This is the service definition. 
+Set a property test1.path=/path/to/executable.sh in a .properties file in your RAMADDA home dir --&gt;</span>
+    &lt;service <span class="xmlattr">id</span>="test.service1&quot;  <span class="xmlattr">command</span>="${test1.path}&quot; <span class="xmlattr">label</span>="Run example service 1&quot; <span class="xmlattr">icon</span>="/icons/pdf.png&quot; &gt;
+    &lt;description&gt;<span class="xmlcdata">&lt;![CDATA[Runs an example service]]&gt;</span>&lt;/description&gt;
+<span class="xmlcomment">&lt;!-- Define the command line arguments --&gt;</span>
+
+<span class="xmlcomment">&lt;!-- Always have 'any value' as an arg --&gt;</span>
+       &lt;arg <span class="xmlattr">value</span>="any value&quot;/&gt;
+
+<span class="xmlcomment">&lt;!-- specify type='enumeration' for a pull down list. --&gt;</span>
+       &lt;arg <span class="xmlattr">name</span>="fruit1&quot; <span class="xmlattr">type</span>="enumeration&quot; <span class="xmlattr">values</span>="apple,banana,orange&quot; <span class="xmlattr">addNone</span>="true&quot;/&gt;
+
+<span class="xmlcomment">&lt;!-- specify value:label pairs --&gt;</span>
+       &lt;arg <span class="xmlattr">name</span>="fruit2&quot; <span class="xmlattr">type</span>="enumeration&quot; <span class="xmlattr">values</span>="apple:Apple label,banana:Banana label,orange:Orange label&quot;/&gt;
+
+<span class="xmlcomment">&lt;!-- Specify a value attribute where the macro '${value}' is replaced with the selected value --&gt;</span>
+       &lt;arg <span class="xmlattr">name</span>="fruit3&quot; <span class="xmlattr">type</span>="enumeration&quot; <span class="xmlattr">values</span>="apple,banana,orange&quot; <span class="xmlattr">value</span>="fruit=${value}&quot;/&gt;
+
+       &lt;arg <span class="xmlattr">value</span>="${entry.file}&quot; <span class="xmlattr">type</span>="entry&quot; <span class="xmlattr">entryType</span>="type_document_pdf&quot; <span class="xmlattr">primary</span>="true&quot; <span class="xmlattr">label</span>="Input PDF File&quot; &gt;&lt;/arg&gt;
+       &lt;arg <span class="xmlattr">value</span>="${file}&quot; <span class="xmlattr">file</span>="${entry.file.base}.txt&quot;&gt;&lt;/arg&gt;
+       &lt;output <span class="xmlattr">type</span>="file&quot; <span class="xmlattr">pattern</span>=".*\.txt&quot;/g
+       &lt;output <span class="xmlattr">type</span>="type_image&quot; <span class="xmlattr">pattern</span>=".*\.png&quot;/&gt;
     &lt;/service&gt;
   &lt;/outputhandler&gt;
-
-  &lt;outputhandler&gt;
-   &lt;service <span class="xmlattr">id</span>="media.pdfbox.extractimages&quot; <span class="xmlattr">label</span>="Extract images from PDF&quot;&gt;
-
-&lt;process_description&gt;<span class="xmlcdata">&lt;![CDATA[&lt;wiki&gt;
-{{description}}
-{{gallery}}
-
-----
-{{tree}}
-]]&gt;</span>&lt;/process_description&gt;
-
-&lt;description&gt;<span class="xmlcdata">&lt;![CDATA[
-Runs PDFBox  &lt;a <span class="xmlattr">href</span>="https://pdfbox.apache.org/commandline/#pdfToImage&quot; <span class="xmlattr">target</span>="_help&quot;&gt;Extract Images&lt;/a&gt;
-]]&gt;</span>&lt;/description&gt;
-          &lt;arg <span class="xmlattr">value</span>="ExtractImages&quot;/&gt;
-          &lt;arg <span class="xmlattr">value</span>="-prefix&quot;/&gt;
-          &lt;arg <span class="xmlattr">value</span>="${file}&quot;  <span class="xmlattr">file</span>="${entry.file.base}.jpg&quot;/&gt;
-          &lt;arg <span class="xmlattr">value</span>="${entry.file}&quot; <span class="xmlattr">type</span>="entry&quot; <span class="xmlattr">entryType</span>="type_document_pdf&quot; <span class="xmlattr">primary</span>="true&quot; <span class="xmlattr">copy</span>="true&quot; <span class="xmlattr">label</span>="Input PDF File&quot;&gt;&lt;/arg&gt;
-          &lt;output <span class="xmlattr">type</span>="file&quot; <span class="xmlattr">pattern</span>=".*\.jpg&quot;/&gt;
-    &lt;/service&gt;
-  &lt;/outputhandler&gt;
-
-  &lt;outputhandler&gt;
-   &lt;service <span class="xmlattr">id</span>="media.pdfbox.pdftoimage&quot; <span class="xmlattr">label</span>="Make images from PDF&quot; <span class="xmlattr">outputToStderr</span>="true&quot;&gt;
-&lt;process_description&gt;<span class="xmlcdata">&lt;![CDATA[&lt;wiki&gt;
-{{description}}
-{{gallery}}
-
-----
-{{tree}}
-]]&gt;</span>&lt;/process_description&gt;
-
-&lt;description&gt;<span class="xmlcdata">&lt;![CDATA[
-Runs PDFBox  &lt;a <span class="xmlattr">href</span>="https://pdfbox.apache.org/commandline/#pdfToImage&quot; <span class="xmlattr">target</span>="_help&quot;&gt;PDF to image&lt;/a&gt;
-]]&gt;</span>&lt;/description&gt;
-          &lt;arg <span class="xmlattr">value</span>="PDFToImage&quot;/&gt;
-          &lt;arg <span class="xmlattr">value</span>="-outputPrefix&quot;/&gt;
-          &lt;arg <span class="xmlattr">value</span>="${file.base}&quot;  <span class="xmlattr">file</span>="${entry.file.base}.jpg&quot; <span class="xmlattr">filePattern</span>=".*${unique}${entry.file.base}[0-9]+.jpg&quot;/&gt;
-          &lt;arg <span class="xmlattr">value</span>="${entry.file}&quot; <span class="xmlattr">type</span>="entry&quot; <span class="xmlattr">entryType</span>="type_document_pdf&quot; <span class="xmlattr">primary</span>="true&quot; <span class="xmlattr">copy</span>="true&quot; <span class="xmlattr">label</span>="Input PDF File&quot;&gt;&lt;/arg&gt;
-          &lt;output <span class="xmlattr">type</span>="file&quot; <span class="xmlattr">pattern</span>=".*\.jpg&quot;/&gt;
-    &lt;/service&gt;
-  &lt;/outputhandler&gt;
-
-  &lt;outputhandler&gt;
-   &lt;service <span class="xmlattr">id</span>="media.pdfbox.pdfsplit&quot; <span class="xmlattr">label</span>="Split PDF&quot; <span class="xmlattr">outputToStderr</span>="true&quot;&gt;
-&lt;description&gt;<span class="xmlcdata">&lt;![CDATA[
-Runs PDFBox  &lt;a <span class="xmlattr">href</span>="https://pdfbox.apache.org/commandline/#pdfSplit&quot; <span class="xmlattr">target</span>="_help&quot;&gt;PDF Split&lt;/a&gt;
-]]&gt;</span>&lt;/description&gt;
-          &lt;arg <span class="xmlattr">value</span>="PDFSplit&quot;/&gt;
-          &lt;arg <span class="xmlattr">value</span>="${entry.file}&quot; <span class="xmlattr">type</span>="entry&quot; <span class="xmlattr">entryType</span>="type_document_pdf&quot; <span class="xmlattr">primary</span>="true&quot; <span class="xmlattr">copy</span>="true&quot; <span class="xmlattr">label</span>="Input PDF File&quot;&gt;&lt;/arg&gt;
-          &lt;arg <span class="xmlattr">type</span>="int&quot; <span class="xmlattr">prefix</span>="-split&quot; <span class="xmlattr">label</span>="Split&quot; <span class="xmlattr">help</span>="Number of pages per splitted part of the PDF&quot;/&gt;
-          &lt;output <span class="xmlattr">type</span>="type_document_pdf&quot; <span class="xmlattr">pattern</span>=".*\.pdf&quot;/&gt;
-    &lt;/service&gt;
-  &lt;/outputhandler&gt;
-
-  &lt;outputhandler&gt;
-   &lt;service <span class="xmlattr">id</span>="media.pdfbox.texttopdf&quot; <span class="xmlattr">label</span>="Text to PDF&quot; <span class="xmlattr">outputToStderr</span>="true&quot;&gt;
-&lt;description&gt;<span class="xmlcdata">&lt;![CDATA[
-Runs PDFBox  &lt;a <span class="xmlattr">href</span>="https://pdfbox.apache.org/commandline/#textToPDF&quot; <span class="xmlattr">target</span>="_help&quot;&gt;Text to PDF&lt;/a&gt;
-]]&gt;</span>&lt;/description&gt;
-          &lt;arg <span class="xmlattr">value</span>="TextToPDF&quot;/&gt;
-          &lt;arg <span class="xmlattr">value</span>="${file}&quot; <span class="xmlattr">file</span>="${entry.file.base}.pdf&quot;&gt;&lt;/arg&gt;
-          &lt;arg <span class="xmlattr">value</span>="${entry.file}&quot; <span class="xmlattr">type</span>="entry&quot; <span class="xmlattr">entryType</span>="file&quot; <span class="xmlattr">entryPattern</span>=".*\.txt&quot; <span class="xmlattr">primary</span>="true&quot; <span class="xmlattr">label</span>="Input PDF File&quot;&gt;&lt;/arg&gt;
-          &lt;output <span class="xmlattr">type</span>="type_document_pdf&quot; <span class="xmlattr">pattern</span>=".*\.pdf&quot;/&gt;
-    &lt;/service&gt;
-  &lt;/outputhandler&gt;
-
-  &lt;outputhandler&gt;
-   &lt;service <span class="xmlattr">id</span>="media.pdfbox.merge&quot; <span class="xmlattr">label</span>="Merge PDF Files&quot; <span class="xmlattr">outputToStderr</span>="true&quot;&gt;
-&lt;description&gt;<span class="xmlcdata">&lt;![CDATA[
-Runs PDFBox  &lt;a <span class="xmlattr">href</span>="https://pdfbox.apache.org/commandline/#textToPDF&quot; <span class="xmlattr">target</span>="_help&quot;&gt;PDFMerger&lt;/a&gt;
-]]&gt;</span>&lt;/description&gt;
-          &lt;arg <span class="xmlattr">value</span>="PDFMerger&quot;/&gt;
-          &lt;arg <span class="xmlattr">value</span>="${entry.file}&quot; <span class="xmlattr">multiple</span>="true&quot; <span class="xmlattr">type</span>="entry&quot; <span class="xmlattr">entryType</span>="type_document_pdf&quot; <span class="xmlattr">entryPattern</span>=".*\.pdf&quot; <span class="xmlattr">primary</span>="true&quot; <span class="xmlattr">label</span>="Input PDF File&quot;&gt;&lt;/arg&gt;
-          &lt;arg <span class="xmlattr">value</span>="merged.pdf&quot;&gt;&lt;/arg&gt;
-
-          &lt;output <span class="xmlattr">type</span>="type_document_pdf&quot; <span class="xmlattr">pattern</span>=".*\.pdf&quot;/&gt;
-    &lt;/service&gt;
-  &lt;/outputhandler&gt;
-
-
 
 &lt;/outputhandlers&gt;
+<a href="examples/outputhandlers_ex1.xml"><img src="folder.gif" border="0">examples/outputhandlers_ex1.xml</a>
+</pre></blockquote>
+
+Another way is to define the services in a services.xml file, e.g.:
+<blockquote><pre>&lt;services&gt;
+<span class="xmlcomment">&lt;!-- This is the service definition. 
+Set a property test1.path=/path/to/executable.sh in a .properties file in your RAMADDA home dir 
+--&gt;</span>
+    &lt;service 
+       <span class="xmlattr">id</span>="test_service1&quot;  
+       <span class="xmlattr">command</span>="${test.service1.path}&quot; 
+       <span class="xmlattr">label</span>="Run example service 1&quot; 
+       <span class="xmlattr">icon</span>="/icons/pdf.png&quot; &gt;
+    &lt;description&gt;<span class="xmlcdata">&lt;![CDATA[Runs an example service]]&gt;</span>&lt;/description&gt;
+<span class="xmlcomment">&lt;!-- Define the command line arguments --&gt;</span>
+
+<span class="xmlcomment">&lt;!--
+Each arg tag has the following attributes:
+type (string, flag, enumeration, value,int, entry, etc)
+name - the url argument id 
+value - a value to use - may contain ${...} macros
+label
+help - shown in the form
+values - list of comma separated enum values
+prefix - added to the arg list if the value is defined
+--&gt;</span>
+
+
+<span class="xmlcomment">&lt;!-- Always have 'any value' as an arg --&gt;</span>
+       &lt;arg <span class="xmlattr">value</span>="any value&quot;/&gt;
+
+<span class="xmlcomment">&lt;!-- specify type='enumeration' for a pull down list. --&gt;</span>
+       &lt;arg <span class="xmlattr">name</span>="fruit1&quot; <span class="xmlattr">type</span>="enumeration&quot; <span class="xmlattr">values</span>="apple,banana,orange&quot; <span class="xmlattr">addNone</span>="true&quot;/&gt;
+
+<span class="xmlcomment">&lt;!-- specify value:label pairs --&gt;</span>
+       &lt;arg <span class="xmlattr">name</span>="fruit2&quot; <span class="xmlattr">type</span>="enumeration&quot; <span class="xmlattr">values</span>="apple:Apple label,banana:Banana label,orange:Orange label&quot;/&gt;
+
+<span class="xmlcomment">&lt;!-- Specify a value attribute where the macro '${value}' is replaced with the selected value --&gt;</span>
+       &lt;arg <span class="xmlattr">name</span>="fruit3&quot; <span class="xmlattr">type</span>="enumeration&quot; <span class="xmlattr">values</span>="apple,banana,orange&quot; <span class="xmlattr">value</span>="fruit=${value}&quot;/&gt;
+
+       &lt;arg <span class="xmlattr">name</span>="length&quot; <span class="xmlattr">type</span>="int&quot; <span class="xmlattr">default</span>="5&quot; <span class="xmlattr">help</span>="Some length&quot; <span class="xmlattr">label</span>="Length&quot;/&gt;
+
+       &lt;arg <span class="xmlattr">name</span>="string1&quot; <span class="xmlattr">type</span>="string&quot; <span class="xmlattr">size</span>="50&quot;  <span class="xmlattr">label</span>="Some string&quot;/&gt;
+<span class="xmlcomment">&lt;!--
+If the string is defined then also add the prefix as an argument
+--&gt;</span>
+       &lt;arg <span class="xmlattr">name</span>="string2&quot; <span class="xmlattr">type</span>="string&quot; <span class="xmlattr">size</span>="50&quot;  <span class="xmlattr">label</span>="Some string&quot; <span class="xmlattr">prefix</span>="-string&quot;/&gt;
+
+<span class="xmlcomment">&lt;!-- If checkbox is selected then add the value--&gt;</span>
+       &lt;arg <span class="xmlattr">name</span>="flag1&quot; <span class="xmlattr">type</span>="flag&quot;   <span class="xmlattr">label</span>="Some flag&quot; <span class="xmlattr">value</span>="flag1 selected&quot;/&gt;
+
+<span class="xmlcomment">&lt;!-- If checkbox is selected then add the &quot;-someflag&quot; &quot;value&quot; --&gt;</span>
+       &lt;arg <span class="xmlattr">name</span>="flag2&quot; <span class="xmlattr">type</span>="flag&quot;   <span class="xmlattr">label</span>="Some flag&quot; <span class="xmlattr">prefix</span>="-someflag&quot; <span class="xmlattr">value</span>="flag1 selected&quot;/&gt;
+
+<span class="xmlcomment">&lt;!-- Args of type entry match up with specific entry types in ramadda --&gt;</span>
+       &lt;arg <span class="xmlattr">value</span>="${entry.file}&quot; <span class="xmlattr">type</span>="entry&quot; <span class="xmlattr">entryType</span>="type_document_pdf&quot; <span class="xmlattr">primary</span>="true&quot; <span class="xmlattr">label</span>="Input PDF File&quot; &gt;&lt;/arg&gt;
+
+<span class="xmlcomment">&lt;!--
+This uses the macro ${entry.file.base} to get the base name (minus the suffix) of the selected entry's file
+So, if we having incoming.pdf the output file is incoming.txt
+--&gt;</span>
+       &lt;arg <span class="xmlattr">value</span>="${file}&quot; <span class="xmlattr">file</span>="${entry.file.base}.txt&quot;&gt;&lt;/arg&gt;
+
+<span class="xmlcomment">&lt;!--
+Now define the outputs. Each output has a regexp pattern that matches on any generated file
+You can specify an entry type for the entries that get created for each file
+--&gt;</span>
+       &lt;output <span class="xmlattr">type</span>="file&quot; <span class="xmlattr">pattern</span>=".*\.txt&quot;/g
+       &lt;output <span class="xmlattr">type</span>="type_image&quot; <span class="xmlattr">pattern</span>=".*\.png&quot;/&gt;
+
+<span class="xmlcomment">&lt;!-- If the service produces text to the stdout then this specifies to write to a file --&gt;</span>
+    &lt;output <span class="xmlattr">showResults</span>="true&quot; <span class="xmlattr">stdout</span>="true&quot; <span class="xmlattr">filename</span>="test.txt&quot;/&gt;
+   
+ &lt;/service&gt;
+&lt;/services&gt;
+<a href="examples/services_ex1.xml"><img src="folder.gif" border="0">examples/services_ex1.xml</a>
+</pre></blockquote>
+
+Then have an outputhandlers.xml that references the services:
+<blockquote><pre>&lt;outputhandlers <span class="xmlattr">class</span>="org.ramadda.repository.output.ServiceOutputHandler&quot; 
+                <span class="xmlattr">icon</span>="/icons/cog.png&quot;&gt;
+  &lt;outputhandler <span class="xmlattr">serviceId</span>="bio_hmmer_convert&quot;/&gt;
+  &lt;outputhandler <span class="xmlattr">serviceId</span>="bio_hmmer_convert&quot;/&gt;
+&lt;/outputhandlers&gt;
+<a href="examples/outputhandlers_ex2.xml"><img src="folder.gif" border="0">examples/outputhandlers_ex2.xml</a>
+</pre></blockquote>
 
 
 <a name="configuration"></a><div class="pagesubtitle">14.4.1 Configuration</div> 

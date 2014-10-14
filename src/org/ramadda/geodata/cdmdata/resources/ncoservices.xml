@@ -1,5 +1,5 @@
-  <services category="Earth Science Data">
-    <service label="NCO Weighted Average" id="nco.ncwa" command="${nco.path}/ncwa" handler="org.ramadda.geodata.cdmdata.NetcdfService">
+  <services category="Earth Science Data" icon="/cdmdata/nco.png">
+    <service label="NCO Weighted Average" id="geo_nco_ncwa" command="${service.nco.ncwa}" handler="org.ramadda.geodata.cdmdata.NetcdfService">
 <description>
 Run NetCDF Climate Operators (NCO) weighted average
 </description>

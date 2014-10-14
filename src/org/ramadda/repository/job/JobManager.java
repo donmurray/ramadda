@@ -672,6 +672,10 @@ public class JobManager extends RepositoryManager {
         CategoryBuffer  cb = new CategoryBuffer();
         String urlBase = getRepository().getUrlBase();
         for(Service service: getServices()) {
+            if(!service.isEnabled()) {
+                continue;
+            }
+
             String img = "";
             if(service.getIcon()!=null) {
                 img = HtmlUtils.img(iconUrl(service.getIcon()));
@@ -687,6 +691,12 @@ public class JobManager extends RepositoryManager {
                                                           urlBase +"/services/view",ARG_SERVICEID, service.getId()),
                                             service.getLabel()));
             
+            /*
+            String xmlUrl = HtmlUtils.href(HtmlUtils.url(
+                                                         urlBase +"/services/view",ARG_SERVICEID, service.getId(),ARG_OUTPUT,"xml"),HtmlUtils.img(iconUrl(ICON_XML)));
+
+            serviceSB.append(xmlUrl);
+            */
             if(Utils.stringDefined(service.getDescription())) {
                 serviceSB.append(HtmlUtils.div(service.getDescription(),HtmlUtils.cssClass("service-list-description")));
             }
@@ -711,10 +721,22 @@ public class JobManager extends RepositoryManager {
     public Result processServicesView(Request request)
             throws Exception {
         StringBuilder sb = new StringBuilder();
-        addHtmlHeader(request, sb);
         Service service = getService(request.getString(ARG_SERVICEID, ""));
         if(service == null) {
             sb.append(getPageHandler().showDialogError("No service found:" + request.getString(ARG_SERVICEID, "")));
+            return new Result(msg("Services"), sb);
+        }
+
+        /*
+        if(request.getString(ARG_OUTPUT,"").equals("xml")) {
+            service.toXml(sb);
+            request.setReturnFilename(service.getLabel()+"services.xml");
+            return new Result("",sb,"text/xml");
+            }*/
+
+
+        if(!service.isEnabled()) {
+            sb.append(getPageHandler().showDialogError("Service not enabled"));
             return new Result(msg("Services"), sb);
         }
 

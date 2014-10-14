@@ -1,5 +1,5 @@
   <services category="Earth Science Data">
-    <service label="Create image from GeoTIFF" id="gdal.tiff2image" command="${geo.gdal.path}/gdal_translate" outputToStderr="true">
+    <service label="Create image from GeoTIFF" id="gdal_tiff2image" command="${service.gdal.gdal_translate}" outputToStderr="true">
 <description>
 Run gdal_translate to make an image from a geotiff
 </description>
@@ -10,7 +10,7 @@ Run gdal_translate to make an image from a geotiff
           <output pattern=".*\.png" type="type_image"/>
     </service>
 
-    <service label="GDAL Info" id="gdal.info" command="${geo.gdal.path}/gdalinfo" xoutputToStderr="true">
+    <service label="GDAL Info" id="gdal_info" command="${service.gdal.gdalinfo}" xoutputToStderr="true">
 <description>
 Run gdalinfo
 </description>

@@ -60,7 +60,8 @@ proc importxml {file} {
    set href "<a href=\"$file\"><img src=\"folder.gif\" border=\"0\">$file</a>"
    set xml [xml [string trim $xml]]
    regsub {</pre>\s*</blockquote>} $xml "" xml
-##   append xml "\n$href</pre></blockquote>"
+   append xml "\n$href"
+   append xml "\n</pre></blockquote>"
    set xml
 }
 

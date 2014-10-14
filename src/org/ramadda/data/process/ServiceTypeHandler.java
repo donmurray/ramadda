@@ -149,6 +149,11 @@ public class ServiceTypeHandler extends OrderedGroupTypeHandler {
         if (service == null) {
             return null;
         }
+        StringBuilder xml = new StringBuilder();
+        service.toXml(xml, null);
+        System.out.println(xml);
+
+
         ServiceOutputHandler soh = new ServiceOutputHandler(repository,
                                        service);
         StringBuilder sb = new StringBuilder();
@@ -156,17 +161,17 @@ public class ServiceTypeHandler extends OrderedGroupTypeHandler {
         subGroups.addAll(entries);
         addListForm(request, entry, subGroups, sb);
 
-        String params = entry.getValue(IDX_PARAMETERS,"");
+        String params = entry.getValue(IDX_PARAMETERS, "");
 
-        if(Utils.stringDefined(params)) {
-            Element root = XmlUtil.getRoot(params);
+        if (Utils.stringDefined(params)) {
+            Element  root  = XmlUtil.getRoot(params);
             NodeList nodes = XmlUtil.getElements(root, Service.TAG_PARAM);
-            if(nodes.getLength()>0) {
+            if (nodes.getLength() > 0) {
                 request = request.cloneMe();
             }
             for (int i = 0; i < nodes.getLength(); i++) {
-                Element node  = (Element) nodes.item(i);
-                request.put(XmlUtil.getAttribute(node,Service.ATTR_NAME),
+                Element node = (Element) nodes.item(i);
+                request.put(XmlUtil.getAttribute(node, Service.ATTR_NAME),
                             XmlUtil.getChildText(node));
             }
             System.err.println("params:" + params);
@@ -257,9 +262,10 @@ public class ServiceTypeHandler extends OrderedGroupTypeHandler {
         service.setServiceEntry(entry);
         //IMPORTANT! Always do this because we don't allow a service xml entry file to have commands
         service.ensureSafeServices();
-        if(Utils.stringDefined(entry.getLabel())) {
+        if (Utils.stringDefined(entry.getLabel())) {
             service.setLabel(entry.getLabel());
         }
+
         return service;
 
     }

@@ -1,4 +1,4 @@
 <outputhandlers>
-  <outputhandler  class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="mb.mbinfo"/>
-  <outputhandler  class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="mb.mblist"/>
+  <outputhandler  class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="geo.mb_mbinfo"/>
+  <outputhandler  class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="geo_mb_mblist"/>
 </outputhandlers>

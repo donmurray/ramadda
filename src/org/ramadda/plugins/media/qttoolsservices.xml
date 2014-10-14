@@ -1,5 +1,5 @@
 <services  icon="/icons/mov.png" category="Documents and Images">
-   <service id="media.qttools.info" label="Show movie info" command="${media.qtools.path}/qt_info">
+   <service id="media_qttools_info" label="Show movie info" command="${service.qttools}/gt_info">
 <description><![CDATA[
 Show movie file information using  <a href="http://www.omino.com/sw/qt_tools/man/qt_info.html" target="_help">QTTools</a>
 ]]></description>
@@ -9,7 +9,7 @@ Show movie file information using  <a href="http://www.omino.com/sw/qt_tools/man
 
 
 
-   <service id="media.qttools.export" label="Movie export" command="${media.qtools.path}/qt_export">
+   <service id="media_qttools_export" label="Movie export" command="${service.qttools}/qt_export">
 <description><![CDATA[
 Export movie using  <a href="http://www.omino.com/sw/qt_tools/man/qt_export.html" target="_help">QTTools</a>
 ]]></description>
@@ -25,7 +25,7 @@ Export movie using  <a href="http://www.omino.com/sw/qt_tools/man/qt_export.html
 
 
 
-   <service id="media.qttools.proofsheet" label="Movie proofsheet" command="${media.qtools.path}/qt_proofsheet">
+   <service id="media_qttools_proofsheet" label="Movie proofsheet" command="${service.qttools}/qt_proofsheet">
 <description><![CDATA[
 Create proof sheet image using  <a href="http://www.omino.com/sw/qt_tools/man/qt_proofsheet.html" target="_help">QTTools</a>
 ]]></description>
@@ -42,7 +42,7 @@ Create proof sheet image using  <a href="http://www.omino.com/sw/qt_tools/man/qt
     </service>
 
 
-   <service id="media.qttools.thumbnail" label="Movie thumbnail" command="${media.qtools.path}/qt_proofsheet">
+   <service id="media_qttools_thumbnail" label="Movie thumbnail" command="${service.qttools}/qt_proofsheet">
 <description><![CDATA[
 Create thumbnail image using  <a href="http://www.omino.com/sw/qt_tools/man/qt_proofsheet.html" target="_help">QTTools</a>
 ]]></description>

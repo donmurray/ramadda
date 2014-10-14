@@ -63,6 +63,7 @@ public class ServiceOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final String ARG_ASYNCH = "asynch";
+    public static final String ARG_TOXML = "toxml";
 
     /** _more_          */
     public static final String ARG_NEWDIRECTORY = "newdirectory";
@@ -136,10 +137,10 @@ public class ServiceOutputHandler extends OutputHandler {
         if (serviceId != null) {
             service = getRepository().getJobManager().getService(serviceId);
             if (service == null) {
-                throw new IllegalStateException(
-                    "ServiceOutputHandler: could not find service:"
-                    + serviceId);
+                getLogManager().logError("ServiceOutputHandler: could not find service:" + serviceId);
+                return;
             }
+
         }
 
 
@@ -154,6 +155,10 @@ public class ServiceOutputHandler extends OutputHandler {
         }
 
 
+        if (service == null) {
+            getLogManager().logError("ServiceOutputHandler: could not find service:" + XmlUtil.toString(element));
+            return;
+        }
 
         outputType = new OutputType(
             XmlUtil.getAttribute(element, ATTR_LABEL, service.getLabel()),
@@ -178,7 +183,7 @@ public class ServiceOutputHandler extends OutputHandler {
      * @return _more_
      */
     public boolean isEnabled() {
-        return service.isEnabled();
+        return service!=null && service.isEnabled();
     }
 
     /**
@@ -299,6 +304,11 @@ public class ServiceOutputHandler extends OutputHandler {
     public Result handleRequest(Request request, Entry entry,
                                 List<Entry> entries)
             throws Exception {
+        if ( !isEnabled()) {
+            return null;
+        }
+
+
         if ( !request.defined(ARG_EXECUTE)) {
             StringBuffer sb = new StringBuffer();
             makeForm(request, service, entry, entries, outputType, sb);
@@ -394,8 +404,11 @@ public class ServiceOutputHandler extends OutputHandler {
             new ArrayList<ServiceInput>();
 
 
-        final boolean forDisplay   = request.get(ARG_SHOWCOMMAND, false);
+        boolean asynchronous = request.get(ARG_ASYNCH, false);
+        boolean toXml = request.get(ARG_TOXML, false);
+        final boolean forDisplay   = (toXml?true:request.get(ARG_SHOWCOMMAND, false));
         final boolean doingPublish = doingPublish(request);
+
         if (service.requiresMultipleEntries()) {
             ServiceInput serviceInput = new ServiceInput(workDir, entries,
                                             true);
@@ -425,7 +438,8 @@ public class ServiceOutputHandler extends OutputHandler {
             serviceInputs.add(serviceInput);
         }
 
-        boolean asynchronous = request.get(ARG_ASYNCH, false);
+
+        
 
         if (asynchronous) {
             ActionManager.Action action = new ActionManager.Action() {
@@ -498,6 +512,15 @@ public class ServiceOutputHandler extends OutputHandler {
                 service.addOutput(request, serviceInput, output, sb);
             }
         }
+
+        if(toXml) {
+            StringBuilder xml = new StringBuilder();
+            service.toXml(xml, serviceInputs.size()>0?serviceInputs.get(0):null);
+            System.err.println(xml);
+            request.setReturnFilename(service.getLabel()+"services.xml");
+            return new Result("",xml,"text/xml");
+        }
+
 
         if (forDisplay) {
             StringBuffer commands = new StringBuffer();
@@ -712,7 +735,9 @@ public class ServiceOutputHandler extends OutputHandler {
 
         extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_SHOWCOMMAND, "true",
                 request.get(ARG_SHOWCOMMAND, false), "Show command"));
-
+        
+        extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_TOXML, "true",
+                                                  request.get(ARG_TOXML, false), msg("Export full XML")));
 
         if (haveAnyOutputs) {
             extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_ASYNCH, "true",
