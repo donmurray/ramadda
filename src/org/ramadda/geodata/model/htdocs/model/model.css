@@ -16,11 +16,20 @@
     margin: 0 0 .5em 0;
 }
 
+
 label.selector {
     display: block;
     font-weight: bold;
     font-size: .85em;
+    margin:0px;
+    margin-top:5px;
+    padding-bottom:0px;
     vertical-align: top;
+}
+
+.select_widget {
+    margin:0px;
+    padding:0px;
 }
 
 .select_widget {

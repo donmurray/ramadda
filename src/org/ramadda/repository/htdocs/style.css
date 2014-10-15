@@ -8,6 +8,20 @@ body {
    padding: 0px;
 }
 
+h1 {
+   font-size: 22pt;
+}
+
+h2 {
+   font-size:20pt;
+}
+
+h3 {
+   font-size: 18pt;
+}
+
+
+
 .ui-button-text, textarea, input, select {
       font-size: .8em;
 }
