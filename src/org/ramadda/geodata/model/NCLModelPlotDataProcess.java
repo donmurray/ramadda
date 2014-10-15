@@ -136,62 +136,91 @@ public class NCLModelPlotDataProcess extends Service {
         sb.append(HtmlUtils.formTable());
         Entry first = input.getEntries().get(0);
 
+        String units = "";
+
         CdmDataOutputHandler dataOutputHandler =
             nclOutputHandler.getDataOutputHandler();
         GridDataset dataset =
             dataOutputHandler.getCdmManager().getGridDataset(first,
                 first.getResource().getPath());
-        List<GridDatatype> grids = dataset.getGrids();
-        GridDatatype       grid  = grids.get(0);
+        if(dataset!=null) {
+            List<GridDatatype> grids = dataset.getGrids();
+            GridDatatype       grid  = grids.get(0);
+            units = grid.getUnitsString();
+        }
+
+        String space1 =  HtmlUtils.space(1);
+        String space2 =  HtmlUtils.space(1);
 
         if (input.getOperands().size() > 1) {
-            sb.append(
-                HtmlUtils.formEntry(
-                    Repository.msgLabel("Plot As"),
-                    HtmlUtils.radio(
-                        ARG_NCL_OUTPUT, "diff",
-                        RepositoryManager.getShouldButtonBeSelected(
-                            request, ARG_NCL_OUTPUT, "diff",
-                            true)) + Repository.msg("Difference")
-                                   + HtmlUtils.radio(
-                                       ARG_NCL_OUTPUT, "comp",
-                                       RepositoryManager.getShouldButtonBeSelected(
-                                           request, ARG_NCL_OUTPUT, "comp",
-                                           false)) + Repository.msg(
-                                               "Separate Plots")));
+            StringBuilder buttons = new StringBuilder();
+            buttons.append(HtmlUtils.radio(
+                                           ARG_NCL_OUTPUT, "diff",
+                                           RepositoryManager.getShouldButtonBeSelected(
+                                                                                       request, ARG_NCL_OUTPUT, "diff",
+                                                                                       true)));
+            buttons.append(space1);
+            buttons.append(Repository.msg("Difference"));
+            buttons.append(space2);
+            buttons.append(HtmlUtils.radio(
+                                           ARG_NCL_OUTPUT, "comp",
+                                           RepositoryManager.getShouldButtonBeSelected(
+                                                                                       request, ARG_NCL_OUTPUT, "comp",
+                                                                                       false)));
+            buttons.append(space1);
+            buttons.append(Repository.msg("Separate Plots"));
+
+            sb.append(HtmlUtils.formEntry(Repository.msgLabel("Plot As"),
+                                          buttons.toString()));
         }
+        StringBuilder plotTypes = new StringBuilder();
+        plotTypes.append(HtmlUtils.radio(
+                                         NCLOutputHandler.ARG_NCL_PLOTTYPE, "png",
+                                         RepositoryManager.getShouldButtonBeSelected(
+                                                                                     request, NCLOutputHandler.ARG_NCL_PLOTTYPE, "png",
+                                                                                     true)));
+        plotTypes.append(space1);
+        plotTypes.append(Repository.msg("Map (Image)"));
+        plotTypes.append(space2);
+        plotTypes.append(HtmlUtils.radio(
+                                         NCLOutputHandler.ARG_NCL_PLOTTYPE, "kmz",
+                                         RepositoryManager.getShouldButtonBeSelected(
+                                                                                     request,
+                                                                                     NCLOutputHandler.ARG_NCL_PLOTTYPE,
+                                                                                     "kmz", false)));
+        plotTypes.append(space1);
+        plotTypes.append(Repository.msg("Google Earth"));
+
+
         sb.append(
             HtmlUtils.formEntry(
                 Repository.msgLabel("Plot Type"),
-                HtmlUtils.radio(
-                    NCLOutputHandler.ARG_NCL_PLOTTYPE, "png",
-                    RepositoryManager.getShouldButtonBeSelected(
-                        request, NCLOutputHandler.ARG_NCL_PLOTTYPE, "png",
-                        true)) + Repository.msg("Map (Image)")
-                               + HtmlUtils.radio(
-                                   NCLOutputHandler.ARG_NCL_PLOTTYPE, "kmz",
-                                   RepositoryManager.getShouldButtonBeSelected(
-                                       request,
-                                       NCLOutputHandler.ARG_NCL_PLOTTYPE,
-                                       "kmz", false)) + Repository.msg(
-                                           "Google Earth")));
+                plotTypes.toString()));
+
         // units
-        String units = grid.getUnitsString();
         if (SimpleUnit.isCompatible(units,  "K")) {
-            sb.append(
-                HtmlUtils.formEntry(
-                    Repository.msgLabel("Plot Units"),
-                    HtmlUtils.radio(
-                        ARG_NCL_UNITS, "K",
-                        RepositoryManager.getShouldButtonBeSelected(
-                            request, ARG_NCL_UNITS, "K",
-                            true)) + Repository.msg("Kelvin")
-                                   + HtmlUtils.radio(
+            StringBuilder unitsSB = new StringBuilder();
+            unitsSB.append(HtmlUtils.radio(
+                                           ARG_NCL_UNITS, "K",
+                                           RepositoryManager.getShouldButtonBeSelected(
+                                                                                       request, ARG_NCL_UNITS, "K",
+                                                                                       true)));
+            unitsSB.append(space1);
+            unitsSB.append(Repository.msg("Kelvin"));
+            unitsSB.append(space2);
+            unitsSB.append(HtmlUtils.radio(
                                        ARG_NCL_UNITS, "degC",
                                        RepositoryManager.getShouldButtonBeSelected(
                                            request, ARG_NCL_UNITS, "degC",
-                                           false)) + Repository.msg(
-                                               "Celsius")));
+                                           false)));
+            unitsSB.append(space1);
+            unitsSB.append(Repository.msg("Celsius"));
+
+
+            sb.append(
+                HtmlUtils.formEntry(
+                    Repository.msgLabel("Plot Units"),
+                    unitsSB.toString()));
         } else if (SimpleUnit.isCompatible(units,  "kg m-2 s-1") ||
                    SimpleUnit.isCompatible(units,  "mm/day")) {
             sb.append(HtmlUtils.hidden(ARG_NCL_UNITS, "mm/day"));

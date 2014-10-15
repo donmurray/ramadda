@@ -1,6 +1,8 @@
 
 .model-header {
+    min-height: 35px;
     border: 1px solid #8BB;
+    margin-right: 5px;
     padding: 0.2em .8em;
     background-color: #CCFFFF;
     font-weight: bold;
@@ -28,10 +30,18 @@ label.selector {
    /* margin-bottom: .75em; */
 }
 
+
+
+
 .model-dataset_title {
    font-weight: bold;
    text-align: center;
 }
+
+.model-dataset {
+    padding: 10px;
+}
+
 
 .header {
     border: 1px solid blue;

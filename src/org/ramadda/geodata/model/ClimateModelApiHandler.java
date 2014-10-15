@@ -677,15 +677,17 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         }
 
         sb.append("<table><tr valign=\"center\" align=\"left\">\n");
-        sb.append(
-            HtmlUtils.open(
-                "td",
-                "width=\"400px\" class=\"model-header\" height=\"30px\"") + "\n");
-        sb.append(msg("Select Data To Plot"));
+        sb.append(HtmlUtils.open(
+                                 "td",
+                                 "width=\"400px\""));
+        sb.append(HtmlUtils.div(msg("Select Data To Plot"),
+                                HtmlUtils.cssClass("model-header")));
         sb.append(HtmlUtils.close("td"));
+
+        sb.append(HtmlUtils.open("td",
+                                 "width=\"800px\" "));
+        sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("model-header")));
         if (hasOperands) {
-            sb.append(
-                "<td width=\"800px\" class=\"model-header\" height=\"30px\">");
             if (type.equals(ARG_ACTION_COMPARE)) {
                 sb.append(
                     HtmlUtils.submit(
@@ -702,15 +704,13 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                             sb,
                             msg("Making Time Series, Please Wait") + "...")));
             }
-        } else {
-            sb.append(
-                "<td width=\"800px\" class=\"model-header\" height=\"30px\">&nbsp;");
         }
-        sb.append("</td>");
-        sb.append("</tr>\n<tr valign=\"top\">");
+        sb.append(HtmlUtils.close("div"));
+        sb.append(HtmlUtils.close("td"));
+        sb.append("</tr>\n");
 
+        sb.append("<tr valign=\"top\">");
         sb.append(HtmlUtils.open("td", "width=\"400px\"") + "\n");
-
 
         // Field selection
         sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("titled_border")));
@@ -825,17 +825,18 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             "<td style=\"border-right:1px solid #0000FF;border-left:none;border-top:none;border-bottom:none\">");
         sb.append(HtmlUtils.div(msg(datasetTitles.get(0)),
                                 HtmlUtils.cssClass("model-dataset_title")));
-        sb.append(datasets.get(0));
+        sb.append(HtmlUtils.div(datasets.get(0), HtmlUtils.cssClass("model-dataset")));
         sb.append("</td>");
         sb.append("<td valign=\"top\">");
         sb.append(HtmlUtils.div(msg(datasetTitles.get(1)),
                                 HtmlUtils.cssClass("model-dataset_title")));
-        sb.append(datasets.get(1));
+        sb.append(HtmlUtils.div(datasets.get(1), HtmlUtils.cssClass("model-dataset")));
         sb.append("</td>");
         sb.append("</tr>");
 
         if ( !hasOperands) {
             sb.append("<tr><td colspan=\"2\" align=\"center\">");
+            sb.append(HtmlUtils.p());
             sb.append(HtmlUtils.submit("Select Data", ARG_ACTION_SEARCH,
                                        HtmlUtils.id(formId + "_submit")
                                        + makeButtonSubmitDialog(sb,
@@ -855,6 +856,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             sb.append("</td>");
         } else {
             sb.append("<tr><td colspan=\"2\" align=\"center\">");
+            sb.append(HtmlUtils.p());
             sb.append(HtmlUtils.submit("Update Data Selection",
                                        ARG_ACTION_SEARCH,
                                        HtmlUtils.id(formId + "_submit")
