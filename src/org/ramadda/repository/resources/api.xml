@@ -86,7 +86,7 @@
   <group handler="registrymanager">
       <api request="/registry/add"       method="processRegistryAdd"/>
       <api request="/registry/info"      method="processRegistryInfo"/>
-      <api request="/registry/list"      method="processRegistryList" toplevel="true" name="Repositories"/>
+      <api request="/registry/list"      method="processRegistryList" toplevel="false" name="Repositories"/>
       <api request="/admin/remoteservers"      method="processAdminRemoteServers"  name="Remote Servers" admin="true"/>
   </group>
 
