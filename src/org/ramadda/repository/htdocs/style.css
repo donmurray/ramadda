@@ -1724,6 +1724,10 @@ xxxpath.link {
    padding-bottom: 0px;
 }
 
+.ramadda-breadcrumbs img {
+  vertical-align: top;
+}
+
 .ramadda-breadcrumbs-menu-img {
    padding: 1px;
    margin:0px;
