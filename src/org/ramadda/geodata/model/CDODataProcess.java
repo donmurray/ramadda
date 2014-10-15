@@ -254,7 +254,7 @@ public abstract class CDODataProcess extends Service {
                     CDOOutputHandler.STAT_MEAN,
                     RepositoryManager.getShouldButtonBeSelected(
                         request, CDOOutputHandler.ARG_CDO_STAT,
-                        CDOOutputHandler.STAT_MEAN, true)) + Repository.msg(
+                        CDOOutputHandler.STAT_MEAN, true)) + HtmlUtils.space(1) + Repository.msg(
                             "Average") + HtmlUtils.space(2)
                                        + HtmlUtils.radio(
                                            CDOOutputHandler.ARG_CDO_STAT,
@@ -263,7 +263,7 @@ public abstract class CDODataProcess extends Service {
                                                request,
                                                    CDOOutputHandler.ARG_CDO_STAT,
                                                        CDOOutputHandler.STAT_ANOM,
-                                                           false)) + Repository.msg(
+                                                           false)) + HtmlUtils.space(1) + Repository.msg(
                                                                "Anomaly")));
     }
 
