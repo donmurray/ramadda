@@ -57,7 +57,7 @@ proc xml {args} {
 proc importxml {file} {
    lappend ::filesToCopy [file join  $file] [file join [gen::getTargetDir]  [file dirname $file]]
    set xml [import  $file]
-   set href "<a href=\"$file\"><img src=\"folder.gif\" border=\"0\">$file</a>"
+   set href "<a href=\"$file\">$file</a>"
    set xml [xml [string trim $xml]]
    regsub {</pre>\s*</blockquote>} $xml "" xml
    append xml "\n$href"

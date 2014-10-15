@@ -288,11 +288,12 @@ dl.see_also {margin-left: 0;
     margin-bottom: 10}
 
 .xmlcomment {
-     background-color: lightgray;
+     background-color: #eee;
+     font-style:italic;
 }
 
 .xmlcdata {
-      background-color: #6495ed;
+//      background-color: #6495ed;
 }
 
 .xmlattr {

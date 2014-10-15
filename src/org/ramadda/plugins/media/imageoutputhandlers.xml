@@ -2,21 +2,20 @@
 
   <outputhandler>
    <service id="imagemagick_convert" label="Convert Image" command="${service.imagemagick}/convert">
-<description><![CDATA[
-Runs ImageMagick convert
-]]></description>
-<process_description><![CDATA[<wiki>
-{{description}}
-{{gallery}}
-----
-{{tree}}
-]]></process_description>
+<description><![CDATA[Runs ImageMagick convert]]></description>
           <arg value="${entry.file}" type="entry"  label="Input Image" primary="true"></arg>
           <arg type="int" prefix="-resize" name="resize" label="Resize" help=" percent" value="${value}%"  />
           <arg type="string" prefix="-bordercolor" default="" name="bordercolor" label="Border Color"  help="e.g., white, red, blue, ..."/>
           <arg type="int" prefix="-border" name="border" label="Border Size" />
           <arg type="enumeration" name="newtype" label="Convert to" values="png,gif,jpg,tiff" value="${file}"  file="${entry.file.base}.${value}" />
           <output type="type_image" pattern=".*"/>
+<process_description><![CDATA[<wiki>
+{{description}}
+{{gallery}}
+----
+{{tree}}
+]]></process_description>
+
     </service>
   </outputhandler>
 
