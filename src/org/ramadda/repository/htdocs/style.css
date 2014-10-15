@@ -27,6 +27,11 @@ h3 {
     border-radius: 4px;
 }
 
+img {
+  vertical-align: baseline;
+}
+
+
 .ui-button-text, textarea, input, select {
       font-size: .8em;
 }
