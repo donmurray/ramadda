@@ -409,8 +409,8 @@ public class Service extends RepositoryManager {
 
             if ((command == null) || (command.indexOf("${") >= 0)) {
                 getLogManager().logError("Service: no command defined:"
-                                         + XmlUtil.toString(element)
-                                         + " path:" + pathProperty);
+                                         + (command!=null?command:XmlUtil.toString(element))
+                                         + " property:" + pathProperty);
 
                 return;
             }

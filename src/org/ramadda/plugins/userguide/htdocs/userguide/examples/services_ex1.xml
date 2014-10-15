@@ -59,7 +59,7 @@ So, if we having incoming.pdf the output file is incoming.txt -->
 Now define the outputs. Each output has a regexp pattern that matches on any generated file
 You can specify an entry type for the entries that get created for each file
 -->
-       <output type="file" pattern=".*\.txt"/g
+       <output type="file" pattern=".*\.txt"/>
        <output type="type_image" pattern=".*\.png"/>
 
 <!-- If the service produces text to the stdout then this specifies to write to a file -->

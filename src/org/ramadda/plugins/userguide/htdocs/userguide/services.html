@@ -117,19 +117,25 @@ service.test1=/path/to/program
 service.test2=/path/to/program</pre>
 
 Note: To install as a plugin remove the "_ex1" so you have an outputhandlers.xml plugin file.
-<blockquote><pre>&lt;outputhandlers&gt;
-<span class="xmlcomment">&lt;!--
-with the ServiceOutputHandler class. This xml can either contain the service xml directly
-or it can refer to a service that was defined in a separate services.xml file
---&gt;</span>
-  &lt;outputhandler <span class="xmlattr">class</span>="org.ramadda.repository.output.ServiceOutputHandler&quot; <span class="xmlattr">category</span>="Test Output&quot;&gt;
+<blockquote><pre>&lt;outputhandlers <span class="xmlattr">class</span>="org.ramadda.repository.output.ServiceOutputHandler&quot;&gt;
+<span class="xmlcomment">&lt;!-- You can specify attributes that are inherited by all services, e.g., <span class="xmlattr">class</span>="ServiceOutputHandler&quot; 
+This xml can either contain the service xml directly
+or it can refer to a service that was defined in a separate services.xml file --&gt;</span>
+
+  &lt;outputhandler  <span class="xmlattr">category</span>="Test Output&quot;&gt;
+<span class="xmlcomment">&lt;!-- Set a property service.test1=/path/to/executable.sh in a .properties file in your RAMADDA home dir --&gt;</span>
     &lt;service <span class="xmlattr">id</span>="test_service1&quot;  <span class="xmlattr">command</span>="${service.test1}&quot; <span class="xmlattr">label</span>="Run example service 1&quot; <span class="xmlattr">icon</span>="/icons/pdf.png&quot; &gt;
-<span class="xmlcomment">&lt;!-- ... There would be service attributes here. See services.xml ... --&gt;</span>
+
+<span class="xmlcomment">&lt;!-- Specify an entry of a particular type (type_document_pdf) --&gt;</span>
+       &lt;arg <span class="xmlattr">value</span>="${entry.file}&quot; <span class="xmlattr">type</span>="entry&quot; <span class="xmlattr">entryType</span>="type_document_pdf&quot; <span class="xmlattr">primary</span>="true&quot; <span class="xmlattr">label</span>="Input PDF File&quot; &gt;&lt;/arg&gt;
+
+<span class="xmlcomment">&lt;!-- ... There would be other service attributes here. See services.xml ... --&gt;</span>
+
     &lt;/service&gt;
   &lt;/outputhandler&gt;
 
 <span class="xmlcomment">&lt;!-- Or you can have the output handler reference the service id from a services.xml file --&gt;</span>
-  &lt;outputhandler <span class="xmlattr">class</span>="org.ramadda.repository.output.ServiceOutputHandler&quot; <span class="xmlattr">category</span>="Test Output&quot; <span class="xmlattr">serviceId</span>="test_service2&quot;/&gt;
+  &lt;outputhandler  <span class="xmlattr">category</span>="Test Output&quot; <span class="xmlattr">serviceId</span>="test_service2&quot;/&gt;
 
 
 &lt;/outputhandlers&gt;
@@ -199,7 +205,7 @@ So, if we having incoming.pdf the output file is incoming.txt --&gt;</span>
 Now define the outputs. Each output has a regexp pattern that matches on any generated file
 You can specify an entry type for the entries that get created for each file
 --&gt;</span>
-       &lt;output <span class="xmlattr">type</span>="file&quot; <span class="xmlattr">pattern</span>=".*\.txt&quot;/g
+       &lt;output <span class="xmlattr">type</span>="file&quot; <span class="xmlattr">pattern</span>=".*\.txt&quot;/&gt;
        &lt;output <span class="xmlattr">type</span>="type_image&quot; <span class="xmlattr">pattern</span>=".*\.png&quot;/&gt;
 
 <span class="xmlcomment">&lt;!-- If the service produces text to the stdout then this specifies to write to a file --&gt;</span>
