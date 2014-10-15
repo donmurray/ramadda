@@ -887,8 +887,10 @@ public class HtmlUtils {
                        attrs(ATTR_BORDER, "0", ATTR_SRC, path, ATTR_TITLE,
                              title, ATTR_ALT, title) + " " + extra);
         }
-        String img =  tag(TAG_IMG,
-                          attrs(ATTR_BORDER, "0", ATTR_SRC, path) + " " + extra);
+        String img = tag(TAG_IMG,
+                         attrs(ATTR_BORDER, "0", ATTR_SRC, path) + " "
+                         + extra);
+
         return img;
     }
 
@@ -1651,8 +1653,8 @@ public class HtmlUtils {
      */
     public static String radio(String name, String value, boolean checked) {
         return tag(TAG_INPUT,
-                   attrs(ATTR_CLASS, CLASS_RADIO, ATTR_TYPE, TYPE_RADIO,
-                         ATTR_NAME, name, ATTR_VALUE, value) + (checked
+                   attrs( /*ATTR_CLASS, CLASS_RADIO,*/ATTR_TYPE, TYPE_RADIO,
+                       ATTR_NAME, name, ATTR_VALUE, value) + (checked
                 ? " checked "
                 : ""));
     }
