@@ -1704,7 +1704,7 @@ public class HtmlUtils {
                                   String extra) {
         return tag(TAG_INPUT,
                    extra
-                   + attrs(ATTR_CLASS, CLASS_CHECKBOX, ATTR_TYPE,
+                   + attrs(/*ATTR_CLASS, CLASS_CHECKBOX, */ATTR_TYPE,
                            TYPE_CHECKBOX, ATTR_NAME, name, ATTR_VALUE,
                            value) + (checked
                                      ? " checked "
