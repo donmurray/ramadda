@@ -8,6 +8,7 @@ body {
    padding: 0px;
 }
 
+//Resets for bootstrap
 h1 {
    font-size: 22pt;
 }
@@ -20,7 +21,11 @@ h3 {
    font-size: 18pt;
 }
 
-
+.jumbotron {
+    padding: 20px;
+    margin-bottom:20px;
+    border-radius: 4px;
+}
 
 .ui-button-text, textarea, input, select {
       font-size: .8em;
