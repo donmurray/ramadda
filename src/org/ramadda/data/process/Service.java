@@ -997,6 +997,8 @@ public class Service extends RepositoryManager {
                         "Too many entries specified for arg:"
                         + arg.getLabel() + " entries:" + entries);
                 } else if ( !arg.isRequired() && (entries.size() == 0)) {
+                    System.err.println("arg:" + arg.getName());
+                    System.err.println("entryMap:" +entryMap);
                     throw new IllegalArgumentException(
                         "No entry specified for arg:" + arg.getLabel());
                 }
@@ -1027,6 +1029,11 @@ public class Service extends RepositoryManager {
             } else {
                 argValue = getRequestValue(request, input, argPrefix,
                                            arg.getName(), (String) null);
+
+                if(argValue == null && arg.getDefault()!=null) {
+                    argValue = arg.getDefault();
+                }
+
                 if (argValue != null) {}
             }
 
@@ -1463,10 +1470,15 @@ public class Service extends RepositoryManager {
                                  HtmlUtils.cssClass("service-form")));
 
 
+        String rightSide = HtmlUtils.href(getRepository().getJobManager().getServiceUrl(request, this),
+                                          HtmlUtils.img(iconUrl("/icons/application_form.png"),msg("View top-level form")));
+
+        rightSide = HtmlUtils.div(rightSide, HtmlUtils.cssClass("service-form-header-links"));
         sb.append(
             HtmlUtils.div(
-                HtmlUtils.img(iconUrl(getIcon())) + " " + label,
-                HtmlUtils.cssClass("service-form-header")));
+                          HtmlUtils.leftRight(
+                                              HtmlUtils.img(iconUrl(getIcon())) + " " + label, rightSide),
+                          HtmlUtils.cssClass("service-form-header")));
 
 
         if (Utils.stringDefined(getDescription())) {
