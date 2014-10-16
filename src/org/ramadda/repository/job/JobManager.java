@@ -37,10 +37,10 @@ import org.ramadda.repository.type.TypeHandler;
 
 import org.ramadda.sql.Clause;
 import org.ramadda.sql.SqlUtil;
+import org.ramadda.util.CategoryBuffer;
 
 
 import org.ramadda.util.HtmlUtils;
-import org.ramadda.util.CategoryBuffer;
 import org.ramadda.util.ProcessRunner;
 import org.ramadda.util.StreamEater;
 import org.ramadda.util.TTLCache;
@@ -85,11 +85,11 @@ public class JobManager extends RepositoryManager {
 
     /** _more_ */
     public final RequestUrl URL_SERVICES_LIST = new RequestUrl(this,
-                                                   "/services/list");
+                                                    "/services/list");
 
     /** _more_ */
     public final RequestUrl URL_SERVICES_VIEW = new RequestUrl(this,
-                                                   "/services/view");
+                                                    "/services/view");
 
 
     /** _more_ */
@@ -219,19 +219,27 @@ public class JobManager extends RepositoryManager {
      * @param id _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
     public Service getService(String id) throws Exception {
-        Service service =  serviceMap.get(id);
-        if(service!=null) return service;
-        Request request = getRepository().getTmpRequest();
-        Entry serviceEntry = getEntryManager().getEntry(
-                                                         request, id);
-        if(serviceEntry !=null && (serviceEntry.getTypeHandler() instanceof ServiceTypeHandler)) {
-            ServiceTypeHandler serviceType= (ServiceTypeHandler)serviceEntry.getTypeHandler();
+        Service service = serviceMap.get(id);
+        if (service != null) {
+            return service;
+        }
+        Request request      = getRepository().getTmpRequest();
+        Entry   serviceEntry = getEntryManager().getEntry(request, id);
+        if ((serviceEntry != null)
+                && (serviceEntry.getTypeHandler()
+                    instanceof ServiceTypeHandler)) {
+            ServiceTypeHandler serviceType =
+                (ServiceTypeHandler) serviceEntry.getTypeHandler();
+
             return serviceType.getService(request, serviceEntry);
         }
+
         return null;
-        
+
     }
 
 
@@ -661,44 +669,59 @@ public class JobManager extends RepositoryManager {
     }
 
 
-    public Result processServicesList(Request request)
-            throws Exception {
-        StringBuffer sb  = new StringBuffer("\n");
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result processServicesList(Request request) throws Exception {
+        StringBuffer sb = new StringBuffer("\n");
         sb.append(HtmlUtils.p());
         sb.append(header(msg("Services")));
         sb.append(HtmlUtils.p());
         sb.append("\n");
-        sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV, HtmlUtils.cssClass("service-list")));
-        CategoryBuffer  cb = new CategoryBuffer();
-        String urlBase = getRepository().getUrlBase();
-        for(Service service: getServices()) {
-            if(!service.isEnabled()) {
+        sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
+                                 HtmlUtils.cssClass("service-list")));
+        CategoryBuffer cb      = new CategoryBuffer();
+        String         urlBase = getRepository().getUrlBase();
+        for (Service service : getServices()) {
+            if ( !service.isEnabled()) {
                 continue;
             }
 
             String img = "";
-            if(service.getIcon()!=null) {
+            if (service.getIcon() != null) {
                 img = HtmlUtils.img(iconUrl(service.getIcon()));
             } else {
                 img = HtmlUtils.img(iconUrl("/icons/cog.png"));
             }
             StringBuffer serviceSB = new StringBuffer();
 
-            serviceSB.append(HtmlUtils.open(HtmlUtils.TAG_DIV, HtmlUtils.cssClass("service-list-service")));
+            serviceSB.append(
+                HtmlUtils.open(
+                    HtmlUtils.TAG_DIV,
+                    HtmlUtils.cssClass("service-list-service")));
             serviceSB.append(img);
             serviceSB.append(" ");
-            serviceSB.append(HtmlUtils.href(HtmlUtils.url(
-                                                          urlBase +"/services/view",ARG_SERVICEID, service.getId()),
-                                            service.getLabel()));
-            
+            serviceSB.append(
+                HtmlUtils.href(
+                    HtmlUtils.url(
+                        urlBase + "/services/view", ARG_SERVICEID,
+                        service.getId()), service.getLabel()));
+
             /*
             String xmlUrl = HtmlUtils.href(HtmlUtils.url(
                                                          urlBase +"/services/view",ARG_SERVICEID, service.getId(),ARG_OUTPUT,"xml"),HtmlUtils.img(iconUrl(ICON_XML)));
 
             serviceSB.append(xmlUrl);
             */
-            if(Utils.stringDefined(service.getDescription())) {
-                serviceSB.append(HtmlUtils.div(service.getDescription(),HtmlUtils.cssClass("service-list-description")));
+            if (Utils.stringDefined(service.getDescription())) {
+                serviceSB.append(HtmlUtils.div(service.getDescription(),
+                        HtmlUtils.cssClass("service-list-description")));
             }
             serviceSB.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
             serviceSB.append("\n");
@@ -706,24 +729,53 @@ public class JobManager extends RepositoryManager {
         }
 
 
-        for(String category:cb.getCategories()) {
-            sb.append(HtmlUtils.div(category, HtmlUtils.cssClass("service-list-header")));
-            sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV, HtmlUtils.cssClass("service-list-category")));
+        for (String category : cb.getCategories()) {
+            sb.append(
+                HtmlUtils.div(
+                    category, HtmlUtils.cssClass("service-list-header")));
+            sb.append(
+                HtmlUtils.open(
+                    HtmlUtils.TAG_DIV,
+                    HtmlUtils.cssClass("service-list-category")));
             sb.append(cb.get(category).toString());
             sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
         }
 
         sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
+
         return new Result(msg("Services"), sb);
     }
 
 
-    public Result processServicesView(Request request)
-            throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param service _more_
+     *
+     * @return _more_
+     */
+    public String getServiceUrl(Request request, Service service) {
+        return HtmlUtils.url(getRepository().getUrlBase() + "/services/view",
+                             ARG_SERVICEID, service.getId());
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Result processServicesView(Request request) throws Exception {
         StringBuilder sb = new StringBuilder();
-        Service service = getService(request.getString(ARG_SERVICEID, ""));
-        if(service == null) {
-            sb.append(getPageHandler().showDialogError("No service found:" + request.getString(ARG_SERVICEID, "")));
+        Service service  = getService(request.getString(ARG_SERVICEID, ""));
+        if (service == null) {
+            sb.append(getPageHandler().showDialogError("No service found:"
+                    + request.getString(ARG_SERVICEID, "")));
+
             return new Result(msg("Services"), sb);
         }
 
@@ -735,23 +787,25 @@ public class JobManager extends RepositoryManager {
             }*/
 
 
-        if(!service.isEnabled()) {
-            sb.append(getPageHandler().showDialogError("Service not enabled"));
+        if ( !service.isEnabled()) {
+            sb.append(
+                getPageHandler().showDialogError("Service not enabled"));
+
             return new Result(msg("Services"), sb);
         }
 
         ServiceOutputHandler soh = new ServiceOutputHandler(getRepository(),
                                        service);
         String extra = HtmlUtils.hidden(ARG_SERVICEID, service.getId());
-        if (!soh.doExecute(request)) {
-            soh.makeForm(request, service, null, null,
-                         URL_SERVICES_VIEW,null, sb, extra);
+        if ( !soh.doExecute(request)) {
+            soh.makeForm(request, service, null, null, URL_SERVICES_VIEW,
+                         null, sb, extra);
+
             return new Result("", sb);
         }
 
-        return soh.evaluateService(request, URL_SERVICES_VIEW, null,
-                                   null, null, service,
-                                   extra);
+        return soh.evaluateService(request, URL_SERVICES_VIEW, null, null,
+                                   null, service, extra);
     }
 
     /**
@@ -811,8 +865,11 @@ public class JobManager extends RepositoryManager {
      *
      * @param request _more_
      * @param sb _more_
+     *
+     * @throws Exception _more_
      */
-    public void addHtmlHeader(Request request, Appendable sb) throws Exception {}
+    public void addHtmlHeader(Request request, Appendable sb)
+            throws Exception {}
 
 
 

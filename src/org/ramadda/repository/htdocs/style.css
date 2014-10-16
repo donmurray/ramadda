@@ -1945,6 +1945,25 @@ a.toggleblocklabellink:visited {
    margin-top: 15px;
 }
 
+.service-form-header-links {
+    padding: 2px;
+    padding-right: 5px;
+}
+
+.service-form-header-links img {
+    vertical-align: center;
+    width: 12px;
+    border: 1px  #E6F1F6 solid;
+}
+
+.service-form-header-links img:hover {
+    width: 12px;
+    border: 1px #888 solid;
+}
+
+
+
+
 .service-list-category {
    border-left: 1px #f0f0f0 solid;
    border-bottom: 1px #f0f0f0 solid;
@@ -1963,6 +1982,7 @@ a.toggleblocklabellink:visited {
 }
 
 
+
 .service-form {
   margin:5px;
   border-top: 0px #888 solid;
@@ -1976,13 +1996,15 @@ a.toggleblocklabellink:visited {
 
 .service-form-description  {
    border: 1px #EFEFEF solid;
+   border: 1px #eaeaea solid;
    border-top: 0px;
-   border-bottom: 1px #EFEFEF solid;
-//   background: #fffeec;
+   background: #fffeec;
+   background: #f8f8f8;
    padding:5px;
    max-height: 100px; 
    overflow-y: auto;
    padding-left:10px;
+   padding-bottom:2px;
 
 }
 

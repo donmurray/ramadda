@@ -58,14 +58,16 @@ import java.util.List;
  */
 public class ServiceOutputHandler extends OutputHandler {
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_PROCESSDIR = "processdir";
 
     /** _more_ */
     public static final String ARG_ASYNCH = "asynch";
-    public static final String ARG_TOXML = "toxml";
 
     /** _more_          */
+    public static final String ARG_TOXML = "toxml";
+
+    /** _more_ */
     public static final String ARG_NEWDIRECTORY = "newdirectory";
 
     /** _more_ */
@@ -137,7 +139,10 @@ public class ServiceOutputHandler extends OutputHandler {
         if (serviceId != null) {
             service = getRepository().getJobManager().getService(serviceId);
             if (service == null) {
-                getLogManager().logError("ServiceOutputHandler: could not find service:" + serviceId);
+                getLogManager().logError(
+                    "ServiceOutputHandler: could not find service:"
+                    + serviceId);
+
                 return;
             }
 
@@ -156,7 +161,10 @@ public class ServiceOutputHandler extends OutputHandler {
 
 
         if (service == null) {
-            getLogManager().logError("ServiceOutputHandler: could not find service:" + XmlUtil.toString(element));
+            getLogManager().logError(
+                "ServiceOutputHandler: could not find service:"
+                + XmlUtil.toString(element));
+
             return;
         }
 
@@ -183,7 +191,7 @@ public class ServiceOutputHandler extends OutputHandler {
      * @return _more_
      */
     public boolean isEnabled() {
-        return service!=null && service.isEnabled();
+        return (service != null) && service.isEnabled();
     }
 
     /**
@@ -404,9 +412,11 @@ public class ServiceOutputHandler extends OutputHandler {
             new ArrayList<ServiceInput>();
 
 
-        boolean asynchronous = request.get(ARG_ASYNCH, false);
-        boolean toXml = request.get(ARG_TOXML, false);
-        final boolean forDisplay   = (toXml?true:request.get(ARG_SHOWCOMMAND, false));
+        boolean       asynchronous = request.get(ARG_ASYNCH, false);
+        boolean       toXml        = request.get(ARG_TOXML, false);
+        final boolean forDisplay   = (toXml
+                                      ? true
+                                      : request.get(ARG_SHOWCOMMAND, false));
         final boolean doingPublish = doingPublish(request);
 
         if (service.requiresMultipleEntries()) {
@@ -439,7 +449,7 @@ public class ServiceOutputHandler extends OutputHandler {
         }
 
 
-        
+
 
         if (asynchronous) {
             ActionManager.Action action = new ActionManager.Action() {
@@ -449,7 +459,8 @@ public class ServiceOutputHandler extends OutputHandler {
                     List<Entry> outputEntries = new ArrayList<Entry>();
                     for (ServiceInput serviceInput : serviceInputs) {
                         try {
-                            ServiceOutput output = evaluateService(request, service, serviceInput);
+                            ServiceOutput output = evaluateService(request,
+                                                       service, serviceInput);
                             if ( !output.isOk()) {
                                 getActionManager().setContinueHtml(
                                     actionId,
@@ -513,12 +524,15 @@ public class ServiceOutputHandler extends OutputHandler {
             }
         }
 
-        if(toXml) {
+        if (toXml) {
             StringBuilder xml = new StringBuilder();
-            service.toXml(xml, serviceInputs.size()>0?serviceInputs.get(0):null);
+            service.toXml(xml, (serviceInputs.size() > 0)
+                               ? serviceInputs.get(0)
+                               : null);
             System.err.println(xml);
-            request.setReturnFilename(service.getLabel()+"services.xml");
-            return new Result("",xml,"text/xml");
+            request.setReturnFilename(service.getLabel() + "services.xml");
+
+            return new Result("", xml, "text/xml");
         }
 
 
@@ -712,12 +726,12 @@ public class ServiceOutputHandler extends OutputHandler {
         String       extraDirHtml = "";
         File         currentDir   = getCurrentProcessingDir(request);
         if (currentDir != null) {
-            extraDirHtml = HtmlUtils.space(2)
-                           + "(" + HtmlUtils.href(
+            extraDirHtml = HtmlUtils.space(2) + "("
+                           + HtmlUtils.href(
                                getStorageManager().getProcessDirEntryUrl(
-                                   request, currentDir), msg(
-                                   "View current"), HtmlUtils.attrs(
-                                   "target", "_view")) +")";
+                                   request, currentDir), msg("View current"),
+                                       HtmlUtils.attrs(
+                                           "target", "_view")) + ")";
 
         }
 
@@ -735,9 +749,9 @@ public class ServiceOutputHandler extends OutputHandler {
 
         extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_SHOWCOMMAND, "true",
                 request.get(ARG_SHOWCOMMAND, false), "Show command"));
-        
+
         extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_TOXML, "true",
-                                                  request.get(ARG_TOXML, false), msg("Export full XML")));
+                request.get(ARG_TOXML, false), msg("Export full XML")));
 
         if (haveAnyOutputs) {
             extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_ASYNCH, "true",
@@ -745,8 +759,8 @@ public class ServiceOutputHandler extends OutputHandler {
         }
 
         service.addToForm(request, (entries != null)
-                          ? new ServiceInput(null, entries, true)
-                          : new ServiceInput(), sb,null, null);
+                                   ? new ServiceInput(null, entries, true)
+                                   : new ServiceInput(), sb, null, null);
 
         sb.append(HtmlUtils.hidden(Service.ARG_SERVICEFORM, "true"));
 
@@ -756,7 +770,7 @@ public class ServiceOutputHandler extends OutputHandler {
                                         makeButtonSubmitDialog(sb,
                                             "Processing request...")));
         StringBuffer etc = new StringBuffer();
-        etc.append(StringUtil.join("<p>", extraSubmit));
+        etc.append(StringUtil.join("&nbsp; <p> ", extraSubmit));
         etc.append(HtmlUtils.p());
         etc.append(HtmlUtils.formTable());
         if (haveAnyOutputs) {
