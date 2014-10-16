@@ -71,13 +71,30 @@
 <arg type="string" prefix="-z" label="Z" help="Only convert the specified Z section (indexed from 0)"/>
 <arg type="string" prefix="-timepoint" label="Time point" help="Only convert the specified timepoint (indexed from 0)"/>
 <arg type="category" value="Output file"/>
-<arg type="enumeration" name="imageformat" label="Image type" values="png,gif,jpg,tiff" include="false"/>
+<arg type="enumeration" name="imageformat" label="Image type" values="png,gif,jpg,tiff" include="false" default="png"/>
 <arg type="string" include="false" name="suffix" label="Pattern suffix" help="%s series index&lt;br&gt;%nseries name&lt;br&gt;%c channel index&lt;br&gt;%w channel name&lt;br&gt;%z Z index&lt;br&gt;%t T index&lt;br&gt;%A acquisition timestamp"/>
 
-<arg value="${entry.file}" type="entry"  label="Input image file" primary="true" entryType="bio_dicom"></arg>
+<arg value="${entry.file}" type="entry"  label="Input image file" primary="true" entryType="bio_dicom,bio_ome_tiff"></arg>
 <arg value="${file}" file="${entry.file.base}${suffix}.${imageformat}"/>
 <output type="type_image" pattern=".*"/>
 </service>
+
+
+
+
+
+   <service id="bio_ome_xml" label="Extract ome metadata" command="${service.showinf}" icon="/bioimage/ome.png">
+        <description><![CDATA[Extract OME metadata xml from an OME-TIFF using the <a href="https://www.openmicroscopy.org/site/products/bio-formats">OME Bio-Formats</a> tool showinf]]></description>
+<arg value="-omexml"/>
+<arg value="-nopix"/>
+<arg value="-novalid"/>
+
+<arg value="${entry.file}" type="entry"  label="OME Tiff file" primary="true" entryType="bio_ome_tiff"></arg>
+    <output type="file" pattern=".*\.xml" stdout="true" filename="${entry.file.base}.xml"/>
+</service>
+
+
+
 
 
 

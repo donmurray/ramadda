@@ -2,4 +2,5 @@
   <outputhandler serviceId="bio_dicom_txt"/>
   <outputhandler serviceId="bio_dicom_image"/>
   <outputhandler serviceId="bio_ome_bfconvert"/>
+  <outputhandler serviceId="bio_ome_xml"/>
 </outputhandlers>

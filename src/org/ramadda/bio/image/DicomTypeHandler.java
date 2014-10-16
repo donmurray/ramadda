@@ -56,10 +56,10 @@ import java.util.List;
  */
 public class DicomTypeHandler extends GenericTypeHandler {
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<String, Tag> tags = new Hashtable<String, Tag>();
 
-    /** _more_          */
+    /** _more_ */
     private HashSet<String> metadataTags = new HashSet<String>();
 
 
@@ -79,19 +79,19 @@ public class DicomTypeHandler extends GenericTypeHandler {
     }
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_ATTR = "attr";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TAG = "tag";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_VR = "vr";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LEN = "len";
 
-    /** _more_          */
+    /** _more_ */
     private static final String DEFAULT_TAGS = "00100010,00100020";
 
     /**
@@ -218,14 +218,14 @@ public class DicomTypeHandler extends GenericTypeHandler {
      *
      *
      * @version        $version$, Thu, Oct 2, '14
-     * @author         Enter your name here...    
+     * @author         Enter your name here...
      */
     public static class Tag {
 
-        /** _more_          */
+        /** _more_ */
         String id;
 
-        /** _more_          */
+        /** _more_ */
         String name;
 
         /**
