@@ -105,7 +105,7 @@ public class DicomTypeHandler extends GenericTypeHandler {
         List<String> lines =
             StringUtil.split(
                 getRepository().getResource(
-                    "/org/ramadda/bio.image/dicomtags.txt"), "\n", true,
+                    "/org/ramadda/bio/image/dicomtags.txt"), "\n", true,
                         true);
         for (int i = 0; i < lines.size(); i += 2) {
             Tag tag = new Tag(lines.get(i), lines.get(i + 1));
