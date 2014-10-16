@@ -21,14 +21,29 @@ h3 {
    font-size: 18pt;
 }
 
+
+
+.jumbotron p {
+   font-size: 12pt;
+}
+
+.jumbotron h2 {
+   padding:0px;
+   margin:0px;
+   font-size: 18pt;
+}
+
 .jumbotron {
-    padding: 15px;
-    padding-left: 10px;
-    padding-right: 10px;
-    margin:0px;
-    margin-top:10px;
-    margin-bottom:10px;
+//    background: #f9f9f9;
     border-radius: 4px;
+    padding: 0px;
+    margin:0px;
+    padding-top:8px;
+    padding-bottom:4px;
+    padding-left: 8px;
+    padding-right: 8px;
+    margin-top: 10px;
+    margin-bottom: 10px;
 }
 
 img {
@@ -204,8 +219,8 @@ input, password, fileinput,textarea {
 
 .entry-list {
     overflow-y: auto;
-    border: 1px #aaa solid;
-    border-top: 0px #aaa solid;
+    border: 1px #ccc solid;
+    border-top: 0px #ccc solid;
 }
 
 .entry-list-settings {
@@ -225,7 +240,7 @@ input, password, fileinput,textarea {
   padding-right: 5px;
 //  border-top-left-radius: 6px;
 //  border-top-right-radius: 6px;
-  border : 1px #aaa solid;
+  border : 1px #ccc solid;
   background-color: #efefef;
   margin-top: 2px;
   padding-top: 0px;
@@ -235,7 +250,7 @@ input, password, fileinput,textarea {
 
 .entry-list-header-column {
    font-weight: bold; 
-   border-right : 1px #aaa solid;
+   border-right : 1px #ccc solid;
    text-align: center;
    padding-bottom:1px;
    padding-top:4px;
