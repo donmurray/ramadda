@@ -782,7 +782,9 @@ public class Service extends RepositoryManager {
         if (linkId != null) {
             try {
                 link = getRepository().getJobManager().getService(linkId);
-                System.out.println("Service link:" + linkId + " " + link);
+                if(link == null) {
+                    System.out.println("Could not find service:" + linkId);
+                }
             } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
@@ -875,7 +877,6 @@ public class Service extends RepositoryManager {
 
 
         if (haveLink()) {
-            System.err.println("Calling link:" + link);
             return link.addArgs(request, argPrefix, input, commands,
                                 filesToDelete, allEntries);
         }
