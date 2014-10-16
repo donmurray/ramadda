@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -582,7 +582,8 @@ public class PhoneHarvester extends Harvester {
                     return true;
                 }
                 List<org.ramadda.repository.Comment> comments =
-                    getRepository().getCommentManager().getComments(getRequest(), currentEntry);
+                    getRepository().getCommentManager().getComments(
+                        getRequest(), currentEntry);
                 for (org.ramadda.repository.Comment comment : comments) {
                     msg.append(XmlUtil.encodeString("Comment:"
                             + comment.getSubject() + "\n"
@@ -745,7 +746,8 @@ public class PhoneHarvester extends Harvester {
             if (currentEntry.getTypeHandler().getType().equals("wikipage")) {
                 cleanedInputText = cleanedInputText.replaceAll("<br>", "\n");
                 Object[] values =
-                    currentEntry.getTypeHandler().getEntryValues(currentEntry);
+                    currentEntry.getTypeHandler().getEntryValues(
+                        currentEntry);
                 if (values[0] == null) {
                     values[0] = cleanedInputText;
                 } else {
@@ -783,7 +785,8 @@ public class PhoneHarvester extends Harvester {
         Entry       entry =
             typeHandler.createEntry(getRepository().getGUID());
         Date        date        = new Date();
-        Object[]    values      = typeHandler.makeEntryValues(new Hashtable());
+        Object[]    values      =
+            typeHandler.makeEntryValues(new Hashtable());
         if (type.equals("phone_sms")) {
             values[0] = info.getFromPhone();
             values[1] = info.getToPhone();
@@ -1116,7 +1119,7 @@ public class PhoneHarvester extends Harvester {
         OutputStream toStream =
             getStorageManager().getFileOutputStream(newFile);
         try {
-            int bytes = IOUtil.writeTo(fromStream, toStream);
+            long bytes = IOUtil.writeTo(fromStream, toStream);
             if (bytes < 0) {
                 System.err.println(
                     "PhoneHarvester: failed to read voice URL:" + url);
