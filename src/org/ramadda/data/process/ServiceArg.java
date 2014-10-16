@@ -127,6 +127,9 @@ public class ServiceArg implements Constants {
     /** _more_ */
     private boolean ifDefined = true;
 
+    /** _more_ */
+    private boolean include = true;
+
 
     /** _more_ */
     private boolean multiple = false;
@@ -166,6 +169,9 @@ public class ServiceArg implements Constants {
 
     /** _more_ */
     private String entryType;
+
+    /** _more_ */
+    private List<String> entryTypes;
 
     /** _more_ */
     private String entryPattern;
@@ -216,6 +222,9 @@ public class ServiceArg implements Constants {
         entryType = XmlUtil.getAttributeFromTree(node,
                 Service.ATTR_ENTRY_TYPE, (String) null);
 
+        if (entryType != null) {
+            entryTypes = StringUtil.split(entryType, ",", true, true);
+        }
         entryPattern = XmlUtil.getAttributeFromTree(node,
                 Service.ATTR_ENTRY_PATTERN, (String) null);
 
@@ -264,6 +273,7 @@ public class ServiceArg implements Constants {
         }
         size      = XmlUtil.getAttribute(node, Service.ATTR_SIZE, size);
         ifDefined = XmlUtil.getAttribute(node, "ifdefined", ifDefined);
+        include   = XmlUtil.getAttribute(node, "include", true);
         multiple  = XmlUtil.getAttribute(node, "multiple", multiple);
         first     = XmlUtil.getAttribute(node, "first", false);
         multipleJoin = XmlUtil.getAttribute(node, "multipleJoin",
@@ -319,6 +329,7 @@ public class ServiceArg implements Constants {
         Service.attr(attrs, "filename", fileName);
         Service.attr(attrs, Service.ATTR_SIZE, size);
         Service.attr(attrs, "ifdefined", ifDefined);
+        Service.attr(attrs, "include", include);
         Service.attr(attrs, "multiple", multiple);
         Service.attr(attrs, "first", first);
         Service.attr(attrs, "multipleJoin", multipleJoin);
@@ -352,14 +363,23 @@ public class ServiceArg implements Constants {
                                + " entry type:" + entryType + " pattern:"
                                + entryPattern);
         }
-        if (entryType != null) {
-            if ( !entry.getTypeHandler().isType(entryType)) {
+        if (entryTypes != null) {
+            boolean isType = false;
+            for (String type : entryTypes) {
+                if (entry.getTypeHandler().isType(type)) {
+                    isType = true;
+
+                    break;
+                }
+            }
+            if ( !isType) {
                 if (debug) {
-                    System.err.println("\tentry is not type");
+                    System.err.println("\tentry is not type: " + type);
                 }
 
                 return false;
             }
+
             if (entryPattern == null) {
                 if (debug) {
                     System.err.println("\thas entry type:" + entryType);
@@ -426,6 +446,15 @@ public class ServiceArg implements Constants {
      */
     public boolean getIfDefined() {
         return ifDefined;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getInclude() {
+        return include;
     }
 
 
@@ -531,6 +560,15 @@ public class ServiceArg implements Constants {
      */
     public String getEntryType() {
         return entryType;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public List<String> getEntryTypes() {
+        return entryTypes;
     }
 
 
