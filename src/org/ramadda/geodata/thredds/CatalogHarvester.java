@@ -668,7 +668,7 @@ public class CatalogHarvester extends Harvester {
                 InputStream   fromStream = connection.getInputStream();
                 OutputStream toStream =
                     getStorageManager().getFileOutputStream(newFile);
-                int bytes = IOUtil.writeTo(fromStream, toStream);
+                long bytes = IOUtil.writeTo(fromStream, toStream);
                 toStream.close();
                 fromStream.close();
                 if (bytes > 0) {
