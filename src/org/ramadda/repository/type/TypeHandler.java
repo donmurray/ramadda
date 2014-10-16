@@ -2940,15 +2940,19 @@ public class TypeHandler extends RepositoryManager {
             if(!service.isEnabled()) {
                 continue;
             }
-            File workDir = getStorageManager().createProcessDir();
-            ServiceInput serviceInput = new ServiceInput(workDir, entry);
-            ServiceOutput output = service.evaluate(getRepository().getTmpRequest(), serviceInput, null);
-            if ( !output.isOk()) {
-                System.err.println ("service not ok");
-                continue;
+            try {
+                File workDir = getStorageManager().createProcessDir();
+                ServiceInput serviceInput = new ServiceInput(workDir, entry);
+                ServiceOutput output = service.evaluate(getRepository().getTmpRequest(), serviceInput, null);
+                if ( !output.isOk()) {
+                    System.err.println ("service not ok");
+                    continue;
+                }
+                //Defer to the entry's type handler
+                entry.getTypeHandler().handleServiceResults(entry, service, output);
+            } catch(Exception exc) {
+                getLogManager().logError("ERROR: TypeHandler calling service:" + service +"\n",exc);
             }
-            //Defer to the entry's type handler
-            entry.getTypeHandler().handleServiceResults(entry, service, output);
         }
 
 
