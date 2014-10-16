@@ -2069,7 +2069,10 @@ public class Service extends RepositoryManager {
             return link.getLabel();
         }
 
-        return id.replaceAll("_", " ");
+        if(id!=null) {
+            return id.replaceAll("_", " ");
+        }
+        return "Service";
     }
 
 
