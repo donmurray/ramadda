@@ -22,7 +22,7 @@
 
 
 
-  <service label="z View DICOM attributes" id="bio_dicom_txt"   command="${service.dicom.dcm4che}/dcm2txt" >
+  <service label="View DICOM attributes" id="bio_dicom_txt"   command="${service.dicom.dcm4che}/dcm2txt" >
 <description><![CDATA[Show attributes contained in a DICOM file]]></description>
     <arg label="DICOM File" value="${entry.file}" type="entry" entryType="bio_dicom" primary="true"></arg>
     <output showResults="true" stdout="true"/>
