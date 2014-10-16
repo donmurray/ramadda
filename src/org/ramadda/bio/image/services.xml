@@ -50,7 +50,7 @@
 <process_description><![CDATA[<wiki>
 {{description}}
 
-{{imageplayer sort="number:.*_(.*).png"}}
+{{gallery}}
 
 == All Files ==
 {{tree sort="number:.*_(.*).png"}}
@@ -64,11 +64,13 @@
 <arg type="flag" value="-bigtiff" help="Force BigTIFF files to be written"/>
 <arg type="string" prefix="-series" label="Series" help="Specify which image series to convert"/>
 <arg type="string" prefix="-range" label="Range" help="Specify range of planes to convert (inclusive)"/>
-<arg type="flag" value="-autoscale" label="Automatically adjust brightness and contrast before converting"/>
+<arg type="flag" value="-autoscale" help="Automatically adjust brightness and contrast before converting"/>
+<arg type="category" value="Subset"/>
 <arg type="string" prefix="-crop" label="Crop" help="Crop images before converting; argument is 'x,y,w,h'"/>
 <arg type="string" prefix="-channel" label="Channel" help="Only convert the specified channel (indexed from 0)"/>
 <arg type="string" prefix="-z" label="Z" help="Only convert the specified Z section (indexed from 0)"/>
 <arg type="string" prefix="-timepoint" label="Time point" help="Only convert the specified timepoint (indexed from 0)"/>
+<arg type="category" value="Output file"/>
 <arg type="enumeration" name="imageformat" label="Image type" values="png,gif,jpg,tiff" include="false"/>
 <arg type="string" include="false" name="suffix" label="Pattern suffix" help="%s series index&lt;br&gt;%nseries name&lt;br&gt;%c channel index&lt;br&gt;%w channel name&lt;br&gt;%z Z index&lt;br&gt;%t T index&lt;br&gt;%A acquisition timestamp"/>
 
