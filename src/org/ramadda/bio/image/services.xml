@@ -57,7 +57,7 @@
 
 
 ]]></process_description>
-
+<arg value="-no-upgrade"/>
 <arg type="flag" value="-separate" help="Split RGB images into separate channels"/>
 <arg type="flag" value="-merge" help="Combine separate channels into RGB image"/>
 <arg type="flag" value="-expand" help="Expand indexed color to RGB"/>
@@ -88,7 +88,7 @@
 <arg value="-omexml"/>
 <arg value="-nopix"/>
 <arg value="-novalid"/>
-
+<arg value="-no-upgrade"/>
 <arg value="${entry.file}" type="entry"  label="OME Tiff file" primary="true" entryType="bio_ome_tiff"></arg>
     <output type="file" pattern=".*\.xml" stdout="true" filename="${entry.file.base}.xml"/>
 </service>
