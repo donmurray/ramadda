@@ -2204,7 +2204,7 @@ public class EntryManager extends RepositoryManager {
                     OutputStream toStream =
                         getStorageManager().getFileOutputStream(newFile);
                     try {
-                        int bytes = IOUtil.writeTo(fromStream, toStream,
+                        long bytes = IOUtil.writeTo(fromStream, toStream,
                                         actionId, length);
                         if (bytes < 0) {
                             return new Result(

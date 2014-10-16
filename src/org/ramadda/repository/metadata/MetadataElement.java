@@ -715,7 +715,7 @@ public class MetadataElement extends MetadataTypeBase implements DataTypes {
             OutputStream toStream =
                 getStorageManager().getFileOutputStream(tmpFile);
             try {
-                int bytes = IOUtil.writeTo(fromStream, toStream);
+                long bytes = IOUtil.writeTo(fromStream, toStream);
                 if (bytes < 0) {
                     throw new IllegalArgumentException(
                         "Could not download url:" + url);
