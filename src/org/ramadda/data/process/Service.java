@@ -376,13 +376,12 @@ public class Service extends RepositoryManager {
             addChild(new Service(getRepository(), this, node, i));
         }
 
-
         if ((linkId == null) && !haveChildren()) {
             command = XmlUtil.getAttributeFromTree(element, ATTR_COMMAND,
-                    (String) null);
+                                                   (String) null);
 
             pathProperty = XmlUtil.getAttribute(element, ATTR_PATHPROPERTY,
-                    (String) null);
+                                                (String) null);
 
             //Extract it from the command
             if ((pathProperty == null) && (command != null)) {
@@ -783,6 +782,7 @@ public class Service extends RepositoryManager {
         if (linkId != null) {
             try {
                 link = getRepository().getJobManager().getService(linkId);
+                System.out.println("Service link:" + linkId + " " + link);
             } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
@@ -875,15 +875,22 @@ public class Service extends RepositoryManager {
 
 
         if (haveLink()) {
+            System.err.println("Calling link:" + link);
             return link.addArgs(request, argPrefix, input, commands,
                                 filesToDelete, allEntries);
         }
 
-        List<Entry>     inputEntries = input.getEntries();
-
-        File            workDir      = input.getProcessDir();
         HashSet<String> seenGroup    = new HashSet<String>();
         HashSet<String> definedArgs  = new HashSet<String>();
+
+        if(linkId!=null) {
+            System.err.println("Have linkId but no link:" + linkId);
+            return definedArgs;
+        }
+
+        List<Entry>     inputEntries = input.getEntries();
+        File            workDir      = input.getProcessDir();
+
 
 
         Hashtable<String, List<Entry>> entryMap = new Hashtable<String,
@@ -947,8 +954,9 @@ public class Service extends RepositoryManager {
 
         Entry currentEntry = (Entry) Utils.safeGet(inputEntries, 0);
 
-        String cmd = applyMacros(currentEntry, entryMap, valueMap, workDir,
-                                 getCommand(), input.getForDisplay());
+        String cmd = getCommand();
+        cmd = applyMacros(currentEntry, entryMap, valueMap, workDir,
+                          cmd, input.getForDisplay());
         commands.add(cmd);
 
         addExtraArgs(request, input, commands, true);
