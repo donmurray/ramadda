@@ -208,9 +208,12 @@ public class NetcdfVisitor extends BridgeRecordVisitor {
         List<VariableSimpleIF> vars = new ArrayList<VariableSimpleIF>();
         vars.add(var);
 
+        /*
         writer = new WriterCFPointCollection("test.nc", "point data");
         writer.writeHeader(vars, DateUnit.getUnixDateUnit(), "m");
         writer.finish();
+        */
+
 
         /*
         writer = new WriterCFPointCollection(outputNetcdfFile.toString(), "point data");

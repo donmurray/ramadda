@@ -1688,7 +1688,7 @@ public class PointOutputHandler extends RecordOutputHandler {
                     getStorageManager().getFileInputStream(imageFile);
                 OutputStream os = getOutputStream(request, jobId, mainEntry,
                                       imageSuffix);
-                int bytes = IOUtil.writeTo(imageInputStream, os);
+                long bytes = IOUtil.writeTo(imageInputStream, os);
                 IOUtil.close(os);
                 IOUtil.close(imageInputStream);
                 if (doKmz) {
@@ -1731,7 +1731,7 @@ public class PointOutputHandler extends RecordOutputHandler {
                     getStorageManager().getFileInputStream(imageFile);
                 OutputStream os = getOutputStream(request, jobId, mainEntry,
                                       destFileName);
-                int bytes = IOUtil.writeTo(imageInputStream, os);
+                long bytes = IOUtil.writeTo(imageInputStream, os);
                 IOUtil.close(os);
                 IOUtil.close(imageInputStream);
 
