@@ -1,17 +1,17 @@
 <types>
 
 
-  <type name="bio.image"  description="DICOM File"  category="Bio" pattern=".*\.dcm" handler="org.ramadda.bio.image.DicomTypeHandler">
+  <type name="bio_dicom"  description="DICOM File"  category="Bio" pattern=".*\.dcm" handler="org.ramadda.bio.image.DicomTypeHandler">
      <property name="icon" value="/dicom/film.png"/>
      <property name="form.area.show" value="false"/>
      <property name="form.todate.show" value="false"/>
      <property name="form.fromdate.label" value="Date"/>
-     <service link="bio.image_makethumbnail" id="dicomimage"/>
-     <service link="bio.image_xml" id="dicomxml"/>
+     <service link="bio_dicom_makethumbnail" id="dicomimage"/>
+     <service link="bio_dicom_xml" id="dicomxml"/>
   </type>
 
 
-  <type name="bio.image_test"  super="bio.image" description="DICOM Test File"   handler="org.ramadda.bio.image.DicomTypeHandler">
+  <type name="bio_dicom_test"  super="bio_dicom" description="DICOM Test File"   handler="org.ramadda.bio.image.DicomTypeHandler">
      <column name="PatientName" label="Patient Name"  />
      <column name="PatientID" label="Patient ID"  />
      <column name="PatientAge" label="Patient Age"  />
@@ -23,7 +23,7 @@ StationName
   </type>
 
 
-  <type name="bio.image_xml"  description="DICOM Text File"  category="Bio">
+  <type name="bio_dicom_xml"  description="DICOM Text File"  category="Bio">
 <!--
      <property name="icon" value="/dicom/document-film.png"/>
 -->
@@ -31,5 +31,6 @@ StationName
      <property name="form.todate.show" value="false"/>
      <property name="form.fromdate.label" value="Date"/>
   </type>
+
 
 </types>
