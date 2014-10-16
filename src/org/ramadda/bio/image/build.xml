@@ -3,11 +3,11 @@
     <target name="plugin">
       <property file="${basedir}/build.properties"/>
       <property name="plugindestdir" value="${dist_dir}/otherplugins"/>
-      <property name="plugin" value="dicom"/>
+      <property name="plugin" value="bioimage"/>
       <property file="${basedir}/build.properties"/>
       <ant antfile="${basedir}/build.xml" target="commoninit" />
       <property name="jarfile" value="${plugin}plugin.jar"/>
-      <property name="plugin_dir" value="org/ramadda/bio/${plugin}"/>
+      <property name="plugin_dir" value="org/ramadda/bio/image"/>
       <ant antfile="${basedir}/build.xml" target="plugin"/>
       <ant antfile="${basedir}/build.xml" target="plugin_install"/>
     </target>

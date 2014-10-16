@@ -1,0 +1,49 @@
+<services icon="/dicom/document-film.png" category="Medical Imagery">
+
+
+   <service id="bio.image_image" label="Make images from DICOM" command="${service.imagemagick}/convert">
+        <description><![CDATA[Generate an image from a DICOM file using ImageMagick convert]]></description>
+<process_description><![CDATA[<wiki>
+{{description}}
+
+{{imageplayer sort="number:.*_(.*).png"}}
+
+== All Files ==
+{{tree sort="number:.*_(.*).png"}}
+
+
+
+]]></process_description>
+        <arg value="${entry.file}" type="entry"  label="Input DICOM file" primary="true" entryType="bio.image"></arg>
+        <arg value="${entry.file.base}_%d.png"/>
+        <output type="type_image" pattern=".*"/>
+    </service>
+
+
+
+
+  <service label="View DICOM attributes" id="bio.image_txt"   command="${service.dicom.dcm4che}/dcm2txt" >
+<description><![CDATA[Show attributes contained in a DICOM file]]></description>
+    <arg label="DICOM File" value="${entry.file}" type="entry" entryType="bio.image" primary="true"></arg>
+    <output showResults="true" stdout="true"/>
+   </service>
+
+
+  <service label="View DICOM XML" id="bio.image_xml"   command="${service.dicom.dcm4che}/dcm2xml" >
+<description><![CDATA[Run dcm2xml]]></description>
+    <arg label="DICOM File" value="${entry.file}" type="entry" entryType="bio.image" primary="true"></arg>
+    <arg value="-X"/>
+    <output type="bio.image_xml" pattern=".*\.xml" stdout="true" filename="${entry.file.base}.xml"/>
+   </service>
+
+
+
+   <service id="bio.image_makethumbnail" label="Make thumbnail" command="${service.imagemagick}/convert">
+        <description><![CDATA[Generate an image from a DICOM file using ImageMagick convert]]></description>
+        <arg value="${entry.file}" type="entry"  label="Input DICOM file" primary="true" entryType="bio.image"></arg>
+        <arg value="${entry.file.base}.png"/>
+        <output type="type_image" pattern=".*"/>
+    </service>
+
+
+</services>

@@ -18,7 +18,7 @@
 * DEALINGS IN THE SOFTWARE.
 */
 
-package org.ramadda.bio.dicom;
+package org.ramadda.bio.image;
 
 
 
@@ -105,7 +105,7 @@ public class DicomTypeHandler extends GenericTypeHandler {
         List<String> lines =
             StringUtil.split(
                 getRepository().getResource(
-                    "/org/ramadda/bio/dicom/dicomtags.txt"), "\n", true,
+                    "/org/ramadda/bio.image/dicomtags.txt"), "\n", true,
                         true);
         for (int i = 0; i < lines.size(); i += 2) {
             Tag tag = new Tag(lines.get(i), lines.get(i + 1));
@@ -172,7 +172,7 @@ public class DicomTypeHandler extends GenericTypeHandler {
             if (metadataTags.contains(tag.id)
                     || metadataTags.contains(tag.name)) {
                 Metadata metadata = new Metadata(getRepository().getGUID(),
-                                        entry.getId(), "bio_dicom_attr",
+                                        entry.getId(), "bio.image_attr",
                                         false, tag.name, value, null, null,
                                         null);
 
