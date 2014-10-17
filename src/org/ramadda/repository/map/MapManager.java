@@ -59,8 +59,6 @@ import java.util.List;
  */
 public class MapManager extends RepositoryManager {
 
-    /** dummy layer */
-    private static final WmsMapLayer dummyLayerToForceCompile = null;
 
     /** default height for GE plugin */
     public static int DFLT_EARTH_HEIGHT = 500;
