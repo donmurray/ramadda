@@ -1,8 +1,8 @@
 <types>
 
   <type name="geo_gdal" foruser="false" handler="org.ramadda.geodata.earthdata.GdalTypeHandler" category="Geospatial">
-     <service link="gdal.tiff2image"/>
-     <service link="gdal.info"/>
+     <service link="gdal_tiff2image"/>
+     <service link="gdal_info"/>
   </type>
 
   <type name="geo_geotiff"  description="GeoTIFF"  super="geo_gdal" >
