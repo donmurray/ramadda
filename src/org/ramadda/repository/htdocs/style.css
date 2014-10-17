@@ -36,7 +36,23 @@ h3 {
    font-size: 12pt;
 }
 
+.minitron h2 {
+   margin:0px;
+   padding-top: 0px;
+}
+
+.minitron {
+   padding-top: 10px;
+   padding-left: 12px;
+   padding-right: 12px;
+   min-height: 325px;
+   border-radius: 6px;
+   border: 1px #ddd solid;
+   background: #F5F5F5;
+}
+
 .jumbotron h2 {
+   font-weight: 400;
    padding:0px;
    margin:0px;
 //   margin-top:5px;
@@ -44,12 +60,13 @@ h3 {
 }
 
 .jumbotron {
+   border: 1px #ddd solid;
 //    background: #f9f9f9;
     border-radius: 4px;
     padding: 0px;
     margin:0px;
-    padding-top:1.5em;
-    padding-bottom:8px;
+    padding-top:1em;
+    padding-bottom:1em;
     padding-left: 8px;
     padding-right: 8px;
     margin-top: 10px;
