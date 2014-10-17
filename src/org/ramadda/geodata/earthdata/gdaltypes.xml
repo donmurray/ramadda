@@ -5,7 +5,7 @@
      <service link="gdal.info"/>
   </type>
 
-  <type name="geo_geotiff"  description="GeoTIFF"  super="geo_gdal" pattern="(.*\.tif|.*\.tiff)">
+  <type name="geo_geotiff"  description="GeoTIFF"  super="geo_gdal" >
   </type>
 
 </types>
