@@ -105,6 +105,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                             new WikiTag(WIKI_TAG_LIST), 
                             new WikiTag(WIKI_TAG_TABS, attrs(
                                                              ATTR_TAG, WIKI_TAG_HTML, ATTR_SHOWLINK, "true", ATTR_INCLUDEICON, "false") + ATTRS_LAYOUT), 
+                            new WikiTag(WIKI_TAG_BOOTSTRAP, attrs(
+                                                                  ATTR_TAG, WIKI_TAG_LINKS, "inner-height","100", ATTR_INCLUDEICON, "true")), 
                             new WikiTag(WIKI_TAG_TREE, attrs(
                                                              ATTR_DETAILS, "true")), 
                             new WikiTag(WIKI_TAG_TREEVIEW, attrs(ATTR_WIDTH,"750", ATTR_HEIGHT,"500")), 
@@ -1423,7 +1425,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             List<Entry> children = getEntries(request, originalEntry, entry,
                                        props);
             boolean      doingSlideshow = theTag.equals(WIKI_TAG_SLIDESHOW);
-            boolean doingBootstrap  = theTag.equals(WIKI_TAG_BOOTSTRAP);
+            boolean      doingBootstrap = theTag.equals(WIKI_TAG_BOOTSTRAP);
             List<String> titles         = new ArrayList<String>();
             List<String> contents       = new ArrayList<String>();
             String       dfltTag        = WIKI_TAG_SIMPLE;
@@ -1442,9 +1444,10 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             boolean showLink = Misc.getProperty(props, ATTR_SHOWLINK, true);
             boolean includeIcon = Misc.getProperty(props, ATTR_INCLUDEICON,
                                       false);
-            boolean includeUrl = Misc.getProperty(props, "includeurl",
-                                                  false);
-            if(doingBootstrap) includeIcon = false;
+            boolean includeUrl = Misc.getProperty(props, "includeurl", false);
+            if (doingBootstrap) {
+                includeIcon = false;
+            }
             boolean useCookies = Misc.getProperty(props, "cookie", false);
             String  linklabel  = Misc.getProperty(props, ATTR_LINKLABEL, "");
 
@@ -1543,9 +1546,9 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                             ? getEntryDisplayName(child)
                             : linklabel);
 
-                    if(includeUrl) {
+                    if (includeUrl) {
                         content = content + HtmlUtils.br()
-                            + HtmlUtils.leftRight("", href);
+                                  + HtmlUtils.leftRight("", href);
                     }
                 }
                 contents.add(content);
@@ -1558,25 +1561,54 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
                 return sb.toString();
             } else if (theTag.equals(WIKI_TAG_BOOTSTRAP)) {
-                sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("row")));
-                int colCnt = 0;
-                for(int i=0;i<titles.size();i++) {
-                    colCnt++;
-                    if(colCnt>3) {
-                        sb.append(HtmlUtils.close("div"));
-                        sb.append("<hr>");
-                        sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("row")));
-                        colCnt=1;
-                    }
-                    sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("col-md-4")));
-                    sb.append(HtmlUtils.div(
-                                            HtmlUtils.tag("h2", "", titles.get(i))+
-                                            contents.get(i),
-                                            HtmlUtils.cssClass("minitron")));
+                int innerHeight = Misc.getProperty(props, "inner-height", -1);
+                int minHeight = Misc.getProperty(props, "inner-minheight",
+                                    -1);
+                int maxHeight = Misc.getProperty(props, "inner-maxheight",
+                                    -1);
 
+                StringBuilder innerStyle = new StringBuilder();
+                if (innerHeight > 0) {
+                    innerStyle.append("height:" + innerHeight + "px;");
+                    innerStyle.append("overflow-y: auto;");
+                }
+                if (minHeight > 0) {
+                    innerStyle.append("min-height:" + minHeight + "px;");
+                    innerStyle.append("overflow-y: auto;");
+                }
+                if (maxHeight > 0) {
+                    innerStyle.append("max-height:" + maxHeight + "px;");
+                    innerStyle.append("overflow-y: auto;");
+                }
+                //                sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("row")));
+                int rowCnt = 0;
+                int colCnt = 100;
+                for (int i = 0; i < titles.size(); i++) {
+                    colCnt++;
+                    if (colCnt >= 3) {
+                        if (rowCnt > 0) {
+                            sb.append(HtmlUtils.close("div"));
+                            sb.append("<hr>");
+                        }
+                        rowCnt++;
+                        sb.append(HtmlUtils.open("div",
+                                HtmlUtils.cssClass("row")));
+                        colCnt = 0;
+                    }
+                    sb.append(HtmlUtils.open("div",
+                                             HtmlUtils.cssClass("col-md-4")));
+                    sb.append(HtmlUtils.open("div",
+                                             HtmlUtils.cssClass("minitron")));
+                    sb.append(HtmlUtils.tag("h2", "", titles.get(i)));
+                    sb.append(HtmlUtils.div(contents.get(i),
+                                            HtmlUtils.cssClass("bs-inner")
+                                            + HtmlUtils.attr("style",
+                                                innerStyle.toString())));
+                    sb.append(HtmlUtils.close("div"));
                     sb.append(HtmlUtils.close("div"));
                 }
                 sb.append(HtmlUtils.close("div"));
+
                 return sb.toString();
             } else if (doingSlideshow) {
                 // for slideshow
@@ -1928,6 +1960,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 link.append(tagClose);
                 links.add(link.toString());
             }
+
             return StringUtil.join(separator, links);
         } else {
             String fromTypeHandler =
