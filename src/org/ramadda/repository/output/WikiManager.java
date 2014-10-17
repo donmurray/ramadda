@@ -1418,10 +1418,12 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             return makeSimpleDisplay(request, props, originalEntry, entry);
         } else if (theTag.equals(WIKI_TAG_TABS)
                    || theTag.equals(WIKI_TAG_ACCORDIAN)
-                   || theTag.equals(WIKI_TAG_SLIDESHOW)) {
+                   || theTag.equals(WIKI_TAG_SLIDESHOW)
+                   || theTag.equals(WIKI_TAG_BOOTSTRAP)) {
             List<Entry> children = getEntries(request, originalEntry, entry,
                                        props);
             boolean      doingSlideshow = theTag.equals(WIKI_TAG_SLIDESHOW);
+            boolean doingBootstrap  = theTag.equals(WIKI_TAG_BOOTSTRAP);
             List<String> titles         = new ArrayList<String>();
             List<String> contents       = new ArrayList<String>();
             String       dfltTag        = WIKI_TAG_SIMPLE;
@@ -1440,6 +1442,9 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             boolean showLink = Misc.getProperty(props, ATTR_SHOWLINK, true);
             boolean includeIcon = Misc.getProperty(props, ATTR_INCLUDEICON,
                                       false);
+            boolean includeUrl = Misc.getProperty(props, "includeurl",
+                                                  false);
+            if(doingBootstrap) includeIcon = false;
             boolean useCookies = Misc.getProperty(props, "cookie", false);
             String  linklabel  = Misc.getProperty(props, ATTR_LINKLABEL, "");
 
@@ -1538,8 +1543,10 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                             ? getEntryDisplayName(child)
                             : linklabel);
 
-                    content = content + HtmlUtils.br()
-                              + HtmlUtils.leftRight("", href);
+                    if(includeUrl) {
+                        content = content + HtmlUtils.br()
+                            + HtmlUtils.leftRight("", href);
+                    }
                 }
                 contents.add(content);
 
@@ -1549,6 +1556,27 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             if (theTag.equals(WIKI_TAG_ACCORDIAN)) {
                 HtmlUtils.makeAccordian(sb, titles, contents);
 
+                return sb.toString();
+            } else if (theTag.equals(WIKI_TAG_BOOTSTRAP)) {
+                sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("row")));
+                int colCnt = 0;
+                for(int i=0;i<titles.size();i++) {
+                    colCnt++;
+                    if(colCnt>3) {
+                        sb.append(HtmlUtils.close("div"));
+                        sb.append("<hr>");
+                        sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("row")));
+                        colCnt=1;
+                    }
+                    sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("col-md-4")));
+                    sb.append(HtmlUtils.div(
+                                            HtmlUtils.tag("h2", "", titles.get(i))+
+                                            contents.get(i),
+                                            HtmlUtils.cssClass("minitron")));
+
+                    sb.append(HtmlUtils.close("div"));
+                }
+                sb.append(HtmlUtils.close("div"));
                 return sb.toString();
             } else if (doingSlideshow) {
                 // for slideshow
@@ -1900,7 +1928,6 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 link.append(tagClose);
                 links.add(link.toString());
             }
-
             return StringUtil.join(separator, links);
         } else {
             String fromTypeHandler =

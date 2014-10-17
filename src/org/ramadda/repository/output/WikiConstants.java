@@ -364,6 +364,8 @@ public interface WikiConstants {
     /** wiki import */
     public static final String WIKI_TAG_TABS = "tabs";
 
+    public static final String WIKI_TAG_BOOTSTRAP = "bootstrap";
+
     /** _more_ */
     public static final String WIKI_TAG_APPLY = "apply";
 
