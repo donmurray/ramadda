@@ -9,19 +9,24 @@ body {
 }
 
 //Resets for bootstrap
+
 h1 {
-   font-size: 22pt;
+   font-size: 180%;
 }
 
 h2 {
-   font-size:20pt;
+   font-size:160%;
 }
 
 h3 {
-   font-size: 18pt;
+   font-size: 130%;
 }
 
 
+
+.jumbotron a {
+  color:#0000CD;
+}
 
 .jumbotron p {
    font-size: 12pt;
@@ -30,7 +35,8 @@ h3 {
 .jumbotron h2 {
    padding:0px;
    margin:0px;
-   font-size: 18pt;
+//   margin-top:5px;
+   margin-bottom:5px;
 }
 
 .jumbotron {
@@ -38,8 +44,8 @@ h3 {
     border-radius: 4px;
     padding: 0px;
     margin:0px;
-    padding-top:8px;
-    padding-bottom:4px;
+    padding-top:12px;
+    padding-bottom:8px;
     padding-left: 8px;
     padding-right: 8px;
     margin-top: 10px;

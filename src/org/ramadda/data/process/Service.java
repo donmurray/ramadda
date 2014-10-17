@@ -376,6 +376,7 @@ public class Service extends RepositoryManager {
             addChild(new Service(getRepository(), this, node, i));
         }
 
+
         if ((linkId == null) && !haveChildren()) {
             command = XmlUtil.getAttributeFromTree(element, ATTR_COMMAND,
                                                    (String) null);
@@ -783,7 +784,9 @@ public class Service extends RepositoryManager {
             try {
                 link = getRepository().getJobManager().getService(linkId);
                 if(link == null) {
-                    System.out.println("Could not find service:" + linkId);
+                    System.out.println("Could not find service:" + linkId +" " + label +" " + id);
+                    System.err.println(XmlUtil.toString(element));
+                    enabled = false;
                 }
             } catch (Exception exc) {
                 throw new RuntimeException(exc);
