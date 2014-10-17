@@ -106,7 +106,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                             new WikiTag(WIKI_TAG_TABS, attrs(
                                                              ATTR_TAG, WIKI_TAG_HTML, ATTR_SHOWLINK, "true", ATTR_INCLUDEICON, "false") + ATTRS_LAYOUT), 
                             new WikiTag(WIKI_TAG_BOOTSTRAP, attrs(
-                                                                  ATTR_TAG, WIKI_TAG_LINKS, "inner-height","100", ATTR_INCLUDEICON, "true")), 
+                                                                  ATTR_TAG, WIKI_TAG_LINKS, "inner-height","100", ATTR_COLUMNS, "3", ATTR_INCLUDEICON, "true", "weights","","doline","true")), 
                             new WikiTag(WIKI_TAG_TREE, attrs(
                                                              ATTR_DETAILS, "true")), 
                             new WikiTag(WIKI_TAG_TREEVIEW, attrs(ATTR_WIDTH,"750", ATTR_HEIGHT,"500")), 
@@ -1561,6 +1561,14 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
                 return sb.toString();
             } else if (theTag.equals(WIKI_TAG_BOOTSTRAP)) {
+                List<String> weights = null;
+                boolean doLine =  Misc.getProperty(props, "doline", true);
+                String ws = Misc.getProperty(props, "weights", (String) null);
+                if(ws!=null) {
+                    weights = StringUtil.split(ws,",",true,true);
+                }
+
+                int columns = Misc.getProperty(props, "columns", 3);
                 int innerHeight = Misc.getProperty(props, "inner-height", -1);
                 int minHeight = Misc.getProperty(props, "inner-minheight",
                                     -1);
@@ -1583,20 +1591,30 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 //                sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("row")));
                 int rowCnt = 0;
                 int colCnt = 100;
+                int weight = 12/columns;
+
                 for (int i = 0; i < titles.size(); i++) {
                     colCnt++;
-                    if (colCnt >= 3) {
+                    if (colCnt >= columns) {
                         if (rowCnt > 0) {
                             sb.append(HtmlUtils.close("div"));
-                            sb.append("<hr>");
+                            if(doLine) {
+                                sb.append("<hr>");
+                            } else {
+                                sb.append(HtmlUtils.br());
+                            }
                         }
                         rowCnt++;
                         sb.append(HtmlUtils.open("div",
                                 HtmlUtils.cssClass("row")));
                         colCnt = 0;
                     }
+                    String weightString = ""+weight;
+                    if(weights!=null && i< weights.size()) {
+                        weightString  = weights.get(i);
+                    }
                     sb.append(HtmlUtils.open("div",
-                                             HtmlUtils.cssClass("col-md-4")));
+                                             HtmlUtils.cssClass("col-md-" + weightString)));
                     sb.append(HtmlUtils.open("div",
                                              HtmlUtils.cssClass("minitron")));
                     sb.append(HtmlUtils.tag("h2", "", titles.get(i)));
