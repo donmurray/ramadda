@@ -26,8 +26,8 @@ var map_google_streets = "google.streets";
 var map_google_hybrid = "google.hybrid";
 var map_google_satellite = "google.satellite";
 
-var map_default_layer =  map_google_terrain;
-
+// ESRI Maps
+var map_esri_topo = "esri.topo";
 
 
 // Microsoft maps - only work for -180 to 180
@@ -35,8 +35,7 @@ var map_ms_shaded = "ms.shaded";
 var map_ms_hybrid = "ms.hybrid";
 var map_ms_aerial = "ms.aerial";
 
-// ESRI Maps
-var map_esri_topo = "esri.topo";
+
 
 // WMS maps
 var map_wms_openlayers = "wms:OpenLayers WMS,http://vmap0.tiles.osgeo.org/wms/vmap0,basic";
@@ -45,6 +44,9 @@ var map_wms_openlayers = "wms:OpenLayers WMS,http://vmap0.tiles.osgeo.org/wms/vm
 var map_wms_topographic = "wms:Topo Maps,http://terraservice.net/ogcmap.ashx,DRG";
 
 var map_ol_openstreetmap = "ol.openstreetmap";
+
+
+var map_default_layer =  map_google_terrain;
 
 var defaultLocation = new OpenLayers.LonLat(-0, 0);
 var defaultZoomLevel = 2;
@@ -97,6 +99,7 @@ function RepositoryMap(mapId, params) {
                 latlonReadout : latlonReadoutID,
                 map: null,
                 defaultMapLayer: map_default_layer,
+                haveAddedDefaultLayer: false,
                 layer: null,
                 markers: null,
                 boxes: null,
@@ -163,6 +166,39 @@ function RepositoryMap(mapId, params) {
     }
 
 
+
+    this.addMapLayer = function(name, url, layer, isBaseLayer, isDefault) {
+        var layer;
+        if (/\/tile\//.exec(url)) {
+            layer = new OpenLayers.Layer.XYZ(
+                        name, url, {
+                            sphericalMercator : sphericalMercatorDefault,
+                            numZoomLevels : zoomLevelsDefault,
+                            wrapDateLine : wrapDatelineDefault
+                        });
+        } else {
+            layer = new OpenLayers.Layer.WMS(name, url, {
+                    layers : layer,
+                    format: "image/png"
+                }, {
+                    wrapDateLine : wrapDatelineDefault
+                });
+        }
+        if(isBaseLayer) 
+            layer.isBaseLayer = true;
+        else
+            layer.isBaseLayer = false;
+        layer.visibility = false;
+        layer.reproject = true;
+        this.map.addLayer(layer);
+        if(isDefault) {
+            this.haveAddedDefaultLayer = true;
+            this.map.setLayerIndex(layer, 0);
+            this.map.setBaseLayer(layer);
+        }
+    }
+
+
     this.addKMLLayer = function(name, kmlUrl) {
         var layer = new OpenLayers.Layer.Vector(name, {
                 strategies: [new OpenLayers.Strategy.Fixed()],
@@ -188,7 +224,7 @@ function RepositoryMap(mapId, params) {
             ];
         }
 
-        if(this.defaultMapLayer) {
+        if(!this.haveAddedDefaultLayer && this.defaultMapLayer) {
             var index = this.mapLayers.indexOf(this.defaultMapLayer);
             if(index >= 0) { 
                 this.mapLayers.splice(index, 1);
@@ -275,6 +311,18 @@ function RepositoryMap(mapId, params) {
                             numZoomLevels : zoomLevelsDefault,
                             wrapDateLine : wrapDatelineDefault
                         }));
+            } else if (/\/tile\//.exec(mapLayer)) {
+                var layerURL = mapLayer;
+                this.map.addLayer(new OpenLayers.Layer.XYZ(
+                        "ESRI - China Map", layerURL, {
+                            sphericalMercator : sphericalMercatorDefault,
+                            numZoomLevels : zoomLevelsDefault,
+                            wrapDateLine : wrapDatelineDefault
+                        }));
+
+
+
+
             } else {
                 var match = /wms:(.*),(.*),(.*)/.exec(mapLayer);
                 if (!match) {

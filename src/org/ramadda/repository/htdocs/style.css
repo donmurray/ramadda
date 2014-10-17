@@ -693,7 +693,8 @@ padding-right-rtl-source: physical;
 
 
 label {
-  display: block;
+//  display: block;
+  margin-left: 3px;
   margin-bottom: 3px;
   padding-left: 15px;
   text-indent: -15px;

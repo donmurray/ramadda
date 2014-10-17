@@ -27,9 +27,9 @@ import org.ramadda.repository.Repository;
 import org.ramadda.repository.Request;
 import org.ramadda.repository.metadata.Metadata;
 import org.ramadda.repository.metadata.MetadataHandler;
-import org.ramadda.util.Utils;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.MapRegion;
+import org.ramadda.util.Utils;
 
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
@@ -289,6 +289,7 @@ public class MapInfo {
             return getMapDiv("&nbsp;Maps not available");
         }
 
+        repository.getPageHandler().addToMap(request, this);
         for (PageDecorator pageDecorator :
                 repository.getPluginManager().getPageDecorators()) {
             pageDecorator.addToMap(request, this);
@@ -970,11 +971,13 @@ public class MapInfo {
      *  Set the DefaultMapRegion property.
      *
      *  @param The DefaultMapRegion
+     *
+     * @param mapRegion _more_
      */
     public void setDefaultMapRegion(String mapRegion) {
         defaultMapRegion = mapRegion;
     }
-    
+
     /**
      *  Get the DefaultMapRegion property.
      *

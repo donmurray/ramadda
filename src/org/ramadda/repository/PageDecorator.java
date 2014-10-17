@@ -22,6 +22,9 @@ package org.ramadda.repository;
 
 
 import org.ramadda.repository.map.MapInfo;
+import org.ramadda.repository.map.MapLayer;
+
+
 
 import org.ramadda.util.WikiUtil;
 

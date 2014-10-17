@@ -23,6 +23,9 @@ package org.ramadda.repository;
 
 import org.ramadda.repository.auth.Permission;
 import org.ramadda.repository.auth.User;
+
+import org.ramadda.repository.map.MapInfo;
+import org.ramadda.repository.map.MapLayer;
 import org.ramadda.repository.metadata.ContentMetadataHandler;
 import org.ramadda.repository.metadata.Metadata;
 import org.ramadda.repository.output.CalendarOutputHandler;
@@ -30,13 +33,13 @@ import org.ramadda.repository.output.HtmlOutputHandler;
 import org.ramadda.repository.output.OutputHandler;
 import org.ramadda.repository.output.OutputType;
 import org.ramadda.repository.output.PageStyle;
-
-import org.ramadda.util.Utils;
 import org.ramadda.util.CategoryBuffer;
 import org.ramadda.util.HtmlTemplate;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.JQuery;
 import org.ramadda.util.MapRegion;
+
+import org.ramadda.util.Utils;
 
 import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.DateUtil;
@@ -127,6 +130,10 @@ public class PageHandler extends RepositoryManager {
 
 
     /** _more_ */
+    private List<MapLayer> mapLayers = null;
+
+
+    /** _more_ */
     private List<MapRegion> mapRegions = new ArrayList<MapRegion>();
 
 
@@ -138,7 +145,7 @@ public class PageHandler extends RepositoryManager {
     public static final String PROP_LANGUAGE_DEFAULT =
         "ramadda.language.default";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_ENTRY_TABLE_SHOW_CREATEDATE =
         "ramadda.entry.table.show.createdate";
 
@@ -1107,11 +1114,13 @@ public class PageHandler extends RepositoryManager {
                 }
 
 
-                mapRegions.add(new MapRegion(toks.get(1), toks.get(0), group,
-                                             Utils.decodeLatLon(toks.get(2)),
-                                             Utils.decodeLatLon(toks.get(3)),
-                                             Utils.decodeLatLon(toks.get(4)),
-                                             Utils.decodeLatLon(toks.get(5))));
+                mapRegions.add(
+                    new MapRegion(
+                        toks.get(1), toks.get(0), group,
+                        Utils.decodeLatLon(toks.get(2)),
+                        Utils.decodeLatLon(toks.get(3)),
+                        Utils.decodeLatLon(toks.get(4)),
+                        Utils.decodeLatLon(toks.get(5))));
             }
 
         }
@@ -2221,8 +2230,8 @@ public class PageHandler extends RepositoryManager {
      * @return _more_
      */
     public static String getDialogString(String s) {
-        s  = s.replaceAll("<pre>","PREOPEN");
-        s  = s.replaceAll("</pre>","PRECLOSE");
+        s = s.replaceAll("<pre>", "PREOPEN");
+        s = s.replaceAll("</pre>", "PRECLOSE");
         s = HtmlUtils.entityEncode(s);
         s = s.replace("&#60;msg&#32;", "<msg ");
         s = s.replace("&#32;msg&#62;", " msg>");
@@ -2230,9 +2239,10 @@ public class PageHandler extends RepositoryManager {
         s = s.replace("&#60;p&#62;", "<p>");
         s = s.replace("&#60;br&#62;", "<br>");
         s = s.replace("&#38;nbsp&#59;", "&nbsp;");
-        s  = s.replaceAll("PREOPEN","<pre>");
-        s  = s.replaceAll("PRECLOSE", "</pre>");
+        s = s.replaceAll("PREOPEN", "<pre>");
+        s = s.replaceAll("PRECLOSE", "</pre>");
         System.err.println("s:" + s);
+
         return s;
     }
 
@@ -2644,7 +2654,8 @@ public class PageHandler extends RepositoryManager {
         String treeLink = HtmlUtils.href(
                               request.entryUrl(
                                   getRepository().URL_ENTRY_SHOW, entry,
-                                  ARG_OUTPUT, output.toString()), HtmlUtils.img(
+                                  ARG_OUTPUT,
+                                  output.toString()), HtmlUtils.img(
                                       iconUrl(output.getIcon()),
                                       output.getLabel()));
 
@@ -3283,6 +3294,67 @@ public class PageHandler extends RepositoryManager {
      */
     public boolean showEntryTableCreateDate() {
         return getProperty(PROP_ENTRY_TABLE_SHOW_CREATEDATE, false);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    private List<MapLayer> getMapLayers() {
+        if (mapLayers == null) {
+            List<MapLayer> tmp = new ArrayList<MapLayer>();
+            for (String base :
+                    StringUtil.split(
+                        getRepository().getProperty(
+                            "ramadda.map.extras", ""), ",", true, true)) {
+                tmp.addAll(MapLayer.makeLayers(getRepository(), base));
+            }
+            mapLayers = tmp;
+        }
+
+        return mapLayers;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param mapInfo _more_
+     */
+    public void addToMap(Request request, MapInfo mapInfo) {
+        //        if(mapInfo.forSelection()) return;
+        //http://wms.alaskamapped.org/extras?
+
+        List<String> titles = new ArrayList<String>();
+        List<String> tabs   = new ArrayList<String>();
+        for (MapLayer mapLayer : getMapLayers()) {
+            if (Utils.stringDefined(mapLayer.getLegendLabel())) {
+                titles.add(mapLayer.getLegendLabel());
+                StringBuffer sb = new StringBuffer(mapLayer.getLegendText());
+                if (Utils.stringDefined(mapLayer.getLegendImage())) {
+                    sb.append(HtmlUtils.img(mapLayer.getLegendImage()));
+                }
+                tabs.add(HtmlUtils.div(sb.toString(),
+                                       HtmlUtils.cssClass("map-legend-div")));
+            }
+            mapLayer.addToMap(request, mapInfo);
+        }
+
+        StringBuffer rightSide = new StringBuffer();
+        rightSide.append("<b>Legends</b><br>");
+        rightSide.append(OutputHandler.makeTabs(titles, tabs, true));
+
+        mapInfo.addRightSide(
+            getPageHandler().makeStickyPopup(
+                HtmlUtils.img(getRepository().fileUrl("/icons/map_go.png")),
+                rightSide.toString(), null));
+        //        mapInfo.addRightSide(HtmlUtils.makeShowHideBlock("", rightSide.toString(),false));
+        //        mapInfo.addRightSide(HtmlUtils.makeShowHideBlock("", rightSide.toString(),false));
+
     }
 
 

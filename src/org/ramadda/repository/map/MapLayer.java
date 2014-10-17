@@ -42,7 +42,7 @@ import java.util.List;
 /**
  * A MapInfo class to hold map info
  */
-public class WmsMapLayer {
+public class MapLayer {
 
     /** _more_ */
     private String url;
@@ -65,6 +65,9 @@ public class WmsMapLayer {
     /** _more_ */
     private String legendLabel;
 
+    /** _more_          */
+    private boolean isDefault = false;
+
     /**
      * _more_
      *
@@ -74,8 +77,8 @@ public class WmsMapLayer {
      * @param legendImage _more_
      * @param legendLabel _more_
      */
-    public WmsMapLayer(String id, String url, String label,
-                       String legendImage, String legendLabel) {
+    public MapLayer(String id, String url, String label, String legendImage,
+                    String legendLabel) {
         this.url         = url;
         this.id          = id;
         this.label       = label;
@@ -91,13 +94,13 @@ public class WmsMapLayer {
      * @param prefix _more_
      * @param id _more_
      */
-    public WmsMapLayer(Repository repository, String prefix, String id) {
+    public MapLayer(Repository repository, String prefix, String id) {
         this.id  = id;
         prefix   = prefix + "." + id;
         this.url = repository.getProperty(prefix + ".url", "");
         if (this.url.length() == 0) {
             throw new IllegalArgumentException(
-                "no url defined for wms layer:" + prefix + ".url");
+                "no url defined for map layer:" + prefix + ".url");
         }
         this.label = repository.getProperty(prefix + ".label", "NONE");
         this.legendImage = repository.getProperty(prefix + ".legend.image",
@@ -105,7 +108,8 @@ public class WmsMapLayer {
         this.legendText = repository.getProperty(prefix + ".legend.text", "");
         this.legendLabel = repository.getProperty(prefix + ".legend.label",
                 "");
-        this.labelArg = this.label.replaceAll("'", "\\\\'");
+        this.labelArg  = this.label.replaceAll("'", "\\\\'");
+        this.isDefault = repository.getProperty(prefix + ".default", false);
     }
 
 
@@ -118,16 +122,16 @@ public class WmsMapLayer {
      *
      * @return _more_
      */
-    public static List<WmsMapLayer> makeLayers(Repository repository,
-            String prefix) {
-        List<WmsMapLayer> layers = new ArrayList<WmsMapLayer>();
+    public static List<MapLayer> makeLayers(Repository repository,
+                                            String prefix) {
+        List<MapLayer> layers = new ArrayList<MapLayer>();
         for (String id :
-                StringUtil.split(repository.getProperty(prefix + ".layers",
+                StringUtil.split(repository.getProperty(prefix + ".maps",
                     ""), ",", true, true)) {
             try {
-                layers.add(new WmsMapLayer(repository, prefix, id));
+                layers.add(new MapLayer(repository, prefix, id));
             } catch (Exception exc) {
-                repository.getLogManager().logError("Adding WMS layer:"
+                repository.getLogManager().logError("Adding map layer:"
                         + exc, exc);
             }
         }
@@ -147,11 +151,12 @@ public class WmsMapLayer {
 
         mapInfo.addJS(
             HtmlUtils.call(
-                mapInfo.getVariableName() + ".addWMSLayer",
+                mapInfo.getVariableName() + ".addMapLayer",
                 HtmlUtils.jsMakeArgs(
                     new String[] { HtmlUtils.squote(labelArg),
                                    HtmlUtils.squote(url),
-                                   HtmlUtils.squote(id), "true" }, false)));
+                                   HtmlUtils.squote(id), "true",
+                                   "" + isDefault }, false)));
         mapInfo.addJS("\n");
     }
 
@@ -268,5 +273,12 @@ public class WmsMapLayer {
     }
 
 
-
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getIsDefault() {
+        return isDefault;
+    }
 }
