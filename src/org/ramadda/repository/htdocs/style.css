@@ -28,6 +28,10 @@ h3 {
   color:#0000CD;
 }
 
+.jumbotron .btn {
+  color:#fff;
+}
+
 .jumbotron p {
    font-size: 12pt;
 }
