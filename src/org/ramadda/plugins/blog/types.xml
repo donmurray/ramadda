@@ -1,17 +1,19 @@
 <types>
 
 
-  <type name="weblog"  description="Weblog" handler="org.ramadda.plugins.blog.WeblogTypeHandler" category="Collaboration">
+  <type name="weblog"  description="Weblog" handler="org.ramadda.plugins.blog.WeblogTypeHandler" category="Collaboration" metadata="enum_tag,content.attachment">
      <property name="icon" value="/blog/blog_icon.png"/>
      <property name="form.description.rows" value="5"/>
      <property name="form.area.show" value="false"/>
      <property name="form.resource.show" value="false"/>
      <property name="form.datatype.show" value="false"/>
+     <column name="header" type="string" size="5000" label="Header wiki  text"  rows="20" columns="80"/>
+     <column name="navhtml" type="string" size="5000" label="Navigation text"  rows="20" columns="80"/>
 </type>
 
 
 
-  <type name="blogentry"  description="Weblog Entry" handler="org.ramadda.plugins.blog.BlogEntryTypeHandler" category="Collaboration" foruser="false">
+  <type name="blogentry"  description="Weblog Entry" handler="org.ramadda.plugins.blog.BlogEntryTypeHandler" category="Collaboration" foruser="false" metadata="enum_tag,content.attachment">
      <property name="icon" value="/blog/blog_icon.png"/>
 
      <property name="form.name.label" value="Subject"/>

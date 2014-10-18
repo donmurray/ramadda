@@ -1,32 +1,49 @@
 
 
-.blogentries {
-    margin: 5px;
+.blog-entries {
+    margin: 0px;
+    padding-left: 20px;
 }
 
 
-.blogentry {
+.blog-body {
+   font-family: georgia;
+   font-size: 16px;
+   color: #333;
+   line-height: 24px;
 }
 
-.blogheader {
+.blog-body .wiki-image {
+   margin:10px;
+} 
+
+.blog-body  .wiki-image-caption {
+   color:#888;
+   margin:10px;
+   margin-top:5px;
+} 
+
+.blog-header {
     padding-top: 5px;
     border-bottom : 1px #888888 solid;
     margin-top: 10px;
 }
 
-.blogdate {
+.blog-posted {
      color: #999;
-
+     font-size: 10pt;
 }
 
-.blogsubject {
-   font-size: 24px;
+.blog-subject {
+   font-size: 21px;
 }
 
-a.blogsubject {
-   font-size: 24px;
+.blog-subject a {
+   font-size: 21px;
+   color:black;
+   font-weight: bold;
 }
 
-.blogbody {
+.blog-body {
     margin-bottom: 5px;
 }

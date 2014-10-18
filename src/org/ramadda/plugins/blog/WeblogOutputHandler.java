@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -153,41 +153,98 @@ public class WeblogOutputHandler extends OutputHandler {
                               Entry group, List<Entry> subGroups,
                               List<Entry> entries)
             throws Exception {
-        boolean canAdd = getAccessManager().canDoAction(request, group,
-                             Permission.ACTION_NEW);
 
-        StringBuilder sb = new StringBuilder();
+        StringBuilder sb          = new StringBuilder();
+        StringBuilder blogEntries = new StringBuilder();
+        for (Entry entry : entries) {
+            if ( !entry.getTypeHandler().isType("blogentry")) {
+                continue;
+            }
+            String blogEntry = getBlogEntry(request, entry, false);
+            blogEntries.append(
+                HtmlUtils.div(blogEntry, HtmlUtils.cssClass("blog-entry")));
+        }
+
+        wrapContent(request, group, sb,
+                    HtmlUtils.div(blogEntries.toString(),
+                                  HtmlUtils.cssClass("blog-entries")));
+
+        return new Result("", sb);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     * @param sb _more_
+     * @param content _more_
+     *
+     * @throws Exception _more_
+     */
+    public void wrapContent(Request request, Entry group, StringBuilder sb,
+                            String content)
+            throws Exception {
         sb.append(HtmlUtils.cssLink(getRepository().getUrlBase()
                                     + "/blog/blogstyle.css"));
-        if (canAdd && !request.get(ARG_EMBEDDED, false)) {
-            sb.append(
-                HtmlUtils
-                    .href(HtmlUtils
-                        .url(request
-                            .entryUrl(
-                                getRepository().URL_ENTRY_FORM, group,
+        List<String> links = new ArrayList<String>();
+        if (group != null) {
+            String header = getWikiManager().wikifyEntry(request, group,
+                                group.getValue(0, ""));
+
+            sb.append(header);
+            boolean canAdd = getAccessManager().canDoAction(request, group,
+                                 Permission.ACTION_NEW);
+
+
+            if (canAdd && !request.get(ARG_EMBEDDED, false)) {
+                links.add(
+                    HtmlUtils
+                        .href(HtmlUtils
+                            .url(request
+                                .entryUrl(
+                                    getRepository().URL_ENTRY_FORM, group,
                                     ARG_GROUP), ARG_TYPE,
                                         BlogEntryTypeHandler
                                             .TYPE_BLOGENTRY), HtmlUtils
                                                 .img(getRepository()
                                                     .iconUrl(ICON_NEW), msg(
                                                         "New Weblog Entry"))));
-        }
-
-        StringBuilder blogEntries = new StringBuilder();
-        for (Entry entry : entries) {
-            if ( !entry.getType().equals("blogentry")) {
-                continue;
             }
-            String blogEntry = getBlogEntry(request, entry, false);
-            blogEntries.append(
-                HtmlUtils.div(blogEntry, HtmlUtils.cssClass("blogentry")));
         }
-        sb.append(HtmlUtils.div(blogEntries.toString(),
-                                HtmlUtils.cssClass("blogentries")));
 
-        return new Result("", sb);
+
+        sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("row")));
+        sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("col-md-8")));
+        sb.append(content);
+        sb.append(HtmlUtils.close("div"));
+
+        sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("col-md-4")));
+        if (group != null) {
+            String rightSide = getWikiManager().wikifyEntry(request, group,
+                                   group.getValue(1, ""));
+            String rssLink = request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                 group, ARG_OUTPUT,
+                                 RssOutputHandler.OUTPUT_RSS_FULL.toString());
+
+
+            links.add(
+                HtmlUtils.href(
+                    rssLink,
+                    HtmlUtils.img(iconUrl(RssOutputHandler.ICON_RSS))));
+
+
+            sb.append(StringUtil.join(" ", links));
+            sb.append(HtmlUtils.br());
+            sb.append(rightSide);
+            sb.append(HtmlUtils.close("div"));
+        }
+
+
+        sb.append(HtmlUtils.close("div"));
     }
+
 
     /**
      * _more_
@@ -221,23 +278,23 @@ public class WeblogOutputHandler extends OutputHandler {
         String subject;
         if (single) {
             subject = HtmlUtils.div(entry.getLabel(),
-                                    HtmlUtils.cssClass("blogsubject"));
+                                    HtmlUtils.cssClass("blog-subject"));
         } else {
             subject = HtmlUtils.div(
                 HtmlUtils.href(
                     entryUrl, entry.getLabel(), HtmlUtils.cssClass(
-                        "blogsubject")), HtmlUtils.cssClass("blogsubject"));
+                        "blog-subject")), HtmlUtils.cssClass("blog-subject"));
         }
-        String postingInfo =
-            HtmlUtils.div(
-                "by" + " " + entry.getUser().getName() + " @ "
-                + formatDate(
-                    new Date(entry.getStartDate())), HtmlUtils.cssClass(
-                    "blogdate"));
+        String posted = msg("Posted on") + " "
+                        + formatDate(new Date(entry.getStartDate())) + " "
+                        + msg("by") + " " + entry.getUser().getName();
+        String postingInfo = HtmlUtils.div(posted,
+                                           HtmlUtils.cssClass("blog-posted"));
+
 
         String header = HtmlUtils.leftRightBottom(subject, postingInfo, "");
         blogEntry.append(HtmlUtils.div(header,
-                                       HtmlUtils.cssClass("blogheader")));
+                                       HtmlUtils.cssClass("blog-header")));
         String desc = entry.getDescription();
         if (desc.startsWith("<p>")) {
             desc = desc.substring(3);
@@ -249,13 +306,18 @@ public class WeblogOutputHandler extends OutputHandler {
 
 
         StringBuilder blogBody = new StringBuilder(desc);
-        Object[]     values   = entry.getValues();
+        Object[]      values   = entry.getValues();
         if (values[0] != null) {
             String extra = ((String) values[0]).trim();
             if (extra.length() > 0) {
                 extra = getWikiManager().wikifyEntry(request, entry, extra);
-                blogBody.append(HtmlUtils.makeShowHideBlock(msg("More..."),
-                        extra, false));
+                if (single) {
+                    blogBody.append(extra);
+                } else {
+                    blogBody.append(
+                        HtmlUtils.makeShowHideBlock(
+                            msg("More..."), extra, false));
+                }
             }
         }
         StringBuilder comments = getCommentBlock(request, entry, false);
@@ -265,7 +327,7 @@ public class WeblogOutputHandler extends OutputHandler {
 
         blogBody.append(commentsBlock);
         blogEntry.append(HtmlUtils.div(blogBody.toString(),
-                                       HtmlUtils.cssClass("blogbody")));
+                                       HtmlUtils.cssClass("blog-body")));
 
         return blogEntry.toString();
     }

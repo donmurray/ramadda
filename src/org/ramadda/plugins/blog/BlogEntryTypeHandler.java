@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -127,11 +127,20 @@ public class BlogEntryTypeHandler extends GenericTypeHandler {
                 (WeblogOutputHandler) getRepository().getOutputHandler(
                     WeblogOutputHandler.OUTPUT_BLOG);
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         sb.append(
             HtmlUtils.cssLink(
                 getRepository().fileUrl("/blog/blogstyle.css")));
-        sb.append(weblogOutputHandler.getBlogEntry(request, entry, true));
+
+        Entry group = entry.getParentEntry();
+        if ((group != null) && !group.getTypeHandler().isType("weblog")) {
+            group = null;
+        }
+        String entryHtml = weblogOutputHandler.getBlogEntry(request, entry,
+                               true);
+        entryHtml = HtmlUtils.div(entryHtml,
+                                  HtmlUtils.cssClass("blog-entries"));
+        weblogOutputHandler.wrapContent(request, group, sb, entryHtml);
 
         return new Result("", sb);
     }
