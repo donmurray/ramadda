@@ -435,6 +435,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
     public String getWikiImage(WikiUtil wikiUtil, Request request,
                                String url, Entry entry, Hashtable props)
             throws Exception {
+
         String align = (String) props.get(ATTR_ALIGN);
         String width = (String) props.get(ATTR_WIDTH);
         String alt   = (String) props.get(HtmlUtils.ATTR_ALT);
@@ -492,6 +493,9 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         }
 
 
+        String  caption = Misc.getProperty(props, "caption", (String) null);
+
+
         String  img = HtmlUtils.img(url, getEntryDisplayName(entry), extra);
         boolean link = Misc.equals("true", props.get(ATTR_LINK));
         boolean linkResource = Misc.getProperty(props, ATTR_LINKRESOURCE,
@@ -522,12 +526,22 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             img = buf.toString();
         }
 
-        if (align != null) {
-            img = HtmlUtils.div(img,
-                                HtmlUtils.style("text-align:" + align + ";"));
-        }
+        StringBuilder sb    = new StringBuilder();
+        String        attrs = ((align != null)
+                               ? HtmlUtils.style("text-align:" + align + ";")
+                               : "") + HtmlUtils.cssClass("wiki-image");
 
-        return img;
+        sb.append(HtmlUtils.open("div", attrs));
+        sb.append(img);
+        if (caption != null) {
+            sb.append(
+                HtmlUtils.div(
+                    caption, HtmlUtils.cssClass("wiki-image-caption")));
+        }
+        sb.append(HtmlUtils.close("div"));
+
+        return sb.toString();
+
     }
 
 
@@ -1562,13 +1576,14 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 return sb.toString();
             } else if (theTag.equals(WIKI_TAG_BOOTSTRAP)) {
                 List<String> weights = null;
-                boolean doLine =  Misc.getProperty(props, "doline", true);
+                boolean      doLine  = Misc.getProperty(props, "doline",
+                                           true);
                 String ws = Misc.getProperty(props, "weights", (String) null);
-                if(ws!=null) {
-                    weights = StringUtil.split(ws,",",true,true);
+                if (ws != null) {
+                    weights = StringUtil.split(ws, ",", true, true);
                 }
 
-                int columns = Misc.getProperty(props, "columns", 3);
+                int columns     = Misc.getProperty(props, "columns", 3);
                 int innerHeight = Misc.getProperty(props, "inner-height", -1);
                 int minHeight = Misc.getProperty(props, "inner-minheight",
                                     -1);
@@ -1591,14 +1606,14 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 //                sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("row")));
                 int rowCnt = 0;
                 int colCnt = 100;
-                int weight = 12/columns;
+                int weight = 12 / columns;
 
                 for (int i = 0; i < titles.size(); i++) {
                     colCnt++;
                     if (colCnt >= columns) {
                         if (rowCnt > 0) {
                             sb.append(HtmlUtils.close("div"));
-                            if(doLine) {
+                            if (doLine) {
                                 sb.append("<hr>");
                             } else {
                                 sb.append(HtmlUtils.br());
@@ -1609,12 +1624,13 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                 HtmlUtils.cssClass("row")));
                         colCnt = 0;
                     }
-                    String weightString = ""+weight;
-                    if(weights!=null && i< weights.size()) {
-                        weightString  = weights.get(i);
+                    String weightString = "" + weight;
+                    if ((weights != null) && (i < weights.size())) {
+                        weightString = weights.get(i);
                     }
                     sb.append(HtmlUtils.open("div",
-                                             HtmlUtils.cssClass("col-md-" + weightString)));
+                                             HtmlUtils.cssClass("col-md-"
+                                                 + weightString)));
                     sb.append(HtmlUtils.open("div",
                                              HtmlUtils.cssClass("minitron")));
                     sb.append(HtmlUtils.tag("h2", "", titles.get(i)));
