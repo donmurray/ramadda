@@ -9,6 +9,9 @@
     margin: 0px;
 }
 
+.blog-entries-embed .wiki-image {
+   width: 200px;
+}
 
 .blog-body {
    font-family: georgia;
@@ -16,6 +19,8 @@
    color: #333;
    line-height: 24px;
 }
+
+
 
 .blog-body .wiki-image {
    margin:10px;

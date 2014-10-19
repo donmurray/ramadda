@@ -466,6 +466,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             String imageClass = (String) wikiUtil.getProperty("image.class");
             if (imageClass != null) {
                 extra = extra + HtmlUtils.cssClass(imageClass);
+            } else {
+                extra = extra + HtmlUtils.cssClass("wiki-image");
             }
         }
 

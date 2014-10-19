@@ -32,6 +32,10 @@ h3 {
   color:#fff;
 }
 
+.jumbotron  {
+  font-weight:300;
+}
+
 .jumbotron p {
    font-size: 12pt;
 }
