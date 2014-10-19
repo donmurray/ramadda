@@ -53,10 +53,12 @@ h3 {
    border-radius: 6px;
    border: 1px #ddd solid;
    background: #F5F5F5;
+   overflow-y: auto;
 }
 
 .minitron .bs-inner {
    margin-bottom: 5px;
+   overflow-y: auto;
 }
 
 

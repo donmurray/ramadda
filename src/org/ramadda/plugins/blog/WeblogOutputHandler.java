@@ -165,10 +165,11 @@ public class WeblogOutputHandler extends OutputHandler {
                 HtmlUtils.div(blogEntry, HtmlUtils.cssClass("blog-entry")));
         }
 
-        wrapContent(request, group, sb,
-                    HtmlUtils.div(blogEntries.toString(),
-                                  HtmlUtils.cssClass("blog-entries")));
+        boolean embedded= request.get(ARG_EMBEDDED, false);
 
+        wrapContent(request, group, sb,
+                        HtmlUtils.div(blogEntries.toString(),
+                                      HtmlUtils.cssClass("blog-entries"+(embedded?"-embed":""))));
         return new Result("", sb);
     }
 
@@ -188,6 +189,11 @@ public class WeblogOutputHandler extends OutputHandler {
             throws Exception {
         sb.append(HtmlUtils.cssLink(getRepository().getUrlBase()
                                     + "/blog/blogstyle.css"));
+        boolean embedded= request.get(ARG_EMBEDDED, false);
+        if(embedded) {
+            sb.append(content);
+            return;
+        }
         List<String> links = new ArrayList<String>();
         if (group != null) {
             String header = getWikiManager().wikifyEntry(request, group,
@@ -197,8 +203,7 @@ public class WeblogOutputHandler extends OutputHandler {
             boolean canAdd = getAccessManager().canDoAction(request, group,
                                  Permission.ACTION_NEW);
 
-
-            if (canAdd && !request.get(ARG_EMBEDDED, false)) {
+            if (canAdd && !embedded) {
                 links.add(
                     HtmlUtils
                         .href(HtmlUtils
@@ -271,6 +276,7 @@ public class WeblogOutputHandler extends OutputHandler {
      */
     public String getBlogEntry(Request request, Entry entry, boolean single)
             throws Exception {
+        boolean embedded= request.get(ARG_EMBEDDED, false);
         StringBuilder blogEntry = new StringBuilder();
         String entryUrl = request.entryUrl(getRepository().URL_ENTRY_SHOW,
                                            entry);
@@ -284,14 +290,18 @@ public class WeblogOutputHandler extends OutputHandler {
                     entryUrl, entry.getLabel(), HtmlUtils.cssClass(
                         "blog-subject")), HtmlUtils.cssClass("blog-subject"));
         }
-        String posted = msg("Posted on") + " "
-                        + formatDate(new Date(entry.getStartDate())) + " "
-                        + msg("by") + " " + entry.getUser().getName();
-        String postingInfo = HtmlUtils.div(posted,
-                                           HtmlUtils.cssClass("blog-posted"));
-
-
-        String header = HtmlUtils.leftRightBottom(subject, postingInfo, "");
+        String postingInfo = "";
+        String header;
+        if(!embedded) {
+            String posted = msg("Posted on") + " "
+                + formatDate(new Date(entry.getStartDate())) + " "
+                + msg("by") + " " + entry.getUser().getName();
+            postingInfo = HtmlUtils.div(posted,
+                                        HtmlUtils.cssClass("blog-posted"));
+            header = HtmlUtils.leftRightBottom(subject, postingInfo, "");
+        } else {
+            header = subject;
+        }
         blogEntry.append(HtmlUtils.div(header,
                                        HtmlUtils.cssClass("blog-header")));
         String desc = entry.getDescription();
@@ -313,18 +323,26 @@ public class WeblogOutputHandler extends OutputHandler {
                 if (single) {
                     blogBody.append(extra);
                 } else {
-                    blogBody.append(
-                        HtmlUtils.makeShowHideBlock(
-                            msg("More..."), extra, false));
+                    if(!embedded) {
+                        blogBody.append(
+                                        HtmlUtils.makeShowHideBlock(
+                                                                    msg("More..."), extra, false));
+                    }
                 }
             }
         }
-        StringBuilder comments = getCommentBlock(request, entry, false);
-        String commentsBlock = HtmlUtils.makeShowHideBlock(msg("Comments"),
-                                   HtmlUtils.insetDiv(comments.toString(), 0,
-                                       30, 0, 0), false);
 
-        blogBody.append(commentsBlock);
+        if(!embedded) {
+            StringBuilder comments = getCommentBlock(request, entry, false);
+            String commentsBlock = HtmlUtils.makeShowHideBlock(msg("Comments"),
+                                                               HtmlUtils.insetDiv(comments.toString(), 0,
+                                                                                  30, 0, 0), false);
+            
+            blogBody.append(commentsBlock);
+        }
+
+
+
         blogEntry.append(HtmlUtils.div(blogBody.toString(),
                                        HtmlUtils.cssClass("blog-body")));
 
