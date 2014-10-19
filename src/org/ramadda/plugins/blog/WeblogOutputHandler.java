@@ -298,10 +298,11 @@ public class WeblogOutputHandler extends OutputHandler {
                 + msg("by") + " " + entry.getUser().getName();
             postingInfo = HtmlUtils.div(posted,
                                         HtmlUtils.cssClass("blog-posted"));
-            header = HtmlUtils.leftRightBottom(subject, postingInfo, "");
         } else {
-            header = subject;
+            postingInfo = formatDate(new Date(entry.getStartDate()));
         }
+        header = HtmlUtils.leftRightBottom(subject, postingInfo, "");
+
         blogEntry.append(HtmlUtils.div(header,
                                        HtmlUtils.cssClass("blog-header")));
         String desc = entry.getDescription();
