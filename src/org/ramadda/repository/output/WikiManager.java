@@ -1443,6 +1443,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             boolean      doingSlideshow = theTag.equals(WIKI_TAG_SLIDESHOW);
             boolean      doingBootstrap = theTag.equals(WIKI_TAG_BOOTSTRAP);
             List<String> titles         = new ArrayList<String>();
+            List<String> urls         = new ArrayList<String>();
             List<String> contents       = new ArrayList<String>();
             String       dfltTag        = WIKI_TAG_SIMPLE;
 
@@ -1501,6 +1502,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                             child)) + " " + title;
                 }
                 titles.add(title);
+                urls.add(request.entryUrl(
+                                          getRepository().URL_ENTRY_SHOW, child));
                 String content = getWikiInclude(wikiUtil, newRequest,
                                      originalEntry, child, tag, tmpProps);
 
@@ -1635,7 +1638,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                                  + weightString)));
                     sb.append(HtmlUtils.open("div",
                                              HtmlUtils.cssClass("minitron")));
-                    sb.append(HtmlUtils.tag("h2", "", titles.get(i)));
+                    sb.append(HtmlUtils.tag("h2", "", HtmlUtils.href(urls.get(i), titles.get(i))));
                     sb.append(HtmlUtils.div(contents.get(i),
                                             HtmlUtils.cssClass("bs-inner")
                                             + HtmlUtils.attr("style",
@@ -1985,7 +1988,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 if (includeIcon) {
                     linkLabel =
                         HtmlUtils.img(getPageHandler().getIconUrl(request,
-                            child)) + " " + linkLabel;
+                                                                  child)) + HtmlUtils.space(1) + linkLabel;
                 }
                 String href = HtmlUtils.href(url, linkLabel,
                                              HtmlUtils.cssClass(cssClass)
