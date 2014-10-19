@@ -191,7 +191,7 @@ public class WeblogOutputHandler extends OutputHandler {
         List<String> links = new ArrayList<String>();
         if (group != null) {
             String header = getWikiManager().wikifyEntry(request, group,
-                                group.getValue(0, ""));
+                                                         group.getValue(0, ""));
 
             sb.append(header);
             boolean canAdd = getAccessManager().canDoAction(request, group,
@@ -214,13 +214,12 @@ public class WeblogOutputHandler extends OutputHandler {
             }
         }
 
-
         sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("row")));
-        sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("col-md-8")));
+        sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("col-md-9")));
         sb.append(content);
         sb.append(HtmlUtils.close("div"));
 
-        sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("col-md-4")));
+        sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("col-md-3")));
         if (group != null) {
             String rightSide = getWikiManager().wikifyEntry(request, group,
                                    group.getValue(1, ""));

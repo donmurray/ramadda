@@ -127,21 +127,17 @@ public class BlogEntryTypeHandler extends GenericTypeHandler {
                 (WeblogOutputHandler) getRepository().getOutputHandler(
                     WeblogOutputHandler.OUTPUT_BLOG);
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append(
-            HtmlUtils.cssLink(
-                getRepository().fileUrl("/blog/blogstyle.css")));
 
         Entry group = entry.getParentEntry();
         if ((group != null) && !group.getTypeHandler().isType("weblog")) {
             group = null;
         }
         String entryHtml = weblogOutputHandler.getBlogEntry(request, entry,
-                               true);
+                                                            true);
         entryHtml = HtmlUtils.div(entryHtml,
                                   HtmlUtils.cssClass("blog-entries"));
+        StringBuilder sb = new StringBuilder();
         weblogOutputHandler.wrapContent(request, group, sb, entryHtml);
-
         return new Result("", sb);
     }
 

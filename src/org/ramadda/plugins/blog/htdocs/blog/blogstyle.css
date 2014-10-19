@@ -36,12 +36,13 @@
 
 .blog-subject {
    font-size: 21px;
+   font-weight: 500;
+   font-size: 21px;
+   color:black;
 }
 
 .blog-subject a {
-   font-size: 21px;
    color:black;
-   font-weight: bold;
 }
 
 .blog-body {
