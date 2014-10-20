@@ -551,7 +551,16 @@
 }
 
 
+.display-layout-table {
+}
 
+.display-wrapper {
+     padding: 5px;
+}
+
+.display-contents {
+//     border: 1px red solid;
+}
 
 
 .display-fields {

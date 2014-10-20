@@ -224,6 +224,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             dataCollection: new DataCollection(),
             selectedCbx: [],
             entries: [],
+           
             getDisplayManager: function() {
                return this.displayManager;
             },
@@ -805,6 +806,16 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             },
             updateUI: function(data) {
             },
+            getDoBs: function() {
+                if (!(typeof this.dobs === 'undefined')) {
+                    return dobs;
+                }
+                if(this.displayParent) {
+                    return this.displayParent.getDoBs();
+
+                }
+                return false;
+            },
 
             /*
               This creates the default layout for a display
@@ -819,38 +830,51 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
               That needs to call setContents with the html contents of the display
             */
             getHtml: function() {
+                var dobs = this.getDoBs();
                 var html = "";
+                var width = this.getWidth();
+                if(dobs) {
+                    html += "<div class=minitron>";
+                }
+                if(width>0) {
+                    html += "<div class=display-contents style=\"width:" + width +"\; >";
+                } else {
+                    html += "<div class=display-contents>";
+                }
+
+
                 html+= HtmlUtil.div([ATTR_CLASS,"ramadda-popup", ATTR_ID, this.getDomId(ID_MENU_OUTER)], "");
                 var menu = HtmlUtil.div([ATTR_CLASS, "display-dialog", ATTR_ID, this.getDomId(ID_DIALOG)], "");
-                var width = this.getWidth();
-                var tableWidth = "100%";
-                if(width>0) {
-                    tableWidth = width+"px";
-                }
-                html += HtmlUtil.openTag(TAG_TABLE, [ATTR_CLASS, "display", "border","0", "width",tableWidth, "cellpadding","0", "cellspacing","0"]);
-                html += HtmlUtil.openTag(TAG_TR, ["valign", "bottom"]);
+                html += HtmlUtil.openTag("h2");
+                html += HtmlUtil.openTag(TAG_DIV, [ATTR_CLASS, "row"]);
                 if(this.getShowTitle()) {
-                    html += HtmlUtil.td([], HtmlUtil.div([ATTR_CLASS,"display-title",ATTR_ID,this.getDomId(ID_TITLE)], this.getTitle()));
+                    html += HtmlUtil.div(["class","col-md-8"], HtmlUtil.tag("div", [ATTR_CLASS,"display-title",ATTR_ID,this.getDomId(ID_TITLE)], this.getTitle()));
                 } else {
-                    html += HtmlUtil.td([], "");
+                    html += HtmlUtil.div(["class","col-md-8"], "");
                 }
 
                 var get = this.getGet();
 
+                var button = "";
                 if(this.getShowMenu()) {
-                    var menuButton = HtmlUtil.onClick(get+".showDialog();", 
+                    button = HtmlUtil.onClick(get+".showDialog();", 
                                                       HtmlUtil.image(ramaddaBaseUrl+"/icons/downdart.png", 
                                                                      [ATTR_CLASS, "display-dialog-button", ATTR_ID,  this.getDomId(ID_DIALOG_BUTTON)]));
-                    html += HtmlUtil.td(["align", "right"], menuButton);
-                } else {
-                    html += HtmlUtil.td(["align", "right"], "");
                 }
-                html += HtmlUtil.closeTag(TAG_TR);
+                
+                html += HtmlUtil.div(["class","col-md-4","align", "right"], button);
+                html += HtmlUtil.closeTag(TAG_DIV);
+                html += HtmlUtil.closeTag("h2");
 
                 var contents = this.getContentsDiv();
-                html += HtmlUtil.tr([], HtmlUtil.td(["colspan", "2"],contents));
-                html += HtmlUtil.closeTag(TAG_TABLE)
+                //                contents  = "CONTENTS";
+                html += contents;
                 html += menu;
+                html += "</div>"
+                if(dobs) {
+                    html += "</div>"
+                }
+                console.log(html);
                 return html;
             },
              makeDialog: function() {
@@ -1176,6 +1200,9 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
             isLayoutColumns: function() {
                 return this.layout == LAYOUT_COLUMNS;
             },
+            getDoBs: function() {
+                return this.dobs;
+            },
             walkTree: function(func, data) {
                 for(var i=0;i<this.displays.length;i++) {
                     var display  = this.displays[i];
@@ -1269,7 +1296,7 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
                         html+= displaysToLayout[0].getHtml();
                     } else {
                         var width = Math.round(100/this.columns)+"%";
-                        html+=HtmlUtil.openTag(TAG_TABLE, ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "5"]);
+                        html+=HtmlUtil.openTag(TAG_TABLE, ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "5","class","display-layout-table"]);
                         for(var i=0;i<displaysToLayout.length;i++) {
                             colCnt++;
                             if(colCnt>=this.columns) {
@@ -1279,7 +1306,7 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
                                 html+= HtmlUtil.openTag(TAG_TR,["valign", "top"]);
                                 colCnt=0;
                             }
-                            html+=HtmlUtil.tag(TAG_TD, ["width", width], HtmlUtil.div([], displaysToLayout[i].getHtml()));
+                            html+=HtmlUtil.tag(TAG_TD, ["width", width], HtmlUtil.div(["class","display-wrapper"], displaysToLayout[i].getHtml()));
                         }
                         html+= HtmlUtil.closeTag(TAG_TR);
                         html+= HtmlUtil.closeTag(TAG_TABLE);
