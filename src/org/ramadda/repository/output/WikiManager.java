@@ -1439,7 +1439,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                    || theTag.equals(WIKI_TAG_SLIDESHOW)
                    || theTag.equals(WIKI_TAG_BOOTSTRAP)) {
             List<Entry> children = getEntries(request, originalEntry, entry,
-                                       props);
+                                              props);
             boolean      doingSlideshow = theTag.equals(WIKI_TAG_SLIDESHOW);
             boolean      doingBootstrap = theTag.equals(WIKI_TAG_BOOTSTRAP);
             List<String> titles         = new ArrayList<String>();
@@ -1490,7 +1490,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             Request   newRequest = makeRequest(request, props);
             Hashtable tmpProps   = new Hashtable(props);
             tmpProps.remove(ATTR_ENTRY);
-
+            tmpProps.remove(ATTR_ENTRIES);
+            tmpProps.remove(ATTR_FIRST);
 
 
 
