@@ -1615,6 +1615,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 int weight = 12 / columns;
 
                 for (int i = 0; i < titles.size(); i++) {
+                    Entry child = children.get(i);
                     colCnt++;
                     if (colCnt >= columns) {
                         if (rowCnt > 0) {
@@ -1639,9 +1640,14 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                                  + weightString)));
                     sb.append(HtmlUtils.open("div",
                                              HtmlUtils.cssClass("minitron")));
+
                     sb.append(HtmlUtils.tag("h2", "",
                                             HtmlUtils.href(urls.get(i),
                                                 titles.get(i))));
+                    String snippet = StringUtil.findPattern(child.getDescription(),"<snippet>(.*)</snippet>");
+                    if(snippet!=null) {
+                        sb.append(HtmlUtils.div(snippet, HtmlUtils.cssClass("ramadda-snippet")));
+                    }
                     sb.append(HtmlUtils.div(contents.get(i),
                                             HtmlUtils.cssClass("bs-inner")
                                             + HtmlUtils.attr("style",

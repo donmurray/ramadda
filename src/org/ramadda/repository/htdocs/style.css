@@ -73,6 +73,8 @@ color:black;
    overflow-y: auto;
 }
 
+.minitron .ramadda-snippet {
+}
 
 .jumbotron h2 {
    font-weight: 400;
@@ -1225,6 +1227,10 @@ a.image-link {
 
 .subheader-container {
    margin-top:10px;
+}
+
+snippet {
+   display:inline;
 }
 
 .subheader {
