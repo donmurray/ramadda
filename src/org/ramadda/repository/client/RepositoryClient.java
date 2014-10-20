@@ -57,10 +57,13 @@ import java.util.zip.ZipOutputStream;
  */
 public class RepositoryClient extends RepositoryBase {
 
+    /** _more_          */
     public static final String PROP_REPOSITORY = "RAMADDA_CLIENT_REPOSITORY";
 
+    /** _more_          */
     public static final String PROP_USER = "RAMADDA_CLIENT_USER";
 
+    /** _more_          */
     public static final String PROP_PASSWORD = "RAMADDA_CLIENT_PASSWORD";
 
 
@@ -1088,6 +1091,9 @@ public class RepositoryClient extends RepositoryBase {
         String authToken = RepositoryUtil.hashString(getSessionId());
         entries.add(HttpFormEntry.hidden(ARG_AUTHTOKEN, authToken));
         entries.add(HttpFormEntry.hidden(ARG_RESPONSE, RESPONSE_XML));
+        if (isAnonymous()) {
+            entries.add(HttpFormEntry.hidden(ARG_ANONYMOUS, "true"));
+        }
     }
 
 
@@ -1656,12 +1662,12 @@ public class RepositoryClient extends RepositoryBase {
         RequestUrl URL_ENTRY_SEARCH = new RequestUrl(this, "/search/do",
                                           "Search");
         List<String> argList = new ArrayList<String>();
-        String output  = "xml.xml";
+        String       output  = "xml.xml";
         for (String[] args : searchArgs) {
             if (args[0].startsWith("-")) {
                 args[0] = args[0].substring(1);
             }
-            if(args[0].equals("output")) {
+            if (args[0].equals("output")) {
                 output = args[1];
             }
             argList.add(args[0]);

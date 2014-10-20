@@ -361,6 +361,7 @@ public interface Constants {
 
 
 
+    /** _more_          */
     public static final String ARG_SERVICEID = "serviceid";
 
 
@@ -588,6 +589,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_ALLENTRIES = "allentries";
 
+    /** _more_          */
     public static final String ARG_ENTRYTYPE = "entrytype";
 
     /** _more_ */
@@ -1231,6 +1233,9 @@ public interface Constants {
 
     /** _more_ */
     public static final String ARG_SESSIONID = "sessionid";
+
+    /** _more_          */
+    public static final String ARG_ANONYMOUS = "anonymous";
 
     /** _more_ */
     public static final String ARG_AUTHTOKEN = "authtoken";

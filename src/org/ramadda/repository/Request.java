@@ -146,6 +146,7 @@ public class Request implements Constants, Cloneable {
     /** _more_ */
     private boolean isMobile = false;
 
+    /** _more_ */
     private boolean isRobot = false;
 
     /** _more_ */
@@ -691,10 +692,7 @@ public class Request implements Constants, Cloneable {
      * _more_
      *
      * @param theUrl _more_
-     * @param arg1 _more_
-     * @param value1 _more_
-     * @param arg2 _more_
-     * @param value2 _more_
+     * @param args _more_
      *
      * @return _more_
      */
@@ -816,14 +814,13 @@ public class Request implements Constants, Cloneable {
      */
     public String getAbsoluteUrl(String url) {
         int port = getServerPort();
-        String protocol =StringUtil.split(httpServletRequest.getScheme(),"/",true,true).get(0);
+        String protocol = StringUtil.split(httpServletRequest.getScheme(),
+                                           "/", true, true).get(0);
         //        System.err.println("Request.getAbsoluteUrl:" + protocol +" port:" + port);
         if (port == 80) {
-            return protocol + "://" + getServerName()
-                   + url;
+            return protocol + "://" + getServerName() + url;
         } else {
-            return protocol + "://" + getServerName()
-                   + ":" + port + url;
+            return protocol + "://" + getServerName() + ":" + port + url;
         }
     }
 
@@ -1488,15 +1485,21 @@ public class Request implements Constants, Cloneable {
             if (authToken.trim().equals(sessionAuth)) {
                 return;
             }
-            getRepository().getLogManager().logError("Request.ensureAuthToken: authToken != sessionAuth :" +
-                                                     "\n\tsession:" + mySessionId+
-                                                     "\n\tauth token:" + authToken +
-                                                     "\n\tsession hashed:"+ sessionAuth,null);
+            getRepository().getLogManager().logError(
+                "Request.ensureAuthToken: authToken != sessionAuth :"
+                + "\n\tsession:" + mySessionId + "\n\tauth token:"
+                + authToken + "\n\tsession hashed:" + sessionAuth, null);
         }
 
-        getRepository().getLogManager().logError("Request.ensureAuthToken: something null :" +
-                                                 "\n\tsession:" + mySessionId+
-                                                 "\n\tauth token:" + authToken,null);
+        //If we are publishing anonymously then don't look for a auth token
+        if (get(ARG_ANONYMOUS, false) && isAnonymous()) {
+            return;
+        }
+
+
+        getRepository().getLogManager().logError(
+            "Request.ensureAuthToken: something null :" + "\n\tsession:"
+            + mySessionId + "\n\tauth token:" + authToken, null);
 
         throw new IllegalArgumentException("Bad authentication token");
     }
@@ -1740,6 +1743,14 @@ public class Request implements Constants, Cloneable {
         return v;
     }
 
+    /**
+     * _more_
+     *
+     * @param from _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public double getLatOrLonValue(RequestArgument from, double dflt) {
         if ( !defined(from)) {
             return dflt;
@@ -1750,6 +1761,7 @@ public class Request implements Constants, Cloneable {
             return dflt;
         }
         double result = Utils.decodeLatLon(llString);
+
         return result;
     }
 
@@ -2241,12 +2253,22 @@ public class Request implements Constants, Cloneable {
         return value;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean getIsRobot() {
         return isRobot;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isRealRequest() {
-        return httpServletResponse!=null;
+        return httpServletResponse != null;
     }
 
 
