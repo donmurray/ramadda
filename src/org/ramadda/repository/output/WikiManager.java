@@ -1644,11 +1644,17 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                     sb.append(HtmlUtils.tag("h2", "",
                                             HtmlUtils.href(urls.get(i),
                                                 titles.get(i))));
-                    String snippet = StringUtil.findPattern(child.getDescription(),"<snippet>(.*)</snippet>");
+                                        
+                    String snippet = StringUtil.findPattern(child.getDescription(),"(?s)<snippet>(.*)</snippet>");
                     if(snippet!=null) {
-                        sb.append(HtmlUtils.div(snippet, HtmlUtils.cssClass("ramadda-snippet")));
+                        snippet  = HtmlUtils.div(snippet, HtmlUtils.cssClass("ramadda-snippet"));
+                    }  else {
+                        snippet = "";
                     }
-                    sb.append(HtmlUtils.div(contents.get(i),
+
+
+
+                    sb.append(HtmlUtils.div(snippet + contents.get(i),
                                             HtmlUtils.cssClass("bs-inner")
                                             + HtmlUtils.attr("style",
                                                 innerStyle.toString())));

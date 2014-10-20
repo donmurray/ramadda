@@ -74,6 +74,9 @@ color:black;
 }
 
 .minitron .ramadda-snippet {
+    border-bottom: 1px #ccc solid;
+    margin-top: 5px;
+    margin-bottom: 5px;
 }
 
 .jumbotron h2 {
