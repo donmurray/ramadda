@@ -1489,6 +1489,9 @@ public interface Constants {
     public static final String PROP_BUILD_DATE = "ramadda.build.date";
 
     /** _more_ */
+    public static final String PROP_JAVA_VERSION = "java.version";
+    
+    /** _more_ */
     public static final String PROP_ACCESS_ADMINONLY =
         "ramadda.access.adminonly";
 

@@ -1688,7 +1688,10 @@ public class Admin extends RepositoryManager {
             HtmlUtils.formEntry(
                 msgLabel("Build Date"),
                 getRepository().getProperty(PROP_BUILD_DATE, "N/A")));
-
+        statusSB.append(
+            HtmlUtils.formEntry(
+                msgLabel("Java Version"),
+                getRepository().getProperty(PROP_JAVA_VERSION, "N/A")));
 
         statusSB.append(
             HtmlUtils.formEntry(

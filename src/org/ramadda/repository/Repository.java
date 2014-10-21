@@ -889,6 +889,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
         statusMsg.append("  --  Build Date:"
                          + getProperty(PROP_BUILD_DATE, "N/A"));
         getLogManager().logInfoAndPrint(statusMsg.toString());
+        getLogManager().logInfoAndPrint("RAMADDA: using Java version: "
+                         + getProperty(PROP_JAVA_VERSION, "N/A"));
     }
 
     /**
