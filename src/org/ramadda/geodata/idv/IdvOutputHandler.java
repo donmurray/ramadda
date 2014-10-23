@@ -45,10 +45,7 @@ import org.w3c.dom.Element;
 import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.ft.FeatureDatasetPoint;
 
-import ucar.unidata.data.DataCategory;
-import ucar.unidata.data.DataChoice;
-import ucar.unidata.data.DataSource;
-import ucar.unidata.data.DataSourceDescriptor;
+import ucar.unidata.data.*;
 import ucar.unidata.data.gis.WmsSelection;
 import ucar.unidata.data.grid.GeoGridDataSource;
 import ucar.unidata.data.point.NetcdfPointDataSource;
@@ -970,10 +967,14 @@ public class IdvOutputHandler extends OutputHandler implements IdvConstants {
         List<DataChoice> choices =
             (List<DataChoice>) dataSource.getDataChoices();
         for (DataChoice dataChoice : choices) {
-            idToChoice.put(dataChoice.getDescription().toLowerCase(), dataChoice);
+            if(dataChoice instanceof DerivedDataChoice)
+                idToChoice.put(StringUtil.camelCase(dataChoice.getDescription()), dataChoice);
+            else
+                idToChoice.put(dataChoice.getName(), dataChoice);
         }
 
         List params     = request.get(ARG_PARAM, new ArrayList());
+        //System.out.print("YYYYYYYY " + params.size() + "  HH " + params.get(0).toString());
         int  displayIdx = -1;
         for (int i = 0; i < params.size(); i++) {
             String param = (String) params.get(i);
@@ -987,7 +988,7 @@ public class IdvOutputHandler extends OutputHandler implements IdvConstants {
             List<String> innerTabContents = new ArrayList<String>();
 
             StringBuffer tab              = new StringBuffer();
-            DataChoice   choice           = idToChoice.get(param.toLowerCase());
+            DataChoice   choice           = idToChoice.get(param);
 
             if (choice == null) {
                 continue;
@@ -1441,8 +1442,12 @@ public class IdvOutputHandler extends OutputHandler implements IdvConstants {
                 catMap.put(catName, tfos);
                 cats.add(catName);
             }
-            tfos.add(new TwoFacedObject("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+            if(dataChoice instanceof DerivedDataChoice)
+                tfos.add(new TwoFacedObject("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
                                         + label, label));
+            else
+                tfos.add(new TwoFacedObject("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+                        + label, dataChoice.getName()));
         }
 
         for (String cat : cats) {
