@@ -96,6 +96,9 @@ public class ServiceArg implements Constants {
     private static final String TYPE_CATEGORY = "category";
 
     /** _more_ */
+    private static final String TYPE_DATE = "date";
+
+    /** _more_ */
     private Service service;
 
     /** _more_ */
@@ -465,6 +468,15 @@ public class ServiceArg implements Constants {
      */
     public boolean isEnumeration() {
         return (type != null) && type.equals(TYPE_ENUMERATION);
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean isDate() {
+        return (type != null) && type.equals(TYPE_DATE);
     }
 
     /**

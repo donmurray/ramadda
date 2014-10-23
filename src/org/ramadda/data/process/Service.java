@@ -1608,6 +1608,10 @@ public class Service extends RepositoryManager {
             }
 
             return;
+        } else if (arg.isDate()) {
+            inputHtml.append(getRepository().getPageHandler().makeDateInput(
+                    request, argUrlName, "searchform", null,
+                    null, false));
         } else if (arg.isFile()) {
             //noop
         } else if (arg.isEntry()) {
