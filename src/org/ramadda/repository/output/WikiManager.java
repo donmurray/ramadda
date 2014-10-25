@@ -105,14 +105,14 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                             new WikiTag(WIKI_TAG_LIST), 
                             new WikiTag(WIKI_TAG_TABS, attrs(
                                                              ATTR_TAG, WIKI_TAG_HTML, ATTR_SHOWLINK, "true", ATTR_INCLUDEICON, "false") + ATTRS_LAYOUT), 
-                            new WikiTag(WIKI_TAG_BOOTSTRAP, attrs(
+                            new WikiTag(WIKI_TAG_GRID, attrs(
                                                                   ATTR_TAG, WIKI_TAG_LINKS, "inner-height","100", ATTR_COLUMNS, "3", ATTR_INCLUDEICON, "true", "weights","","doline","true")), 
                             new WikiTag(WIKI_TAG_TREE, attrs(
                                                              ATTR_DETAILS, "true")), 
                             new WikiTag(WIKI_TAG_TREEVIEW, attrs(ATTR_WIDTH,"750", ATTR_HEIGHT,"500")), 
                             new WikiTag(WIKI_TAG_ACCORDIAN, attrs(
                                                                  ATTR_TAG, WIKI_TAG_HTML, ATTR_SHOWLINK, "true", ATTR_INCLUDEICON, "false") + ATTRS_LAYOUT), 
-                            new WikiTag(WIKI_TAG_GRID), 
+                            //                            new WikiTag(WIKI_TAG_GRID), 
                             new WikiTag(WIKI_TAG_TABLE), 
                             new WikiTag(WIKI_TAG_RECENT, attrs(
                                                                ATTR_DAYS, "3")), 
@@ -1437,11 +1437,12 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         } else if (theTag.equals(WIKI_TAG_TABS)
                    || theTag.equals(WIKI_TAG_ACCORDIAN)
                    || theTag.equals(WIKI_TAG_SLIDESHOW)
-                   || theTag.equals(WIKI_TAG_BOOTSTRAP)) {
+                   || theTag.equals(WIKI_TAG_BOOTSTRAP)
+                   || theTag.equals(WIKI_TAG_GRID)) {
             List<Entry> children = getEntries(request, originalEntry, entry,
                                               props);
             boolean      doingSlideshow = theTag.equals(WIKI_TAG_SLIDESHOW);
-            boolean      doingBootstrap = theTag.equals(WIKI_TAG_BOOTSTRAP);
+            boolean      doingGrid = theTag.equals(WIKI_TAG_GRID) || theTag.equals(WIKI_TAG_BOOTSTRAP);
             List<String> titles         = new ArrayList<String>();
             List<String> urls           = new ArrayList<String>();
             List<String> contents       = new ArrayList<String>();
@@ -1462,7 +1463,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             boolean includeIcon = Misc.getProperty(props, ATTR_INCLUDEICON,
                                       false);
             boolean includeUrl = Misc.getProperty(props, "includeurl", false);
-            if (doingBootstrap) {
+            if (doingGrid) {
                 includeIcon = false;
             }
             boolean useCookies = Misc.getProperty(props, "cookie", false);
@@ -1580,7 +1581,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 HtmlUtils.makeAccordian(sb, titles, contents);
 
                 return sb.toString();
-            } else if (theTag.equals(WIKI_TAG_BOOTSTRAP)) {
+            } else if (doingGrid) {
                 List<String> weights = null;
                 boolean      doLine  = Misc.getProperty(props, "doline",
                                            true);
@@ -1779,7 +1780,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 return OutputHandler.makeTabs(titles, contents, true,
                         useCookies);
             }
-        } else if (theTag.equals(WIKI_TAG_GRID)) {
+        } else if (false && theTag.equals(WIKI_TAG_GRID)) {
             getHtmlOutputHandler().makeGrid(request,
                                             getEntries(request,
                                                 originalEntry, entry,
@@ -3986,9 +3987,11 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             props.remove(ATTR_COLORS);
         }
 
+        boolean showTitle = false;
         if (props.get(ATTR_SHOWTITLE) != null) {
             propList.add(ATTR_SHOWTITLE);
             propList.add(Misc.getProperty(props, ATTR_SHOWTITLE, "true"));
+            showTitle = Misc.equals("true", Misc.getProperty(props, ATTR_SHOWTITLE, "true"));
             topProps.add(ATTR_SHOWTITLE);
             topProps.add(Misc.getProperty(props, ATTR_SHOWTITLE, "true"));
             props.remove(ATTR_SHOWTITLE);
@@ -3999,7 +4002,10 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         if (title != null) {
             propList.add(ATTR_TITLE);
             propList.add(Json.quote(title));
-        }
+        } else {
+            propList.add(ATTR_TITLE);
+            propList.add(Json.quote(entry.getName()));
+        }            
         topProps.add("layoutType");
         topProps.add(Json.quote(Misc.getProperty(props, "layoutType",
                 "table")));
