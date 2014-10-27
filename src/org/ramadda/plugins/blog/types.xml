@@ -1,7 +1,7 @@
 <types>
 
 
-  <type name="weblog"  description="Weblog" handler="org.ramadda.plugins.blog.WeblogTypeHandler" category="Collaboration" metadata="enum_tag,content.attachment">
+  <type name="weblog"  description="Weblog" handler="org.ramadda.plugins.blog.WeblogTypeHandler" category="Information" metadata="enum_tag,content.attachment">
      <property name="icon" value="/blog/blog_icon.png"/>
      <property name="form.description.rows" value="5"/>
      <property name="form.area.show" value="false"/>
@@ -13,7 +13,7 @@
 
 
 
-  <type name="blogentry"  description="Weblog Entry" handler="org.ramadda.plugins.blog.BlogEntryTypeHandler" category="Collaboration" foruser="false" metadata="enum_tag,content.attachment">
+  <type name="blogentry"  description="Weblog Entry" handler="org.ramadda.plugins.blog.BlogEntryTypeHandler" category="Information" foruser="false" metadata="enum_tag,content.attachment">
      <property name="icon" value="/blog/blog_icon.png"/>
 
      <property name="form.name.label" value="Subject"/>
