@@ -214,6 +214,10 @@ function RepositoryMap(mapId, params) {
     }
 
     this.addBaseLayers = function() {
+        if (typeof google === 'undefined') {
+            console.log("No google");
+            return;
+        }
         if (!this.mapLayers) {
             this.mapLayers = [ 
                               map_google_terrain,
