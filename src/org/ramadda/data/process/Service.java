@@ -1633,9 +1633,15 @@ public class Service extends RepositoryManager {
             return;
         } else if (arg.isDate()) {
             //TODO: add a time field
+            String dateProp = arg.getValuesProperty();
+            List<Date> dates = new ArrayList<Date>();
+            if (arg.getValuesProperty() != null) {
+                dates = (List<Date>) input.getProperty(
+                    arg.getValuesProperty(), dates);
+            }
             inputHtml.append(
                 getRepository().getPageHandler().makeDateInput(
-                    request, argUrlName, "searchform", null, null, false));
+                    request, argUrlName, "searchform", null, null, false, dates));
         } else if (arg.isFile()) {
             //noop
         } else if (arg.isEntry()) {

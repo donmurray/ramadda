@@ -1556,6 +1556,24 @@ public class PageHandler extends RepositoryManager {
     public String makeDateInput(Request request, String name,
                                 String formName, Date date, String timezone,
                                 boolean includeTime) {
+        return makeDateInput(request, name, formName, date, timezone, includeTime, null);
+    }
+    
+    /**
+     * Make the HTML for a date input widget
+     *
+     * @param request The request
+     * @param name    the name
+     * @param formName  the form name
+     * @param date      the default date
+     * @param timezone  the timezone
+     * @param includeTime  true to include a time box
+     *
+     * @return  the widget html
+     */
+    public String makeDateInput(Request request, String name,
+                                String formName, Date date, String timezone,
+                                boolean includeTime, List dates) {
         String dateHelp = "e.g., yyyy-mm-dd,  now, -1 week, +3 days, etc.";
         String           timeHelp   = "hh:mm:ss Z, e.g. 20:15:00 MST";
 
@@ -1572,12 +1590,20 @@ public class PageHandler extends RepositoryManager {
                                        : timeFormat.format(date));
 
         String           inputId    = "dateinput" + (HtmlUtils.blockCnt++);
+        String minDate = null;
+        String maxDate = null;
+        if (dates != null && !dates.isEmpty()) {
+            minDate = dateSdf.format((Date)dates.get(0));
+            maxDate = dateSdf.format((Date)dates.get(dates.size()-1));
+        }
 
-
-        String js =
-            "<script>jQuery(function() {$( "
-            + HtmlUtils.squote("#" + inputId)
-            + " ).datepicker({ dateFormat: 'yy-mm-dd',changeMonth: true, changeYear: true,constrainInput:false, yearRange: '1900:2100' });});</script>";
+        StringBuilder jsBuf = new StringBuilder("<script>jQuery(function() {$( ");
+        jsBuf.append(HtmlUtils.squote("#" + inputId));
+        jsBuf.append(" ).datepicker({ dateFormat: 'yy-mm-dd',changeMonth: true, changeYear: true,constrainInput:false, yearRange: '1900:2100' ");
+        if (minDate != null && maxDate != null) {
+            jsBuf.append(", minDate: '"+minDate+"', maxDate: '"+maxDate+"'");
+        }
+        jsBuf.append(" });});</script>");
         String extra = "";
         if (includeTime) {
             extra = " T:"
@@ -1587,7 +1613,7 @@ public class PageHandler extends RepositoryManager {
                                           timeHelp));
         }
 
-        return "\n" + js + "\n"
+        return "\n" + jsBuf.toString() + "\n"
                + HtmlUtils.input(name, dateString,
                                  HtmlUtils.SIZE_10 + HtmlUtils.id(inputId)
                                  + HtmlUtils.title(dateHelp)) + extra;

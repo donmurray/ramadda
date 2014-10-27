@@ -13,8 +13,8 @@ Run <a href="https://code.zmaw.de/projects/cdo/embedded/1.6.4/cdo.html#x1-400002
 <help><![CDATA[
 Run <a href="https://code.zmaw.de/projects/cdo/embedded/1.6.4/cdo.html#x1-1200002.3.3" target="_help">cdo seldate</a>
 ]]></help>
-          <arg type="date" name="cdo.fromdate" label="Start Date" include="false"/>
-          <arg type="date" name="cdo.todate" label="End Date" include="false"/>
+          <arg type="date" name="cdo.fromdate" label="Start Date" include="false" valuesProperty="dateList"/>
+          <arg type="date" name="cdo.todate" label="End Date" include="false" valuesProperty="dateList"/>
           <arg value="-seldate,${cdo.fromdate},${cdo.todate}"/>
           <arg label="Input NetCDF file" value="${entry.file}"   type="entry" primary="true" entryPattern="(.*\.nc|.*\.grb|.*\.grib)"></arg>
           <arg value="${file}" file="${entry.file.base}_${cdo.fromdate}_${cdo.todate}.nc"></arg>

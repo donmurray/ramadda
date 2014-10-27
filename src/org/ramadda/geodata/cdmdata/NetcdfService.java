@@ -36,8 +36,12 @@ import org.ramadda.util.TempDir;
 import org.w3c.dom.*;
 
 import ucar.nc2.Variable;
+import ucar.nc2.constants.AxisType;
 import ucar.nc2.dataset.CoordinateAxis;
+import ucar.nc2.dataset.CoordinateAxis1D;
 import ucar.nc2.dataset.NetcdfDataset;
+import ucar.nc2.dt.grid.GridDataset;
+import ucar.nc2.time.CalendarDate;
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
@@ -49,6 +53,7 @@ import ucar.unidata.xml.XmlUtil;
 import java.io.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 
@@ -136,10 +141,20 @@ public class NetcdfService extends Service {
                 varNames.add(new TwoFacedObject(var.getName(),
                                                 var.getShortName()));
             }
-
+            
+            // If it's a grid, get the list of times.
+            GridDataset gds = new GridDataset(dataset);
+            List<CalendarDate> dates = dataOutputHandler.getGridDates(gds);
+            List<Date> dateList = new ArrayList<Date>(dates.size());
+            for (CalendarDate cdate :dates) {
+                dateList.add(cdate.toDate());
+            }
+            gds.close();
             dataset.close();
+            
             input.putProperty("varNames", varNames);
             input.putProperty("coordNames", coordNames);
+            input.putProperty("dateList", dateList);
 
     }
 
