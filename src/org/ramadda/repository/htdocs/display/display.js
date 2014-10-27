@@ -663,7 +663,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 var moveDown = HtmlUtil.onClick(get +".moveDisplayDown();", "Down");
 
                 var menu =  "<table>" +
-                    "<tr style=\"border:1px #000 solid;\"><td align=right><b>Move:</b></td><td>" + moveUp + " " +moveDown+  " " +moveRight+ " " + moveLeft +"</td></tr>"  +
+                    "<tr xstyle=\"border:1px #000 solid;\"><td align=right><b>Move:</b></td><td>" + moveUp + " " +moveDown+  " " +moveRight+ " " + moveLeft +"</td></tr>"  +
                     "<tr><td align=right><b>Name:</b></td><td> " + HtmlUtil.input("", this.getProperty("name",""), ["size","7",ATTR_ID,  this.getDomId("name")]) + "</td></tr>" +
                     "<tr><td align=right><b>Source:</b></td><td>"  + 
                     HtmlUtil.input("", this.getProperty("eventsource",""), ["size","7",ATTR_ID,  this.getDomId("eventsource")]) +
@@ -724,7 +724,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 this.getLayoutManager().layoutChanged(this);
             },
             moveDisplayRight: function() {
-                if(this.getLayoutManager.isLayoutColumns()) {
+                if(this.getLayoutManager().isLayoutColumns()) {
                     this.deltaColumn(1);
                 } else {
                     this.getLayoutManager().moveDisplayDown(this);
@@ -845,16 +845,15 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
 
                 html+= HtmlUtil.div([ATTR_CLASS,"ramadda-popup", ATTR_ID, this.getDomId(ID_MENU_OUTER)], "");
                 var menu = HtmlUtil.div([ATTR_CLASS, "display-dialog", ATTR_ID, this.getDomId(ID_DIALOG)], "");
-                html += HtmlUtil.openTag("h2");
-                html += HtmlUtil.openTag(TAG_DIV, [ATTR_CLASS, "row"]);
+
+                var title = "";
+                console.log("title:" + this.getTitle() +" " + this.getShowTitle());
                 if(this.getShowTitle()) {
-                    html += HtmlUtil.div(["class","col-md-8"], HtmlUtil.tag("div", [ATTR_CLASS,"display-title",ATTR_ID,this.getDomId(ID_TITLE)], this.getTitle()));
-                } else {
-                    html += HtmlUtil.div(["class","col-md-8"], "");
+                    title= this.getTitle();
                 }
 
-                var get = this.getGet();
 
+                var get = this.getGet();
                 var button = "";
                 if(this.getShowMenu()) {
                     button = HtmlUtil.onClick(get+".showDialog();", 
@@ -862,19 +861,23 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                                                                      [ATTR_CLASS, "display-dialog-button", ATTR_ID,  this.getDomId(ID_DIALOG_BUTTON)]));
                 }
                 
-                html += HtmlUtil.div(["class","col-md-4","align", "right"], button);
-                html += HtmlUtil.closeTag(TAG_DIV);
-                html += HtmlUtil.closeTag("h2");
+                if(button!= "" || title!="") {
+                    html += HtmlUtil.openTag("h2");
+                    html += HtmlUtil.openTag(TAG_DIV, [ATTR_CLASS, "row"]);
+                    html += HtmlUtil.div(["class","col-md-10"], HtmlUtil.tag("div", [ATTR_CLASS,"display-title",ATTR_ID,this.getDomId(ID_TITLE)], title));
+                    html += HtmlUtil.div(["class","col-md-2","align", "right"], button);
+                    html += HtmlUtil.closeTag(TAG_DIV);
+                    html += HtmlUtil.closeTag("h2");
+                }
 
                 var contents = this.getContentsDiv();
                 //                contents  = "CONTENTS";
                 html += contents;
                 html += menu;
-                html += "</div>"
+                html += HtmlUtil.closeTag(TAG_DIV);
                 if(dobs) {
-                    html += "</div>"
+                    html += HtmlUtil.closeTag(TAG_DIV);
                 }
-                console.log(html);
                 return html;
             },
              makeDialog: function() {
@@ -1271,6 +1274,9 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
                 this.displays.push(display);
                 this.doLayout();
             },
+           layoutChanged: function(display) {
+               this.doLayout();
+           },
             removeDisplay:function(display) {
                 var index = this.displays.indexOf(display);
                 if(index >= 0) { 
@@ -1293,23 +1299,33 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
 
                 if(this.layout == LAYOUT_TABLE) {
                     if(displaysToLayout.length == 1) {
-                        html+= displaysToLayout[0].getHtml();
+                        html+=  HtmlUtil.div(["class"," display-wrapper"], 
+                                             displaysToLayout[0].getHtml());
                     } else {
-                        var width = Math.round(100/this.columns)+"%";
-                        html+=HtmlUtil.openTag(TAG_TABLE, ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "5","class","display-layout-table"]);
-                        for(var i=0;i<displaysToLayout.length;i++) {
+                        var weight = 12 / this.columns;
+                        var weights = null;
+                        if(typeof  this.weights  != "undefined") {
+                            weights = this.weights.split(",");
+                        }
+                        var  i =0;
+                        for(;i<displaysToLayout.length;i++) {
                             colCnt++;
                             if(colCnt>=this.columns) {
                                 if(i>0) {
-                                    html+= HtmlUtil.closeTag(TAG_TR);
+                                    html+= HtmlUtil.closeTag(TAG_DIV);
                                 }
-                                html+= HtmlUtil.openTag(TAG_TR,["valign", "top"]);
+                                html += HtmlUtil.openTag("div",["class","row"]);
                                 colCnt=0;
                             }
-                            html+=HtmlUtil.tag(TAG_TD, ["width", width], HtmlUtil.div(["class","display-wrapper"], displaysToLayout[i].getHtml()));
+                            var weightToUse = weight;
+                            if(weights!=null && i<weights.length) {
+                                weightToUse = weights[i];
+                            }
+                            html+= HtmlUtil.div(["class","col-md-" + weightToUse +" display-wrapper"],  displaysToLayout[i].getHtml());
                         }
-                        html+= HtmlUtil.closeTag(TAG_TR);
-                        html+= HtmlUtil.closeTag(TAG_TABLE);
+                        if(i>0) {
+                            html+= HtmlUtil.closeTag(TAG_DIV);
+                        }
                     }
                 } else if(this.layout==LAYOUT_TABS) {
                     //TODO
@@ -1348,19 +1364,18 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
                         }
                         cols[column].push(display.getHtml());
                     }
-                    html+=HtmlUtil.openTag(TAG_TABLE, ["border","0","width", "100%", "cellpadding", "5",  "cellspacing", "0"]);
-                    html+=HtmlUtil.openTag(TAG_TR, ["valign","top"]);
+                    html+=HtmlUtil.openTag(TAG_DIV, ["class","row"]);
                     var width = Math.round(100/cols.length)+"%";
+                    var weight = 12 / cols.length;
                     for(var i=0;i<cols.length;i++) {
                         var rows = cols[i];
                         var contents = "";
                         for(var j=0;j<rows.length;j++) {
                             contents+= rows[j];
                         }
-                        html+=HtmlUtil.tag(TAG_TD, ["width", width, "valign","top"], contents);
+                        html+=HtmlUtil.div(["class","col-md-" + weight], contents);
                     }
-                    html+= HtmlUtil.closeTag(TAG_TR);
-                    html+= HtmlUtil.closeTag(TAG_TABLE);
+                    html+= HtmlUtil.closeTag(TAG_TD);
                 } else {
                     html+="Unknown layout:" + this.layout;
                 }

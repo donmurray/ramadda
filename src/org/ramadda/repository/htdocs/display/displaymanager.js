@@ -282,9 +282,7 @@ function DisplayManager(argId,argProperties) {
                 }
                 return null;
             },
-           layoutChanged: function(display) {
-               this.doLayout();
-           },
+
            writeDisplay: function() {
                if(this.originalLocation==null) {
                    this.originalLocation = document.location;

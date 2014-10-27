@@ -1228,14 +1228,15 @@ function RamaddaTimelineDisplay(displayManager, id, properties) {
 
 function RamaddaEntrydisplayDisplay(displayManager, id, properties) {
     var SUPER;
-    $.extend(this, {
-            sourceEntry: properties.sourceEntry});
+    $.extend(this, {sourceEntry: properties.sourceEntry});
     RamaddaUtil.inherit(this, SUPER = new RamaddaDisplay(displayManager, id, DISPLAY_ENTRYDISPLAY, properties));
     addRamaddaDisplay(this);
     $.extend(this, {
             selectedEntry: null,
             initDisplay: function() {
                 this.initUI();
+                console.log("entry: " + this.sourceEntry);
+
                 if(this.sourceEntry!=null) {
                     this.addEntryHtml(this.sourceEntry);
                 } else {
@@ -1262,10 +1263,10 @@ function RamaddaEntrydisplayDisplay(displayManager, id, properties) {
             },
             addEntryHtml: function(entry) {
                 if(entry==null) {
-                    this.setContents("&nbsp;");
+                    this.setContents("NULL" + "&nbsp;");
                     return;
                 }
-                this.setContents(this.getEntryHtml(entry));
+                this.setContents("ENTRY " + this.getEntryHtml(entry));
             },
         });
 }
