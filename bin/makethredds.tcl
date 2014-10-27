@@ -5,34 +5,38 @@ cd thredds
 puts "Unjarring thredds.war"
 exec jar -xvf ../thredds.war
 
+set skips [list jfree  jcommon unidatacommon slf4j 52 json waterml ]
 
 cd WEB-INF/classes
 if {1} {
 ##exec rm -r org/apache/log4j
 foreach jar [glob ../lib/*.jar] {
-    if {[regexp jfree $jar]} {
+    set shouldSkip 0
+    foreach skip $skips {
+        if {[regexp $skip $jar]} {
+            puts "skipping $jar"
+            set shouldSkip 1
+            break;
+        }
+    }
+    if {$shouldSkip} {
         puts "skipping $jar"
         continue
     }
-    if {[regexp jcommon $jar]} {
-        puts "skipping $jar"
-        continue
-    }
-    if {[regexp unidatacommon $jar]} {
-        puts "skipping $jar"
-        continue
-    }
+
 #    if {[regexp netcdf $jar]} {
 #        puts "skipping $jar"
 #        continue
 #    }
 
-    if {[regexp slf4j $jar]} {
-        puts "skipping $jar"
-        continue
-    }
+
+
     puts "Unjarring $jar"
     exec jar -xvf $jar
+    if {[file exists LICENSE]} {
+        puts "Deleting LICENSE"
+        exec rm -r -f LICENSE
+    }
 }
 
 ##unjar the common jar
