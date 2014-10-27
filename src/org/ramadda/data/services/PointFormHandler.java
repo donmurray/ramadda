@@ -748,7 +748,8 @@ public class PointFormHandler extends RecordFormHandler {
         formatLists.add(pointFormats);
         formatLists.add(gridFormats);
 
-        sb.append(HtmlUtils.formTable(" width=100%  border=0 "));
+        sb.append(HtmlUtils.formTable(
+                                      HtmlUtils.cssClass("formtable") + HtmlUtils.attrs(HtmlUtils.ATTR_CELLPADDING, "0", HtmlUtils.ATTR_CELLSPACING, "0", HtmlUtils.ATTR_WIDTH, "100%")));
         sb.append("<tr><td width=15%>");
         sb.append(HtmlUtils.submit(msg("Get Data"), ARG_GETDATA));
         sb.append("</td><td></td></tr>");
