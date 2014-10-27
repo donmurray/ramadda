@@ -45,6 +45,8 @@ import java.lang.reflect.*;
 
 import java.net.*;
 
+import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -122,6 +124,12 @@ public class ServiceArg implements Constants {
 
     /** _more_ */
     private String filePattern;
+
+    /** _more_          */
+    private SimpleDateFormat dateFormat;
+
+    /** _more_          */
+    private String dateFormatString;
 
     /** _more_ */
     private boolean nameDefined = false;
@@ -225,6 +233,11 @@ public class ServiceArg implements Constants {
         entryType = XmlUtil.getAttributeFromTree(node,
                 Service.ATTR_ENTRY_TYPE, (String) null);
 
+
+        dateFormat =
+            RepositoryUtil.makeDateFormat(dateFormatString =
+                XmlUtil.getAttributeFromTree(node, "dateFormat",
+                                             "yyyy-MM-dd"));
         if (entryType != null) {
             entryTypes = StringUtil.split(entryType, ",", true, true);
         }
@@ -311,6 +324,7 @@ public class ServiceArg implements Constants {
         StringBuilder attrs = new StringBuilder();
         Service.attr(attrs, Service.ATTR_TYPE, type);
         Service.attr(attrs, "depends", depends);
+        Service.attr(attrs, "dateFormat", dateFormatString);
         Service.attr(attrs, "addAll", addAll);
         Service.attr(attrs, "addNone", addNone);
         Service.attr(attrs, Service.ATTR_ENTRY_TYPE, entryType);
@@ -845,6 +859,15 @@ public class ServiceArg implements Constants {
      */
     public String getMultipleJoin() {
         return multipleJoin;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public SimpleDateFormat getDateFormat() {
+        return dateFormat;
     }
 
 }

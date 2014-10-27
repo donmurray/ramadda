@@ -45,6 +45,8 @@ import java.lang.reflect.*;
 
 import java.net.*;
 
+import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -179,6 +181,9 @@ public class Service extends RepositoryManager {
 
     /** _more_ */
     private boolean ignoreStderr = false;
+
+    /** _more_          */
+    private String errorPattern;
 
     /** _more_ */
     private boolean cleanup = false;
@@ -342,6 +347,8 @@ public class Service extends RepositoryManager {
         ignoreStderr = XmlUtil.getAttributeFromTree(element, "ignoreStderr",
                 ignoreStderr);
 
+        errorPattern = XmlUtil.getAttributeFromTree(element, "errorPattern",
+                (String) null);
         cleanup = XmlUtil.getAttributeFromTree(element, ATTR_CLEANUP, true);
         category = XmlUtil.getAttributeFromTree(element, "category",
                 (String) null);
@@ -379,10 +386,10 @@ public class Service extends RepositoryManager {
 
         if ((linkId == null) && !haveChildren()) {
             command = XmlUtil.getAttributeFromTree(element, ATTR_COMMAND,
-                                                   (String) null);
+                    (String) null);
 
             pathProperty = XmlUtil.getAttribute(element, ATTR_PATHPROPERTY,
-                                                (String) null);
+                    (String) null);
 
             //Extract it from the command
             if ((pathProperty == null) && (command != null)) {
@@ -783,8 +790,9 @@ public class Service extends RepositoryManager {
         if (linkId != null) {
             try {
                 link = getRepository().getJobManager().getService(linkId);
-                if(link == null) {
-                    System.out.println("Could not find service:" + linkId +" " + label +" " + id);
+                if (link == null) {
+                    System.out.println("Could not find service:" + linkId
+                                       + " " + label + " " + id);
                     System.err.println(XmlUtil.toString(element));
                     enabled = false;
                 }
@@ -884,16 +892,17 @@ public class Service extends RepositoryManager {
                                 filesToDelete, allEntries);
         }
 
-        HashSet<String> seenGroup    = new HashSet<String>();
-        HashSet<String> definedArgs  = new HashSet<String>();
+        HashSet<String> seenGroup   = new HashSet<String>();
+        HashSet<String> definedArgs = new HashSet<String>();
 
-        if(linkId!=null) {
+        if (linkId != null) {
             System.err.println("Have linkId but no link:" + linkId);
+
             return definedArgs;
         }
 
-        List<Entry>     inputEntries = input.getEntries();
-        File            workDir      = input.getProcessDir();
+        List<Entry> inputEntries = input.getEntries();
+        File        workDir      = input.getProcessDir();
 
 
 
@@ -956,11 +965,11 @@ public class Service extends RepositoryManager {
             input.setEntries(allEntries);
         }
 
-        Entry currentEntry = (Entry) Utils.safeGet(inputEntries, 0);
+        Entry  currentEntry = (Entry) Utils.safeGet(inputEntries, 0);
 
-        String cmd = getCommand();
-        cmd = applyMacros(currentEntry, entryMap, valueMap, workDir,
-                          cmd, input.getForDisplay());
+        String cmd          = getCommand();
+        cmd = applyMacros(currentEntry, entryMap, valueMap, workDir, cmd,
+                          input.getForDisplay());
         commands.add(cmd);
 
         addExtraArgs(request, input, commands, true);
@@ -982,6 +991,16 @@ public class Service extends RepositoryManager {
             List<String> values   = null;
             if (arg.isValueArg()) {
                 argValue = arg.getValue();
+            } else if (arg.isDate()) {
+                //TODO: add time
+                String dateString = getRequestValue(request, input,
+                                        argPrefix, arg.getName(),
+                                        (String) null);
+                if (Utils.stringDefined(dateString)) {
+                    Date date = getRepository().getPageHandler().parseDate(
+                                    dateString);
+                    argValue = arg.getDateFormat().format(date);
+                }
             } else if (arg.isFlag()) {
                 if (arg.getGroup() != null) {
                     if ( !seenGroup.contains(arg.getGroup())) {
@@ -1010,7 +1029,8 @@ public class Service extends RepositoryManager {
                         + arg.getLabel() + " entries:" + entries);
                 } else if ( !arg.isRequired() && (entries.size() == 0)) {
                     System.err.println("arg:" + arg.getName());
-                    System.err.println("entryMap:" +entryMap);
+                    System.err.println("entryMap:" + entryMap);
+
                     throw new IllegalArgumentException(
                         "No entry specified for arg:" + arg.getLabel());
                 }
@@ -1042,7 +1062,7 @@ public class Service extends RepositoryManager {
                 argValue = getRequestValue(request, input, argPrefix,
                                            arg.getName(), (String) null);
 
-                if(argValue == null && arg.getDefault()!=null) {
+                if ((argValue == null) && (arg.getDefault() != null)) {
                     argValue = arg.getDefault();
                 }
 
@@ -1372,12 +1392,10 @@ public class Service extends RepositoryManager {
         }
 
         String myPrefix = getPrefix(argPrefix);
-        System.err.println("addToForm argPrefix:" + argPrefix + " myPrefix:"
-                           + myPrefix);
+        //        System.err.println("addToForm argPrefix:" + argPrefix + " myPrefix:" + myPrefix);
 
         if (haveLink()) {
-            System.err.println("Link:" + link + " "
-                               + link.getClass().getName());
+            //            System.err.println("Link:" + link + " " + link.getClass().getName());
             link.addToForm(request, input, sb, myPrefix, getLabel());
 
             return;
@@ -1482,15 +1500,20 @@ public class Service extends RepositoryManager {
                                  HtmlUtils.cssClass("service-form")));
 
 
-        String rightSide = HtmlUtils.href(getRepository().getJobManager().getServiceUrl(request, this),
-                                          HtmlUtils.img(iconUrl("/icons/application_form.png"),msg("View top-level form")));
+        String rightSide = HtmlUtils.href(
+                               getRepository().getJobManager().getServiceUrl(
+                                   request, this), HtmlUtils.img(
+                                   iconUrl("/icons/application_form.png"),
+                                   msg("View top-level form")));
 
-        rightSide = HtmlUtils.div(rightSide, HtmlUtils.cssClass("service-form-header-links"));
+        rightSide =
+            HtmlUtils.div(rightSide,
+                          HtmlUtils.cssClass("service-form-header-links"));
         sb.append(
             HtmlUtils.div(
-                          HtmlUtils.leftRight(
-                                              HtmlUtils.img(iconUrl(getIcon())) + " " + label, rightSide),
-                          HtmlUtils.cssClass("service-form-header")));
+                HtmlUtils.leftRight(
+                    HtmlUtils.img(iconUrl(getIcon())) + " " + label,
+                    rightSide), HtmlUtils.cssClass("service-form-header")));
 
 
         if (Utils.stringDefined(getDescription())) {
@@ -1609,9 +1632,10 @@ public class Service extends RepositoryManager {
 
             return;
         } else if (arg.isDate()) {
-            inputHtml.append(getRepository().getPageHandler().makeDateInput(
-                    request, argUrlName, "searchform", null,
-                    null, false));
+            //TODO: add a time field
+            inputHtml.append(
+                getRepository().getPageHandler().makeDateInput(
+                    request, argUrlName, "searchform", null, null, false));
         } else if (arg.isFile()) {
             //noop
         } else if (arg.isEntry()) {
@@ -2085,9 +2109,10 @@ public class Service extends RepositoryManager {
             return link.getLabel();
         }
 
-        if(id!=null) {
+        if (id != null) {
             return id.replaceAll("_", " ");
         }
+
         return "Service";
     }
 
@@ -2247,12 +2272,27 @@ public class Service extends RepositoryManager {
             if (getOutputToStderr()) {
                 myOutput.append(errMsg);
                 myOutput.append("\n");
-            } else if ( !getIgnoreStderr()) {
-                //If there is an error then
-                myOutput.setOk(false);
-                myOutput.append(errMsg);
+            } else {
+                if ( !getIgnoreStderr()) {
+                    if (errorPattern != null) {
+                        if (errMsg.matches(errorPattern)) {
+                            myOutput.setOk(false);
+                            myOutput.append(errMsg);
 
-                return myOutput;
+                            return myOutput;
+                        } else {
+                            System.err.println("Skipping stderr:" + errMsg);
+                            getLogManager().logInfo(
+                                "Service: ignoring stderr:" + errMsg);
+                        }
+                    } else {
+                        //If there is an error then
+                        myOutput.setOk(false);
+                        myOutput.append(errMsg);
+
+                        return myOutput;
+                    }
+                }
             }
         }
 
