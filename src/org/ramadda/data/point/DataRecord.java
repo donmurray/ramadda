@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -188,8 +188,8 @@ public class DataRecord extends PointRecord {
 
                 continue;
             }
-            String name = field.getName();
-            String lowerCaseName      = name.toLowerCase();
+            String name          = field.getName();
+            String lowerCaseName = name.toLowerCase();
 
             if (field.getIsDate()) {
                 dateIndex = fieldIdx + 1;
@@ -213,12 +213,14 @@ public class DataRecord extends PointRecord {
                     break;
                 }
             }
-            if ((latField != null) && latField.equalsIgnoreCase(lowerCaseName)) {
+            if ((latField != null)
+                    && latField.equalsIgnoreCase(lowerCaseName)) {
                 idxY = fieldIdx;
 
                 continue;
             }
-            if ((lonField != null) && lonField.equalsIgnoreCase(lowerCaseName)) {
+            if ((lonField != null)
+                    && lonField.equalsIgnoreCase(lowerCaseName)) {
                 idxX = fieldIdx;
 
                 continue;
@@ -228,7 +230,8 @@ public class DataRecord extends PointRecord {
                 if (idxX == -1) {
                     idxX = fieldIdx;
                 }
-            } else if (lowerCaseName.equals("longitude") || lowerCaseName.equals("long")
+            } else if (lowerCaseName.equals("longitude")
+                       || lowerCaseName.equals("long")
                        || lowerCaseName.equals("lon")) {
                 if ( !seenLon) {
                     idxX    = fieldIdx;
@@ -239,13 +242,16 @@ public class DataRecord extends PointRecord {
                     idxY = fieldIdx;
                 }
 
-            } else if (lowerCaseName.equals("latitude") || lowerCaseName.equals("lat")) {
+            } else if (lowerCaseName.equals("latitude")
+                       || lowerCaseName.equals("lat")) {
                 if ( !seenLat) {
                     idxY    = fieldIdx;
                     seenLat = true;
                 }
-            } else if (lowerCaseName.equals("z") || lowerCaseName.equals("altitude")
-                       || lowerCaseName.equals("elevation") || lowerCaseName.equals("elev")
+            } else if (lowerCaseName.equals("z")
+                       || lowerCaseName.equals("altitude")
+                       || lowerCaseName.equals("elevation")
+                       || lowerCaseName.equals("elev")
                        || lowerCaseName.equals("alt")) {
                 if (idxZ == -1) {
                     idxZ = fieldIdx;
@@ -261,7 +267,22 @@ public class DataRecord extends PointRecord {
         }
 
         if (gotDateFields) {
-            getRecordFile().setYMDHMSIndices(ymdhmsIndices);
+            boolean ok           = true;
+            boolean seenNegative = false;
+            for (int i = 0; i < ymdhmsIndices.length; i++) {
+                if (ymdhmsIndices[i] >= 0) {
+                    if (seenNegative) {
+                        ok = false;
+
+                        break;
+                    }
+                } else if (ymdhmsIndices[i] < 0) {
+                    seenNegative = true;
+                }
+            }
+            if (ok) {
+                getRecordFile().setYMDHMSIndices(ymdhmsIndices);
+            }
         }
 
 

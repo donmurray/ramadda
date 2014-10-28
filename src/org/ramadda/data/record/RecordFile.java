@@ -227,7 +227,7 @@ public abstract class RecordFile {
         return that;
     }
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<String, String> classProperties;
 
     /**
@@ -444,8 +444,16 @@ public abstract class RecordFile {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param prop _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     public boolean getProperty(String prop, boolean dflt) {
-        return getProperty(prop, ""+dflt).equals("true");
+        return getProperty(prop, "" + dflt).equals("true");
     }
 
 
@@ -1394,6 +1402,9 @@ public abstract class RecordFile {
             }
             goodCnt++;
         }
+        if (goodCnt == 0) {
+            return null;
+        }
 
         return sdfs[goodCnt - 1];
     }
@@ -1573,7 +1584,9 @@ public abstract class RecordFile {
         this.dateIndex = dateIndex;
         this.timeIndex = timeIndex;
         String pattern = "yyyy-MM-dd";
-        if(timeIndex>=0) pattern += " HHmm";
+        if (timeIndex >= 0) {
+            pattern += " HHmm";
+        }
         sdf = makeDateFormat(getProperty(PROP_DATEFORMAT, pattern));
 
 
