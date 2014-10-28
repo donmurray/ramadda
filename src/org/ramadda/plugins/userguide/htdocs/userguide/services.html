@@ -34,7 +34,6 @@ All RAMADDA repositories (running the latest release) have their list of enabled
 <a href="http://ramadda.org/repository/services/list">http://ramadda.org/repository/services/list</a>.
 
 
-
 <a name="configuration"></a><div class="pagesubtitle">14.4.0 Configuration</div> 
 To enable an installed service you need to specify one or more properties 
 in a .properties file in your RAMADDA home directory that specify the 
@@ -111,7 +110,7 @@ service.picard=&lt;path&gt;/picard-tools-1.119/picard.sh
 
 <a name="run"></a><div class="pagesubtitle">14.4.1 Service XML</div> 
 A service is specified as either an outputhandler XML file or a services XML plugin.
-There are numerous examples available at 
+There are numerous examples under the SVN source tree  at 
 <a href="http://sourceforge.net/p/ramadda/code/HEAD/tree/src/org/ramadda/">http://sourceforge.net/p/ramadda/code/HEAD/tree/src/org/ramadda/</a>
 
 Below is an example of two output services, one defined inline and the other referencing a service defined in the below services.xml file.
@@ -221,7 +220,36 @@ You can specify an entry type for the entries that get created for each file
 </pre></blockquote>
 
 
+<a name="faq"></a><div class="pagesubtitle">14.4.2 Common Argument Constructs</div> 
 
+<h3>One command line argument made up of multiple  user choices.</h3>
+Use the <i>include</i> attribute to provide a user interface element (e.g., date select) but not directly add the value to the 
+command line arguments. Rather you can embed the value in a later argument with the "${name}" macro syntax. 
+
+e.g. org/ramadda/geodata/cdmdata/resources/cdoservices.xml
+
+<pre>
+//specify 2 date arguments
+   &lt;arg type="date" name="cdo.fromdate" label="Start Date" include="false" valuesProperty="dateList"/&gt;
+   &lt;arg type="date" name="cdo.todate" label="End Date" include="false" valuesProperty="dateList"/&gt;
+//specify a simple value argument that includes the values of the two date args
+   &lt;arg value="-seldate,${cdo.fromdate},${cdo.todate}"/&gt;
+</pre>
+
+
+Here we have an image format enumeration value with include=false. It is used 
+From  org/ramadda/bio/image/services.xml
+
+<pre>
+&lt;arg type="enumeration" name="imageformat" label="Image type" values="png,gif,jpg,tiff" include="false" default="png"/&gt;
+
+//Specify an entry
+&lt;arg value="${entry.file}" type="entry"  label="Input image file" primary="true" entryType="bio_dicom,bio_ome_tiff"&gt;&lt;/arg&gt;
+
+//Provide the output image
+&lt;arg value="${file}" file="${entry.file.base}${suffix}.${imageformat}"/&gt;
+
+</pre>
 
 
 
