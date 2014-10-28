@@ -542,9 +542,12 @@ the grandchildren as a grid:
 <li> [wiki::tagdef recent {days="number of days to show"}]:
 Show the most recent N days in a list organized by day.
 
-<li> [wiki::tagdef imageplayer {width="image width" loopdelay="delay in milliseconds" loopstart="true|false"}]:
+<li> [wiki::tagdef imageplayer {width="image width" loopdelay="delay in milliseconds" loopstart="true|false" useAttachment="true|false"}]:
 Show images in an image player, e.g.
 [wiki::text {{{imageplayer loopdelay="500" loopstart="true"}}}] </pre>
+
+If <i>useAttachment</i> is true then, if the entry's file is not an image but it has
+an attachment that is an image then use the attachment image.
 
 
 <li> [wiki::tagdef gallery {width="image width" columns="number of columns" showdescription="true"}]:
