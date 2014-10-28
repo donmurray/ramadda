@@ -60,6 +60,7 @@ color:black;
 
 .minitron {
    padding-top: 4px;
+   margin-top:4px;
    padding-left: 4px;
    padding-right: 4px;
    border-radius: 4px;
@@ -669,13 +670,6 @@ padding-right-rtl-source: physical;
     overflow-x: auto;
 }
 
-.ramadda-entry-menu-title {
-  font-style:italic;
-  width: 100%;
-   border-bottom : 1px #888 solid;
-}
-
-
 
 
 .ui-menu-item {
@@ -1049,16 +1043,6 @@ a.ramadda-heading-2-link:visited {
     content: "|";
 }
 
-.ramadda-menuitem-row {
-}
-
-.ramadda-menuitem-td {
-   margin-left:2px;
-   margin-right:2px;
-   margin-top:1px;
-   margin-bottom:1px;
-   padding-bottom:2px;
-}
 
 .entry-sidebox {
      border: 1px #ddd solid;
@@ -1107,10 +1091,9 @@ a.ramadda-menuitem-link {
    text-decoration: none;
 }
 
-.ramadda-menuitem-link {
-    color: #000000;
-    font-weight: normal;
-}
+
+
+
 
 .ramadda-menuitem-link:visited {
     color: #000000;
@@ -1120,12 +1103,33 @@ a.ramadda-menuitem-link {
     color: #000000;
 }
 
-.ramadda-menuitem-link a {
+
+.ramadda-menuitem a {
+   font-weight: normal;
    text-decoration: none;
+   color: #000000;
 }
 
-.ramadda-menuitem-link a:hover {
-   color:#000000;
+.ramadda-menuitem a:hover {
+   color:#000;
+}
+
+
+.ramadda-entry-menu-title {
+  font-style:italic;
+   width: 100%;
+   border-bottom : 1px #ccc solid;
+   margin-left:4px;
+   margin-bottom:4px;
+}
+
+.ramadda-menuitem {
+    margin-left:10px;
+    margin-right:10px;
+    margin-top:3px;
+    margin-bottom:3px;
+    padding-bottom:2px;
+    min-width:150px;
 }
 
 
@@ -1133,6 +1137,8 @@ a.ramadda-menuitem-link {
     margin:2px;
     margin-bottom:3px;
     padding:0px;
+    color:black;
+    border-bottom: 1px #ccc solid;
 }
 
 
@@ -1966,19 +1972,18 @@ a.toggleblocklabellink:visited {
 }
 
 
-
-
 .formtable  {
    padding-top: 0px;
    padding-bottom: 0px;
 }
 
 .formtable td {
-      padding-top: 5px;
-      padding-bottom: 5px;
-      padding-left: 4px;
-      padding-right: 4px;
+      padding-top: 4px;
+      padding-bottom: 4px;
+      padding-left: 3px;
+      padding-right: 3px;
 }
+
 
 .formlabel, .formlabeltop {
   font-weight: bold;

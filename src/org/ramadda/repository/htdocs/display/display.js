@@ -453,12 +453,23 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                     var left = menu +" " + entry.getLink(entry.getIconImage() +" " + entry.getName());
                     if(props.headerRight) html += HtmlUtil.leftRight(left,props.headerRight);
                     else html += left;
-                    html += "<hr>";
+                    //                    html += "<hr>";
                 }
+                var divid = "entry_" + (uniqueCnt++);
+                html += HtmlUtil.div(["id", divid],"");
+
+                if(false) {
+                    var url = this.getRamadda().getRoot() +"/entry/show?entryid=" + entry.getId() +"&decorate=false&output=metadataxml&details=true";
+
+                console.log(url);
+                
+                $( "#" + divid).load( url, function() {
+                        alert( "Load was performed." );
+                    });
+                }
+
                 html += entry.getDescription();
                 html += HtmlUtil.formTable();
-
-
                 var columns = entry.getColumns();
 
                 if(entry.getFilesize()>0) {
@@ -506,7 +517,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 }
                 return getGlobalRamadda();
         },
-        getEntry: function(entryId) {
+       getEntry: function(entryId, callback) {
                 var ramadda = this.getRamadda();
                 var toks = entryId.split(",");
                 if(toks.length==2) {
@@ -522,7 +533,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 }
                 if(entry == null) {
                     console.log("Display.getEntry: entry not found id=" + entryId +" repository=" + ramadda.getRoot());
-                    entry = this.getRamadda().getEntry(entryId);
+                    entry = this.getRamadda().getEntry(entryId, callback);
                 }
                 return entry;
             },
@@ -543,7 +554,9 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 }
                 var props = {
                     showMenu: true,
-                    sourceEntry: entry
+                    sourceEntry: entry,
+                    showTitle: true,
+                    title: entry.getName(),
                 };
 
                 //TODO: figure out when to create data, check for grids, etc
@@ -662,7 +675,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 var moveUp = HtmlUtil.onClick(get +".moveDisplayUp();", "Up");
                 var moveDown = HtmlUtil.onClick(get +".moveDisplayDown();", "Down");
 
-                var menu =  "<table>" +
+                var menu =  "<table class=formtable>" +
                     "<tr xstyle=\"border:1px #000 solid;\"><td align=right><b>Move:</b></td><td>" + moveUp + " " +moveDown+  " " +moveRight+ " " + moveLeft +"</td></tr>"  +
                     "<tr><td align=right><b>Name:</b></td><td> " + HtmlUtil.input("", this.getProperty("name",""), ["size","7",ATTR_ID,  this.getDomId("name")]) + "</td></tr>" +
                     "<tr><td align=right><b>Source:</b></td><td>"  + 
@@ -1297,16 +1310,18 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
                     }
                 }
 
+                var weightIdx = 0;
+                var weights = null;
+                if(typeof  this.weights  != "undefined") {
+                    weights = this.weights.split(",");
+                }
+
                 if(this.layout == LAYOUT_TABLE) {
                     if(displaysToLayout.length == 1) {
                         html+=  HtmlUtil.div(["class"," display-wrapper"], 
                                              displaysToLayout[0].getHtml());
                     } else {
                         var weight = 12 / this.columns;
-                        var weights = null;
-                        if(typeof  this.weights  != "undefined") {
-                            weights = this.weights.split(",");
-                        }
                         var  i =0;
                         for(;i<displaysToLayout.length;i++) {
                             colCnt++;
@@ -1318,8 +1333,12 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
                                 colCnt=0;
                             }
                             var weightToUse = weight;
-                            if(weights!=null && i<weights.length) {
-                                weightToUse = weights[i];
+                            if(weights!=null) {
+                                if(weightIdx >=weights.length) {
+                                    weightIdx = 0;
+                                }
+                                weightToUse = weights[weightIdx];
+                                weightIdx ++;
                             }
                             html+= HtmlUtil.div(["class","col-md-" + weightToUse +" display-wrapper"],  displaysToLayout[i].getHtml());
                         }
@@ -1353,14 +1372,12 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
                     }
                 } else if(this.layout==LAYOUT_COLUMNS) {
                     var cols = [];
-                    var weights = [];
                     for(var i=0;i<displaysToLayout.length;i++) {
                         var display =displaysToLayout[i];
                         var column = display.getColumn();
                         if((""+column).length==0) column = 0;
                         while(cols.length<=column) {
                             cols.push([]);
-                            weights.push(0);
                         }
                         cols[column].push(display.getHtml());
                     }
@@ -1373,7 +1390,15 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
                         for(var j=0;j<rows.length;j++) {
                             contents+= rows[j];
                         }
-                        html+=HtmlUtil.div(["class","col-md-" + weight], contents);
+                        var weightToUse = weight;
+                        if(weights!=null) {
+                            if(weightIdx >=weights.length) {
+                                weightIdx = 0;
+                            }
+                            weightToUse = weights[weightIdx];
+                            weightIdx ++;
+                        }
+                        html+=HtmlUtil.div(["class","col-md-" + weightToUse], contents);
                     }
                     html+= HtmlUtil.closeTag(TAG_TD);
                 } else {

@@ -144,20 +144,29 @@ function DisplayManager(argId,argProperties) {
                     console.log("handleEventRecordSelection: bad index= " + index);
                     return;
                  }
+                var decimals = 4;
                 var record = records[index];
-                var values = "<table>";
+                var values = "<table class=formtable>";
                 if(record.hasLocation()) {
                     var latitude = record.getLatitude();
                     var longitude = record.getLongitude();
-                    values+= "<tr><td align=right><b>Latitude:</b></td><td>" + latitude + "</td></tr>";
-                    values+= "<tr><td align=right><b>Longitude:</b></td><td>" + longitude + "</td></tr>";
+
+                    values+= "<tr><td align=right><b>Latitude:</b></td><td>" +  number_format(latitude, decimals, '.', '') + "</td></tr>";
+                    values+= "<tr><td align=right><b>Longitude:</b></td><td>" + number_format(longitude, decimals, '.', '') + "</td></tr>";
                 }
                 if(record.hasElevation()) {
-                    values+= "<tr><td  align=right><b>Elevation:</b></td><td>" + record.getElevation() + "</td></tr>";
+                    
+                    values+= "<tr><td  align=right><b>Elevation:</b></td><td>" + number_format(record.getElevation(), decimals, '.', '') + "</td></tr>";
                 }
                 for(var i=0;i<record.getData().length;i++) {
                     var label = fields[i].getLabel();
-                    values+= "<tr><td align=right><b>" + label +":</b></td><td>" + record.getValue(i) + "</td></tr>";
+                    var value = record.getValue(i);
+                    if(typeof value  == "number") {
+                        if((value+"").indexOf('.')>=0) {
+                            value  = number_format(value, decimals,'.','');
+                        }
+                    }
+                    values+= "<tr><td align=right><b>" + label +":</b></td><td>" + value + "</td></tr>";
                 }
                 values += "</table>";
                 this.notifyEvent("handleEventRecordSelection", source, {index:index, record:record, html:values});

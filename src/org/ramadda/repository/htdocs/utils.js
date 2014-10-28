@@ -92,6 +92,16 @@ var GuiUtils = {
             req.send("");
         }
     },
+    loadHtml: function (url, callback) {
+        var jqxhr = $.get(url, function(data) {
+                alert( "success" );
+                console.log(data);
+            })
+        .done(function() {})
+        .fail(function() {
+                console.log("Failed to load url: "+ url);
+            });
+    },
     loadUrl: function (url, callback,arg) {
         var req = false;
         if(window.XMLHttpRequest) {

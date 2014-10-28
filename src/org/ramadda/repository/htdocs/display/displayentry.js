@@ -1230,19 +1230,29 @@ function RamaddaEntrydisplayDisplay(displayManager, id, properties) {
     var SUPER;
     $.extend(this, {sourceEntry: properties.sourceEntry});
     RamaddaUtil.inherit(this, SUPER = new RamaddaDisplay(displayManager, id, DISPLAY_ENTRYDISPLAY, properties));
+    if(properties.sourceEntry == null && properties.entryId!=null) {
+        var _this = this;
+        var callback  = function(entries) {
+            var entry = entries[0];
+            _this.sourceEntry = entry;
+            _this.initDisplay();
+        }
+        properties.sourceEntry = this.getEntry(properties.entryId, callback);
+    }
+
+
     addRamaddaDisplay(this);
     $.extend(this, {
             selectedEntry: null,
             initDisplay: function() {
                 this.initUI();
-                console.log("entry: " + this.sourceEntry);
-
                 if(this.sourceEntry!=null) {
                     this.addEntryHtml(this.sourceEntry);
+                    this.setTitle(this.sourceEntry.getName());
                 } else {
                     this.addEntryHtml(this.selectedEntry);
+                    this.setTitle("Entry Display");
                 }
-                this.setTitle("Entry Display");
             },
             handleEventEntrySelection: function(source, args) {
                 //Ignore select events
@@ -1263,10 +1273,10 @@ function RamaddaEntrydisplayDisplay(displayManager, id, properties) {
             },
             addEntryHtml: function(entry) {
                 if(entry==null) {
-                    this.setContents("NULL" + "&nbsp;");
+                    this.setContents("&nbsp;");
                     return;
                 }
-                this.setContents("ENTRY " + this.getEntryHtml(entry));
+                this.setContents(this.getEntryHtml(entry));
             },
         });
 }

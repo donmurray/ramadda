@@ -129,7 +129,7 @@ function Ramadda(repositoryRoot) {
             },
             getMetadataCount: function(type, callback) {
                 var url  = this.repositoryRoot +"/metadata/list?metadata.type=" + type.getType() +"&response=json";
-                console.log("getMetadata:" + type.getType() + " URL:" + url);
+                //                console.log("getMetadata:" + type.getType() + " URL:" + url);
                 var jqxhr = $.getJSON(url, function(data) {
                         if(GuiUtils.isJsonError(data)) {
                             return;
@@ -216,8 +216,7 @@ function Ramadda(repositoryRoot) {
                             return;
                         }
                         var entryList =  createEntriesFromJson(data, ramadda);
-                        console.log("got entry:" + entryList);
-                        callback.call(data);
+                        callback.call(null, entryList);
                     })
                     .fail(function(jqxhr, textStatus, error) {
                             var err = textStatus + ", " + error;
@@ -348,6 +347,7 @@ function Entry(props) {
 
                 var myCallback = {
                     entryListChanged: function(list) {
+
                         callback(list.getEntries());
                     }
                 };
