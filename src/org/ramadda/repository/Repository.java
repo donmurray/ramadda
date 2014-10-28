@@ -3361,7 +3361,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
                                 msg("Error"),
                                 new StringBuilder(
                                     getPageHandler().showDialogError(
-                                        msgLabel("Unknown request") + "\""
+                                                                     "Unknown request" + "\""
                                         + path + "\"")));
             result.setResponseCode(Result.RESPONSE_NOTFOUND);
 
@@ -3493,7 +3493,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
                             msg("Error"),
                             new StringBuilder(
                                 getPageHandler().showDialogError(
-                                    msgLabel("Unknown request") + path)));
+                                                                 "Unknown request " + path)));
         result.setResponseCode(Result.RESPONSE_NOTFOUND);
 
         return result;
