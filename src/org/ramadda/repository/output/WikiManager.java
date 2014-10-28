@@ -1064,43 +1064,48 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                    || theTag.equals(WIKI_TAG_CHART)) {
 
             String jsonUrl = null;
-            if (entry.getTypeHandler() instanceof PointTypeHandler) {
-                PointTypeHandler pth =
-                    (PointTypeHandler) entry.getTypeHandler();
-                PointOutputHandler poh =
-                    (PointOutputHandler) pth.getRecordOutputHandler();
+            if (theTag.equals(WIKI_TAG_CHART)) {
+                if (entry.getTypeHandler() instanceof PointTypeHandler) {
+                    PointTypeHandler pth =
+                        (PointTypeHandler) entry.getTypeHandler();
+                    PointOutputHandler poh =
+                        (PointOutputHandler) pth.getRecordOutputHandler();
 
-                jsonUrl = poh.getJsonUrl(request, entry);
-            } else {
-                StringBuilder jsonbuf = new StringBuilder();
-                jsonbuf.append(getRepository().getUrlBase() + "/grid/json?"
-                               + HtmlUtils.args(new String[] {
-                    ARG_ENTRYID, entry.getId(), ARG_LOCATION_LATITUDE,
-                    "${latitude}", ARG_LOCATION_LONGITUDE, "${longitude}"
-                }, false));
-                // add in the list of selected variables as well
-                String    VAR_PREFIX = Constants.ARG_VARIABLE + ".";
-                Hashtable args       = request.getArgs();
-                for (Enumeration keys =
-                        args.keys(); keys.hasMoreElements(); ) {
-                    String arg = (String) keys.nextElement();
-                    if (arg.startsWith(VAR_PREFIX)
-                            && request.get(arg, false)) {
-                        jsonbuf.append("&");
-                        jsonbuf.append(VAR_PREFIX);
-                        jsonbuf.append(arg.substring(VAR_PREFIX.length()));
-                        jsonbuf.append("=true");
+                    jsonUrl = poh.getJsonUrl(request, entry);
+                } else {
+                    StringBuilder jsonbuf = new StringBuilder();
+                    jsonbuf.append(getRepository().getUrlBase()
+                                   + "/grid/json?"
+                                   + HtmlUtils.args(new String[] {
+                        ARG_ENTRYID, entry.getId(), ARG_LOCATION_LATITUDE,
+                        "${latitude}", ARG_LOCATION_LONGITUDE, "${longitude}"
+                    }, false));
+                    // add in the list of selected variables as well
+                    String    VAR_PREFIX = Constants.ARG_VARIABLE + ".";
+                    Hashtable args       = request.getArgs();
+                    for (Enumeration keys = args.keys();
+                            keys.hasMoreElements(); ) {
+                        String arg = (String) keys.nextElement();
+                        if (arg.startsWith(VAR_PREFIX)
+                                && request.get(arg, false)) {
+                            jsonbuf.append("&");
+                            jsonbuf.append(VAR_PREFIX);
+                            jsonbuf.append(
+                                arg.substring(VAR_PREFIX.length()));
+                            jsonbuf.append("=true");
+                        }
                     }
+                    jsonUrl = jsonbuf.toString();
                 }
-                jsonUrl = jsonbuf.toString();
             }
-            getEntryDisplay(request, entry, entry.getName(), jsonUrl, sb,
-                            props);
+            getEntryDisplay(request, entry, theTag, entry.getName(), jsonUrl,
+                            sb, props);
 
             return sb.toString();
         } else if (theTag.equals(WIKI_TAG_GROUP)
                    || theTag.equals(WIKI_TAG_GROUP_OLD)) {
-            getEntryDisplay(request, entry, entry.getName(), null, sb, props);
+            getEntryDisplay(request, entry, theTag, entry.getName(), null,
+                            sb, props);
 
             return sb.toString();
         } else if (theTag.equals(WIKI_TAG_GRAPH)) {
@@ -1440,13 +1445,14 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                    || theTag.equals(WIKI_TAG_BOOTSTRAP)
                    || theTag.equals(WIKI_TAG_GRID)) {
             List<Entry> children = getEntries(request, originalEntry, entry,
-                                              props);
-            boolean      doingSlideshow = theTag.equals(WIKI_TAG_SLIDESHOW);
-            boolean      doingGrid = theTag.equals(WIKI_TAG_GRID) || theTag.equals(WIKI_TAG_BOOTSTRAP);
-            List<String> titles         = new ArrayList<String>();
-            List<String> urls           = new ArrayList<String>();
-            List<String> contents       = new ArrayList<String>();
-            String       dfltTag        = WIKI_TAG_SIMPLE;
+                                       props);
+            boolean doingSlideshow = theTag.equals(WIKI_TAG_SLIDESHOW);
+            boolean doingGrid = theTag.equals(WIKI_TAG_GRID)
+                                || theTag.equals(WIKI_TAG_BOOTSTRAP);
+            List<String> titles   = new ArrayList<String>();
+            List<String> urls     = new ArrayList<String>();
+            List<String> contents = new ArrayList<String>();
+            String       dfltTag  = WIKI_TAG_SIMPLE;
 
             if (props.get(ATTR_USEDESCRIPTION) != null) {
                 boolean useDescription = Misc.getProperty(props,
@@ -1645,11 +1651,14 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                     sb.append(HtmlUtils.tag("h2", "",
                                             HtmlUtils.href(urls.get(i),
                                                 titles.get(i))));
-                                        
-                    String snippet = StringUtil.findPattern(child.getDescription(),"(?s)<snippet>(.*)</snippet>");
-                    if(snippet!=null) {
-                        snippet  = HtmlUtils.div(snippet, HtmlUtils.cssClass("ramadda-snippet"));
-                    }  else {
+
+                    String snippet =
+                        StringUtil.findPattern(child.getDescription(),
+                            "(?s)<snippet>(.*)</snippet>");
+                    if (snippet != null) {
+                        snippet = HtmlUtils.div(snippet,
+                                HtmlUtils.cssClass("ramadda-snippet"));
+                    } else {
                         snippet = "";
                     }
 
@@ -1851,6 +1860,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
         } else if (theTag.equals(WIKI_TAG_PLAYER)
                    || theTag.equals(WIKI_TAG_PLAYER_OLD)) {
+            boolean useAttachment = Misc.getProperty(props, "useAttachment",
+                                        false);
 
             List<Entry> children = getEntries(request, originalEntry, entry,
                                        props, true);
@@ -1861,6 +1872,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 (ImageOutputHandler) getRepository().getOutputHandler(
                     ImageOutputHandler.OUTPUT_PLAYER);
             Request imageRequest = request.cloneMe();
+
             int     width        = Misc.getProperty(props, ATTR_WIDTH, 0);
             if (width > 0) {
                 imageRequest.put(ARG_WIDTH, "" + width);
@@ -1869,6 +1881,11 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             if (loopStart) {
                 imageRequest.put("loopstart", "true");
             }
+
+            if (useAttachment) {
+                imageRequest.put("useAttachment", "true");
+            }
+
             int delay = Misc.getProperty(props, "loopdelay", 0);
             if (delay > 0) {
                 imageRequest.put("loopdelay", "" + delay);
@@ -2191,12 +2208,19 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
     /**
      * Get the entries that are images
      *
+     *
+     * @param request _more_
      * @param entries  the list of entries
+     * @param useAttachment _more_
      *
      * @return  the list of entries that are images
+     *
+     * @throws Exception _more_
      */
-    public List<Entry> getImageEntries(List<Entry> entries) {
-        return getImageEntriesOrNot(entries, false);
+    public List<Entry> getImageEntries(Request request, List<Entry> entries,
+                                       boolean useAttachment)
+            throws Exception {
+        return getImageEntriesOrNot(request, entries, false, useAttachment);
     }
 
     /**
@@ -2224,16 +2248,29 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entries _more_
      * @param orNot _more_
+     * @param useAttachment _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public List<Entry> getImageEntriesOrNot(List<Entry> entries,
-                                            boolean orNot) {
+    public List<Entry> getImageEntriesOrNot(Request request,
+                                            List<Entry> entries,
+                                            boolean orNot,
+                                            boolean useAttachment)
+            throws Exception {
         List<Entry> imageEntries = new ArrayList<Entry>();
         for (Entry entry : entries) {
-            orNot(imageEntries, entry, entry.getResource().isImage(), orNot);
+            boolean isImage = entry.getResource().isImage();
+            if ( !isImage && useAttachment) {
+                isImage = getMetadataManager().getImageUrls(request,
+                        entry).size() > 0;
+            }
+            orNot(imageEntries, entry, isImage, orNot);
         }
 
         return imageEntries;
@@ -2339,6 +2376,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                   String attrPrefix)
             throws Exception {
 
+        boolean useAttachment = Misc.getProperty(props, "useAttachment",
+                                    false);
 
         if (props == null) {
             props = new Hashtable();
@@ -2378,7 +2417,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 filter = filter.substring(1);
             }
             if (filter.equals(FILTER_IMAGE)) {
-                entries = getImageEntriesOrNot(entries, doNot);
+                entries = getImageEntriesOrNot(request, entries, doNot,
+                        useAttachment);
             } else if (filter.equals(FILTER_FILE)) {
                 List<Entry> tmp = new ArrayList<Entry>();
                 for (Entry child : entries) {
@@ -2428,7 +2468,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
         if (onlyImages
                 || Misc.getProperty(props, attrPrefix + ATTR_IMAGES, false)) {
-            entries = getImageEntries(entries);
+            entries = getImageEntries(request, entries, useAttachment);
         }
 
 
@@ -3938,6 +3978,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
      *
      * @param request _more_
      * @param entry _more_
+     * @param tag _more_
      * @param name _more_
      * @param url _more_
      * @param sb _more_
@@ -3945,8 +3986,9 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
      *
      * @throws Exception _more_
      */
-    public void getEntryDisplay(Request request, Entry entry, String name,
-                                String url, StringBuilder sb, Hashtable props)
+    public void getEntryDisplay(Request request, Entry entry, String tag,
+                                String name, String url, StringBuilder sb,
+                                Hashtable props)
             throws Exception {
 
         this.addDisplayImports(request, sb);
@@ -3991,7 +4033,9 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         if (props.get(ATTR_SHOWTITLE) != null) {
             propList.add(ATTR_SHOWTITLE);
             propList.add(Misc.getProperty(props, ATTR_SHOWTITLE, "true"));
-            showTitle = Misc.equals("true", Misc.getProperty(props, ATTR_SHOWTITLE, "true"));
+            showTitle = Misc.equals("true",
+                                    Misc.getProperty(props, ATTR_SHOWTITLE,
+                                        "true"));
             topProps.add(ATTR_SHOWTITLE);
             topProps.add(Misc.getProperty(props, ATTR_SHOWTITLE, "true"));
             props.remove(ATTR_SHOWTITLE);
@@ -4005,7 +4049,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         } else {
             propList.add(ATTR_TITLE);
             propList.add(Json.quote(entry.getName()));
-        }            
+        }
         topProps.add("layoutType");
         topProps.add(Json.quote(Misc.getProperty(props, "layoutType",
                 "table")));
@@ -4028,10 +4072,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             mainDivId = HtmlUtils.getUniqueId("displaydiv");
         }
 
-
-
         //If no json url then just add the displaymanager
-        if (url == null) {
+        if (tag.equals(WIKI_TAG_GROUP)) {
             for (Enumeration keys = props.keys(); keys.hasMoreElements(); ) {
                 Object key   = keys.nextElement();
                 Object value = props.get(key);
@@ -4039,6 +4081,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 topProps.add(Json.quote(value.toString()));
             }
             sb.append(HtmlUtils.div("", HtmlUtils.id(mainDivId)));
+            sb.append("\n");
             js.append("var displayManager = getOrCreateDisplayManager("
                       + HtmlUtils.quote(mainDivId) + ","
                       + Json.map(topProps, false) + ",true);\n");
@@ -4051,7 +4094,6 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         boolean needToCreateGroup = request.getExtraProperty("added group")
                                     == null;
         request.putExtraProperty("added group", "true");
-
 
         String fields = Misc.getProperty(props, "fields", (String) null);
         if (fields != null) {
@@ -4079,6 +4121,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
         //Put the main div after the display div
         sb.append(HtmlUtils.div("", HtmlUtils.id(mainDivId)));
+        sb.append("\n");
 
         for (String arg : new String[] {
             "eventSource", "name", "displayFilter", "chartMin", ARG_WIDTH,
@@ -4113,7 +4156,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
 
         js.append(
-            "//This gets the global display manager or creates it if not created\n");
+            "\n//This gets the global display manager or creates it if not created\n");
         js.append("var displayManager = getOrCreateDisplayManager("
                   + HtmlUtils.quote(mainDivId) + ","
                   + Json.map(topProps, false) + ");\n");
@@ -4121,14 +4164,20 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         js.append("var pointDataProps = {entryId:'" + entry.getId()
                   + "'};\n");
 
-        propList.add("data");
-        propList.add("new  PointData(" + HtmlUtils.quote(name)
-                     + ",  null,null," + HtmlUtils.quote(url)
-                     + ",pointDataProps)");
+        propList.add("entryId");
+        propList.add(HtmlUtils.quote(entry.getId()));
+
+        if (url != null) {
+            propList.add("data");
+            propList.add("new  PointData(" + HtmlUtils.quote(name)
+                         + ",  null,null," + HtmlUtils.quote(url)
+                         + ",pointDataProps)");
+        }
         js.append("displayManager.createDisplay("
                   + HtmlUtils.quote(displayType) + ","
                   + Json.map(propList, false) + ");\n");
 
+        sb.append("\n");
         sb.append(HtmlUtils.script(js.toString()));
     }
 

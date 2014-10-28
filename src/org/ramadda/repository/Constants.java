@@ -361,7 +361,7 @@ public interface Constants {
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_SERVICEID = "serviceid";
 
 
@@ -589,7 +589,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_ALLENTRIES = "allentries";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_ENTRYTYPE = "entrytype";
 
     /** _more_ */
@@ -1234,7 +1234,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_SESSIONID = "sessionid";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_ANONYMOUS = "anonymous";
 
     /** _more_ */
@@ -1490,7 +1490,7 @@ public interface Constants {
 
     /** _more_ */
     public static final String PROP_JAVA_VERSION = "java.version";
-    
+
     /** _more_ */
     public static final String PROP_ACCESS_ADMINONLY =
         "ramadda.access.adminonly";
@@ -2088,11 +2088,7 @@ public interface Constants {
         "ramadda-menuitem-separator";
 
     /** _more_ */
-    public static final String CSS_CLASS_MENUITEM_TD = "ramadda-menuitem-td";
-
-    /** _more_ */
-    public static final String CSS_CLASS_MENUITEM_ROW =
-        "ramadda-menuitem-row";
+    public static final String CSS_CLASS_MENUITEM = "ramadda-menuitem";
 
     /** _more_ */
     public static final String CSS_CLASS_HIGHLIGHT = "ramadda-highlight";

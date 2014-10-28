@@ -28,6 +28,7 @@ import org.ramadda.repository.type.*;
 import org.ramadda.sql.SqlUtil;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Json;
+import org.ramadda.util.Utils;
 
 
 import org.w3c.dom.*;
@@ -675,9 +676,11 @@ public class ImageOutputHandler extends OutputHandler {
         }
 
         if (output.equals(OUTPUT_GALLERY)) {
+            boolean useAttachment = request.get("useAttachment", false);
             getWikiManager().makeGallery(
-                request, getWikiManager().getImageEntries(entries),
-                new Hashtable(), sb);
+                request,
+                getWikiManager().getImageEntries(
+                    request, entries, useAttachment), new Hashtable(), sb);
 
             return new Result(group.getName(), sb, getMimeType(output));
 
@@ -758,10 +761,11 @@ public class ImageOutputHandler extends OutputHandler {
                            boolean addHeader, boolean checkSort)
             throws Exception {
 
-        String        playerPrefix = "imageplayer_" + HtmlUtils.blockCnt++;
-        String        playerVar    = playerPrefix + "Var";
+        boolean       useAttachment = request.get("useAttachment", false);
+        String        playerPrefix  = "imageplayer_" + HtmlUtils.blockCnt++;
+        String        playerVar     = playerPrefix + "Var";
 
-        StringBuilder sb           = new StringBuilder();
+        StringBuilder sb            = new StringBuilder();
         if (entries.size() == 0) {
             finalSB.append("<b>Nothing Found</b><p>");
 
@@ -779,6 +783,17 @@ public class ImageOutputHandler extends OutputHandler {
         for (int i = entries.size() - 1; i >= 0; i--) {
             Entry  entry = entries.get(i);
             String url   = getImageUrl(request, entry);
+            if (url == null) {
+                if (useAttachment) {
+                    List<String> imageUrls =
+                        getMetadataManager().getImageUrls(request, entry);
+                    if (imageUrls.size() > 0) {
+                        url = imageUrls.get(0);
+                    }
+                }
+            }
+
+
             if (url == null) {
                 continue;
             }
@@ -821,6 +836,9 @@ public class ImageOutputHandler extends OutputHandler {
                 playerArgs.add("true");
             }
         }
+
+
+
 
         if (request.get("loopdelay", 0) > 0) {
             playerArgs.add("delay");

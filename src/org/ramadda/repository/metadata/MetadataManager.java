@@ -35,6 +35,7 @@ import org.ramadda.sql.SqlUtil;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.JQuery;
 import org.ramadda.util.Json;
+import org.ramadda.util.Utils;
 
 
 
@@ -349,13 +350,15 @@ public class MetadataManager extends RepositoryManager {
         }
     }
 
+
+
     /**
      * _more_
      *
      * @param request _more_
      * @param entry _more_
      *
-     * @return _more_
+     * @return list of name/url pairs
      *
      * @throws Exception _more_
      */
@@ -369,6 +372,32 @@ public class MetadataManager extends RepositoryManager {
 
         return nameUrlPairs;
     }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public List<String> getImageUrls(Request request, Entry entry)
+            throws Exception {
+        List<String> urls = new ArrayList<String>();
+        List<String[]> metadataUrls =
+            getMetadataManager().getFilelUrls(request, entry);
+        for (String[] pair : metadataUrls) {
+            //[0] is the filename,[1] is the url
+            if (Utils.isImage(pair[0])) {
+                urls.add(pair[1]);
+            }
+        }
+
+        return urls;
+    }
+
 
 
     /**
