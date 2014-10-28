@@ -847,14 +847,13 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 var html = "";
                 var width = this.getWidth();
                 if(dobs) {
-                    html += "<div class=minitron>";
+                    html += HtmlUtil.openDiv(["class","minitron"]);
                 }
                 if(width>0) {
-                    html += "<div class=display-contents style=\"width:" + width +"\; >";
+                    html += HtmlUtil.openDiv(["class","display-contents","style","width:" + width +";"]);
                 } else {
-                    html += "<div class=display-contents>";
+                    html += HtmlUtil.openDiv(["class","display-contents"]);
                 }
-
 
                 html+= HtmlUtil.div([ATTR_CLASS,"ramadda-popup", ATTR_ID, this.getDomId(ID_MENU_OUTER)], "");
                 var menu = HtmlUtil.div([ATTR_CLASS, "display-dialog", ATTR_ID, this.getDomId(ID_DIALOG)], "");
@@ -1315,6 +1314,8 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
                     weights = this.weights.split(",");
                 }
 
+                console.log("LAYOUT:" + this.layout);
+
                 if(this.layout == LAYOUT_TABLE) {
                     if(displaysToLayout.length == 1) {
                         html+=  HtmlUtil.div(["class"," display-wrapper"], 
@@ -1345,6 +1346,7 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
                             html+= HtmlUtil.closeTag(TAG_DIV);
                         }
                     }
+                    //                    console.log("HTML " + html);
                 } else if(this.layout==LAYOUT_TABS) {
                     //TODO
                 } else if(this.layout==LAYOUT_ROWS) {
@@ -1374,11 +1376,13 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
                     for(var i=0;i<displaysToLayout.length;i++) {
                         var display =displaysToLayout[i];
                         var column = display.getColumn();
+                        //                        console.log("COL:" + column);
                         if((""+column).length==0) column = 0;
                         while(cols.length<=column) {
                             cols.push([]);
                         }
                         cols[column].push(display.getHtml());
+                        //                        cols[column].push("HTML");
                     }
                     html+=HtmlUtil.openTag(TAG_DIV, ["class","row"]);
                     var width = Math.round(100/cols.length)+"%";
@@ -1399,7 +1403,9 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
                         }
                         html+=HtmlUtil.div(["class","col-md-" + weightToUse], contents);
                     }
-                    html+= HtmlUtil.closeTag(TAG_TD);
+                    html+= HtmlUtil.closeTag(TAG_DIV);
+                    //                    console.log("HTML:" + html);
+
                 } else {
                     html+="Unknown layout:" + this.layout;
                 }
@@ -1440,7 +1446,7 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
 
         });
 
-
+    console.log("group:" + this.columns);
 }
 
 

@@ -385,6 +385,9 @@ var HtmlUtil =  {
         var html = "<" + tagName +" " + this.attrs(attrs) +">";
         return html;
     },
+    openDiv : function(attrs) {
+        return this.openTag("div",attrs);
+    },
 
     closeTag : function(tagName) {
         return  "</" + tagName +">\n";
