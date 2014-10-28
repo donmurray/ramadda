@@ -144,7 +144,7 @@ function RamaddaD3Display(displayManager, id, properties) {
                 this.displayHeight = parseInt((d3.select("#"+this.getDomId(ID_SVG)).style("height")).split("px")[0])-margin.top-margin.bottom;//this.getProperty("height",300);//d3.select("#"+this.getDomId(ID_SVG)).style("height");//
                 this.displayWidth  = parseInt((d3.select("#"+this.getDomId(ID_SVG)).style("width")).split("px")[0])-margin.left-margin.right;//this.getProperty("width",600);//d3.select("#"+this.getDomId(ID_SVG)).style("width");//
                 	
-                console.log("WxH:" + this.displayHeight +" " + this.displayWidth);
+                //                console.log("WxH:" + this.displayHeight +" " + this.displayWidth);
 
                 // To solve the problem with the classess within the class
                 var myThis = this;

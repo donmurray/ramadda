@@ -460,12 +460,12 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
 
                 if(false) {
                     var url = this.getRamadda().getRoot() +"/entry/show?entryid=" + entry.getId() +"&decorate=false&output=metadataxml&details=true";
-
-                console.log(url);
+                    
+                    console.log(url);
                 
-                $( "#" + divid).load( url, function() {
-                        alert( "Load was performed." );
-                    });
+                    $( "#" + divid).load( url, function() {
+                            alert( "Load was performed." );
+                        });
                 }
 
                 html += entry.getDescription();
@@ -860,7 +860,6 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 var menu = HtmlUtil.div([ATTR_CLASS, "display-dialog", ATTR_ID, this.getDomId(ID_DIALOG)], "");
 
                 var title = "";
-                console.log("title:" + this.getTitle() +" " + this.getShowTitle());
                 if(this.getShowTitle()) {
                     title= this.getTitle();
                 }

@@ -1064,7 +1064,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                    || theTag.equals(WIKI_TAG_CHART)) {
 
             String jsonUrl = null;
-            if (theTag.equals(WIKI_TAG_CHART)) {
+            if (theTag.equals(WIKI_TAG_CHART) || theTag.equals(WIKI_TAG_DISPLAY)) {
                 if (entry.getTypeHandler() instanceof PointTypeHandler) {
                     PointTypeHandler pth =
                         (PointTypeHandler) entry.getTypeHandler();
@@ -4166,6 +4166,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
         propList.add("entryId");
         propList.add(HtmlUtils.quote(entry.getId()));
+
+
 
         if (url != null) {
             propList.add("data");
