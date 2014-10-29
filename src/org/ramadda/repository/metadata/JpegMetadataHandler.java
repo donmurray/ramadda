@@ -101,7 +101,7 @@ public class JpegMetadataHandler extends MetadataHandler {
 
                 return;
             }
-            Image newImage = ImageUtils.resize(image, 150, -1);
+            Image newImage = ImageUtils.resize(image, 300, -1);
             ImageUtils.waitOnImage(newImage);
             String thumbFile = IOUtil.stripExtension(entry.getName())  + "_thumb.";
             if(path.toLowerCase().endsWith("gif")) {
