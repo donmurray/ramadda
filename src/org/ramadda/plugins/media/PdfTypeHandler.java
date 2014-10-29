@@ -105,12 +105,13 @@ public class PdfTypeHandler extends GenericTypeHandler {
         List<String> headerLines = new ArrayList<String>();
         String       firstLine   = null;
         for (String line : StringUtil.split(results, "\n", true, true)) {
-            line  = clean(line);
-            if(line.length()==0 || line.startsWith("!")) {
+            line = clean(line);
+            if ((line.length() == 0) || line.startsWith("!")) {
                 continue;
-            } 
+            }
             if (firstLine == null) {
                 firstLine = line;
+
                 continue;
             }
             headerLines.add(line);
@@ -123,12 +124,18 @@ public class PdfTypeHandler extends GenericTypeHandler {
                 && ( !Utils.stringDefined(entry.getName())
                      || entry.getResource().getPath().endsWith(
                          entry.getName()))) {
+            if (firstLine.length() > Entry.MAX_NAME_LENGTH) {
+                firstLine = firstLine.substring(0, Entry.MAX_NAME_LENGTH - 1);
+            }
             entry.setName(firstLine);
         }
         if ((headerLines.size() > 0)
                 && !Utils.stringDefined(entry.getDescription())) {
-            entry.setDescription("<pre>" + StringUtil.join("\n", headerLines)
-                                 + "</pre>");
+            String desc = StringUtil.join("\n", headerLines);
+            if (desc.length() > Entry.MAX_DESCRIPTION_LENGTH) {
+                desc = desc.substring(0, Entry.MAX_DESCRIPTION_LENGTH - 1);
+            }
+            entry.setDescription("<pre>" + desc + "</pre>");
         }
 
 
@@ -137,10 +144,22 @@ public class PdfTypeHandler extends GenericTypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     private String clean(String s) {
-        if(s == null) return s;
+        if (s == null) {
+            return s;
+        }
         s = Utils.removeNonAscii(s);
         s = s.trim();
+        s = s.replaceAll("\n", " ");
+        s = s.replaceAll("(_-)+", "");
+
         return s;
     }
 
