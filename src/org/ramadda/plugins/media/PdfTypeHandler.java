@@ -105,9 +105,12 @@ public class PdfTypeHandler extends GenericTypeHandler {
         List<String> headerLines = new ArrayList<String>();
         String       firstLine   = null;
         for (String line : StringUtil.split(results, "\n", true, true)) {
+            line  = clean(line);
+            if(line.length()==0 || line.startsWith("!")) {
+                continue;
+            } 
             if (firstLine == null) {
                 firstLine = line;
-
                 continue;
             }
             headerLines.add(line);
@@ -134,6 +137,12 @@ public class PdfTypeHandler extends GenericTypeHandler {
     }
 
 
+    private String clean(String s) {
+        if(s == null) return s;
+        s = Utils.removeNonAscii(s);
+        s = s.trim();
+        return s;
+    }
 
 
 }
