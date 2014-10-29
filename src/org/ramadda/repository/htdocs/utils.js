@@ -300,14 +300,12 @@ var HtmlUtil =  {
         return this.tag("table",["border","0", "cellspacing","0","cellpadding","0"],
                         row);
     },
-
-    leftRight : function(left,right,leftWidth, rightWidth) {
-        if(leftWidth==null) leftWidth = "50%";
-        if(rightWidth==null) rightWidth = "50%";
-        return this.tag("table",["border","0", "width","100%","cellspacing","0","cellpadding","0"],
-                        this.tr(["valign","top"],
-                                this.td(["align","left","width",leftWidth],left) +
-                                this.td(["align","right","width", rightWidth],right)));
+    leftRight : function(left,right,leftWeight, rightWeight) {
+        if(leftWeight==null) leftWeight = "6";
+        if(rightWeight==null) rightWeight = "6";
+        return this.div(["class","row"],
+                        this.div(["class", "col-md-" + leftWeight], left) +
+                        this.div(["class", "col-md-" + rightWeight,"style","align:right;"], right));
     },
     leftCenterRight : function(left,center, right,leftWidth, centerWidth, rightWidth) {
         if(leftWidth==null) leftWidth = "33%";

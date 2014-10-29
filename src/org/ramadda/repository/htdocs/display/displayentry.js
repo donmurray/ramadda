@@ -933,7 +933,10 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
                     var details = HtmlUtil.div([ATTR_ID,this.getDomId(ID_DETAILS+entry.getId()), ATTR_CLASS,"display-entrylist-details"],HtmlUtil.div([ATTR_CLASS,"display-entrylist-details-inner",ATTR_ID,this.getDomId(ID_DETAILS_INNER+entry.getId())],""));
 
-                    var mainLine = HtmlUtil.div([ATTR_ID, this.getDomId(ID_DETAILS_MAIN+ entry.getId()), ATTR_CLASS,"display-entrylist-entry-main", "entryid",entry.getId()], HtmlUtil.leftRight(left,toolbar,"60%","30%"));
+                    var line = HtmlUtil.leftRight(left,toolbar,"10","2");
+                    //                    line = HtmlUtil.leftRight(left,toolbar,"60%","30%");
+
+                    var mainLine = HtmlUtil.div([ATTR_ID, this.getDomId(ID_DETAILS_MAIN+ entry.getId()), ATTR_CLASS,"display-entrylist-entry-main", "entryid",entry.getId()], line);
                     var line = HtmlUtil.div([ATTR_ID, this.getDomId("entryinner_" + entry.getId())], mainLine + details);
                     html  += HtmlUtil.tag(TAG_LI,[ATTR_ID,
                                                 this.getDomId("entry_" + entry.getId()),
