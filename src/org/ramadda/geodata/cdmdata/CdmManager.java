@@ -987,12 +987,11 @@ public class CdmManager extends RepositoryManager {
             patterns    = tmpPatterns;
             notPatterns = tmpNotPatterns;
             suffixSet   = tmpSuffixSet;
-
+            //            System.err.println ("not:"  + notPatterns);
+            //            System.err.println ("suffix:"  + suffixSet);
         }
 
         url = url.toLowerCase();
-
-
 
         //First check the patterns
         List<Pattern> patternList = (forNot
