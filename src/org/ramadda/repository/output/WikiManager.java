@@ -1241,7 +1241,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             if (cnt == 0) {
                 return "";
             }
-            String title = Misc.getProperty(props, ATTR_TITLE, "Links");
+            String title = Misc.getProperty(props, ATTR_TITLE, "Services");
             sb.append(HtmlUtils.div(title, HtmlUtils.cssClass("wiki-h4")));
             sb.append(HtmlUtils.div(links.toString(),
                                     HtmlUtils.cssClass("entry-tools-box")));

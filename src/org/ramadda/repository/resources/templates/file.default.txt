@@ -10,7 +10,7 @@ ${innercontent}
 <td width=25%>
 <div class="entry-page-info">
 
-{{tools includeicon="true" title="Links" message=""}}
+{{tools includeicon="true" title="Services" message=""}}
 
 
 {{map width="250" height="250"  box.maxheight="300" message="" prefix="====Location===="}}
