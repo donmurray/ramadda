@@ -672,10 +672,10 @@ public class HarvesterManager extends RepositoryManager {
             String rowAttributes = HtmlUtils.attr(HtmlUtils.ATTR_VALIGN,
                                        HtmlUtils.VALUE_TOP);
 
-            if (harvester.getActive()) {
-                rowAttributes +=
-                    HtmlUtils.cssClass(CSS_CLASS_HARVESTER_ACTIVE);
-            }
+           
+            rowAttributes +=
+                HtmlUtils.cssClass( harvester.getActive()?"harvester-row harvester-active":"harvester-row");
+            
 
             StringBuffer info  = new StringBuffer();
             StringBuffer error = harvester.getError();

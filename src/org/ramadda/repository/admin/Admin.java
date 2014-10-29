@@ -1329,6 +1329,7 @@ public class Admin extends RepositoryManager {
             }
             outputSB.append(HtmlUtils.checkbox("outputtype." + type.getId(),
                     "true", ok));
+            outputSB.append(HtmlUtils.space(1));
             outputSB.append(type.getLabel());
             outputSB.append(HtmlUtils.space(3));
         }

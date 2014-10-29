@@ -378,14 +378,14 @@ public class PluginManager extends RepositoryManager {
             zin.close();
         } else if (pluginFile.toLowerCase().endsWith(".jar")) {
             pluginSB.append(
-                "<tr><td><b>Plugin file</b></td><td colspan=2><i>"
+                "<tr class=\"ramadda-plugin-row\"><td><b>Plugin file</b></td><td colspan=2><i>"
                 + pluginFile + "</i> "
                 + new Date(tmpPluginFile.lastModified()) + " Length:"
                 + tmpPluginFile.length() + "</td></tr>");
             classLoader.addJar(pluginFile);
         } else {
             pluginSB.append(
-                "<tr><td><b>Plugin file</b></td><td colspan=2><i>"
+                "<tr class=\"ramadda-plugin-row\"><td><b>Plugin file</b></td><td colspan=2><i>"
                 + pluginFile + "</i>   "
                 + new Date(tmpPluginFile.lastModified()) + " Length:"
                 + tmpPluginFile.length() + "</td></tr>");
@@ -532,9 +532,7 @@ public class PluginManager extends RepositoryManager {
         formBuffer.append(HtmlUtils.formClose());
         formBuffer.append(HtmlUtils.br());
         formBuffer.append(msg("Installed Plugins"));
-        formBuffer.append("<table>");
-        formBuffer.append(pluginSB);
-        formBuffer.append("</table>");
+        formBuffer.append(HtmlUtils.table(pluginSB.toString()));
         sb.append(formBuffer);
     }
 

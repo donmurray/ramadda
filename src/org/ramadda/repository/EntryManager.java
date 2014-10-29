@@ -3035,7 +3035,7 @@ public class EntryManager extends RepositoryManager {
             inner.append(
                 HtmlUtils.div(
                     breadcrumbs,
-                    HtmlUtils.cssClass("ramadda-confirm-entries")));
+                    HtmlUtils.cssClass("ramadda-confirm")));
             inner.append(
                 HtmlUtils.b(
                     msg(
@@ -3046,7 +3046,7 @@ public class EntryManager extends RepositoryManager {
             inner.append(
                 HtmlUtils.div(
                     breadcrumbs,
-                    HtmlUtils.cssClass("ramadda-confirm-entries")));
+                    HtmlUtils.cssClass("ramadda-confirm")));
         }
 
 
@@ -3172,7 +3172,7 @@ public class EntryManager extends RepositoryManager {
         msgSB.append(
             HtmlUtils.div(
                 entryListSB.toString(),
-                HtmlUtils.cssClass("ramadda-confirm-entries")));
+                HtmlUtils.cssClass("ramadda-confirm")));
 
         if (anyFolders) {
             msgSB.append(

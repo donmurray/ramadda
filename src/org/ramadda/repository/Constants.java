@@ -2032,9 +2032,6 @@ public interface Constants {
     public static final String BREADCRUMB_SEPARATOR = "&raquo;";
 
 
-    /** _more_ */
-    public static final String CSS_CLASS_HARVESTER_ACTIVE =
-        "ramadda-harvester-active";
 
     /** _more_ */
     public static final String CSS_CLASS_ENTRY_TREE_ROW = "entry-tree-row";

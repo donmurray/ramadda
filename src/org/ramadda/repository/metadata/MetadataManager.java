@@ -1390,7 +1390,7 @@ public class MetadataManager extends RepositoryManager {
                 metadataEntry.append(HtmlUtils.formTableClose());
                 sb.append(
                     HtmlUtils.makeShowHideBlock(
-                        cbx + html[0],
+                                                cbx + HtmlUtils.space(1) +html[0],
                         HtmlUtils.div(
                             metadataEntry.toString(),
                             HtmlUtils.cssClass("metadatagroup")), false));

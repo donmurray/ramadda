@@ -774,7 +774,7 @@ public class AccessManager extends RepositoryManager {
                 cols.append(HtmlUtils.cols(StringUtil.join("<br>", roles)));
             }
         }
-        sb.append(HtmlUtils.rowTop(cols.toString()));
+        sb.append(HtmlUtils.row(cols.toString(), HtmlUtils.cssClass("ramadda-access-summary")));
         listAccess(request,
                    getEntryManager().getEntry(request,
                        entry.getParentEntryId()), sb);
@@ -905,18 +905,14 @@ public class AccessManager extends RepositoryManager {
         request.appendMessage(sb);
 
         StringBuffer currentAccess = new StringBuffer();
-        currentAccess.append(
-            HtmlUtils.open(
-                HtmlUtils.TAG_TABLE,
-                " cellspacing=0 ccellpadding=0 border=1 "));
+        currentAccess.append(HtmlUtils.open(HtmlUtils.TAG_TABLE));
         StringBuffer header =
             new StringBuffer(HtmlUtils.cols(HtmlUtils.bold(msg("Entry"))));
         for (int i = 0; i < Permission.ACTIONS.length; i++) {
             header.append(
-                HtmlUtils.cols(
-                    HtmlUtils.bold(msg(Permission.ACTION_NAMES[i]))));
+                HtmlUtils.cols(msg(Permission.ACTION_NAMES[i])));
         }
-        currentAccess.append(HtmlUtils.rowTop(header.toString()));
+        currentAccess.append(HtmlUtils.row(header.toString(), HtmlUtils.cssClass("ramadda-access-summary-header")));
 
         listAccess(request, entry, currentAccess);
         currentAccess.append(HtmlUtils.close(HtmlUtils.TAG_TABLE));

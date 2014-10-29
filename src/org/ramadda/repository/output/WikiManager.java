@@ -897,8 +897,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                         + HtmlUtils.space(2) + label;
 
                 return HtmlUtils.div(
-                    HtmlUtils.href(url, label),
-                    HtmlUtils.cssClass("entry-download-box"));
+                                     HtmlUtils.href(url, label, HtmlUtils.cssClass("btn btn-primary btn-lg") +HtmlUtils.attr("role", "button")));
+
             }
 
             return HtmlUtils.href(url, label);

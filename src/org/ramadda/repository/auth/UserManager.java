@@ -1780,7 +1780,7 @@ public class UserManager extends RepositoryManager {
         //        addActivity(request, request.getUser(),  ACTIVITY_PASSWORD_CHANGE, "");
 
         request.formPostWithAuthToken(usersHtml, URL_USER_SELECT_DO);
-        usersHtml.append("<table cellpadding=3 cellspacing=0>");
+        usersHtml.append(HtmlUtils.open("table", HtmlUtils.cssClass("ramadda-user-table")));
         usersHtml.append(HtmlUtils.row(HtmlUtils.cols("",
                                                       HtmlUtils.bold(msg("Edit"))  + HtmlUtils.space(2),
                                                       HtmlUtils.bold(msg("ID"))    + HtmlUtils.space(2),
@@ -1818,14 +1818,15 @@ public class UserManager extends RepositoryManager {
                                  "true", false, "");
 
 
-            String row = (user.getAdmin()
-                          ? "<tr valign=\"top\" style=\"background-color:#cccccc;\">"
-                          : "<tr valign=\"top\" >") + HtmlUtils.cols(userCbx,
-                                                                     userEditLink, userProfileLink,
-                              user.getName(),
-            /*user.getRolesAsString("<br>"),*/
-            user.getEmail(), "" + user.getAdmin(),
-                                                                     "" + user.getIsGuest(),userLogLink) + "</tr>";
+
+
+            String row = HtmlUtils.row(HtmlUtils.cols(userCbx,
+                                                userEditLink, userProfileLink,
+                                                user.getName(),
+                                                /*user.getRolesAsString("<br>"),*/
+                                                user.getEmail(), "" + user.getAdmin(),
+                                                      "" + user.getIsGuest(),userLogLink),
+                                       HtmlUtils.cssClass("ramadda-user-row " + (user.getAdmin()?"ramadda-user-admin":"")));
             usersHtml.append(row);
 
             List<String> roles = user.getRoles();
@@ -3615,7 +3616,7 @@ public class UserManager extends RepositoryManager {
             String extra = results.getString(col++);
             String ip    = results.getString(col++);
             sb.append(HtmlUtils.row(HtmlUtils.cols(firstCol, what,
-                    getPageHandler().formatDate(dttm), ip)));
+                                                   getPageHandler().formatDate(dttm), ip), HtmlUtils.cssClass("ramadda-user-activity")));
 
             cnt++;
         }

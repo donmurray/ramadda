@@ -1,7 +1,10 @@
 
 
+
+
 body {
    font-family:  Helvetica Neue, Arial, Helvetica, sans-serif;
+   font-family: xCalibri,xTahoma,xGeneva,"Helvetica Neue",Helvetica,Arial,sans-serif;
 //   font-size: 11pt;
    color: black;
    margin: 0px;
@@ -23,7 +26,6 @@ h3 {
 }
 
 
-
 .jumbotron a {
   color:#0000CD;
 }
@@ -43,7 +45,6 @@ h3 {
 
 
 .minitron h2 {
-   
    font-size: 130%; 
    margin:0px;
    margin-bottom:6px;
@@ -104,11 +105,9 @@ img {
   vertical-align: baseline;
 }
 
-
 .ui-button-text, textarea, input, select {
       font-size: .8em;
 }
-
 
 a {
    color: #0000FF;
@@ -138,18 +137,12 @@ input, password, fileinput,textarea {
   border : 1px #888 solid;
 }
 
-
-
-
-
 .input:focus, .textarea:focus {
   background: #fffeec;
   border : 1px #000 solid;
 }
 
-
-
-.ramadda-confirm-entries {
+.ramadda-confirm {
    font-weight: bold; 
    margin:15px;
    margin-left:25px;
@@ -159,7 +152,6 @@ input, password, fileinput,textarea {
    font-size: 90%; 
    font-style:italic;
 }
-
 
 .entry-simple {
 }
@@ -173,7 +165,6 @@ input, password, fileinput,textarea {
    padding:10px;
 }
 
-
 .entry-action-list {
    background: transparent;
    padding: 0px;
@@ -181,50 +172,19 @@ input, password, fileinput,textarea {
    max-width:100px;
  }
 
-
-
 .entry-link {
-//   border: 1px red solid;
      max-width: 200px;
-      overflow-x:hidden;
+     overflow-x:hidden;
 }
-
 
 .entry-list-block {
    padding-left:0px;
    padding-right:0px;
 }
 
-
-.entry-download-box {
-  background-color: #338F33;
-  background-color: #48be48;
-  max-width:8em;
-  color: white;
-  font-weight: bold; 
-  padding-left: 8px;
-  padding-bottom: 3px;
-  padding-top: 8px;
-  margin-top:10px;
-  margin-bottom:10px;
-  border-radius: 6px;
-  -webkit-border-radius: 6px;
-  text-align: bottom;
-}
-
-.entry-download-box:hover {
-}
-
-.entry-download-box  a {
-    color: #fff;
-}
-
-
-
-
 .sf-menu   {
- margin:0px;
-       padding:0px;
+  margin:0px;
+  padding:0px;
 }
 
 .sf-menu  li {
@@ -267,9 +227,7 @@ input, password, fileinput,textarea {
 .entry-type-search:hover {
    text-decoration: underline;
    color: black;
-//   background: URL(${urlroot}/icons/find_small.png) no-repeat;
 }
-
 
 .entry-list {
     overflow-y: auto;
@@ -292,15 +250,11 @@ input, password, fileinput,textarea {
 .entry-list-header {
   padding-left: 5px;
   padding-right: 5px;
-//  border-top-left-radius: 6px;
-//  border-top-right-radius: 6px;
   border : 1px #ccc solid;
   background-color: #efefef;
   margin-top: 2px;
   padding-top: 0px;
 }
-
-
 
 .entry-list-header-column {
    font-weight: bold; 
@@ -313,7 +267,6 @@ input, password, fileinput,textarea {
 
 .entry-list-header-column-last {
    font-weight: bold; 
-//   border-right : 1px #aaa solid;
    text-align: center;
    padding-bottom:1px;
    padding-top:4px;
@@ -336,10 +289,6 @@ input, password, fileinput,textarea {
   border-bottom:1px #dadada dotted;
 }
 
-.entry-list-row:hover {
-//  background-color:#f2f2f2;
-}
-
 .entry-tree-row {
   margin-top:2px;
   padding: 2px;
@@ -358,7 +307,6 @@ input, password, fileinput,textarea {
 }
 
 .entry-table-date   {
-//    max-width:10em;
     white-space: nowrap;
     overflow: hidden;
 }
@@ -373,9 +321,6 @@ input, password, fileinput,textarea {
 .search-select {
        max-width:150px;
 }
-
-
-
 
 .entry-table-page   {
   font-size: 90%;
@@ -503,9 +448,7 @@ padding-right-rtl-source: physical;
 
   margin-top:0.0em;
   margin-bottom:0.7em;
-
 }
-
 
 .entry-page-divider {
   height: 100%;
@@ -526,9 +469,6 @@ padding-right-rtl-source: physical;
    padding:0px;
    padding-left:12px;
 }
-
-
-
 
 .entry-arrow {
       margin-right: 5px;
@@ -695,10 +635,6 @@ padding-right-rtl-source: physical;
 }
 
 
-
-
-
-
 .ramadda-popup a:hover {
    text-decoration: underline;
    color:black;
@@ -737,9 +673,16 @@ label {
   text-indent: -15px;
 }
 
+.harvester-row  {
+  border-bottom: 1px #efefef solid;
+}
 
+.harvester-row td {
+  padding: 5px;
+  padding-left: 5px;
+}
 
-.ramadda-harvester-active {
+.harvester-active {
   background: #FFFFCC;
 }
 
@@ -820,7 +763,46 @@ label {
 }
 
 
+.ramadda-user-admin {
+     background:#ccc;
+}
 
+.ramadda-user-row  {
+    border-bottom: 1px #efefef solid;
+}
+
+.ramadda-plugin-row td {
+    padding: 5px;
+}
+
+.ramadda-user-row td {
+    padding: 5px;
+}
+
+.ramadda-access-summary-header  {
+    border-bottom: 2px #000 solid;
+}
+
+.ramadda-access-summary-header td {
+    padding: 5px;
+}
+
+.ramadda-access-summary {
+    border-bottom: 1px #efefef solid;
+}
+
+
+.ramadda-access-summary td {
+    padding: 5px;
+    border: 1px #efefef solid;
+}
+
+.ramadda-user-activity  {
+}
+
+.ramadda-user-activity td {
+    padding: 5px;
+}
 
 .ramadda-user-menu-item {
 
