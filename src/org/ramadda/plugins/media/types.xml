@@ -87,6 +87,7 @@
   
   <type name="type_document_pdf"  description="PDF File" pattern=".*\.pdf" super="type_document" handler="org.ramadda.plugins.media.PdfTypeHandler" >
      <service link="media_pdfbox_extracttext"/>
+     <service link="media_pdfbox_thumbnail"/>
      <property name="icon" value="/icons/pdf.png"/>
 </type>
   <type name="type_document_doc"  description="Microsoft Word File" pattern="(.*\.doc|.*\.docx)"  super="type_document"         handler="org.ramadda.plugins.media.MsDocTypeHandler" >
