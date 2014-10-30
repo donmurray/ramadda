@@ -123,8 +123,8 @@ public class ServiceLinkTypeHandler extends ServiceTypeHandler {
      * @throws Exception _more_
      */
     @Override
-    public void initializeNewEntry(Entry entry) throws Exception {
-        super.initializeNewEntry(entry);
+    public void initializeNewEntry(Request request, Entry entry) throws Exception {
+        super.initializeNewEntry(request, entry);
 
         if ( !Utils.stringDefined(entry.getName())) {
             Service service = getService(getRepository().getTmpRequest(),

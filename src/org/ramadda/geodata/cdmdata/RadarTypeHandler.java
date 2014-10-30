@@ -131,7 +131,7 @@ public class RadarTypeHandler extends GenericTypeHandler {
      * @throws Exception _more_
      */
     @Override
-    public void initializeNewEntry(Entry entry) throws Exception {
+    public void initializeNewEntry(Request request, Entry entry) throws Exception {
         Object[]   values = entry.getTypeHandler().getEntryValues(entry);
         File       f      = entry.getFile();
         NetcdfFile ncf    = NetcdfFile.open(f.toString());

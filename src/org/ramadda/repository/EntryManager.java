@@ -2010,7 +2010,7 @@ public class EntryManager extends RepositoryManager {
                     publishAnonymousEntry(request, entry);
                     List<Entry> entries = new ArrayList<Entry>();
                     entries.add(entry);
-                    insertEntries(entries, newEntry);
+                    insertEntries(request, entries, newEntry);
 
                     return new Result(
                         request.entryUrl(
@@ -2620,7 +2620,7 @@ public class EntryManager extends RepositoryManager {
         }
 
 
-        insertEntries(entries, newEntry);
+        insertEntries(request, entries, newEntry);
         if (newEntry) {
             for (Entry theNewEntry : entries) {
                 theNewEntry.getTypeHandler().doFinalEntryInitialization(
@@ -6944,7 +6944,7 @@ public class EntryManager extends RepositoryManager {
      */
     public void addNewEntries(Request request, List<Entry> entries)
             throws Exception {
-        insertEntries(entries, true);
+        insertEntries(request, entries, true);
         for (Entry theNewEntry : entries) {
             theNewEntry.getTypeHandler().doFinalEntryInitialization(request,
                     theNewEntry);
@@ -6961,7 +6961,7 @@ public class EntryManager extends RepositoryManager {
      */
     public void updateEntries(Request request, List<Entry> entries)
             throws Exception {
-        insertEntries(entries, false);
+        insertEntries(request, entries, false);
     }
 
 
@@ -6974,7 +6974,7 @@ public class EntryManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    private void insertEntries(List<Entry> entries, boolean isNew)
+    private void insertEntries(Request request, List<Entry> entries, boolean isNew)
             throws Exception {
         if (entries.size() == 0) {
             return;
@@ -6982,7 +6982,7 @@ public class EntryManager extends RepositoryManager {
 
         if (isNew) {
             for (Entry theNewEntry : entries) {
-                theNewEntry.getTypeHandler().initializeNewEntry(theNewEntry);
+                theNewEntry.getTypeHandler().initializeNewEntry(request, theNewEntry);
             }
         }
 
@@ -7623,7 +7623,7 @@ public class EntryManager extends RepositoryManager {
                 changedEntries.add(entry);
             }
         }
-        insertEntries(changedEntries, false);*/
+        insertEntries(request, changedEntries, false);*/
         return new Result("Metadata", new StringBuilder("OK"));
     }
 

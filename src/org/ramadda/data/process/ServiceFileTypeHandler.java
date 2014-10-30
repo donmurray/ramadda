@@ -79,8 +79,8 @@ public class ServiceFileTypeHandler extends ServiceTypeHandler {
      * @throws Exception _more_
      */
     @Override
-    public void initializeNewEntry(Entry entry) throws Exception {
-        super.initializeNewEntry(entry);
+    public void initializeNewEntry(Request request, Entry entry) throws Exception {
+        super.initializeNewEntry(request, entry);
         Element root = XmlUtil.getRoot(
                            IOUtil.readContents(
                                getStorageManager().getFileInputStream(

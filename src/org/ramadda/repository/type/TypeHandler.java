@@ -1495,7 +1495,7 @@ public class TypeHandler extends RepositoryManager {
         //Recreate the entry. This will fill in any extra entry type db tables
         entry = getEntryManager().getEntry(request, entry.getId());
         //Then initialize it, e.g., point data type will read the file and set the entry values, etc.
-        initializeNewEntry(entry);
+        initializeNewEntry(request, entry);
         //        Object[] values =  getEntryValues(entry);
         //        System.err.println("type:" + this);
         //        for(int i=0;i<values.length;i++) {
@@ -2858,9 +2858,9 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void initializeNewEntry(Entry entry) throws Exception {
+    public void initializeNewEntry(Request request, Entry entry) throws Exception {
         if (parent != null) {
-            parent.initializeNewEntry(entry);
+            parent.initializeNewEntry(request, entry);
         }
         if (fieldFilePattern != null) {
             String  path    = entry.getResource().getPath();
@@ -2949,7 +2949,7 @@ public class TypeHandler extends RepositoryManager {
                     continue;
                 }
                 //Defer to the entry's type handler
-                entry.getTypeHandler().handleServiceResults(entry, service, output);
+                entry.getTypeHandler().handleServiceResults(request, entry, service, output);
             } catch(Exception exc) {
                 getLogManager().logError("ERROR: TypeHandler calling service:" + service +"\n",exc);
             }
@@ -2969,8 +2969,8 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void handleServiceResults(Entry entry, Service service,
-                                         ServiceOutput output)
+    public void handleServiceResults(Request request, Entry entry, Service service,
+                                     ServiceOutput output)
         throws Exception {
         List<Entry> entries = output.getEntries();
         if (entries.size() == 0) {

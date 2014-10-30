@@ -84,10 +84,10 @@ public class PdfTypeHandler extends GenericTypeHandler {
      * @throws Exception _more_
      */
     @Override
-    public void handleServiceResults(Entry entry, Service service,
+        public void handleServiceResults(Request request, Entry entry, Service service,
                                      ServiceOutput output)
             throws Exception {
-        super.handleServiceResults(entry, service, output);
+        super.handleServiceResults(request, entry, service, output);
         List<Entry> entries = output.getEntries();
         if (entries.size() == 0) {
             return;

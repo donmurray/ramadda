@@ -132,8 +132,9 @@ public class EclipseTypeHandler extends FitsTypeHandler {
      *
      * @throws Exception _more_
      */
-    public void initializeNewEntry(Entry entry) throws Exception {
-        super.initializeNewEntry(entry);
+@Override
+    public void initializeNewEntry(Request request, Entry entry) throws Exception {
+    super.initializeNewEntry(request, entry);
         File imageFile = getFitsOutputHandler().outputImage(
                              getRepository().getTmpRequest(),
                              entry.getFile(), -1);

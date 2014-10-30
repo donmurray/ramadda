@@ -103,8 +103,8 @@ public class ClimateModelFileTypeHandler extends GranuleTypeHandler {
      * @throws Exception  problems during initialization
      */
     @Override
-    public void initializeNewEntry(Entry entry) throws Exception {
-        super.initializeNewEntry(entry);
+    public void initializeNewEntry(Request request, Entry entry) throws Exception {
+        super.initializeNewEntry(request, entry);
         Object[] values = getEntryValues(entry);
         if ((values[1] != null) && !values[1].toString().isEmpty()) {
             //System.err.println("already have  values set");

@@ -96,8 +96,8 @@ public class GpsTypeHandler extends GenericTypeHandler {
      * @throws Exception On badness
      */
     @Override
-    public void initializeNewEntry(Entry entry) throws Exception {
-        super.initializeNewEntry(entry);
+    public void initializeNewEntry(Request request, Entry entry) throws Exception {
+        super.initializeNewEntry(request, entry);
         //        Misc.printStack("GpsTypeHandler.initializeNewEntry",10,null);
         initializeGpsEntry(entry);
     }

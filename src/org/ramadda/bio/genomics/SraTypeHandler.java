@@ -74,8 +74,8 @@ public class SraTypeHandler extends GenomicsTypeHandler {
      * @throws Exception _more_
      */
     @Override
-    public void initializeNewEntry(Entry entry) throws Exception {
-        super.initializeNewEntry(entry);
+    public void initializeNewEntry(Request request, Entry entry) throws Exception {
+        super.initializeNewEntry(request, entry);
 
         String path = getProperty(PROP_SRA_BIN, null);
         if (path == null) {

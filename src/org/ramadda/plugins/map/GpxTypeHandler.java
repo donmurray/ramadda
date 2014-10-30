@@ -93,9 +93,9 @@ public class GpxTypeHandler extends GenericTypeHandler {
      * @throws Exception _more_
      */
     @Override
-    public void initializeNewEntry(Entry entry) throws Exception {
+    public void initializeNewEntry(Request request,Entry entry) throws Exception {
 
-        super.initializeNewEntry(entry);
+        super.initializeNewEntry(request, entry);
 
         Element root     = readXml(entry);
         Element metadata = XmlUtil.findChild(root, GpxUtil.TAG_METADATA);

@@ -245,7 +245,7 @@ public class FitsTypeHandler extends GenericTypeHandler {
      * @throws Exception _more_
      */
     @Override
-    public void initializeNewEntry(Entry entry) throws Exception {
+    public void initializeNewEntry(Request request, Entry entry) throws Exception {
         Object[] values = entry.getValues();
         if (values == null) {
             values = makeEntryValueArray();

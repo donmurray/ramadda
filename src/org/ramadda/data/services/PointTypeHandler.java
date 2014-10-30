@@ -120,11 +120,11 @@ public class PointTypeHandler extends RecordTypeHandler {
      * @throws Exception On badness
      */
     @Override
-    public void initializeNewEntry(Entry entry) throws Exception {
+     public void initializeNewEntry(Request request, Entry entry) throws Exception {
         //        System.err.println (getClass().getName()+".initNewEntry");
         if (anySuperTypesOfThisType()) {
             //            System.err.println ("has super");
-            super.initializeNewEntry(entry);
+            super.initializeNewEntry(request, entry);
             return;
         }
 
@@ -152,7 +152,6 @@ public class PointTypeHandler extends RecordTypeHandler {
             ((PointTypeHandler)entry.getTypeHandler()).doMakeMetadataHarvester(pointEntry);
         //        System.err.println (getClass().getName()+"  - scanning file:" + metadataHarvester.getClass().getName());
         visitorGroup.addVisitor(metadataHarvester);
-        Request    request       = getRepository().getTmpRequest();
         final File quickScanFile = pointEntry.getQuickScanFile();
 
 

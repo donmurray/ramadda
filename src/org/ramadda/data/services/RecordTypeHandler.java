@@ -272,7 +272,7 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
     public void initializeCopiedEntry(Entry entry, Entry originalEntry)
             throws Exception {
         super.initializeCopiedEntry(entry, originalEntry);
-        initializeNewEntry(entry);
+        initializeNewEntry(null, entry);
     }
 
 

@@ -23,6 +23,7 @@ package org.ramadda.geodata.cdmdata;
 
 import org.ramadda.data.util.CdmUtil;
 import org.ramadda.repository.Entry;
+import org.ramadda.repository.Request;
 import org.ramadda.repository.Repository;
 import org.ramadda.util.Utils;
 
@@ -71,7 +72,7 @@ public class DoradeRadarTypeHandler extends RadarTypeHandler {
      *
      * @throws Exception _more_
      */
-    public void initializeNewEntry(Entry entry) throws Exception {
+    public void initializeNewEntry(Request request, Entry entry) throws Exception {
         Object[]   values = entry.getTypeHandler().getEntryValues(entry);
         File       f      = entry.getFile();
         NetcdfFile ncf    = NetcdfFile.open(f.toString());

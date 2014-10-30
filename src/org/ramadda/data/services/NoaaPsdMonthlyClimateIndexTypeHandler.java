@@ -7,6 +7,7 @@ import org.ramadda.data.point.text.MultiMonthFile;
 import org.ramadda.data.record.RecordFile;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
+import org.ramadda.repository.Request;
 import org.w3c.dom.Element;
 
 import ucar.unidata.util.IOUtil;
@@ -30,8 +31,8 @@ public class NoaaPsdMonthlyClimateIndexTypeHandler extends PointTypeHandler {
      * @throws Exception On badness
      */
     @Override
-    public void initializeNewEntry(Entry entry) throws Exception {
-        super.initializeNewEntry(entry);
+        public void initializeNewEntry(Request request, Entry entry) throws Exception {
+        super.initializeNewEntry(request, entry);
         // override to set the missing value from the file/url
         String loc = entry.getResource().getPath();
         Object[] values = entry.getValues();
