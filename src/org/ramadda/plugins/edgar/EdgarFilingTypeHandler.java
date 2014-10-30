@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+/** Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -65,57 +65,74 @@ public class EdgarFilingTypeHandler extends GenericTypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
     @Override
-    public void initializeNewEntry(Entry entry)
-            throws Exception {
+    public void initializeNewEntry(Entry entry) throws Exception {
         super.initializeNewEntry(entry);
 
         //If the file for the entry does not exist then return
         if ( !entry.isFile()) {
             return;
         }
-        InputStream fis =  getStorageManager().getFileInputStream(entry.getFile().toString());
-        StringBuilder headerSB = new StringBuilder();
-        BufferedReader br  = new BufferedReader(new InputStreamReader(fis));
-        int cnt = 0;
-        while(true) {
+        InputStream fis = getStorageManager().getFileInputStream(
+                              entry.getFile().toString());
+        StringBuilder  headerSB = new StringBuilder();
+        BufferedReader br = new BufferedReader(new InputStreamReader(fis));
+        int            cnt      = 0;
+        while (true) {
             cnt++;
             String line = br.readLine();
-            if(cnt>1000 || line == null || line.indexOf("</SEC-HEADER>")>=0) {
+            if ((cnt > 1000) || (line == null)
+                    || (line.indexOf("</SEC-HEADER>") >= 0)) {
                 break;
             }
-            headerSB.append(line);        
-            headerSB.append("\n");        
+            headerSB.append(line);
+            headerSB.append("\n");
         }
         IOUtil.close(fis);
         String header = headerSB.toString();
 
-        String dateString= StringUtil.findPattern(header, "CONFORMED PERIOD OF REPORT:([^\\n]+)\\n");
-        if(dateString!=null) {
+        String dateString = StringUtil.findPattern(header,
+                                "CONFORMED PERIOD OF REPORT:([^\\n]+)\\n");
+        if (dateString != null) {
             dateString = dateString.trim();
-            Date date = RepositoryUtil.makeDateFormat("yyyyMMdd").parse(dateString);
-            System.err.println("DATE:" + dateString);
+            Date date =
+                RepositoryUtil.makeDateFormat("yyyyMMdd").parse(dateString);
             entry.setStartDate(date.getTime());
             entry.setEndDate(date.getTime());
         }
 
-        Object[] values = getEntryValues(entry);
-        String[] patterns = new String[]{
-            "FORM TYPE:([^\\n]+)\\n",
-            "ACCESSION NUMBER:([^\\n]+)\\n",
+        Object[] values   = getEntryValues(entry);
+        String[] patterns = new String[] {
+            "FORM TYPE:([^\\n]+)\\n", "ACCESSION NUMBER:([^\\n]+)\\n",
             "COMPANY CONFORMED NAME:([^\\n]+)\\n",
             //CIK number
-            "ACCESSION NUMBER:([^-]+)-",
-            "CENTRAL INDEX KEY:([^\\n]+)\\n",
+            "ACCESSION NUMBER:([^-]+)-", "CENTRAL INDEX KEY:([^\\n]+)\\n",
             "STANDARD INDUSTRIAL CLASSIFICATION:([^\\n]+)\\n",
-            "IRS NUMBER:([^\\n]+)\\n",
-            "STATE OF INCORPORATION:([^\\n]+)\\n"
+            "IRS NUMBER:([^\\n]+)\\n", "STATE OF INCORPORATION:([^\\n]+)\\n"
         };
-        for(int i=0;i<patterns.length;i++) {
+        for (int i = 0; i < patterns.length; i++) {
             String value = StringUtil.findPattern(header, patterns[i]);
-            if(value!=null) value = value.trim();
-            values[i] =  value;
+            if (value != null) {
+                value = value.trim();
+            }
+            values[i] = value;
         }
+
+        String companyName =
+            (String) entry.getTypeHandler().getEntryValue(entry,
+                "company_name");
+        if (companyName != null) {
+            entry.setName(companyName + "-" + entry.getName());
+        }
+
+
     }
 
 
