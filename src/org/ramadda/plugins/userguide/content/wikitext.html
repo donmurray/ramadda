@@ -69,23 +69,67 @@ For tables its best just to use HTML table markup.
 <subhead intoc="false" id="bootstrap">Bootstrap Markup</subhead>
 There is support for the <a href="http://getbootstrap.com/">Bootstrap</a> CSS grid system.
 To add a "jumbotron" banner do:
-
-<pre> 
-+jumbo
+<pre>+jumbo
 This is some text and some more test. Lorem ipsum
 -jumbo
 </pre>
 
+You will get something like:
+<div class="jumbotron">
+This is some text and some more test. Lorem ipsum
+</div>
+
+
 To add RAMADDA's "minittron" smaller banner do
-<pre> 
-+mini
+<pre>+mini
 &lt;h2&gt;Heading&lt;/h2&gt;
 This is some text and some more test. Lorem ipsum
 -mini
 </pre>
 
-To do a row layout use the following. The "+col-md-..." correspond to Bootstraps column widths, e.g., col-md-\[2,3,4,6,8,9,10,12\]
+You will get something like:
+<div class="minitron">
+<h2>Heading</h2>
+This is some text and some more test. Lorem ipsum
+</div>
 
+
+To do a row layout use the following. The "+col-md-..." correspond to Bootstraps column widths, e.g., col-md-\[2,3,4,6,8,9,10,12\].
+Basically you can have any number of columns within a row.
+Each column has a width, the sum of which adds up to 12.
+
+Three equally spaced columns:
+
+<pre>+row
++col-md-4 
+Left column contents
+-col
++col-md-4 
+Center column contents
+-col
++col-md-4
+Right column contents
+-col
+-row
+</pre>
+
+Results in: 
+
+<div class="row">
+<div class="col-md-4" style="border: 1px #000 solid;">
+Left column contents
+</div>
+<div class="col-md-4"  style="border: 1px #000 solid;">
+Center column contents
+</div>
+<div class="col-md-4"  style="border: 1px #000 solid;">
+Right column contents
+</div>
+</div>
+
+
+
+You can set the widths of different columns:
 <pre>
 +row
 +col-md-2 
@@ -95,9 +139,19 @@ Left column contents
 Right column contents
 -col
 -row
-
 </pre>
 
+Results in:
+
+<div class="row">
+<div class="col-md-2"  style="border: 1px #000 solid;">
+Left column contents
+</div>
+<div class="col-md-10"  style="border: 1px #000 solid;">
+<div class="minitron">
+Right column contents
+</div>
+</div>
 
 
 
