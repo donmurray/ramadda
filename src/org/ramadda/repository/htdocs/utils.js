@@ -45,9 +45,12 @@ function noop() {}
 
 
 var GuiUtils = {
-    handleError: function(error) {
+    handleError: function(error, extra) {
         console.log("Error: " +error);
-        alert("An error has occurred: " + error);
+        //        alert("An error has occurred: " + error);
+        if(extra) {
+            console.log(extra);
+        }
         closeFormLoadingDialog ();
     },
     isJsonError: function(data) {

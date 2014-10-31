@@ -1314,7 +1314,6 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
                     weights = this.weights.split(",");
                 }
 
-                console.log("LAYOUT:" + this.layout);
 
                 if(this.layout == LAYOUT_TABLE) {
                     if(displaysToLayout.length == 1) {
@@ -1446,7 +1445,6 @@ function DisplayGroup(argDisplayManager, argId, argProperties) {
 
         });
 
-    console.log("group:" + this.columns);
 }
 
 

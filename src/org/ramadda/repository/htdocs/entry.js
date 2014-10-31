@@ -103,7 +103,8 @@ function Ramadda(repositoryRoot) {
             getEntryTypes: function(callback) {
                 if(this.entryTypes == null) {
                     var theRamadda = this;
-                    var jqxhr = $.getJSON(this.repositoryRoot +"/entry/types", function(data) {
+                    var url = this.repositoryRoot +"/entry/types";
+                    var jqxhr = $.getJSON(url, function(data) {
                             if(GuiUtils.isJsonError(data)) {
                                 return;
                             }
@@ -122,7 +123,7 @@ function Ramadda(repositoryRoot) {
                                 //                                console.log("Always:" +textStatus);
                         }).fail(function(jqxhr, textStatus, error) {
                             var err = textStatus + " --  " + error;
-                            GuiUtils.handleError(err);
+                            GuiUtils.handleError(err, url);
                             });
                 }
                 return this.entryTypes;
@@ -138,7 +139,7 @@ function Ramadda(repositoryRoot) {
                     })
                     .fail(function(jqxhr, textStatus, error) {
                             var err = textStatus + ", " + error;
-                            GuiUtils.handleError(err);
+                            GuiUtils.handleError(err, url);
                         });
                 return null;
             },
@@ -220,7 +221,7 @@ function Ramadda(repositoryRoot) {
                     })
                     .fail(function(jqxhr, textStatus, error) {
                             var err = textStatus + ", " + error;
-                            GuiUtils.handleError(err);
+                            GuiUtils.handleError(err, jsonUrl);
                         });
                 return null;
             }
@@ -564,7 +565,7 @@ function EntryList(ramadda, jsonUrl, listener) {
                 //var err = textStatus + ", " + error;
                 console.log(textStatus + ", " + error);
                 var err = "Unable to complete request.";
-                GuiUtils.handleError(err);
+                GuiUtils.handleError(err, jsonUrl);
             });
 }
 

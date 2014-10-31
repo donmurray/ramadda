@@ -193,9 +193,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                     chartArea:{left:75,top:10,height:"60%",width:width}
                  });
                 var chartId = this.getDomId(ID_CHART);
-                console.log("Chart id:" + chartId);
                 this.setContents(HtmlUtil.div([ATTR_ID, chartId],""));
-                console.log("element:" + document.getElementById(chartId));
 
                 if(chartType == DISPLAY_BARCHART) {
                     chartOptions.orientation =  "horizontal";
