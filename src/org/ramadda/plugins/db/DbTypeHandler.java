@@ -974,9 +974,8 @@ public class DbTypeHandler extends BlobTypeHandler {
                               String extraLinks)
             throws Exception {
 
-        if(request.get(ARG_EMBEDDED, false)) {
-            return;
-        }
+        boolean embedded = request.get(ARG_EMBEDDED, false);
+
 
 
         if (Utils.stringDefined(entry.getDescription())) {
@@ -984,6 +983,10 @@ public class DbTypeHandler extends BlobTypeHandler {
             sb.append(HtmlUtils.br());
         }
 
+        if(embedded) {
+            addStyleSheet(sb);
+            return;
+        }
 
         List<String> headerToks = new ArrayList<String>();
         String baseUrl =
