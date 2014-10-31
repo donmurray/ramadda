@@ -320,11 +320,9 @@ public class GraphOutputHandler extends OutputHandler {
         js.append("function createGraph" + divId + "() {\n");
         sb.append(HtmlUtils.importJS(fileUrl("/lib/d3/d3.v3.min.js")));
         sb.append(HtmlUtils.importJS(fileUrl("/d3graph.js")));
-        sb.append(HtmlUtils.tag(HtmlUtils.TAG_DIV,
-                                HtmlUtils.style("width:" + width + ";height:"
-                                    + height) + HtmlUtils.id(divId)
-                                        + HtmlUtils.cssClass("graph-div")));
-
+        sb.append(HtmlUtils.div("",HtmlUtils.style("width:" + width + ";height:"
+                                                   + height) + HtmlUtils.id(divId)
+                                + HtmlUtils.cssClass("graph-div")));
         return divId;
     }
 
