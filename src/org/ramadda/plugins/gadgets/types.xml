@@ -34,7 +34,7 @@
      <column name="symbols" type="string" label="Symbols"  showinhtml="true" suffix="One per line" rows="10"/>
      <column name="width" type="int" label="Width"  default="400"/>
      <column name="height" type="int" label="Height"  default="400"/>
-     <column name="interval" type="int" label="Interval"  suffix="minutes" default="60"/>
+     <column name="time_interval" type="int" label="Interval"  suffix="minutes" default="60"/>
 </type>
 
   <type name="gadgets_clock"  description="Clock" handler="org.ramadda.plugins.gadgets.ClockTypeHandler" category="Gadgets">
