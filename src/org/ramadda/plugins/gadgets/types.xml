@@ -24,6 +24,18 @@
      <column name="howmany" type="enumeration" values="file:/org/ramadda/plugins/gadgets/howmany.txt" label="Show"  default="4" showinhtml="false"/>
 </type>
 
+  <type name="gadgets_stock"  description="Stock Ticker" handler="org.ramadda.plugins.gadgets.StockTickerTypeHandler" category="Gadgets">
+     <property name="icon" value="/gadgets/weather.png"/>
+     <property name="form.description.show" value="false"/>
+     <property name="form.area.show" value="false"/>
+     <property name="form.date.show" value="false"/>
+     <property name="form.resource.show" value="false"/>
+     <property name="form.datatype.show" value="false"/>
+     <column name="symbols" type="string" label="Symbols"  showinhtml="true" suffix="One per line" rows="10"/>
+     <column name="width" type="int" label="Width"  default="400"/>
+     <column name="height" type="int" label="Height"  default="400"/>
+     <column name="interval" type="int" label="Interval"  suffix="minutes" default="60"/>
+</type>
 
   <type name="gadgets_clock"  description="Clock" handler="org.ramadda.plugins.gadgets.ClockTypeHandler" category="Gadgets">
      <property name="icon" value="/gadgets/clock.png"/>

@@ -442,6 +442,9 @@ public class Json {
             }
             s = cleanString(s);
             s = s.replaceAll("\"", "\\\\\"");
+            if(s.equals("true") || s.equals("false")) return s;
+            if(s.matches("^[0-9\\.]+$")) return s;
+
             return "\"" + s + "\"";
         } catch (Exception exc) {
             throw new IllegalArgumentException("Could not quote string:" + s);

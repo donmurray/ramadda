@@ -22,18 +22,19 @@ package org.ramadda.plugins.gadgets;
 
 
 import org.ramadda.repository.*;
-import org.ramadda.repository.output.*;
 import org.ramadda.repository.type.*;
 
+
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Json;
+import org.ramadda.util.Utils;
+
 
 import org.w3c.dom.*;
 
 import ucar.unidata.util.StringUtil;
 
-import java.util.ArrayList;
 import java.util.Date;
-
 import java.util.List;
 
 
@@ -41,7 +42,8 @@ import java.util.List;
  *
  *
  */
-public class CountdownTypeHandler extends GenericTypeHandler {
+public class StockTickerTypeHandler extends GenericTypeHandler {
+
 
 
     /**
@@ -52,16 +54,11 @@ public class CountdownTypeHandler extends GenericTypeHandler {
      *
      * @throws Exception _more_
      */
-    public CountdownTypeHandler(Repository repository, Element entryNode)
+    public StockTickerTypeHandler(Repository repository, Element entryNode)
             throws Exception {
         super(repository, entryNode);
     }
 
-    /** _more_ */
-    private int countdownCnt = 0;
-
-    /** _more_ */
-    private String countdownHtml;
 
     /**
      * _more_
@@ -78,37 +75,46 @@ public class CountdownTypeHandler extends GenericTypeHandler {
      */
     public Result getHtmlDisplay(Request request, Entry entry)
             throws Exception {
-        if (countdownHtml == null) {
-            countdownHtml = getRepository().getResource(
-                "/org/ramadda/plugins/gadgets/countdown.html");
+        StringBuffer sb = new StringBuffer();
+        sb.append(entry.getDescription());
+        sb.append(HtmlUtils.p());
+        StringBuffer js       = new StringBuffer();
+        String       symbols  = entry.getValue(0, "");
+        String       width    = entry.getValue(1, "400");
+        String       height   = entry.getValue(2, "400");
+        String       interval = entry.getValue(3, "60");
+        if ( !Utils.stringDefined(width)) {
+            width = "400";
         }
-        String orient  = entry.getValue(0, "");
-        String howMany = entry.getValue(1, "");
-        if (howMany.length() == 0) {
-            howMany = "4";
+        if ( !Utils.stringDefined(height)) {
+            width = "400";
         }
-        StringBuffer sb = new StringBuffer(countdownHtml);
-        sb.append("<table><tr><td><center>");
-        sb.append(getPageHandler().formatDate(request, entry.getStartDate(),
-                getEntryUtil().getTimezone(entry)));
-        Date   to = new Date(entry.getStartDate());
-        String id = "countdownid_" + (countdownCnt++);
-        //        sb.append(HtmlUtils.cssBlock(".countdown-clock {font-size: 150%;}\n.countdown-number {color:#A94DEA;\n.countdown-label {color:#000;}\n"));
-        String inner = HtmlUtils.div("",
-                                     HtmlUtils.id(id)
-                                     + HtmlUtils.cssClass("countdown-clock"));
-        sb.append("<table><td><td>"
-                  + HtmlUtils.div(inner, HtmlUtils.cssClass("countdown"))
-                  + "</td></tr></table>");
-        sb.append(
-            HtmlUtils.script(
-                "$(document).ready(function() {countdownStart("
-                + HtmlUtils.squote(entry.getName()) + ","
-                + HtmlUtils.squote(id) + "," + (to.getTime() / 1000) + ","
-                + HtmlUtils.squote(orient) + "," + howMany + ");});\n"));
-        sb.append("</center></td></tr></table>");
+        if ( !Utils.stringDefined(interval)) {
+            interval = "60";
+        }
 
-        return new Result("Countdown", sb);
+        sb.append(
+            HtmlUtils.importJS(
+                "https://d33t3vvu2t2yu5.cloudfront.net/tv.js"));
+
+        for (String line : StringUtil.split(symbols, "\n", true, true)) {
+            js.append("new TradingView.widget(");
+            js.append(Json.mapAndQuote("symbol", line, "width", width,
+                                       "height", height, "interval",
+                                       interval, "timezone", "exchange",
+                                       "theme", "White", "style", "2",
+                                       "toolbar_bg", "#f1f3f6",
+                                       "hide_top_toolbar", "true",
+                                       "allow_symbol_change", "true",
+                                       "hideideas", "true",
+                                       "show_popup_button", "false",
+                                       "popup_width", "1000", "popup_height",
+                                       "650"));
+            js.append(");\n");
+        }
+        sb.append(HtmlUtils.script(js.toString()));
+
+        return new Result(msg("Stock ticker"), sb);
     }
 
 
