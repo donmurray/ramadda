@@ -436,10 +436,11 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                String url, Entry entry, Hashtable props)
             throws Exception {
 
+        boolean inDiv = request.get("inDiv",true);
         String align = (String) props.get(ATTR_ALIGN);
         String width = (String) props.get(ATTR_WIDTH);
         String alt   = (String) props.get(HtmlUtils.ATTR_ALT);
-        String extra = "";
+        StringBuilder extra = new StringBuilder();
 
         //imagewidth says to resize and cache the image on the server
         //If its defined then add it to the URL
@@ -448,7 +449,11 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             url = url + "&" + ARG_IMAGEWIDTH + "=" + imageWidth;
         }
         if (width != null) {
-            extra = extra + HtmlUtils.attr(HtmlUtils.ATTR_WIDTH, width);
+            extra.append(HtmlUtils.attr(HtmlUtils.ATTR_WIDTH, width));
+        }
+
+        if(!inDiv && align!=null) {
+            extra.append(HtmlUtils.style("align:" + align +";"));
         }
 
         if (alt == null) {
@@ -459,15 +464,15 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         }
 
         if (alt != null) {
-            extra = extra + HtmlUtils.attr(HtmlUtils.ATTR_ALT, alt);
+            extra.append(HtmlUtils.attr(HtmlUtils.ATTR_ALT, alt));
         }
 
         if (wikiUtil != null) {
             String imageClass = (String) wikiUtil.getProperty("image.class");
             if (imageClass != null) {
-                extra = extra + HtmlUtils.cssClass(imageClass);
+                extra.append(HtmlUtils.cssClass(imageClass));
             } else {
-                extra = extra + HtmlUtils.cssClass("wiki-image");
+                extra.append(HtmlUtils.cssClass("wiki-image"));
             }
         }
 
@@ -491,14 +496,14 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         }
 
         if (style.length() > 0) {
-            extra = extra + " style=\" " + style + "\" ";
+            extra.append(" style=\" " + style + "\" ");
         }
 
 
         String  caption = Misc.getProperty(props, "caption", (String) null);
 
 
-        String  img = HtmlUtils.img(url, getEntryDisplayName(entry), extra);
+        String  img = HtmlUtils.img(url, getEntryDisplayName(entry), extra.toString());
         boolean link = Misc.equals("true", props.get(ATTR_LINK));
         boolean linkResource = Misc.getProperty(props, ATTR_LINKRESOURCE,
                                    false);
@@ -533,14 +538,17 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                ? HtmlUtils.style("text-align:" + align + ";")
                                : "") + HtmlUtils.cssClass("wiki-image");
 
-        sb.append(HtmlUtils.open("div", attrs));
+
+        if(inDiv)
+            sb.append(HtmlUtils.open("div", attrs));
         sb.append(img);
         if (caption != null) {
             sb.append(
                 HtmlUtils.div(
                     caption, HtmlUtils.cssClass("wiki-image-caption")));
         }
-        sb.append(HtmlUtils.close("div"));
+        if(inDiv)
+            sb.append(HtmlUtils.close("div"));
 
         return sb.toString();
 

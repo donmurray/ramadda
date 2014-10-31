@@ -974,6 +974,11 @@ public class DbTypeHandler extends BlobTypeHandler {
                               String extraLinks)
             throws Exception {
 
+        if(request.get(ARG_EMBEDDED, false)) {
+            return;
+        }
+
+
         if (Utils.stringDefined(entry.getDescription())) {
             sb.append(entry.getDescription());
             sb.append(HtmlUtils.br());

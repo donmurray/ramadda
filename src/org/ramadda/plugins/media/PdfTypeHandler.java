@@ -88,6 +88,9 @@ public class PdfTypeHandler extends GenericTypeHandler {
                                      ServiceOutput output)
             throws Exception {
         super.handleServiceResults(request, entry, service, output);
+        if(request!=null && !request.get(ARG_METADATA_ADD,false)) {
+            return;
+        }
         List<Entry> entries = output.getEntries();
         if (entries.size() == 0) {
             return;
