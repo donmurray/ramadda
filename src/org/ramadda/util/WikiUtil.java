@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -50,7 +50,7 @@ public class WikiUtil {
     /** _more_ */
     public static final String ATTR_OPEN = "open";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_VAR = "var";
 
     /** _more_ */
@@ -78,7 +78,7 @@ public class WikiUtil {
     /** _more_ */
     private Hashtable properties;
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<String, String> myVars = new Hashtable<String,
                                                    String>();
 
@@ -463,6 +463,49 @@ public class WikiUtil {
         for (String line :
                 (List<String>) StringUtil.split(s, "\n", false, false)) {
             String tline = line.trim();
+            if (tline.equals("+row")) {
+                buff.append("<div class=\"row\">");
+
+                continue;
+            }
+            if (tline.equals("-row")) {
+                buff.append("</div>");
+
+                continue;
+            }
+            if (tline.equals("+jumbo")) {
+                buff.append("<div class=\"jumbotron\">");
+
+                continue;
+            }
+            if (tline.equals("-jumbo")) {
+                buff.append("</div>");
+
+                continue;
+            }
+
+            if (tline.equals("+mini")) {
+                buff.append("<div class=\"minitron\">");
+
+                continue;
+            }
+            if (tline.equals("-mini")) {
+                buff.append("</div>");
+
+                continue;
+            }
+            if (tline.startsWith("+col-")) {
+                buff.append("<div class=\"" + tline.substring(1) + "\">");
+
+                continue;
+            }
+
+            if (tline.startsWith("-col")) {
+                buff.append("</div>");
+
+                continue;
+            }
+
             if (tline.equals("----")) {
                 buff.append("<hr>");
                 buff.append("\n");
@@ -703,6 +746,13 @@ public class WikiUtil {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
     public String getWikiVariable(String key) {
         return (String) myVars.get(key);
     }
