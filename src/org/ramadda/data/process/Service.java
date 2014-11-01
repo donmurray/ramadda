@@ -2308,7 +2308,7 @@ public class Service extends RepositoryManager {
 
 
         for (File f : filesToDelete) {
-            System.err.println("delete:" + f);
+            System.err.println("Service: deleting file:" + f);
             f.delete();
         }
 

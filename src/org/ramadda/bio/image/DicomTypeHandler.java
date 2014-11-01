@@ -157,6 +157,9 @@ public class DicomTypeHandler extends GenericTypeHandler {
 
 
 
+
+
+
         //<attr tag="00020000" vr="UL" len="4">194</attr>
         for (int childIdx = 0; childIdx < children.getLength(); childIdx++) {
             Element item = (Element) children.item(childIdx);
@@ -191,6 +194,42 @@ public class DicomTypeHandler extends GenericTypeHandler {
                 continue;
             }
             column.setValue(entry, values, value);
+        }
+
+        String dateString  = null;
+        String timeString  = null;
+        
+        //Look for date/time
+        for(String[]pair: new String[][]{{"00080022","00080032"},{"00080020","00080030"}}) {
+            dateString = tagToValue.get(pair[0]);
+            if(dateString == null) continue;
+            timeString = tagToValue.get(pair[1]);
+            break;
+        }
+
+
+        Date date = null;
+        if(dateString!=null) {
+            dateString = dateString.replaceAll("\\.","");
+            //For now don't parse the time as there are a number of formats that I've seen
+            timeString = null;
+            if(timeString!=null) {
+                timeString = timeString.replaceAll(":","");
+            }
+            try {
+            if(timeString!=null) {
+                date  = RepositoryUtil.makeDateFormat("yyyyMMdd HHmmss").parse(dateString+" " + timeString);
+            } else {
+                date  = RepositoryUtil.makeDateFormat("yyyyMMdd").parse(dateString);
+            }
+            } catch(Exception exc) {
+                getLogManager().logError("Dicom. parsing date:" + exc +" date:" + dateString +" time:" + timeString);
+            }
+        }
+
+        if(date!=null) {
+            entry.setStartDate(date.getTime());
+            entry.setEndDate(date.getTime());
         }
 
     }
