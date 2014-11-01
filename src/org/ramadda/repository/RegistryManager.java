@@ -532,7 +532,9 @@ public class RegistryManager extends RepositoryManager {
     public List<ServerInfo> getRegisteredServers() throws Exception {
         List<ServerInfo> servers = registeredServers;
         if (servers != null) {
-            return servers;
+            synchronized(servers) {
+                return new ArrayList<ServerInfo>(servers);
+            }
         }
         servers = new ArrayList<ServerInfo>();
 
@@ -613,7 +615,9 @@ public class RegistryManager extends RepositoryManager {
     public List<ServerInfo> getSelectedRemoteServers() throws Exception {
         List<ServerInfo> selected = selectedRemoteServers;
         if (selected != null) {
-            return selected;
+            synchronized(selected) {
+                return new ArrayList<ServerInfo>(selected);
+            }
         }
         selected = new ArrayList<ServerInfo>();
         for (ServerInfo serverInfo : getRemoteServers()) {
