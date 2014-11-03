@@ -4623,6 +4623,7 @@ public class EntryManager extends RepositoryManager {
     private Result processEntryMove(Request request, Entry toGroup,
                                     List<Entry> entries)
             throws Exception {
+        addSessionFolder(request, toGroup);
         Connection connection = getDatabaseManager().getConnection();
         connection.setAutoCommit(false);
         Statement statement = connection.createStatement();

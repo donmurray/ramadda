@@ -1384,6 +1384,12 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                   APPLY_PREFIX + "divclass", "");
 
 
+            boolean includeLinkAfter = false;
+
+            if (layout.equals("accordian")) {
+                includeLinkAfter = true;
+            }
+
             String divExtra = HtmlUtils.cssClass(divClass);
             int    colCnt   = 0;
             for (Entry child : children) {
@@ -1427,6 +1433,9 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                   + HtmlUtils.style(style.toString()));
                 content.append(childsHtml);
                 content.append(suffix);
+                if(includeLinkAfter) {
+                    content.append(childUrl);
+                }
 
                 if (layout.equals("table")) {
                     if (columns > 1) {
