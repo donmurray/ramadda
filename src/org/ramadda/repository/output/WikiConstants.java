@@ -61,6 +61,9 @@ public interface WikiConstants {
     /** _more_ */
     public static final String ATTR_PADDING = "padding";
 
+    /** _more_          */
+    public static final String ATTR_MARGIN = "margin";
+
     /** border color */
     public static final String ATTR_BORDERCOLOR = "bordercolor";
 
@@ -285,7 +288,7 @@ public interface WikiConstants {
     /** _more_ */
     public static final String WIKI_TAG_GROUP = "group";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKI_TAG_CHART = "chart";
 
     /** _more_ */
@@ -312,7 +315,7 @@ public interface WikiConstants {
     /** wiki import */
     public static final String WIKI_TAG_DATE = "date";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKI_TAG_DATERANGE = "daterange";
 
     /** wiki import */
@@ -321,10 +324,10 @@ public interface WikiConstants {
     /** wiki import */
     public static final String WIKI_TAG_DATE_TO = "todate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKI_TAG_DATE_CREATE = "createdate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKI_TAG_DATE_CHANGE = "changedate";
 
     /** wiki import */
@@ -364,6 +367,7 @@ public interface WikiConstants {
     /** wiki import */
     public static final String WIKI_TAG_TABS = "tabs";
 
+    /** _more_          */
     public static final String WIKI_TAG_BOOTSTRAP = "bootstrap";
 
     /** _more_ */
@@ -512,13 +516,13 @@ public interface WikiConstants {
     /** _more_ */
     public static final String ATTR_SEARCH_URL = PREFIX_SEARCH + "url";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SHOWFORM = "showForm";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_FORMOPEN = "formOpen";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_LAYOUTHERE = "layoutHere";
 
 

@@ -436,10 +436,10 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                String url, Entry entry, Hashtable props)
             throws Exception {
 
-        boolean inDiv = request.get("inDiv",true);
-        String align = (String) props.get(ATTR_ALIGN);
-        String width = (String) props.get(ATTR_WIDTH);
-        String alt   = (String) props.get(HtmlUtils.ATTR_ALT);
+        boolean       inDiv = request.get("inDiv", true);
+        String        align = (String) props.get(ATTR_ALIGN);
+        String        width = (String) props.get(ATTR_WIDTH);
+        String        alt   = (String) props.get(HtmlUtils.ATTR_ALT);
         StringBuilder extra = new StringBuilder();
 
         //imagewidth says to resize and cache the image on the server
@@ -452,8 +452,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             extra.append(HtmlUtils.attr(HtmlUtils.ATTR_WIDTH, width));
         }
 
-        if(!inDiv && align!=null) {
-            extra.append(HtmlUtils.style("align:" + align +";"));
+        if ( !inDiv && (align != null)) {
+            extra.append(HtmlUtils.style("align:" + align + ";"));
         }
 
         if (alt == null) {
@@ -500,10 +500,11 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         }
 
 
-        String  caption = Misc.getProperty(props, "caption", (String) null);
+        String caption = Misc.getProperty(props, "caption", (String) null);
 
 
-        String  img = HtmlUtils.img(url, getEntryDisplayName(entry), extra.toString());
+        String img = HtmlUtils.img(url, getEntryDisplayName(entry),
+                                   extra.toString());
         boolean link = Misc.equals("true", props.get(ATTR_LINK));
         boolean linkResource = Misc.getProperty(props, ATTR_LINKRESOURCE,
                                    false);
@@ -539,16 +540,18 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                : "") + HtmlUtils.cssClass("wiki-image");
 
 
-        if(inDiv)
+        if (inDiv) {
             sb.append(HtmlUtils.open("div", attrs));
+        }
         sb.append(img);
         if (caption != null) {
             sb.append(
                 HtmlUtils.div(
                     caption, HtmlUtils.cssClass("wiki-image-caption")));
         }
-        if(inDiv)
+        if (inDiv) {
             sb.append(HtmlUtils.close("div"));
+        }
 
         return sb.toString();
 
@@ -904,8 +907,9 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 label = HtmlUtils.img(iconUrl("/icons/download.png"))
                         + HtmlUtils.space(2) + label;
 
-                return HtmlUtils.div(
-                                     HtmlUtils.href(url, label, HtmlUtils.cssClass("btn btn-primary btn-lg") +HtmlUtils.attr("role", "button")));
+                return HtmlUtils.div(HtmlUtils.href(url, label,
+                        HtmlUtils.cssClass("btn btn-primary btn-lg")
+                        + HtmlUtils.attr("role", "button")));
 
             }
 
@@ -1072,7 +1076,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                    || theTag.equals(WIKI_TAG_CHART)) {
 
             String jsonUrl = null;
-            if (theTag.equals(WIKI_TAG_CHART) || theTag.equals(WIKI_TAG_DISPLAY)) {
+            if (theTag.equals(WIKI_TAG_CHART)
+                    || theTag.equals(WIKI_TAG_DISPLAY)) {
                 if (entry.getTypeHandler() instanceof PointTypeHandler) {
                     PointTypeHandler pth =
                         (PointTypeHandler) entry.getTypeHandler();
@@ -1302,6 +1307,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                       APPLY_PREFIX + ATTR_STYLE, ""));
             int padding = Misc.getProperty(props,
                                            APPLY_PREFIX + ATTR_PADDING, 5);
+            int margin = Misc.getProperty(props, APPLY_PREFIX + ATTR_MARGIN,
+                                          5);
             int border = Misc.getProperty(props, APPLY_PREFIX + ATTR_BORDER,
                                           -1);
             String bordercolor = Misc.getProperty(props,
@@ -1314,6 +1321,10 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
             if (padding > 0) {
                 style.append(" padding: " + padding + "px; ");
+            }
+
+            if (margin > 0) {
+                style.append(" margin: " + margin + "px; ");
             }
 
 
@@ -1369,20 +1380,29 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
             boolean includeIcon = Misc.getProperty(props,
                                       APPLY_PREFIX + ATTR_INCLUDEICON, false);
+            String divClass = Misc.getProperty(props,
+                                  APPLY_PREFIX + "divclass", "");
 
 
-            int colCnt = 0;
+            String divExtra = HtmlUtils.cssClass(divClass);
+            int    colCnt   = 0;
             for (Entry child : children) {
                 String childsHtml = getWikiInclude(wikiUtil, newRequest,
                                         originalEntry, child, tag, tmpProps);
-                childsHtml = HtmlUtils.div(childsHtml,
-                                           HtmlUtils.style(style.toString()));
-                String prefix = prefixTemplate;
-                String suffix = suffixTemplate;
+
+                String prefix   = prefixTemplate;
+                String suffix   = suffixTemplate;
+                String urlLabel = getEntryDisplayName(child);
+                if (includeIcon) {
+                    urlLabel =
+                        HtmlUtils.img(getPageHandler().getIconUrl(request,
+                            child)) + " " + urlLabel;
+                }
+
                 String childUrl = HtmlUtils.href(
                                       request.entryUrl(
                                           getRepository().URL_ENTRY_SHOW,
-                                          child), getEntryDisplayName(child));
+                                          child), urlLabel);
                 prefix = prefix.replace(
                     "${name}",
                     getEntryDisplayName(child).replace(
@@ -1401,6 +1421,10 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
                 StringBuilder content = new StringBuilder();
                 content.append(prefix);
+                childsHtml =
+                    HtmlUtils.div(getSnippet(request, child) + childsHtml,
+                                  divExtra
+                                  + HtmlUtils.style(style.toString()));
                 content.append(childsHtml);
                 content.append(suffix);
 
@@ -1660,17 +1684,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                             HtmlUtils.href(urls.get(i),
                                                 titles.get(i))));
 
-                    String snippet =
-                        StringUtil.findPattern(child.getDescription(),
-                            "(?s)<snippet>(.*)</snippet>");
-                    if (snippet != null) {
-                        snippet = HtmlUtils.div(snippet,
-                                HtmlUtils.cssClass("ramadda-snippet"));
-                    } else {
-                        snippet = "";
-                    }
-
-
+                    String snippet = getSnippet(request, child);
 
                     sb.append(HtmlUtils.div(snippet + contents.get(i),
                                             HtmlUtils.cssClass("bs-inner")
@@ -2065,6 +2079,29 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         }
 
     }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param child _more_
+     *
+     * @return _more_
+     */
+    private String getSnippet(Request request, Entry child) {
+        String snippet = StringUtil.findPattern(child.getDescription(),
+                             "(?s)<snippet>(.*)</snippet>");
+        if (snippet != null) {
+            snippet = HtmlUtils.div(snippet,
+                                    HtmlUtils.cssClass("ramadda-snippet"));
+        } else {
+            snippet = "";
+        }
+
+        return snippet;
+    }
+
+
 
     /**
      * _more_
