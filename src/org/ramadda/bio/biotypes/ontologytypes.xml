@@ -28,6 +28,22 @@
 
   <type name="bio_ontology_series"  description="Series" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Bio">
      <property name="icon" value="/biotypes/images.png"/>
+     <wiki><![CDATA[
++row
++col-md-10
+<h2>{{name}}</h2>
+-col
++col-md-2
+<a href="{{root}}/entry/show?entryid={{entryid}}&output=zip.zipgroup" class="btn btn-primary btn-default" role="button">Download Zip</a>
+-col
+-row
+{{description}}
+{{imageplayer  loopdelay="1000"  loopstart="false"  useAttachment="true" message=""}}
+----
+<h2>Files</h2>
+{{tree message=""}}
+]]>
+</wiki>
   </type>
 
 
