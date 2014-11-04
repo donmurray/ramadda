@@ -443,7 +443,10 @@ public class Json {
             s = cleanString(s);
             s = s.replaceAll("\"", "\\\\\"");
             if(s.equals("true") || s.equals("false")) return s;
-            if(s.matches("^[0-9]+\\.?[0-9]*$")) return s;
+            //This can mess up and match on what should be a string value, e.g.
+            //00000000000
+            //Not sure what to do here
+            //            if(s.matches("^[0-9]+\\.?[0-9]*$")) return s;
 
             return "\"" + s + "\"";
         } catch (Exception exc) {
