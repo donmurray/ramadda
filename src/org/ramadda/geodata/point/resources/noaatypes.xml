@@ -77,4 +77,16 @@ DC Climate Data"  handler="org.ramadda.data.services.PointTypeHandler">
   </type>
 
 
+  <type name="type_point_atcf"  super="type_point_noaa" description="ATCF Hurricane Track"  handler="org.ramadda.data.services.PointTypeHandler">
+     <property name="icon" value="/point/noaa.gif"/>
+     <property name="record.file.class" value="org.ramadda.data.point.text.CsvFile"/>
+ <property name="record.properties">
+fields=BASIN[type="string"],CY[type="string"],YYYYMMDDHH[type="date" format="yyyyMMddHH"],TECHNUM[type="string"],TECH[type="string"],TAU,Latitude[scale="0.10"],Longitude[scale="0.10"],VMAX[],MSLP[],TY[],RAD[],WINDCODE[],RAD1[],RAD2[],RAD3[],RAD4[],RADP[],RRP[],MRD[],GUSTS[],EYE[],SUBREGION[],MAXSEAS[],INITIALS[],DIR[],SPEED[],STORMNAME[],DEPTH[],SEAS[],SEASCODE[],SEAS1[],SEAS2[],SEAS3[],SEAS4[]
+picky=false
+     </property>
+  </type>
+
+
+
+
 </types>
