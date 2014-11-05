@@ -4,7 +4,7 @@
       <description><![CDATA[
 Run Picard to convert FASTQ to SAM
 <br>
-<a href="http://picard.sourceforge.net/service-line-overview.shtml#FastqToSam" target="_help">Documentation</a>
+<a href="http://broadinstitute.github.io/picard/" target="_help">Documentation</a>
 ]]></description>
       <output type="bio_sam" pattern=".*\.sam"/>
       <arg value="FastqToSam.jar"></arg>
@@ -20,7 +20,7 @@ pre-pipeline 1.3 style scores (solexa scaling + 66), Illumina for pipeline 1.3 a
 (phred scaling + 64) or Standard for phred scaled scores with a character shift of 33.  
 If this value is not specified, the quality format will be detected automatically.  
 <br>
-<a target="_help" href="http://picard.sourceforge.net/service-line-overview.shtml#FastqToSam">Documentation</a>
+<a target="_help" href="http://broadinstitute.github.io/picard/">Documentation</a>
 ]]></help>
 </arg>
     </service>
@@ -29,7 +29,7 @@ If this value is not specified, the quality format will be detected automaticall
       <description><![CDATA[
 Run Picard to convert SAM to FASTQ
 <br>
-<a href="http://picard.sourceforge.net/service-line-overview.shtml#SamToFastq" target="_help">Documentation</a>
+<a href="http://broadinstitute.github.io/picard/" target="_help">Documentation</a>
 ]]></description>
       <output type="bio_fastq" pattern=".*\.fastq"/>
       <arg value="SamToFastq.jar"></arg>
@@ -55,7 +55,7 @@ Run Picard to convert SAM to FASTQ
       <description><![CDATA[
 Reads a SAM or BAM file and writes a file containing summary alignment metrics. 
 <br>
-<a href="http://picard.sourceforge.net/service-line-overview.shtml#CollectAlignmentSummaryMetrics" target="_help">Documentation</a>
+<a href="http://broadinstitute.github.io/picard/" target="_help">Documentation</a>
 ]]></description>
       <output type="bio_sam" pattern=".*\.sam"/>
       <arg value="CollectAlignmentSummaryMetrics.jar"></arg>
@@ -79,7 +79,7 @@ Reads a SAM or BAM file and writes a file containing summary alignment metrics.
       <description><![CDATA[
 Replaces all read groups in the INPUT file with a new read group and assigns all reads to this read group in the OUTPUT
 <br>
-<a target="_help" href="http://picard.sourceforge.net/service-line-overview.shtml#AddOrReplaceReadGroups">Documentation</a>
+<a target="_help" href="http://broadinstitute.github.io/picard/">Documentation</a>
 ]]></description>
       <output type="bio_sam" pattern=".*\.sam"/>
       <output type="bio_bam" pattern=".*\.bam"/>
