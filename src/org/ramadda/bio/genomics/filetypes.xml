@@ -60,7 +60,11 @@
   <type name="bio_wig"  description="Wiggle (WIG) Format" foruser="true" super="bio_genomics"  pattern=".*\.wig$">
   </type>
 
-  <type name="bio_pdb"  description="PDB Protein File" category="Genomics"  handler="org.ramadda.bio.genomics.PdbTypeHandler" pattern="(.*\.ent$|.*\.ent.gz$)">
+  <type name="bio_sf" foruser="false" category="Genomics" >
+     <property name="icon" value="/genomics/dna.png"/>
+  </type>
+
+  <type name="bio_sf_pdb"  super="bio_sf" description="PDB Protein File" category="Genomics"  handler="org.ramadda.bio.genomics.PdbTypeHandler" pattern="(.*\.ent$|.*\.ent.gz$)">
      <property name="icon" value="/genomics/dna.png"/>
      <property name="form.area.show" value="false"/>
      <property name="form.todate.show" value="false"/>
