@@ -1963,15 +1963,19 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
 
         //Bridge the ramadda servlet to the opendap servlet
         NcDODSServlet servlet = new NcDODSServlet(request, entry, ncFile) {
+@Override
             public ServletConfig getServletConfig() {
                 return request.getHttpServlet().getServletConfig();
             }
+@Override
             public ServletContext getServletContext() {
                 return request.getHttpServlet().getServletContext();
             }
+@Override
             public String getServletInfo() {
                 return request.getHttpServlet().getServletInfo();
             }
+@Override
             public Enumeration getInitParameterNames() {
                 return request.getHttpServlet().getInitParameterNames();
             }
