@@ -38,10 +38,15 @@ import java.awt.Image;
 import java.awt.Toolkit;
 import java.awt.image.*;
 
+import java.io.*;
+
 import java.io.File;
 import java.io.InputStream;
 
 import java.lang.reflect.Constructor;
+
+import java.net.URL;
+import java.net.URLConnection;
 
 import java.text.SimpleDateFormat;
 
@@ -58,6 +63,8 @@ import java.util.List;
 import java.util.TimeZone;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.zip.*;
+import java.util.zip.GZIPInputStream;
 
 
 /**
@@ -1086,6 +1093,73 @@ public class Utils {
 
         return list.get(index);
     }
+
+    /**
+     * _more_
+     *
+     * @param filename _more_
+     * @param buffered _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
+    public static InputStream doMakeInputStream(String filename,
+            boolean buffered)
+            throws IOException {
+        int         size = 8000;
+        InputStream is   = null;
+        if (new File(filename).exists()) {
+            is = new FileInputStream(filename);
+        } else {
+            //Try it as a url
+            URL           url        = new URL(filename);
+            URLConnection connection = url.openConnection();
+            is = connection.getInputStream();
+        }
+
+        if (filename.toLowerCase().endsWith(".gz")) {
+            is = new GZIPInputStream(is);
+        }
+
+        if (filename.toLowerCase().endsWith(".zip")) {
+            ZipEntry       ze  = null;
+            ZipInputStream zin = new ZipInputStream(is);
+            //Read into the zip stream to the first entry
+            while ((ze = zin.getNextEntry()) != null) {
+                if (ze.isDirectory()) {
+                    continue;
+                }
+
+                break;
+                /*                String path = ze.getName();
+                                  if(path.toLowerCase().endsWith(".las")) {
+                                  break;
+                                  }
+                */
+            }
+            is = zin;
+        }
+
+
+
+
+        if ( !buffered) {
+            //            System.err.println("not buffered");
+            //            return is;
+            //            size = 8*3;
+        }
+
+        if (buffered) {
+            size = 1000000;
+        }
+
+        //        System.err.println("buffer size:" + size);
+        return new BufferedInputStream(is, size);
+    }
+
+
+
 
 
 }
