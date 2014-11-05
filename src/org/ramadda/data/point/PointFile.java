@@ -651,7 +651,7 @@ public abstract class PointFile extends RecordFile implements Cloneable,
                 }
             } catch (Exception exc) {
                 System.err.println("Error:" + exc + " file:" + arg);
-                //                exc.printStackTrace();
+                exc.printStackTrace();
                 if(verbose) {
                     return;
                 }

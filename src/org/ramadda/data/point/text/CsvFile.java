@@ -201,7 +201,7 @@ public class CsvFile extends TextFile {
         TextRecord record = new TextRecord(this, getFields());
         record.setFirstDataLine(firstDataLine);
         record.setDelimiter(getDelimiter());
-
+        record.setBePickyAboutTokens(getProperty("picky",true));
         return record;
     }
 

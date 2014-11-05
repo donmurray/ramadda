@@ -314,8 +314,14 @@ public class TextRecord extends DataRecord {
                 if (isMissingValue(field, tok)) {
                     values[fieldCnt] = Double.NaN;
                 } else {
+                    double dValue;
+                    if(idxX == fieldCnt  || idxY == fieldCnt) {
+                        dValue = ucar.unidata.util.Misc.decodeLatLon(tok);
+                    } else {
+                        dValue  = Double.parseDouble(tok);
+                    }
                     values[fieldCnt] =
-                        field.convertValue(Double.parseDouble(tok));
+                        field.convertValue(dValue);
                     if (isMissingValue(field, values[fieldCnt])) {
                         values[fieldCnt] = Double.NaN;
                     }
