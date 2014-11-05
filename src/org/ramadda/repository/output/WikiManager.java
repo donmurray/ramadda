@@ -1614,10 +1614,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                             ? getEntryDisplayName(child)
                             : linklabel);
 
-                    if (includeUrl) {
-                        content = content + HtmlUtils.br()
+                    content = content + HtmlUtils.br()
                                   + HtmlUtils.leftRight("", href);
-                    }
                 }
                 contents.add(content);
 
