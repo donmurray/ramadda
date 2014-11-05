@@ -572,55 +572,7 @@ public abstract class RecordFile {
      */
     public InputStream doMakeInputStream(boolean buffered)
             throws IOException {
-        int         size = 8000;
-        InputStream is   = null;
-        if (new File(filename).exists()) {
-            is = new FileInputStream(filename);
-        } else {
-            //Try it as a url
-            URL           url        = new URL(filename);
-            URLConnection connection = url.openConnection();
-            is = connection.getInputStream();
-        }
-
-        if (filename.toLowerCase().endsWith(".gz")) {
-            is = new GZIPInputStream(is);
-        }
-
-        if (filename.toLowerCase().endsWith(".zip")) {
-            ZipEntry       ze  = null;
-            ZipInputStream zin = new ZipInputStream(is);
-            //Read into the zip stream to the first entry
-            while ((ze = zin.getNextEntry()) != null) {
-                if (ze.isDirectory()) {
-                    continue;
-                }
-
-                break;
-                /*                String path = ze.getName();
-                                  if(path.toLowerCase().endsWith(".las")) {
-                                  break;
-                                  }
-                */
-            }
-            is = zin;
-        }
-
-
-
-
-        if ( !buffered) {
-            //            System.err.println("not buffered");
-            //            return is;
-            //            size = 8*3;
-        }
-
-        if (buffered) {
-            size = 1000000;
-        }
-
-        //        System.err.println("buffer size:" + size);
-        return new BufferedInputStream(is, size);
+        return Utils.doMakeInputStream(filename, buffered);
     }
 
     /**
