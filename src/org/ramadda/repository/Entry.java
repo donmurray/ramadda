@@ -1643,6 +1643,9 @@ public class Entry implements Cloneable {
      */
     public void setName(String value) {
         name = value;
+        if (name.length() > MAX_NAME_LENGTH) {
+            name = name.substring(0, MAX_NAME_LENGTH - 1);
+        }
     }
 
     /**
@@ -1667,6 +1670,10 @@ public class Entry implements Cloneable {
      */
     public void setDescription(String value) {
         description = value;
+        if (description.length() > MAX_DESCRIPTION_LENGTH) {
+            description = description.substring(0,
+                    MAX_DESCRIPTION_LENGTH - 1);
+        }
     }
 
     /**
