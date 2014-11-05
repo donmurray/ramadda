@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Properties;
 import java.util.TimeZone;
 import java.util.zip.*;
+import java.util.zip.GZIPInputStream;
 
 
 /**
@@ -582,6 +583,10 @@ public abstract class RecordFile {
             is = connection.getInputStream();
         }
 
+        if (filename.toLowerCase().endsWith(".gz")) {
+            is = new GZIPInputStream(is);
+        }
+
         if (filename.toLowerCase().endsWith(".zip")) {
             ZipEntry       ze  = null;
             ZipInputStream zin = new ZipInputStream(is);
@@ -600,6 +605,8 @@ public abstract class RecordFile {
             }
             is = zin;
         }
+
+
 
 
         if ( !buffered) {
@@ -1359,7 +1366,7 @@ public abstract class RecordFile {
         //I really shouldn't be doing this here
         return s.equals("---") || s.equals("n.v.") || (s.length() == 0)
                || s.equals("null") || s.equals("nan") || s.equals("NAN")
-               || s.equals("NA") || s.equals("NaN");
+               || s.equals("NA") || s.equals("NaN") || s.equals("UKN");
     }
 
 
