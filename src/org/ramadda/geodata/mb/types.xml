@@ -8,7 +8,7 @@
 
     <service link="geo_mb_mbinfo" id="initmb">
       <params>
-          <param name="mb.mbinfo.xml">true</param>
+          <param name="initmb.geo_mb_mbinfo.xml">true</param>
       </params>
     </service>
 

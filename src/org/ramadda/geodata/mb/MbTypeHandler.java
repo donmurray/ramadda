@@ -107,8 +107,7 @@ public class MbTypeHandler extends GenericTypeHandler {
                                          getClass(), "");
         Element root = null;
 
-        System.err.println(xml);
-
+        //        System.err.println(xml);
         try {
             root = XmlUtil.getRoot(xml);
         } catch (Exception exc) {
