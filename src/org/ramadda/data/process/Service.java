@@ -602,6 +602,7 @@ public class Service extends RepositoryManager {
      * @return _more_
      */
     public Request makeRequest(Request request) {
+        System.err.println ("request:" + paramValues);
         if (paramValues.size() == 0) {
             return request;
         }
@@ -690,6 +691,7 @@ public class Service extends RepositoryManager {
                                   String dflt) {
         String fullArg = getUrlArg(argPrefix, argName);
 
+        //        System.err.println ("getRequestValue:" + " prefix:" + argPrefix +" name:" + argName +" full:" + fullArg);
         if (request.defined(fullArg)) {
             String value = request.getString(fullArg, dflt);
             if (input != null) {
@@ -1603,10 +1605,10 @@ public class Service extends RepositoryManager {
             List selected = request.get(argUrlName, new ArrayList<String>());
             //                                        request.get(arg.getName(),
             //                                                    Misc.newList(arg.getDefault())));
-            System.err.println("arg.name:" + arg.getName());
-            System.err.println("argUrlName:" + argUrlName);
-            System.err.println("selected:" + selected);
-            System.err.println("request:" + request);
+            //            System.err.println("arg.name:" + arg.getName());
+            //            System.err.println("argUrlName:" + argUrlName);
+            //            System.err.println("selected:" + selected);
+            //            System.err.println("request:" + request);
             inputHtml.append(HtmlUtils.select(argUrlName, values, selected,
                     extra, 100));
         } else if (arg.isFlag()) {
