@@ -41,6 +41,7 @@ import java.io.*;
 import java.util.ArrayList;
 
 import java.util.Date;
+import java.util.Hashtable;
 import java.util.List;
 
 import javax.mail.*;
@@ -89,12 +90,12 @@ public class PdbTypeHandler extends GenericTypeHandler {
             return;
         }
 
-        List<String> titles    = new ArrayList<String>();
-        List<String> remarks   = new ArrayList<String>();
-        List<String> keywords  = new ArrayList<String>();
-        List<String> compounds = new ArrayList<String>();
-        List<String> sources   = new ArrayList<String>();
-        List<String> authors   = new ArrayList<String>();
+        List<String>        titles    = new ArrayList<String>();
+        List<String>        remarks   = new ArrayList<String>();
+        List<String>        keywords  = new ArrayList<String>();
+        List<StringBuilder> compounds = new ArrayList<StringBuilder>();
+        List<StringBuilder> sources   = new ArrayList<StringBuilder>();
+        List<String>        authors   = new ArrayList<String>();
         InputStream is =
             Utils.doMakeInputStream(entry.getResource().getPath(), true);
         BufferedReader br  = new BufferedReader(new InputStreamReader(is));
@@ -131,9 +132,17 @@ public class PdbTypeHandler extends GenericTypeHandler {
                         line.substring("KEYWDS ".length()).trim(), ",", true,
                         true));
             } else if (line.startsWith("COMPND ")) {
-                compounds.add(line.substring("COMPND ".length()).trim());
+                String tmp = read(line, "COMPND ");
+                if (tmp.startsWith("MOL_ID") || (compounds.size() == 0)) {
+                    compounds.add(new StringBuilder());
+                }
+                compounds.get(compounds.size() - 1).append(tmp);
             } else if (line.startsWith("SOURCE ")) {
-                sources.add(line.substring("SOURCE ".length()).trim());
+                String tmp = read(line, "SOURCE ");
+                if (tmp.startsWith("MOL_ID") || (sources.size() == 0)) {
+                    sources.add(new StringBuilder());
+                }
+                sources.get(sources.size() - 1).append(tmp);
             } else if (line.startsWith("AUTHOR ")) {
                 authors.addAll(
                     StringUtil.split(
@@ -143,32 +152,24 @@ public class PdbTypeHandler extends GenericTypeHandler {
 
         }
 
-        for (String compound : compounds) {
-            compound = compound.replaceAll("^\\s*[0-9]+", "");
-            compound = compound.replaceAll(";$", "");
-            List<String> toks = StringUtil.splitUpTo(compound, ":", 2);
+        for (StringBuilder compound : compounds) {
+            Hashtable<String, String> map = getMap(compound);
             entry.addMetadata(new Metadata(getRepository().getGUID(),
                                            entry.getId(), "bio_pdb_compound",
-                                           true, toks.get(0),
-                                           ((toks.size() <= 1)
-                                            ? ""
-                                            : toks.get(1)), "", "", ""));
-
-
+                                           true, map.get("MOL_ID"),
+                                           map.get("MOLECULE"),
+                                           map.get("CHAIN"),
+                                           map.get("ENGINEERED"), ""));
         }
 
-        for (String source : sources) {
-            source = source.replaceAll("^\\s*[0-9]+", "");
-            source = source.replaceAll(";$", "");
-            List<String> toks = StringUtil.splitUpTo(source, ":", 2);
+        for (StringBuilder source : sources) {
+            Hashtable<String, String> map = getMap(source);
             entry.addMetadata(new Metadata(getRepository().getGUID(),
                                            entry.getId(), "bio_pdb_source",
-                                           true, toks.get(0),
-                                           ((toks.size() <= 1)
-                                            ? ""
-                                            : toks.get(1)), "", "", ""));
-
-
+                                           true, map.get("MOL_ID"),
+                                           map.get("ORGANISM_SCIENTIFIC"),
+                                           map.get("ORGANISM_COMMON"),
+                                           map.get("ORGANISM_TAXID"), ""));
         }
 
         for (String word : authors) {
@@ -187,10 +188,16 @@ public class PdbTypeHandler extends GenericTypeHandler {
             entry.setName(StringUtil.join(" ", titles));
         }
         if (remarks.size() > 0) {
-
-            entry.setDescription(
-                "<pre><div style=\"max-height: 300px; overflow-y:auto;\">"
-                + StringUtil.join("\n", remarks) + "</div></pre>");
+            StringBuilder desc =
+                new StringBuilder(
+                    "<pre><div style=\"max-height: 300px; overflow-y:auto;\">");
+            desc.append(StringUtil.join("\n", remarks));
+            if (desc.length() > Entry.MAX_DESCRIPTION_LENGTH - 20) {
+                desc = new StringBuilder(
+                    desc.substring(Entry.MAX_DESCRIPTION_LENGTH - 20));
+            }
+            desc.append("</div></pre>");
+            entry.setDescription(desc.toString());
         }
         /*
           entry.getFile().toString();
@@ -201,6 +208,39 @@ public class PdbTypeHandler extends GenericTypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     *
+     * @return _more_
+     */
+    private Hashtable<String, String> getMap(StringBuilder sb) {
+        Hashtable<String, String> map = new Hashtable<String, String>();
+        for (String tok : StringUtil.split(sb.toString(), ";", true, true)) {
+            List<String> toks = StringUtil.splitUpTo(tok, ":", 2);
+            map.put(toks.get(0), (toks.size() < 2)
+                                 ? ""
+                                 : toks.get(1));
+        }
 
+        return map;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param line _more_
+     * @param prefix _more_
+     *
+     * @return _more_
+     */
+    private String read(String line, String prefix) {
+        String tmp = line.substring(prefix.length()).trim();
+        tmp = tmp.replaceAll("^[0-9]+", "");
+
+        return tmp;
+    }
 
 }

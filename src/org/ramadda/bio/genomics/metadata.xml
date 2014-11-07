@@ -10,14 +10,19 @@
     </type>
 
     <type id="bio_pdb_compound" name="PDB Compound" foruser="true" searchable="true">
-      <element id="name" name="Name" />
-      <element id="value" name="Value" />
+      <element id="mol_id" name="Molecule ID" />
+      <element id="molecule" name="Molecule" />
+      <element id="chain" name="Chain" />
+      <element id="engineered" name="Engineered" />
     </type>
 
 
     <type id="bio_pdb_source" name="PDB Source" foruser="true" searchable="true">
-      <element id="name" name="Name" />
-      <element id="value" name="Value" />
+      <element id="mol_id" name="Molecule ID" />
+      <element id="organism_scientific" name="Organism scientific" />
+      <element id="organism_common" name="Organism common" />
+      <element id="organism_taxid" name="Organism taxid" />
+
     </type>
   </handler>
 
