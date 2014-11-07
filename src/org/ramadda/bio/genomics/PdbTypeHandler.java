@@ -107,20 +107,14 @@ public class PdbTypeHandler extends GenericTypeHandler {
                 break;
             }
             if (line.startsWith("TITLE ")) {
-                //                System.err.println (line);
-                titles.add(
-                    line.substring("TITLE ".length()).replaceAll(
-                        "^\\s*[0-9]+", ""));
+                String title = read(line,"TITLE "); 
+                title = title.trim();
+                titles.add(title);
             } else if (line.startsWith("REMARK ")) {
-                //                System.err.println (line);
-                String remark = line.substring("REMARK ".length()).trim();
-                int    idx    = remark.indexOf(" ");
-                if (idx > 0) {
-                    remark = remark.substring(idx + 1);
-                } else {
-                    continue;
+                String remark = read(line,"REMARK ");
+                if(Utils.stringDefined(remark)) {
+                    remarks.add(remark);
                 }
-                remarks.add(remark);
             } else if (line.startsWith("EXPDATA ")) {
                 entry.addMetadata(new Metadata(getRepository().getGUID(),
                         entry.getId(), "bio_method", true,
@@ -128,9 +122,8 @@ public class PdbTypeHandler extends GenericTypeHandler {
 
             } else if (line.startsWith("KEYWDS ")) {
                 keywords.addAll(
-                    StringUtil.split(
-                        line.substring("KEYWDS ".length()).trim(), ",", true,
-                        true));
+                    StringUtil.split(read(line,"KEYWDS "), ",", true,
+                                     true));
             } else if (line.startsWith("COMPND ")) {
                 String tmp = read(line, "COMPND ");
                 if (tmp.startsWith("MOL_ID") || (compounds.size() == 0)) {
@@ -185,6 +178,7 @@ public class PdbTypeHandler extends GenericTypeHandler {
                                            true, word, "", "", "", ""));
         }
         if (titles.size() > 0) {
+
             entry.setName(StringUtil.join(" ", titles));
         }
         if (remarks.size() > 0) {
