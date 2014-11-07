@@ -277,10 +277,10 @@ public class Metadata implements Constants {
         this.entryId   = entryId;
         this.type      = type;
         this.inherited = inherited;
-        setAttr1(attr1);
-        setAttr2(attr2);
-        setAttr3(attr3);
-        setAttr4(attr4);
+        setAttr1(attr1!=null?attr1:"");
+        setAttr2(attr2!=null?attr2:"");
+        setAttr3(attr3!=null?attr3:"");
+        setAttr4(attr4!=null?attr4:"");
         this.extra = extra;
         if (this.extra == null) {
             this.extra = "";
