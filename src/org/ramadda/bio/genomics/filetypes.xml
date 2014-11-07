@@ -69,6 +69,21 @@
      <property name="form.area.show" value="false"/>
      <property name="form.todate.show" value="false"/>
      <property name="form.fromdate.label" value="Date"/>
+     <wiki_inner><![CDATA[
+<h2>{{name}}</h2>
+{{description}}
++mini
+<h2>Information</h2>
+{{information}}
+-mini
+----
++mini
+<h2>Properties</h2>
+{{properties}}
+-mini
+
+]]>
+</wiki_inner>
   </type>
 
 
