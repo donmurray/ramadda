@@ -1,4 +1,5 @@
 <types>
+
   <type name="type_mb"  description="MB Bathymetry" handler="org.ramadda.geodata.mb.MbTypeHandler" category="Oceanography" pattern=".*\.mb[0-9]+">
      <property name="icon" value="/mb/mb.png"/>
      <property name="form.altitude.show" value="true"/>
