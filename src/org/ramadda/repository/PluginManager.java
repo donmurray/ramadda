@@ -24,6 +24,7 @@ package org.ramadda.repository;
 import org.ramadda.repository.admin.*;
 import org.ramadda.repository.auth.*;
 import org.ramadda.repository.harvester.*;
+import org.ramadda.repository.search.*;
 
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.MultiJarClassLoader;
@@ -114,7 +115,7 @@ public class PluginManager extends RepositoryManager {
     /** _more_ */
     private Properties properties;
 
-    /** _more_          */
+    /** _more_ */
     private List<String> allFiles = new ArrayList<String>();
 
 
@@ -309,8 +310,16 @@ public class PluginManager extends RepositoryManager {
                 if (classToLoad.startsWith("#")) {
                     continue;
                 }
+                List<String> toks = StringUtil.split(classToLoad, ";", true,
+                                        true);
+                if (toks.size() > 1) {
+                    classToLoad = toks.get(0);
+                    toks.remove(0);
+                } else {
+                    toks = null;
+                }
                 Class c = Misc.findClass(classToLoad);
-                classLoader.checkSpecialClass(c);
+                classLoader.checkSpecialClass(c, toks);
             }
         }
 
@@ -660,7 +669,7 @@ public class PluginManager extends RepositoryManager {
 
         /*
         public void checkClass(Class c) throws Exception {
-            this.checkSpecialClass(c);
+            this.checkSpecialClass(c,null);
             super.checkClass(c);
         }
         */
@@ -670,15 +679,21 @@ public class PluginManager extends RepositoryManager {
          * Check if this class is one of the special classes, e.g., ImportHandler, PageDecorator, etc.
          *
          * @param c the class
+         * @param args _more_
          *
          * @throws Exception On badness
          */
-        public void checkSpecialClass(Class c) throws Exception {
-            if (seenClasses.contains(c)) {
+        public void checkSpecialClass(Class c, List<String> args)
+                throws Exception {
+            String key = c.getName();
+            if (args != null) {
+                key += args.toString();
+            }
+            if (seenClasses.contains(key)) {
                 //                System.out.println ("class: Seen it:" + c.getName());
                 return;
             }
-            seenClasses.add(c);
+            seenClasses.add(key);
             if (ImportHandler.class.isAssignableFrom(c)) {
                 //                System.out.println("class:" + c.getName());
                 pluginStat("Import handler", c.getName());
@@ -691,6 +706,37 @@ public class PluginManager extends RepositoryManager {
                 } else {
                     importHandlers.add((ImportHandler) c.newInstance());
                 }
+
+                return;
+            }
+
+            if (SearchProvider.class.isAssignableFrom(c)) {
+                String className = c.getName();
+                pluginStat("Search provider", className);
+                String         extra    = null;
+                SearchProvider provider = null;
+                Constructor    ctor     = null;
+                if ((args != null) && (args.size() > 0)) {
+                    System.err.println("args:" + args);
+                    ctor = Misc.findConstructor(c,
+                            new Class[] { Repository.class,
+                                          List.class });
+                    provider =
+                        (SearchProvider) ctor.newInstance(new Object[] {
+                            getRepository(),
+                            args });
+                } else {
+                    ctor = Misc.findConstructor(c,
+                            new Class[] { Repository.class });
+                    if (ctor != null) {
+                        provider =
+                            (SearchProvider) ctor.newInstance(new Object[] {
+                                getRepository() });
+                    } else {
+                        provider = (SearchProvider) c.newInstance();
+                    }
+                }
+                getSearchManager().addPluginSearchProvider(provider);
 
                 return;
             }

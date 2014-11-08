@@ -1433,7 +1433,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                   + HtmlUtils.style(style.toString()));
                 content.append(childsHtml);
                 content.append(suffix);
-                if(includeLinkAfter) {
+                if (includeLinkAfter) {
                     content.append(childUrl);
                 }
 
@@ -1615,7 +1615,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                             : linklabel);
 
                     content = content + HtmlUtils.br()
-                                  + HtmlUtils.leftRight("", href);
+                              + HtmlUtils.leftRight("", href);
                 }
                 contents.add(content);
 
@@ -2795,14 +2795,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
                     List<ServerInfo> servers = new ArrayList<ServerInfo>();
                     servers.add(serverInfo);
-                    List<Entry> remoteGroups  = new ArrayList<Entry>();
-                    List<Entry> remoteEntries = new ArrayList<Entry>();
-
                     getSearchManager().doDistributedSearch(myRequest,
-                            servers, theBaseEntry, remoteGroups,
-                            remoteEntries);
-                    entries.addAll(remoteGroups);
-                    entries.addAll(remoteEntries);
+                            servers, theBaseEntry, entries);
 
                     continue;
                 }

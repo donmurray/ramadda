@@ -231,8 +231,13 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
     private boolean isLuceneEnabled = true;
 
 
-    /** _more_          */
+    /** _more_ */
     private List<SearchProvider> searchProviders = null;
+
+
+    /** _more_          */
+    private List<SearchProvider> pluginSearchProviders =
+        new ArrayList<SearchProvider>();
 
 
     /**
@@ -656,7 +661,8 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                                       "application/atom+xml",
                                       OpenSearchUtil.ATTR_TEMPLATE, url });
 
-        String xml  = XmlUtil.getHeader() +XmlUtil.toString(root);
+        String xml = XmlUtil.getHeader() + XmlUtil.toString(root);
+
         return new Result(xml, OpenSearchUtil.MIMETYPE);
     }
 
@@ -1303,6 +1309,16 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
     /**
      * _more_
      *
+     * @param provider _more_
+     */
+    public void addPluginSearchProvider(SearchProvider provider) {
+        pluginSearchProviders.add(provider);
+    }
+
+
+    /**
+     * _more_
+     *
      * @param request _more_
      * @param searchCriteriaSB _more_
      *
@@ -1310,23 +1326,38 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
      *
      * @throws Exception _more_
      */
-    public List[] doSearch(Request request, Appendable searchCriteriaSB)
+    public List<Entry>[] doSearch(Request request,
+                                  Appendable searchCriteriaSB)
             throws Exception {
         if (searchProviders == null) {
+            System.err.println(
+                "SearchManager.doSearch- making searchProviders");
+            System.err.println("   plugin:" + pluginSearchProviders);
             List<SearchProvider> tmp = new ArrayList<SearchProvider>();
             tmp.add(
                 new SearchProvider.RamaddaSearchProvider(getRepository()));
+            tmp.addAll(pluginSearchProviders);
             searchProviders = tmp;
+
         }
 
-        //TODO: clean up the whole array  of lists and handle multiple search providers
+        ArrayList<Entry> folders = new ArrayList<Entry>();
+        ArrayList<Entry> entries = new ArrayList<Entry>();
+
         for (int i = 0; i < searchProviders.size(); i++) {
             SearchProvider searchProvider = searchProviders.get(i);
-
-            return searchProvider.getEntries(request, searchCriteriaSB);
+            List<Entry> results = searchProvider.getEntries(request,
+                                      searchCriteriaSB);
+            for (Entry e : results) {
+                if (e.isGroup()) {
+                    folders.add(e);
+                } else {
+                    entries.add(e);
+                }
+            }
         }
 
-        return null;
+        return (List<Entry>[]) new List[] { folders, entries };
     }
 
 
@@ -1436,8 +1467,16 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                 return new Result("Remote Search Results", sb);
             }
 
-            Entry tmpGroup = getEntryManager().getDummyGroup();
-            doDistributedSearch(request, servers, tmpGroup, groups, entries);
+            Entry       tmpGroup = getEntryManager().getDummyGroup();
+            List<Entry> results  = new ArrayList<Entry>();
+            doDistributedSearch(request, servers, tmpGroup, results);
+            for (Entry e : results) {
+                if (e.isGroup()) {
+                    groups.add(e);
+                } else {
+                    entries.add(e);
+                }
+            }
             Result result = getRepository().getOutputHandler(
                                 request).outputGroup(
                                 request, request.getOutput(), tmpGroup,
@@ -1536,15 +1575,12 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
      *
      * @throws Exception _more_
      */
-    public void doDistributedSearch(final Request request,
-                                    List<ServerInfo> servers, Entry tmpEntry,
-                                    final List<Entry> groups,
+    public void doDistributedSearch(Request request,
+                                    List<ServerInfo> servers,
+                                    final Entry tmpEntry,
                                     final List<Entry> entries)
             throws Exception {
-
-        String output = request.getString(ARG_OUTPUT, "");
-        request.put(ARG_OUTPUT, XmlOutputHandler.OUTPUT_XML);
-        final String    linkUrl     = request.getUrlArgs();
+        request = request.cloneMe();
         ServerInfo      thisServer  = getRepository().getServerInfo();
         final int[]     runnableCnt = { 0 };
         final boolean[] running     = { true };
@@ -1554,80 +1590,11 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             if (server.equals(thisServer)) {
                 continue;
             }
-            final Entry parentEntry =
-                new Entry(getRepository().getGroupTypeHandler(), true);
-            parentEntry.setId(
-                getEntryManager().getRemoteEntryId(server.getUrl(), ""));
-            getEntryManager().cacheEntry(parentEntry);
-            parentEntry.setRemoteServer(server.getUrl());
-            parentEntry.setIsRemoteEntry(true);
-            parentEntry.setUser(getUserManager().getAnonymousUser());
-            parentEntry.setParentEntry(tmpEntry);
-            parentEntry.setName(server.getUrl());
-            final ServerInfo theServer = server;
-            Runnable         runnable  = new Runnable() {
-                public void run() {
-                    String remoteSearchUrl =
-                        theServer.getUrl() + URL_ENTRY_SEARCH.getPath() + "?"
-                        + linkUrl + "&max=5&type=project_gps_rinex";
 
+            Runnable runnable = makeRunnable(request, server.getUrl(),
+                                             tmpEntry, entries, running,
+                                             runnableCnt);
 
-
-                    System.err.println(remoteSearchUrl);
-                    try {
-                        String entriesXml =
-                            getStorageManager().readSystemResource(
-                                new URL(remoteSearchUrl));
-                        System.err.println(entriesXml);
-                        if ( !running[0]) {
-                            return;
-                        }
-                        Element  root     = XmlUtil.getRoot(entriesXml);
-                        NodeList children = XmlUtil.getElements(root);
-                        //Synchronize on the groups list so only one thread at  a time adds its entries to it
-                        synchronized (groups) {
-                            for (int i = 0; i < children.getLength(); i++) {
-                                Element node = (Element) children.item(i);
-                                //                    if (!node.getTagName().equals(TAG_ENTRY)) {continue;}
-                                Entry entry =
-                                    getEntryManager().createEntryFromXml(
-                                        request, node, parentEntry,
-                                        new Hashtable(), false, false);
-
-                                entry.setResource(
-                                    new Resource(
-                                        "remote:"
-                                        + XmlUtil.getAttribute(
-                                            node, ATTR_RESOURCE,
-                                            ""), Resource.TYPE_REMOTE_FILE));
-                                entry.setId(
-                                    getEntryManager().getRemoteEntryId(
-                                        theServer.getUrl(),
-                                        XmlUtil.getAttribute(node, ATTR_ID)));
-                                entry.setIsRemoteEntry(true);
-                                entry.setRemoteServer(theServer.getUrl());
-                                getEntryManager().cacheEntry(entry);
-                                if (entry.isGroup()) {
-                                    groups.add((Entry) entry);
-                                } else {
-                                    entries.add((Entry) entry);
-                                }
-                            }
-                        }
-                    } catch (Exception exc) {
-                        logException("Error doing search:" + remoteSearchUrl,
-                                     exc);
-                    } finally {
-                        synchronized (runnableCnt) {
-                            runnableCnt[0]--;
-                        }
-                    }
-                }
-
-                public String toString() {
-                    return "Runnable:" + theServer.getUrl();
-                }
-            };
             runnables.add(runnable);
         }
 
@@ -1657,13 +1624,108 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             }
         }
         running[0] = false;
+    }
 
 
 
-        request.put(ARG_OUTPUT, output);
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param serverUrl _more_
+     * @param tmpEntry _more_
+     * @param entries _more_
+     * @param running _more_
+     * @param runnableCnt _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Runnable makeRunnable(final Request request,
+                                 final String serverUrl,
+                                 final Entry tmpEntry,
+                                 final List<Entry> entries,
+                                 final boolean[] running,
+                                 final int[] runnableCnt)
+            throws Exception {
 
+
+        request.put(ARG_OUTPUT, XmlOutputHandler.OUTPUT_XML);
+        final Entry parentEntry =
+            new Entry(getRepository().getGroupTypeHandler(), true);
+        parentEntry.setId(getEntryManager().getRemoteEntryId(serverUrl, ""));
+        getEntryManager().cacheEntry(parentEntry);
+        parentEntry.setRemoteServer(serverUrl);
+        parentEntry.setIsRemoteEntry(true);
+        parentEntry.setUser(getUserManager().getAnonymousUser());
+        parentEntry.setParentEntry(tmpEntry);
+        parentEntry.setName(serverUrl);
+        final String linkUrl  = request.getUrlArgs();
+        Runnable     runnable = new Runnable() {
+            public void run() {
+                String remoteSearchUrl = serverUrl
+                                         + URL_ENTRY_SEARCH.getPath() + "?"
+                                         + linkUrl;
+
+                System.err.println("Remote URL:" + remoteSearchUrl);
+                try {
+                    String entriesXml =
+                        getStorageManager().readSystemResource(
+                            new URL(remoteSearchUrl));
+                    //                        System.err.println(entriesXml);
+                    if ((running != null) && !running[0]) {
+                        return;
+                    }
+                    Element  root     = XmlUtil.getRoot(entriesXml);
+                    NodeList children = XmlUtil.getElements(root);
+                    //Synchronize on the list so only one thread at  a time adds its entries to it
+                    synchronized (entries) {
+                        for (int i = 0; i < children.getLength(); i++) {
+                            Element node = (Element) children.item(i);
+                            //                    if (!node.getTagName().equals(TAG_ENTRY)) {continue;}
+                            Entry entry =
+                                getEntryManager().createEntryFromXml(request,
+                                    node, parentEntry, new Hashtable(),
+                                    false, false);
+
+                            entry.setResource(
+                                new Resource(
+                                    "remote:"
+                                    + XmlUtil.getAttribute(
+                                        node, ATTR_RESOURCE,
+                                        ""), Resource.TYPE_REMOTE_FILE));
+                            entry.setId(
+                                getEntryManager().getRemoteEntryId(
+                                    serverUrl,
+                                    XmlUtil.getAttribute(node, ATTR_ID)));
+                            entry.setIsRemoteEntry(true);
+                            entry.setRemoteServer(serverUrl);
+                            getEntryManager().cacheEntry(entry);
+                            entries.add((Entry) entry);
+                        }
+                    }
+                } catch (Exception exc) {
+                    logException("Error doing search:" + remoteSearchUrl,
+                                 exc);
+                } finally {
+                    if (runnableCnt != null) {
+                        synchronized (runnableCnt) {
+                            runnableCnt[0]--;
+                        }
+                    }
+                }
+            }
+
+            public String toString() {
+                return "Runnable:" + serverUrl;
+            }
+        };
+
+        return runnable;
 
     }
+
 
     /**
      * _more_

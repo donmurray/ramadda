@@ -53,8 +53,8 @@ public abstract class SearchProvider extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public abstract List<Entry>[] getEntries(Request request,
-                                             Appendable searchCriteriaSB)
+    public abstract List<Entry> getEntries(Request request,
+                                           Appendable searchCriteriaSB)
      throws Exception;
 
     /**
@@ -62,7 +62,7 @@ public abstract class SearchProvider extends RepositoryManager {
      *
      *
      * @version        $version$, Fri, Mar 14, '14
-     * @author         Enter your name here...    
+     * @author         Enter your name here...
      */
     public static class RamaddaSearchProvider extends SearchProvider {
 
@@ -86,10 +86,16 @@ public abstract class SearchProvider extends RepositoryManager {
          *
          * @throws Exception _more_
          */
-        public List<Entry>[] getEntries(Request request,
-                                        Appendable searchCriteriaSB)
+        public List<Entry> getEntries(Request request,
+                                      Appendable searchCriteriaSB)
                 throws Exception {
-            return getEntryManager().getEntries(request, searchCriteriaSB);
+            List<Entry>[] repositoryResults =
+                getEntryManager().getEntries(request, searchCriteriaSB);
+            List<Entry> results = new ArrayList<Entry>();
+            results.addAll(repositoryResults[0]);
+            results.addAll(repositoryResults[1]);
+
+            return results;
         }
 
     }

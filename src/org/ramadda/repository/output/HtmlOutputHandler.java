@@ -626,7 +626,7 @@ public class HtmlOutputHandler extends OutputHandler {
         if (metataDataHtml.length() > 0) {
             return HtmlUtils.makeShowHideBlock(msg("Attachments"),
                     "<div class=\"description\">" + metadataSB + "</div>",
-                                               true);
+                    true);
         }
 
         return "";
@@ -933,11 +933,11 @@ public class HtmlOutputHandler extends OutputHandler {
                                List<Entry> entries)
             throws Exception {
 
-        String       localeId = request.getString(ARG_LOCALEID, null);
+        String        localeId = request.getString(ARG_LOCALEID, null);
 
-        String       target   = request.getString(ATTR_TARGET, "");
-        StringBuffer sb       = new StringBuffer();
-        boolean      didExtra = false;
+        String        target   = request.getString(ATTR_TARGET, "");
+        StringBuilder sb       = new StringBuilder();
+        boolean       didExtra = false;
         String sectionDivider =
             HtmlUtils.tag(
                 "hr",
@@ -985,24 +985,6 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
         if (addExtra) {
-            List<FavoriteEntry> favoritesList =
-                getUserManager().getFavorites(request, request.getUser());
-
-
-            if (favoritesList.size() > 0) {
-                sb.append(
-                    HtmlUtils.open(
-                        "div", HtmlUtils.cssClass("ramadda-select-inner")));
-                sb.append(HtmlUtils.center(HtmlUtils.b(msg("Favorites"))));
-                List favoriteLinks = new ArrayList();
-                for (FavoriteEntry favorite : favoritesList) {
-                    Entry favEntry = favorite.getEntry();
-                    sb.append(getSelectLink(request, favEntry, target));
-                }
-                sb.append(HtmlUtils.close("div"));
-                sb.append(sectionDivider);
-            }
-
 
             List<Entry> recents =
                 getEntryManager().getSessionFolders(request);
@@ -1019,6 +1001,25 @@ public class HtmlOutputHandler extends OutputHandler {
                 sb.append(sectionDivider);
 
 
+            }
+
+
+            List<FavoriteEntry> favoritesList =
+                getUserManager().getFavorites(request, request.getUser());
+
+
+            if (favoritesList.size() > 0) {
+                sb.append(
+                    HtmlUtils.open(
+                        "div", HtmlUtils.cssClass("ramadda-select-inner")));
+                sb.append(HtmlUtils.center(HtmlUtils.b(msg("Favorites"))));
+                List favoriteLinks = new ArrayList();
+                for (FavoriteEntry favorite : favoritesList) {
+                    Entry favEntry = favorite.getEntry();
+                    sb.append(getSelectLink(request, favEntry, target));
+                }
+                sb.append(HtmlUtils.close("div"));
+                sb.append(sectionDivider);
             }
 
 
