@@ -70,12 +70,15 @@ public class MbTypeHandler extends GenericTypeHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      *
      * @throws Exception On badness
      */
     @Override
-    public void initializeNewEntry(Request request, Entry entry) throws Exception {
+    public void initializeNewEntry(Request request, Entry entry)
+            throws Exception {
         Object[] values = getEntryValues(entry);
         String suffix =
             IOUtil.getFileExtension(entry.getResource().getPath());
@@ -89,6 +92,8 @@ public class MbTypeHandler extends GenericTypeHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      * @param service _more_
      * @param output _more_
@@ -96,8 +101,8 @@ public class MbTypeHandler extends GenericTypeHandler {
      * @throws Exception _more_
      */
     @Override
-    public void handleServiceResults(Request request, Entry entry, Service service,
-                                     ServiceOutput output)
+    public void handleServiceResults(Request request, Entry entry,
+                                     Service service, ServiceOutput output)
             throws Exception {
         List<Entry> entries = output.getEntries();
         if (entries.size() == 0) {
@@ -117,8 +122,11 @@ public class MbTypeHandler extends GenericTypeHandler {
         Element limits   = XmlUtil.findChild(root, MbUtil.TAG_LIMITS);
 
         Element fileInfo = XmlUtil.findChild(root, MbUtil.TAG_FILE_INFO);
-        entry.setDescription(XmlUtil.getGrandChildText(fileInfo,
-                MbUtil.TAG_INFORMAL_DESCRIPTION));
+        String desc = XmlUtil.getGrandChildText(fileInfo,
+                          MbUtil.TAG_INFORMAL_DESCRIPTION);
+
+        desc = Utils.removeNonAscii(desc);
+        entry.setDescription(desc);
 
         for (String attr :
                 StringUtil.split(XmlUtil.getGrandChildText(fileInfo,
