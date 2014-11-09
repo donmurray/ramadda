@@ -110,14 +110,23 @@ public class MbTypeHandler extends GenericTypeHandler {
         if (entries.size() == 0) {
             return;
         }
-        
-        String file = entries.get(0).getFile().toString();
-        if(!file.endsWith(".xml")) {
+
+        String xml = null;
+
+        for (Entry newEntry : entries) {
+            String file = newEntry.getFile().toString();
+            //            System.err.println("File:" + file);
+            if (file.endsWith(".xml")) {
+                xml = IOUtil.readContents(file, getClass(), "");
+
+                break;
+            }
+        }
+        if (xml == null) {
+            //            System.err.println("No xml file found");
             return;
         }
 
-        String xml = IOUtil.readContents(file,
-                                         getClass(), "");
         Element root = null;
 
         //        System.err.println(xml);
