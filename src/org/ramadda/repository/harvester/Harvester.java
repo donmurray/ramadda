@@ -411,8 +411,8 @@ public abstract class Harvester extends RepositoryManager {
     protected Request getRequest() throws Exception {
         if (request == null) {
             request = new Request(getRepository(), getUser());
+            request.setSessionId(getSessionManager().createSessionId());
         }
-
         return request;
     }
 
