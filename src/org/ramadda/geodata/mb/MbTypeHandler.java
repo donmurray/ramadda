@@ -104,11 +104,19 @@ public class MbTypeHandler extends GenericTypeHandler {
     public void handleServiceResults(Request request, Entry entry,
                                      Service service, ServiceOutput output)
             throws Exception {
+        super.handleServiceResults(request, entry, service, output);
+
         List<Entry> entries = output.getEntries();
         if (entries.size() == 0) {
             return;
         }
-        String xml = IOUtil.readContents(entries.get(0).getFile().toString(),
+        
+        String file = entries.get(0).getFile().toString();
+        if(!file.endsWith(".xml")) {
+            return;
+        }
+
+        String xml = IOUtil.readContents(file,
                                          getClass(), "");
         Element root = null;
 

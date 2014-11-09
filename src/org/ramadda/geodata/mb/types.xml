@@ -7,12 +7,12 @@
      <column name="number_of_records" label="Number of records"  type="int"/>
      <column name="total_track_length" label="Track length"  type="double"/>
 
-    <service link="geo_mb_mbinfo" id="initmb">
+    <service link="geo_mb_mbinfo">
       <params>
           <param name="initmb.geo_mb_mbinfo.xml">true</param>
       </params>
     </service>
-
+    <service link="geo_mb_mblist" target="sibling" target.type="type_mb_point_basic"/>
    </type>
 
   <type name="type_mb_point_basic"  

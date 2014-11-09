@@ -7,7 +7,7 @@
      <property name="search.form.area.show" value="false"/>
      <property name="form.todate.show" value="false"/>
      <property name="form.fromdate.label" value="Date"/>
-     <service link="bio_dicom_makethumbnail" id="dicomimage"/>
+     <service link="bio_dicom_makethumbnail" id="dicomimage"  target="attachment"/>
      <service link="bio_dicom_xml" id="dicomxml"/>
   </type>
 
@@ -39,7 +39,7 @@ StationName
      <property name="form.area.show" value="false"/>
      <property name="form.todate.show" value="false"/>
      <property name="form.fromdate.label" value="Date"/>
-     <service link="bio_ome_bfconvert"/>
+     <service link="bio_ome_bfconvert"  target="attachment"/>
      <service link="bio_ome_xml"/>
   </type>
 

@@ -479,6 +479,11 @@ padding-right-rtl-source: physical;
       margin-bottom:2px;
 }
 
+.ramadda-pre {
+   max-height: 300px; 
+   overflow-y: auto;
+}
+
 .entry-inline {
    max-height: 300px; 
    overflow-y: auto;

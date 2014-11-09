@@ -2959,6 +2959,9 @@ public class TypeHandler extends RepositoryManager {
 
     }
 
+    public static final String TARGET_ATTACHMENT = "attachment";
+    public static final String TARGET_CHILD = "child";
+    public static final String TARGET_SIBLING = "sibling";
 
     /**
      * _more_
@@ -2976,16 +2979,51 @@ public class TypeHandler extends RepositoryManager {
         if (entries.size() == 0) {
             return;
         }
-        Entry serviceEntry = entries.get(0);
-        if (serviceEntry.getResource().isImage()) {
-            String fileName = getStorageManager().copyToEntryDir(entry,
-                                                                 serviceEntry.getFile()).getName();
-            Metadata metadata =
-                new Metadata(getRepository().getGUID(), entry.getId(),
-                             (ContentMetadataHandler.TYPE_THUMBNAIL), false,
-                             fileName, null, null, null, null);
+        String target = service.getTarget();
+        if(target == null) {
+            System.err.println("No target:" + service);
+            return;
+        }
+        if(target.equals(TARGET_ATTACHMENT)) {
+            for(Entry serviceEntry:entries) {
+                String fileName = getStorageManager().copyToEntryDir(entry,
+                                                                         serviceEntry.getFile()).getName();
+                
 
-            entry.addMetadata(metadata);
+                String mtype = serviceEntry.getResource().isImage()?ContentMetadataHandler.TYPE_THUMBNAIL:ContentMetadataHandler.TYPE_ATTACHMENT;
+                Metadata metadata =
+                    new Metadata(getRepository().getGUID(), entry.getId(),
+                                 mtype, false,
+                                 fileName, null, null, null, null);
+                entry.addMetadata(metadata);
+            }
+        } else if(target.equals(TARGET_SIBLING) || target.equals(TARGET_CHILD)) {
+            for(Entry serviceEntry:entries) {
+                File f = serviceEntry.getFile();
+                String name = f.getName();
+                f = getStorageManager().copyToStorage(request, f,
+                                                      getStorageManager().getStorageFileName(f.getName()));
+
+                
+                
+                TypeHandler typeHandler = null;
+                if(service.getTargetType()!=null) {
+                    typeHandler = getRepository().getTypeHandler(service.getTargetType());
+                }
+                if(typeHandler == null) {
+                    typeHandler = getEntryManager().findDefaultTypeHandler(f.toString());
+                }
+                Entry parent = target.equals(TARGET_CHILD)?entry:entry.getParentEntry();
+                Entry newEntry = getEntryManager().addFileEntry(request, f,
+                                                                parent, 
+                                                                name,
+                                                                request.getUser(),
+                                                                typeHandler, null);
+
+                getAssociationManager().addAssociation(request, entry, newEntry,"derived", "derived");
+            }
+        } else {
+            System.err.println("Unknown target:" + target);
         }
     }
 

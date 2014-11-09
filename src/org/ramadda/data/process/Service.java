@@ -103,6 +103,9 @@ public class Service extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_ENTRY_TYPE = "entryType";
 
+    public static final String ATTR_TARGET = "target";
+    public static final String ATTR_TARGET_TYPE = "target.type";
+
     /** _more_ */
     public static final String ATTR_ENTRY_PATTERN = "entryPattern";
 
@@ -184,6 +187,10 @@ public class Service extends RepositoryManager {
 
     /** _more_          */
     private String errorPattern;
+
+
+    private String target;
+    private String targetType;
 
     /** _more_ */
     private boolean cleanup = false;
@@ -349,6 +356,10 @@ public class Service extends RepositoryManager {
 
         errorPattern = XmlUtil.getAttributeFromTree(element, "errorPattern",
                 (String) null);
+        target = XmlUtil.getAttributeFromTree(element, ATTR_TARGET,
+                (String) null);
+        targetType = XmlUtil.getAttributeFromTree(element, ATTR_TARGET_TYPE,
+                                                  (String) null);
         cleanup = XmlUtil.getAttributeFromTree(element, ATTR_CLEANUP, true);
         category = XmlUtil.getAttributeFromTree(element, "category",
                 (String) null);
@@ -602,7 +613,7 @@ public class Service extends RepositoryManager {
      * @return _more_
      */
     public Request makeRequest(Request request) {
-        System.err.println ("request:" + paramValues);
+        //        System.err.println ("request:" + paramValues);
         if (paramValues.size() == 0) {
             return request;
         }
@@ -1335,6 +1346,14 @@ public class Service extends RepositoryManager {
             }*/
 
         return id;
+    }
+
+    public String getTarget() {
+        return target;
+    }
+
+    public String getTargetType() {
+        return targetType;
     }
 
 

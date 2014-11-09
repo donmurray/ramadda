@@ -127,18 +127,21 @@ public class PdfTypeHandler extends GenericTypeHandler {
                 && ( !Utils.stringDefined(entry.getName())
                      || entry.getResource().getPath().endsWith(
                          entry.getName()))) {
-            if (firstLine.length() > Entry.MAX_NAME_LENGTH) {
-                firstLine = firstLine.substring(0, Entry.MAX_NAME_LENGTH - 1);
+            firstLine = firstLine.replaceAll("(_\\s)+_","_");
+            firstLine = firstLine.replaceAll("_+_","_");
+            if (firstLine.length() > 100) {
+                firstLine = firstLine.substring(0, 100);
             }
             entry.setName(firstLine);
         }
         if ((headerLines.size() > 0)
                 && !Utils.stringDefined(entry.getDescription())) {
-            String desc = StringUtil.join("\n", headerLines);
-            if (desc.length() > Entry.MAX_DESCRIPTION_LENGTH) {
-                desc = desc.substring(0, Entry.MAX_DESCRIPTION_LENGTH - 1);
+            String desc = "<pre class=\"ramadda-pre\">" +
+                StringUtil.join("\n", headerLines);
+            if (desc.length() > Entry.MAX_DESCRIPTION_LENGTH-10) {
+                desc = desc.substring(0, Entry.MAX_DESCRIPTION_LENGTH - 10);
             }
-            entry.setDescription("<pre>" + desc + "</pre>");
+            entry.setDescription(desc + "</pre>");
         }
 
 
