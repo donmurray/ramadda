@@ -3020,6 +3020,7 @@ public class TypeHandler extends RepositoryManager {
                                                                 request.getUser(),
                                                                 typeHandler, null);
 
+                getRepository().addAuthToken(request);
                 getAssociationManager().addAssociation(request, entry, newEntry,"derived", "derived");
             }
         } else {

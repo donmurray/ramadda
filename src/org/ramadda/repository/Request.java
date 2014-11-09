@@ -1482,6 +1482,7 @@ public class Request implements Constants, Cloneable {
         if ((authToken != null) && (mySessionId != null)) {
             //            System.err.println("checking auth token");
             String sessionAuth = RepositoryUtil.hashString(mySessionId);
+            //            System.err.println ("Request.ensureAuthToken:" + sessionId + " hashed:" +  sessionAuth +" token:" + authToken);
             if (authToken.trim().equals(sessionAuth)) {
                 return;
             }
@@ -1498,7 +1499,7 @@ public class Request implements Constants, Cloneable {
 
 
         getRepository().getLogManager().logError(
-            "Request.ensureAuthToken: something null :" + "\n\tsession:"
+            "Request.ensureAuthToken: something null:" + "\n\tsession:"
             + mySessionId + "\n\tauth token:" + authToken, null);
 
         throw new IllegalArgumentException("Bad authentication token");
