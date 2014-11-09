@@ -2981,7 +2981,7 @@ public class TypeHandler extends RepositoryManager {
         }
         String target = service.getTarget();
         if(target == null) {
-            System.err.println("No target:" + service);
+            //            System.err.println("TypeHandler: No target for service:" + service);
             return;
         }
         if(target.equals(TARGET_ATTACHMENT)) {
