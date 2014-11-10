@@ -3034,8 +3034,7 @@ public class EntryManager extends RepositoryManager {
                 msg("Are you sure you want to delete the following folder?"));
             inner.append(
                 HtmlUtils.div(
-                    breadcrumbs,
-                    HtmlUtils.cssClass("ramadda-confirm")));
+                    breadcrumbs, HtmlUtils.cssClass("ramadda-confirm")));
             inner.append(
                 HtmlUtils.b(
                     msg(
@@ -3045,8 +3044,7 @@ public class EntryManager extends RepositoryManager {
                 msg("Are you sure you want to delete the following entry?"));
             inner.append(
                 HtmlUtils.div(
-                    breadcrumbs,
-                    HtmlUtils.cssClass("ramadda-confirm")));
+                    breadcrumbs, HtmlUtils.cssClass("ramadda-confirm")));
         }
 
 
@@ -3169,10 +3167,8 @@ public class EntryManager extends RepositoryManager {
                 msg(
                 "Are you sure you want to delete all of the following entries?"));
         }
-        msgSB.append(
-            HtmlUtils.div(
-                entryListSB.toString(),
-                HtmlUtils.cssClass("ramadda-confirm")));
+        msgSB.append(HtmlUtils.div(entryListSB.toString(),
+                                   HtmlUtils.cssClass("ramadda-confirm")));
 
         if (anyFolders) {
             msgSB.append(
@@ -3676,7 +3672,7 @@ public class EntryManager extends RepositoryManager {
             if ( !typeHandler.canBeCreatedBy(request)) {
                 continue;
             }
-            String icon = typeHandler.getProperty("icon", (String) null);
+            String icon = typeHandler.getIconProperty(null);
             String img;
             if (icon == null) {
                 icon = ICON_BLANK;
@@ -4404,8 +4400,7 @@ public class EntryManager extends RepositoryManager {
                         + entry.getName());
                 }
                 entry = changeType(request, entry, newTypeHandler);
-                String icon = newTypeHandler.getProperty("icon",
-                                  (String) null);
+                String icon = newTypeHandler.getIconProperty(null);
                 if (icon != null) {
                     icon = newTypeHandler.iconUrl(icon);
                 }
@@ -5622,7 +5617,7 @@ public class EntryManager extends RepositoryManager {
                                        entry.getId(),
                                        url, label }, true));
         }
-        boolean       showUrl    = request.get(ARG_DISPLAYLINK, true);
+        boolean       showUrl     = request.get(ARG_DISPLAYLINK, true);
         boolean       showDetails = request.get(ARG_DETAILS, true);
 
         StringBuilder sb          = new StringBuilder();
@@ -5634,8 +5629,8 @@ public class EntryManager extends RepositoryManager {
         String folderClickUrl =
             request.entryUrl(getRepository().URL_ENTRY_SHOW, entry) + "&"
             + HtmlUtils.args(new String[] {
-            ARG_OUTPUT, output, ARG_DETAILS, "" + showDetails, ARG_DISPLAYLINK,
-            "" + showUrl
+            ARG_OUTPUT, output, ARG_DETAILS, "" + showDetails,
+            ARG_DISPLAYLINK, "" + showUrl
         });
 
 
@@ -6970,12 +6965,15 @@ public class EntryManager extends RepositoryManager {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entries _more_
      * @param isNew _more_
      *
      * @throws Exception _more_
      */
-    private void insertEntries(Request request, List<Entry> entries, boolean isNew)
+    private void insertEntries(Request request, List<Entry> entries,
+                               boolean isNew)
             throws Exception {
         if (entries.size() == 0) {
             return;
@@ -6983,7 +6981,8 @@ public class EntryManager extends RepositoryManager {
 
         if (isNew) {
             for (Entry theNewEntry : entries) {
-                theNewEntry.getTypeHandler().initializeNewEntry(request, theNewEntry);
+                theNewEntry.getTypeHandler().initializeNewEntry(request,
+                        theNewEntry);
             }
         }
 

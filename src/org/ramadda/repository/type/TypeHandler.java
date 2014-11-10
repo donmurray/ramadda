@@ -21,12 +21,14 @@
 package org.ramadda.repository.type;
 
 
-import org.ramadda.repository.*;
-import org.ramadda.repository.auth.*;
-import org.ramadda.repository.database.*;
 import org.ramadda.data.process.Service;
 import org.ramadda.data.process.ServiceInput;
 import org.ramadda.data.process.ServiceOutput;
+
+
+import org.ramadda.repository.*;
+import org.ramadda.repository.auth.*;
+import org.ramadda.repository.database.*;
 
 
 import org.ramadda.repository.map.*;
@@ -122,19 +124,19 @@ public class TypeHandler extends RepositoryManager {
     public static final RequestArgument REQUESTARG_EAST =
         new RequestArgument("ramadda.arg.area.east");
 
-    /** _more_          */
+    /** _more_ */
     public static final RequestArgument REQUESTARG_LATITUDE =
         new RequestArgument("ramadda.arg.latitude");
 
-    /** _more_          */
+    /** _more_ */
     public static final RequestArgument REQUESTARG_LONGITUDE =
         new RequestArgument("ramadda.arg.longitude");
 
-    /** _more_          */
+    /** _more_ */
     public static final RequestArgument REQUESTARG_FROMDATE =
         new RequestArgument("ramadda.arg.fromdate");
 
-    /** _more_          */
+    /** _more_ */
     public static final RequestArgument REQUESTARG_TODATE =
         new RequestArgument("ramadda.arg.todate");
 
@@ -271,6 +273,9 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     private String description;
 
+    /** _more_          */
+    private String iconPath;
+
     /** _more_ */
     private String category = CATEGORY_DEFAULT;
 
@@ -331,6 +336,7 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     private List<String[]> requiredMetadata = new ArrayList<String[]>();
 
+    /** _more_          */
     private List<Service> services = new ArrayList<Service>();
 
     /**
@@ -390,20 +396,28 @@ public class TypeHandler extends RepositoryManager {
      *
      * @param entryNode _more_
      *
+     * @param node _more_
+     *
      */
-    private void initTypeHandler(Element entryNode) {
+    private void initTypeHandler(Element node) {
         try {
-            displayTemplatePath = Utils.getAttributeOrTag(entryNode,
+            displayTemplatePath = Utils.getAttributeOrTag(node,
                     "displaytemplate", (String) null);
 
 
-            this.category = Utils.getAttributeOrTag(entryNode, ATTR_CATEGORY,
-                    category);
-            this.superCategory = Utils.getAttributeOrTag(entryNode,
-                    ATTR_SUPERCATEGORY, superCategory);
-            this.filePattern = Utils.getAttributeOrTag(entryNode,
-                    ATTR_PATTERN, (String) null);
-            String tmp = Utils.getAttributeOrTag(entryNode,
+            category = Utils.getAttributeOrTag(node, ATTR_CATEGORY,
+                    (String) null);
+            if (category == null) {
+                category = XmlUtil.getAttributeFromTree(node, ATTR_CATEGORY,
+                        CATEGORY_DEFAULT);
+            }
+            iconPath = XmlUtil.getAttributeFromTree(node, "icon",
+                    (String) null);
+            superCategory = Utils.getAttributeOrTag(node, ATTR_SUPERCATEGORY,
+                    superCategory);
+            filePattern = Utils.getAttributeOrTag(node, ATTR_PATTERN,
+                    (String) null);
+            String tmp = Utils.getAttributeOrTag(node,
                              PROP_FIELD_FILE_PATTERN, (String) null);
 
             if (tmp != null) {
@@ -416,19 +430,18 @@ public class TypeHandler extends RepositoryManager {
 
 
 
-            wikiTemplate = Utils.getAttributeOrTag(entryNode, ATTR_WIKI,
+            wikiTemplate = Utils.getAttributeOrTag(node, ATTR_WIKI,
                     (String) null);
 
-            wikiTemplateInner = Utils.getAttributeOrTag(entryNode,
+            wikiTemplateInner = Utils.getAttributeOrTag(node,
                     ATTR_WIKI_INNER, (String) null);
 
 
-            defaultChildrenEntries = Utils.getAttributeOrTag(entryNode,
+            defaultChildrenEntries = Utils.getAttributeOrTag(node,
                     TAG_CHILDREN, (String) null);
 
 
-            List metadataNodes = XmlUtil.findChildren(entryNode,
-                                     TAG_METADATA);
+            List metadataNodes = XmlUtil.findChildren(node, TAG_METADATA);
             for (int i = 0; i < metadataNodes.size(); i++) {
                 Element metadataNode = (Element) metadataNodes.get(i);
                 requiredMetadata.add(new String[] {
@@ -438,34 +451,31 @@ public class TypeHandler extends RepositoryManager {
             }
 
 
-            List serviceNodes = XmlUtil.findChildren(entryNode,
-                                                     Service.TAG_SERVICE);
+            List serviceNodes = XmlUtil.findChildren(node,
+                                    Service.TAG_SERVICE);
             for (int i = 0; i < serviceNodes.size(); i++) {
-                Element node = (Element) serviceNodes.get(i);
-                services.add(new Service(getRepository(), node));
+                Element serviceNode = (Element) serviceNodes.get(i);
+                services.add(new Service(getRepository(), serviceNode));
             }
 
-            this.metadataTypes =
-                StringUtil.split(Utils.getAttributeOrTag(entryNode,
+            metadataTypes = StringUtil.split(Utils.getAttributeOrTag(node,
                     ATTR_METADATA,
                     EnumeratedMetadataHandler.TYPE_TAG + ","
                     + ContentMetadataHandler.TYPE_KEYWORD), ",", true, true);
 
-            this.childTypes =
-                StringUtil.split(Utils.getAttributeOrTag(entryNode,
+            childTypes = StringUtil.split(Utils.getAttributeOrTag(node,
                     ATTR_CHILDTYPES, ""));
-            forUser = Utils.getAttributeOrTag(entryNode, ATTR_FORUSER,
-                    forUser);
-            setType(Utils.getAttributeOrTag(entryNode, ATTR_DB_NAME, ""));
+            forUser = Utils.getAttributeOrTag(node, ATTR_FORUSER, forUser);
+            setType(Utils.getAttributeOrTag(node, ATTR_DB_NAME, ""));
             if (getType().indexOf(".") > 0) {
                 //            System.err.println("DOT TYPE: " + getType());
             }
 
-            setProperties(entryNode);
-            setDescription(Utils.getAttributeOrTag(entryNode,
-                    ATTR_DB_DESCRIPTION, getType()));
+            setProperties(node);
+            setDescription(Utils.getAttributeOrTag(node, ATTR_DB_DESCRIPTION,
+                    getType()));
 
-            String superType = Utils.getAttributeOrTag(entryNode, ATTR_SUPER,
+            String superType = Utils.getAttributeOrTag(node, ATTR_SUPER,
                                    (String) null);
             if (superType != null) {
                 parent = getRepository().getTypeHandler(superType, false,
@@ -546,8 +556,8 @@ public class TypeHandler extends RepositoryManager {
         items.add("columns");
         items.add(Json.list(cols));
 
-        String icon = request.getAbsoluteUrl(iconUrl(getProperty("icon",
-                          (String) ICON_FOLDER_CLOSED)));
+        String icon = request.getAbsoluteUrl(
+                          iconUrl(getIconProperty(ICON_FOLDER_CLOSED)));
         items.add("icon");
         items.add(Json.quote(icon));
         items.add("category");
@@ -2299,7 +2309,7 @@ public class TypeHandler extends RepositoryManager {
             seen.add(type);
             didone = true;
             TypeHandler typeHandler = getRepository().getTypeHandler(type);
-            String      icon = typeHandler.getProperty("icon", (String) null);
+            String      icon        = typeHandler.getIconProperty(null);
             if (icon == null) {
                 icon = getRepository().iconUrl(ICON_ENTRY_ADD);
             } else {
@@ -2319,13 +2329,33 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
+
+    /**
+     * _more_
+     *
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
+    public String getIconProperty(String dflt) {
+        String icon = iconPath;
+        if (icon == null) {
+            icon = getProperty("icon", (String) null);
+            if (icon == null) {
+                icon = dflt;
+            }
+        }
+
+        return icon;
+    }
+
     /**
      * _more_
      *
      * @return _more_
      */
     public String getTypeIconUrl() {
-        String icon = getProperty("icon", (String) null);
+        String icon = getIconProperty(null);
         if (icon != null) {
             icon = iconUrl(icon);
         }
@@ -2854,11 +2884,15 @@ public class TypeHandler extends RepositoryManager {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      *
      * @throws Exception _more_
      */
-    public void initializeNewEntry(Request request, Entry entry) throws Exception {
+    public void initializeNewEntry(Request request, Entry entry)
+            throws Exception {
+
         if (parent != null) {
             parent.initializeNewEntry(request, entry);
         }
@@ -2936,92 +2970,111 @@ public class TypeHandler extends RepositoryManager {
             }
         }
 
-        for(Service service: services) {
-            if(!service.isEnabled()) {
+        for (Service service : services) {
+            if ( !service.isEnabled()) {
                 continue;
             }
             try {
-                File workDir = getStorageManager().createProcessDir();
+                File         workDir = getStorageManager().createProcessDir();
                 ServiceInput serviceInput = new ServiceInput(workDir, entry);
-                ServiceOutput output = service.evaluate(getRepository().getTmpRequest(), serviceInput, null);
+                ServiceOutput output =
+                    service.evaluate(getRepository().getTmpRequest(),
+                                     serviceInput, null);
                 if ( !output.isOk()) {
-                    System.err.println ("service not ok");
+                    System.err.println("service not ok");
+
                     continue;
                 }
                 //Defer to the entry's type handler
-                entry.getTypeHandler().handleServiceResults(request, entry, service, output);
-            } catch(Exception exc) {
-                getLogManager().logError("ERROR: TypeHandler calling service:" + service +"\n",exc);
+                entry.getTypeHandler().handleServiceResults(request, entry,
+                        service, output);
+            } catch (Exception exc) {
+                getLogManager().logError(
+                    "ERROR: TypeHandler calling service:" + service + "\n",
+                    exc);
             }
         }
 
 
 
+
     }
 
+    /** _more_          */
     public static final String TARGET_ATTACHMENT = "attachment";
+
+    /** _more_          */
     public static final String TARGET_CHILD = "child";
+
+    /** _more_          */
     public static final String TARGET_SIBLING = "sibling";
 
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      * @param service _more_
      * @param output _more_
      *
      * @throws Exception _more_
      */
-    public void handleServiceResults(Request request, Entry entry, Service service,
-                                     ServiceOutput output)
-        throws Exception {
+    public void handleServiceResults(Request request, Entry entry,
+                                     Service service, ServiceOutput output)
+            throws Exception {
         List<Entry> entries = output.getEntries();
         if (entries.size() == 0) {
             return;
         }
         String target = service.getTarget();
-        if(target == null) {
+        if (target == null) {
             //            System.err.println("TypeHandler: No target for service:" + service);
             return;
         }
-        if(target.equals(TARGET_ATTACHMENT)) {
-            for(Entry serviceEntry:entries) {
+        if (target.equals(TARGET_ATTACHMENT)) {
+            for (Entry serviceEntry : entries) {
                 String fileName = getStorageManager().copyToEntryDir(entry,
-                                                                         serviceEntry.getFile()).getName();
-                
+                                      serviceEntry.getFile()).getName();
 
-                String mtype = serviceEntry.getResource().isImage()?ContentMetadataHandler.TYPE_THUMBNAIL:ContentMetadataHandler.TYPE_ATTACHMENT;
-                Metadata metadata =
-                    new Metadata(getRepository().getGUID(), entry.getId(),
-                                 mtype, false,
-                                 fileName, null, null, null, null);
+
+                String mtype = serviceEntry.getResource().isImage()
+                               ? ContentMetadataHandler.TYPE_THUMBNAIL
+                               : ContentMetadataHandler.TYPE_ATTACHMENT;
+                Metadata metadata = new Metadata(getRepository().getGUID(),
+                                        entry.getId(), mtype, false,
+                                        fileName, null, null, null, null);
                 entry.addMetadata(metadata);
             }
-        } else if(target.equals(TARGET_SIBLING) || target.equals(TARGET_CHILD)) {
-            for(Entry serviceEntry:entries) {
-                File f = serviceEntry.getFile();
+        } else if (target.equals(TARGET_SIBLING)
+                   || target.equals(TARGET_CHILD)) {
+            for (Entry serviceEntry : entries) {
+                File   f    = serviceEntry.getFile();
                 String name = f.getName();
                 f = getStorageManager().copyToStorage(request, f,
-                                                      getStorageManager().getStorageFileName(f.getName()));
+                        getStorageManager().getStorageFileName(f.getName()));
 
-                
-                
+
+
                 TypeHandler typeHandler = null;
-                if(service.getTargetType()!=null) {
-                    typeHandler = getRepository().getTypeHandler(service.getTargetType());
+                if (service.getTargetType() != null) {
+                    typeHandler = getRepository().getTypeHandler(
+                        service.getTargetType());
                 }
-                if(typeHandler == null) {
-                    typeHandler = getEntryManager().findDefaultTypeHandler(f.toString());
+                if (typeHandler == null) {
+                    typeHandler = getEntryManager().findDefaultTypeHandler(
+                        f.toString());
                 }
-                Entry parent = target.equals(TARGET_CHILD)?entry:entry.getParentEntry();
+                Entry parent = target.equals(TARGET_CHILD)
+                               ? entry
+                               : entry.getParentEntry();
                 Entry newEntry = getEntryManager().addFileEntry(request, f,
-                                                                parent, 
-                                                                name,
-                                                                request.getUser(),
-                                                                typeHandler, null);
+                                     parent, name, request.getUser(),
+                                     typeHandler, null);
 
                 getRepository().addAuthToken(request);
-                getAssociationManager().addAssociation(request, entry, newEntry,"derived", "derived");
+                getAssociationManager().addAssociation(request, entry,
+                        newEntry, "derived", "derived");
             }
         } else {
             System.err.println("Unknown target:" + target);

@@ -141,7 +141,7 @@ public class GenericTypeHandler extends TypeHandler {
      * @throws Exception on badness
      */
     public String getIconUrl(Request request, Entry entry) throws Exception {
-        String icon = getProperty("icon", (String) null);
+        String icon = getIconProperty(null);
         if (icon != null) {
             return iconUrl(icon);
         }
@@ -243,7 +243,7 @@ public class GenericTypeHandler extends TypeHandler {
                     columnNode,
                     new Integer(valuesOffset + colNames.size() - 1) });
             columns.add(column);
-            column.setColumnIndex(columns.size()-1);
+            column.setColumnIndex(columns.size() - 1);
             if ((categoryColumn == null) && column.getIsCategory()) {
                 categoryColumn = column;
             }
@@ -380,12 +380,25 @@ public class GenericTypeHandler extends TypeHandler {
     }
 
 
-@Override
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param columnName _more_
+     *
+     * @return _more_
+     */
+    @Override
     public Object getEntryValue(Entry entry, String columnName) {
         Object[] values = getEntryValues(entry);
-        if(values == null) return null;
+        if (values == null) {
+            return null;
+        }
         Column column = findColumn(columnName);
-        if(column == null)  return null;
+        if (column == null) {
+            return null;
+        }
+
         return column.getObject(values);
     }
 
@@ -1093,9 +1106,9 @@ public class GenericTypeHandler extends TypeHandler {
                                         " class=\"formgroupheader\" "), " colspan=2 ")));
                     }
                     StringBuilder tmpSb = new StringBuilder();
-                    if(values!=null) {
+                    if (values != null) {
                         formatColumnHtmlValue(request, entry, column, tmpSb,
-                                              values);
+                                values);
                     }
                     if ( !column.getShowEmpty() && (tmpSb.length() == 0)) {
                         continue;
@@ -1287,10 +1300,10 @@ public class GenericTypeHandler extends TypeHandler {
             throws Exception {
         boolean hasValue = column.getString(values) != null;
 
-        if(!column.getAddToForm()) {
+        if ( !column.getAddToForm()) {
             return;
         }
-        if (entry != null && hasValue && !column.getEditable()) {
+        if ((entry != null) && hasValue && !column.getEditable()) {
             StringBuilder tmpSb = new StringBuilder();
             column.formatValue(entry, tmpSb, Column.OUTPUT_HTML, values);
             formBuffer.append(HtmlUtils.formEntry(column.getLabel() + ":",

@@ -235,7 +235,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
     private List<SearchProvider> searchProviders = null;
 
 
-    /** _more_          */
+    /** _more_ */
     private List<SearchProvider> pluginSearchProviders =
         new ArrayList<SearchProvider>();
 
@@ -1027,7 +1027,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             if (cnt == 0) {
                 continue;
             }
-            String icon = typeHandler.getProperty("icon", (String) null);
+            String icon = typeHandler.getIconProperty(null);
             String img;
             if (icon == null) {
                 icon = ICON_BLANK;
