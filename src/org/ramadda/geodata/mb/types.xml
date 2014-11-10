@@ -1,7 +1,6 @@
-<types>
+<types category="Ocean Data" icon="/mb/mb.png">
 
-  <type name="type_mb"  description="MB Bathymetry" handler="org.ramadda.geodata.mb.MbTypeHandler" category="Oceanography" pattern=".*\.mb[0-9]+">
-     <property name="icon" value="/mb/mb.png"/>
+  <type name="type_mb"  description="MB Bathymetry" handler="org.ramadda.geodata.mb.MbTypeHandler" pattern=".*\.mb[0-9]+">
      <property name="form.altitude.show" value="true"/>
      <column name="format" label="Format"  type="enumerationplus"   values="file:/org/ramadda/geodata/mb/mbtypes.txt"/>
      <column name="number_of_records" label="Number of records"  type="int"/>
@@ -13,14 +12,42 @@
       </params>
     </service>
     <service link="geo_mb_mblist" target="sibling" target.type="type_mb_point_basic"/>
+
+<wiki>
+<![CDATA[
++row
++col-md-9
+{{name box.class=entry-page-name}}
+{{description box.class="entry-page-description"}} 
+{{information}}
+<br>
++row
++col-md-8
+{{chart fields="depth" title="Depth"  height="150" width="500" entry="link:type_mb_point_basic" message=""}}
+{{chart fields="amplitude" title="Amplitude"  height="150"  width="500" entry="link:type_mb_point_basic" message=""}}
+-col
++col-md-4
+{{display type="map"  height="300"  width="300" layoutHere="true" defaultMapLayer="google.satellite" entry="link:type_mb_point_basic" message=""}}
+-col
+-row
+-col
++col-md-3
+{{tools includeicon="true" title="Services" message=""}}
+<br>
+{{list includeicon="true" details="false" entries="links,siblings"  message="" box.maxheight="200" box.class="entry-sidebox" prefix="====Related====" xblock.show="true" xblock.title="Related" xblock.open="false"}}
+-col
+-row
+
+]]></wiki>
+
+
+
    </type>
 
   <type name="type_mb_point_basic"  
         super="type_point" 
-        icon="/mb/mb.png"
         description="Basic MB point file"  
         handler="org.ramadda.data.services.PointTypeHandler">
-    <property name="icon" value="/mb/mb.png"/>
     <property name="record.file.class" value="org.ramadda.data.point.text.CsvFile"/>
 <property name="record.properties">
 delimiter=tab
@@ -33,17 +60,23 @@ fields=time[format="yyyy/MM/dd/HH/mm/ss"],longitude[unit="degrees"],latitude[uni
 
 {{description}}
 
-<table width=100% cellpadding=5>
-<tr valign=top>
-<td width="100%">
-{{displaygroup layoutType="columns"}}
-{{display type="map"  height="300"  width="400" column="1" layoutHere="false" defaultMapLayer="google.satellite"}}
-{{display row="0" fields="depth" title="Depth"  height="150" column="0" layoutHere="false"}}
-{{display row="0" fields="amplitude" title="Amplitude"  height="150" column="0" layoutHere="false"}}
-</td>
-</tr></table>
-
++row
++col-md-8
+{{chart fields="depth" title="Depth"  height="150" }}
+{{chart fields="amplitude" title="Amplitude"  height="150" }}
+----
 {{information}}
+-col
++col-md-4
+{{display type="map"  height="300"  width="400" layoutHere="true" defaultMapLayer="google.satellite"}}
+----
+{{list includeicon="true" details="false" entries="siblings,links"  message="" box.maxheight="200" box.class="entry-sidebox" 
+ prefix="====Related===="}}
+-col
+-row
+
+
+
 
 
 ]]></wiki>
