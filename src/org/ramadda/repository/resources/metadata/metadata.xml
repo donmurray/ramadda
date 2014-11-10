@@ -166,7 +166,7 @@
          default="fromdate"
          name="Field"
          datatype="enumeration"
-         values="fromdate:From Date,todate:To Date,createdate:Create Date,name:Name,mixed:Mixed"/>
+         values="fromdate:From Date,todate:To Date,createdate:Create Date,name:Name,type:Type,mixed:Mixed"/>
       <element
          default="true"
          name="Ascending"
