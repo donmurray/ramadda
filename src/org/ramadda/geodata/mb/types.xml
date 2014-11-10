@@ -70,7 +70,7 @@ fields=time[format="yyyy/MM/dd/HH/mm/ss"],longitude[unit="degrees"],latitude[uni
 +col-md-4
 {{display type="map"  height="300"  width="400" layoutHere="true" defaultMapLayer="google.satellite"}}
 ----
-{{list includeicon="true" details="false" entries="siblings,links"  message="" box.maxheight="200" box.class="entry-sidebox" 
+{{list includeicon="true" details="false" entries="links,siblings"  message="" box.maxheight="200" box.class="entry-sidebox" 
  prefix="====Related===="}}
 -col
 -row
