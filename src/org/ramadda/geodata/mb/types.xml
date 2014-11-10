@@ -1,11 +1,19 @@
 <types category="Ocean Data" icon="/mb/mb.png">
 
 
+
   <type name="type_mb_collection"  description="Bathymetry Collection" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler">
 
 <wiki>
 <![CDATA[
++row
++col-md-10
 =={{name}}==
+-col
++col-md-2
+{{link title="Zip and Download Collection" button="true" output="zip.zipgroup"}}
+-col
+-row
 {{description}}
 +row
 +col-md-10

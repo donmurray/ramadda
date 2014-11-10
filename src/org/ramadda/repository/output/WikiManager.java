@@ -904,11 +904,16 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 url = entry.getTypeHandler().getEntryResourceUrl(request,
                         entry);
             } else {
-                url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry);
+                String output = Misc.getProperty(props, ATTR_OUTPUT, OutputHandler.OUTPUT_HTML.getId());
+                url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT, output);
             }
 
-            return HtmlUtils.href(url, title);
-
+            if(Misc.getProperty(props, "button", false)) {
+                return HtmlUtils.href(url, title,
+                                      HtmlUtils.cssClass("btn btn-primary btn-default") +HtmlUtils.attr("role","button"));
+            } else {
+                return HtmlUtils.href(url, title);
+            }
         } else if (theTag.equals(WIKI_TAG_RESOURCE)) {
             if ( !entry.getResource().isDefined()) {
                 String message = Misc.getProperty(props, ATTR_MESSAGE,

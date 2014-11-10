@@ -84,6 +84,11 @@ h3 {
 
 
 
+a.btn:link {
+   color: #ffffFF;
+}
+
+
 .jumbotron h2 {
    font-weight: 400;
    padding:0px;
@@ -121,6 +126,7 @@ a {
 a:link {
    color: #0000FF;
 }
+
 
 a:hover {
    color: #FF0000;
