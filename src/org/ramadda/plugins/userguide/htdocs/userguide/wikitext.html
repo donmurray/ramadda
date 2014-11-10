@@ -233,9 +233,19 @@ Normally, all property tags refer to the current entry. However, you can specify
 <blockquote><pre>{{information <i>entry="some other entry id or name or 'parent' or 'grandparent'"</i>}}</pre></blockquote>
 
 
-The entry value can be the ID of an entry, its name (or full path) or "parent" or "grandparent" to denote
-the parent entry (or its parent) of the current entry.
-The Add entry id menu in the editor toolbar allows you to select the entry to use. As a convenience this
+
+The entry value can be:
+<ul>
+<li> The ID of an entry
+<li> Its full path, e.g., /Top/.../entry_name
+<li> The parent entry - "parent" 
+<li> The parent of the parent entry  -"grandparent"
+<li> The entry itself - "this"
+<li> An entry linked to the entry. Either "link" to find the first one or to specify an entry type use "link:entry_type"
+</ul>
+
+
+The <i>Add Entry ID</i> menu in the editor toolbar allows you to select the entry to use. As a convenience this
 adds both the ID of the entry as well as its name. 
 
 <p>
