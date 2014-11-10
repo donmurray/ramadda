@@ -992,6 +992,32 @@ public class AssociationManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param association _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Entry getOtherEntry(Request request, Association association,
+                               Entry entry)
+            throws Exception {
+        String id;
+        if ( !association.getFromId().equals(entry.getId())) {
+            id = association.getFromId();
+        } else if ( !association.getToId().equals(entry.getId())) {
+            id = association.getToId();
+        } else {
+            return null;
+        }
+
+        return getEntryManager().getEntry(request, id);
+    }
+
 
 
 }
