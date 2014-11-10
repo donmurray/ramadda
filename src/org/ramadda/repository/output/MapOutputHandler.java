@@ -176,7 +176,7 @@ public class MapOutputHandler extends OutputHandler {
 
         MapInfo map = getMapManager().getMap(request, entriesToUse, sb, 700,
                                              500, true,
-                                             new boolean[] { false }, false);
+                                             new boolean[] { false });
 
         return makeLinksResult(request, msg("Map"), sb, new State(entry));
     }
@@ -224,7 +224,7 @@ public class MapOutputHandler extends OutputHandler {
         boolean[] haveBearingLines = { false };
         MapInfo map = getMapManager().getMap(request, entriesToUse, sb, 700,
                                              500, false, haveBearingLines,
-                                             true);
+                                             true, null);
 
         return makeLinksResult(request, msg("Map"), sb,
                                new State(group, subGroups, entries));

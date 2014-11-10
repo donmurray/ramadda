@@ -1,5 +1,35 @@
 <types category="Ocean Data" icon="/mb/mb.png">
 
+
+  <type name="type_mb_collection"  description="Bathymetry Collection" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler">
+
+<wiki>
+<![CDATA[
+=={{name}}==
+{{description}}
++row
++col-md-10
+{{timeline  height="150"  entries.filter="type:type_mb"}}
+-col
++col-md-2
+-col
+-row
+
+<br>
+
+{{map  width="800"  height="500"  listentries="true"  details="false"  icon="#/icons/dots/green.png"  iconsonly="false"  entries.filter="type:type_mb" layer="google.satellite"}}
+
+----
+
+{{tree  details="true"  prefix="==All Files=="}}
+
+]]></wiki>
+
+</type>
+
+
+
+
   <type name="type_mb"  description="MB Bathymetry" handler="org.ramadda.geodata.mb.MbTypeHandler" pattern=".*\.mb[0-9]+">
      <property name="form.altitude.show" value="true"/>
      <column name="format" label="Format"  type="enumerationplus"   values="file:/org/ramadda/geodata/mb/mbtypes.txt"/>
@@ -39,8 +69,6 @@
 -row
 
 ]]></wiki>
-
-
 
    </type>
 

@@ -822,7 +822,7 @@ public class MapManager extends RepositoryManager {
                           boolean detailed, boolean[] haveBearingLines)
             throws Exception {
         return getMap(request, entriesToUse, sb, width, height, detailed,
-                      haveBearingLines, false);
+                      haveBearingLines, false, null);
     }
 
 
@@ -845,11 +845,17 @@ public class MapManager extends RepositoryManager {
     public MapInfo getMap(Request request, List<Entry> entriesToUse,
                           StringBuilder sb, int width, int height,
                           boolean detailed, boolean[] haveBearingLines,
-                          boolean listentries)
+                          boolean listentries,
+                          List<Object[]>mapProps)
             throws Exception {
         MapInfo map = createMap(request, width, height, false);
         if (map == null) {
             return null;
+        }
+        if(mapProps!=null) {
+            for(Object[]pair: mapProps) {
+                map.addProperty(pair[0].toString(), pair[1]);
+            }
         }
         addToMap(request, map, entriesToUse, detailed, haveBearingLines,
                  true);

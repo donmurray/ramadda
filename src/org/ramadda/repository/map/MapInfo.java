@@ -315,9 +315,9 @@ public class MapInfo {
             result.append("</td></tr></table>");
         }
         */
-        result.append(HtmlUtils.script(getJS().toString()));
-        result.append("\n");
 
+        result.append(HtmlUtils.script(getFinalJS().toString()));
+        result.append("\n");
         return result.toString();
     }
 
@@ -330,19 +330,28 @@ public class MapInfo {
     private StringBuilder getJS() {
         if (jsBuffer == null) {
             jsBuffer = new StringBuilder();
-            jsBuffer.append("//mapjs\n");
-            jsBuffer.append("var params = " + formatProps() + ";\n");
-            jsBuffer.append("var " + mapVarName + " = new RepositoryMap("
-                            + HtmlUtils.squote(mapVarName) + ", params);\n");
-            jsBuffer.append("var theMap = " + mapVarName + ";\n");
-            // TODO: why is this here?
-            if ( !forSelection) {
-                jsBuffer.append("theMap.initMap(" + forSelection + ");\n");
-            }
         }
 
         return jsBuffer;
     }
+
+    private StringBuilder getFinalJS() {
+        StringBuilder js  = new StringBuilder();
+        js.append("\n//mapjs\n");
+        js.append("var params = " + formatProps() + ";\n");
+        js.append("var " + mapVarName + " = new RepositoryMap("
+                  + HtmlUtils.squote(mapVarName) + ", params);\n");
+        js.append("var theMap = " + mapVarName + ";\n");
+        // TODO: why is this here?
+        if ( !forSelection) {
+            js.append("theMap.initMap(" + forSelection + ");\n");
+        }
+        js.append(getJS());
+        return js;
+    }
+
+
+
 
     /**
      * Add a property for the map
@@ -507,12 +516,8 @@ public class MapInfo {
             }
         }
         retBuf.append(html);
-        retBuf.append(HtmlUtils.script(getJS().toString()));
-
+        retBuf.append(HtmlUtils.script(getFinalJS().toString()));
         return retBuf.toString();
-
-        //return HtmlUtils.table(new Object[] { widget.toString(), rightSide }) + html
-        //       + HtmlUtils.script(getJS().toString());
     }
 
     /**

@@ -1195,6 +1195,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             }
 
 
+
             if (children.size() == 0) {
                 String message = Misc.getProperty(props, ATTR_MESSAGE,
                                      (String) null);
@@ -1257,9 +1258,11 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                     (String) null))) {
                     newRequest.put(ARG_MAP_ICONSONLY, "true");
                 }
+                List<Object[]> mapProps = new ArrayList<Object[]>();
+                mapProps.add(new Object[]{"defaultMapLayer", Json.quote(layer)});
                 MapInfo map = getMapManager().getMap(newRequest, children,
                                   sb, width, height, details,
-                                  haveBearingLines, listEntries);
+                                                     haveBearingLines, listEntries,mapProps);
                 if (icon != null) {
                     newRequest.remove(ARG_ICON);
                 }
