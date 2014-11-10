@@ -6,20 +6,14 @@
 
 <wiki>
 <![CDATA[
-+row
-+col-md-10
 =={{name}}==
--col
-+col-md-2
-{{link title="Zip and Download Collection" button="true" output="zip.zipgroup"}}
--col
--row
 {{description}}
 +row
-+col-md-10
++col-md-8
 {{timeline  height="150"  entries.filter="type:type_mb"}}
 -col
-+col-md-2
++col-md-4
+{{link title="Zip and Download Collection" button="true" output="zip.zipgroup"}}
 -col
 -row
 
