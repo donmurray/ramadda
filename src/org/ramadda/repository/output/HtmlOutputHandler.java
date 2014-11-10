@@ -847,7 +847,7 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
         StringBuffer sb         = new StringBuffer();
         String       folder     = iconUrl(ICON_FOLDER_CLOSED);
-        boolean      showLink   = request.get(ARG_SHOWLINK, true);
+        boolean      showUrl   = request.get(ARG_SHOWURL, true);
         boolean      onlyGroups = request.get(ARG_ONLYGROUPS, false);
 
         int          cnt        = 0;

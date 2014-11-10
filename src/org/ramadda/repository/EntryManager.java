@@ -5622,7 +5622,7 @@ public class EntryManager extends RepositoryManager {
                                        entry.getId(),
                                        url, label }, true));
         }
-        boolean       showLink    = request.get(ARG_SHOWLINK, true);
+        boolean       showUrl    = request.get(ARG_SHOWURL, true);
         boolean       showDetails = request.get(ARG_DETAILS, true);
 
         StringBuilder sb          = new StringBuilder();
@@ -5634,8 +5634,8 @@ public class EntryManager extends RepositoryManager {
         String folderClickUrl =
             request.entryUrl(getRepository().URL_ENTRY_SHOW, entry) + "&"
             + HtmlUtils.args(new String[] {
-            ARG_OUTPUT, output, ARG_DETAILS, "" + showDetails, ARG_SHOWLINK,
-            "" + showLink
+            ARG_OUTPUT, output, ARG_DETAILS, "" + showDetails, ARG_SHOWURL,
+            "" + showUrl
         });
 
 
@@ -5768,7 +5768,7 @@ public class EntryManager extends RepositoryManager {
             getMetadataManager().decorateEntry(request, entry, sb, true);
         }
 
-        if (showLink) {
+        if (showUrl) {
             sb.append(HtmlUtils.span(getTooltipLink(request, entry, linkText,
                     url), HtmlUtils.cssClass("entry-link")));
         } else {
