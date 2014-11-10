@@ -1253,7 +1253,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_SHOWLINK = "showlink";
 
-    public static final String ARG_SHOWURL = "showurl";
+    public static final String ARG_DISPLAYLINK = "displaylink";
 
     /** _more_ */
     public static final String ARG_SHOWTAB = "showtab";
