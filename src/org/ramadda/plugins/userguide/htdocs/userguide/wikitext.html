@@ -1,6 +1,6 @@
 <html>
 <head>
-<title>Wiki Text</title>
+<title></title>
   <link rel="stylesheet" type="text/css" href="./default.css" title="Style">
 
 </head>
@@ -14,7 +14,7 @@
 </td>
 <td width=30%>&nbsp;</td>
 </tr></table>
-<div class="pagetitle">11.1 Wiki Text</div>
+<div class="pagetitle">11.1 </div>
 
 <style type="text/css">
 pre {
@@ -22,8 +22,7 @@ pre {
 }
 </style>
 
-
-
+[ht::head {Wiki Text}]
 
 
 
@@ -40,7 +39,7 @@ or the wiki text might be coming from a <a href="pagestyle.html">Page Style</a>.
 
 <a name="editor"></a><div class="pagesubtitle">11.1.0 Wiki Editor</div> 
 In any of these cases RAMADDA provides a wiki text editor:
-<a name="image1"></a><div class="cimg"><a href="images/wikiedit.png"><img  src="images/wikiedit.png" border=0 width=600 alt="Wiki Text Editor" ></a><br><span class="caption">Image 1: Wiki Text Editor</span></div>
+[ht::cimg images/wikiedit.png {Wiki Text Editor} {border=0 width=600}]
 <ul>
 <li>
 The  buttons allow you to add basic wiki markup.
@@ -57,34 +56,34 @@ The Add entry link menu adds wiki links to other entries.
 
 The RAMADDA Wiki facility generally follows the format
 that Wikipedia follows. For example:
-<blockquote><pre>
+[wiki::text {
 ==Section Heading 1==
 ===Section Heading 2===
-</pre></blockquote>
+}]
 
 A horizontal line:
-<blockquote><pre>
+[wiki::text {
 ----
-</pre></blockquote>
+}]
 
 Lists:
-<blockquote><pre>
+[wiki::text {
 * bullet 1
 * bullet 2
 ** sub bullet 1
 ** sub bullet 2
 * bullet 3
-</pre></blockquote>
+}]
 
 
 You can escape your wiki text and include raw, unprocessed text with the &lt;nowiki&gt; tag:
-<blockquote><pre>
+[wiki::text {
 Some wiki text
 &lt;nowiki&gt;
 This is text that does not get formatted
 &lt;/nowiki&gt;
 more wiki text
-</pre></blockquote>
+}]
 
 See the 
 <a href=" http://en.wikipedia.org/wiki/Help:Wiki_markup">Wikipedia page on Wiki Markup</a> for more information on basic Wiki markup. 
@@ -119,7 +118,7 @@ This is some text and some more test. Lorem ipsum
 </div>
 
 
-To do a row layout use the following. The "+col-md-..." correspond to Bootstraps column widths, e.g., col-md-[2,3,4,6,8,9,10,12].
+To do a row layout use the following. The "+col-md-..." correspond to Bootstraps column widths, e.g., col-md-\[2,3,4,6,8,9,10,12\].
 Basically you can have any number of columns within a row.
 Each column has a width, the sum of which adds up to 12.
 
@@ -182,31 +181,31 @@ Right column contents
 
 <a name="links"></a><div class="pagesubtitle">11.1.3 Linking to other entries</div> 
 Normally in a wiki a link to another page is of the form:
-<blockquote><pre>
+[wiki::text {
 [[Page name]]
-</pre></blockquote>
+}]
 
 In RAMADDA you can use the name of another entry to create the link.
 You can use the Add entry link menu to select an entry. 
 This produces wiki text of the form:
-<blockquote><pre>
+[wiki::text {
 [[entry id|Label to show for link]]
-</pre></blockquote>
+}]
 
 e.g.:
-<blockquote><pre>
+[wiki::text {
 [[7ca13e52-8efb-4d17-863f-e17027dbcc22|Earthquake data]]
-</pre></blockquote>
+}]
 
 You can also just specify an entry by name. Either an absolute path:
-<blockquote><pre>
+[wiki::text {
 [[Top entry/Some other entry]]
-</pre></blockquote>
+}]
 
 Or relative to the wiki entry:
-<blockquote><pre>
+[wiki::text {
 [[Some entry]]
-</pre></blockquote>
+}]
 
 
 If the entry with the given name does not exist then the link will take one to the
@@ -216,21 +215,21 @@ create entry form.
 <a name="properties"></a><div class="pagesubtitle">11.1.4 Wiki Properties</div> 
 You can also import content from the current Wiki Page entry or any other entry with the import  
 syntax:
-<blockquote><pre>{{property}}</pre></blockquote>
+[wiki::text [wiki::tag property]]
 
 e.g., if we wanted to show the information tabs for an entry we'd do:
-<blockquote><pre>{{information}}</pre></blockquote>
+[wiki::text [wiki::tag information]]
 
 
 For example, if we want to import the information block with it open:
-<blockquote><pre>{{information <i>open="true"</i>}}</pre></blockquote>
+[wiki::text [wiki::tag information {open="true"}]]
 
 This would give us:
-<div class="cimg"><a href="images/wikiinformation.png"><img  src="images/wikiinformation.png" border=0 alt="images/wikiinformation.png" ></a></div>
+[ht::cimg images/wikiinformation.png {} {border=0}]
 
 
 Normally, all property tags refer to the current entry. However, you can specify another entry:
-<blockquote><pre>{{information <i>entry="some other entry id or name or 'parent' or 'grandparent'"</i>}}</pre></blockquote>
+[wiki::text [wiki::tag information {entry="some other entry id or name or 'parent' or 'grandparent'"}]]
 
 
 
@@ -251,30 +250,30 @@ adds both the ID of the entry as well as its name.
 <p>
 Some of the properties can result in an error message (e.g., image not found, entry not found, etc). You can specify a different message (or blank) with message attribute:
 
-<blockquote><pre>{{someproperty <i>message="some message"</i>}}</pre></blockquote>
+[wiki::text [wiki::tag someproperty {message="some message"}]]
 
 For example, you can set up a wiki template that shows an image attachment 
 and a list of entries in a sub-folder called "Links". If you used the below wiki text then you would see displayed 
 "Could not find image" 
 and "Could not find entry" error messages. 
 
-<blockquote><pre>
+[wiki::text {
 {{image src="::*"}}
 {{links entry="Links"}}
-</pre></blockquote>
+}]
 
 If, however, you specify a blank message then nothing will be shown:
 
-<blockquote><pre>
+[wiki::text {
 {{image src="::*" message=""}}
 {{links entry="Links" message=""}}
-</pre></blockquote>
+}]
 
 Note: you can specify a prefix and suffix attributes that are only used if the tag was successful. So for example you could specify a heading for the links: 
 
-<blockquote><pre>
+[wiki::text {
 {{links entry="Links" message="" prefix="Here are the links:&lt;br&gt;}}
-</pre></blockquote>
+}]
 
 
 This would only show when there is a Links sub-folder.
@@ -285,24 +284,24 @@ This would only show when there is a Links sub-folder.
 The first set of property tags show some information for the entry. Note: the attributes are all optional.
 
 <ul>
-<li> <a name="name"></a>{{name}}:  Entry name
-<li> <a name="entryid"></a>{{entryid}}:  Entry ID
-<li> <a name="description"></a>{{description <i>wikify="true|false"</i>}}: Entry description. If wikify=true then treat the description as
+<li> [wiki::tagdef name]:  Entry name
+<li> [wiki::tagdef entryid]:  Entry ID
+<li> [wiki::tagdef description {wikify="true|false"}]: Entry description. If wikify=true then treat the description as
 wiki text.
 <li> 
-<a name="fromdate"></a>{{fromdate <i>format="date time format"</i>}}<br> 
-<a name="todate"></a>{{todate <i>format="date time format"</i>}}<br> 
-<a name="daterange"></a>{{daterange <i>format="date time format" separator=" -- "</i>}}<br> 
-<a name="createdate"></a>{{createdate <i>format="date time format"</i>}}<br>  
-<a name="changedate"></a>{{changedate <i>format="date time format"</i>}}<br>  
+[wiki::tagdef fromdate {format="date time format"} ]<br> 
+[wiki::tagdef todate {format="date time format"} ]<br> 
+[wiki::tagdef daterange {format="date time format" separator=" -- "} ]<br> 
+[wiki::tagdef createdate {format="date time format"} ]<br>  
+[wiki::tagdef changedate {format="date time format"} ]<br>  
 Show the different dates available for an entyr.
 If specified, format the date with the given date time format.
 This follows the
 Java <a href="http://docs.oracle.com/javase/6/docs/api/java/text/SimpleDateFormat.html">date format</a> conventions.
 
 
-<li> <a name="information"></a>{{information}}: The information tabs.
-<li> <a name="properties"></a>{{properties <i>metadata.types="types to show or not show"</i>}}: Show the properties listing.
+<li> [wiki::tagdef information]: The information tabs.
+<li> [wiki::tagdef properties {metadata.types="types to show or not show"}]: Show the properties listing.
 The attribute metadata.types is an optional comma separated list of the metata (or property) types that should be shown or not shown.
 
 For example, if you wanted to show all of the properties except for the Project PI property do:
@@ -316,8 +315,9 @@ Then if you wanted to just show  the Project PI property then do:
 </pre>
 
 
-<li> <a name="html"></a>{{html}}: Shows the default html view of the entry. Note: this requires an entry="..." to specify a different entry.
-<li> <a name="map"></a>{{map <i>width="width of map" height="height of map" listentries="true|false" listwidth="width or percent"</i>}}: Display a map. If the entry is a folder then display the children entries of the folder.
+<li> [wiki::tagdef html]: Shows the default html view of the entry. Note: this requires an entry="..." to specify a different entry.
+<li> [wiki::tagdef link {linkresource=true|false button=true|false output=someoutput]: Makes a link to the entry. Set button=true to buttonize the link. Link to the file with linkresource=true. Link to some other view with output=
+<li> [wiki::tagdef map {width="width of map" height="height of map" listentries="true|false" listwidth="width or percent"}]: Display a map. If the entry is a folder then display the children entries of the folder.
 
 If you do not specify a width then the map will be sized to fit its page. 
 
@@ -334,14 +334,14 @@ If you have a Folder (or other group) and want to just show the Folder and nots 
 </pre>
 
 
-<li> <a name="earth"></a>{{earth <i>width="width of map" height="height of map"</i>}}: 
+<li> [wiki::tagdef earth {width="width of map" height="height of map"}]: 
 Display the Google Earth plugin. 
 
-<li> <a name="comments"></a>{{comments}}: Show the comments.
-<li> <a name="breadcrumbs"></a>{{breadcrumbs}}: Show the breadcrumb path.
-<li> <a name="layout"></a>{{layout}}: This shows the "Layout:" toolbar bar for an entry.
-<li> <a name="toolbar"></a>{{toolbar}}: Show the entry toolbar.
-<li> <a name="image"></a>{{image <i>src="image source" alt="alt text" width="image width" link="true|false" left="absolute position" top="absolute position" linkresource="true|false" alt="image alt label"</i>}}: Include an image. If src is not given then this shows the image (if there is one) 
+<li> [wiki::tagdef comments]: Show the comments.
+<li> [wiki::tagdef breadcrumbs]: Show the breadcrumb path.
+<li> [wiki::tagdef layout]: This shows the "Layout:" toolbar bar for an entry.
+<li> [wiki::tagdef toolbar]: Show the entry toolbar.
+<li> [wiki::tagdef image {src="image source" alt="alt text" width="image width" link="true|false" left="absolute position" top="absolute position" linkresource="true|false" alt="image alt label"}]: Include an image. If src is not given then this shows the image (if there is one) 
 from the entry.  If src is specified it can take on the form: 
 <pre>
 src="entry name"
@@ -363,7 +363,7 @@ resource).  height and width can be used to scale the image, the alt
 attribute will be used in place of the entry id as a label on the image
 for accessibility.
 
-<li> <a name="menu"></a>{{menu <i>popup="true|false" title="title to use" menus="file,edit,feeds,view,other"</i>}}: 
+<li> [wiki::tagdef menu {popup="true|false" title="title to use" menus="file,edit,feeds,view,other"}]: 
 Show the menu actions. If menus is not specified
 show all of the menus. If menus is specified only show those menus listed.
 Show all menus in a toggle block:
@@ -400,10 +400,10 @@ may be located in a fixed location (using layoutHere=false) in the web page or t
 
 The group is defined as:
 
-<a name="group"></a>{{group <i>showTitle="true"  showMenu="false"  layoutType="table"  layoutColumns="1" divid="maindiv"</i>}}
+[wiki::tagdef group {showTitle="true"  showMenu="false"  layoutType="table"  layoutColumns="1" divid="maindiv"}]
 
 And the displays are defined as:
-<a name="display"></a>{{display <i>type="display type"   layoutHere="true"  ...</i>}}
+[wiki::tagdef display {type="display type"   layoutHere="true"  ...}]
 
 If you have a wiki page that does not have a group but only one or more display tags then a group will be
 added automatically.
@@ -451,28 +451,29 @@ To do this we define a regular html table layout that contains a couple of div t
 
 Likewise, the group has a divid=maindiv which corresponds to the div at the bottom of the page.
 
-<blockquote><pre>
-&lt;table width=100% border=0 cellpadding=10&gt;
-&lt;tr valign=top&gt;
-&lt;td width=50%&gt;&lt;div <span class="xmlattr">id</span>="listdiv&quot;&gt;&lt;/div&gt;&lt;/td&gt;
-&lt;td width=50%&gt;&lt;div <span class="xmlattr">id</span>="mapdiv&quot;&gt;&lt;/div&gt;&lt;/td&gt;
-&lt;/table&gt;
+[xml {
+<table width=100% border=0 cellpadding=10>
+<tr valign=top>
+<td width=50%><div id="listdiv"></div></td>
+<td width=50%><div id="mapdiv"></div></td>
+</table>
 
-&lt;div id=maindiv&gt;&lt;/div&gt;
+<div id=maindiv></div>
 
-{{displaygroup  <span class="xmlattr">layoutType</span>="table&quot;  <span class="xmlattr">layoutColumns</span>="1&quot; <span class="xmlattr">divid</span>="maindiv&quot;}}
+{{displaygroup  layoutType="table"  layoutColumns="1" divid="maindiv"}}
 
-{{display   <span class="xmlattr">type</span>="entrylist&quot;   <span class="xmlattr">divid</span>="listdiv&quot; }}
+{{display   type="entrylist"   divid="listdiv" }}
 
-{{display   <span class="xmlattr">type</span>="map&quot;  <span class="xmlattr">layoutHere</span>="true&quot; <span class="xmlattr">height</span>="250&quot; <span class="xmlattr">divid</span>="mapdiv&quot;}}
-</pre></blockquote>
+{{display   type="map"  layoutHere="true" height="250" divid="mapdiv"}}
+}]
 
 
 
 
 When using the display tag you need to specify the type of display.
 
-<a name="display"></a>{{display <i>type="entrylist"   layoutHere="true"   orientation="vertical"  showMetadata="false" showTypes="true" name="list1" innerHeight="200" divid="listdiv" formOpen="false"</i>}}:
+[wiki::tagdef display {type="entrylist"   layoutHere="true"   orientation="vertical"  showMetadata="false" showTypes="true" name="list1" innerHeight="200" divid="listdiv" formOpen="false"}
+]:
 
 <h3>Entry List Display</h3>
 
@@ -488,14 +489,14 @@ ramaddaBaseUrl="http://community.ramadda.org/repository/repos/data"
 The following properties display a collection of entries. By default they
 are the children entries of the wiki entry but you can specify
 other groups of entries with any of the following arguments:
-<blockquote><pre>{{property entry="some other entry" 
+[wiki::text {{{property entry="some other entry" 
                entries="entryid1,entryid2,entryid3.." 
                entries.filter="file|folder|image|type:some type|geo|suffix:file suffixes"
                exclude="entryid1,entryid2,entryid3.."  
                first="entryid1,entryid2,entryid3.."  
                last="entryid1,entryid2,entryid3.."  
                sort="name|date"  sortorder="up|down"
-               max="number of entries to use" }}</pre></blockquote>
+               max="number of entries to use" }}}]
 
 The entries attribute is a comma separated list of entry identifiers. They can be specific entry ids or they can be one of a set of relative descriptors:
 <ul>
@@ -650,50 +651,50 @@ search
 
 <ul>
 
-<li> <a name="tree"></a>{{tree}}:
-The <a name="tree"></a>{{tree}} tag is used to display the children entries of a folder.
+<li> [wiki::tagdef tree]:
+The [wiki::tagdef tree] tag is used to display the children entries of a folder.
 It can take the form:
-<blockquote><pre><a name="tree"></a>{{tree <i>title="Links" showtoggle="false" open="true" </i>}}</pre></blockquote>
+[wiki::text [wiki::tagdef tree {title="Links" showtoggle="false" open="true" }]]
 
 The title attribute is used in place of "Children". 
 If showtoggle="false" then the show/hide toggle link is not shown.
 
-<li> <a name="grid"></a>{{grid}}: Show the children in a grid. e.g., show 
+<li> [wiki::tagdef grid]: Show the children in a grid. e.g., show 
 the grandchildren as a grid:
-<blockquote><pre>{{grid entries="grandchildren"}}</pre></blockquote>
+[wiki::text {{{grid entries="grandchildren"}}}]
 
 
-<li> <a name="recent"></a>{{recent <i>days="number of days to show"</i>}}:
+<li> [wiki::tagdef recent {days="number of days to show"}]:
 Show the most recent N days in a list organized by day.
 
-<li> <a name="imageplayer"></a>{{imageplayer <i>width="image width" loopdelay="delay in milliseconds" loopstart="true|false" useAttachment="true|false"</i>}}:
+<li> [wiki::tagdef imageplayer {width="image width" loopdelay="delay in milliseconds" loopstart="true|false" useAttachment="true|false"}]:
 Show images in an image player, e.g.
-<blockquote><pre>{{imageplayer loopdelay="500" loopstart="true"}}</pre></blockquote> </pre>
+[wiki::text {{{imageplayer loopdelay="500" loopstart="true"}}}] </pre>
 
 If <i>useAttachment</i> is true then, if the entry's file is not an image but it has
 an attachment that is an image then use the attachment image.
 
 
-<li> <a name="gallery"></a>{{gallery <i>width="image width" columns="number of columns" showdescription="true"</i>}}:
+<li> [wiki::tagdef gallery {width="image width" columns="number of columns" showdescription="true"}]:
 Show a 3 column gallery:
-<blockquote><pre>{{gallery columns="3"}}</pre></blockquote> </pre>
+[wiki::text {{{gallery columns="3"}}}] </pre>
 
 Show a vertical listing of the children entry images:
-<blockquote><pre>{{gallery columns="1"}}</pre></blockquote> </pre>
+[wiki::text {{{gallery columns="1"}}}] </pre>
 
 Set the image width and only show up to 5 images:
-<blockquote><pre>{{gallery  width="300" max="5"}}</pre></blockquote> </pre>
+[wiki::text {{{gallery  width="300" max="5"}}}] </pre>
 
-<li> <a name="tabs"></a>{{tabs}}: Show the children as tabs:
-<blockquote><pre>{{tabs}}</pre></blockquote> </pre>
+<li> [wiki::tagdef tabs]: Show the children as tabs:
+[wiki::text {{{tabs}}}] </pre>
 
 Show only the 3 specified entries in tabs:
-<blockquote><pre>{{tabs entries="0af4d166-5723-4775-88fc-b83b72ab47a4,
+[wiki::text {{{tabs entries="0af4d166-5723-4775-88fc-b83b72ab47a4,
                  83539d5c-e9d9-408e-b0af-35f480000ae6,
-                 49684d25-6af1-4188-a0ae-4d5302d22f2a" }}</pre></blockquote> </pre>
+                 49684d25-6af1-4188-a0ae-4d5302d22f2a" }}}] </pre>
 
 Show only the children of type wikipage in tabs:
-<blockquote><pre>{{tabs entries="type:wikipage"}}</pre></blockquote></pre>
+[wiki::text {{{tabs entries="type:wikipage"}}}]</pre>
 
 Additional arguments:
 
@@ -708,12 +709,12 @@ Additional arguments:
 <li>linkresource="true|false" - if true, link to the entry resource
 </ul>
 
-<li> <a name="accordian"></a>{{accordian}}: Show the children in an accordian:
-<blockquote><pre>{{accordian}}</pre></blockquote> </pre>
+<li> [wiki::tagdef accordian]: Show the children in an accordian:
+[wiki::text {{{accordian}}}] </pre>
 Uses the same arguments as tabs.
 
-<li> <a name="slideshow"></a>{{slideshow}}: Show the children in a slideshow:
-<blockquote><pre>{{slideshow}}</pre></blockquote> </pre>
+<li> [wiki::tagdef slideshow]: Show the children in a slideshow:
+[wiki::text {{{slideshow}}}] </pre>
 <p>
 Uses the same arguments as tabs, plus:
 <ul>
@@ -727,57 +728,57 @@ Uses the same arguments as tabs, plus:
 
 <p>
 
-<li> <a name="links"></a>{{links <i>separator="separator text to use" 
+<li> [wiki::tagdef links {separator="separator text to use" 
                           style="inline css style for the link"
                           class="css class for the link"
                           tagopen="html to prepend to the link - default is li" 
                           tagclose="close html"
-                          linkresource="true|false if true link to the entry's file or URL; If false link to the entry"</i>}}: Layout links to the entries.<br>
+                          linkresource="true|false if true link to the entry's file or URL; If false link to the entry"}]: Layout links to the entries.<br>
 This produces a set of links to the entries. 
 
 A bulleted list:
-<blockquote><pre>
+[wiki::text {
 &lt;ul&gt;
 {{links}}
 &lt;/ul&gt;
-</pre></blockquote>
+}]
 
 A bulleted list with the links to the entry's file:
-<blockquote><pre>
+[wiki::text {
 &lt;ul&gt;
 {{links linkresource="true"}}
 &lt;/ul&gt;
-</pre></blockquote>
+}]
 
 If you wanted to make a vertical list do:
-<blockquote><pre>
+[wiki::text {
 {{links tagopen="&lt;div&gt;" tagclose="&lt;/div&gt;"}}
-</pre></blockquote>
+}]
 
 You can create a header with wiki text like:
-<blockquote><pre>
+[wiki::text {
 &lt;center&gt;
 {{links separator="&amp;nbsp;|&amp;nbsp" tagopen=""}}
 &lt;/center&gt;
-</pre></blockquote>
+}]
 
 
-<li> <a name="search"></a>{{search <i>
+<li> [wiki::tagdef search {
                   type="entry type" 
                   search.showform="true|false"
-                  search.showheader="true|false"</i>}}
+                  search.showheader="true|false"}]
 
 The "search" tag performs an entry type specific search and embed it into the wiki. This is the same as the top-level type specific search. You can use any of the "search." attributes defined above, e.g., search.text.
 
 The default is to not show the form.
 
 
-<li> <a name="apply"></a>{{apply}}
+<li> [wiki::tagdef apply]
 The apply tag allows you to apply some tag (e.g., links, map) to a set of entries in turn. You can then layout
 the results in a variety of ways (e.g.,  table, tabs);
 The apply tag is of the form:
 
-<blockquote><pre>
+[wiki::text {
 {{apply
 apply.entry="the entry to find the children of"
 apply.tag="some tag to apply to the entries"
@@ -791,7 +792,7 @@ apply.includeicon="true|false"
 ...
 &lt;arguments for the apply tag&gt;
 }}
-</pre></blockquote>
+}]
 
 All of the arguments, including the entry argument are the same as described above but have the prefix "apply.". This way you can
 mix the arguments that control the apply function with the arguments that you are using for each entry.
@@ -810,20 +811,20 @@ parent
 
 If you used the apply tag:
 
-<blockquote><pre>
+[wiki::text {
 {{apply
 apply.entry="parent"
 apply.layout="tabs"
 apply.tag="links"
 linkresource="true"
 }}
-</pre></blockquote>
+}]
 
 This applies the tag "links" to each main entry. It puts each result in a tab.
 
 This tag would make a 2 column table of maps with links to the entries show in the header.
 
-<blockquote><pre>
+[wiki::text {
 {{apply
 apply.layout="table"
 apply.columns="2"
@@ -832,7 +833,7 @@ apply.border="1"
 apply.header="${url}"
 &lt;any map arguments*gt;
 }}
-</pre></blockquote>
+}]
 
 
 
@@ -846,51 +847,51 @@ The &lt;block&gt; tag allows you to easily create a toggle block and/or show or 
 based on the user's device.
 
 To show a simple toggle block just do:
-<blockquote><pre>
-&lt;block&gt;
+[xml {
+<block>
  any content here
-&lt;/block&gt;
-</pre></blockquote>
+</block>
+}]
 
 You can specify the toggle label title with:
-<blockquote><pre>
-&lt;block <span class="xmlattr">title</span>="Click here to open&quot;&gt;
+[xml {
+<block title="Click here to open">
  any content here
-&lt;/block&gt;
-</pre></blockquote>
+</block>
+}]
 
 
 You can specify whether the block is open or closed:
-<blockquote><pre>
-&lt;block <span class="xmlattr">open</span>="false&quot;&gt;
+[xml {
+<block open="false">
  any content here
-&lt;/block&gt;
-</pre></blockquote>
+</block>
+}]
 
 You can specify whether to show the content or not:
-<blockquote><pre>
-&lt;block <span class="xmlattr">show</span>="mobile&quot; <span class="xmlattr">decorate</span>="false&quot;&gt;
+[xml {
+<block show="mobile" decorate="false">
   this will only show for mobile users
-&lt;/block&gt;
-&lt;block <span class="xmlattr">show</span>="!mobile&quot; <span class="xmlattr">decorate</span>="false&quot;&gt;
+</block>
+<block show="!mobile" decorate="false">
   this will only show for non-mobile users
-&lt;/block&gt;
-</pre></blockquote>
+</block>
+}]
 
 You can also use the block tag to define a variable or macro that is used later.
 
-<blockquote><pre>
-&lt;block <span class="xmlattr">var</span>="var_name&quot;&gt;
+[xml {
+<block var="var_name">
  any content here
-&lt;/block&gt;
-</pre></blockquote>
+</block>
+}]
 
 
 This will not show the content in place. Rather you can reference and insert the content later with:
-<blockquote><pre>
+[xml {
  \${var_name}
-&lt;/block&gt;
-</pre></blockquote>
+</block>
+}]
 
 
 
@@ -902,19 +903,19 @@ This will not show the content in place. Rather you can reference and insert the
 
 You can also import any of the views of an entry, e.g., the map view, 
 the OPeNDAP view, the calendar view, etc., with the  
-{{import}} tag:<br>
-<a name="import"></a>{{import <i>output="<any of the output types>"</i>}}
+[wiki::tag import] tag:<br>
+[wiki::tagdef import {output="<any of the output types>"}]
 <p>
 
 So, if you wanted to show the calendar view of an entry you would do:
-<blockquote><pre>{{import <i>output="calendar.calendar"</i>}}</pre></blockquote>
+[wiki::text [wiki::tag import {output="calendar.calendar"}]]
 
 To find the correct output identifier just navigate to the page you 
 want to include and look at the url for the output=... url argument 
 and use that.
 
 
-
+[ht::foot]
 <p>
 
 <p>&nbsp;<p>
