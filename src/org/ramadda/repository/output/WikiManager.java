@@ -375,6 +375,36 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         if (entryId.equals(ID_THIS)) {
             theEntry = entry;
         }
+
+        if (entryId.equals("link") || entryId.startsWith("link:")) {
+
+            String type = StringUtil.findPattern(entryId, ":(.*)$");
+            System.err.println("Link: " + type);
+            List<Association> associations =
+                getRepository().getAssociationManager().getAssociations(
+                    request, entry.getId());
+            System.err.println("associations: " + associations);
+            for (Association association : associations) {
+                Entry otherEntry =
+                    getAssociationManager().getOtherEntry(request,
+                        association, entry);
+                System.err.println("other entry: " + otherEntry);
+                if (otherEntry == null) {
+                    continue;
+                }
+                if ((type != null)
+                        && !otherEntry.getTypeHandler().isType(type)) {
+                    System.err.println("not type");
+
+                    continue;
+                }
+                theEntry = otherEntry;
+
+                break;
+            }
+        }
+
+
         if (entryId.equals(ID_ROOT)) {
             theEntry = getEntryManager().getTopGroup();
         }
@@ -943,7 +973,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             }
             String img = "";
             if (Misc.getProperty(props, ATTR_INCLUDEICON, false)) {
-                String icon = typeHandler.getProperty("icon", (String) null);
+                String icon = typeHandler.getIconProperty(null);
                 if (icon == null) {
                     icon = ICON_BLANK;
                     img = HtmlUtils.img(typeHandler.iconUrl(icon), "",
