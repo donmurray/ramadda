@@ -473,13 +473,15 @@ public class WikiUtil {
 
                 continue;
             }
-            if (tline.equals("+pagehead")) {
+            if (tline.startsWith("+pagehead")) {
+                String weight = StringUtil.findPattern(tline,"-([0-9]+)");
+                if(weight==null) weight = "8";
                 buff.append("<div class=\"row\">");
-                buff.append("<div class=\"col-md-8\">");
+                buff.append("<div class=\"col-md-" + weight +"\">");
                 buff.append("<div class=\"jumbotron\">");
                 continue;
             }
-            if (tline.equals("-pagehead")) {
+            if (tline.startsWith("-pagehead")) {
                 buff.append("</div></div></div>");
                 continue;
             }
