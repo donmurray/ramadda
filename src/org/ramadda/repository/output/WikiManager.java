@@ -485,7 +485,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
         if ( !inDiv && align != null) {
             //            extra.append(HtmlUtils.style("align:" + align + ";"));
-            extra.append(HtmlUtils.attr("align", align));
+            //            extra.append(HtmlUtils.attr("align", align));
         }
 
         if (alt == null) {
@@ -574,16 +574,17 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
         if (inDiv) {
             sb.append(HtmlUtils.open("div", attrs));
+        } else {
+            sb.append(HtmlUtils.open("div", HtmlUtils.style((align!=null?"float:" + align+";" : "")+" display:inline-block;text-align:center")));
         }
         sb.append(img);
         if (caption != null) {
+            sb.append(HtmlUtils.br());
             sb.append(
-                HtmlUtils.div(
+                HtmlUtils.span(
                     caption, HtmlUtils.cssClass("wiki-image-caption")));
         }
-        if (inDiv) {
-            sb.append(HtmlUtils.close("div"));
-        }
+        sb.append(HtmlUtils.close("div"));
 
         return sb.toString();
 
