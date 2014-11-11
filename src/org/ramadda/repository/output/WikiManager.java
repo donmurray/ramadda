@@ -379,16 +379,16 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         if (entryId.equals("link") || entryId.startsWith("link:")) {
 
             String type = StringUtil.findPattern(entryId, ":(.*)$");
-            System.err.println("Link: " + type);
+            //            System.err.println("Link: " + type);
             List<Association> associations =
                 getRepository().getAssociationManager().getAssociations(
                     request, entry.getId());
-            System.err.println("associations: " + associations);
+            //            System.err.println("associations: " + associations);
             for (Association association : associations) {
                 Entry otherEntry =
                     getAssociationManager().getOtherEntry(request,
                         association, entry);
-                System.err.println("other entry: " + otherEntry);
+                //                System.err.println("other entry: " + otherEntry);
                 if (otherEntry == null) {
                     continue;
                 }
@@ -466,7 +466,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                String url, Entry entry, Hashtable props)
             throws Exception {
 
-        boolean       inDiv = request.get("inDiv", true);
+
+        boolean       inDiv =  Misc.getProperty(props,"inDiv", true);
         String        align = (String) props.get(ATTR_ALIGN);
         String        width = (String) props.get(ATTR_WIDTH);
         String        alt   = (String) props.get(HtmlUtils.ATTR_ALT);
@@ -482,7 +483,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             extra.append(HtmlUtils.attr(HtmlUtils.ATTR_WIDTH, width));
         }
 
-        if ( !inDiv && (align != null)) {
+        if ( !inDiv && align != null) {
             extra.append(HtmlUtils.style("align:" + align + ";"));
         }
 

@@ -1389,6 +1389,10 @@ snippet {
 }
 
 
+.wiki-image-caption {
+   font-style:italic;
+}
+
 .wiki-text-raw {
     background-color: #ddd;
     border:1px #888 solid;
