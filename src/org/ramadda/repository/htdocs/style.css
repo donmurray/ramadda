@@ -1112,6 +1112,17 @@ a.ramadda-menuitem-link {
 }
 
 
+.ramadda-menu  { 
+   background: #fff;
+   border: 1px #ccc solid;
+}
+
+.ramadda-menu td { 
+     padding: 0px;
+     text-align: left;
+}
+
+
 .ramadda-entry-menu-title {
   font-style:italic;
    width: 100%;

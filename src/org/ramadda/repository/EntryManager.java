@@ -6020,7 +6020,7 @@ public class EntryManager extends RepositoryManager {
                 HtmlUtils.div(
                     header, HtmlUtils.cssClass("ramadda-entry-menu-title")));
         }
-        menu.append("<table cellspacing=\"0\" cellpadding=\"4\">");
+        menu.append("<table class=\"ramadda-menu\">");
         menu.append(HtmlUtils.open(HtmlUtils.TAG_TR,
                                    HtmlUtils.attr(HtmlUtils.ATTR_VALIGN,
                                        "top")));
