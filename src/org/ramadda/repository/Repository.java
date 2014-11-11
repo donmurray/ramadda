@@ -221,7 +221,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
     /** File Listing OutputType */
     public static final OutputType OUTPUT_FILELISTING =
         new OutputType("File Listing", "repository.filelisting",
-                       OutputType.TYPE_FILE, "", ICON_FILELISTING);
+                       OutputType.TYPE_FILE|OutputType.TYPE_FORSEARCH, "", ICON_FILELISTING);
 
 
     /** the jetty server */
