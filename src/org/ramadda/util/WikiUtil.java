@@ -473,6 +473,16 @@ public class WikiUtil {
 
                 continue;
             }
+            if (tline.equals("+pagehead")) {
+                buff.append("<div class=\"row\">");
+                buff.append("<div class=\"col-md-8\">");
+                buff.append("<div class=\"jumbotron\">");
+                continue;
+            }
+            if (tline.equals("-pagehead")) {
+                buff.append("</div></div></div>");
+                continue;
+            }
             if (tline.equals("+jumbo")) {
                 buff.append("<div class=\"jumbotron\">");
 
