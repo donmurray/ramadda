@@ -638,6 +638,7 @@ padding-right-rtl-source: physical;
    text-decoration: none;
    border : 1px #aaa solid;
    background-color : #E6E6E6;
+   background-color : #fff;
    position:absolute;
 
   -webkit-box-shadow: 3px 3px 6px rgba(0, 0, 0, 0.5);
@@ -1111,10 +1112,10 @@ a.ramadda-menuitem-link {
    color:#000;
 }
 
-
 .ramadda-menu  { 
+   margin: 5px;
    background: #fff;
-   border: 1px #ccc solid;
+   border: 0px #ccc solid;
 }
 
 .ramadda-menu td { 
