@@ -484,7 +484,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         }
 
         if ( !inDiv && align != null) {
-            extra.append(HtmlUtils.style("align:" + align + ";"));
+            //            extra.append(HtmlUtils.style("align:" + align + ";"));
+            extra.append(HtmlUtils.attr("align", align));
         }
 
         if (alt == null) {
