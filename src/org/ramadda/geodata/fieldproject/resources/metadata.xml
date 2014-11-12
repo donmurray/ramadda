@@ -19,6 +19,9 @@
       <element id="type" name="Type" datatype="enumerationplus" values="file:/org/ramadda/geodata/fieldproject/resources/personnel.properties"/>
       <element id="institution" name="Institution"/>
       <element id="email" name="Email" datatype="email"/>
+
+      <template type="html"><![CDATA[<a href="mailto:${email}">${name}</a> - ${type} - ${institution}]]></template>
+
     </type>
 
 
@@ -29,6 +32,7 @@
       <element id="email" name="Email" datatype="email"/>
       <element id="url" datatype="url" name="URL"/>
       <element id="picture" datatype="file" name="Picture" thumbnail="false" attachment="false"/>
+      <template type="html"><![CDATA[<a href="mailto:${email}">${name}</a> <a href="${url}">${institution}</a>]]></template>
     </type>
 
 

@@ -61,13 +61,13 @@
      <column name="notes" type="string"  label="Notes" rows="5" size="5000" changetype="true"/>
      <wiki><![CDATA[
 {{noheading}}
-<table width="100%">
-<tr valign=top>
-<td width="50%">
++row
++col-md-8
 <div class="wiki-h1">{{name}}</div>
 <div style="max-height: 400px; overflow-y: auto;">
 {{description wikify="true"}}
 </div>
+
 
 ==Project Information==
 <table class="formtable">
@@ -79,18 +79,19 @@
 {{field name="notes" row.label="Notes:"}}
 </table>
 
-{{properties metadata.types="!project_pi" message="" }}
+{{properties metadata.types="project_pi,project_person,project_funding" message="" }}
+
+{{tree title="Data" details="false" showtoggle="false" message="" prefix="==Data=="}}
+
+{{properties metadata.types="!project_pi,!project_person,!project_funding" message="" }}
 {{links entry="Links" message=""}}
-</td>
-<td width="50%">
-{{properties metadata.types="project_pi" message="" }}
+-col
++col-md-4
 {{image src="::*" message="" width="300"}}
 <p>
 {{mapentry width="350" message=""}}
-<p>
-{{tree title="Data" details="false" showtoggle="false" message="" prefix="==Data=="}}
-</td></tr>
-</table>
+-col
+-row
 ]]>
 </wiki>
    </type>
