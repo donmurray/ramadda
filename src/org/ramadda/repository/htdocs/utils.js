@@ -295,6 +295,9 @@ var HtmlUtil =  {
     sqt : function (value) {
         return "\'" + value +"\'";
     },
+    getUniqueId: function() {
+        return "id_" + (uniqueCnt++);
+    },
     hbox : function() {
         var row = HtmlUtil.openTag("tr",["valign","top"]);
         row += "<td>";
@@ -388,6 +391,9 @@ var HtmlUtil =  {
     },
     openDiv : function(attrs) {
         return this.openTag("div",attrs);
+    },
+    closeDiv : function() {
+        return this.closeTag("div");
     },
 
     closeTag : function(tagName) {
