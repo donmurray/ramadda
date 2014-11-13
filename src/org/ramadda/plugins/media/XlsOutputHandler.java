@@ -77,6 +77,9 @@ import java.util.zip.*;
 public class XlsOutputHandler extends OutputHandler {
 
 
+    public static final int MAX_ROWS = 500;
+    public static final int MAX_COLS = 100;
+
     /** _more_ */
     public static final OutputType OUTPUT_XLS_JSON =
         new OutputType("XLS to JSON", "xls_json", OutputType.TYPE_FEEDS, "",
@@ -205,14 +208,14 @@ public class XlsOutputHandler extends OutputHandler {
             HSSFSheet    sheet = wb.getSheetAt(sheetIdx);
             List<String> rows  = new ArrayList<String>();
             for (int rowIdx = sheet.getFirstRowNum();
-                    rowIdx <= sheet.getLastRowNum(); rowIdx++) {
+                 rowIdx<MAX_ROWS && rowIdx <= sheet.getLastRowNum(); rowIdx++) {
                 HSSFRow row = sheet.getRow(rowIdx);
                 if (row == null) {
                     continue;
                 }
                 List<String> cols     = new ArrayList<String>();
                 short        firstCol = row.getFirstCellNum();
-                for (short col = firstCol; col < row.getLastCellNum();
+                for (short col = firstCol; col< MAX_COLS && col < row.getLastCellNum();
                         col++) {
                     HSSFCell cell = row.getCell(col);
                     if (cell == null) {
@@ -245,6 +248,7 @@ public class XlsOutputHandler extends OutputHandler {
             XSSFSheet    sheet = wb.getSheetAt(sheetIdx);
             List<String> rows  = new ArrayList<String>();
             for (int rowIdx = sheet.getFirstRowNum();
+                 rowIdx<MAX_ROWS && 
                     rowIdx <= sheet.getLastRowNum(); rowIdx++) {
                 XSSFRow row = sheet.getRow(rowIdx);
                 if (row == null) {
@@ -252,7 +256,7 @@ public class XlsOutputHandler extends OutputHandler {
                 }
                 List<String> cols     = new ArrayList<String>();
                 short        firstCol = row.getFirstCellNum();
-                for (short col = firstCol; col < row.getLastCellNum();
+                for (short col = firstCol; col< MAX_COLS && col < row.getLastCellNum();
                         col++) {
                     XSSFCell cell = row.getCell(col);
                     if (cell == null) {

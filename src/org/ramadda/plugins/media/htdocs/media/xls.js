@@ -17,6 +17,7 @@ function RamaddaXls(divId, url, props) {
         fixedColumnsLeft: 0,
         rowHeaders: true,
         colHeaders: true,
+        colWidths:   null,
     };
     $.extend(this.props, props);
 
@@ -24,8 +25,6 @@ function RamaddaXls(divId, url, props) {
             loadSheet: function(sheetIdx) {
                 var sheet = this.sheets[sheetIdx];
                 var rows =sheet.rows.slice(0);
-                console.log("rows:" + rows.length);
-
                 var html = "";
 
                 var args  = {
@@ -38,6 +37,7 @@ function RamaddaXls(divId, url, props) {
                     minSpareRows: 1,
                 };
                 $.extend(args, this.props);
+
 
                 if(args.useFirstRowAsHeader) {
                     var headers = rows[0];

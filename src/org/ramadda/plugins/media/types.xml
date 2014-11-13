@@ -103,6 +103,7 @@
      <column name="usefirstrow" type="boolean" label="Use first row as header"  default="true" showinhtml="false"/>
      <column name="colheader" type="boolean" label="Show Column Header"  default="false" showinhtml="false"/>
      <column name="rowheader" type="boolean" label="Show Row Header"  default="false" showinhtml="false"/>
+     <column name="widths" type="string"  size="500" label="Column Widths"  showinhtml="false" suffix="Comma separate list of column widths"/>
 
 
 </type>

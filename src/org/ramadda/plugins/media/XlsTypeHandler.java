@@ -93,12 +93,14 @@ public class XlsTypeHandler extends MsDocTypeHandler {
         if ( !Misc.equals(entry.getValue(0, "false"), "true")) {
             return null;
         }
+                                               
         boolean useFirstRowAsHeader = Misc.equals("true",
                                           entry.getValue(1, "true"));
 
 
         boolean colHeader = Misc.equals("true", entry.getValue(2, "false"));
         boolean rowHeader = Misc.equals("true", entry.getValue(3, "false"));
+        List<String> widths = StringUtil.split(entry.getValue(4,""),",",true,true);
         List    propsList = new ArrayList();
 
         propsList.add("useFirstRowAsHeader");
@@ -107,6 +109,12 @@ public class XlsTypeHandler extends MsDocTypeHandler {
         propsList.add("" + colHeader);
         propsList.add("rowHeaders");
         propsList.add("" + rowHeader);
+
+
+        if(widths.size()>0) {
+            propsList.add("colWidths");
+            propsList.add(Json.list(widths));
+        }
 
         String        props = Json.map(propsList);
 
