@@ -36,6 +36,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.ramadda.repository.*;
 import org.ramadda.repository.auth.*;
 import org.ramadda.repository.output.*;
+import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Json;
 import org.ramadda.util.Utils;
 
@@ -45,7 +46,6 @@ import org.ramadda.util.XlsUtil;
 import org.w3c.dom.*;
 
 import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringUtil;
@@ -55,13 +55,11 @@ import java.io.File;
 
 import java.net.*;
 
-import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.Enumeration;
+import java.util.HashSet;
 
-import java.util.GregorianCalendar;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
@@ -69,7 +67,7 @@ import java.util.TimeZone;
 
 
 import java.util.regex.*;
-import java.util.zip.*;
+
 
 
 /**
@@ -77,13 +75,21 @@ import java.util.zip.*;
 public class XlsOutputHandler extends OutputHandler {
 
 
+    /** _more_          */
     public static final int MAX_ROWS = 500;
+
+    /** _more_          */
     public static final int MAX_COLS = 100;
 
     /** _more_ */
     public static final OutputType OUTPUT_XLS_JSON =
         new OutputType("XLS to JSON", "xls_json", OutputType.TYPE_FEEDS, "",
                        "/media/xls.png");
+
+    /** _more_          */
+    public static final OutputType OUTPUT_XLS_HTML =
+        new OutputType("Show Spreadsheet", "xls_html", OutputType.TYPE_VIEW,
+                       "", "/media/xls.png");
 
 
     /**
@@ -102,6 +108,7 @@ public class XlsOutputHandler extends OutputHandler {
     public XlsOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
+        addType(OUTPUT_XLS_HTML);
         addType(OUTPUT_XLS_JSON);
     }
 
@@ -117,9 +124,21 @@ public class XlsOutputHandler extends OutputHandler {
      */
     public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
-        if (state.getEntry().getTypeHandler().isType("type_document_xls")) {
-            links.add(makeLink(request, state.getEntry(), OUTPUT_XLS_JSON));
+        Entry   entry = state.getEntry();
+        boolean isXls = entry.getTypeHandler().isType("type_document_xls");
+        if ( !isXls) {
+            if ( !entry.isFile()) {
+                return;
+            }
+            String path = entry.getResource().getPath();
+            if (path.endsWith(".xls") || path.endsWith("xlsx")) {
+                isXls = true;
+            }
+        }
 
+        if (isXls) {
+            links.add(makeLink(request, state.getEntry(), OUTPUT_XLS_HTML));
+            links.add(makeLink(request, state.getEntry(), OUTPUT_XLS_JSON));
         }
     }
 
@@ -139,20 +158,27 @@ public class XlsOutputHandler extends OutputHandler {
     public Result outputEntry(Request request, OutputType outputType,
                               Entry entry)
             throws Exception {
-        try {
-            return outputEntryInner(request, outputType, entry);
-        } catch (org.apache.poi.hssf.OldExcelFormatException exc) {
-            StringBuilder sb = new StringBuilder();
-            sb.append(Json.map("error",
-                               Json.quote("Old Excel format not supported")));
-            request.setReturnFilename(entry.getName() + ".json");
-            Result result = new Result("", sb);
-            result.setShouldDecorate(false);
-            result.setMimeType("application/json");
+        if (outputType.equals(OUTPUT_XLS_JSON)) {
+            try {
+                return outputEntryJson(request, outputType, entry);
+            } catch (org.apache.poi.hssf.OldExcelFormatException exc) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(
+                    Json.map(
+                        "error",
+                        Json.quote("Old Excel format not supported")));
+                request.setReturnFilename(entry.getName() + ".json");
+                Result result = new Result("", sb);
+                result.setShouldDecorate(false);
+                result.setMimeType("application/json");
 
-            return result;
+                return result;
+            }
         }
 
+        return new Result("",
+                          new StringBuffer(getHtmlDisplay(request,
+                              new Hashtable(), entry)));
     }
 
 
@@ -167,18 +193,33 @@ public class XlsOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    private Result outputEntryInner(Request request, OutputType outputType,
-                                    Entry entry)
+    private Result outputEntryJson(Request request, OutputType outputType,
+                                   Entry entry)
             throws Exception {
-        StringBuilder sb     = new StringBuilder();
-        List<String>  sheets = new ArrayList<String>();
-        String        file   = entry.getFile().toString();
-        InputStream   myxls  = getStorageManager().getFileInputStream(file);
+        StringBuilder    sb           = new StringBuilder();
+        List<String>     sheets       = new ArrayList<String>();
+
+        String           file         = entry.getFile().toString();
+        InputStream      myxls = getStorageManager().getFileInputStream(file);
+
+
+
+        HashSet<Integer> sheetsToShow = null;
+        if (entry.getTypeHandler().isType("type_document_xls")) {
+            List<String> sheetsStr = StringUtil.split(entry.getValue(5, ""),
+                                         ",", true, true);
+            if (sheetsStr.size() > 0) {
+                sheetsToShow = new HashSet<Integer>();
+                for (String s : sheetsStr) {
+                    sheetsToShow.add(Integer.parseInt(s));
+                }
+            }
+        }
 
         if (file.endsWith(".xlsx")) {
-            readXlsx(myxls, sheets);
+            readXlsx(myxls, sheets, sheetsToShow);
         } else {
-            readXls(myxls, sheets);
+            readXls(myxls, sheets, sheetsToShow);
         }
 
 
@@ -197,25 +238,33 @@ public class XlsOutputHandler extends OutputHandler {
      *
      * @param myxls _more_
      * @param sheets _more_
+     * @param sheetsToShow _more_
      *
      * @throws Exception _more_
      */
-    private void readXls(InputStream myxls, List<String> sheets)
+
+    private void readXls(InputStream myxls, List<String> sheets,
+                         HashSet<Integer> sheetsToShow)
             throws Exception {
         HSSFWorkbook wb = new HSSFWorkbook(myxls);
         for (int sheetIdx = 0; sheetIdx < wb.getNumberOfSheets();
                 sheetIdx++) {
+            if ((sheetsToShow != null) && !sheetsToShow.contains(sheetIdx)) {
+                continue;
+            }
             HSSFSheet    sheet = wb.getSheetAt(sheetIdx);
             List<String> rows  = new ArrayList<String>();
             for (int rowIdx = sheet.getFirstRowNum();
-                 rowIdx<MAX_ROWS && rowIdx <= sheet.getLastRowNum(); rowIdx++) {
+                    (rowIdx < MAX_ROWS) && (rowIdx <= sheet.getLastRowNum());
+                    rowIdx++) {
                 HSSFRow row = sheet.getRow(rowIdx);
                 if (row == null) {
                     continue;
                 }
                 List<String> cols     = new ArrayList<String>();
                 short        firstCol = row.getFirstCellNum();
-                for (short col = firstCol; col< MAX_COLS && col < row.getLastCellNum();
+                for (short col = firstCol;
+                        (col < MAX_COLS) && (col < row.getLastCellNum());
                         col++) {
                     HSSFCell cell = row.getCell(col);
                     if (cell == null) {
@@ -237,10 +286,13 @@ public class XlsOutputHandler extends OutputHandler {
      *
      * @param myxls _more_
      * @param sheets _more_
+     * @param sheetsToShow _more_
      *
      * @throws Exception _more_
      */
-    private void readXlsx(InputStream myxls, List<String> sheets)
+
+    private void readXlsx(InputStream myxls, List<String> sheets,
+                          HashSet<Integer> sheetsToShow)
             throws Exception {
         XSSFWorkbook wb = new XSSFWorkbook(myxls);
         for (int sheetIdx = 0; sheetIdx < wb.getNumberOfSheets();
@@ -248,15 +300,16 @@ public class XlsOutputHandler extends OutputHandler {
             XSSFSheet    sheet = wb.getSheetAt(sheetIdx);
             List<String> rows  = new ArrayList<String>();
             for (int rowIdx = sheet.getFirstRowNum();
-                 rowIdx<MAX_ROWS && 
-                    rowIdx <= sheet.getLastRowNum(); rowIdx++) {
+                    (rowIdx < MAX_ROWS) && (rowIdx <= sheet.getLastRowNum());
+                    rowIdx++) {
                 XSSFRow row = sheet.getRow(rowIdx);
                 if (row == null) {
                     continue;
                 }
                 List<String> cols     = new ArrayList<String>();
                 short        firstCol = row.getFirstCellNum();
-                for (short col = firstCol; col< MAX_COLS && col < row.getLastCellNum();
+                for (short col = firstCol;
+                        (col < MAX_COLS) && (col < row.getLastCellNum());
                         col++) {
                     XSSFCell cell = row.getCell(col);
                     if (cell == null) {
@@ -271,6 +324,84 @@ public class XlsOutputHandler extends OutputHandler {
                                 "rows", Json.list(rows)));
         }
     }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param requestProps _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String getHtmlDisplay(Request request, Hashtable requestProps,
+                                 Entry entry)
+            throws Exception {
+        boolean useFirstRowAsHeader = Misc.equals("true",
+                                          entry.getValue(1, "true"));
+
+
+        boolean colHeader = Misc.equals("true", entry.getValue(2, "false"));
+        boolean rowHeader = Misc.equals("true", entry.getValue(3, "false"));
+        List<String> widths = StringUtil.split(entry.getValue(4, ""), ",",
+                                  true, true);
+
+
+
+        List propsList = new ArrayList();
+
+        propsList.add("useFirstRowAsHeader");
+        propsList.add("" + useFirstRowAsHeader);
+        propsList.add("colHeaders");
+        propsList.add("" + colHeader);
+        propsList.add("rowHeaders");
+        propsList.add("" + rowHeader);
+
+
+        if (widths.size() > 0) {
+            propsList.add("colWidths");
+            propsList.add(Json.list(widths));
+        }
+
+        String        props = Json.map(propsList);
+
+        StringBuilder sb    = new StringBuilder();
+        String jsonUrl =
+            request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
+                             ARG_OUTPUT,
+                             XlsOutputHandler.OUTPUT_XLS_JSON.getId());
+
+
+
+        sb.append(HtmlUtils.importJS(getRepository().getUrlBase()
+                                     + "/media/jquery.handsontable.full.js"));
+        sb.append(HtmlUtils.cssLink(getRepository().getUrlBase()
+                                    + "/media/jquery.handsontable.full.css"));
+
+        sb.append(HtmlUtils.cssLink(getRepository().getUrlBase()
+                                    + "/media/xls.css"));
+        sb.append(HtmlUtils.importJS(getRepository().getUrlBase()
+                                     + "/media/xls.js"));
+
+        sb.append("\n");
+
+        sb.append(header(entry.getName()));
+        sb.append(entry.getDescription());
+        String divId = HtmlUtils.getUniqueId("div_");
+        sb.append(HtmlUtils.div("", HtmlUtils.id(divId)));
+        String js = "var ramaddaXls  = new RamaddaXls("
+                    + HtmlUtils.quote(divId) + "," + HtmlUtils.quote(jsonUrl)
+                    + "," + props + ");";
+        sb.append(HtmlUtils.script("$( document ).ready(function() {\n" + js
+                                   + "\n});\n"));
+
+        return sb.toString();
+    }
+
+
 
 
 }
