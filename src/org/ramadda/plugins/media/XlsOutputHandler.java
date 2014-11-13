@@ -38,6 +38,7 @@ import org.ramadda.repository.auth.*;
 import org.ramadda.repository.output.*;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Json;
+import org.ramadda.util.GoogleChart;
 import org.ramadda.util.Utils;
 
 import org.ramadda.util.XlsUtil;
@@ -377,14 +378,17 @@ public class XlsOutputHandler extends OutputHandler {
 
 
         sb.append(HtmlUtils.importJS(getRepository().getUrlBase()
-                                     + "/media/jquery.handsontable.full.js"));
+                                     + "/media/jquery.handsontable.full.min.js"));
         sb.append(HtmlUtils.cssLink(getRepository().getUrlBase()
-                                    + "/media/jquery.handsontable.full.css"));
+                                    + "/media/jquery.handsontable.full.min.css"));
 
         sb.append(HtmlUtils.cssLink(getRepository().getUrlBase()
                                     + "/media/xls.css"));
         sb.append(HtmlUtils.importJS(getRepository().getUrlBase()
                                      + "/media/xls.js"));
+
+        GoogleChart.addChartImport(sb);
+
 
         sb.append("\n");
 
