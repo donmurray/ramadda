@@ -72,10 +72,10 @@ CREATE TABLE  metadata (id varchar(200),
 			entry_id varchar(200),
                         type varchar(200),
                 	inherited int,
-                        attr1 varchar(6000),
-                        attr2 varchar(6000),
-                        attr3 varchar(6000),
-                        attr4 varchar(6000),
+                        attr1 varchar(5000),
+                        attr2 varchar(5000),
+                        attr3 varchar(5000),
+                        attr4 varchar(5000),
 		        extra ramadda.bigclob);
 
 

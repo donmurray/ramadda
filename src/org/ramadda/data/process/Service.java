@@ -426,6 +426,7 @@ public class Service extends RepositoryManager {
             }
 
             if ((command == null) || (command.indexOf("${") >= 0)) {
+                /*
                 getLogManager().logError("Service: no command defined:"
                                          + ((command != null)
                                             ? command
@@ -433,6 +434,7 @@ public class Service extends RepositoryManager {
                                             element)) + " property:"
                                                 + pathProperty);
 
+                */
                 return;
             }
             if ( !new File(command).exists()) {

@@ -140,8 +140,8 @@
        <property name="iscategory" value="true"/>
    </column>
    <column name="date" type="date" label="Date" cansearch="true"   canlist="true"/>
-   <column name="status" type="string" label="Past work"  canlist="true" rows="5" columns="60" size="10000" />
-   <column name="plans" type="string" label="Future plans"  canlist="true" rows="5" columns="60" size="10000" />
+   <column name="status" type="string" label="Past work"  canlist="true" rows="5" columns="60" size="5000" />
+   <column name="plans" type="string" label="Future plans"  canlist="true" rows="5" columns="60" size="5000" />
 </table>
 
 
