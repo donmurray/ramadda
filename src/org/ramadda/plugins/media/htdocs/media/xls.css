@@ -2,7 +2,7 @@
 
 
 .ramadda-xls-table {
-   height: 300px; 
+   height: 400px; 
    overflow: auto;
 }
 
@@ -12,3 +12,7 @@
 }
 
 
+.ramadda-xls-button {
+    min-width: 150px;
+    max-width: 150px;
+}
