@@ -30,11 +30,16 @@ public class GoogleChart {
      *
      * @param sb _more_
      */
-    public static void addChartImport(StringBuffer sb) {
+    public static void addChartImport(Appendable sb) throws Exception {
+        StringBuilder js = new StringBuilder();
+        js.append("if ((typeof ramaddaLoadedGoogleCharts === 'undefined')) {\n");
+        js.append("ramaddaLoadedGoogleCharts=true;\n");
+        js.append("google.load('visualization', '1.0', {'packages':['corechart']});\n");
+        js.append("}\n");
         sb.append(HtmlUtils.importJS("https://www.google.com/jsapi"));
         sb.append(
             HtmlUtils.script(
-                "if (!(typeof ramaddaLoadedGoodleCharts === 'undefined')) {ramaddaLoadedGoodleCharts=true;google.load('visualization', '1.0', {'packages':['corechart']});\n"));
+                             js.toString()));
         //        // Set a callback to run when the Google Visualization API is loaded.
         //        google.setOnLoadCallback(drawChart);
     }
