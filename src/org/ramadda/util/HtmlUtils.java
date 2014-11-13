@@ -3159,9 +3159,11 @@ public class HtmlUtils {
     public static String script(String s) {
         //Don't do this for now as it takes some overhead
         //        s = "\n" + be.belgampaul.tools.javascript.JsBeautify.jsBeautify(s, 2);
-        String js = tag(TAG_SCRIPT, attrs(ATTR_TYPE, "text/JavaScript"), s);
-
-        return js;
+        StringBuilder js = new StringBuilder();
+        js.append("\n<nowiki>\n");
+        js.append(tag(TAG_SCRIPT, attrs(ATTR_TYPE, "text/JavaScript"), s));
+        js.append("\n</nowiki>\n");
+        return js.toString();
     }
 
 
