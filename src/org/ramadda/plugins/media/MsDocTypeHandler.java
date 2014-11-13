@@ -24,8 +24,9 @@ package org.ramadda.plugins.media;
 import org.ramadda.repository.*;
 import org.ramadda.repository.metadata.*;
 import org.ramadda.repository.type.*;
-
 import org.ramadda.util.HtmlUtils;
+
+import org.ramadda.util.XlsUtil;
 
 
 import org.w3c.dom.*;
@@ -74,13 +75,16 @@ public class MsDocTypeHandler extends GenericTypeHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      *
      * @throws Exception _more_
      */
-@Override
-    public void initializeNewEntry(Request request, Entry entry) throws Exception {
-    super.initializeNewEntry(request, entry);
+    @Override
+    public void initializeNewEntry(Request request, Entry entry)
+            throws Exception {
+        super.initializeNewEntry(request, entry);
         File file = entry.getFile();
         if ( !file.exists()) {
             return;

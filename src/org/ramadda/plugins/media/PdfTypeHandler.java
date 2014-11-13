@@ -77,6 +77,8 @@ public class PdfTypeHandler extends GenericTypeHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      * @param service _more_
      * @param output _more_
@@ -84,11 +86,11 @@ public class PdfTypeHandler extends GenericTypeHandler {
      * @throws Exception _more_
      */
     @Override
-        public void handleServiceResults(Request request, Entry entry, Service service,
-                                     ServiceOutput output)
+    public void handleServiceResults(Request request, Entry entry,
+                                     Service service, ServiceOutput output)
             throws Exception {
         super.handleServiceResults(request, entry, service, output);
-        if(request!=null && !request.get(ARG_METADATA_ADD,false)) {
+        if ((request != null) && !request.get(ARG_METADATA_ADD, false)) {
             return;
         }
         List<Entry> entries = output.getEntries();
@@ -127,8 +129,8 @@ public class PdfTypeHandler extends GenericTypeHandler {
                 && ( !Utils.stringDefined(entry.getName())
                      || entry.getResource().getPath().endsWith(
                          entry.getName()))) {
-            firstLine = firstLine.replaceAll("(_\\s)+_","_");
-            firstLine = firstLine.replaceAll("_+_","_");
+            firstLine = firstLine.replaceAll("(_\\s)+_", "_");
+            firstLine = firstLine.replaceAll("_+_", "_");
             if (firstLine.length() > 100) {
                 firstLine = firstLine.substring(0, 100);
             }
@@ -136,9 +138,9 @@ public class PdfTypeHandler extends GenericTypeHandler {
         }
         if ((headerLines.size() > 0)
                 && !Utils.stringDefined(entry.getDescription())) {
-            String desc = "<pre class=\"ramadda-pre\">" +
-                StringUtil.join("\n", headerLines);
-            if (desc.length() > Entry.MAX_DESCRIPTION_LENGTH-10) {
+            String desc = "<pre class=\"ramadda-pre\">"
+                          + StringUtil.join("\n", headerLines);
+            if (desc.length() > Entry.MAX_DESCRIPTION_LENGTH - 10) {
                 desc = desc.substring(0, Entry.MAX_DESCRIPTION_LENGTH - 10);
             }
             entry.setDescription(desc + "</pre>");

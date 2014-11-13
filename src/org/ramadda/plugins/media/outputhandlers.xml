@@ -3,4 +3,7 @@
 <outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="media_qttools_info"/>
 <outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="media_qttools_proofsheet"/>
 <outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="media_qttools_thumbnail"/>
+
+
+<outputhandler class="org.ramadda.plugins.media.XlsOutputHandler"/>
 </outputhandlers>
