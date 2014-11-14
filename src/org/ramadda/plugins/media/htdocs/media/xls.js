@@ -43,7 +43,9 @@ function RamaddaXls(divId, url, props) {
 
                 var lbl1 = this.getHeading(this.xAxisIndex);
                 var lbl2 = this.getHeading(this.yAxisIndex);
-                this.columnLabels = [lbl1,lbl2];
+
+
+
                 $("#" + this.getId("params-xaxis-label")).html(lbl1);
                 $("#" + this.getId("params-yaxis-label")).html(lbl2);
             },
@@ -64,7 +66,7 @@ function RamaddaXls(divId, url, props) {
                 var _this = this;
                 var args  = {
                     contextMenu: true,
-                    stretchH: 'last',
+                    stretchH: 'all',
 
                     useFirstRowAsHeader: false,
                     colHeaders: true,
@@ -74,10 +76,6 @@ function RamaddaXls(divId, url, props) {
                     afterSelection: function() {
                         if(arguments.length>2) {
                             var col = arguments[1];
-                            if(_this.lastColumnSelected == col) {
-                                return;
-                            }
-                            _this.lastColumnSelected = col;
                             _this.columnSelected(col);
                         }
                     },
@@ -119,42 +117,47 @@ function RamaddaXls(divId, url, props) {
                 var rows =this.currentData.slice(0);
 
 
-                if(this.xAxisIndex>=0 || this.yAxisIndex>=0) {
-                    var subset = [];
-                    for(var rowIdx=0;rowIdx<rows.length;rowIdx++) {
-                        var row = [];
-                        var idx = 0;
-                        if(this.xAxisIndex>0) {
-                            row.push(rows[rowIdx][this.xAxisIndex]);
-                        }   else {
-                            row.push(10+rowIdx);
-                        }
-                        if(this.yAxisIndex>0) {
-                            row.push(rows[rowIdx][this.yAxisIndex]);
-                        }
-                        subset.push(row);
-                        if(rowIdx>4) break;
-                    }
-                    console.log("setting rows to subset");
-                    rows = subset;
+                if(this.yAxisIndex<0) {
+                    alert("You must select a y-axis field.\n\nSelect the desired axis with the radio button.\n\nClick the column in the table to chart.");
+                    return;
                 }
 
-
+                var subset = [];
+                for(var rowIdx=0;rowIdx<rows.length;rowIdx++) {
+                    var row = [];
+                    var idx = 0;
+                    if(this.xAxisIndex>0) {
+                        row.push(rows[rowIdx][this.xAxisIndex]);
+                    }   else {
+                        row.push(rowIdx);
+                    }
+                    if(this.yAxisIndex>=0) {
+                        row.push(rows[rowIdx][this.yAxisIndex]);
+                    }
+                    subset.push(row);
+                }
+                rows = subset;
 
                 for(var rowIdx=0;rowIdx<rows.length;rowIdx++) {
                     var cols = rows[rowIdx];
+
+
                     for(var colIdx=0;colIdx<cols.length;colIdx++) {
-                        if(rowIdx>0) {
-                            cols[colIdx] = Number(cols[colIdx]);
-                        }
+                        var value = cols[colIdx]+"";
+                        cols[colIdx] = parseFloat(value.trim());
                     }
-                }
+               }
+
+
+                var lbl1 = this.getHeading(this.xAxisIndex,true);
+                var lbl2 = this.getHeading(this.yAxisIndex, true);
+                this.columnLabels = [lbl1,lbl2];
+
 
                 var labels = this.columnLabels!=null?this.columnLabels:["Field 1","Field 2"];
-                labels = ["Field 1","Field 2"];
-                
-                console.log("labels:" + labels);
+                //                console.log("labels:" + labels);
                 rows.splice(0,0,labels);
+                /*
 
                 for(var rowIdx=0;rowIdx<rows.length;rowIdx++) {
                     var cols = rows[rowIdx];
@@ -162,13 +165,12 @@ function RamaddaXls(divId, url, props) {
                     for(var colIdx=0;colIdx<cols.length;colIdx++) {
                         if(colIdx>0)
                             s += ", ";
-                        s += cols[colIdx];
+                        s += "'" +cols[colIdx]+"'" + " (" + (typeof cols[colIdx]) +")";
                     }
                     console.log(s);
                     if(rowIdx>5) break;
                 }
-
-
+                */
 
                 var dataTable = google.visualization.arrayToDataTable(rows);
                 var   chartOptions = {};
@@ -209,6 +211,11 @@ function RamaddaXls(divId, url, props) {
 
                 } else {
                     $.extend(chartOptions, {lineWidth: 1});
+                    $.extend(chartOptions, {
+                            //                            series: [{targetAxisIndex:0},{targetAxisIndex:1},],
+                                //                                legend: { position: 'bottom' },
+                                //                                chartArea:{left:75,top:10,height:"60%",width:width}
+                        });
                     //                    $.extend(chartOptions, {lineWidth: 1,vAxis: {}});
                     chartOptions.chartArea = {left:75,top:10,height:"60%",width:width};
                     this.chart = new google.visualization.LineChart(document.getElementById(chartDivId));
@@ -299,7 +306,7 @@ function RamaddaXls(divId, url, props) {
                 var makeChartId =  HtmlUtil.getUniqueId();
 
                 html += HtmlUtil.openDiv(["class","col-md-" + weight]);
-                html += HtmlUtil.div(["id",this.ssId,"class","ramadda-xls-table"]);
+                html += HtmlUtil.div(["id",this.ssId,"class","ramadda-xls-table","style","width:800px; height: 300px; overflow: auto"]);
                 html += "<p>";
                 var chartTypes = ["barchart","linechart","scatterplot"];
                 for(var i=0;i<chartTypes.length;i++) {
@@ -311,12 +318,16 @@ function RamaddaXls(divId, url, props) {
                 html+=HtmlUtil.div(["id", this.getId("removechart"),"class","ramadda-xls-button"],  "Clear");
 
 
-                html += "<br>";
-                html += "<form>Fields: <input type=radio checked name=\"param\" id=\"" + this.getId("params-xaxis-select")+"\"> x-axis:&nbsp;" +
-                    HtmlUtil.div(["id", this.getId("params-xaxis-label"), "style","border-bottom:1px #ccc dotted;min-width:20em;display:inline-block;"], "") +
-                    "&nbsp;&nbsp;&nbsp;" +
-                    "<input type=radio name=\"param\" id=\"" + this.getId("params-yaxis-select")+"\"> y-axis:&nbsp;" +
+                html += "<p>";
+                html += "<form>Fields: ";
+                html +=  "<input type=radio checked name=\"param\" id=\"" + this.getId("params-yaxis-select")+"\"> y-axis:&nbsp;" +
                     HtmlUtil.div(["id", this.getId("params-yaxis-label"), "style","border-bottom:1px #ccc dotted;min-width:20em;display:inline-block;"], "");
+
+                html += "&nbsp;&nbsp;&nbsp;";
+                html += "<input type=radio  name=\"param\" id=\"" + this.getId("params-xaxis-select")+"\"> x-axis:&nbsp;" +
+                    HtmlUtil.div(["id", this.getId("params-xaxis-label"), "style","border-bottom:1px #ccc dotted;min-width:20em;display:inline-block;"], "");
+
+
                 html+= "</form>";
 
                 html += HtmlUtil.div(["id",this.chartContainerId,"class","ramadda-xls-chart"]);
@@ -324,7 +335,7 @@ function RamaddaXls(divId, url, props) {
                 html += HtmlUtil.closeDiv();
                 html += HtmlUtil.closeDiv();
 
-                $("#" + divId).append(html);
+                $("#" + this.divId).html(html);
 
                 for(var i=0;i<chartTypes.length;i++) {
                     this.addNewChartListener(makeChartId, chartTypes[i]);
