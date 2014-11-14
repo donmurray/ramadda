@@ -42,6 +42,8 @@
       <element id="id" name="ID"/>
       <element id="url" datatype="url" name="URL"/>
       <element id="notes" name="Notes" rows="5"/>
+      <template type="html"><![CDATA[<a href="${url}">${title}</a> ID: ${id}<br>${notes} ]]></template>
+xxx
     </type>
 
 
