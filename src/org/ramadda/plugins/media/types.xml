@@ -105,6 +105,9 @@
      <column name="rowheader" type="boolean" label="Show Row Header"  default="false" showinhtml="false"/>
      <column name="widths" type="string"  size="500" label="Column Widths"  showinhtml="false" suffix="Comma separated list of column widths"/>
      <column name="sheets" type="string"  size="500" label="Sheets"  showinhtml="false" suffix="Comma separated list of sheet numbers to show (zero based)"/>
+     <column name="header" type="string"  size="500" label="Header"  showinhtml="false" suffix="Comma separated list of column header labels"/>
+     <column name="skiprows" type="int" label="Skip Rows"  default="0" showinhtml="false" suffix="How many rows to remove from the data"/>
+     <column name="skipcolumnss" type="int" label="Skip Columns" default="0"  showinhtml="false" suffix="How many columns to remove from the data"/>
 
 
 </type>

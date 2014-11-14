@@ -207,7 +207,7 @@ public class XlsOutputHandler extends OutputHandler {
 
         HashSet<Integer> sheetsToShow = null;
         if (entry.getTypeHandler().isType("type_document_xls")) {
-            List<String> sheetsStr = StringUtil.split(entry.getValue(5, ""),
+            List<String> sheetsStr = StringUtil.split(entry.getValue(XlsTypeHandler.IDX_SHEETS, ""),
                                          ",", true, true);
             if (sheetsStr.size() > 0) {
                 sheetsToShow = new HashSet<Integer>();
@@ -342,14 +342,18 @@ public class XlsOutputHandler extends OutputHandler {
                                  Entry entry)
             throws Exception {
         boolean useFirstRowAsHeader = Misc.equals("true",
-                                          entry.getValue(1, "true"));
+                                          entry.getValue(XlsTypeHandler.IDX_USEFIRSTROW, "true"));
 
 
-        boolean colHeader = Misc.equals("true", entry.getValue(2, "false"));
-        boolean rowHeader = Misc.equals("true", entry.getValue(3, "false"));
-        List<String> widths = StringUtil.split(entry.getValue(4, ""), ",",
+        boolean colHeader = Misc.equals("true", entry.getValue(XlsTypeHandler.IDX_COLHEADER, "false"));
+        boolean rowHeader = Misc.equals("true", entry.getValue(XlsTypeHandler.IDX_ROWHEADER, "false"));
+        List<String> widths = StringUtil.split(entry.getValue(XlsTypeHandler.IDX_WIDTHS, ""), ",",
                                   true, true);
 
+
+
+        List<String> sheetsStr = StringUtil.split(entry.getValue(XlsTypeHandler.IDX_SHEETS, ""),
+                                                  ",", true, true);
 
 
         List propsList = new ArrayList();
@@ -360,6 +364,17 @@ public class XlsOutputHandler extends OutputHandler {
         propsList.add("" + colHeader);
         propsList.add("rowHeaders");
         propsList.add("" + rowHeader);
+
+        propsList.add("skipRows");
+        propsList.add(entry.getValue(XlsTypeHandler.IDX_SKIPROWS, "0"));
+        propsList.add("skipColumns");
+        propsList.add(entry.getValue(XlsTypeHandler.IDX_SKIPCOLUMNS, "0"));
+
+        List<String> header = StringUtil.split(entry.getValue(XlsTypeHandler.IDX_HEADER, ""),",", true, true);
+        if(header.size()>0) {
+            propsList.add("header");
+            propsList.add(Json.list(header, true));
+        }
 
 
         if (widths.size() > 0) {
