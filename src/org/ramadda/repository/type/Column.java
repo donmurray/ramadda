@@ -1222,7 +1222,15 @@ public class Column implements DataTypes, Constants {
             values[offset] = new Double(results.getDouble(valueIdx));
             valueIdx++;
         } else if (isType(DATATYPE_BOOLEAN)) {
-            values[offset] = new Boolean(results.getInt(valueIdx) == 1);
+            String value = results.getString(valueIdx);
+            if(value == null || value.length()==0) {
+                value = dflt;
+            }
+            if(value == null) {
+                value = "0";
+            }
+
+            values[offset] = new Boolean(value.equals("true") || value.equals("1"));
             valueIdx++;
         } else if (isDate()) {
             values[offset] =

@@ -397,6 +397,13 @@ var HtmlUtil =  {
         var html = "<" + tagName +" " + this.attrs(attrs) +">";
         return html;
     },
+    openRow : function() {
+        return this.openTag("div",["class","row"]);
+    },
+    closeRow : function() {
+        return this.closeTag("div");
+    },
+
     openDiv : function(attrs) {
         return this.openTag("div",attrs);
     },
