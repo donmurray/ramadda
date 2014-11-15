@@ -1113,42 +1113,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         } else if (theTag.equals(WIKI_TAG_DISPLAY)
                    || theTag.equals(WIKI_TAG_CHART)) {
 
-            String jsonUrl = null;
-            if (theTag.equals(WIKI_TAG_CHART)
-                    || theTag.equals(WIKI_TAG_DISPLAY)) {
-                if (entry.getTypeHandler() instanceof PointTypeHandler) {
-                    PointTypeHandler pth =
-                        (PointTypeHandler) entry.getTypeHandler();
-                    PointOutputHandler poh =
-                        (PointOutputHandler) pth.getRecordOutputHandler();
-
-                    jsonUrl = poh.getJsonUrl(request, entry);
-                } else {
-                    StringBuilder jsonbuf = new StringBuilder();
-                    jsonbuf.append(getRepository().getUrlBase()
-                                   + "/grid/json?"
-                                   + HtmlUtils.args(new String[] {
-                        ARG_ENTRYID, entry.getId(), ARG_LOCATION_LATITUDE,
-                        "${latitude}", ARG_LOCATION_LONGITUDE, "${longitude}"
-                    }, false));
-                    // add in the list of selected variables as well
-                    String    VAR_PREFIX = Constants.ARG_VARIABLE + ".";
-                    Hashtable args       = request.getArgs();
-                    for (Enumeration keys = args.keys();
-                            keys.hasMoreElements(); ) {
-                        String arg = (String) keys.nextElement();
-                        if (arg.startsWith(VAR_PREFIX)
-                                && request.get(arg, false)) {
-                            jsonbuf.append("&");
-                            jsonbuf.append(VAR_PREFIX);
-                            jsonbuf.append(
-                                arg.substring(VAR_PREFIX.length()));
-                            jsonbuf.append("=true");
-                        }
-                    }
-                    jsonUrl = jsonbuf.toString();
-                }
-            }
+            String jsonUrl =  entry.getTypeHandler().getUrlForWiki(request, entry, theTag);
             getEntryDisplay(request, entry, theTag, entry.getName(), jsonUrl,
                             sb, props);
 

@@ -30,7 +30,9 @@
      <property name="form.altitude.show.top" value="false"/>
    </type>
 
-  <type name="cdm_grid"  description="Gridded Data File" foruser="true" category="Geoscience Data" pattern=".\.grb.*">
+  <type name="cdm_grid"  description="Gridded Data File" foruser="true" category="Geoscience Data" 
+        handler="org.ramadda.geodata.cdmdata.GridTypeHandler"
+        pattern=".\.grb.*">
      <property name="icon" value="/cdmdata/grid.gif"/>
   </type>
 

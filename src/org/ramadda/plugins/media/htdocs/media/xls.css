@@ -3,6 +3,8 @@
 
 
 .ramadda-xls-table {
+   border-bottom: 1px #ccc solid;
+   border-right: 1px #ccc solid;
 }
 
 
@@ -12,6 +14,6 @@
 
 
 .ramadda-xls-button {
-    min-width: 150px;
-    max-width: 150px;
+    min-width: 125px;
+    max-width: 125px;
 }

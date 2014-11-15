@@ -122,6 +122,7 @@ function RamaddaXls(divId, url, props) {
                     return;
                 }
 
+                if(chartType!= "motion") {
                 var subset = [];
                 for(var rowIdx=0;rowIdx<rows.length;rowIdx++) {
                     var row = [];
@@ -137,6 +138,7 @@ function RamaddaXls(divId, url, props) {
                     subset.push(row);
                 }
                 rows = subset;
+                }
 
                 for(var rowIdx=0;rowIdx<rows.length;rowIdx++) {
                     var cols = rows[rowIdx];
@@ -201,6 +203,8 @@ function RamaddaXls(divId, url, props) {
                     this.chart = new google.visualization.BarChart(document.getElementById(chartDivId));
                 } else  if(chartType == "table") {
                     this.chart = new google.visualization.Table(document.getElementById(chartDivId));
+                } else  if(chartType == "motion") {
+                    this.chart = new google.visualization.MotionChart(document.getElementById(chartDivId));
                 } else  if(chartType == "scatterplot") {
                     chartOptions.chartArea = {left:50,top:30,height:400,width:400};
                     chartOptions.legend = 'none';
@@ -259,7 +263,9 @@ function RamaddaXls(divId, url, props) {
             },
              getHeading: function(index, doField) {
                 if(this.header != null && index>=0 && index< this.header.length) {
-                    return this.header[index];
+                    var v=  this.header[index];
+                    v  = v.trim();
+                    if(v.length>0) return v;
                 }
                 if(doField)
                     return "Field " + (index+1);
@@ -277,17 +283,14 @@ function RamaddaXls(divId, url, props) {
                     buttons += "<p>";
                 }
                 var weight = "12";
+                html += HtmlUtil.openDiv(["class","row"]);
                 if(this.sheets.length>1) {
                     weight = "10";
-                }
-                html += HtmlUtil.openDiv(["class","row"]);
-                html += HtmlUtil.openDiv(["class","col-md-2"]);
-                if(this.sheets.length>1) {
-                    html+=HtmlUtil.div(["class","ramadda-xls-label"],"Sheets")
-                    
+                    html += HtmlUtil.div(["class","col-md-2"],
+                                         HtmlUtil.div(["class","ramadda-xls-label"],"Sheets"));
                 }
 
-                html += HtmlUtil.closeDiv();
+
                 html += HtmlUtil.openDiv(["class","col-md-" + weight]);
                 html+=HtmlUtil.div(["id",this.ssLabelId,"class","ramadda-xls-label"])
                 html += HtmlUtil.closeDiv();
@@ -315,7 +318,7 @@ function RamaddaXls(divId, url, props) {
                 }
 
                 html+= "&nbsp;";
-                html+=HtmlUtil.div(["id", this.getId("removechart"),"class","ramadda-xls-button"],  "Clear");
+                html+=HtmlUtil.div(["id", this.getId("removechart"),"class","ramadda-xls-button"],  "Clear Charts");
 
 
                 html += "<p>";

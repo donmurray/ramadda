@@ -313,6 +313,21 @@ public class PointTypeHandler extends RecordTypeHandler {
 
 
 
+    @Override
+    public String getUrlForWiki(Request request, Entry entry, String tag) {
+        if (tag.equals(WikiConstants.WIKI_TAG_CHART)
+                || tag.equals(WikiConstants.WIKI_TAG_DISPLAY)) {
+            try {
+                return ((PointOutputHandler)getRecordOutputHandler()).getJsonUrl(request, entry);
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
+        }
+        return super.getUrlForWiki(request, entry, tag);
+    }
+
+
+
     /**
      * _more_
      *

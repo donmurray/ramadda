@@ -113,6 +113,10 @@ public class XlsOutputHandler extends OutputHandler {
         addType(OUTPUT_XLS_JSON);
     }
 
+
+
+
+
     /**
      * _more_
      *
@@ -272,7 +276,8 @@ public class XlsOutputHandler extends OutputHandler {
                         break;
                     }
                     String value = cell.toString();
-                    cols.add(XlsUtil.clean(Json.quote(value)));
+                    value = value.replaceAll("\"","&quot;");
+                    cols.add(Json.quote(value));
                 }
                 rows.add(Json.list(cols));
             }

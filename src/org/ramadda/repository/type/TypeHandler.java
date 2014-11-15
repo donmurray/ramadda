@@ -568,6 +568,12 @@ public class TypeHandler extends RepositoryManager {
 
 
 
+    public String getUrlForWiki(Request request, Entry entry, String tag) {
+        return null;
+    }
+
+
+
     /**
      * _more_
      *
