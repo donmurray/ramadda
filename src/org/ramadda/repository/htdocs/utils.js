@@ -42,7 +42,15 @@ var uniqueCnt = 0;
 
 function noop() {}
 
-
+var Utils = {
+    isDefined: function(v) {
+        return  !(typeof v=== 'undefined');
+    },
+    getDefined: function(v1, v2) {
+        if(Utils.isDefined(v1)) return v1;
+        return v2;
+    }
+};
 
 var GuiUtils = {
     handleError: function(error, extra) {

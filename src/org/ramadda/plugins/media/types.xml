@@ -108,6 +108,7 @@
      <column name="header" type="string"  size="500" label="Header"  showinhtml="false" suffix="Comma separated list of column header labels"/>
      <column name="skiprows" type="int" label="Skip Rows"  default="0" showinhtml="false" suffix="How many rows to remove from the data"/>
      <column name="skipcolumnss" type="int" label="Skip Columns" default="0"  showinhtml="false" suffix="How many columns to remove from the data"/>
+     <column name="charts" type="string"  size="500" rows="5" label="Default Charts"  showinhtml="false" suffix="Specify 1 or more default charts:&lt;br&gt;charttype,y column,x column&lt;br&gt;e.g.:&lt;br&gt;linechart,1&lt;br&gt;scatterplot,2,3&lt;br&gt;..."/>
 
 
 </type>

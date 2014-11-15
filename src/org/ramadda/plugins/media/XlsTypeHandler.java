@@ -91,6 +91,9 @@ public class XlsTypeHandler extends MsDocTypeHandler {
     /** _more_          */
     public static final int IDX_SKIPCOLUMNS = IDX++;
 
+    /** _more_          */
+    public static final int IDX_CHARTS = IDX++;
+
 
 
     /** _more_ */

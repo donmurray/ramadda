@@ -9,6 +9,23 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
 
     RamaddaUtil.inherit(this, new RamaddaDisplay(displayManager, id, "xls", properties));
     addRamaddaDisplay(this);
+
+    this.xxxdefaultCharts = [
+                          {
+                              type:"linechart",
+                              yAxisIndex:"2"
+                          },
+
+                          {
+                              type:"linechart",
+                              yAxisIndex:"5"
+                          },
+
+                          ];
+
+
+
+
     this.url = properties.url;
     this.tableProps = {
         fixedRowsTop: 0,
@@ -40,10 +57,12 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
             currentSheet:  0,
             currentData: null,
             columnLabels: null,
+            startRow:0,
             xAxisIndex: -1,
             yAxisIndex: -1,
             header: null,
-            columnSelected: function(col) {
+            cellSelected: function(row, col) {
+                this.startRow = row;
                 if(this.jq("params-xaxis-select").attr("checked")) {
                     this.xAxisIndex = col;
                 } else {
@@ -81,8 +100,12 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                     contextMenu: true,
                     afterSelection: function() {
                         if(arguments.length>2) {
+                            for(var i=0;i<arguments.length;i++) {
+                                //                                console.log("a[" + i +"]=" + arguments[i]);
+                            }
+                            var row = arguments[0];
                             var col = arguments[1];
-                            _this.columnSelected(col);
+                            _this.cellSelected(row, col);
                         }
                     },
                 };
@@ -109,43 +132,54 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 this.jq(ID_TABLE).handsontable(args);
 
             },
-            makeChart: function(chartType) {
+            makeChart: function(chartType, props) {
                 if(typeof google == 'undefined') {
-                    this.jq(ID_CHART).html("No google");
+                    this.jq(ID_CHART).html("No google chart available");
                     return;
                 }
                 if(this.currentData ==null) {
-                    this.jq(ID_CHART).html("No data");
+                    this.jq(ID_CHART).html("There is no data");
                     return;
                 }
 
+                if(props==null) props = {};
+                var xAxisIndex = Utils.getDefined(props.xAxisIndex, this.xAxisIndex);
+                var yAxisIndex = Utils.getDefined(props.yAxisIndex, this.yAxisIndex);
 
-                //remove the first header row
-                var rows =this.currentData.slice(0);
+                //                console.log("y:" + yAxisIndex +" props:" + props.yAxisIndex);
 
-
-                if(this.yAxisIndex<0) {
+                if(yAxisIndex<0) {
                     alert("You must select a y-axis field.\n\nSelect the desired axis with the radio button.\n\nClick the column in the table to chart.");
                     return;
                 }
 
-                if(chartType!= "motion") {
+                var rows =this.currentData;
+
+                //remove the first header row
+                var rows =rows.slice(1);
+                
+                for(var i=0;i<this.startRow-1;i++) {
+                    rows =rows.slice(1);
+                }
+
                 var subset = [];
+                console.log("x:" + xAxisIndex +" " + " y:" + yAxisIndex);
                 for(var rowIdx=0;rowIdx<rows.length;rowIdx++) {
                     var row = [];
                     var idx = 0;
-                    if(this.xAxisIndex>0) {
-                        row.push(rows[rowIdx][this.xAxisIndex]);
+                    if(xAxisIndex>=0) {
+                        row.push(rows[rowIdx][xAxisIndex]);
                     }   else {
                         row.push(rowIdx);
                     }
-                    if(this.yAxisIndex>=0) {
-                        row.push(rows[rowIdx][this.yAxisIndex]);
+                    if(yAxisIndex>=0) {
+                        row.push(rows[rowIdx][yAxisIndex]);
                     }
                     subset.push(row);
+                    if(rowIdx<2)
+                        console.log("row:" + row);
                 }
                 rows = subset;
-                }
 
                 for(var rowIdx=0;rowIdx<rows.length;rowIdx++) {
                     var cols = rows[rowIdx];
@@ -158,8 +192,8 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                }
 
 
-                var lbl1 = this.getHeading(this.xAxisIndex,true);
-                var lbl2 = this.getHeading(this.yAxisIndex, true);
+                var lbl1 = this.getHeading(xAxisIndex,true);
+                var lbl2 = this.getHeading(yAxisIndex, true);
                 this.columnLabels = [lbl1,lbl2];
 
 
@@ -187,11 +221,11 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                  });
 
                 if(this.header!=null) {
-                    if(this.xAxisIndex>=0) {
-                        chartOptions.hAxis =  {title: this.header[this.xAxisIndex]};
+                    if(xAxisIndex>=0) {
+                        chartOptions.hAxis =  {title: this.header[xAxisIndex]};
                     }
-                    if(this.yAxisIndex>=0) {
-                        chartOptions.vAxis =  {title: this.header[this.yAxisIndex]};
+                    if(yAxisIndex>=0) {
+                        chartOptions.vAxis =  {title: this.header[yAxisIndex]};
                     }
                 }
 
@@ -242,6 +276,7 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
             },
             clear: function() {
                 this.jq(ID_CHART).html("");
+                this.startRow = 0;
                 this.xAxisIndex = -1;
                 this.yAxisIndex = -1;
                 this.jq("params-xaxis-label").html("");
@@ -266,14 +301,13 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                     buttons+=HtmlUtil.div(["id", id,"class","ramadda-xls-button"],
                                           this.sheets[sheetIdx].name);
 
-                    buttons += "<p>";
+                    buttons += "\n";
                 }
                 var weight = "12";
                 html += HtmlUtil.openDiv(["class","row"]);
                 if(this.sheets.length>1) {
                     weight = "10";
-                    html += HtmlUtil.div(["class","col-md-2"],
-                                         HtmlUtil.div(["class","ramadda-xls-label"],"Sheets"));
+                    html += HtmlUtil.div(["class","col-md-2"],"");
                 }
 
 
@@ -286,7 +320,7 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 html += HtmlUtil.openDiv(["class","row"]);
                 if(this.sheets.length>1) {
                     html += HtmlUtil.openDiv(["class","col-md-2"]);
-                    html += buttons;
+                    html += HtmlUtil.div(["class","ramadda-xls-buttons"], buttons);
                     html += HtmlUtil.closeDiv();
                     weight = "10";
                 }
@@ -345,6 +379,15 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 }
 
                 this.loadSheet(sheetIdx);
+
+                if(this.defaultCharts) {
+                    for(var i=0;i<this.defaultCharts.length;i++) {
+                        var dflt  =this.defaultCharts[i];
+                        this.makeChart(dflt.type,dflt);
+                    }
+                }
+
+
             },
 
 

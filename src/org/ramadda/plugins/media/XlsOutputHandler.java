@@ -407,6 +407,26 @@ public class XlsOutputHandler extends OutputHandler {
                              ARG_OUTPUT,
                              XlsOutputHandler.OUTPUT_XLS_JSON.getId());
 
+        List<String> charts  = new ArrayList<String>();
+        for(String line: 
+                StringUtil.split(entry.getValue(XlsTypeHandler.IDX_CHARTS,""),"\n", true, true)) {
+            List<String> toks = StringUtil.split(line,",");
+            if(toks.size()<2) continue;
+            List<String> chart  = new ArrayList<String>();
+            chart.add("type");
+            chart.add(Json.quote(toks.get(0)));
+            chart.add("yAxisIndex");
+            chart.add(toks.get(1));
+            if(toks.size()>2) {
+                chart.add("xAxisIndex");
+                chart.add(toks.get(2));
+            }
+            charts.add(Json.map(chart));
+        }
+        if(charts.size()>0) {
+            propsList.add("defaultCharts");
+            propsList.add(Json.list(charts));
+        }
 
         propsList.add("url");
         propsList.add(Json.quote(jsonUrl));
