@@ -1,12 +1,14 @@
 
 
-
-
 .ramadda-xls-table {
-   border-bottom: 1px #ccc solid;
-   border-right: 1px #ccc solid;
+//   border-bottom: 1px #ccc solid;
+//   border-right: 1px #ccc solid;
 }
 
+.ramadda-xls-chart-toolbar {
+   margin-top:10px;
+  // border-bottom: 1px #ccc solid;
+}
 
 .ramadda-xls-label {
    font-weight: bold; 
@@ -16,11 +18,18 @@
 .ramadda-xls-button {
     min-width: 125px;
     max-width: 125px;
-    margin-top: 8px;
+}
+
+.ramadda-xls-button-sheet {
+    min-width: 100px;
+    max-width: 100px;
+    margin-bottom: 8px;
 }
 
 .ramadda-xls-buttons {
     display: inline-block;
     overflow-y: auto;
-    height: 400px;
+    max-height: 290px;
+//    margin-left:5px;
+    margin-right:5px;
 }
