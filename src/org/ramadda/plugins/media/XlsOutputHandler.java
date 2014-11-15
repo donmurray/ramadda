@@ -130,6 +130,7 @@ public class XlsOutputHandler extends OutputHandler {
     public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
         Entry   entry = state.getEntry();
+        if(entry == null) return;
         boolean isXls = entry.getTypeHandler().isType("type_document_xls");
         if ( !isXls) {
             if ( !entry.isFile()) {
