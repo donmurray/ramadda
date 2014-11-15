@@ -348,6 +348,10 @@ public class XlsOutputHandler extends OutputHandler {
                                  Entry entry)
             throws Exception {
 
+        boolean showTable  = entry.getValue(XlsTypeHandler.IDX_SHOWTABLE, true);
+        boolean showChart  = entry.getValue(XlsTypeHandler.IDX_SHOWCHART, true);
+
+
         boolean useFirstRowAsHeader =
             Misc.equals("true",
                         entry.getValue(XlsTypeHandler.IDX_USEFIRSTROW,
@@ -375,8 +379,14 @@ public class XlsOutputHandler extends OutputHandler {
 
         List propsList = new ArrayList();
 
+
         propsList.add("useFirstRowAsHeader");
         propsList.add("" + useFirstRowAsHeader);
+        propsList.add("showTable");
+        propsList.add("" + showTable);
+        propsList.add("showChart");
+        propsList.add("" + showChart);
+
         propsList.add("colHeaders");
         propsList.add("" + colHeader);
         propsList.add("rowHeaders");

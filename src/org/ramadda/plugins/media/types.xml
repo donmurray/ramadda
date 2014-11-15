@@ -100,6 +100,7 @@
   <type name="type_document_xls"  description="Microsoft Excel File" pattern="(.*\.xls|.*\.xlsx)"  super="type_document"   handler="org.ramadda.plugins.media.XlsTypeHandler">
      <property name="icon" value="/icons/xls.png"/>
      <column name="showtable" type="boolean" label="Show Table"  default="true" showinhtml="false"/>
+     <column name="showchart" type="boolean" label="Show Chart"  default="true" showinhtml="false"/>
      <column name="usefirstrow" type="boolean" label="Use first row as header"  default="true" showinhtml="false"/>
      <column name="colheader" type="boolean" label="Show Column Header"  default="false" showinhtml="false"/>
      <column name="rowheader" type="boolean" label="Show Row Header"  default="false" showinhtml="false"/>

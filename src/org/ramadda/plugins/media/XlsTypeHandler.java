@@ -68,6 +68,9 @@ public class XlsTypeHandler extends MsDocTypeHandler {
     public static final int IDX_SHOWTABLE = IDX++;
 
     /** _more_          */
+    public static final int IDX_SHOWCHART = IDX++;
+
+    /** _more_          */
     public static final int IDX_USEFIRSTROW = IDX++;
 
     /** _more_          */
@@ -145,7 +148,11 @@ public class XlsTypeHandler extends MsDocTypeHandler {
                                    Entry entry)
             throws Exception {
 
-        if ( !Misc.equals(entry.getValue(IDX_SHOWTABLE, "false"), "true")) {
+        boolean showTable  = entry.getValue(XlsTypeHandler.IDX_SHOWTABLE, true);
+        boolean showChart  = entry.getValue(XlsTypeHandler.IDX_SHOWCHART, true);
+
+
+        if (!showTable && !showChart) {
             return null;
         }
 
