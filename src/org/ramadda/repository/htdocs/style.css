@@ -1,7 +1,5 @@
 
 
-
-
 body {
    font-family:  Helvetica Neue, Arial, Helvetica, sans-serif;
    font-family: xCalibri,xTahoma,xGeneva,"Helvetica Neue",Helvetica,Arial,sans-serif;
@@ -701,6 +699,22 @@ label {
 .harvester-active {
   background: #FFFFCC;
 }
+
+
+
+.ramadda-bubble
+{
+//   font-style:italic;
+   display:inline-block;
+   padding: 10px;
+   background-color: #fffeec;
+   border: #aaa solid 1px;
+   -webkit-border-radius: 2px;
+   -moz-border-radius: 2px;
+   border-radius: 2px;
+}
+
+
 
 .ramadda-comment-block {
    border-bottom : 1px #aaaaaa dashed;
