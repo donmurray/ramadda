@@ -61,20 +61,39 @@ import java.util.zip.ZipInputStream;
 public class XlsTypeHandler extends MsDocTypeHandler {
 
 
+    /** _more_          */
     private static int IDX = 0;
-    public static final int IDX_SHOWTABLE  = IDX++;
-    public static final int IDX_USEFIRSTROW  = IDX++;
-    public static final int IDX_COLHEADER  = IDX++;
-    public static final int IDX_ROWHEADER  = IDX++;
-    public static final int IDX_WIDTHS  = IDX++;
-    public static final int IDX_SHEETS  = IDX++;
-    public static final int IDX_HEADER  = IDX++;
-    public static final int IDX_SKIPROWS  = IDX++;
-    public static final int IDX_SKIPCOLUMNS  = IDX++;
-
-
 
     /** _more_          */
+    public static final int IDX_SHOWTABLE = IDX++;
+
+    /** _more_          */
+    public static final int IDX_USEFIRSTROW = IDX++;
+
+    /** _more_          */
+    public static final int IDX_COLHEADER = IDX++;
+
+    /** _more_          */
+    public static final int IDX_ROWHEADER = IDX++;
+
+    /** _more_          */
+    public static final int IDX_WIDTHS = IDX++;
+
+    /** _more_          */
+    public static final int IDX_SHEETS = IDX++;
+
+    /** _more_          */
+    public static final int IDX_HEADER = IDX++;
+
+    /** _more_          */
+    public static final int IDX_SKIPROWS = IDX++;
+
+    /** _more_          */
+    public static final int IDX_SKIPCOLUMNS = IDX++;
+
+
+
+    /** _more_ */
     private XlsOutputHandler xlsOutputHandler;
 
     /**

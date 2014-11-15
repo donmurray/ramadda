@@ -1,19 +1,16 @@
 
 
 
-function RamaddaXls(divId, url, props) {
-    $("#" + divId).html("Loading...");
-    this.url = url;
-    this.divId = divId;
-    this.baseId = HtmlUtil.getUniqueId();
-    this.ssId = HtmlUtil.getUniqueId();
-    this.ssLabelId = HtmlUtil.getUniqueId();
-    this.chartContainerId = HtmlUtil.getUniqueId();
+function RamaddaXlsDisplay(displayManager, id, properties) {  
 
-    if(props == null) {
-        props = {};
-    }
-    this.props = {
+    var ID_TABLE = "table";
+    var ID_TABLE_LABEL = "tablelabel";
+    var ID_CHART = "chart";
+
+    RamaddaUtil.inherit(this, new RamaddaDisplay(displayManager, id, "xls", properties));
+    addRamaddaDisplay(this);
+    this.url = properties.url;
+    this.tableProps = {
         fixedRowsTop: 0,
         fixedColumnsLeft: 0,
         rowHeaders: true,
@@ -22,7 +19,22 @@ function RamaddaXls(divId, url, props) {
         skipRows: 0,
         skipColumns: 0,
     };
-    $.extend(this.props, props);
+    if(properties!=null) {
+        $.extend(this.tableProps, properties);
+    }
+
+
+    RamaddaUtil.defineMembers(this, {
+            initDisplay: function() {
+                this.initUI();
+                this.setTitle("Table Data");
+                this.divId = HtmlUtil.getUniqueId();
+                var html  = HtmlUtil.div(["id", this.divId],this.getLoadingMessage())
+                this.setContents(html);
+                this.loadTableData(this.url);
+            },
+         });
+
 
     RamaddaUtil.defineMembers(this, {
             currentSheet:  0,
@@ -32,7 +44,7 @@ function RamaddaXls(divId, url, props) {
             yAxisIndex: -1,
             header: null,
             columnSelected: function(col) {
-                if($("#"+this.getId("params-xaxis-select")).attr("checked")) {
+                if(this.jq("params-xaxis-select").attr("checked")) {
                     this.xAxisIndex = col;
                 } else {
                     this.yAxisIndex = col;
@@ -45,10 +57,10 @@ function RamaddaXls(divId, url, props) {
                 var lbl2 = this.getHeading(this.yAxisIndex);
 
 
-
-                $("#" + this.getId("params-xaxis-label")).html(lbl1);
-                $("#" + this.getId("params-yaxis-label")).html(lbl2);
+                this.jq("params-xaxis-label").html(lbl1);
+                this.jq("params-yaxis-label").html(lbl2);
             },
+
             loadSheet: function(sheetIdx) {
                 this.currentSheet = sheetIdx;
                 var sheet = this.sheets[sheetIdx];
@@ -57,17 +69,11 @@ function RamaddaXls(divId, url, props) {
                     this.header = rows[0];
                 }
 
-
-
-
-
-
                 var html = "";
                 var _this = this;
                 var args  = {
                     contextMenu: true,
                     stretchH: 'all',
-
                     useFirstRowAsHeader: false,
                     colHeaders: true,
                     rowHeaders: true,
@@ -80,35 +86,36 @@ function RamaddaXls(divId, url, props) {
                         }
                     },
                 };
-                $.extend(args, this.props);
+                $.extend(args, this.tableProps);
+
 
                 if(args.useFirstRowAsHeader) {
                     var headers = rows[0];
                     args.colHeaders = headers;
                     rows = rows.splice(1);
                 }
-                for(var i=0;i<this.props.skipRows;i++) {
+                for(var i=0;i<this.tableProps.skipRows;i++) {
                     rows = rows.splice(1);
                 }
 
                 args.data = rows;
                 this.currentData = rows;
 
-                if(this.props.headers!=null) {
-                    args.colHeaders = this.props.headers;
+                if(this.tableProps.headers!=null) {
+                    args.colHeaders = this.tableProps.headers;
                 }
 
-                $("#" + this.ssLabelId).html(sheet.name);
-                $("#" + this.ssId).handsontable(args);
+                this.jq(ID_TABLE_LABEL).html(sheet.name);
+                this.jq(ID_TABLE).handsontable(args);
 
             },
             makeChart: function(chartType) {
                 if(typeof google == 'undefined') {
-                    $("#" + this.chartContainerId).html("No google");
+                    this.jq(ID_CHART).html("No google");
                     return;
                 }
                 if(this.currentData ==null) {
-                    $("#" + this.chartContainerId).html("No data");
+                    this.jq(ID_CHART).html("No data");
                     return;
                 }
 
@@ -157,10 +164,8 @@ function RamaddaXls(divId, url, props) {
 
 
                 var labels = this.columnLabels!=null?this.columnLabels:["Field 1","Field 2"];
-                //                console.log("labels:" + labels);
                 rows.splice(0,0,labels);
                 /*
-
                 for(var rowIdx=0;rowIdx<rows.length;rowIdx++) {
                     var cols = rows[rowIdx];
                     var s = "";
@@ -178,8 +183,7 @@ function RamaddaXls(divId, url, props) {
                 var   chartOptions = {};
                 var width = "95%";
                 $.extend(chartOptions, {
-                        //                          series: [{targetAxisIndex:0},{targetAxisIndex:1},],
-                          legend: { position: 'top' },
+                      legend: { position: 'top' },
                  });
 
                 if(this.header!=null) {
@@ -192,10 +196,12 @@ function RamaddaXls(divId, url, props) {
                 }
 
                 var chartDivId = HtmlUtil.getUniqueId();
-                var chartDiv = HtmlUtil.div(["id", chartDivId],"");
-
-                $("#"+this.chartContainerId).append(chartDiv);
-
+                var divAttrs = ["id",chartDivId];
+                if(chartType == "scatterplot") {
+                    divAttrs.push("style");
+                    divAttrs.push("width: 450px; height: 450px;");
+                }
+                this.jq(ID_CHART).append(HtmlUtil.div(divAttrs));
 
                 if(chartType == "barchart") {
                     chartOptions.chartArea = {left:75,top:10,height:"60%",width:width};
@@ -209,36 +215,19 @@ function RamaddaXls(divId, url, props) {
                     chartOptions.chartArea = {left:50,top:30,height:400,width:400};
                     chartOptions.legend = 'none';
                     chartOptions.axisTitlesPosition = "in";
-                    var newDivId= HtmlUtil.getUniqueId();
-                    $("#" + chartDivId).html(HtmlUtil.div(["id", newDivId,"style","width: 450px; height: 450px;"],""));
-                    this.chart = new google.visualization.ScatterChart(document.getElementById(newDivId));
-
+                    this.chart = new google.visualization.ScatterChart(document.getElementById(chartDivId));
                 } else {
                     $.extend(chartOptions, {lineWidth: 1});
-                    $.extend(chartOptions, {
-                            //                            series: [{targetAxisIndex:0},{targetAxisIndex:1},],
-                                //                                legend: { position: 'bottom' },
-                                //                                chartArea:{left:75,top:10,height:"60%",width:width}
-                        });
-                    //                    $.extend(chartOptions, {lineWidth: 1,vAxis: {}});
                     chartOptions.chartArea = {left:75,top:10,height:"60%",width:width};
                     this.chart = new google.visualization.LineChart(document.getElementById(chartDivId));
                 }
-
-
-
-
-
-
-
-
-
                 if(this.chart!=null) {
                     this.chart.draw(dataTable, chartOptions);
                 }
             },
 
-                addNewChartListener: function(makeChartId, chartType) {
+            addNewChartListener: function(makeChartId, chartType) {
+                var _this = this;
                 $("#" + makeChartId+"-" + chartType).button().click(function(event){
                         console.log("make chart:" + chartType);
                         _this.makeChart(chartType);
@@ -251,15 +240,12 @@ function RamaddaXls(divId, url, props) {
                         _this.loadSheet(index);
                     });
             },
-            getId: function(suffix) {
-                return this.baseId +"_"+ suffix;
-            },
             clear: function() {
-                $("#" + this.chartContainerId).html("");
+                this.jq(ID_CHART).html("");
                 this.xAxisIndex = -1;
                 this.yAxisIndex = -1;
-                $("#" + this.getId("params-xaxis-label")).html("");
-                $("#" + this.getId("params-yaxis-label")).html("");
+                this.jq("params-xaxis-label").html("");
+                this.jq("params-yaxis-label").html("");
             },
              getHeading: function(index, doField) {
                 if(this.header != null && index>=0 && index< this.header.length) {
@@ -271,12 +257,12 @@ function RamaddaXls(divId, url, props) {
                     return "Field " + (index+1);
                 return "";
             },
-            loadData: function(data) {
+            showTableData: function(data) {
                 this.sheets = data;
                 var buttons = "";
                 var html = "";
                 for(var sheetIdx =0;sheetIdx<this.sheets.length;sheetIdx++) {
-                    var id = this.getId(sheetIdx);
+                    var id = this.getDomId("sheet_"+ sheetIdx);
                     buttons+=HtmlUtil.div(["id", id,"class","ramadda-xls-button"],
                                           this.sheets[sheetIdx].name);
 
@@ -292,7 +278,7 @@ function RamaddaXls(divId, url, props) {
 
 
                 html += HtmlUtil.openDiv(["class","col-md-" + weight]);
-                html+=HtmlUtil.div(["id",this.ssLabelId,"class","ramadda-xls-label"])
+                html+=HtmlUtil.div(["id",this.getDomId(ID_TABLE_LABEL),"class","ramadda-xls-label"])
                 html += HtmlUtil.closeDiv();
                 html += HtmlUtil.closeDiv();
 
@@ -309,7 +295,7 @@ function RamaddaXls(divId, url, props) {
                 var makeChartId =  HtmlUtil.getUniqueId();
 
                 html += HtmlUtil.openDiv(["class","col-md-" + weight]);
-                html += HtmlUtil.div(["id",this.ssId,"class","ramadda-xls-table","style","width:800px; height: 300px; overflow: auto"]);
+                html += HtmlUtil.div(["id",this.getDomId(ID_TABLE),"class","ramadda-xls-table","style","width:800px; height: 300px; overflow: auto"]);
                 html += "<p>";
                 var chartTypes = ["barchart","linechart","scatterplot"];
                 for(var i=0;i<chartTypes.length;i++) {
@@ -318,22 +304,22 @@ function RamaddaXls(divId, url, props) {
                 }
 
                 html+= "&nbsp;";
-                html+=HtmlUtil.div(["id", this.getId("removechart"),"class","ramadda-xls-button"],  "Clear Charts");
+                html+=HtmlUtil.div(["id", this.getDomId("removechart"),"class","ramadda-xls-button"],  "Clear Charts");
 
 
                 html += "<p>";
                 html += "<form>Fields: ";
-                html +=  "<input type=radio checked name=\"param\" id=\"" + this.getId("params-yaxis-select")+"\"> y-axis:&nbsp;" +
-                    HtmlUtil.div(["id", this.getId("params-yaxis-label"), "style","border-bottom:1px #ccc dotted;min-width:20em;display:inline-block;"], "");
+                html +=  "<input type=radio checked name=\"param\" id=\"" + this.getDomId("params-yaxis-select")+"\"> y-axis:&nbsp;" +
+                    HtmlUtil.div(["id", this.getDomId("params-yaxis-label"), "style","border-bottom:1px #ccc dotted;min-width:20em;display:inline-block;"], "");
 
                 html += "&nbsp;&nbsp;&nbsp;";
-                html += "<input type=radio  name=\"param\" id=\"" + this.getId("params-xaxis-select")+"\"> x-axis:&nbsp;" +
-                    HtmlUtil.div(["id", this.getId("params-xaxis-label"), "style","border-bottom:1px #ccc dotted;min-width:20em;display:inline-block;"], "");
+                html += "<input type=radio  name=\"param\" id=\"" + this.getDomId("params-xaxis-select")+"\"> x-axis:&nbsp;" +
+                    HtmlUtil.div(["id", this.getDomId("params-xaxis-label"), "style","border-bottom:1px #ccc dotted;min-width:20em;display:inline-block;"], "");
 
 
                 html+= "</form>";
 
-                html += HtmlUtil.div(["id",this.chartContainerId,"class","ramadda-xls-chart"]);
+                html += HtmlUtil.div(["id",this.getDomId(ID_CHART),"class","ramadda-xls-chart"]);
 
                 html += HtmlUtil.closeDiv();
                 html += HtmlUtil.closeDiv();
@@ -343,13 +329,13 @@ function RamaddaXls(divId, url, props) {
                 for(var i=0;i<chartTypes.length;i++) {
                     this.addNewChartListener(makeChartId, chartTypes[i]);
                 }
-                $("#" + this.getId("removechart")).button().click(function(event){
+                this.jq("removechart").button().click(function(event){
                         _this.clear();
                     });
 
               for(var sheetIdx =0;sheetIdx<this.sheets.length;sheetIdx++) {
-                  var id = this.getId(sheetIdx);
-                    this.makeSheetButton(id, sheetIdx);
+                  var id = this.getDomId("sheet_"+ sheetIdx);
+                  this.makeSheetButton(id, sheetIdx);
                 }
                 var sheetIdx = 0;
                 var rx = /sheet=([^&]+)/g;
@@ -359,22 +345,27 @@ function RamaddaXls(divId, url, props) {
                 }
 
                 this.loadSheet(sheetIdx);
+            },
+
+
+
+
+           loadTableData:  function(url) {
+                var _this = this;
+                console.log("url:" + this.url);
+                var jqxhr = $.getJSON( this.url, function(data) {
+                        if(GuiUtils.isJsonError(data)) {
+                            $("#" + this.divId).html("Error:" + data.error);
+                            return;
+                        }
+                        _this.showTableData(data);
+                    })
+                    .fail(function(jqxhr, textStatus, error) {
+                            var err = textStatus + ", " + error;
+                            $("#" + this.divId).html("An error occurred: " + error);
+                            console.log("JSON error:" +err);
+                        });
             }
         });
-
-    var _this = this;
-    console.log("url:" + url);
-    var jqxhr = $.getJSON( url, function(data) {
-            if(GuiUtils.isJsonError(data)) {
-                $("#" + divId).html("Error:" + data.error);
-                return;
-            }
-            _this.loadData(data);
-        })
-        .fail(function(jqxhr, textStatus, error) {
-                var err = textStatus + ", " + error;
-                $("#" + divId).html("An error occurred: " + error);
-                console.log("JSON error:" +err);
-            });
 
      }

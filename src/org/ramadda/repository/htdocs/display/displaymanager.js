@@ -336,6 +336,7 @@ function DisplayManager(argId,argProperties) {
                 var func = null;
                 var funcName = null;
                 for(var i=0;i<names.length;i++) {
+                    //                    console.log("trying:" + names[i]);
                     if(window[names[i]]!=null) {
                         funcName = names[i];
                         func = window[names[i]];

@@ -36,9 +36,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.ramadda.repository.*;
 import org.ramadda.repository.auth.*;
 import org.ramadda.repository.output.*;
+import org.ramadda.util.GoogleChart;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Json;
-import org.ramadda.util.GoogleChart;
 import org.ramadda.util.Utils;
 
 import org.ramadda.util.XlsUtil;
@@ -76,10 +76,10 @@ import java.util.regex.*;
 public class XlsOutputHandler extends OutputHandler {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final int MAX_ROWS = 500;
 
-    /** _more_          */
+    /** _more_ */
     public static final int MAX_COLS = 100;
 
     /** _more_ */
@@ -87,7 +87,7 @@ public class XlsOutputHandler extends OutputHandler {
         new OutputType("XLS to JSON", "xls_json", OutputType.TYPE_FEEDS, "",
                        "/media/xls.png");
 
-    /** _more_          */
+    /** _more_ */
     public static final OutputType OUTPUT_XLS_HTML =
         new OutputType("Show Spreadsheet", "xls_html", OutputType.TYPE_VIEW,
                        "", "/media/xls.png");
@@ -211,8 +211,9 @@ public class XlsOutputHandler extends OutputHandler {
 
         HashSet<Integer> sheetsToShow = null;
         if (entry.getTypeHandler().isType("type_document_xls")) {
-            List<String> sheetsStr = StringUtil.split(entry.getValue(XlsTypeHandler.IDX_SHEETS, ""),
-                                         ",", true, true);
+            List<String> sheetsStr =
+                StringUtil.split(entry.getValue(XlsTypeHandler.IDX_SHEETS,
+                    ""), ",", true, true);
             if (sheetsStr.size() > 0) {
                 sheetsToShow = new HashSet<Integer>();
                 for (String s : sheetsStr) {
@@ -276,7 +277,7 @@ public class XlsOutputHandler extends OutputHandler {
                         break;
                     }
                     String value = cell.toString();
-                    value = value.replaceAll("\"","&quot;");
+                    value = value.replaceAll("\"", "&quot;");
                     cols.add(Json.quote(value));
                 }
                 rows.add(Json.list(cols));
@@ -346,19 +347,30 @@ public class XlsOutputHandler extends OutputHandler {
     public String getHtmlDisplay(Request request, Hashtable requestProps,
                                  Entry entry)
             throws Exception {
-        boolean useFirstRowAsHeader = Misc.equals("true",
-                                          entry.getValue(XlsTypeHandler.IDX_USEFIRSTROW, "true"));
+
+        boolean useFirstRowAsHeader =
+            Misc.equals("true",
+                        entry.getValue(XlsTypeHandler.IDX_USEFIRSTROW,
+                                       "true"));
 
 
-        boolean colHeader = Misc.equals("true", entry.getValue(XlsTypeHandler.IDX_COLHEADER, "false"));
-        boolean rowHeader = Misc.equals("true", entry.getValue(XlsTypeHandler.IDX_ROWHEADER, "false"));
-        List<String> widths = StringUtil.split(entry.getValue(XlsTypeHandler.IDX_WIDTHS, ""), ",",
-                                  true, true);
+        boolean colHeader =
+            Misc.equals("true",
+                        entry.getValue(XlsTypeHandler.IDX_COLHEADER,
+                                       "false"));
+        boolean rowHeader =
+            Misc.equals("true",
+                        entry.getValue(XlsTypeHandler.IDX_ROWHEADER,
+                                       "false"));
+        List<String> widths =
+            StringUtil.split(entry.getValue(XlsTypeHandler.IDX_WIDTHS, ""),
+                             ",", true, true);
 
 
 
-        List<String> sheetsStr = StringUtil.split(entry.getValue(XlsTypeHandler.IDX_SHEETS, ""),
-                                                  ",", true, true);
+        List<String> sheetsStr =
+            StringUtil.split(entry.getValue(XlsTypeHandler.IDX_SHEETS, ""),
+                             ",", true, true);
 
 
         List propsList = new ArrayList();
@@ -375,8 +387,10 @@ public class XlsOutputHandler extends OutputHandler {
         propsList.add("skipColumns");
         propsList.add(entry.getValue(XlsTypeHandler.IDX_SKIPCOLUMNS, "0"));
 
-        List<String> header = StringUtil.split(entry.getValue(XlsTypeHandler.IDX_HEADER, ""),",", true, true);
-        if(header.size()>0) {
+        List<String> header =
+            StringUtil.split(entry.getValue(XlsTypeHandler.IDX_HEADER, ""),
+                             ",", true, true);
+        if (header.size() > 0) {
             propsList.add("header");
             propsList.add(Json.list(header, true));
         }
@@ -387,28 +401,35 @@ public class XlsOutputHandler extends OutputHandler {
             propsList.add(Json.list(widths));
         }
 
-        String        props = Json.map(propsList);
 
-        StringBuilder sb    = new StringBuilder();
         String jsonUrl =
             request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
                              ARG_OUTPUT,
                              XlsOutputHandler.OUTPUT_XLS_JSON.getId());
 
 
+        propsList.add("url");
+        propsList.add(Json.quote(jsonUrl));
 
-        sb.append(HtmlUtils.importJS(getRepository().getUrlBase()
-                                     + "/media/jquery.handsontable.full.min.js"));
-        sb.append(HtmlUtils.cssLink(getRepository().getUrlBase()
-                                    + "/media/jquery.handsontable.full.min.css"));
+        String        props = Json.map(propsList);
+
+        StringBuilder sb    = new StringBuilder();
+
+        getRepository().getWikiManager().addDisplayImports(request, sb);
+
+        sb.append(
+            HtmlUtils.importJS(
+                getRepository().getUrlBase()
+                + "/media/jquery.handsontable.full.min.js"));
+        sb.append(
+            HtmlUtils.cssLink(
+                getRepository().getUrlBase()
+                + "/media/jquery.handsontable.full.min.css"));
 
         sb.append(HtmlUtils.cssLink(getRepository().getUrlBase()
                                     + "/media/xls.css"));
         sb.append(HtmlUtils.importJS(getRepository().getUrlBase()
                                      + "/media/xls.js"));
-
-        GoogleChart.addChartImport(sb);
-
 
         sb.append("\n");
 
@@ -416,13 +437,18 @@ public class XlsOutputHandler extends OutputHandler {
         sb.append(entry.getDescription());
         String divId = HtmlUtils.getUniqueId("div_");
         sb.append(HtmlUtils.div("", HtmlUtils.id(divId)));
-        String js = "var ramaddaXls  = new RamaddaXls("
-                    + HtmlUtils.quote(divId) + "," + HtmlUtils.quote(jsonUrl)
-                    + "," + props + ");";
-        sb.append(HtmlUtils.script("$( document ).ready(function() {\n" + js
-                                   + "\n});\n"));
+        StringBuilder js = new StringBuilder();
+        js.append("var displayManager = getOrCreateDisplayManager(\"" + divId
+                  + "\",");
+        js.append(Json.map("showMap", "false", "showMenu", "false",
+                           "showTitle", "false", "layoutType",
+                           Json.quote("table"), "layoutColumns", "1"));
+        js.append(");\n");
+        js.append("displayManager.createDisplay('xls'," + props + ");\n");
+        sb.append(HtmlUtils.script(js.toString()));
 
         return sb.toString();
+
     }
 
 
