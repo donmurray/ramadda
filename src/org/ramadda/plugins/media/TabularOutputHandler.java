@@ -518,7 +518,7 @@ public class TabularOutputHandler extends OutputHandler {
         js.append(Json.map("showMap", "false", "showMenu", "false",
                            "showTitle", "false", "layoutType",
                            Json.quote("table"), "layoutColumns", "1"));
-        js.append(");\n");
+        js.append(",true);\n");
         js.append("displayManager.createDisplay('xls'," + props + ");\n");
         sb.append(HtmlUtils.script(js.toString()));
 
