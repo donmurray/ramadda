@@ -99,17 +99,22 @@
 
   <type name="type_document_tabular"  description="Tabular File" foruser="false"  super="type_document"  >
      <property name="icon" value="/icons/document-excel-csv.png"/>
-     <column name="showtable" type="boolean" label="Show Table"  default="true" showinhtml="false"/>
-     <column name="showchart" type="boolean" label="Show Chart"  default="true" showinhtml="false"/>
-     <column name="usefirstrow" type="boolean" label="Use first row as header"  default="true" showinhtml="false"/>
-     <column name="colheader" type="boolean" label="Show Column Header"  default="false" showinhtml="false"/>
-     <column name="rowheader" type="boolean" label="Show Row Header"  default="false" showinhtml="false"/>
-     <column name="widths" type="string"  size="500" label="Column Widths"  showinhtml="false" suffix="Comma separated list of column widths"/>
-     <column name="sheets" type="string"  size="500" label="Sheets"  showinhtml="false" suffix="Comma separated list of sheet numbers to show (zero based)"/>
-     <column name="header" type="string"  size="500" label="Header"  showinhtml="false" suffix="Comma separated list of column header labels"/>
+     <column name="showtable" type="boolean" label="Show table"  default="true" showinhtml="false"/>
+     <column name="showchart" type="boolean" label="Show chart"  default="true" showinhtml="false"/>
+
+     <column name="sheets" type="string"  size="500" label="Sheets"  showinhtml="false" suffix="Comma separated list of sheet numbers to show (zero based)" group="Data"/>
      <column name="skiprows" type="int" label="Skip Rows"  default="0" showinhtml="false" suffix="How many rows to remove from the data"/>
-     <column name="skipcolumnss" type="int" label="Skip Columns" default="0"  showinhtml="false" suffix="How many columns to remove from the data"/>
-     <column name="charts" type="string"  size="500" rows="5" label="Default Charts"  showinhtml="false" suffix="Specify 1 or more default charts:&lt;br&gt;type=&quot;linechart|barchart|scatterplot&quot;, xAxisIndex=&quot;0&quot;, yAxisIndex=&quot;1&quot;, ... &lt;br&gt;..."/>
+     <column name="skipcolumns" type="int" label="Skip columns" default="0"  showinhtml="false" suffix="How many columns to remove from the data"/>
+
+
+     <column name="usefirstrow" type="boolean" label="Use first row as header"  default="true" showinhtml="false" group="Header"/>
+     <column name="colheader" type="boolean" label="Show column header"  default="false" showinhtml="false"/>
+     <column name="header" type="string"  size="500" label="Header"  showinhtml="false" suffix="Comma separated list of column header labels"/>
+     <column name="rowheader" type="boolean" label="Show row header"  default="false" showinhtml="false"/>
+
+
+     <column name="widths" type="string"  size="500" label="Column widths"  showinhtml="false" suffix="Comma separated list of column widths" group="Display"/>
+     <column name="charts" type="string"  size="500" rows="5" columns="60" label="Default charts"  showinhtml="false" suffix="Specify 1 or more default charts:&lt;br&gt;type=linechart|barchart|scatterplot, xAxisIndex=0, yAxisIndex=1, sheet=0, ... &lt;br&gt;..."/>
 
  </type>
 

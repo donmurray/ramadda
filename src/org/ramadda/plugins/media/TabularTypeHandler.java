@@ -58,7 +58,7 @@ import java.util.zip.ZipInputStream;
  *
  *
  */
-public class TabularTypeHandler extends TypeHandler {
+public class TabularTypeHandler extends MsDocTypeHandler {
 
 
     /** _more_          */
@@ -71,10 +71,24 @@ public class TabularTypeHandler extends TypeHandler {
     public static final int IDX_SHOWCHART = IDX++;
 
     /** _more_          */
+    public static final int IDX_SHEETS = IDX++;
+
+    /** _more_          */
+    public static final int IDX_SKIPROWS = IDX++;
+
+    /** _more_          */
+    public static final int IDX_SKIPCOLUMNS = IDX++;
+
+
+
+    /** _more_          */
     public static final int IDX_USEFIRSTROW = IDX++;
 
     /** _more_          */
     public static final int IDX_COLHEADER = IDX++;
+
+    /** _more_          */
+    public static final int IDX_HEADER = IDX++;
 
     /** _more_          */
     public static final int IDX_ROWHEADER = IDX++;
@@ -83,24 +97,11 @@ public class TabularTypeHandler extends TypeHandler {
     public static final int IDX_WIDTHS = IDX++;
 
     /** _more_          */
-    public static final int IDX_SHEETS = IDX++;
-
-    /** _more_          */
-    public static final int IDX_HEADER = IDX++;
-
-    /** _more_          */
-    public static final int IDX_SKIPROWS = IDX++;
-
-    /** _more_          */
-    public static final int IDX_SKIPCOLUMNS = IDX++;
-
-    /** _more_          */
     public static final int IDX_CHARTS = IDX++;
 
 
-
     /** _more_ */
-    private XlsOutputHandler xlsOutputHandler;
+    private TabularOutputHandler tabularOutputHandler;
 
     /**
      * _more_
@@ -110,7 +111,7 @@ public class TabularTypeHandler extends TypeHandler {
      *
      * @throws Exception _more_
      */
-    public XlsTypeHandler(Repository repository, Element entryNode)
+    public TabularTypeHandler(Repository repository, Element entryNode)
             throws Exception {
         super(repository, entryNode);
     }
@@ -121,14 +122,14 @@ public class TabularTypeHandler extends TypeHandler {
      *
      * @return _more_
      */
-    private XlsOutputHandler getXlsOutputHandler() {
-        if (xlsOutputHandler == null) {
-            xlsOutputHandler =
-                (XlsOutputHandler) getRepository().getOutputHandler(
-                    XlsOutputHandler.class);
+    private TabularOutputHandler getTabularOutputHandler() {
+        if (tabularOutputHandler == null) {
+            tabularOutputHandler =
+                (TabularOutputHandler) getRepository().getOutputHandler(
+                    TabularOutputHandler.class);
         }
 
-        return xlsOutputHandler;
+        return tabularOutputHandler;
     }
 
 
@@ -148,15 +149,15 @@ public class TabularTypeHandler extends TypeHandler {
                                    Entry entry)
             throws Exception {
 
-        boolean showTable  = entry.getValue(XlsTypeHandler.IDX_SHOWTABLE, true);
-        boolean showChart  = entry.getValue(XlsTypeHandler.IDX_SHOWCHART, true);
+        boolean showTable  = entry.getValue(IDX_SHOWTABLE, true);
+        boolean showChart  = entry.getValue(IDX_SHOWCHART, true);
 
 
         if (!showTable && !showChart) {
             return null;
         }
 
-        return getXlsOutputHandler().getHtmlDisplay(request, requestProps,
+        return getTabularOutputHandler().getHtmlDisplay(request, requestProps,
                 entry);
     }
 

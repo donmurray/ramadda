@@ -47,6 +47,7 @@ import org.ramadda.util.XlsUtil;
 import org.w3c.dom.*;
 
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringUtil;
@@ -73,7 +74,7 @@ import java.util.regex.*;
 
 /**
  */
-public class XlsOutputHandler extends OutputHandler {
+public class TabularOutputHandler extends OutputHandler {
 
 
     /** _more_ */
@@ -96,7 +97,7 @@ public class XlsOutputHandler extends OutputHandler {
     /**
      * _more_
      */
-    public XlsOutputHandler() {}
+    public TabularOutputHandler() {}
 
     /**
      * _more_
@@ -106,7 +107,7 @@ public class XlsOutputHandler extends OutputHandler {
      * @param element _more_
      * @throws Exception _more_
      */
-    public XlsOutputHandler(Repository repository, Element element)
+    public TabularOutputHandler(Repository repository, Element element)
             throws Exception {
         super(repository, element);
         addType(OUTPUT_XLS_HTML);
@@ -137,7 +138,7 @@ public class XlsOutputHandler extends OutputHandler {
                 return;
             }
             String path = entry.getResource().getPath();
-            if (path.endsWith(".xls") || path.endsWith(".xlsx")) {
+            if (path.endsWith(".xls") || path.endsWith(".xlsx") || path.endsWith(".csv")) {
                 isXls = true;
             }
         }
@@ -177,7 +178,6 @@ public class XlsOutputHandler extends OutputHandler {
                 Result result = new Result("", sb);
                 result.setShouldDecorate(false);
                 result.setMimeType("application/json");
-
                 return result;
             }
         }
@@ -211,7 +211,7 @@ public class XlsOutputHandler extends OutputHandler {
 
 
         HashSet<Integer> sheetsToShow = null;
-        if (entry.getTypeHandler().isType("type_document_xls")) {
+        if (entry.getTypeHandler().isType("type_document_tabular")) {
             List<String> sheetsStr =
                 StringUtil.split(entry.getValue(XlsTypeHandler.IDX_SHEETS,
                     ""), ",", true, true);
@@ -223,10 +223,17 @@ public class XlsOutputHandler extends OutputHandler {
             }
         }
 
-        if (file.endsWith(".xlsx")) {
-            readXlsx(myxls, sheets, sheetsToShow);
+        int skip = request.get("table.skip",0);
+
+        String suffix = IOUtil.getFileExtension(file).toLowerCase();
+        if (suffix.equals(".xlsx")) {
+            readXlsx(myxls, sheets, sheetsToShow, skip);
+        } else if (suffix.endsWith(".xls")) {
+            readXls(myxls, sheets, sheetsToShow, skip);
+        } else if (suffix.endsWith(".csv")) {
+            readCsv(entry,myxls, sheets, skip);
         } else {
-            readXls(myxls, sheets, sheetsToShow);
+            throw new IllegalStateException("Unknown file type:" + suffix);
         }
 
 
@@ -249,9 +256,8 @@ public class XlsOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-
     private void readXls(InputStream myxls, List<String> sheets,
-                         HashSet<Integer> sheetsToShow)
+                         HashSet<Integer> sheetsToShow, int skip)
             throws Exception {
         HSSFWorkbook wb = new HSSFWorkbook(myxls);
         for (int sheetIdx = 0; sheetIdx < wb.getNumberOfSheets();
@@ -261,13 +267,19 @@ public class XlsOutputHandler extends OutputHandler {
             }
             HSSFSheet    sheet = wb.getSheetAt(sheetIdx);
             List<String> rows  = new ArrayList<String>();
+            int sheetSkip=skip;
+            int rowCnt = 0;
             for (int rowIdx = sheet.getFirstRowNum();
-                    (rowIdx < MAX_ROWS) && (rowIdx <= sheet.getLastRowNum());
+                    (rowCnt < MAX_ROWS) && (rowIdx <= sheet.getLastRowNum());
                     rowIdx++) {
+                if(sheetSkip-->0) continue;
+
                 HSSFRow row = sheet.getRow(rowIdx);
                 if (row == null) {
                     continue;
                 }
+                rowCnt++;
+
                 List<String> cols     = new ArrayList<String>();
                 short        firstCol = row.getFirstCellNum();
                 for (short col = firstCol;
@@ -300,20 +312,25 @@ public class XlsOutputHandler extends OutputHandler {
      */
 
     private void readXlsx(InputStream myxls, List<String> sheets,
-                          HashSet<Integer> sheetsToShow)
+                          HashSet<Integer> sheetsToShow, int skip)
             throws Exception {
         XSSFWorkbook wb = new XSSFWorkbook(myxls);
         for (int sheetIdx = 0; sheetIdx < wb.getNumberOfSheets();
                 sheetIdx++) {
             XSSFSheet    sheet = wb.getSheetAt(sheetIdx);
             List<String> rows  = new ArrayList<String>();
+            int sheetSkip = skip;
+            int rowCnt = 0;
             for (int rowIdx = sheet.getFirstRowNum();
-                    (rowIdx < MAX_ROWS) && (rowIdx <= sheet.getLastRowNum());
-                    rowIdx++) {
+                 (rowCnt < MAX_ROWS) && (rowIdx <= sheet.getLastRowNum());
+                 rowIdx++) {
+                if(sheetSkip-->0) continue;
+
                 XSSFRow row = sheet.getRow(rowIdx);
                 if (row == null) {
                     continue;
                 }
+                rowCnt++;
                 List<String> cols     = new ArrayList<String>();
                 short        firstCol = row.getFirstCellNum();
                 for (short col = firstCol;
@@ -333,6 +350,27 @@ public class XlsOutputHandler extends OutputHandler {
         }
     }
 
+    private void readCsv(Entry entry, InputStream myxls, List<String> sheets, int skip)
+        throws Exception {
+        BufferedReader br =  new BufferedReader(new InputStreamReader(myxls));
+        String line;
+        int rowIdx =0;
+        List<String> rows  = new ArrayList<String>();
+        while((line=br.readLine())!=null) {
+            if(line.startsWith("#")) {
+                continue;
+            }
+            if(skip-->0) continue;
+            rowIdx++;
+            if(rowIdx > MAX_ROWS) {
+                break;
+            }
+            List<String> cols     = Utils.tokenizeColumns(line, ",");
+            rows.add(Json.list(cols, true));
+        }
+        sheets.add(Json.map("name", Json.quote(entry.getName()),
+                            "rows", Json.list(rows)));
+    }
 
     /**
      * _more_
@@ -388,8 +426,7 @@ public class XlsOutputHandler extends OutputHandler {
         propsList.add("showChart");
         propsList.add("" + showChart);
 
-        propsList.add("colHeaders");
-        propsList.add("" + colHeader);
+
         propsList.add("rowHeaders");
         propsList.add("" + rowHeader);
 
@@ -402,8 +439,11 @@ public class XlsOutputHandler extends OutputHandler {
             StringUtil.split(entry.getValue(XlsTypeHandler.IDX_HEADER, ""),
                              ",", true, true);
         if (header.size() > 0) {
-            propsList.add("header");
+            propsList.add("colHeaders");
             propsList.add(Json.list(header, true));
+        } else {
+            propsList.add("colHeaders");
+            propsList.add("" + colHeader);
         }
 
 
@@ -416,7 +456,7 @@ public class XlsOutputHandler extends OutputHandler {
         String jsonUrl =
             request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
                              ARG_OUTPUT,
-                             XlsOutputHandler.OUTPUT_XLS_JSON.getId());
+                             TabularOutputHandler.OUTPUT_XLS_JSON.getId());
 
         List<String> charts  = new ArrayList<String>();
         for(String line: 
@@ -433,7 +473,8 @@ public class XlsOutputHandler extends OutputHandler {
                     continue;
                 }
                 String value = subtoks.get(1);
-                chart.add(value);
+                chart.add(key);
+                chart.add(Json.quote(value));
             }
             charts.add(Json.map(chart));
         }

@@ -5,5 +5,5 @@
 <outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="media_qttools_thumbnail"/>
 
 
-<outputhandler class="org.ramadda.plugins.media.XlsOutputHandler"/>
+<outputhandler class="org.ramadda.plugins.media.TabularOutputHandler"/>
 </outputhandlers>

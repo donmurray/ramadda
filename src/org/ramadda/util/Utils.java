@@ -122,15 +122,20 @@ public class Utils {
             if (line.startsWith("#")) {
                 continue;
             }
-            List<String> toks      = new ArrayList<String>();
-            StrTokenizer tokenizer = StrTokenizer.getCSVInstance(line);
-            while (tokenizer.hasNext()) {
-                toks.add(tokenizer.nextToken());
-            }
-            results.add(toks);
+            results.add(tokenizeColumns(line, columnDelimiter));
         }
 
         return results;
+    }
+
+
+    public static List<String> tokenizeColumns(String line, String columnDelimiter) {
+        List<String> toks      = new ArrayList<String>();
+        StrTokenizer tokenizer = StrTokenizer.getCSVInstance(line);
+        while (tokenizer.hasNext()) {
+            toks.add(tokenizer.nextToken());
+        }
+        return toks;
     }
 
     /**

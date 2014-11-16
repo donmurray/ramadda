@@ -60,10 +60,6 @@ import java.util.zip.ZipInputStream;
  */
 public class XlsTypeHandler extends TabularTypeHandler {
 
-
-    /** _more_ */
-    private XlsOutputHandler xlsOutputHandler;
-
     /**
      * _more_
      *
@@ -75,57 +71,6 @@ public class XlsTypeHandler extends TabularTypeHandler {
     public XlsTypeHandler(Repository repository, Element entryNode)
             throws Exception {
         super(repository, entryNode);
-    }
-
-    public void initializeNewEntry(Request request, Entry entry)
-            throws Exception {
-        super.initializeNewEntry(request, entry);
-        ((MsDocTypeHandler)getRepository().getTypeHandler(MsDocTypeHandler.class)).initializeDocEntry(request, entry);
-    }
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    private XlsOutputHandler getXlsOutputHandler() {
-        if (xlsOutputHandler == null) {
-            xlsOutputHandler =
-                (XlsOutputHandler) getRepository().getOutputHandler(
-                    XlsOutputHandler.class);
-        }
-
-        return xlsOutputHandler;
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param requestProps _more_
-     * @param entry _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    @Override
-    public String getSimpleDisplay(Request request, Hashtable requestProps,
-                                   Entry entry)
-            throws Exception {
-
-        boolean showTable  = entry.getValue(XlsTypeHandler.IDX_SHOWTABLE, true);
-        boolean showChart  = entry.getValue(XlsTypeHandler.IDX_SHOWCHART, true);
-
-
-        if (!showTable && !showChart) {
-            return null;
-        }
-
-        return getXlsOutputHandler().getHtmlDisplay(request, requestProps,
-                entry);
     }
 
 
