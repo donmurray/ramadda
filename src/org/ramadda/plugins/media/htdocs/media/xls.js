@@ -74,11 +74,9 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 var args  = {
                     contextMenu: true,
                     stretchH: 'all',
-                    useFirstRowAsHeader: false,
                     colHeaders: true,
                     rowHeaders: true,
                     minSpareRows: 1,
-                    contextMenu: true,
                     afterSelection: function() {
                         if(arguments.length>2) {
                             for(var i=0;i<arguments.length;i++) {
@@ -91,9 +89,7 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                     },
                 };
                 $.extend(args, this.tableProps);
-
-
-                if(args.useFirstRowAsHeader) {
+                if(this.tableProps.useFirstRowAsHeader) {
                     var headers = rows[0];
                     args.colHeaders = headers;
                     rows = rows.splice(1);
@@ -115,13 +111,29 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 }
 
             },
+            getDataForSheet: function(sheetIdx, args) {
+                var sheet = this.sheets[sheetIdx];
+                var rows =sheet.rows.slice(0);
+                if(rows.length>0) {
+                    this.header = rows[0];
+                }
+
+                if(this.tableProps.useFirstRowAsHeader) {
+                    var headers = rows[0];
+                    if(args) {
+                        args.colHeaders = headers;
+                    }
+                    rows = rows.splice(1);
+                }
+                for(var i=0;i<this.tableProps.skipRows;i++) {
+                    rows = rows.splice(1);
+                }
+                return rows;
+            },
+
             makeChart: function(chartType, props) {
                 if(typeof google == 'undefined') {
                     this.jq(ID_CHART).html("No google chart available");
-                    return;
-                }
-                if(this.currentData ==null) {
-                    this.jq(ID_CHART).html("There is no data");
                     return;
                 }
 
@@ -136,7 +148,17 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                     return;
                 }
 
-                var rows =this.currentData;
+                var sheetIdx  = this.currentSheet;
+                if(!(typeof props.sheet == "undefined")) {
+                    sheetIdx = props.sheet;
+                }
+
+                var rows = this.getDataForSheet(sheetIdx);
+                if(rows ==null) {
+                    this.jq(ID_CHART).html("There is no data");
+                    return;
+                }
+
 
                 //remove the first header row
                 var rows =rows.slice(1);
