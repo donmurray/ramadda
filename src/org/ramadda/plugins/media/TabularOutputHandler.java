@@ -205,13 +205,14 @@ public class TabularOutputHandler extends OutputHandler {
         StringBuilder    sb           = new StringBuilder();
         List<String>     sheets       = new ArrayList<String>();
 
-        String           file         = entry.getFile().toString();
-        InputStream      myxls = getStorageManager().getFileInputStream(file);
-
-
+        String           file         = null;
+        if(entry.isFile()) {
+            file = entry.getFile().toString();
+        }
+        boolean isTabular  = entry.getTypeHandler().isType("type_document_tabular");
 
         HashSet<Integer> sheetsToShow = null;
-        if (entry.getTypeHandler().isType("type_document_tabular")) {
+        if (isTabular) {
             List<String> sheetsStr =
                 StringUtil.split(entry.getValue(XlsTypeHandler.IDX_SHEETS,
                     ""), ",", true, true);
@@ -225,15 +226,25 @@ public class TabularOutputHandler extends OutputHandler {
 
         int skip = request.get("table.skip",0);
 
-        String suffix = IOUtil.getFileExtension(file).toLowerCase();
+        InputStream      inputStream = null;
+        String suffix = "";
+        if(file!=null) {
+            inputStream = getStorageManager().getFileInputStream(file);
+            suffix = IOUtil.getFileExtension(file).toLowerCase();
+        }
         if (suffix.equals(".xlsx")) {
-            readXlsx(myxls, sheets, sheetsToShow, skip);
+            readXlsx(inputStream, sheets, sheetsToShow, skip);
         } else if (suffix.endsWith(".xls")) {
-            readXls(myxls, sheets, sheetsToShow, skip);
+            readXls(inputStream, sheets, sheetsToShow, skip);
         } else if (suffix.endsWith(".csv")) {
-            readCsv(entry,myxls, sheets, skip);
+            readCsv(entry,inputStream, sheets, skip);
         } else {
-            throw new IllegalStateException("Unknown file type:" + suffix);
+            if(isTabular) {
+                TabularTypeHandler tth = (TabularTypeHandler)entry.getTypeHandler();
+                tth.read(request, entry,  inputStream, sheets,sheetsToShow, skip);
+            } else {
+                throw new IllegalStateException("Unknown file type:" + suffix);
+            }
         }
 
 
@@ -250,16 +261,16 @@ public class TabularOutputHandler extends OutputHandler {
     /**
      * _more_
      *
-     * @param myxls _more_
+     * @param inputStream _more_
      * @param sheets _more_
      * @param sheetsToShow _more_
      *
      * @throws Exception _more_
      */
-    private void readXls(InputStream myxls, List<String> sheets,
+    private void readXls(InputStream inputStream, List<String> sheets,
                          HashSet<Integer> sheetsToShow, int skip)
             throws Exception {
-        HSSFWorkbook wb = new HSSFWorkbook(myxls);
+        HSSFWorkbook wb = new HSSFWorkbook(inputStream);
         for (int sheetIdx = 0; sheetIdx < wb.getNumberOfSheets();
                 sheetIdx++) {
             if ((sheetsToShow != null) && !sheetsToShow.contains(sheetIdx)) {
@@ -304,17 +315,17 @@ public class TabularOutputHandler extends OutputHandler {
     /**
      * _more_
      *
-     * @param myxls _more_
+     * @param inputStream _more_
      * @param sheets _more_
      * @param sheetsToShow _more_
      *
      * @throws Exception _more_
      */
 
-    private void readXlsx(InputStream myxls, List<String> sheets,
+    private void readXlsx(InputStream inputStream, List<String> sheets,
                           HashSet<Integer> sheetsToShow, int skip)
             throws Exception {
-        XSSFWorkbook wb = new XSSFWorkbook(myxls);
+        XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         for (int sheetIdx = 0; sheetIdx < wb.getNumberOfSheets();
                 sheetIdx++) {
             XSSFSheet    sheet = wb.getSheetAt(sheetIdx);
@@ -350,9 +361,9 @@ public class TabularOutputHandler extends OutputHandler {
         }
     }
 
-    private void readCsv(Entry entry, InputStream myxls, List<String> sheets, int skip)
+    private void readCsv(Entry entry, InputStream inputStream, List<String> sheets, int skip)
         throws Exception {
-        BufferedReader br =  new BufferedReader(new InputStreamReader(myxls));
+        BufferedReader br =  new BufferedReader(new InputStreamReader(inputStream));
         String line;
         int rowIdx =0;
         List<String> rows  = new ArrayList<String>();

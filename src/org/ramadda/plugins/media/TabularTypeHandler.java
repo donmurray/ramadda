@@ -48,6 +48,7 @@ import java.util.ArrayList;
 
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.HashSet;
 import java.util.List;
 
 import java.util.zip.ZipEntry;
@@ -99,6 +100,8 @@ public class TabularTypeHandler extends MsDocTypeHandler {
     /** _more_          */
     public static final int IDX_CHARTS = IDX++;
 
+    public static final int IDX_LAST = IDX;
+
 
     /** _more_ */
     private TabularOutputHandler tabularOutputHandler;
@@ -130,6 +133,11 @@ public class TabularTypeHandler extends MsDocTypeHandler {
         }
 
         return tabularOutputHandler;
+    }
+
+
+    public void read(Request request, Entry entry, InputStream myxls, List<String> sheets, HashSet<Integer> sheetsToShow, int skip) throws Exception {
+
     }
 
 

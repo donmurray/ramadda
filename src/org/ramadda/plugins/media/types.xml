@@ -127,6 +127,15 @@
      <property name="icon" value="/icons/document-excel-csv.png"/>
 </type>
 
+  <type name="type_document_db"  description="Database Table"  super="type_document_tabular"   handler="org.ramadda.plugins.media.DbTableTypeHandler">
+     <property name="form.resource.show" value="false"/>
+     <property name="icon" value="/media/database.png"/>
+     <column   name="jdbc_url" type="string"  columns="60" label="JDBC Url"  showinhtml="false" suffix="JDBC URL to connect to" group="Database"/>
+     <column   name="jdbc_user" type="string"   label="Database user"  showinhtml="false"/>
+     <column   name="jdbc_password" type="password" label="Database user"  showinhtml="false"/>
+     <column   name="table_name" type="string"  size="200" columns="60" label="Table name"  showinhtml="false" suffix="Database table to query"/>
+     <column name="columns" type="string"  size="500" rows="5" columns="60" label="Columns to use"  showinhtml="false" suffix="One column name per line"/>
+</type>
 
 
 </types>
