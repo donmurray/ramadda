@@ -58,7 +58,45 @@ import java.util.zip.ZipInputStream;
  *
  *
  */
-public class XlsTypeHandler extends TabularTypeHandler {
+public class TabularTypeHandler extends TypeHandler {
+
+
+    /** _more_          */
+    private static int IDX = 0;
+
+    /** _more_          */
+    public static final int IDX_SHOWTABLE = IDX++;
+
+    /** _more_          */
+    public static final int IDX_SHOWCHART = IDX++;
+
+    /** _more_          */
+    public static final int IDX_USEFIRSTROW = IDX++;
+
+    /** _more_          */
+    public static final int IDX_COLHEADER = IDX++;
+
+    /** _more_          */
+    public static final int IDX_ROWHEADER = IDX++;
+
+    /** _more_          */
+    public static final int IDX_WIDTHS = IDX++;
+
+    /** _more_          */
+    public static final int IDX_SHEETS = IDX++;
+
+    /** _more_          */
+    public static final int IDX_HEADER = IDX++;
+
+    /** _more_          */
+    public static final int IDX_SKIPROWS = IDX++;
+
+    /** _more_          */
+    public static final int IDX_SKIPCOLUMNS = IDX++;
+
+    /** _more_          */
+    public static final int IDX_CHARTS = IDX++;
+
 
 
     /** _more_ */
@@ -75,12 +113,6 @@ public class XlsTypeHandler extends TabularTypeHandler {
     public XlsTypeHandler(Repository repository, Element entryNode)
             throws Exception {
         super(repository, entryNode);
-    }
-
-    public void initializeNewEntry(Request request, Entry entry)
-            throws Exception {
-        super.initializeNewEntry(request, entry);
-        ((MsDocTypeHandler)getRepository().getTypeHandler(MsDocTypeHandler.class)).initializeDocEntry(request, entry);
     }
 
 
@@ -128,6 +160,24 @@ public class XlsTypeHandler extends TabularTypeHandler {
                 entry);
     }
 
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param wikiTemplate _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    @Override
+    public String getInnerWikiContent(Request request, Entry entry,
+                                      String wikiTemplate)
+            throws Exception {
+        return getSimpleDisplay(request, null, entry);
+    }
 
 
 }

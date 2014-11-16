@@ -131,13 +131,13 @@ public class XlsOutputHandler extends OutputHandler {
             throws Exception {
         Entry   entry = state.getEntry();
         if(entry == null) return;
-        boolean isXls = entry.getTypeHandler().isType("type_document_xls");
+        boolean isXls = entry.getTypeHandler().isType("type_document_tabular");
         if ( !isXls) {
             if ( !entry.isFile()) {
                 return;
             }
             String path = entry.getResource().getPath();
-            if (path.endsWith(".xls") || path.endsWith("xlsx")) {
+            if (path.endsWith(".xls") || path.endsWith(".xlsx")) {
                 isXls = true;
             }
         }
@@ -421,16 +421,19 @@ public class XlsOutputHandler extends OutputHandler {
         List<String> charts  = new ArrayList<String>();
         for(String line: 
                 StringUtil.split(entry.getValue(XlsTypeHandler.IDX_CHARTS,""),"\n", true, true)) {
-            List<String> toks = StringUtil.split(line,",");
-            if(toks.size()<2) continue;
+
             List<String> chart  = new ArrayList<String>();
-            chart.add("type");
-            chart.add(Json.quote(toks.get(0)));
-            chart.add("yAxisIndex");
-            chart.add(toks.get(1));
-            if(toks.size()>2) {
-                chart.add("xAxisIndex");
-                chart.add(toks.get(2));
+            Hashtable<String,String> map = new Hashtable<String,String>();
+            for(String tok:StringUtil.split(line,",")) {
+                List<String>subtoks = StringUtil.splitUpTo(tok,"=",2);
+                String key = subtoks.get(0);
+                if(subtoks.size()<2) {
+                    chart.add("type");
+                    chart.add(Json.quote(key));
+                    continue;
+                }
+                String value = subtoks.get(1);
+                chart.add(value);
             }
             charts.add(Json.map(chart));
         }

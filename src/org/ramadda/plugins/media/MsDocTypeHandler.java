@@ -85,6 +85,12 @@ public class MsDocTypeHandler extends GenericTypeHandler {
     public void initializeNewEntry(Request request, Entry entry)
             throws Exception {
         super.initializeNewEntry(request, entry);
+        initializeDocFile(request, entry);
+    }
+
+
+    public void initializeDocEntry(Request request, Entry entry)
+        throws Exception {
         File file = entry.getFile();
         if ( !file.exists()) {
             return;
@@ -94,6 +100,7 @@ public class MsDocTypeHandler extends GenericTypeHandler {
                 || filename.endsWith(".xlsx"))) {
             return;
         }
+
 
         try {
             InputStream    fis = getStorageManager().getFileInputStream(file);
