@@ -491,7 +491,9 @@ public class TabularOutputHandler extends OutputHandler {
         StringBuilder sb    = new StringBuilder();
         getRepository().getWikiManager().addDisplayImports(request, sb);
         sb.append(header(entry.getName()));
-        sb.append(entry.getDescription());
+        if(!request.get(ARG_EMBEDDED, false)) {
+            sb.append(entry.getDescription());
+        }
         String divId = HtmlUtils.getUniqueId("div_");
         sb.append(HtmlUtils.div("", HtmlUtils.id(divId)));
         StringBuilder js = new StringBuilder();
