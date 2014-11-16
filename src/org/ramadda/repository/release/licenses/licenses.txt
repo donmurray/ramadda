@@ -21,6 +21,13 @@ The JPEG metadata extractor used is from Drew Noake's metadataxtractor:
 http://code.google.com/p/metadata-extractor/
 
 
+jQuery
+We make extensive use of jQuery (http://jquery.com/) and a number of plugins.
+
+handsontable table plugin
+http://handsontable.com/
+
+
 The HTML select form style is done using Greg Franko's selectboxit 
 http://gregfranko.com/jquery.selectBoxIt.js/
 

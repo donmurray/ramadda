@@ -489,25 +489,7 @@ public class TabularOutputHandler extends OutputHandler {
         String        props = Json.map(propsList);
 
         StringBuilder sb    = new StringBuilder();
-
         getRepository().getWikiManager().addDisplayImports(request, sb);
-
-        sb.append(
-            HtmlUtils.importJS(
-                getRepository().getUrlBase()
-                + "/media/jquery.handsontable.full.min.js"));
-        sb.append(
-            HtmlUtils.cssLink(
-                getRepository().getUrlBase()
-                + "/media/jquery.handsontable.full.min.css"));
-
-        sb.append(HtmlUtils.cssLink(getRepository().getUrlBase()
-                                    + "/media/xls.css"));
-        sb.append(HtmlUtils.importJS(getRepository().getUrlBase()
-                                     + "/media/xls.js"));
-
-        sb.append("\n");
-
         sb.append(header(entry.getName()));
         sb.append(entry.getDescription());
         String divId = HtmlUtils.getUniqueId("div_");

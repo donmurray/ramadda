@@ -1488,6 +1488,62 @@ snippet {
 }
 
 
+
+.ramadda-xls-table {
+//   border-bottom: 1px #ccc solid;
+//   border-right: 1px #ccc solid;
+}
+
+.ramadda-xls-chart-toolbar {
+   margin-top:10px;
+  // border-bottom: 1px #ccc solid;
+}
+
+.ramadda-xls-label {
+   font-weight: bold; 
+}
+
+
+.ramadda-xls-button {
+    min-width: 125px;
+    max-width: 125px;
+}
+
+.ramadda-xls-button-sheet {
+    min-width: 100px;
+    max-width: 100px;
+    margin-bottom: 8px;
+}
+
+.ramadda-tag-box {
+   max-width:200px;
+   overflow-x:hidden;
+   padding: 0px;
+   padding-left: 5px;
+   padding-right: 5px;
+   margin: 4px;
+//   display: inline-block;
+   border: 1px #888 solid;
+   border-radius: 3px;
+   background-color: #eee;
+   color: #000;
+}
+
+.ramadda-xls-button-sheet-selected {
+   font-weight: bold;
+}
+
+
+.ramadda-xls-buttons {
+    display: inline-block;
+    overflow-y: auto;
+    max-height: 290px;
+//    margin-left:5px;
+    margin-right:5px;
+}
+
+
+
 .result-table {
    border-color: #666;
    border-width: 0px 0px 1px 1px;

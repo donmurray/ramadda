@@ -4261,12 +4261,19 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                     "google.load(\"visualization\", \"1\", {packages:['corechart','table']});\n"));
             sb.append(HtmlUtils.importJS(fileUrl("/lib/d3/d3.min.js")));
 
+            sb.append(HtmlUtils.importJS(fileUrl("/lib/jquery.handsontable.full.min.js")));
+            sb.append(HtmlUtils.cssLink(fileUrl("/lib/jquery.handsontable.full.min.css")));
+
+
             /*
+
             sb.append(HtmlUtils.cssLink(fileUrl("/lib/timelinejs/css/timeline.css")));
             sb.append(HtmlUtils.importJS(fileUrl("/lib/timelinejs/js/timeline.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/lib/timelinejs/js/storyjs-embed.js")));
             */
             sb.append(HtmlUtils.importJS(fileUrl("/db/dom-drag.js")));
+
+
             sb.append(HtmlUtils.importJS(fileUrl("/display/pointdata.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/utils.js")));
             sb.append(
@@ -4275,8 +4282,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             sb.append(
                 HtmlUtils.importJS(fileUrl("/display/displayentry.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/displaymap.js")));
-            sb.append(
-                HtmlUtils.importJS(fileUrl("/display/displaychart.js")));
+            sb.append(HtmlUtils.importJS(fileUrl("/display/displaychart.js")));
+            sb.append(HtmlUtils.importJS(fileUrl("/display/displaytable.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/control.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/displayd3.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/displayext.js")));

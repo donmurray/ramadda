@@ -4,7 +4,6 @@
 function RamaddaXlsDisplay(displayManager, id, properties) {  
 
     var ID_TABLE = "table";
-    var ID_TABLE_LABEL = "tablelabel";
     var ID_CHART = "chart";
 
     RamaddaUtil.inherit(this, new RamaddaDisplay(displayManager, id, "xls", properties));
@@ -57,11 +56,30 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 var p1 = "";
                 var p2 = "";
 
-                this.jq("params-xaxis-label").html(this.getHeading(this.xAxisIndex));
-                this.jq("params-yaxis-label").html(this.getHeading(this.yAxisIndex));
+                this.setAxisLabel("params-xaxis-label", this.getHeading(this.xAxisIndex, true));
+                this.setAxisLabel("params-yaxis-label", this.getHeading(this.yAxisIndex, true));
             },
-
+           setAxisLabel: function(fieldId, lbl) {
+                var id= HtmlUtil.getUniqueId();
+                if(lbl.length>25) {
+                    lbl = lbl.substring(0,25) +"...";
+                }
+                if(lbl.trim()!="") {
+                    lbl= HtmlUtil.span(["id",id,"class","ramadda-tag-box"], "&nbsp;&nbsp;" + lbl + "&nbsp;&nbsp;");
+                }
+                this.jq(fieldId).html(lbl);
+            },
             loadSheet: function(sheetIdx) {
+                
+                var all = $("[id^=" + this.getDomId("sheet_")+"]");
+                var sel = $("#" + this.getDomId("sheet_")+sheetIdx);
+
+                all.css('font-weight','normal');
+                sel.css('font-weight','bold');
+
+                all.css('border','1px #ccc solid');
+                sel.css('border','1px #666 solid');
+
                 this.currentSheet = sheetIdx;
                 var sheet = this.sheets[sheetIdx];
                 var rows =sheet.rows.slice(0);
@@ -106,7 +124,6 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 }
 
                 if(this.getProperty("showTable",true)) {
-                    this.jq(ID_TABLE_LABEL).html(sheet.name);
                     this.jq(ID_TABLE).handsontable(args);
                 }
 
@@ -284,10 +301,11 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 this.startRow = 0;
                 this.xAxisIndex = -1;
                 this.yAxisIndex = -1;
-                this.jq("params-xaxis-label").html("");
-                this.jq("params-yaxis-label").html("");
+                this.setAxisLabel("params-yaxis-label", "");
+                this.setAxisLabel("params-xaxis-label", "");
             },
              getHeading: function(index, doField) {
+                if(index<0) return "";
                 if(this.header != null && index>=0 && index< this.header.length) {
                     var v=  this.header[index];
                     v  = v.trim();
@@ -311,21 +329,9 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 var weight = "12";
 
                 var tableHtml =  "<table width=100%>";
-                tableHtml +=  "<tr>";
-                tableHtml+="\n";
                 if(this.sheets.length>1) {
                     weight = "10";
-                    //empty column
-                    tableHtml += HtmlUtil.td(["width","120"],"");
-                    tableHtml+="\n";
                 }
-
-
-
-
-                tableHtml += HtmlUtil.td([], HtmlUtil.div(["id",this.getDomId(ID_TABLE_LABEL),"class","ramadda-xls-label"]));
-                tableHtml += "</tr>";
-                tableHtml+="\n";
 
                 tableHtml +=  "<tr valign=top>";
 
@@ -409,11 +415,7 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                         this.makeChart(dflt.type,dflt);
                     }
                 }
-
-
-                this.jq("params-yaxis-label").html(this.getHeading(this.yAxisIndex));
-
-
+                this.setAxisLabel("params-yaxis-label", this.getHeading(this.yAxisIndex, true));
             },
 
 
