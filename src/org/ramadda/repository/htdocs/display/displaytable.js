@@ -344,8 +344,12 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 var _this = this;
                 var makeChartId =  HtmlUtil.getUniqueId();
 
+                var tableWidth = this.getProperty("tableWidth", "300px");
+                var tableHeight = this.getProperty("tableWidth", "300px");
+
+                var style = "width:" + tableWidth + " height: "+ tableHeight +" overflow: auto";
                 //                tableHtml += HtmlUtil.openDiv(["class","col-md-" + weight]);
-                tableHtml += HtmlUtil.td([],HtmlUtil.div(["id",this.getDomId(ID_TABLE),"class","ramadda-xls-table","style","width:900px; height: 300px; overflow: auto"]));
+                tableHtml += HtmlUtil.td([],HtmlUtil.div(["id",this.getDomId(ID_TABLE),"class","ramadda-xls-table","style",style]));
 
 
                 tableHtml += "</tr>";

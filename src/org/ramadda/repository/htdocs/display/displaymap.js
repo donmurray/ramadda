@@ -156,6 +156,9 @@ function RamaddaMapDisplay(displayManager, id, properties) {
 				this.map.clearSelectionMarker();
 			}
 
+                        if((typeof source.forMap)!="undefined" && !source.forMap) {
+                            return;
+                        }
 			var oldEntries = this.sourceToEntries[source.getId()];
 			if (oldEntries != null) {
 				for ( var i = 0; i < oldEntries.length; i++) {
