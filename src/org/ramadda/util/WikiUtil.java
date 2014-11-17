@@ -470,7 +470,10 @@ public class WikiUtil {
             }
             if (tline.equals("-row")) {
                 buff.append("</div>");
-
+                continue;
+            }
+            if (tline.equals("-div")) {
+                buff.append("</div>");
                 continue;
             }
             if (tline.startsWith("+pagehead")) {
@@ -491,6 +494,32 @@ public class WikiUtil {
                 continue;
             }
             if (tline.equals("-jumbo")) {
+                buff.append("</div>");
+
+                continue;
+            }
+            if (tline.startsWith("+info-sec")) {
+                String clazz =  "info-section";
+                if(tline.indexOf("odd")>=0)  {
+                    clazz += " info-section-odd";
+                }
+                buff.append("<div class=\"");
+                buff.append(clazz);
+                buff.append("\">");
+                continue;
+            }
+            if (tline.startsWith("-info-sec")) {
+                buff.append("</div>");
+
+                continue;
+            }
+
+            if (tline.equals("+info-text")) {
+                buff.append("<div class=\"info-text\">");
+
+                continue;
+            }
+            if (tline.equals("-info-text")) {
                 buff.append("</div>");
 
                 continue;
