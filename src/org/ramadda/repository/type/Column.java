@@ -385,8 +385,8 @@ public class Column implements DataTypes, Constants {
         group = XmlUtil.getAttribute(element, ATTR_GROUP, (String) null);
         oldNames = StringUtil.split(XmlUtil.getAttribute(element,
                 ATTR_OLDNAMES, ""), ",", true, true);
-        suffix = XmlUtil.getAttribute(element, ATTR_SUFFIX, "");
-        label  = XmlUtil.getAttribute(element, ATTR_LABEL, name);
+        suffix = Utils.getAttributeOrTag(element, ATTR_SUFFIX, "");
+        label  = Utils.getAttributeOrTag(element, ATTR_LABEL, name);
         searchType = XmlUtil.getAttribute(element, ATTR_SEARCHTYPE,
                                           searchType);
         propertiesFile = XmlUtil.getAttribute(element, ATTR_PROPERTIES,
