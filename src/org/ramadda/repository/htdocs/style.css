@@ -35,6 +35,45 @@ h3 {
 .jumbotron  {
 }
 
+.info-main {
+}
+
+.info-section  {
+    font-size:13pt;
+}
+
+.info-section h2 {
+   font-size:20pt;
+//   font-size:170%;
+   padding-top:0px;
+   margin-top:0px;
+   font-weight: 300;
+   color: #000;
+   text-align: center;
+}
+
+.info-text  {
+  text-align: center;
+}
+
+.info-section  {
+    color: #444;
+    padding-left:150px;
+    padding-right:150px;
+    padding-top:15px;
+    padding-bottom:20px;
+    border-bottom:1px #ccc   dotted;
+    margin: 0px;
+}
+
+.info-section-odd  {
+   background: #F3F3F3;
+   background: #F6F6F6;
+}
+
+
+
+
 .jumbotron p {
    font-size: 12pt;
    font-weight:400;
@@ -49,6 +88,7 @@ h3 {
    border-radius: 5px;
    border: 1px #eee solid;
    background: #F8F8F8;
+   background: #F3F3F3;
    overflow-y: auto;
 }
 
