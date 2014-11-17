@@ -4124,7 +4124,6 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             mainDivId = HtmlUtils.getUniqueId("displaydiv");
         }
 
-        //If no json url then just add the displaymanager
         if (tag.equals(WIKI_TAG_GROUP) || tag.equals(WIKI_TAG_GROUP_OLD)) {
             for (Enumeration keys = props.keys(); keys.hasMoreElements(); ) {
                 Object key   = keys.nextElement();

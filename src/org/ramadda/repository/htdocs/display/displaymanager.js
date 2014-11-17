@@ -72,6 +72,8 @@ var ID_DISPLAYS = "displays";
 //
 
 function DisplayManager(argId,argProperties) {
+
+
     var ID_MENU_BUTTON = "menu_button";
     var ID_MENU_OUTER =  "menu_outer";
     var ID_MENU_INNER =  "menu_inner";
@@ -352,7 +354,7 @@ function DisplayManager(argId,argProperties) {
                 if(props.data==null && this.dataList.length>0) {
                     props.data =  this.dataList[0];
                 }
-                var display =  eval(" new " + funcName+"(this, displayId, props);");
+                var display =  eval(" new " + funcName+"(this,'" +  displayId+"', props);");
                 if(display == null) {
                     console.log("Error: could not create display using:" + funcName);
                     alert("Error: could not create display using:" + funcName);

@@ -121,7 +121,6 @@ function DisplayThing(argId, argProperties) {
 
     RamaddaUtil.defineMembers(this, {
             objectId: argId,
-            cnt: 0,
             properties:argProperties,
             displayParent: null,
             getId: function() {
@@ -131,9 +130,7 @@ function DisplayThing(argId, argProperties) {
                 this.objectId = id;
             },
         getUniqueId: function(base) {
-                var uid =  base +"_" +(this.cnt++);
-                return uid;
-
+                return HtmlUtil.getUniqueId(base);
         },
         handleError: function(code, message) {
                 alert("An error has occurred:" + message);
@@ -455,7 +452,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                     else html += left;
                     //                    html += "<hr>";
                 }
-                var divid = "entry_" + (uniqueCnt++);
+                var divid = HtmlUtil.getUniqueId("entry_");
                 html += HtmlUtil.div(["id", divid],"");
 
                 if(false) {

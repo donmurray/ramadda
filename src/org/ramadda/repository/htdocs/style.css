@@ -42,6 +42,10 @@ h3 {
     font-size:13pt;
 }
 
+.info-section h2 a {
+color: black;
+}
+
 .info-section h2 {
    font-size:20pt;
 //   font-size:170%;
