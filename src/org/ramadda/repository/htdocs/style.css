@@ -38,6 +38,12 @@ h3 {
 .info-main {
 }
 
+.inset {
+    margin-left: 20px;
+    margin-right: 20px;
+}
+
+
 .info-section  {
     font-size:13pt;
 }
