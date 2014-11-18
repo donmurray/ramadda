@@ -33,6 +33,8 @@ h3 {
 }
 
 .jumbotron  {
+   margin-left: 10px;
+   margin-right: 10px;
 }
 
 .info-main {
@@ -44,41 +46,51 @@ h3 {
 }
 
 
-.info-section  {
-    font-size:13pt;
+.info-main {
 }
 
+
+
+
+
 .info-section h2 a {
-color: black;
+    color: black;
 }
+
 
 .info-section h2 {
    font-size:20pt;
-//   font-size:170%;
-   padding-top:0px;
-   margin-top:0px;
+   padding: 0px;
+   margin: 0px;
    font-weight: 300;
    color: #000;
    text-align: center;
 }
+
 
 .info-text  {
   text-align: center;
 }
 
 .info-section  {
+    margin:0px;
+    padding:0px;  
+    font-size:13pt;
     color: #444;
     padding-left:70px;
     padding-right:70px;
-    padding-top:15px;
-    padding-bottom:20px;
+    padding-top:10px;
+    padding-bottom:10px;
     border-bottom:1px #ccc   dotted;
     margin: 0px;
 }
 
 .info-section-odd  {
-   background: #F3F3F3;
    background: #F6F6F6;
+}
+
+.info-section-first  {
+    padding-top:0px;    
 }
 
 
