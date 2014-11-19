@@ -505,9 +505,9 @@ public class WikiUtil {
                 continue;
             }
             if (tline.startsWith("+info-sec") || tline.startsWith("+section")) {
-                String label = StringUtil.findPattern(tline,"label=\\\"(.*?)\\\"");
-                String classArg = StringUtil.findPattern(tline,"class=(.*?)");
-                String extraArg = StringUtil.findPattern(tline,"style=\\\"(.*?)\\\"");
+                String label = StringUtil.findPattern(tline,"label\\s*=\\s*\\\"(.*?)\\\"");
+                String classArg = StringUtil.findPattern(tline,"class\\s*=\\s*\\\"(.*?)\\\"");
+                String extraArg = StringUtil.findPattern(tline,"style\\s*=\\s*\\\"(.*?)\\\"");
                 boolean doEvenOdd  = tline.indexOf("#")>=0;
                 String extraClass = "";
                 String extraAttr = (extraArg==null?  "":" style=\"" + extraArg+"\" ");

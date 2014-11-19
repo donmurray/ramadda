@@ -50,10 +50,10 @@ h3 {
 }
 
 
-
-.ramadda-section h2 a {
+.ramadda-section h2 a, .ramadda-section h2 a:visited {
     color: black;
 }
+
 
 
 .ramadda-section h2 {
@@ -83,6 +83,22 @@ h3 {
     border-bottom:1px #ccc   dotted;
     margin: 0px;
 }
+
+.ramadda-section-map {
+     background: URL(${urlroot}/images/background.png);
+}
+.ramadda-section-lightpink {
+   background: #FFFAFA;
+}
+
+.ramadda-section-lightblue {
+   background: #F0FFFF;
+}
+
+.ramadda-section-lightgreen {
+   background: #E3F7E3;
+}
+
 
 .ramadda-section-odd  {
    background: #F6F6F6;
