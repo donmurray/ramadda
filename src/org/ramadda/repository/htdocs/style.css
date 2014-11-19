@@ -46,19 +46,17 @@ h3 {
 }
 
 
-.info-main {
+.ramadda-main {
 }
 
 
 
-
-
-.info-section h2 a {
+.ramadda-section h2 a {
     color: black;
 }
 
 
-.info-section h2 {
+.ramadda-section h2 {
    font-size:20pt;
    padding: 0px;
    margin: 0px;
@@ -72,7 +70,7 @@ h3 {
   text-align: center;
 }
 
-.info-section  {
+.ramadda-section  {
     margin:0px;
     padding:0px;  
     font-size:13pt;
@@ -85,15 +83,13 @@ h3 {
     margin: 0px;
 }
 
-.info-section-odd  {
+.ramadda-section-odd  {
    background: #F6F6F6;
 }
 
-.info-section-first  {
+.ramadda-section-first  {
     padding-top:0px;    
 }
-
-
 
 
 .jumbotron p {
@@ -2045,10 +2041,13 @@ xxxpath.link {
   margin: 0px;
 }
 
+wiki {
+   display: inline;
+}
+
 .ramadda-content {
   min-height:800px;
   margin:0px;
-  margin-right:5px;
   background-color:#ffffff;
 }
 

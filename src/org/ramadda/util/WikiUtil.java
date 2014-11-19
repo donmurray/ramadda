@@ -65,6 +65,9 @@ public class WikiUtil {
     /** _more_ */
     public static final String PROP_NOHEADING = "noheading";
 
+    public static final String PROP_NOP = "nop";
+    public static final String PROP_DOP = "dop";
+
     /** _more_ */
     public static final String PROP_HEADING = "heading";
 
@@ -93,6 +96,8 @@ public class WikiUtil {
 
     /** _more_ */
     private boolean replaceNewlineWithP = true;
+
+
 
     /** _more_ */
     private boolean mobile = false;
@@ -327,6 +332,7 @@ public class WikiUtil {
     public String wikify(String text, WikiPageHandler handler) {
 
 
+        if(text.startsWith("<wiki>")) text = text.substring("<wiki>".length());
         StringBuffer mainBuffer = new StringBuffer();
         List<String> toks       = splitOnNoWiki(text);
         boolean      isText     = true;
@@ -498,19 +504,48 @@ public class WikiUtil {
 
                 continue;
             }
-            if (tline.startsWith("+info-sec")) {
-                String clazz =  "info-section";
-                if(tline.indexOf("odd")>=0)  {
-                    clazz += " info-section-odd";
+            if (tline.startsWith("+info-sec") || tline.startsWith("+section")) {
+                String label = StringUtil.findPattern(tline,"label=\\\"(.*?)\\\"");
+                String classArg = StringUtil.findPattern(tline,"class=(.*?)");
+                String extraArg = StringUtil.findPattern(tline,"style=\\\"(.*?)\\\"");
+                boolean doEvenOdd  = tline.indexOf("#")>=0;
+                String extraClass = "";
+                String extraAttr = (extraArg==null?  "":" style=\"" + extraArg+"\" ");
+                if(doEvenOdd) {
+                    Integer scnt = (Integer) getProperty("section-cnt");
+                    boolean first = false;
+                    if(scnt == null) {
+                        scnt  = new Integer(-1);
+                        first = true;
+                    }
+                    int newCnt = scnt.intValue()+1;
+                    if(((float)newCnt/2.0) ==(int) ((float)newCnt/2.0)) {
+                        extraClass = "ramadda-section-even";
+                    } else  {
+                        extraClass = "ramadda-section-odd";
+                    }
+                    if(first)  {
+                        extraClass = "ramadda-section-first";
+                    }
+                    putProperty("section-cnt", new Integer(newCnt));
                 }
+                if(classArg!=null) {
+                    extraClass=classArg;
+                }
+
+                String clazz =  "ramadda-section " + extraClass;
                 buff.append("<div class=\"");
                 buff.append(clazz);
-                buff.append("\">");
+                buff.append("\"   " + extraAttr +">");
+                if(label!=null) {
+                    buff.append("<h2>");
+                    buff.append(label);
+                    buff.append("</h2>");
+                }
                 continue;
             }
-            if (tline.startsWith("-info-sec")) {
+            if (tline.startsWith("-info-sec") || tline.startsWith("-section")) {
                 buff.append("</div>");
-
                 continue;
             }
 
@@ -655,6 +690,10 @@ public class WikiUtil {
                 makeHeadings = false;
             } else if (property.equals(PROP_HEADING)) {
                 makeHeadings = true;
+            } else if (property.equals(PROP_NOP)) {
+                replaceNewlineWithP = false;
+            } else if (property.equals(PROP_DOP)) {
+                replaceNewlineWithP = true;
             } else {
                 String value = null;
                 if (handler != null) {
