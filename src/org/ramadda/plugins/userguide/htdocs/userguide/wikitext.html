@@ -93,7 +93,42 @@ See the
 Note: RAMADDA does not support the Wikipedia HTML table format. 
 For tables its best just to use HTML table markup.
 
-<a name="bootstrap"></a><div class="pagesubtitle">11.1.2 Bootstrap Markup</div> 
+
+
+
+
+<a name="display"></a><div class="pagesubtitle">11.1.2 Layout and Display Markup</div> 
+There are a number of helper layout tags that make it easy to do page layout and display.
+
+<b>Sections</b><br>
+
+To get the full page layout like on <a href="http://ramadda.org/repository">ramadda.org</a> use the "+section" tag:
+<pre>
++section 
+...
+-section
+</pre>
+
+If you append a "#" then the row number is kept track of and an even/odd color scheme is applied. 
+
+If you add label="..." then a header is added.
+
+The normal use is:
+
+<pre>
++section # label="section 1"
+...
+-section
++section # label="section 2"
+...
+-section
++section # label="section 3"
+...
+-section
+</pre>
+
+
+<b>Grid Layout</b><br>
 There is support for the <a href="http://getbootstrap.com/">Bootstrap</a> CSS grid system.
 To add a "jumbotron" banner do:
 <pre>+jumbo
