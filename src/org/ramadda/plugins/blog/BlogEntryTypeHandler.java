@@ -66,7 +66,7 @@ import java.util.Properties;
  *
  *
  */
-public class BlogEntryTypeHandler extends GenericTypeHandler {
+public class BlogEntryTypeHandler extends ExtensibleGroupTypeHandler {
 
 
     /** _more_ */
