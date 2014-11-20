@@ -18,12 +18,14 @@
 
   <type name="geo_gpx"  description="GPX GPS File"  category="GIS Data" handler="org.ramadda.plugins.map.GpxTypeHandler" pattern=".*\.gpx$">
      <property name="icon" value="/map/tracklog.gif"/>
-<wiki>
+<wiki_inner>
 <![CDATA[
+<div class="inset">
 {{map width="800" height="450" details="true"}}
 {{information}}
+</div>
 ]]>
-</wiki>
+</wiki_inner>
    </type>
 
 
