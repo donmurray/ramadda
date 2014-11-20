@@ -1,9 +1,9 @@
 
 
+//@import url(http://fonts.googleapis.com/css?family=Lato);
+
 body {
-   font-family:  Helvetica Neue, Arial, Helvetica, sans-serif;
-   font-family: xCalibri,xTahoma,xGeneva,"Helvetica Neue",Helvetica,Arial,sans-serif;
-//   font-size: 11pt;
+   font-family: Helvetica Neue, Arial, Helvetica, sans-serif;
    color: black;
    margin: 0px;
    padding: 0px;
@@ -858,10 +858,14 @@ label {
   font-size: 200%;
 }
 
+.ramadda-header-links {
+    font-size: 80%;
+}
+
 .ramadda-header a  {
     color:#000;
-    font-weight:bold;
-    font-weight:600;
+//    font-weight:bold;
+//    font-weight:600;
 }
 
 .ramadda-header a:hover  {

@@ -318,6 +318,7 @@ public class PageHandler extends RepositoryManager {
 
         String jsContent     = getTemplateJavascriptContent();
 
+        List   allLinks      = new ArrayList();
         List   links         = (List) result.getProperty(PROP_NAVLINKS);
         String linksHtml     = HtmlUtils.space(1);
 
@@ -325,6 +326,8 @@ public class PageHandler extends RepositoryManager {
             linksHtml = StringUtil.join(
                 htmlTemplate.getTemplateProperty(
                     "ramadda.template.link.separator", ""), links);
+            linksHtml = HtmlUtils.div(linksHtml,HtmlUtils.cssClass("ramadda-header-links"));
+            allLinks.addAll(links);
         }
         String entryHeader = (String) result.getProperty(PROP_ENTRY_HEADER);
         if (entryHeader == null) {
@@ -476,7 +479,14 @@ public class PageHandler extends RepositoryManager {
             userLinks = extra
                         + makePopupLink(userImage, userLinks, false, true);
 
+            allLinks.add(userLinks);
         }
+
+        String allLinksHtml = StringUtil.join(
+                                              htmlTemplate.getTemplateProperty(
+                                                                               "ramadda.template.link.separator", ""), allLinks);
+        allLinksHtml = HtmlUtils.div(allLinksHtml,HtmlUtils.cssClass("ramadda-header-links"));
+
 
         StringBuilder bottom = new StringBuilder(result.getBottomHtml());
 
@@ -484,6 +494,7 @@ public class PageHandler extends RepositoryManager {
             MACRO_LOGO_URL, logoUrl, MACRO_LOGO_IMAGE, logoImage,
             MACRO_HEADER_IMAGE, iconUrl(ICON_HEADER), MACRO_HEADER_TITLE,
             pageTitle, MACRO_USERLINK, userLinks, MACRO_LINKS, linksHtml,
+            "alllinks", allLinksHtml,
             MACRO_REPOSITORY_NAME,
             repository.getProperty(PROP_REPOSITORY_NAME, "Repository"),
             MACRO_FOOTER, repository.getProperty(PROP_HTML_FOOTER, BLANK),
