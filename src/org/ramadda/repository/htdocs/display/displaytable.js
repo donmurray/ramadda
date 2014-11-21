@@ -344,11 +344,15 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 var _this = this;
                 var makeChartId =  HtmlUtil.getUniqueId();
 
-                var tableWidth = this.getProperty("tableWidth", "300px");
-                var tableHeight = this.getProperty("tableWidth", "300px");
+                var tableWidth = this.getProperty("tableWidth", "");
+                var tableHeight = this.getProperty("tableHeight", "300px");
 
-                var style = "width:" + tableWidth + " height: "+ tableHeight +" overflow: auto";
-                //                tableHtml += HtmlUtil.openDiv(["class","col-md-" + weight]);
+                var style = "";
+                if(tableWidth!="") {
+                    style += " width:" + tableWidth + ";";
+                }
+                style += " height: "+ tableHeight +";";
+                style += " overflow: auto;";
                 tableHtml += HtmlUtil.td([],HtmlUtil.div(["id",this.getDomId(ID_TABLE),"class","ramadda-xls-table","style",style]));
 
 

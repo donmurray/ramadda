@@ -103,7 +103,10 @@ public class Service extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_ENTRY_TYPE = "entryType";
 
+    /** _more_          */
     public static final String ATTR_TARGET = "target";
+
+    /** _more_          */
     public static final String ATTR_TARGET_TYPE = "target.type";
 
     /** _more_ */
@@ -185,11 +188,14 @@ public class Service extends RepositoryManager {
     /** _more_ */
     private boolean ignoreStderr = false;
 
-    /** _more_          */
+    /** _more_ */
     private String errorPattern;
 
 
+    /** _more_          */
     private String target;
+
+    /** _more_          */
     private String targetType;
 
     /** _more_ */
@@ -250,6 +256,7 @@ public class Service extends RepositoryManager {
 
     /** _more_ */
     private Element element;
+
 
     /**
      * _more_
@@ -334,6 +341,10 @@ public class Service extends RepositoryManager {
     private void init(Service parent, Element element, String dfltId)
             throws Exception {
 
+        if (element == null) {
+            return;
+        }
+
         this.element = element;
         this.parent  = parent;
         id           = XmlUtil.getAttribute(element, ATTR_ID, dfltId);
@@ -359,7 +370,7 @@ public class Service extends RepositoryManager {
         target = XmlUtil.getAttributeFromTree(element, ATTR_TARGET,
                 (String) null);
         targetType = XmlUtil.getAttributeFromTree(element, ATTR_TARGET_TYPE,
-                                                  (String) null);
+                (String) null);
         cleanup = XmlUtil.getAttributeFromTree(element, ATTR_CLEANUP, true);
         category = XmlUtil.getAttributeFromTree(element, "category",
                 (String) null);
@@ -437,13 +448,6 @@ public class Service extends RepositoryManager {
                 */
                 return;
             }
-            if ( !new File(command).exists()) {
-                getLogManager().logError(
-                    "Service: command file does not exist:" + command);
-
-                return;
-            }
-
         }
 
         //Look for:
@@ -458,12 +462,33 @@ public class Service extends RepositoryManager {
             if (className.trim().length() == 0) {
                 className = "org.ramadda.repository.job.ServiceUtil";
             }
-            commandObject = Misc.findClass(className).newInstance();
-            Class[] paramTypes = new Class[] { Request.class, Entry.class,
-                    Service.class, ServiceInput.class, List.class };
+            Class c = Misc.findClass(className);
+            Constructor ctor = Misc.findConstructor(c,
+                                   new Class[] { Repository.class,
+                    Element.class });
+
+            if (ctor != null) {
+                commandObject = ctor.newInstance(new Object[] { repository,
+                        null });
+            } else {
+                commandObject = c.newInstance();
+            }
+            Class[] paramTypes = new Class[] { Request.class, Service.class,
+                    ServiceInput.class, List.class };
             commandMethod = Misc.findMethod(commandObject.getClass(),
                                             toks.get(2), paramTypes);
+            command = null;
         }
+
+        if (command != null) {
+            if ( !new File(command).exists()) {
+                getLogManager().logError(
+                    "Service: command file does not exist:" + command);
+
+                return;
+            }
+        }
+
 
         nodes = XmlUtil.getElements(element, TAG_ARG);
         for (int i = 0; i < nodes.getLength(); i++) {
@@ -919,6 +944,12 @@ public class Service extends RepositoryManager {
         List<Entry> inputEntries = input.getEntries();
         File        workDir      = input.getProcessDir();
 
+        for (Entry testEntry : inputEntries) {
+            if ( !getAccessManager().canAccessFile(request, testEntry)) {
+                throw new AccessException("Can't access file", request);
+            }
+        }
+
 
 
         Hashtable<String, List<Entry>> entryMap = new Hashtable<String,
@@ -1350,10 +1381,20 @@ public class Service extends RepositoryManager {
         return id;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getTarget() {
         return target;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getTargetType() {
         return targetType;
     }
@@ -1656,15 +1697,17 @@ public class Service extends RepositoryManager {
             return;
         } else if (arg.isDate()) {
             //TODO: add a time field
-            String dateProp = arg.getValuesProperty();
-            List<Date> dates = new ArrayList<Date>();
+            String     dateProp = arg.getValuesProperty();
+            List<Date> dates    = new ArrayList<Date>();
             if (arg.getValuesProperty() != null) {
-                dates = (List<Date>) input.getProperty(
-                    arg.getValuesProperty(), dates);
+                dates =
+                    (List<Date>) input.getProperty(arg.getValuesProperty(),
+                        dates);
             }
             inputHtml.append(
                 getRepository().getPageHandler().makeDateInput(
-                    request, argUrlName, "searchform", null, null, false, dates));
+                    request, argUrlName, "searchform", null, null, false,
+                    dates));
         } else if (arg.isFile()) {
             //noop
         } else if (arg.isEntry()) {
@@ -2355,7 +2398,7 @@ public class Service extends RepositoryManager {
             if (output.getShowResults()) {
                 setResultsFromStdout = false;
                 myOutput.setResultsShownAsText(true);
-                if (output.getUseStdout()) {
+                if (output.getUseStdout() && stdoutFile.exists()) {
                     myOutput.append(IOUtil.readContents(stdoutFile));
                 } else {}
 
@@ -2437,7 +2480,7 @@ public class Service extends RepositoryManager {
             }
         }
 
-        if (setResultsFromStdout) {
+        if (setResultsFromStdout && stdoutFile.exists()) {
             myOutput.append(IOUtil.readContents(stdoutFile));
         }
 

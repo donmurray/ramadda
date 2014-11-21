@@ -641,9 +641,9 @@ public class ServiceOutputHandler extends OutputHandler {
 
             return output;
         } catch (Exception exc) {
-            exc.printStackTrace();
-
-            return new ServiceOutput(false, exc.toString());
+            Throwable thr  = ucar.unidata.util.LogUtil.getInnerException(exc);
+            thr.printStackTrace();
+            return new ServiceOutput(false, thr.toString());
         }
 
     }
