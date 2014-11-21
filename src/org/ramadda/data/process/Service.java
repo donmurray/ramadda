@@ -97,6 +97,8 @@ public class Service extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_ID = "id";
 
+    public static final String ATTR_MAXFILESIZE = "maxFileSize";
+
     /** _more_ */
     public static final String ATTR_PRIMARY = "primary";
 
@@ -175,6 +177,8 @@ public class Service extends RepositoryManager {
 
     /** _more_ */
     private boolean enabled = false;
+
+    private double maxFileSize = -1;
 
     /** _more_ */
     private Boolean requiresMultipleEntries;
@@ -355,6 +359,10 @@ public class Service extends RepositoryManager {
         entryType = XmlUtil.getAttribute(element, ATTR_ENTRY_TYPE,
                                          (String) null);
 
+
+        maxFileSize = new Double(XmlUtil.getAttributeFromTree(element, ATTR_MAXFILESIZE,
+                                                              "-1.0")).doubleValue();
+
         icon = XmlUtil.getAttributeFromTree(element, ATTR_ICON,
                                             (String) null);
         outputToStderr = XmlUtil.getAttributeFromTree(element,
@@ -464,12 +472,10 @@ public class Service extends RepositoryManager {
             }
             Class c = Misc.findClass(className);
             Constructor ctor = Misc.findConstructor(c,
-                                   new Class[] { Repository.class,
-                    Element.class });
+                                   new Class[] { Repository.class});
 
             if (ctor != null) {
-                commandObject = ctor.newInstance(new Object[] { repository,
-                        null });
+                commandObject = ctor.newInstance(new Object[] { repository});
             } else {
                 commandObject = c.newInstance();
             }
@@ -1134,7 +1140,9 @@ public class Service extends RepositoryManager {
             if (values != null) {
                 for (String originalValue : values) {
                     String value = originalValue;
-                    if (arg.getIfDefined() && !Utils.stringDefined(value)) {
+                    boolean valueDefined = Utils.stringDefined(value);
+                    if (!valueDefined && arg.getIfDefined()) {
+                        //                        System.err.println("Value not defined");
                         continue;
                     }
                     argCnt++;
@@ -1143,87 +1151,87 @@ public class Service extends RepositoryManager {
                         value = arg.getValue().replace("${value}", value);
                     }
 
-                    if (Utils.stringDefined(value) || arg.isRequired()) {
-                        if (Utils.stringDefined(arg.getPrefix())) {
-                            commands.add(arg.getPrefix());
-                        }
+                    //arg.isRequired()
 
-                        if (arg.getFile() != null) {
-                            //                            System.err.println ("file:" + arg.getFile() + " " + arg.filePattern);
-                            String fileName = applyMacros(currentEntry,
-                                                  entryMap, valueMap,
-                                                  workDir, arg.getFile(),
-                                                  input.getForDisplay());
-
-
-                            fileName = fileName.replace("${value}",
-                                    originalValue);
-                            File destFile = new File(IOUtil.joinDir(workDir,
-                                                fileName));
-                            int cnt = 0;
-
-                            //                            System.err.println("dest file:" + destFile+" " + destFile.exists());
-                            while (destFile.exists()) {
-                                cnt++;
-                                destFile = new File(IOUtil.joinDir(workDir,
-                                        cnt + "_" + fileName));
-                            }
-
-                            if (arg.getFilePattern() != null) {
-                                String basePattern =
-                                    applyMacros(currentEntry, entryMap,
-                                        valueMap, workDir,
-                                        arg.getFilePattern(),
-                                        input.getForDisplay());
-
-
-                                basePattern = basePattern.replace("${value}",
-                                        originalValue);
-
-                                String pattern =
-                                    basePattern.replace("${unique}", "");
-                                File[] files =
-                                    workDir.listFiles(
-                                        (FileFilter) new PatternFileFilter(
-                                            pattern));
-                                //                                System.err.println("pattern:"+ pattern + " " + files.length);
-                                destFile = new File(IOUtil.joinDir(workDir,
-                                        fileName));
-                                while (files.length > 0) {
-                                    cnt++;
-                                    pattern =
-                                        basePattern.replace("${unique}",
-                                            cnt + "");
-                                    files = workDir.listFiles(
-                                        (FileFilter) new PatternFileFilter(
-                                            pattern));
-                                    //                                    System.err.println("pattern:"+ pattern + " " + files.length);
-                                    destFile =
-                                        new File(IOUtil.joinDir(workDir,
-                                            cnt + "_" + fileName));
-                                }
-                            }
-
-                            //                            System.err.println("dest file after:" + destFile);
-                            value = arg.getValue().replace("${value}", value);
-
-                            value = value.replace("${file}",
-                                    destFile.getName());
-                            value = value.replace(
-                                "${file.base}",
-                                IOUtil.stripExtension(destFile.getName()));
-                            value = value.replace("${value}", originalValue);
-                            //                            System.err.println("new value:" + value);
-                        }
-                        value = applyMacros(currentEntry, entryMap, valueMap,
-                                            workDir, value,
-                                            input.getForDisplay());
-                        valueMap.put(arg.getName(), value);
-                        if ( !arg.getInclude()) {
-                            continue;
-                        }
-                        commands.add(value);
+                    if (Utils.stringDefined(arg.getPrefix())) {
+                        commands.add(arg.getPrefix());
                     }
+
+                    if (arg.getFile() != null) {
+                        //                            System.err.println ("file:" + arg.getFile() + " " + arg.filePattern);
+                        String fileName = applyMacros(currentEntry,
+                                                      entryMap, valueMap,
+                                                      workDir, arg.getFile(),
+                                                      input.getForDisplay());
+
+
+                        fileName = fileName.replace("${value}",
+                                                    originalValue);
+                        File destFile = new File(IOUtil.joinDir(workDir,
+                                                                fileName));
+                        int cnt = 0;
+
+                        //                            System.err.println("dest file:" + destFile+" " + destFile.exists());
+                        while (destFile.exists()) {
+                            cnt++;
+                            destFile = new File(IOUtil.joinDir(workDir,
+                                                               cnt + "_" + fileName));
+                        }
+
+                        if (arg.getFilePattern() != null) {
+                            String basePattern =
+                                applyMacros(currentEntry, entryMap,
+                                            valueMap, workDir,
+                                            arg.getFilePattern(),
+                                            input.getForDisplay());
+
+
+                            basePattern = basePattern.replace("${value}",
+                                                              originalValue);
+
+                            String pattern =
+                                basePattern.replace("${unique}", "");
+                            File[] files =
+                                workDir.listFiles(
+                                                  (FileFilter) new PatternFileFilter(
+                                                                                     pattern));
+                            //                                System.err.println("pattern:"+ pattern + " " + files.length);
+                            destFile = new File(IOUtil.joinDir(workDir,
+                                                               fileName));
+                            while (files.length > 0) {
+                                cnt++;
+                                pattern =
+                                    basePattern.replace("${unique}",
+                                                        cnt + "");
+                                files = workDir.listFiles(
+                                                          (FileFilter) new PatternFileFilter(
+                                                                                             pattern));
+                                //                                    System.err.println("pattern:"+ pattern + " " + files.length);
+                                destFile =
+                                    new File(IOUtil.joinDir(workDir,
+                                                            cnt + "_" + fileName));
+                            }
+                        }
+
+                        //                            System.err.println("dest file after:" + destFile);
+                        value = arg.getValue().replace("${value}", value);
+
+                        value = value.replace("${file}",
+                                              destFile.getName());
+                        value = value.replace(
+                                              "${file.base}",
+                                              IOUtil.stripExtension(destFile.getName()));
+                        value = value.replace("${value}", originalValue);
+                        //                            System.err.println("new value:" + value);
+                    }
+                    value = applyMacros(currentEntry, entryMap, valueMap,
+                                        workDir, value,
+                                        input.getForDisplay());
+                    valueMap.put(arg.getName(), value);
+                    if ( !arg.getInclude()) {
+                        continue;
+                    }
+                    commands.add(value);
                 }
             }
 
@@ -2832,6 +2840,8 @@ public class Service extends RepositoryManager {
     }
 
 
-
+    public double getMaxFileSize() {
+        return   maxFileSize;
+    }
 
 }

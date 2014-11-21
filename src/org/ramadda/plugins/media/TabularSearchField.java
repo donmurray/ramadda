@@ -21,64 +21,82 @@
 package org.ramadda.plugins.media;
 
 
-import org.ramadda.data.process.*;
-
-
-import org.ramadda.repository.*;
-
-import org.w3c.dom.*;
-
-import java.util.List;
-
-
 
 /**
- *
- * @author Jeff McWhirter/geodesystems.com
  */
-public class TabularService extends Service {
+public class TabularSearchField {
+
+    /** _more_ */
+    private String name;
+
+    /** _more_ */
+    private String value;
 
 
     /**
-     * ctor
+     * _more_
      *
-     * @param repository _more_
-     * @throws Exception _more_
+     * @param name _more_
      */
-    public TabularService(Repository repository) throws Exception {
-        super(repository, (Element) null);
+    public TabularSearchField(String name) {
+        this.name = name;
     }
 
 
     /**
      * _more_
      *
-     * @return _more_
-     *
-     * @throws Exception _more_
+     * @param name _more_
+     * @param value _more_
      */
-    public TabularOutputHandler getTabularOutputHandler() throws Exception {
-        return (TabularOutputHandler) getRepository().getOutputHandler(
-            TabularOutputHandler.class);
+    public TabularSearchField(String name, String value) {
+        this.name  = name;
+        this.value = value;
+    }
+
+    public String toString() {
+        return "search field: name=" + name +" value=" + value;
+    }
+
+    public String getUrlArg() {
+        return "search_table_" + name;
     }
 
     /**
-     * _more_
-     *
-     * @param request _more_
-     * @param service _more_
-     * @param input _more_
-     * @param args _more_
-     *
-     *
-     * @return _more_
-     * @throws Exception _more_
-     */
-    public boolean extractSheet(Request request, Service service,
-                                ServiceInput input, List args)
-            throws Exception {
-        return getTabularOutputHandler().extractSheet(request, service,
-                input, args);
+       Set the Name property.
+
+       @param value The new value for Name
+    **/
+    public void setName (String value) {
+	name = value;
     }
+
+    /**
+       Get the Name property.
+
+       @return The Name
+    **/
+    public String getName () {
+	return name;
+    }
+
+    /**
+       Set the Value property.
+
+       @param value The new value for Value
+    **/
+    public void setValue (String value) {
+	value = value;
+    }
+
+    /**
+       Get the Value property.
+
+       @return The Value
+    **/
+    public String getValue () {
+	return value;
+    }
+
 
 }

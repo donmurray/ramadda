@@ -110,29 +110,21 @@ public class DbTableTypeHandler extends TabularTypeHandler {
     }
 
 
-
     /**
      * _more_
      *
      * @param request _more_
      * @param entry _more_
      * @param myxls _more_
-     * @param sheets _more_
-     * @param sheetsToShow _more_
-     * @param skip _more_
+     * @param visitInfo _more_
+     * @param visitor _more_
      *
      * @throws Exception _more_
      */
     @Override
-    public void read(Request request, Entry entry, InputStream myxls,
-                     List<String> sheets, HashSet<Integer> sheetsToShow,
-                     int skip)
+    public void visit(Request request, Entry entry, InputStream myxls,
+                      TabularVisitInfo visitInfo, TabularVisitor visitor)
             throws Exception {
-
-        //        Object[]values = entry.getValues();
-        //        for(int i=0;i<values.length;i++) {
-        //            System.err.println (i +" =  "  + values[i]);
-        //        }
 
         String table = entry.getValue(IDX_TABLE, (String) null);
         System.err.println("table:" + table + " idx:" + IDX_TABLE);
@@ -156,43 +148,45 @@ public class DbTableTypeHandler extends TabularTypeHandler {
         Statement stmt = getDatabaseManager().select(what,
                              Misc.newList(table), null, "", max);
 
-        SqlUtil.Iterator  iter = getDatabaseManager().getIterator(stmt);
-        ResultSet         results;
+        SqlUtil.Iterator   iter = getDatabaseManager().getIterator(stmt);
+        ResultSet          results;
 
+        ResultSetMetaData  rsmd = null;
 
-
-
-        List<String>      rows = new ArrayList<String>();
-        ResultSetMetaData rsmd = null;
-
+        List<List<Object>> rows = new ArrayList<List<Object>>();
         while ((results = iter.getNext()) != null) {
             if (rsmd == null) {
                 rsmd = results.getMetaData();
                 int          columnCount = rsmd.getColumnCount();
-                List<String> names       = new ArrayList<String>();
+                List<Object> names       = new ArrayList<Object>();
                 for (int i = 1; i < columnCount + 1; i++) {
                     String name = rsmd.getColumnName(i);
-                    names.add(Json.quote(name));
+                    names.add(name);
                 }
-                rows.add(Json.list(names));
+                rows.add(names);
             }
-            List<String> row = new ArrayList<String>();
+            List<Object> row = new ArrayList<Object>();
             for (int col = 0; col < rsmd.getColumnCount(); col++) {
-                String s = results.getString(col + 1);
-                if (s == null) {
-                    s = "null";
+                int    colIdx = col + 1;
+                int    type   = rsmd.getColumnType(colIdx);
+                Object value  = null;
+                //TODO: Handle more dates
+                if (type == java.sql.Types.DOUBLE) {
+                    value = new Double(results.getDouble(colIdx));
+                } else if (type == java.sql.Types.FLOAT) {
+                    value = new Float(results.getFloat(colIdx));
+                } else if (type == java.sql.Types.INTEGER) {
+                    value = new Integer(results.getInt(colIdx));
                 } else {
-                    s = Json.quote(s);
+                    value = results.getString(colIdx);
                 }
-                row.add(s);
+                row.add(value);
             }
-            rows.add(Json.list(row));
+            if(!visitInfo.rowOk(row)) {
+                continue;
+            }
+            rows.add(row);
         }
-
-        sheets.add(Json.map("name", Json.quote(table), "rows",
-                            Json.list(rows)));
-
-
-
+        visitor.visit(visitInfo, table, rows);
     }
 }

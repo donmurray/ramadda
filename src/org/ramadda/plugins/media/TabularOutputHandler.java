@@ -21,16 +21,17 @@
 package org.ramadda.plugins.media;
 
 
-import org.apache.poi.hssf.usermodel.HSSFCell;
-import org.apache.poi.hssf.usermodel.HSSFDateUtil;
-import org.apache.poi.hssf.usermodel.HSSFRow;
-import org.apache.poi.hssf.usermodel.HSSFSheet;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 
-import org.apache.poi.xssf.usermodel.XSSFCell;
-import org.apache.poi.xssf.usermodel.XSSFRow;
-import org.apache.poi.xssf.usermodel.XSSFSheet;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+
+import org.apache.poi.xssf.streaming.SXSSFWorkbook;
+import org.apache.poi.xssf.usermodel.*;
+
+import org.ramadda.data.process.*;
 
 
 import org.ramadda.repository.*;
@@ -49,7 +50,6 @@ import org.w3c.dom.*;
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
-
 import ucar.unidata.util.StringUtil;
 
 import java.io.*;
@@ -61,14 +61,8 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
-
 import java.util.Hashtable;
 import java.util.List;
-import java.util.Properties;
-import java.util.TimeZone;
-
-
-import java.util.regex.*;
 
 
 
@@ -134,20 +128,19 @@ public class TabularOutputHandler extends OutputHandler {
         if (entry == null) {
             return;
         }
-        boolean isXls =
-            entry.getTypeHandler().isType("type_document_tabular");
-        if ( !isXls) {
+        boolean isTabular = isTabular(entry);
+        if ( !isTabular) {
             if ( !entry.isFile()) {
                 return;
             }
             String path = entry.getResource().getPath();
             if (path.endsWith(".xls") || path.endsWith(".xlsx")
                     || path.endsWith(".csv")) {
-                isXls = true;
+                isTabular = true;
             }
         }
 
-        if (isXls) {
+        if (isTabular) {
             links.add(makeLink(request, state.getEntry(), OUTPUT_XLS_HTML));
             links.add(makeLink(request, state.getEntry(), OUTPUT_XLS_JSON));
         }
@@ -240,26 +233,29 @@ public class TabularOutputHandler extends OutputHandler {
         if (entry.isFile()) {
             file = entry.getFile().toString();
         }
-        boolean isTabular =
-            entry.getTypeHandler().isType("type_document_tabular");
+
 
         HashSet<Integer> sheetsToShow = null;
-        if (isTabular) {
+        if (isTabular(entry)) {
             sheetsToShow =
                 getSheetsToShow(entry.getValue(XlsTypeHandler.IDX_SHEETS,
                     ""));
         }
 
-
         final List<String> sheets  = new ArrayList<String>();
         TabularVisitor     visitor = new TabularVisitor() {
-            public boolean visit(String sheet, List<List<String>> rows) {
+            @Override
+            public boolean visit(TabularVisitInfo info,String sheet, List<List<Object>> rows) {
                 List<String> jrows = new ArrayList<String>();
-                for (List<String> cols : rows) {
+                for (List<Object> cols : rows) {
                     List<String> quoted = new ArrayList<String>();
-                    for (String c : cols) {
-                        c = c.replaceAll("\"", "&quot;");
-                        quoted.add(Json.quote(c));
+                    for (Object col : cols) {
+                        if (col == null) {
+                            col = "null";
+                        }
+                        String s = col.toString();
+                        s = s.replaceAll("\"", "&quot;");
+                        quoted.add(Json.quote(s));
                     }
                     jrows.add(Json.list(quoted));
                 }
@@ -270,7 +266,13 @@ public class TabularOutputHandler extends OutputHandler {
             }
         };
 
-        visit(request, entry, file, sheetsToShow, visitor);
+        TabularVisitInfo visitInfo =
+            new TabularVisitInfo(request, entry, 
+                                 getSkipRows(request, entry),
+                                 getRowCount(request, entry, MAX_ROWS),
+                                 sheetsToShow);
+        visit(request, entry, file, visitInfo, visitor);
+
         sb.append(Json.list(sheets));
         request.setReturnFilename(entry.getName() + ".json");
         Result result = new Result("", sb);
@@ -281,6 +283,43 @@ public class TabularOutputHandler extends OutputHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private int getSkipRows(Request request, Entry entry) throws Exception {
+        int dflt = 0;
+        if (isTabular(entry)) {
+            dflt = (int) entry.getValue(XlsTypeHandler.IDX_SKIPROWS, dflt);
+        }
+
+        return (int) request.get("table.skiprows", dflt);
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private int getRowCount(Request request, Entry entry, int dflt)
+            throws Exception {
+        int v = (int) request.get("table.rows", dflt);
+        System.err.println("getRowCount:" + v);
+
+        return v;
+    }
 
     /**
      * _more_
@@ -288,39 +327,44 @@ public class TabularOutputHandler extends OutputHandler {
      * @param request _more_
      * @param entry _more_
      * @param file _more_
-     * @param sheetsToShow _more_
+     * @param visitInfo _more_
      * @param visitor _more_
      *
      * @throws Exception _more_
      */
     public void visit(Request request, Entry entry, String file,
-                      HashSet<Integer> sheetsToShow, TabularVisitor visitor)
+                      TabularVisitInfo visitInfo, TabularVisitor visitor)
             throws Exception {
-        boolean isTabular =
-            entry.getTypeHandler().isType("type_document_tabular");
 
-        int         skip        = request.get("table.skip", 0);
+        System.err.println("visit:" + visitInfo);
+
+
+
+
         InputStream inputStream = null;
         String      suffix      = "";
+
         if (file != null) {
-            inputStream = getStorageManager().getFileInputStream(file);
-            suffix      = IOUtil.getFileExtension(file).toLowerCase();
+            inputStream = new BufferedInputStream(
+                getStorageManager().getFileInputStream(file));
+            suffix = IOUtil.getFileExtension(file).toLowerCase();
+            if (suffix.equals(".xlsx") || suffix.equals(".xls")) {
+                if (new File(file).length() > 10 * 1000000) {
+                    throw new IllegalArgumentException("File too big");
+                }
+            }
+
         }
 
-        if (suffix.equals(".xlsx")) {
-            visitXlsx(request, entry, inputStream, sheetsToShow, skip,
-                      visitor);
-        } else if (suffix.endsWith(".xls")) {
-            visitXls(request, entry, inputStream, sheetsToShow, skip,
-                     visitor);
+        if (suffix.equals(".xlsx") || suffix.equals(".xls")) {
+            visitXls(request, entry, suffix, inputStream, visitInfo, visitor);
         } else if (suffix.endsWith(".csv")) {
-            visitCsv(request, entry, inputStream, skip, visitor);
+            visitCsv(request, entry, inputStream, visitInfo, visitor);
         } else {
-            if (isTabular) {
+            if (isTabular(entry)) {
                 TabularTypeHandler tth =
                     (TabularTypeHandler) entry.getTypeHandler();
-                //                tth.read(request, entry, inputStream, sheets, sheetsToShow,
-                //                         skip);
+                tth.visit(request, entry, inputStream, visitInfo, visitor);
             } else {
                 throw new IllegalStateException("Unknown file type:"
                         + suffix);
@@ -337,36 +381,62 @@ public class TabularOutputHandler extends OutputHandler {
      * @param request _more_
      * @param entry _more_
      * @param inputStream _more_
-     * @param skip _more_
+     * @param visitInfo _more_
      * @param visitor _more_
      *
      * @throws Exception _more_
      */
     public void visitCsv(Request request, Entry entry,
-                         InputStream inputStream, int skip,
+                         InputStream inputStream, TabularVisitInfo visitInfo,
                          TabularVisitor visitor)
             throws Exception {
         BufferedReader br =
             new BufferedReader(new InputStreamReader(inputStream));
         String             line;
-        int                rowIdx = 0;
-        List<List<String>> rows   = new ArrayList<List<String>>();
+        int                rowIdx   = 0;
+        List<List<Object>> rows     = new ArrayList<List<Object>>();
+        int                skipRows = visitInfo.getSkipRows();
+        int                maxRows  = visitInfo.getMaxRows();
         while ((line = br.readLine()) != null) {
             if (line.startsWith("#")) {
                 continue;
             }
-            if (skip-- > 0) {
+            if (skipRows-- > 0) {
                 continue;
             }
             rowIdx++;
-            if (rowIdx > MAX_ROWS) {
+            if ((maxRows >= 0) && (rowIdx > maxRows)) {
                 break;
             }
-            List<String> cols = Utils.tokenizeColumns(line, ",");
-            rows.add(cols);
+            List cols = Utils.tokenizeColumns(line, ",");
+            if(!visitInfo.rowOk(cols)) {
+                continue;
+            }
+            rows.add((List<Object>) cols);
         }
-        visitor.visit(entry.getName(), rows);
+        visitor.visit(visitInfo, entry.getName(), rows);
     }
+
+
+
+    /**
+     * _more_
+     *
+     * @param suffix _more_
+     * @param inputStream _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Workbook makeWorkbook(String suffix, InputStream inputStream)
+            throws Exception {
+        return (suffix.equals(".xls")
+                ? new HSSFWorkbook(inputStream)
+                : new XSSFWorkbook(inputStream));
+
+    }
+
 
 
     /**
@@ -374,121 +444,81 @@ public class TabularOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param entry _more_
+     * @param suffix _more_
      * @param inputStream _more_
-     * @param sheetsToShow _more_
-     * @param skip _more_
+     * @param visitInfo _more_
      * @param visitor _more_
      *
      * @throws Exception _more_
      */
-    private void visitXls(Request request, Entry entry,
+    private void visitXls(Request request, Entry entry, String suffix,
                           InputStream inputStream,
-                          HashSet<Integer> sheetsToShow, int skip,
-                          TabularVisitor visitor)
+                          TabularVisitInfo visitInfo, TabularVisitor visitor)
             throws Exception {
-        HSSFWorkbook wb = new HSSFWorkbook(inputStream);
+        System.err.println("visitXls: making workbook");
+        Workbook wb = makeWorkbook(suffix, inputStream);
+        //        System.err.println("visitXls:" + skip + " max rows:" + maxRows + " #sheets:" + wb.getNumberOfSheets());
+        int maxRows = visitInfo.getMaxRows();
         for (int sheetIdx = 0; sheetIdx < wb.getNumberOfSheets();
                 sheetIdx++) {
-            if ((sheetsToShow != null) && !sheetsToShow.contains(sheetIdx)) {
+            if ( !visitInfo.okToShowSheet(sheetIdx)) {
                 continue;
             }
-            HSSFSheet          sheet     = wb.getSheetAt(sheetIdx);
-            List<List<String>> rows      = new ArrayList<List<String>>();
-            int                sheetSkip = skip;
+            Sheet sheet = wb.getSheetAt(sheetIdx);
+            //            System.err.println("\tsheet:" + sheet.getSheetName() + " #rows:" + sheet.getLastRowNum());
+            List<List<Object>> rows      = new ArrayList<List<Object>>();
+            int                sheetSkip = visitInfo.getSkipRows();
             int                rowCnt    = 0;
             for (int rowIdx = sheet.getFirstRowNum();
-                    (rowCnt < MAX_ROWS) && (rowIdx <= sheet.getLastRowNum());
+                    (rowCnt < maxRows) && (rowIdx <= sheet.getLastRowNum());
                     rowIdx++) {
                 if (sheetSkip-- > 0) {
                     continue;
                 }
 
-                HSSFRow row = sheet.getRow(rowIdx);
+                Row row = sheet.getRow(rowIdx);
                 if (row == null) {
                     continue;
                 }
-                rowCnt++;
-
-                List<String> cols     = new ArrayList<String>();
+                List<Object> cols     = new ArrayList<Object>();
                 short        firstCol = row.getFirstCellNum();
                 for (short col = firstCol;
                         (col < MAX_COLS) && (col < row.getLastCellNum());
                         col++) {
-                    HSSFCell cell = row.getCell(col);
+                    Cell cell = row.getCell(col);
                     if (cell == null) {
                         break;
                     }
-                    String value = cell.toString();
+                    Object value = null;
+                    int    type  = cell.getCellType();
+                    if (type == cell.CELL_TYPE_NUMERIC) {
+                        value = new Double(cell.getNumericCellValue());
+                    } else if (type == cell.CELL_TYPE_BOOLEAN) {
+                        value = new Boolean(cell.getBooleanCellValue());
+                    } else if (type == cell.CELL_TYPE_ERROR) {
+                        value = "" + cell.getErrorCellValue();
+                    } else if (type == cell.CELL_TYPE_BLANK) {
+                        value = "";
+                    } else if (type == cell.CELL_TYPE_FORMULA) {
+                        value = cell.getCellFormula();
+                    } else {
+                        value = cell.getStringCellValue();
+                    }
                     cols.add(value);
                 }
-                rows.add(cols);
-            }
-            if ( !visitor.visit(sheet.getSheetName(), rows)) {
-                break;
-            }
-        }
-    }
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     * @param inputStream _more_
-     * @param sheetsToShow _more_
-     * @param skip _more_
-     * @param visitor _more_
-     *
-     * @throws Exception _more_
-     */
-    private void visitXlsx(Request request, Entry entry,
-                           InputStream inputStream,
-                           HashSet<Integer> sheetsToShow, int skip,
-                           TabularVisitor visitor)
-            throws Exception {
-        XSSFWorkbook wb = new XSSFWorkbook(inputStream);
-        for (int sheetIdx = 0; sheetIdx < wb.getNumberOfSheets();
-                sheetIdx++) {
-            if ((sheetsToShow != null) && !sheetsToShow.contains(sheetIdx)) {
-                continue;
-            }
-            XSSFSheet          sheet     = wb.getSheetAt(sheetIdx);
-            List<List<String>> rows      = new ArrayList<List<String>>();
-            int                sheetSkip = skip;
-            int                rowCnt    = 0;
-            for (int rowIdx = sheet.getFirstRowNum();
-                    (rowCnt < MAX_ROWS) && (rowIdx <= sheet.getLastRowNum());
-                    rowIdx++) {
-                if (sheetSkip-- > 0) {
-                    continue;
-                }
 
-                XSSFRow row = sheet.getRow(rowIdx);
-                if (row == null) {
+                if(!visitInfo.rowOk(cols)) {
                     continue;
                 }
                 rowCnt++;
-
-                List<String> cols     = new ArrayList<String>();
-                short        firstCol = row.getFirstCellNum();
-                for (short col = firstCol;
-                        (col < MAX_COLS) && (col < row.getLastCellNum());
-                        col++) {
-                    XSSFCell cell = row.getCell(col);
-                    if (cell == null) {
-                        break;
-                    }
-                    String value = cell.toString();
-                    cols.add(value);
-                }
                 rows.add(cols);
             }
-            if ( !visitor.visit(sheet.getSheetName(), rows)) {
+            if ( !visitor.visit(visitInfo, sheet.getSheetName(), rows)) {
                 break;
             }
         }
     }
-
 
 
 
@@ -574,7 +604,6 @@ public class TabularOutputHandler extends OutputHandler {
             propsList.add(Json.list(widths));
         }
 
-
         String jsonUrl =
             request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
                              ARG_OUTPUT,
@@ -610,6 +639,20 @@ public class TabularOutputHandler extends OutputHandler {
         propsList.add("url");
         propsList.add(Json.quote(jsonUrl));
 
+        TabularVisitInfo visitInfo =
+            new TabularVisitInfo(request, entry);
+
+        System.err.println("search fields:" + visitInfo.getSearchFields());
+
+        if(visitInfo.getSearchFields()!=null) {
+            propsList.add("searchFields");
+            List<String> names = new ArrayList<String>();
+            for(TabularSearchField searchField: visitInfo.getSearchFields()) {
+                names.add(searchField.getName());
+            }
+            propsList.add(Json.list(names,true));
+        }
+
         String        props = Json.map(propsList);
 
         StringBuilder sb    = new StringBuilder();
@@ -634,6 +677,100 @@ public class TabularOutputHandler extends OutputHandler {
 
     }
 
+
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
+    public static boolean isTabular(Entry entry) {
+        if(entry == null) return false;
+        return entry.getTypeHandler().isType(TabularTypeHandler.TYPE_TABULAR);
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param service _more_
+     * @param input _more_
+     * @param args _more_
+     *
+     *
+     * @return _more_
+     * @throws Exception _more_
+     */
+    public boolean extractSheet(Request request, Service service,
+                                ServiceInput input, List args)
+            throws Exception {
+        Entry entry = null;
+        for (Entry e : input.getEntries()) {
+            if (isTabular(e)) {
+                entry = e;
+
+                break;
+            }
+        }
+        if (entry == null) {
+            throw new IllegalArgumentException("No tabular entry found");
+        }
+
+        HashSet<Integer> sheetsToShow = getSheetsToShow((String) args.get(2));
+
+        final SXSSFWorkbook wb        = new SXSSFWorkbook(100);
+        //        final Workbook   wb           = new XSSFWorkbook();
+        File newFile = new File(
+                           IOUtil.joinDir(
+                               input.getProcessDir(),
+                               IOUtil.stripExtension(
+                                   getStorageManager().getFileTail(
+                                       entry)) + ".xlsx"));
+
+        final List<String> sheets  = new ArrayList<String>();
+        TabularVisitor     visitor = new TabularVisitor() {
+            public boolean visit(TabularVisitInfo info, String sheetName, List<List<Object>> rows) {
+                sheetName = sheetName.replaceAll("[/]+", "-");
+                Sheet sheet  = wb.createSheet(sheetName);
+                int   rowCnt = 0;
+                for (List<Object> cols : rows) {
+                    Row row = sheet.createRow(rowCnt++);
+                    for (int colIdx = 0; colIdx < cols.size(); colIdx++) {
+                        Object col  = cols.get(colIdx);
+                        Cell   cell = row.createCell(colIdx);
+                        if (col instanceof Double) {
+                            cell.setCellValue(((Double) col).doubleValue());
+                        } else if (col instanceof Date) {
+                            cell.setCellValue((Date) col);
+                        } else if (col instanceof Boolean) {
+                            cell.setCellValue(((Boolean) col).booleanValue());
+                        } else {
+                            cell.setCellValue(col.toString());
+                        }
+                    }
+                }
+
+                return true;
+            }
+        };
+
+        TabularVisitInfo visitInfo =
+            new TabularVisitInfo(request, entry,
+                getSkipRows(request, entry),
+                getRowCount(request, entry, Integer.MAX_VALUE), sheetsToShow);
+
+
+        visit(request, entry, entry.getFile().toString(), visitInfo, visitor);
+
+        FileOutputStream fileOut = new FileOutputStream(newFile);
+        wb.write(fileOut);
+        fileOut.close();
+        wb.dispose();
+
+        return true;
+
+    }
 
 
 

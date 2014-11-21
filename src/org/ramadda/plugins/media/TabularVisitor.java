@@ -36,6 +36,6 @@ public interface TabularVisitor {
      *
      * @return _more_
      */
-    public boolean visit(String sheetName, List<List<String>> rows);
+    public boolean visit(TabularVisitInfo info, String sheetName, List<List<Object>> rows);
 
 }

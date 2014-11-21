@@ -63,6 +63,10 @@ public class TabularTypeHandler extends MsDocTypeHandler {
 
 
     /** _more_ */
+    public static final String TYPE_TABULAR = "type_document_tabular";
+
+
+    /** _more_ */
     private static int IDX = 0;
 
     /** _more_ */
@@ -101,7 +105,16 @@ public class TabularTypeHandler extends MsDocTypeHandler {
     public static final int IDX_CHARTS = IDX++;
 
     /** _more_ */
+    public static final int IDX_SEARCHINFO = IDX++;
+
+    /** _more_ */
     public static final int IDX_LAST = IDX;
+
+    /*
+column:type
+name:string
+     */
+
 
 
     /** _more_ */
@@ -119,6 +132,19 @@ public class TabularTypeHandler extends MsDocTypeHandler {
             throws Exception {
         super(repository, entryNode);
     }
+
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
+    public static boolean isTabular(Entry entry) {
+        if(entry == null) return false;
+        return entry.getTypeHandler().isType(TabularTypeHandler.TYPE_TABULAR);
+    }
+
 
 
     /**
@@ -143,15 +169,13 @@ public class TabularTypeHandler extends MsDocTypeHandler {
      * @param request _more_
      * @param entry _more_
      * @param myxls _more_
-     * @param sheets _more_
-     * @param sheetsToShow _more_
-     * @param skip _more_
+     * @param visitInfo _more_
+     * @param visitor _more_
      *
      * @throws Exception _more_
      */
-    public void read(Request request, Entry entry, InputStream myxls,
-                     List<String> sheets, HashSet<Integer> sheetsToShow,
-                     int skip)
+    public void visit(Request request, Entry entry, InputStream myxls,
+                      TabularVisitInfo visitInfo, TabularVisitor visitor)
             throws Exception {}
 
 
