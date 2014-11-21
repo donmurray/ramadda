@@ -19,7 +19,7 @@
         <property name="srcrelease_dir" value="${release_name}src${_version}" />
 	<property name="docs_dir" value="${dist_dir}/${release_name}docs"/>
         <property name="docs_javadoc_dest" value="${docs_dir}/javadoc" />
-        <property name="tika_jar" value="${lib_dir}/tika-app-1.1.jar" />
+        <property name="tika_jar" value="${lib_dir}/tika-app-1.4.jar" />
         <property name="clientbase" value="ramaddaclient" />
         
     </target>
