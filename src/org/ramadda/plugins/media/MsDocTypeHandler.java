@@ -89,8 +89,16 @@ public class MsDocTypeHandler extends GenericTypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
     public void initializeDocEntry(Request request, Entry entry)
-        throws Exception {
+            throws Exception {
         File file = entry.getFile();
         if ( !file.exists()) {
             return;

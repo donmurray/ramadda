@@ -47,8 +47,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 
 import java.util.Date;
-import java.util.Hashtable;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 
 import java.util.zip.ZipEntry;
@@ -62,44 +62,45 @@ import java.util.zip.ZipInputStream;
 public class TabularTypeHandler extends MsDocTypeHandler {
 
 
-    /** _more_          */
+    /** _more_ */
     private static int IDX = 0;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_SHOWTABLE = IDX++;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_SHOWCHART = IDX++;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_SHEETS = IDX++;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_SKIPROWS = IDX++;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_SKIPCOLUMNS = IDX++;
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_USEFIRSTROW = IDX++;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_COLHEADER = IDX++;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_HEADER = IDX++;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_ROWHEADER = IDX++;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_WIDTHS = IDX++;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_CHARTS = IDX++;
 
+    /** _more_ */
     public static final int IDX_LAST = IDX;
 
 
@@ -136,9 +137,22 @@ public class TabularTypeHandler extends MsDocTypeHandler {
     }
 
 
-    public void read(Request request, Entry entry, InputStream myxls, List<String> sheets, HashSet<Integer> sheetsToShow, int skip) throws Exception {
-
-    }
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param myxls _more_
+     * @param sheets _more_
+     * @param sheetsToShow _more_
+     * @param skip _more_
+     *
+     * @throws Exception _more_
+     */
+    public void read(Request request, Entry entry, InputStream myxls,
+                     List<String> sheets, HashSet<Integer> sheetsToShow,
+                     int skip)
+            throws Exception {}
 
 
     /**
@@ -157,16 +171,16 @@ public class TabularTypeHandler extends MsDocTypeHandler {
                                    Entry entry)
             throws Exception {
 
-        boolean showTable  = entry.getValue(IDX_SHOWTABLE, true);
-        boolean showChart  = entry.getValue(IDX_SHOWCHART, true);
+        boolean showTable = entry.getValue(IDX_SHOWTABLE, true);
+        boolean showChart = entry.getValue(IDX_SHOWCHART, true);
 
 
-        if (!showTable && !showChart) {
+        if ( !showTable && !showChart) {
             return null;
         }
 
-        return getTabularOutputHandler().getHtmlDisplay(request, requestProps,
-                entry);
+        return getTabularOutputHandler().getHtmlDisplay(request,
+                requestProps, entry);
     }
 
 

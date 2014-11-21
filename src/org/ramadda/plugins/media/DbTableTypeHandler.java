@@ -66,22 +66,22 @@ import java.util.zip.ZipInputStream;
  */
 public class DbTableTypeHandler extends TabularTypeHandler {
 
-    /** _more_          */
+    /** _more_ */
     private static int IDX = TabularTypeHandler.IDX_LAST;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_JDBC = IDX++;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_USER = IDX++;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_PASSWORD = IDX++;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_TABLE = IDX++;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_COLUMNS = IDX++;
 
 

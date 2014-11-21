@@ -1,0 +1,10 @@
+<services >
+<service id="media_tabular_extractsheet" label="Extract sheets" command="java:org.ramadda.plugins.media.TabularService:extractSheet" >
+<description><![CDATA[
+Extracts the XLS sheet
+]]></description>
+          <arg value="${entry.file}" type="entry" entryType="type_document_xls" primary="true" label="Input XLS File" ></arg>
+          <arg type="string"  label="Sheets" help="Comma separated list of sheet numbers 1..N"/>
+          <output type="type_document_xls" pattern=".*\.xlsx"/>
+    </service>
+</services>

@@ -130,15 +130,19 @@ public class TabularOutputHandler extends OutputHandler {
      */
     public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
-        Entry   entry = state.getEntry();
-        if(entry == null) return;
-        boolean isXls = entry.getTypeHandler().isType("type_document_tabular");
+        Entry entry = state.getEntry();
+        if (entry == null) {
+            return;
+        }
+        boolean isXls =
+            entry.getTypeHandler().isType("type_document_tabular");
         if ( !isXls) {
             if ( !entry.isFile()) {
                 return;
             }
             String path = entry.getResource().getPath();
-            if (path.endsWith(".xls") || path.endsWith(".xlsx") || path.endsWith(".csv")) {
+            if (path.endsWith(".xls") || path.endsWith(".xlsx")
+                    || path.endsWith(".csv")) {
                 isXls = true;
             }
         }
@@ -178,6 +182,7 @@ public class TabularOutputHandler extends OutputHandler {
                 Result result = new Result("", sb);
                 result.setShouldDecorate(false);
                 result.setMimeType("application/json");
+
                 return result;
             }
         }
@@ -185,6 +190,32 @@ public class TabularOutputHandler extends OutputHandler {
         return new Result("",
                           new StringBuffer(getHtmlDisplay(request,
                               new Hashtable(), entry)));
+    }
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+
+    public HashSet<Integer> getSheetsToShow(String s) {
+        HashSet<Integer> sheetsToShow = null;
+        if (Utils.stringDefined(s)) {
+            List<String> sheetsStr = StringUtil.split(s, ",", true, true);
+            if (sheetsStr.size() > 0) {
+                sheetsToShow = new HashSet<Integer>();
+                for (String tok : sheetsStr) {
+                    sheetsToShow.add(Integer.parseInt(tok));
+                }
+            }
+        }
+
+        return sheetsToShow;
     }
 
 
@@ -202,52 +233,44 @@ public class TabularOutputHandler extends OutputHandler {
     private Result outputEntryJson(Request request, OutputType outputType,
                                    Entry entry)
             throws Exception {
-        StringBuilder    sb           = new StringBuilder();
-        List<String>     sheets       = new ArrayList<String>();
+        StringBuilder sb   = new StringBuilder();
 
-        String           file         = null;
-        if(entry.isFile()) {
+
+        String        file = null;
+        if (entry.isFile()) {
             file = entry.getFile().toString();
         }
-        boolean isTabular  = entry.getTypeHandler().isType("type_document_tabular");
+        boolean isTabular =
+            entry.getTypeHandler().isType("type_document_tabular");
 
         HashSet<Integer> sheetsToShow = null;
         if (isTabular) {
-            List<String> sheetsStr =
-                StringUtil.split(entry.getValue(XlsTypeHandler.IDX_SHEETS,
-                    ""), ",", true, true);
-            if (sheetsStr.size() > 0) {
-                sheetsToShow = new HashSet<Integer>();
-                for (String s : sheetsStr) {
-                    sheetsToShow.add(Integer.parseInt(s));
+            sheetsToShow =
+                getSheetsToShow(entry.getValue(XlsTypeHandler.IDX_SHEETS,
+                    ""));
+        }
+
+
+        final List<String> sheets  = new ArrayList<String>();
+        TabularVisitor     visitor = new TabularVisitor() {
+            public boolean visit(String sheet, List<List<String>> rows) {
+                List<String> jrows = new ArrayList<String>();
+                for (List<String> cols : rows) {
+                    List<String> quoted = new ArrayList<String>();
+                    for (String c : cols) {
+                        c = c.replaceAll("\"", "&quot;");
+                        quoted.add(Json.quote(c));
+                    }
+                    jrows.add(Json.list(quoted));
                 }
+                sheets.add(Json.map("name", Json.quote(sheet), "rows",
+                                    Json.list(jrows)));
+
+                return true;
             }
-        }
+        };
 
-        int skip = request.get("table.skip",0);
-
-        InputStream      inputStream = null;
-        String suffix = "";
-        if(file!=null) {
-            inputStream = getStorageManager().getFileInputStream(file);
-            suffix = IOUtil.getFileExtension(file).toLowerCase();
-        }
-        if (suffix.equals(".xlsx")) {
-            readXlsx(inputStream, sheets, sheetsToShow, skip);
-        } else if (suffix.endsWith(".xls")) {
-            readXls(inputStream, sheets, sheetsToShow, skip);
-        } else if (suffix.endsWith(".csv")) {
-            readCsv(entry,inputStream, sheets, skip);
-        } else {
-            if(isTabular) {
-                TabularTypeHandler tth = (TabularTypeHandler)entry.getTypeHandler();
-                tth.read(request, entry,  inputStream, sheets,sheetsToShow, skip);
-            } else {
-                throw new IllegalStateException("Unknown file type:" + suffix);
-            }
-        }
-
-
+        visit(request, entry, file, sheetsToShow, visitor);
         sb.append(Json.list(sheets));
         request.setReturnFilename(entry.getName() + ".json");
         Result result = new Result("", sb);
@@ -258,17 +281,110 @@ public class TabularOutputHandler extends OutputHandler {
     }
 
 
+
     /**
      * _more_
      *
-     * @param inputStream _more_
-     * @param sheets _more_
+     * @param request _more_
+     * @param entry _more_
+     * @param file _more_
      * @param sheetsToShow _more_
+     * @param visitor _more_
      *
      * @throws Exception _more_
      */
-    private void readXls(InputStream inputStream, List<String> sheets,
-                         HashSet<Integer> sheetsToShow, int skip)
+    public void visit(Request request, Entry entry, String file,
+                      HashSet<Integer> sheetsToShow, TabularVisitor visitor)
+            throws Exception {
+        boolean isTabular =
+            entry.getTypeHandler().isType("type_document_tabular");
+
+        int         skip        = request.get("table.skip", 0);
+        InputStream inputStream = null;
+        String      suffix      = "";
+        if (file != null) {
+            inputStream = getStorageManager().getFileInputStream(file);
+            suffix      = IOUtil.getFileExtension(file).toLowerCase();
+        }
+
+        if (suffix.equals(".xlsx")) {
+            visitXlsx(request, entry, inputStream, sheetsToShow, skip,
+                      visitor);
+        } else if (suffix.endsWith(".xls")) {
+            visitXls(request, entry, inputStream, sheetsToShow, skip,
+                     visitor);
+        } else if (suffix.endsWith(".csv")) {
+            visitCsv(request, entry, inputStream, skip, visitor);
+        } else {
+            if (isTabular) {
+                TabularTypeHandler tth =
+                    (TabularTypeHandler) entry.getTypeHandler();
+                //                tth.read(request, entry, inputStream, sheets, sheetsToShow,
+                //                         skip);
+            } else {
+                throw new IllegalStateException("Unknown file type:"
+                        + suffix);
+            }
+        }
+        IOUtil.close(inputStream);
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param inputStream _more_
+     * @param skip _more_
+     * @param visitor _more_
+     *
+     * @throws Exception _more_
+     */
+    public void visitCsv(Request request, Entry entry,
+                         InputStream inputStream, int skip,
+                         TabularVisitor visitor)
+            throws Exception {
+        BufferedReader br =
+            new BufferedReader(new InputStreamReader(inputStream));
+        String             line;
+        int                rowIdx = 0;
+        List<List<String>> rows   = new ArrayList<List<String>>();
+        while ((line = br.readLine()) != null) {
+            if (line.startsWith("#")) {
+                continue;
+            }
+            if (skip-- > 0) {
+                continue;
+            }
+            rowIdx++;
+            if (rowIdx > MAX_ROWS) {
+                break;
+            }
+            List<String> cols = Utils.tokenizeColumns(line, ",");
+            rows.add(cols);
+        }
+        visitor.visit(entry.getName(), rows);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param inputStream _more_
+     * @param sheetsToShow _more_
+     * @param skip _more_
+     * @param visitor _more_
+     *
+     * @throws Exception _more_
+     */
+    private void visitXls(Request request, Entry entry,
+                          InputStream inputStream,
+                          HashSet<Integer> sheetsToShow, int skip,
+                          TabularVisitor visitor)
             throws Exception {
         HSSFWorkbook wb = new HSSFWorkbook(inputStream);
         for (int sheetIdx = 0; sheetIdx < wb.getNumberOfSheets();
@@ -276,14 +392,16 @@ public class TabularOutputHandler extends OutputHandler {
             if ((sheetsToShow != null) && !sheetsToShow.contains(sheetIdx)) {
                 continue;
             }
-            HSSFSheet    sheet = wb.getSheetAt(sheetIdx);
-            List<String> rows  = new ArrayList<String>();
-            int sheetSkip=skip;
-            int rowCnt = 0;
+            HSSFSheet          sheet     = wb.getSheetAt(sheetIdx);
+            List<List<String>> rows      = new ArrayList<List<String>>();
+            int                sheetSkip = skip;
+            int                rowCnt    = 0;
             for (int rowIdx = sheet.getFirstRowNum();
                     (rowCnt < MAX_ROWS) && (rowIdx <= sheet.getLastRowNum());
                     rowIdx++) {
-                if(sheetSkip-->0) continue;
+                if (sheetSkip-- > 0) {
+                    continue;
+                }
 
                 HSSFRow row = sheet.getRow(rowIdx);
                 if (row == null) {
@@ -301,47 +419,56 @@ public class TabularOutputHandler extends OutputHandler {
                         break;
                     }
                     String value = cell.toString();
-                    value = value.replaceAll("\"", "&quot;");
-                    cols.add(Json.quote(value));
+                    cols.add(value);
                 }
-                rows.add(Json.list(cols));
+                rows.add(cols);
             }
-            sheets.add(Json.map("name", Json.quote(sheet.getSheetName()),
-                                "rows", Json.list(rows)));
+            if ( !visitor.visit(sheet.getSheetName(), rows)) {
+                break;
+            }
         }
     }
-
 
     /**
      * _more_
      *
+     * @param request _more_
+     * @param entry _more_
      * @param inputStream _more_
-     * @param sheets _more_
      * @param sheetsToShow _more_
+     * @param skip _more_
+     * @param visitor _more_
      *
      * @throws Exception _more_
      */
-
-    private void readXlsx(InputStream inputStream, List<String> sheets,
-                          HashSet<Integer> sheetsToShow, int skip)
+    private void visitXlsx(Request request, Entry entry,
+                           InputStream inputStream,
+                           HashSet<Integer> sheetsToShow, int skip,
+                           TabularVisitor visitor)
             throws Exception {
         XSSFWorkbook wb = new XSSFWorkbook(inputStream);
         for (int sheetIdx = 0; sheetIdx < wb.getNumberOfSheets();
                 sheetIdx++) {
-            XSSFSheet    sheet = wb.getSheetAt(sheetIdx);
-            List<String> rows  = new ArrayList<String>();
-            int sheetSkip = skip;
-            int rowCnt = 0;
+            if ((sheetsToShow != null) && !sheetsToShow.contains(sheetIdx)) {
+                continue;
+            }
+            XSSFSheet          sheet     = wb.getSheetAt(sheetIdx);
+            List<List<String>> rows      = new ArrayList<List<String>>();
+            int                sheetSkip = skip;
+            int                rowCnt    = 0;
             for (int rowIdx = sheet.getFirstRowNum();
-                 (rowCnt < MAX_ROWS) && (rowIdx <= sheet.getLastRowNum());
-                 rowIdx++) {
-                if(sheetSkip-->0) continue;
+                    (rowCnt < MAX_ROWS) && (rowIdx <= sheet.getLastRowNum());
+                    rowIdx++) {
+                if (sheetSkip-- > 0) {
+                    continue;
+                }
 
                 XSSFRow row = sheet.getRow(rowIdx);
                 if (row == null) {
                     continue;
                 }
                 rowCnt++;
+
                 List<String> cols     = new ArrayList<String>();
                 short        firstCol = row.getFirstCellNum();
                 for (short col = firstCol;
@@ -352,36 +479,18 @@ public class TabularOutputHandler extends OutputHandler {
                         break;
                     }
                     String value = cell.toString();
-                    cols.add(XlsUtil.clean(Json.quote(value)));
+                    cols.add(value);
                 }
-                rows.add(Json.list(cols));
+                rows.add(cols);
             }
-            sheets.add(Json.map("name", Json.quote(sheet.getSheetName()),
-                                "rows", Json.list(rows)));
+            if ( !visitor.visit(sheet.getSheetName(), rows)) {
+                break;
+            }
         }
     }
 
-    private void readCsv(Entry entry, InputStream inputStream, List<String> sheets, int skip)
-        throws Exception {
-        BufferedReader br =  new BufferedReader(new InputStreamReader(inputStream));
-        String line;
-        int rowIdx =0;
-        List<String> rows  = new ArrayList<String>();
-        while((line=br.readLine())!=null) {
-            if(line.startsWith("#")) {
-                continue;
-            }
-            if(skip-->0) continue;
-            rowIdx++;
-            if(rowIdx > MAX_ROWS) {
-                break;
-            }
-            List<String> cols     = Utils.tokenizeColumns(line, ",");
-            rows.add(Json.list(cols, true));
-        }
-        sheets.add(Json.map("name", Json.quote(entry.getName()),
-                            "rows", Json.list(rows)));
-    }
+
+
 
     /**
      * _more_
@@ -398,8 +507,10 @@ public class TabularOutputHandler extends OutputHandler {
                                  Entry entry)
             throws Exception {
 
-        boolean showTable  = entry.getValue(XlsTypeHandler.IDX_SHOWTABLE, true);
-        boolean showChart  = entry.getValue(XlsTypeHandler.IDX_SHOWCHART, true);
+        boolean showTable = entry.getValue(XlsTypeHandler.IDX_SHOWTABLE,
+                                           true);
+        boolean showChart = entry.getValue(XlsTypeHandler.IDX_SHOWCHART,
+                                           true);
 
 
         boolean useFirstRowAsHeader =
@@ -469,18 +580,20 @@ public class TabularOutputHandler extends OutputHandler {
                              ARG_OUTPUT,
                              TabularOutputHandler.OUTPUT_XLS_JSON.getId());
 
-        List<String> charts  = new ArrayList<String>();
-        for(String line: 
-                StringUtil.split(entry.getValue(XlsTypeHandler.IDX_CHARTS,""),"\n", true, true)) {
+        List<String> charts = new ArrayList<String>();
+        for (String line :
+                StringUtil.split(entry.getValue(XlsTypeHandler.IDX_CHARTS,
+                    ""), "\n", true, true)) {
 
-            List<String> chart  = new ArrayList<String>();
-            Hashtable<String,String> map = new Hashtable<String,String>();
-            for(String tok:StringUtil.split(line,",")) {
-                List<String>subtoks = StringUtil.splitUpTo(tok,"=",2);
-                String key = subtoks.get(0);
-                if(subtoks.size()<2) {
+            List<String>              chart = new ArrayList<String>();
+            Hashtable<String, String> map   = new Hashtable<String, String>();
+            for (String tok : StringUtil.split(line, ",")) {
+                List<String> subtoks = StringUtil.splitUpTo(tok, "=", 2);
+                String       key     = subtoks.get(0);
+                if (subtoks.size() < 2) {
                     chart.add("type");
                     chart.add(Json.quote(key));
+
                     continue;
                 }
                 String value = subtoks.get(1);
@@ -489,7 +602,7 @@ public class TabularOutputHandler extends OutputHandler {
             }
             charts.add(Json.map(chart));
         }
-        if(charts.size()>0) {
+        if (charts.size() > 0) {
             propsList.add("defaultCharts");
             propsList.add(Json.list(charts));
         }
@@ -502,7 +615,7 @@ public class TabularOutputHandler extends OutputHandler {
         StringBuilder sb    = new StringBuilder();
         getRepository().getWikiManager().addDisplayImports(request, sb);
         sb.append(header(entry.getName()));
-        if(!request.get(ARG_EMBEDDED, false)) {
+        if ( !request.get(ARG_EMBEDDED, false)) {
             sb.append(entry.getDescription());
         }
         String divId = HtmlUtils.getUniqueId("div_");

@@ -6,4 +6,9 @@
 
 
 <outputhandler class="org.ramadda.plugins.media.TabularOutputHandler"/>
+<outputhandler class="org.ramadda.repository.output.ServiceOutputHandler" serviceId="media_tabular_extractsheet"/>
+
+
+
+
 </outputhandlers>
