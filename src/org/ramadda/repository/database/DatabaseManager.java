@@ -432,16 +432,13 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      *
      * @throws Exception _more_
      */
-    public Connection getExternalConnection(String dbId) throws Exception {
-        String connectionURL = getRepository().getProperty("ramadda.db."
-                                   + dbId + ".url", (String) null);
-        String user = getRepository().getProperty("ramadda.db." + dbId
-                          + ".user", (String) null);
-        String password = getRepository().getProperty("ramadda.db." + dbId
-                              + ".password", (String) null);
+    public Connection getExternalConnection(String prefix) throws Exception {
+        String connectionURL = getRepository().getProperty(prefix + ".url", (String) null);
+        String user = getRepository().getProperty(prefix + ".user", (String) null);
+        String password = getRepository().getProperty(prefix + ".password", (String) null);
 
         if (connectionURL == null) {
-            System.err.println("No connection url property for:" + dbId);
+            System.err.println("No connection url property for:" + prefix);
 
             return null;
         }
@@ -468,12 +465,10 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             return conn;
         }
 
-        BasicDataSource ds = getExternalDataSource(dbId);
+        BasicDataSource ds = getExternalDataSource(prefix);
         if (ds == null) {
             return null;
         }
-        System.err.println("Making connection:" + dbId + " " + ds);
-
         return ds.getConnection();
     }
 

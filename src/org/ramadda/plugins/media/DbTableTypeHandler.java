@@ -125,23 +125,17 @@ public class DbTableTypeHandler extends TabularTypeHandler {
                       TabularVisitInfo visitInfo, TabularVisitor visitor)
             throws Exception {
 
-        System.err.println ("visit");
         String dbid = entry.getValue(IDX_DBID, (String) null);
         if ( !Utils.stringDefined(dbid)) {
             System.err.println("DbTableTypeHandler.visit: no dbid defined");
-
             return;
         }
 
-        Connection connection =
-            getDatabaseManager().getExternalConnection(dbid);
+        Connection   connection = getDatabaseManager().getExternalConnection("table.db." + dbid);
         if (connection == null) {
             System.err.println("DbTableTypeHandler.visit: no connection");
-
             return;
         }
-
-
 
         String table = entry.getValue(IDX_TABLE, (String) null);
         //        System.err.println("table:" + table + " idx:" + IDX_TABLE);
@@ -162,18 +156,17 @@ public class DbTableTypeHandler extends TabularTypeHandler {
 
         int max = TabularOutputHandler.MAX_ROWS;
  
-        SqlUtil.debug = true;
+        //        SqlUtil.debug = true;
        Statement stmt = SqlUtil.select(connection, what,
                                         Misc.newList(table), null, "", max,
                                         0);
 
 
-        SqlUtil.debug = false;
+       //        SqlUtil.debug = false;
         SqlUtil.Iterator   iter = new SqlUtil.Iterator(stmt);
         ResultSet          results;
         ResultSetMetaData  rsmd = null;
 
-       System.err.println ("iterating");
         List<List<Object>> rows = new ArrayList<List<Object>>();
         while ((results = iter.getNext()) != null) {
             if (rsmd == null) {
@@ -184,7 +177,7 @@ public class DbTableTypeHandler extends TabularTypeHandler {
                     String name = rsmd.getColumnName(i);
                     names.add(name);
                 }
-                rows.add(names);
+               rows.add(names);
             }
             List<Object> row = new ArrayList<Object>();
             for (int col = 0; col < rsmd.getColumnCount(); col++) {
@@ -243,7 +236,7 @@ public class DbTableTypeHandler extends TabularTypeHandler {
             throws Exception {
 
         if (column.getName().equals("db_id")) {
-            List<String> dbs = StringUtil.split(getRepository().getProperty("ramadda.dbs",""),",",true,true);
+            List<String> dbs = StringUtil.split(getRepository().getProperty("table.db.databases",""),",",true,true);
             if(dbs.size() > 0) {
                 String dbid = entry.getValue(IDX_DBID, (String) null);
                 formBuffer.append(
@@ -314,7 +307,7 @@ public class DbTableTypeHandler extends TabularTypeHandler {
         if (tableInfos == null) {
             Connection connection = null;
             try {
-                connection = getDatabaseManager().getExternalConnection(dbid);
+                connection = getDatabaseManager().getExternalConnection("table.db." + dbid);
                 if (connection == null) {
                     System.err.println("DbTableTypeHadler.visit: no connection");
                     return null;
