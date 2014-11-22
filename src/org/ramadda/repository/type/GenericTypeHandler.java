@@ -1309,12 +1309,32 @@ public class GenericTypeHandler extends TypeHandler {
             formBuffer.append(HtmlUtils.formEntry(column.getLabel() + ":",
                     tmpSb.toString()));
         } else {
-            column.addToEntryForm(request, entry, formBuffer, values, state,
-                                  formInfo);
+            addColumnToEntryForm(request, entry, column, formBuffer, values,
+                                 state, formInfo);
         }
     }
 
-
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param column _more_
+     * @param formBuffer _more_
+     * @param values _more_
+     * @param state _more_
+     * @param formInfo _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addColumnToEntryForm(Request request, Entry entry,
+                                     Column column, Appendable formBuffer,
+                                     Object[] values, Hashtable state,
+                                     FormInfo formInfo)
+            throws Exception {
+        column.addToEntryForm(request, entry, formBuffer, values, state,
+                              formInfo);
+    }
 
 
     /**
