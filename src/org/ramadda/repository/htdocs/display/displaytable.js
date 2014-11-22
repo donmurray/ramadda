@@ -4,6 +4,7 @@
 function RamaddaXlsDisplay(displayManager, id, properties) {  
 
     var ID_SEARCH_HEADER = "searchheader";    
+    var ID_RESULTS = "results";    
     var ID_CONTENTS = "tablecontents";    
     var ID_SEARCH_FORM = "searchform";
     var ID_SEARCH_TEXT = "searchtext";
@@ -121,17 +122,19 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                     rows = rows.splice(1);
                 }
 
+                if(rows.length==0) {
+                    this.jq(ID_TABLE).html("No data found");
+                    this.jq(ID_RESULTS).html("");
+                    return;
+                }
+
+                this.jq(ID_RESULTS).html("Found: " + rows.length);
                 args.data = rows;
                 this.currentData = rows;
 
                 if(this.tableProps.headers!=null) {
                     args.colHeaders = this.tableProps.headers;
                 }
-
-                
-
-                
-
 
                 if(this.getProperty("showTable",true)) {
                     this.jq(ID_TABLE).handsontable(args);
@@ -340,7 +343,7 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
 
                 var weight = "12";
 
-                var tableHtml =  "<table width=100%>";
+                var tableHtml =  "<table width=100% style=\"max-width:1000px;\" > ";
                 if(this.sheets.length>1) {
                     weight = "10";
                 }
@@ -398,14 +401,14 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                var html = "";
 
                 if(this.getProperty("showSearch",true)) {
-                    var search = ""
-                    search+= HtmlUtil.openTag("div",["class","ramadda-xls-search-form"]);
 
+                    var results = HtmlUtil.div(["id",this.getDomId(ID_RESULTS)],"");
+                    var search =  HtmlUtil.openTag("div",["class","ramadda-xls-search-form"]);
                     search+= HtmlUtil.openTag("form",["id",this.getDomId(ID_SEARCH_FORM)]);
                     search += HtmlUtil.input(ID_SEARCH_TEXT, this.jq(ID_SEARCH_TEXT).val(),["id", this.getDomId(ID_SEARCH_TEXT),"placeholder","Search"]);
                     search+= HtmlUtil.closeTag("form");
                     search+= HtmlUtil.closeTag("div");
-                    this.jq(ID_SEARCH_HEADER).html(search);
+                    this.jq(ID_SEARCH_HEADER).html(HtmlUtil.leftRight(search,results));
                 }
 
 

@@ -319,7 +319,7 @@ var HtmlUtil =  {
         if(rightWeight==null) rightWeight = "6";
         return this.div(["class","row"],
                         this.div(["class", "col-md-" + leftWeight], left) +
-                        this.div(["class", "col-md-" + rightWeight,"style","align:right;"], right));
+                        this.div([ "class", "col-md-" + rightWeight,"style","text-align:right;"], right));
     },
     leftCenterRight : function(left,center, right,leftWidth, centerWidth, rightWidth) {
         if(leftWidth==null) leftWidth = "33%";
