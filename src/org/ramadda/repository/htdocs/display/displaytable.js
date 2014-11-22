@@ -3,7 +3,8 @@
 
 function RamaddaXlsDisplay(displayManager, id, properties) {  
 
-    var ID_SEARCH = "search";    
+    var ID_SEARCH_HEADER = "searchheader";    
+    var ID_CONTENTS = "tablecontents";    
     var ID_SEARCH_FORM = "searchform";
     var ID_SEARCH_TEXT = "searchtext";
     var ID_TABLE = "table";
@@ -32,9 +33,10 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
             initDisplay: function() {
                 this.initUI();
                 this.setTitle("Table Data");
-                this.divId = HtmlUtil.getUniqueId();
-                var html  = HtmlUtil.div(["id", this.divId],this.getLoadingMessage())
-                this.setContents(html);
+                var body = HtmlUtil.div(["id", this.getDomId(ID_SEARCH_HEADER)]) +
+                    HtmlUtil.div(["id", this.getDomId(ID_CONTENTS)]);
+
+                this.setContents(body);
                 this.loadTableData(this.url);
             },
          });
@@ -396,12 +398,14 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                var html = "";
 
                 if(this.getProperty("showSearch",true)) {
-                    html+= HtmlUtil.openTag("div",["class","ramadda-xls-search-form"]);
+                    var search = ""
+                    search+= HtmlUtil.openTag("div",["class","ramadda-xls-search-form"]);
 
-                    html+= HtmlUtil.openTag("form",["id",this.getDomId(ID_SEARCH_FORM)]);
-                    html += HtmlUtil.input(ID_SEARCH_TEXT, this.jq(ID_SEARCH_TEXT).val(),["id", this.getDomId(ID_SEARCH_TEXT),"placeholder","Search"]);
-                    html+= HtmlUtil.closeTag("form");
-                    html+= HtmlUtil.closeTag("div");
+                    search+= HtmlUtil.openTag("form",["id",this.getDomId(ID_SEARCH_FORM)]);
+                    search += HtmlUtil.input(ID_SEARCH_TEXT, this.jq(ID_SEARCH_TEXT).val(),["id", this.getDomId(ID_SEARCH_TEXT),"placeholder","Search"]);
+                    search+= HtmlUtil.closeTag("form");
+                    search+= HtmlUtil.closeTag("div");
+                    this.jq(ID_SEARCH_HEADER).html(search);
                 }
 
 
@@ -414,7 +418,7 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                }
                html += HtmlUtil.div(["id",this.getDomId(ID_CHART),"class","ramadda-xls-chart"]);
 
-                $("#" + this.divId).html(html);
+               this.jq(ID_CONTENTS).html(html);
 
 
                 if(this.getProperty("showSearch",true)) {
@@ -456,10 +460,11 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 this.setAxisLabel("params-yaxis-label", this.getHeading(this.yAxisIndex, true));
             },
 
-
-
-
+            displayMessage: function(msg) {
+                this.jq(ID_CONTENTS).html(msg);
+            },
            loadTableData:  function(url) {
+                this.jq(ID_CONTENTS).html(this.getLoadingMessage());
                 var _this = this;
                 var url = this.url;
 
@@ -472,14 +477,14 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
 
                 var jqxhr = $.getJSON(url, function(data) {
                         if(GuiUtils.isJsonError(data)) {
-                            $("#" + _this.divId).html("Error: " + data.error);
+                            this.displayMessage("Error: " + data.error);
                             return;
                         }
                         _this.showTableData(data);
                     })
                     .fail(function(jqxhr, textStatus, error) {
                             var err = textStatus + ", " + error;
-                            $("#" + this.divId).html("An error occurred: " + error);
+                            this.displayMessage("An error occurred: " + error);
                             console.log("JSON error:" +err);
                         });
             }
