@@ -127,12 +127,10 @@ public class DbTableTypeHandler extends TabularTypeHandler {
             throws Exception {
 
         String table = entry.getValue(IDX_TABLE, (String) null);
-        System.err.println("table:" + table + " idx:" + IDX_TABLE);
-
+        //        System.err.println("table:" + table + " idx:" + IDX_TABLE);
 
         if ( !Utils.stringDefined(table)) {
-            System.err.println("db-read- no table");
-
+            System.err.println("DbTableTypeHadler.visit: no table defined");
             return;
         }
 

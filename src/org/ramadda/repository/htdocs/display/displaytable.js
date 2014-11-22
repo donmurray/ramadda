@@ -423,6 +423,7 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                             _this.loadTableData(_this.url);
                         });
                     this.jq(ID_SEARCH_TEXT).focus();
+                    this.jq(ID_SEARCH_TEXT).select();
                 }
 
 

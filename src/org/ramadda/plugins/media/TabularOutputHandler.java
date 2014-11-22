@@ -316,8 +316,6 @@ public class TabularOutputHandler extends OutputHandler {
     private int getRowCount(Request request, Entry entry, int dflt)
             throws Exception {
         int v = (int) request.get("table.rows", dflt);
-        System.err.println("getRowCount:" + v);
-
         return v;
     }
 
@@ -336,11 +334,7 @@ public class TabularOutputHandler extends OutputHandler {
                       TabularVisitInfo visitInfo, TabularVisitor visitor)
             throws Exception {
 
-        System.err.println("visit:" + visitInfo);
-
-
-
-
+        //        System.err.println("visit:" + visitInfo);
         InputStream inputStream = null;
         String      suffix      = "";
 
@@ -414,6 +408,10 @@ public class TabularOutputHandler extends OutputHandler {
             }
             rows.add((List<Object>) cols);
         }
+
+
+        
+
         visitor.visit(visitInfo, entry.getName(), rows);
     }
 
@@ -455,7 +453,7 @@ public class TabularOutputHandler extends OutputHandler {
                           InputStream inputStream,
                           TabularVisitInfo visitInfo, TabularVisitor visitor)
             throws Exception {
-        System.err.println("visitXls: making workbook");
+        //        System.err.println("visitXls: making workbook");
         Workbook wb = makeWorkbook(suffix, inputStream);
         //        System.err.println("visitXls:" + skip + " max rows:" + maxRows + " #sheets:" + wb.getNumberOfSheets());
         int maxRows = visitInfo.getMaxRows();
@@ -468,9 +466,8 @@ public class TabularOutputHandler extends OutputHandler {
             //            System.err.println("\tsheet:" + sheet.getSheetName() + " #rows:" + sheet.getLastRowNum());
             List<List<Object>> rows      = new ArrayList<List<Object>>();
             int                sheetSkip = visitInfo.getSkipRows();
-            int                rowCnt    = 0;
             for (int rowIdx = sheet.getFirstRowNum();
-                    (rowCnt < maxRows) && (rowIdx <= sheet.getLastRowNum());
+                 (rows.size() < maxRows) && (rowIdx <= sheet.getLastRowNum());
                     rowIdx++) {
                 if (sheetSkip-- > 0) {
                     continue;
@@ -507,13 +504,17 @@ public class TabularOutputHandler extends OutputHandler {
                     cols.add(value);
                 }
 
-
                 if(!visitInfo.rowOk(cols)) {
-                    continue;
+                    if(rows.size()==0) {
+                        //todo: check for the header line
+                    } else {
+                        continue;
+                    }
                 }
-                rowCnt++;
                 rows.add(cols);
+                //                if(xxx>15) break;
             }
+            //            System.err.println("Rows:" + rows);
             if ( !visitor.visit(visitInfo, sheet.getSheetName(), rows)) {
                 break;
             }
@@ -642,7 +643,7 @@ public class TabularOutputHandler extends OutputHandler {
         TabularVisitInfo visitInfo =
             new TabularVisitInfo(request, entry);
 
-        System.err.println("search fields:" + visitInfo.getSearchFields());
+        //        System.err.println("search fields:" + visitInfo.getSearchFields());
 
         if(visitInfo.getSearchFields()!=null) {
             propsList.add("searchFields");
