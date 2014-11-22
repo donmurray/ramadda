@@ -106,8 +106,8 @@ public class ColumnInfo {
             return TYPE_TIME;
         } else if (type == java.sql.Types.VARCHAR) {
             return TYPE_VARCHAR;
-        } else if (type == java.sql.Types.TEXT) {
-            return TYPE_VARCHAR;
+            //        } else if (type == java.sql.Types.TEXT) {
+            //            return TYPE_VARCHAR;
         } else if (type == java.sql.Types.INTEGER) {
             return TYPE_INTEGER;
         } else if (type == java.sql.Types.DOUBLE) {
