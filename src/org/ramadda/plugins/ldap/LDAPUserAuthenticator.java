@@ -119,6 +119,9 @@ public class LDAPUserAuthenticator extends UserAuthenticatorImpl {
         LDAPAdminHandler adminHandler =
             LDAPAdminHandler.getLDAPHandler(getRepository());
 
+        if(adminHandler==null) {
+            return  null;
+        }
         //Check if the admin handler has changed its state
         if ((lastLDAPServerVersion != adminHandler.getVersion())
                 || (manager == null)) {
