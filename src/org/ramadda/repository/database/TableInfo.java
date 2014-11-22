@@ -74,6 +74,22 @@ public class TableInfo {
     /**
      * _more_
      *
+     * @param infos _more_
+     *
+     * @return _more_
+     */
+    public static List<String> getTableNames(List<TableInfo> infos) {
+        List<String> names = new ArrayList<String>();
+        for (TableInfo info : infos) {
+            names.add(info.getName());
+        }
+
+        return names;
+    }
+
+    /**
+     * _more_
+     *
      * @return _more_
      */
     public String[] getColumnNames() {

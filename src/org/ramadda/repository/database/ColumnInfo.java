@@ -44,9 +44,18 @@ public class ColumnInfo {
     /** _more_ */
     public static final int TYPE_CLOB = 5;
 
-
     /** _more_ */
     public static final int TYPE_BIGINT = 6;
+
+
+    /** _more_ */
+    public static final int TYPE_SMALLINT = 6;
+
+    /** _more_ */
+    public static final int TYPE_TINYINT = 7;
+
+    /** _more_ */
+    public static final int TYPE_TIME = 8;
 
     /** _more_ */
     private String name;
@@ -87,10 +96,17 @@ public class ColumnInfo {
      *
      * @return _more_
      */
-    public static int convertType(int type) {
+    public int convertType(int type) {
+        //TODO: Not sure what the different types for time things should be
         if (type == java.sql.Types.TIMESTAMP) {
             return TYPE_TIMESTAMP;
+        } else if (type == java.sql.Types.DATE) {
+            return TYPE_TIMESTAMP;
+        } else if (type == java.sql.Types.TIME) {
+            return TYPE_TIME;
         } else if (type == java.sql.Types.VARCHAR) {
+            return TYPE_VARCHAR;
+        } else if (type == java.sql.Types.TEXT) {
             return TYPE_VARCHAR;
         } else if (type == java.sql.Types.INTEGER) {
             return TYPE_INTEGER;
@@ -100,8 +116,21 @@ public class ColumnInfo {
             return TYPE_CLOB;
         } else if (type == java.sql.Types.BIGINT) {
             return TYPE_BIGINT;
+        } else if (type == java.sql.Types.SMALLINT) {
+            return TYPE_SMALLINT;
+        } else if (type == java.sql.Types.TINYINT) {
+            return TYPE_TINYINT;
+        } else if (type == java.sql.Types.CHAR) {
+            return TYPE_TINYINT;
+        } else if (type == java.sql.Types.BIT) {
+            return TYPE_TINYINT;
+        } else if (type == java.sql.Types.DECIMAL) {
+            return TYPE_DOUBLE;
         } else {
-            throw new IllegalArgumentException("Unknown sqltype:" + type);
+            System.out.println("Unknown:" + type + " " + typeName);
+
+            return type;
+            //            throw new IllegalArgumentException("Unknown sqltype:" + type);
         }
     }
 

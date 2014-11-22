@@ -154,6 +154,11 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     /** _more_ */
     private BasicDataSource dataSource;
 
+    /** _more_ */
+    private Hashtable<String, BasicDataSource> externalDataSources =
+        new Hashtable<String, BasicDataSource>();
+
+
     /** Keeps track of active connections */
     //    private Hashtable<Connection, ConnectionInfo> connectionMap =
     //        new Hashtable<Connection, ConnectionInfo>();
@@ -208,6 +213,11 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             return;
         }
         haveInitialized = true;
+        System.setProperty(
+            "jdbc.drivers",
+            "org.apache.derby.jdbc.EmbeddedDriver:com.mysql.jdbc.Driver:org.postgresql.Driver:org.Oracle.Driver");
+
+
         SqlUtil.setConnectionManager(this);
 
         dataSource = doMakeDataSource();
@@ -327,7 +337,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      *
      * @return _more_
      */
-    private String getDbId(String jdbc) {
+    private String getDbType(String jdbc) {
         if (jdbc.indexOf("mysql") >= 0) {
             return DB_MYSQL;
         }
@@ -363,13 +373,14 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     public BasicDataSource makeDataSource(String connectionUrl,
                                           String userName, String password)
             throws Exception {
-        String db                      = getDbId(connectionUrl);
-        String driverClassPropertyName = PROP_DB_DRIVER.replace("${db}", db);
+        String dbType = getDbType(connectionUrl);
+        String driverClassPropertyName = PROP_DB_DRIVER.replace("${db}",
+                                             dbType);
         //      System.err.println("JDBC Property:" + driverClassPropertyName);
         String driverClassName =
             (String) getRepository().getProperty(driverClassPropertyName);
-        //      System.err.println("JDBC driver class:" + driverClassName);
-        Misc.findClass(driverClassName);
+
+        //        Misc.findClass(driverClassName);
 
         BasicDataSource ds = new BasicDataSource();
 
@@ -387,17 +398,119 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         ds.setRemoveAbandonedOnMaintenance(true);
 
 
-        ds.setDriverClassName(driverClassName);
+        System.err.println("DatabaseManager.makeDataSource: url="
+                           + connectionUrl);
+        System.err.println("JDBC driver class:" + driverClassName
+                           + " db type:" + dbType);
+
+        //        ds.setDriverClassName(driverClassName);
         ds.setUsername(userName);
         ds.setPassword(password);
         ds.setUrl(connectionURL);
+
+
+
+        /*
         Logger logger = getLogManager().getLogger(LOGID);
         if (logger != null) {
             ds.setLogWriter(new Log4jPrintWriter(logger));
         }
+        */
 
         return ds;
     }
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param dbId _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Connection getExternalConnection(String dbId) throws Exception {
+        String connectionURL = getRepository().getProperty("ramadda.db."
+                                   + dbId + ".url", (String) null);
+        String user = getRepository().getProperty("ramadda.db." + dbId
+                          + ".user", (String) null);
+        String password = getRepository().getProperty("ramadda.db." + dbId
+                              + ".password", (String) null);
+
+        if (connectionURL == null) {
+            System.err.println("No connection url property for:" + dbId);
+
+            return null;
+        }
+
+
+        Properties connectionProps = new Properties();
+        if (user != null) {
+            connectionProps.put("user", user);
+        }
+        if (password != null) {
+            connectionProps.put("password", password);
+        }
+
+        Connection conn = DriverManager.getConnection(connectionURL,
+                              connectionProps);
+        if (conn == null) {
+            System.err.println("Got null connection for url:"
+                               + connectionURL);
+
+            return null;
+        }
+
+        if (true) {
+            return conn;
+        }
+
+        BasicDataSource ds = getExternalDataSource(dbId);
+        if (ds == null) {
+            return null;
+        }
+        System.err.println("Making connection:" + dbId + " " + ds);
+
+        return ds.getConnection();
+    }
+
+    /**
+     * _more_
+     *
+     * @param dbId _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public BasicDataSource getExternalDataSource(String dbId)
+            throws Exception {
+
+        String connectionURL = getRepository().getProperty("ramadda.db."
+                                   + dbId + ".url", (String) null);
+        String user = getRepository().getProperty("ramadda.db." + dbId
+                          + ".user", (String) null);
+        String password = getRepository().getProperty("ramadda.db." + dbId
+                              + ".password", (String) null);
+
+        if (connectionURL == null) {
+            return null;
+        }
+
+        BasicDataSource ds = externalDataSources.get(connectionURL);
+        if (ds != null) {
+            return ds;
+        }
+
+        ds = makeDataSource(connectionURL, user, password);
+        externalDataSources.put(connectionURL, ds);
+
+        return ds;
+    }
+
 
 
 
@@ -1391,6 +1504,107 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     /**
      * _more_
      *
+     * @param connection _more_
+     * @param all _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public List<TableInfo> getTableInfos(Connection connection, boolean all)
+            throws Exception {
+        DatabaseMetaData dbmd = connection.getMetaData();
+        ResultSet tables = dbmd.getTables(null, null, null,
+                                          new String[] { "TABLE" });
+
+
+        ResultSetMetaData rsmd = tables.getMetaData();
+        for (int col = 1; col <= rsmd.getColumnCount(); col++) {
+            //                System.err.println (rsmd.getColumnName(col));
+        }
+        List<TableInfo> tableInfos = new ArrayList<TableInfo>();
+        while (tables.next()) {
+            String  tableName = tables.getString("TABLE_NAME");
+            String  tn        = tableName.toLowerCase();
+            boolean ok        = true;
+            for (TypeHandler typeHandler :
+                    getRepository().getTypeHandlers()) {
+                if ( !typeHandler.shouldExportTable(tn)) {
+                    ok = false;
+
+                    break;
+                }
+            }
+
+            if ( !ok) {
+                continue;
+            }
+            String tableType = tables.getString("TABLE_TYPE");
+
+            if ((tableType == null) || tableType.startsWith("SYSTEM")
+                    || Misc.equals(tableType, "INDEX")) {
+                continue;
+            }
+
+            ResultSet indices = dbmd.getIndexInfo(null, null, tableName,
+                                    false, false);
+            List<IndexInfo> indexList = new ArrayList<IndexInfo>();
+            while (indices.next()) {
+                indexList.add(
+                    new IndexInfo(
+                        indices.getString("INDEX_NAME"),
+                        indices.getString("COLUMN_NAME")));
+
+            }
+
+            if ( !all) {
+                if (tn.equals(Tables.GLOBALS.NAME)
+                        || tn.equals(Tables.USERS.NAME)
+                        || tn.equals(Tables.PERMISSIONS.NAME)
+                        || tn.equals(Tables.HARVESTERS.NAME)
+                        || tn.equals(Tables.USERROLES.NAME)) {
+                    continue;
+                }
+            }
+
+            ResultSet cols = dbmd.getColumns(null, null, tableName, null);
+            rsmd = cols.getMetaData();
+            for (int col = 1; col <= rsmd.getColumnCount(); col++) {
+                //                    System.err.println ("\t" +rsmd.getColumnName(col));
+            }
+
+            List<ColumnInfo> columns = new ArrayList<ColumnInfo>();
+            //                System.err.println(tn);
+            while (cols.next()) {
+                String colName  = cols.getString("COLUMN_NAME");
+                int    type     = cols.getInt("DATA_TYPE");
+                String typeName = cols.getString("TYPE_NAME");
+                int    size     = cols.getInt("COLUMN_SIZE");
+                if (type == -1) {
+                    if (typeName.toLowerCase().equals("mediumtext")) {
+                        type = java.sql.Types.CLOB;
+                        //Just come up with some size
+                        size = 36000;
+                    } else if (typeName.toLowerCase().equals("longtext")) {
+                        type = java.sql.Types.CLOB;
+                        //Just come up with some size
+                        size = 36000;
+                    }
+                }
+                //                System.err.println ("col:" + colName +" " + typeName +" " + type);
+                columns.add(new ColumnInfo(colName, typeName, type, size));
+            }
+            tableInfos.add(new TableInfo(tn, indexList, columns));
+        }
+
+        return tableInfos;
+    }
+
+
+
+    /**
+     * _more_
+     *
      * @param os _more_
      * @param all _more_
      * @param actionId _more_
@@ -1405,96 +1619,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         DataOutputStream dos        = new DataOutputStream(os);
         Connection       connection = getConnection();
         try {
-            DatabaseMetaData dbmd     = connection.getMetaData();
-            ResultSet        catalogs = dbmd.getCatalogs();
-            ResultSet tables = dbmd.getTables(null, null, null,
-                                   new String[] { "TABLE" });
-
-
-            ResultSetMetaData rsmd = tables.getMetaData();
-            for (int col = 1; col <= rsmd.getColumnCount(); col++) {
-                //                System.err.println (rsmd.getColumnName(col));
-            }
-            List<TableInfo> tableInfos = new ArrayList<TableInfo>();
-            while (tables.next()) {
-                String  tableName = tables.getString("TABLE_NAME");
-                String  tn        = tableName.toLowerCase();
-                boolean ok        = true;
-                for (TypeHandler typeHandler :
-                        getRepository().getTypeHandlers()) {
-                    if ( !typeHandler.shouldExportTable(tn)) {
-                        ok = false;
-
-                        break;
-                    }
-                }
-
-                if ( !ok) {
-                    continue;
-                }
-                String tableType = tables.getString("TABLE_TYPE");
-
-                if ((tableType == null) || tableType.startsWith("SYSTEM")
-                        || Misc.equals(tableType, "INDEX")) {
-                    continue;
-                }
-
-                ResultSet indices = dbmd.getIndexInfo(null, null, tableName,
-                                        false, false);
-                List<IndexInfo> indexList = new ArrayList<IndexInfo>();
-                while (indices.next()) {
-                    indexList.add(
-                        new IndexInfo(
-                            indices.getString("INDEX_NAME"),
-                            indices.getString("COLUMN_NAME")));
-
-                }
-
-                if ( !all) {
-                    if (tn.equals(Tables.GLOBALS.NAME)
-                            || tn.equals(Tables.USERS.NAME)
-                            || tn.equals(Tables.PERMISSIONS.NAME)
-                            || tn.equals(Tables.HARVESTERS.NAME)
-                            || tn.equals(Tables.USERROLES.NAME)) {
-                        continue;
-                    }
-                }
-
-                ResultSet cols = dbmd.getColumns(null, null, tableName, null);
-                rsmd = cols.getMetaData();
-                for (int col = 1; col <= rsmd.getColumnCount(); col++) {
-                    //                    System.err.println ("\t" +rsmd.getColumnName(col));
-                }
-
-                List<ColumnInfo> columns = new ArrayList<ColumnInfo>();
-                //                System.err.println(tn);
-                while (cols.next()) {
-                    String colName  = cols.getString("COLUMN_NAME");
-                    int    type     = cols.getInt("DATA_TYPE");
-                    String typeName = cols.getString("TYPE_NAME");
-                    int    size     = cols.getInt("COLUMN_SIZE");
-                    if (type == -1) {
-                        if (typeName.toLowerCase().equals("mediumtext")) {
-                            type = java.sql.Types.CLOB;
-                            //Just come up with some size
-                            size = 36000;
-                        } else if (typeName.toLowerCase().equals(
-                                "longtext")) {
-                            type = java.sql.Types.CLOB;
-                            //Just come up with some size
-                            size = 36000;
-                        }
-                    }
-                    System.err.println("\tcol:" + colName + " type:" + type
-                                       + " name:" + typeName + " size:"
-                                       + size);
-                    columns.add(new ColumnInfo(colName, typeName, type,
-                            size));
-                }
-                tableInfos.add(new TableInfo(tn, indexList, columns));
-            }
-
-            String xml = encoder.toXml(tableInfos, false);
+            List<TableInfo> tableInfos = getTableInfos(connection, false);
+            String          xml        = encoder.toXml(tableInfos, false);
             writeString(dos, xml);
 
             int rowCnt = 0;
@@ -1541,6 +1667,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                             }
                         } else if (type == ColumnInfo.TYPE_VARCHAR) {
                             writeString(dos, results.getString(i));
+                        } else if (type == ColumnInfo.TYPE_TIME) {
+                            //TODO: What is the format of a type time?
+                            //                            writeString(dos, results.getString(i));
                         } else if (type == ColumnInfo.TYPE_INTEGER) {
                             writeInteger(dos, (Integer) results.getObject(i));
                         } else if (type == ColumnInfo.TYPE_DOUBLE) {
@@ -1549,6 +1678,11 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                             writeString(dos, results.getString(i));
                         } else if (type == ColumnInfo.TYPE_BIGINT) {
                             writeLong(dos, results.getLong(i));
+                        } else if (type == ColumnInfo.TYPE_SMALLINT) {
+                            dos.writeShort(results.getShort(i));
+                        } else if (type == ColumnInfo.TYPE_TINYINT) {
+                            //TODO:
+                            //dos.write(results.getChar(i));
                         } else {
                             Object object = results.getObject(i);
 
