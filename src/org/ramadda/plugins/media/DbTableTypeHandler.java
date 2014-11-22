@@ -204,10 +204,10 @@ public class DbTableTypeHandler extends TabularTypeHandler {
                 row.add(value);
             }
             if ( !visitInfo.rowOk(row)) {
-                System.err.println ("bad row:" + row);
+                //                System.err.println ("bad row:" + row);
                 continue;
             }
-            System.err.println ("adding row:" + row);
+            //            System.err.println ("adding row:" + row);
             rows.add(row);
         }
         visitor.visit(visitInfo, table, rows);
