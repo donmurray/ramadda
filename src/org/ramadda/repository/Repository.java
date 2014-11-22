@@ -4832,9 +4832,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
         User user = getUserManager().findUser(userId);
 
         if (user == null) {
-            throw new IllegalArgumentException("Could not find user:"
-                    + userId);
-
+            //            throw new IllegalArgumentException("Could not find user:" + userId);
         }
         Request request = new Request(getRepository(), "", new Hashtable());
         request.setUser(user);
