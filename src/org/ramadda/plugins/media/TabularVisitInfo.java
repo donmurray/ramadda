@@ -26,8 +26,9 @@ import org.ramadda.repository.*;
 
 import ucar.unidata.util.StringUtil;
 
-import java.util.HashSet;
 import java.util.ArrayList;
+
+import java.util.HashSet;
 import java.util.List;
 
 
@@ -44,28 +45,34 @@ public class TabularVisitInfo {
     /** _more_ */
     private List<TabularSearchField> searchFields;
 
+    /** _more_          */
     private String searchText;
 
 
     /** _more_ */
     private HashSet<Integer> sheetsToShow;
 
-    public TabularVisitInfo(Request request, 
-                            Entry entry) {
-        searchText = request.getString("table.text",(String) null);
-        if(searchText!=null) {
-            searchText = "(?i:.*" + searchText +".*)";
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     */
+    public TabularVisitInfo(Request request, Entry entry) {
+        searchText = request.getString("table.text", (String) null);
+        if (searchText != null) {
+            searchText = "(?i:.*" + searchText + ".*)";
         }
 
-        if(TabularTypeHandler.isTabular(entry)) {
-            searchFields =  new ArrayList<TabularSearchField>();
+        if (TabularTypeHandler.isTabular(entry)) {
+            searchFields = new ArrayList<TabularSearchField>();
             for (String line :
                     StringUtil.split(
                         entry.getValue(
                             TabularTypeHandler.IDX_SEARCHINFO, ""), "\n",
                                 true, true)) {
                 TabularSearchField sf = new TabularSearchField(line);
-                sf.setValue(request.getString(sf.getUrlArg(),(String)null));
+                sf.setValue(request.getString(sf.getUrlArg(), (String) null));
                 searchFields.add(sf);
             }
             if (searchFields.size() == 0) {
@@ -75,16 +82,27 @@ public class TabularVisitInfo {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param cols _more_
+     *
+     * @return _more_
+     */
     public boolean rowOk(List cols) {
-        if(searchText!=null) {
-            for(Object o: cols) {
-                if(o == null) continue;
-                if(o.toString().matches(searchText)) {
+        if (searchText != null) {
+            for (Object o : cols) {
+                if (o == null) {
+                    continue;
+                }
+                if (o.toString().matches(searchText)) {
                     return true;
                 }
             }
+
             return false;
         }
+
         return true;
     }
 
@@ -93,15 +111,16 @@ public class TabularVisitInfo {
     /**
      * _more_
      *
+     *
+     * @param request _more_
+     * @param entry _more_
      * @param skipRows _more_
      * @param maxRows _more_
      * @param sheetsToShow _more_
      * @param searchFields _more_
      */
-    public TabularVisitInfo(Request request, 
-                            Entry entry,
-                            int skipRows, int maxRows,
-                            HashSet<Integer> sheetsToShow) {
+    public TabularVisitInfo(Request request, Entry entry, int skipRows,
+                            int maxRows, HashSet<Integer> sheetsToShow) {
         this(request, entry);
         this.skipRows     = skipRows;
         this.maxRows      = maxRows;

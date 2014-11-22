@@ -131,11 +131,9 @@
   <type name="type_document_db"  description="Database Table"  super="type_document_tabular"   handler="org.ramadda.plugins.media.DbTableTypeHandler">
      <property name="form.resource.show" value="false"/>
      <property name="icon" value="/media/database.png"/>
-     <column   name="jdbc_url" type="string"  columns="60" label="JDBC Url"  showinhtml="false"  group="Database">
-<suffix><![CDATA[JDBC URL to connect to. <a target="_help" href="http://ramadda.org/repository/media/dbtable.html"/>Help</a>]]></suffix>
+     <column   name="db_id" type="string"  columns="60" label="External Database ID"  showinhtml="false"  group="Database">
+<suffix><![CDATA[The shorthand ID of the external database connection <a target="_help" href="http://ramadda.org/repository/media/dbtable.html"/>More information</a>]]></suffix>
 </column>
-     <column   name="jdbc_user" type="string"   label="Database user"  showinhtml="false"/>
-     <column   name="jdbc_password" type="password" label="Database user"  showinhtml="false"/>
      <column   name="table_name" type="string"  size="200" columns="60" label="Table name"  showinhtml="false" suffix="Database table to query"/>
      <column name="columns" type="string"  size="500" rows="5" columns="60" label="Columns to use"  showinhtml="false" suffix="One column name per line"/>
 </type>

@@ -110,13 +110,6 @@ public class TabularTypeHandler extends MsDocTypeHandler {
     /** _more_ */
     public static final int IDX_LAST = IDX;
 
-    /*
-column:type
-name:string
-     */
-
-
-
     /** _more_ */
     private TabularOutputHandler tabularOutputHandler;
 
@@ -141,7 +134,10 @@ name:string
      * @return _more_
      */
     public static boolean isTabular(Entry entry) {
-        if(entry == null) return false;
+        if (entry == null) {
+            return false;
+        }
+
         return entry.getTypeHandler().isType(TabularTypeHandler.TYPE_TABULAR);
     }
 
@@ -207,6 +203,10 @@ name:string
                 requestProps, entry);
     }
 
+
+    public boolean okToShowTable(Request request,  Entry entry) {
+        return true;
+    }
 
     /**
      * _more_

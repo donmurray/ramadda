@@ -245,7 +245,8 @@ public class TabularOutputHandler extends OutputHandler {
         final List<String> sheets  = new ArrayList<String>();
         TabularVisitor     visitor = new TabularVisitor() {
             @Override
-            public boolean visit(TabularVisitInfo info,String sheet, List<List<Object>> rows) {
+            public boolean visit(TabularVisitInfo info, String sheet,
+                                 List<List<Object>> rows) {
                 List<String> jrows = new ArrayList<String>();
                 for (List<Object> cols : rows) {
                     List<String> quoted = new ArrayList<String>();
@@ -266,11 +267,10 @@ public class TabularOutputHandler extends OutputHandler {
             }
         };
 
-        TabularVisitInfo visitInfo =
-            new TabularVisitInfo(request, entry, 
-                                 getSkipRows(request, entry),
-                                 getRowCount(request, entry, MAX_ROWS),
-                                 sheetsToShow);
+        TabularVisitInfo visitInfo = new TabularVisitInfo(request, entry,
+                                         getSkipRows(request, entry),
+                                         getRowCount(request, entry,
+                                             MAX_ROWS), sheetsToShow);
         visit(request, entry, file, visitInfo, visitor);
 
         sb.append(Json.list(sheets));
@@ -316,6 +316,7 @@ public class TabularOutputHandler extends OutputHandler {
     private int getRowCount(Request request, Entry entry, int dflt)
             throws Exception {
         int v = (int) request.get("table.rows", dflt);
+
         return v;
     }
 
@@ -403,14 +404,14 @@ public class TabularOutputHandler extends OutputHandler {
                 break;
             }
             List cols = Utils.tokenizeColumns(line, ",");
-            if(!visitInfo.rowOk(cols)) {
+            if ( !visitInfo.rowOk(cols)) {
                 continue;
             }
             rows.add((List<Object>) cols);
         }
 
 
-        
+
 
         visitor.visit(visitInfo, entry.getName(), rows);
     }
@@ -467,7 +468,8 @@ public class TabularOutputHandler extends OutputHandler {
             List<List<Object>> rows      = new ArrayList<List<Object>>();
             int                sheetSkip = visitInfo.getSkipRows();
             for (int rowIdx = sheet.getFirstRowNum();
-                 (rows.size() < maxRows) && (rowIdx <= sheet.getLastRowNum());
+                    (rows.size() < maxRows)
+                    && (rowIdx <= sheet.getLastRowNum());
                     rowIdx++) {
                 if (sheetSkip-- > 0) {
                     continue;
@@ -504,8 +506,8 @@ public class TabularOutputHandler extends OutputHandler {
                     cols.add(value);
                 }
 
-                if(!visitInfo.rowOk(cols)) {
-                    if(rows.size()==0) {
+                if ( !visitInfo.rowOk(cols)) {
+                    if (rows.size() == 0) {
                         //todo: check for the header line
                     } else {
                         continue;
@@ -537,6 +539,14 @@ public class TabularOutputHandler extends OutputHandler {
     public String getHtmlDisplay(Request request, Hashtable requestProps,
                                  Entry entry)
             throws Exception {
+
+        if(isTabular( entry)) {
+            TabularTypeHandler handler =  (TabularTypeHandler) entry.getTypeHandler();
+            if(!handler.okToShowTable(request,  entry)) {
+                return null;
+            }
+        }
+
 
         boolean showTable = entry.getValue(XlsTypeHandler.IDX_SHOWTABLE,
                                            true);
@@ -640,18 +650,18 @@ public class TabularOutputHandler extends OutputHandler {
         propsList.add("url");
         propsList.add(Json.quote(jsonUrl));
 
-        TabularVisitInfo visitInfo =
-            new TabularVisitInfo(request, entry);
+        TabularVisitInfo visitInfo = new TabularVisitInfo(request, entry);
 
         //        System.err.println("search fields:" + visitInfo.getSearchFields());
 
-        if(visitInfo.getSearchFields()!=null) {
+        if (visitInfo.getSearchFields() != null) {
             propsList.add("searchFields");
             List<String> names = new ArrayList<String>();
-            for(TabularSearchField searchField: visitInfo.getSearchFields()) {
+            for (TabularSearchField searchField :
+                    visitInfo.getSearchFields()) {
                 names.add(searchField.getName());
             }
-            propsList.add(Json.list(names,true));
+            propsList.add(Json.list(names, true));
         }
 
         String        props = Json.map(propsList);
@@ -687,7 +697,10 @@ public class TabularOutputHandler extends OutputHandler {
      * @return _more_
      */
     public static boolean isTabular(Entry entry) {
-        if(entry == null) return false;
+        if (entry == null) {
+            return false;
+        }
+
         return entry.getTypeHandler().isType(TabularTypeHandler.TYPE_TABULAR);
     }
 
@@ -731,7 +744,8 @@ public class TabularOutputHandler extends OutputHandler {
 
         final List<String> sheets  = new ArrayList<String>();
         TabularVisitor     visitor = new TabularVisitor() {
-            public boolean visit(TabularVisitInfo info, String sheetName, List<List<Object>> rows) {
+            public boolean visit(TabularVisitInfo info, String sheetName,
+                                 List<List<Object>> rows) {
                 sheetName = sheetName.replaceAll("[/]+", "-");
                 Sheet sheet  = wb.createSheet(sheetName);
                 int   rowCnt = 0;
@@ -757,8 +771,8 @@ public class TabularOutputHandler extends OutputHandler {
         };
 
         TabularVisitInfo visitInfo =
-            new TabularVisitInfo(request, entry,
-                getSkipRows(request, entry),
+            new TabularVisitInfo(
+                request, entry, getSkipRows(request, entry),
                 getRowCount(request, entry, Integer.MAX_VALUE), sheetsToShow);
 
 

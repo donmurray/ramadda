@@ -54,48 +54,58 @@ public class TabularSearchField {
         this.value = value;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
-        return "search field: name=" + name +" value=" + value;
+        return "search field: name=" + name + " value=" + value;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getUrlArg() {
         return "search_table_" + name;
     }
 
     /**
-       Set the Name property.
-
-       @param value The new value for Name
-    **/
-    public void setName (String value) {
-	name = value;
+     *  Set the Name property.
+     *
+     *  @param value The new value for Name
+     */
+    public void setName(String value) {
+        name = value;
     }
 
     /**
-       Get the Name property.
-
-       @return The Name
-    **/
-    public String getName () {
-	return name;
+     *  Get the Name property.
+     *
+     *  @return The Name
+     */
+    public String getName() {
+        return name;
     }
 
     /**
-       Set the Value property.
-
-       @param value The new value for Value
-    **/
-    public void setValue (String value) {
-	value = value;
+     *  Set the Value property.
+     *
+     *  @param value The new value for Value
+     */
+    public void setValue(String value) {
+        value = value;
     }
 
     /**
-       Get the Value property.
-
-       @return The Value
-    **/
-    public String getValue () {
-	return value;
+     *  Get the Value property.
+     *
+     *  @return The Value
+     */
+    public String getValue() {
+        return value;
     }
 
 

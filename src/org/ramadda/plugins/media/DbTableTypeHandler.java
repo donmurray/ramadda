@@ -22,10 +22,12 @@ package org.ramadda.plugins.media;
 
 
 import org.ramadda.repository.*;
+import org.ramadda.repository.database.*;
 import org.ramadda.repository.metadata.*;
 import org.ramadda.repository.type.*;
 
 import org.ramadda.sql.*;
+import org.ramadda.util.FormInfo;
 import org.ramadda.util.HtmlUtils;
 
 import org.ramadda.util.Json;
@@ -70,13 +72,7 @@ public class DbTableTypeHandler extends TabularTypeHandler {
     private static int IDX = TabularTypeHandler.IDX_LAST;
 
     /** _more_ */
-    public static final int IDX_JDBC = IDX++;
-
-    /** _more_ */
-    public static final int IDX_USER = IDX++;
-
-    /** _more_ */
-    public static final int IDX_PASSWORD = IDX++;
+    public static final int IDX_DBID = IDX++;
 
     /** _more_ */
     public static final int IDX_TABLE = IDX++;
@@ -85,6 +81,9 @@ public class DbTableTypeHandler extends TabularTypeHandler {
     public static final int IDX_COLUMNS = IDX++;
 
 
+    /** _more_          */
+    private Hashtable<String, List<TableInfo>> dbToTables =
+        new Hashtable<String, List<TableInfo>>();
 
     /**
      * _more_
@@ -126,11 +125,30 @@ public class DbTableTypeHandler extends TabularTypeHandler {
                       TabularVisitInfo visitInfo, TabularVisitor visitor)
             throws Exception {
 
+        System.err.println ("visit");
+        String dbid = entry.getValue(IDX_DBID, (String) null);
+        if ( !Utils.stringDefined(dbid)) {
+            System.err.println("DbTableTypeHandler.visit: no dbid defined");
+
+            return;
+        }
+
+        Connection connection =
+            getDatabaseManager().getExternalConnection(dbid);
+        if (connection == null) {
+            System.err.println("DbTableTypeHandler.visit: no connection");
+
+            return;
+        }
+
+
+
         String table = entry.getValue(IDX_TABLE, (String) null);
         //        System.err.println("table:" + table + " idx:" + IDX_TABLE);
 
         if ( !Utils.stringDefined(table)) {
             System.err.println("DbTableTypeHadler.visit: no table defined");
+
             return;
         }
 
@@ -143,14 +161,19 @@ public class DbTableTypeHandler extends TabularTypeHandler {
         }
 
         int max = TabularOutputHandler.MAX_ROWS;
-        Statement stmt = getDatabaseManager().select(what,
-                             Misc.newList(table), null, "", max);
+ 
+        SqlUtil.debug = true;
+       Statement stmt = SqlUtil.select(connection, what,
+                                        Misc.newList(table), null, "", max,
+                                        0);
 
-        SqlUtil.Iterator   iter = getDatabaseManager().getIterator(stmt);
+
+        SqlUtil.debug = false;
+        SqlUtil.Iterator   iter = new SqlUtil.Iterator(stmt);
         ResultSet          results;
-
         ResultSetMetaData  rsmd = null;
 
+       System.err.println ("iterating");
         List<List<Object>> rows = new ArrayList<List<Object>>();
         while ((results = iter.getNext()) != null) {
             if (rsmd == null) {
@@ -180,11 +203,134 @@ public class DbTableTypeHandler extends TabularTypeHandler {
                 }
                 row.add(value);
             }
-            if(!visitInfo.rowOk(row)) {
+            if ( !visitInfo.rowOk(row)) {
+                System.err.println ("bad row:" + row);
                 continue;
             }
+            System.err.println ("adding row:" + row);
             rows.add(row);
         }
         visitor.visit(visitInfo, table, rows);
+        connection.close();
     }
+
+
+    @Override
+    public boolean okToShowTable(Request request,  Entry entry) {
+        if(!Utils.stringDefined(entry.getValue(IDX_DBID, (String) null))) return false;
+        if(!Utils.stringDefined(entry.getValue(IDX_TABLE, (String) null))) return false;
+        return super.okToShowTable(request,  entry);
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param column _more_
+     * @param formBuffer _more_
+     * @param values _more_
+     * @param state _more_
+     * @param formInfo _more_
+     *
+     * @throws Exception _more_
+     */
+    @Override
+    public void addColumnToEntryForm(Request request, Entry entry,
+                                     Column column, Appendable formBuffer,
+                                     Object[] values, Hashtable state,
+                                     FormInfo formInfo)
+            throws Exception {
+
+        if (column.getName().equals("db_id")) {
+            List<String> dbs = StringUtil.split(getRepository().getProperty("ramadda.dbs",""),",",true,true);
+            if(dbs.size() > 0) {
+                String dbid = entry.getValue(IDX_DBID, (String) null);
+                formBuffer.append(
+                    formEntry(
+                        request, column.getLabel() + ":",
+                        HtmlUtils.select(
+                                         column.getEditArg(), dbs,dbid)));
+                return;
+            }
+        }
+
+        if (column.getName().equals("table_name")) {
+            List<String> tables = getTableNames(entry);
+            if (tables != null && tables.size()>0) {
+                tables.add(0,"");
+                String name = entry.getValue(IDX_TABLE, (String) null);
+                formBuffer.append(
+                    formEntry(
+                        request, column.getLabel() + ":",
+                        HtmlUtils.select(
+                            column.getEditArg(), tables,
+                            name)));
+
+                return;
+            }
+        }
+        super.addColumnToEntryForm(request, entry, column, formBuffer,
+                                   values, state, formInfo);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param column _more_
+     * @param widget _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String xxxgetFormWidget(Request request, Entry entry,
+                                   Column column, String widget)
+            throws Exception {
+        return super.getFormWidget(request, entry, column, widget);
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private List<String> getTableNames(Entry entry) throws Exception {
+        String dbid = entry.getValue(IDX_DBID, (String) null);
+        if ( !Utils.stringDefined(dbid)) {
+            return null;
+        }
+
+        List<TableInfo> tableInfos  = dbToTables.get(dbid);
+        if (tableInfos == null) {
+            Connection connection = null;
+            try {
+                connection = getDatabaseManager().getExternalConnection(dbid);
+                if (connection == null) {
+                    System.err.println("DbTableTypeHadler.visit: no connection");
+                    return null;
+                }
+                tableInfos = getDatabaseManager().getTableInfos(connection, true);
+            } finally {
+                connection.close();
+            }
+            dbToTables.put(dbid, tableInfos);
+        }
+
+        if(tableInfos == null) {
+            return null;
+        }
+        return TableInfo.getTableNames(tableInfos);
+    }
+
+
 }
