@@ -227,6 +227,9 @@ public class JobManager extends RepositoryManager {
         if (service != null) {
             return service;
         }
+        if (!getAdmin().getInstallationComplete()) {
+            return null;
+        }
         Request request      = getRepository().getTmpRequest();
         Entry   serviceEntry = getEntryManager().getEntry(request, id);
         if ((serviceEntry != null)
