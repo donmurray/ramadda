@@ -278,21 +278,6 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             scourMessages = new ArrayList<String>();
             totalScours   = 0;
 
-
-            BasicDataSource ds = new BasicDataSource();
-
-            //            ds.setMaxActive(getRepository().getProperty(PROP_DB_POOL_MAXACTIVE, 100));
-            //            ds.setMaxIdle(getRepository().getProperty(PROP_DB_POOL_MAXIDLE,100));
-            ds.setMaxTotal(getRepository().getProperty(PROP_DB_POOL_MAXACTIVE,100));
-
-            //30 second time out
-            ds.setMaxWaitMillis(1000*30);
-            //60 seconds
-            ds.setRemoveAbandonedTimeout(60);
-            //            ds.setRemoveAbandoned(true);
-            ds.setRemoveAbandonedOnBorrow(true);
-            ds.setRemoveAbandonedOnMaintenance(true);
-
             String userName = (String) getRepository().getProperty(
                                   PROP_DB_USER.replace("${db}", db));
             String password = (String) getRepository().getProperty(
@@ -310,14 +295,6 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             connectionURL = connectionURL.replace("%db.name%",
                     getRepository().getProperty("db.name", "repository"));
 
-            String driverClassPropertyName = PROP_DB_DRIVER.replace("${db}",
-                                                 db);
-            //      System.err.println("JDBC Property:" + driverClassPropertyName);
-            String driverClassName =
-                (String) getRepository().getProperty(driverClassPropertyName);
-            //      System.err.println("JDBC driver class:" + driverClassName);
-            Misc.findClass(driverClassName);
-
             System.err.println("RAMADDA: DatabaseManager connection url:"
                                + connectionURL + " user name:" + userName);
 
@@ -328,14 +305,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                 connectionURL += "dataEncryption=true;bootPassword="
                                  + encryptPassword + ";";
             }
-            ds.setDriverClassName(driverClassName);
-            ds.setUsername(userName);
-            ds.setPassword(password);
-            ds.setUrl(connectionURL);
-            Logger logger = getLogManager().getLogger(LOGID);
-            if (logger != null) {
-                ds.setLogWriter(new Log4jPrintWriter(logger));
-            }
+            BasicDataSource ds = makeDataSource(connectionURL, userName,
+                                     password);
 
             return ds;
         } catch (Exception exc) {
@@ -345,6 +316,87 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
 
             throw exc;
         }
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param jdbc _more_
+     *
+     * @return _more_
+     */
+    private String getDbId(String jdbc) {
+        if (jdbc.indexOf("mysql") >= 0) {
+            return DB_MYSQL;
+        }
+        if (jdbc.indexOf("postgres") >= 0) {
+            return DB_POSTGRES;
+        }
+        if (jdbc.indexOf("oracle") >= 0) {
+            return DB_ORACLE;
+        }
+        if (jdbc.indexOf("h2") >= 0) {
+            return DB_H2;
+        }
+        if (jdbc.indexOf("derby") >= 0) {
+            return DB_DERBY;
+        }
+
+        throw new IllegalArgumentException(
+            "Could not determine database type:" + jdbc);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param connectionUrl _more_
+     * @param userName _more_
+     * @param password _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public BasicDataSource makeDataSource(String connectionUrl,
+                                          String userName, String password)
+            throws Exception {
+        String db                      = getDbId(connectionUrl);
+        String driverClassPropertyName = PROP_DB_DRIVER.replace("${db}", db);
+        //      System.err.println("JDBC Property:" + driverClassPropertyName);
+        String driverClassName =
+            (String) getRepository().getProperty(driverClassPropertyName);
+        //      System.err.println("JDBC driver class:" + driverClassName);
+        Misc.findClass(driverClassName);
+
+        BasicDataSource ds = new BasicDataSource();
+
+        //            ds.setMaxActive(getRepository().getProperty(PROP_DB_POOL_MAXACTIVE, 100));
+        //            ds.setMaxIdle(getRepository().getProperty(PROP_DB_POOL_MAXIDLE,100));
+        ds.setMaxTotal(getRepository().getProperty(PROP_DB_POOL_MAXACTIVE,
+                100));
+
+        //30 second time out
+        ds.setMaxWaitMillis(1000 * 30);
+        //60 seconds
+        ds.setRemoveAbandonedTimeout(60);
+        //            ds.setRemoveAbandoned(true);
+        ds.setRemoveAbandonedOnBorrow(true);
+        ds.setRemoveAbandonedOnMaintenance(true);
+
+
+        ds.setDriverClassName(driverClassName);
+        ds.setUsername(userName);
+        ds.setPassword(password);
+        ds.setUrl(connectionURL);
+        Logger logger = getLogManager().getLogger(LOGID);
+        if (logger != null) {
+            ds.setLogWriter(new Log4jPrintWriter(logger));
+        }
+
+        return ds;
     }
 
 
@@ -442,9 +494,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         StringBuffer    poolSB = new StringBuffer();
         poolSB.append("&nbsp;&nbsp;#active:" + bds.getNumActive()
                       + "<br>&nbsp;&nbsp;#idle:" + bds.getNumIdle()
-                      //                      + "<br>&nbsp;&nbsp;max active: " + bds.getMaxActive()
-                      //                      + "<br>&nbsp;&nbsp;max idle:" + bds.getMaxIdle());
-                      + "<br>&nbsp;&nbsp;max active: " + bds.getMaxTotal());
+        //                      + "<br>&nbsp;&nbsp;max active: " + bds.getMaxActive()
+        //                      + "<br>&nbsp;&nbsp;max idle:" + bds.getMaxIdle());
+        + "<br>&nbsp;&nbsp;max active: " + bds.getMaxTotal());
 
         poolSB.append("<br># of open selects:" + numberOfSelects.getCount());
         poolSB.append("<br>");
@@ -489,48 +541,48 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                 HtmlUtils.makeShowHideBlock(
                     msg("Connection Pool"), poolSB.toString(), false), 20));
 
-        /********************
-          Don't show the entry break down as it can be kind of slow
-        dbSB.append(HtmlUtils.br());
-        dbSB.append("<table>\n");
-        String[] names = { msg("Users"), msg("Associations"),
-                           msg("Metadata Items") };
-        String[] tables = { Tables.USERS.NAME, Tables.ASSOCIATIONS.NAME,
-                            Tables.METADATA.NAME };
-        for (int i = 0; i < tables.length; i++) {
-            dbSB.append(HtmlUtils.row(HtmlUtils.cols(""
-                    + getDatabaseManager().getCount(tables[i].toLowerCase(),
-                        new Clause()), names[i])));
-        }
-
-
-        dbSB.append(
-            HtmlUtils.row(
-                HtmlUtils.colspan(HtmlUtils.bold(msgLabel("Types")), 2)));
-        int total = 0;
-        dbSB.append(HtmlUtils.row(HtmlUtils.cols(""
-                + getDatabaseManager().getCount(Tables.ENTRIES.NAME,
-                    new Clause()), msg("Total entries"))));
-        for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
-            if (typeHandler.isType(TypeHandler.TYPE_ANY)) {
-                continue;
-            }
-            int cnt = getCount(Tables.ENTRIES.NAME,
-                               Clause.eq(Tables.ENTRIES.COL_TYPE,
-                                         typeHandler.getType()));
-
-            String url =
-                HtmlUtils.href(
-                    request.url(
-                        getRepository().getSearchManager().URL_SEARCH_FORM,
-                        ARG_TYPE,
-                        typeHandler.getType()), typeHandler.getLabel());
-            dbSB.append(HtmlUtils.row(HtmlUtils.cols("" + cnt, url)));
-        }
-
-
-        dbSB.append("</table>\n");
-        *****/
+        /**
+         * Don't show the entry break down as it can be kind of slow
+         * dbSB.append(HtmlUtils.br());
+         * dbSB.append("<table>\n");
+         * String[] names = { msg("Users"), msg("Associations"),
+         *                  msg("Metadata Items") };
+         * String[] tables = { Tables.USERS.NAME, Tables.ASSOCIATIONS.NAME,
+         *                   Tables.METADATA.NAME };
+         * for (int i = 0; i < tables.length; i++) {
+         *   dbSB.append(HtmlUtils.row(HtmlUtils.cols(""
+         *           + getDatabaseManager().getCount(tables[i].toLowerCase(),
+         *               new Clause()), names[i])));
+         * }
+         *
+         *
+         * dbSB.append(
+         *   HtmlUtils.row(
+         *       HtmlUtils.colspan(HtmlUtils.bold(msgLabel("Types")), 2)));
+         * int total = 0;
+         * dbSB.append(HtmlUtils.row(HtmlUtils.cols(""
+         *       + getDatabaseManager().getCount(Tables.ENTRIES.NAME,
+         *           new Clause()), msg("Total entries"))));
+         * for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
+         *   if (typeHandler.isType(TypeHandler.TYPE_ANY)) {
+         *       continue;
+         *   }
+         *   int cnt = getCount(Tables.ENTRIES.NAME,
+         *                      Clause.eq(Tables.ENTRIES.COL_TYPE,
+         *                                typeHandler.getType()));
+         *
+         *   String url =
+         *       HtmlUtils.href(
+         *           request.url(
+         *               getRepository().getSearchManager().URL_SEARCH_FORM,
+         *               ARG_TYPE,
+         *               typeHandler.getType()), typeHandler.getLabel());
+         *   dbSB.append(HtmlUtils.row(HtmlUtils.cols("" + cnt, url)));
+         * }
+         *
+         *
+         * dbSB.append("</table>\n");
+         */
     }
 
 
@@ -586,7 +638,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         public String toString() {
             //            return "info:" + connection + " ";
             //            return "info:" + msg +"\n" + where + " ";
-            return  where;
+            return where;
         }
 
 
@@ -790,9 +842,12 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         return connection;
     }
 
+    /**
+     * _more_
+     */
     public void printIt() {
         System.err.println("active:" + dataSource.getNumActive());
-        System.err.println("idle:" +dataSource.getNumIdle());
+        System.err.println("idle:" + dataSource.getNumIdle());
         //        System.err.println ("Open cnt:" + openCnt);
         for (ConnectionInfo info : getConnectionInfos()) {
             System.out.println("*******************");
@@ -816,6 +871,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                             || info.connection.equals(connection)) {
                         connectionInfos.remove(info);
                         gotOne = true;
+
                         break;
                     }
                 }
@@ -843,6 +899,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         }
     }
 
+    /** _more_ */
     public static int openCnt = 0;
 
 
