@@ -306,6 +306,24 @@ var HtmlUtil =  {
     getUniqueId: function() {
         return "id_" + (uniqueCnt++);
     },
+    inset : function(html, top, left, bottom, right) {
+        var attrs = [];
+        var style = "";
+        if(top) {
+            style += "padding-top: "  + top + "px; ";
+        }
+        if(left) {
+            style += "padding-left: "  + left + "px; ";
+        }
+        if(bottom) {
+            style += "padding-bottom: "  + bottom + "px; ";
+        }
+        if(right) {
+            style += "padding-right: "  + right + "px; ";
+        }
+        return HtmlUtil.div(["style", style], html);
+
+    },
     hbox : function() {
         var row = HtmlUtil.openTag("tr",["valign","top"]);
         row += "<td>";
