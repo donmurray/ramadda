@@ -526,7 +526,6 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 this.displayDownloadUrl();
 
             },
-
             displayMessage: function(msg) {
                 this.jq(ID_TABLE_HOLDER).html(msg);
            },
@@ -543,8 +542,7 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
             },
            loadTableData:  function(url) {
                 this.url = url;
-
-                this.jq(ID_CONTENTS).html(this.getLoadingMessage());
+                this.displayMessage(this.getLoadingMessage());
                 var _this = this;
 
                 var text = this.jq(ID_SEARCH_TEXT).val();
