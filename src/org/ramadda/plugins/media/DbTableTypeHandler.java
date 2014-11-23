@@ -484,7 +484,9 @@ public class DbTableTypeHandler extends TabularTypeHandler {
                 tableInfos = getDatabaseManager().getTableInfos(connection,
                         true);
             } finally {
-                connection.close();
+                if (connection != null) {
+                    connection.close();
+                }
             }
             dbToTables.put(dbid, tableInfos);
         }
