@@ -1493,8 +1493,8 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
         if(children.size()>0) {
-            initUrl = request.entryUrl(
-                                       getRepository().URL_ENTRY_SHOW, children.get(0));
+            initUrl = request.entryUrl(getRepository().URL_ENTRY_SHOW, children.get(0),
+                                       "template","empty");
         }
         sb.append(HtmlUtils.col(HtmlUtils.tag("iframe",
                                              HtmlUtils.attrs("id", "treeview_view",
