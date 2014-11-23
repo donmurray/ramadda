@@ -1488,10 +1488,19 @@ public class HtmlOutputHandler extends OutputHandler {
                 HtmlUtils.id("treeview_header")), gotoHtml)));
         sb.append("</tr><tr valign=\"top\">");
         sb.append(HtmlUtils.col(listSB.toString()));
-        sb.append(HtmlUtils.col("<iframe id=\"treeview_view\" src=\""
-                                + getRepository().getUrlBase()
-                                + "/blank\" width=\"" + width
-                                + "\" height=\"" + height + "\"></iframe>"));
+        String initUrl = getRepository().getUrlBase()
+            + "/blank";
+
+
+        if(children.size()>0) {
+            initUrl = request.entryUrl(
+                                       getRepository().URL_ENTRY_SHOW, children.get(0));
+        }
+        sb.append(HtmlUtils.col(HtmlUtils.tag("iframe",
+                                             HtmlUtils.attrs("id", "treeview_view",
+                                                            "src",initUrl,
+                                                            "width", ""+width,
+                                                            "height",""+height))));
         sb.append("</tr></table>");
         request.remove(ARG_TREEVIEW);
     }
