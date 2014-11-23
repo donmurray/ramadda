@@ -204,7 +204,15 @@ public class TabularTypeHandler extends MsDocTypeHandler {
     }
 
 
-    public boolean okToShowTable(Request request,  Entry entry) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     */
+    public boolean okToShowTable(Request request, Entry entry) {
         return true;
     }
 

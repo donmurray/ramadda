@@ -267,13 +267,17 @@ public class TabularOutputHandler extends OutputHandler {
             }
         };
 
+        List props = new ArrayList();
         TabularVisitInfo visitInfo = new TabularVisitInfo(request, entry,
                                          getSkipRows(request, entry),
                                          getRowCount(request, entry,
-                                             MAX_ROWS), sheetsToShow);
-        visit(request, entry, file, visitInfo, visitor);
+                                                     MAX_ROWS), sheetsToShow);
+        visit(request, entry, visitInfo, visitor);
+        props.addAll(visitInfo.getTableProperties());
+        props.add("sheets");
+        props.add(Json.list(sheets));
+        sb.append(Json.map(props));
 
-        sb.append(Json.list(sheets));
         request.setReturnFilename(entry.getName() + ".json");
         Result result = new Result("", sb);
         result.setShouldDecorate(false);
@@ -331,20 +335,21 @@ public class TabularOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public void visit(Request request, Entry entry, String file,
+    public void visit(Request request, Entry entry,
                       TabularVisitInfo visitInfo, TabularVisitor visitor)
             throws Exception {
 
+        File file = entry.getFile();
         //        System.err.println("visit:" + visitInfo);
         InputStream inputStream = null;
         String      suffix      = "";
 
-        if (file != null) {
+        if ((file != null) && file.exists()) {
             inputStream = new BufferedInputStream(
                 getStorageManager().getFileInputStream(file));
-            suffix = IOUtil.getFileExtension(file).toLowerCase();
+            suffix = IOUtil.getFileExtension(file.toString()).toLowerCase();
             if (suffix.equals(".xlsx") || suffix.equals(".xls")) {
-                if (new File(file).length() > 10 * 1000000) {
+                if (file.length() > 10 * 1000000) {
                     throw new IllegalArgumentException("File too big");
                 }
             }
@@ -540,9 +545,10 @@ public class TabularOutputHandler extends OutputHandler {
                                  Entry entry)
             throws Exception {
 
-        if(isTabular( entry)) {
-            TabularTypeHandler handler =  (TabularTypeHandler) entry.getTypeHandler();
-            if(!handler.okToShowTable(request,  entry)) {
+        if (isTabular(entry)) {
+            TabularTypeHandler handler =
+                (TabularTypeHandler) entry.getTypeHandler();
+            if ( !handler.okToShowTable(request, entry)) {
                 return null;
             }
         }
@@ -731,19 +737,21 @@ public class TabularOutputHandler extends OutputHandler {
             throw new IllegalArgumentException("No tabular entry found");
         }
 
-        HashSet<Integer> sheetsToShow = getSheetsToShow((String) args.get(2));
+        HashSet<Integer> sheetsToShow = getSheetsToShow((String) args.get(0));
 
         final SXSSFWorkbook wb        = new SXSSFWorkbook(100);
         //        final Workbook   wb           = new XSSFWorkbook();
-        File newFile = new File(
-                           IOUtil.joinDir(
-                               input.getProcessDir(),
-                               IOUtil.stripExtension(
-                                   getStorageManager().getFileTail(
-                                       entry)) + ".xlsx"));
 
-        final List<String> sheets  = new ArrayList<String>();
-        TabularVisitor     visitor = new TabularVisitor() {
+        String name = getStorageManager().getFileTail(entry);
+        if ( !Utils.stringDefined(name)) {
+            name = entry.getName();
+        }
+        name = IOUtil.stripExtension(name);
+
+        File newFile = new File(IOUtil.joinDir(input.getProcessDir(),
+                           name + ".xlsx"));
+
+        TabularVisitor visitor = new TabularVisitor() {
             public boolean visit(TabularVisitInfo info, String sheetName,
                                  List<List<Object>> rows) {
                 sheetName = sheetName.replaceAll("[/]+", "-");
@@ -775,8 +783,9 @@ public class TabularOutputHandler extends OutputHandler {
                 request, entry, getSkipRows(request, entry),
                 getRowCount(request, entry, Integer.MAX_VALUE), sheetsToShow);
 
+        //        http:://localhost:8080/repository/entry/show?entryid=740ae258-805d-4a1f-935d-289d0a6e5519&output=media_tabular_extractsheet&serviceform=true&execute=Execute
 
-        visit(request, entry, entry.getFile().toString(), visitInfo, visitor);
+        visit(request, entry, visitInfo, visitor);
 
         FileOutputStream fileOut = new FileOutputStream(newFile);
         wb.write(fileOut);

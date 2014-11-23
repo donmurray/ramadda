@@ -45,12 +45,17 @@ public class TabularVisitInfo {
     /** _more_ */
     private List<TabularSearchField> searchFields;
 
-    /** _more_          */
+    /** _more_ */
     private String searchText;
+
+    /** _more_          */
+    private String searchTextWithPattern;
 
 
     /** _more_ */
     private HashSet<Integer> sheetsToShow;
+
+    private List props = new ArrayList();
 
     /**
      * _more_
@@ -61,7 +66,7 @@ public class TabularVisitInfo {
     public TabularVisitInfo(Request request, Entry entry) {
         searchText = request.getString("table.text", (String) null);
         if (searchText != null) {
-            searchText = "(?i:.*" + searchText + ".*)";
+            searchTextWithPattern = "(?i:.*" + searchText + ".*)";
         }
 
         if (TabularTypeHandler.isTabular(entry)) {
@@ -82,6 +87,15 @@ public class TabularVisitInfo {
     }
 
 
+    public void addTableProperty(String name, String value) {
+        props.add(name);
+        props.add(value);
+    }
+
+    public List getTableProperties() {
+        return props;
+    }
+
     /**
      * _more_
      *
@@ -95,7 +109,7 @@ public class TabularVisitInfo {
                 if (o == null) {
                     continue;
                 }
-                if (o.toString().matches(searchText)) {
+                if (o.toString().matches(searchTextWithPattern)) {
                     return true;
                 }
             }
@@ -215,6 +229,16 @@ public class TabularVisitInfo {
     public HashSet<Integer> getSheetsToShow() {
         return sheetsToShow;
     }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getSearchText() {
+        return searchText;
+    }
+
 
 
 }

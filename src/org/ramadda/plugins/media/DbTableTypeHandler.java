@@ -53,10 +53,12 @@ import java.sql.*;
 
 import java.util.ArrayList;
 
+
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+import java.util.regex.*;
 
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
@@ -81,7 +83,7 @@ public class DbTableTypeHandler extends TabularTypeHandler {
     public static final int IDX_COLUMNS = IDX++;
 
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<String, List<TableInfo>> dbToTables =
         new Hashtable<String, List<TableInfo>>();
 
@@ -125,15 +127,32 @@ public class DbTableTypeHandler extends TabularTypeHandler {
                       TabularVisitInfo visitInfo, TabularVisitor visitor)
             throws Exception {
 
+
+        TableInfo tableInfo = getTableInfo(entry);
+        if(tableInfo!=null) {
+            List columns = new ArrayList();
+            for (ColumnInfo col : tableInfo.getColumns()) {
+                columns.add(Json.map("name",
+                                     Json.quote(col.getName()),
+                                     "type",
+                                     Json.quote(col.getTypeName())));
+            }
+            visitInfo.addTableProperty("columns", Json.list(columns));
+        }
+
+
         String dbid = entry.getValue(IDX_DBID, (String) null);
         if ( !Utils.stringDefined(dbid)) {
             System.err.println("DbTableTypeHandler.visit: no dbid defined");
+
             return;
         }
 
-        Connection   connection = getDatabaseManager().getExternalConnection("table.db." + dbid);
+        Connection connection =
+            getDatabaseManager().getExternalConnection("table.db." + dbid);
         if (connection == null) {
             System.err.println("DbTableTypeHandler.visit: no connection");
+
             return;
         }
 
@@ -154,15 +173,97 @@ public class DbTableTypeHandler extends TabularTypeHandler {
             what = StringUtil.join(",", cols);
         }
 
-        int max = TabularOutputHandler.MAX_ROWS;
- 
-        //        SqlUtil.debug = true;
-       Statement stmt = SqlUtil.select(connection, what,
-                                        Misc.newList(table), null, "", max,
-                                        0);
+        int          max        = TabularOutputHandler.MAX_ROWS;
+
+        List<Clause> andClauses = new ArrayList<Clause>();
+        List<Clause> orClauses  = new ArrayList<Clause>();
+        String       s          = visitInfo.getSearchText();
+        String opp = "(<>|=|<|>|<=|>=)";
+
+        if (Utils.stringDefined(s)) {
+            if (tableInfo != null) {
+                for (ColumnInfo col : tableInfo.getColumns()) {
+                    //Don't loop forever
+                    int cnt = 5;
+                    while (cnt-- > 0) {
+                        if (s.length() == 0) {
+                            break;
+                        }
+                        String pattern = col.getName().toLowerCase() + "\\s*"
+                                         + opp + "\\s*([^\\s]+)";
+                        String[] toks = Utils.findPatterns(s, pattern);
+                        if (toks == null) {
+                            pattern = col.getName().toLowerCase() + "\\s*"
+                                      + opp + "\\s*\"(.*)\"";
+                            toks = Utils.findPatterns(s, pattern);
+                        }
+                        if (toks == null) {
+                            break;
+                        }
+                        if (toks != null) {
+                            String op = toks[0].trim();
+                            String v  = toks[1];
+                            s = s.replaceFirst(pattern, "").trim();
+                            v = v.trim();
+                            Clause clause = new Clause(col.getName(), op, v);
+                            andClauses.add(clause);
+                        }
+                    }
+                }
 
 
-       //        SqlUtil.debug = false;
+                if (Utils.stringDefined(s)) {
+                    String sqlString = SqlUtil.wildCardBoth(s);
+                    for (ColumnInfo col : tableInfo.getColumns()) {
+                        if (col.getType() == col.TYPE_VARCHAR) {
+                            orClauses.add(Clause.like(col.getName(),
+                                    sqlString));
+                        }
+                    }
+                }
+            }
+        }
+
+
+        if (tableInfo != null) {
+            for (ColumnInfo col : tableInfo.getColumns()) {
+                String v = request.getString("table." + col.getName().toLowerCase(),(String)null);
+                if(!Utils.stringDefined(v)) continue;
+                List<String> toks = StringUtil.split(v," ",true,true);
+                String lastOp = null;
+                String pattern = "^" + opp +"(.+)";
+                for(int i=0;i<toks.size();i++) {
+                    String tok = toks.get(i);
+                    String[] toks2 = Utils.findPatterns(tok, pattern);
+                    if(toks2==null) {
+                        String isOp = StringUtil.findPattern(tok, opp);
+                        if(isOp!=null) {
+                            lastOp = tok;
+                            continue;
+                        }
+                        if(lastOp == null) lastOp = Clause.EXPR_EQUALS;
+                        andClauses.add(new Clause(col.getName(), lastOp, tok));
+                        lastOp = null;
+                        continue;
+                    }
+                    Clause clause = new Clause(col.getName(), toks2[0].trim(), toks2[1].trim());
+                    andClauses.add(clause);
+
+                }
+            }
+        }
+
+
+
+        if (orClauses.size() > 0) {
+            andClauses.add(Clause.or(orClauses));
+        }
+        SqlUtil.debug = true;
+        Statement stmt = SqlUtil.select(connection, what,
+                                        Misc.newList(table),
+                                        Clause.and(andClauses), "", max, 0);
+
+        SqlUtil.debug = false;
         SqlUtil.Iterator   iter = new SqlUtil.Iterator(stmt);
         ResultSet          results;
         ResultSetMetaData  rsmd = null;
@@ -174,10 +275,12 @@ public class DbTableTypeHandler extends TabularTypeHandler {
                 int          columnCount = rsmd.getColumnCount();
                 List<Object> names       = new ArrayList<Object>();
                 for (int i = 1; i < columnCount + 1; i++) {
-                    String name = rsmd.getColumnName(i);
+                    String name     = rsmd.getColumnName(i);
+                    String typeName = rsmd.getColumnTypeName(i);
+                    //                    names.add(name + " - " + typeName);
                     names.add(name);
                 }
-               rows.add(names);
+                rows.add(names);
             }
             List<Object> row = new ArrayList<Object>();
             for (int col = 0; col < rsmd.getColumnCount(); col++) {
@@ -196,8 +299,8 @@ public class DbTableTypeHandler extends TabularTypeHandler {
                 }
                 row.add(value);
             }
-            if ( !visitInfo.rowOk(row)) {
-                //                System.err.println ("bad row:" + row);
+            if ((andClauses.size() == 0) && !visitInfo.rowOk(row)) {
+                //                System.err.println ("skipping row:" + row);
                 continue;
             }
             //            System.err.println ("adding row:" + row);
@@ -208,11 +311,24 @@ public class DbTableTypeHandler extends TabularTypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     @Override
-    public boolean okToShowTable(Request request,  Entry entry) {
-        if(!Utils.stringDefined(entry.getValue(IDX_DBID, (String) null))) return false;
-        if(!Utils.stringDefined(entry.getValue(IDX_TABLE, (String) null))) return false;
-        return super.okToShowTable(request,  entry);
+    public boolean okToShowTable(Request request, Entry entry) {
+        if ( !Utils.stringDefined(entry.getValue(IDX_DBID, (String) null))) {
+            return false;
+        }
+        if ( !Utils.stringDefined(entry.getValue(IDX_TABLE, (String) null))) {
+            return false;
+        }
+
+        return super.okToShowTable(request, entry);
     }
 
     /**
@@ -236,29 +352,30 @@ public class DbTableTypeHandler extends TabularTypeHandler {
             throws Exception {
 
         if (column.getName().equals("db_id")) {
-            List<String> dbs = StringUtil.split(getRepository().getProperty("table.db.databases",""),",",true,true);
-            if(dbs.size() > 0) {
+            List<String> dbs = StringUtil.split(
+                                   getRepository().getProperty(
+                                       "table.db.databases", ""), ",", true,
+                                           true);
+            if (dbs.size() > 0) {
                 String dbid = entry.getValue(IDX_DBID, (String) null);
                 formBuffer.append(
                     formEntry(
                         request, column.getLabel() + ":",
-                        HtmlUtils.select(
-                                         column.getEditArg(), dbs,dbid)));
+                        HtmlUtils.select(column.getEditArg(), dbs, dbid)));
+
                 return;
             }
         }
 
         if (column.getName().equals("table_name")) {
             List<String> tables = getTableNames(entry);
-            if (tables != null && tables.size()>0) {
-                tables.add(0,"");
+            if ((tables != null) && (tables.size() > 0)) {
+                tables.add(0, "");
                 String name = entry.getValue(IDX_TABLE, (String) null);
                 formBuffer.append(
                     formEntry(
                         request, column.getLabel() + ":",
-                        HtmlUtils.select(
-                            column.getEditArg(), tables,
-                            name)));
+                        HtmlUtils.select(column.getEditArg(), tables, name)));
 
                 return;
             }
@@ -298,31 +415,81 @@ public class DbTableTypeHandler extends TabularTypeHandler {
      * @throws Exception _more_
      */
     private List<String> getTableNames(Entry entry) throws Exception {
+        List<TableInfo> tableInfos = getTableInfos(entry);
+        if (tableInfos == null) {
+            return null;
+        }
+
+        return TableInfo.getTableNames(tableInfos);
+    }
+
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public TableInfo getTableInfo(Entry entry) throws Exception {
+        List<TableInfo> tableInfos = getTableInfos(entry);
+        if (tableInfos == null) {
+            return null;
+        }
+        String table = entry.getValue(IDX_TABLE, (String) null);
+        if ( !Utils.stringDefined(table)) {
+            return null;
+        }
+        table = table.toLowerCase();
+        for (TableInfo tableInfo : tableInfos) {
+            if (tableInfo.getName().toLowerCase().equals(table)) {
+                return tableInfo;
+            }
+        }
+
+        return null;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private List<TableInfo> getTableInfos(Entry entry) throws Exception {
         String dbid = entry.getValue(IDX_DBID, (String) null);
         if ( !Utils.stringDefined(dbid)) {
             return null;
         }
 
-        List<TableInfo> tableInfos  = dbToTables.get(dbid);
+        List<TableInfo> tableInfos = dbToTables.get(dbid);
         if (tableInfos == null) {
             Connection connection = null;
             try {
-                connection = getDatabaseManager().getExternalConnection("table.db." + dbid);
+                connection =
+                    getDatabaseManager().getExternalConnection("table.db."
+                        + dbid);
                 if (connection == null) {
-                    System.err.println("DbTableTypeHadler.visit: no connection");
+                    System.err.println(
+                        "DbTableTypeHadler.visit: no connection");
+
                     return null;
                 }
-                tableInfos = getDatabaseManager().getTableInfos(connection, true);
+                tableInfos = getDatabaseManager().getTableInfos(connection,
+                        true);
             } finally {
                 connection.close();
             }
             dbToTables.put(dbid, tableInfos);
         }
 
-        if(tableInfos == null) {
-            return null;
-        }
-        return TableInfo.getTableNames(tableInfos);
+        return tableInfos;
     }
 
 

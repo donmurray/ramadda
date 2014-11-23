@@ -1572,6 +1572,11 @@ snippet {
  margin-bottom:2px;
 }
 
+.ramadda-xls-search-extra {
+   margin-top: 10px;
+   margin-left: 20px;
+}
+
 .ramadda-xls-table {
 //   border-bottom: 1px #ccc solid;
 //   border-right: 1px #ccc solid;

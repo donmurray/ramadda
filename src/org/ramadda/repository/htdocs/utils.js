@@ -505,7 +505,7 @@ var HtmlUtil =  {
         HtmlUtil.handleFormChangeShowUrl(formId, outputId, skip);
     },
     input :   function(name, value, attrs) {
-        return "<input " + HtmlUtil.attrs(attrs) + HtmlUtil.attrs(["name", name, "value",value]) +"/>";
+        return "<input " + HtmlUtil.attrs(attrs) + HtmlUtil.attrs(["name", name, "value",value]) +">";
     },
 
     valueDefined: function(value) {

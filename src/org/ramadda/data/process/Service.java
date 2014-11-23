@@ -1020,10 +1020,11 @@ public class Service extends RepositoryManager {
         Entry  currentEntry = (Entry) Utils.safeGet(inputEntries, 0);
 
         String cmd          = getCommand();
-        cmd = applyMacros(currentEntry, entryMap, valueMap, workDir, cmd,
-                          input.getForDisplay());
-        commands.add(cmd);
-
+        if(Utils.stringDefined(cmd)) {
+            cmd = applyMacros(currentEntry, entryMap, valueMap, workDir, cmd,
+                              input.getForDisplay());
+            commands.add(cmd);
+        }
         addExtraArgs(request, input, commands, true);
 
 

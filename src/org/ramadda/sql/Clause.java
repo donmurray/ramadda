@@ -870,7 +870,7 @@ public class Clause {
             return col;
         }
         if (SqlUtil.debug) {
-            System.err.println("   value:" + value + " " + col);
+            System.err.println("   value:" + value + " col #:" + col);
         }
         SqlUtil.setValue(stmt, value, col);
 
