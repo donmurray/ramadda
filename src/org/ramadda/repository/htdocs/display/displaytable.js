@@ -136,7 +136,7 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 }
 
                 if(rows.length==0) {
-                    this.jq(ID_TABLE_HOLDER).html("No data found");
+                    this.displayMessage("No data found");
                     this.jq(ID_RESULTS).html("");
                     return;
                 }
@@ -488,7 +488,7 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 if(this.getProperty("showSearch",true)) {
                     this.jq(ID_SEARCH_FORM).submit(function( event ) {
                             event.preventDefault();
-                            _this.loadTableData(_this.url);
+                            _this.loadTableData(_this.url,"Searching...");
                         });
                     this.jq(ID_SEARCH_TEXT).focus();
                     this.jq(ID_SEARCH_TEXT).select();
@@ -526,8 +526,14 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 this.displayDownloadUrl();
 
             },
-            displayMessage: function(msg) {
-                this.jq(ID_TABLE_HOLDER).html(msg);
+             displayMessage: function(msg, icon) {
+                if(!icon) {
+                    icon = icon_information;
+                }
+                var html  = HtmlUtil.hbox(HtmlUtil.image(icon,["align","left"]),
+                                          HtmlUtil.inset(msg,10,10,5,10));
+                html = HtmlUtil.div(["class","note"],html);
+                this.jq(ID_TABLE_HOLDER).html(html);
            },
            displayDownloadUrl: function() {
                 var url = this.lastUrl;
@@ -540,9 +546,10 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 var img = HtmlUtil.image(ramaddaBaseUrl +"/icons/xls.png",["title","Download XLSX"]);
                 this.jq(ID_DOWNLOADURL).html(HtmlUtil.href(url,img));
             },
-           loadTableData:  function(url) {
+            loadTableData:  function(url, message) {
                 this.url = url;
-                this.displayMessage(this.getLoadingMessage());
+                if(!message) message = this.getLoadingMessage();
+                this.displayMessage(message, icon_progress);
                 var _this = this;
 
                 var text = this.jq(ID_SEARCH_TEXT).val();

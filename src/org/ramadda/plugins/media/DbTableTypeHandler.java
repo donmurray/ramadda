@@ -357,7 +357,7 @@ public class DbTableTypeHandler extends TabularTypeHandler {
                                        "table.db.databases", ""), ",", true,
                                            true);
             if (dbs.size() > 0) {
-                String dbid = entry.getValue(IDX_DBID, (String) null);
+                String dbid = (entry==null?null:entry.getValue(IDX_DBID, (String) null));
                 formBuffer.append(
                     formEntry(
                         request, column.getLabel() + ":",
@@ -371,7 +371,7 @@ public class DbTableTypeHandler extends TabularTypeHandler {
             List<String> tables = getTableNames(entry);
             if ((tables != null) && (tables.size() > 0)) {
                 tables.add(0, "");
-                String name = entry.getValue(IDX_TABLE, (String) null);
+                String name = entry==null?null:entry.getValue(IDX_TABLE, (String) null);
                 formBuffer.append(
                     formEntry(
                         request, column.getLabel() + ":",
@@ -415,6 +415,7 @@ public class DbTableTypeHandler extends TabularTypeHandler {
      * @throws Exception _more_
      */
     private List<String> getTableNames(Entry entry) throws Exception {
+        if(entry  == null) return null;
         List<TableInfo> tableInfos = getTableInfos(entry);
         if (tableInfos == null) {
             return null;
