@@ -90,11 +90,16 @@ public class LatLonImageTypeHandler extends GenericTypeHandler {
         //    this.addImageLayer = function(name, url, north,west,south,east, width,height) {
         //map.addMarker("id", lat, lon, null, info);
         //    public static String jsMakeArgs(String[]args, boolean andSquote) {
+
+        String width  = entry.getValue(0, "400");
+        String height = entry.getValue(1, "400");
+
+
         map.addJS(HtmlUtils.call("theMap.addImageLayer",
                                  HtmlUtils.jsMakeArgs(new String[] {
             HtmlUtils.squote(entry.getName()), HtmlUtils.squote(url),
             "" + entry.getNorth(), "" + entry.getWest(),
-            "" + entry.getSouth(), "" + entry.getEast(), "400", "400"
+            "" + entry.getSouth(), "" + entry.getEast(), width, height
         }, false)));
 
         return true;
