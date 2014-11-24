@@ -86,20 +86,20 @@ public class LatLonImageTypeHandler extends GenericTypeHandler {
         String url =
             getRepository().getHtmlOutputHandler().getImageUrl(request,
                 entry);
-        //        this.addImageLayer('Test', '/repository/images/dilbert.gif',88,-180,-88,180,500,500);
-        //    this.addImageLayer = function(name, url, north,west,south,east, width,height) {
-        //map.addMarker("id", lat, lon, null, info);
-        //    public static String jsMakeArgs(String[]args, boolean andSquote) {
 
-        String width  = entry.getValue(0, "400");
-        String height = entry.getValue(1, "400");
+        int width  = (int) entry.getValue(0, -1);
+        int height = (int) entry.getValue(1, -1);
+        if ((width > 0) && (height > 0)) {
+            map.setWidth(width);
+            map.setHeight(height);
+        }
 
 
         map.addJS(HtmlUtils.call("theMap.addImageLayer",
                                  HtmlUtils.jsMakeArgs(new String[] {
             HtmlUtils.squote(entry.getName()), HtmlUtils.squote(url),
             "" + entry.getNorth(), "" + entry.getWest(),
-            "" + entry.getSouth(), "" + entry.getEast(), width, height
+            "" + entry.getSouth(), "" + entry.getEast(), "400", "400"
         }, false)));
 
         return true;
