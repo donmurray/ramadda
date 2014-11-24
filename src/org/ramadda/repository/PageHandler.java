@@ -2652,7 +2652,7 @@ public class PageHandler extends RepositoryManager {
             sb.append("<td>");
             sb.append(header);
             sb.append("</td>");
-            sb.append("<td align=right>");
+            sb.append("<td align=right width=100>");
             sb.append(toolbar);
             sb.append("</td>");
             sb.append("</tr></table></div>");
@@ -2702,7 +2702,6 @@ public class PageHandler extends RepositoryManager {
             if (link.isType(OutputType.TYPE_TOOLBAR)) {
                 String href = HtmlUtils.href(link.getUrl(),
                                              HtmlUtils.img(link.getIcon(),
-                                                 link.getLabel(),
                                                  link.getLabel()));
                 sb.append(HtmlUtils.inset(href, 0, 3, 0, 0));
             }
