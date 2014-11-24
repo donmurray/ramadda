@@ -110,6 +110,13 @@ public class BlogEntryTypeHandler extends ExtensibleGroupTypeHandler {
         return entry.getDescription();
     }
 
+
+    public Result getHtmlDisplay(Request request, Entry group,
+                                 List<Entry> subGroups, List<Entry> entries)
+            throws Exception {
+        return getHtmlDisplay(request, group);
+    }
+
     /**
      * _more_
      *
