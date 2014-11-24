@@ -951,7 +951,12 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
             }
 
-            return HtmlUtils.href(url, label);
+            String extra ="";
+
+
+
+
+            return HtmlUtils.href(url, label, extra);
 
         } else if (theTag.equals(WIKI_TAG_UPLOAD)) {
             Entry group = getEntryManager().findGroup(request);

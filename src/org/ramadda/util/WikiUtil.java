@@ -506,7 +506,23 @@ public class WikiUtil {
             }
 
             if (tline.startsWith("+inset")) {
-                buff.append("<div class=\"inset\">");
+                List<String> toks = StringUtil.splitUpTo(tline, " ", 2);
+                StringBuilder extra = new StringBuilder();
+                if(toks.size()>1) {
+                    StringBuilder styles = new StringBuilder();
+                    for(String side: new String[]{"top","left","bottom","right"}) {
+                        String v = StringUtil.findPattern(tline,side+"\\s*=\\s*\\\"(.*?)\\\"");
+                        if(v!=null) {
+                            styles.append("margin-" + side+":" + v +"px;");
+                        }
+                    }
+
+                    if(styles.length()>0) {
+                        extra.append(HtmlUtils.style(styles.toString()));
+                    }
+                }
+
+                buff.append(HtmlUtils.open("div",HtmlUtils.cssClass("inset") + extra));
                 continue;
             }
             if (tline.equals("-inset")) {
