@@ -1,4 +1,5 @@
 <wiki>
++inset
 Welcome to your RAMADDA server.
 
 ===Next steps===
@@ -12,3 +13,5 @@ Here are some folders to get you started:<br>
 
 {{tree showtoggle="false"}}
 
+
+-inset

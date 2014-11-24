@@ -1595,20 +1595,6 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_DB_DERBY_HOME = "ramadda.db.derby.home";
 
-    /** _more_ */
-    public static final String PROP_DB_DRIVER = "ramadda.db.${db}.driver";
-
-    /** _more_ */
-    public static final String PROP_DB_PASSWORD = "ramadda.db.${db}.password";
-
-    /** _more_ */
-    public static final String PROP_DB_SCRIPT = "ramadda.db.script";
-
-    /** _more_ */
-    public static final String PROP_DB_URL = "ramadda.db.${db}.url";
-
-    /** _more_ */
-    public static final String PROP_DB_USER = "ramadda.db.${db}.user";
 
     /** _more_ */
     public static final String PROP_DEBUG = "ramadda.debug";

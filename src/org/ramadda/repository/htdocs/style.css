@@ -45,16 +45,12 @@ h3 {
     margin-right: 20px;
 }
 
-
 .ramadda-main {
 }
-
 
 .ramadda-section h2 a, .ramadda-section h2 a:visited {
     color: black;
 }
-
-
 
 .ramadda-section h2 {
    font-size:20pt;
@@ -497,15 +493,15 @@ padding-right-rtl-source: physical;
 }
 
 .entry-page-main {
-   margin:8px;
-   margin-top:8px;
-   margin-right:4px;
+   border-right: 1px #efefef solid;
+   padding-left:30px;
+   padding-right:15px;
+   padding-top:8px;
 }
 
 .entry-page-info {
-   margin:8px;
-   margin-top:8px;
-   margin-left:4px;
+//   padding-top:8px;
+   padding-right: 8px;
    max-width: 300;
    overflow-x: auto;
 }
@@ -854,6 +850,23 @@ label {
     /*color: #ff0000;*/
 }
 
+.ramadda-header {
+   background-repeat: repeat; 
+   background-image:url(${urlroot}/images/background.png);
+   padding: 6px;
+   padding-bottom: 0px;
+   border-bottom : 1px #bbb solid;
+//   border-bottom : 0px;
+}
+
+.ramadda-header-label {
+    font-size:20px;
+    font-family: xHelvetica Neue, Arial, Helvetica, sans-serif;
+    text-align: bottom;
+    margin-left:10px;
+    color: #444;
+}
+
 .ramadda-header-title {
   font-size: 200%;
 }
@@ -1149,7 +1162,7 @@ a.ramadda-heading-2-link:visited {
 }
 
 .entry-tools-box {
-  border: 1px #ddd solid;
+  border: 1px #efefef solid;
   padding-left: 8px;
   padding-bottom: 2px;
   padding-top: 6px;
@@ -2038,6 +2051,11 @@ xxxpath.link {
    padding-top: 2px;
    padding-bottom: 2px;
    border-right : 1px #888 solid;
+}
+
+
+.breadCrumb ul li {
+   background: url(${urlroot}/icons/smallchevron.gif) no-repeat 100% center;
 }
 
 

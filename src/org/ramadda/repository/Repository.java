@@ -3810,7 +3810,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
         //Force a connection
         getDatabaseManager().init();
         String sql = getStorageManager().readUncheckedSystemResource(
-                         getProperty(PROP_DB_SCRIPT));
+                         getProperty(DatabaseManager.PROP_DB_SCRIPT));
         sql = getDatabaseManager().convertSql(sql);
 
         //        System.err.println("RAMADDA: loading schema");
