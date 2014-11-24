@@ -106,6 +106,22 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     .ConnectionManager {
 
     /** _more_ */
+    public static final String PROP_DB_DRIVER = "ramadda.db.${db}.driver";
+
+    /** _more_ */
+    public static final String PROP_DB_PASSWORD = "ramadda.db.${db}.password";
+
+    /** _more_ */
+    public static final String PROP_DB_SCRIPT = "ramadda.db.script";
+
+    /** _more_ */
+    public static final String PROP_DB_URL = "ramadda.db.${db}.url";
+
+    /** _more_ */
+    public static final String PROP_DB_USER = "ramadda.db.${db}.user";
+
+
+    /** _more_ */
     private long myTime = System.currentTimeMillis();
 
     /** _more_ */
@@ -380,30 +396,29 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         String driverClassName =
             (String) getRepository().getProperty(driverClassPropertyName);
 
-        //        Misc.findClass(driverClassName);
+        Misc.findClass(driverClassName);
 
         BasicDataSource ds = new BasicDataSource();
 
-        //            ds.setMaxActive(getRepository().getProperty(PROP_DB_POOL_MAXACTIVE, 100));
-        //            ds.setMaxIdle(getRepository().getProperty(PROP_DB_POOL_MAXIDLE,100));
+
+        //ds.setMaxActive(getRepository().getProperty(PROP_DB_POOL_MAXACTIVE, 100));
+        //ds.setMaxIdle(getRepository().getProperty(PROP_DB_POOL_MAXIDLE,100));
         ds.setMaxTotal(getRepository().getProperty(PROP_DB_POOL_MAXACTIVE,
                 100));
-
         //30 second time out
         ds.setMaxWaitMillis(1000 * 30);
         //60 seconds
         ds.setRemoveAbandonedTimeout(60);
-        //            ds.setRemoveAbandoned(true);
+        //ds.setRemoveAbandoned(true);
         ds.setRemoveAbandonedOnBorrow(true);
         ds.setRemoveAbandonedOnMaintenance(true);
-
 
         System.err.println("DatabaseManager.makeDataSource: url="
                            + connectionUrl);
         System.err.println("JDBC driver class:" + driverClassName
                            + " db type:" + dbType);
 
-        //        ds.setDriverClassName(driverClassName);
+        ds.setDriverClassName(driverClassName);
         ds.setUsername(userName);
         ds.setPassword(password);
         ds.setUrl(connectionURL);
@@ -428,14 +443,19 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      *
      * @param dbId _more_
      *
+     * @param prefix _more_
+     *
      * @return _more_
      *
      * @throws Exception _more_
      */
     public Connection getExternalConnection(String prefix) throws Exception {
-        String connectionURL = getRepository().getProperty(prefix + ".url", (String) null);
-        String user = getRepository().getProperty(prefix + ".user", (String) null);
-        String password = getRepository().getProperty(prefix + ".password", (String) null);
+        String connectionURL = getRepository().getProperty(prefix + ".url",
+                                   (String) null);
+        String user = getRepository().getProperty(prefix + ".user",
+                          (String) null);
+        String password = getRepository().getProperty(prefix + ".password",
+                              (String) null);
 
         if (connectionURL == null) {
             System.err.println("No connection url property for:" + prefix);
@@ -469,6 +489,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         if (ds == null) {
             return null;
         }
+
         return ds.getConnection();
     }
 
