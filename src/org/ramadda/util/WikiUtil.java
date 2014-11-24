@@ -482,7 +482,7 @@ public class WikiUtil {
                 buff.append("</div>");
                 continue;
             }
-            if (tline.startsWith("+pagehead")) {
+            if (tline.startsWith("+pagehead")) { 
                 String weight = StringUtil.findPattern(tline,"-([0-9]+)");
                 if(weight==null) weight = "8";
                 buff.append("<div class=\"row\">");
@@ -502,6 +502,15 @@ public class WikiUtil {
             if (tline.equals("-jumbo")) {
                 buff.append("</div>");
 
+                continue;
+            }
+
+            if (tline.startsWith("+inset")) {
+                buff.append("<div class=\"inset\">");
+                continue;
+            }
+            if (tline.equals("-inset")) {
+                buff.append("</div>");
                 continue;
             }
             if (tline.startsWith("+info-sec") || tline.startsWith("+section")) {
@@ -571,7 +580,17 @@ public class WikiUtil {
                 continue;
             }
             if (tline.startsWith("+col-")) {
-                buff.append("<div class=\"" + tline.substring(1) + "\">");
+                List<String> toks = StringUtil.splitUpTo(tline, " ", 2);
+                StringBuilder extra = new StringBuilder();
+                String clazz = toks.get(0).substring(1);
+                if(toks.size()>1) {
+                    String attrs = toks.get(1);
+                    String style = StringUtil.findPattern(attrs,"style\\s*=\\s*\\\"(.*?)\\\"");
+                    String clazz2 = StringUtil.findPattern(attrs,"class\\s*=\\s*\\\"(.*?)\\\"");
+                    if(style!=null) extra.append(HtmlUtils.style(style));
+                    if(clazz2!=null) clazz = clazz + " " + clazz2;
+                }
+                buff.append(HtmlUtils.open("div", HtmlUtils.cssClass(clazz) + extra));
 
                 continue;
             }
