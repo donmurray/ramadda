@@ -9,6 +9,7 @@
      <property name="form.altitude.top.show" value="false"/>
      <wiki><![CDATA[
 {{noheading}}
++inset
 <table width="100%">
 <tr valign=top>
 <td width="50%">
@@ -34,8 +35,7 @@
 
 </td></tr>
 </table>
-
-
+-inset
 ]]>
 </wiki>
 
@@ -61,6 +61,7 @@
      <column name="notes" type="string"  label="Notes" rows="5" size="5000" changetype="true"/>
      <wiki><![CDATA[
 {{noheading}}
++inset
 +row
 +col-md-8
 <div class="wiki-h1">{{name}}</div>
@@ -92,6 +93,7 @@
 {{mapentry width="350" message=""}}
 -col
 -row
+-inset
 ]]>
 </wiki>
    </type>
@@ -130,6 +132,7 @@
 
      <wiki><![CDATA[
 {{noheading}}
++inset
 <table width="100%" cellpadding="5" cellspacing="5">
 <tr valign=top>
 <td width="50%">
@@ -168,6 +171,7 @@
 
 </table>
 
+-inset
 
 ]]>
 </wiki>
@@ -238,6 +242,7 @@
 
      <wiki><![CDATA[
 {{noheading}}
++inset
 <div class="wiki-h1">Assessment: {{name}}</div>
 
 {{description wikify="true"}}
@@ -246,6 +251,7 @@
 
 {{tree  showtoggle="false" message="" prefix="==Data=="}}
 ]]>
+-inset
 </wiki>
    </type>
 
@@ -274,6 +280,7 @@
       <column name="notes" label="Notes" rows="5"/>
      <wiki><![CDATA[
 {{noheading}}
++inset
 <table width="100%">
 <tr valign=top>
 <td width="50%">
@@ -309,6 +316,7 @@
 </tr>
 </table>
 
+-inset
 ]]>
 </wiki>
 
@@ -351,6 +359,7 @@
      <column name="notes" type="string"  label="Notes" rows="5" size="5000" changetype="true"/>
      <wiki><![CDATA[
 {{noheading}}
++inset
 <table width="100%">
 <tr valign=top>
 <td width="50%">
@@ -377,10 +386,7 @@
 
 
 </table>
-
-
-
-
+-inset
 ]]>
 </wiki>
    </type>
@@ -397,6 +403,7 @@
      <column name="type" type="enumeration"  label="Instrument Type"   />
      <wiki><![CDATA[
 {{noheading}}
++inset
 <table width="100%">
 <tr valign=top>
 <td width="50%">
@@ -426,6 +433,7 @@
 <block open="false" title="View all properties">
 {{properties}}
 </block>
+-inset
 
 
 ]]>
@@ -442,6 +450,7 @@
      <property name="form.altitude.top.show" value="false"/>
      <wiki><![CDATA[
 {{noheading}}
++inset
 
 <div style="max-height: 400px; overflow-y: auto;">
 {{description wikify="true"}}
@@ -452,6 +461,8 @@
 {{timeline width="600"}}
 <p>
 {{tree message=""}}
+-inset
+
 ]]>
 </wiki>
 
@@ -504,6 +515,7 @@
      <column name="notes" label="Notes"  size="1000" rows="5" />
      <wiki><![CDATA[
 {{noheading}}
++inset
 <div class="wiki-h1">{{name}}</div>
 <table width="100%">
 <tr valign=top>
@@ -520,6 +532,7 @@
 <p>
 </td></tr>
 </table>
+-inset
 ]]>
 </wiki>
    </type>
@@ -539,6 +552,7 @@
      <column name="expected_users" type="string"  label="Expected Users"   changetype="true" size="2000"/>
      <wiki><![CDATA[
 {{noheading}}
++inset
 <div class="wiki-h1">{{name}}</div>
 <table width="100%"><tr valign="top">
 <td width="50%">{{description wikify="true"}}</td>
@@ -554,6 +568,7 @@
 </tr>
 </table>
 {{links  prefix="==Links=="   message=""}}
+-inset
 
 ]]>
 </wiki>
@@ -583,6 +598,7 @@ features
 
      <wiki><![CDATA[
 {{noheading}}
++inset
 <table width="100%">
 <tr valign=top>
 <td width="50%">
@@ -602,6 +618,7 @@ features
 {{mapentry width="350" message=""}}
 </td></tr>
 </table>
+-inset
 
 ]]>
 </wiki>
@@ -626,6 +643,7 @@ features
 
      <wiki><![CDATA[
 {{noheading}}
++inset
 <table width="100%">
 <tr valign=top>
 <td width="50%">
@@ -663,6 +681,7 @@ features
 ==Properties==
 {{properties block.show="true" block.open="false"}}
 <p>
+-inset
 ]]>
 </wiki>
 
@@ -710,6 +729,7 @@ features
 
      <wiki><![CDATA[
 {{noheading}}
++inset
 <table width="100%" cellspacing="10" >
 <tr valign=top>
 <td width="50%">
@@ -754,6 +774,7 @@ features
 </table>
 
 
+-inset
 
 ]]>
 </wiki>
@@ -785,6 +806,7 @@ features
 
      <wiki><![CDATA[
 {{noheading}}
++inset
 <table width="100%" cellspacing="10" >
 <tr valign=top>
 <td width="50%">
@@ -829,6 +851,7 @@ features
 </table>
 
 
+-inset
 
 ]]>
 </wiki>

@@ -6,6 +6,7 @@
 
 <wiki>
 <![CDATA[
++inset
 =={{name}}==
 {{description}}
 +row
@@ -24,6 +25,7 @@
 ----
 
 {{tree  details="true"  prefix="==All Files=="}}
+-inset
 
 ]]></wiki>
 
@@ -47,6 +49,7 @@
 
 <wiki>
 <![CDATA[
++inset
 +row
 +col-md-9
 {{name box.class=entry-page-name}}
@@ -69,6 +72,7 @@
 {{list includeicon="true" details="false" entries="links,siblings"  message="" box.maxheight="200" box.class="entry-sidebox" prefix="====Related====" xblock.show="true" xblock.title="Related" xblock.open="false"}}
 -col
 -row
+-inset
 
 ]]></wiki>
 
@@ -86,6 +90,7 @@ fields=time[format="yyyy/MM/dd/HH/mm/ss"],longitude[unit="degrees"],latitude[uni
 
 <wiki>
 <![CDATA[
++inset
 <div class="wiki-h2">{{name}} </div>
 
 {{description}}
@@ -108,6 +113,7 @@ fields=time[format="yyyy/MM/dd/HH/mm/ss"],longitude[unit="degrees"],latitude[uni
 
 
 
+-inset
 
 ]]></wiki>
 

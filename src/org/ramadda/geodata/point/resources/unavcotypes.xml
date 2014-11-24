@@ -18,6 +18,7 @@ this gets it from the type_point super class
      <column  name="processing_center"  type="enumerationplus" label="Processing Center" cansearch="true"/>
 <wiki>
 <![CDATA[
++inset
 <div class="wiki-h2"> Station: {{field name="station_name"}} -- {{name}} </div>
 
 <table width=100% cellpadding=5>
@@ -38,6 +39,7 @@ this gets it from the type_point super class
 {{display type="text" column="1" layoutHere="true" }}
 </td>
 </tr></table>
+-inset
 ]]>
 
 </wiki>

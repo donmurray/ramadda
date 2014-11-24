@@ -10,6 +10,7 @@
 
 <wiki_inner>
 <![CDATA[
++inset
 <table width=100% border=0>
 <tr valign=top>
 <td width=50%>
@@ -30,6 +31,7 @@
 
 {{display    height="200"  fields=""  type="map"   layoutHere="false"  showTitle="true"  }}
 
+-inset
 
 ]]>
 
