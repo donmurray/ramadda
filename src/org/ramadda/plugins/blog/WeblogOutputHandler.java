@@ -154,9 +154,10 @@ public class WeblogOutputHandler extends OutputHandler {
                               List<Entry> entries)
             throws Exception {
 
+        subGroups.addAll(entries);
         StringBuilder sb          = new StringBuilder();
         StringBuilder blogEntries = new StringBuilder();
-        for (Entry entry : entries) {
+        for (Entry entry : subGroups) {
             if ( !entry.getTypeHandler().isType("blogentry")) {
                 continue;
             }
