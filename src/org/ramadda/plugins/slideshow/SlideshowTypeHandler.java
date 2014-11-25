@@ -347,21 +347,21 @@ public class SlideshowTypeHandler extends GenericTypeHandler {
     private String makeCommands(int cnt, boolean exists, boolean visible) {
         String newLink =
             HtmlUtils.submitImage(getRepository().iconUrl(ICON_SLIDE_NEW),
-                                  ARG_SLIDE_NEW + cnt, "Insert New Slide");
+                                  ARG_SLIDE_NEW + cnt, "Insert New Slide","");
         String copyLink =
             HtmlUtils.submitImage(getRepository().iconUrl(ICON_SLIDE_COPY),
-                                  ARG_SLIDE_COPY + cnt, "Copy Slide");
+                                  ARG_SLIDE_COPY + cnt, "Copy Slide","");
         String upLink =
             HtmlUtils.submitImage(getRepository().iconUrl(ICON_SLIDE_UP),
-                                  ARG_SLIDE_UP + cnt, "Move Slide Up");
+                                  ARG_SLIDE_UP + cnt, "Move Slide Up","");
         String downLink =
             HtmlUtils.submitImage(getRepository().iconUrl(ICON_SLIDE_DOWN),
-                                  ARG_SLIDE_DOWN + cnt, "Move Slide Down");
+                                  ARG_SLIDE_DOWN + cnt, "Move Slide Down","");
         String deleteLink = ( !exists
                               ? ""
                               : HtmlUtils.submitImage(
                                   getRepository().iconUrl(ICON_SLIDE_DELETE),
-                                  ARG_SLIDE_DELETE + cnt, "Delete Slide"));
+                                  ARG_SLIDE_DELETE + cnt, "Delete Slide",""));
         String visibleCbx = HtmlUtils.checkbox(ARG_SLIDE_VISIBLE + cnt,
                                 "true", visible);
 

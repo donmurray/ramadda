@@ -1,4 +1,4 @@
-/*
+/**
 * Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
@@ -2233,8 +2233,8 @@ public class UserManager extends RepositoryManager {
      *
      * @return The result
      */
-    public Result makeResult(Request request, String title, StringBuffer sb) {
-        StringBuffer headerSB = new StringBuffer();
+    public Result makeResult(Request request, String title, Appendable sb) throws Exception {
+        StringBuilder headerSB = new StringBuilder();
         addUserHeader(request, headerSB);
         headerSB.append(sb);
         sb = headerSB;
@@ -2264,7 +2264,7 @@ public class UserManager extends RepositoryManager {
      * @param request the request
      * @param sb _more_
      */
-    public void addUserHeader(Request request, StringBuffer sb) {
+    public void addUserHeader(Request request, Appendable sb) throws Exception {
         User             user    = request.getUser();
         boolean          useAnon = user.getAnonymous() || user.getIsGuest();
         List<RequestUrl> links   = userUrls;
@@ -2506,7 +2506,8 @@ public class UserManager extends RepositoryManager {
     public Result processHome(Request request) throws Exception {
         boolean responseAsXml = request.getString(ARG_RESPONSE,
                                     "").equals(RESPONSE_XML);
-        StringBuffer sb   = new StringBuffer();
+        StringBuilder sb   = new StringBuilder();
+        sb.append(HtmlUtils.openInset());
         User         user = request.getUser();
         if (user.getAnonymous()) {
             if (responseAsXml) {
@@ -2567,7 +2568,7 @@ public class UserManager extends RepositoryManager {
                     + " icon to add it to your list of favorites"));
         }
 
-        //        xxxx
+        sb.append(HtmlUtils.closeInset());
         return makeResult(request, "User Home", sb);
     }
 

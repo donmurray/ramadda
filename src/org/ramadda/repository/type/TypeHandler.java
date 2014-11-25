@@ -273,7 +273,7 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     private String description;
 
-    /** _more_          */
+    /** _more_ */
     private String iconPath;
 
     /** _more_ */
@@ -336,7 +336,7 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     private List<String[]> requiredMetadata = new ArrayList<String[]>();
 
-    /** _more_          */
+    /** _more_ */
     private List<Service> services = new ArrayList<Service>();
 
     /**
@@ -568,6 +568,15 @@ public class TypeHandler extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param tag _more_
+     *
+     * @return _more_
+     */
     public String getUrlForWiki(Request request, Entry entry, String tag) {
         return null;
     }
@@ -1636,16 +1645,23 @@ public class TypeHandler extends RepositoryManager {
      *
      * @param request The request
      * @param entry _more_
+     * @param fromImport _more_
      */
-    public void doFinalEntryInitialization(Request request, Entry entry) {
-        //Clear the column value cache
+    public void doFinalEntryInitialization(Request request, Entry entry,
+                                           boolean fromImport) {
+        //Clear the column value cache?
 
+        System.err.println("TypeHandler.doFinal: import=" + fromImport);
+        if (fromImport) {
+            return;
+        }
         if (request == null) {
             return;
         }
         try {
             //Check if there is a default set of children entries
             if (defaultChildrenEntries != null) {
+                Misc.printStack("adding default children");
                 Element root = XmlUtil.getRoot(defaultChildrenEntries);
                 List<Entry> newEntries =
                     getEntryManager().processEntryXml(request, root, entry,
@@ -3006,13 +3022,13 @@ public class TypeHandler extends RepositoryManager {
 
     }
 
-    /** _more_          */
+    /** _more_ */
     public static final String TARGET_ATTACHMENT = "attachment";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TARGET_CHILD = "child";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TARGET_SIBLING = "sibling";
 
     /**
@@ -4325,9 +4341,8 @@ public class TypeHandler extends RepositoryManager {
                     typeSelect + HtmlUtils.space(1)
                     + HtmlUtils.submitImage(
                         getRepository().iconUrl(ICON_SEARCH), "submit_type",
-                        msg(
-                        "Show search form with this type")) + HtmlUtils.space(
-                            1) + groupCbx));
+                        msg("Show search form with this type"),
+                        "") + HtmlUtils.space(1) + groupCbx));
         } else if (typeHandlers.size() == 1) {
             basicSB.append(HtmlUtils.hidden(ARG_TYPE,
                                             typeHandlers.get(0).getType()));

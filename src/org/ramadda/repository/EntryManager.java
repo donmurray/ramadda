@@ -2624,7 +2624,7 @@ public class EntryManager extends RepositoryManager {
         if (newEntry) {
             for (Entry theNewEntry : entries) {
                 theNewEntry.getTypeHandler().doFinalEntryInitialization(
-                    request, theNewEntry);
+                    request, theNewEntry, false);
             }
         }
 
@@ -5022,12 +5022,14 @@ public class EntryManager extends RepositoryManager {
             }
         }
 
+
         List<Entry> newEntries = processEntryXml(request, root, parent,
                                      origFileToStorage);
 
 
         for (Entry entry : newEntries) {
-            entry.getTypeHandler().doFinalEntryInitialization(request, entry);
+            entry.getTypeHandler().doFinalEntryInitialization(request, entry,
+                    true);
         }
         if (request.getString(ARG_RESPONSE, "").equals(RESPONSE_XML)) {
             //TODO: Return a list of the newly created entries
@@ -5091,6 +5093,7 @@ public class EntryManager extends RepositoryManager {
             entries.put("", parent);
         }
 
+
         List<Entry>   newEntries       = new ArrayList<Entry>();
         List<Element> entryNodes       = new ArrayList<Element>();
         List<Element> associationNodes = new ArrayList<Element>();
@@ -5102,6 +5105,7 @@ public class EntryManager extends RepositoryManager {
         } else {
             children = XmlUtil.getElements(root);
         }
+
 
 
         for (int i = 0; i < children.getLength(); i++) {
@@ -5153,8 +5157,7 @@ public class EntryManager extends RepositoryManager {
             newEntry.getTypeHandler().convertIdsFromImport(newEntry, idList);
         }
 
-
-        addNewEntries(request, newEntries);
+        addNewEntries(request, newEntries, true);
 
         return newEntries;
     }
@@ -6940,10 +6943,25 @@ public class EntryManager extends RepositoryManager {
      */
     public void addNewEntries(Request request, List<Entry> entries)
             throws Exception {
+        addNewEntries(request, entries);
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entries _more_
+     * @param fromImport _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addNewEntries(Request request, List<Entry> entries,
+                              boolean fromImport)
+            throws Exception {
         insertEntries(request, entries, true);
         for (Entry theNewEntry : entries) {
             theNewEntry.getTypeHandler().doFinalEntryInitialization(request,
-                    theNewEntry);
+                    theNewEntry, fromImport);
         }
     }
 
@@ -7521,7 +7539,7 @@ public class EntryManager extends RepositoryManager {
         List<String> ids          = new ArrayList<String>();
         boolean      isSynthEntry = isSynthEntry(group.getId());
         if (group.getTypeHandler().isSynthType() || isSynthEntry) {
-            //            System.err.println(" is synth");
+            //            System.err.printlnb(" is synth");
 
             Entry  mainEntry = group;
             String synthId   = null;

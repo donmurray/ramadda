@@ -217,9 +217,9 @@ public class PointTypeHandler extends RecordTypeHandler {
      * @param entry _more_
      */
     @Override
-    public void doFinalEntryInitialization(Request request, Entry entry) {
+    public void doFinalEntryInitialization(Request request, Entry entry, boolean fromImport) {
         try {
-            super.doFinalEntryInitialization(request, entry);
+            super.doFinalEntryInitialization(request, entry, fromImport);
             if ( !anySuperTypesOfThisType()) {
                 getEntryManager().setBoundsFromChildren(request,
                         entry.getParentEntry());

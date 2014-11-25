@@ -135,7 +135,11 @@ public class Request implements Constants, Cloneable {
 
 
     /** _more_ */
-    private String leftMessage;
+    private StringBuilder prefixHtml = new StringBuilder();
+
+    /** _more_          */
+    private StringBuilder suffixHtml = new StringBuilder();
+
 
     /** _more_ */
     private boolean checkingAuthMethod = false;
@@ -2381,22 +2385,41 @@ public class Request implements Constants, Cloneable {
     }
 
     /**
-     *  Set the LeftMessage property.
+     * Set the PrefixHtml property.
      *
-     *  @param value The new value for LeftMessage
+     * @param value The new value for PrefixHtml
      */
-    public void setLeftMessage(String value) {
-        leftMessage = value;
+    public void appendPrefixHtml(String value) {
+        prefixHtml.append(value);
     }
 
     /**
-     *  Get the LeftMessage property.
+     * Get the PrefixHtml property.
      *
-     *  @return The LeftMessage
+     * @return The PrefixHtml
      */
-    public String getLeftMessage() {
-        return leftMessage;
+    public String getPrefixHtml() {
+        return prefixHtml.toString();
     }
+
+    /**
+     * Set the SuffixHtml property.
+     *
+     * @param value The new value for SuffixHtml
+     */
+    public void appendSuffixHtml(String value) {
+        suffixHtml.append(value);
+    }
+
+    /**
+     * Get the SuffixHtml property.
+     *
+     * @return The SuffixHtml
+     */
+    public String getSuffixHtml() {
+        return suffixHtml.toString();
+    }
+
 
     /**
      * _more_

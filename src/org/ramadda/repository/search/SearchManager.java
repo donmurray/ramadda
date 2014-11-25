@@ -760,7 +760,8 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
         //Put in an empty submit button so when the user presses return 
         //it acts like a regular submit (not a submit to change the type)
         sb.append(HtmlUtils.submitImage(iconUrl(ICON_BLANK),
-                                        ARG_SEARCH_SUBMIT));
+                                        ARG_SEARCH_SUBMIT, "",
+                                        " style=\"display: none;\" "));
 
         String what = (String) request.getWhat(BLANK);
         if (what.length() == 0) {
@@ -1299,7 +1300,9 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
         StringBuffer headerSB = new StringBuffer();
         headerSB.append(getPageHandler().makeHeader(request, getSearchUrls(),
                 ""));
+        headerSB.append(HtmlUtils.openInset());
         headerSB.append(sb);
+        headerSB.append(HtmlUtils.closeInset());
         sb = headerSB;
         Result result = new Result(title, sb);
 
@@ -1500,6 +1503,9 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             s = "";
         }
 
+        if (s.length() > 0) {
+            s = HtmlUtils.formTable() + s + HtmlUtils.formTableClose();
+        }
 
         //        if (s.length() > 0) {
         StringBuffer searchForm = new StringBuffer();
@@ -1527,6 +1533,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                 ""));
         header.append(msgHeader("Search Results"));
 
+
         if (foundAny) {
             String form = HtmlUtils.makeShowHideBlock(msg("Search Again"),
                               HtmlUtils.inset(searchForm.toString(), 0, 20,
@@ -1544,8 +1551,11 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             header.append(searchForm);
         }
 
-        request.setLeftMessage(header.toString());
-        //        }
+        request.appendPrefixHtml(HtmlUtils.openInset());
+        request.appendPrefixHtml(header.toString());
+        request.appendSuffixHtml(HtmlUtils.closeInset());
+
+
         if (theGroup == null) {
             theGroup = getEntryManager().getDummyGroup();
         }

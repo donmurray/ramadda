@@ -847,7 +847,7 @@ public class HtmlOutputHandler extends OutputHandler {
             throws Exception {
         StringBuffer sb         = new StringBuffer();
         String       folder     = iconUrl(ICON_FOLDER_CLOSED);
-        boolean      showUrl   = request.get(ARG_DISPLAYLINK, true);
+        boolean      showUrl    = request.get(ARG_DISPLAYLINK, true);
         boolean      onlyGroups = request.get(ARG_ONLYGROUPS, false);
 
         int          cnt        = 0;
@@ -1488,19 +1488,17 @@ public class HtmlOutputHandler extends OutputHandler {
                 HtmlUtils.id("treeview_header")), gotoHtml)));
         sb.append("</tr><tr valign=\"top\">");
         sb.append(HtmlUtils.col(listSB.toString()));
-        String initUrl = getRepository().getUrlBase()
-            + "/blank";
+        String initUrl = getRepository().getUrlBase() + "/blank";
 
 
-        if(children.size()>0) {
-            initUrl = request.entryUrl(getRepository().URL_ENTRY_SHOW, children.get(0),
-                                       "template","empty");
+        if (children.size() > 0) {
+            initUrl = request.entryUrl(getRepository().URL_ENTRY_SHOW,
+                                       children.get(0), "template", "empty");
         }
         sb.append(HtmlUtils.col(HtmlUtils.tag("iframe",
-                                             HtmlUtils.attrs("id", "treeview_view",
-                                                            "src",initUrl,
-                                                            "width", ""+width,
-                                                            "height",""+height))));
+                HtmlUtils.attrs("id", "treeview_view", "src", initUrl,
+                                "width", "" + width, "height",
+                                "" + height))));
         sb.append("</tr></table>");
         request.remove(ARG_TREEVIEW);
     }
@@ -1821,9 +1819,9 @@ public class HtmlOutputHandler extends OutputHandler {
         StringBuffer sb = new StringBuffer("");
         request.appendMessage(sb);
 
-        String messageLeft = request.getLeftMessage();
-        if (messageLeft != null) {
-            sb.append(messageLeft);
+        String prefix = request.getPrefixHtml();
+        if (prefix != null) {
+            sb.append(prefix);
         }
 
 
@@ -1907,6 +1905,10 @@ public class HtmlOutputHandler extends OutputHandler {
         }
 
         sb.append(suffix);
+        String rsuffix = request.getSuffixHtml();
+        if (rsuffix != null) {
+            sb.append(rsuffix);
+        }
 
         Result result = makeLinksResult(request, msg("Folder"), sb,
                                         new State(group, subGroups, entries));

@@ -807,10 +807,9 @@ features
      <wiki><![CDATA[
 {{noheading}}
 +inset
-<table width="100%" cellspacing="10" >
-<tr valign=top>
-<td width="50%">
-<div class="wiki-h1">{{name}}</div>
++row
++col-md-8
+<h2>{{name}}</h2>
 <div style="max-height: 400px; overflow-y: auto;">
 {{description wikify="true"}}
 </div>
@@ -826,8 +825,8 @@ features
 
 {{tree title="Data" details="false" showtoggle="false" message="No data available" prefix="==Data=="}}
 
-
-</td><td>
+-col
++col-md-4
 
 {{properties metadata.types="project_creator" message="" }}
 
@@ -847,9 +846,8 @@ features
 {{list includeicon="true" details="false" entries="siblings:type:project_learning_resource,links"  message="" box.maxheight="200" box.class="entry-sidebox" prefix="==Related=="}}
 
 
-</td>
-</table>
-
+-col
+-row
 
 -inset
 

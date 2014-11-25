@@ -1704,11 +1704,11 @@ public class HtmlUtils {
                                   String extra) {
         return tag(TAG_INPUT,
                    extra
-                   + attrs(/*ATTR_CLASS, CLASS_CHECKBOX, */ATTR_TYPE,
-                           TYPE_CHECKBOX, ATTR_NAME, name, ATTR_VALUE,
-                           value) + (checked
-                                     ? " checked "
-                                     : ""));
+                   + attrs( /*ATTR_CLASS, CLASS_CHECKBOX, */ATTR_TYPE,
+                       TYPE_CHECKBOX, ATTR_NAME, name, ATTR_VALUE,
+                       value) + (checked
+                                 ? " checked "
+                                 : ""));
     }
 
     /**
@@ -1812,11 +1812,7 @@ public class HtmlUtils {
      * @return _more_
      */
     public static String submitImage(String img, String name) {
-        return tag(TAG_INPUT,
-                   attrs(ATTR_CLASS, CLASS_SUBMITIMAGE, ATTR_NAME, name,
-                         ATTR_VALUE, name) + attrs(ATTR_BORDER, "0",
-                             ATTR_SRC, img, ATTR_TYPE, TYPE_IMAGE));
-
+        return submitImage(img, name, "", "");
     }
 
 
@@ -1826,16 +1822,20 @@ public class HtmlUtils {
      * @param img _more_
      * @param name _more_
      * @param alt _more_
+     * @param extra _more_
      *
      * @return _more_
      */
-    public static String submitImage(String img, String name, String alt) {
+    public static String submitImage(String img, String name, String alt,
+                                     String extra) {
         return tag(TAG_INPUT,
-                   attrs(ATTR_NAME, name, ATTR_BORDER, "0", ATTR_SRC, img,
-                         ATTR_VALUE, name) + attrs(ATTR_CLASS,
-                             CLASS_SUBMITIMAGE, ATTR_TITLE, alt, ATTR_ALT,
-                             alt, ATTR_TYPE, TYPE_IMAGE));
+                   extra
+                   + attrs(ATTR_NAME, name, ATTR_BORDER, "0", ATTR_SRC, img,
+                           ATTR_VALUE, name) + attrs(ATTR_CLASS,
+                               CLASS_SUBMITIMAGE, ATTR_TITLE, alt, ATTR_ALT,
+                               alt, ATTR_TYPE, TYPE_IMAGE));
     }
+
 
 
     /**
@@ -2750,11 +2750,32 @@ public class HtmlUtils {
      *
      * @return _more_
      */
+    public static String openInset() {
+        return open(TAG_DIV, cssClass("inset"));
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public static String closeInset() {
+        return close(TAG_DIV);
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public static String formTable() {
         return open(TAG_TABLE,
                     cssClass("formtable")
                     + attrs(ATTR_CELLPADDING, "0", ATTR_CELLSPACING, "0"));
     }
+
 
 
     /**
@@ -3163,6 +3184,7 @@ public class HtmlUtils {
         js.append("\n<nowiki>\n");
         js.append(tag(TAG_SCRIPT, attrs(ATTR_TYPE, "text/JavaScript"), s));
         js.append("\n</nowiki>\n");
+
         return js.toString();
     }
 

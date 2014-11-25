@@ -156,7 +156,7 @@ public class GridAggregationTypeHandler extends ExtensibleGroupTypeHandler {
      * @param entry    the Entry
      */
     @Override
-    public void doFinalEntryInitialization(Request request, Entry entry) {
+    public void doFinalEntryInitialization(Request request, Entry entry, boolean fromImport) {
         //Call this to force an initial ingest
         try {
             if (getIngest(entry)) {
@@ -165,7 +165,7 @@ public class GridAggregationTypeHandler extends ExtensibleGroupTypeHandler {
         } catch (Exception exc) {
             throw new RuntimeException(exc);
         }
-        super.doFinalEntryInitialization(request, entry);
+        super.doFinalEntryInitialization(request, entry, fromImport);
     }
 
 

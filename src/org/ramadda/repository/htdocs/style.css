@@ -2153,9 +2153,12 @@ a.toggleblocklabellink:visited {
 
 .toggleblocklabel {
   font-weight: bold;
+  display: inline-block;
 }
 
+
 .toggleblocklabel:hover {
+   text-decoration: underline;
 }
 
 
