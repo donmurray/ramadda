@@ -511,7 +511,7 @@ public class WikiUtil {
                 if(toks.size()>1) {
                     StringBuilder styles = new StringBuilder();
                     for(String side: new String[]{"top","left","bottom","right"}) {
-                        String v = StringUtil.findPattern(tline,side+"\\s*=\\s*\\\"(.*?)\\\"");
+                        String v = getAttribute(tline, side);
                         if(v!=null) {
                             styles.append("margin-" + side+":" + v +"px;");
                         }
@@ -530,9 +530,10 @@ public class WikiUtil {
                 continue;
             }
             if (tline.startsWith("+info-sec") || tline.startsWith("+section")) {
-                String label = StringUtil.findPattern(tline,"label\\s*=\\s*\\\"(.*?)\\\"");
-                String classArg = StringUtil.findPattern(tline,"class\\s*=\\s*\\\"(.*?)\\\"");
-                String extraArg = StringUtil.findPattern(tline,"style\\s*=\\s*\\\"(.*?)\\\"");
+
+                String label = getAttribute(tline,"label");
+                String classArg = getAttribute(tline,"class");
+                String extraArg = getAttribute(tline,"style");
                 boolean doEvenOdd  = tline.indexOf("#")>=0;
                 String extraClass = "";
                 String extraAttr = (extraArg==null?  "":" style=\"" + extraArg+"\" ");
@@ -585,9 +586,8 @@ public class WikiUtil {
                 continue;
             }
 
-            if (tline.equals("+mini")) {
-                buff.append("<div class=\"minitron\">");
-
+            if (tline.startsWith("+mini")) {
+                buff.append(HtmlUtils.open("div", HtmlUtils.cssClass("minitron " +getAttribute(tline,"class",""))));
                 continue;
             }
             if (tline.equals("-mini")) {
@@ -601,10 +601,9 @@ public class WikiUtil {
                 String clazz = toks.get(0).substring(1);
                 if(toks.size()>1) {
                     String attrs = toks.get(1);
-                    String style = StringUtil.findPattern(attrs,"style\\s*=\\s*\\\"(.*?)\\\"");
-                    String clazz2 = StringUtil.findPattern(attrs,"class\\s*=\\s*\\\"(.*?)\\\"");
+                    String style = getAttribute(attrs,"style");
                     if(style!=null) extra.append(HtmlUtils.style(style));
-                    if(clazz2!=null) clazz = clazz + " " + clazz2;
+                    clazz = clazz + " " + getAttribute(attrs,"class","");
                 }
                 buff.append(HtmlUtils.open("div", HtmlUtils.cssClass(clazz) + extra));
 
@@ -858,6 +857,23 @@ public class WikiUtil {
         }
 
         return s;
+    }
+
+
+
+    private String getAttribute(String line, String attr) {
+        return getAttribute(line, attr, null);
+    }
+
+    private String getAttribute(String line, String attr, String dflt) {
+        String v = StringUtil.findPattern(line,attr+"\\s*=\\s*\\\"(.*?)\\\"");
+        if(v == null) {
+            v = StringUtil.findPattern(line,attr+"\\s*=\\s*([^\\s]+)");
+        }
+        if(v == null) {
+            return dflt;
+        }
+        return v;
     }
 
 

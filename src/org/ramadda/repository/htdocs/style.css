@@ -110,6 +110,8 @@ h3 {
    font-weight:400;
 }
 
+
+
 .minitron {
    padding-top: 4px;
    padding-bottom: 4px;
@@ -148,6 +150,23 @@ h3 {
 .minitron .ramadda-snippet {
     border-bottom: 1px #ccc solid;
     margin-bottom: 5px;
+}
+
+
+
+.callout {
+   display: inline-block;
+   padding: 10px;
+   font-family: georgia;
+   border: 1px #eee solid;
+}
+
+.callout-yellow {
+   background: #fffeec;
+}
+
+.callout-blue {
+   background: #F0FFFF;
 }
 
 
