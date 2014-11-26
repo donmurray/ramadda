@@ -106,7 +106,6 @@
      <column name="skiprows" type="int" label="Skip Rows"  default="0" showinhtml="false" suffix="How many rows to remove from the data"/>
      <column name="skipcolumns" type="int" label="Skip columns" default="0"  showinhtml="false" suffix="How many columns to remove from the data"/>
 
-
      <column name="usefirstrow" type="boolean" label="Use first row as header"  default="true" showinhtml="false" group="Header"/>
      <column name="colheader" type="boolean" label="Show column header"  default="false" showinhtml="false"/>
      <column name="header" type="string"  size="500" label="Header"  showinhtml="false" suffix="Comma separated list of column header labels"/>
@@ -128,15 +127,23 @@
      <property name="icon" value="/icons/document-excel-csv.png"/>
 </type>
 
-  <type name="type_document_db"  description="Database Table"  super="type_document_tabular"   handler="org.ramadda.plugins.media.DbTableTypeHandler">
+  <type name="type_db_table"  description="Database Table"  super="type_document_tabular"   handler="org.ramadda.plugins.media.DbTableTypeHandler"         category="Database" >
      <property name="form.resource.show" value="false"/>
-     <property name="icon" value="/media/database.png"/>
+     <property name="icon" value="/media/database_table.png"/>
      <column   name="db_id" type="string"  columns="60" label="External Database ID"  showinhtml="false"  group="Database">
 <suffix><![CDATA[The shorthand ID of the external database connection <a target="_help" href="http://ramadda.org/repository/media/dbtable.html"/>More information</a>]]></suffix>
 </column>
      <column   name="table_name" type="string"  size="200" columns="60" label="Table name"  showinhtml="false" suffix="Database table to query"/>
-     <column name="columns" type="string"  size="500" rows="5" columns="60" label="Columns to use"  showinhtml="false" suffix="One column name per line"/>
+     <column name="properties" type="string"  size="5000"  showinhtml="false" />
 </type>
+
+
+<!--
+  <type name="type_db_schema"  description="Database Schema"  handler="org.ramadda.plugins.media.DbSchemaTypeHandler"  category="Database">
+     <property name="form.resource.show" value="false"/>
+     <property name="icon" value="/media/database.png"/>
+</type>
+-->
 
 
 </types>

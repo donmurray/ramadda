@@ -23,27 +23,19 @@ package org.ramadda.plugins.media;
 
 import org.ramadda.repository.*;
 import org.ramadda.repository.database.*;
-import org.ramadda.repository.metadata.*;
 import org.ramadda.repository.type.*;
 
 import org.ramadda.sql.*;
 import org.ramadda.util.FormInfo;
 import org.ramadda.util.HtmlUtils;
-
 import org.ramadda.util.Json;
 import org.ramadda.util.Utils;
-import org.ramadda.util.XlsUtil;
-
 
 import org.w3c.dom.*;
 
 import ucar.unidata.util.IOUtil;
-
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
-
-
-import ucar.unidata.xml.XmlUtil;
 
 import java.io.File;
 import java.io.InputStream;
@@ -53,15 +45,12 @@ import java.sql.*;
 
 import java.util.ArrayList;
 
-
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.regex.*;
 
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 
 
 /**
@@ -80,7 +69,7 @@ public class DbTableTypeHandler extends TabularTypeHandler {
     public static final int IDX_TABLE = IDX++;
 
     /** _more_ */
-    public static final int IDX_COLUMNS = IDX++;
+    public static final int IDX_PROPERTIES = IDX++;
 
 
     /** _more_ */
@@ -112,6 +101,11 @@ public class DbTableTypeHandler extends TabularTypeHandler {
 
 
     /**
+       column: Label, searchable
+     **/
+
+
+    /**
      * _more_
      *
      * @param request _more_
@@ -129,16 +123,18 @@ public class DbTableTypeHandler extends TabularTypeHandler {
 
 
         TableInfo tableInfo = getTableInfo(entry);
-        if(tableInfo!=null) {
-            List columns = new ArrayList();
-            for (ColumnInfo col : tableInfo.getColumns()) {
-                columns.add(Json.map("name",
-                                     Json.quote(col.getName()),
-                                     "type",
-                                     Json.quote(col.getTypeName())));
-            }
-            visitInfo.addTableProperty("columns", Json.list(columns));
+        if(tableInfo==null) {
+            System.err.println ("Error: Could not find TableInfo for entry:" + entry);
+            return;
         }
+        List columns = new ArrayList();
+        for (ColumnInfo col : tableInfo.getColumns()) {
+            columns.add(Json.map("name",
+                                 Json.quote(col.getName()),
+                                 "type",
+                                 Json.quote(col.getTypeName())));
+        }
+        visitInfo.addTableProperty("columns", Json.list(columns));
 
 
         String dbid = entry.getValue(IDX_DBID, (String) null);
@@ -165,13 +161,20 @@ public class DbTableTypeHandler extends TabularTypeHandler {
             return;
         }
 
+        
+
+
+        String what = "*";
+
+
+
+        /*
         List<String> cols = StringUtil.split(entry.getValue(IDX_COLUMNS, ""),
                                              "\n", true, true);
-        String what = "*";
 
         if (cols.size() > 0) {
             what = StringUtil.join(",", cols);
-        }
+            }*/
 
         int          max        = TabularOutputHandler.MAX_ROWS;
 
@@ -495,5 +498,13 @@ public class DbTableTypeHandler extends TabularTypeHandler {
         return tableInfos;
     }
 
+    public static class TableProperty {
+        private String type;
+        private String otherTable;
+        private String name;
+        private String label;
+        private boolean canSearch;
+
+    }
 
 }
