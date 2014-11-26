@@ -3,6 +3,11 @@
 
 function RamaddaXlsDisplay(displayManager, id, properties) {  
 
+    var COORD_X = "xaxis";
+    var COORD_Y= "yaxis";
+    var COORD_GROUP= "group";
+
+
     var ID_SEARCH = "search";    
     var ID_SEARCH_PREFIX = "table";    
     var ID_SEARCH_EXTRA = "searchextra";    
@@ -59,13 +64,13 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
             startRow:0,
             groupIndex: -1,
             xAxisIndex: -1,
-            yAxisIndex: 0,
+            yAxisIndex: -1,
             header: null,
             cellSelected: function(row, col) {
                 this.startRow = row;
                 if(this.jq("params-xaxis-select").attr("checked")) {
                     this.xAxisIndex = col;
-                } if(this.jq("params-group-select").attr("checked")) {
+                } else if(this.jq("params-group-select").attr("checked")) {
                     this.groupIndex = col;
                 } else {
                     this.yAxisIndex = col;
@@ -74,11 +79,15 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 var p1 = "";
                 var p2 = "";
 
-                this.setAxisLabel("params-xaxis-label", this.getHeading(this.xAxisIndex, true));
-                this.setAxisLabel("params-group-label", this.getHeading(this.groupIndex, true));
-                this.setAxisLabel("params-yaxis-label", this.getHeading(this.yAxisIndex, true));
+                this.setAxisLabel(COORD_X, this.getHeading(this.xAxisIndex, true));
+                this.setAxisLabel(COORD_GROUP, this.getHeading(this.groupIndex, true));
+                this.setAxisLabel(COORD_Y, this.getHeading(this.yAxisIndex, true));
+            },
+            getAxisLabelId: function(root) {
+                return "params-" + root +"-label"
             },
            setAxisLabel: function(fieldId, lbl) {
+                fieldId = this.getAxisLabelId(fieldId);
                 var id= HtmlUtil.getUniqueId();
                 if(lbl.length>25) {
                     lbl = lbl.substring(0,25) +"...";
@@ -330,11 +339,9 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 this.groupIndex = -1;
                 this.xAxisIndex = -1;
                 this.yAxisIndex = -1;
-                this.setAxisLabel("params-group-label", "");
-                this.setAxisLabel("params-xaxis-label", "");
-                this.setAxisLabel("params-yaxis-label", "");
-
-
+                this.setAxisLabel(COORD_GROUP, "");
+                this.setAxisLabel(COORD_X, "");
+                this.setAxisLabel(COORD_Y, "");
             },
              getHeading: function(index, doField) {
                 if(index<0) return "";
