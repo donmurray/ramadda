@@ -1476,11 +1476,11 @@ public class HtmlOutputHandler extends OutputHandler {
                              Appendable sb, int width, int height)
             throws Exception {
         request.put(ARG_TREEVIEW, "true");
-        StringBuffer listSB = new StringBuffer();
+        StringBuilder listSB = new StringBuilder();
         sb.append("<table width=\"100%\"><tr valign=\"top\">");
         String link = getEntriesList(request, listSB, children, true, false,
                                      false);
-        sb.append(HtmlUtils.col(link,
+        sb.append(HtmlUtils.col("",
                                 HtmlUtils.attr(HtmlUtils.ATTR_WIDTH, "350")));
         String gotoHtml = HtmlUtils.mouseClickHref("treeViewGoTo();",
                               "Go to", "");
