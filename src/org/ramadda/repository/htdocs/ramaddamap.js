@@ -108,6 +108,8 @@ function RepositoryMap(mapId, params) {
                 selectorMarker: null,
                 listeners: [],
                 initialLayers: [],
+                imageLayers:{
+                },
                 });
     $.extend(this, params);
 
@@ -128,7 +130,7 @@ function RepositoryMap(mapId, params) {
             }
         });
 
-    this.addImageLayer = function(name, url, north,west,south,east, width,height) {
+    this.addImageLayer = function(layerId, name, url, visible, north,west,south,east, width,height) {
         //Things go blooeey with lat up to 90
         if(north>88) north = 88;
         if(south<-88) south = -88;
@@ -145,7 +147,13 @@ function RepositoryMap(mapId, params) {
                                                     );
         
         //        imageLayer.isBaseLayer = false;
+        if(!visible) {
+            imageLayer.setVisibility(false);
+        }
         this.map.addLayer(imageLayer);
+        this.imageLayers[layerId] = imageLayer;
+        imageLayer.ramaddaId = layerId;
+        imageLayer.ramaddaName = name;
     }
 
 
@@ -860,7 +868,22 @@ function RepositoryMap(mapId, params) {
 
 
 
+    this.showImageLayer = function(layer, visible) {
+        for(var i in this.imageLayers) {
+            if(this.imageLayers[i]!= layer) {
+                this.imageLayers[i].setVisibility(false);
+            }
+        }
+        layer.setVisibility(visible);
+    },
     this.hiliteMarker = function(id) {
+        var imageLayer = this.imageLayers[id];
+        if(imageLayer) {
+            this.showImageLayer(imageLayer, true);
+            return;
+        }
+
+
         var mymarker = this.findMarker(id);
         if (!mymarker) {
             return;

@@ -129,14 +129,14 @@ public class MapManager extends RepositoryManager {
                              boolean forSelection) {
 
 
-
+        //        System.err.println("MapManager.createMap: " + width + " " + height);
         MapInfo mapInfo = new MapInfo(request, getRepository(), width,
                                       height, forSelection);
 
-        String maplayers = getRepository().getProperty(PROP_MAP_LAYERS,
-                                                       null);
+        String maplayers = getRepository().getProperty(PROP_MAP_LAYERS, null);
         if (maplayers != null) {
-            mapInfo.addProperty("mapLayers", StringUtil.split(maplayers,";",true,true));
+            mapInfo.addProperty("mapLayers",
+                                StringUtil.split(maplayers, ";", true, true));
         }
 
 
@@ -837,6 +837,7 @@ public class MapManager extends RepositoryManager {
      * @param detailed      detailed or not
      * @param haveBearingLines   true if plot bearing lines
      * @param listentries  if true, include the entries on the side
+     * @param mapProps _more_
      *
      * @return MapInfo (not really used)
      *
@@ -845,15 +846,14 @@ public class MapManager extends RepositoryManager {
     public MapInfo getMap(Request request, List<Entry> entriesToUse,
                           StringBuilder sb, int width, int height,
                           boolean detailed, boolean[] haveBearingLines,
-                          boolean listentries,
-                          List<Object[]>mapProps)
+                          boolean listentries, List<Object[]> mapProps)
             throws Exception {
         MapInfo map = createMap(request, width, height, false);
         if (map == null) {
             return null;
         }
-        if(mapProps!=null) {
-            for(Object[]pair: mapProps) {
+        if (mapProps != null) {
+            for (Object[] pair : mapProps) {
                 map.addProperty(pair[0].toString(), pair[1]);
             }
         }
@@ -890,8 +890,6 @@ public class MapManager extends RepositoryManager {
                 HtmlUtils.open(
                     HtmlUtils.TAG_DIV,
                     HtmlUtils.cssClass(CSS_CLASS_EARTH_NAV)));
-            catSB.append(
-                "<table cellspacing=0 cellpadding=0  width=100%><tr><td>");
             String iconUrl = getPageHandler().getIconUrl(request, entry);
             String navUrl = "javascript:" + map.getVariableName()
                             + ".hiliteMarker(" + sqt(entry.getId()) + ");";
@@ -902,14 +900,7 @@ public class MapManager extends RepositoryManager {
                         iconUrl, msg("Click to view entry details"))));
             catSB.append("&nbsp;");
             catSB.append(HtmlUtils.href(navUrl, getEntryDisplayName(entry)));
-            catSB.append("</td><td align=right>");
-            catSB.append(
-                HtmlUtils.href(
-                    navUrl,
-                    HtmlUtils.img(
-                        getRepository().iconUrl(ICON_MAP_NAV),
-                        "View entry")));
-            catSB.append("</td></tr></table>");
+            catSB.append("<br>");
             catSB.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
             numEntries++;
         }

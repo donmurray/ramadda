@@ -467,7 +467,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             throws Exception {
 
 
-        boolean       inDiv =  Misc.getProperty(props,"inDiv", true);
+        boolean       inDiv = Misc.getProperty(props, "inDiv", true);
         String        align = (String) props.get(ATTR_ALIGN);
         String        width = (String) props.get(ATTR_WIDTH);
         String        alt   = (String) props.get(HtmlUtils.ATTR_ALT);
@@ -483,7 +483,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             extra.append(HtmlUtils.attr(HtmlUtils.ATTR_WIDTH, width));
         }
 
-        if ( !inDiv && align != null) {
+        if ( !inDiv && (align != null)) {
             //            extra.append(HtmlUtils.style("align:" + align + ";"));
             //            extra.append(HtmlUtils.attr("align", align));
         }
@@ -575,7 +575,9 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         if (inDiv) {
             sb.append(HtmlUtils.open("div", attrs));
         } else {
-            sb.append(HtmlUtils.open("div", HtmlUtils.style((align!=null?"float:" + align+";" : "")+" display:inline-block;text-align:center")));
+            sb.append(HtmlUtils.open("div", HtmlUtils.style(((align != null)
+                    ? "float:" + align + ";"
+                    : "") + " display:inline-block;text-align:center")));
         }
         sb.append(img);
         if (caption != null) {
@@ -907,13 +909,17 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 url = entry.getTypeHandler().getEntryResourceUrl(request,
                         entry);
             } else {
-                String output = Misc.getProperty(props, ATTR_OUTPUT, OutputHandler.OUTPUT_HTML.getId());
-                url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT, output);
+                String output = Misc.getProperty(props, ATTR_OUTPUT,
+                                    OutputHandler.OUTPUT_HTML.getId());
+                url = request.entryUrl(getRepository().URL_ENTRY_SHOW, entry,
+                                       ARG_OUTPUT, output);
             }
 
-            if(Misc.getProperty(props, "button", false)) {
-                return HtmlUtils.href(url, title,
-                                      HtmlUtils.cssClass("btn btn-primary btn-default") +HtmlUtils.attr("role","button"));
+            if (Misc.getProperty(props, "button", false)) {
+                return HtmlUtils.href(
+                    url, title,
+                    HtmlUtils.cssClass("btn btn-primary btn-default")
+                    + HtmlUtils.attr("role", "button"));
             } else {
                 return HtmlUtils.href(url, title);
             }
@@ -951,7 +957,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
             }
 
-            String extra ="";
+            String extra = "";
 
 
 
@@ -1118,7 +1124,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         } else if (theTag.equals(WIKI_TAG_DISPLAY)
                    || theTag.equals(WIKI_TAG_CHART)) {
 
-            String jsonUrl =  entry.getTypeHandler().getUrlForWiki(request, entry, theTag);
+            String jsonUrl = entry.getTypeHandler().getUrlForWiki(request,
+                                 entry, theTag);
             getEntryDisplay(request, entry, theTag, entry.getName(), jsonUrl,
                             sb, props);
 
@@ -1237,10 +1244,11 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                     newRequest.put(ARG_MAP_ICONSONLY, "true");
                 }
                 List<Object[]> mapProps = new ArrayList<Object[]>();
-                mapProps.add(new Object[]{"defaultMapLayer", Json.quote(layer)});
+                mapProps.add(new Object[] { "defaultMapLayer",
+                                            Json.quote(layer) });
                 MapInfo map = getMapManager().getMap(newRequest, children,
                                   sb, width, height, details,
-                                                     haveBearingLines, listEntries,mapProps);
+                                  haveBearingLines, listEntries, mapProps);
                 if (icon != null) {
                     newRequest.remove(ARG_ICON);
                 }
@@ -4265,8 +4273,12 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                     "google.load(\"visualization\", \"1\", {packages:['corechart','table']});\n"));
             sb.append(HtmlUtils.importJS(fileUrl("/lib/d3/d3.min.js")));
 
-            sb.append(HtmlUtils.importJS(fileUrl("/lib/jquery.handsontable.full.min.js")));
-            sb.append(HtmlUtils.cssLink(fileUrl("/lib/jquery.handsontable.full.min.css")));
+            sb.append(
+                HtmlUtils.importJS(
+                    fileUrl("/lib/jquery.handsontable.full.min.js")));
+            sb.append(
+                HtmlUtils.cssLink(
+                    fileUrl("/lib/jquery.handsontable.full.min.css")));
 
 
             /*
@@ -4286,8 +4298,10 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             sb.append(
                 HtmlUtils.importJS(fileUrl("/display/displayentry.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/displaymap.js")));
-            sb.append(HtmlUtils.importJS(fileUrl("/display/displaychart.js")));
-            sb.append(HtmlUtils.importJS(fileUrl("/display/displaytable.js")));
+            sb.append(
+                HtmlUtils.importJS(fileUrl("/display/displaychart.js")));
+            sb.append(
+                HtmlUtils.importJS(fileUrl("/display/displaytable.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/control.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/displayd3.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/displayext.js")));
