@@ -306,7 +306,7 @@ public class PageHandler extends RepositoryManager {
         Entry        currentEntry = getSessionManager().getLastEntry(request);
         String       template     = null;
         HtmlTemplate htmlTemplate;
-        if (request.isMobile()) {
+        if (request.isMobile() && !request.defined(ARG_TEMPLATE)) {
             htmlTemplate = getMobileTemplate();
         } else {
             htmlTemplate = getTemplate(request, currentEntry);
