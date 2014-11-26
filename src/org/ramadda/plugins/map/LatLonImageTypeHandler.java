@@ -83,21 +83,39 @@ public class LatLonImageTypeHandler extends GenericTypeHandler {
      */
     @Override
     public boolean addToMap(Request request, Entry entry, MapInfo map) {
+
+        if (!entry.hasAreaDefined()) {
+            return false;
+        }
+
+        //Only set the width if the latlonentry is the main displayed entry
+
+        if(entry.getId().equals(request.getString(ARG_ENTRYID,""))) {
+            int width  = (int) entry.getValue(0, -1);
+            int height = (int) entry.getValue(1, -1);
+            if ((width > 0) && (height > 0)) {
+                map.setWidth(width);
+                map.setHeight(height);
+            }
+        }
+
+
+
         String url =
             getRepository().getHtmlOutputHandler().getImageUrl(request,
                 entry);
 
-        int width  = (int) entry.getValue(0, -1);
-        int height = (int) entry.getValue(1, -1);
-        if ((width > 0) && (height > 0)) {
-            map.setWidth(width);
-            map.setHeight(height);
+        boolean visible = false;
+        if(request.getExtraProperty("wmslayershow") == null) {
+            request.putExtraProperty("wmslayershow","true");
+            visible = true;
         }
-
 
         map.addJS(HtmlUtils.call("theMap.addImageLayer",
                                  HtmlUtils.jsMakeArgs(new String[] {
-            HtmlUtils.squote(entry.getName()), HtmlUtils.squote(url),
+                                         HtmlUtils.squote(entry.getId()),
+                                         HtmlUtils.squote(entry.getName()), HtmlUtils.squote(url),
+            ""+visible,
             "" + entry.getNorth(), "" + entry.getWest(),
             "" + entry.getSouth(), "" + entry.getEast(), "400", "400"
         }, false)));
