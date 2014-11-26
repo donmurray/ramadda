@@ -80,6 +80,12 @@ h3 {
     margin: 0px;
 }
 
+.ramadda-section-wide  {
+    padding-left:20px;
+    padding-right:20px;
+}
+
+
 .ramadda-section-map {
      background: URL(${urlroot}/images/background.png);
 }
@@ -331,6 +337,7 @@ input, password, fileinput,textarea {
     overflow-y: auto;
     border: 1px #ccc solid;
     border-top: 0px #ccc solid;
+    background: #fff;
 }
 
 .entry-list-settings {
@@ -1748,6 +1755,9 @@ xxxpath.link {
    border: 1px solid #000;
 }
 
+.slide {
+       background-color:white;
+}
 
 
 .calendartable,  .dategrid {
