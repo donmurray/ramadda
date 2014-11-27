@@ -6943,7 +6943,7 @@ public class EntryManager extends RepositoryManager {
      */
     public void addNewEntries(Request request, List<Entry> entries)
             throws Exception {
-        addNewEntries(request, entries);
+        addNewEntries(request, entries, false);
     }
 
     /**
