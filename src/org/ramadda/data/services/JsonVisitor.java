@@ -218,17 +218,17 @@ public class JsonVisitor extends BridgeRecordVisitor {
         if (doNewEncoding) {
             if (pointRecord.isValidPosition()) {
                 pw.append(COMMA);
-                pw.append("" + pointRecord.getLatitude());
+                pw.append(Json.formatNumber(pointRecord.getLatitude()));
                 pw.append(COMMA);
-                pw.append("" + pointRecord.getLongitude());
+                pw.append(Json.formatNumber(pointRecord.getLongitude()));
                 pw.append(COMMA);
-                pw.append("" + pointRecord.getAltitude());
+                pw.append(Json.formatNumber(pointRecord.getAltitude()));
             }
             if (pointRecord.hasRecordTime()) {
                 pw.append(COMMA);
                 //                pw.append(Json.quote(DateUtil.getTimeAsISO8601(pointRecord.getRecordTime())));
                 //Just use the milliseconds
-                pw.append("" + pointRecord.getRecordTime());
+                pw.append(Json.formatNumber(pointRecord.getRecordTime()));
             }
         }
 
