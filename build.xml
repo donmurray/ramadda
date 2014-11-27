@@ -141,6 +141,16 @@
 
 
 
+    <target name="plugin_main">
+      <property file="${basedir}/build.properties"/>
+      <ant antfile="${basedir}/build.xml" target="commoninit" />
+      <property name="jarfile" value="${plugin}plugin.jar"/>
+      <property name="plugin_dir" value="org/ramadda/plugins/${plugin}"/>
+      <ant antfile="${basedir}/build.xml" target="plugin"/>
+      <ant antfile="${basedir}/build.xml" target="plugin_install"/>
+    </target>
+
+
     <target name="pluginnocode" depends="init,pluginclean">
         <property name="plugindestdir" value="${dist_dir}/plugins"/>
         <mkdir dir="${plugindestdir}"/>
