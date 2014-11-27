@@ -782,7 +782,7 @@ features
 
 
 
-  <type name="project_learning_resource"  description="Learning Resource" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Science Project"      metadata="project_creator,enum_tag,content.keyword">
+  <type name="project_learning_resource"  description="Teaching Resource" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Science Project"      metadata="project_creator,enum_tag,content.keyword">
      <property name="icon" value="/fieldproject/reports-stack.png"/>
 
      <property name="form.file.show" value="false"/>
