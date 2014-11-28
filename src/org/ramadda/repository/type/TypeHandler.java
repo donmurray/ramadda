@@ -1651,7 +1651,6 @@ public class TypeHandler extends RepositoryManager {
                                            boolean fromImport) {
         //Clear the column value cache?
 
-        System.err.println("TypeHandler.doFinal: import=" + fromImport);
         if (fromImport) {
             return;
         }

@@ -829,6 +829,12 @@ public class Entry implements Cloneable {
         return retval;
     }
 
+    public void setValue(int idx, Object v) {
+        Object[] values    = getTypeHandler().getEntryValues(this);
+        values[idx] = v;
+    }
+
+
     /**
      * Return a String representation of this Object
      *
