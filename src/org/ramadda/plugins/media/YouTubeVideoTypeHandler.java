@@ -38,6 +38,7 @@ import ucar.unidata.util.StringUtil;
 
 import ucar.unidata.xml.XmlUtil;
 
+import java.io.*;
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -49,20 +50,26 @@ import java.util.List;
  */
 public class YouTubeVideoTypeHandler extends GenericTypeHandler {
 
-    /** _more_ */
-    public static final int IDX_WIDTH = 0;
+    private static int IDX = 0;
+
+
+    public static final int IDX_ID = IDX++;
+
 
     /** _more_ */
-    public static final int IDX_HEIGHT = 1;
+    public static final int IDX_WIDTH = IDX++;
 
     /** _more_ */
-    public static final int IDX_START = 2;
+    public static final int IDX_HEIGHT = IDX++;
 
     /** _more_ */
-    public static final int IDX_END = 3;
+    public static final int IDX_START = IDX++;
 
     /** _more_ */
-    public static final int IDX_DISPLAY = 4;
+    public static final int IDX_END = IDX++;
+
+    /** _more_ */
+    public static final int IDX_DISPLAY = IDX++;
 
     /** _more_ */
     private int idCnt = 0;
@@ -108,7 +115,11 @@ public class YouTubeVideoTypeHandler extends GenericTypeHandler {
                 DFLT_WIKI_HEADER));
 
         String url = entry.getResource().getPath();
-        String id  = StringUtil.findPattern(url, "v=([^&]+)&");
+        String id  = entry.getValue(IDX_ID,(String) null);
+        //For legacy entries
+        if (id == null) {
+            id = StringUtil.findPattern(url, "v=([^&]+)&");
+        }
         if (id == null) {
             id = StringUtil.findPattern(url, "v=([^&]+)");
         }
@@ -120,6 +131,9 @@ public class YouTubeVideoTypeHandler extends GenericTypeHandler {
             return getPageHandler().showDialogError(
                 "Could not find ID in YouTube URL");
         }
+
+
+
 
 
         String width  = entry.getValue(IDX_WIDTH, "640");
@@ -195,29 +209,61 @@ public class YouTubeVideoTypeHandler extends GenericTypeHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param path _more_
-     *
-     * @return _more_
-     */
-    public String getDefaultEntryName(String path) {
-        String html  = IOUtil.readContents(path, "");
+
+    @Override
+    public void initializeNewEntry(Request request, Entry entry)
+            throws Exception {
+        super.initializeNewEntry(request, entry);
+
+        String url = entry.getResource().getPath();
+        String id  = StringUtil.findPattern(url, "v=([^&]+)&");
+        if (id == null) {
+            id = StringUtil.findPattern(url, "v=([^&]+)");
+        }
+        if (id == null) {
+            id = StringUtil.findPattern(url, "youtu.be/([^&]+)");
+        }
+        if (id != null) {
+            entry.setValue(IDX_ID, id);
+        }
+
+        String html  = IOUtil.readContents(url, "");
         String title = StringUtil.findPattern(html, "<title>(.*)</title>");
         if (title == null) {
             title = StringUtil.findPattern(html, "<TITLE>(.*)</TITLE>");
         }
-        System.err.println("title:" + title);
         if (title != null) {
             title = title.replace("- YouTube", "");
-
-            return title;
+            entry.setName(title);
         }
 
-        //TODO: fetch the web page and get the title
-        return "YouTube Video";
+
+        if(id!=null) {
+            String thumbUrl = "https://i.ytimg.com/vi/" + id +"/default.jpg";
+            System.err.println (thumbUrl);
+            try {
+                File f = getStorageManager().getTmpFile(request, "youtubethumb.jpg");
+                InputStream is = getStorageManager().getInputStream(thumbUrl);
+                OutputStream fos = getStorageManager().getFileOutputStream(f);
+                try {
+                    IOUtil.writeTo(is, fos);
+                    f = getStorageManager().moveToEntryDir(entry, f);
+                    entry.addMetadata(new Metadata(getRepository().getGUID(),
+                                                   entry.getId(), ContentMetadataHandler.TYPE_THUMBNAIL, false,
+                                                   f.getName(), null, null, null, null));
+                
+                } finally {
+                    IOUtil.close(fos);
+                    IOUtil.close(is);
+                }            
+            } catch(Exception exc) {
+                System.err.println ("Error fetching youtube thumbnail:" + thumbUrl);
+            }
+        }
     }
+
+
+
 
     /**
      * _more_
