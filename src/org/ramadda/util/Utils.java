@@ -22,6 +22,7 @@ package org.ramadda.util;
 
 
 import org.apache.commons.lang.text.StrTokenizer;
+import org.apache.commons.net.ftp.*;
 
 import org.w3c.dom.*;
 
@@ -129,12 +130,22 @@ public class Utils {
     }
 
 
-    public static List<String> tokenizeColumns(String line, String columnDelimiter) {
+    /**
+     * _more_
+     *
+     * @param line _more_
+     * @param columnDelimiter _more_
+     *
+     * @return _more_
+     */
+    public static List<String> tokenizeColumns(String line,
+            String columnDelimiter) {
         List<String> toks      = new ArrayList<String>();
         StrTokenizer tokenizer = StrTokenizer.getCSVInstance(line);
         while (tokenizer.hasNext()) {
             toks.add(tokenizer.nextToken());
         }
+
         return toks;
     }
 
@@ -1103,6 +1114,22 @@ public class Utils {
      * _more_
      *
      * @param filename _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
+    public static boolean isCompressed(String filename) throws IOException {
+        filename = filename.toLowerCase();
+
+        return filename.endsWith(".gz") || filename.endsWith(".zip");
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param filename _more_
      * @param buffered _more_
      *
      * @return _more_
@@ -1147,8 +1174,6 @@ public class Utils {
         }
 
 
-
-
         if ( !buffered) {
             //            System.err.println("not buffered");
             //            return is;
@@ -1164,6 +1189,83 @@ public class Utils {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param url _more_
+     * @param os _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static boolean writeFile(URL url, OutputStream os)
+            throws Exception {
+        if (url.getProtocol().equals("ftp")) {
+            FTPClient ftpClient = null;
+            try {
+                ftpClient = Utils.makeFTPClient(url);
+                if (ftpClient == null) {
+                    return false;
+                }
+                if (ftpClient.retrieveFile(url.getPath(), os)) {
+                    return true;
+                }
+
+                return false;
+            } finally {
+                closeConnection(ftpClient);
+            }
+        } else {
+            InputStream is = IOUtil.getInputStream(url.toString(),
+                                 Utils.class);
+            IOUtil.writeTo(is, os);
+
+            return true;
+        }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param url _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static FTPClient makeFTPClient(URL url) throws Exception {
+        FTPClient ftpClient = new FTPClient();
+        ftpClient.connect(url.getHost());
+        ftpClient.login("anonymous", "");
+        int reply = ftpClient.getReplyCode();
+        if ( !FTPReply.isPositiveCompletion(reply)) {
+            ftpClient.disconnect();
+            System.err.println("FTP server refused connection.");
+
+            return null;
+        }
+        ftpClient.setFileType(FTP.IMAGE_FILE_TYPE);
+        ftpClient.enterLocalPassiveMode();
+
+        return ftpClient;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param ftpClient _more_
+     */
+    public static void closeConnection(FTPClient ftpClient) {
+        try {
+            ftpClient.logout();
+        } catch (Exception exc) {}
+        try {
+            ftpClient.disconnect();
+        } catch (Exception exc) {}
+    }
 
 
 

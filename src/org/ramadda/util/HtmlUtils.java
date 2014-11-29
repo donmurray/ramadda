@@ -24,6 +24,11 @@
 package org.ramadda.util;
 
 
+import org.apache.commons.net.ftp.*;
+
+import ucar.unidata.util.IOUtil;
+
+
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
@@ -31,16 +36,20 @@ import ucar.unidata.util.TwoFacedObject;
 
 import ucar.unidata.xml.XmlUtil;
 
-
 import java.awt.Color;
 
 import java.lang.reflect.*;
+
+import java.net.URL;
 
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
+
+
+import java.util.regex.*;
 
 
 
@@ -3893,7 +3902,214 @@ public class HtmlUtils {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param url _more_
+     * @param linkPattern _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static List<Link> extractLinks(URL url, String linkPattern)
+            throws Exception {
+        if ( !Utils.stringDefined(linkPattern)) {
+            linkPattern = null;
+        }
+        List<Link> links = new ArrayList<Link>();
 
+        if (url.getProtocol().equals("ftp")) {
+            return extractLinksFtp(url, linkPattern);
+        }
+
+
+        String html = IOUtil.readContents(url.toString(), HtmlUtils.class);
+
+        String pattern =
+            "(?i)<\\s*a href\\s*=\\s*\"?([^\">]+)\"?[^>]*>(.+)</a>";
+
+
+
+        Matcher matcher = Pattern.compile(pattern).matcher(html);
+        while (matcher.find()) {
+            String href  = matcher.group(1);
+            String label = matcher.group(2);
+            label = StringUtil.stripTags(label).trim();
+            if (linkPattern != null) {
+                if ( !(href.matches(linkPattern)
+                        || label.matches(linkPattern))) {
+                    continue;
+                }
+            }
+            URL newUrl = new URL(url, href);
+            links.add(new Link(newUrl, label));
+        }
+
+        return links;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param url _more_
+     * @param linkPattern _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static List<Link> extractLinksFtp(URL url, String linkPattern)
+            throws Exception {
+        FTPClient ftpClient = null;
+        try {
+            ftpClient = Utils.makeFTPClient(url);
+            if (ftpClient == null) {
+                return null;
+            }
+            List<Link> links = new ArrayList<Link>();
+            FTPFile[]  files = ftpClient.listFiles(url.getPath());
+            for (int i = 0; i < files.length; i++) {
+                if ( !files[i].isFile()) {
+                    continue;
+                }
+                String href  = files[i].getName();
+                String label = href;
+                if (linkPattern != null) {
+                    if ( !(href.matches(linkPattern)
+                            || label.matches(linkPattern))) {
+                        continue;
+                    }
+                }
+                URL newUrl = new URL(url, href);
+                links.add(new Link(newUrl, label, files[i].getSize()));
+            }
+
+            return links;
+        } finally {
+            Utils.closeConnection(ftpClient);
+        }
+    }
+
+
+
+
+
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Sat, Nov 29, '14
+     * @author         Enter your name here...
+     */
+    public static class Link {
+
+        /** _more_ */
+        private URL url;
+
+        /** _more_ */
+        private String label;
+
+        /** _more_ */
+        private long size = -1;
+
+        /**
+         * _more_
+         *
+         * @param url _more_
+         * @param label _more_
+         * @param size _more_
+         */
+        public Link(URL url, String label, long size) {
+            this(url, label);
+            this.size = size;
+        }
+
+        /**
+         * _more_
+         *
+         * @param url _more_
+         * @param label _more_
+         */
+        public Link(URL url, String label) {
+            this.url   = url;
+            this.label = label;
+        }
+
+        /**
+         *  Set the Url property.
+         *
+         *  @param value The new value for Url
+         */
+        public void setUrl(URL value) {
+            url = value;
+        }
+
+        /**
+         *  Get the Url property.
+         *
+         *  @return The Url
+         */
+        public URL getUrl() {
+            return url;
+        }
+
+        /**
+         *  Set the Label property.
+         *
+         *  @param value The new value for Label
+         */
+        public void setLabel(String value) {
+            label = value;
+        }
+
+        /**
+         *  Get the Label property.
+         *
+         *  @return The Label
+         */
+        public String getLabel() {
+            return label;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public String getHref() {
+            return HtmlUtils.href(this.url.toString(), this.label);
+        }
+
+        /**
+         *  Set the Size property.
+         *
+         *  @param value The new value for Size
+         */
+        public void setSize(long value) {
+            size = value;
+        }
+
+        /**
+         *  Get the Size property.
+         *
+         *  @return The Size
+         */
+        public long getSize() {
+            return size;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public String toString() {
+            return url + " " + label;
+        }
+
+    }
 
 
 }
