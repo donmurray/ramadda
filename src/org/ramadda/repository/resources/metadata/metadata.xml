@@ -59,6 +59,12 @@
       <element name="Name"/>
     </type>
 
+    <type id="metadata_source" name="Source" searchable="true" priority="20"  displaygroup="Source">
+      <element id="url" datatype="url" name="URL"/>
+      <element id="via" name="VIA"/>
+    </type>
+
+
     <type
        name="Author"
        searchable="false"
@@ -266,6 +272,8 @@
        id="content.jython">
       <element name="Jython File" datatype="file" thumbnail="false"/>
     </type>
+
+
 
 
 </handler>
