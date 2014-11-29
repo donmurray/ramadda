@@ -6684,6 +6684,7 @@ public class EntryManager extends RepositoryManager {
                               TypeHandler typeHandler,
                               EntryInitializer initializer)
             throws Exception {
+
         String resourceType;
 
         //Is it a ramadda managed file?
@@ -6693,6 +6694,40 @@ public class EntryManager extends RepositoryManager {
         } else {
             resourceType = Resource.TYPE_LOCAL_FILE;
         }
+
+
+        Entry entry = makeEntry(request, new Resource(newFile, resourceType),
+                                group, name, "", user, typeHandler,
+                                initializer);
+
+        addNewEntry(request, entry);
+
+        return entry;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param resource _more_
+     * @param group _more_
+     * @param name _more_
+     * @param description _more_
+     * @param user _more_
+     * @param typeHandler _more_
+     * @param initializer _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Entry makeEntry(Request request, Resource resource, Entry group,
+                           String name, String description, User user,
+                           TypeHandler typeHandler,
+                           EntryInitializer initializer)
+            throws Exception {
 
 
         if ( !getRepository().getAccessManager().canDoAction(request, group,
@@ -6705,21 +6740,17 @@ public class EntryManager extends RepositoryManager {
                 getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
         }
 
-        Entry    entry    =
-            typeHandler.createEntry(getRepository().getGUID());
+        Entry entry = typeHandler.createEntry(getRepository().getGUID());
 
 
-
-        Resource resource = new Resource(newFile.toString(), resourceType);
-        Date     dttm     = new Date();
-        entry.initEntry(name, "", group, request.getUser(), resource, "",
-                        dttm.getTime(), dttm.getTime(), dttm.getTime(),
-                        dttm.getTime(), null);
+        Date  dttm  = new Date();
+        entry.initEntry(name, "", group, request.getUser(), resource,
+                        description, dttm.getTime(), dttm.getTime(),
+                        dttm.getTime(), dttm.getTime(), null);
 
         if (initializer != null) {
             initializer.initEntry(entry);
         }
-        addNewEntry(request, entry);
 
         return entry;
     }

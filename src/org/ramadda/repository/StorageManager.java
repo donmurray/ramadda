@@ -27,6 +27,7 @@ import org.ramadda.repository.auth.AccessException;
 import org.ramadda.repository.job.JobManager;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.TempDir;
+import org.ramadda.util.Utils;
 
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
@@ -2264,8 +2265,33 @@ public class StorageManager extends RepositoryManager {
         return files;
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param f _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public File uncompressIfNeeded(Request request, File f) throws Exception {
+        if (Utils.isCompressed(f.toString())) {
+            File uncompressedFile =
+                getTmpFile(request,
+                           getFileTail(IOUtil.stripExtension(f.toString())));
+            InputStream is = Utils.doMakeInputStream(f.toString(), true);
+            if (IOUtil.writeTo(is, new FileOutputStream(uncompressedFile))
+                    == 0) {
+                IOUtil.close(is);
 
+                return null;
+            }
+            IOUtil.close(is);
+            f = uncompressedFile;
+        }
 
-
+        return f;
+    }
 
 }
