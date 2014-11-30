@@ -266,6 +266,8 @@ public class Column implements DataTypes, Constants {
     /** _more_ */
     private boolean isIndex;
 
+    private boolean isWiki;
+
     /** _more_ */
     private boolean isCategory;
 
@@ -407,6 +409,7 @@ public class Column implements DataTypes, Constants {
         dflt           = getAttributeOrTag(element, ATTR_DEFAULT, "").trim();
         alias          = getAttributeOrTag(element, "alias", (String) null);
         isIndex        = getAttributeOrTag(element, ATTR_ISINDEX, false);
+        isWiki         = getAttributeOrTag(element, "iswiki", false);
         isCategory     = getAttributeOrTag(element, ATTR_ISCATEGORY, false);
         canSearch      = getAttributeOrTag(element, ATTR_CANSEARCH, false);
         advancedSearch = getAttributeOrTag(element, ATTR_ADVANCED, false);
@@ -1994,13 +1997,23 @@ public class Column implements DataTypes, Constants {
                 }
             } else {
                 String domId = HtmlUtils.getUniqueId("input_");
-                if (rows > 1) {
+                if (rows > 1 || isWiki) {
                     if (isType(DATATYPE_LIST)) {
                         value = StringUtil.join("\n",
                                 StringUtil.split(value, ",", true, true));
                     }
-                    widget = HtmlUtils.textArea(urlArg, value, rows, columns,
-                            HtmlUtils.id(domId));
+                    String buttons = "";
+                    if(isWiki) {
+                        buttons =
+                            getRepository().getWikiManager().makeWikiEditBar(request, entry,
+                                                                             domId);
+                    }
+                    int areaRows = rows;
+                    if(areaRows<=1 && isWiki) {
+                        areaRows = 50;
+                    }
+                    widget = buttons + HtmlUtils.textArea(urlArg, value, areaRows, columns,
+                                                          HtmlUtils.id(domId));
                 } else {
                     widget = HtmlUtils.input(urlArg, value,
                                              HtmlUtils.id(domId) + " size=\""
@@ -2753,6 +2766,7 @@ public class Column implements DataTypes, Constants {
     public boolean getIsIndex() {
         return isIndex;
     }
+
 
 
     /**

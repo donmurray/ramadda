@@ -401,11 +401,13 @@ public class WikiPageTypeHandler extends ExtensibleGroupTypeHandler {
                             + HtmlUtils.textArea(ARG_WIKI_TEXTAREA, wikiText,
                                 50, 80, HtmlUtils.id(textAreaId));
 
+        /*
         String right = HtmlUtils.div(help.toString(),
                                      HtmlUtils.cssClass(CSS_CLASS_SMALLHELP));
         right = "";
         textWidget = "<table><tr valign=\"top\"><td>" + textWidget
                      + "</td><td>" + right + "</td></tr></table>";
+        */
         sb.append(HtmlUtils.formEntryTop(msgLabel("Wiki Text"), textWidget));
         addDateToEntryForm(request, sb, entry);
         addAreaWidget(request, entry, sb, formInfo);

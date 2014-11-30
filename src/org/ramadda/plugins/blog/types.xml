@@ -27,7 +27,7 @@
      <property name="form.area.show" value="false"/>
      <property name="form.resource.show" value="false"/>
 
-     <column name="blogtext" type="clob" size="256000" label="Extra Text" cansearch="true" showinhtml="false" rows="20" columns="80"/>
+     <column name="blogtext" type="clob" size="256000" label="Extra Text" cansearch="true" showinhtml="false" rows="20" columns="80" iswiki="true"/>
 </type>
 
 
