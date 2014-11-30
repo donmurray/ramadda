@@ -2006,7 +2006,7 @@ public class Column implements DataTypes, Constants {
                     if(isWiki) {
                         buttons =
                             getRepository().getWikiManager().makeWikiEditBar(request, entry,
-                                                                             domId);
+                                                                             domId) + HtmlUtils.br();
                     }
                     int areaRows = rows;
                     if(areaRows<=1 && isWiki) {
