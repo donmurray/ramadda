@@ -42,13 +42,23 @@ function getRamadda(baseUrl) {
     return manager;
 }
 
+function addRepository(repository) {
+    if(window.globalRamaddas==null) {
+        window.globalRamaddas = {};
+    }
+    window.globalRamaddas[repository.repositoryRoot] = repository;
+}
+
 function getGlobalRamadda() {
     return getRamadda(ramaddaBaseUrl);
 }
 
 
 
-function Ramadda(repositoryRoot) {
+function Ramadda(repositoryRoot, isContainer) {
+    if(repositoryRoot == "all" && !isContainer) {
+    }
+
     if(repositoryRoot == null) {
         repositoryRoot = ramaddaBaseUrl;
     }
@@ -70,10 +80,20 @@ function Ramadda(repositoryRoot) {
             entryCache: {},
             entryTypes: null,
             entryTypeMap: {},
+            addRepository: function(repository) {
+                if(this.children==null) {
+                    this.children = [];
+                }
+                this.children.push(repository);
+            },
             getHostname: function() {
                 return this.hostname;
             },
+            canSearch: function() {
+                return this.children==null;
+            },
             getName: function() {
+                if(this.children) { return "Search all repositories";}
                 if(this.name!=null) return this.name;
                 if(this.repositoryRoot.indexOf("/") == 0)  {
                     return this.name  = "This RAMADDA";
@@ -101,9 +121,36 @@ function Ramadda(repositoryRoot) {
                 return this.entryTypeMap[typeId];
             },
             getEntryTypes: function(callback) {
+                if(this.entryTypes != null) {
+                    return this.entryTypes;
+                }
+                if(this.children!=null) {
+                    if(this.entryTypes == null) {
+                        this.entryTypes = [];
+                    }
+                    var seen = {};
+                    for(var i =0;i<this.children.length;i++) {
+                        var types = this.children[i].getEntryTypes();
+                        for(var j =0;j<types.length;j++) {
+                            var type = types[j];
+                            if(seen[type.getId()] == null) {
+                                var newType = {};
+                                newType = $.extend(newType, type);
+                                seen[type.getId()] = newType;
+                                this.entryTypes.push(newType);
+                            } else {
+                                seen[type.getId()].entryCount+= type.getEntryCount();
+                            }
+                        }
+                    }
+                    return this.entryTypes;
+                }
+
+
                 if(this.entryTypes == null) {
                     var theRamadda = this;
                     var url = this.repositoryRoot +"/entry/types";
+                    //                    console.log(this.repositoryRoot +" fetching: " + url +" children:" + this.children);
                     var jqxhr = $.getJSON(url, function(data) {
                             if(GuiUtils.isJsonError(data)) {
                                 return;
@@ -123,7 +170,7 @@ function Ramadda(repositoryRoot) {
                                 //                                console.log("Always:" +textStatus);
                         }).fail(function(jqxhr, textStatus, error) {
                             var err = textStatus + " --  " + error;
-                            GuiUtils.handleError(err, url);
+                            GuiUtils.handleError("entry error 1:" + err, url);
                             });
                 }
                 return this.entryTypes;
@@ -139,7 +186,7 @@ function Ramadda(repositoryRoot) {
                     })
                     .fail(function(jqxhr, textStatus, error) {
                             var err = textStatus + ", " + error;
-                            GuiUtils.handleError(err, url);
+                            GuiUtils.handleError("entry error 2:" +err, url);
                         });
                 return null;
             },
@@ -221,13 +268,15 @@ function Ramadda(repositoryRoot) {
                     })
                     .fail(function(jqxhr, textStatus, error) {
                             var err = textStatus + ", " + error;
-                            GuiUtils.handleError(err, jsonUrl);
+                            GuiUtils.handleError("entry error 3:" +err, jsonUrl);
                         });
                 return null;
             }
         });
 
-    this.getEntryTypes();
+    if(!isContainer) {
+        this.getEntryTypes();
+    }
 }
 
 
@@ -352,7 +401,7 @@ function Entry(props) {
                         callback(list.getEntries());
                     }
                 };
-                var entryList = new EntryList(this.getRamadda(), jsonUrl, myCallback);
+                var entryList = new EntryList(this.getRamadda(), jsonUrl, myCallback, true);
                 return null;
             },
             getType: function() {
@@ -494,20 +543,22 @@ function Entry(props) {
 
 
 
-function EntryList(ramadda, jsonUrl, listener) {
-    this.ramadda = ramadda;
-    var entryList = this;
-
+function EntryList(repository, jsonUrl, listener, doSearch) {
     $.extend(this, {
+            repository: repository,
+            url: jsonUrl,
+            listener : listener,
             haveLoaded : false,
             divId : null,
             entries :[],
             map: {},
-            listener : listener,
+            getRepository: function() {
+                return this.repository;
+            },
             getEntry : function(id) {
                 var entry =  this.map[id];
                 if(entry!=null) return entry;
-                return this.ramadda.getEntry(id);
+                return this.getRepository().getEntry(id);
             },
             getEntries : function() {
                 return this.entries;
@@ -520,7 +571,7 @@ function EntryList(ramadda, jsonUrl, listener) {
                 var html;
                 this.divId = divId;
                 if(this.entries.length==0)  {
-                    if(entryList.haveLoaded) {
+                    if(this.haveLoaded) {
                         html = "No entries";
                     } else {
                         html = "Loading...";
@@ -536,39 +587,48 @@ function EntryList(ramadda, jsonUrl, listener) {
                     var entry = this.entries[i];
                     html += "<div class=entry-list-entry>";
                     html+= entry.getName();
-                    html += "</div>";
-                }
+                    html += "</div>"; 
+               }
                 return html;
             },
-            createEntries: function(data) {
-                this.entries =   createEntriesFromJson(data, this.ramadda);
+            createEntries: function(data,listener ) {
+                this.entries =   createEntriesFromJson(data, this.getRepository());
                 for(var i =0;i<this.entries.length;i++) {
                     var entry = this.entries[i];
                     this.map[entry.getId()] = entry;
                 }
-                if(this.listener) {
-                    this.listener.entryListChanged(this);
+                if(listener == null) {
+                    listener = this.listener;
                 }
+                if(listener) {
+                   listener.entryListChanged(this);
+                }
+            },
+            doSearch: function(listener) {
+                if(listener == null) {
+                    listener = this.listener;
+                }
+                var _this = this;
+                console.log("json:" + this.url);
+                var jqxhr = $.getJSON( this.url, function(data) {
+                        if(GuiUtils.isJsonError(data)) {
+                            return;
+                        }
+                        _this.haveLoaded = true;
+                        _this.createEntries(data, listener);
+                    })
+            .fail(function(jqxhr, textStatus, error) {
+                    console.log(textStatus + ", " + error);
+                    var err = "Unable to complete request.";
+                    GuiUtils.handleError("entry error 4:" +err, _this.url);
+                });
             }
-            });
+        });
 
-    this.url = jsonUrl;
-    console.log("json:" + jsonUrl);
-    var jqxhr = $.getJSON( jsonUrl, function(data) {
-            if(GuiUtils.isJsonError(data)) {
-                return;
-            }
-            entryList.haveLoaded = true;
-            entryList.createEntries(data);
-        })
-        .fail(function(jqxhr, textStatus, error) {
-                //var err = textStatus + ", " + error;
-                console.log(textStatus + ", " + error);
-                var err = "Unable to complete request.";
-                GuiUtils.handleError(err, jsonUrl);
-            });
+    if(doSearch) {
+        this.doSearch();
+    }
 }
-
 
 
 
@@ -636,4 +696,55 @@ function EntrySearchSettings(props) {
     if(props!=null) {
         $.extend(this,props);
     }
+}
+
+
+function EntryListHolder(ramadda) {
+    var SUPER;
+    RamaddaUtil.inherit(this, SUPER = new EntryList(ramadda, null));
+
+    $.extend(this, {
+            entryLists: [],
+            addEntryList: function(e) {
+                this.entryLists.push(e);
+            },
+            doSearch: function(listener) {
+                var _this  = this;
+                if(listener == null) {
+                    listener = this.listener;
+                }
+                for(var i =0;i<this.entryLists.length;i++) {
+                    var entryList = this.entryLists[i];
+                    if(!entryList.getRepository().canSearch()) continue;
+                    var callback = {
+                        entryListChanged: function(entryList) {
+                            if(listener) {
+                                listener.entryListChanged(_this, entryList);
+                            }
+                        }
+                    };
+                    entryList.doSearch(callback);
+                }
+            },
+            getEntry : function(id) {
+                for(var i =0;i<this.entryLists.length;i++) {
+                    var entryList = this.entryLists[i];
+                    var entry =  entryList.getEntry(id);
+                    if(entry!=null) {
+                        return entry;
+                    }
+                }
+                return  null;
+            },
+            getEntries : function() {
+                var entries = [];
+                for(var i =0;i<this.entryLists.length;i++) {
+                    var sub = this.entryLists[i].getEntries();
+                    for(var j =0;j<sub.length;j++) {
+                        entries.push(sub[j]);
+                    }
+                }
+                return entries;
+            },});
+
 }

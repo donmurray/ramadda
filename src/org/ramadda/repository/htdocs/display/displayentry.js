@@ -37,6 +37,12 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
              this.ramaddas.push(getRamadda(toks[i]));
          }
          if(this.ramaddas.length>0) {
+             var container = new Ramadda("all", true);
+             addRepository(container);
+             for(var i=0;i<this.ramaddas.length;i++) {
+                 container.addRepository(this.ramaddas[i]);
+             }
+             this.ramaddas.push(container);
              this.setRamadda(this.ramaddas[0]);
          }
      }
@@ -385,9 +391,31 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 }
 
                 //Call this now because it sets settings
-                var jsonUrl = this.makeSearchUrl(this.getRamadda());
-                this.entryList = new EntryList(this.getRamadda(), jsonUrl, this, this.entryList);
-                this.updateForSearching(jsonUrl);
+
+
+              var theRepository= this.getRamadda()
+
+              if(theRepository.children) {
+                  console.log("Searching  multiple ramaddas");
+                  this.entryList = new EntryListHolder(theRepository, this);
+                  this.multiSearch  = {
+                      count: 0,
+                  };
+
+                  for(var i =0;i<theRepository.children.length;i++) {
+                      var ramadda = theRepository.children[i];
+                      var jsonUrl = this.makeSearchUrl(ramadda);
+                      this.updateForSearching(jsonUrl);
+                      this.entryList.addEntryList(new EntryList(ramadda, jsonUrl, null, false));
+                      this.multiSearch.count++;
+                  }
+                  this.entryList.doSearch(this);
+              } else {
+                  this.multiSearch  = null;
+                  var jsonUrl = this.makeSearchUrl(this.getRamadda());
+                  this.entryList = new EntryList(this.getRamadda(), jsonUrl, this, true);
+                  this.updateForSearching(jsonUrl);
+              }
 
 
             },
@@ -760,13 +788,23 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
             },
 
             entryListChanged: function(entryList) {
+                if(this.multiSearch) {
+                    this.multiSearch.count--;
+                }
                 SUPER.entryListChanged.apply(this,[entryList]);
                 var entries = this.entryList.getEntries();
 
                 if(entries.length==0) {
                     this.searchSettings.skip=0;
                     this.searchSettings.max=50;
-                    this.writeHtml(ID_ENTRIES, this.getMessage("Nothing found"));
+                    var msg = "Nothing found";
+                    if(this.multiSearch) {
+                        if(this.multiSearch.count>0) {
+                            msg = "Nothing found so far. Still searching " + this.multiSearch.count +" repositories";
+                        } else {
+                        }
+                    }
+                    this.writeHtml(ID_ENTRIES, this.getMessage(msg));
                     this.writeHtml(ID_FOOTER_LEFT,"");
                     this.writeHtml(ID_RESULTS,"&nbsp;");
                     this.getDisplayManager().handleEventEntriesChanged(this, []);
@@ -1301,7 +1339,7 @@ function RamaddaOperandsDisplay(displayManager, id, properties) {
             initDisplay: function() {
                 this.initUI();
                 this.baseUrl = this.getRamadda().getSearchUrl(this.searchSettings, OUTPUT_JSON);
-                this.entryList = new EntryList(this.getRamadda(), jsonUrl, this, this.entryList);
+                this.entryList = new EntryList(this.getRamadda(), jsonUrl, this);
                 var html = "";
                 html += HtmlUtil.div([ATTR_ID,this.getDomId(ID_ENTRIES),ATTR_CLASS,"display-entrylist-entries"], "");
                 this.setContents(html);

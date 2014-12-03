@@ -69,7 +69,7 @@ var GuiUtils = {
         if(data.error!=null) {
             var code = data.errorcode;
             if(code == null) code = "error";
-            this.handleError(data.error);
+            this.handleError("Error 2:" + data.error);
             return true;
         }
         return false;

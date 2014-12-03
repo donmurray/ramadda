@@ -998,7 +998,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                         theDisplay.doneQuickEntrySearch(entryList, callback);
                     }
                 };
-                var entryList =  new EntryList(jsonUrl, handler);
+                var entryList =  new EntryList(this.getRamadda(), jsonUrl, handler, true);
             },
             doneQuickEntrySearch: function(entryList, callback) {
                 var names = [];
