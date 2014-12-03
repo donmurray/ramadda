@@ -43,7 +43,7 @@
 
 
 
-  <type name="project_project"  description="Project" handler="org.ramadda.geodata.fieldproject.FieldProjectTypeHandler" category="Science Project"      metadata="enum_tag,content.keyword,project_person,project_funding">
+  <type name="project_project"  description="Project" handler="org.ramadda.geodata.fieldproject.FieldProjectTypeHandler" category="Science Project"      metadata="project_pi,project_person,project_funding,enum_tag,content.keyword">
      <property name="icon" value="/fieldproject/page_world.png"/>
 
      <property name="form.file.show" value="false"/>
@@ -53,7 +53,7 @@
      <property name="form.altitude.top.show" value="false"/>
      <property name="search.label" value="Search for Projects"/>
      <property name="search.tabs" value="list,timeline"/>
-     <property name="search.metadatatypes" value="project_person"/>
+     <property name="search.metadatatypes" value="project_pi,project_person"/>
      <column name="project_id"  type="string" label="Project ID"/>
      <column name="status"  type="enumerationplus"  values="file:/org/ramadda/geodata/fieldproject/resources/statuses.txt" label="Status"/>
      <column name="project_type"  type="enumerationplus"  label="Project Type"/>
@@ -96,6 +96,15 @@
 -inset
 ]]>
 </wiki>
+<children><![CDATA[
+<entries>
+<entry  name="Data"  type="group"/>
+<entry  name="Documents"  type="group"/>
+</entries>
+]]>
+</children>
+
+
    </type>
 
   <type name="project_site"  description="Site" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Science Project" mefirst="true">

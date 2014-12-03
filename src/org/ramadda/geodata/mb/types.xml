@@ -3,6 +3,7 @@
 
 
   <type name="type_mb_collection"  description="Bathymetry Collection" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler">
+     <property name="form.resource.show" value="true"/>
 
 <wiki>
 <![CDATA[
