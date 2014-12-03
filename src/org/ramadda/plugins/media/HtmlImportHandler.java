@@ -95,7 +95,7 @@ public class HtmlImportHandler extends ImportHandler {
     public void addImportTypes(List<TwoFacedObject> importTypes,
                                Appendable formBuffer) {
         super.addImportTypes(importTypes, formBuffer);
-        importTypes.add(new TwoFacedObject("HTML Page", TYPE_HTML));
+        importTypes.add(new TwoFacedObject("Links in an HTML Page", TYPE_HTML));
     }
 
 
