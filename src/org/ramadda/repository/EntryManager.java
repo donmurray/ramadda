@@ -136,6 +136,8 @@ public class EntryManager extends RepositoryManager {
     /** _more_ */
     public static final String SESSION_FOLDERS = "folders";
 
+    public static final String SESSION_TYPES = "types";
+
     /** _more_ */
     private Object MUTEX_ENTRY = new Object();
 
@@ -1336,7 +1338,7 @@ public class EntryManager extends RepositoryManager {
                                    ARG_EXTEDIT_REPORT));
 
         sb.append(HtmlUtils.endInset());
-        List<HtmlUtils.Selector> tfos = getTypeHandlerSelectors(true, true,
+        List<HtmlUtils.Selector> tfos = getTypeHandlerSelectors(request, true, true,
                                             entry);
 
         sb.append("<br>&nbsp;<br>");
@@ -1423,15 +1425,29 @@ public class EntryManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public List<HtmlUtils.Selector> getTypeHandlerSelectors(boolean fileType,
+    public List<HtmlUtils.Selector> getTypeHandlerSelectors(Request request, 
+                                                            boolean fileType,
             boolean nonFileType, Entry entry)
             throws Exception {
+        List<String> sessionTypes =
+            (List<String>) getSessionManager().getSessionProperty(request,
+                                                                  SESSION_TYPES);
+
+        List<HtmlUtils.Selector> tfos = new ArrayList<HtmlUtils.Selector>();
+
+        HashSet<String> first = new HashSet<String>();
+        if(sessionTypes!=null) {
+            first.addAll(sessionTypes);
+        }
+
         CategoryList<HtmlUtils.Selector> cats =
             new CategoryList<HtmlUtils.Selector>();
         for (String preload : PRELOAD_CATEGORIES) {
             cats.get(preload);
         }
 
+        
+        
         for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
             if ( !typeHandler.getForUser()) {
                 continue;
@@ -1452,9 +1468,16 @@ public class EntryManager extends RepositoryManager {
                 new HtmlUtils.Selector(
                     HtmlUtils.space(2) + typeHandler.getLabel(),
                     typeHandler.getType(), typeHandler.getTypeIconUrl());
+            //Add the seen ones first
+            if(first.contains(typeHandler.getType())) {
+                if(tfos.size()==0) {
+                    tfos.add(new HtmlUtils.Selector("Recent", "", null, 0, true));
+                }
+                tfos.add(tfo);
+            }
+
             cats.add(typeHandler.getCategory(), tfo);
         }
-        List<HtmlUtils.Selector> tfos = new ArrayList<HtmlUtils.Selector>();
         for (String cat : cats.getCategories()) {
             List<HtmlUtils.Selector> selectors = cats.get(cat);
             if (selectors.size() > 0) {
@@ -1532,6 +1555,8 @@ public class EntryManager extends RepositoryManager {
     private Entry changeType(Request request, Entry entry,
                              TypeHandler newTypeHandler)
             throws Exception {
+        addSessionType(request, newTypeHandler.getType());
+
         if ( !getAccessManager().canDoAction(request, entry,
                                              Permission.ACTION_EDIT)) {
             throw new AccessException("Cannot edit:" + entry.getLabel(),
@@ -1620,24 +1645,7 @@ public class EntryManager extends RepositoryManager {
             type = request.getString(ARG_TYPE, (String) null);
         }
 
-        if (type != null) {
-            if ( !type.equals(TYPE_FILE) && !type.equals(TYPE_GROUP)) {
-                List<String> pastTypes =
-                    (List<String>) getSessionManager().getSessionProperty(
-                        request, ARG_TYPE);
-                if (pastTypes == null) {
-                    pastTypes = new ArrayList<String>();
-                    getSessionManager().putSessionProperty(request, ARG_TYPE,
-                            pastTypes);
-                }
-                pastTypes.remove(type);
-                pastTypes.add(0, type);
-                //cap it at 3 types
-                if (pastTypes.size() > 3) {
-                    pastTypes.remove(3);
-                }
-            }
-        }
+        addSessionType(request, type);
 
 
         if ((entry != null) && entry.getIsLocalFile()) {
@@ -1762,6 +1770,27 @@ public class EntryManager extends RepositoryManager {
         return group;
 
     }
+
+    private void addSessionType(Request request, String type) throws Exception {
+        if(type == null) return;
+        if ( !type.equals(TYPE_FILE) && !type.equals(TYPE_GROUP)) {
+            List<String> pastTypes =
+                (List<String>) getSessionManager().getSessionProperty(request, SESSION_TYPES);
+            if (pastTypes == null) {
+                pastTypes = new ArrayList<String>();
+                getSessionManager().putSessionProperty(request, SESSION_TYPES,
+                                                       pastTypes);
+            }
+            pastTypes.remove(type);
+            pastTypes.add(0, type);
+            //cap it at 3 types
+            if (pastTypes.size() > 3) {
+                pastTypes.remove(3);
+            }
+        }
+
+    }
+
 
     /**
      * _more_
@@ -3656,7 +3685,7 @@ public class EntryManager extends RepositoryManager {
 
         List<String> sessionTypes =
             (List<String>) getSessionManager().getSessionProperty(request,
-                ARG_TYPE);
+                                                                  SESSION_TYPES);
 
         List<TypeHandler> typeHandlers = getRepository().getTypeHandlers();
         for (TypeHandler typeHandler : typeHandlers) {
@@ -4420,7 +4449,7 @@ public class EntryManager extends RepositoryManager {
 
 
 
-        List<HtmlUtils.Selector> tfos = getTypeHandlerSelectors(true, true,
+        List<HtmlUtils.Selector> tfos = getTypeHandlerSelectors(request, true, true,
                                             null);
 
         request.formPostWithAuthToken(sb,

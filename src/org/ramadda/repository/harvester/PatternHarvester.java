@@ -497,7 +497,7 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
                                         TypeHandler typeHandler)
             throws Exception {
         List<HtmlUtils.Selector> items =
-            getEntryManager().getTypeHandlerSelectors(true, false, null);
+            getEntryManager().getTypeHandlerSelectors(request, true, false, null);
         items.add(0, new HtmlUtils.Selector(msg("Find match"),
                                             TYPE_FINDMATCH, null));
 
