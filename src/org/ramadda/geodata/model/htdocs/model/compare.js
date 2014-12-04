@@ -109,7 +109,7 @@ function CollectionForm(formId, type, args) {
                         }
                     };
                     //Just create the entry list, passing in the callback object
-                    var entryList = new EntryList(ramadda, jsonUrl, callbackObject);
+                    var entryList = new EntryList(ramadda, jsonUrl, callbackObject, true);
                 }  else if (doImage) {
 
                     //add the arg that gives us the image directly back then set the img src
