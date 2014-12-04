@@ -1433,6 +1433,7 @@ function RamaddaRepositoriesDisplay(displayManager, id, properties) {
                     if(i == 0) {
                     }
                     var ramadda = this.ramaddas[i];
+                    if(ramadda.children) continue;
                     var types = ramadda.getEntryTypes(function(ramadda, types) {theDisplay.gotTypes(ramadda, types);});
                     if(types !=null) {
                         this.numberWithTypes++;

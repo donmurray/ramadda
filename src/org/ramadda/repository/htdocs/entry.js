@@ -131,6 +131,7 @@ function Ramadda(repositoryRoot, isContainer) {
                     var seen = {};
                     for(var i =0;i<this.children.length;i++) {
                         var types = this.children[i].getEntryTypes();
+                        if(types == null) continue;
                         for(var j =0;j<types.length;j++) {
                             var type = types[j];
                             if(seen[type.getId()] == null) {
