@@ -21,9 +21,15 @@
 package org.ramadda.util;
 
 
+import org.w3c.dom.*;
+
+
+import ucar.unidata.util.IOUtil;
+
+
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.TwoFacedObject;
-
+import ucar.unidata.xml.XmlUtil;
 
 import java.text.StringCharacterIterator;
 
@@ -442,7 +448,9 @@ public class Json {
             }
             s = cleanString(s);
             s = s.replaceAll("\"", "\\\\\"");
-            if(s.equals("true") || s.equals("false")) return s;
+            if (s.equals("true") || s.equals("false")) {
+                return s;
+            }
             //This can mess up and match on what should be a string value, e.g.
             //00000000000
             //Not sure what to do here
@@ -503,6 +511,7 @@ public class Json {
 
         //Make into all ascii ??
         s = s.replaceAll("[^\n\\x20-\\x7E]+", " ");
+
         return s;
     }
 
@@ -512,13 +521,80 @@ public class Json {
      * _more_
      *
      * @param args _more_
+     *
+     * @throws Exception _more_
      */
-    public static void main(String[] args) {
-        System.err.println(
-            cleanString(
-                "953731 NWT Ltd. \\x \\\" also operates as \"South Camp Enterprises\".-- provides rental vehicles"));
+    public static void main(String[] args) throws Exception {
+        Element root = XmlUtil.getRoot(IOUtil.readContents(args[0], ""));
+        System.err.println(xmlToJson(root));
     }
 
+    /**
+     * _more_
+     *
+     * @param node _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static String xmlToJson(Element node) throws Exception {
+        StringBuilder json = new StringBuilder();
+        xmlToJson(node, json);
+
+        return json.toString();
+    }
+
+    /*
+      <tag attrs=
+     */
+
+    /**
+     * _more_
+     *
+     * @param node _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    private static void xmlToJson(Element node, Appendable sb)
+            throws Exception {
+        List<String> attrs = new ArrayList<String>();
+        attrs.add("xml_tag");
+        attrs.add(quote(node.getTagName()));
+        NamedNodeMap nnm = node.getAttributes();
+        if (nnm != null) {
+            for (int i = 0; i < nnm.getLength(); i++) {
+                Attr attr = (Attr) nnm.item(i);
+                attrs.add(attr.getNodeName());
+                attrs.add(quote(attr.getNodeValue()));
+            }
+        }
+        String text = XmlUtil.getChildText(node);
+        if (Utils.stringDefined(text)) {
+            text = text.replaceAll("\"", "\\\"");
+            attrs.add("xml_text");
+            attrs.add(quote(text));
+        }
+        List<String> childJson = new ArrayList<String>();
+        NodeList     children  = node.getChildNodes();
+        for (int i = 0; i < children.getLength(); i++) {
+            Node child = children.item(i);
+            if ( !(child instanceof Element)) {
+                continue;
+            }
+            StringBuilder csb = new StringBuilder();
+            xmlToJson((Element) child, csb);
+            childJson.add(csb.toString());
+        }
+        if (childJson.size() > 0) {
+            attrs.add("children");
+            attrs.add(list(childJson));
+        }
+
+        sb.append(map(attrs));
+
+    }
 
 
 }
