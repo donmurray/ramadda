@@ -4508,8 +4508,6 @@ public class Repository extends RepositoryBase implements RequestHandler,
             contents = contents.trim();
             IOUtil.close(is);
             contents = Json.xmlToJson(XmlUtil.getRoot(contents));
-            System.err.println("Json:" + contents);
-
             return new Result(new ByteArrayInputStream(contents.getBytes()),
                               "application/json");
         }
