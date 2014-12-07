@@ -26,6 +26,8 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 
+import org.ramadda.data.process.Service;
+
 import org.ramadda.repository.admin.Admin;
 import org.ramadda.repository.admin.AdminHandler;
 import org.ramadda.repository.admin.MailManager;
@@ -40,7 +42,6 @@ import org.ramadda.repository.database.DatabaseManager;
 import org.ramadda.repository.database.Tables;
 import org.ramadda.repository.ftp.FtpManager;
 import org.ramadda.repository.harvester.HarvesterManager;
-import org.ramadda.data.process.Service;
 import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.map.MapManager;
 import org.ramadda.repository.metadata.ContentMetadataHandler;
@@ -65,6 +66,7 @@ import org.ramadda.repository.util.ServerInfo;
 import org.ramadda.sql.Clause;
 import org.ramadda.sql.SqlUtil;
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Json;
 import org.ramadda.util.MyTrace;
 
 
@@ -221,7 +223,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
     /** File Listing OutputType */
     public static final OutputType OUTPUT_FILELISTING =
         new OutputType("File Listing", "repository.filelisting",
-                       OutputType.TYPE_FILE|OutputType.TYPE_FORSEARCH, "", ICON_FILELISTING);
+                       OutputType.TYPE_FILE | OutputType.TYPE_FORSEARCH, "",
+                       ICON_FILELISTING);
 
 
     /** the jetty server */
@@ -890,7 +893,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
                          + getProperty(PROP_BUILD_DATE, "N/A"));
         getLogManager().logInfoAndPrint(statusMsg.toString());
         getLogManager().logInfoAndPrint("RAMADDA: using Java version: "
-                         + getProperty(PROP_JAVA_VERSION, "N/A"));
+                                        + getProperty(PROP_JAVA_VERSION,
+                                            "N/A"));
     }
 
     /**
@@ -1479,20 +1483,33 @@ public class Repository extends RepositoryBase implements RequestHandler,
         }
     }
 
-    public Service makeService(Element node, boolean addToGlobals) throws Exception {
+    /**
+     * _more_
+     *
+     * @param node _more_
+     * @param addToGlobals _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Service makeService(Element node, boolean addToGlobals)
+            throws Exception {
         Constructor ctor =
-            Misc.findConstructor(Misc.findClass(XmlUtil.getAttributeFromTree(node,
-                                                                     "handler",
-                                                                     "org.ramadda.data.process.Service")), new Class[] {
-                                     Repository.class,
-                                     Element.class });
-        Service command = (Service) ctor.newInstance(new Object[] {
-                this,
+            Misc.findConstructor(
+                Misc.findClass(
+                    XmlUtil.getAttributeFromTree(
+                        node, "handler",
+                        "org.ramadda.data.process.Service")), new Class[] {
+                            Repository.class,
+                            Element.class });
+        Service command = (Service) ctor.newInstance(new Object[] { this,
                 node });
         //               Service command =  new Service(this, node);
-        if(addToGlobals) {
+        if (addToGlobals) {
             getJobManager().addService(command);
         }
+
         return command;
     }
 
@@ -3240,7 +3257,10 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @return _more_
      */
     public String getAuthToken(String sessionId) {
-        if(sessionId==null) return "";
+        if (sessionId == null) {
+            return "";
+        }
+
         return RepositoryUtil.hashString(sessionId);
     }
 
@@ -3361,8 +3381,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
                                 msg("Error"),
                                 new StringBuilder(
                                     getPageHandler().showDialogError(
-                                                                     "Unknown request" + "\""
-                                        + path + "\"")));
+                                        "Unknown request" + "\"" + path
+                                        + "\"")));
             result.setResponseCode(Result.RESPONSE_NOTFOUND);
 
             return result;
@@ -3493,7 +3513,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
                             msg("Error"),
                             new StringBuilder(
                                 getPageHandler().showDialogError(
-                                                                 "Unknown request " + path)));
+                                    "Unknown request " + path)));
         result.setResponseCode(Result.RESPONSE_NOTFOUND);
 
         return result;
@@ -4463,8 +4483,6 @@ public class Repository extends RepositoryBase implements RequestHandler,
         if ( !url.startsWith("http:") && !url.startsWith("https:")) {
             throw new IllegalArgumentException("Bad URL:" + url);
         }
-        //        System.err.println("url:" + url);
-
         //Check the whitelist
         boolean ok = false;
         for (String pattern :
@@ -4483,6 +4501,29 @@ public class Repository extends RepositoryBase implements RequestHandler,
 
         URLConnection connection = new URL(url).openConnection();
         InputStream   is         = connection.getInputStream();
+
+
+        if (request.get("xmltojson", false)) {
+            String contents = IOUtil.readInputStream(is);
+            contents = contents.trim();
+            IOUtil.close(is);
+            contents = Json.xmlToJson(XmlUtil.getRoot(contents));
+            System.err.println("Json:" + contents);
+
+            return new Result(new ByteArrayInputStream(contents.getBytes()),
+                              "application/json");
+        }
+
+
+        if (request.get("trim", false)) {
+            String contents = IOUtil.readInputStream(is);
+            contents = contents.trim();
+            IOUtil.close(is);
+
+            return new Result(new ByteArrayInputStream(contents.getBytes()),
+                              "application/json");
+        }
+
 
         return request.returnStream(is);
     }
