@@ -14,32 +14,65 @@ var OUTPUTS = [
 //
 //return the global entry manager with the given id, null if not found
 //
-function getRamadda(baseUrl) {
+function getRamadda(id) {
+
+    /*
+      OpenSearch(http://asdasdsadsds);sdsadasdsa,...
+     */
+
     //check for the embed label
-    var toks = baseUrl.split(";");
+    var toks = id.split(";");
     var name = null;
     if(toks.length>1) {
-        baseUrl = toks[0];
+        id = toks[0];
         name = toks[1];
     }
 
-    if(baseUrl == "this") {
+    var extraArgs = null;
+    var regexp = new RegExp("^(.*)\\((.+)\\).*$");
+    var args = regexp.exec(id);
+    if(args) {
+        id = args[1].trim();
+        extraArgs = args[2];
+    }
+
+    if(id == "this") {
         return getGlobalRamadda();
     }
 
     if(window.globalRamaddas==null) {
         window.globalRamaddas = {};
     }
-    var manager =  window.globalRamaddas[baseUrl];
-    if(manager == null) {
-        //        console.log("new ramadda:" + baseUrl);
-        manager = new Ramadda(baseUrl);
-        if(name!=null) {
-            manager.name = name;
-        }
-        window.globalRamaddas[baseUrl] = manager;
+    var repo =  window.globalRamaddas[id];
+    if(repo!=null) {
+        return repo;
     }
-    return manager;
+
+
+    //See if its a js class
+    var func = window[id];
+    if(func == null) {
+        func = window[id+"Repository"];
+    }
+
+    if(func) {
+        repo =   new Object();
+        func.call(repo,name, extraArgs);
+        //eval(" new " + id+"();");
+    }
+
+
+    if(repo == null) {
+        repo = new Ramadda(id);
+        if(name!=null) {
+            repo.name = name;
+        }
+    }
+
+
+
+    addRepository(repo);
+    return repo;
 }
 
 function addRepository(repository) {
@@ -55,14 +88,7 @@ function getGlobalRamadda() {
 
 
 
-function Ramadda(repositoryRoot, isContainer) {
-    if(repositoryRoot == "all" && !isContainer) {
-    }
-
-    if(repositoryRoot == null) {
-        repositoryRoot = ramaddaBaseUrl;
-    }
-
+function Repository(repositoryRoot) {
     //    console.log("root:" + repositoryRoot);
     var hostname = null;
     var match =  repositoryRoot.match("^(http.?://[^/]+)/");
@@ -77,20 +103,40 @@ function Ramadda(repositoryRoot, isContainer) {
             repositoryRoot:repositoryRoot,
             hostname: hostname,
             name: null,
-            entryCache: {},
-            entryTypes: null,
-            entryTypeMap: {},
-            addRepository: function(repository) {
-                if(this.children==null) {
-                    this.children = [];
-                }
-                this.children.push(repository);
+            getSearchMessage: function() {
+                return "Searching " + this.getName();
+            },
+            getSearchLinks: function(searchSettings) {
+                return null;
+            },
+            getSearchUrl: function(settings) {
+                return null;
+            },
+            getId: function() {
+                return this.repositoryRoot;
+            },
+            getIconUrl: function(entry) {
+                return ramaddaBaseUrl +"/icons/page.png";
+            },
+            getEntryTypes: function(callback) {
+                return new Array();
+            },
+            getMetadataCount: function(type, callback) {
+                //                console.log("getMetatataCount:" + type.name);
+                return 0;
+            },
+            getEntryUrl : function (entry, extraArgs) {
+                return null;
+            },
+
+            getRoot: function() {
+                return this.repositoryRoot;
             },
             getHostname: function() {
                 return this.hostname;
             },
             canSearch: function() {
-                return this.children==null;
+                return true;
             },
             getName: function() {
                 if(this.children) { return "Search all repositories";}
@@ -108,50 +154,92 @@ function Ramadda(repositoryRoot, isContainer) {
                 if(path == "/repository") return host;
                 return this.name = host+": " + path;
             },
-            getId: function() {
-                return this.repositoryRoot;
+
+        });
+
+
+}
+
+
+function RepositoryContainer(id, name) {
+    this._id = "CONTAINER";
+    var SUPER;
+    RamaddaUtil.inherit(this, SUPER = new Repository(id));
+    RamaddaUtil.defineMembers(this, {
+            name: name,
+            children: [],
+            canSearch: function() {
+                return false;
             },
-            getRoot: function() {
-                return this.repositoryRoot;
+            getSearchMessage: function() {
+                return "Searching " + this.children.length +" repositories";
             },
-            getJsonUrl: function(entryId) {
-                return this.repositoryRoot + "/entry/show?entryid=" + entryId +"&output=json";
-            },
-            getEntryType: function(typeId) {
-                return this.entryTypeMap[typeId];
+            addRepository: function(repository) {
+                this.children.push(repository);
             },
             getEntryTypes: function(callback) {
                 if(this.entryTypes != null) {
                     return this.entryTypes;
                 }
-                if(this.children!=null) {
-                    if(this.entryTypes == null) {
-                        this.entryTypes = [];
-                    }
-                    var seen = {};
-                    for(var i =0;i<this.children.length;i++) {
-                        var types = this.children[i].getEntryTypes();
-                        if(types == null) continue;
-                        for(var j =0;j<types.length;j++) {
-                            var type = types[j];
-                            if(seen[type.getId()] == null) {
-                                var newType = {};
-                                newType = $.extend(newType, type);
-                                seen[type.getId()] = newType;
-                                this.entryTypes.push(newType);
-                            } else {
-                                seen[type.getId()].entryCount+= type.getEntryCount();
-                            }
+                this.entryTypes = [];
+                var seen = {};
+                for(var i =0;i<this.children.length;i++) {
+                    var types = this.children[i].getEntryTypes();
+                    if(types == null) continue;
+                    for(var j =0;j<types.length;j++) {
+                        var type = types[j];
+                        if(seen[type.getId()] == null) {
+                            var newType = {};
+                            newType = $.extend(newType, type);
+                            seen[type.getId()] = newType;
+                            this.entryTypes.push(newType);
+                        } else {
+                            seen[type.getId()].entryCount+= type.getEntryCount();
                         }
                     }
-                    return this.entryTypes;
                 }
+                return this.entryTypes;
+            }
 
+        });
 
+}
+
+function Ramadda(repositoryRoot) {
+    if(repositoryRoot == null) {
+        repositoryRoot = ramaddaBaseUrl;
+    }
+    var SUPER;
+    RamaddaUtil.inherit(this, SUPER = new Repository(repositoryRoot));
+
+    RamaddaUtil.defineMembers(this, {
+            entryCache: {},
+            entryTypes: null,
+            entryTypeMap: {},
+            canSearch: function() {
+                return true;
+            },
+            getJsonUrl: function(entryId) {
+                return this.repositoryRoot + "/entry/show?entryid=" + entryId +"&output=json";
+            },
+            createEntriesFromJson: function(data) {
+                var entries = new Array();
+                for(var i=0;i<data.length;i++)  {
+                    var entryData = data[i];
+                    entryData.baseUrl = this.getRoot();
+                    var entry = new Entry(entryData);
+                    this.addEntry(entry);
+                    entries.push(entry);
+                }
+                return entries;
+            },    
+            getEntryType: function(typeId) {
+                return this.entryTypeMap[typeId];
+            },
+            getEntryTypes: function(callback) {
                 if(this.entryTypes == null) {
                     var theRamadda = this;
                     var url = this.repositoryRoot +"/entry/types";
-                    //                    console.log(this.repositoryRoot +" fetching: " + url +" children:" + this.children);
                     var jqxhr = $.getJSON(url, function(data) {
                             if(GuiUtils.isJsonError(data)) {
                                 return;
@@ -171,7 +259,7 @@ function Ramadda(repositoryRoot, isContainer) {
                                 //                                console.log("Always:" +textStatus);
                         }).fail(function(jqxhr, textStatus, error) {
                             var err = textStatus + " --  " + error;
-                            GuiUtils.handleError("entry error 1:" + err, url);
+                            GuiUtils.handleError("Error reading entry types:" + err, "URL:" + url);
                             });
                 }
                 return this.entryTypes;
@@ -190,6 +278,16 @@ function Ramadda(repositoryRoot, isContainer) {
                             GuiUtils.handleError("entry error 2:" +err, url);
                         });
                 return null;
+            },
+            getEntryUrl : function (entry, extraArgs) {
+                var url =   this.getRoot() + "/entry/show?entryid=" + entry.id;
+                if(extraArgs!=null) {
+                    if (!StringUtil.startsWith(extraArgs, "&")) {
+                        url += "&";
+                    }
+                    url += extraArgs;
+                }
+                return url;
             },
             getSearchLinks: function(searchSettings) {
                 var urls = [];
@@ -275,33 +373,18 @@ function Ramadda(repositoryRoot, isContainer) {
             }
         });
 
-    if(!isContainer) {
-        this.getEntryTypes();
-    }
+    this.getEntryTypes();
 }
 
-
-
-
-
-
-
-
-
-
+/**
+This creates a list of Entry objects from the given JSON data. 
+If the given ramadda is null then use the global
+*/
 function createEntriesFromJson(data, ramadda) {
-    var entries = new Array();
     if(ramadda==null) {
         ramadda = getGlobalRamadda();
     }
-    for(var i=0;i<data.length;i++)  {
-        var entryData = data[i];
-        entryData.baseUrl = ramadda.getRoot();
-        var entry = new Entry(entryData);
-        ramadda.addEntry(entry);
-        entries.push(entry);
-    }
-    return entries;
+    return ramadda.createEntriesFromJson(data);
 }
 
 
@@ -357,10 +440,21 @@ function EntryType(props) {
 }
 
 function Entry(props) {
-    if(props.baseUrl == null) props.baseUrl = ramaddaBaseUrl;
+    if(props.repositoryId == null) {
+        props.repositoryId = props.baseUrl;
+    }
+    if(props.repositoryId == null) {
+        props.repositoryId = ramaddaBaseUrl;
+    }
+
+
     var NONGEO = -9999;
     if(props.type) props.type = new EntryType(props.type);
     $.extend(this, {
+            id:null,
+            name:null,
+            description:null,
+                //xxx
             latitude: NaN,
             longitude: NaN,
             north: NaN,
@@ -412,7 +506,7 @@ function Entry(props) {
                 return this.metadata;
             },
             getRamadda: function() {
-                return getRamadda(this.baseUrl);
+                return getRamadda(this.repositoryId);
             },
             getLocationLabel: function() {
                 return "n: " + this.north + " w:" + this.west + " s:" + this.south +" e:" + this.east;
@@ -455,7 +549,7 @@ function Entry(props) {
             },
             getIconUrl : function () {
                 if(this.icon==null) {
-                    return this.getRamadda().getRoot() + "/icons/page.png";
+                    return this.getRamadda().getIconUrl(this);
                 }
                 var url;
                 var hostname = this.getRamadda().getHostname();
@@ -470,6 +564,9 @@ function Entry(props) {
                 return HtmlUtil.image(this.getIconUrl(),attrs);
             },
             getColumns : function () {
+                if(this.type.getColumns() == null) {
+                    return new Array();
+                }
                 return this.type.getColumns();
             },
             getColumnValue : function (name) {
@@ -509,14 +606,8 @@ function Entry(props) {
                 return GuiUtils.size_format(this.getFilesize());
             },
             getEntryUrl : function (extraArgs) {
-                var url =   this.getRamadda().getRoot() + "/entry/show?entryid=" + this.id;
-                if(extraArgs!=null) {
-                    if (!StringUtil.startsWith(extraArgs, "&")) {
-                      url += "&";
-                    }
-                    url += extraArgs;
-                }
-                return url;
+                if(this.url) return this.url;
+                return this.getRamadda().getEntryUrl(this, extraArgs);
             },
             getFilename : function () {
                 return this.filename;
@@ -550,7 +641,6 @@ function EntryList(repository, jsonUrl, listener, doSearch) {
             url: jsonUrl,
             listener : listener,
             haveLoaded : false,
-            divId : null,
             entries :[],
             map: {},
             getRepository: function() {
@@ -563,34 +653,6 @@ function EntryList(repository, jsonUrl, listener, doSearch) {
             },
             getEntries : function() {
                 return this.entries;
-            },
-            setHtml: function(html) {
-                if(this.divId == null) return;
-                $("#" + this.divId).html(html);
-            },
-            initDisplay: function(divId) {
-                var html;
-                this.divId = divId;
-                if(this.entries.length==0)  {
-                    if(this.haveLoaded) {
-                        html = "No entries";
-                    } else {
-                        html = "Loading...";
-                    }
-                } else {
-                    html = getHtml();
-                }
-                this.setHtml(html);
-            },
-            getHtml: function() {
-                var html = "";
-                for(var i=0;i<this.entries.length;i++) {
-                    var entry = this.entries[i];
-                    html += "<div class=entry-list-entry>";
-                    html+= entry.getName();
-                    html += "</div>"; 
-               }
-                return html;
             },
             createEntries: function(data,listener ) {
                 this.entries =   createEntriesFromJson(data, this.getRepository());
@@ -611,18 +673,17 @@ function EntryList(repository, jsonUrl, listener, doSearch) {
                 }
                 var _this = this;
                 console.log("json:" + this.url);
-                var jqxhr = $.getJSON( this.url, function(data) {
+                var jqxhr = $.getJSON( this.url, function(data, status, jqxhr) {
                         if(GuiUtils.isJsonError(data)) {
                             return;
                         }
                         _this.haveLoaded = true;
                         _this.createEntries(data, listener);
                     })
-            .fail(function(jqxhr, textStatus, error) {
-                    console.log(textStatus + ", " + error);
-                    var err = "Unable to complete request.";
-                    GuiUtils.handleError("entry error 4:" +err, _this.url);
-                });
+                    .fail(function(jqxhr, textStatus, error) {
+                            //                            console.log("ERROR:" + jqxhr.responseText);
+                            GuiUtils.handleError("error doing search:" +error, _this.url);
+                        });
             }
         });
 
@@ -749,3 +810,37 @@ function EntryListHolder(ramadda) {
             },});
 
 }
+
+
+/**
+   {"id":"0fdc0daa-2535-4f89-9a36-6295ea8279f4",
+"name":"Top",
+"description":"<wiki>\r\nThis is an example RAMADDA repository highlighting some of its science data management facilities.\r\n\r\n\r\n\r\n\r\n\r\n{{tree details=false}}\r\n\r\n{{import entry=df59f025-7f30-494e-a8c8-3dd317a956ff }}\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n",
+"type":{"id":"group",
+"name":"Folder"},
+"isGroup":true,
+"icon":"/repository/repos/data/icons/folderclosed.png",
+"parent":null,
+"user":"default",
+"createDate":"2013-06-11 19:13:00",
+"startDate":"2013-06-11 19:13:00",
+"endDate":"2013-06-11 19:13:00",
+"north":-9999,
+"south":-9999,
+"east":-9999,
+"west":-9999,
+"altitudeTop":-9999,
+"altitudeBottom":-9999,
+"services":[],
+"columnNames":[],
+"columnLabels":[],
+"extraColumns":[],
+"metadata":[{"id":"44ea1893-e433-490d-9b0c-5fd77af0ee6c",
+"type":"content.sort",
+"label":"Sort Order",
+"attr1":"name",
+"attr2":true,
+"attr3":"-1",
+"attr4":""}]}
+
+*/

@@ -144,4 +144,77 @@ function GoogleRepository() {
 
 
 
+function OpenSearchRepository(name, baseUrl) {
+    if(name == null) {
+        name = baseUrl;
+    }
+    console.log("OpenSearch:" + baseUrl);
+    RamaddaUtil.inherit(this,  new Repository(name));
+    RamaddaUtil.defineMembers(this, {
+            getName: function() {
+                return name;
+            },
+            getSearchUrl: function(settings, output) {
+                var url =  baseUrl;
+                var searchText = "data";
+                if(settings.text!=null&& settings.text.length>0)  {
+                    searchText = settings.text;
+                }
+                url = url.replace("{searchTerms?}",  encodeURIComponent(searchText));
+                url = url.replace("{geo:box?}","-180,-90,180,90");                
+                url = url.replace("{geo:polygon?}","");
+                
+                url = url.replace("{time:start?}","1900-01-01");
+                url = url.replace("{time:end?}","2020-01-01");
+                url =  GuiUtils.getProxyUrl(url);
+                url = url+"&xmltojson=true";
+                return url;
+            },
+            createEntriesFromJson: function(data) {
+                var entries = new Array();
+                if(data.children==null) {
+                    console.log("No 'children' in results");
+                    return entries;
+                }
 
+                for(var i=0;i<data.children.length;i++) {
+                    var child = data.children[i];
+                    if(child.xml_tag != "entry") {
+                        continue;
+                    }
+                    var props = {
+                        repositoryId: this.getId(),
+                        id:"opensearch-result-" + i,
+                        type: "opensearch-link",
+                        name:""
+                    };
+                    for(var j=0;j<child.children.length;j++) {
+                        var t = child.children[j];
+                        //                        console.log("tag:" + t.xml_tag);
+                        if(t.xml_tag == "title") {
+                            props.name = t.xml_text;
+                        } else if(t.xml_tag == "id") {
+                            //                            props.id = t.xml_text;
+                        } else if(t.xml_tag == "link") {
+                            if(props.url == null) {
+                                props.url = t.href;
+                            }
+                        } else if(t.xml_tag == "summary") {
+                            props.description = t.xml_text;
+                        } else if(t.xml_tag == "geo:box") {
+                            //                            props.description = t.xml_text;
+                        } else if(t.xml_tag == "time:Start") {
+                            //                            props.description = t.xml_text;
+                        } else if(t.xml_tag == "time:End") {
+                            //                            props.description = t.xml_text;
+                        } else {
+                            //                            console.log("NA:" + t.xml_tag);
+                        }
+                    }
+                    entries.push(new Entry(props));
+                }
+                return entries;
+            }
+        });
+
+}

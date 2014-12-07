@@ -53,8 +53,13 @@ var Utils = {
 };
 
 var GuiUtils = {
+    getProxyUrl: function(url) {
+        var base = ramaddaBaseUrl + "/proxy?trim=true&url=";
+        return base + encodeURIComponent(url);
+    },
+
     handleError: function(error, extra) {
-        console.log("Error: " +error);
+        console.log(error);
         //        alert("An error has occurred: " + error);
         if(extra) {
             console.log(extra);

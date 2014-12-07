@@ -29,15 +29,17 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
      var ID_TOOLBAR_INNER = "toolbarinner";
      RamaddaUtil.inherit(this, SUPER = new RamaddaDisplay(displayManager, id, type, properties));
 
-     this.ramaddas = [];
+     this.ramaddas = new Array();
      var repos = this.getProperty("repositories",this.getProperty("repos",null));
      if(repos != null) {
          var toks = repos.split(",");
+         //OpenSearch;http://adasd..asdasdas.dasdas.,
          for(var i=0;i<toks.length;i++) {
-             this.ramaddas.push(getRamadda(toks[i]));
+             var tok = toks[i];
+             this.ramaddas.push(getRamadda(tok));
          }
          if(this.ramaddas.length>0) {
-             var container = new Ramadda("all", true);
+             var container = new RepositoryContainer("all", "All entries");
              addRepository(container);
              for(var i=0;i<this.ramaddas.length;i++) {
                  container.addRepository(this.ramaddas[i]);
@@ -46,6 +48,8 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
              this.setRamadda(this.ramaddas[0]);
          }
      }
+
+
 
      RamaddaUtil.defineMembers(this, {
              searchSettings: new EntrySearchSettings({
@@ -236,7 +240,8 @@ function RamaddaSearcher(displayManager, id, type, properties) {
 
                 this.jq(ID_REPOSITORY).selectBoxIt({});
                 this.jq(ID_REPOSITORY).change(function() {
-                        var ramadda = getRamadda(theDisplay.jq(ID_REPOSITORY).val());
+                        var v = theDisplay.jq(ID_REPOSITORY).val();
+                        var ramadda = getRamadda(v);
                         theDisplay.setRamadda(ramadda);
                         theDisplay.addTypes(null);
                         theDisplay.typeChanged();
@@ -421,9 +426,9 @@ function RamaddaSearcher(displayManager, id, type, properties) {
             },
             updateForSearching: function(jsonUrl) {
                 var outputs = this.getRamadda().getSearchLinks(this.searchSettings);
-                this.footerRight  = "Links: " + HtmlUtil.join(outputs," - "); 
+                this.footerRight  = outputs == null?"":"Links: " + HtmlUtil.join(outputs," - "); 
                 this.writeHtml(ID_FOOTER_RIGHT, this.footerRight);
-                this.writeHtml(ID_RESULTS, "Searching...");
+                this.writeHtml(ID_RESULTS, this.getRamadda().getSearchMessage());
                 this.writeHtml(ID_ENTRIES, HtmlUtil.div([ATTR_STYLE,"margin:20px;"], this.getWaitImage()));
                 this.hideEntryDetails();
             },
@@ -439,7 +444,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     this.savedValues[id] = value;
                 }
             },
-            makeSearchUrl: function(ramadda) {
+            makeSearchUrl: function(repository) {
                 var extra = "";
                 var cols  = this.getSearchableColumns();
                 for(var i =0;i<cols.length;i++) {
@@ -449,7 +454,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     extra+= "&" + col.getSearchArg() +"=" + encodeURI(value);
                 }
                 this.searchSettings.setExtra(extra);
-                var jsonUrl = ramadda.getSearchUrl(this.searchSettings, OUTPUT_JSON);
+                var jsonUrl = repository.getSearchUrl(this.searchSettings, OUTPUT_JSON);
                 return jsonUrl;
             },
             makeSearchForm: function() {
@@ -1433,7 +1438,6 @@ function RamaddaRepositoriesDisplay(displayManager, id, properties) {
                     if(i == 0) {
                     }
                     var ramadda = this.ramaddas[i];
-                    if(ramadda.children) continue;
                     var types = ramadda.getEntryTypes(function(ramadda, types) {theDisplay.gotTypes(ramadda, types);});
                     if(types !=null) {
                         this.numberWithTypes++;
