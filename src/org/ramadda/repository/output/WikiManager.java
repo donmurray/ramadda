@@ -4305,6 +4305,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             sb.append(HtmlUtils.importJS(fileUrl("/display/control.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/displayd3.js")));
             sb.append(HtmlUtils.importJS(fileUrl("/display/displayext.js")));
+            sb.append(HtmlUtils.importJS(fileUrl("/repositories.js")));
 
 
 
