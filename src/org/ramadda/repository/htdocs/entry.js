@@ -683,6 +683,10 @@ function EntryList(repository, jsonUrl, listener, doSearch) {
                     .fail(function(jqxhr, textStatus, error) {
                             //                            console.log("ERROR:" + jqxhr.responseText);
                             GuiUtils.handleError("error doing search:" +error, _this.url);
+                            console.log("listener:" + listener.handleSearchError);
+                            if(listener.handleSearchError) {
+                                listener.handleSearchError(_this.url,error);
+                            }
                         });
             }
         });

@@ -4499,6 +4499,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
             throw new IllegalArgumentException("URL not in whitelist:" + url);
         }
 
+        System.out.println("proxy: " + url);
         URLConnection connection = new URL(url).openConnection();
         InputStream   is         = connection.getInputStream();
 
@@ -4507,7 +4508,9 @@ public class Repository extends RepositoryBase implements RequestHandler,
             String contents = IOUtil.readInputStream(is);
             contents = contents.trim();
             IOUtil.close(is);
-            contents = Json.xmlToJson(XmlUtil.getRoot(contents));
+            contents = Json.xmlToJson(XmlUtil.getRoot(contents), null);
+            System.out.println(contents);
+
             return new Result(new ByteArrayInputStream(contents.getBytes()),
                               "application/json");
         }

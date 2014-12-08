@@ -424,6 +424,11 @@ function RamaddaSearcher(displayManager, id, type, properties) {
 
 
             },
+            handleSearchError: function(url, msg) {
+                this.writeHtml(ID_ENTRIES, "");
+                this.writeHtml(ID_RESULTS, "");
+                alert("There was an error performing the search\n" + msg);
+            },
             updateForSearching: function(jsonUrl) {
                 var outputs = this.getRamadda().getSearchLinks(this.searchSettings);
                 this.footerRight  = outputs == null?"":"Links: " + HtmlUtil.join(outputs," - "); 

@@ -148,6 +148,8 @@ function OpenSearchRepository(name, baseUrl) {
     if(name == null) {
         name = baseUrl;
     }
+    //    https://api.echo.nasa.gov:443/opensearch/datasets.atom?keyword={os:searchTerms?}&instrument={echo:instrument?}&satellite={echo:satellite?}&boundingBox={geo:box?}&geometry={geo:geometry?}&placeName={geo:name?}&startTime={time:start?}&endTime={time:end?}&cursor={os:startPage?}&numberOfResults={os:count?}
+https://api.echo.nasa.gov:443/opensearch/datasets.atom?keyword=satellite&instrument=&satellite=&boundingBox=&geometry=&placeName=&startTime=&endTime=
     console.log("OpenSearch:" + baseUrl);
     RamaddaUtil.inherit(this,  new Repository(name));
     RamaddaUtil.defineMembers(this, {
@@ -210,6 +212,69 @@ function OpenSearchRepository(name, baseUrl) {
                         } else {
                             //                            console.log("NA:" + t.xml_tag);
                         }
+                    }
+                    entries.push(new Entry(props));
+                }
+                return entries;
+            }
+        });
+
+}
+
+
+
+function GsacRepository(name, baseUrl) {
+    if(baseUrl == null) {
+        baseUrl = "http://facility.unavco.org/gsacws";
+    }
+    var urlSuffix = "/gsacapi/site/search/siteops.xml?output=siteops.xml&max=5";
+    //site.code=p12*&bbox.north=42.197265625&site.sortorder=ascending&site.name.searchtype=exact&site.code.searchtype=exact&bbox.south=30.595703125&bbox.west=-119.482421875&limit=500&bbox.east=-99.970703125&site.interval=interval.normal
+    if(name == null) {
+        name = baseUrl;
+    }
+    console.log("GSAC:" + baseUrl);
+    RamaddaUtil.inherit(this,  new Repository(name));
+    RamaddaUtil.defineMembers(this, {
+            getName: function() {
+                return name;
+            },
+            getSearchUrl: function(settings, output) {
+                var url =  baseUrl + urlSuffix;
+                var searchText = "";
+                if(settings.text!=null&& settings.text.length>0)  {
+                    searchText = settings.text;
+                }
+                //                url = url.replace("{searchTerms?}",  encodeURIComponent(searchText));
+                url =  GuiUtils.getProxyUrl(url);
+                url = url+"&xmltojson=true";
+                return url;
+            },
+            createEntriesFromJson: function(data) {
+                var entries = new Array();
+                if(data.children==null) {
+                    console.log("No 'children' in results");
+                    return entries;
+                }
+
+
+                for(var i=0;i<data.children.length;i++) {
+                    var child = data.children[i];
+                    if(child.xml_tag != "entry") {
+                        continue;
+                    }
+                    var props = {
+                        repositoryId: this.getId(),
+                        id:"gsac-result-" + i,
+                    };
+                    for(var j=0;j<child.children.length;j++) {
+                        var site = child.children[j];
+                        /*
+siteIdentification":{"Site":{"xml_text":"0001"},
+"Name":{"xml_text":"0001"},
+"Type":{"xml_text":"GPS/GNSS Campaign Site"},
+                        */
+                        props.name =  site.siteIdentification.Name;
+                        props.type =  site.siteIdentification.Type.xml_text;
                     }
                     entries.push(new Entry(props));
                 }
