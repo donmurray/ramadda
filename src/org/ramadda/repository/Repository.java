@@ -4508,7 +4508,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
             String contents = IOUtil.readInputStream(is);
             contents = contents.trim();
             IOUtil.close(is);
-            contents = Json.xmlToJson(XmlUtil.getRoot(contents), null);
+            contents = Json.xmlToJson(XmlUtil.getRoot(contents));
             System.out.println(contents);
 
             return new Result(new ByteArrayInputStream(contents.getBytes()),

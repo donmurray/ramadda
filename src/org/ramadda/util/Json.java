@@ -34,6 +34,8 @@ import ucar.unidata.xml.XmlUtil;
 import java.text.StringCharacterIterator;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 
 
@@ -526,7 +528,7 @@ public class Json {
      */
     public static void main(String[] args) throws Exception {
         Element root = XmlUtil.getRoot(IOUtil.readContents(args[0], ""));
-        System.err.println(xmlToJson(root));
+        System.out.println(xmlToJson(root));
     }
 
     /**
@@ -541,12 +543,11 @@ public class Json {
     public static String xmlToJson(Element node) throws Exception {
         StringBuilder json = new StringBuilder();
         xmlToJson(node, json);
-
         return json.toString();
     }
 
     /*
-      <tag attrs=
+
      */
 
     /**
@@ -576,17 +577,27 @@ public class Json {
             attrs.add("xml_text");
             attrs.add(quote(text));
         }
+
         List<String> childJson = new ArrayList<String>();
+
+
+
         NodeList     children  = node.getChildNodes();
+
+
+
         for (int i = 0; i < children.getLength(); i++) {
             Node child = children.item(i);
             if ( !(child instanceof Element)) {
                 continue;
             }
+            String tag = ((Element)child).getTagName();
+
             StringBuilder csb = new StringBuilder();
             xmlToJson((Element) child, csb);
             childJson.add(csb.toString());
         }
+
         if (childJson.size() > 0) {
             attrs.add("children");
             attrs.add(list(childJson));
