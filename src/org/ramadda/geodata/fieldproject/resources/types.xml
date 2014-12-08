@@ -823,7 +823,7 @@ features
 {{description wikify="true"}}
 </div>
 
-==Learning Resource==
+==Teaching Resource==
 <table class="formtable">
 {{resource row.label="URL:"  message=""}}
 {{field name="topic" row.label="Topic:"}}
