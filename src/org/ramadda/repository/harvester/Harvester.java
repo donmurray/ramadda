@@ -169,8 +169,6 @@ public abstract class Harvester extends RepositoryManager {
     /** _more_ */
     public static final String ATTR_BASEGROUP = "basegroup";
 
-    /** _more_ */
-    public static final String TYPE_FINDMATCH = "findmatch";
 
 
     /** _more_ */

@@ -104,7 +104,7 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
 
 
     /** _more_ */
-    private static final int FILE_CHANGED_TIME_THRESHOLD_MS = 60 * 1000;
+    private static final int FILE_CHANGED_TIME_THRESHOLD_MS = 30 * 1000;
 
     /** _more_ */
     private String dateFormat = "yyyyMMdd_HHmm";
@@ -496,14 +496,7 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
     public String makeEntryTypeSelector(Request request,
                                         TypeHandler typeHandler)
             throws Exception {
-        List<HtmlUtils.Selector> items =
-            getEntryManager().getTypeHandlerSelectors(request, true, false, null);
-        items.add(0, new HtmlUtils.Selector(msg("Find match"),
-                                            TYPE_FINDMATCH, null));
-
-        return repository.makeTypeSelect(items, request, false,
-                                         getTypeHandler().getType(), false,
-                                         null);
+        return getPageHandler().makeFileTypeSelector(request, typeHandler);
     }
 
 
@@ -947,6 +940,8 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
                     //                    logHarvesterInfo("No entry created");
                     continue;
                 }
+
+
                 entries.add(entry);
                 entryCnt++;
                 if (getTestMode() && (entryCnt >= getTestCount())) {
@@ -1209,7 +1204,6 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
 
         //check if its a hidden file
         boolean isPlaceholder = f.getName().equals(FILE_PLACEHOLDER);
-
         if (f.getName().startsWith(".") && !isPlaceholder) {
             //            logHarvesterInfo("File is hidden file:" + f);
             return null;
@@ -1221,7 +1215,6 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
 
         String fileName = f.toString();
         fileName = fileName.replace("\\", "/");
-
 
 
         Matcher matcher = null;
@@ -1287,15 +1280,25 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
         TypeHandler typeHandler      = getTypeHandler();
         TypeHandler typeHandlerToUse = null;
 
+        boolean     isEntryXml       = fileName.endsWith(".entry.xml");
 
-        Entry       templateEntry    = getEntryManager().getTemplateEntry(f);
+
+        Entry       templateEntry    = null;
+
+
+        if (isEntryXml) {
+            templateEntry = getEntryManager().parseEntryXml(f, true);
+        } else {
+            templateEntry = getEntryManager().getTemplateEntry(f);
+        }
+
         if (templateEntry != null) {
             typeHandlerToUse = templateEntry.getTypeHandler();
         }
 
 
         if ((typeHandlerToUse == null)
-                && typeHandler.getType().equals(TYPE_FINDMATCH)) {
+                && typeHandler.getType().equals(TypeHandler.TYPE_FINDMATCH)) {
             String path      = f.toString();
             String shortName = f.getName();
             for (TypeHandler otherTypeHandler :
@@ -1309,7 +1312,7 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
         }
 
         if (typeHandlerToUse == null) {
-            if ( !typeHandler.getType().equals(TYPE_FINDMATCH)) {
+            if ( !typeHandler.getType().equals(TypeHandler.TYPE_FINDMATCH)) {
                 typeHandlerToUse = typeHandler;
             } else {
                 //Default to the generic file type
@@ -1534,26 +1537,27 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
         }
 
 
-        if (getGenerateMd5()) {
-            resource.setMd5(IOUtil.getMd5(resource.getPath()));
-        }
-        //        System.err.println("\tcalling initEntry");
+
+
         Date now = new Date();
-        //We used to use the file create date as the entry create and change date. This is wrong so we now use the current time
-        createDate = now;
 
-        entry.initEntry(name, desc, group, getUser(), resource, "",
-                        createDate.getTime(), createDate.getTime(),
-                        fromDate.getTime(), toDate.getTime(), values);
-        //        System.err.println("\tdone");
+        if (isEntryXml) {
+            entry.setCreateDate(now.getTime());
+            entry.setParentEntry(group);
+            entry.setUser(getUser());
+        } else {
+            if (getGenerateMd5()) {
+                resource.setMd5(IOUtil.getMd5(resource.getPath()));
+            }
+            //        System.err.println("\tcalling initEntry");
+            //We used to use the file create date as the entry create and change date. This is wrong so we now use the current time
+            createDate = now;
 
-        Date date = null;
-        //Don't try to pull the date from the filename for now
-        //Date date = Utils.extractDate(name);
-        if ((date != null) && !entry.hasDate()) {
-            entry.setStartDate(date.getTime());
-            entry.setEndDate(date.getTime());
+            entry.initEntry(name, desc, group, getUser(), resource, "",
+                            createDate.getTime(), createDate.getTime(),
+                            fromDate.getTime(), toDate.getTime(), values);
         }
+
 
         //If it is an image then we create a thumbnail for it in the JpegMetadataHandler
         //else we check if there is a .thm file
