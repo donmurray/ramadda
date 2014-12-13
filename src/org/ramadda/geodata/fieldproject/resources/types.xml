@@ -340,9 +340,50 @@
      <property name="form.datatype.show" value="false"/>
      <property name="form.altitude.show" value="true"/>
      <property name="form.altitude.top.show" value="true"/>
+     <column name="dataset_id"   label="Dataset ID" cansearch="true"/>
      <column name="data_type"  type="enumerationplus"  label="Data Type" values="na:NA,grid:Gridded Data,observation:Observation,satellite:Satellite,remote_sensing:Remote Sensing,misc:Miscellaneous" cansearch="true"/>
      <column name="data_level"  type="enumerationplus"  label="Data Level" values="na:NA,level0:Level 0,level1:Level 1,level2:Level 2,level3:Level 3" cansearch="true"/>
      <column name="usage_notes" type="string"  label="Usage Notes" rows="5" size="5000" changetype="true"/>
+
+
+     <wiki><![CDATA[
+{{noheading}}
++inset
++row
++col-md-8
+<div class="wiki-h1">{{name}}</div>
+<div style="max-height: 400px; overflow-y: auto;">
+{{description wikify="true"}}
+</div>
+
+
+==Dataset Information==
+<table class="formtable">
+{{resource row.label="URL:"  message=""}}
+{{field name="dataset_id" row.label="Dataset ID:"}}
+{{field name="data_type" row.label="Data Type:"}}
+{{field name="usage_notes" row.label="Usage Notes:"}}
+</table>
+
+{{properties metadata.types="project_pi,project_person,project_funding" message="" }}
+
+{{tree title="Data" details="false" showtoggle="false" message="" prefix="==Data=="}}
+
+{{properties metadata.types="!project_pi,!project_person,!project_funding" message="" }}
+-col
++col-md-4
+{{image src="::*" message="" width="300"}}
+<p>
+{{mapentry width="350" message=""}}
+-col
+-row
+-inset
+]]>
+</wiki>
+
+
+
+
    </type>
 
 

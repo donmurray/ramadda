@@ -393,10 +393,11 @@ ${Chronostratigraphic_Unit}
        name="Related URL"
        searchable="false"
        id="dif.related_url">
-      <element datatype="url" name="URL"/>
-      <element name="Description"/>
-      <element name="Type"/>
+      <element datatype="url" name="URL" id="url"/>
+      <element name="Description" id="desc"/>
+      <element name="Type" id="url_type"/>
       <element name="Sub Type"/>
+      <template type="html"><![CDATA[${url_type}: <a href="${url}">${desc}</a>]]></template>
       <template type="dif"><![CDATA[
 <Related_URL><URL_Content_Type>
 <Type>${Type}</Type>
@@ -406,6 +407,7 @@ ${Chronostratigraphic_Unit}
 <Description>${Description.cdata}</Description>
 </Related_URL>
 ]]></template>
+
     </type>
 
     <type name="Revision History" id="dif.revision_history">
