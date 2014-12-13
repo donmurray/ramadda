@@ -480,8 +480,10 @@ public class Utils {
      * _more_
      *
      * @param args _more_
+     *
+     * @throws Exception _more_
      */
-    public static void main(String args[]) {
+    public static void main(String args[]) throws Exception {
         String pattern =
             ".*l(.)(.)(\\d\\d\\d)(\\d\\d\\d)(\\d\\d\\d\\d)(\\d\\d\\d)(...)(\\d\\d)\\.hdf$";
 
@@ -1267,6 +1269,43 @@ public class Utils {
         } catch (Exception exc) {}
     }
 
-
+    /**
+     *   public static void mungeCsv() throws Exception {
+     *
+     *   System.out.print("Street");
+     *   for (int i = 0; i < 20; i++) {
+     *       System.out.print(",");
+     *       System.out.print("" + (2013 - i));
+     *   }
+     *   System.out.println("");
+     *   String c = IOUtil.readContents(args[0], "");
+     *   for (String line : StringUtil.split(c, "\n", true, true)) {
+     *       //            System.err.println("LINE:" + line);
+     *       List cols = new ArrayList();
+     *       int  cnt  = 0;
+     *       for (String s : Utils.tokenizeColumns(line, ",")) {
+     *           cnt++;
+     *           if (cnt <= 2) {
+     *               continue;
+     *           }
+     *           if (cnt > 3) {
+     *               if (cnt % 2 == 0) {
+     *                   continue;
+     *               }
+     *           }
+     *           if (cnt > 43) {
+     *               break;
+     *           }
+     *           s = s.replace(",", "");
+     *           cols.add(s.trim());
+     *       }
+     *       System.out.println(StringUtil.join(",", cols));
+     *   }
+     *
+     *   if (true) {
+     *       return;
+     *   }
+     * }
+     */
 
 }
