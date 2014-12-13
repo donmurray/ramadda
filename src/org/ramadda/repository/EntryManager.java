@@ -5407,11 +5407,13 @@ public class EntryManager extends RepositoryManager {
         if (XmlUtil.hasAttribute(node, ATTR_FROMDATE)) {
             fromDate = getPageHandler().parseDate(XmlUtil.getAttribute(node,
                     ATTR_FROMDATE));
+            if(fromDate == null)  fromDate = createDate;
         }
         Date toDate = fromDate;
         if (XmlUtil.hasAttribute(node, ATTR_TODATE)) {
             toDate = getPageHandler().parseDate(XmlUtil.getAttribute(node,
                     ATTR_TODATE));
+            if(toDate == null)  toDate = fromDate;
         }
         if ( !canBeCreatedBy(request, typeHandler)) {
             throw new IllegalArgumentException(

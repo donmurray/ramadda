@@ -33,6 +33,7 @@ import org.ramadda.repository.output.HtmlOutputHandler;
 import org.ramadda.repository.output.OutputHandler;
 import org.ramadda.repository.output.OutputType;
 import org.ramadda.repository.output.PageStyle;
+import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.util.CategoryBuffer;
 import org.ramadda.util.HtmlTemplate;
 import org.ramadda.util.HtmlUtils;
@@ -326,7 +327,9 @@ public class PageHandler extends RepositoryManager {
             linksHtml = StringUtil.join(
                 htmlTemplate.getTemplateProperty(
                     "ramadda.template.link.separator", ""), links);
-            linksHtml = HtmlUtils.div(linksHtml,HtmlUtils.cssClass("ramadda-header-links"));
+            linksHtml =
+                HtmlUtils.div(linksHtml,
+                              HtmlUtils.cssClass("ramadda-header-links"));
             allLinks.addAll(links);
         }
         String entryHeader = (String) result.getProperty(PROP_ENTRY_HEADER);
@@ -483,9 +486,12 @@ public class PageHandler extends RepositoryManager {
         }
 
         String allLinksHtml = StringUtil.join(
-                                              htmlTemplate.getTemplateProperty(
-                                                                               "ramadda.template.link.separator", ""), allLinks);
-        allLinksHtml = HtmlUtils.div(allLinksHtml,HtmlUtils.cssClass("ramadda-header-links"));
+                                  htmlTemplate.getTemplateProperty(
+                                      "ramadda.template.link.separator",
+                                      ""), allLinks);
+        allLinksHtml =
+            HtmlUtils.div(allLinksHtml,
+                          HtmlUtils.cssClass("ramadda-header-links"));
 
 
         StringBuilder bottom = new StringBuilder(result.getBottomHtml());
@@ -494,8 +500,7 @@ public class PageHandler extends RepositoryManager {
             MACRO_LOGO_URL, logoUrl, MACRO_LOGO_IMAGE, logoImage,
             MACRO_HEADER_IMAGE, iconUrl(ICON_HEADER), MACRO_HEADER_TITLE,
             pageTitle, MACRO_USERLINK, userLinks, MACRO_LINKS, linksHtml,
-            "alllinks", allLinksHtml,
-            MACRO_REPOSITORY_NAME,
+            "alllinks", allLinksHtml, MACRO_REPOSITORY_NAME,
             repository.getProperty(PROP_REPOSITORY_NAME, "Repository"),
             MACRO_FOOTER, repository.getProperty(PROP_HTML_FOOTER, BLANK),
             MACRO_TITLE, result.getTitle(), MACRO_BOTTOM, bottom.toString(),
@@ -1567,9 +1572,10 @@ public class PageHandler extends RepositoryManager {
     public String makeDateInput(Request request, String name,
                                 String formName, Date date, String timezone,
                                 boolean includeTime) {
-        return makeDateInput(request, name, formName, date, timezone, includeTime, null);
+        return makeDateInput(request, name, formName, date, timezone,
+                             includeTime, null);
     }
-    
+
     /**
      * Make the HTML for a date input widget
      *
@@ -1579,6 +1585,7 @@ public class PageHandler extends RepositoryManager {
      * @param date      the default date
      * @param timezone  the timezone
      * @param includeTime  true to include a time box
+     * @param dates _more_
      *
      * @return  the widget html
      */
@@ -1601,18 +1608,21 @@ public class PageHandler extends RepositoryManager {
                                        : timeFormat.format(date));
 
         String           inputId    = "dateinput" + (HtmlUtils.blockCnt++);
-        String minDate = null;
-        String maxDate = null;
-        if (dates != null && !dates.isEmpty()) {
-            minDate = dateSdf.format((Date)dates.get(0));
-            maxDate = dateSdf.format((Date)dates.get(dates.size()-1));
+        String           minDate    = null;
+        String           maxDate    = null;
+        if ((dates != null) && !dates.isEmpty()) {
+            minDate = dateSdf.format((Date) dates.get(0));
+            maxDate = dateSdf.format((Date) dates.get(dates.size() - 1));
         }
 
-        StringBuilder jsBuf = new StringBuilder("<script>jQuery(function() {$( ");
+        StringBuilder jsBuf =
+            new StringBuilder("<script>jQuery(function() {$( ");
         jsBuf.append(HtmlUtils.squote("#" + inputId));
-        jsBuf.append(" ).datepicker({ dateFormat: 'yy-mm-dd',changeMonth: true, changeYear: true,constrainInput:false, yearRange: '1900:2100' ");
-        if (minDate != null && maxDate != null) {
-            jsBuf.append(", minDate: '"+minDate+"', maxDate: '"+maxDate+"'");
+        jsBuf.append(
+            " ).datepicker({ dateFormat: 'yy-mm-dd',changeMonth: true, changeYear: true,constrainInput:false, yearRange: '1900:2100' ");
+        if ((minDate != null) && (maxDate != null)) {
+            jsBuf.append(", minDate: '" + minDate + "', maxDate: '" + maxDate
+                         + "'");
         }
         jsBuf.append(" });});</script>");
         String extra = "";
@@ -2086,6 +2096,9 @@ public class PageHandler extends RepositoryManager {
      * @throws java.text.ParseException _more_
      */
     public Date parseDate(String dttm) throws java.text.ParseException {
+        if ( !Utils.stringDefined(dttm)) {
+            return null;
+        }
         if (formats == null) {
             formats = new ArrayList<SimpleDateFormat>();
             formats.add(makeSDF("yyyy-MM-dd HH:mm:ss z"));
@@ -3393,6 +3406,32 @@ public class PageHandler extends RepositoryManager {
 
     }
 
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param typeHandler _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String makeFileTypeSelector(Request request,
+                                       TypeHandler typeHandler)
+            throws Exception {
+        List<HtmlUtils.Selector> items =
+            getEntryManager().getTypeHandlerSelectors(request, true, false,
+                null);
+        items.add(0, new HtmlUtils.Selector(msg("Find match"),
+                                            TypeHandler.TYPE_FINDMATCH,
+                                            null));
+
+        return repository.makeTypeSelect(items, request, false,
+                                         (typeHandler != null)
+                                         ? typeHandler.getType()
+                                         : "", false, null);
+    }
 
 
 }

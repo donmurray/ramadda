@@ -10,6 +10,16 @@
   </type>
 
 
+  <type name="type_link_data"  description="Data Link"  foruser="false">
+     <property name="icon" value="/icons/link.png"/>
+<!--
+     <property name="form.date.show" value="false"/>
+     <property name="form.area.show" value="false"/>
+-->
+     <property name="form.file.show" value="false"/>
+  </type>
+
+
 
 <!--
   <type name="article"  description="Article" >

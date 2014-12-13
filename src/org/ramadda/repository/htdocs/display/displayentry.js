@@ -36,6 +36,7 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
          //OpenSearch;http://adasd..asdasdas.dasdas.,
          for(var i=0;i<toks.length;i++) {
              var tok = toks[i];
+             tok = tok.trim();
              this.ramaddas.push(getRamadda(tok));
          }
          if(this.ramaddas.length>0) {

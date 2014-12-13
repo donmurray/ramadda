@@ -24,8 +24,8 @@ function getRamadda(id) {
     var toks = id.split(";");
     var name = null;
     if(toks.length>1) {
-        id = toks[0];
-        name = toks[1];
+        id = toks[0].trim();
+        name = toks[1].trim();
     }
 
     var extraArgs = null;
