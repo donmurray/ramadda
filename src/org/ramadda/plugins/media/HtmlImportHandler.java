@@ -51,22 +51,22 @@ import java.util.regex.Pattern;
  */
 public class HtmlImportHandler extends ImportHandler {
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_IMPORT_PATTERN = "import.pattern";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_IMPORT_DOIT = "import.doit";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_IMPORT_PROVENANCE = "import.addprovenance";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_IMPORT_UNCOMPRESS = "import.uncompress";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_IMPORT_HANDLE = "import.handle";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_HTML = "html";
 
     /**
@@ -95,7 +95,8 @@ public class HtmlImportHandler extends ImportHandler {
     public void addImportTypes(List<TwoFacedObject> importTypes,
                                Appendable formBuffer) {
         super.addImportTypes(importTypes, formBuffer);
-        importTypes.add(new TwoFacedObject("Links in an HTML Page", TYPE_HTML));
+        importTypes.add(new TwoFacedObject("Links in an HTML Page",
+                                           TYPE_HTML));
     }
 
 
@@ -140,9 +141,14 @@ public class HtmlImportHandler extends ImportHandler {
 
                 sb.append("<ul>");
                 for (HtmlUtils.Link link : links) {
-                    Resource    resource    = null;
-                    TypeHandler typeHandler = null;
-                    String      name        = link.getLabel();
+                    Resource resource = null;
+                    TypeHandler typeHandler =
+                        getRepository().getTypeHandler(request);
+
+
+
+
+                    String name = link.getLabel();
                     //TODO: check if we have a entry already
                     Entry existing =
                         getEntryManager().findEntryWithName(request,
@@ -162,6 +168,7 @@ public class HtmlImportHandler extends ImportHandler {
 
                         continue;
                     }
+
 
 
                     if (addFile) {
@@ -194,9 +201,13 @@ public class HtmlImportHandler extends ImportHandler {
                         }
                         tmpFile = getStorageManager().moveToStorage(request,
                                 tmpFile);
-                        typeHandler =
-                            getEntryManager().findDefaultTypeHandler(
-                                tmpFile.toString());
+                        if ((typeHandler == null)
+                                || typeHandler.getType().equals(
+                                    TypeHandler.TYPE_FINDMATCH)) {
+                            typeHandler =
+                                getEntryManager().findDefaultTypeHandler(
+                                    tmpFile.toString());
+                        }
                         resource = new Resource(tmpFile,
                                 Resource.TYPE_STOREDFILE);
                     } else {
@@ -286,6 +297,8 @@ public class HtmlImportHandler extends ImportHandler {
             return importHtml(request, repository, url, parentEntry, links);
         }
 
+        TypeHandler typeHandler = getRepository().getTypeHandler(request);
+
 
         String buttons =
             HtmlUtils.buttons(HtmlUtils.submit(msg("Test it out")),
@@ -319,6 +332,11 @@ public class HtmlImportHandler extends ImportHandler {
                 + HtmlUtils.radio(ARG_IMPORT_HANDLE, "url", false)
                 + HtmlUtils.space(1) + msg("Add the link")));
 
+
+        sb.append(
+            HtmlUtils.formEntry(
+                msgLabel("Entry type"),
+                getPageHandler().makeFileTypeSelector(request, typeHandler)));
 
         sb.append(
             HtmlUtils.formEntry(
