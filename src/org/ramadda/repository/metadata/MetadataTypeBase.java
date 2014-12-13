@@ -332,6 +332,7 @@ public class MetadataTypeBase extends RepositoryManager {
         //        System.out.println ("VALUE:" +value);
 
 
+
         String   label = element.getLabel(value);
         String   name  = element.getName();
         String[] keys  = {
@@ -342,6 +343,7 @@ public class MetadataTypeBase extends RepositoryManager {
         Hashtable macros = new Hashtable();
         macros.put("name", name);
         //      template = template.replaceAll("\\${name}", name);
+
         for (String key : keys) {
             if (key == null) {
                 continue;

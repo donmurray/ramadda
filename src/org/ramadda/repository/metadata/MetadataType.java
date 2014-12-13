@@ -470,8 +470,7 @@ public class MetadataType extends MetadataTypeBase {
                 fileArg = XmlUtil.getAttribute(node,
                         "attr" + element.getIndex(), (String) null);
                 if (fileArg == null) {
-                    System.err.println("Could not find attr node:"
-                                       + XmlUtil.toString(node));
+                    //                    System.err.println("Could not find attr node:"  + XmlUtil.toString(node));
 
                     continue;
                 }
@@ -976,7 +975,7 @@ public class MetadataType extends MetadataTypeBase {
             for (MetadataElement element : getChildren()) {
                 String value = metadata.getAttr(element.getIndex());
                 if (value == null) {
-                    value = "null";
+                    value = "";
                 }
                 value = value.replaceAll("&", "&amp;");
                 value = value.replaceAll("<", "&lt;");

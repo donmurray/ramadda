@@ -277,10 +277,18 @@ public class Metadata implements Constants {
         this.entryId   = entryId;
         this.type      = type;
         this.inherited = inherited;
-        setAttr1(attr1!=null?attr1:"");
-        setAttr2(attr2!=null?attr2:"");
-        setAttr3(attr3!=null?attr3:"");
-        setAttr4(attr4!=null?attr4:"");
+        setAttr1((attr1 != null)
+                 ? attr1
+                 : "");
+        setAttr2((attr2 != null)
+                 ? attr2
+                 : "");
+        setAttr3((attr3 != null)
+                 ? attr3
+                 : "");
+        setAttr4((attr4 != null)
+                 ? attr4
+                 : "");
         this.extra = extra;
         if (this.extra == null) {
             this.extra = "";
@@ -399,7 +407,7 @@ public class Metadata implements Constants {
                 return result;
             }
 
-            if(o1.attr2!=null && o2.attr2!=null) {
+            if ((o1.attr2 != null) && (o2.attr2 != null)) {
                 result = o1.attr2.compareTo(o2.attr2);
             }
 
@@ -504,7 +512,11 @@ public class Metadata implements Constants {
             attr4 = value;
         }
         Hashtable<Integer, String> extraMap = getExtraMap();
-        extraMap.put(new Integer(idx), value);
+        if (value == null) {
+            extraMap.remove(new Integer(idx));
+        } else {
+            extraMap.put(new Integer(idx), value);
+        }
         this.extra = null;
     }
 
