@@ -155,6 +155,11 @@ public class TypeHandler extends RepositoryManager {
     public static final String TYPE_GUESS = "guess";
 
     /** _more_ */
+    public static final String TYPE_FINDMATCH = "findmatch";
+
+
+
+    /** _more_ */
     public static final String TYPE_FILE = Constants.TYPE_FILE;
 
     /** _more_ */
