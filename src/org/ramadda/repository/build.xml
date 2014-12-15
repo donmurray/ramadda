@@ -26,6 +26,7 @@
             <filterset>
                 <filter token="DATE" value="${date}"/>
                 <filter token="VERSION" value="${version}"/>
+                <filter token="RELEASE_VERSION" value="${release_version}"/>
             </filterset>
        </copy>
         

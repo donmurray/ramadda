@@ -1,7 +1,6 @@
 
-
-Version: @VERSION@
-Build date: @DATE@
+Latest release: @RELEASE_VERSION@
+https://sourceforge.net/projects/ramadda/files/ramadda@RELEASE_VERSION@
 
 repository.war: self contained war file for running under Tomcat, Glassfish, etc
 
