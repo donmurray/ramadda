@@ -318,7 +318,7 @@ public class PhoneHarvester extends Harvester {
      * @throws Exception _more_
      */
     public boolean handleMessage(Request request, PhoneInfo info,
-                                 StringBuffer msg)
+                                 Appendable msg)
             throws Exception {
 
         if ((fromPhone != null) && (fromPhone.length() > 0)) {
@@ -352,7 +352,7 @@ public class PhoneHarvester extends Harvester {
      * @throws Exception _more_
      */
     public boolean handleMessageInner(Request request, PhoneInfo info,
-                                      StringBuffer msg)
+                                      Appendable msg)
             throws Exception {
 
         System.err.println("PhoneHarvester: handleMessage: from:"
@@ -382,7 +382,6 @@ public class PhoneHarvester extends Harvester {
         } else {
             //??
         }
-
 
 
 
@@ -416,6 +415,50 @@ public class PhoneHarvester extends Harvester {
 
             return true;
         }
+
+
+
+        List<String> urls = new ArrayList<String>();
+        for(int i=0;i<10;i++) {
+            if(!request.defined("MediaUrl" + i)) {
+                break;
+            }
+            String url  = request.getString("MediaUrl" + i);
+            url = java.net.URLDecoder.decode(url, "UTF-8");
+
+            urls.add(url);
+            System.err.println ("url:" + url);
+        }
+
+
+        if(urls.size()>0) {
+            if ( !session.getCanAdd()) {
+                msg.append("No permission to add\nEnter:\npass <password>");
+                return true;
+            }
+            for(String url: urls) {
+                String tail = IOUtil.getFileTail(url);
+                File newFile = getStorageManager().getTmpFile(request,
+                                                              tail);
+                
+                InputStream fromStream = getStorageManager().getInputStream(url);
+                OutputStream toStream =
+                    getStorageManager().getFileOutputStream(newFile);
+                try {
+                    IOUtil.writeTo(fromStream, toStream);
+                } finally {
+                    IOUtil.close(toStream);
+                    IOUtil.close(fromStream);
+                }
+                type = null;
+                newFile = getStorageManager().moveToStorage(request,
+                                                            newFile);
+                
+                addEntry(info,currentEntry, type, msg,tail, cleanUpText(message), newFile.toString());
+            }
+            return true;
+        }
+
 
 
         List<String> lines = StringUtil.split(message, "\n");
@@ -485,7 +528,7 @@ public class PhoneHarvester extends Harvester {
                     msg.append(getEntryName(child));
                     msg.append("\n");
                 }
-                if (msg.length() == 0) {
+                if (msg.toString().length() == 0) {
                     msg.append("No entries found");
                 }
                 msg.append("\n");
@@ -698,7 +741,7 @@ public class PhoneHarvester extends Harvester {
                 break;
             }
 
-
+            
             if (type == null) {
                 String[] cmds  = {
                     "folder", "mkdir", "wiki", "blog", "sms", "note"
@@ -762,6 +805,17 @@ public class PhoneHarvester extends Harvester {
 
             return true;
         }
+
+
+        if ( !defined(name)) {
+            name = "SMS Entry";
+        }
+        name = name.trim();
+
+
+
+
+
         if (type == null) {
             if ( !processedACommand) {
                 msg.append("No commands were given\n" + getHelp());
@@ -770,18 +824,26 @@ public class PhoneHarvester extends Harvester {
             return true;
         }
 
-        if ( !defined(name)) {
-            name = "SMS Entry";
-        }
-        name = name.trim();
 
+        addEntry(info,currentEntry, type, msg,name, cleanedInputText, null);
+
+        return true;
+    }
+
+    private void addEntry(PhoneInfo info, Entry currentEntry, String type, Appendable msg, String name, String cleanedInputText, String resource) throws Exception {
         if ( !currentEntry.isGroup()) {
             msg.append("ERROR: Not a folder:\n" + currentEntry.getName());
-
-            return true;
+            return;
         }
 
-        TypeHandler typeHandler = getRepository().getTypeHandler(type);
+        TypeHandler typeHandler = null;
+        if(type!=null) {
+            typeHandler = getRepository().getTypeHandler(type);
+        }  else if(resource!=null) {
+            typeHandler = getEntryManager().findDefaultTypeHandler(resource);
+        } else {
+            typeHandler = getRepository().getTypeHandler("file");
+        }
         Entry       entry =
             typeHandler.createEntry(getRepository().getGUID());
         Date        date        = new Date();
@@ -796,7 +858,7 @@ public class PhoneHarvester extends Harvester {
         }
 
         entry.initEntry(name, cleanedInputText, currentEntry, getUser(),
-                        new Resource(), "", date.getTime(), date.getTime(),
+                        resource!=null?new Resource(resource):new Resource(), "", date.getTime(), date.getTime(),
                         date.getTime(), date.getTime(), values);
 
 
@@ -810,8 +872,8 @@ public class PhoneHarvester extends Harvester {
         getEntryManager().addNewEntries(getRequest(), entries);
         msg.append("New entry:\n" + getEntryInfo(entry));
 
-        return true;
     }
+
 
     /**
      * _more_
@@ -1166,7 +1228,7 @@ public class PhoneHarvester extends Harvester {
      * @throws Exception _more_
      */
     private Entry getEntry(Request request, String line, Entry currentEntry,
-                           StringBuffer msg)
+                           Appendable msg)
             throws Exception {
         for (String name : StringUtil.split(line, "/", true, true)) {
 
