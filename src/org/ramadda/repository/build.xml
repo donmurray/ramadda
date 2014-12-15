@@ -11,7 +11,6 @@
          <format property="date" pattern="yyyy-MM-dd HH:mm z" timezone="UTC"/>
        </tstamp>
         <property file="${basedir}/build.properties"/>
-        <mkdir dir="${dist_dir}"/>
         <property name="ramadda_relpath" value="org/ramadda/repository" />
         <property name="ramadda_dir" value="${src_dir}/${ramadda_relpath}" />
         <property name="release_dir" value="${dist_dir}/${release_name}" />
@@ -21,6 +20,14 @@
         <property name="docs_javadoc_dest" value="${docs_dir}/javadoc" />
         <property name="tika_jar" value="${lib_dir}/tika-app-1.4.jar" />
         <property name="clientbase" value="ramaddaclient" />
+
+        <mkdir dir="${dist_dir}"/>
+        <copy overwrite="true" file="${ramadda_dir}/release/README" todir="${dist_dir}">
+            <filterset>
+                <filter token="DATE" value="${date}"/>
+                <filter token="VERSION" value="${version}"/>
+            </filterset>
+       </copy>
         
     </target>
 
