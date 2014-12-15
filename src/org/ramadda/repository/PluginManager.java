@@ -717,7 +717,7 @@ public class PluginManager extends RepositoryManager {
                 SearchProvider provider = null;
                 Constructor    ctor     = null;
                 if ((args != null) && (args.size() > 0)) {
-                    System.err.println("args:" + args);
+                    //                    System.err.println("args:" + args);
                     ctor = Misc.findConstructor(c,
                             new Class[] { Repository.class,
                                           List.class });
