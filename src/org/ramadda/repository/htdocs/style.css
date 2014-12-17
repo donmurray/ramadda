@@ -160,11 +160,11 @@ h3 {
 
 
 
-.callout {
+.callout { 
    display: inline-block;
    padding: 10px;
-   font-family: georgia;
    border: 1px #eee solid;
+   border-radius: 6px;
 }
 
 .callout-yellow {
