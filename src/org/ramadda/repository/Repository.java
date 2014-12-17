@@ -498,7 +498,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
             setIpAddress(localMachine.getHostAddress());
         } catch (Exception exc) {
             System.err.println("Got exception accessing local hostname");
-            exc.printStackTrace();
+            //            exc.printStackTrace();
             setHostname("unknown");
             setIpAddress("unknown");
         }
