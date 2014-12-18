@@ -28,10 +28,9 @@ status() {
 start() {
     if [ -f $PID ]
     then
-        echo
         echo "RAMADDA already started. PID: [$( cat $PID )]"
     else
-        echo "RAMADDA Start"
+        echo "RAMADDA start"
         touch $PID
         if nohup $COMMAND >>$LOG 2>&1 &
         then echo $! >$PID
@@ -81,6 +80,7 @@ stop() {
 
 case "$1" in
     'start')
+            stop ; echo "Sleeping..."; sleep 1 ;
             start
             ;;
     'stop')
