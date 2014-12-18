@@ -14,14 +14,14 @@ basedir=/mnt/ramadda
 
 
 dir=`dirname $0`
-homedir=`dirname $dir`
+userdir=`dirname $dir`
 
-keepAsking="1"
+keepAsking=1
 
-perms==$(stat $homedir)
+perms==$(stat $userdir)
 if [[ $perms =~ .*rwx---.*$ ]]; then
-    echo "Changing permissions of home directory $homedir"
-    chmod 755 $homedir
+    echo "Changing permissions of home directory $userdir"
+    chmod 755 $userdir
 fi
 
 
@@ -35,14 +35,14 @@ askYesNo() {
 	return;
     fi
     
-    if [ "$keepAsking" == "0" ]; then
+    if [ $keepAsking == 0 ]; then
 	response="$dflt";
 	return;
     fi
 
     read -p "${msg}?  [y|A(all)|n]: " response
     if [ "$response" == "A" ]; then
-	keepAsking = "0";
+	keepAsking = 0
 	response="$dflt";
 	return;
     fi
@@ -167,14 +167,26 @@ if [ "$response" == "y" ]; then
     printf "#!/bin/sh\n# chkconfig: - 80 30\n# description: RAMADDA repository\n\nsh $dir/ramaddaserver/ramaddainit.sh \"\$@\"\n" > ${serviceDir}/${serviceName}
     chmod 755 ${serviceDir}/${serviceName}
     chkconfig ${serviceName} on
-    printf "to run: sudo service ${serviceName} <options>\n"
+    printf "     to run: sudo service ${serviceName} <options>\n"
 fi
+
+
+askYesNo "Generate keystore and enable SSL" "y"
+if [ "$response" == "y" ]; then
+    password="ssl_${RANDOM}_${RANDOM}"
+    echo "OK, ignore the keystore output. We're using some default values"
+    rm -f ${homedir}/keystore
+    printf "${password}\n${password}\nname\nunit\norg\ncity\nstate\nusa\nyes\n\n" | keytool -genkey -keystore ${homedir}/keystore
+    printf "#generated password\n\nramadda.ssl.password=${password}\nramadda.ssl.keypassword=${password}\nramadda.ssl.port=443\n" > ${homedir}/ssl.properties
+    printf "\n\n"
+fi
+
 
 
 askYesNo "Start RAMADDA" "y"
 if [ "$response" == "y" ]; then
     service ${serviceName} restart
-    printf "Finish the configuration at http://<hostname>/repository\n"
+    printf "Finish the configuration at https://<hostname>/repository or http://<hostname>/repository\n"
 fi
 
 exit

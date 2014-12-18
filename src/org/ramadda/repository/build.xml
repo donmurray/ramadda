@@ -163,9 +163,18 @@
 
 
     <target name="installer" depends="init,clean">
+        <copy overwrite="true" file="${ramadda_dir}/release/installer.sh" tofile="${dist_dir}/installer.sh">
+            <filterset>
+                <filter token="DATE" value="${date}"/>
+                <filter token="VERSION" value="${version}"/>
+                <filter token="RELEASE_VERSION" value="${release_version}"/>
+            </filterset>
+
+          </copy>
         <zip destfile="${dist_dir}/ramaddainstaller.zip">
          <zipfileset dir="${ramadda_dir}/release" includes="README.INSTALLER" fullpath="ramaddainstaller/README"/>
-         <zipfileset dir="${ramadda_dir}/release" includes="installer.sh" fullpath="ramaddainstaller/installer.sh"/>
+         <zipfileset dir="${dist_dir}" includes="installer.sh" fullpath="ramaddainstaller/installer.sh">
+            </zipfileset>
         </zip>
     </target>
 
