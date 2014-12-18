@@ -14,8 +14,17 @@ basedir=/mnt/ramadda
 
 
 dir=`dirname $0`
+homedir=`dirname $dir`
 
 keepAsking="1"
+
+perms==$(stat $homedir)
+if [[ $perms =~ .*rwx---.*$ ]]; then
+    echo "Changing permissions of home directory $homedir"
+    chmod 755 $homedir
+fi
+
+
 
 
 askYesNo() {
@@ -136,6 +145,7 @@ if [ "$response" == "y" ]; then
 
 	postgresPassword="password$RANDOM"
 	printf "create database repository;\ncreate user ramadda;\nalter user ramadda with password '${postgresPassword}';\ngrant all privileges on database repository to ramadda;\n" > $dir/postgres.sql
+	chmod 644 $dir/postgres.sql
 	sudo su -c "psql -f $dir/postgres.sql"  - postgres
 	rm $dir/postgres.sql
         printf "ramadda.db=postgres\nramadda.db.postgres.user=ramadda\nramadda.db.postgres.password=${postgresPassword}"  > ${homedir}/db.properties
@@ -164,6 +174,7 @@ fi
 askYesNo "Start RAMADDA" "y"
 if [ "$response" == "y" ]; then
     service ${serviceName} restart
+    printf "Finish the configuration at http://<hostname>/repository"
 fi
 
 exit
