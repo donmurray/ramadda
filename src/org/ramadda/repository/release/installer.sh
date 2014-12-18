@@ -148,7 +148,7 @@ if [ "$response" == "y" ]; then
 	rm -r -f ${dir}/ramaddaserver
 	wget -O ${dir}/ramaddaserver.zip ${ramaddaDownload}
 	unzip -d ${dir} -o ${dir}/ramaddaserver.zip
-	printf "\n\nexport RAMADDA_HOME=${homedir}\nexport RAMADDA_PORT=80\n" > ramaddaserver/ramaddaenv.sh
+	printf "\n\nexport RAMADDA_HOME=${homedir}\nexport RAMADDA_PORT=80\n" > ${dir}/ramaddaserver/ramaddaenv.sh
 fi
 
 
