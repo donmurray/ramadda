@@ -10,6 +10,7 @@ index.html
 -repository.dummy_properties
 -examples/pdfboxoutputhandlers_ex.xml
 -examples/pdfbox.sh
+-examples/README.INSTALLER
 -map.html
 >overview.html
 >user.html
