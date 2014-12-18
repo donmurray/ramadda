@@ -57,14 +57,14 @@ kill_cmd() {
                 /bin/rm $PID
             fi
         else
-           echo "All killed..." ; 
+#           echo "All killed..." ; 
            break
         fi
     done
 }
 
 stop() {
-    echo "==== Stop"
+    echo "Stopping RAMADDA"
 
     if [ -f $PID ]
     then
@@ -74,20 +74,20 @@ stop() {
         /bin/rm $PID
         kill_cmd
     else
-        echo "No pid file. Already stopped?"
+#        echo "No pid file. Already stopped?"
     fi
 }
 
 case "$1" in
     'start')
-            stop ; echo "Sleeping..."; sleep 1 ;
+            stop ;  sleep 1 ;
             start
             ;;
     'stop')
             stop
             ;;
     'restart')
-            stop ; echo "Sleeping..."; sleep 1 ;
+            stop ;  sleep 1 ;
             start
             ;;
     'status')
