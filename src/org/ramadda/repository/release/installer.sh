@@ -174,7 +174,7 @@ fi
 askYesNo "Start RAMADDA" "y"
 if [ "$response" == "y" ]; then
     service ${serviceName} restart
-    printf "Finish the configuration at http://<hostname>/repository"
+    printf "Finish the configuration at http://<hostname>/repository\n"
 fi
 
 exit
