@@ -2,7 +2,7 @@
 
 <project basedir="../../../.." default="all" name="Ramadda">
 
-    <target name="all" depends="ramadda.jar,repository.war,ramadda.zip">
+    <target name="all" depends="ramadda.jar,repository.war,ramadda.zip,installer">
     </target>
 
 
