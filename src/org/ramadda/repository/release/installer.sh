@@ -3,36 +3,45 @@
 dir=`dirname $0`
 answ="y"
 
-homedir=/mnt/ramadda/repository
-
-sed -e 's/HOSTNAME=localhost.localdomain/HOSTNAME=ramadda.localdomain/g' /etc/sysconfig/network> dummy.network
-mv dummy.network /etc/sysconfig/network
-
-sed -e 's/127.0.0.1   localhost localhost.localdomain/127.0.0.1 ramadda.localdomain ramadda localhost localhost.localdomain/g' /etc/hosts> dummy.hosts
-
-mv dummy.hosts /etc/hosts
+basedir=/mnt/ramadda
 
 
 
 
 
 
-read -p "Enter RAMADDA home directory: (default: $homedir): " tmp
+read -p "Enter base directory: (default: $basedir): " tmp
 case $tmp in "") 
 ;;
 *)
-	homedir=$tmp
+       basedir=$tmp
 ;;  esac
 
 
+
+
+
+
+homedir=$basedir/repository
+datadir=$basedir/data
+pgdir=$basedir/pgsql93
+
+
 mkdir -p $homedir
+mkdir -p $datadir
+mkdir -p $pgdir
 
 
-mntdir=`dirname $homedir`
-read -p "Mount $mntdir on /dev/?: (e.g.  xvdb) " mntfrom
+
+
+
+
+mntfrom="xvdf"
+read -p "Mount $basedir on /dev/???: (e.g. xvdb) " mntfrom
 case $mntfrom in "") 
 ;;
 *)
+echo "Mounting $basedir on $mntfrom"
 sed -e 's/.*$homedir.*//g' /etc/fstab> dummy.fstab
 mv dummy.fstab /etc/fstab
 printf "\n/dev/${mntfrom}   /$homedir ext4 defaults  0 0\n" >> /etc/fstab
@@ -44,6 +53,14 @@ mount /dev/${mntfrom} $homedir
 
 
 
+echo "Fixing the localhost name problem"
+sed -e 's/HOSTNAME=localhost.localdomain/HOSTNAME=ramadda.localdomain/g' /etc/sysconfig/network> dummy.network
+mv dummy.network /etc/sysconfig/network
+
+sed -e 's/127.0.0.1   localhost localhost.localdomain/127.0.0.1 ramadda.localdomain ramadda localhost localhost.localdomain/g' /etc/hosts> dummy.hosts
+
+mv dummy.hosts /etc/hosts
+
 
 
 
@@ -54,6 +71,8 @@ case $answ in y|Y) sudo yum install java;;  esac
 ### Database 
 read -p "Install postgres [y|n]? " answ
 case $answ in y|Y)
+	ln -s $pgdir /var/lib/pgsql93
+
 	sudo yum install postgresql93-server
 	sudo service postgresql93 initdb
 	sudo chkconfig postgresql93 on

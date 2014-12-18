@@ -1,13 +1,49 @@
 
-If you're running an Amazon instance make sure the ec2-user home directory is readable
+### Setting up your Amazon instance 
 
-e.g.:
-cd ..
-chmod 755 ec2-user
+Create an Amazon AWS account. 
+From the EC2 Dashboard go to the  Instances page and select  Launch Instance
+Choose the standard  Amazon Linux AMI
+Select the machine type
+For the security group add the following ports:
+
+HTTP port 80
+HTTPS port 443
+SSH  port 22
+Custom ports 20 & 21 - FTP
 
 
-Run the  server.sh script as sudo but give it the absolute path, e.g.:
-sudo sh /home/ec2-user/ramaddainstaller/server.sh
+Add a Storage Volume. This will hold the database, the RAMADDA home directory and any data you may have. The size depends on how much data and content you plan to have on your RAMADDA. 100 GB is more than plenty for normal RAMADDA use.
+Note the device, e.g., /dev/sdb. This often will show up on the machine as /dev/xvdb. 
+
+
+When you Launch the instance create and save a .pem file. This is what you use to access your server.
+
+
+### Configure your server
+
+#copy the  the ramadda installer
+scp  -i <.pem file> ramaddainstaller.zip  ec2-user@<server IP address>:
+
+#SSH to the machine
+ssh -i <.pem file>  ec2-user@<server IP address>
+
+#Make sure the ec2-user home directory is world readable
+sudo chmod 755 /home/ec2-user
+
+#Unpack the installer
+unzip ramaddainstaller.zip
+
+#run the installer - make sure to give it the absolute path
+sudo sh /home/ec2-user/ramaddainstaller/installer.sh
+
+This will walk you through a number of installation steps to setup the directories, and install and configure  Java, Postgres and RAMADDA
+
+
+To start and stop RAMADDA do:
+sudo sh ramaddainstaller/ramaddaserver/ramaddainit.sh stop|start|restart
+
+
 
 
 
