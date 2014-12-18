@@ -79,6 +79,7 @@
         <antcall target="ramadda.jar"/>
         <antcall target="ramadda.zip"/>
         <antcall target="repository.war"/>
+        <antcall target="installer"/>
         <antcall target="client"/>
     </target>
 
@@ -158,6 +159,15 @@
          <zipfileset dir="${ramadda_dir}/client" includes="README" fullpath="${clientbase}/README"/>
         </zip>
 
+    </target>
+
+
+    <target name="installer" depends="init,clean">
+        <zip destfile="${dist_dir}/ramaddainstaller.zip">
+         <zipfileset dir="${ramadda_dir}/release" includes="README.INSTALLER" fullpath="ramaddainstaller/README"/>
+         <zipfileset dir="${ramadda_dir}/release" includes="server.sh" fullpath="ramaddainstaller/server.sh"/>
+         <zipfileset dir="${ramadda_dir}/release" includes="postgres.init.sql" fullpath="ramaddainstaller/postgres.init.sql"/>
+        </zip>
     </target>
 
 

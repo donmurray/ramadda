@@ -6,8 +6,7 @@ cd ..
 chmod 755 ec2-user
 
 
-Run the  server.sh script as sudo but give it the absolute path:
-cd ramaddainstaller
+Run the  server.sh script as sudo but give it the absolute path, e.g.:
 sudo sh /home/ec2-user/ramaddainstaller/server.sh
 
 

@@ -5,6 +5,18 @@ answ="y"
 
 homedir=/mnt/ramadda/repository
 
+sed -e 's/HOSTNAME=localhost.localdomain/HOSTNAME=ramadda.localdomain/g' /etc/sysconfig/network> dummy.network
+mv dummy.network /etc/sysconfig/network
+
+sed -e 's/127.0.0.1   localhost localhost.localdomain/127.0.0.1 ramadda.localdomain ramadda localhost localhost.localdomain/g' /etc/hosts> dummy.hosts
+
+mv dummy.hosts /etc/hosts
+
+
+
+
+
+
 read -p "Enter RAMADDA home directory: (default: $homedir): " tmp
 case $tmp in "") 
 ;;
@@ -17,8 +29,7 @@ mkdir -p $homedir
 
 
 mntdir=`dirname $homedir`
-mntfrom="xvdf"
-read -p "Mount $mntdir on /dev/???: (e.g. xvdb) " mntfrom
+read -p "Mount $mntdir on /dev/?: (e.g.  xvdb) " mntfrom
 case $mntfrom in "") 
 ;;
 *)
@@ -63,10 +74,10 @@ case $answ in y|Y)
 
 read -p "Install RAMADDA from SourceForge [y|n]? " answ
 case $answ in y|Y) 
-	rm -f ramaddaserver.zip
-	rm -r -f ramaddaserver
-	wget -O ramaddaserver.zip http://downloads.sourceforge.net/project/ramadda/ramadda1.7/ramaddaserver.zip
-	unzip -o ramaddaserver.zip
+	rm -f ${dir}/ramaddaserver.zip
+	rm -r -f ${dir}/ramaddaserver
+	wget -O ${dir}/ramaddaserver.zip http://downloads.sourceforge.net/project/ramadda/ramadda1.7/ramaddaserver.zip
+	unzip -o ${dir}/ramaddaserver.zip
 	;;  esac
 
 sed -e 's/.*ramaddainit.sh.*//g' /etc/rc.local> dummy.rc.local
