@@ -73,8 +73,6 @@ stop() {
         fi
         /bin/rm $PID
         kill_cmd
-    else
-#        echo "No pid file. Already stopped?"
     fi
 }
 
