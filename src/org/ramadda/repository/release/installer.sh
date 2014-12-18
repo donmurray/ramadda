@@ -1,5 +1,19 @@
 
 
+ask() {
+    local msg="$1"
+    read -p "${msg}?  [y|n]: " response
+    case $response in y|Y) 
+            response='y'
+            ;;  
+        *) response='n'
+            ;;
+    esac
+}
+
+
+
+
 dir=`dirname $0`
 answ="y"
 
@@ -10,11 +24,11 @@ basedir=/mnt/ramadda
 
 
 
-read -p "Enter base directory: (default: $basedir): " tmp
-case $tmp in "") 
+read -p   "Enter base directory: (default: $basedir): " response
+case $response in "") 
 ;;
 *)
-       basedir=$tmp
+       basedir=$response
 ;;  esac
 
 
@@ -36,8 +50,8 @@ mkdir -p $pgdir
 
 
 
-mntfrom="xvdf"
-read -p "Mount $basedir on /dev/???: (e.g. xvdb) " mntfrom
+
+read -p  "What device should we mount on /dev? (e.g. xvdb) " mntfrom
 case $mntfrom in "") 
 ;;
 *)
@@ -64,13 +78,13 @@ mv dummy.hosts /etc/hosts
 
 
 
-read -p "Install java [y|n]? " answ
-case $answ in y|Y) sudo yum install java;;  esac
+ask "Install java" 
+case $$response in y|Y) sudo yum install java;;  esac
 
 
 ### Database 
-read -p "Install postgres [y|n]? " answ
-case $answ in y|Y)
+ask  "Install postgres" 
+case $response in y|Y)
 	ln -s $pgdir /var/lib/pgsql93
 
 	sudo yum install postgresql93-server
@@ -78,12 +92,11 @@ case $answ in y|Y)
 	sudo chkconfig postgresql93 on
 	sudo service postgresql93 start
 
-
 	sed -e 's/ident/trust/g' /var/lib/pgsql93/data/pg_hba.conf> dummy.conf
 	sudo mv dummy.conf /var/lib/pgsql93/data/pg_hba.conf
 	sudo service postgresql93 reload
 
-	postgresPassword="pasword$RANDOM"
+	postgresPassword="password$RANDOM"
 	sed -e 's/%password%/${postgresPassword}/g' $dir/postgres.init.sql> $dir/postgres.sql
 	sudo su -c "psql -f $dir/postgres.sql"  - postgres
 	rm $dir/postgres.sql
@@ -91,8 +104,8 @@ case $answ in y|Y)
 ;; esac
 
 
-read -p "Install RAMADDA from SourceForge [y|n]? " answ
-case $answ in y|Y) 
+ask "Install RAMADDA from SourceForge" 
+case $$response in y|Y) 
 	rm -f ${dir}/ramaddaserver.zip
 	rm -r -f ${dir}/ramaddaserver
 	wget -O ${dir}/ramaddaserver.zip http://downloads.sourceforge.net/project/ramadda/ramadda1.7/ramaddaserver.zip
@@ -104,8 +117,8 @@ printf "\nsh $dir/ramaddaserver/ramaddainit.sh start\n\n" >> dummy.rc.local
 mv dummy.rc.local /etc/rc.local
 printf "\n\nexport RAMADDA_HOME=${homedir}\nexport RAMADDA_PORT=80\n" > ramaddaserver/ramaddaenv.sh
 
-read -p "Start RAMADDA [y|n]? " answ
-case $answ in y|Y) 
+ask "Start RAMADDA"
+case $response in y|Y) 
 	sh ramaddaserver/ramaddainit.sh restart
 	;;  esac
 
