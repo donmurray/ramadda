@@ -6,6 +6,8 @@ repository.war: self contained war file for running under Tomcat, Glassfish, etc
 
 ramaddaserver.zip: stand-alone version of RAMADDA. Just needs Java to run. Download and unzip the file
 
+ramaddainstaller.zip: contains script to setup a Linux box with postgres and ramadda
+
 allplugins.jar: You only need this if you have previously installed RAMADDA without installing allplugins.jar
 If you already have the allplugins.jar installed in your release then RAMADDA will automatically update it
 
