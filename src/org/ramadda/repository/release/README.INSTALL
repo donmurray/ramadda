@@ -1,0 +1,14 @@
+
+If you're running an Amazon instance make sure the ec2-user home directory is readable
+
+e.g.:
+cd ..
+chmod 755 ec2-user
+
+
+Run the  server.sh script as sudo but give it the absolute path:
+cd ramaddainstaller
+sudo sh /home/ec2-user/ramaddainstaller/server.sh
+
+
+
