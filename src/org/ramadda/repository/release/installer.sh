@@ -1,11 +1,17 @@
+
 #!/bin/sh
 #
 #This script installs Java, Postgres and RAMADDA
 #
 
+useDefault=0
+ramaddaVersion=1.7
+
+ramaddaDownload="http://downloads.sourceforge.net/project/ramadda/ramadda${ramaddaVersion}/ramaddaserver.zip"
 serviceName="ramadda"
 serviceDir="/etc/rc.d/init.d"
 basedir=/mnt/ramadda
+
 
 dir=`dirname $0`
 
@@ -15,6 +21,11 @@ keepAsking="1"
 askYesNo() {
     local msg="$1"
     local dflt="$2"
+    if [ $useDefault == 1 ]; then
+	response="$dflt";
+	return;
+    fi
+    
     if [ "$keepAsking" == "0" ]; then
 	response="$dflt";
 	return;
@@ -50,6 +61,12 @@ askYesNo() {
 ask() {
     local msg="$1";
     local dflt="$2";
+    if [ $useDefault == 1 ]; then
+	response="$dflt";
+        return;
+    fi
+
+
     read -p "${msg} " response;
 
     if [ "$response" == "" ]; then
@@ -83,9 +100,7 @@ if [ "$response" != "" ]; then
 	sed -e 's/.*$homedir.*//g' /etc/fstab> dummy.fstab
 	mv dummy.fstab /etc/fstab
 	printf "\n/dev/${mntfrom}   /$homedir ext4 defaults  0 0\n" >> /etc/fstab
-	echo "mkfs"
 	mkfs -t ext4 /dev/${mntfrom}
-	echo "mount"
 	mount /dev/${mntfrom} $homedir
 	fi
 fi
@@ -131,15 +146,16 @@ askYesNo "Install RAMADDA from SourceForge"  "y"
 if [ "$response" == "y" ]; then
 	rm -f ${dir}/ramaddaserver.zip
 	rm -r -f ${dir}/ramaddaserver
-	wget -O ${dir}/ramaddaserver.zip http://downloads.sourceforge.net/project/ramadda/ramadda1.7/ramaddaserver.zip
-	unzip -o ${dir}/ramaddaserver.zip
+	wget -O ${dir}/ramaddaserver.zip ${ramaddaDownload}
+	unzip -d ${dir} -o ${dir}/ramaddaserver.zip
 	printf "\n\nexport RAMADDA_HOME=${homedir}\nexport RAMADDA_PORT=80\n" > ramaddaserver/ramaddaenv.sh
 fi
 
 
 askYesNo "Add RAMADDA as a service"  "y"
 if [ "$response" == "y" ]; then
-    printf "#!/bin/sh\nsh $dir/ramaddaserver/ramaddainit.sh \"$@\"\n" > ${serviceDir}/${serviceName}
+    printf "#!/bin/sh\n# chkconfig: - 80 30\n# description: RAMADDA repository\n\nsh $dir/ramaddaserver/ramaddainit.sh \"\$@\"\n" > ${serviceDir}/${serviceName}
+    chmod 755 ${serviceDir}/${serviceName}
     chkconfig ${serviceName} on
     printf "to run: sudo service ${serviceName} <options>\n"
 fi

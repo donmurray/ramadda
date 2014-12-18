@@ -17,7 +17,7 @@ scp ~/.ramadda/plugins/nlasplugin.jar dist/otherplugins/* ${sfuser},ramadda@frs.
 
 #scp the top level build products to SF
 echo "copying core"
-scp  dist/ramaddaserver.zip  dist/allplugins.jar dist/ramaddaclient.zip dist/pointtools.zip  dist/repository.war  ${sfuser},ramadda@frs.sourceforge.net:${dest}
+scp  dist/ramaddaserver.zip dist/ramaddainstaller.zip  dist/allplugins.jar dist/ramaddaclient.zip dist/pointtools.zip  dist/repository.war  ${sfuser},ramadda@frs.sourceforge.net:${dest}
 
 
 
