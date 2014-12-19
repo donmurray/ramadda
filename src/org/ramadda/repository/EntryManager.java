@@ -136,6 +136,7 @@ public class EntryManager extends RepositoryManager {
     /** _more_ */
     public static final String SESSION_FOLDERS = "folders";
 
+    /** _more_          */
     public static final String SESSION_TYPES = "types";
 
     /** _more_ */
@@ -1338,8 +1339,8 @@ public class EntryManager extends RepositoryManager {
                                    ARG_EXTEDIT_REPORT));
 
         sb.append(HtmlUtils.endInset());
-        List<HtmlUtils.Selector> tfos = getTypeHandlerSelectors(request, true, true,
-                                            entry);
+        List<HtmlUtils.Selector> tfos = getTypeHandlerSelectors(request,
+                                            true, true, entry);
 
         sb.append("<br>&nbsp;<br>");
         sb.append(msgHeader("Entry Type"));
@@ -1417,6 +1418,8 @@ public class EntryManager extends RepositoryManager {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param fileType _more_
      * @param nonFileType _more_
      * @param entry _more_
@@ -1425,18 +1428,17 @@ public class EntryManager extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public List<HtmlUtils.Selector> getTypeHandlerSelectors(Request request, 
-                                                            boolean fileType,
-            boolean nonFileType, Entry entry)
+    public List<HtmlUtils.Selector> getTypeHandlerSelectors(Request request,
+            boolean fileType, boolean nonFileType, Entry entry)
             throws Exception {
         List<String> sessionTypes =
             (List<String>) getSessionManager().getSessionProperty(request,
-                                                                  SESSION_TYPES);
+                SESSION_TYPES);
 
-        List<HtmlUtils.Selector> tfos = new ArrayList<HtmlUtils.Selector>();
+        List<HtmlUtils.Selector> tfos  = new ArrayList<HtmlUtils.Selector>();
 
-        HashSet<String> first = new HashSet<String>();
-        if(sessionTypes!=null) {
+        HashSet<String>          first = new HashSet<String>();
+        if (sessionTypes != null) {
             first.addAll(sessionTypes);
         }
 
@@ -1446,8 +1448,8 @@ public class EntryManager extends RepositoryManager {
             cats.get(preload);
         }
 
-        
-        
+
+
         for (TypeHandler typeHandler : getRepository().getTypeHandlers()) {
             if ( !typeHandler.getForUser()) {
                 continue;
@@ -1469,9 +1471,10 @@ public class EntryManager extends RepositoryManager {
                     HtmlUtils.space(2) + typeHandler.getLabel(),
                     typeHandler.getType(), typeHandler.getTypeIconUrl());
             //Add the seen ones first
-            if(first.contains(typeHandler.getType())) {
-                if(tfos.size()==0) {
-                    tfos.add(new HtmlUtils.Selector("Recent", "", null, 0, true));
+            if (first.contains(typeHandler.getType())) {
+                if (tfos.size() == 0) {
+                    tfos.add(new HtmlUtils.Selector("Recent", "", null, 0,
+                            true));
                 }
                 tfos.add(tfo);
             }
@@ -1771,15 +1774,27 @@ public class EntryManager extends RepositoryManager {
 
     }
 
-    private void addSessionType(Request request, String type) throws Exception {
-        if(type == null) return;
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param type _more_
+     *
+     * @throws Exception _more_
+     */
+    private void addSessionType(Request request, String type)
+            throws Exception {
+        if (type == null) {
+            return;
+        }
         if ( !type.equals(TYPE_FILE) && !type.equals(TYPE_GROUP)) {
             List<String> pastTypes =
-                (List<String>) getSessionManager().getSessionProperty(request, SESSION_TYPES);
+                (List<String>) getSessionManager().getSessionProperty(
+                    request, SESSION_TYPES);
             if (pastTypes == null) {
                 pastTypes = new ArrayList<String>();
-                getSessionManager().putSessionProperty(request, SESSION_TYPES,
-                                                       pastTypes);
+                getSessionManager().putSessionProperty(request,
+                        SESSION_TYPES, pastTypes);
             }
             pastTypes.remove(type);
             pastTypes.add(0, type);
@@ -3685,7 +3700,7 @@ public class EntryManager extends RepositoryManager {
 
         List<String> sessionTypes =
             (List<String>) getSessionManager().getSessionProperty(request,
-                                                                  SESSION_TYPES);
+                SESSION_TYPES);
 
         List<TypeHandler> typeHandlers = getRepository().getTypeHandlers();
         for (TypeHandler typeHandler : typeHandlers) {
@@ -4449,8 +4464,8 @@ public class EntryManager extends RepositoryManager {
 
 
 
-        List<HtmlUtils.Selector> tfos = getTypeHandlerSelectors(request, true, true,
-                                            null);
+        List<HtmlUtils.Selector> tfos = getTypeHandlerSelectors(request,
+                                            true, true, null);
 
         request.formPostWithAuthToken(sb,
                                       getRepository().URL_ENTRY_TYPECHANGE);
@@ -5237,6 +5252,22 @@ public class EntryManager extends RepositoryManager {
 
 
     /**
+     *  trim and remove the delimiter character
+     *
+     * @param name _more_
+     *
+     * @return _more_
+     */
+    public String cleanupEntryName(String name) {
+        if (name.length() > 200) {
+            name = name.substring(0, 195) + "...";
+        }
+        name = name.replaceAll(Entry.PATHDELIMITER, "-");
+
+        return name;
+    }
+
+    /**
      * _more_
      *
      * @param request _more_
@@ -5257,14 +5288,9 @@ public class EntryManager extends RepositoryManager {
             throws Exception {
 
         boolean doAnonymousUpload = false;
-        String  name              = XmlUtil.getAttribute(node, ATTR_NAME, "");
-        if (name.length() > 200) {
-            name = name.substring(0, 195) + "...";
-        }
 
-
-
-
+        String name = cleanupEntryName(XmlUtil.getAttribute(node, ATTR_NAME,
+                          ""));
 
 
         String category = XmlUtil.getAttribute(node, ATTR_CATEGORY, "");
@@ -5407,13 +5433,17 @@ public class EntryManager extends RepositoryManager {
         if (XmlUtil.hasAttribute(node, ATTR_FROMDATE)) {
             fromDate = getPageHandler().parseDate(XmlUtil.getAttribute(node,
                     ATTR_FROMDATE));
-            if(fromDate == null)  fromDate = createDate;
+            if (fromDate == null) {
+                fromDate = createDate;
+            }
         }
         Date toDate = fromDate;
         if (XmlUtil.hasAttribute(node, ATTR_TODATE)) {
             toDate = getPageHandler().parseDate(XmlUtil.getAttribute(node,
                     ATTR_TODATE));
-            if(toDate == null)  toDate = fromDate;
+            if (toDate == null) {
+                toDate = fromDate;
+            }
         }
         if ( !canBeCreatedBy(request, typeHandler)) {
             throw new IllegalArgumentException(
