@@ -73,6 +73,7 @@
 ==Project Information==
 <table class="formtable">
 {{resource row.label="URL:"  message=""}}
+{{daterange row.label="Project Dates:"  message=""}}
 {{field name="project_id" row.label="Project ID:"}}
 {{field name="status" row.label="Status:"}}
 {{field name="project_type" row.label="Type:"}}
