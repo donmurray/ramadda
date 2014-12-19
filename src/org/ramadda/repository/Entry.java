@@ -410,6 +410,10 @@ public class Entry implements Cloneable {
         }
         setTypeHandler(template.getTypeHandler());
 
+        if(template.resource!=null) {
+            this.resource = new Resource(template.resource);
+        }
+
         if (template.getMetadata() != null) {
             List<Metadata> thisMetadata = new ArrayList<Metadata>();
             for (Metadata metadata : template.getMetadata()) {
