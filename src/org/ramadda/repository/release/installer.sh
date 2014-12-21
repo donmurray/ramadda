@@ -42,7 +42,6 @@ askYesNo() {
 	return;
     fi
     
-    echo "Keep asking: $keepAsking"
 
     if [ $keepAsking == 0 ]; then
 	response="$dflt";
@@ -212,7 +211,7 @@ fi
 askYesNo "Start RAMADDA" "y"
 if [ "$response" == "y" ]; then
     service ${serviceName} restart
-    printf "Finish the configuration at https://${ipAddress}/repository\n"
+    printf "Finish the configuration at https://<ip address>/repository\n"
 fi
 
 exit
