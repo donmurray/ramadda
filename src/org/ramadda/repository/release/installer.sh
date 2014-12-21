@@ -25,11 +25,11 @@ keepAsking=1
 
 
 
-perms==$(stat $userdir)
-if [[ $perms =~ .*rwx---.*$ ]]; then
-    echo "Changing permissions of home directory $userdir"
-    chmod 755 $userdir
-fi
+#perms==$(stat $userdir)
+#if [[ $perms =~ .*rwx---.*$ ]]; then
+#    echo "Changing permissions of home directory $userdir"
+#    chmod 755 $userdir
+#fi
 
 
 
@@ -154,9 +154,9 @@ if [ "$response" == "y" ]; then
 	sudo service postgresql93 reload
 
 	postgresPassword="password$RANDOM"
-	printf "create database repository;\ncreate user ramadda;\nalter user ramadda with password '${postgresPassword}';\ngrant all privileges on database repository to ramadda;\n" > $dir/postgres.sql
-	chmod 644 $dir/postgres.sql
-	sudo su -c "psql -f $dir/postgres.sql"  - postgres
+	printf "create database repository;\ncreate user ramadda;\nalter user ramadda with password '${postgresPassword}';\ngrant all privileges on database repository to ramadda;\n" > /tmp/postgres.sql
+	chmod 644 /tmp/postgres.sql
+	sudo su -c "psql -f /tmp/postgres.sql"  - postgres
 	rm $dir/postgres.sql
         printf "ramadda.db=postgres\nramadda.db.postgres.user=ramadda\nramadda.db.postgres.password=${postgresPassword}"  > ${homedir}/db.properties
 fi
@@ -212,7 +212,7 @@ fi
 askYesNo "Start RAMADDA" "y"
 if [ "$response" == "y" ]; then
     service ${serviceName} restart
-    printf "Finish the configuration at https://<hostname>/repository or http://<hostname>/repository\n"
+    printf "Finish the configuration at https://${ipAddress}/repository\n"
 fi
 
 exit
