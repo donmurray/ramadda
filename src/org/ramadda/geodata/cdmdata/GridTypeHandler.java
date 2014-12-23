@@ -109,6 +109,21 @@ public class GridTypeHandler extends TypeHandler {
                 }
             }
 
+
+            if (request.defined(ARG_FROMDATE)) {
+                jsonbuf.append("&");
+                jsonbuf.append(
+                    HtmlUtils.arg(
+                        ARG_FROMDATE, request.getString(ARG_FROMDATE)));
+            }
+
+            if (request.defined(ARG_TODATE)) {
+                jsonbuf.append("&");
+                jsonbuf.append(HtmlUtils.arg(ARG_TODATE,
+                                             request.getString(ARG_TODATE)));
+            }
+
+
             return jsonbuf.toString();
         }
 
