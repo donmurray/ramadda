@@ -321,6 +321,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             connectionURL = connectionURL.replace("%db.name%",
                     getRepository().getProperty("db.name", "repository"));
 
+            connectionURL = connectionURL.trim();
             System.err.println("RAMADDA: DatabaseManager connection url:"
                                + connectionURL + " user name:" + userName);
 
