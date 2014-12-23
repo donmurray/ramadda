@@ -1126,6 +1126,19 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
             String jsonUrl = entry.getTypeHandler().getUrlForWiki(request,
                                  entry, theTag);
+            //Gack - handle the files that are gridded netcdf
+            //This is awful to have this here but I just don't know how to 
+            //handle these entries
+            if ((jsonUrl == null)
+                    && entry.getTypeHandler().isType(Constants.TYPE_FILE)
+                    && entry.getResource().getPath().toLowerCase().endsWith(
+                        ".nc")) {
+                TypeHandler gridType =
+                    getRepository().getTypeHandler("cdm_grid");
+                if (gridType != null) {
+                    jsonUrl = gridType.getUrlForWiki(request, entry, theTag);
+                }
+            }
             getEntryDisplay(request, entry, theTag, entry.getName(), jsonUrl,
                             sb, props);
 
