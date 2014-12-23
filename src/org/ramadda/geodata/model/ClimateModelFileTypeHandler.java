@@ -26,6 +26,7 @@ import org.ramadda.repository.Repository;
 import org.ramadda.repository.Request;
 import org.ramadda.repository.type.GenericTypeHandler;
 import org.ramadda.repository.type.GranuleTypeHandler;
+import org.ramadda.repository.type.TypeHandler;
 
 import org.w3c.dom.Element;
 
@@ -98,12 +99,15 @@ public class ClimateModelFileTypeHandler extends GranuleTypeHandler {
     /**
      * Initialize the entry
      *
+     *
+     * @param request _more_
      * @param entry the Entry
      *
      * @throws Exception  problems during initialization
      */
     @Override
-    public void initializeNewEntry(Request request, Entry entry) throws Exception {
+    public void initializeNewEntry(Request request, Entry entry)
+            throws Exception {
         super.initializeNewEntry(request, entry);
         Object[] values = getEntryValues(entry);
         if ((values[1] != null) && !values[1].toString().isEmpty()) {
@@ -148,6 +152,35 @@ public class ClimateModelFileTypeHandler extends GranuleTypeHandler {
 
     }
 
+
+
+    /**
+     * This gets called from the wiki chart displays
+     * we route the request to the cdm_grid type handler
+     *
+     * @param request The request
+     * @param entry The entry
+     * @param tag The wiki tag being used
+     *
+     * @return The point time series url
+     */
+    @Override
+    public String getUrlForWiki(Request request, Entry entry, String tag) {
+        try {
+            TypeHandler gridType = getRepository().getTypeHandler("cdm_grid");
+            if (gridType != null) {
+                return gridType.getUrlForWiki(request, entry, tag);
+            }
+        } catch (Exception exc) {
+            throw new RuntimeException(exc);
+        }
+
+        return super.getUrlForWiki(request, entry, tag);
+
+    }
+
+
+
     /**
      * Test it
      *
@@ -164,7 +197,14 @@ public class ClimateModelFileTypeHandler extends GranuleTypeHandler {
      *       }
      *   }
      * }
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param tag _more_
+     *
+     * @return _more_
      */
+
 
 
 }
