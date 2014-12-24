@@ -44,7 +44,7 @@ An alternative  is to use the command line installation script described below.
 
 
 <a name="amazon"></a><div class="pagesubtitle">14.1.1 Command Line Amazon Install</div> 
-The <a href="http://sourceforge.net/p/ramadda/code/HEAD/tree/src/org/ramadda/repository/release/aws.sh">aws.sh</a> script uses the 
+The <a href="http://sourceforge.net/p/ramadda/code/HEAD/tree/src/org/ramadda/repository/release/installer/aws.sh">aws.sh</a> script uses the 
 <a href="http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-welcome.html">Amazon Command Line Interface (CLI)</a>
 to create and configure an Amazon machine instance running RAMADDA. In just a couple of minutes you can have a server up and running.
 
@@ -57,46 +57,9 @@ Once you have the CLI installed run the script:<pre>
 
 
 You can kill the script at any time and re-run it without messing things up though you might see some warnings along the way.
-<p>
-The script looks like (with comments added):
-<pre>
-# Enter the access key you got from <a href="http://docs.aws.amazon.com/cli/latest/userguide/cli-chap-getting-set-up.html#cli-signup">Amazon</a> Do you want to enter your Amazon authentication (only needed one time)? [y|n]:
-AWS Access Key ID: 
-AWS Secret Access Key: 
-Default region name [us-west-2]: 
-Default output format [json]: 
 
-# Enter machine info and disk size. 
-# Note: the installer only works on Amazon Linux AMIs
-Enter the image id [ami-55a7ea65]: 
 
-# More info about <a href="http://aws.amazon.com/ec2/instance-types/">instance types</a> 
-Enter the instance type id [t1.micro]: 
-Enter the volume size (GB) [100]: 
-
-# This will create a &lt;key pair name&gt;.pem file, e.g. ramadda.pem This is the only way to access your instance
-#If you've done this already you don't have to do it again
-Enter the key pair name [ramadda]: 
-Do you want to create the keypair [y|n]: 
-
-# Create a security group called ramadda that has has ports 22, 80, 443 open
-Create the security group ramadda? [y|n]: n
-
-# If you have already created the instance and just want to finish up enter "n"
-#We'll get the instance information from the instanceinfo.json file
-Do you want to create the instance with image: ami-55a7ea65 type: t1.micro? [y|n]: n
-
-# It takes some time to get the instance running so you might have to keep trying here
-Instance id: i-de4ccfd2
-Hit return to check to see if the instance is ready
-Doesn't seem ready yet
-....
-
-# Once the instance is running the script will do a 'sudo yum update' and then will
-# download and install the above RAMADDA installer and step through that installation process.
-
-</pre>
-
+More info about <a href="http://aws.amazon.com/ec2/instance-types/">instance types</a> 
 
 
 
