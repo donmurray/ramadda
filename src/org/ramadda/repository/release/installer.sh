@@ -13,7 +13,7 @@ ramaddaDownload="http://downloads.sourceforge.net/project/ramadda/ramadda${ramad
 serviceName="ramadda"
 serviceDir="/etc/rc.d/init.d"
 basedir=/mnt/ramadda
-
+postgresDir=/var/lib/pgsql93/data
 
 dir=`dirname $0`
 userdir=`dirname $dir`
@@ -141,22 +141,40 @@ fi
 ### Database 
 askYesNo  "Install postgres"  "y"
 if [ "$response" == "y" ]; then
-	ln -f -s $pgdir /var/lib/pgsql93
+	ln -f -s $pgdir ${postgresDir}
+
 
 	sudo yum install postgresql93-server
 	sudo service postgresql93 initdb
 	sudo chkconfig postgresql93 on
 	sudo service postgresql93 start
 
-	sed -e 's/ident/trust/g' /var/lib/pgsql93/data/pg_hba.conf> dummy.conf
-	sudo mv dummy.conf /var/lib/pgsql93/data/pg_hba.conf
+        if [! -f ${postgresDir}/pg_hba.conf.bak ]; then
+            cp ${postgresDir}/pg_hba.conf ${postgresDir}/pg_hba.conf.bak
+        fi
+
+
+	postgresPassword="password$RANDOM-$RANDOM"
+	postgresUser="ramadda"
+        postgresAuth="
+#
+#written out by the RAMADDA installer
+#
+host repository ${postgresUser} 127.0.0.1/32  password
+local   all             all                                     peer
+host    all             all             127.0.0.1/32            ident
+host    all             all             ::1/128                 ident
+"
+
+
+        printf "${postgresAuth}" > ${postgresDir}/pg_hba.conf
+
 	sudo service postgresql93 reload
 
-	postgresPassword="password$RANDOM"
 	printf "create database repository;\ncreate user ramadda;\nalter user ramadda with password '${postgresPassword}';\ngrant all privileges on database repository to ramadda;\n" > /tmp/postgres.sql
 	chmod 644 /tmp/postgres.sql
 	sudo su -c "psql -f /tmp/postgres.sql"  - postgres
-	rm $dir/postgres.sql
+	rm -f $dir/postgres.sql
         printf "ramadda.db=postgres\nramadda.db.postgres.user=ramadda\nramadda.db.postgres.password=${postgresPassword}"  > ${homedir}/db.properties
 fi
 

@@ -142,22 +142,13 @@ if [ "$ipAddress" == "" ]; then
     exit
 fi
 
-printf "Your instance is up and running and can be accessed by:\nssh -i ${keyPair}.pem ec2-user@${ipAddress}\n\n"
+printf "Your instance will be ready to access in minute or so:\nssh -i ${keyPair}.pem ec2-user@${ipAddress}\n\n"
 
 
 read -p  "Set instance name to: " tmp
 if [ "$tmp" != "" ]; then
     aws ec2 create-tags --resources ${instanceId} --tags Key=Name,Value=$tmp
 fi
-
-
-tmp="";
-#read -p "Create a new IP address? [y|n]: " tmp
-case $tmp in
-    ""|"y")
-#    aws ec2 allocate-address --query 'PublicIp' --output text
-;;
-esac
 
 
 
@@ -177,7 +168,6 @@ while [ ! -f $pemFile ]; do
     fi
 done
 
-echo "It will take a minute or so for the machine to come up."
 echo "We'll keep trying to do a 'ssh yum update' "
 while [ 1  ]; do
     echo "ssh: sudo yum update"
@@ -199,7 +189,7 @@ esac
 
 
 
-printf "\nFinish configuration of the RAMADDA repository at https://$ipAddress/repository"
+printf "\nFinish configuration of the RAMADDA repository at https://$ipAddress/repository\n"
 
 
 
