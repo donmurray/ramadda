@@ -2225,7 +2225,7 @@ public class Column implements DataTypes, Constants {
                                    ((dflt != null)
                                     ? dflt
                                     : ""));
-                value = StringUtil.join(",",
+                value = StringUtil.join(", ",
                                         StringUtil.split(value, "\n", true,
                                             true));
                 values[offset] = value;
