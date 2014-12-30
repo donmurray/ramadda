@@ -1,56 +1,93 @@
 #!/bin/sh
+
 #
-#This script installs Java, Postgres and RAMADDA
+#This script installs some base packages, Postgres and then RAMADDA
 #
 
 
+OS_REDHAT="redhat"
+OS_AMAZON="amazon_linux"
+os=$OS_AMAZON
 
-
-useDefault=0
+dir=`dirname $0`
+userdir=`dirname $dir`
+promptUser=1
+yumArg=""
 ramaddaVersion=1.7
 
 ramaddaDownload="http://downloads.sourceforge.net/project/ramadda/ramadda${ramaddaVersion}/ramaddaserver.zip"
 serviceName="ramadda"
 serviceDir="/etc/rc.d/init.d"
-basedir=/mnt/ramadda
-postgresDir=/var/lib/pgsql93/data
-
-dir=`dirname $0`
-userdir=`dirname $dir`
-
-keepAsking=1
+basedir=""
 
 
+usage() {
+    echo "installer.sh -os redhat -y (assume yes installer) -help "
+    exit
+}
 
 
 
+while [ $# != 0 ]
+do
+    case $1 in 
+	-os)
+	    shift
+	    os=$1;
+	    ;;
+	-help)
+	    usage
+	    ;;
+	-y)
+	    promptUser=0
+	    yumArg=--assumeyes
+	    ;;
+	*)
+	    echo "Unknown argument $1"
+	    usage
+	    ;;
+    esac
+    shift
+done
 
-#perms==$(stat $userdir)
-#if [[ $perms =~ .*rwx---.*$ ]]; then
-#    echo "Changing permissions of home directory $userdir"
-#    chmod 755 $userdir
-#fi
+
+echo "target os: $os"
+
+if [ "$os" == "${OS_REDHAT}" ]; then
+    pgsql=pgsql
+    pgService=postgresql-server
+    pgInstall=http://yum.postgresql.org/9.3/redhat/rhel-6-x86_64/pgdg-redhat93-9.3-1.noarch.rpm
+else
+    pgsql=pgsql93
+    pgService=postgresql93
+    pgInstall=postgresql93-server
+fi
+
+postgresDir=/var/lib/${pgsql}
+postgresDataDir=${postgresDir}/data
 
 
-
+yumInstall() {
+    local target="$1"
+    if [ "$yumArg" == "" ]; then
+	yum install ${target}
+    else 
+	yum install ${yumArg} ${target}
+    fi
+}
 
 askYesNo() {
     local msg="$1"
     local dflt="$2"
-    if [ $useDefault == 1 ]; then
-	response="$dflt";
-	return;
-    fi
-    
 
-    if [ $keepAsking == 0 ]; then
+    if [ $promptUser == 0 ]; then
 	response="$dflt";
 	return;
     fi
 
     read -p "${msg}?  [y|A(all)|n]: " response
     if [ "$response" == "A" ]; then
-	keepAsking=0;
+	promptUser=0;
 	response="$dflt";
 	return;
     fi
@@ -78,11 +115,15 @@ askYesNo() {
 ask() {
     local msg="$1";
     local dflt="$2";
-    if [ $useDefault == 1 ]; then
+    local extra="$3"
+    if [ $promptUser == 0 ]; then
 	response="$dflt";
         return;
     fi
 
+    if [ "$extra" != "" ]; then
+        printf "\n# $extra\n"
+    fi
 
     read -p "${msg} " response;
 
@@ -91,37 +132,76 @@ ask() {
     fi
 }
 
+mntDir=""
 
-ask   "Enter base directory: (default: $basedir):" $basedir
-if [ "$response" != "" ]; then
-    basedir=$response
+declare -a dirLocations=("/dev/xvdb" )
+for i in "${dirLocations[@]}"
+do
+   if [ -b "$i" ]; then
+       askYesNo  "Do you want to mount the volume: $i [y|n]:"  "y"
+       if [ "$response" == "y" ]; then
+           mntDir="$i"
+           break;
+       fi
+   fi
+done
+
+
+while [ "$mntDir" == "" ]; do
+    ask  "Enter the volume to mount, e.g., /dev/xvdb  [<volume>|n] "  ""
+    if [ "$response" == "" ] ||  [ "$response" == "n"  ]; then
+        break;
+    fi
+    if [ -f $response ]; then
+        mntDir="$response"
+        break;
+    fi
+    echo "Directory does not exist: $response"
+done
+
+if [ "$mntDir" != "" ]; then
+    basedir=/mnt/ramadda
+    echo "Mounting $basedir on $mntDir"
+    sed -e 's/.*$basedir.*//g' /etc/fstab> dummy.fstab
+    mv dummy.fstab /etc/fstab
+    printf "\n#added by ramadda installer.sh\n${mntDir}   /$basedir ext4 defaults  0 0\n" >> /etc/fstab
+    mkfs -t ext4 $mntDir
+    mount $mntDir $basedir
 fi
+
+
+
+
+dfltDir="";
+if [ -d "${userdir}" ]; then
+    dfltDir="${userdir}/ramadda";
+fi
+
+
+if [ -d "/mnt/ramadda" ]; then
+    dfltDir="/mnt/ramadda";
+fi
+
+while [ "$basedir" == "" ]; do
+    ask   "Enter base directory: [$dfltDir]:" $dfltDir  "The base directory holds the repository, pgsql, and data sub-directories"
+    if [ "$response" == "" ]; then
+        break;
+    fi
+    basedir=$response;
+    break
+done
 
 
 
 homedir=$basedir/repository
 datadir=$basedir/data
-pgdir=$basedir/pgsql93
+
 
 
 mkdir -p $homedir
 mkdir -p $datadir
-mkdir -p $pgdir
 
 
-
-ask  "What device should we mount on /dev? (default: xvdb, enter 'n' for none): "  "xvdb"
-if [ "$response" != "" ]; then
-    if [ "$response" != "n" ]; then
-	mntfrom="$response"
-	echo "Mounting $basedir on $mntfrom"
-	sed -e 's/.*$homedir.*//g' /etc/fstab> dummy.fstab
-	mv dummy.fstab /etc/fstab
-	printf "\n/dev/${mntfrom}   /$homedir ext4 defaults  0 0\n" >> /etc/fstab
-	mkfs -t ext4 /dev/${mntfrom}
-	mount /dev/${mntfrom} $homedir
-	fi
-fi
 
 
 
@@ -132,31 +212,56 @@ sed -e 's/127.0.0.1   localhost localhost.localdomain/127.0.0.1 ramadda.localdom
 mv dummy.hosts /etc/hosts
 
 
-askYesNo "Install java"  "y"
-if [ "$response" == "y" ]; then
-    sudo yum install java
-fi
+echo "Installing base packages - wget, unzip & java"
+yum install -y wget > /dev/null
+yum install -y unzip > /dev/null
+yum install -y java > /dev/null
+
 
 
 ### Database 
 askYesNo  "Install postgres"  "y"
 if [ "$response" == "y" ]; then
-	ln -f -s $pgdir ${postgresDir}
+
+    yum install -y  ${pgInstall}
+    pgdir="${basedir}/${pgsql}"
+
+    if [ "$os" == "${OS_REDHAT}" ]; then
+	 postgresql-setup initdb
+    else
+	 service ${pgService} initdb
+    fi
+
+    if  [ -d ${postgresDir} ] ; then
+	if  [ ! -h ${postgresDir} ]; then
+	    echo "Moving ${postgresDir} to $pgdir"
+	    mv  ${postgresDir} $pgdir
+	    ln  -s -f  $pgdir ${postgresDir}
+	    chown -R postgres ${postgresDir}
+	    chown -R postgres ${pgdir}
+	fi
+    else
+	echo "Warning: ${postgresDir} does not exist"	
+    fi
 
 
-	sudo yum install postgresql93-server
-	sudo service postgresql93 initdb
-	sudo chkconfig postgresql93 on
-	sudo service postgresql93 start
+    if [ "$os" == "${OS_REDHAT}" ]; then
+	 systemctl enable postgresql
+	 systemctl start postgresql.service
+    else
+	 chkconfig ${pgService} on
+	 service ${pgService} start
+    fi
 
-        if [! -f ${postgresDir}/pg_hba.conf.bak ]; then
-            cp ${postgresDir}/pg_hba.conf ${postgresDir}/pg_hba.conf.bak
-        fi
 
 
-	postgresPassword="password$RANDOM-$RANDOM"
-	postgresUser="ramadda"
-        postgresAuth="
+    if [ ! -f ${postgresDataDir}/pg_hba.conf.bak ]; then
+        cp ${postgresDataDir}/pg_hba.conf ${postgresDataDir}/pg_hba.conf.bak
+    fi
+
+    postgresPassword="password$RANDOM-$RANDOM"
+    postgresUser="ramadda"
+    postgresAuth="
 #
 #written out by the RAMADDA installer
 #
@@ -167,13 +272,13 @@ host    all             all             ::1/128                 ident
 "
 
 
-        printf "${postgresAuth}" > ${postgresDir}/pg_hba.conf
+        printf "${postgresAuth}" > ${postgresDataDir}/pg_hba.conf
 
-	sudo service postgresql93 reload
+	 service ${pgService} reload
 
 	printf "create database repository;\ncreate user ramadda;\nalter user ramadda with password '${postgresPassword}';\ngrant all privileges on database repository to ramadda;\n" > /tmp/postgres.sql
 	chmod 644 /tmp/postgres.sql
-	sudo su -c "psql -f /tmp/postgres.sql"  - postgres
+	 su -c "psql -f /tmp/postgres.sql"  - postgres
 	rm -f $dir/postgres.sql
         printf "ramadda.db=postgres\nramadda.db.postgres.user=ramadda\nramadda.db.postgres.password=${postgresPassword}"  > ${homedir}/db.properties
 fi

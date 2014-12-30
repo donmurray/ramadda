@@ -48,7 +48,7 @@ if [ "$tmp" != "" ]; then
     instanceType=$tmp
 fi
 
-read -p "Enter the volume size (GB) [${volumeSize}]: " tmp
+read -p "Enter the size (GB) of the storage volume. 0 for none. [${volumeSize}]: " tmp
 if [ "$tmp" != "" ]; then
     volumeSize=$tmp
 fi
@@ -76,7 +76,7 @@ fi
 
 
 
-readit "Security group to create [${securityGroup}|n]? " tmp "RAMADDA needs ports 22 (ssh), 80 (http) and 443 (https) defined in its security group"
+readit "Security group [${securityGroup}|n]? " tmp "RAMADDA needs ports 22 (ssh), 80 (http) and 443 (https) defined in its security group\nEnter 'n' if you have already created a ${securityGroup} security group"
 
 case $tmp in
     "n")
@@ -99,8 +99,13 @@ read -p "Do you want to create the instance with image: ${imageId} type: ${insta
 case $tmp in
     ""|"y")
         echo "Creating instance... ";
+        if [ ${volumeSize} == 0 ]; then
+            device="[]"
+        else
+            device="[{\"DeviceName\":\"/dev/xvdb\",\"Ebs\":{\"VolumeSize\":${volumeSize},\"DeleteOnTermination\":false}}]"
+        fi
 #Note - this device name should match the one in installer.sh
-        aws ec2 run-instances  --output text --image-id ${imageId} --count 1 --instance-type ${instanceType} --key-name ${keyPair} --security-groups ${securityGroup}  --block-device-mappings "[{\"DeviceName\":\"/dev/xvdb\",\"Ebs\":{\"VolumeSize\":${volumeSize},\"DeleteOnTermination\":false}}]" > runinstance.txt
+        aws ec2 run-instances  --output text --image-id ${imageId} --count 1 --instance-type ${instanceType} --key-name ${keyPair} --security-groups ${securityGroup}  --block-device-mappings $device > runinstance.txt
         ;;
     *)
         if [ ! -f runinstance.txt ]; then
@@ -142,7 +147,7 @@ if [ "$ipAddress" == "" ]; then
     exit
 fi
 
-printf "Your instance will be ready to access in minute or so:\nssh -i ${keyPair}.pem ec2-user@${ipAddress}\n\n"
+printf "Your instance will be ready to access in a minute or so:\nssh -i ${keyPair}.pem ec2-user@${ipAddress}\n\n"
 
 
 read -p  "Set instance name to: " tmp
@@ -168,11 +173,11 @@ while [ ! -f $pemFile ]; do
     fi
 done
 
-echo "We'll keep trying to do a 'ssh yum update' "
+echo "We'll keep trying to ssh to the instance and update the OS "
 while [ 1  ]; do
-    echo "ssh: sudo yum update"
-    ssh -i ${pemFile} -t  ec2-user@${ipAddress} "sudo yum update"
-    read -p "Did the yum update go OK? If not have patience [y|n]: " tmp
+    echo "ssh: sudo yum update -y"
+    ssh -i ${pemFile} -t  ec2-user@${ipAddress} "sudo yum update -y"
+    read -p "Did the yum update go OK? If not have patience, it takes a minute or two [y|n]: " tmp
     if [ "$tmp" == "y" ]; then
         break;
     fi
