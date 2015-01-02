@@ -137,36 +137,50 @@ mntDir=""
 declare -a dirLocations=("/dev/xvdb" )
 for i in "${dirLocations[@]}"
 do
-   if [ -b "$i" ]; then
-       askYesNo  "Do you want to mount the volume: $i [y|n]:"  "y"
-       if [ "$response" == "y" ]; then
-           mntDir="$i"
-           break;
-       fi
-   fi
+    if [ -b "$i" ]; then
+        askYesNo  "Do you want to mount the volume: $i "  "y"
+        if [ "$response" == "y" ]; then
+            mntDir="$i"
+            break;
+        fi
+    fi
 done
 
 
+##/dev/xvdb       /mnt/ramadda   ext4    defaults,nofail        0       2
 while [ "$mntDir" == "" ]; do
     ask  "Enter the volume to mount, e.g., /dev/xvdb  [<volume>|n] "  ""
     if [ "$response" == "" ] ||  [ "$response" == "n"  ]; then
         break;
     fi
-    if [ -f $response ]; then
+    if [ -b $response ]; then
         mntDir="$response"
         break;
     fi
-    echo "Directory does not exist: $response"
+    echo "Volume does not exist: $response"
 done
 
 if [ "$mntDir" != "" ]; then
     basedir=/mnt/ramadda
-    echo "Mounting $basedir on $mntDir"
-    sed -e 's/.*$basedir.*//g' /etc/fstab> dummy.fstab
-    mv dummy.fstab /etc/fstab
-    printf "\n#added by ramadda installer.sh\n${mntDir}   /$basedir ext4 defaults  0 0\n" >> /etc/fstab
-    mkfs -t ext4 $mntDir
-    mount $mntDir $basedir
+    mntState=$( file -s $mntDir );
+    case $mntState in
+	*files*)
+	    echo "$mntDir is already mounted";
+	    ;;
+	*)
+	    echo "Mounting $basedir on $mntDir"
+	    if [ ! -f /etc/fstab.bak ]; then
+		cp  /etc/fstab /etc/fstab.bak
+	    fi
+	    sed -e 's/.*$basedir.*//g' /etc/fstab | sed -e 's/.*added ramadda.*//g' > dummy.fstab
+	    mv dummy.fstab /etc/fstab
+	    printf "\n#added by ramadda installer.sh\n${mntDir}   $basedir ext4 defaults,nofail   0 2\n" >> /etc/fstab
+	    mkfs -t ext4 $mntDir
+	    mkdir $basedir
+	    mount $mntDir $basedir
+	    mount -a
+	    ;;
+    esac
 fi
 
 
@@ -183,7 +197,7 @@ if [ -d "/mnt/ramadda" ]; then
 fi
 
 while [ "$basedir" == "" ]; do
-    ask   "Enter base directory: [$dfltDir]:" $dfltDir  "The base directory holds the repository, pgsql, and data sub-directories"
+    ask   "Enter base directory: [$dfltDir]:" $dfltDir  "The base directory holds the repository and pgsql sub-directories"
     if [ "$response" == "" ]; then
         break;
     fi
@@ -192,17 +206,22 @@ while [ "$basedir" == "" ]; do
 done
 
 
-
 homedir=$basedir/repository
-datadir=$basedir/data
-
-
-
 mkdir -p $homedir
-mkdir -p $datadir
+
+
+parentDir=`dirname $basedir`
+permissions=$(stat -c %a $parentDir)
+if [ "$permissions" == "700" ]; then
+    chmod 755 "$parentDir"
+fi
 
 
 
+echo "Installing base packages - wget, unzip & java"
+yum install -y wget > /dev/null
+yum install -y unzip > /dev/null
+yum install -y java > /dev/null
 
 
 echo "Fixing the localhost name problem"
@@ -212,10 +231,6 @@ sed -e 's/127.0.0.1   localhost localhost.localdomain/127.0.0.1 ramadda.localdom
 mv dummy.hosts /etc/hosts
 
 
-echo "Installing base packages - wget, unzip & java"
-yum install -y wget > /dev/null
-yum install -y unzip > /dev/null
-yum install -y java > /dev/null
 
 
 
@@ -223,13 +238,13 @@ yum install -y java > /dev/null
 askYesNo  "Install postgres"  "y"
 if [ "$response" == "y" ]; then
 
-    yum install -y  ${pgInstall}
+    yum install -y  ${pgInstall} > /dev/null
     pgdir="${basedir}/${pgsql}"
 
     if [ "$os" == "${OS_REDHAT}" ]; then
-	 postgresql-setup initdb
+	postgresql-setup initdb
     else
-	 service ${pgService} initdb
+	service ${pgService} initdb
     fi
 
     if  [ -d ${postgresDir} ] ; then
@@ -246,11 +261,11 @@ if [ "$response" == "y" ]; then
 
 
     if [ "$os" == "${OS_REDHAT}" ]; then
-	 systemctl enable postgresql
-	 systemctl start postgresql.service
+	systemctl enable postgresql
+	systemctl start postgresql.service
     else
-	 chkconfig ${pgService} on
-	 service ${pgService} start
+	chkconfig ${pgService} on
+	service ${pgService} start
     fi
 
 
@@ -272,15 +287,16 @@ host    all             all             ::1/128                 ident
 "
 
 
-        printf "${postgresAuth}" > ${postgresDataDir}/pg_hba.conf
+    printf "${postgresAuth}" > ${postgresDataDir}/pg_hba.conf
 
-	 service ${pgService} reload
+    service ${pgService} reload
 
-	printf "create database repository;\ncreate user ramadda;\nalter user ramadda with password '${postgresPassword}';\ngrant all privileges on database repository to ramadda;\n" > /tmp/postgres.sql
-	chmod 644 /tmp/postgres.sql
-	 su -c "psql -f /tmp/postgres.sql"  - postgres
-	rm -f $dir/postgres.sql
-        printf "ramadda.db=postgres\nramadda.db.postgres.user=ramadda\nramadda.db.postgres.password=${postgresPassword}"  > ${homedir}/db.properties
+    printf "create database repository;\ncreate user ramadda;\nalter user ramadda with password '${postgresPassword}';\ngrant all privileges on database repository to ramadda;\n" > /tmp/postgres.sql
+    chmod 644 /tmp/postgres.sql
+    echo "Creating repository database and Adding ramadda user"
+    su -c "psql -f /tmp/postgres.sql"  - postgres > /dev/null
+    rm -f $dir/postgres.sql
+    printf "ramadda.db=postgres\nramadda.db.postgres.user=ramadda\nramadda.db.postgres.password=${postgresPassword}"  > ${homedir}/db.properties
 fi
 
 
@@ -290,7 +306,7 @@ script="#!/bin/sh
 echo 'stopping ${serviceName}';
 service ${serviceName} stop;
 rm -r -f ${dir}/ramaddaserver;
-unzip -d ${dir} -o ${dir}/ramaddaserver.zip
+unzip -d ${dir} -o ${dir}/ramaddaserver.zip >/dev/null
 printf \"$ramaddaConfig\" > ${dir}/ramaddaserver/ramaddaenv.sh
 echo 'starting ${serviceName}';
 service ${serviceName} start;
@@ -300,11 +316,11 @@ printf "$script"  > ${dir}/installRamadda.sh
 
 askYesNo "Download and install RAMADDA from SourceForge"  "y"
 if [ "$response" == "y" ]; then
-	rm -f ${dir}/ramaddaserver.zip
-	wget -O ${dir}/ramaddaserver.zip ${ramaddaDownload}
-	rm -r -f ${dir}/ramaddaserver
-	unzip -d ${dir} -o ${dir}/ramaddaserver.zip
-	printf "$ramaddaConfig" > ${dir}/ramaddaserver/ramaddaenv.sh
+    rm -f ${dir}/ramaddaserver.zip
+    wget -O ${dir}/ramaddaserver.zip ${ramaddaDownload}
+    rm -r -f ${dir}/ramaddaserver
+    unzip -d ${dir} -o ${dir}/ramaddaserver.zip
+    printf "$ramaddaConfig" > ${dir}/ramaddaserver/ramaddaenv.sh
 fi
 
 
@@ -321,10 +337,9 @@ fi
 
 askYesNo "Generate keystore and enable SSL" "y"
 if [ "$response" == "y" ]; then
-    password="ssl_${RANDOM}_${RANDOM}"
-    echo "OK, ignore the keystore output. We're using some default values"
+    password="ssl_${RANDOM}_${RANDOM}_${RANDOM}"
     rm -f ${homedir}/keystore
-    printf "${password}\n${password}\nname\nunit\norg\ncity\nstate\nusa\nyes\n\n" | keytool -genkey -keystore ${homedir}/keystore
+    printf "${password}\n${password}\nname\nunit\norg\ncity\nstate\nusa\nyes\n\n" | keytool -genkey -keystore ${homedir}/keystore > /dev/null
     printf "#generated password\n\nramadda.ssl.password=${password}\nramadda.ssl.keypassword=${password}\nramadda.ssl.port=443\n" > ${homedir}/ssl.properties
     printf "\n\n"
 fi

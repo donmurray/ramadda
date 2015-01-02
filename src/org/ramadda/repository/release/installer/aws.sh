@@ -85,10 +85,12 @@ case $tmp in
     if [ "$tmp" != "" ]; then
         securityGroup="$tmp"
     fi
-    aws ec2 create-security-group --group-name ${securityGroup} --description "RAMADDA security group"
-    aws ec2 authorize-security-group-ingress --group-name ${securityGroup}  --protocol tcp --port 22 --cidr 0.0.0.0/0
-    aws ec2 authorize-security-group-ingress --group-name ${securityGroup}  --protocol tcp --port 80 --cidr 0.0.0.0/0
-    aws ec2 authorize-security-group-ingress --group-name ${securityGroup}  --protocol tcp --port 443 --cidr 0.0.0.0/0
+    aws ec2 create-security-group --group-name ${securityGroup} --description "RAMADDA security group" > /dev/null 2> /dev/null
+    aws ec2 authorize-security-group-ingress --group-name ${securityGroup}  --protocol tcp --port 22 --cidr 0.0.0.0/0 > /dev/null 2> /dev/null
+    aws ec2 authorize-security-group-ingress --group-name ${securityGroup}  --protocol tcp --port 80 --cidr 0.0.0.0/0 > /dev/null 2> /dev/null
+    aws ec2 authorize-security-group-ingress --group-name ${securityGroup}  --protocol tcp --port 443 --cidr 0.0.0.0/0 > /dev/null 2> /dev/null
+    aws ec2 authorize-security-group-ingress --group-name ${securityGroup}  --protocol tcp --port 21 --cidr 0.0.0.0/0 > /dev/null 2> /dev/null
+    aws ec2 authorize-security-group-ingress --group-name ${securityGroup}  --protocol tcp --port 44001-44099 --cidr 0.0.0.0/0 > /dev/null 2> /dev/null
     ;;
 esac
 
