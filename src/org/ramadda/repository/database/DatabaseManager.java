@@ -1627,7 +1627,14 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                         size = 36000;
                     }
                 }
-                //                System.err.println ("col:" + colName +" " + typeName +" " + type);
+                if (typeName.equalsIgnoreCase("text")) {
+                    System.err.println ("col:" + colName +" " + typeName +" " + type+" " + size);
+                    if(size<=0) {
+                        size  = 36000;
+                    }
+                }
+
+
                 columns.add(new ColumnInfo(colName, typeName, type, size));
             }
 
