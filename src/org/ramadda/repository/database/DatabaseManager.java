@@ -1403,8 +1403,12 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                     sql.append("ramadda.double");
                 } else if (type == ColumnInfo.TYPE_BIGINT) {
                     sql.append("ramadda.bigint");
+                } else if (type == ColumnInfo.TYPE_SMALLINT) {
+                    sql.append("int");
                 } else if (type == ColumnInfo.TYPE_CLOB) {
                     sql.append(convertType("clob", column.getSize()));
+                } else {
+                    throw new IllegalStateException ("Unknown column type:" + type);
                 }
             }
             sql.append(");\n");

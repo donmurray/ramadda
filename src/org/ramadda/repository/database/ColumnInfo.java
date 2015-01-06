@@ -47,7 +47,6 @@ public class ColumnInfo {
     /** _more_ */
     public static final int TYPE_BIGINT = 6;
 
-
     /** _more_ */
     public static final int TYPE_SMALLINT = 7;
 
@@ -130,10 +129,10 @@ public class ColumnInfo {
             return TYPE_TINYINT;
         } else if (type == java.sql.Types.DECIMAL) {
             return TYPE_DOUBLE;
+        } else if (typeName.equalsIgnoreCase("text")) {
+            return TYPE_CLOB;
         } else {
-            System.out.println("Unknown:" + type + " " + typeName);
-
-            return type;
+            throw new IllegalArgumentException("Unknown database type:" + type + " " + typeName);
             //            throw new IllegalArgumentException("Unknown sqltype:" + type);
         }
     }
