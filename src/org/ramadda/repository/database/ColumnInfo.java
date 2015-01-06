@@ -89,7 +89,7 @@ public class ColumnInfo {
     }
 
     public String toString() {
-        return "Column: " + name;
+        return "Column: " + name + " " + type +" size:" + size +" " ;
     }
 
     /**

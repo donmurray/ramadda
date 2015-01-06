@@ -1620,22 +1620,28 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                     if (typeName.toLowerCase().equals("mediumtext")) {
                         type = java.sql.Types.CLOB;
                         //Just come up with some size
-                        size = 36000;
+
+                        if(size<=0) {
+                            size = 36000;
+                        }
                     } else if (typeName.toLowerCase().equals("longtext")) {
                         type = java.sql.Types.CLOB;
                         //Just come up with some size
-                        size = 36000;
+                        if(size<=0) {
+                            size = 36000;
+                        }
                     }
                 }
                 if (typeName.equalsIgnoreCase("text")) {
-                    System.err.println ("col:" + colName +" " + typeName +" " + type+" " + size);
                     if(size<=0) {
                         size  = 36000;
                     }
                 }
 
-
                 columns.add(new ColumnInfo(colName, typeName, type, size));
+                if(tn.indexOf("wiki")>=0) {
+                    System.err.println ("COLS:" + columns);
+                }
             }
 
             tableInfos.add(new TableInfo(tn, indexList, columns));
