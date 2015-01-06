@@ -49,13 +49,13 @@ public class ColumnInfo {
 
 
     /** _more_ */
-    public static final int TYPE_SMALLINT = 6;
+    public static final int TYPE_SMALLINT = 7;
 
     /** _more_ */
-    public static final int TYPE_TINYINT = 7;
+    public static final int TYPE_TINYINT = 8;
 
     /** _more_ */
-    public static final int TYPE_TIME = 8;
+    public static final int TYPE_TIME = 9;
 
     /** _more_ */
     private String name;
@@ -87,6 +87,10 @@ public class ColumnInfo {
         this.typeName = typeName;
         this.type     = convertType(type);
         this.size     = size;
+    }
+
+    public String toString() {
+        return "Column: " + name;
     }
 
     /**

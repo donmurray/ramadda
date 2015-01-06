@@ -1416,11 +1416,13 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         }
 
 
+
         //        System.err.println(drop);
         //        System.err.println(sql);
-        loadSql(drop.toString(), true, false);
+        
+        //TODO: 
+        //        loadSql(drop.toString(), true, false);
         loadSql(convertSql(sql.toString()), false, true);
-
 
         TableInfo  tableInfo  = null;
         int        rows       = 0;
@@ -1459,6 +1461,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                     System.err.println("rows:" + rows);
                 }
 
+
+
                 Object[] values = new Object[tableInfo.getColumns().size()];
                 int      colCnt = 0;
                 for (ColumnInfo columnInfo : tableInfo.getColumns()) {
@@ -1474,6 +1478,12 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                         values[colCnt++] = new Double(dis.readDouble());
                     } else if (type == ColumnInfo.TYPE_CLOB) {
                         values[colCnt++] = readString(dis);
+                    } else if (type == ColumnInfo.TYPE_BIGINT) {
+                        long v = dis.readLong();
+                        values[colCnt++] = new Long(v);
+                    } else if (type == ColumnInfo.TYPE_SMALLINT) {
+                        short v = dis.readShort();
+                        values[colCnt++] = new Short(v);
                     } else {
                         throw new IllegalArgumentException(
                             "Unknown type for table" + tableInfo.getName()
@@ -1540,15 +1550,33 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             //                System.err.println (rsmd.getColumnName(col));
         }
         List<TableInfo> tableInfos = new ArrayList<TableInfo>();
+        HashSet<String> seen = new HashSet<String>();
+
+
+
         while (tables.next()) {
             String  tableName = tables.getString("TABLE_NAME");
             String  tn        = tableName.toLowerCase();
+
+            if(tn.equals("participant")) {
+                //a hack due to some old bad derby db I have
+                continue;
+            }
+
+
+            //Just in case
+            if(seen.contains(tn))  {
+                System.err.println ("Warning: duplicate table:" + tableName);
+                continue;
+            } 
+            seen.add(tn);
+
+
             boolean ok        = true;
             for (TypeHandler typeHandler :
                     getRepository().getTypeHandlers()) {
                 if ( !typeHandler.shouldExportTable(tn)) {
                     ok = false;
-
                     break;
                 }
             }
@@ -1574,24 +1602,11 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
 
             }
 
-            if ( !all) {
-                if (tn.equals(Tables.GLOBALS.NAME)
-                        || tn.equals(Tables.USERS.NAME)
-                        || tn.equals(Tables.PERMISSIONS.NAME)
-                        || tn.equals(Tables.HARVESTERS.NAME)
-                        || tn.equals(Tables.USERROLES.NAME)) {
-                    continue;
-                }
-            }
+
 
             ResultSet cols = dbmd.getColumns(null, null, tableName, null);
             rsmd = cols.getMetaData();
-            for (int col = 1; col <= rsmd.getColumnCount(); col++) {
-                //                    System.err.println ("\t" +rsmd.getColumnName(col));
-            }
-
             List<ColumnInfo> columns = new ArrayList<ColumnInfo>();
-            //                System.err.println(tn);
             while (cols.next()) {
                 String colName  = cols.getString("COLUMN_NAME");
                 int    type     = cols.getInt("DATA_TYPE");
@@ -1611,6 +1626,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                 //                System.err.println ("col:" + colName +" " + typeName +" " + type);
                 columns.add(new ColumnInfo(colName, typeName, type, size));
             }
+
             tableInfos.add(new TableInfo(tn, indexList, columns));
         }
 
@@ -1636,14 +1652,17 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         DataOutputStream dos        = new DataOutputStream(os);
         Connection       connection = getConnection();
         try {
+            HashSet<String> skip = new HashSet<String>();
+            skip.add(Tables.SESSIONS.NAME);
+
             List<TableInfo> tableInfos = getTableInfos(connection, false);
             String          xml        = encoder.toXml(tableInfos, false);
             writeString(dos, xml);
 
+
             int rowCnt = 0;
             System.err.println("Exporting database");
             for (TableInfo tableInfo : tableInfos) {
-                //Hummm
                 if (tableInfo.getName().equalsIgnoreCase("base")) {
                     continue;
                 }
@@ -1662,6 +1681,9 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                 ResultSet        results;
                 dos.writeInt(DUMPTAG_TABLE);
                 writeString(dos, tableInfo.getName());
+                if(skip.contains(tableInfo.getName().toLowerCase())) {
+                    continue;
+                }
                 while ((results = iter.getNext()) != null) {
                     dos.writeInt(DUMPTAG_ROW);
                     rowCnt++;

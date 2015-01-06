@@ -946,6 +946,7 @@ public class Admin extends RepositoryManager {
      */
     private void dumpDatabase(Object actionId) throws Exception {
         amDumpingDb = true;
+        String msg = "";
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy_MM_dd_HH_mm");
             File tmp = new File(getStorageManager().getBackupsDir() + "/"
@@ -957,6 +958,7 @@ public class Admin extends RepositoryManager {
             IOUtil.close(bos);
             IOUtil.close(fos);
 
+            msg  = "Database has been exported to: " + tmp;
             StringBuffer sb = new StringBuffer(
                                   getPageHandler().showDialogNote(
                                       "Database has been exported to:<br>"
@@ -964,7 +966,8 @@ public class Admin extends RepositoryManager {
             //            return makeResult(request, msg("Database export"), sb);
         } finally {
             if (actionId != null) {
-                getActionManager().actionComplete(actionId);
+                    getActionManager().setContinueHtml(actionId,
+                                                       msg);
             }
             amDumpingDb = false;
         }
