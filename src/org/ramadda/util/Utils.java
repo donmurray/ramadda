@@ -142,6 +142,11 @@ public class Utils {
             String columnDelimiter) {
         List<String> toks      = new ArrayList<String>();
         StrTokenizer tokenizer = StrTokenizer.getCSVInstance(line);
+        //        StrTokenizer tokenizer = new StrTokenizer(line, columnDelimiter);
+        if(!columnDelimiter.equals(",")) {
+            tokenizer.setDelimiterChar(columnDelimiter.charAt(0));
+        }
+        //        tokenizer.setQuoteChar('"');
         while (tokenizer.hasNext()) {
             toks.add(tokenizer.nextToken());
         }
