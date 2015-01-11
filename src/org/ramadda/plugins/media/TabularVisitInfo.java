@@ -29,6 +29,7 @@ import ucar.unidata.util.StringUtil;
 import java.util.ArrayList;
 
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 
 
@@ -69,6 +70,7 @@ public class TabularVisitInfo {
             searchTextWithPattern = "(?i:.*" + searchText + ".*)";
         }
 
+
         if (TabularTypeHandler.isTabular(entry)) {
             searchFields = new ArrayList<TabularSearchField>();
             for (String line :
@@ -76,7 +78,20 @@ public class TabularVisitInfo {
                         entry.getValue(
                             TabularTypeHandler.IDX_SEARCHINFO, ""), "\n",
                                 true, true)) {
+
+                String label = null;
+                List<String> toks = StringUtil.splitUpTo(line, " ", 2);
+                if(toks.size()>1) {
+                    line = toks.get(0);
+                    Hashtable props = StringUtil.parseHtmlProperties(toks.get(1));
+                    label = (String) props.get("label");
+                }
+
+
                 TabularSearchField sf = new TabularSearchField(line);
+                if(label!=null) {
+                    sf.setLabel(label);
+                }
                 sf.setValue(request.getString(sf.getUrlArg(), (String) null));
                 searchFields.add(sf);
             }

@@ -38,6 +38,7 @@ import org.ramadda.repository.*;
 import org.ramadda.repository.auth.*;
 import org.ramadda.repository.output.*;
 import org.ramadda.util.GoogleChart;
+import org.ramadda.util.CsvUtil;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Json;
 import org.ramadda.util.Utils;
@@ -387,16 +388,70 @@ public class TabularOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public void visitCsv(Request request, Entry entry,
-                         InputStream inputStream, TabularVisitInfo visitInfo,
+                         InputStream inputStream, final TabularVisitInfo visitInfo,
                          TabularVisitor visitor)
             throws Exception {
         BufferedReader br =
             new BufferedReader(new InputStreamReader(inputStream));
         String             line;
         int                rowIdx   = 0;
-        List<List<Object>> rows     = new ArrayList<List<Object>>();
-        int                skipRows = visitInfo.getSkipRows();
-        int                maxRows  = visitInfo.getMaxRows();
+        final List<List<Object>> rows     = new ArrayList<List<Object>>();
+
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        CsvUtil.ProcessInfo info  = new CsvUtil.ProcessInfo(new BufferedInputStream(inputStream), 
+                                                            bos);
+
+        info.setSkip(visitInfo.getSkipRows());
+        info.setMaxRows(visitInfo.getMaxRows());
+        CsvUtil.Processor processor = new CsvUtil.Processor() {
+                public void processRow(CsvUtil.ProcessInfo info, List<String> toks) {
+                    List obj = new ArrayList();
+                    obj.addAll(toks);
+                    rows.add((List<Object>)obj);
+                }
+            };
+        CsvUtil.FilterGroup filterGroup = new CsvUtil.FilterGroup();
+
+
+        filterGroup.addFilter(new CsvUtil.Filter() {
+                public boolean rowOk(CsvUtil.ProcessInfo info, List<String> toks) {
+                    return visitInfo.rowOk(toks);
+                }
+            });
+
+        if (visitInfo.getSearchFields() != null) {
+            for (TabularSearchField searchField :
+                    visitInfo.getSearchFields()) {
+                String id= "table." + searchField.getName();
+                if(request.defined(id)) {
+                    //Columns are 1 based to the user
+                    if(searchField.getName().startsWith("column")) {
+                        int column = Integer.parseInt(searchField.getName().substring("column".length()).trim())-1;
+                        String s = request.getString(id,"");
+                        s = s.trim();
+                        System.err.println ("column:" + column +" s:" + s);
+                        String operator = StringUtil.findPattern(s, "^([<>=]+).*");
+                        if(operator !=null) {
+                            System.err.println ("operator:" + operator);
+                            s  = s.replace(operator,"").trim();
+                            double value = Double.parseDouble(s);
+                            int op = CsvUtil.ValueFilter.getOperator(operator);
+                            filterGroup.addFilter(new CsvUtil.ValueFilter(column, op,value));
+                            continue;
+                        }
+                        //                        if(s.
+                        filterGroup.addFilter(new CsvUtil.PatternFilter(column, request.getString(id,"")));
+
+                    }
+                }
+
+            }
+        }
+
+
+        CsvUtil.process(info, filterGroup, null, processor);
+
+        /*
         while ((line = br.readLine()) != null) {
             if (line.startsWith("#")) {
                 continue;
@@ -414,6 +469,8 @@ public class TabularOutputHandler extends OutputHandler {
             }
             rows.add((List<Object>) cols);
         }
+        */
+
 
 
 
@@ -658,19 +715,26 @@ public class TabularOutputHandler extends OutputHandler {
 
         TabularVisitInfo visitInfo = new TabularVisitInfo(request, entry);
 
-        //        System.err.println("search fields:" + visitInfo.getSearchFields());
+        System.err.println("search fields:" + visitInfo.getSearchFields());
 
         if (visitInfo.getSearchFields() != null) {
             propsList.add("searchFields");
             List<String> names = new ArrayList<String>();
             for (TabularSearchField searchField :
                     visitInfo.getSearchFields()) {
-                names.add(searchField.getName());
+                
+                List<String> props = new ArrayList<String>();
+                props.add("name");
+                props.add(Json.quote(searchField.getName()));
+                props.add("label");
+                props.add(Json.quote(searchField.getLabel()));
+                names.add(Json.map(props));
             }
-            propsList.add(Json.list(names, true));
+            propsList.add(Json.list(names));
         }
 
         String        props = Json.map(propsList);
+        System.err.println (props);
 
         StringBuilder sb    = new StringBuilder();
         getRepository().getWikiManager().addDisplayImports(request, sb);
