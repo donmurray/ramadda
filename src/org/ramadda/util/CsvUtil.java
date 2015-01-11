@@ -30,6 +30,7 @@ import java.io.*;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -45,16 +46,26 @@ import java.util.regex.*;
 public class CsvUtil {
 
 
-    /** _more_          */
-    static String theLine;
+    /** a hack for debugging  */
+    private static String theLine;
+
 
     /**
-     * _more_
+     * Merge each row in the given files out. e.g., if file1 has
+     *  1,2,3
+     *  4,5,6
+     * and file2 has
+     * 8,9,10
+     * 11,12,13
+     * the result would be
+     * 1,2,3,8,9,10
+     * 4,5,6,11,12,13
+     * Gotta figure out how to handle different numbers of rows
      *
-     * @param files _more_
-     * @param out _more_
+     * @param files files
+     * @param out output
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public static void merge(List<String> files, OutputStream out)
             throws Exception {
@@ -92,27 +103,18 @@ public class CsvUtil {
 
 
     /**
-     * _more_
+     * Run through the csv file in the ProcessInfo
      *
-     * @param input _more_
-     * @param out _more_
-     * @param filter _more_
-     * @param converter _more_
-     * @param processor _more_
-     * @param skip _more_
+     * @param info Holds input, output, skip, delimiter, etc
+     * @param filter determines whether to process a row
+     * @param converter Convert the columns
+     * @param processor Process the columns
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
-    public static void process(InputStream input, OutputStream out,
-                               Filter filter, Converter converter,
-                               Processor processor, int skip)
+    public static void process(ProcessInfo info, Filter filter,
+                               Converter converter, Processor processor)
             throws Exception {
-
-        input = new BufferedInputStream(input);
-
-        String delimiter = null;
-        //        BufferedReader br =      new BufferedReader(new InputStreamReader(input));
-        PrintWriter   writer = new PrintWriter(out);
         String        line;
         int           rowIdx = 0;
 
@@ -120,8 +122,8 @@ public class CsvUtil {
         int           c;
 
         boolean       inQuote = false;
-        while ((c = input.read()) != -1) {
-            //(line = br.readLine()) != null) {
+        int visitedRows = 0;
+        while ((c = info.getInput().read()) != -1) {
             if (c != '\n') {
                 if (c == '"') {
                     inQuote = !inQuote;
@@ -139,50 +141,57 @@ public class CsvUtil {
             lb      = new StringBuilder();
             theLine = line;
             rowIdx++;
-            if (rowIdx <= skip) {
+            if (rowIdx <= info.getSkip()) {
                 if (processor == null) {
-                    //                    writer.println(line);
+                    //TODO: What to do with header lines
+                    //                    info.getWriter().println(line);
                 }
-
                 continue;
             }
 
-            if (line.startsWith("#")) {
-                //                writer.println(line);
+            if ((filter != null) && !filter.lineOk(info, line)) {
                 continue;
             }
 
-            if (delimiter == null) {
-                delimiter = ",";
+
+            if (info.getDelimiter() == null) {
+                String delimiter = ",";
+                //Check for the bad separator
                 int i1 = line.indexOf(",");
                 int i2 = line.indexOf("|");
                 if ((i2 >= 0) && ((i1 < 0) || (i2 < i1))) {
                     delimiter = "|";
                 }
+                info.setDelimiter(delimiter);
             }
 
+            List<String> cols = Utils.tokenizeColumns(line,
+                                    info.getDelimiter());
 
-            List<String> cols = Utils.tokenizeColumns(line, delimiter);
-
-            if ((filter != null) && !filter.ok(cols)) {
+            if ((filter != null) && !filter.rowOk(info, cols)) {
                 continue;
             }
 
+
+            visitedRows++;
+            if(info.getMaxRows()>=0 && visitedRows>info.getMaxRows()) {
+                break;
+            }
 
             if (converter != null) {
                 cols = converter.convert(cols);
             }
 
             if (processor != null) {
-                processor.process(cols);
+                processor.processRow(info, cols);
             } else {
-                writer.println(StringUtil.join(",", cols));
-                writer.flush();
+                info.getWriter().println(StringUtil.join(",", cols));
+                info.getWriter().flush();
             }
         }
 
         if (processor != null) {
-            processor.finish(writer);
+            processor.finish(info);
         }
 
     }
@@ -193,16 +202,17 @@ public class CsvUtil {
      *
      * @param args _more_
      *
-     * @throws Exception _more_
+     * @throws Exception On badness
      */
     public static void main(String[] args) throws Exception {
-        boolean       doMerge = false;
+        boolean        doMerge   = false;
 
 
-        List<String>  files   = new ArrayList<String>();
-        List<Integer> cols    = null;
-        Summer        summer  = null;
-        FilterGroup   filter  = new FilterGroup();
+        List<String>   files     = new ArrayList<String>();
+        List<Integer>  cols      = null;
+        ProcessorGroup processor = new ProcessorGroup();
+        FilterGroup    filter    = new FilterGroup();
+        String format = null;
 
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
@@ -212,13 +222,40 @@ public class CsvUtil {
                 continue;
             }
 
+            if (arg.equals("-format")) {
+                format = args[++i];
+                continue;
+            }
 
-
-            if (arg.equals("-sum")) {
-                summer = new Summer();
+            if (arg.equals("-header")) {
+                i++;
+                System.out.println(args[i]);
 
                 continue;
             }
+
+
+            if (arg.equals("-sum")) {
+                processor.addProcessor(new Operator(Operator.OP_SUM));
+                continue;
+            }
+
+            if (arg.equals("-max")) {
+                processor.addProcessor(new Operator(Operator.OP_MAX));
+                continue;
+            }
+
+            if (arg.equals("-min")) {
+                processor.addProcessor(new Operator(Operator.OP_MIN));
+                continue;
+            }
+
+            if (arg.equals("-average")) {
+                processor.addProcessor(new Operator(Operator.OP_AVERAGE));
+                continue;
+            }
+
+
             if (arg.equals("-columns")) {
                 i++;
                 cols = new ArrayList<Integer>();
@@ -233,7 +270,26 @@ public class CsvUtil {
                 int    col     = new Integer(args[++i]);
                 String pattern = args[++i];
                 filter.addFilter(new PatternFilter(col, pattern));
+                continue;
+            }
 
+
+            if (arg.equals("-lt")) {
+                int    col     = new Integer(args[++i]);
+                filter.addFilter(new ValueFilter(col, ValueFilter.OP_LT,Double.parseDouble(args[++i])));
+                continue;
+            }
+
+            if (arg.equals("-gt")) {
+                int    col     = new Integer(args[++i]);
+                filter.addFilter(new ValueFilter(col, ValueFilter.OP_GT,Double.parseDouble(args[++i])));
+                continue;
+            }
+
+
+            if (arg.equals("-defined")) {
+                int    col     = new Integer(args[++i]);
+                filter.addFilter(new ValueFilter(col, ValueFilter.OP_DEFINED, 0));
                 continue;
             }
             files.add(arg);
@@ -242,11 +298,16 @@ public class CsvUtil {
             merge(files, System.out);
         } else {
             for (String file : files) {
-                if (summer != null) {
-                    summer.reset();
+                processor.reset();
+                ProcessInfo info = new ProcessInfo(
+                                       new BufferedInputStream(
+                                           new FileInputStream(
+                                               file)), System.out);
+                info.setSkip(1);
+                if(format!=null) {
+                    info.setFormat(format);
                 }
-                process(new FileInputStream(file), System.out, filter,
-                        new ColumnSelector(cols), summer, 1);
+                process(info, filter, new ColumnSelector(cols), processor);
             }
         }
     }
@@ -257,7 +318,7 @@ public class CsvUtil {
      *
      *
      * @version        $version$, Fri, Jan 9, '15
-     * @author         Enter your name here...    
+     * @author         Jeff McWhirter
      */
     public abstract static class Converter {
 
@@ -276,11 +337,11 @@ public class CsvUtil {
      *
      *
      * @version        $version$, Fri, Jan 9, '15
-     * @author         Enter your name here...    
+     * @author         Jeff McWhirter
      */
     public static class ColumnSelector extends Converter {
 
-        /** _more_          */
+        /** _more_ */
         List<Integer> indices;
 
         /**
@@ -325,25 +386,27 @@ public class CsvUtil {
      *
      *
      * @version        $version$, Fri, Jan 9, '15
-     * @author         Enter your name here...    
+     * @author         Jeff McWhirter
      */
     public static abstract class Processor {
 
         /**
          * _more_
          *
+         *
+         * @param info _more_
          * @param toks _more_
          */
-        public abstract void process(List<String> toks);
+        public void processRow(ProcessInfo info, List<String> toks) {}
 
         /**
          * _more_
          *
-         * @param writer _more_
+         * @param info _more_
          *
-         * @throws Exception _more_
+         * @throws Exception On badness
          */
-        public abstract void finish(PrintWriter writer) throws Exception;
+        public void finish(ProcessInfo info) throws Exception {}
 
         /**
          * _more_
@@ -355,46 +418,168 @@ public class CsvUtil {
      * Class description
      *
      *
-     * @version        $version$, Fri, Jan 9, '15
-     * @author         Enter your name here...    
+     * @version        $version$, Sat, Jan 10, '15
+     * @author         Jeff McWhirter
      */
-    public static class Summer extends Processor {
+    public static class ProcessorGroup extends Processor {
 
-        /** _more_          */
-        List<Double> values;
+        /** _more_ */
+        private List<Processor> processors = new ArrayList<Processor>();
 
         /**
          * _more_
          */
-        public Summer() {}
+        public ProcessorGroup() {}
+
+        /**
+         * _more_
+         *
+         * @param processor _more_
+         */
+        public void addProcessor(Processor processor) {
+            processors.add(processor);
+        }
+
+
+        /**
+         * _more_
+         */
+        public void reset() {
+            for (Processor processor : processors) {
+                processor.reset();
+            }
+        }
+
+        /**
+         * _more_
+         *
+         * @param info _more_
+         * @param columns _more_
+         */
+@Override
+        public void processRow(ProcessInfo info, List<String> columns) {
+            if (processors.size() == 0) {
+                info.getWriter().println(StringUtil.join(",", columns));
+                info.getWriter().flush();
+            }
+            for (Processor processor : processors) {
+                processor.processRow(info, columns);
+            }
+        }
+
+        /**
+         * _more_
+         *
+         * @param info _more_
+         *
+         * @throws Exception On badness
+         */
+@Override
+        public void finish(ProcessInfo info) throws Exception {
+            for (int i=0;i<processors.size();i++) {
+                Processor processor =  processors.get(i);
+                if(i>0)
+                    info.getWriter().print(",");
+                processor.finish(info);
+            }
+            info.getWriter().print("\n");
+            info.getWriter().flush();
+        }
+    }
+
+
+
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Fri, Jan 9, '15
+     * @author         Jeff McWhirter
+     */
+    public static class Operator extends Processor {
+
+        /** _more_ */
+        public static final int OP_SUM = 0;
+
+        public static final int OP_MIN = 1;
+
+        public static final int OP_MAX = 2;
+
+        /** _more_ */
+        public static final int OP_AVERAGE = 3;
+
+
+        /** _more_ */
+        private int op = OP_SUM;
+
+        /** _more_ */
+        private List<Double> values;
+
+        /** _more_ */
+        private List<Integer> counts;
+
+        /**
+         * _more_
+         */
+        public Operator() {}
+
+        /**
+         * _more_
+         *
+         * @param op _more_
+         */
+        public Operator(int op) {
+            this.op = op;
+        }
 
         /**
          * _more_
          */
         public void reset() {
             values = null;
+            counts = null;
         }
 
         /**
          * _more_
          *
+         *
+         * @param info _more_
          * @param toks _more_
          */
-        public void process(List<String> toks) {
+@Override
+        public void processRow(ProcessInfo info, List<String> toks) {
+            boolean first = false;
             if (values == null) {
                 values = new ArrayList<Double>();
+                counts = new ArrayList<Integer>();
+                first = true;
             }
             for (int i = 0; i < toks.size(); i++) {
                 if (i >= values.size()) {
                     values.add(new Double(0));
+                    counts.add(new Integer(0));
                 }
                 try {
-                    String s     = toks.get(i).trim();
-                    double value = (s.length() == 0)
-                                   ? 0
-                                   : new Double(s).doubleValue();
-                    double sum   = values.get(i).doubleValue() + value;
-                    values.set(i, sum);
+                    String s            = toks.get(i).trim();
+                    double value        = (s.length() == 0)
+                                          ? 0
+                                          : new Double(s).doubleValue();
+                    double currentValue = values.get(i).doubleValue();
+                    double newValue     = 0;
+                    if (op == OP_SUM) {
+                        newValue = currentValue + value;
+                    } else if (op == OP_MIN) {
+                        newValue = first? value:Math.min(value,currentValue);
+                    } else if (op == OP_MAX) {
+                        newValue = first? value:Math.max(value,currentValue);
+                    } else if (op == OP_AVERAGE) {
+                        newValue = currentValue + value;
+                    } else {
+                        System.err.println("NA:" + op);
+                    }
+                    values.set(i, newValue);
+                    counts.set(i, new Integer(counts.get(i).intValue() + 1));
                 } catch (Exception exc) {
                     //                    System.err.println("err:" + exc);
                     //                    System.err.println("line:" + theLine);
@@ -405,21 +590,31 @@ public class CsvUtil {
         /**
          * _more_
          *
-         * @param writer _more_
+         * @param info _more_
          *
-         * @throws Exception _more_
+         * @throws Exception On badness
          */
-        public void finish(PrintWriter writer) throws Exception {
+@Override
+        public void finish(ProcessInfo info) throws Exception {
             if (values == null) {
-                writer.println("no values");
+                info.getWriter().print("-0");
+                //                System.err.println("no values");
             } else {
-                writer.println(StringUtil.join(",", values));
+                for (int i = 0; i < values.size(); i++) {
+                    double value = values.get(i);
+                    if (op == OP_AVERAGE) {
+                        value = value / counts.get(i);
+                    }
+                    if (i > 0) {
+                        info.getWriter().print(",");
+                    }
+                    info.getWriter().print(info.formatValue(value));
+                }
             }
-            writer.flush();
+            info.getWriter().flush();
         }
 
     }
-
 
 
     /**
@@ -427,9 +622,13 @@ public class CsvUtil {
      *
      *
      * @version        $version$, Fri, Jan 9, '15
-     * @author         Enter your name here...    
+     * @author         Jeff McWhirter
      */
     public abstract static class Filter {
+
+        /** _more_ */
+        private String commentPrefix = "#";
+
 
         /**
          * _more_
@@ -439,11 +638,31 @@ public class CsvUtil {
         /**
          * _more_
          *
+         *
+         * @param info _more_
          * @param toks _more_
          *
          * @return _more_
          */
-        public abstract boolean ok(List<String> toks);
+        public boolean rowOk(ProcessInfo info, List<String> toks) {
+            return true;
+        }
+
+        /**
+         * _more_
+         *
+         * @param info _more_
+         * @param line _more_
+         *
+         * @return _more_
+         */
+        public boolean lineOk(ProcessInfo info, String line) {
+            if ((commentPrefix != null) && line.startsWith(commentPrefix)) {
+                return false;
+            }
+
+            return true;
+        }
 
     }
 
@@ -452,11 +671,11 @@ public class CsvUtil {
      *
      *
      * @version        $version$, Fri, Jan 9, '15
-     * @author         Enter your name here...    
+     * @author         Jeff McWhirter
      */
     public abstract static class ColumnFilter extends Filter {
 
-        /** _more_          */
+        /** _more_ */
         int col;
 
         /**
@@ -474,11 +693,11 @@ public class CsvUtil {
      *
      *
      * @version        $version$, Fri, Jan 9, '15
-     * @author         Enter your name here...    
+     * @author         Jeff McWhirter
      */
     public static class FilterGroup extends Filter {
 
-        /** _more_          */
+        /** _more_ */
         List<Filter> filters = new ArrayList<Filter>();
 
         /**
@@ -498,16 +717,19 @@ public class CsvUtil {
         /**
          * _more_
          *
+         *
+         * @param info _more_
          * @param toks _more_
          *
          * @return _more_
          */
-        public boolean ok(List<String> toks) {
+        @Override
+        public boolean rowOk(ProcessInfo info, List<String> toks) {
             if (filters.size() == 0) {
                 return true;
             }
             for (Filter filter : filters) {
-                if ( !filter.ok(toks)) {
+                if ( !filter.rowOk(info, toks)) {
                     //                    System.err.println ("filter not OK");
                     return false;
                 }
@@ -526,11 +748,11 @@ public class CsvUtil {
      *
      *
      * @version        $version$, Fri, Jan 9, '15
-     * @author         Enter your name here...    
+     * @author         Jeff McWhirter
      */
     public static class PatternFilter extends ColumnFilter {
 
-        /** _more_          */
+        /** _more_ */
         Pattern pattern;
 
         /**
@@ -547,11 +769,13 @@ public class CsvUtil {
         /**
          * _more_
          *
+         *
+         * @param info _more_
          * @param toks _more_
          *
          * @return _more_
          */
-        public boolean ok(List<String> toks) {
+        public boolean rowOk(ProcessInfo info, List<String> toks) {
             if (col >= toks.size()) {
                 return false;
             }
@@ -564,6 +788,267 @@ public class CsvUtil {
         }
 
     }
+
+
+    public static class ValueFilter extends ColumnFilter {
+
+        
+        public static int OP_LT = 0;
+        public static int OP_LE = 1;
+        public static int OP_GT = 2;
+        public static int OP_GE = 3;
+        public static int OP_EQUALS = 4;
+        public static int OP_DEFINED = 5;
+
+        private int op;
+
+        private double value;
+
+        /**
+         * _more_
+         *
+         * @param col _more_
+         * @param pattern _more_
+         */
+        public ValueFilter(int col, int op, double value) {
+            super(col);
+            this.op = op;
+            this.value = value;
+        }
+
+        public static int getOperator(String s) {
+            if(s.equals("<")) return OP_LT;
+            if(s.equals("<=")) return OP_LE;
+            if(s.equals(">")) return OP_GT;
+            if(s.equals(">=")) return OP_GE;
+            if(s.equals("=")) return OP_EQUALS;
+            return -1;
+        }
+
+
+        /**
+         * _more_
+         *
+         *
+         * @param info _more_
+         * @param toks _more_
+         *
+         * @return _more_
+         */
+        public boolean rowOk(ProcessInfo info, List<String> toks) {
+            if (col >= toks.size()) {
+                return false;
+            }
+            try {
+                String v = toks.get(col);
+                double value = Double.parseDouble(v);
+                if(op == OP_LT)
+                    return value < this.value;
+                if(op == OP_LE)
+                    return value <= this.value;
+                if(op == OP_GT)
+                    return value > this.value;
+                if(op == OP_GE)
+                    return value >= this.value;
+                if(op == OP_EQUALS)
+                    return value == this.value;
+                if(op == OP_DEFINED)
+                    return value == value;
+                return false;
+            } catch(Exception exc) {
+            }
+            return false;
+
+        }
+
+    }
+
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Sat, Jan 10, '15
+     * @author         Jeff McWhirter
+     */
+    public static class ProcessInfo {
+
+        /** _more_ */
+        private PrintWriter writer;
+
+        /** _more_ */
+        private InputStream input;
+
+        /** _more_ */
+        private OutputStream output;
+
+        /** _more_ */
+        private String delimiter = null;
+
+        /** _more_ */
+        private int skip = 0;
+
+        private int maxRows = -1;
+
+        private DecimalFormat format;
+
+        /**
+         * _more_
+         *
+         * @param input _more_
+         * @param output _more_
+         */
+        public ProcessInfo(InputStream input, OutputStream output) {
+            this(input, output, null);
+        }
+
+        /**
+         * _more_
+         *
+         * @param input _more_
+         * @param output _more_
+         * @param delimiter _more_
+         */
+        public ProcessInfo(InputStream input, OutputStream output,
+                           String delimiter) {
+            this.input     = input;
+            this.output    = output;
+            this.writer    = new PrintWriter(this.output);
+            this.delimiter = delimiter;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public PrintWriter getWriter() {
+            return writer;
+        }
+
+
+        public String formatValue(double value) {
+            if(format!=null)  return format.format(value);
+            return ""+value;
+        }
+
+
+        /**
+Set the Format property.
+
+@param value The new value for Format
+**/
+public void setFormat (String value) {
+    if(value == null)
+        format  =null;
+    else
+        format  = new DecimalFormat(value);
+}
+
+
+
+
+        /**
+         * Set the Input property.
+         *
+         * @param value The new value for Input
+         */
+        public void setInput(InputStream value) {
+            input = value;
+        }
+
+        /**
+         * Get the Input property.
+         *
+         * @return The Input
+         */
+        public InputStream getInput() {
+            return input;
+        }
+
+        /**
+         * Set the Output property.
+         *
+         * @param value The new value for Output
+         */
+        public void setOutput(OutputStream value) {
+            output = value;
+        }
+
+        /**
+         * Get the Output property.
+         *
+         * @return The Output
+         */
+        public OutputStream getOutput() {
+            return output;
+        }
+
+
+
+/**
+Set the MaxRows property.
+
+@param value The new value for MaxRows
+**/
+public void setMaxRows (int value) {
+	maxRows = value;
+}
+
+/**
+Get the MaxRows property.
+
+@return The MaxRows
+**/
+public int getMaxRows () {
+	return maxRows;
+}
+
+
+
+
+        /**
+         * Set the Skip property.
+         *
+         * @param value The new value for Skip
+         */
+        public void setSkip(int value) {
+            skip = value;
+        }
+
+        /**
+         * Get the Skip property.
+         *
+         * @return The Skip
+         */
+        public int getSkip() {
+            return skip;
+        }
+
+
+
+        /**
+         * Set the Delimiter property.
+         *
+         * @param value The new value for Delimiter
+         */
+        public void setDelimiter(String value) {
+            delimiter = value;
+        }
+
+        /**
+         * Get the Delimiter property.
+         *
+         * @return The Delimiter
+         */
+        public String getDelimiter() {
+            return delimiter;
+        }
+
+
+
+
+    }
+
 
 
 }
