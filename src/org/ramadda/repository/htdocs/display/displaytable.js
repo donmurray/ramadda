@@ -457,6 +457,22 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                         search += extra;
                     }
 
+
+                    if(this.searchFields) {
+                        var extra = HtmlUtil.openTag("table", ["class","formtable"]);
+                        for(var i =0;i<this.searchFields.length;i++) {
+                            var col = this.searchFields[i];
+                            var id = ID_SEARCH_PREFIX+"_" + col.name;
+                            var widget = HtmlUtil.input(id, this.jq(id).val(), ["id", this.getDomId(id),"placeholder","Search"]);
+                            extra += HtmlUtil.formEntry(col.label+ ":",widget);
+                        }
+                        extra += HtmlUtil.closeTag("table");
+                        search += extra;
+                    }
+
+                    
+
+
                     search += "\n";
                     search+= HtmlUtil.closeTag("div");
                     search += "\n";
@@ -566,6 +582,17 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
                 if(this.columns) {
                     for(var i =0;i<this.columns.length;i++) {
                         var col = this.columns[i];
+                        var id = ID_SEARCH_PREFIX+"_" + col.name;
+                        var text = this.jq(id).val();
+                        if(text) {
+                            url = url + "&table." + col.name +"=" + encodeURIComponent(text);
+                        }
+                    }
+                }
+
+                if(this.searchFields) {
+                    for(var i =0;i<this.searchFields.length;i++) {
+                        var col = this.searchFields[i];
                         var id = ID_SEARCH_PREFIX+"_" + col.name;
                         var text = this.jq(id).val();
                         if(text) {
