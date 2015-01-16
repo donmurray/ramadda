@@ -98,8 +98,13 @@ public class ShapefileTypeHandler extends GenericTypeHandler {
         if ( !entry.isFile()) {
             return;
         }
-        EsriShapefile shapefile =
-            new EsriShapefile(entry.getFile().toString());
+        EsriShapefile shapefile = null;
+        try {
+            shapefile = new EsriShapefile(entry.getFile().toString());
+        } catch (Exception exc) {
+            return;
+        }
+
         Rectangle2D bounds   = shapefile.getBoundingBox();
         double[][]  lonlat   = new double[][] {
             { bounds.getX() }, { bounds.getY() + bounds.getHeight() }
@@ -117,6 +122,7 @@ public class ShapefileTypeHandler extends GenericTypeHandler {
         }
         entry.setSouth(lonlat[IDX_LAT][0]);
         entry.setEast(lonlat[IDX_LON][0]);
+
     }
 
 
@@ -136,8 +142,13 @@ public class ShapefileTypeHandler extends GenericTypeHandler {
                 return true;
             }
             //TODO: stream through the shapes
-            EsriShapefile shapefile =
-                new EsriShapefile(entry.getFile().toString());
+            EsriShapefile shapefile = null;
+            try {
+                shapefile = new EsriShapefile(entry.getFile().toString());
+            } catch (Exception exc) {
+                return true;
+            }
+
             List features    = shapefile.getFeatures();
             int  totalPoints = 0;
             int  MAX_POINTS  = 10000;
