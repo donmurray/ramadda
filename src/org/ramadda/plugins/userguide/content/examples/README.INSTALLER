@@ -4,27 +4,31 @@
 0) Create an Amazon AWS account. 
 
 1) From the EC2 Dashboard go to the  Instances page and select  Launch Instance
-Choose the standard  Amazon Linux AMI
-Select the machine type
+Choose the standard  Amazon Linux AMI and select the machine type
 
-2) Define the security group
-Add the following ports:
+2) Create a security group with the following ports:
 
 HTTP port 80
 HTTPS port 443
 SSH  port 22
-Custom ports 20 & 21 - FTP
+
+Optionally open FTP: 
+Custom TCP Rule port 21  
+Custom TCP Rule port range 44001 - 44099
 
 
 3) Add a Storage Volume. 
-This will hold the database, the RAMADDA home directory and any data you may have. The size depends on how much data and content you plan to have on your RAMADDA. 100 GB is more than plenty for normal RAMADDA use.
-Note the device, e.g., /dev/sdb. This often will show up on the machine as /dev/xvdb. 
+Normally, the instance has a smallish volume. This is where /home is mounted. You can add an extra 
+volume that holds the the database, the RAMADDA home directory and any data you may have. The size depends 
+on how much data and content you plan to have on your RAMADDA. 100 GB is more than plenty for normal RAMADDA 
+use. Note the device, e.g., /dev/sdb. This often will show up on the machine as /dev/xvdb. 
 
-
+4) Download the PEM file
 When you Launch the instance create and save a .pem file. This is what you use to access your server.
+The permissions on the pem file need to be 400, e.g.:
+chmod 400 ramadda.pem
 
-
-### Configure your server
+5) Configure your server
 
 #SSH to the machine
 ssh -i <.pem file>  ec2-user@<server IP address>
