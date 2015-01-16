@@ -360,8 +360,7 @@ public class PluginManager extends RepositoryManager {
 
         File tmpPluginFile = new File(pluginFile);
         if (pluginFile.toLowerCase().endsWith(".zip")) {
-            ZipInputStream zin =
-                new ZipInputStream(new FileInputStream(pluginFile));
+            ZipInputStream zin =getStorageManager().makeZipInputStream(new FileInputStream(pluginFile));
             ZipEntry ze = null;
             while ((ze = zin.getNextEntry()) != null) {
                 if (ze.isDirectory()) {

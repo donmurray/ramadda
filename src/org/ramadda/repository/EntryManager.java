@@ -2352,7 +2352,7 @@ public class EntryManager extends RepositoryManager {
                 InputStream fis =
                     getStorageManager().getFileInputStream(resource);
                 OutputStream   fos = null;
-                ZipInputStream zin = new ZipInputStream(fis);
+                ZipInputStream zin = getStorageManager().makeZipInputStream(fis);
                 ZipEntry       ze  = null;
                 try {
                     while ((ze = zin.getNextEntry()) != null) {
@@ -4993,7 +4993,7 @@ public class EntryManager extends RepositoryManager {
         InputStream fis = getStorageManager().getFileInputStream(file);
         try {
             if (file.endsWith(".zip")) {
-                ZipInputStream zin = new ZipInputStream(fis);
+                ZipInputStream zin = getStorageManager().makeZipInputStream(fis);
                 ZipEntry       ze;
                 while ((ze = zin.getNextEntry()) != null) {
                     String entryName = ze.getName();

@@ -146,6 +146,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
     private static final org.ramadda.util.ObjectPool dummyField2ToForceCompile =
         null;
 
+
+
     /** dummy field 3 */
     private static final org.ramadda.util.EntryGroup dummyField3ToForceCompile =
         null;
@@ -163,6 +165,9 @@ public class Repository extends RepositoryBase implements RequestHandler,
     private static final org.ramadda.repository.job.JobManager dummyField6ToForceCompile =
         null;
 
+
+    private static final org.ramadda.util.text.CsvUtil dummyField7ToForceCompile =
+        null;
 
     /** Cache resoruces property */
     public static final String PROP_CACHERESOURCES = "ramadda.cacheresources";

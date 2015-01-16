@@ -43,6 +43,8 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
 
+import java.nio.charset.*;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.GregorianCalendar;
@@ -2236,7 +2238,7 @@ public class StorageManager extends RepositoryManager {
         List<File>     files = new ArrayList<File>();
         InputStream    fis   = getFileInputStream(zipFile);
         OutputStream   fos   = null;
-        ZipInputStream zin   = new ZipInputStream(fis);
+        ZipInputStream zin   = getStorageManager().makeZipInputStream(fis);
         try {
             ZipEntry ze = null;
             while ((ze = zin.getNextEntry()) != null) {
@@ -2293,5 +2295,27 @@ public class StorageManager extends RepositoryManager {
 
         return f;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param fis _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public ZipInputStream makeZipInputStream(InputStream fis)
+            throws Exception {
+        String encoding = getRepository().getProperty("ramadda.zip.encoding");
+        if(encoding!=null) {
+            return new ZipInputStream(fis, Charset.forName(encoding));
+        } else {
+            return new ZipInputStream(fis);
+        }
+    }
+
+
 
 }
