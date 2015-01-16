@@ -172,10 +172,6 @@ public class CsvUtil {
                 continue;
             }
 
-
-
-
-
             if ((filter != null) && !filter.lineOk(info, line)) {
                 continue;
             }
@@ -357,6 +353,7 @@ public class CsvUtil {
             "\n\t-pattern <col #> <regexp pattern>\n\t\"<column=~<value>\" pattern search" +
             "\n\t<-gt|-ge|-lt|-le> <col #> <value>\n\t-skip <how many lines to skip>" +
             "\n\t-delete <col #>" +
+            "\n\t-add <col #> <value>" +
             "\n\t-change <col #> <pattern> <substitution string>" +
             "\n\t-format <decimal format, e.g. '#'>\n\t-u (show unique values)\n\t-count (show count)" +
             "\n\t-header (pretty print the first line)\n\t-merge\n\t*.csv - one or more csv files"
@@ -380,7 +377,6 @@ public class CsvUtil {
         int            skip          = 1;
         String iterateColumn = null;
         List<String> iterateValues = new ArrayList<String>();
-
 
         List<String>   files         = new ArrayList<String>();
 
@@ -448,37 +444,31 @@ public class CsvUtil {
 
             if (arg.equals("-u")) {
                 processor.addProcessor(new Uniquifier());
-
                 continue;
             }
 
             if (arg.equals("-count")) {
                 processor.addProcessor(new Counter());
-
                 continue;
             }
 
             if (arg.equals("-sum")) {
                 processor.addProcessor(new Operator(Operator.OP_SUM));
-
                 continue;
             }
 
             if (arg.equals("-max")) {
                 processor.addProcessor(new Operator(Operator.OP_MAX));
-
                 continue;
             }
 
             if (arg.equals("-min")) {
                 processor.addProcessor(new Operator(Operator.OP_MIN));
-
                 continue;
             }
 
             if (arg.equals("-average")) {
                 processor.addProcessor(new Operator(Operator.OP_AVERAGE));
-
                 continue;
             }
 
@@ -487,7 +477,6 @@ public class CsvUtil {
                 List<String>   cols = StringUtil.split(args[i], ",", true, true);
                 selector = new ColumnSelector(cols);
                 converter.addConverter(selector);
-
                 continue;
             }
 
@@ -510,8 +499,10 @@ public class CsvUtil {
                 continue;
             }
 
-
-
+            if (arg.equals("-add")) {
+                converter.addConverter(new  ColumnAdder(args[++i],args[++i]));
+                continue;
+            }
 
 
             if(arg.equals("-or")) {
@@ -890,6 +881,40 @@ public class CsvUtil {
                 return cols;
             }
             cols.remove(index);
+            return cols;
+        }
+
+    }
+
+
+    public static class ColumnAdder extends Converter {
+
+        private String value;
+
+
+        /**
+         * _more_
+         *
+         * @param indices _more_
+         */
+        public ColumnAdder(String col, String value) {
+            super(col);
+            this.value = value;
+        }
+
+        /**
+         * _more_
+         *
+         * @param cols _more_
+         *
+         * @return _more_
+         */
+        public List<String> convert(ProcessInfo info, List<String> cols) {
+            int index = getIndex(info);            
+            if (index<0 || index>=cols.size()) {
+                return cols;
+            }
+            cols.add(index, value);
             return cols;
         }
 
