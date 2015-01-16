@@ -101,8 +101,16 @@ public class DbTableTypeHandler extends TabularTypeHandler {
 
 
     /**
-       column: Label, searchable
-     **/
+     *  column: Label, searchable
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param myxls _more_
+     * @param visitInfo _more_
+     * @param visitor _more_
+     *
+     * @throws Exception _more_
+     */
 
 
     /**
@@ -123,15 +131,15 @@ public class DbTableTypeHandler extends TabularTypeHandler {
 
 
         TableInfo tableInfo = getTableInfo(entry);
-        if(tableInfo==null) {
-            System.err.println ("Error: Could not find TableInfo for entry:" + entry);
+        if (tableInfo == null) {
+            System.err.println("Error: Could not find TableInfo for entry:"
+                               + entry);
+
             return;
         }
         List columns = new ArrayList();
         for (ColumnInfo col : tableInfo.getColumns()) {
-            columns.add(Json.map("name",
-                                 Json.quote(col.getName()),
-                                 "type",
+            columns.add(Json.map("name", Json.quote(col.getName()), "type",
                                  Json.quote(col.getTypeName())));
         }
         visitInfo.addTableProperty("columns", Json.list(columns));
@@ -161,7 +169,7 @@ public class DbTableTypeHandler extends TabularTypeHandler {
             return;
         }
 
-        
+
 
 
         String what = "*";
@@ -181,7 +189,7 @@ public class DbTableTypeHandler extends TabularTypeHandler {
         List<Clause> andClauses = new ArrayList<Clause>();
         List<Clause> orClauses  = new ArrayList<Clause>();
         String       s          = visitInfo.getSearchText();
-        String opp = "(<>|=|<|>|<=|>=)";
+        String       opp        = "(<>|=|<|>|<=|>=)";
 
         if (Utils.stringDefined(s)) {
             if (tableInfo != null) {
@@ -230,26 +238,36 @@ public class DbTableTypeHandler extends TabularTypeHandler {
 
         if (tableInfo != null) {
             for (ColumnInfo col : tableInfo.getColumns()) {
-                String v = request.getString("table." + col.getName().toLowerCase(),(String)null);
-                if(!Utils.stringDefined(v)) continue;
-                List<String> toks = StringUtil.split(v," ",true,true);
-                String lastOp = null;
-                String pattern = "^" + opp +"(.+)";
-                for(int i=0;i<toks.size();i++) {
-                    String tok = toks.get(i);
+                String v =
+                    request.getString("table." + col.getName().toLowerCase(),
+                                      (String) null);
+                if ( !Utils.stringDefined(v)) {
+                    continue;
+                }
+                List<String> toks    = StringUtil.split(v, " ", true, true);
+                String       lastOp  = null;
+                String       pattern = "^" + opp + "(.+)";
+                for (int i = 0; i < toks.size(); i++) {
+                    String   tok   = toks.get(i);
                     String[] toks2 = Utils.findPatterns(tok, pattern);
-                    if(toks2==null) {
+                    if (toks2 == null) {
                         String isOp = StringUtil.findPattern(tok, opp);
-                        if(isOp!=null) {
+                        if (isOp != null) {
                             lastOp = tok;
+
                             continue;
                         }
-                        if(lastOp == null) lastOp = Clause.EXPR_EQUALS;
-                        andClauses.add(new Clause(col.getName(), lastOp, tok));
+                        if (lastOp == null) {
+                            lastOp = Clause.EXPR_EQUALS;
+                        }
+                        andClauses.add(new Clause(col.getName(), lastOp,
+                                tok));
                         lastOp = null;
+
                         continue;
                     }
-                    Clause clause = new Clause(col.getName(), toks2[0].trim(), toks2[1].trim());
+                    Clause clause = new Clause(col.getName(),
+                                        toks2[0].trim(), toks2[1].trim());
                     andClauses.add(clause);
 
                 }
@@ -360,7 +378,9 @@ public class DbTableTypeHandler extends TabularTypeHandler {
                                        "table.db.databases", ""), ",", true,
                                            true);
             if (dbs.size() > 0) {
-                String dbid = (entry==null?null:entry.getValue(IDX_DBID, (String) null));
+                String dbid = ((entry == null)
+                               ? null
+                               : entry.getValue(IDX_DBID, (String) null));
                 formBuffer.append(
                     formEntry(
                         request, column.getLabel() + ":",
@@ -374,7 +394,9 @@ public class DbTableTypeHandler extends TabularTypeHandler {
             List<String> tables = getTableNames(entry);
             if ((tables != null) && (tables.size() > 0)) {
                 tables.add(0, "");
-                String name = entry==null?null:entry.getValue(IDX_TABLE, (String) null);
+                String name = (entry == null)
+                              ? null
+                              : entry.getValue(IDX_TABLE, (String) null);
                 formBuffer.append(
                     formEntry(
                         request, column.getLabel() + ":",
@@ -418,7 +440,9 @@ public class DbTableTypeHandler extends TabularTypeHandler {
      * @throws Exception _more_
      */
     private List<String> getTableNames(Entry entry) throws Exception {
-        if(entry  == null) return null;
+        if (entry == null) {
+            return null;
+        }
         List<TableInfo> tableInfos = getTableInfos(entry);
         if (tableInfos == null) {
             return null;
@@ -498,11 +522,28 @@ public class DbTableTypeHandler extends TabularTypeHandler {
         return tableInfos;
     }
 
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Fri, Jan 16, '15
+     * @author         Enter your name here...    
+     */
     public static class TableProperty {
+
+        /** _more_          */
         private String type;
+
+        /** _more_          */
         private String otherTable;
+
+        /** _more_          */
         private String name;
+
+        /** _more_          */
         private String label;
+
+        /** _more_          */
         private boolean canSearch;
 
     }

@@ -39,6 +39,7 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
 import java.io.*;
+
 import java.util.Date;
 import java.util.Hashtable;
 import java.util.List;
@@ -50,9 +51,11 @@ import java.util.List;
  */
 public class YouTubeVideoTypeHandler extends GenericTypeHandler {
 
+    /** _more_          */
     private static int IDX = 0;
 
 
+    /** _more_          */
     public static final int IDX_ID = IDX++;
 
 
@@ -102,6 +105,7 @@ public class YouTubeVideoTypeHandler extends GenericTypeHandler {
     public String getSimpleDisplay(Request request, Hashtable props,
                                    Entry entry)
             throws Exception {
+
         String  sdisplay = entry.getValue(IDX_DISPLAY, "true");
         boolean display  = (sdisplay.length() == 0)
                            ? true
@@ -115,7 +119,7 @@ public class YouTubeVideoTypeHandler extends GenericTypeHandler {
                 DFLT_WIKI_HEADER));
 
         String url = entry.getResource().getPath();
-        String id  = entry.getValue(IDX_ID,(String) null);
+        String id  = entry.getValue(IDX_ID, (String) null);
         //For legacy entries
         if (id == null) {
             id = StringUtil.findPattern(url, "v=([^&]+)&");
@@ -206,10 +210,19 @@ public class YouTubeVideoTypeHandler extends GenericTypeHandler {
         }
 
         return sb.toString();
+
     }
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @throws Exception _more_
+     */
     @Override
     public void initializeNewEntry(Request request, Entry entry)
             throws Exception {
@@ -238,26 +251,30 @@ public class YouTubeVideoTypeHandler extends GenericTypeHandler {
         }
 
 
-        if(id!=null) {
-            String thumbUrl = "https://i.ytimg.com/vi/" + id +"/default.jpg";
-            System.err.println (thumbUrl);
+        if (id != null) {
+            String thumbUrl = "https://i.ytimg.com/vi/" + id + "/default.jpg";
+            System.err.println(thumbUrl);
             try {
-                File f = getStorageManager().getTmpFile(request, "youtubethumb.jpg");
-                InputStream is = getStorageManager().getInputStream(thumbUrl);
+                File f = getStorageManager().getTmpFile(request,
+                             "youtubethumb.jpg");
+                InputStream  is =
+                    getStorageManager().getInputStream(thumbUrl);
                 OutputStream fos = getStorageManager().getFileOutputStream(f);
                 try {
                     IOUtil.writeTo(is, fos);
                     f = getStorageManager().moveToEntryDir(entry, f);
                     entry.addMetadata(new Metadata(getRepository().getGUID(),
-                                                   entry.getId(), ContentMetadataHandler.TYPE_THUMBNAIL, false,
-                                                   f.getName(), null, null, null, null));
-                
+                            entry.getId(),
+                            ContentMetadataHandler.TYPE_THUMBNAIL, false,
+                            f.getName(), null, null, null, null));
+
                 } finally {
                     IOUtil.close(fos);
                     IOUtil.close(is);
-                }            
-            } catch(Exception exc) {
-                System.err.println ("Error fetching youtube thumbnail:" + thumbUrl);
+                }
+            } catch (Exception exc) {
+                System.err.println("Error fetching youtube thumbnail:"
+                                   + thumbUrl);
             }
         }
     }

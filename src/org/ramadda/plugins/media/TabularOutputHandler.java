@@ -38,12 +38,15 @@ import org.ramadda.repository.*;
 import org.ramadda.repository.auth.*;
 import org.ramadda.repository.output.*;
 import org.ramadda.util.GoogleChart;
-import org.ramadda.util.CsvUtil;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Json;
 import org.ramadda.util.Utils;
 
 import org.ramadda.util.XlsUtil;
+import org.ramadda.util.text.CsvUtil;
+import org.ramadda.util.text.Filter;
+import org.ramadda.util.text.ProcessInfo;
+import org.ramadda.util.text.Processor;
 
 
 import org.w3c.dom.*;
@@ -272,7 +275,7 @@ public class TabularOutputHandler extends OutputHandler {
         TabularVisitInfo visitInfo = new TabularVisitInfo(request, entry,
                                          getSkipRows(request, entry),
                                          getRowCount(request, entry,
-                                                     MAX_ROWS), sheetsToShow);
+                                             MAX_ROWS), sheetsToShow);
         visit(request, entry, visitInfo, visitor);
         props.addAll(visitInfo.getTableProperties());
         props.add("sheets");
@@ -388,59 +391,67 @@ public class TabularOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public void visitCsv(Request request, Entry entry,
-                         InputStream inputStream, final TabularVisitInfo visitInfo,
+                         InputStream inputStream,
+                         final TabularVisitInfo visitInfo,
                          TabularVisitor visitor)
             throws Exception {
         BufferedReader br =
             new BufferedReader(new InputStreamReader(inputStream));
-        String             line;
-        int                rowIdx   = 0;
-        final List<List<Object>> rows     = new ArrayList<List<Object>>();
+        String                   line;
+        int                      rowIdx = 0;
+        final List<List<Object>> rows   = new ArrayList<List<Object>>();
 
-        ByteArrayOutputStream bos = new ByteArrayOutputStream();
-        CsvUtil.ProcessInfo info  = new CsvUtil.ProcessInfo(new BufferedInputStream(inputStream), 
-                                                            bos);
+        ByteArrayOutputStream    bos    = new ByteArrayOutputStream();
+        ProcessInfo info =
+            new ProcessInfo(new BufferedInputStream(inputStream), bos);
 
         info.setSkip(visitInfo.getSkipRows());
         info.setMaxRows(visitInfo.getMaxRows());
-        CsvUtil.Processor processor = new CsvUtil.Processor() {
-                public void processRow(CsvUtil.ProcessInfo info, List<String> toks) {
-                    List obj = new ArrayList();
-                    obj.addAll(toks);
-                    rows.add((List<Object>)obj);
-                }
-            };
-        CsvUtil.FilterGroup filterGroup = new CsvUtil.FilterGroup();
+        Processor processor = new Processor() {
+            public void processRow(ProcessInfo info, List<String> toks) {
+                List obj = new ArrayList();
+                obj.addAll(toks);
+                rows.add((List<Object>) obj);
+            }
+        };
+        Filter.FilterGroup filterGroup = new Filter.FilterGroup();
 
 
-        filterGroup.addFilter(new CsvUtil.Filter() {
-                public boolean rowOk(CsvUtil.ProcessInfo info, List<String> toks) {
-                    return visitInfo.rowOk(toks);
-                }
-            });
+        filterGroup.addFilter(new Filter() {
+            public boolean rowOk(ProcessInfo info, List<String> toks) {
+                return visitInfo.rowOk(toks);
+            }
+        });
 
         if (visitInfo.getSearchFields() != null) {
             for (TabularSearchField searchField :
                     visitInfo.getSearchFields()) {
-                String id= "table." + searchField.getName();
-                if(request.defined(id)) {
+                String id = "table." + searchField.getName();
+                if (request.defined(id)) {
                     //Columns are 1 based to the user
-                    if(searchField.getName().startsWith("column")) {
-                        int column = Integer.parseInt(searchField.getName().substring("column".length()).trim())-1;
-                        String s = request.getString(id,"");
+                    if (searchField.getName().startsWith("column")) {
+                        int column = Integer.parseInt(
+                                         searchField.getName().substring(
+                                             "column".length()).trim()) - 1;
+                        String s = request.getString(id, "");
                         s = s.trim();
-                        System.err.println ("column:" + column +" s:" + s);
-                        String operator = StringUtil.findPattern(s, "^([<>=]+).*");
-                        if(operator !=null) {
-                            System.err.println ("operator:" + operator);
-                            s  = s.replace(operator,"").trim();
+                        System.err.println("column:" + column + " s:" + s);
+                        String operator = StringUtil.findPattern(s,
+                                              "^([<>=]+).*");
+                        if (operator != null) {
+                            System.err.println("operator:" + operator);
+                            s = s.replace(operator, "").trim();
                             double value = Double.parseDouble(s);
-                            int op = CsvUtil.ValueFilter.getOperator(operator);
-                            filterGroup.addFilter(new CsvUtil.ValueFilter(column, op,value));
+                            int op = Filter.ValueFilter.getOperator(operator);
+                            filterGroup.addFilter(
+                                new Filter.ValueFilter(column, op, value));
+
                             continue;
                         }
                         //                        if(s.
-                        filterGroup.addFilter(new CsvUtil.PatternFilter(column, request.getString(id,"")));
+                        filterGroup.addFilter(
+                            new Filter.PatternFilter(
+                                column, request.getString(id, "")));
 
                     }
                 }
@@ -722,7 +733,7 @@ public class TabularOutputHandler extends OutputHandler {
             List<String> names = new ArrayList<String>();
             for (TabularSearchField searchField :
                     visitInfo.getSearchFields()) {
-                
+
                 List<String> props = new ArrayList<String>();
                 props.add("name");
                 props.add(Json.quote(searchField.getName()));
@@ -733,10 +744,10 @@ public class TabularOutputHandler extends OutputHandler {
             propsList.add(Json.list(names));
         }
 
-        String        props = Json.map(propsList);
-        System.err.println (props);
+        String props = Json.map(propsList);
+        System.err.println(props);
 
-        StringBuilder sb    = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         getRepository().getWikiManager().addDisplayImports(request, sb);
         sb.append(header(entry.getName()));
         if ( !request.get(ARG_EMBEDDED, false)) {

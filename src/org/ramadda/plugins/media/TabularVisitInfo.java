@@ -49,13 +49,14 @@ public class TabularVisitInfo {
     /** _more_ */
     private String searchText;
 
-    /** _more_          */
+    /** _more_ */
     private String searchTextWithPattern;
 
 
     /** _more_ */
     private HashSet<Integer> sheetsToShow;
 
+    /** _more_          */
     private List props = new ArrayList();
 
     /**
@@ -79,17 +80,18 @@ public class TabularVisitInfo {
                             TabularTypeHandler.IDX_SEARCHINFO, ""), "\n",
                                 true, true)) {
 
-                String label = null;
-                List<String> toks = StringUtil.splitUpTo(line, " ", 2);
-                if(toks.size()>1) {
+                String       label = null;
+                List<String> toks  = StringUtil.splitUpTo(line, " ", 2);
+                if (toks.size() > 1) {
                     line = toks.get(0);
-                    Hashtable props = StringUtil.parseHtmlProperties(toks.get(1));
+                    Hashtable props =
+                        StringUtil.parseHtmlProperties(toks.get(1));
                     label = (String) props.get("label");
                 }
 
 
                 TabularSearchField sf = new TabularSearchField(line);
-                if(label!=null) {
+                if (label != null) {
                     sf.setLabel(label);
                 }
                 sf.setValue(request.getString(sf.getUrlArg(), (String) null));
@@ -102,11 +104,22 @@ public class TabularVisitInfo {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     */
     public void addTableProperty(String name, String value) {
         props.add(name);
         props.add(value);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List getTableProperties() {
         return props;
     }

@@ -29,6 +29,7 @@ public class TabularSearchField {
     /** _more_ */
     private String name;
 
+    /** _more_          */
     private String label;
 
     /** _more_ */
@@ -112,23 +113,26 @@ public class TabularSearchField {
 
 
     /**
-Set the Label property.
+     * Set the Label property.
+     *
+     * @param value The new value for Label
+     */
+    public void setLabel(String value) {
+        label = value;
+    }
 
-@param value The new value for Label
-**/
-public void setLabel (String value) {
-	label = value;
-}
+    /**
+     * Get the Label property.
+     *
+     * @return The Label
+     */
+    public String getLabel() {
+        if (label == null) {
+            return name;
+        }
 
-/**
-Get the Label property.
-
-@return The Label
-**/
-public String getLabel () {
-    if(label==null) return name;
-	return label;
-}
+        return label;
+    }
 
 
 
