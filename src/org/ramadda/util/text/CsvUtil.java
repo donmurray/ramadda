@@ -180,6 +180,7 @@ public class CsvUtil {
             }
 
             if ((filter != null) && !filter.lineOk(info, line)) {
+
                 continue;
             }
 
@@ -194,17 +195,10 @@ public class CsvUtil {
                 info.setDelimiter(delimiter);
             }
 
-            //            System.err.println("line:" + line);
 
+            Row row = new Row(line, info.getDelimiter());
 
-            List<String> cols = Utils.tokenizeColumns(line,
-                                    info.getDelimiter());
-
-            //            System.err.println("cols:" + cols);
-
-
-
-            if ((filter != null) && !filter.rowOk(info, cols)) {
+            if ((filter != null) && !filter.rowOk(info, row)) {
                 continue;
             }
 
@@ -215,13 +209,14 @@ public class CsvUtil {
             }
 
             if (converter != null) {
-                cols = converter.convert(info, cols);
+                row = converter.convert(info, row);
             }
 
             if (processor != null) {
-                processor.processRow(info, cols, line);
+                processor.processRow(info, row, line);
             } else {
-                info.getWriter().println(columnsToString(cols, ","));
+                info.getWriter().println(columnsToString(row.getValues(),
+                        ","));
                 info.getWriter().flush();
             }
 

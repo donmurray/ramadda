@@ -65,11 +65,11 @@ public class Filter {
      *
      *
      * @param info _more_
-     * @param toks _more_
+     * @param row _more_
      *
      * @return _more_
      */
-    public boolean rowOk(ProcessInfo info, List<String> toks) {
+    public boolean rowOk(ProcessInfo info, Row row) {
         return true;
     }
 
@@ -220,17 +220,17 @@ public class Filter {
          *
          *
          * @param info _more_
-         * @param toks _more_
+         * @param row _more_
          *
          * @return _more_
          */
         @Override
-        public boolean rowOk(ProcessInfo info, List<String> toks) {
+        public boolean rowOk(ProcessInfo info, Row row) {
             if (filters.size() == 0) {
                 return true;
             }
             for (Filter filter : filters) {
-                if ( !filter.rowOk(info, toks)) {
+                if ( !filter.rowOk(info, row)) {
                     if (andLogic) {
                         return false;
                     }
@@ -315,16 +315,16 @@ public class Filter {
          *
          *
          * @param info _more_
-         * @param toks _more_
+         * @param row _more_
          *
          * @return _more_
          */
-        public boolean rowOk(ProcessInfo info, List<String> toks) {
+        public boolean rowOk(ProcessInfo info, Row row) {
             int idx = getIndex(info);
-            if (idx >= toks.size()) {
+            if (idx >= row.size()) {
                 return doNegate(false);
             }
-            String v = toks.get(idx);
+            String v = row.getString(idx);
             if (pattern.matcher(v).find()) {
                 return doNegate(true);
             }
@@ -372,7 +372,6 @@ public class Filter {
          * _more_
          *
          * @param col _more_
-         * @param pattern _more_
          * @param op _more_
          * @param value _more_
          */
@@ -433,17 +432,17 @@ public class Filter {
          *
          *
          * @param info _more_
-         * @param toks _more_
+         * @param row _more_
          *
          * @return _more_
          */
-        public boolean rowOk(ProcessInfo info, List<String> toks) {
+        public boolean rowOk(ProcessInfo info, Row row) {
             int idx = getIndex(info);
-            if (idx >= toks.size()) {
+            if (idx >= row.size()) {
                 return false;
             }
             try {
-                String v     = toks.get(idx);
+                String v     = row.getString(idx);
                 double value = Double.parseDouble(v);
                 if (op == OP_LT) {
                     return value < this.value;

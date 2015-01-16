@@ -56,11 +56,10 @@ public abstract class Processor {
      *
      *
      * @param info _more_
-     * @param toks _more_
+     * @param row _more_
      * @param line _more_
      */
-    public void processRow(ProcessInfo info, List<String> toks,
-                           String line) {}
+    public void processRow(ProcessInfo info, Row row, String line) {}
 
     /**
      * _more_
@@ -119,12 +118,11 @@ public abstract class Processor {
          * _more_
          *
          * @param info _more_
-         * @param columns _more_
+         * @param row _more_
          * @param line _more_
          */
         @Override
-        public void processRow(ProcessInfo info, List<String> columns,
-                               String line) {
+        public void processRow(ProcessInfo info, Row row, String line) {
             if (processors.size() == 0) {
                 if (info.getRow() == 0) {
                     //not now
@@ -132,13 +130,12 @@ public abstract class Processor {
                         //                        info.getWriter().println(header);
                     }
                 }
-                //                System.err.println ("cols:" + columns);
-                info.getWriter().println(CsvUtil.columnsToString(columns,
-                        ","));
+                info.getWriter().println(
+                    CsvUtil.columnsToString(row.getValues(), ","));
                 info.getWriter().flush();
             }
             for (Processor processor : processors) {
-                processor.processRow(info, columns, line);
+                processor.processRow(info, row, line);
             }
         }
 
@@ -225,25 +222,24 @@ public abstract class Processor {
          *
          *
          * @param info _more_
-         * @param toks _more_
+         * @param row _more_
          * @param line _more_
          */
         @Override
-        public void processRow(ProcessInfo info, List<String> toks,
-                               String line) {
+        public void processRow(ProcessInfo info, Row row, String line) {
             boolean first = false;
             if (values == null) {
                 values = new ArrayList<Double>();
                 counts = new ArrayList<Integer>();
                 first  = true;
             }
-            for (int i = 0; i < toks.size(); i++) {
+            for (int i = 0; i < row.size(); i++) {
                 if (i >= values.size()) {
                     values.add(new Double(0));
                     counts.add(new Integer(0));
                 }
                 try {
-                    String s            = toks.get(i).trim();
+                    String s            = row.getString(i).trim();
                     double value        = (s.length() == 0)
                                           ? 0
                                           : new Double(s).doubleValue();
@@ -350,23 +346,22 @@ public abstract class Processor {
          *
          *
          * @param info _more_
-         * @param toks _more_
+         * @param row _more_
          * @param line _more_
          */
         @Override
-        public void processRow(ProcessInfo info, List<String> toks,
-                               String line) {
+        public void processRow(ProcessInfo info, Row row, String line) {
             boolean first = false;
             if (contains == null) {
                 contains = new ArrayList<HashSet>();
                 values   = new ArrayList<List>();
             }
-            for (int i = 0; i < toks.size(); i++) {
+            for (int i = 0; i < row.size(); i++) {
                 if (i >= values.size()) {
                     contains.add(new HashSet());
                     values.add(new ArrayList());
                 }
-                String s = toks.get(i).trim();
+                String s = row.getString(i).trim();
                 if (contains.get(i).contains(s)) {
                     continue;
                 }
@@ -435,13 +430,12 @@ public abstract class Processor {
          *
          *
          * @param info _more_
-         * @param toks _more_
+         * @param row _more_
          * @param line _more_
          */
         @Override
-        public void processRow(ProcessInfo info, List<String> toks,
-                               String line) {
-            uniqueCounts.add(toks.size());
+        public void processRow(ProcessInfo info, Row row, String line) {
+            uniqueCounts.add(row.size());
             count++;
         }
 

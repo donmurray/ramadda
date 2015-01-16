@@ -79,11 +79,11 @@ public abstract class Converter {
      *
      *
      * @param info _more_
-     * @param cols _more_
+     * @param row _more_
      *
      * @return _more_
      */
-    public abstract List<String> convert(ProcessInfo info, List<String> cols);
+    public abstract Row convert(ProcessInfo info, Row row);
 
     /**
      * _more_
@@ -135,16 +135,16 @@ public abstract class Converter {
          *
          *
          * @param info _more_
-         * @param cols _more_
+         * @param row _more_
          *
          * @return _more_
          */
-        public List<String> convert(ProcessInfo info, List<String> cols) {
+        public Row convert(ProcessInfo info, Row row) {
             for (Converter child : converters) {
-                cols = child.convert(info, cols);
+                row = child.convert(info, row);
             }
 
-            return cols;
+            return row;
         }
 
     }
@@ -202,20 +202,20 @@ public abstract class Converter {
          *
          *
          * @param info _more_
-         * @param cols _more_
+         * @param row _more_
          *
          * @return _more_
          */
-        public List<String> convert(ProcessInfo info, List<String> cols) {
+        public Row convert(ProcessInfo info, Row row) {
 
             getIndices(info);
             if (indices == null) {
-                return cols;
+                return row;
             }
             List<String> result = new ArrayList<String>();
             for (Integer idx : indices) {
-                if (idx < cols.size()) {
-                    String s = cols.get(idx);
+                if (idx < row.size()) {
+                    String s = row.getString(idx);
                     //                    if(s.indexOf("ROOFING") >=0) {
                     //                        System.err.println("Line:" + theLine);
                     //                        System.err.println("Cols:" + cols);
@@ -224,7 +224,7 @@ public abstract class Converter {
                 }
             }
 
-            return result;
+            return new Row(result);
         }
 
     }
@@ -264,21 +264,20 @@ public abstract class Converter {
          *
          *
          * @param info _more_
-         * @param cols _more_
+         * @param row _more_
          *
          * @return _more_
          */
-        public List<String> convert(ProcessInfo info, List<String> cols) {
+        public Row convert(ProcessInfo info, Row row) {
             int index = getIndex(info);
-            if ((index < 0) || (index >= cols.size())) {
-                return cols;
+            if ((index < 0) || (index >= row.size())) {
+                return row;
             }
-            String s = cols.get(index);
+            String s = row.getString(index);
             s = s.replaceAll(pattern, value);
+            row.set(index, s);
 
-            cols.set(index, s);
-
-            return cols;
+            return row;
         }
 
     }
@@ -317,22 +316,22 @@ public abstract class Converter {
          *
          *
          * @param info _more_
-         * @param cols _more_
+         * @param row _more_
          *
          * @return _more_
          */
-        public List<String> convert(ProcessInfo info, List<String> cols) {
+        public Row convert(ProcessInfo info, Row row) {
             int index = getIndex(info);
-            if ((index < 0) || (index >= cols.size())) {
-                return cols;
+            if ((index < 0) || (index >= row.size())) {
+                return row;
             }
-            cols.remove(index);
+            row.remove(index);
             int colOffset = 0;
-            for (String tok : StringUtil.split(cols.get(index), delimiter)) {
-                cols.add(index + (colOffset++), tok);
+            for (String tok : StringUtil.split(row.get(index), delimiter)) {
+                row.add(index + (colOffset++), tok);
             }
 
-            return cols;
+            return row;
         }
 
     }
@@ -362,18 +361,18 @@ public abstract class Converter {
          *
          *
          * @param info _more_
-         * @param cols _more_
+         * @param row _more_
          *
          * @return _more_
          */
-        public List<String> convert(ProcessInfo info, List<String> cols) {
+        public Row convert(ProcessInfo info, Row row) {
             int index = getIndex(info);
-            if ((index < 0) || (index >= cols.size())) {
-                return cols;
+            if ((index < 0) || (index >= row.size())) {
+                return row;
             }
-            cols.remove(index);
+            row.remove(index);
 
-            return cols;
+            return row;
         }
 
     }
@@ -408,18 +407,18 @@ public abstract class Converter {
          *
          *
          * @param info _more_
-         * @param cols _more_
+         * @param row _more_
          *
          * @return _more_
          */
-        public List<String> convert(ProcessInfo info, List<String> cols) {
+        public Row convert(ProcessInfo info, Row row) {
             int index = getIndex(info);
-            if ((index < 0) || (index >= cols.size())) {
-                return cols;
+            if ((index < 0) || (index >= row.size())) {
+                return row;
             }
-            cols.add(index, value);
+            row.add(index, value);
 
-            return cols;
+            return row;
         }
 
     }
