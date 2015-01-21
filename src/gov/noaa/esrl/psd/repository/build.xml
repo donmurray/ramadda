@@ -76,6 +76,7 @@
             <include name="gov/noaa/esrl/psd/repository/htdocs/**/*.gif"/> 
             <include name="gov/noaa/esrl/psd/repository/data/**/*.xml"/> 
             <include name="gov/noaa/esrl/psd/repository/data/**/*.txt"/> 
+            <include name="gov/noaa/esrl/psd/repository/resources/**/*.csv"/> 
             <include name="gov/noaa/esrl/psd/repository/resources/**/*.txt"/> 
             <include name="gov/noaa/esrl/psd/repository/resources/**/*.xml"/> 
             <include name="gov/noaa/esrl/psd/repository/resources/**/*.html"/> 

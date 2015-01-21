@@ -1,0 +1,5 @@
+# the second line is the name of the group for each of these map regions values are: Name,ID,North,West,South,East
+model regions
+South America,SAM,20,-100,-60,-20
+North America,NAM,85,-180,0,-40
+East Africa,EAF,14,30,-18,52
