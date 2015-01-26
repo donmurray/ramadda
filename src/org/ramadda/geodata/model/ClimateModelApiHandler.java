@@ -68,6 +68,9 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
     /** compare action */
     public static final String ARG_ACTION_COMPARE = "action.compare";
 
+    /** multi compare action */
+    public static final String ARG_ACTION_MULTI_COMPARE = "action.multicompare";
+
     /** timeseries action */
     public static final String ARG_ACTION_TIMESERIES = "action.timeseries";
 
@@ -127,7 +130,8 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             throws Exception {
         //return getTypeHandler().getServicesToRun(request);
         List<Service> processes = new ArrayList<Service>();
-        if (action.equals(ARG_ACTION_COMPARE)) {
+        if (action.equals(ARG_ACTION_COMPARE) ||
+            action.equals(ARG_ACTION_MULTI_COMPARE)) {
             Service process = new CDOArealStatisticsProcess(repository);
             if (process.isEnabled()) {
                 processes.add(process);
@@ -424,6 +428,19 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
     }
 
     /**
+     * handle the multiple param comparison request
+     *
+     * @param request request
+     *
+     * @return result
+     *
+     * @throws Exception on badness
+     */
+    public Result processMultiCompareRequest(Request request) throws Exception {
+        return handleRequest(request, ARG_ACTION_MULTI_COMPARE);
+    }
+
+    /**
      * handle the time series request
      *
      * @param request request
@@ -612,6 +629,10 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 "<script type=\"text/JavaScript\">google.load(\"earth\", \"1\");</script>\n");
             //sb.append(HtmlUtils.script(
             //    "$(document).ready(function() {\n $(\"a.popup_image\").fancybox({\n 'titleShow' : false\n });\n });\n"));
+        } else if (type.equals(ARG_ACTION_MULTI_COMPARE)) {
+            sb.append(HtmlUtils.form(getMultiCompareUrlPath(request),
+                                     formAttrs));
+            getWikiManager().addDisplayImports(request, sb);
         } else {
             sb.append(HtmlUtils.form(getTimeSeriesUrlPath(request),
                                      formAttrs));
@@ -781,12 +802,16 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                                   + "</label>" + selector);
                 } else {
 
+                    String extraSelect = "";
+                    if (type.equals(ARG_ACTION_MULTI_COMPARE)) {
+                        extraSelect = HtmlUtils.attr(HtmlUtils.ATTR_MULTIPLE, "true")+HtmlUtils.attr("size", "4");
+                    }
                     String selectBox =
                         HtmlUtils.select(arg, values, selectedValue,
                                          HtmlUtils.cssClass("select_widget")
                                          + HtmlUtils.attr("id",
                                              getFieldSelectId(formId,
-                                                 collection, fieldIdx)));
+                                                 collection, fieldIdx))+extraSelect);
                     String select = "<label class=\"selector\" for=\""
                                     + getFieldSelectId(formId, collection,
                                         fieldIdx) + "\">"
@@ -1001,15 +1026,29 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             } else {
                 arg = getFieldSelectArg(collection, fieldIdx);
             }
-            String v = request.getString(arg, "");
-            if (v.length() > 0) {
-                clauses.add(Clause.eq(column.getName(), v));
-            } else {
+            List v = request.get(arg, new ArrayList());
+            if (v.isEmpty() || (v.size() == 1 && v.get(0).toString().isEmpty())) {
                 haveAllFields = false;
-
                 break;
             }
+            if (v.size() > 0) {
+               List<Clause> ors = new ArrayList<Clause>(); 
+               for (Object o : v) {
+                   String s = o.toString();
+                   if (s.length() > 0) {
+                       ors.add(Clause.eq(column.getName(), s));
+                   }
+               }
+               if (!ors.isEmpty()) {
+                   clauses.add(Clause.or(ors));
+               }
+            } /*else {
+               haveAllFields = false;
+               break;
+            } */
         }
+        //System.out.println(clauses);
+        //System.out.println(haveAllFields);
         //If we have a fixed collection then don't do the search if no fields were selected
         //if ( !haveAllFields && request.defined(ARG_COLLECTION)) {
         if ( !haveAllFields) {
@@ -1101,12 +1140,25 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         List<Column> columns = typeHandler.getGranuleColumns();
         for (int fieldIdx = 0; fieldIdx < columns.size(); fieldIdx++) {
             String arg = "field" + fieldIdx;
-            String v   = request.getString(arg, "");
-            if (v.length() > 0) {
-                String column = columns.get(fieldIdx).getName();
-                clauses.add(Clause.eq(column, v));
+            String column = columns.get(fieldIdx).getName();
+            List v = request.get(arg, new ArrayList());
+            if (v.size() == 1 && v.get(0).toString().isEmpty()) {
+                continue;
             }
+            if (v.size() > 0) {
+               List<Clause> ors = new ArrayList<Clause>(); 
+               for (Object o : v) {
+                   String s = o.toString();
+                   if (s.length() > 0) {
+                       ors.add(Clause.eq(column, s));
+                   }
+               }
+               if (!ors.isEmpty()) {
+                   clauses.add(Clause.or(ors));
+               }
+            } 
         }
+        //System.err.println("x: " + clauses);
 
         int columnIdx = request.get("field", 1);
         if (columnIdx >= columns.size()) {
@@ -1134,6 +1186,24 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         return new Result("", sb, Json.MIMETYPE);
     }
 
+    /**
+     *  return the main entry point URL
+     *
+     *
+     * @param request _more_
+     * @return  the main entry point
+     */
+    private String getMultiCompareUrlPath(Request request) {
+        //Use the collection type in the path. This is defined in the api.xml file
+        StringBuilder base = new StringBuilder(getRepository().getUrlBase());
+        base.append("/model/mcompare");
+        if (request.defined(ARG_FREQUENCY)) {
+            base.append("?");
+            base.append(getFrequencyArgs(request));
+        }
+
+        return base.toString();
+    }
 
 
     /**

@@ -57,8 +57,14 @@ function CollectionForm(formId, type, args) {
                             return;
                         }
                     }
-                    if(HtmlUtil.valueDefined(value)) {
-                        url += "&" + this.name+ "=" + encodeURIComponent(value);
+                    if(typeof value === "string") {
+                       value = [value];
+                    }
+                    for (var i = 0; i < value.length; i++) {
+                       var s = value[i];
+                       if(HtmlUtil.valueDefined(s)) {
+                          url += "&" + this.name+ "=" + encodeURIComponent(s);
+                       }
                     }
                 });       
 
@@ -70,7 +76,7 @@ function CollectionForm(formId, type, args) {
 
                 if(doJson) {
                     var jsonUrl =  url + "&returnjson=true";
-                    //console.log("json url:" + jsonUrl);
+                    console.log("json url:" + jsonUrl);
 
                     //Define a variable pointing to this object so we can reference it in the callback below
                     var theCollectionForm  = this;
@@ -311,9 +317,18 @@ function CollectionForm(formId, type, args) {
                 var url = this.analysisUrl +"&json=test&thecollection=" + collectionId+"&field=" + fieldIdx;
                 //Assemble the other field values up to the currently selected field
                 for(var i=0;i<fieldIdx;i++) {
-                    var val = this.getFieldSelect(collection, i).val();
-                    if(val!="") {
-                        url = url +"&field" + i + "=" + encodeURIComponent(val);
+                    var value = this.getFieldSelect(collection, i).val();
+                    //if(val!="") {
+                    //    url = url +"&field" + i + "=" + encodeURIComponent(val);
+                    //}
+                    if(typeof value === 'string') {
+                       value = [value];
+                    }
+                    for (var j = 0; j < value.length; j++) {
+                       var s = value[j];
+                       if(HtmlUtil.valueDefined(s)) {
+                          url += "&field" + i + "=" + encodeURIComponent(s);
+                       }
                     }
                 }
                 var collectionForm = this;
