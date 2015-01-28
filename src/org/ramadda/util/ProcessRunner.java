@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -35,6 +35,9 @@ public class ProcessRunner extends Thread {
     /** a flag for whether the process is finished */
     private boolean finished = false;
 
+    /** _more_          */
+    private boolean processTimedOut = false;
+
     /** the process exit code */
     private int exitCode = 0;
 
@@ -66,7 +69,6 @@ public class ProcessRunner extends Thread {
         }
         synchronized (this) {
             notifyAll();
-            finished = true;
         }
     }
 
@@ -88,7 +90,6 @@ public class ProcessRunner extends Thread {
      * Wait for or kill the process
      */
     private void waitForOrKill() {
-
         //If we don't have a time out then we just want to wait until we're done
         if (timeoutMillis <= 0) {
             while ( !finished) {
@@ -106,8 +107,8 @@ public class ProcessRunner extends Thread {
                 // Ignore
             }
             if ( !finished) {
+                processTimedOut = true;
                 process.destroy();
-                exitCode = PROCESS_KILLED;
             }
         }
     }
@@ -117,8 +118,19 @@ public class ProcessRunner extends Thread {
      * @return process
      */
     public int getExitCode() {
-        return ( !finished)
-               ? PROCESS_KILLED
-               : exitCode;
+        return exitCode;
     }
+
+
+    /**
+     *  Get the ProcessTimedOut property.
+     *
+     *  @return The ProcessTimedOut
+     */
+    public boolean getProcessTimedOut() {
+        return processTimedOut;
+    }
+
+
+
 }
