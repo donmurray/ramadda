@@ -85,11 +85,14 @@ public class NCLOutputHandler extends OutputHandler {
     private static final String SCRIPT_KML = "kml.ncl";
 
     /** NCL map plot script */
+    private static final String SCRIPT_CHANGE_UNITS = "change_units.ncl";
+
+    /** NCL map plot script */
     private static final String SCRIPT_HLURESFILE = ".hluresfile";
 
-    /** sripts */
+    /** scripts */
     private static final String[] SCRIPTS = { SCRIPT_MAPPLOT, SCRIPT_KML,
-            "remove_middle_contours.ncl", "change_units.ncl", SCRIPT_HLURESFILE };
+            "remove_middle_contours.ncl", SCRIPT_CHANGE_UNITS, SCRIPT_HLURESFILE };
 
     /** NCL prefix string */
     private static final String ARG_NCL_PREFIX = "ncl_";
