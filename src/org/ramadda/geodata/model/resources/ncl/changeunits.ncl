@@ -220,6 +220,24 @@ begin
       end if
     end if
 
+    ;; Pressure
+    if (unitsIn .eq. "Pa" .or. \
+        unitsIn .eq. "kg m-1 s-2") then
+      if (unitsOut .eq. "mb" .or.  \
+          unitsOut .eq. "mbar" .or. \
+          unitsOut .eq. "hPa") then
+        dataOut = dataIn/100
+        dataOut@units = "hPa"
+      end if
+    end if
+    if (unitsIn .eq. "mb" .or.  \
+        unitsIn .eq. "mbar" .or. \
+        unitsIn .eq. "hPa") then
+      if (unitsOut .eq. "Pa") then
+        dataOut = dataIn*100
+        dataOut@units = "Pa"
+      end if
+    end if
   end if
   return dataOut
 
