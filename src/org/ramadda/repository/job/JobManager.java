@@ -227,7 +227,7 @@ public class JobManager extends RepositoryManager {
         if (service != null) {
             return service;
         }
-        if (!getAdmin().getInstallationComplete()) {
+        if ( !getAdmin().getInstallationComplete()) {
             return null;
         }
         Request request      = getRepository().getTmpRequest();
@@ -1000,8 +1000,9 @@ public class JobManager extends RepositoryManager {
             } finally {
                 process.destroy();
             }
-            exitCode = runnable.getExitCode();
-            if (exitCode == ProcessRunner.PROCESS_KILLED) {
+
+            //Check if the process timed out
+            if (runnable.getProcessTimedOut()) {
                 throw new InterruptedException("Process timed out");
             }
         }
