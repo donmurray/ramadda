@@ -1,5 +1,5 @@
 ;*************************************************
-; Function: changeUnits
+; Function: change_units
 ;
 ; Purpose:  change the units of the data
 ;
@@ -9,8 +9,8 @@
 ;
 ; Return:   the data in the new units
 ;*************************************************
-undef("changeUnits")
-function changeUnits(dataIn:float, unitsIn:string, unitsOut:string)
+undef("change_units")
+function change_units(dataIn:float, unitsIn:string, unitsOut:string)
 local dataOut
 
 begin

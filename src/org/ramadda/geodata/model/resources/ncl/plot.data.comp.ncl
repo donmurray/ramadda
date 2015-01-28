@@ -15,7 +15,7 @@ load "$NCARG_ROOT/lib/ncarg/nclscripts/contrib/ut_string.ncl"
 load "$NCARG_ROOT/lib/ncarg/nclscripts/contrib/calendar_decode2.ncl"
 load "$NCL_RESOURCES/kml.ncl"
 load "$NCL_RESOURCES/remove_middle_contours.ncl"
-load "$NCL_RESOURCES/changeunits.ncl"
+load "$NCL_RESOURCES/change_units.ncl"
 ;************************************************
 
 
@@ -205,7 +205,7 @@ begin
   if (opts@isanom .and.  (outunits .eq. "K" .or. outunits .eq. "degC")) then
     vardata@units = outunits
   else
-    vardata = changeUnits(vardata, units, opts@units)
+    vardata = change_units(vardata, units, opts@units)
   end if
   return(vardata)
 
@@ -258,7 +258,7 @@ local unit1, unit2, newData
 begin
 
   remappedData = remapData(data1,data2)
-  remappedData = changeUnits(remappedData, data2@units, data1@units)
+  remappedData = change_units(remappedData, data2@units, data1@units)
   return data1-remappedData
 
 end

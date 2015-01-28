@@ -89,7 +89,7 @@ public class NCLOutputHandler extends OutputHandler {
 
     /** sripts */
     private static final String[] SCRIPTS = { SCRIPT_MAPPLOT, SCRIPT_KML,
-            "remove_middle_contours.ncl", "changeunits.ncl", SCRIPT_HLURESFILE };
+            "remove_middle_contours.ncl", "change_units.ncl", SCRIPT_HLURESFILE };
 
     /** NCL prefix string */
     private static final String ARG_NCL_PREFIX = "ncl_";
