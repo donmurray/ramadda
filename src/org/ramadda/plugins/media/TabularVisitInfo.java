@@ -66,12 +66,6 @@ public class TabularVisitInfo {
      * @param entry _more_
      */
     public TabularVisitInfo(Request request, Entry entry) {
-        searchText = request.getString("table.text", (String) null);
-        if (searchText != null) {
-            searchTextWithPattern = "(?i:.*" + searchText + ".*)";
-        }
-
-
         if (TabularTypeHandler.isTabular(entry)) {
             searchFields = new ArrayList<TabularSearchField>();
             for (String line :
@@ -147,7 +141,6 @@ public class TabularVisitInfo {
 
         return true;
     }
-
 
 
     /**

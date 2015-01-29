@@ -47,6 +47,7 @@ import org.ramadda.util.text.CsvUtil;
 import org.ramadda.util.text.Filter;
 import org.ramadda.util.text.ProcessInfo;
 import org.ramadda.util.text.Processor;
+import org.ramadda.util.text.SearchField;
 
 
 import org.w3c.dom.*;
@@ -232,7 +233,6 @@ public class TabularOutputHandler extends OutputHandler {
             throws Exception {
         StringBuilder sb   = new StringBuilder();
 
-
         String        file = null;
         if (entry.isFile()) {
             file = entry.getFile().toString();
@@ -272,12 +272,13 @@ public class TabularOutputHandler extends OutputHandler {
         };
 
         List props = new ArrayList();
-        TabularVisitInfo visitInfo = new TabularVisitInfo(request, entry,
-                                         getSkipRows(request, entry),
-                                         getRowCount(request, entry,
-                                             MAX_ROWS), sheetsToShow);
-        visit(request, entry, visitInfo, visitor);
-        props.addAll(visitInfo.getTableProperties());
+
+        ProcessInfo info =  new ProcessInfo();
+        info.setSkip(getSkipRows(request, entry));
+        info.setMaxRows(getRowCount(request, entry,MAX_ROWS));
+        //        TabularVisitInfo visitInfo = new TabularVisitInfo(request, entry, sheetsToShow);
+        visit(request, entry, info, visitor);
+        props.addAll(info.getTableProperties());
         props.add("sheets");
         props.add(Json.list(sheets));
         sb.append(Json.map(props));
@@ -340,7 +341,7 @@ public class TabularOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public void visit(Request request, Entry entry,
-                      TabularVisitInfo visitInfo, TabularVisitor visitor)
+                      ProcessInfo visitInfo, TabularVisitor visitor)
             throws Exception {
 
         File file = entry.getFile();
@@ -361,14 +362,14 @@ public class TabularOutputHandler extends OutputHandler {
         }
 
         if (suffix.equals(".xlsx") || suffix.equals(".xls")) {
-            visitXls(request, entry, suffix, inputStream, visitInfo, visitor);
+            //            visitXls(request, entry, suffix, inputStream, visitInfo, visitor);
         } else if (suffix.endsWith(".csv")) {
             visitCsv(request, entry, inputStream, visitInfo, visitor);
         } else {
             if (isTabular(entry)) {
                 TabularTypeHandler tth =
                     (TabularTypeHandler) entry.getTypeHandler();
-                tth.visit(request, entry, inputStream, visitInfo, visitor);
+                //                tth.visit(request, entry, inputStream, visitInfo, visitor);
             } else {
                 throw new IllegalStateException("Unknown file type:"
                         + suffix);
@@ -392,40 +393,29 @@ public class TabularOutputHandler extends OutputHandler {
      */
     public void visitCsv(Request request, Entry entry,
                          InputStream inputStream,
-                         final TabularVisitInfo visitInfo,
+                         final ProcessInfo  info,
                          TabularVisitor visitor)
             throws Exception {
         BufferedReader br =
             new BufferedReader(new InputStreamReader(inputStream));
-        String                   line;
-        int                      rowIdx = 0;
         final List<List<Object>> rows   = new ArrayList<List<Object>>();
 
         ByteArrayOutputStream    bos    = new ByteArrayOutputStream();
-        ProcessInfo info =
-            new ProcessInfo(new BufferedInputStream(inputStream), bos);
+        
+        info.setInput(new BufferedInputStream(inputStream));
+        info.setOutput(bos);
+        info.getProcessor().addProcessor(new Processor() {
+                @Override
+                    public boolean processRow(ProcessInfo info, org.ramadda.util.text.Row row, String line) {
+                    List obj = new ArrayList();
+                    obj.addAll(row.getValues());
+                    rows.add((List<Object>) obj);
+                    return true;
+                }
+            });
 
-        info.setSkip(visitInfo.getSkipRows());
-        info.setMaxRows(visitInfo.getMaxRows());
-        Processor processor = new Processor() {
-            public void processRow(ProcessInfo info, List<String> toks) {
-                List obj = new ArrayList();
-                obj.addAll(toks);
-                rows.add((List<Object>) obj);
-            }
-        };
-        Filter.FilterGroup filterGroup = new Filter.FilterGroup();
-
-
-        filterGroup.addFilter(new Filter() {
-            public boolean rowOk(ProcessInfo info, List<String> toks) {
-                return visitInfo.rowOk(toks);
-            }
-        });
-
-        if (visitInfo.getSearchFields() != null) {
-            for (TabularSearchField searchField :
-                    visitInfo.getSearchFields()) {
+        if (info.getSearchFields() != null) {
+            for (SearchField searchField :  info.getSearchFields()) {
                 String id = "table." + searchField.getName();
                 if (request.defined(id)) {
                     //Columns are 1 based to the user
@@ -443,13 +433,14 @@ public class TabularOutputHandler extends OutputHandler {
                             s = s.replace(operator, "").trim();
                             double value = Double.parseDouble(s);
                             int op = Filter.ValueFilter.getOperator(operator);
-                            filterGroup.addFilter(
+                            info.getFilter().addFilter(
                                 new Filter.ValueFilter(column, op, value));
 
                             continue;
                         }
                         //                        if(s.
-                        filterGroup.addFilter(
+
+                        info.getFilter().addFilter(
                             new Filter.PatternFilter(
                                 column, request.getString(id, "")));
 
@@ -459,34 +450,16 @@ public class TabularOutputHandler extends OutputHandler {
             }
         }
 
-
-        CsvUtil.process(info, filterGroup, null, processor);
-
-        /*
-        while ((line = br.readLine()) != null) {
-            if (line.startsWith("#")) {
-                continue;
-            }
-            if (skipRows-- > 0) {
-                continue;
-            }
-            rowIdx++;
-            if ((maxRows >= 0) && (rowIdx > maxRows)) {
-                break;
-            }
-            List cols = Utils.tokenizeColumns(line, ",");
-            if ( !visitInfo.rowOk(cols)) {
-                continue;
-            }
-            rows.add((List<Object>) cols);
+        String searchText = request.getString("table.text", (String) null);
+        if (Utils.stringDefined(searchText)) {
+            //match all
+            info.getFilter().addFilter(new Filter.PatternFilter(-1, "(?i:.*" + searchText + ".*)"));
         }
-        */
 
 
-
-
-
-        visitor.visit(visitInfo, entry.getName(), rows);
+        System.err.println ("Process");
+        CsvUtil.process(info);
+        //        visitor.visit(visitInfo, entry.getName(), rows);
     }
 
 
@@ -579,20 +552,24 @@ public class TabularOutputHandler extends OutputHandler {
                     cols.add(value);
                 }
 
-                if ( !visitInfo.rowOk(cols)) {
+                /**** TODO
+                org.ramadda.util.text.Row row = new Row(cols);
+
+                if ( !visitInfo.rowOk(row)) {
                     if (rows.size() == 0) {
                         //todo: check for the header line
                     } else {
                         continue;
                     }
                 }
-                rows.add(cols);
+                *****/
+                //                rows.add(cols);
                 //                if(xxx>15) break;
             }
             //            System.err.println("Rows:" + rows);
-            if ( !visitor.visit(visitInfo, sheet.getSheetName(), rows)) {
-                break;
-            }
+            //            if ( !visitor.visit(visitInfo, sheet.getSheetName(), rows)) {
+            //                break;
+            //            }
         }
     }
 
@@ -724,14 +701,12 @@ public class TabularOutputHandler extends OutputHandler {
         propsList.add("url");
         propsList.add(Json.quote(jsonUrl));
 
+        /***
         TabularVisitInfo visitInfo = new TabularVisitInfo(request, entry);
-
-        System.err.println("search fields:" + visitInfo.getSearchFields());
-
         if (visitInfo.getSearchFields() != null) {
             propsList.add("searchFields");
             List<String> names = new ArrayList<String>();
-            for (TabularSearchField searchField :
+            for (SearchField searchField :
                     visitInfo.getSearchFields()) {
 
                 List<String> props = new ArrayList<String>();
@@ -743,6 +718,7 @@ public class TabularOutputHandler extends OutputHandler {
             }
             propsList.add(Json.list(names));
         }
+        */
 
         String props = Json.map(propsList);
         System.err.println(props);
@@ -858,9 +834,12 @@ public class TabularOutputHandler extends OutputHandler {
                 request, entry, getSkipRows(request, entry),
                 getRowCount(request, entry, Integer.MAX_VALUE), sheetsToShow);
 
+        ProcessInfo info =  new ProcessInfo();
+        info.setSkip(getSkipRows(request, entry));
+        info.setMaxRows(getRowCount(request, entry,MAX_ROWS));
         //        http:://localhost:8080/repository/entry/show?entryid=740ae258-805d-4a1f-935d-289d0a6e5519&output=media_tabular_extractsheet&serviceform=true&execute=Execute
 
-        visit(request, entry, visitInfo, visitor);
+        visit(request, entry, info, visitor);
 
         FileOutputStream fileOut = new FileOutputStream(newFile);
         wb.write(fileOut);
@@ -871,6 +850,64 @@ public class TabularOutputHandler extends OutputHandler {
 
     }
 
+
+
+    public boolean csv(Request request, Service service,
+                       ServiceInput input, List args)
+            throws Exception {
+        return true;
+    }
+
+    /*
+        Entry entry = null;
+        for (Entry e : input.getEntries()) {
+            if (isTabular(e)) {
+                entry = e;
+
+                break;
+            }
+        }
+        if (entry == null) {
+            throw new IllegalArgumentException("No tabular entry found");
+        }
+
+        HashSet<Integer> sheetsToShow = getSheetsToShow((String) args.get(0));
+        String name = getStorageManager().getFileTail(entry);
+        if ( !Utils.stringDefined(name)) {
+            name = entry.getName();
+        }
+        name = IOUtil.stripExtension(name);
+
+        File newFile = new File(IOUtil.joinDir(input.getProcessDir(),
+                           name + ".csv"));
+
+        String file = "";
+        InputStream inputStream = new BufferedInputStream(
+                                                          getStorageManager().getFileInputStream(file));
+        final ProcessInfo info =
+            new ProcessInfo(new BufferedInputStream(inputStream), new FileOutputStream(newFile));
+
+
+        TabularVisitor visitor = new TabularVisitor() {
+            public boolean visit(TabularVisitInfo info, String sheetName,
+                                 List<List<Object>> rows) {
+                return true;
+            }
+        };
+
+        TabularVisitInfo visitInfo =
+            new TabularVisitInfo(
+                request, entry, getSkipRows(request, entry),
+                getRowCount(request, entry, Integer.MAX_VALUE), sheetsToShow);
+
+
+        visit(request, entry, visitInfo, visitor);
+
+
+        return true;
+
+    }
+    */
 
 
 }
