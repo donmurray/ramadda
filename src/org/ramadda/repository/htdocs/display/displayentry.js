@@ -428,7 +428,8 @@ function RamaddaSearcher(displayManager, id, type, properties) {
             handleSearchError: function(url, msg) {
                 this.writeHtml(ID_ENTRIES, "");
                 this.writeHtml(ID_RESULTS, "");
-                alert("There was an error performing the search\n" + msg);
+                console.log("Error performing search:" + msg);
+                //alert("There was an error performing the search\n" + msg);
             },
             updateForSearching: function(jsonUrl) {
                 var outputs = this.getRamadda().getSearchLinks(this.searchSettings);
