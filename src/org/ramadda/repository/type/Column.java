@@ -892,10 +892,14 @@ public class Column implements DataTypes, Constants {
                 sb.append(dateTimeFormat.format((Date) values[offset]));
             }
         } else if (isType(DATATYPE_DATE)) {
-            if (sdf != null) {
-                sb.append(sdf.format((Date) values[offset]));
+            if(values[offset] == null) {
+                sb.append("null");
             } else {
-                sb.append(dateFormat.format((Date) values[offset]));
+                if (sdf != null) {
+                    sb.append(sdf.format((Date) values[offset]));             
+                } else {
+                    sb.append(dateFormat.format((Date) values[offset]));
+                }
             }
         } else if (isType(DATATYPE_ENTRY)) {
             String entryId  = toString(values, offset);
@@ -2330,14 +2334,26 @@ public class Column implements DataTypes, Constants {
         } else if (isDate()) {
             fullDateTimeFormat.setTimeZone(RepositoryBase.TIMEZONE_UTC);
             values[offset] = parseDate(value);
-        } else if (isType(DATATYPE_BOOLEAN)) {
-            values[offset] = new Boolean(value);
         } else if (isEnumeration()) {
             values[offset] = value;
+        } else if (isType(DATATYPE_BOOLEAN)) {
+            if(Utils.stringDefined(value)) {
+                values[offset] = new Boolean(value);
+            } else {
+                values[offset] = new Boolean(false);
+            }
         } else if (isType(DATATYPE_INT)) {
-            values[offset] = new Integer(value);
+            if(Utils.stringDefined(value)) {
+                values[offset] = new Integer(value);
+            } else {
+                values[offset] = new Integer(0);
+            }
         } else if (isType(DATATYPE_PERCENTAGE) || isDouble()) {
-            values[offset] = new Double(value);
+            if(Utils.stringDefined(value)) {
+                values[offset] = new Double(value);
+            }   else {
+                values[offset] = new Double(0);
+            }
         } else if (isType(DATATYPE_ENTRY)) {
             values[offset] = value;
         } else {
@@ -2356,6 +2372,10 @@ public class Column implements DataTypes, Constants {
      * @throws Exception _more_
      */
     private Date parseDate(String value) throws Exception {
+        if(!Utils.stringDefined(value)) {
+            return null;
+        }
+
         if (dateParser != null) {
             return dateParser.parse(value);
         }
