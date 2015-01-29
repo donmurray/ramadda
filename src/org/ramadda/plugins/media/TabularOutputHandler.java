@@ -45,7 +45,7 @@ import org.ramadda.util.Utils;
 import org.ramadda.util.XlsUtil;
 import org.ramadda.util.text.CsvUtil;
 import org.ramadda.util.text.Filter;
-import org.ramadda.util.text.ProcessInfo;
+import org.ramadda.util.text.Visitor;
 import org.ramadda.util.text.Processor;
 import org.ramadda.util.text.SearchField;
 
@@ -273,7 +273,7 @@ public class TabularOutputHandler extends OutputHandler {
 
         List props = new ArrayList();
 
-        ProcessInfo info =  new ProcessInfo();
+        Visitor info =  new Visitor();
         info.setSkip(getSkipRows(request, entry));
         info.setMaxRows(getRowCount(request, entry,MAX_ROWS));
         //        TabularVisitInfo visitInfo = new TabularVisitInfo(request, entry, sheetsToShow);
@@ -341,7 +341,7 @@ public class TabularOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public void visit(Request request, Entry entry,
-                      ProcessInfo visitInfo, TabularVisitor visitor)
+                      Visitor visitInfo, TabularVisitor visitor)
             throws Exception {
 
         File file = entry.getFile();
@@ -393,7 +393,7 @@ public class TabularOutputHandler extends OutputHandler {
      */
     public void visitCsv(Request request, Entry entry,
                          InputStream inputStream,
-                         final ProcessInfo  info,
+                         final Visitor  info,
                          TabularVisitor visitor)
             throws Exception {
         BufferedReader br =
@@ -406,7 +406,7 @@ public class TabularOutputHandler extends OutputHandler {
         info.setOutput(bos);
         info.getProcessor().addProcessor(new Processor() {
                 @Override
-                    public boolean processRow(ProcessInfo info, org.ramadda.util.text.Row row, String line) {
+                    public boolean processRow(Visitor info, org.ramadda.util.text.Row row, String line) {
                     List obj = new ArrayList();
                     obj.addAll(row.getValues());
                     rows.add((List<Object>) obj);
@@ -834,7 +834,7 @@ public class TabularOutputHandler extends OutputHandler {
                 request, entry, getSkipRows(request, entry),
                 getRowCount(request, entry, Integer.MAX_VALUE), sheetsToShow);
 
-        ProcessInfo info =  new ProcessInfo();
+        Visitor info =  new Visitor();
         info.setSkip(getSkipRows(request, entry));
         info.setMaxRows(getRowCount(request, entry,MAX_ROWS));
         //        http:://localhost:8080/repository/entry/show?entryid=740ae258-805d-4a1f-935d-289d0a6e5519&output=media_tabular_extractsheet&serviceform=true&execute=Execute
@@ -884,8 +884,8 @@ public class TabularOutputHandler extends OutputHandler {
         String file = "";
         InputStream inputStream = new BufferedInputStream(
                                                           getStorageManager().getFileInputStream(file));
-        final ProcessInfo info =
-            new ProcessInfo(new BufferedInputStream(inputStream), new FileOutputStream(newFile));
+        final Visitor info =
+            new Visitor(new BufferedInputStream(inputStream), new FileOutputStream(newFile));
 
 
         TabularVisitor visitor = new TabularVisitor() {
