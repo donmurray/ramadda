@@ -86,7 +86,7 @@ public abstract class Converter {
      *
      * @return _more_
      */
-    public abstract Row convert(ProcessInfo info, Row row);
+    public abstract Row convert(Visitor info, Row row);
 
     /**
      * _more_
@@ -95,7 +95,7 @@ public abstract class Converter {
      *
      * @return _more_
      */
-    public int getIndex(ProcessInfo info) {
+    public int getIndex(Visitor info) {
 
         if (index < 0) {
             if (index == INDEX_ALL) {
@@ -151,7 +151,7 @@ public abstract class Converter {
          * @return _more_
          */
         @Override
-        public Row convert(ProcessInfo info, Row row) {
+        public Row convert(Visitor info, Row row) {
             for (Converter child : converters) {
                 row = child.convert(info, row);
                 if (row == null) {
@@ -195,7 +195,7 @@ public abstract class Converter {
          *
          * @return _more_
          */
-        public List<Integer> getIndices(ProcessInfo info) {
+        public List<Integer> getIndices(Visitor info) {
             if (indices == null) {
                 indices = new ArrayList<Integer>();
                 for (String s : sindices) {
@@ -222,7 +222,7 @@ public abstract class Converter {
          * @return _more_
          */
         @Override
-        public Row convert(ProcessInfo info, Row row) {
+        public Row convert(Visitor info, Row row) {
 
             getIndices(info);
             if (indices == null) {
@@ -290,7 +290,7 @@ public abstract class Converter {
          * @return _more_
          */
         @Override
-        public Row convert(ProcessInfo info, Row row) {
+        public Row convert(Visitor info, Row row) {
             int index = getIndex(info);
             if (index == INDEX_ALL) {
                 for (int i = 0; i < row.getValues().size(); i++) {
@@ -351,7 +351,7 @@ public abstract class Converter {
          * @return _more_
          */
         @Override
-        public Row convert(ProcessInfo info, Row row) {
+        public Row convert(Visitor info, Row row) {
             int index = getIndex(info);
             if ((index < 0) || (index >= row.size())) {
                 return row;
@@ -397,7 +397,7 @@ public abstract class Converter {
          * @return _more_
          */
         @Override
-        public Row convert(ProcessInfo info, Row row) {
+        public Row convert(Visitor info, Row row) {
             int index = getIndex(info);
             if ((index < 0) || (index >= row.size())) {
                 return row;
@@ -444,7 +444,7 @@ public abstract class Converter {
          * @return _more_
          */
         @Override
-        public Row convert(ProcessInfo info, Row row) {
+        public Row convert(Visitor info, Row row) {
             int index = getIndex(info);
             if ((index < 0) || (index >= row.size())) {
                 return row;

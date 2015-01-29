@@ -61,7 +61,7 @@ public abstract class Processor {
      *
      * @return _more_
      */
-    public boolean processRow(ProcessInfo info, Row row, String line) {
+    public boolean processRow(Visitor info, Row row, String line) {
         return true;
     }
 
@@ -72,7 +72,7 @@ public abstract class Processor {
      *
      * @throws Exception On badness
      */
-    public void finish(ProcessInfo info) throws Exception {}
+    public void finish(Visitor info) throws Exception {}
 
     /**
      * _more_
@@ -129,7 +129,7 @@ public abstract class Processor {
          * @return _more_
          */
         @Override
-        public boolean processRow(ProcessInfo info, Row row, String line) {
+        public boolean processRow(Visitor info, Row row, String line) {
             if (processors.size() == 0) {
                 if (info.getRow() == 0) {
                     //not now
@@ -159,7 +159,7 @@ public abstract class Processor {
          * @throws Exception On badness
          */
         @Override
-        public void finish(ProcessInfo info) throws Exception {
+        public void finish(Visitor info) throws Exception {
             for (int i = 0; i < processors.size(); i++) {
                 Processor processor = processors.get(i);
                 if (i > 0) {
@@ -240,7 +240,7 @@ public abstract class Processor {
          * @return _more_
          */
         @Override
-        public boolean processRow(ProcessInfo info, Row row, String line) {
+        public boolean processRow(Visitor info, Row row, String line) {
             boolean first = false;
             if (values == null) {
                 values = new ArrayList<Double>();
@@ -293,7 +293,7 @@ public abstract class Processor {
          * @throws Exception On badness
          */
         @Override
-        public void finish(ProcessInfo info) throws Exception {
+        public void finish(Visitor info) throws Exception {
             if (values == null) {
                 Converter.ColumnSelector selector = info.getSelector();
                 if ((selector != null)
@@ -365,7 +365,7 @@ public abstract class Processor {
          * @return _more_
          */
         @Override
-        public boolean processRow(ProcessInfo info, Row row, String line) {
+        public boolean processRow(Visitor info, Row row, String line) {
             rows.add(row);
 
             return true;
@@ -418,7 +418,7 @@ public abstract class Processor {
          * @throws Exception On badness
          */
         @Override
-        public void finish(ProcessInfo info) throws Exception {
+        public void finish(Visitor info) throws Exception {
             int columnIndex = 0;
             while (true) {
                 boolean stillHaveData = false;
@@ -471,7 +471,7 @@ public abstract class Processor {
          * @throws Exception On badness
          */
         @Override
-        public void finish(ProcessInfo info) throws Exception {
+        public void finish(Visitor info) throws Exception {
             List<Row> rows = getRows();
             for (int i = rows.size() - 1; i >= 0; i--) {
                 Row row = rows.get(i);
@@ -525,7 +525,7 @@ public abstract class Processor {
          * @return _more_
          */
         @Override
-        public boolean processRow(ProcessInfo info, Row row, String line) {
+        public boolean processRow(Visitor info, Row row, String line) {
             boolean first = false;
             if (contains == null) {
                 contains = new ArrayList<HashSet>();
@@ -555,7 +555,7 @@ public abstract class Processor {
          *   @throws Exception On badness
          */
         @Override
-        public void finish(ProcessInfo info) throws Exception {
+        public void finish(Visitor info) throws Exception {
             if (contains == null) {
                 info.getWriter().print("-0");
             } else {
@@ -613,7 +613,7 @@ public abstract class Processor {
          * @return _more_
          */
         @Override
-        public boolean processRow(ProcessInfo info, Row row, String line) {
+        public boolean processRow(Visitor info, Row row, String line) {
             uniqueCounts.add(row.size());
             count++;
 
@@ -628,7 +628,7 @@ public abstract class Processor {
          *   @throws Exception On badness
          */
         @Override
-        public void finish(ProcessInfo info) throws Exception {
+        public void finish(Visitor info) throws Exception {
             info.getWriter().print(count);
             //            System.err.println(uniqueCounts);
         }

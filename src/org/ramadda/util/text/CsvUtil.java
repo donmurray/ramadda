@@ -161,7 +161,7 @@ public class CsvUtil {
                                            XmlUtil.attrs("id", id, "name",
                                                name, "icon",
                                                    "/db/database.png")));
-            ProcessInfo info = new ProcessInfo();
+            Visitor info = new Visitor();
             info.setDelimiter(",");
             info.setSkip(0);
             info.setInput(new BufferedInputStream(new FileInputStream(file)));
@@ -214,13 +214,13 @@ public class CsvUtil {
 
 
     /**
-     * Run through the csv file in the ProcessInfo
+     * Run through the csv file in the Visitor
      *
      * @param info Holds input, output, skip, delimiter, etc
      *
      * @throws Exception On badness
      */
-    public static void process(ProcessInfo info) throws Exception {
+    public static void process(Visitor info) throws Exception {
         int rowIdx      = 0;
         int visitedRows = 0;
         int cnt         = 0;
@@ -394,7 +394,7 @@ public class CsvUtil {
         List<String> iterateValues = new ArrayList<String>();
         List<String> files         = new ArrayList<String>();
 
-        ProcessInfo  info          = new ProcessInfo();
+        Visitor  info          = new Visitor();
 
 
         List<String> extra         = new ArrayList<String>();
@@ -487,7 +487,7 @@ public class CsvUtil {
      *
      * @throws Exception _more_
      */
-    public static void parseArgs(List<String> args, ProcessInfo info,
+    public static void parseArgs(List<String> args, Visitor info,
                                  List<String> files)
             throws Exception {
 
@@ -755,7 +755,7 @@ public class CsvUtil {
      * @param filterToAddTo _more_
      * @param converter _more_
      */
-    private static void handlePattern(ProcessInfo info,
+    private static void handlePattern(Visitor info,
                                       Filter.FilterGroup filterToAddTo,
                                       Filter converter) {
         if (filterToAddTo != null) {

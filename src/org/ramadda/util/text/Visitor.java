@@ -50,7 +50,7 @@ import java.util.regex.*;
  */
 
 
-public class ProcessInfo implements Cloneable {
+public class Visitor implements Cloneable {
 
 
     /** _more_ */
@@ -121,7 +121,7 @@ public class ProcessInfo implements Cloneable {
     /**
      * _more_
      */
-    public ProcessInfo() {}
+    public Visitor() {}
 
 
 
@@ -148,9 +148,9 @@ public class ProcessInfo implements Cloneable {
      *
      * @throws CloneNotSupportedException _more_
      */
-    public ProcessInfo cloneMe(InputStream input, OutputStream output)
+    public Visitor cloneMe(InputStream input, OutputStream output)
             throws CloneNotSupportedException {
-        ProcessInfo that = (ProcessInfo) super.clone();
+        Visitor that = (Visitor) super.clone();
         that.input  = input;
         that.output = output;
         that.writer = new PrintWriter(that.output);

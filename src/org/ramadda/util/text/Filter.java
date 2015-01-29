@@ -69,7 +69,7 @@ public class Filter extends Converter {
      * @return _more_
      */
     @Override
-    public Row convert(ProcessInfo info, Row row) {
+    public Row convert(Visitor info, Row row) {
         if (rowOk(info, row)) {
             return row;
         } else {
@@ -86,7 +86,7 @@ public class Filter extends Converter {
      *
      * @return _more_
      */
-    public boolean rowOk(ProcessInfo info, Row row) {
+    public boolean rowOk(Visitor info, Row row) {
         return true;
     }
 
@@ -98,7 +98,7 @@ public class Filter extends Converter {
      *
      * @return _more_
      */
-    public boolean lineOk(ProcessInfo info, String line) {
+    public boolean lineOk(Visitor info, String line) {
         if ((commentPrefix != null) && line.startsWith(commentPrefix)) {
             return false;
         }
@@ -178,7 +178,7 @@ public class Filter extends Converter {
          *
          * @return _more_
          */
-        public int getIndex(ProcessInfo info) {
+        public int getIndex(Visitor info) {
             if (col >= 0) {
                 return col;
             }
@@ -242,7 +242,7 @@ public class Filter extends Converter {
          * @return _more_
          */
         @Override
-        public boolean rowOk(ProcessInfo info, Row row) {
+        public boolean rowOk(Visitor info, Row row) {
             if (filters.size() == 0) {
                 return true;
             }
@@ -336,7 +336,7 @@ public class Filter extends Converter {
          *
          * @return _more_
          */
-        public boolean rowOk(ProcessInfo info, Row row) {
+        public boolean rowOk(Visitor info, Row row) {
             int idx = getIndex(info);
             if (idx >= row.size()) {
                 return doNegate(false);
@@ -464,7 +464,7 @@ public class Filter extends Converter {
          *
          * @return _more_
          */
-        public boolean rowOk(ProcessInfo info, Row row) {
+        public boolean rowOk(Visitor info, Row row) {
             int idx = getIndex(info);
             if (idx >= row.size()) {
                 return false;
@@ -541,7 +541,7 @@ public class Filter extends Converter {
          * @return _more_
          */
         @Override
-        public boolean rowOk(ProcessInfo info, Row row) {
+        public boolean rowOk(Visitor info, Row row) {
             currentRow++;
             if ((start >= 0) && (currentRow < start)) {
                 return false;
