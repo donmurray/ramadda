@@ -58,8 +58,12 @@ public abstract class Processor {
      * @param info _more_
      * @param row _more_
      * @param line _more_
+     *
+     * @return _more_
      */
-    public void processRow(ProcessInfo info, Row row, String line) {}
+    public boolean processRow(ProcessInfo info, Row row, String line) {
+        return true;
+    }
 
     /**
      * _more_
@@ -105,6 +109,7 @@ public abstract class Processor {
         }
 
 
+
         /**
          * _more_
          */
@@ -120,9 +125,11 @@ public abstract class Processor {
          * @param info _more_
          * @param row _more_
          * @param line _more_
+         *
+         * @return _more_
          */
         @Override
-        public void processRow(ProcessInfo info, Row row, String line) {
+        public boolean processRow(ProcessInfo info, Row row, String line) {
             if (processors.size() == 0) {
                 if (info.getRow() == 0) {
                     //not now
@@ -131,12 +138,17 @@ public abstract class Processor {
                     }
                 }
                 info.getWriter().println(
-                    CsvUtil.columnsToString(row.getValues(), ","));
+                    CsvUtil.columnsToString(
+                        row.getValues(), info.getOutputDelimiter()));
                 info.getWriter().flush();
             }
             for (Processor processor : processors) {
-                processor.processRow(info, row, line);
+                if ( !processor.processRow(info, row, line)) {
+                    return false;
+                }
             }
+
+            return true;
         }
 
         /**
@@ -151,14 +163,14 @@ public abstract class Processor {
             for (int i = 0; i < processors.size(); i++) {
                 Processor processor = processors.get(i);
                 if (i > 0) {
-                    info.getWriter().print(",");
+                    info.print(",");
                 }
                 processor.finish(info);
             }
             if (processors.size() > 0) {
-                info.getWriter().print("\n");
+                info.print("\n");
             }
-            info.getWriter().flush();
+            info.flush();
         }
     }
 
@@ -224,9 +236,11 @@ public abstract class Processor {
          * @param info _more_
          * @param row _more_
          * @param line _more_
+         *
+         * @return _more_
          */
         @Override
-        public void processRow(ProcessInfo info, Row row, String line) {
+        public boolean processRow(ProcessInfo info, Row row, String line) {
             boolean first = false;
             if (values == null) {
                 values = new ArrayList<Double>();
@@ -267,6 +281,8 @@ public abstract class Processor {
                     //                    System.err.println("line:" + theLine);
                 }
             }
+
+            return true;
         }
 
         /**
@@ -311,6 +327,163 @@ public abstract class Processor {
     }
 
 
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Fri, Jan 9, '15
+     * @author         Jeff McWhirter
+     */
+    public static class RowCollector extends Processor {
+
+        /** _more_ */
+        private List<Row> rows = new ArrayList<Row>();
+
+
+        /**
+         * _more_
+         *
+         */
+        public RowCollector() {}
+
+        /**
+         * _more_
+         */
+        @Override
+        public void reset() {
+            rows = new ArrayList<Row>();
+        }
+
+        /**
+         * _more_
+         *
+         *
+         * @param info _more_
+         * @param row _more_
+         * @param line _more_
+         *
+         * @return _more_
+         */
+        @Override
+        public boolean processRow(ProcessInfo info, Row row, String line) {
+            rows.add(row);
+
+            return true;
+        }
+
+        /**
+         *  Set the Rows property.
+         *
+         *  @param value The new value for Rows
+         */
+        public void setRows(List<Row> value) {
+            rows = value;
+        }
+
+        /**
+         *  Get the Rows property.
+         *
+         *  @return The Rows
+         */
+        public List<Row> getRows() {
+            return rows;
+        }
+
+
+    }
+
+
+
+
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Fri, Jan 9, '15
+     * @author         Jeff McWhirter
+     */
+    public static class Rotator extends RowCollector {
+
+        /**
+         * _more_
+         *
+         */
+        public Rotator() {}
+
+        /**
+         * _more_
+         *
+         * @param info _more_
+         *
+         * @throws Exception On badness
+         */
+        @Override
+        public void finish(ProcessInfo info) throws Exception {
+            int columnIndex = 0;
+            while (true) {
+                boolean stillHaveData = false;
+                int     rowIndex      = 0;
+                for (Row row : getRows()) {
+                    List values = row.getValues();
+                    if (columnIndex < values.size()) {
+                        //info.getWriter().print(",");
+                        if (rowIndex > 0) {
+                            info.getWriter().print(",");
+                        }
+                        info.getWriter().print(values.get(columnIndex));
+                        stillHaveData = true;
+                    }
+                    rowIndex++;
+                }
+                info.getWriter().print("\n");
+                columnIndex++;
+                if ( !stillHaveData) {
+                    break;
+                }
+
+            }
+        }
+
+    }
+
+
+
+
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Fri, Jan 9, '15
+     * @author         Jeff McWhirter
+     */
+    public static class Flipper extends RowCollector {
+
+        /**
+         * ctor
+         */
+        public Flipper() {}
+
+        /**
+         * _more_
+         *
+         * @param info _more_
+         *
+         * @throws Exception On badness
+         */
+        @Override
+        public void finish(ProcessInfo info) throws Exception {
+            List<Row> rows = getRows();
+            for (int i = rows.size() - 1; i >= 0; i--) {
+                Row row = rows.get(i);
+                info.getWriter().println(
+                    CsvUtil.columnsToString(row.getValues(), ","));
+            }
+        }
+
+    }
+
+
+
 
 
     /**
@@ -348,9 +521,11 @@ public abstract class Processor {
          * @param info _more_
          * @param row _more_
          * @param line _more_
+         *
+         * @return _more_
          */
         @Override
-        public void processRow(ProcessInfo info, Row row, String line) {
+        public boolean processRow(ProcessInfo info, Row row, String line) {
             boolean first = false;
             if (contains == null) {
                 contains = new ArrayList<HashSet>();
@@ -368,6 +543,8 @@ public abstract class Processor {
                 contains.get(i).add(s);
                 values.get(i).add(s);
             }
+
+            return true;
         }
 
         /**
@@ -432,11 +609,15 @@ public abstract class Processor {
          * @param info _more_
          * @param row _more_
          * @param line _more_
+         *
+         * @return _more_
          */
         @Override
-        public void processRow(ProcessInfo info, Row row, String line) {
+        public boolean processRow(ProcessInfo info, Row row, String line) {
             uniqueCounts.add(row.size());
             count++;
+
+            return true;
         }
 
         /**

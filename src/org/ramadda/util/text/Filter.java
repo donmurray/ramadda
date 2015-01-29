@@ -49,7 +49,7 @@ import java.util.regex.*;
  * @author Jeff McWhirter
  */
 
-public class Filter {
+public class Filter extends Converter {
 
     /** _more_ */
     private String commentPrefix = "#";
@@ -59,6 +59,23 @@ public class Filter {
      * _more_
      */
     public Filter() {}
+
+    /**
+     * _more_
+     *
+     * @param info _more_
+     * @param row _more_
+     *
+     * @return _more_
+     */
+    @Override
+    public Row convert(ProcessInfo info, Row row) {
+        if (rowOk(info, row)) {
+            return row;
+        } else {
+            return null;
+        }
+    }
 
     /**
      * _more_
@@ -324,6 +341,17 @@ public class Filter {
             if (idx >= row.size()) {
                 return doNegate(false);
             }
+            if (idx < 0) {
+                for (int i = 0; i < row.size(); i++) {
+                    String v = row.getString(i);
+                    if (pattern.matcher(v).find()) {
+                        return doNegate(true);
+                    }
+                }
+
+                return doNegate(false);
+            }
+
             String v = row.getString(idx);
             if (pattern.matcher(v).find()) {
                 return doNegate(true);
@@ -471,6 +499,65 @@ public class Filter {
         }
 
     }
+
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Fri, Jan 9, '15
+     * @author         Jeff McWhirter
+     */
+    public static class Cutter extends Filter {
+
+        /** _more_ */
+        private int currentRow = -1;
+
+        /** _more_ */
+        private int start = -1;
+
+        /** _more_ */
+        private int end = -1;
+
+
+        /**
+         * _more_
+         *
+         * @param op _more_
+         *
+         * @param start _more_
+         * @param end _more_
+         */
+        public Cutter(int start, int end) {
+            this.start = start;
+            this.end   = end;
+        }
+
+        /**
+         * _more_
+         *
+         * @param info _more_
+         * @param row _more_
+         *
+         * @return _more_
+         */
+        @Override
+        public boolean rowOk(ProcessInfo info, Row row) {
+            currentRow++;
+            if ((start >= 0) && (currentRow < start)) {
+                return false;
+            }
+            if ((end >= 0) && (currentRow > end)) {
+                return false;
+            }
+
+            return true;
+        }
+
+
+
+    }
+
+
 
 
 }

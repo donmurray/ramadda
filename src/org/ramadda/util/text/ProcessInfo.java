@@ -50,7 +50,8 @@ import java.util.regex.*;
  */
 
 
-public class ProcessInfo {
+public class ProcessInfo implements Cloneable {
+
 
     /** _more_ */
     private PrintWriter writer;
@@ -62,7 +63,14 @@ public class ProcessInfo {
     private OutputStream output;
 
     /** _more_ */
+    private int nextChar = -1;
+
+
+    /** _more_ */
     private String delimiter = null;
+
+    /** _more_ */
+    private String outputDelimiter = ",";
 
     /** _more_ */
     private int skip = 0;
@@ -75,6 +83,23 @@ public class ProcessInfo {
 
 
     /** _more_ */
+    private Converter.ColumnSelector selector;
+
+    /** _more_          */
+    private Filter.FilterGroup filter = new Filter.FilterGroup();
+
+    /** _more_ */
+    private Converter.ConverterGroup converter =
+        new Converter.ConverterGroup();
+
+    /** _more_ */
+    private Processor.ProcessorGroup processor =
+        new Processor.ProcessorGroup();
+
+    /** _more_ */
+    private DecimalFormat format;
+
+    /** _more_ */
     private List<String> headerLines = new ArrayList<String>();
 
     /** _more_ */
@@ -84,21 +109,170 @@ public class ProcessInfo {
     private List<String> columnNames;
 
     /** _more_ */
-    private DecimalFormat format;
+    private List props = new ArrayList();
 
     /** _more_ */
-    private Converter.ColumnSelector selector;
+    private HashSet<Integer> sheetsToShow;
 
+    /** _more_ */
+    private List<SearchField> searchFields = new ArrayList<SearchField>();
+
+
+    /**
+     * _more_
+     */
+    public ProcessInfo() {}
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws CloneNotSupportedException _more_
+     */
+    public Object clone() throws CloneNotSupportedException {
+        Object that = super.clone();
+
+        return that;
+    }
 
     /**
      * _more_
      *
      * @param input _more_
      * @param output _more_
+     *
+     * @return _more_
+     *
+     * @throws CloneNotSupportedException _more_
      */
-    public ProcessInfo(InputStream input, OutputStream output) {
-        this(input, output, null);
+    public ProcessInfo cloneMe(InputStream input, OutputStream output)
+            throws CloneNotSupportedException {
+        ProcessInfo that = (ProcessInfo) super.clone();
+        that.input  = input;
+        that.output = output;
+        that.writer = new PrintWriter(that.output);
+
+        return that;
     }
+
+
+    /**
+     * _more_
+     *
+     * @param info _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public String readLine() throws Exception {
+        //        System.err.println("readline");
+        StringBuilder lb = new StringBuilder();
+        int           c;
+        boolean       inQuote         = false;
+        StringBuilder sb              = new StringBuilder();
+        char          NEWLINE         = '\n';
+        char          CARRIAGE_RETURN = '\r';
+        while (true) {
+
+            /*
+            if (lb.length() > 750) {
+                System.err.println("Whoa:" + lb);
+                System.err.println(sb);
+                System.exit(0);
+            }
+            */
+
+            if (nextChar >= 0) {
+                c        = nextChar;
+                nextChar = -1;
+            } else {
+                c = getInput().read();
+            }
+            if (c == -1) {
+                break;
+            }
+
+            if (c == NEWLINE) {
+                sb.append("\t************** new line:" + inQuote + "\n");
+                if ( !inQuote) {
+                    break;
+                }
+            } else if (c == CARRIAGE_RETURN) {
+                sb.append("\tcr:" + inQuote + "\n");
+                if ( !inQuote) {
+                    nextChar = getInput().read();
+                    if (nextChar == -1) {
+                        break;
+                    }
+                    if (nextChar == NEWLINE) {
+                        nextChar = -1;
+                    }
+
+                    break;
+                }
+            } else {
+                sb.append("\tchar:" + (char) c + "  " + inQuote + "\n");
+            }
+            lb.append((char) c);
+            if (c == '"') {
+                //                sb.append("\tquote: "  + inQuote+"\n");
+                if ( !inQuote) {
+                    //                    sb.append("\tinto quote\n");
+                    inQuote = true;
+                } else {
+                    nextChar = getInput().read();
+                    if (nextChar == -1) {
+                        break;
+                    }
+                    if (nextChar != '"') {
+                        //                        sb.append("\tout quote\n");
+                        inQuote = false;
+                        if (nextChar == NEWLINE) {
+                            //                            sb.append("\t************** new line:" + inQuote+"\n");
+                            break;
+                        }
+                    }
+                    //                    sb.append("\tnext char:" +(char) nextChar+"\n");
+                    lb.append((char) nextChar);
+                    nextChar = -1;
+                }
+            }
+
+        }
+        //        System.out.println(sb);
+
+
+        String line = lb.toString();
+        if (line.length() == 0) {
+            return null;
+        }
+
+        //        System.err.println("LINE:" + line);
+        return line;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param sheetIdx _more_
+     *
+     * @return _more_
+     */
+    public boolean okToShowSheet(int sheetIdx) {
+        if ((sheetsToShow != null) && !sheetsToShow.contains(sheetIdx)) {
+            return false;
+        }
+
+        return true;
+    }
+
+
 
     /**
      *  Set the Selector property.
@@ -174,20 +348,6 @@ public class ProcessInfo {
 
 
 
-    /**
-     * _more_
-     *
-     * @param input _more_
-     * @param output _more_
-     * @param delimiter _more_
-     */
-    public ProcessInfo(InputStream input, OutputStream output,
-                       String delimiter) {
-        this.input     = input;
-        this.output    = output;
-        this.writer    = new PrintWriter(this.output);
-        this.delimiter = delimiter;
-    }
 
     /**
      * _more_
@@ -196,6 +356,28 @@ public class ProcessInfo {
      */
     public PrintWriter getWriter() {
         return writer;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param s _more_
+     */
+    public void print(String s) {
+        if (writer != null) {
+            writer.print(s);
+        }
+    }
+
+
+    /**
+     * _more_
+     */
+    public void flush() {
+        if (writer != null) {
+            writer.flush();
+        }
     }
 
 
@@ -346,6 +528,128 @@ public class ProcessInfo {
         return delimiter;
     }
 
+
+    /**
+     * Set the Converter property.
+     *
+     * @param value The new value for Converter
+     */
+    public void setConverter(Converter.ConverterGroup value) {
+        converter = value;
+    }
+
+    /**
+     * Get the Converter property.
+     *
+     * @return The Converter
+     */
+    public Converter.ConverterGroup getConverter() {
+        return converter;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public Filter.FilterGroup getFilter() {
+        return filter;
+    }
+
+
+    /**
+     * Set the Processor property.
+     *
+     * @param value The new value for Processor
+     */
+    public void setProcessor(Processor.ProcessorGroup value) {
+        processor = value;
+    }
+
+    /**
+     * Get the Processor property.
+     *
+     * @return The Processor
+     */
+    public Processor.ProcessorGroup getProcessor() {
+        return processor;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param name _more_
+     * @param value _more_
+     */
+    public void addTableProperty(String name, String value) {
+        props.add(name);
+        props.add(value);
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public List getTableProperties() {
+        return props;
+    }
+
+    /**
+     *  Set the SheetsToShow property.
+     *
+     *  @param value The new value for SheetsToShow
+     */
+    public void setSheetsToShow(HashSet<Integer> value) {
+        sheetsToShow = value;
+    }
+
+    /**
+     *  Get the SheetsToShow property.
+     *
+     *  @return The SheetsToShow
+     */
+    public HashSet<Integer> getSheetsToShow() {
+        return sheetsToShow;
+    }
+
+
+    /**
+     * Set the SearchFields property.
+     *
+     * @param value The new value for SearchFields
+     */
+    public void setSearchFields(List<SearchField> value) {
+        searchFields = value;
+    }
+
+    /**
+     * Get the SearchFields property.
+     *
+     * @return The SearchFields
+     */
+    public List<SearchField> getSearchFields() {
+        return searchFields;
+    }
+
+    /**
+     * Set the OutputDelimiter property.
+     *
+     * @param value The new value for OutputDelimiter
+     */
+    public void setOutputDelimiter(String value) {
+        outputDelimiter = value;
+    }
+
+    /**
+     * Get the OutputDelimiter property.
+     *
+     * @return The OutputDelimiter
+     */
+    public String getOutputDelimiter() {
+        return outputDelimiter;
+    }
 
 
 

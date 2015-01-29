@@ -55,6 +55,9 @@ import java.util.regex.*;
 public abstract class Converter {
 
     /** _more_ */
+    public static final int INDEX_ALL = -9999;
+
+    /** _more_ */
     private int index = -1;
 
     /** _more_ */
@@ -93,8 +96,16 @@ public abstract class Converter {
      * @return _more_
      */
     public int getIndex(ProcessInfo info) {
+
         if (index < 0) {
-            index = info.getColumnIndex(scol);
+            if (index == INDEX_ALL) {
+                return INDEX_ALL;
+            }
+            if (scol.equals("all")) {
+                index = INDEX_ALL;
+            } else {
+                index = info.getColumnIndex(scol);
+            }
         }
 
         return index;
@@ -139,9 +150,13 @@ public abstract class Converter {
          *
          * @return _more_
          */
+        @Override
         public Row convert(ProcessInfo info, Row row) {
             for (Converter child : converters) {
                 row = child.convert(info, row);
+                if (row == null) {
+                    return null;
+                }
             }
 
             return row;
@@ -206,6 +221,7 @@ public abstract class Converter {
          *
          * @return _more_
          */
+        @Override
         public Row convert(ProcessInfo info, Row row) {
 
             getIndices(info);
@@ -228,6 +244,11 @@ public abstract class Converter {
         }
 
     }
+
+
+
+
+
 
 
     /**
@@ -268,19 +289,28 @@ public abstract class Converter {
          *
          * @return _more_
          */
+        @Override
         public Row convert(ProcessInfo info, Row row) {
             int index = getIndex(info);
-            if ((index < 0) || (index >= row.size())) {
-                return row;
+            if (index == INDEX_ALL) {
+                for (int i = 0; i < row.getValues().size(); i++) {
+                    String s = row.getString(i);
+                    s = s.replaceAll(pattern, value);
+                    row.set(i, s);
+                }
+            } else {
+                if ((index >= 0) && (index < row.size())) {
+                    String s = row.getString(index);
+                    s = s.replaceAll(pattern, value);
+                    row.set(index, s);
+                }
             }
-            String s = row.getString(index);
-            s = s.replaceAll(pattern, value);
-            row.set(index, s);
 
             return row;
         }
 
     }
+
 
 
 
@@ -320,6 +350,7 @@ public abstract class Converter {
          *
          * @return _more_
          */
+        @Override
         public Row convert(ProcessInfo info, Row row) {
             int index = getIndex(info);
             if ((index < 0) || (index >= row.size())) {
@@ -365,6 +396,7 @@ public abstract class Converter {
          *
          * @return _more_
          */
+        @Override
         public Row convert(ProcessInfo info, Row row) {
             int index = getIndex(info);
             if ((index < 0) || (index >= row.size())) {
@@ -411,6 +443,7 @@ public abstract class Converter {
          *
          * @return _more_
          */
+        @Override
         public Row convert(ProcessInfo info, Row row) {
             int index = getIndex(info);
             if ((index < 0) || (index >= row.size())) {

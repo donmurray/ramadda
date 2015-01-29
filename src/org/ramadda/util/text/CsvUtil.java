@@ -23,10 +23,12 @@ package org.ramadda.util.text;
 
 import org.ramadda.util.Utils;
 
-
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+
+
+import ucar.unidata.xml.XmlUtil;
 
 import java.io.*;
 
@@ -73,7 +75,7 @@ public class CsvUtil {
      *
      * @throws Exception On badness
      */
-    public static void merge(List<String> files, OutputStream out)
+    public static void concat(List<String> files, OutputStream out)
             throws Exception {
         PrintWriter          writer    = new PrintWriter(out);
         String               delimiter = ",";
@@ -141,23 +143,89 @@ public class CsvUtil {
 
 
     /**
+     * _more_
+     *
+     * @param files _more_
+     * @param out _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void doDbXml(List<String> files, OutputStream out)
+            throws Exception {
+        PrintWriter writer = new PrintWriter(out);
+        writer.println("<tables>");
+        for (String file : files) {
+            String name = IOUtil.stripExtension(IOUtil.getFileTail(file));
+            String id   = name.toLowerCase().replaceAll(" ", "_");
+            writer.println(XmlUtil.openTag("table",
+                                           XmlUtil.attrs("id", id, "name",
+                                               name, "icon",
+                                                   "/db/database.png")));
+            ProcessInfo info = new ProcessInfo();
+            info.setDelimiter(",");
+            info.setSkip(0);
+            info.setInput(new BufferedInputStream(new FileInputStream(file)));
+            Row       row1    = new Row(info.readLine(), info.getDelimiter());
+            List<Row> samples = new ArrayList<Row>();
+            for (int i = 0; i < 50; i++) {
+                String line = info.readLine();
+                if (line == null) {
+                    break;
+                }
+                samples.add(new Row(line, info.getDelimiter()));
+            }
+            boolean[] isNumeric = new boolean[row1.getValues().size()];
+            for (int i = 0; i < isNumeric.length; i++) {
+                isNumeric[i] = false;
+            }
+
+            for (Row sample : samples) {
+                for (int colIdx = 0; colIdx < sample.getValues().size();
+                        colIdx++) {
+                    Object value = sample.getValues().get(colIdx);
+                    try {
+                        Double.parseDouble(value.toString());
+                        //                        System.err.println("OK: " + row1.getValues().get(colIdx));
+                        isNumeric[colIdx] = true;
+                    } catch (Exception ignore) {}
+                }
+            }
+
+            for (int colIdx = 0; colIdx < row1.getValues().size(); colIdx++) {
+                Object col = row1.getValues().get(colIdx);
+                String colId = col.toString().toLowerCase().replaceAll(" ",
+                                   "_").replaceAll("[^a-z0-9]", "_");
+                boolean isNumber = isNumeric[colIdx];
+                writer.println(XmlUtil.tag("column",
+                                           XmlUtil.attrs(new String[] {
+                    "name", colId, "type", isNumber
+                                           ? "double"
+                                           : "string", "label",
+                    col.toString(), "cansearch", "true", "canlist", "true"
+                })));
+            }
+
+            writer.println(XmlUtil.closeTag("table"));
+        }
+        writer.println("</tables>");
+        writer.flush();
+    }
+
+
+
+    /**
      * Run through the csv file in the ProcessInfo
      *
      * @param info Holds input, output, skip, delimiter, etc
-     * @param filter determines whether to process a row
-     * @param converter Convert the columns
-     * @param processor Process the columns
      *
      * @throws Exception On badness
      */
-    public static void process(ProcessInfo info, Filter filter,
-                               Converter converter, Processor processor)
-            throws Exception {
+    public static void process(ProcessInfo info) throws Exception {
         int rowIdx      = 0;
         int visitedRows = 0;
         int cnt         = 0;
         while (true) {
-            String line = readLine(info);
+            String line = info.readLine();
             if (line == null) {
                 break;
             }
@@ -179,8 +247,8 @@ public class CsvUtil {
                 continue;
             }
 
-            if ((filter != null) && !filter.lineOk(info, line)) {
-
+            if ((info.getFilter() != null)
+                    && !info.getFilter().lineOk(info, line)) {
                 continue;
             }
 
@@ -195,11 +263,19 @@ public class CsvUtil {
                 info.setDelimiter(delimiter);
             }
 
-
             Row row = new Row(line, info.getDelimiter());
 
-            if ((filter != null) && !filter.rowOk(info, row)) {
+            if ((info.getFilter() != null)
+                    && !info.getFilter().rowOk(info, row)) {
                 continue;
+            }
+
+
+            if (info.getConverter() != null) {
+                row = info.getConverter().convert(info, row);
+                if (row == null) {
+                    continue;
+                }
             }
 
             visitedRows++;
@@ -208,15 +284,12 @@ public class CsvUtil {
                 break;
             }
 
-            if (converter != null) {
-                row = converter.convert(info, row);
-            }
 
-            if (processor != null) {
-                processor.processRow(info, row, line);
+            if (info.getProcessor() != null) {
+                info.getProcessor().processRow(info, row, line);
             } else {
                 info.getWriter().println(columnsToString(row.getValues(),
-                        ","));
+                        info.getOutputDelimiter()));
                 info.getWriter().flush();
             }
 
@@ -225,8 +298,8 @@ public class CsvUtil {
 
         }
 
-        if (processor != null) {
-            processor.finish(info);
+        if (info.getProcessor() != null) {
+            info.getProcessor().finish(info);
         }
 
     }
@@ -234,81 +307,6 @@ public class CsvUtil {
 
     /** _more_ */
     static int xcnt = 0;
-
-    /**
-     * _more_
-     *
-     * @param info _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    private static String readLine(ProcessInfo info) throws Exception {
-        //        System.err.println("readline");
-        StringBuilder lb = new StringBuilder();
-        int           c;
-        boolean       inQuote    = false;
-        int           nextChar   = -1;
-        StringBuilder sb         = new StringBuilder();
-        char          LINE_BREAK = '\n';
-        while (true) {
-            if (lb.length() > 1500) {
-                System.err.println("Whoa:" + lb);
-                System.err.println(sb);
-                System.exit(0);
-            }
-
-            c = info.getInput().read();
-            if (c == -1) {
-                break;
-            }
-
-            if (c == LINE_BREAK) {
-                //                sb.append("\t************** new line:" + inQuote+"\n");
-                if ( !inQuote) {
-                    break;
-                }
-            } else if (c == '\r') {
-                //                sb.append("\tcr:" + inQuote+"\n");
-            } else {
-                //sb.append("\tchar:" + (char)c+"  " + inQuote +"\n");
-            }
-            lb.append((char) c);
-            if (c == '"') {
-                //                sb.append("\tquote: "  + inQuote+"\n");
-                if ( !inQuote) {
-                    //                    sb.append("\tinto quote\n");
-                    inQuote = true;
-                } else {
-                    nextChar = info.getInput().read();
-                    if (nextChar == -1) {
-                        break;
-                    }
-                    if (nextChar != '"') {
-                        //                        sb.append("\tout quote\n");
-                        inQuote = false;
-                        if (nextChar == LINE_BREAK) {
-                            //                            sb.append("\t************** new line:" + inQuote+"\n");
-                            break;
-                        }
-                    }
-                    //                    sb.append("\tnext char:" +(char) nextChar+"\n");
-                    lb.append((char) nextChar);
-                }
-            }
-
-        }
-        //        System.out.println(sb);
-
-
-        String line = lb.toString();
-        if (line.length() == 0) {
-            return null;
-        }
-
-        return line;
-    }
 
 
     /**
@@ -368,10 +366,14 @@ public class CsvUtil {
             + "\n\t-columns <comma separated list of columns #s. 0-based>"
             + "\n\t-pattern <col #> <regexp pattern>\n\t\"<column=~<value>\" pattern search"
             + "\n\t<-gt|-ge|-lt|-le> <col #> <value>\n\t-skip <how many lines to skip>"
+            + "\n\t-rotate" + "\n\t-flip"
+            + "\n\t-cut <start row> <end row (-1 for end)>"
             + "\n\t-delete <col #>" + "\n\t-add <col #> <value>"
             + "\n\t-change <col #> <pattern> <substitution string>"
             + "\n\t-format <decimal format, e.g. '#'>\n\t-u (show unique values)\n\t-count (show count)"
-            + "\n\t-header (pretty print the first line)\n\t-merge\n\t*.csv - one or more csv files");
+            + "\n\t-delimiter (specify an alternative delimiter)"
+            + "\n\t-header (pretty print the first line)\n\t-concat\n\t*.csv - one or more csv files"
+            + "\n\t-db (generate the RAMADDA db xml from the header)");
         System.exit(0);
     }
 
@@ -384,24 +386,18 @@ public class CsvUtil {
      */
     public static void main(String[] args) throws Exception {
 
-        boolean                  doMerge       = false;
-        boolean                  doHeader      = false;
-        boolean                  printFileName = false;
-        boolean                  reset         = true;
-        int                      skip          = 1;
-        String                   iterateColumn = null;
-        List<String>             iterateValues = new ArrayList<String>();
+        boolean      doConcat      = false;
+        boolean      doDbXml       = false;
+        boolean      doHeader      = false;
 
-        List<String>             files         = new ArrayList<String>();
+        String       iterateColumn = null;
+        List<String> iterateValues = new ArrayList<String>();
+        List<String> files         = new ArrayList<String>();
 
-        Converter.ColumnSelector selector      = null;
-        Processor.ProcessorGroup processor = new Processor.ProcessorGroup();
-        Converter.ConverterGroup converter = new Converter.ConverterGroup();
-        Filter.FilterGroup       filter        = new Filter.FilterGroup();
-        Filter.FilterGroup       subFilter     = null;
-        Filter.FilterGroup       filterToAddTo = filter;
+        ProcessInfo  info          = new ProcessInfo();
 
-        String                   format        = null;
+
+        List<String> extra         = new ArrayList<String>();
         for (int i = 0; i < args.length; i++) {
             String arg = args[i];
 
@@ -409,20 +405,14 @@ public class CsvUtil {
                 usage("");
             }
 
-            if (arg.equals("-merge")) {
-                doMerge = true;
+            if (arg.equals("-concat")) {
+                doConcat = true;
 
                 continue;
             }
 
-            if (arg.equals("-noreset")) {
-                reset = false;
-
-                continue;
-            }
-
-            if (arg.equals("-printfile")) {
-                printFileName = true;
+            if (arg.equals("-db")) {
+                doDbXml = true;
 
                 continue;
             }
@@ -439,63 +429,176 @@ public class CsvUtil {
 
                 continue;
             }
+            extra.add(arg);
+        }
+
+        parseArgs(extra, info, files);
+
+        if (doConcat) {
+            concat(files, System.out);
+        } else if (doDbXml) {
+            doDbXml(files, System.out);
+        } else if (doHeader) {
+            header(files, System.out);
+        } else {
+            if (files.size() == 0) {
+                files.add("stdin");
+            }
+
+            Filter.PatternFilter iteratePattern = null;
+            if (iterateColumn == null) {
+                iterateValues.add("dummy");
+            } else {
+                iteratePattern = new Filter.PatternFilter(iterateColumn, "");
+                info.getFilter().addFilter(iteratePattern);
+            }
 
 
+            for (int i = 0; i < iterateValues.size(); i++) {
+                String pattern = iterateValues.get(i);
+                if (iteratePattern != null) {
+                    iteratePattern.setPattern(pattern);
+                }
+                for (String file : files) {
+                    info.getProcessor().reset();
+                    InputStream is;
+                    if (file.equals("stdin")) {
+                        is = System.in;
+                    } else {
+                        is = new BufferedInputStream(
+                            new FileInputStream(file));
+                    }
+                    process(info.cloneMe(is, System.out));
+                }
+            }
+        }
+    }
+
+
+
+
+
+    /**
+     * _more_
+     *
+     * @param args _more_
+     * @param info _more_
+     * @param files _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void parseArgs(List<String> args, ProcessInfo info,
+                                 List<String> files)
+            throws Exception {
+
+        Filter.FilterGroup subFilter     = null;
+        Filter.FilterGroup filterToAddTo = null;
+        //info.getFilter();
+
+
+        for (int i = 0; i < args.size(); i++) {
+            String arg = args.get(i);
             if (arg.equals("-format")) {
-                format = args[++i];
+                info.setFormat(args.get(++i));
 
                 continue;
             }
 
             if (arg.equals("-skip")) {
-                skip = Integer.parseInt(args[++i]);
+                info.setSkip(Integer.parseInt(args.get(++i)));
 
                 continue;
             }
 
-
             if (arg.equals("-prefix")) {
-                i++;
-                System.out.println(args[i]);
+                System.out.println(args.get(++i));
 
                 continue;
             }
 
             if (arg.equals("-u")) {
-                processor.addProcessor(new Processor.Uniquifier());
+                info.getProcessor().addProcessor(new Processor.Uniquifier());
 
                 continue;
             }
 
             if (arg.equals("-count")) {
-                processor.addProcessor(new Processor.Counter());
+                info.getProcessor().addProcessor(new Processor.Counter());
 
                 continue;
             }
 
             if (arg.equals("-sum")) {
-                processor.addProcessor(
+                info.getProcessor().addProcessor(
                     new Processor.Operator(Processor.Operator.OP_SUM));
 
                 continue;
             }
 
+            if (arg.equals("-rotate")) {
+                info.getProcessor().addProcessor(new Processor.Rotator());
+
+                continue;
+            }
+
+            if (arg.equals("-flip")) {
+                info.getProcessor().addProcessor(new Processor.Flipper());
+
+                continue;
+            }
+
+            if (arg.equals("-delimiter")) {
+                info.setDelimiter(args.get(++i));
+
+                continue;
+            }
+
+            if (arg.equals("-output")) {
+                String s = args.get(++i);
+                if (s.equals("tab")) {
+                    s = "\t";
+                }
+                info.setOutputDelimiter(s);
+
+                continue;
+            }
+
+            if (arg.equals("-cut")) {
+                String r1 = args.get(++i);
+                String r2;
+                int    idx = r1.indexOf(";");
+                if (idx > 0) {
+                    List<String> toks = StringUtil.splitUpTo(r1, ";", 2);
+                    r1 = toks.get(0);
+                    r2 = toks.get(1);
+                } else {
+                    r2 = args.get(++i);
+                }
+
+                info.getConverter().addConverter(
+                // info.getFilter().addFilter(
+                new Filter.Cutter(Integer.parseInt(r1),
+                                  Integer.parseInt(r2)));
+
+                continue;
+            }
+
             if (arg.equals("-max")) {
-                processor.addProcessor(
+                info.getProcessor().addProcessor(
                     new Processor.Operator(Processor.Operator.OP_MAX));
 
                 continue;
             }
 
             if (arg.equals("-min")) {
-                processor.addProcessor(
+                info.getProcessor().addProcessor(
                     new Processor.Operator(Processor.Operator.OP_MIN));
 
                 continue;
             }
 
             if (arg.equals("-average")) {
-                processor.addProcessor(
+                info.getProcessor().addProcessor(
                     new Processor.Operator(Processor.Operator.OP_AVERAGE));
 
                 continue;
@@ -503,104 +606,107 @@ public class CsvUtil {
 
             if (arg.equals("-columns")) {
                 i++;
-                List<String> cols = StringUtil.split(args[i], ",", true,
+                List<String> cols = StringUtil.split(args.get(i), ",", true,
                                         true);
-                selector = new Converter.ColumnSelector(cols);
-                converter.addConverter(selector);
+                info.setSelector(new Converter.ColumnSelector(cols));
+                info.getConverter().addConverter(info.getSelector());
 
                 continue;
             }
 
             if (arg.equals("-change")) {
-                converter.addConverter(new Converter.ColumnChanger(args[++i],
-                        args[++i], args[++i]));
+                info.getConverter().addConverter(
+                    new Converter.ColumnChanger(
+                        args.get(++i), args.get(++i), args.get(++i)));
 
                 continue;
             }
 
 
             if (arg.equals("-split")) {
-                converter.addConverter(
-                    new Converter.ColumnSplitter(args[++i], args[++i]));
+                info.getConverter().addConverter(
+                    new Converter.ColumnSplitter(
+                        args.get(++i), args.get(++i)));
 
                 continue;
             }
 
             if (arg.equals("-delete")) {
-                converter.addConverter(
-                    new Converter.ColumnDeleter(args[++i]));
+                info.getConverter().addConverter(
+                    new Converter.ColumnDeleter(args.get(++i)));
 
                 continue;
             }
 
             if (arg.equals("-add")) {
-                converter.addConverter(new Converter.ColumnAdder(args[++i],
-                        args[++i]));
+                info.getConverter().addConverter(
+                    new Converter.ColumnAdder(args.get(++i), args.get(++i)));
 
                 continue;
             }
 
 
             if (arg.equals("-or")) {
-                subFilter = new Filter.FilterGroup(false);
-                filter.addFilter(subFilter);
-                filterToAddTo = subFilter;
+                filterToAddTo = new Filter.FilterGroup(false);
+                info.getConverter().addConverter(filterToAddTo);
 
                 continue;
             }
 
             if (arg.equals("-and")) {
-                subFilter = new Filter.FilterGroup(true);
-                filter.addFilter(subFilter);
-                filterToAddTo = subFilter;
+                filterToAddTo = new Filter.FilterGroup(true);
+                info.getConverter().addConverter(filterToAddTo);
 
                 continue;
             }
 
             if (arg.equals("-pattern")) {
-                String col     = args[++i];
-                String pattern = args[++i];
-                filterToAddTo.addFilter(new Filter.PatternFilter(col,
-                        pattern));
+                String col     = args.get(++i);
+                String pattern = args.get(++i);
+                handlePattern(info, filterToAddTo,
+                              new Filter.PatternFilter(col, pattern));
 
                 continue;
             }
 
             if (arg.equals("-lt")) {
-                filterToAddTo.addFilter(new Filter.ValueFilter(args[++i],
-                        Filter.ValueFilter.OP_LT,
-                        Double.parseDouble(args[++i])));
+                handlePattern(info, filterToAddTo,
+                              new Filter.ValueFilter(args.get(++i),
+                                  Filter.ValueFilter.OP_LT,
+                                  Double.parseDouble(args.get(++i))));
 
                 continue;
             }
 
             if (arg.equals("-gt")) {
-                filterToAddTo.addFilter(new Filter.ValueFilter(args[++i],
-                        Filter.ValueFilter.OP_GT,
-                        Double.parseDouble(args[++i])));
+                handlePattern(info, filterToAddTo,
+                              new Filter.ValueFilter(args.get(++i),
+                                  Filter.ValueFilter.OP_GT,
+                                  Double.parseDouble(args.get(++i))));
 
                 continue;
             }
 
 
             if (arg.equals("-defined")) {
-                filterToAddTo.addFilter(new Filter.ValueFilter(args[++i],
-                        Filter.ValueFilter.OP_DEFINED, 0));
+                handlePattern(info, filterToAddTo,
+                              new Filter.ValueFilter(args.get(++i),
+                                  Filter.ValueFilter.OP_DEFINED, 0));
 
                 continue;
             }
             if (arg.startsWith("-")) {
-                usage("Unknown arg:" + arg);
+                throw new IllegalArgumentException("Unknown arg:" + arg);
             }
 
             int idx;
 
             idx = arg.indexOf("!=");
             if (idx >= 0) {
-                filterToAddTo.addFilter(
-                    new Filter.PatternFilter(
-                        arg.substring(0, idx).trim(),
-                        arg.substring(idx + 2).trim(), true));
+                handlePattern(info, filterToAddTo,
+                              new Filter.PatternFilter(arg.substring(0,
+                                  idx).trim(), arg.substring(idx + 2).trim(),
+                                      true));
 
                 continue;
             }
@@ -608,10 +714,10 @@ public class CsvUtil {
 
             idx = arg.indexOf("=~");
             if (idx >= 0) {
-                filterToAddTo.addFilter(
-                    new Filter.PatternFilter(
-                        arg.substring(0, idx).trim(),
-                        arg.substring(idx + 2).trim()));
+                handlePattern(info, filterToAddTo,
+                              new Filter.PatternFilter(arg.substring(0,
+                                  idx).trim(), arg.substring(idx
+                                  + 2).trim()));
 
                 continue;
             }
@@ -621,7 +727,8 @@ public class CsvUtil {
             for (String op : new String[] { "<=", ">=", "<", ">", "=" }) {
                 idx = arg.indexOf(op);
                 if (idx >= 0) {
-                    filterToAddTo.addFilter(
+                    handlePattern(
+                        info, filterToAddTo,
                         new Filter.ValueFilter(
                             arg.substring(0, idx).trim(),
                             Filter.ValueFilter.getOperator(op),
@@ -639,63 +746,24 @@ public class CsvUtil {
             files.add(arg);
         }
 
-
-        if (doMerge) {
-            merge(files, System.out);
-        } else if (doHeader) {
-            header(files, System.out);
-        } else {
-            if (files.size() == 0) {
-                files.add("stdin");
-            }
-
-            Filter.PatternFilter iteratePattern = null;
-            if (iterateColumn == null) {
-                iterateValues.add("dummy");
-            } else {
-                iteratePattern = new Filter.PatternFilter(iterateColumn, "");
-                filter.addFilter(iteratePattern);
-            }
-
-
-
-
-            for (int i = 0; i < iterateValues.size(); i++) {
-                String pattern = iterateValues.get(i);
-                if (iteratePattern != null) {
-                    iteratePattern.setPattern(pattern);
-                }
-                for (String file : files) {
-                    if (reset) {
-                        processor.reset();
-                    }
-                    InputStream is;
-                    if (file.equals("stdin")) {
-                        is = System.in;
-                    } else {
-                        is = new BufferedInputStream(
-                            new FileInputStream(file));
-                    }
-                    ProcessInfo info = new ProcessInfo(is, System.out);
-                    info.setSelector(selector);
-                    info.setSkip(skip);
-                    if (format != null) {
-                        info.setFormat(format);
-                    }
-                    if (printFileName) {
-                        System.out.println("");
-                        System.out.println(file);
-                    }
-
-
-
-
-                    process(info, filter, converter, processor);
-                }
-            }
-        }
     }
 
+    /**
+     * _more_
+     *
+     * @param info _more_
+     * @param filterToAddTo _more_
+     * @param converter _more_
+     */
+    private static void handlePattern(ProcessInfo info,
+                                      Filter.FilterGroup filterToAddTo,
+                                      Filter converter) {
+        if (filterToAddTo != null) {
+            filterToAddTo.addFilter(converter);
+        } else {
+            info.getConverter().addConverter(converter);
+        }
+    }
 
 
 }

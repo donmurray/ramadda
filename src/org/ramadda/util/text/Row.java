@@ -59,7 +59,9 @@ public class Row {
      *
      * @param values _more_
      */
-    public Row(List values) {}
+    public Row(List values) {
+        this.values = values;
+    }
 
 
     /**
