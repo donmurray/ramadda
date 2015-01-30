@@ -489,6 +489,15 @@ public class Utils {
      * @throws Exception _more_
      */
     public static void main(String args[]) throws Exception {
+        if(true) {
+            System.out.println("Sleeping");
+            Misc.sleepSeconds(10);
+            System.out.println("Done");
+            return;
+        }
+
+
+
         String pattern =
             ".*l(.)(.)(\\d\\d\\d)(\\d\\d\\d)(\\d\\d\\d\\d)(\\d\\d\\d)(...)(\\d\\d)\\.hdf$";
 

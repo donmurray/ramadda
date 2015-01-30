@@ -21,6 +21,16 @@
 package org.ramadda.util;
 
 
+import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
+
+import ucar.unidata.util.Trace;
+
+import java.io.*;
+
+import java.util.concurrent.*;
+
+
 /**
  * A utility for running a process
  */
@@ -30,30 +40,71 @@ public class ProcessRunner extends Thread {
     public static final int PROCESS_KILLED = -143;
 
     /** the process */
+    ProcessBuilder processBuilder;
+
+    /** _more_          */
     Process process;
 
     /** a flag for whether the process is finished */
     private boolean finished = false;
 
-    /** _more_          */
+    /** _more_ */
     private boolean processTimedOut = false;
 
     /** the process exit code */
     private int exitCode = 0;
 
     /** timeout */
-    private long timeoutMillis = 0;
+    private long timeoutSeconds = 0;
+
+    /** _more_          */
+    private PrintWriter stdOutPrintWriter;
+
+    /** _more_          */
+    private PrintWriter stdErrPrintWriter;
+
+    /** _more_          */
+    private StreamEater isg;
+
+    /** _more_          */
+    private StreamEater esg;
+
 
     /**
-     * Create a new ProcessRunner
+     * _more_
      *
-     * @param process  the process
-     * @param timeoutMillis  kill the process after this amount of time if not finished
-     *                       if <= 0, don't timeout
+     * @param processBuilder _more_
+     * @param timeoutSeconds _more_
+     * @param stdOutPrintWriter _more_
+     * @param stdErrPrintWriter _more_
      */
-    public ProcessRunner(Process process, long timeoutMillis) {
-        this.process       = process;
-        this.timeoutMillis = timeoutMillis;
+    public ProcessRunner(ProcessBuilder processBuilder, long timeoutSeconds,
+                         PrintWriter stdOutPrintWriter,
+                         PrintWriter stdErrPrintWriter) {
+
+        this.processBuilder    = processBuilder;
+        this.timeoutSeconds    = timeoutSeconds;
+        this.stdOutPrintWriter = stdOutPrintWriter;
+        this.stdErrPrintWriter = stdErrPrintWriter;
+    }
+
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    private void eatUpTheStreams() throws Exception {
+        int cnt = 0;
+        while (esg.getRunning() && (cnt++ < 100)) {
+            //            Trace.msg("esg.sleep");
+            Misc.sleep(100);
+        }
+
+        cnt = 0;
+        while (isg.getRunning() && (cnt++ < 100)) {
+            //            Trace.msg("isg.sleep");
+            Misc.sleep(100);
+        }
     }
 
     /**
@@ -61,11 +112,13 @@ public class ProcessRunner extends Thread {
      */
     public void run() {
         try {
+            //            Trace.call1("ProcessRunner.run");
             exitCode = process.waitFor();
         } catch (InterruptedException e) {
             // Ignore
         } finally {
             finished = true;
+            //            Trace.call2("ProcessRunner.run");
         }
         synchronized (this) {
             notifyAll();
@@ -76,11 +129,24 @@ public class ProcessRunner extends Thread {
      * Wait for or kill the process
      *
      * @return  the process exit code
+     *
+     * @throws Exception _more_
      */
-    public int runProcess() {
+    public int runProcess() throws Exception {
+        //Create the process
+        process = processBuilder.start();
+        esg     = new StreamEater(process.getErrorStream(),
+                                  stdErrPrintWriter);
+        isg     = new StreamEater(process.getInputStream(),
+                                  stdOutPrintWriter);
+
+        esg.start();
+        isg.start();
+
         Thread thread = new Thread(this);
         thread.start();
-        waitForOrKill();
+        waitFor();
+        eatUpTheStreams();
 
         return this.exitCode;
     }
@@ -88,27 +154,30 @@ public class ProcessRunner extends Thread {
 
     /**
      * Wait for or kill the process
+     *
+     * @throws Exception _more_
      */
-    private void waitForOrKill() {
+    private void waitFor() throws Exception {
         //If we don't have a time out then we just want to wait until we're done
-        if (timeoutMillis <= 0) {
-            while ( !finished) {
-                try {
-                    wait(100);
-                } catch (InterruptedException e) {}
-            }
-
-            return;
-        }
-        if ( !finished) {
+        long timeWaiting   = 0;
+        long sleepTime     = 100;
+        int  timeoutMillis = (int) TimeUnit.SECONDS.toMillis(timeoutSeconds);
+        while ( !finished) {
             try {
-                wait(timeoutMillis);
+                synchronized (this) {
+                    wait(sleepTime);
+                }
             } catch (InterruptedException e) {
-                // Ignore
+                //                Trace.msg("***** interrupted ");
+                return;
             }
-            if ( !finished) {
+            timeWaiting += sleepTime;
+            if ( !finished && (timeoutMillis > 0)
+                    && (timeWaiting > timeoutMillis)) {
+                //                Trace.msg("***** Timed out");
                 processTimedOut = true;
                 process.destroy();
+                return;
             }
         }
     }
