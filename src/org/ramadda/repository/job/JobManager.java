@@ -53,6 +53,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.Trace;
 import ucar.unidata.xml.XmlUtil;
 
 
@@ -954,6 +955,16 @@ public class JobManager extends RepositoryManager {
                                          PrintWriter stdOutPrintWriter,
                                          PrintWriter stdErrPrintWriter)
             throws Exception {
+        //        Trace.startTrace();
+        //        Trace.call1("JobManager.executeCommand",  "timeout:" + timeOutInSeconds + " Commands:" + commands);
+        StringWriter outBuf   = new StringWriter();
+        StringWriter errorBuf = new StringWriter();
+        if (stdOutPrintWriter == null) {
+            stdOutPrintWriter = new PrintWriter(outBuf);
+        }
+        if (stdErrPrintWriter == null) {
+            stdErrPrintWriter = new PrintWriter(errorBuf);
+        }
         ProcessBuilder pb = new ProcessBuilder(commands);
         if (envVars != null) {
             Map<String, String> env = pb.environment();
@@ -961,62 +972,16 @@ public class JobManager extends RepositoryManager {
             env.putAll(envVars);
         }
         pb.directory(workingDir);
-        StringWriter outBuf   = new StringWriter();
-        StringWriter errorBuf = new StringWriter();
-        Process      process  = pb.start();
-        // process the outputs in a thread
-        if (stdOutPrintWriter == null) {
-            stdOutPrintWriter = new PrintWriter(outBuf);
-        }
-        if (stdErrPrintWriter == null) {
-            stdErrPrintWriter = new PrintWriter(errorBuf);
+
+        ProcessRunner runner = new ProcessRunner(pb, timeOutInSeconds,
+                                   stdOutPrintWriter, stdErrPrintWriter);
+        int exitCode = runner.runProcess();
+        if (runner.getProcessTimedOut()) {
+            throw new InterruptedException("Process timed out");
         }
 
-        StreamEater esg = new StreamEater(process.getErrorStream(),
-                                          stdErrPrintWriter);
-        StreamEater isg = new StreamEater(process.getInputStream(),
-                                          stdOutPrintWriter);
-        esg.start();
-        isg.start();
-        int exitCode = 0;
-        if (timeOutInSeconds <= 0) {
-            //TODO: check exit code and throw error?
-            exitCode = process.waitFor();
-            //            System.err.println ("Exit code:" + exitCode);
 
-            if (exitCode != 0) {}
-        } else {
-            ProcessRunner runnable = new ProcessRunner(
-                                         process,
-                                         TimeUnit.SECONDS.toMillis(
-                                             timeOutInSeconds));
-            runnable.start();
-            try {
-                runnable.join(TimeUnit.SECONDS.toMillis(timeOutInSeconds));
-            } catch (InterruptedException ex) {
-                esg.interrupt();
-                isg.interrupt();
-                runnable.interrupt();
-            } finally {
-                process.destroy();
-            }
-
-            //Check if the process timed out
-            if (runnable.getProcessTimedOut()) {
-                throw new InterruptedException("Process timed out");
-            }
-        }
-
-        int cnt = 0;
-        while (esg.getRunning() && (cnt++ < 100)) {
-            Misc.sleep(100);
-        }
-
-        cnt = 0;
-        while (isg.getRunning() && (cnt++ < 100)) {
-            Misc.sleep(100);
-        }
-
+        //        Trace.call2("JobManager.executeCommand");
 
         return new CommandResults(outBuf.toString(), errorBuf.toString(),
                                   exitCode);
@@ -1040,38 +1005,17 @@ public class JobManager extends RepositoryManager {
         StringWriter outBuf   = new StringWriter();
         StringWriter errorBuf = new StringWriter();
 
-        Process process = Runtime.getRuntime().exec(command, null,
-                              workingDir);
-        // process the outputs in a thread
-        StreamEater esg = new StreamEater(process.getErrorStream(),
-                                          new PrintWriter(errorBuf));
-        StreamEater isg = new StreamEater(process.getInputStream(),
-                                          new PrintWriter(outBuf));
-        esg.start();
-        isg.start();
-        int exitCode = 0;
-        if (timeOutInSeconds <= 0) {
-            //TODO: check exit code and throw error?
-            exitCode = process.waitFor();
-        } else {
-            ProcessRunner runnable = new ProcessRunner(
-                                         process,
-                                         TimeUnit.SECONDS.toMillis(
-                                             timeOutInSeconds));
-            runnable.start();
-            try {
-                runnable.join(TimeUnit.SECONDS.toMillis(timeOutInSeconds));
-            } catch (InterruptedException ex) {
-                esg.interrupt();
-                isg.interrupt();
-                runnable.interrupt();
-            } finally {
-                process.destroy();
-            }
-            exitCode = runnable.getExitCode();
-            if (exitCode == ProcessRunner.PROCESS_KILLED) {
-                throw new InterruptedException("Process timed out");
-            }
+        List<String> commands = new ArrayList<String>();
+        commands.add(command);
+        ProcessBuilder pb = new ProcessBuilder(commands);
+        pb.directory(workingDir);
+
+        ProcessRunner runner = new ProcessRunner(pb, timeOutInSeconds,
+                                   new PrintWriter(outBuf),
+                                   new PrintWriter(errorBuf));
+        int exitCode = runner.runProcess();
+        if (runner.getProcessTimedOut()) {
+            throw new InterruptedException("Process timed out");
         }
 
         return new CommandResults(outBuf.toString(), errorBuf.toString(),
