@@ -381,6 +381,9 @@ function CollectionForm(formId, type, args) {
             setFieldValues: function(collection, data, fieldIdx) {
                 if (data == null) return false;
                 var currentValue =    this.getFieldSelect(collection, fieldIdx).val();
+                if (typeof currentValue === "string") {
+                   currentValue = [ currentValue];
+                }
                 var currentValueIsInNewList = false;
                 //var html = "<select>";
                 var html = "";
@@ -401,10 +404,17 @@ function CollectionForm(formId, type, args) {
                     }
                     if (value == "sprd" || value == "clim") continue;
                     var extra = "";
-                    if(currentValue == value) {
-                        extra = " selected ";
-                        currentValueIsInNewList = true;
+                    for (var j = 0; j < currentValue.length; j++) {
+                        var s = currentValue[j];
+                        if (s == value) {
+                            extra = " selected ";
+                            currentValueIsInNewList = true;
+                        }
                     }
+                    //if(currentValue == value) {
+                    //    extra = " selected ";
+                    //    currentValueIsInNewList = true;
+                    //}
                     html += "<option value=\'"+value+"\'   " + extra +" >" + label +"</option>";
                 }
                 //html+="</select>";

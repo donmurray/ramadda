@@ -666,14 +666,9 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         }
 
         for (ServiceOperand op : input.getOperands()) {
-            List<Entry> entries = op.getEntries();
-            // TODO: change this when we can handle more than one entry (e.g. daily data)
-            if (entries.isEmpty() || (entries.size() > 1)) {
-                return false;
-            }
-            Entry firstEntry = entries.get(0);
-            if ( !(firstEntry.getTypeHandler()
-                    instanceof ClimateModelFileTypeHandler)) {
+            if (checkForValidEntries(op.getEntries())) {
+                continue;
+            } else {
                 return false;
             }
         }
@@ -681,6 +676,44 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         return true;
     }
 
+    /**
+     * Check for valid entries
+     * @param entries  list of entries
+     * @return
+     */
+    private boolean checkForValidEntries(List<Entry> entries) {
+        // TODO: change this when we can handle more than one entry (e.g. daily data)
+        if (entries.isEmpty()) {
+        //if (entries.isEmpty() || (entries.size() > 1)) {
+            return false;
+        }
+        SortedSet<String> uniqueModels =
+                Collections.synchronizedSortedSet(new TreeSet<String>());
+        SortedSet<String> uniqueMembers =
+                Collections.synchronizedSortedSet(new TreeSet<String>());
+        for (Entry entry : entries) {
+            if ( !(entry.getTypeHandler()
+                    instanceof ClimateModelFileTypeHandler)) {
+                return false;
+            }
+            uniqueModels.add(entry.getValue(1).toString());
+            uniqueMembers.add(entry.getValue(3).toString());
+        }
+        // one model, one member
+        if (uniqueModels.size() == 1 && uniqueMembers.size() == 1) {
+            return true;
+        }
+        // multi-model multi-ensemble - don't want to think about this
+        if (uniqueModels.size() >= 1 && uniqueMembers.size() > 1) {
+            return false;
+        }
+        // single model, multi-ensemble - can't handle yet
+        if (uniqueModels.size() > 1 && uniqueMembers.size() > 1) {
+            return false;
+        }
+        return true;
+    }
+    
     /**
      * Add the statitics widget
      *
@@ -800,9 +833,10 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             if (grid > 0) {
                 years.add(0, "");
             }
-            int endIndex = (grid == 0)
-                           ? years.size() - 1
-                           : 0;
+            int endIndex = 0;
+            //int endIndex = (grid == 0)
+            //               ? years.size() - 1
+            //               : 0;
 
             sb.append(HtmlUtils
                 .formEntry(Repository.msgLabel("Years"), yrLabel

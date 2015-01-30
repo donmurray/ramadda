@@ -536,22 +536,6 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 operands.add(new ServiceOperand(entries.get(0).getName(),
                         entries));
 
-                /* This is to generate a list of entries for display, but is not used now
-                tmp.append(
-                    "<div style=\" margin-bottom:2px;  margin-top:2px; max-height: 150px; overflow-y: auto\">");
-                if ( !request.defined(ARG_COLLECTION)) {
-                    tmp.append(getEntryManager().getEntryLink(request,
-                            collectionEntry));
-                }
-                tmp.append("<ul>");
-                for (Entry granule : entries) {
-                    tmp.append("<li>");
-                    tmp.append(getEntryManager().getEntryLink(request,
-                            granule));
-                }
-                tmp.append("</ul>");
-                tmp.append("</div>");
-                */
             }
         }
 
@@ -610,6 +594,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             }
         }
 
+        // Build the input form
 
 
         ClimateCollectionTypeHandler typeHandler = getTypeHandler();
@@ -659,6 +644,9 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         String        formType  = "compare";
         String helpFile =
             "/org/ramadda/geodata/model/htdocs/model/compare.html";
+        if (type.equals(ARG_ACTION_MULTI_COMPARE)) {
+            formType = "mcompare";
+        }
         if (type.equals(ARG_ACTION_TIMESERIES)) {
             formType = "timeseries";
             helpFile =

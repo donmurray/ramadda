@@ -781,9 +781,10 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
                                 ARG_CDO_ENDMONTH, MONTHS,
                                 request.getString(
                                     ARG_CDO_ENDMONTH,
-                                    MONTHS.get(
-                                        MONTHS.size()
-                                        - 1).getId().toString()), HtmlUtils.title(
+                                    null), HtmlUtils.title(
+                                    //MONTHS.get(
+                                    //    MONTHS.size()
+                                    //    - 1).getId().toString()), HtmlUtils.title(
                                             "Select the ending month"))));
     }
 
@@ -833,8 +834,9 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
                                 ARG_CDO_ENDYEAR, years,
                                 request.getString(
                                     ARG_CDO_ENDYEAR,
-                                    years.get(
-                                        years.size() - 1)), HtmlUtils.title(
+                                      years.get(0)), HtmlUtils.title(
+                                    //years.get(
+                                    //    years.size() - 1)), HtmlUtils.title(
                                             "Select the ending year"))));
     }
 

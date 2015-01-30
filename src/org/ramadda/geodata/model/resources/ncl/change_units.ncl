@@ -15,6 +15,7 @@ local dataOut
 
 begin
 
+  ;print("unitsIn: "+unitsIn+", unitsOut: "+unitsOut)
   dataOut = dataIn
   if ((unitsIn .ne. unitsOut) .and. (.not. ismissing(unitsOut) .and. unitsOut .ne. "")) then
 
@@ -23,6 +24,13 @@ begin
         unitsIn .eq. "degK" .or. \
         unitsIn .eq. "Kelvin" .or. \
         unitsIn .eq. "Kelvins") then
+      ; just a name change
+      if (unitsOut .eq. "K" .or. \
+          unitsOut .eq. "degK" .or. \
+          unitsOut .eq. "Kelvin" .or. \
+          unitsOut .eq. "Kelvins") then
+        dataOut@units = unitsOut
+      end if
       if (unitsOut .eq. "C" .or. \
           unitsOut .eq. "Cel" .or. \
           unitsOut .eq. "degC" .or. \
@@ -43,6 +51,13 @@ begin
         unitsIn .eq. "Cel" .or. \
         unitsIn .eq. "degC" .or. \
         unitsIn .eq. "Celsius") then
+      ; just a name change
+      if (unitsOut .eq. "C" .or. \
+          unitsOut .eq. "Cel" .or. \
+          unitsOut .eq. "degC" .or. \
+          unitsOut .eq. "Celsius") then
+        dataOut@units = unitsOut
+      end if
       if (unitsOut .eq. "K" .or. unitsOut .eq. "degK") then
         dataOut = dataIn+273.15
         dataOut@units = "K"
@@ -59,6 +74,12 @@ begin
     if (unitsIn .eq. "F" .or. \
         unitsIn .eq. "degF" .or. \
         unitsIn .eq. "Fahrenheit") then
+      ; just a name change
+      if (unitsOut .eq. "F" .or. \
+          unitsOut .eq. "degF" .or. \
+          unitsOut .eq. "Fahrenheit") then
+        dataOut@units = unitsOut
+      end if
       if (unitsOut .eq. "C" .or. \
           unitsOut .eq. "Cel" .or. \
           unitsOut .eq. "degC" .or. \
@@ -79,8 +100,12 @@ begin
         unitsIn .eq. "kg/m^2/s" .or. \
         unitsIn .eq. "Kg/m^2/s" .or. \
         unitsIn .eq. "mm/s") then
-      if (unitsOut .eq. "mm/s") then
-        ; just a name change
+      ; just a name change
+      if (unitsOut .eq. "kg m-2 s-1" .or. \
+          unitsOut .eq. "kg m**-2 s**-1" .or. \
+          unitsOut .eq. "kg/m^2/s" .or. \
+          unitsOut .eq. "Kg/m^2/s" .or. \
+          unitsOut .eq. "mm/s") then
         dataOut@units = unitsOut
       end if
       if (unitsOut .eq. "mm/day") then
@@ -91,6 +116,12 @@ begin
     if (unitsIn .eq. "m s-1" .or. \
         unitsIn .eq. "m s**-1" .or. \
         unitsIn .eq. "m/s") then
+      ; just a name change
+      if (unitsOut .eq. "m s-1" .or. \
+          unitsOut .eq. "m s**-1" .or. \
+          unitsOut .eq. "m/s") then
+        dataOut@units = unitsOut
+      end if
       if (unitsOut .eq. "mm/s") then
         dataOut = dataIn*1000
         dataOut@units = unitsOut
@@ -115,6 +146,12 @@ begin
     if (unitsIn .eq. "m s-1" .or. \
         unitsIn .eq. "m s**-1" .or. \
         unitsIn .eq. "m/s") then
+      ; just a name change
+      if (unitsOut .eq. "m s-1" .or. \
+          unitsOut .eq. "m s**-1" .or. \
+          unitsOut .eq. "m/s") then
+        dataOut@units = unitsOut
+      end if
       if (unitsOut .eq. "mi/h" .or. \
           unitsOut .eq. "mi h-1" .or. \
           unitsOut .eq. "mph") then
@@ -130,6 +167,11 @@ begin
     end if
     if (unitsIn .eq. "mi/h" .or. \
         unitsIn .eq. "mi h-1") then
+      ; just a name change
+      if (unitsOut .eq. "mi/h" .or. \
+          unitsOut .eq. "mi h-1") then
+        dataOut@units = unitsOut
+      end if
       if (unitsOut .eq. "m/s" .or. \
           unitsOut .eq. "m s-1") then
         dataOut = dataIn*0.44704
@@ -150,8 +192,12 @@ begin
         unitsIn .eq. "kg/m^2" .or. \
         unitsIn .eq. "Kg/m^2" .or. \
         unitsIn .eq. "mm") then
-      if (unitsOut .eq. "mm") then
-        ; just a name change
+      ; just a name change
+      if (unitsOut .eq. "kg m-2" .or. \
+          unitsOut .eq. "kg m**-2" .or. \
+          unitsOut .eq. "kg/m^2" .or. \
+          unitsOut .eq. "Kg/m^2" .or. \
+          unitsOut .eq. "mm") then
         dataOut@units = unitsOut
       end if
       if (unitsOut .eq. "cm") then
@@ -175,6 +221,11 @@ begin
     ;; meters/geopotential meters -> ft/submeters (long_lengths)
     if (unitsIn .eq. "m" .or. \
         unitsIn .eq. "gpm") then
+      ; just a name change
+      if (unitsOut .eq. "m" .or. \
+          unitsOut .eq. "gpm") then
+        dataOut@units = unitsOut
+      end if
       if (unitsOut .eq. "mm") then
         dataOut = dataIn*1000
         dataOut@units = unitsOut
@@ -190,6 +241,11 @@ begin
     end if
     if (unitsIn .eq. "ft" .or. \
         unitsIn .eq. "feet") then
+      ; just a name change
+      if (unitsOut .eq. "ft" .or. \
+          unitsOut .eq. "feet") then
+        dataOut@units = unitsOut
+      end if
       if (unitsOut .eq. "mm") then
         dataOut = dataIn*304.8
         dataOut@units = unitsOut
@@ -206,6 +262,12 @@ begin
     if (unitsIn .eq. "in" .or. \
         unitsIn .eq. "inch" .or. \
         unitsIn .eq. "inches") then
+      ; just a name change
+      if (unitsOut .eq. "in" .or. \
+          unitsOut .eq. "inch" .or. \
+          unitsOut .eq. "inches") then
+        dataOut@units = unitsOut
+      end if
       if (unitsOut .eq. "mm") then
         dataOut = dataIn*25.4
         dataOut@units = unitsOut
@@ -222,9 +284,21 @@ begin
 
     ;; Pressure
     if (unitsIn .eq. "Pa" .or. \
+        unitsIn .eq. "Pascal" .or. \
+        unitsIn .eq. "Pascals" .or. \
         unitsIn .eq. "kg m-1 s-2") then
+      ; just a name change
+      if (unitsOut .eq. "Pa" .or. \
+          unitsOut .eq. "Pascal" .or. \
+          unitsOut .eq. "Pascals" .or. \
+          unitsOut .eq. "kg m-1 s-2") then
+        dataOut@units = unitsOut
+      end if
       if (unitsOut .eq. "mb" .or.  \
           unitsOut .eq. "mbar" .or. \
+          unitsOut .eq. "millibar" .or. \
+          unitsOut .eq. "hectoPascal" .or. \
+          unitsOut .eq. "hectoPascals" .or. \
           unitsOut .eq. "hPa") then
         dataOut = dataIn/100
         dataOut@units = "hPa"
@@ -232,7 +306,19 @@ begin
     end if
     if (unitsIn .eq. "mb" .or.  \
         unitsIn .eq. "mbar" .or. \
+        unitsIn .eq. "millibar" .or. \
+        unitsIn .eq. "hectoPascal" .or. \
+        unitsIn .eq. "hectoPascals" .or. \
         unitsIn .eq. "hPa") then
+      ; just a name change
+      if (unitsOut .eq. "mb" .or.  \
+          unitsOut .eq. "mbar" .or. \
+          unitsOut .eq. "millibar" .or. \
+          unitsOut .eq. "hectoPascal" .or. \
+          unitsOut .eq. "hectoPascals" .or. \
+          unitsOut .eq. "hPa") then
+        dataOut@units = unitsOut
+      end if
       if (unitsOut .eq. "Pa") then
         dataOut = dataIn*100
         dataOut@units = "Pa"

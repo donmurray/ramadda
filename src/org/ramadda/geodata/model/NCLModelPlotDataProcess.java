@@ -23,11 +23,14 @@ package org.ramadda.geodata.model;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.ramadda.data.process.Service;
 import org.ramadda.data.process.ServiceInput;
@@ -565,14 +568,9 @@ public class NCLModelPlotDataProcess extends Service {
         }
 
         for (ServiceOperand op : dpi.getOperands()) {
-            List<Entry> entries = op.getEntries();
-            // TODO: change this when we can handle more than one entry (e.g. daily data)
-            if (entries.isEmpty() || (entries.size() > 1)) {
-                return false;
-            }
-            Entry firstEntry = entries.get(0);
-            if ( !(firstEntry.getTypeHandler()
-                    instanceof ClimateModelFileTypeHandler)) {
+            if (checkForValidEntries(op.getEntries())) {
+                continue;
+            } else {
                 return false;
             }
         }
@@ -580,6 +578,43 @@ public class NCLModelPlotDataProcess extends Service {
         return true;
     }
 
+    /**
+     * Check for valid entries
+     * @param entries  list of entries
+     * @return
+     */
+    private boolean checkForValidEntries(List<Entry> entries) {
+        // TODO: change this when we can handle more than one entry (e.g. daily data)
+        if (entries.isEmpty()) {
+        //if (entries.isEmpty() || (entries.size() > 1)) {
+            return false;
+        }
+        SortedSet<String> uniqueModels =
+                Collections.synchronizedSortedSet(new TreeSet<String>());
+        SortedSet<String> uniqueMembers =
+                Collections.synchronizedSortedSet(new TreeSet<String>());
+        for (Entry entry : entries) {
+            if ( !(entry.getTypeHandler()
+                    instanceof ClimateModelFileTypeHandler)) {
+                return false;
+            }
+            uniqueModels.add(entry.getValue(1).toString());
+            uniqueMembers.add(entry.getValue(3).toString());
+        }
+        // one model, one member
+        if (uniqueModels.size() == 1 && uniqueMembers.size() == 1) {
+            return true;
+        }
+        // multi-model multi-ensemble - don't want to think about this
+        if (uniqueModels.size() >= 1 && uniqueMembers.size() > 1) {
+            return false;
+        }
+        // single model, multi-ensemble - can't handle yet
+        if (uniqueModels.size() > 1 && uniqueMembers.size() > 1) {
+            return false;
+        }
+        return true;
+    }
     /**
      * Is this enabled?
      *
