@@ -60,7 +60,7 @@ var GuiUtils = {
 
     handleError: function(error, extra) {
         console.log(error);
-        //        alert("An error has occurred: " + error);
+        alert("An error has occurred: " + error);
         if(extra) {
             console.log(extra);
         }
