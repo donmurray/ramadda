@@ -3,6 +3,6 @@
     <target name="plugin">
       <property name="plugin" value="media"/>
       <property name="plugin_dest" value="otherplugins"/>
-      <ant antfile="${basedir}/build.xml" target="plugin_main" />
+      <ant antfile="${basedir}/build.xml" target="plugin_build" />
     </target>
 </project>
