@@ -197,14 +197,15 @@ public class Visitor implements Cloneable {
             }
 
             if (c == NEWLINE) {
-                sb.append("\t************** new line:" + inQuote + "\n");
+                //                sb.append("\t************** new line:" + inQuote + "\n");
                 if ( !inQuote) {
                     break;
                 }
             } else if (c == CARRIAGE_RETURN) {
-                sb.append("\tcr:" + inQuote + "\n");
+                //                sb.append("\t ***** cr:" + inQuote + "\n");
                 if ( !inQuote) {
                     nextChar = getInput().read();
+                    //                    sb.append("read next char:" + nextChar);
                     if (nextChar == -1) {
                         break;
                     }
@@ -215,7 +216,7 @@ public class Visitor implements Cloneable {
                     break;
                 }
             } else {
-                sb.append("\tchar:" + (char) c + "  " + inQuote + "\n");
+                //                sb.append("\tchar:" + (char) c + "  " + inQuote + "\n");
             }
             lb.append((char) c);
             if (c == '"') {
@@ -228,10 +229,12 @@ public class Visitor implements Cloneable {
                     if (nextChar == -1) {
                         break;
                     }
+                    //                    sb.append("read next char (2):" + nextChar);
                     if (nextChar != '"') {
                         //                        sb.append("\tout quote\n");
                         inQuote = false;
                         if (nextChar == NEWLINE) {
+                            nextChar = -1;
                             //                            sb.append("\t************** new line:" + inQuote+"\n");
                             break;
                         }
@@ -247,11 +250,12 @@ public class Visitor implements Cloneable {
 
 
         String line = lb.toString();
+        //        System.err.println("LINE:" + line);
         if (line.length() == 0) {
             return null;
         }
 
-        //        System.err.println("LINE:" + line);
+
         return line;
     }
 
