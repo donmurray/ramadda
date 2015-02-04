@@ -1,6 +1,7 @@
 <project basedir="../../../../../" default="plugin">
     <target name="plugin">
       <property name="plugin" value="edu"/>
-      <ant antfile="${basedir}/build.xml" target="plugin_main"/>
+      <property name="plugin_dest" value="otherplugins"/>
+      <ant antfile="${basedir}/build.xml" target="plugin_build"/>
     </target>
 </project>
