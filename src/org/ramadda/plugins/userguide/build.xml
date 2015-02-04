@@ -5,7 +5,7 @@
 
     <target name="plugin">
       <property name="plugin" value="userguide"/>
-      <property name="plugin_dest" value="otherplugins"/>
+      <property name="plugin_dest" value="coreplugins"/>
       <ant antfile="${basedir}/build.xml" target="plugin_build"/>
     </target>
 

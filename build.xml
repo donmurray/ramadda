@@ -4,10 +4,6 @@
 
     <target name="init">
         <property file="${basedir}/build.properties"/>
-        <property name="allpluginszip" value="${dist_dir}/allplugins.zip"/>
-        <property name="allpluginsjar" value="${dist_dir}/allplugins.jar"/>
-        <property name="noclasses_allpluginsjar" value="${dist_dir}/allplugins_noclasses.jar"/>
-        <property name="classes_allpluginsjar" value="${dist_dir}/allplugins_classes.jar"/>
         <mkdir dir="${dist_dir}"/>
     </target>
 
@@ -24,7 +20,13 @@
       <antcall target="purge"/>
       <antcall target="plugins"/>
       <antcall target="pointtools"/>
-      <copy overwrite="true" file="${allpluginsjar}"  todir="${src_dir}/org/ramadda/repository/resources/plugins"/>
+
+      <copy overwrite="true" file="${dist_dir}/coreplugins.jar"  todir="${src_dir}/org/ramadda/repository/resources/plugins"/>
+      <copy overwrite="true" file="${dist_dir}/geoplugins.jar"  todir="${src_dir}/org/ramadda/repository/resources/plugins"/>
+<!--
+      <copy overwrite="true" file="${dist_dir}/bioplugins.jar"  todir="${src_dir}/org/ramadda/repository/resources/plugins"/>
+-->
+
       <ant antfile="${src_dir}/org/ramadda/repository/build.xml" inheritAll="false" target="release"/>
     </target>
 
@@ -39,53 +41,65 @@
     </target>
 
     <target name="plugins" depends="init,purgeplugins">
-      <ant antfile="${src_dir}/org/ramadda/geodata/build.xml" inheritAll="false"/>
+
       <ant antfile="${src_dir}/org/ramadda/plugins/build.xml" inheritAll="false"/>
+      <ant antfile="${src_dir}/org/ramadda/geodata/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/bio/build.xml" inheritAll="false"/>
-      <antcall target="allplugins.zip"/>
+
+      <ant target="plugins.zip" antfile="${basedir}/build.xml" inheritAll="false">
+        <property name="plugins_target" value="coreplugins"/>
+      </ant>
+
+      <ant target="plugins.zip" antfile="${basedir}/build.xml" inheritAll="false">
+        <property name="plugins_target" value="bioplugins"/>
+      </ant>
+
+      <ant target="plugins.zip" antfile="${basedir}/build.xml" inheritAll="false">
+        <property name="plugins_target" value="geoplugins"/>
+      </ant>
+
    </target>
 
 
-    <target name="allplugins.zip" depends="init">
-<!-- Make the .zip -->
-      <zip destfile="${allpluginszip}">
-          <zipfileset dir="${dist_dir}/plugins" includes="*"/>
+    <target name="plugins.zip" depends="init">
+     <property name="plugins_target" value="coreplugins"/>
+
+     <property name="pluginszip" value="${dist_dir}/${plugins_target}.zip"/>
+     <property name="pluginsjar" value="${dist_dir}/${plugins_target}.jar"/>
+     <property name="noclasses_pluginsjar" value="${dist_dir}/${plugins_target}_noclasses.jar"/>
+     <property name="classes_pluginsjar" value="${dist_dir}/${plugins_target}_classes.jar"/>
+      <zip destfile="${pluginszip}">
+          <zipfileset dir="${dist_dir}/${plugins_target}" includes="*"/>
       </zip>
-      <property name="allpluginsdir" value="${dist_dir}/allplugins"/>
-      <delete dir="${allpluginsdir}"/>
-      <mkdir dir="${allpluginsdir}"/>
-      <unjar dest="${allpluginsdir}">
-          <fileset dir="${dist_dir}/plugins">
+      <property name="pluginsdir" value="${dist_dir}/${plugin_target}"/>
+      <delete dir="${pluginsdir}"/>
+      <mkdir dir="${pluginsdir}"/>
+      <unjar dest="${pluginsdir}">
+          <fileset dir="${dist_dir}/${plugins_target}">
              <include name="**/*.jar"/>
          </fileset>
       </unjar>
       <jar 
-         basedir="${allpluginsdir}"
+         basedir="${pluginsdir}"
          update="false"
          compress="true"
-         jarfile="${allpluginsjar}">
+         jarfile="${pluginsjar}">
       </jar>
       <jar 
-         basedir="${allpluginsdir}"
+         basedir="${pluginsdir}"
          update="false"
          compress="true"
          excludes="**/*.class"
-         jarfile="${noclasses_allpluginsjar}">
+         jarfile="${noclasses_pluginsjar}">
       </jar>
       <jar 
-         basedir="${allpluginsdir}"
+         basedir="${pluginsdir}"
          update="false"
          compress="true"
          includes="**/*.class"
-         jarfile="${classes_allpluginsjar}">
+         jarfile="${classes_pluginsjar}">
       </jar>
     </target>
-
-
-    <target name="allplugins" depends="init,purgeplugins">
-      <ant antfile="${src_dir}/org/ramadda/geodata/build.xml" inheritAll="false" target="allplugins"/>
-      <ant antfile="${src_dir}/org/ramadda/plugins/build.xml" inheritAll="false" target="allplugins"/>
-   </target>
 
 
     <target name="runserver" depends="init">
