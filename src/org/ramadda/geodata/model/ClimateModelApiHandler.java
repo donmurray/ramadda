@@ -68,8 +68,11 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
     /** compare action */
     public static final String ARG_ACTION_COMPARE = "action.compare";
 
-    /** multi compare action */
+    /** multi model compare action */
     public static final String ARG_ACTION_MULTI_COMPARE = "action.multicompare";
+
+    /** ensemble compare action */
+    public static final String ARG_ACTION_ENS_COMPARE = "action.enscompare";
 
     /** timeseries action */
     public static final String ARG_ACTION_TIMESERIES = "action.timeseries";
@@ -131,7 +134,8 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         //return getTypeHandler().getServicesToRun(request);
         List<Service> processes = new ArrayList<Service>();
         if (action.equals(ARG_ACTION_COMPARE) ||
-            action.equals(ARG_ACTION_MULTI_COMPARE)) {
+            action.equals(ARG_ACTION_MULTI_COMPARE) ||
+            action.equals(ARG_ACTION_ENS_COMPARE)) {
             Service process = new CDOArealStatisticsProcess(repository);
             if (process.isEnabled()) {
                 processes.add(process);
@@ -441,6 +445,19 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
     }
 
     /**
+     * handle the multiple param comparison request
+     *
+     * @param request request
+     *
+     * @return result
+     *
+     * @throws Exception on badness
+     */
+    public Result processEnsCompareRequest(Request request) throws Exception {
+        return handleRequest(request, ARG_ACTION_ENS_COMPARE);
+    }
+
+    /**
      * handle the time series request
      *
      * @param request request
@@ -533,8 +550,16 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
                     continue;
                 }
-                operands.add(new ServiceOperand(entries.get(0).getName(),
-                        entries));
+                if (type.equals(ARG_ACTION_MULTI_COMPARE) ||
+                        type.equals(ARG_ACTION_ENS_COMPARE)) {
+                    for (Entry e : entries) {
+                        operands.add(new ServiceOperand(e.getName(),
+                                Misc.newList(e)));
+                    }
+                } else {
+                    operands.add(new ServiceOperand(entries.get(0).getName(),
+                            entries));
+                }
 
             }
         }
@@ -557,11 +582,13 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         StringBuilder sb  = new StringBuilder();
         ServiceInput  dpi = new ServiceInput(processDir, operands);
+        dpi.putProperty("type", type);
 
         if (request.exists(type)) {
             if (hasOperands) {
                 try {
                     if (type.equals(ARG_ACTION_COMPARE) ||
+                        type.equals(ARG_ACTION_ENS_COMPARE) ||
                         type.equals(ARG_ACTION_MULTI_COMPARE)) {
                         return doCompare(request, dpi);
                     } else if (type.equals(ARG_ACTION_TIMESERIES)){
@@ -614,20 +641,16 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                                     + "/model/model.css"));
 
         String formAttrs = HtmlUtils.attrs(ATTR_ID, formId);
-        if (type.equals(ARG_ACTION_COMPARE)) {
-            sb.append(HtmlUtils.form(getCompareUrlPath(request), formAttrs));
+        sb.append(HtmlUtils.form(getApiUrlPath(request, type), formAttrs));
+        if (type.equals(ARG_ACTION_COMPARE) || 
+                type.equals(ARG_ACTION_ENS_COMPARE) ||
+                type.equals(ARG_ACTION_MULTI_COMPARE)) {
             getMapManager().addGoogleEarthImports(request, sb);
             sb.append(
                 "<script type=\"text/JavaScript\">google.load(\"earth\", \"1\");</script>\n");
             //sb.append(HtmlUtils.script(
             //    "$(document).ready(function() {\n $(\"a.popup_image\").fancybox({\n 'titleShow' : false\n });\n });\n"));
-        } else if (type.equals(ARG_ACTION_MULTI_COMPARE)) {
-            sb.append(HtmlUtils.form(getMultiCompareUrlPath(request),
-                                     formAttrs));
-            getWikiManager().addDisplayImports(request, sb);
         } else {
-            sb.append(HtmlUtils.form(getTimeSeriesUrlPath(request),
-                                     formAttrs));
             getWikiManager().addDisplayImports(request, sb);
         }
 
@@ -645,9 +668,10 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         String helpFile =
             "/org/ramadda/geodata/model/htdocs/model/compare.html";
         if (type.equals(ARG_ACTION_MULTI_COMPARE)) {
-            formType = "mcompare";
-        }
-        if (type.equals(ARG_ACTION_TIMESERIES)) {
+            formType = "multicompare";
+        } else if (type.equals(ARG_ACTION_ENS_COMPARE)) {
+            formType = "enscompare";
+        } else if (type.equals(ARG_ACTION_TIMESERIES)) {
             formType = "timeseries";
             helpFile =
                 "/org/ramadda/geodata/model/htdocs/model/timeseries.html";
@@ -715,13 +739,14 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                         HtmlUtils.id(formId + "_submit")
                         + makeButtonSubmitDialog(
                             sb, msg("Making Plot, Please Wait") + "...")));
-            } else if (type.equals(ARG_ACTION_MULTI_COMPARE)) {
+            } else if (type.equals(ARG_ACTION_MULTI_COMPARE) ||
+                       type.equals(ARG_ACTION_ENS_COMPARE)) {
                 sb.append(
                     HtmlUtils.submit(
-                        msg("Make Plots"), ARG_ACTION_MULTI_COMPARE,
+                        msg("Make Plots"), type,
                         HtmlUtils.id(formId + "_submit")
                         + makeButtonSubmitDialog(
-                            sb, msg("Making Plot, Please Wait") + "...")));
+                            sb, msg("Making Plots, Please Wait") + "...")));
             } else {
                 sb.append(
                     HtmlUtils.submit(
@@ -810,7 +835,9 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 } else {
 
                     String extraSelect = "";
-                    if (type.equals(ARG_ACTION_MULTI_COMPARE)) {
+                    if (type.equals(ARG_ACTION_MULTI_COMPARE) && column.getName().equals("model")) {
+                        extraSelect = HtmlUtils.attr(HtmlUtils.ATTR_MULTIPLE, "true")+HtmlUtils.attr("size", "4");
+                    } else if (type.equals(ARG_ACTION_ENS_COMPARE) && column.getName().equals("ensemble")) {
                         extraSelect = HtmlUtils.attr(HtmlUtils.ATTR_MULTIPLE, "true")+HtmlUtils.attr("size", "4");
                     }
                     String selectBox =
@@ -1200,13 +1227,21 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
      *  return the main entry point URL
      *
      *
-     * @param request _more_
+     * @param request  the request
      * @return  the main entry point
      */
-    private String getMultiCompareUrlPath(Request request) {
+    private String getApiUrlPath(Request request, String type) {
         //Use the collection type in the path. This is defined in the api.xml file
         StringBuilder base = new StringBuilder(getRepository().getUrlBase());
-        base.append("/model/mcompare");
+        if (type.equals(ARG_ACTION_COMPARE)) {
+            base.append("/model/compare");
+        } else if (type.equals(ARG_ACTION_MULTI_COMPARE)) {
+            base.append("/model/multicompare");
+        } else if (type.equals(ARG_ACTION_ENS_COMPARE)) {
+            base.append("/model/enscompare");
+        } else if (type.equals(ARG_ACTION_TIMESERIES)) {
+            base.append("/model/timeseries");
+        }
         if (request.defined(ARG_FREQUENCY)) {
             base.append("?");
             base.append(getFrequencyArgs(request));
@@ -1214,42 +1249,6 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         return base.toString();
     }
-
-
-    /**
-     *  return the main entry point URL
-     *
-     *
-     * @param request _more_
-     * @return  the main entry point
-     */
-    private String getCompareUrlPath(Request request) {
-        //Use the collection type in the path. This is defined in the api.xml file
-        StringBuilder base = new StringBuilder(getRepository().getUrlBase());
-        base.append("/model/compare");
-        if (request.defined(ARG_FREQUENCY)) {
-            base.append("?");
-            base.append(getFrequencyArgs(request));
-        }
-
-        return base.toString();
-    }
-
-    /**
-     *  return the main entry point URL
-     *
-     *
-     * @param request _more_
-     * @return  the main entry point
-     */
-    private String getTimeSeriesUrlPath(Request request) {
-        //Use the collection type in the path. This is defined in the api.xml file
-        String base = getRepository().getUrlBase() + "/model/timeseries";
-
-        return base;
-    }
-
-
 
     /**
      * Get the type handler

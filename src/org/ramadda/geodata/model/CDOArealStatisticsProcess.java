@@ -50,6 +50,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.StringUtil;
 
 import ucar.visad.data.CalendarDateTime;
+import visad.util.ThreadManager;
 
 
 import java.io.File;
@@ -66,6 +67,7 @@ import java.util.TreeSet;
  */
 public class CDOArealStatisticsProcess extends CDODataProcess {
 
+    String type = null;
 
     /**
      * Area statistics DataProcess
@@ -123,6 +125,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
     private void makeInputForm(Request request, ServiceInput input,
                                Appendable sb, String argPrefix)
             throws Exception {
+        
         Entry first = input.getEntries().get(0);
 
         CdmDataOutputHandler dataOutputHandler =
@@ -164,14 +167,21 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
     @Override
      public ServiceOutput evaluate(Request request, ServiceInput input, String argPrefix)
             throws Exception {
+        
+        final Request myRequest = request;
+        final ServiceInput myInput = input;
+        final String argP = argPrefix;
 
         if ( !canHandle(input)) {
             throw new Exception("Illegal data type");
         }
 
-        List<ServiceOperand> outputEntries = new ArrayList<ServiceOperand>();
+        final List<ServiceOperand> outputEntries = new ArrayList<ServiceOperand>();
         int                  opNum         = 0;
-        for (ServiceOperand op : input.getOperands()) {
+        boolean useThreads = false;
+        ThreadManager threadManager =
+                new ThreadManager("CDOArealStatistics.evaluate");
+        for (final ServiceOperand op : input.getOperands()) {
             Entry oneOfThem = op.getEntries().get(0);
             Entry collection = GranuleTypeHandler.getCollectionEntry(request,
                                    oneOfThem);
@@ -180,11 +190,41 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                 frequency = collection.getValues()[0].toString();
             }
             if (frequency.toLowerCase().indexOf("mon") >= 0) {
-                outputEntries.add(processMonthlyRequest(request, input, op,
-                        opNum));
+                if (!useThreads) {
+                    outputEntries.add(processMonthlyRequest(request, input, op,
+                          opNum));
+                } else {
+                    final int myOp = opNum;
+                    threadManager.addRunnable(new ThreadManager.MyRunnable() {
+                        public void run() throws Exception {
+                            try {
+                                ServiceOperand so = processMonthlyRequest(myRequest, myInput, op,
+                                        myOp);
+                                if (so != null) {
+                                    synchronized (outputEntries) {
+                                        outputEntries.add(so);
+                                    }
+                                }
+                            } catch (Exception ve) {
+                                ve.printStackTrace();
+                            }
+                        }
+                    });
+                }
+
             }
-            opNum++;
+            if (input.getOperands().size() <= 2) {
+               opNum++;
+            }
         }
+        if (useThreads) {
+            try {
+                threadManager.runInParallel(opNum);
+            } catch (Exception ve) {
+                ve.printStackTrace();
+            }
+        }
+        
 
         return new ServiceOutput(outputEntries);
     }
@@ -709,7 +749,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         }
         // single model, multi-ensemble - can't handle yet
         if (uniqueModels.size() > 1 && uniqueMembers.size() > 1) {
-            return false;
+            return true;
         }
         return true;
     }
@@ -756,6 +796,8 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                               ServiceInput input)
             throws Exception {
 
+        String type = input.getProperty("type", 
+               ClimateModelApiHandler.ARG_ACTION_COMPARE).toString();
         List<GridDataset> grids = new ArrayList<GridDataset>();
         for (ServiceOperand op : input.getOperands()) {
             Entry first = op.getEntries().get(0);
@@ -770,7 +812,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
 
         }
         CDOOutputHandler.makeMonthsWidget(request, sb, null);
-        makeYearsWidget(request, sb, grids);
+        makeYearsWidget(request, sb, grids, type);
     }
 
 
@@ -784,13 +826,20 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @throws Exception _more_
      */
     private void makeYearsWidget(Request request, Appendable sb,
-                                 List<GridDataset> grids)
+                                 List<GridDataset> grids, String type)
             throws Exception {
         int grid = 0;
+        int numGrids = grids.size();
+        boolean handleMultiple = type.equals(ClimateModelApiHandler.ARG_ACTION_MULTI_COMPARE) ||
+                                 type.equals(ClimateModelApiHandler.ARG_ACTION_ENS_COMPARE);
+        /* If we are doing a compare, we make widgets for each grid.  If we are doing
+         * a multi compare, we make one from the intersection of all grids
+         */
+        List<String> commonYears = new ArrayList<String>();
         for (GridDataset dataset : grids) {
             List<CalendarDate> dates =
                 CdmDataOutputHandler.getGridDates(dataset);
-            if ( !dates.isEmpty()) {
+            if ( !dates.isEmpty() && grid == 0) {
                 CalendarDate cd  = dates.get(0);
                 Calendar     cal = cd.getCalendar();
                 if (cal != null) {
@@ -821,16 +870,30 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                     years.add(String.valueOf(i));
                 }
             }
-            String yearNum = (grid == 0)
+            if (handleMultiple) {
+                if (grid == 0) {
+                   commonYears.addAll(years);
+                } else {
+                    commonYears.retainAll(years);
+                }
+                if (grid < numGrids-1) {
+                    grid++;
+                    continue;
+                } else {
+                    years = commonYears;
+                }
+            } 
+            
+            String yearNum = (grid == 0 || handleMultiple)
                              ? ""
                              : String.valueOf(grid + 1);
-            String yrLabel = (grids.size() == 1)
+            String yrLabel = (grids.size() == 1 || handleMultiple)
                              ? "Start"
                              : (grid == 0)
                                ? "First Dataset:<br>Start"
                                : "Second Dataset:<br>Start";
             yrLabel = Repository.msgLabel(yrLabel);
-            if (grid > 0) {
+            if (grid > 0 && type.equals(ClimateModelApiHandler.ARG_ACTION_COMPARE)) {
                 years.add(0, "");
             }
             int endIndex = 0;

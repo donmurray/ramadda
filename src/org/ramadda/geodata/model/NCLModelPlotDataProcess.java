@@ -136,6 +136,10 @@ public class NCLModelPlotDataProcess extends Service {
         public void addToForm(Request request, ServiceInput input, Appendable sb, String argPrefix, String label)
             throws Exception {
 
+        String type = input.getProperty("type", 
+                ClimateModelApiHandler.ARG_ACTION_COMPARE).toString();
+        boolean handleMultiple = type.equals(ClimateModelApiHandler.ARG_ACTION_MULTI_COMPARE) ||
+                                 type.equals(ClimateModelApiHandler.ARG_ACTION_ENS_COMPARE);
         sb.append(HtmlUtils.formTable());
         Entry first = input.getEntries().get(0);
 
@@ -155,7 +159,7 @@ public class NCLModelPlotDataProcess extends Service {
         String space1 =  HtmlUtils.space(1);
         String space2 =  HtmlUtils.space(1);
 
-        if (input.getOperands().size() > 1) {
+        if (input.getOperands().size() > 1 && !handleMultiple) {
             StringBuilder buttons = new StringBuilder();
             buttons.append(HtmlUtils.radio(
                                            ARG_NCL_OUTPUT, "diff",
@@ -175,6 +179,8 @@ public class NCLModelPlotDataProcess extends Service {
 
             sb.append(HtmlUtils.formEntry(Repository.msgLabel("Plot As"),
                                           buttons.toString()));
+        } else {
+            sb.append(HtmlUtils.hidden(ARG_NCL_OUTPUT, "comp"));
         }
         StringBuilder plotTypes = new StringBuilder();
         plotTypes.append(HtmlUtils.radio(
@@ -563,9 +569,9 @@ public class NCLModelPlotDataProcess extends Service {
             return false;
         }
 
-        if (dpi.getOperands().size() > 2) {
-            return false;
-        }
+        //if (dpi.getOperands().size() > 2) {
+        //    return false;
+        //}
 
         for (ServiceOperand op : dpi.getOperands()) {
             if (checkForValidEntries(op.getEntries())) {
@@ -611,7 +617,7 @@ public class NCLModelPlotDataProcess extends Service {
         }
         // single model, multi-ensemble - can't handle yet
         if (uniqueModels.size() > 1 && uniqueMembers.size() > 1) {
-            return false;
+            return true;
         }
         return true;
     }

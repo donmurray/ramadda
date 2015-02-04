@@ -648,7 +648,7 @@ begin
   numfiles = dimsizes(files)
   data = readdata(files(0), opts) 
   plots = new(numfiles,graphic)
-  dodiff = opts@outtype .eq. "diff" .and. numfiles .gt. 1
+  dodiff = opts@outtype .eq. "diff" .and. numfiles .eq. 2
   isanom = opts@isanom
   doGoogle = (opts@plottype .eq. "kmz")
   doPanel = (.not. dodiff) .and. (.not. doGoogle) .and. numfiles .gt. 1 
@@ -710,6 +710,8 @@ begin
   ; labelbar
   if (doPanel) then
     rescf@lbLabelBarOn = False         ; turn off label bar
+    rescf@mpGeophysicalLineThicknessF = .5  ; reduce the line thickness
+    rescf@mpNationalLineThicknessF = .5     ; reduce the line thickness
   end if
 
   rescf@tiMainFontHeightF=0.017
@@ -1119,8 +1121,33 @@ begin
       resP@gsnPanelLeft               = 0.05
       resP@gsnPanelRight              = 0.95
 
+      ;---figure out how to lay out the panels
+      numPanels = dimsizes(plots)
+      if (numPanels .eq. 2) then
+         panels = (/2,1/)
+      else
+        if (numPanels .gt. 20) then
+          numRows = numPanels/5+1
+          panels = (/numRows,5/)
+        else
+          if (numPanels .gt. 12) then
+            numRows = numPanels/4+1
+            panels = (/numRows,4/)
+          else 
+            if (numPanels .gt. 6) then
+              numRows = numPanels/3+1
+              panels = (/numRows,3/)
+            else
+              numRows = numPanels/2+1
+              panels = (/numRows,3/)
+            end if
+          end if
+        end if
+      end if
+      ;;print(panels)
+
       ;---Panel the plot.
-      gsn_panel(wks,plots,(/2,1/),resP)
+      gsn_panel(wks,plots,panels,resP)
       ;addAnnotation(wks,opts@annotation)
       ;maximize_output(wks, False)
     else 
