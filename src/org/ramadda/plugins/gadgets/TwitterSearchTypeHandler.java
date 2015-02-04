@@ -18,7 +18,7 @@
 * DEALINGS IN THE SOFTWARE.
 */
 
-package org.ramadda.plugins.twittersearch;
+package org.ramadda.plugins.gadgets;
 
 
 import org.ramadda.repository.*;
@@ -88,7 +88,7 @@ public class TwitterSearchTypeHandler extends GenericTypeHandler {
 
         String template =
             getRepository().getResource(
-                "/org/ramadda/plugins/twittersearch/template.html");
+                "/org/ramadda/plugins/gadgets/template.html");
         String string      = entry.getValue(0, "");
         String width       = entry.getValue(1, "350");
         String height      = entry.getValue(2, "300");
