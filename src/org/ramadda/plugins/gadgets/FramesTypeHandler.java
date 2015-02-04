@@ -18,7 +18,7 @@
 * DEALINGS IN THE SOFTWARE.
 */
 
-package org.ramadda.plugins.frames;
+package org.ramadda.plugins.gadgets;
 
 
 import org.ramadda.repository.*;
