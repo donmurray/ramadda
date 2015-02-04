@@ -51,7 +51,6 @@
       <ant antfile="${src_dir}/org/ramadda/plugins/power/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/userguide/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/workshop/build.xml" inheritAll="false"/>
-      <ant antfile="${src_dir}/org/ramadda/plugins/weather/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/wiki/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/media/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/gadgets/build.xml" inheritAll="false"/>
