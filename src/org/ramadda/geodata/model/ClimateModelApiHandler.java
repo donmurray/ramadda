@@ -818,11 +818,11 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 List values = new ArrayList();
                 values.add(new TwoFacedObject("--", ""));
                 arg = getFieldSelectArg(collection, fieldIdx);
-                String selectedValue = request.getString(arg, "");
-                if (Utils.stringDefined(selectedValue)) {
-                    values.add(selectedValue);
+                //String selectedValue = request.getString(arg, "");
+                List selectedValues = request.get(arg, new ArrayList());
+                if (selectedValues.size() > 0 && !selectedValues.get(0).toString().isEmpty()) {
+                    values.addAll(selectedValues);
                 }
-                //dsb.append("\n");
                 // don't show variable selector for subsequent collections when we have a fixed
                 // collection
                 if (request.defined(ARG_COLLECTION) && (collectionNumber > 1)
@@ -841,7 +841,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                         extraSelect = HtmlUtils.attr(HtmlUtils.ATTR_MULTIPLE, "true")+HtmlUtils.attr("size", "4");
                     }
                     String selectBox =
-                        HtmlUtils.select(arg, values, selectedValue,
+                        HtmlUtils.select(arg, values, selectedValues,
                                          HtmlUtils.cssClass("select_widget")
                                          + HtmlUtils.attr("id",
                                              getFieldSelectId(formId,
@@ -1175,6 +1175,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             (CollectionTypeHandler) entry.getTypeHandler();
         List<Clause> clauses = new ArrayList<Clause>();
         List<Column> columns = typeHandler.getGranuleColumns();
+        List<Clause> ors = new ArrayList<Clause>();
         for (int fieldIdx = 0; fieldIdx < columns.size(); fieldIdx++) {
             String arg = "field" + fieldIdx;
             String column = columns.get(fieldIdx).getName();
@@ -1183,15 +1184,19 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 continue;
             }
             if (v.size() > 0) {
-               List<Clause> ors = new ArrayList<Clause>(); 
+               List<Clause> myOrs = new ArrayList<Clause>();
                for (Object o : v) {
                    String s = o.toString();
                    if (s.length() > 0) {
-                       ors.add(Clause.eq(column, s));
+                       myOrs.add(Clause.eq(column, s));
                    }
                }
-               if (!ors.isEmpty()) {
-                   clauses.add(Clause.or(ors));
+               if (!myOrs.isEmpty()) {
+                   if (myOrs.size() == 1) {
+                      clauses.add(myOrs.get(0));
+                   } else {
+                      ors.addAll(myOrs);
+                   }
                }
             } 
         }
@@ -1202,10 +1207,36 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             return new Result("", new StringBuilder(), Json.MIMETYPE);
         }
         Column myColumn = columns.get(columnIdx);
-        List<String> values =
-            new ArrayList<String>(((CollectionTypeHandler) entry
-                .getTypeHandler())
-                    .getUniqueColumnValues(entry, columnIdx, clauses, false));
+        List<String> uniqueOrs = new ArrayList<String>();
+        int numOrs = ors.size();
+        int orNum = 0;
+        List<String> values = new ArrayList<String>();
+        if (ors.size() > 1) {
+            for (Clause or : ors) {
+                List<Clause> orClause = new ArrayList<Clause>(clauses);
+                orClause.add(or);
+                //System.err.println("or: "+ orClause);
+                values =
+                    new ArrayList<String>(((CollectionTypeHandler) entry
+                        .getTypeHandler())
+                            .getUniqueColumnValues(entry, columnIdx, orClause, false));
+                if (orNum == 0) {
+                    uniqueOrs.addAll(values);
+                } else {
+                    uniqueOrs.retainAll(values);
+                }
+                if (orNum == numOrs-1) {
+                    values = uniqueOrs;
+                }
+                orNum++;
+            }
+        } else {
+           //System.err.println("no or: "+ clauses);
+            values =
+                new ArrayList<String>(((CollectionTypeHandler) entry
+                    .getTypeHandler())
+                        .getUniqueColumnValues(entry, columnIdx, clauses, false));
+        }
         StringBuilder sb = new StringBuilder();
         if (myColumn.isEnumeration()) {
             List<TwoFacedObject> tfos = typeHandler.getValueList(entry,
