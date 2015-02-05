@@ -1036,6 +1036,24 @@ public class HtmlUtils {
      * _more_
      *
      * @param content _more_
+     * @param title _more_
+     *
+     * @return _more_
+     */
+    public static String section(String content, String title) {
+        if (title != null) {
+            return div(tag("h2", "", title) + content,
+                       cssClass("ramadda-section"));
+        }
+
+        return div(content, cssClass("ramadda-section"));
+
+    }
+
+    /**
+     * _more_
+     *
+     * @param content _more_
      *
      * @return _more_
      */
@@ -3766,14 +3784,15 @@ public class HtmlUtils {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
-        String pattern = null;
-        List<String> urls = new ArrayList<String>();
-        for(int i=0;i<args.length;i++) {
-            String arg  = args[i];
-            if(arg.equals("-urls")) {
+        String       pattern = null;
+        List<String> urls    = new ArrayList<String>();
+        for (int i = 0; i < args.length; i++) {
+            String arg = args[i];
+            if (arg.equals("-urls")) {
                 i++;
-                urls.addAll(StringUtil.split(IOUtil.readContents(args[i],""), "\n",true,true));
-            } else if(arg.equals("-pattern")) {
+                urls.addAll(StringUtil.split(IOUtil.readContents(args[i],
+                        ""), "\n", true, true));
+            } else if (arg.equals("-pattern")) {
                 i++;
                 pattern = args[i];
             } else {
@@ -3782,15 +3801,15 @@ public class HtmlUtils {
         }
 
 
-        int cnt =0;
-        for(String url: urls) {
+        int cnt = 0;
+        for (String url : urls) {
             cnt++;
-            System.err.println("Project: #" + cnt +" " + url);
-            System.out.println("project {" + url +"}");
+            System.err.println("Project: #" + cnt + " " + url);
+            System.out.println("project {" + url + "}");
             List<HtmlUtils.Link> links = HtmlUtils.extractLinks(new URL(url),
-                                                                pattern);
-            for (HtmlUtils.Link link: links) {
-                System.out.println("dataset {" + link.getUrl()+"}");
+                                             pattern);
+            for (HtmlUtils.Link link : links) {
+                System.out.println("dataset {" + link.getUrl() + "}");
             }
         }
 
