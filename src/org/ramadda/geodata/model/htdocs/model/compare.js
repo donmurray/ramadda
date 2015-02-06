@@ -35,7 +35,6 @@ function CollectionForm(formId, type, args) {
 
                 //Listen to the buttons
                 $submits.click( function(event) {
-                //$("#" + this.formId+"_submit").button().click(function(event) {
                     which_button = $(this).attr("name");
                 });
 
@@ -70,7 +69,6 @@ function CollectionForm(formId, type, args) {
 
 
 
-                //var doJson = theForm.type === "compare";
                 var doJson = true;
                 var doImage = false;
 
@@ -90,7 +88,6 @@ function CollectionForm(formId, type, args) {
                     //Create the object that gets called back
                     var callbackObject = {
                         entryListChanged: function(entryList) {
-                            //todo: hide the dialog
 
                             //Get the list of entries from the EntryList
                             //There should just be one entry  -  the process folder
@@ -181,10 +178,6 @@ function CollectionForm(formId, type, args) {
                 }
                 // Show GE plugin if we have KMZ
                 if (kmz != null) {
-                    //if(!window.haveLoadedEarth) {
-                    //     google.load("earth", "1");
-                    //     window.haveLoadedEarth=true;
-                    //}
                     var map3d1 = new RamaddaEarth('map3d1', 
                          location.protocol+"//"+location.hostname+":"+location.port+kmz.getResourceUrl(),
                          {showOverview:false});
@@ -318,17 +311,16 @@ function CollectionForm(formId, type, args) {
                 //Assemble the other field values up to the currently selected field
                 for(var i=0;i<fieldIdx;i++) {
                     var value = this.getFieldSelect(collection, i).val();
-                    //if(val!="") {
-                    //    url = url +"&field" + i + "=" + encodeURIComponent(val);
-                    //}
                     if(typeof value === 'string') {
                        value = [value];
                     }
-                    for (var j = 0; j < value.length; j++) {
-                       var s = value[j];
-                       if(HtmlUtil.valueDefined(s)) {
-                          url += "&field" + i + "=" + encodeURIComponent(s);
-                       }
+                    if (!(value === undefined || value == null)) {
+                        for (var j = 0; j < value.length; j++) {
+                           var s = value[j];
+                           if(HtmlUtil.valueDefined(s)) {
+                              url += "&field" + i + "=" + encodeURIComponent(s);
+                           }
+                        }
                     }
                 }
                 var collectionForm = this;
@@ -349,7 +341,6 @@ function CollectionForm(formId, type, args) {
           //Clear the field selects starting at start idx
                 clearFields: function(collection, startIdx) {
                 for(var idx=startIdx;idx<10;idx++) {
-                    //this.getFieldSelect(collection, idx).html("<select><option value=''>--</option></select>");
                     this.getFieldSelect(collection, idx).html("<option value=''>--</option>");
                 }
             },
@@ -385,7 +376,6 @@ function CollectionForm(formId, type, args) {
                    currentValue = [ currentValue];
                 }
                 var currentValueIsInNewList = false;
-                //var html = "<select>";
                 var html = "";
                 for(var i=0;i<data.length;i++)  {
                     var objIQ = data[i];
@@ -404,11 +394,13 @@ function CollectionForm(formId, type, args) {
                     }
                     if (value == "sprd" || value == "clim") continue;
                     var extra = "";
-                    for (var j = 0; j < currentValue.length; j++) {
-                        var s = currentValue[j];
-                        if (s == value) {
-                            extra = " selected ";
-                            currentValueIsInNewList = true;
+                    if (!(currentValue === undefined || currentValue == null)) {
+                        for (var j = 0; j < currentValue.length; j++) {
+                            var s = currentValue[j];
+                            if (s == value) {
+                                extra = " selected ";
+                                currentValueIsInNewList = true;
+                            }
                         }
                     }
                     //if(currentValue == value) {
@@ -417,7 +409,6 @@ function CollectionForm(formId, type, args) {
                     //}
                     html += "<option value=\'"+value+"\'   " + extra +" >" + label +"</option>";
                 }
-                //html+="</select>";
                 this.getFieldSelect(collection, fieldIdx).html(html);
                 return currentValueIsInNewList;
             },
