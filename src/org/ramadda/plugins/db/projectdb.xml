@@ -67,6 +67,14 @@
 </table>
 
 
+<table id="vote_yesno" name="Simple Yes-No Vote" >
+   <column name="name" type="string" label="My Name"   canlist="true" required="true"/>
+   <column name="vote" type="enumeration" label="My vote" values="Yes,No" cansearch="true"   canlist="true">
+       <property name="iscategory" value="true"/>
+   </column>
+</table>
+
+
 
 <table id="devtasks" name="Development Tasks">
    <column name="title" type="string" label="Title" cansearch="true"   canlist="true"/>

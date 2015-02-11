@@ -95,6 +95,10 @@ import java.util.TimeZone;
 
 public class DbTypeHandler extends BlobTypeHandler {
 
+    public static final String PROP_ANONFORM_ENABLED= "anonform.enabled";
+
+    public static final String PROP_ANONFORM_MESSAGE= "anonform.message";
+
     /** _more_ */
     public static final int DEFAULT_MAX = DB_VIEW_ROWS;
 
@@ -747,10 +751,6 @@ public class DbTypeHandler extends BlobTypeHandler {
 
     }
 
-    /*
-
-<iframe width="425" height="240" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="https://maps.google.com/maps?f=q&amp;source=embed&amp;hl=en&amp;geocode=&amp;q=4760+28th+St.,Boulder,CO,80301&amp;sll=40.02931,-105.239977&amp;sspn=0.160098,0.363579&amp;ie=UTF8&amp;hq=&amp;hnear=4760+28th+St,+Boulder,+Colorado+80301&amp;t=m&amp;layer=c&amp;cbll=40.059955,-105.273588&amp;panoid=tTmpYutz3sCD-UhVYGFm-w&amp;cbp=13,23.82,,0,8.81&amp;ll=40.05541,-105.273614&amp;spn=0.015767,0.036478&amp;z=14&amp;output=svembed"></iframe><br /><small><a href="https://maps.google.com/maps?f=q&amp;source=embed&amp;hl=en&amp;geocode=&amp;q=4760+28th+St.,Boulder,CO,80301&amp;sll=40.02931,-105.239977&amp;sspn=0.160098,0.363579&amp;ie=UTF8&amp;hq=&amp;hnear=4760+28th+St,+Boulder,+Colorado+80301&amp;t=m&amp;layer=c&amp;cbll=40.059955,-105.273588&amp;panoid=tTmpYutz3sCD-UhVYGFm-w&amp;cbp=13,23.82,,0,8.81&amp;ll=40.05541,-105.273614&amp;spn=0.015767,0.036478&amp;z=14" style="color:#0000FF;text-align:left">View Larger Map</a></small>
-    */
 
     /**
      * _more_
@@ -822,6 +822,19 @@ public class DbTypeHandler extends BlobTypeHandler {
             return new Result(getTitle(), sb);
         }
 
+
+        Hashtable props = getProperties(entry);
+
+        boolean doAnonForm = Misc.getProperty(props, PROP_ANONFORM_ENABLED,false);
+        if(doAnonForm && !getAccessManager().canEditEntry(request, entry)) {
+            if (request.exists(ARG_DB_CREATE)) {
+                return handleNewOrEdit(request, entry, null, doAnonForm);
+            }
+            return handleForm(request, entry, null, true, doAnonForm);
+        }
+
+
+
         boolean      canEdit = getAccessManager().canEditEntry(request,
                                    entry);
 
@@ -836,7 +849,6 @@ public class DbTypeHandler extends BlobTypeHandler {
             String posx = request.getString("posx", "").replace("px", "");
             String posy = request.getString("posy", "").replace("px", "");
             if (request.exists(ARG_DB_STICKYLABEL)) {
-                Hashtable props = getProperties(entry);
                 String    label = request.getString(ARG_DB_STICKYLABEL, "");
                 props.put(PROP_STICKY_POSX + "." + label, posx);
                 props.put(PROP_STICKY_POSY + "." + label, posy);
@@ -864,7 +876,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
             return handleForm(request, entry,
                               request.getString(ARG_DBID, (String) null),
-                              true);
+                              true, false);
         }
 
 
@@ -874,7 +886,7 @@ public class DbTypeHandler extends BlobTypeHandler {
                                           request);
             }
 
-            return handleForm(request, entry, null, true);
+            return handleForm(request, entry, null, true, false);
         }
 
         if (request.exists(ARG_DB_CREATE)) {
@@ -883,7 +895,7 @@ public class DbTypeHandler extends BlobTypeHandler {
                                           request);
             }
 
-            return handleNewOrEdit(request, entry, null);
+            return handleNewOrEdit(request, entry, null, false);
         }
 
         if (request.exists(ARG_DB_EDIT) || request.exists(ARG_DB_COPY)) {
@@ -894,7 +906,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
             return handleNewOrEdit(request, entry,
                                    request.getString(ARG_DBID,
-                                       (String) null));
+                                                     (String) null), false);
         }
 
         if (request.exists(ARG_DB_SEARCHFORM)) {
@@ -982,10 +994,16 @@ public class DbTypeHandler extends BlobTypeHandler {
                               String extraLinks)
             throws Exception {
 
+        Hashtable props = getProperties(entry);
+        boolean doAnonForm = Misc.getProperty(props, PROP_ANONFORM_ENABLED,false);
+        if(doAnonForm) {
+            if(!getAccessManager().canEditEntry(request, entry)) {
+                addStyleSheet(sb);
+                return;
+            }
+        }
+
         boolean embedded = request.get(ARG_EMBEDDED, false);
-
-
-
         if (Utils.stringDefined(entry.getDescription())) {
             sb.append(entry.getDescription());
             sb.append(HtmlUtils.br());
@@ -993,7 +1011,6 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         if (embedded) {
             addStyleSheet(sb);
-
             return;
         }
 
@@ -1063,7 +1080,7 @@ public class DbTypeHandler extends BlobTypeHandler {
      */
     public void addHeaderItems(Request request, Entry entry, String view,
                                List<String> headerToks, String baseUrl,
-                               boolean[] addNext) {
+                               boolean[] addNext) throws Exception {
 
         if (showInHeader(VIEW_TABLE)) {
             if (view.equals(VIEW_TABLE)) {
@@ -1075,7 +1092,11 @@ public class DbTypeHandler extends BlobTypeHandler {
             }
         }
 
-        if (showInHeader(VIEW_NEW)) {
+        boolean canEdit = getAccessManager().canEditEntry(request, entry);
+        boolean canDoNew = getAccessManager().canDoAction(request, entry, Permission.ACTION_NEW);
+        
+
+        if (canDoNew && showInHeader(VIEW_NEW)) {
             if (view.equals(VIEW_NEW)) {
                 headerToks.add(HtmlUtils.b(msg("New")));
             } else {
@@ -1423,6 +1444,8 @@ public class DbTypeHandler extends BlobTypeHandler {
         super.addToEntryForm(request, formBuffer, parentEntry, entry,
                              formInfo);
         Hashtable props = getProperties(entry);
+
+
         if (entry != null) {
             addToEditForm(request, entry, formBuffer);
             addEnumerationAttributes(request, entry, formBuffer);
@@ -1455,7 +1478,16 @@ public class DbTypeHandler extends BlobTypeHandler {
      * @param formBuffer _more_
      */
     public void addToEditForm(Request request, Entry entry,
-                              Appendable formBuffer) {}
+                              Appendable formBuffer) throws Exception {
+        Hashtable props  = getProperties(entry);
+
+
+        formBuffer.append(HtmlUtils.formEntry("", HtmlUtils.checkbox(PROP_ANONFORM_ENABLED,"true",Misc.getProperty(props, PROP_ANONFORM_ENABLED,false))+ " " +
+                                              msg("Allow anonymous form submission")));
+        formBuffer.append(HtmlUtils.formEntry(msgLabel("Message"), HtmlUtils.input(PROP_ANONFORM_MESSAGE,Misc.getProperty(props, PROP_ANONFORM_MESSAGE,""), 
+                                                                                   HtmlUtils.SIZE_80) +" " +
+                                              msg("What to show the user after they create an item")));
+    }
 
 
     /**
@@ -1614,6 +1646,11 @@ public class DbTypeHandler extends BlobTypeHandler {
             throws Exception {
         super.initializeEntryFromForm(request, entry, parent, newEntry);
         Hashtable props          = getProperties(entry);
+
+
+        props.put(PROP_ANONFORM_ENABLED,request.get(PROP_ANONFORM_ENABLED,false)+"");
+        props.put(PROP_ANONFORM_MESSAGE,request.getString(PROP_ANONFORM_MESSAGE,""));
+
         String stickyLabelString = request.getString(PROP_STICKY_LABELS, "");
         props.put(PROP_STICKY_LABELS,
                   StringUtil.join("\n",
@@ -1762,8 +1799,7 @@ public class DbTypeHandler extends BlobTypeHandler {
             throws Exception {
         StringBuilder sb = new StringBuilder();
         addViewHeader(request, entry, sb, VIEW_SEARCH, 0, false);
-        sb.append(getSearchForm(request, entry));
-
+        sb.append(insetHtml(getSearchForm(request, entry)));
         return new Result(getTitle(), sb);
     }
 
@@ -2060,15 +2096,15 @@ public class DbTypeHandler extends BlobTypeHandler {
      *
      * @throws Exception _more_
      */
-    public Result handleNewOrEdit(Request request, Entry entry, String dbid)
+    public Result handleNewOrEdit(Request request, Entry entry, String dbid, boolean fromAnonForm)
             throws Exception {
         if (request.exists(ARG_DB_COPY)) {
             dbid = null;
         }
 
         boolean isNew = dbid == null;
-        if (request.exists(ARG_DB_BULK_TEXT)
-                || request.exists(ARG_DB_BULK_FILE)) {
+        if (!fromAnonForm && (request.exists(ARG_DB_BULK_TEXT)
+                              || request.exists(ARG_DB_BULK_FILE))) {
             InputStream source = null;
             String      bulkContent;
             if (request.exists(ARG_DB_BULK_FILE)) {
@@ -2107,6 +2143,17 @@ public class DbTypeHandler extends BlobTypeHandler {
         }
 
         doStore(entry, values, dbid == null);
+
+        if(fromAnonForm) {
+            Hashtable      props = getProperties(entry);
+            String message = Misc.getProperty(props, PROP_ANONFORM_MESSAGE,"");
+            if(!Utils.stringDefined(message)) {
+                message = "Thank you for submitting an entry";
+            }
+            return new Result("", new StringBuffer(insetHtml(message)));
+        }
+
+
         String url =
             HtmlUtils.url(request.url(getRepository().URL_ENTRY_SHOW),
                           new String[] {
@@ -2527,12 +2574,12 @@ public class DbTypeHandler extends BlobTypeHandler {
         Hashtable        entryProps = getProperties(entry);
 
         StringBuilder    chartJS    = new StringBuilder();
+        StringBuilder hb = new StringBuilder();
         //        GoogleChart.addChartImport(sb);
-
         if (doForm) {
             String formUrl = request.url(getRepository().URL_ENTRY_SHOW);
-            sb.append(HtmlUtils.form(formUrl));
-            sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
+            hb.append(HtmlUtils.form(formUrl));
+            hb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
         }
         boolean canEdit = getAccessManager().canEditEntry(request, entry);
         HashSet<String> except = new HashSet<String>();
@@ -2547,6 +2594,7 @@ public class DbTypeHandler extends BlobTypeHandler {
                                           ((dfltSortColumn == null)
                                            ? ""
                                            : dfltSortColumn.getName()));
+
         if (valueList.size() > 0) {
             List<TwoFacedObject> actions = new ArrayList<TwoFacedObject>();
             //TODO uncomment            if(hasEmail && getRepository().getAdmin().isEmailCapable()) {
@@ -2563,16 +2611,16 @@ public class DbTypeHandler extends BlobTypeHandler {
 
             if ( !request.get(ARG_EMBEDDED, false) && (actions.size() > 0)) {
                 if (doForm) {
-                    sb.append(HtmlUtils.submit(msgLabel("Do"), ARG_DB_DO));
-                    sb.append(HtmlUtils.select(ARG_DB_ACTION, actions));
+                    hb.append(HtmlUtils.submit(msgLabel("Do"), ARG_DB_DO));
+                    hb.append(HtmlUtils.select(ARG_DB_ACTION, actions));
                 }
             }
 
-            sb.append(HtmlUtils.p());
-            sb.append(
+            hb.append(HtmlUtils.p());
+            hb.append(
                 "<table class=\"dbtable\"  border=1 cellspacing=\"0\" cellpadding=\"0\" width=\"100%\">");
-            sb.append("<tr>");
-            sb.append("<td class=dbtableheader>&nbsp;</td>");
+            hb.append("<tr>");
+            hb.append("<td class=dbtableheader>&nbsp;</td>");
             for (int i = 1; i < columns.size(); i++) {
                 Column column = columns.get(i);
                 if ( !column.getCanList()) {
@@ -2590,7 +2638,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
                 String label = column.getLabel();
                 if ( !showHeaderLinks) {
-                    sb.append(
+                    hb.append(
                         HtmlUtils.col(
                             label, HtmlUtils.cssClass("dbtableheader")));
 
@@ -2621,11 +2669,11 @@ public class DbTypeHandler extends BlobTypeHandler {
                                              + ARG_DB_SORTDIR + (asc
                         ? "=asc"
                         : "=desc"), label) + extra;
-                sb.append(HtmlUtils.col(link,
+                hb.append(HtmlUtils.col(link,
                                         HtmlUtils.cssClass("dbtableheader")));
 
             }
-            sb.append("</tr>");
+            hb.append("</tr>");
         }
 
         Hashtable<String, Double> sums = new Hashtable<String, Double>();
@@ -2636,12 +2684,12 @@ public class DbTypeHandler extends BlobTypeHandler {
             String   divId  = "div_" + values[IDX_DBID];
             String   event  = getEventJS(request, entry, values, rowId,
                                          divId);
-            sb.append("\n");
-            sb.append(HtmlUtils.open(HtmlUtils.TAG_TR,
+            hb.append("\n");
+            hb.append(HtmlUtils.open(HtmlUtils.TAG_TR,
                                      HtmlUtils.attrs(HtmlUtils.ATTR_VALIGN,
                                          "top") + HtmlUtils.cssClass("dbrow")
                                              + HtmlUtils.id(rowId) + event));
-            sb.append(
+            hb.append(
                 "<td width=\"10\" style=\"white-space:nowrap;\"><div id=\""
                 + divId + "\" >");
 
@@ -2655,12 +2703,12 @@ public class DbTypeHandler extends BlobTypeHandler {
                                        HtmlUtils.squote(cbxId))));
 
             if (doForm) {
-                sb.append(HtmlUtils.checkbox(ARG_DBID_SELECTED, dbid, false,
+                hb.append(HtmlUtils.checkbox(ARG_DBID_SELECTED, dbid, false,
                                              HtmlUtils.id(cbxId) + call));
             }
             if (canEdit) {
                 String editUrl = getEditUrl(request, entry, dbid);
-                sb.append(
+                hb.append(
                     HtmlUtils.href(
                         editUrl,
                         HtmlUtils.img(
@@ -2669,14 +2717,14 @@ public class DbTypeHandler extends BlobTypeHandler {
             }
 
             String viewUrl = getViewUrl(request, entry, dbid);
-            sb.append(
+            hb.append(
                 HtmlUtils.href(
                     viewUrl,
                     HtmlUtils.img(
                         getRepository().getUrlBase() + "/db/database_go.png",
                         msg("View entry"))));
 
-            sb.append("</div></td>");
+            hb.append("</div></td>");
 
 
 
@@ -2696,9 +2744,9 @@ public class DbTypeHandler extends BlobTypeHandler {
                     sums.put(column.getName(), d);
                 }
                 if (column.isString()) {
-                    sb.append("<td>");
+                    hb.append("<td>");
                 } else {
-                    sb.append("<td align=\"right\">");
+                    hb.append("<td align=\"right\">");
                 }
 
 
@@ -2737,23 +2785,23 @@ public class DbTypeHandler extends BlobTypeHandler {
                                         HtmlUtils.style(style)));
                             }
                         }
-                        sb.append(prefix.toString());
+                        hb.append(prefix.toString());
                     }
                 }
 
 
-                sb.append("&nbsp;");
-                formatTableValue(request, entry, sb, column, values, sdf);
-                sb.append("</td>\n");
+                hb.append("&nbsp;");
+                formatTableValue(request, entry, hb, column, values, sdf);
+                hb.append("</td>\n");
             }
-            sb.append("</tr>");
+            hb.append("</tr>");
         }
 
 
 
         if (valueList.size() > 0) {
             if (doSum) {
-                sb.append("<tr><td align=right>" + msgLabel("Sum") + "</td>");
+                hb.append("<tr><td align=right>" + msgLabel("Sum") + "</td>");
                 for (int i = 1; i < columns.size(); i++) {
                     Column column = columns.get(i);
                     if ( !column.getCanList()) {
@@ -2762,30 +2810,30 @@ public class DbTypeHandler extends BlobTypeHandler {
                     if (doSums[i]) {
                         Double d = sums.get(column.getName());
                         if (d != null) {
-                            sb.append("<td align=right>" + d + "</td>");
+                            hb.append("<td align=right>" + d + "</td>");
                         } else {
-                            sb.append("<td align=right>" + 0 + "</td>");
+                            hb.append("<td align=right>" + 0 + "</td>");
                         }
                     } else {
-                        sb.append("<td>&nbsp;</td>");
+                        hb.append("<td>&nbsp;</td>");
                     }
                 }
             }
-            sb.append("</table>\n");
+            hb.append("</table>\n");
         } else {
             if ( !fromSearch) {
-                sb.append(HtmlUtils.br());
-                sb.append(
+                hb.append(HtmlUtils.br());
+                hb.append(
                     getPageHandler().showDialogNote(
                         msgLabel("No entries in") + getTitle()));
             } else {
-                sb.append(
+                hb.append(
                     getPageHandler().showDialogNote(msg("Nothing found")));
             }
-
-
         }
-        sb.append(HtmlUtils.formClose());
+        hb.append(HtmlUtils.formClose());
+
+        sb.append(insetHtml(hb.toString()));
     }
 
 
@@ -4325,7 +4373,7 @@ public class DbTypeHandler extends BlobTypeHandler {
      * @throws Exception _more_
      */
     public Result handleForm(Request request, Entry entry, String dbid,
-                             boolean forEdit)
+                             boolean forEdit, boolean doAnonForm)
             throws Exception {
 
         List<String>  colNames = tableHandler.getColumnNames();
@@ -4347,8 +4395,12 @@ public class DbTypeHandler extends BlobTypeHandler {
         }
 
 
+
         StringBuilder buttons = new StringBuilder();
-        if (forEdit) {
+        if(doAnonForm) {
+            buttons.append(HtmlUtils.submit(msg("Submit"),
+                                            ARG_DB_CREATE));
+        } else if (forEdit) {
             if (dbid == null) {
                 buttons.append(HtmlUtils.submit(msg("Create entry"),
                         ARG_DB_CREATE));
@@ -4364,9 +4416,10 @@ public class DbTypeHandler extends BlobTypeHandler {
                         ARG_DB_DELETE));
                 buttons.append(HtmlUtils.buttonSpace());
             }
+            buttons.append(HtmlUtils.submit(msg("Cancel"), ARG_DB_LIST));
+            buttons.append(HtmlUtils.buttonSpace());
         }
-        buttons.append(HtmlUtils.submit(msg("Cancel"), ARG_DB_LIST));
-        buttons.append(HtmlUtils.buttonSpace());
+
 
 
         formBuffer.append(buttons);
@@ -4385,10 +4438,14 @@ public class DbTypeHandler extends BlobTypeHandler {
                             validateJavascript.toString()));
         formBuffer.append(HtmlUtils.script(script));
 
-        if (forEdit && (dbid == null)) {
-            createBulkForm(request, entry, sb, formBuffer);
+        if(doAnonForm) {
+            sb.append(insetHtml(entry.getDescription() +HtmlUtils.p() + formBuffer));
         } else {
-            sb.append(formBuffer);
+            if (forEdit && (dbid == null)) {
+                createBulkForm(request, entry, sb, formBuffer);
+            } else {
+                sb.append(insetHtml(formBuffer));
+            }
         }
 
         return new Result(getTitle(), sb);
@@ -4447,8 +4504,13 @@ public class DbTypeHandler extends BlobTypeHandler {
             (List<String>) Misc.newList(formBuffer.toString(),
                                         bulkSB.toString());
         String contents = OutputHandler.makeTabs(tabTitles, tabContents,
-                              true);
-        Utils.append(sb, contents);
+                                                 true);
+        Utils.append(sb, insetHtml(contents));
+    }
+
+
+    private String insetHtml(Object html) {
+        return HtmlUtils.insetDiv(html.toString(), 0,10,0,10);
     }
 
 
