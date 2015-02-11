@@ -2439,15 +2439,7 @@ public class HtmlUtils {
      */
     public static String inset(String html, int top, int left, int bottom,
                                int right) {
-        return span(html, style(((top == 0)
-                                 ? ""
-                                 : "margin-top:" + top + "px;") + ((left == 0)
-                ? ""
-                : "margin-left:" + left + "px;") + ((bottom == 0)
-                ? ""
-                : "margin-bottom:" + bottom + "px;") + ((right == 0)
-                ? ""
-                : "margin-right:" + top + "px;")));
+        return span(html, style(insetStyle(top, left, bottom, right)));
     }
 
 
@@ -2464,15 +2456,31 @@ public class HtmlUtils {
      */
     public static String insetDiv(String html, int top, int left, int bottom,
                                   int right) {
-        return div(html, style(((top == 0)
-                                ? ""
-                                : "margin-top:" + top + "px;") + ((left == 0)
+        return div(html, style(insetStyle(top, left, bottom, right)));
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param top _more_
+     * @param left _more_
+     * @param bottom _more_
+     * @param right _more_
+     *
+     * @return _more_
+     */
+    public static String insetStyle(int top, int left, int bottom,
+                                    int right) {
+        return ((top == 0)
+                ? ""
+                : "margin-top:" + top + "px;") + ((left == 0)
                 ? ""
                 : "margin-left:" + left + "px;") + ((bottom == 0)
                 ? ""
                 : "margin-bottom:" + bottom + "px;") + ((right == 0)
                 ? ""
-                : "margin-right:" + top + "px;")));
+                : "margin-right:" + right + "px;");
     }
 
 
