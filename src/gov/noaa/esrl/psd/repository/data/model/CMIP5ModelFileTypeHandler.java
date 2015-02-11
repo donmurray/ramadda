@@ -6,6 +6,7 @@ import java.util.regex.Matcher;
 import org.ramadda.geodata.model.ClimateModelFileTypeHandler;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
+import org.ramadda.repository.Request;
 import org.w3c.dom.Element;
 
 import ucar.unidata.util.IOUtil;
@@ -38,9 +39,9 @@ public class CMIP5ModelFileTypeHandler extends ClimateModelFileTypeHandler {
      * @throws Exception _more_
      */
     @Override
-    public void initializeNewEntry(Entry entry)
+        public void initializeNewEntry(Request request, Entry entry)
             throws Exception {
-        super.initializeNewEntry(entry);
+        super.initializeNewEntry(request, entry);
         Object[] values = getEntryValues(entry);
         if(values[1]!=null && !values[1].toString().isEmpty()) {
             //System.err.println ("already have  values set");
