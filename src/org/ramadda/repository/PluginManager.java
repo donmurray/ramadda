@@ -100,14 +100,13 @@ public class PluginManager extends RepositoryManager {
 
     /** _more_          */
     public static final String PLUGIN_BIO =
-        "/org/ramadda/repository/resources/plugins/geoplugins.jar";
+        "/org/ramadda/repository/resources/plugins/bioplugins.jar";
 
 
     //This should be a properties file but...
 
     /** _more_          */
-    public static final String[] PLUGINS = { PLUGIN_CORE, PLUGIN_GEO,
-                                             PLUGIN_BIO };
+    public static final String[] PLUGINS = { PLUGIN_CORE, PLUGIN_GEO, PLUGIN_BIO };
 
 
 

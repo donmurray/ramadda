@@ -31,7 +31,9 @@
       <ant antfile="${src_dir}/org/ramadda/plugins/biblio/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/blog/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/calendar/build.xml" inheritAll="false"/>
+<!--
       <ant antfile="${src_dir}/org/ramadda/plugins/chat/build.xml" inheritAll="false"/>
+-->
       <ant antfile="${src_dir}/org/ramadda/plugins/db/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/doi/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/edgar/build.xml" inheritAll="false"/>
@@ -54,7 +56,6 @@
       <ant antfile="${src_dir}/org/ramadda/plugins/wiki/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/media/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/gadgets/build.xml" inheritAll="false"/>
-
       <ant antfile="${src_dir}/org/ramadda/plugins/ldap/build.xml" inheritAll="false"/>
 <!--
       <ant antfile="${src_dir}/org/ramadda/plugins/aap/build.xml" inheritAll="false"/>
