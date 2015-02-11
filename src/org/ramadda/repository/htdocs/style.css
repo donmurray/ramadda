@@ -2419,6 +2419,19 @@ a.toggleblocklabellink:visited {
 }
 
 
+.ramadda-register {
+   border-radius: 4px;
+   display: inline-block;
+   background-color: #ffffcc;
+   margin: 5px;
+   margin-left: 30px;
+   padding: 2px;
+   padding-left: 8px;
+   padding-right: 8px;
+   border : 1px #999 solid;
+}
+
+
 .admin-block {
    margin-top:5px;
    padding-left:5px;

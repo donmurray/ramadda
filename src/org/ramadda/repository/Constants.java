@@ -1253,6 +1253,7 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_SHOWLINK = "showlink";
 
+    /** _more_          */
     public static final String ARG_DISPLAYLINK = "displaylink";
 
     /** _more_ */
@@ -1552,6 +1553,10 @@ public interface Constants {
 
     /** _more_ */
     public static final String PROP_ADMIN_SMTP = "ramadda.admin.smtp";
+
+    /** _more_          */
+    public static final String PROP_REGISTER_KEY = "ramadda.register.key";
+
 
     /** _more_ */
     public static final String PROP_SMTP_USER = "ramadda.admin.smtp.user";

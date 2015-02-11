@@ -90,6 +90,27 @@ public class PluginManager extends RepositoryManager {
     public static final String PLUGIN_ALL =
         "/org/ramadda/repository/resources/plugins/allplugins.jar";
 
+    /** _more_          */
+    public static final String PLUGIN_CORE =
+        "/org/ramadda/repository/resources/plugins/coreplugins.jar";
+
+    /** _more_          */
+    public static final String PLUGIN_GEO =
+        "/org/ramadda/repository/resources/plugins/geoplugins.jar";
+
+    /** _more_          */
+    public static final String PLUGIN_BIO =
+        "/org/ramadda/repository/resources/plugins/geoplugins.jar";
+
+
+    //This should be a properties file but...
+
+    /** _more_          */
+    public static final String[] PLUGINS = { PLUGIN_CORE, PLUGIN_GEO,
+                                             PLUGIN_BIO };
+
+
+
     /** _more_ */
     private StringBuffer pluginSB = new StringBuffer();
 
@@ -205,8 +226,20 @@ public class PluginManager extends RepositoryManager {
      * @return _more_
      */
     public boolean haveSeen(Object object) {
+        return haveSeen(object, true);
+    }
+
+    /**
+     * _more_
+     *
+     * @param object _more_
+     * @param andMark _more_
+     *
+     * @return _more_
+     */
+    public boolean haveSeen(Object object, boolean andMark) {
         boolean contains = seenThings.contains(object);
-        if ( !contains) {
+        if ( !contains && andMark) {
             markSeen(object);
         }
 
@@ -229,20 +262,31 @@ public class PluginManager extends RepositoryManager {
             Misc.addClassLoader(classLoader);
         }
 
+        //Fix the old legacy allplugins.jar
         //If the allplugins was installed then copy the new one over
         File allPlugins =
             new File(IOUtil.joinDir(getStorageManager().getPluginsDir(),
                                     IOUtil.getFileTail(PLUGIN_ALL)));
         if (allPlugins.exists()) {
             getRepository().println(
-                "RAMADDA: updating plugin file: "
-                + IOUtil.getFileTail(PluginManager.PLUGIN_ALL));
-            copyPlugin(PluginManager.PLUGIN_ALL);
+                "RAMADDA: getting rid of old allplugins.jar file and replacing it with core and geo plugins");
+            copyPlugin(PluginManager.PLUGIN_CORE);
+            copyPlugin(PluginManager.PLUGIN_GEO);
+            allPlugins.delete();
         }
 
-        MyTrace.call1("PluginManager.loadPlugins");
+        for (String plugin : PLUGINS) {
+            if (new File(
+                    IOUtil.joinDir(
+                        getStorageManager().getPluginsDir(),
+                        IOUtil.getFileTail(plugin))).exists()) {
+                getRepository().println("RAMADDA: updating plugin file: "
+                                        + IOUtil.getFileTail(plugin));
+                copyPlugin(plugin);
+            }
+        }
+
         loadPlugins();
-        MyTrace.call2("PluginManager.loadPlugins");
         apiDefFiles.addAll(0, getRepository().getResourcePaths(PROP_API));
         typeDefFiles.addAll(0, getRepository().getResourcePaths(PROP_TYPES));
         outputDefFiles.addAll(
@@ -360,7 +404,8 @@ public class PluginManager extends RepositoryManager {
 
         File tmpPluginFile = new File(pluginFile);
         if (pluginFile.toLowerCase().endsWith(".zip")) {
-            ZipInputStream zin =getStorageManager().makeZipInputStream(new FileInputStream(pluginFile));
+            ZipInputStream zin = getStorageManager().makeZipInputStream(
+                                     new FileInputStream(pluginFile));
             ZipEntry ze = null;
             while ((ze = zin.getNextEntry()) != null) {
                 if (ze.isDirectory()) {

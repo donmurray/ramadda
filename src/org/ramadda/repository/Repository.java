@@ -166,6 +166,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
         null;
 
 
+    /** _more_          */
     private static final org.ramadda.util.text.CsvUtil dummyField7ToForceCompile =
         null;
 
@@ -436,6 +437,10 @@ public class Repository extends RepositoryBase implements RequestHandler,
     /** _more_ */
     private boolean isActive = true;
 
+
+    /** _more_          */
+    private boolean isRegistered = true;
+
     /** _more_ */
     private boolean readOnly = false;
 
@@ -578,6 +583,18 @@ public class Repository extends RepositoryBase implements RequestHandler,
      */
     public boolean isCORSOk() {
         return getProperty(PROP_CORS_OK, false);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean isRegistered() {
+        return true;
+        //
+        //        return isRegistered;
     }
 
 
@@ -1134,11 +1151,16 @@ public class Repository extends RepositoryBase implements RequestHandler,
         if ( !debugSession) {
             debugSession = getProperty("ramadda.debug.session", false);
         }
-
-
+        checkRegistration();
     }
 
-
+    /**
+     * _more_
+     */
+    public void checkRegistration() {
+        String registrationKey = getProperty(PROP_REGISTER_KEY, "");
+        isRegistered = registrationKey.equals("");
+    }
 
     /**
      * _more_
@@ -1321,19 +1343,33 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @throws Exception _more_
      */
     public void loadTypeHandlers() throws Exception {
+        List<String> badFiles = new ArrayList<String>();
         for (String file : getPluginManager().getTypeDefFiles()) {
             try {
                 file = getStorageManager().localizePath(file);
-                if (getPluginManager().haveSeen("types:" + file)) {
+                if (getPluginManager().haveSeen("types:" + file, false)) {
                     continue;
                 }
-
                 Element root = XmlUtil.getRoot(file, getClass());
                 if (root == null) {
                     continue;
                 }
                 loadTypeHandlers(root, false);
+                getPluginManager().markSeen("types:" + file);
+            } catch (Exception exc) {
+                badFiles.add(file);
+            }
+        }
 
+        for (String file : badFiles) {
+            System.err.println("bad file:" + file);
+            try {
+                Element root = XmlUtil.getRoot(file, getClass());
+                if (root == null) {
+                    continue;
+                }
+                loadTypeHandlers(root, false);
+                getPluginManager().markSeen("types:" + file);
             } catch (Exception exc) {
                 System.err.println("RAMADDA: Error loading type handler:"
                                    + " file=" + file);
@@ -1342,6 +1378,9 @@ public class Repository extends RepositoryBase implements RequestHandler,
                 throw exc;
             }
         }
+
+
+
     }
 
     /**

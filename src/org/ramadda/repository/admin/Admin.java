@@ -369,9 +369,10 @@ public class Admin extends RepositoryManager {
 
         if ( !haveDone(ARG_ADMIN_INSTALLNOTICESHOWN)) {
             title = "Installation";
-            sb.append(HtmlUtils.formTable());
             sb.append(
-                "<p>Thank you for installing the RAMADDA Repository. <p>Listed below is the RAMADDA home directory and database information. If you want to change these settings please consult the <a target=\"other\" href=\"" + HELP_ROOT + "/userguide/installing.html#home\">documentation</a> before continuing with the installation process.");
+                getPageHandler().showDialogNote(
+                    "<div style=\"width: 500px;\">Thank you for trying out Geode System's RAMADDA Repository. Listed below is the RAMADDA home directory and database information. If you want to change these settings please consult the <a target=\"other\" href=\"" + HELP_ROOT + "/userguide/installing.html#home\">documentation</a> before continuing with the installation process.</div>"));
+            sb.append(HtmlUtils.formTable());
             getStorageManager().addInfo(sb);
             getDatabaseManager().addInfo(sb);
             sb.append(HtmlUtils.formEntry("", HtmlUtils.submit(msg("Next"))));
@@ -488,12 +489,17 @@ public class Admin extends RepositoryManager {
                     //getRegistryManager().doFinalInitialization();
 
                     //Make sure we do this now before we do the final init entries
-                    if (request.get(ARG_ADMIN_INSTALLPLUGIN, false)) {
-                        getRepository().getPluginManager().installPlugin(
-                            PluginManager.PLUGIN_ALL);
+
+                    boolean didPlugin = false;
+                    for (String plugin : PluginManager.PLUGINS) {
+                        if (request.get("plugin." + plugin, false)) {
+                            didPlugin = true;
+                            getRepository().getPluginManager().installPlugin(
+                                plugin);
+                        }
+                    }
+                    if (didPlugin) {
                         getRepository().loadPluginResources();
-                        //                        getRepository().loadAdminHandlers();
-                        //                        getRepository().loadTypeHandlers();
                     }
 
                     addInitEntries(user);
@@ -595,12 +601,13 @@ public class Admin extends RepositoryManager {
                     "RAMADDA comes with a set of plugins that add functionality. You can install them now or later if you wish."));
             //TODO: read the plugins.xml file and offer more plugins
             //than the hard coded all plugin
-            sb.append(
-                HtmlUtils.formEntry(
-                    "",
-                    HtmlUtils.checkbox(ARG_ADMIN_INSTALLPLUGIN, "true", true)
-                    + " " + "Install all plugins"));
-
+            for (String plugin : PluginManager.PLUGINS) {
+                sb.append(HtmlUtils.formEntry("",
+                        HtmlUtils.checkbox("plugin." + plugin, "true", true)
+                        + " " + "Install plugin: "
+                        + IOUtil.stripExtension(IOUtil.getFileTail(plugin))));
+                sb.append(HtmlUtils.br());
+            }
 
 
             //NOT NOW
@@ -614,8 +621,8 @@ public class Admin extends RepositoryManager {
 
         StringBuffer finalSB = new StringBuffer();
         finalSB.append(request.form(getRepository().URL_INSTALL));
-        finalSB.append(msgHeader(title));
-        finalSB.append(sb);
+        //        finalSB.append(msgHeader(title));
+        finalSB.append(HtmlUtils.section(sb.toString(), title));
         finalSB.append(HtmlUtils.formClose());
 
         return new Result(msg(title), finalSB);
@@ -958,7 +965,7 @@ public class Admin extends RepositoryManager {
             IOUtil.close(bos);
             IOUtil.close(fos);
 
-            msg  = "Database has been exported to: " + tmp;
+            msg = "Database has been exported to: " + tmp;
             StringBuffer sb = new StringBuffer(
                                   getPageHandler().showDialogNote(
                                       "Database has been exported to:<br>"
@@ -966,8 +973,7 @@ public class Admin extends RepositoryManager {
             //            return makeResult(request, msg("Database export"), sb);
         } finally {
             if (actionId != null) {
-                    getActionManager().setContinueHtml(actionId,
-                                                       msg);
+                getActionManager().setContinueHtml(actionId, msg);
             }
             amDumpingDb = false;
         }
@@ -1061,6 +1067,14 @@ public class Admin extends RepositoryManager {
         StringBuffer csb = new StringBuffer();
         csb.append(HtmlUtils.formTable());
 
+
+        csb.append(HtmlUtils.row(HtmlUtils.colspan(msgHeader("Registration"),
+                2)));
+
+        csb.append(HtmlUtils.formEntry(msgLabel("Key"),
+                                       HtmlUtils.input(PROP_REGISTER_KEY,
+                                           getProperty(PROP_REGISTER_KEY,
+                                               ""), HtmlUtils.SIZE_40)));
 
         csb.append(
             HtmlUtils.row(
@@ -1497,6 +1511,8 @@ public class Admin extends RepositoryManager {
         String ratings = "" + request.get(PROP_RATINGS_ENABLE, false);
         getRepository().writeGlobal(PROP_RATINGS_ENABLE, ratings);
 
+
+
         getRepository().writeGlobal(request, PROP_HOSTNAME);
         getRepository().writeGlobal(request, PROP_PORT);
 
@@ -1531,6 +1547,8 @@ public class Admin extends RepositoryManager {
                                     request.getString(PROP_LOCALFILEPATHS,
                                         ""));
 
+        getRepository().writeGlobal(request, PROP_REGISTER_KEY);
+        getRepository().checkRegistration();
 
         getRepository().setLocalFilePaths();
         getRepository().clearCache();

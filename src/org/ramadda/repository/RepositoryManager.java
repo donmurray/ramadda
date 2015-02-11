@@ -91,7 +91,8 @@ public class RepositoryManager implements RepositorySource, Constants,
 
 
     /** _more_ */
-    public static final String HELP_ROOT = "http://ramadda.org/repository";
+    public static final String HELP_ROOT =
+        "http://geodesystems.com/repository";
 
 
     /** _more_ */
@@ -872,12 +873,13 @@ public class RepositoryManager implements RepositorySource, Constants,
      * @param dflt        default if requestArg is not defined in request
      * @return  true if requestArg is present and equals buttonValue, else dflt
      */
-    public static boolean getShouldButtonBeSelected(Request request, 
-    		String requestArg, String buttonValue, boolean dflt) {
-    	if (request.defined(requestArg)) {
-    		return request.getString(requestArg).equals(buttonValue);
-    	}
-    	return dflt;
+    public static boolean getShouldButtonBeSelected(Request request,
+            String requestArg, String buttonValue, boolean dflt) {
+        if (request.defined(requestArg)) {
+            return request.getString(requestArg).equals(buttonValue);
+        }
+
+        return dflt;
     }
 
 }

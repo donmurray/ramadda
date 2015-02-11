@@ -110,6 +110,17 @@ public class PageHandler extends RepositoryManager {
         new GregorianCalendar(TIMEZONE_UTC);
 
 
+    /** _more_          */
+    private static String button =
+        "<a href=\"https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=SA4AUEBEYSHBY&no_shipping=1&return=https%3A%2F%2Fgeodesystems.com%3A8081%2Frepository%2Falias%2Fcheckout&image_url=https%3A%2F%2Fgeodesystems.com%3A8081%2Frepository%2Fimages%2Fgeodesystems.png\" target=\"_purhase\">make a donation</a>";
+
+
+    /** _more_          */
+    public static final String REGISTER_MESSAGE =
+        "<div class=\"ramadda-register\">Thank you for trying RAMADDA. This is shareware. To register this server please "
+        + button
+        + " or visit <a target=register href=\"http://geodesystems.com/repository/alias/register\">Geode Systems</a></div>";
+
 
     /** _more_ */
     protected SimpleDateFormat sdf;
@@ -411,6 +422,12 @@ public class PageHandler extends RepositoryManager {
                 systemMessage,
                 HtmlUtils.cssClass("ramadda-system-message")) + content;
         }
+
+        if ( !getRepository().isRegistered()) {
+            content = REGISTER_MESSAGE + content;
+        }
+
+
 
         String head = (String) result.getProperty(PROP_HTML_HEAD);
         if (head == null) {
