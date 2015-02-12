@@ -21,13 +21,10 @@ DIST=../source/ramadda-code/dist
 
 
 sh ${VERSION}/ramaddainit.sh stop
-
-
-cp ${DIST}/otherplugins/* ${RAMADDA_HOME}/plugins
+cp ${DIST}/miscplugins/* ${RAMADDA_HOME}/plugins
 rm -r -f $VERSION
 cp -r ${DIST}/$VERSION .
 chmod 755 $VERSION/*.sh
-
 sh ${VERSION}/ramaddainit.sh start
 
 
