@@ -21,9 +21,13 @@
 package org.ramadda.data.record;
 
 
+import ucar.unidata.util.DateUtil;
+
+
 import java.io.*;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 
@@ -295,6 +299,13 @@ public abstract class Record implements Cloneable {
         if (object == null) {
             throw new IllegalArgumentException("Unknown attribute id:"
                     + attrId);
+        }
+
+        if (object instanceof Date) {
+            Date dttm = (Date) object;
+
+            return DateUtil.getTimeAsISO8601(dttm.getTime());
+            //TODO: format nicely
         }
 
         return object.toString();
