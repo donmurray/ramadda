@@ -115,10 +115,12 @@ public class CsvUtil {
      *
      * @param files _more_
      * @param out _more_
+     * @param asPoint _more_
      *
      * @throws Exception _more_
      */
-    public static void header(List<String> files, OutputStream out)
+    public static void header(List<String> files, OutputStream out,
+                              boolean asPoint)
             throws Exception {
         PrintWriter          writer    = new PrintWriter(out);
         String               delimiter = ",";
@@ -134,9 +136,36 @@ public class CsvUtil {
                 continue;
             }
             List<String> cols = Utils.tokenizeColumns(line, ",");
+            if (asPoint) {
+                System.out.println("skiplines=1");
+                System.out.print("fields=");
+            }
             for (int i = 0; i < cols.size(); i++) {
                 String col = cols.get(i);
-                System.out.println("#" + i + " " + col);
+                if (asPoint) {
+                    if (i > 0) {
+                        System.out.print(", ");
+                    }
+                    String label = col;
+                    String unit = StringUtil.findPattern(col,
+                                      ".*?\\(([^\\)]+)\\).*");
+                    StringBuffer attrs = new StringBuffer();
+                    attrs.append("label=\"" + label + "\" ");
+                    String id = col.replaceAll(" ", "_");
+                    id = id.replaceAll("\\([^\\)]+\\)", "");
+                    id = id.replaceAll("-", "_");
+                    id = id.toLowerCase();
+                    if (id.indexOf("date") >= 0) {
+                        attrs.append("type=\"date\" format=\"\" ");
+                    }
+
+                    System.out.print(id + "[" + attrs + "] ");
+                } else {
+                    System.out.println("#" + i + " " + col);
+                }
+            }
+            if (asPoint) {
+                System.out.println("");
             }
         }
     }
@@ -372,7 +401,9 @@ public class CsvUtil {
             + "\n\t-change <col #> <pattern> <substitution string>"
             + "\n\t-format <decimal format, e.g. '#'>\n\t-u (show unique values)\n\t-count (show count)"
             + "\n\t-delimiter (specify an alternative delimiter)"
-            + "\n\t-header (pretty print the first line)\n\t-concat\n\t*.csv - one or more csv files"
+            + "\n\t-header (pretty print the first line)"
+            + "\n\t-pointheader (generate the RAMADDA point properties)"
+            + "\n\t-concat\n\t*.csv - one or more csv files"
             + "\n\t-db (generate the RAMADDA db xml from the header)");
         System.exit(0);
     }
@@ -389,12 +420,13 @@ public class CsvUtil {
         boolean      doConcat      = false;
         boolean      doDbXml       = false;
         boolean      doHeader      = false;
+        boolean      doPoint       = true;
 
         String       iterateColumn = null;
         List<String> iterateValues = new ArrayList<String>();
         List<String> files         = new ArrayList<String>();
 
-        Visitor  info          = new Visitor();
+        Visitor      info          = new Visitor();
 
 
         List<String> extra         = new ArrayList<String>();
@@ -423,6 +455,12 @@ public class CsvUtil {
                 continue;
             }
 
+            if (arg.equals("-pointheader")) {
+                doHeader = true;
+
+                continue;
+            }
+
             if (arg.startsWith("-iter")) {
                 iterateColumn = args[++i];
                 iterateValues = StringUtil.split(args[++i], ",");
@@ -439,7 +477,7 @@ public class CsvUtil {
         } else if (doDbXml) {
             doDbXml(files, System.out);
         } else if (doHeader) {
-            header(files, System.out);
+            header(files, System.out, doPoint);
         } else {
             if (files.size() == 0) {
                 files.add("stdin");
