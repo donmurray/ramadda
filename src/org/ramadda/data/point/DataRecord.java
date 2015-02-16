@@ -555,9 +555,16 @@ public class DataRecord extends PointRecord {
 
             if (recordField.isTypeString()) {
                 pw.print(getStringValue(recordField.getParamId()));
-
                 continue;
             }
+
+            if (recordField.isTypeDate()) {
+                String s = getStringValue(recordField.getParamId());
+                pw.print(s);
+                continue;
+            }
+
+
 
             double value = values[fieldCnt];
 
