@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Geoscience">
 
   <type name="type_point_icebridge"  description="" super="type_point" category="IceBridge" foruser="false">
   </type>

@@ -1,11 +1,12 @@
-<types>
+<types  supercategory="Geoscience">
 
   <type name="geo_gdal" foruser="false" handler="org.ramadda.geodata.earthdata.GdalTypeHandler" category="Geospatial">
      <service link="gdal_tiff2image"  target="attachment"/>
      <service link="gdal_info"/>
   </type>
 
-  <type name="geo_geotiff"  description="GeoTIFF"  super="geo_gdal" >
+  <type name="geo_geotiff"  description="GeoTIFF"  super="geo_gdal"  category="Geoscience Data">
+     <property name="icon" value="/icons/image.gif"/>
   </type>
 
 </types>

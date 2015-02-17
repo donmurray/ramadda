@@ -1,4 +1,4 @@
-<types>
+<types  supercategory="Geoscience">
 
 
   <type name="project_gps"  description="GPS File" foruser="false" category="GPS Data"  handler="org.ramadda.geodata.gps.GpsTypeHandler">

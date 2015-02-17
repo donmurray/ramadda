@@ -1,4 +1,4 @@
-<types>
+<types  supercategory="Science and Education">
 
   <type name="project_program"  description="Program" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Science Project">
      <property name="icon" value="/fieldproject/chart_organisation.png"/>

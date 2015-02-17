@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Geoscience">
 
   <type name="type_point_ocean"  description="" super="type_point" category="Ocean Observation Data" foruser="false">
   </type>

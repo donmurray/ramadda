@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Science and Education">
 
   <type name="astro_collection"  description="Astronomy Collection" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Astronomy" >
      <property name="icon" value="/astro/stars.gif"/>

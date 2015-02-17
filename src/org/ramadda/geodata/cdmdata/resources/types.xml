@@ -1,4 +1,4 @@
-<types>
+<types  supercategory="Geoscience">
 
 
   <type name="opendaplink"  description="OPeNDAP Link" handler="org.ramadda.geodata.cdmdata.OpendapLinkTypeHandler" category="Geoscience Data">

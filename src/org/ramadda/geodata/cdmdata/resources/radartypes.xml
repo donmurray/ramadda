@@ -1,4 +1,4 @@
-<types>
+<types  supercategory="Geoscience">
 
 
 <type name="cdm_radar"  description="Base Radar File" foruser="false" category="Radar Data">

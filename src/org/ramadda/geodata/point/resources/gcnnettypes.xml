@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Geoscience">
 
 
   <type name="type_point_gcnet"  super="type_point_aon" description="GC-Net Point Data"  handler="org.ramadda.data.services.PointTypeHandler">

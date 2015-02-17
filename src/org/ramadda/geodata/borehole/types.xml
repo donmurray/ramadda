@@ -1,4 +1,4 @@
-<types>
+<types  supercategory="Geoscience">
 
   <type name="borehole_site"  description="Borehole Site" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Borehole">
      <property name="icon" value="/borehole/well.gif"/>

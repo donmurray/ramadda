@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Geoscience">
 
   <type name="type_point_ameriflux"  description="" super="type_point" category="Point Data" foruser="false">
   </type>

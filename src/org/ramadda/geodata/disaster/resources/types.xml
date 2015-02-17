@@ -1,4 +1,4 @@
-<types>
+<types  supercategory="Miscellaneous">
 
   <type name="disaster"  description="Disaster" handler="org.ramadda.geodata.disaster.DisasterTypeHandler" category="Events">
      <property name="icon" value="/disaster/disaster.png"/>

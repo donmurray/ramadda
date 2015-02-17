@@ -1,8 +1,7 @@
-<types>
+<types supercategory="Geoscience">
 
-  <type name="type_point_wsbb"  description="" super="type_point" category="WS-BB Point Data" foruser="false">
+  <type name="type_point_wsbb"  description="" super="type_point" category="Point Data" foruser="false">
   </type>
-
 
 
 

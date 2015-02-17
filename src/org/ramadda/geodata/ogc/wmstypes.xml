@@ -1,4 +1,4 @@
-<types>
+<types  supercategory="Geoscience" >
 
   <type name="type_wms_capabilities"  description="WMS Capabilities" category="GIS Data" handler="org.ramadda.geodata.ogc.WmsCapabilitiesTypeHandler" pattern=".*service=WMS.*request=GetCapabilities.*">  
      <property name="icon" value="/icons/globe.jpg"/>
