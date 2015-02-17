@@ -1605,7 +1605,9 @@ public class EntryManager extends RepositoryManager {
             entry = getEntry(request);
         }
         StringBuilder sb    = new StringBuilder();
+        sb.append(HtmlUtils.sectionOpen());
         Entry         group = addEntryForm(request, entry, sb);
+        sb.append(HtmlUtils.sectionClose());
         if (entry == null) {
             return addEntryHeader(request, group,
                                   new Result(msg("Add Entry"), sb));
@@ -1628,6 +1630,7 @@ public class EntryManager extends RepositoryManager {
      */
     public Entry addEntryForm(Request request, Entry entry, Appendable sb)
             throws Exception {
+
 
         String type  = null;
         Entry  group = null;
@@ -1654,7 +1657,6 @@ public class EntryManager extends RepositoryManager {
 
         if ((entry != null) && entry.getIsLocalFile()) {
             sb.append(msg("This is a local file and cannot be edited"));
-
             return group;
         }
 
@@ -3684,8 +3686,7 @@ public class EntryManager extends RepositoryManager {
 
         Entry         group = findGroup(request);
         StringBuilder sb    = new StringBuilder();
-        sb.append(HtmlUtils.p());
-        sb.append(msgHeader("Choose entry type"));
+        sb.append(HtmlUtils.section(msg("Choose entry type"),null));
         Hashtable<String, CategoryBuffer> superCatMap = new Hashtable<String,
                                                             CategoryBuffer>();
         List<String>   superCats = new ArrayList<String>();

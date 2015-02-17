@@ -1050,6 +1050,15 @@ public class HtmlUtils {
 
     }
 
+    public static String sectionOpen() {
+        return open(TAG_DIV,  cssClass("ramadda-section"));
+    }
+
+    public static String sectionClose() {
+        return close(TAG_DIV);
+    }
+
+
     /**
      * _more_
      *

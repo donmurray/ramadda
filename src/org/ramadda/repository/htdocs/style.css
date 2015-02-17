@@ -4,6 +4,7 @@
 
 body {
    font-family: Helvetica Neue, Arial, Helvetica, sans-serif;
+   font-size:12pt;
    color: black;
    margin: 0px;
    padding: 0px;
@@ -70,7 +71,7 @@ h3 {
 .ramadda-section  {
     margin:0px;
     padding:0px;  
-    font-size:13pt;
+    font-size:12pt;
     color: #444;
     padding-left:70px;
     padding-right:70px;
