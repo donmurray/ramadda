@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Bioinformatics">
 
   <type name="bio_ontology"  foruser="false" description="Bio Ontology" category="Bio">
      <property name="icon" value="/biotypes/dna.png"/>

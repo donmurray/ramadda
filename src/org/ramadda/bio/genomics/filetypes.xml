@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Bioinformatics">
 
   <type name="bio_genomics"  description="Genomics Data" foruser="false"  category="Genomics">
      <property name="icon" value="/genomics/dna.png"/>
