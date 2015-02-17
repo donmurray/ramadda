@@ -24,9 +24,12 @@ package org.ramadda.repository.search;
 import org.ramadda.repository.*;
 import org.ramadda.repository.type.*;
 
+import org.ramadda.repository.util.ServerInfo;
+
 import java.util.ArrayList;
 import java.util.List;
 
+import java.net.URL;
 
 /**
  * Class description
@@ -40,6 +43,8 @@ public class TestSearchProvider extends SearchProvider {
 
     /** _more_          */
     private String externalUrl;
+
+    private String name;
 
     /**
      * _more_
@@ -58,8 +63,15 @@ public class TestSearchProvider extends SearchProvider {
      */
     public TestSearchProvider(Repository repository, List<String> args) {
         super(repository);
-        if ((args != null) && (args.size() > 0)) {
-            externalUrl = args.get(0);
+        if (args != null) {
+            if (args.size() > 0) {
+                externalUrl = args.get(0);
+            }
+            if (args.size() > 1) {
+                name = args.get(1);
+            } else {
+                name  = externalUrl;
+            }
         }
     }
 
@@ -69,8 +81,8 @@ public class TestSearchProvider extends SearchProvider {
      * @return _more_
      */
     public String toString() {
-        if (externalUrl != null) {
-            return "TestSearchProvider:" + externalUrl;
+        if (name != null) {
+            return name;
         }
 
         return "TestSearchProvider";
@@ -120,10 +132,10 @@ public class TestSearchProvider extends SearchProvider {
         if (externalUrl != null) {
             request = request.cloneMe();
             String url = applyMacros(request, externalUrl);
-            Runnable runnable = getSearchManager().makeRunnable(request, url,
-                                    getEntryManager().getDummyGroup(),
-                                    results, null, null);
-            System.err.println("Remote Search:" + url);
+            Runnable runnable = getSearchManager().makeRunnable(request, 
+                                                                new ServerInfo(new URL(url), this.name,""),
+                                                                getEntryManager().getDummyGroup(),
+                                                                results, null, null);
             runnable.run();
         } else {
             System.err.println("TestSearchProvider.getEntries");

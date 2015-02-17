@@ -25,6 +25,7 @@ import org.ramadda.repository.auth.Permission;
 import org.ramadda.repository.auth.User;
 import org.ramadda.repository.metadata.Metadata;
 import org.ramadda.repository.type.TypeHandler;
+import org.ramadda.repository.util.ServerInfo;
 
 import org.ramadda.util.Utils;
 
@@ -151,11 +152,15 @@ public class Entry implements Cloneable {
     /** is this a local file */
     private boolean isLocalFile = false;
 
-    /** is this a remote entry */
-    private boolean isRemoteEntry = false;
 
-    /** the remote server */
-    private String remoteServer;
+    /** _more_          */
+    private ServerInfo remoteServer;
+
+    /** _more_          */
+    private String remoteUrl;
+
+
+
 
     /** the icon for this Entry */
     private String icon;
@@ -410,7 +415,7 @@ public class Entry implements Cloneable {
         }
         setTypeHandler(template.getTypeHandler());
 
-        if(template.resource!=null) {
+        if (template.resource != null) {
             this.resource = new Resource(template.resource);
         }
 
@@ -833,8 +838,14 @@ public class Entry implements Cloneable {
         return retval;
     }
 
+    /**
+     * _more_
+     *
+     * @param idx _more_
+     * @param v _more_
+     */
     public void setValue(int idx, Object v) {
-        Object[] values    = getTypeHandler().getEntryValues(this);
+        Object[] values = getTypeHandler().getEntryValues(this);
         values[idx] = v;
     }
 
@@ -901,7 +912,7 @@ public class Entry implements Cloneable {
     /**
      * Get the center of the location
      *
-     * @return the center of the location
+     * @return the center of the location - [latitude,longitude]
      */
     public double[] getCenter() {
         return new double[] { south + (north - south) / 2,
@@ -1320,21 +1331,12 @@ public class Entry implements Cloneable {
 
 
     /**
-     * Set the IsRemoteEntry property.
-     *
-     * @param value The new value for IsRemoteEntry
-     */
-    public void setIsRemoteEntry(boolean value) {
-        isRemoteEntry = value;
-    }
-
-    /**
      * Get the IsRemoteEntry property.
      *
      * @return The IsRemoteEntry
      */
     public boolean getIsRemoteEntry() {
-        return isRemoteEntry;
+        return remoteServer != null;
     }
 
     /**
@@ -1342,7 +1344,7 @@ public class Entry implements Cloneable {
      *
      * @param value The new value for RemoteServer
      */
-    public void setRemoteServer(String value) {
+    public void setRemoteServer(ServerInfo value) {
         remoteServer = value;
     }
 
@@ -1351,8 +1353,26 @@ public class Entry implements Cloneable {
      *
      * @return The RemoteServer
      */
-    public String getRemoteServer() {
+    public ServerInfo getRemoteServer() {
         return remoteServer;
+    }
+
+    /**
+     * Set the RemoteUrl property.
+     *
+     * @param value The new value for RemoteUrl
+     */
+    public void setRemoteUrl(String value) {
+        remoteUrl = value;
+    }
+
+    /**
+     * Get the RemoteUrl property.
+     *
+     * @return The RemoteUrl
+     */
+    public String getRemoteUrl() {
+        return remoteUrl;
     }
 
     /**

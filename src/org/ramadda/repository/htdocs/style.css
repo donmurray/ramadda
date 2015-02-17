@@ -317,6 +317,16 @@ input, password, fileinput,textarea {
 }
 
 
+.entry-type-list {
+  margin-top: 2px;
+  margin-left: 10px;
+  margin-right: 10px;
+  padding:2px;
+  max-height: 250px; 
+  overflow-y: auto;
+}
+
+
 .entry-type-search {
    text-decoration: none;
    color: black;

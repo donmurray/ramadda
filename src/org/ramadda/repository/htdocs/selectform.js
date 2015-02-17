@@ -129,9 +129,9 @@ function SelectForm (formId, entryId, arg, outputDiv, selectValues) {
             for(var i=0;i<entries.length;i++)  {
                 var entry = entries[i];
                 if(i==0) {
-                    columnNames = entry.getColumnNames();
+                    columnNames = entry.getAttributeNames();
                     widthPerColumn = Math.floor(60/(columnNames.length+1))+"%";
-                    var labels = entry.getColumnLabels();
+                    var labels = entry.getAttributeLabels();
                     for(var colIdx=0;colIdx<labels.length;colIdx++) {
                         header+="<td width=" + widthPerColumn +"><b>" + labels[colIdx] +"</b></td>";
                         footer+="<td></td>";
@@ -149,7 +149,7 @@ function SelectForm (formId, entryId, arg, outputDiv, selectValues) {
                 listHtml+= entry.getLink(entry.getIconImage()  + " " + entry.getName());
 
                 for(var colIdx=0;colIdx<columnNames.length;colIdx++) {
-                    var value = entry.getColumnValue(columnNames[colIdx]);
+                    var value = entry.getAttributeValue(columnNames[colIdx]);
                     listHtml+= "<td width=" + widthPerColumn +">" + value +"</td>";
                 }
 

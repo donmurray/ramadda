@@ -30,6 +30,9 @@ import org.ramadda.repository.metadata.MetadataType;
 import org.ramadda.repository.type.Column;
 import org.ramadda.repository.type.TypeHandler;
 
+import org.ramadda.repository.util.ServerInfo;
+
+
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Json;
 
@@ -234,8 +237,8 @@ public class JsonOutputHandler extends OutputHandler {
         String typeJson = type.getJson(request);
         //        Json.quoteAttr(items, "type", entry.getType());
         typeJson = Json.mapAndQuote("id",type.getType(),"name",type.getLabel());
-        Json.attr(items, "type", typeJson);
-
+        Json.attr(items, "type", Json.quote(type.getType()));
+        Json.attr(items, "typeName", Json.quote(type.getLabel()));
         //
         if (entry.isGroup()) {
             Json.attr(items, "isGroup", "true");
@@ -247,51 +250,39 @@ public class JsonOutputHandler extends OutputHandler {
             }
             Json.attr(items, "childEntryIds", Json.list(ids));
             */
-
-        } else {
-            Json.attr(items, "isGroup", "false");
         }
 
         Json.quoteAttr(items, "icon",
-                       getPageHandler().getIconUrl(request, entry));
+                       request.getAbsoluteUrl(getPageHandler().getIconUrl(request, entry)));
 
         Json.quoteAttr(items, "parent", entry.getParentEntryId());
+        if(entry.getIsRemoteEntry()) {
+            Json.attr(items, "isRemote", "true");
+            ServerInfo server = entry.getRemoteServer();
+            Json.attr(items, "remoteRepository", Json.map("url",Json.quote(server.getUrl()),"name",
+                                                    Json.quote(server.getLabel())));
+            Json.quoteAttr(items, "remoteUrl", entry.getRemoteUrl());
+        }
+
+        Json.quoteAttr(items, "startDate", formatDate(entry.getStartDate()));
+        Json.quoteAttr(items, "endDate", formatDate(entry.getEndDate()));
+        Json.quoteAttr(items, "createDate",
+                       formatDate(entry.getCreateDate()));
+
         if (entry.getUser() != null) {
-            Json.quoteAttr(items, "user", entry.getUser().getId());
-        } else {
-            Json.quoteAttr(items, "user", null);
+            Json.quoteAttr(items, "creator", entry.getUser().getId());
         }
         if (entry.getResource().isUrl()) {
             Json.quoteAttr(items, "url", entry.getResource().getPath());
         }
-        Json.quoteAttr(items, "createDate",
-                       formatDate(entry.getCreateDate()));
-        Json.quoteAttr(items, "startDate", formatDate(entry.getStartDate()));
-        Json.quoteAttr(items, "endDate", formatDate(entry.getEndDate()));
 
-
-        if (entry.hasNorth()) {
-            Json.attr(items, "north", "" + entry.getNorth());
-        } else {
-            Json.attr(items, "north", "-9999");
-        }
-
-        if (entry.hasSouth()) {
-            Json.attr(items, "south", "" + entry.getSouth());
-        } else {
-            Json.attr(items, "south", "-9999");
-        }
-
-        if (entry.hasEast()) {
-            Json.attr(items, "east", "" + entry.getEast());
-        } else {
-            Json.attr(items, "east", "-9999");
-        }
-
-        if (entry.hasWest()) {
-            Json.attr(items, "west", "" + entry.getWest());
-        } else {
-            Json.attr(items, "west", "-9999");
+        if (entry.hasAreaDefined()) {
+            double [] center = entry.getCenter();
+            Json.attr(items, "geometry", Json.map("type",Json.quote("Point"),"coordinates",Json.list(""+center[1],""+center[0])));
+            Json.attr(items, "bbox", Json.list(""+entry.getWest(),""+entry.getSouth(),""+entry.getEast(), ""+entry.getNorth()));
+        } else if  (entry.hasLocationDefined()) {
+            Json.attr(items, "geometry", Json.map("type",Json.quote("Point"),"coordinates",Json.list(""+entry.getLongitude(),""+entry.getLatitude())));
+            Json.attr(items, "bbox", Json.list(""+entry.getLongitude(),""+entry.getLatitude(),""+entry.getLongitude(), ""+entry.getLatitude()));
         }
 
         if (entry.hasAltitudeTop()) {
@@ -355,6 +346,8 @@ public class JsonOutputHandler extends OutputHandler {
             Json.quoteAttr(items, "md5", "");
         }
 
+        List<String> attrs     = new ArrayList<String>();
+        List<String> ids     = new ArrayList<String>();
 
         // Add special columns to the entries depending on the type
         if (request.get(ARG_EXTRACOLUMNS, true)) {
@@ -370,16 +363,36 @@ public class JsonOutputHandler extends OutputHandler {
                     if (name.endsWith("_id")) {
                         continue;
                     }
-                    String value = Json.quote(entry.getValue(i, ""));
+                    String value = entry.getValue(i, "");
                     columnNames.add(name);
                     columnLabels.add(column.getLabel());
-                    Json.attr(items, "column." + name, value);
-                    extraColumns.add(Json.map(new String[] { name, value }));
+                    //                    Json.attr(items, "column." + name, Json.quote(value));
+                    extraColumns.add(Json.map(new String[] { name, Json.quote(value) }));
+                    ids.add(name);
+                    attrs.add(Json.mapAndQuote(new String[] {
+                                "id", name,
+                                "type","attribute",
+                                "label",column.getLabel(),
+                                "value",value}));
                 }
             }
-            Json.attr(items, "columnNames", Json.list(columnNames, true));
-            Json.attr(items, "columnLabels", Json.list(columnLabels, true));
-            Json.attr(items, "extraColumns", Json.list(extraColumns));
+         /*
+         {
+            "id":"a2280667-f564-4c4f-8527-99e12955b1c1",
+            "label":"Tag",
+            "type":"enum_tag",
+            "attr1":"some tag 2",
+            "attr2":"",
+            "attr3":"",
+            "attr4":""
+         },
+        */
+
+
+            //            Json.attr(items, "columnNames", Json.list(columnNames, true));
+            //            Json.attr(items, "columnNames", Json.list(columnNames, true));
+            //            Json.attr(items, "columnLabels", Json.list(columnLabels, true));
+            //            Json.attr(items, "extraColumns", Json.list(extraColumns));
         }
 
 
@@ -407,7 +420,6 @@ public class JsonOutputHandler extends OutputHandler {
         if (request.get(ARG_METADATA, true)) {
             List<Metadata> metadataList =
                 getMetadataManager().getMetadata(entry);
-            List<String> metadataItems = new ArrayList<String>();
             if (metadataList != null) {
                 for (Metadata metadata : metadataList) {
                     MetadataType metadataType =
@@ -417,33 +429,38 @@ public class JsonOutputHandler extends OutputHandler {
                     }
 
                     List<String> mapItems = new ArrayList<String>();
+                    List<String> valueItems = new ArrayList<String>();
                     Json.quoteAttr(mapItems, "id", metadata.getId());
                     Json.quoteAttr(mapItems, "type", metadata.getType());
-                    Json.quoteAttr(mapItems, "label",
-                                   metadataType.getLabel());
+                    Json.quoteAttr(mapItems, "label",metadataType.getLabel());
+
                     int attrIdx = 1;
                     //We always add the four attributes to have always the same structure
                     while (attrIdx <= 4) {
                         String attr = metadata.getAttr(attrIdx);
                         if (attr != null) {
                             if (attr.length() > 0) {
-                                Json.quoteAttr(mapItems, "attr" + attrIdx,
+                                Json.quoteAttr(valueItems, "attr" + attrIdx,
                                         attr);
                             } else {
-                                Json.quoteAttr(mapItems, "attr" + attrIdx,
+                                Json.quoteAttr(valueItems, "attr" + attrIdx,
                                         "");
                             }
                         } else {
-                            Json.quoteAttr(mapItems, "attr" + attrIdx, "");
+                            Json.quoteAttr(valueItems, "attr" + attrIdx, "");
                         }
                         attrIdx++;
                     }
-                    metadataItems.add(Json.map(mapItems));
+
+                    mapItems.add("value");
+                    mapItems.add(Json.map(valueItems));
+                    ids.add(metadata.getId());
+                    attrs.add(Json.map(mapItems));
                 }
             }
-            Json.attr(items, "metadata", Json.list(metadataItems));
         }
 
+        Json.attr(items, "properties", Json.list(attrs, false));
 
         return Json.map(items);
 

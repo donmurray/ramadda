@@ -1,6 +1,6 @@
-<types>
+<types supercategory="Geoscience">
 
-  <type name="type_point_collection"  description="Point Data Collection" handler="org.ramadda.data.services.PointCollectionTypeHandler" category="LiDAR">
+  <type name="type_point_collection"  description="Point Data Collection" handler="org.ramadda.data.services.PointCollectionTypeHandler" category="Point Data">
      <property name="icon" value="/point/sitemap_color.png"/>
      <property name="form.resource.show" value="false"/>
      <property name="form.area.show" value="true"/>

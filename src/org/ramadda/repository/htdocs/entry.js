@@ -447,29 +447,47 @@ function Entry(props) {
         props.repositoryId = ramaddaBaseUrl;
     }
 
-
     var NONGEO = -9999;
-    if(props.type) props.type = new EntryType(props.type);
+    if(props.typeObject) {
+        props.type = new EntryType(props.typeObject);
+    } else if(props.type) {
+        var obj = {"id" : props.type,
+                   "name": props.typeName!=null?props.typeName:props.type};
+        props.type = new EntryType(obj);
+    }
     $.extend(this, {
             id:null,
             name:null,
             description:null,
-                //xxx
-            latitude: NaN,
-            longitude: NaN,
-            north: NaN,
-            west: NaN,
-            south: NaN,
-            east: NaN,
+            bbox: null,
+            geometry: null,
             services: [],
-            metadata: [],
+            properties: [],
             childrenEntries: null,
         });
 
     RamaddaUtil.inherit(this,  props);
+
+    this.domId = Utils.cleanId(this.id);
+
+    this.attributes = [];
+    this.metadata = [];
+    for(var i=0;i<this.properties.length;i++) {
+        var prop = this.properties[i];
+        if(prop.type == "attribute") {
+            this.attributes.push(prop);
+        } else {
+            this.metadata.push(prop);
+        }
+    }
+
+
     RamaddaUtil.defineMembers(this, {
             getId : function () {
                 return  this.id;
+            },
+            getIdForDom : function () {
+                return  this.domId;
             },
             getFullId: function() {
                 return this.getRamadda().getRoot() +"," + this.id;
@@ -500,6 +518,8 @@ function Entry(props) {
                 return null;
             },
             getType: function() {
+                if(this.typeObject!=null) {
+                }
                 return this.type;
             },
             getMetadata: function() {
@@ -509,7 +529,7 @@ function Entry(props) {
                 return getRamadda(this.repositoryId);
             },
             getLocationLabel: function() {
-                return "n: " + this.north + " w:" + this.west + " s:" + this.south +" e:" + this.east;
+                return "n: " + this.getNorth() + " w:" + this.getWest() + " s:" + this.getSouth() +" e:" + this.getEast();
             },
             getServices: function() {
                 return this.services;
@@ -524,28 +544,52 @@ function Entry(props) {
                 return !isNaN(v) && v != NONGEO;
             },
             hasBounds: function() {
-                return this.goodLoc(this.north) && this.goodLoc(this.west) && this.goodLoc(this.south) && this.goodLoc(this.east);
+                return this.goodLoc(this.getNorth()) && this.goodLoc(this.getWest()) && this.goodLoc(this.getSouth()) && this.goodLoc(this.getEast());
             },
             hasLocation: function() {
-                return this.goodLoc(this.north);
+                return this.goodLoc(this.getNorth());
             },
             getNorth: function() {
-                return this.north;
+                if(this.bbox) {
+                    return this.bbox[3];
+                }
+                if(this.geometry) {
+                    return this.geometry.coordinates[1];
+                }
+                return NONGEO;
             },
             getWest: function() {
-                return this.west;
+                if(this.bbox) return  this.bbox[0];
+                if(this.geometry) {
+                    return this.geometry.coordinates[0];
+                }
+                return NONGEO;
             },
             getSouth: function() {
-                return this.south;
+                if(this.bbox) return this.bbox[1];
+                if(this.geometry) {
+                    return this.geometry.coordinates[1];
+                }
+                return NONGEO;
             },
             getEast: function() {
-                return this.east;
+                if(this.bbox) return this.bbox[2];
+                if(this.geometry) {
+                    return this.geometry.coordinates[0];
+                }
+                return NONGEO;
             },
             getLatitude: function() {
-                return this.north;
+                if(this.geometry) {
+                    return this.geometry.coordinates[1];
+                }
+                return this.getNorth();
             },
             getLongitude: function() {
-                return this.west;
+                if(this.geometry) {
+                    return this.geometry.coordinates[0];
+                }
+                return this.getWest();
             },
             getIconUrl : function () {
                 if(this.icon==null) {
@@ -569,21 +613,40 @@ function Entry(props) {
                 }
                 return this.type.getColumns();
             },
-            getColumnValue : function (name) {
-                var value = this["column." + name];
-                return value;
+            getAttributes : function () {
+                return this.attributes;
             },
-            getColumnNames : function () {
+            getAttribute : function (name) {
+                for(var i=0;i<this.attributes.length;i++) {
+                    var attr = this.attributes[i];
+                    if(attr.id == name) {
+                        return attr;
+                    }
+                }
+                return null;
+            },
+            getAttributeValue : function (name) {
+                var attr = this.getAttribute(name);
+                if(attr == null) return null;
+                return attr.value;
+            },
+            getAttributeNames : function () {
                 var names =  [];
-                for(var i=0;i<this.type.columns.length;i++) {
-                    names.push(this.type.columns[i].getName());
+                for(var i=0;i<this.attributes.length;i++) {
+                    var attr = this.attributes[i];
+                    names.push(attr.label);
                 }
                 return names;
             },
-            getColumnLabels : function () {
+            getAttributeLabels : function () {
                 var labels =  [];
-                for(var i=0;i<this.type.columns.length;i++) {
-                    labels.push(this.type.columns[i].getLabel());
+                for(var i=0;i<this.attributes.length;i++) {
+                    var attr = this.attributes[i];
+                    if(attr.label) {
+                        labels.push(attr.label);
+                    } else {
+                        labels.push(attr.id);
+                    }
                 }
                 return labels;
             },
@@ -606,6 +669,7 @@ function Entry(props) {
                 return GuiUtils.size_format(this.getFilesize());
             },
             getEntryUrl : function (extraArgs) {
+                if(this.remoteUrl) return this.remoteUrl;
                 if(this.url) return this.url;
                 return this.getRamadda().getEntryUrl(this, extraArgs);
             },

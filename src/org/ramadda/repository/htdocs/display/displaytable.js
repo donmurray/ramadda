@@ -110,9 +110,11 @@ function RamaddaXlsDisplay(displayManager, id, properties) {
 
                 this.currentSheet = sheetIdx;
                 var sheet = this.sheets[sheetIdx];
-                var rows =sheet.rows.slice(0);
-                if(rows.length>0) {
-                    this.header = rows[0];
+                if(sheet) {
+                    var rows =sheet.rows.slice(0);
+                    if(rows.length>0) {
+                        this.header = rows[0];
+                    }
                 }
 
                 var html = "";

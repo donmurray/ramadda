@@ -43,6 +43,7 @@ import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.repository.type.TypeInsertInfo;
 import org.ramadda.sql.Clause;
 import org.ramadda.sql.SqlUtil;
+import org.ramadda.util.CategoryBuffer;
 import org.ramadda.util.CategoryList;
 import org.ramadda.util.FormInfo;
 import org.ramadda.util.HtmlTemplate;
@@ -136,7 +137,7 @@ public class EntryManager extends RepositoryManager {
     /** _more_ */
     public static final String SESSION_FOLDERS = "folders";
 
-    /** _more_          */
+    /** _more_ */
     public static final String SESSION_TYPES = "types";
 
     /** _more_ */
@@ -2351,9 +2352,10 @@ public class EntryManager extends RepositoryManager {
                                                            Entry>();
                 InputStream fis =
                     getStorageManager().getFileInputStream(resource);
-                OutputStream   fos = null;
-                ZipInputStream zin = getStorageManager().makeZipInputStream(fis);
-                ZipEntry       ze  = null;
+                OutputStream fos = null;
+                ZipInputStream zin =
+                    getStorageManager().makeZipInputStream(fis);
+                ZipEntry ze = null;
                 try {
                     while ((ze = zin.getNextEntry()) != null) {
                         if (ze.isDirectory()) {
@@ -3684,13 +3686,22 @@ public class EntryManager extends RepositoryManager {
         StringBuilder sb    = new StringBuilder();
         sb.append(HtmlUtils.p());
         sb.append(msgHeader("Choose entry type"));
-        List<String> categories = new ArrayList<String>();
-        Hashtable<String, StringBuilder> catMap = new Hashtable<String,
-                                                      StringBuilder>();
+        Hashtable<String, CategoryBuffer> superCatMap = new Hashtable<String,
+                                                            CategoryBuffer>();
+        List<String>   superCats = new ArrayList<String>();
+
+        CategoryBuffer cats      = new CategoryBuffer();
+        //Preload the super categories
+        superCats.add("");
+        superCatMap.put("", cats);
+        superCats.add("Science and Education");
+        superCatMap.put("Science and Education", new CategoryBuffer());
+        superCats.add("Miscellaneous");
+        superCatMap.put("Miscellaneous", new CategoryBuffer());
+
 
         for (String preload : PRELOAD_CATEGORIES) {
-            categories.add(preload);
-            catMap.put(preload, new StringBuilder());
+            cats.get(preload);
         }
 
         HashSet<String> exclude = new HashSet<String>();
@@ -3733,49 +3744,62 @@ public class EntryManager extends RepositoryManager {
             boolean hasUsedType =
                 ((sessionTypes != null)
                  && sessionTypes.contains(typeHandler.getType()));
-            String        category = typeHandler.getCategory();
-            StringBuilder buffer   = catMap.get(category);
+            String category      = typeHandler.getCategory();
+            String superCategory = typeHandler.getSuperCategory();
 
-            if (buffer == null) {
-                catMap.put(category, buffer = new StringBuilder());
-                if (hasUsedType) {
-                    categories.add(0, category);
-                } else {
-                    categories.add(category);
-                }
-            } else if (hasUsedType) {
-                categories.remove(category);
-                categories.add(0, category);
+            cats = superCatMap.get(superCategory);
+            if (cats == null) {
+                cats = new CategoryBuffer();
+                superCats.add(superCategory);
+                superCatMap.put(superCategory, cats);
             }
 
-            buffer.append(HtmlUtils
+            cats.get(category);
+            if (hasUsedType) {
+                cats.moveToFront(category);
+            }
+            cats.append(category, HtmlUtils
                 .href(request
                     .url(getRepository().URL_ENTRY_FORM, ARG_GROUP, group
                         .getId(), ARG_TYPE, typeHandler.getType()), img + " "
                             + msg(typeHandler.getLabel())));
 
-            buffer.append(HtmlUtils.br());
+            cats.append(category, HtmlUtils.br());
         }
-        sb.append("<table cellpadding=10><tr valign=top>");
-        int colCnt = 0;
-        for (String cat : categories) {
-            StringBuilder catBuff = catMap.get(cat);
-            if (catBuff.length() == 0) {
-                continue;
+
+        StringBuilder inner = new StringBuilder();
+
+        for (String superCategory : superCats) {
+            cats = superCatMap.get(superCategory);
+            inner.append("<div class=ramadda-section>");
+            inner.append("<h2>" + superCategory + "</h2>");
+            inner.append("<table cellpadding=10><tr valign=top>");
+            int colCnt = 0;
+            for (String cat : cats.getCategories()) {
+                StringBuffer catBuff = cats.get(cat);
+                if (catBuff.length() == 0) {
+                    continue;
+                }
+                inner.append(
+                    HtmlUtils.col(
+                        HtmlUtils.b(msg(cat))
+                        + HtmlUtils.div(
+                            catBuff.toString(),
+                            HtmlUtils.cssClass("entry-type-list"))));
+                colCnt++;
+                if (colCnt > 4) {
+                    inner.append(
+                        "</tr><tr><td>&nbsp;</td></tr><tr valign=top>");
+                    colCnt = 0;
+                }
             }
-            sb.append(HtmlUtils.col(HtmlUtils.b(msg(cat))
-                                    + HtmlUtils.insetDiv(catBuff.toString(),
-                                        3, 15, 0, 0)));
-            colCnt++;
-            if (colCnt > 3) {
-                sb.append("</tr><tr valign=top>");
-                colCnt = 0;
-            }
+            inner.append("</tr></table>");
+            inner.append("</div>");
         }
-        sb.append("</tr></table>");
+
+        sb.append(HtmlUtils.insetDiv(inner.toString(), 10, 20, 0, 0));
 
         return makeEntryEditResult(request, group, "Create Entry", sb);
-        //        return new Result("New Form", sb, Result.TYPE_HTML);
     }
 
 
@@ -4993,8 +5017,9 @@ public class EntryManager extends RepositoryManager {
         InputStream fis = getStorageManager().getFileInputStream(file);
         try {
             if (file.endsWith(".zip")) {
-                ZipInputStream zin = getStorageManager().makeZipInputStream(fis);
-                ZipEntry       ze;
+                ZipInputStream zin =
+                    getStorageManager().makeZipInputStream(fis);
+                ZipEntry ze;
                 while ((ze = zin.getNextEntry()) != null) {
                     String entryName = ze.getName();
                     //                System.err.println ("ZIP: " + ze.getName());

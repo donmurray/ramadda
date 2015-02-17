@@ -918,6 +918,29 @@ public class HtmlOutputHandler extends OutputHandler {
     }
 
 
+    @Override
+        public void getServiceInfos(Request request, Entry entry,
+                                    List<ServiceInfo> services) {
+        super.getServiceInfos(request, entry, services);
+        try {
+            String url = request.getAbsoluteUrl(request.url(
+                                                            getRepository().URL_ENTRY_SHOW, ARG_ENTRYID, entry.getId(),
+                                                            ARG_OUTPUT, OUTPUT_HTML.toString()));
+            String icon = getPageHandler().getIconUrl(request, entry);
+            ServiceInfo serviceInfo = new ServiceInfo(
+                                         OUTPUT_HTML.toString(),
+                                         "HTML Display - " + entry.getName(),
+                                         url,
+                                         request.getAbsoluteUrl(icon));
+            if(!services.contains(serviceInfo))  {
+                services.add(serviceInfo);
+            }
+        } catch(Exception exc) {
+            throw new RuntimeException(exc);
+        }
+    }
+
+
     /**
      * _more_
      *

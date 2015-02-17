@@ -299,6 +299,8 @@ public class ServerInfo implements Constants {
      * @return _more_
      */
     public String getUrl() {
+        if(port == -1 || port == 80)
+            return "http://" + hostname + basePath;
         return "http://" + hostname + ":" + port + basePath;
     }
 

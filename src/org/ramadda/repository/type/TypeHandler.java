@@ -418,8 +418,8 @@ public class TypeHandler extends RepositoryManager {
             }
             iconPath = XmlUtil.getAttributeFromTree(node, "icon",
                     (String) null);
-            superCategory = Utils.getAttributeOrTag(node, ATTR_SUPERCATEGORY,
-                    superCategory);
+            superCategory = XmlUtil.getAttributeFromTree(node,
+                    ATTR_SUPERCATEGORY, superCategory);
             filePattern = Utils.getAttributeOrTag(node, ATTR_PATTERN,
                     (String) null);
             String tmp = Utils.getAttributeOrTag(node,
@@ -5964,6 +5964,15 @@ public class TypeHandler extends RepositoryManager {
      */
     public void setCategory(String value) {
         this.category = value;
+    }
+
+    /**
+     * _more_
+     *
+     * @param value _more_
+     */
+    public void setSuperCategory(String value) {
+        this.superCategory = value;
     }
 
     /**

@@ -91,7 +91,7 @@ public class ServiceInfo {
      * @param mimeType _more_
      */
     public ServiceInfo(String type, String name, String url, String icon,
-                   String mimeType) {
+                       String mimeType) {
         this.type     = type;
         this.name     = name;
         this.url      = url;
@@ -110,6 +110,24 @@ public class ServiceInfo {
     public boolean isType(String type) {
         return this.type.equals(type);
     }
+
+    /**
+     * _more_
+     *
+     * @param object _more_
+     *
+     * @return _more_
+     */
+    @Override
+    public boolean equals(Object object) {
+        if ( !(object instanceof ServiceInfo)) {
+            return false;
+        }
+        ServiceInfo that = (ServiceInfo) object;
+
+        return this.url.equals(that.url);
+    }
+
 
     /**
      *  Set the Type property.

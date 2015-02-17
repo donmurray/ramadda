@@ -1601,7 +1601,8 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                 continue;
             }
 
-            Runnable runnable = makeRunnable(request, server.getUrl(),
+            Runnable runnable = makeRunnable(request, 
+                                             server,
                                              tmpEntry, entries, running,
                                              runnableCnt);
 
@@ -1642,7 +1643,6 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
      * _more_
      *
      * @param request _more_
-     * @param serverUrl _more_
      * @param tmpEntry _more_
      * @param entries _more_
      * @param running _more_
@@ -1653,7 +1653,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
      * @throws Exception _more_
      */
     public Runnable makeRunnable(final Request request,
-                                 final String serverUrl,
+                                 final ServerInfo serverInfo,
                                  final Entry tmpEntry,
                                  final List<Entry> entries,
                                  final boolean[] running,
@@ -1664,10 +1664,10 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
         request.put(ARG_OUTPUT, XmlOutputHandler.OUTPUT_XML);
         final Entry parentEntry =
             new Entry(getRepository().getGroupTypeHandler(), true);
+        final String serverUrl = serverInfo.getUrl();
         parentEntry.setId(getEntryManager().getRemoteEntryId(serverUrl, ""));
         getEntryManager().cacheEntry(parentEntry);
-        parentEntry.setRemoteServer(serverUrl);
-        parentEntry.setIsRemoteEntry(true);
+        parentEntry.setRemoteServer(serverInfo);
         parentEntry.setUser(getUserManager().getAnonymousUser());
         parentEntry.setParentEntry(tmpEntry);
         parentEntry.setName(serverUrl);
@@ -1699,18 +1699,20 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                                     node, parentEntry, new Hashtable(),
                                     false, false);
 
+                            //                            entry.setName("remote:" + entry.getName());
                             entry.setResource(
                                 new Resource(
                                     "remote:"
                                     + XmlUtil.getAttribute(
                                         node, ATTR_RESOURCE,
                                         ""), Resource.TYPE_REMOTE_FILE));
+                            String id = XmlUtil.getAttribute(node, ATTR_ID);
                             entry.setId(
                                 getEntryManager().getRemoteEntryId(
                                     serverUrl,
-                                    XmlUtil.getAttribute(node, ATTR_ID)));
-                            entry.setIsRemoteEntry(true);
-                            entry.setRemoteServer(serverUrl);
+                                    id));
+                            entry.setRemoteServer(serverInfo);
+                            entry.setRemoteUrl(serverUrl+"/entry/show?entryid=" + id);
                             getEntryManager().cacheEntry(entry);
                             entries.add((Entry) entry);
                         }

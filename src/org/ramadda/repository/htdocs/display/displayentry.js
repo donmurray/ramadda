@@ -103,7 +103,9 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
                                      HtmlUtil.join(toolbarItems,""));
              },
              getEntryToolbarId: function(entryId) {
-                 return this.getDomId(ID_TOOLBAR +"_" + entryId);
+                 var id = entryId.replace(/:/g,"_");
+                 id = id.replace(/=/g,"_");
+                 return this.getDomId(ID_TOOLBAR +"_" + id);
              }
 
         });
@@ -235,7 +237,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
 
                 this.jq(ID_TEXT_FIELD).autocomplete({
                         source: function(request, callback) {
-                            theDisplay.doQuickEntrySearch(request, callback);
+                            //                            theDisplay.doQuickEntrySearch(request, callback);
                             }
                             });
 
@@ -269,9 +271,9 @@ function RamaddaSearcher(displayManager, id, type, properties) {
             },
             toggleEntryDetails: function(entryId) {
                 var entry = this.getEntry(entryId);
-                var link = this.jq(ID_TREE_LINK+entry.getId());
-                var details = this.jq(ID_DETAILS + entry.getId());
-                var detailsInner = this.jq(ID_DETAILS_INNER + entry.getId());
+                var link = this.jq(ID_TREE_LINK+entry.getIdForDom());
+                var details = this.jq(ID_DETAILS + entry.getIdForDom());
+                var detailsInner = this.jq(ID_DETAILS_INNER + entry.getIdForDom());
                 var open = link.attr("tree-open")=="true";
                 if(open) {
                     link.attr("src", icon_tree_closed);
@@ -285,7 +287,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 if(hereBefore) {
                     //                    detailsInner.html(HtmlUtils.image(icon_progress));
                 } else {
-                    if(entry.getIsGroup()) {
+                    if(entry.getIsGroup() && !entry.isRemote) {
                         detailsInner.html(HtmlUtil.image(icon_progress));
                         var theDisplay = this;
                         var callback = function(entries) {
@@ -306,7 +308,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
 
             },
             displayChildren: function(entry, entries) {
-                var detailsInner = this.jq(ID_DETAILS_INNER + entry.getId());
+                var detailsInner = this.jq(ID_DETAILS_INNER + entry.getIdForDom());
                 if(entries.length==0) {
                     detailsInner.html(this.getEntryHtml(entry,{showHeader:false}));
                 } else {
@@ -330,7 +332,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     atloc = 'left bottom';
                 }
                 this.currentPopupEntry = entry;
-                if(src == null) src =  this.getDomId("entry_" + entry.getId());
+                if(src == null) src =  this.getDomId("entry_" + entry.getIdForDom());
                 var close  = HtmlUtil.onClick(this.getGet()+ ".hideEntryDetails('" + entryId +"');",
                                               HtmlUtil.image(ramaddaBaseUrl +"/icons/close.gif"));
                 
@@ -783,14 +785,14 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
             selectEntry: function(entry, selected) {
                 var changed  = false;
                 if(selected) {
-                    this.jq("entry_" + entry.getId()).addClass("ui-selected");
+                    this.jq("entry_" + entry.getIdForDom()).addClass("ui-selected");
                     var index = this.selectedEntries.indexOf(entry);
                     if (index < 0) {
                         this.selectedEntries.push(entry);
                         changed = true;
                     }
                 } else {
-                    this.jq("entry_" + entry.getId()).removeClass("ui-selected");
+                    this.jq("entry_" + entry.getIdForDom()).removeClass("ui-selected");
                     var index = this.selectedEntries.indexOf(entry);
                     if (index >= 0) {
                         this.selectedEntries.splice(index, 1);
@@ -930,7 +932,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                         } else if(column == "description") {
                             value = entry.getDescription();
                         } else {
-                            value = entry.getColumnValue(column);
+                            value = entry.getAttributeValue(column);
                         }
                         var attrs = [ATTR_CLASS, "display-entrytable-cell"];
                         if(columnWidth!=null) {
@@ -974,23 +976,26 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                     var  arrow = HtmlUtil.image(icon_tree_closed,[ATTR_BORDER,"0",
                                                                   "tree-open","false",
                                                                   ATTR_ID,
-                                                                  this.getDomId(ID_TREE_LINK+entry.getId())]);
+                                                                  this.getDomId(ID_TREE_LINK+entry.getIdForDom())]);
+
+                    //                    console.log("ID:" + ID_TREE_LINK+entry.getIdForDom());
+
                     var open =  HtmlUtil.onClick(this.getGet()+".toggleEntryDetails('" + entry.getId()+ "');", 
                                                  arrow);
 
 
                     var left =   HtmlUtil.div([ATTR_STYLE," white-space: nowrap;  overflow-x:none; max-width:300px;"],open +" " + link +" " +  entryName);
 
-                    var details = HtmlUtil.div([ATTR_ID,this.getDomId(ID_DETAILS+entry.getId()), ATTR_CLASS,"display-entrylist-details"],HtmlUtil.div([ATTR_CLASS,"display-entrylist-details-inner",ATTR_ID,this.getDomId(ID_DETAILS_INNER+entry.getId())],""));
+                    var details = HtmlUtil.div([ATTR_ID,this.getDomId(ID_DETAILS+entry.getIdForDom()), ATTR_CLASS,"display-entrylist-details"],HtmlUtil.div([ATTR_CLASS,"display-entrylist-details-inner",ATTR_ID,this.getDomId(ID_DETAILS_INNER+entry.getIdForDom())],""));
 
                     var line = HtmlUtil.leftRight(left,toolbar,"10","2");
                     //                    line = HtmlUtil.leftRight(left,toolbar,"60%","30%");
 
-                    var mainLine = HtmlUtil.div([ATTR_ID, this.getDomId(ID_DETAILS_MAIN+ entry.getId()), ATTR_CLASS,"display-entrylist-entry-main", "entryid",entry.getId()], line);
-                    var line = HtmlUtil.div([ATTR_ID, this.getDomId("entryinner_" + entry.getId())], mainLine + details);
+                    var mainLine = HtmlUtil.div([ATTR_ID, this.getDomId(ID_DETAILS_MAIN+ entry.getIdForDom()), ATTR_CLASS,"display-entrylist-entry-main", "entryid",entry.getIdForDom()], line);
+                    var line = HtmlUtil.div([ATTR_ID, this.getDomId("entryinner_" + entry.getIdForDom())], mainLine + details);
                     html  += HtmlUtil.tag(TAG_LI,[ATTR_ID,
-                                                this.getDomId("entry_" + entry.getId()),
-                                                  "entryid",entry.getId(), ATTR_CLASS,"display-entrylist-entry ui-widget-content " + rowClass], line);
+                                                this.getDomId("entry_" + entry.getIdForDom()),
+                                                  "entryid",entry.getIdForDom(), ATTR_CLASS,"display-entrylist-entry ui-widget-content " + rowClass], line);
                     html  += "\n";
                 }
                 return html;
@@ -1090,8 +1095,8 @@ function RamaddaMetadataDisplay(displayManager, id, properties) {
                     var entry = entries[entryIdx];
                     var metadata = entry.getMetadata();
                     var row = [];
-                    var buttonId = this.getDomId("entrylink" + entry.getId());
-                    //                    var link =  HtmlUtil.onClick(this.getGet()+".showEntryDetails(event, '" + entry.getId() +"','" + buttonId +"',true);", 
+                    var buttonId = this.getDomId("entrylink" + entry.getIdForDom());
+                    //                    var link =  HtmlUtil.onClick(this.getGet()+".showEntryDetails(event, '" + entry.getIdForDom() +"','" + buttonId +"',true);", 
                     //                                                 entry.getIconImage() +" " + entry.getName(),[ATTR_ID,buttonId,ATTR_CLASS,"display-metadata-link"]);
                     var link =  entry.getLink(entry.getIconImage() +" " + entry.getName());
                     row.push(HtmlUtil.td([ATTR_CLASS, "display-metadata-table-cell"],HtmlUtil.div([ATTR_CLASS,"display-metadata-entrylink"], link)));

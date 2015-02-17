@@ -110,12 +110,12 @@ public class PageHandler extends RepositoryManager {
         new GregorianCalendar(TIMEZONE_UTC);
 
 
-    /** _more_          */
+    /** _more_ */
     private static String button =
         "<a href=\"https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=SA4AUEBEYSHBY&no_shipping=1&return=https%3A%2F%2Fgeodesystems.com%3A8081%2Frepository%2Falias%2Fcheckout&image_url=https%3A%2F%2Fgeodesystems.com%3A8081%2Frepository%2Fimages%2Fgeodesystems.png\" target=\"_purhase\">make a donation</a>";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String REGISTER_MESSAGE =
         "<div class=\"ramadda-register\">Thank you for trying RAMADDA. This is shareware. To register this server please "
         + button
@@ -2994,8 +2994,9 @@ public class PageHandler extends RepositoryManager {
         if (iconPath == null) {
             return null;
         }
-        if (entry.getIsRemoteEntry()) {
-            String iconFile = IOUtil.getFileTail(iconPath);
+        //Assume absolute urls to remote icons
+        if (false && entry.getIsRemoteEntry()) {
+            String iconFile = iconPath.replaceAll("/", "_");
             String ext      = IOUtil.getFileExtension(iconFile);
             String newIcon = IOUtil.stripExtension(iconFile) + "_remote"
                              + ext;
@@ -3007,10 +3008,11 @@ public class PageHandler extends RepositoryManager {
                             "/org/ramadda/repository/htdocs/icons/arrow.png");
                     }
                     //                    System.err.println("    icon path:" + iconFile);
-                    Image originalImage =
-                        ImageUtils.readImage(
-                            "/org/ramadda/repository/htdocs/icons/"
-                            + iconFile);
+                    //TODO: 
+                    System.err.println("Image:" + iconPath);
+                    Image originalImage = ImageUtils.readImage(
+                    //"/org/ramadda/repository/htdocs/icons/" + iconFile
+                    iconPath);
                     if (originalImage != null) {
                         int w = originalImage.getWidth(null);
                         int h = originalImage.getHeight(null);

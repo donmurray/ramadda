@@ -49,6 +49,11 @@ var Utils = {
     getDefined: function(v1, v2) {
         if(Utils.isDefined(v1)) return v1;
         return v2;
+    },
+    cleanId: function(id) {
+        id = id.replace(/:/g,"_");
+        id =  id.replace(/=/g,"_");
+        return id;
     }
 };
 
@@ -469,6 +474,7 @@ var HtmlUtil =  {
         return this.attr("id", s);
     },
     href: function(url, label) {
+        if(!Utils.isDefined(label) || label == "") label = url;
         return this.tag("a", ["href", url], label);
     },
 

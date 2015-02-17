@@ -467,7 +467,14 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
 
                 html += entry.getDescription();
                 html += HtmlUtil.formTable();
-                var columns = entry.getColumns();
+                if(entry.remoteUrl) {
+                    html+= HtmlUtil.formEntry("URL:", HtmlUtil.href(entry.remoteUrl,entry.remoteUrl));
+                }
+                if(entry.remoteRepository) {
+                    html+= HtmlUtil.formEntry("From:", HtmlUtil.href(entry.remoteRepository.url,entry.remoteRepository.name));
+                }
+
+                var columns = entry.getAttributes();
 
                 if(entry.getFilesize()>0) {
                     html+= HtmlUtil.formEntry("File:", entry.getFilename() +" " +
@@ -476,8 +483,8 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 }
                 for(var colIdx =0;colIdx< columns.length;colIdx++) {
                     var column = columns[colIdx];
-                    var columnValue = entry.getColumnValue(column.getName());
-                    if(column.isUrl()) {
+                    var columnValue = column.value;
+                    if(column.isUrl && column.isUrl()) {
                         var tmp = "";
                         var toks = columnValue.split("\n");
                         for(var i=0;i<toks.length;i++) {
@@ -488,8 +495,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                         }
                         columnValue = tmp;
                     }
-
-                    html+= HtmlUtil.formEntry(column.getLabel()+":", columnValue);
+                    html+= HtmlUtil.formEntry(column.label+":", columnValue);
                 }
 
                 html += HtmlUtil.closeTag(TAG_TABLE);
@@ -498,7 +504,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
         getEntryMenuButton: function(entry) {
              var menuButton = HtmlUtil.onClick(this.getGet()+".showEntryMenu(event, '" + entry.getId() +"');", 
                                                HtmlUtil.image(ramaddaBaseUrl+"/icons/downdart.png", 
-                                                              [ATTR_CLASS, "display-dialog-button", ATTR_ID,  this.getDomId(ID_MENU_BUTTON + entry.getId())]));
+                                                              [ATTR_CLASS, "display-dialog-button", ATTR_ID,  this.getDomId(ID_MENU_BUTTON + entry.getIdForDom())]));
              return menuButton;
          },
          setRamadda: function(e) {
@@ -637,17 +643,17 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                     topMenus += HtmlUtil.tag(TAG_LI,[], menus[i]);
                 }
 
-                var menu = HtmlUtil.tag(TAG_UL, [ATTR_ID, this.getDomId(ID_MENU_INNER+entry.getId()),ATTR_CLASS, "sf-menu"], 
+                var menu = HtmlUtil.tag(TAG_UL, [ATTR_ID, this.getDomId(ID_MENU_INNER+entry.getIdForDom()),ATTR_CLASS, "sf-menu"], 
                                         topMenus);
                 return menu;
             },
             showEntryMenu: function(event, entryId) {
                 var menu = this.getEntryMenu(entryId);               
                 this.writeHtml(ID_MENU_OUTER, menu);
-                var srcId = this.getDomId(ID_MENU_BUTTON + entryId);
+                var srcId = this.getDomId(ID_MENU_BUTTON + Utils.cleanId(entryId));
 
                 showPopup(event, srcId, this.getDomId(ID_MENU_OUTER), false,null,"left bottom");
-                $("#"+  this.getDomId(ID_MENU_INNER+entryId)).superfish({
+                $("#"+  this.getDomId(ID_MENU_INNER+Utils.cleanId(entryId))).superfish({
                         animation: {height:'show'},
                             delay: 1200
                             });
