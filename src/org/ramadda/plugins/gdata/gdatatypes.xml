@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Miscellaneous" >
 
 
   <type name="gdata"  description="Gdata"  category="Google Data" handler="org.ramadda.plugins.gdata.GdataBaseTypeHandler" foruser="false">  

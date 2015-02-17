@@ -464,9 +464,13 @@ public class DbTypeHandler extends BlobTypeHandler {
         nodes.add(node);
         super.init(nodes);
 
-        setCategory(XmlUtil.getAttribute(tableNode,
+
+        setCategory(XmlUtil.getAttributeFromTree(tableNode,
                                          TypeHandler.ATTR_CATEGORY,
                                          "Database"));
+        setSuperCategory(XmlUtil.getAttributeFromTree(tableNode,
+                                                      "supercategory",
+                                                      ""));
         tableHandler = new GenericTypeHandler(repository, "db_" + tableName,
                 desc) {
             protected String getEnumValueKey(Column column, Entry entry) {

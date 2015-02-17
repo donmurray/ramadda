@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Science and Education">
 
   <type name="owl.ontology"  description="OWL Ontology" category="Ontology" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler">  
      <property name="icon" value="/icons/rdfgroup.gif"/>

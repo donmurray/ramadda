@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Miscellaneous">
 
   <type name="forum"  description="Forum" handler="org.ramadda.plugins.forum.ForumTypeHandler" category="Collaboration">
      <property name="icon" value="/forum/forum.png"/>

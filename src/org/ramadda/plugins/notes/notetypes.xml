@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Miscellaneous">
 
   <type name="notes_notebook"  description="Notebook" handler="org.ramadda.plugins.notes.NotebookTypeHandler" category="Information">
      <property name="icon" value="/notes/notebook.png"/>

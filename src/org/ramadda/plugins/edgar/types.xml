@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Miscellaneous">
 
   <type name="type_edgar_filing"  description="SEC EDGAR Filing"  handler="org.ramadda.plugins.edgar.EdgarFilingTypeHandler" category="Business">
      <property name="icon" value="/edgar/sec.png"/>

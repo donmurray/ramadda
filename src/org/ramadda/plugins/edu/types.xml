@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Science and Education">
 
   <type name="edu_course"  description="Course" category="EDU"  handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" metadata="edu_instructor,enum_tag,content.keyword">
      <property name="icon" value="/edu/books-stack.png"/>

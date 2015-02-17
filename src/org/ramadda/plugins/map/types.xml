@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Science and Education">
 
 
   <type name="geo_kml"  description="KML/KMZ File"  category="GIS Data" handler="org.ramadda.plugins.map.KmlTypeHandler" pattern="(.*\.kml$|.*\.kmz$)">

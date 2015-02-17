@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Miscellaneous">
 
 <!--
   <type name="pasteitcollection"  description="Paste It Collection" handler="org.ramadda.plugins.pasteit.PasteitCollectionTypeHandler" category="Information">

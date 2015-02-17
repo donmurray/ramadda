@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Miscellaneous">
 
   <type name="incident"  description="Incident" handler="org.ramadda.plugins.incident.IncidentTypeHandler" category="Events">
      <property name="icon" value="/incident/incident.png"/>

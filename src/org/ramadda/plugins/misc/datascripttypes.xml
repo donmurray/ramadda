@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Miscellaneous">
 
   <type name="jythonscript"  description="Repository Script for Data" handler="org.ramadda.geodata.cdmdata.DataJythonTypeHandler" category="Geo Data">
      <property name="icon" value="/icons/python.png"/>

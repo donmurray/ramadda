@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Miscellaneous">
 
   <type name="pfif_person"  description="Missing Person" handler="org.ramadda.plugins.personfinder.PersonTypeHandler" category="Events">
      <property name="icon" value="/personfinder/personfinder.png"/>

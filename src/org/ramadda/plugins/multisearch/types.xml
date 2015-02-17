@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Miscellaneous">
 
   <type name="multisearch"  description="Multiple Search" handler="org.ramadda.plugins.multisearch.MultiSearchTypeHandler" category="Gadgets">
      <property name="icon" value="/multisearch/find.png"/>

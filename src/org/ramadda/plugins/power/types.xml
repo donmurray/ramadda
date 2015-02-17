@@ -1,6 +1,6 @@
-<types>
+<types supercategory="Miscellaneous">
 
-  <type name="type_power"  description="" super="type_point" category="Power Data" foruser="false">
+  <type name="type_power"  description="" super="type_point" category="Business" foruser="false">
   </type>
 
   <type name="type_power_miso_forecast"  super="type_power" description="MISO Foreacast XML"  handler="org.ramadda.data.services.PointTypeHandler">

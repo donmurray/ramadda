@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Miscellaneous">
 
 
   <type name="feed"  description="RSS/ATOM Feed"   handler="org.ramadda.plugins.feed.FeedTypeHandler" foruser="true" category="Events">  

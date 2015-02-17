@@ -1,7 +1,7 @@
-<types>
+<types supercategory="Development">
 
 
-  <type name="type_resilience_project"  description="Resiliency Project" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Comunity"      >
+  <type name="type_resilience_project"  description="Resiliency Project" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Community"      >
      <property name="icon" value="/community/globe-share.png"/>
 
      <property name="form.file.show" value="false"/>

@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Miscellaneous">
 
 
   <type name="poll"  description="Poll" handler="org.ramadda.plugins.poll.PollTypeHandler" category="Events">

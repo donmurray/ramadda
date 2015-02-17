@@ -1,4 +1,4 @@
-<types>
+<types supercategory="Miscellaneous">
 
 
   <type name="trip_report"  description="Trip Report" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Travel" >
