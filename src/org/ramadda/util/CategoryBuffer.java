@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -55,6 +55,19 @@ public class CategoryBuffer {
      * @return _more_
      */
     public StringBuffer get(String category) {
+        return get(category, false);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param category _more_
+     * @param addToFront _more_
+     *
+     * @return _more_
+     */
+    public StringBuffer get(String category, boolean addToFront) {
         if (category == null) {
             category = "";
         }
@@ -62,7 +75,11 @@ public class CategoryBuffer {
         if (sb == null) {
             sb = new StringBuffer();
             buffers.put(category, sb);
-            categories.add(category);
+            if (addToFront) {
+                categories.add(0, category);
+            } else {
+                categories.add(category);
+            }
         }
 
         return sb;
@@ -72,10 +89,32 @@ public class CategoryBuffer {
      * _more_
      *
      * @param category _more_
+     */
+    public void moveToFront(String category) {
+        categories.remove(category);
+        categories.add(0, category);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param category _more_
      * @param object _more_
      */
     public void append(String category, Object object) {
         get(category).append(object);
+    }
+
+    /**
+     * _more_
+     *
+     * @param category _more_
+     *
+     * @return _more_
+     */
+    public boolean contains(String category) {
+        return buffers.get(category) != null;
     }
 
     /**

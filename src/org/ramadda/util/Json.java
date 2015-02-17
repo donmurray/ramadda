@@ -188,7 +188,7 @@ public class Json {
      *
      * @return  the values as a JSON array [ value1,value2,value3,value4 ]
      */
-    public static String list(String[] values) {
+    public static String list(String... values) {
         return list(Misc.toList(values));
     }
 
@@ -543,6 +543,7 @@ public class Json {
     public static String xmlToJson(Element node) throws Exception {
         StringBuilder json = new StringBuilder();
         xmlToJson(node, json);
+
         return json.toString();
     }
 
@@ -591,7 +592,7 @@ public class Json {
             if ( !(child instanceof Element)) {
                 continue;
             }
-            String tag = ((Element)child).getTagName();
+            String        tag = ((Element) child).getTagName();
 
             StringBuilder csb = new StringBuilder();
             xmlToJson((Element) child, csb);
