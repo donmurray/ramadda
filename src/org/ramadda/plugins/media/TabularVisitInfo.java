@@ -56,7 +56,7 @@ public class TabularVisitInfo {
     /** _more_ */
     private HashSet<Integer> sheetsToShow;
 
-    /** _more_          */
+    /** _more_ */
     private List props = new ArrayList();
 
     /**

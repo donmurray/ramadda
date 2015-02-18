@@ -45,9 +45,9 @@ import org.ramadda.util.Utils;
 import org.ramadda.util.XlsUtil;
 import org.ramadda.util.text.CsvUtil;
 import org.ramadda.util.text.Filter;
-import org.ramadda.util.text.Visitor;
 import org.ramadda.util.text.Processor;
 import org.ramadda.util.text.SearchField;
+import org.ramadda.util.text.Visitor;
 
 
 import org.w3c.dom.*;
@@ -246,10 +246,10 @@ public class TabularOutputHandler extends OutputHandler {
                     ""));
         }
 
-        final List<String> sheets  = new ArrayList<String>();
-        TabularVisitor     visitor = new TabularVisitor() {
+        final List<String> sheets         = new ArrayList<String>();
+        TabularVisitor     tabularVisitor = new TabularVisitor() {
             @Override
-            public boolean visit(TabularVisitInfo info, String sheet,
+            public boolean visit(Visitor info, String sheet,
                                  List<List<Object>> rows) {
                 List<String> jrows = new ArrayList<String>();
                 for (List<Object> cols : rows) {
@@ -271,13 +271,13 @@ public class TabularOutputHandler extends OutputHandler {
             }
         };
 
-        List props = new ArrayList();
+        List    props = new ArrayList();
 
-        Visitor info =  new Visitor();
+        Visitor info  = new Visitor();
         info.setSkip(getSkipRows(request, entry));
-        info.setMaxRows(getRowCount(request, entry,MAX_ROWS));
+        info.setMaxRows(getRowCount(request, entry, MAX_ROWS));
         //        TabularVisitInfo visitInfo = new TabularVisitInfo(request, entry, sheetsToShow);
-        visit(request, entry, info, visitor);
+        visit(request, entry, info, tabularVisitor);
         props.addAll(info.getTableProperties());
         props.add("sheets");
         props.add(Json.list(sheets));
@@ -340,8 +340,8 @@ public class TabularOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public void visit(Request request, Entry entry,
-                      Visitor visitInfo, TabularVisitor visitor)
+    public void visit(Request request, Entry entry, Visitor visitInfo,
+                      TabularVisitor visitor)
             throws Exception {
 
         File file = entry.getFile();
@@ -362,14 +362,17 @@ public class TabularOutputHandler extends OutputHandler {
         }
 
         if (suffix.equals(".xlsx") || suffix.equals(".xls")) {
-            //            visitXls(request, entry, suffix, inputStream, visitInfo, visitor);
+            //            System.err.println ("Visit xls");
+            visitXls(request, entry, suffix, inputStream, visitInfo, visitor);
         } else if (suffix.endsWith(".csv")) {
+            //            System.err.println ("Visit csv");
             visitCsv(request, entry, inputStream, visitInfo, visitor);
         } else {
             if (isTabular(entry)) {
                 TabularTypeHandler tth =
                     (TabularTypeHandler) entry.getTypeHandler();
-                //                tth.visit(request, entry, inputStream, visitInfo, visitor);
+                //                System.err.println ("Visit tabular");
+                tth.visit(request, entry, inputStream, visitInfo, visitor);
             } else {
                 throw new IllegalStateException("Unknown file type:"
                         + suffix);
@@ -387,35 +390,38 @@ public class TabularOutputHandler extends OutputHandler {
      * @param entry _more_
      * @param inputStream _more_
      * @param visitInfo _more_
+     * @param info _more_
      * @param visitor _more_
      *
      * @throws Exception _more_
      */
     public void visitCsv(Request request, Entry entry,
-                         InputStream inputStream,
-                         final Visitor  info,
+                         InputStream inputStream, final Visitor info,
                          TabularVisitor visitor)
             throws Exception {
         BufferedReader br =
             new BufferedReader(new InputStreamReader(inputStream));
-        final List<List<Object>> rows   = new ArrayList<List<Object>>();
+        final List<List<Object>> rows = new ArrayList<List<Object>>();
 
-        ByteArrayOutputStream    bos    = new ByteArrayOutputStream();
-        
+        ByteArrayOutputStream    bos  = new ByteArrayOutputStream();
+
         info.setInput(new BufferedInputStream(inputStream));
         info.setOutput(bos);
         info.getProcessor().addProcessor(new Processor() {
-                @Override
-                    public boolean processRow(Visitor info, org.ramadda.util.text.Row row, String line) {
-                    List obj = new ArrayList();
-                    obj.addAll(row.getValues());
-                    rows.add((List<Object>) obj);
-                    return true;
-                }
-            });
+            @Override
+            public boolean processRow(Visitor info,
+                                      org.ramadda.util.text.Row row,
+                                      String line) {
+                List obj = new ArrayList();
+                obj.addAll(row.getValues());
+                rows.add((List<Object>) obj);
+
+                return true;
+            }
+        });
 
         if (info.getSearchFields() != null) {
-            for (SearchField searchField :  info.getSearchFields()) {
+            for (SearchField searchField : info.getSearchFields()) {
                 String id = "table." + searchField.getName();
                 if (request.defined(id)) {
                     //Columns are 1 based to the user
@@ -425,7 +431,7 @@ public class TabularOutputHandler extends OutputHandler {
                                              "column".length()).trim()) - 1;
                         String s = request.getString(id, "");
                         s = s.trim();
-                        System.err.println("column:" + column + " s:" + s);
+                        //                        System.err.println("column:" + column + " s:" + s);
                         String operator = StringUtil.findPattern(s,
                                               "^([<>=]+).*");
                         if (operator != null) {
@@ -453,11 +459,10 @@ public class TabularOutputHandler extends OutputHandler {
         String searchText = request.getString("table.text", (String) null);
         if (Utils.stringDefined(searchText)) {
             //match all
-            info.getFilter().addFilter(new Filter.PatternFilter(-1, "(?i:.*" + searchText + ".*)"));
+            info.getFilter().addFilter(new Filter.PatternFilter(-1,
+                    "(?i:.*" + searchText + ".*)"));
         }
-
-
-        System.err.println ("Process");
+        //        System.err.println ("Process");
         CsvUtil.process(info);
         //        visitor.visit(visitInfo, entry.getName(), rows);
     }
@@ -497,12 +502,12 @@ public class TabularOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     private void visitXls(Request request, Entry entry, String suffix,
-                          InputStream inputStream,
-                          TabularVisitInfo visitInfo, TabularVisitor visitor)
+                          InputStream inputStream, Visitor visitInfo,
+                          TabularVisitor visitor)
             throws Exception {
         //        System.err.println("visitXls: making workbook");
         Workbook wb = makeWorkbook(suffix, inputStream);
-        //        System.err.println("visitXls:" + skip + " max rows:" + maxRows + " #sheets:" + wb.getNumberOfSheets());
+        //        System.err.println("visitXls:" + visitInfo.getSkip() + " max rows:" + visitInfo.getMaxRows()+ " #sheets:" + wb.getNumberOfSheets());
         int maxRows = visitInfo.getMaxRows();
         for (int sheetIdx = 0; sheetIdx < wb.getNumberOfSheets();
                 sheetIdx++) {
@@ -512,7 +517,7 @@ public class TabularOutputHandler extends OutputHandler {
             Sheet sheet = wb.getSheetAt(sheetIdx);
             //            System.err.println("\tsheet:" + sheet.getSheetName() + " #rows:" + sheet.getLastRowNum());
             List<List<Object>> rows      = new ArrayList<List<Object>>();
-            int                sheetSkip = visitInfo.getSkipRows();
+            int                sheetSkip = visitInfo.getSkip();
             for (int rowIdx = sheet.getFirstRowNum();
                     (rows.size() < maxRows)
                     && (rowIdx <= sheet.getLastRowNum());
@@ -552,24 +557,23 @@ public class TabularOutputHandler extends OutputHandler {
                     cols.add(value);
                 }
 
-                /**** TODO
-                org.ramadda.util.text.Row row = new Row(cols);
-
-                if ( !visitInfo.rowOk(row)) {
-                    if (rows.size() == 0) {
-                        //todo: check for the header line
-                    } else {
-                        continue;
-                    }
-                }
-                *****/
-                //                rows.add(cols);
-                //                if(xxx>15) break;
+                /**
+                 * ** TODO
+                 * org.ramadda.util.text.Row row = new Row(cols);
+                 *
+                 * if ( !visitInfo.rowOk(row)) {
+                 *   if (rows.size() == 0) {
+                 *       //todo: check for the header line
+                 *   } else {
+                 *       continue;
+                 *   }
+                 * }
+                 */
+                rows.add(cols);
             }
-            //            System.err.println("Rows:" + rows);
-            //            if ( !visitor.visit(visitInfo, sheet.getSheetName(), rows)) {
-            //                break;
-            //            }
+            if ( !visitor.visit(visitInfo, sheet.getSheetName(), rows)) {
+                break;
+            }
         }
     }
 
@@ -701,27 +705,27 @@ public class TabularOutputHandler extends OutputHandler {
         propsList.add("url");
         propsList.add(Json.quote(jsonUrl));
 
-        /***
-        TabularVisitInfo visitInfo = new TabularVisitInfo(request, entry);
-        if (visitInfo.getSearchFields() != null) {
-            propsList.add("searchFields");
-            List<String> names = new ArrayList<String>();
-            for (SearchField searchField :
-                    visitInfo.getSearchFields()) {
-
-                List<String> props = new ArrayList<String>();
-                props.add("name");
-                props.add(Json.quote(searchField.getName()));
-                props.add("label");
-                props.add(Json.quote(searchField.getLabel()));
-                names.add(Json.map(props));
-            }
-            propsList.add(Json.list(names));
-        }
-        */
+        /**
+         * TabularVisitInfo visitInfo = new TabularVisitInfo(request, entry);
+         * if (visitInfo.getSearchFields() != null) {
+         *   propsList.add("searchFields");
+         *   List<String> names = new ArrayList<String>();
+         *   for (SearchField searchField :
+         *           visitInfo.getSearchFields()) {
+         *
+         *       List<String> props = new ArrayList<String>();
+         *       props.add("name");
+         *       props.add(Json.quote(searchField.getName()));
+         *       props.add("label");
+         *       props.add(Json.quote(searchField.getLabel()));
+         *       names.add(Json.map(props));
+         *   }
+         *   propsList.add(Json.list(names));
+         * }
+         */
 
         String props = Json.map(propsList);
-        System.err.println(props);
+        //        System.err.println(props);
 
         StringBuilder sb = new StringBuilder();
         getRepository().getWikiManager().addDisplayImports(request, sb);
@@ -803,7 +807,7 @@ public class TabularOutputHandler extends OutputHandler {
                            name + ".xlsx"));
 
         TabularVisitor visitor = new TabularVisitor() {
-            public boolean visit(TabularVisitInfo info, String sheetName,
+            public boolean visit(Visitor info, String sheetName,
                                  List<List<Object>> rows) {
                 sheetName = sheetName.replaceAll("[/]+", "-");
                 Sheet sheet  = wb.createSheet(sheetName);
@@ -834,9 +838,9 @@ public class TabularOutputHandler extends OutputHandler {
                 request, entry, getSkipRows(request, entry),
                 getRowCount(request, entry, Integer.MAX_VALUE), sheetsToShow);
 
-        Visitor info =  new Visitor();
+        Visitor info = new Visitor();
         info.setSkip(getSkipRows(request, entry));
-        info.setMaxRows(getRowCount(request, entry,MAX_ROWS));
+        info.setMaxRows(getRowCount(request, entry, MAX_ROWS));
         //        http:://localhost:8080/repository/entry/show?entryid=740ae258-805d-4a1f-935d-289d0a6e5519&output=media_tabular_extractsheet&serviceform=true&execute=Execute
 
         visit(request, entry, info, visitor);
@@ -852,8 +856,20 @@ public class TabularOutputHandler extends OutputHandler {
 
 
 
-    public boolean csv(Request request, Service service,
-                       ServiceInput input, List args)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param service _more_
+     * @param input _more_
+     * @param args _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public boolean csv(Request request, Service service, ServiceInput input,
+                       List args)
             throws Exception {
         return true;
     }

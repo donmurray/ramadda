@@ -30,6 +30,8 @@ import org.ramadda.util.FormInfo;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Json;
 import org.ramadda.util.Utils;
+import org.ramadda.util.text.Row;
+import org.ramadda.util.text.Visitor;
 
 import org.w3c.dom.*;
 
@@ -126,7 +128,7 @@ public class DbTableTypeHandler extends TabularTypeHandler {
      */
     @Override
     public void visit(Request request, Entry entry, InputStream myxls,
-                      TabularVisitInfo visitInfo, TabularVisitor visitor)
+                      Visitor visitInfo, TabularVisitor visitor)
             throws Exception {
 
 
@@ -168,14 +170,7 @@ public class DbTableTypeHandler extends TabularTypeHandler {
 
             return;
         }
-
-
-
-
         String what = "*";
-
-
-
         /*
         List<String> cols = StringUtil.split(entry.getValue(IDX_COLUMNS, ""),
                                              "\n", true, true);
@@ -188,8 +183,9 @@ public class DbTableTypeHandler extends TabularTypeHandler {
 
         List<Clause> andClauses = new ArrayList<Clause>();
         List<Clause> orClauses  = new ArrayList<Clause>();
-        String       s          = visitInfo.getSearchText();
-        String       opp        = "(<>|=|<|>|<=|>=)";
+        //        String       s          = visitInfo.getSearchText();
+        String s   = null;
+        String opp = "(<>|=|<|>|<=|>=)";
 
         if (Utils.stringDefined(s)) {
             if (tableInfo != null) {
@@ -303,7 +299,7 @@ public class DbTableTypeHandler extends TabularTypeHandler {
                 }
                 rows.add(names);
             }
-            List<Object> row = new ArrayList<Object>();
+            List<Object> values = new ArrayList<Object>();
             for (int col = 0; col < rsmd.getColumnCount(); col++) {
                 int    colIdx = col + 1;
                 int    type   = rsmd.getColumnType(colIdx);
@@ -318,14 +314,16 @@ public class DbTableTypeHandler extends TabularTypeHandler {
                 } else {
                     value = results.getString(colIdx);
                 }
-                row.add(value);
+                values.add(value);
             }
-            if ((andClauses.size() == 0) && !visitInfo.rowOk(row)) {
+            Row row = new Row(values);
+            if ((andClauses.size() == 0)
+                    && !visitInfo.getFilter().rowOk(visitInfo, row)) {
                 //                System.err.println ("skipping row:" + row);
                 continue;
             }
             //            System.err.println ("adding row:" + row);
-            rows.add(row);
+            rows.add(values);
         }
         visitor.visit(visitInfo, table, rows);
         connection.close();
@@ -527,23 +525,23 @@ public class DbTableTypeHandler extends TabularTypeHandler {
      *
      *
      * @version        $version$, Fri, Jan 16, '15
-     * @author         Enter your name here...    
+     * @author         Enter your name here...
      */
     public static class TableProperty {
 
-        /** _more_          */
+        /** _more_ */
         private String type;
 
-        /** _more_          */
+        /** _more_ */
         private String otherTable;
 
-        /** _more_          */
+        /** _more_ */
         private String name;
 
-        /** _more_          */
+        /** _more_ */
         private String label;
 
-        /** _more_          */
+        /** _more_ */
         private boolean canSearch;
 
     }

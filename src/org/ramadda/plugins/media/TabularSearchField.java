@@ -29,7 +29,7 @@ public class TabularSearchField {
     /** _more_ */
     private String name;
 
-    /** _more_          */
+    /** _more_ */
     private String label;
 
     /** _more_ */

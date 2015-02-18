@@ -29,6 +29,8 @@ import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Json;
 import org.ramadda.util.XlsUtil;
 
+import org.ramadda.util.text.Visitor;
+
 
 import org.w3c.dom.*;
 
@@ -171,7 +173,7 @@ public class TabularTypeHandler extends MsDocTypeHandler {
      * @throws Exception _more_
      */
     public void visit(Request request, Entry entry, InputStream myxls,
-                      TabularVisitInfo visitInfo, TabularVisitor visitor)
+                      Visitor visitInfo, TabularVisitor visitor)
             throws Exception {}
 
 

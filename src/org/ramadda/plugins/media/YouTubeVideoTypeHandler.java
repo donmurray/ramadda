@@ -51,11 +51,11 @@ import java.util.List;
  */
 public class YouTubeVideoTypeHandler extends GenericTypeHandler {
 
-    /** _more_          */
+    /** _more_ */
     private static int IDX = 0;
 
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_ID = IDX++;
 
 

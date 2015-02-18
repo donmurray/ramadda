@@ -21,6 +21,12 @@
 package org.ramadda.plugins.media;
 
 
+import org.ramadda.util.text.Row;
+import org.ramadda.util.text.Visitor;
+
+
+
+
 import java.util.List;
 
 
@@ -38,7 +44,7 @@ public interface TabularVisitor {
      *
      * @return _more_
      */
-    public boolean visit(TabularVisitInfo info, String sheetName,
+    public boolean visit(Visitor info, String sheetName,
                          List<List<Object>> rows);
 
 }

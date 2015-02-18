@@ -82,11 +82,22 @@ public class TabularService extends Service {
     }
 
 
-    public boolean csv(Request request, Service service,
-                       ServiceInput input, List args)
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param service _more_
+     * @param input _more_
+     * @param args _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public boolean csv(Request request, Service service, ServiceInput input,
+                       List args)
             throws Exception {
-        return getTabularOutputHandler().csv(request, service,
-                input, args);
+        return getTabularOutputHandler().csv(request, service, input, args);
     }
 
 
