@@ -166,7 +166,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
         null;
 
 
-    /** _more_          */
+    /** _more_ */
     private static final org.ramadda.util.text.CsvUtil dummyField7ToForceCompile =
         null;
 
@@ -438,7 +438,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
     private boolean isActive = true;
 
 
-    /** _more_          */
+    /** _more_ */
     private boolean isRegistered = true;
 
     /** _more_ */
@@ -1158,9 +1158,32 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * _more_
      */
     public void checkRegistration() {
+        isRegistered = false;
         String registrationKey = getProperty(PROP_REGISTER_KEY, "");
-        isRegistered = registrationKey.equals("");
+        List<String> toks =
+            StringUtil.split(Utils.unobfuscate(registrationKey), "-");
+        if (toks.size() != 3) {
+            return;
+        }
+        String id     = toks.get(0);
+        String users  = toks.get(1);
+        String thanks = toks.get(2);
+        isRegistered = thanks.equals("thanks");
+        //        System.err.println(id +" - " + users +" - " + thanks + " - " + isRegistered);
     }
+
+    /**
+     * _more_
+     *
+     * @param users _more_
+     *
+     * @return _more_
+     */
+    public String makeRegistration(int users) {
+        return Utils.obfuscate("" + ((int) (Math.random() * 10000000)) + "-"
+                               + users + "-" + "thanks");
+    }
+
 
     /**
      * _more_
