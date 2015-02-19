@@ -143,7 +143,7 @@ public class Utils {
         List<String> toks      = new ArrayList<String>();
         StrTokenizer tokenizer = StrTokenizer.getCSVInstance(line);
         //        StrTokenizer tokenizer = new StrTokenizer(line, columnDelimiter);
-        if(!columnDelimiter.equals(",")) {
+        if ( !columnDelimiter.equals(",")) {
             tokenizer.setDelimiterChar(columnDelimiter.charAt(0));
         }
         //        tokenizer.setQuoteChar('"');
@@ -489,10 +489,11 @@ public class Utils {
      * @throws Exception _more_
      */
     public static void main(String args[]) throws Exception {
-        if(true) {
-            System.out.println("Sleeping");
-            Misc.sleepSeconds(10);
-            System.out.println("Done");
+
+        if (true) {
+            System.out.println(obfuscate("hello there"));
+            System.out.println(unobfuscate(obfuscate("hello there")));
+
             return;
         }
 
@@ -1320,6 +1321,80 @@ public class Utils {
      *       return;
      *   }
      * }
+     *
+     * @param s _more_
+     *
+     * @return _more_
      */
+
+
+    /**
+     */
+    public static String rot13(String s) {
+        StringBuilder sb     = new StringBuilder();
+        int           offset = 13;
+        for (int i = 0; i < s.length(); i++) {
+            char c = s.charAt(i);
+            if ((c >= 'a') && (c <= 'm')) {
+                c += offset;
+            } else if ((c >= 'A') && (c <= 'M')) {
+                c += offset;
+            } else if ((c >= 'n') && (c <= 'z')) {
+                c -= offset;
+            } else if ((c >= 'N') && (c <= 'Z')) {
+                c -= offset;
+            }
+            sb.append(c);
+        }
+
+        return sb.toString();
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    public static String obfuscate(String s) {
+        return encodeBase64(rot13(s).getBytes());
+    }
+
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
+    public static String unobfuscate(String s) {
+        return rot13(new String(decodeBase64(s)));
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param b _more_
+     *
+     * @return _more_
+     */
+    public static String encodeBase64(byte[] b) {
+        return javax.xml.bind.DatatypeConverter.printBase64Binary(b);
+    }
+
+
+    /**
+     *                                                                                                                             * Decode the given base64 String
+     *                                                                                                                               * @param s Holds the base64 encoded bytes
+     * @return The decoded bytes                                                                                                     
+     */
+    public static byte[] decodeBase64(String s) {
+        return javax.xml.bind.DatatypeConverter.parseBase64Binary(s);
+    }
+
 
 }
