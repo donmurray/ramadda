@@ -1,0 +1,12 @@
+<types  supercategory="Science and Education" category="Software and Services">
+
+  <type name="python_source"  description="Python source file"  pattern=".*\.py">
+     <property name="icon" value="/python/python.png"/>
+  </type>
+
+  <type name="python_notebook"  description="IPython Notebook file"  pattern=".*\.ipynb">
+     <property name="icon" value="/python/ipynb.png"/>
+  </type>
+
+
+</types>

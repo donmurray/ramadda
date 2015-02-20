@@ -1,0 +1,15 @@
+<services icon="/python/ipynb.png" command="${service.ipython}" category="Earth Science Data">
+    <service label="IPython Notebook Converstion" id="python_notebook"  outputToStderr="true">
+<help><![CDATA[
+Run IPython notebook convert
+ipython nbconvert --to FORMAT notebook.ipynb
+]]></help>
+          <arg value="nbconvert"/>
+          <arg value="--quiet"/>
+          <arg type="enumeration" name="to" label="Convert to" values="html,latex,slides,markdown,rst,python" prefix="--to" />
+          <arg label="IPython Notebook File" value="${entry.file}"   type="entry" primary="true" entryType="python_notebook"></arg>
+          <output pattern=".*"/>
+    </service>
+</services>
+
+
