@@ -74,12 +74,15 @@ public class ServiceFileTypeHandler extends ServiceTypeHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      *
      * @throws Exception _more_
      */
     @Override
-    public void initializeNewEntry(Request request, Entry entry) throws Exception {
+    public void initializeNewEntry(Request request, Entry entry)
+            throws Exception {
         super.initializeNewEntry(request, entry);
         Element root = XmlUtil.getRoot(
                            IOUtil.readContents(

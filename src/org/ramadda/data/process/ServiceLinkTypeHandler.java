@@ -118,12 +118,15 @@ public class ServiceLinkTypeHandler extends ServiceTypeHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      *
      * @throws Exception _more_
      */
     @Override
-    public void initializeNewEntry(Request request, Entry entry) throws Exception {
+    public void initializeNewEntry(Request request, Entry entry)
+            throws Exception {
         super.initializeNewEntry(request, entry);
 
         if ( !Utils.stringDefined(entry.getName())) {

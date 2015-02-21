@@ -65,7 +65,7 @@ import java.util.zip.*;
  * @version        $version$, Thu, Sep 4, '14
  * @author         Enter your name here...
  */
-public class OutputDefinition {
+public class OutputDefinition extends ServiceElement {
 
     /** _more_ */
     private String entryType;
@@ -96,6 +96,7 @@ public class OutputDefinition {
      * @param node _more_
      */
     public OutputDefinition(Element node) {
+        super(node);
         entryType = XmlUtil.getAttribute(node, Service.ATTR_TYPE,
                                          TypeHandler.TYPE_FILE);
         pattern     = XmlUtil.getAttribute(node, "pattern", (String) null);

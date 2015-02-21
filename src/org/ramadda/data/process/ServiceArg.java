@@ -71,7 +71,7 @@ import java.util.zip.*;
  * @version        $version$, Fri, Oct 10, '14
  * @author         Enter your name here...
  */
-public class ServiceArg implements Constants {
+public class ServiceArg extends ServiceElement {
 
     /** _more_ */
     private static final String TYPE_STRING = "string";
@@ -125,10 +125,10 @@ public class ServiceArg implements Constants {
     /** _more_ */
     private String filePattern;
 
-    /** _more_          */
+    /** _more_ */
     private SimpleDateFormat dateFormat;
 
-    /** _more_          */
+    /** _more_ */
     private String dateFormatString;
 
     /** _more_ */
@@ -222,6 +222,7 @@ public class ServiceArg implements Constants {
      */
     public ServiceArg(Service service, Element node, int idx)
             throws Exception {
+        super(node);
         this.service = service;
 
         type = XmlUtil.getAttribute(node, Service.ATTR_TYPE, (String) null);
