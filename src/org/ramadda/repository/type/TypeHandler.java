@@ -109,6 +109,15 @@ public class TypeHandler extends RepositoryManager {
 
 
     /** _more_ */
+    public static final String TARGET_ATTACHMENT = "attachment";
+
+    /** _more_ */
+    public static final String TARGET_CHILD = "child";
+
+    /** _more_ */
+    public static final String TARGET_SIBLING = "sibling";
+
+    /** _more_ */
     public static final RequestArgument REQUESTARG_NORTH =
         new RequestArgument("ramadda.arg.area.north");
 
@@ -238,6 +247,9 @@ public class TypeHandler extends RepositoryManager {
 
     /** _more_ */
     public static final String PROP_FIELD_FILE_PATTERN = "field_file_pattern";
+
+
+    public static final String PROP_INGEST_LINKS = "ingestLinks";
 
 
     /** _more_ */
@@ -2921,7 +2933,23 @@ public class TypeHandler extends RepositoryManager {
 
         if (parent != null) {
             parent.initializeNewEntry(request, entry);
+        } 
+
+        
+        //Check if we're supposed to extract urls from the file
+        if(getProperty(PROP_INGEST_LINKS,"false").equals("true") && entry.getResource().isFile()) {
+            String contents  = IOUtil.readContents(getStorageManager().getFileInputStream(entry.getFile()));
+            for(String url: Utils.extractPatterns(contents,"(https?://[^\"' \\),]+)")) {
+                entry.addMetadata(new Metadata(getRepository().getGUID(),
+                                               entry.getId(),
+                                               ContentMetadataHandler.TYPE_URL,
+                                               false, url, url, "", "", ""));
+            }
         }
+        
+
+
+        //Do we extract metadata from the file path
         if (fieldFilePattern != null) {
             String  path    = entry.getResource().getPath();
             Matcher matcher = fieldFilePattern.matcher(path);
@@ -2996,6 +3024,7 @@ public class TypeHandler extends RepositoryManager {
             }
         }
 
+        //Now run the services
         for (Service service : services) {
             if ( !service.isEnabled()) {
                 continue;
@@ -3026,14 +3055,6 @@ public class TypeHandler extends RepositoryManager {
 
     }
 
-    /** _more_ */
-    public static final String TARGET_ATTACHMENT = "attachment";
-
-    /** _more_ */
-    public static final String TARGET_CHILD = "child";
-
-    /** _more_ */
-    public static final String TARGET_SIBLING = "sibling";
 
     /**
      * _more_
