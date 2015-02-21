@@ -22,8 +22,8 @@ package org.ramadda.geodata.mb;
 
 
 
-import org.ramadda.data.process.Service;
-import org.ramadda.data.process.ServiceOutput;
+import org.ramadda.service.Service;
+import org.ramadda.service.ServiceOutput;
 import org.ramadda.repository.*;
 import org.ramadda.repository.metadata.Metadata;
 import org.ramadda.repository.type.*;

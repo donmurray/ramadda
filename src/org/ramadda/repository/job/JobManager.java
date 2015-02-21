@@ -21,8 +21,8 @@
 package org.ramadda.repository.job;
 
 
-import org.ramadda.data.process.Service;
-import org.ramadda.data.process.ServiceTypeHandler;
+import org.ramadda.service.Service;
+import org.ramadda.service.ServiceTypeHandler;
 import org.ramadda.data.record.*;
 import org.ramadda.data.record.filter.*;
 

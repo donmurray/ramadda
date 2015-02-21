@@ -21,10 +21,10 @@
 package org.ramadda.geodata.model;
 
 
-import org.ramadda.data.process.Service;
-import org.ramadda.data.process.ServiceInput;
-import org.ramadda.data.process.ServiceOutput;
-import org.ramadda.data.process.ServiceProvider;
+import org.ramadda.service.Service;
+import org.ramadda.service.ServiceInput;
+import org.ramadda.service.ServiceOutput;
+import org.ramadda.service.ServiceProvider;
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
 
 import org.ramadda.repository.Entry;

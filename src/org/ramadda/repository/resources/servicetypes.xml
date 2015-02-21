@@ -8,21 +8,21 @@
   </type>
 
   <type name="type_service_group"  description="Service Group"  super="type_service" 
-        handler="org.ramadda.data.process.ServiceContainerTypeHandler">
+        handler="org.ramadda.service.ServiceContainerTypeHandler">
      <property name="form.resource.show" value="false"/>
      <property name="icon" value="/icons/service_group.png"/>
      <column name="serial"  type="boolean" default="true"   label="Serial"  showinhtml="true"/>
   </type>
 
   <type name="type_service_link"  description="Service Link"   super="type_service" 
-        handler="org.ramadda.data.process.ServiceLinkTypeHandler">
+        handler="org.ramadda.service.ServiceLinkTypeHandler">
      <property name="form.resource.show" value="false"/>
      <property name="icon" value="/icons/service_link.png"/>
      <column name="service_id"  type="string"     label="Service"  showinhtml="true"/>
   </type>
 
   <type name="type_service_file" description="Service Xml File"   super="type_service" 
-        handler="org.ramadda.data.process.ServiceFileTypeHandler">
+        handler="org.ramadda.service.ServiceFileTypeHandler">
      <property name="icon" value="/icons/service_file.png"/>
   </type>
 

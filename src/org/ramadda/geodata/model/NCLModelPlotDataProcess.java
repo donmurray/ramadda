@@ -32,10 +32,10 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import org.ramadda.data.process.Service;
-import org.ramadda.data.process.ServiceInput;
-import org.ramadda.data.process.ServiceOperand;
-import org.ramadda.data.process.ServiceOutput;
+import org.ramadda.service.Service;
+import org.ramadda.service.ServiceInput;
+import org.ramadda.service.ServiceOperand;
+import org.ramadda.service.ServiceOutput;
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
 import org.ramadda.repository.Constants;
 import org.ramadda.repository.Entry;

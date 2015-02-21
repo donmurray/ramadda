@@ -26,7 +26,7 @@ import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
 
-import org.ramadda.data.process.Service;
+import org.ramadda.service.Service;
 
 import org.ramadda.repository.admin.Admin;
 import org.ramadda.repository.admin.AdminHandler;
@@ -1567,7 +1567,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
                 Misc.findClass(
                     XmlUtil.getAttributeFromTree(
                         node, "handler",
-                        "org.ramadda.data.process.Service")), new Class[] {
+                        "org.ramadda.service.Service")), new Class[] {
                             Repository.class,
                             Element.class });
         Service command = (Service) ctor.newInstance(new Object[] { this,

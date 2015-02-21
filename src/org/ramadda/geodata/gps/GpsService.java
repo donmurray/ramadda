@@ -22,7 +22,7 @@ package org.ramadda.geodata.gps;
 
 
 
-import org.ramadda.data.process.*;
+import org.ramadda.service.*;
 import org.ramadda.util.Utils;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.repository.Entry;

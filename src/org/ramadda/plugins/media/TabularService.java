@@ -21,7 +21,7 @@
 package org.ramadda.plugins.media;
 
 
-import org.ramadda.data.process.*;
+import org.ramadda.service.*;
 
 
 import org.ramadda.repository.*;

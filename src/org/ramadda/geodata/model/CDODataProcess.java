@@ -21,8 +21,8 @@
 package org.ramadda.geodata.model;
 
 
-import org.ramadda.data.process.Service;
-import org.ramadda.data.process.ServiceInput;
+import org.ramadda.service.Service;
+import org.ramadda.service.ServiceInput;
 import org.ramadda.repository.Association;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;

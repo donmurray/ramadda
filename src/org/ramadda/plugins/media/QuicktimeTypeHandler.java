@@ -21,10 +21,10 @@
 package org.ramadda.plugins.media;
 
 
-import org.ramadda.data.process.*;
+import org.ramadda.service.*;
 
 
-import org.ramadda.data.process.Service;
+import org.ramadda.service.Service;
 import org.ramadda.repository.*;
 import org.ramadda.repository.metadata.*;
 import org.ramadda.repository.type.*;

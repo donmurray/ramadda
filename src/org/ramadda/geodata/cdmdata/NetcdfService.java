@@ -21,9 +21,9 @@
 package org.ramadda.geodata.cdmdata;
 
 
-import org.ramadda.data.process.*;
+import org.ramadda.service.*;
 
-import org.ramadda.data.process.Service;
+import org.ramadda.service.Service;
 
 import org.ramadda.repository.*;
 import org.ramadda.repository.job.JobManager;

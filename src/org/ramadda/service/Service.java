@@ -18,7 +18,7 @@
 * DEALINGS IN THE SOFTWARE.
 */
 
-package org.ramadda.data.process;
+package org.ramadda.service;
 
 
 import org.ramadda.repository.*;
@@ -463,7 +463,7 @@ public class Service extends RepositoryManager {
         //Look for:
         //java:<class>:<method>
         if ((command != null) && command.equals("util")) {
-            command = "java:org.ramadda.data.process.ServiceUtil:evaluate";
+            command = "java:org.ramadda.service.ServiceUtil:evaluate";
         }
 
         if ((command != null) && command.startsWith("java:")) {

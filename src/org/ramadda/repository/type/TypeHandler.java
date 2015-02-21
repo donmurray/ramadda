@@ -21,9 +21,9 @@
 package org.ramadda.repository.type;
 
 
-import org.ramadda.data.process.Service;
-import org.ramadda.data.process.ServiceInput;
-import org.ramadda.data.process.ServiceOutput;
+import org.ramadda.service.Service;
+import org.ramadda.service.ServiceInput;
+import org.ramadda.service.ServiceOutput;
 
 
 import org.ramadda.repository.*;
