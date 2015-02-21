@@ -489,10 +489,9 @@ public class Utils {
      * @throws Exception _more_
      */
     public static void main(String args[]) throws Exception {
-
         if (true) {
-            System.out.println(obfuscate("hello there"));
-            System.out.println(unobfuscate(obfuscate("hello there")));
+            System.out.println(extractPatterns(IOUtil.readContents(args[0]),
+                    args[1]));
 
             return;
         }
@@ -1390,11 +1389,36 @@ public class Utils {
     /**
      *                                                                                                                             * Decode the given base64 String
      *                                                                                                                               * @param s Holds the base64 encoded bytes
-     * @return The decoded bytes                                                                                                     
+     * @return The decoded bytes
      */
     public static byte[] decodeBase64(String s) {
         return javax.xml.bind.DatatypeConverter.parseBase64Binary(s);
     }
+
+
+
+    /**
+     * _more_
+     *
+     * @param text _more_
+     * @param pattern _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static List<String> extractPatterns(String text, String pattern)
+            throws Exception {
+        List<String> values = new ArrayList<String>();
+        Pattern      p      = Pattern.compile(pattern);
+        Matcher      m      = p.matcher(text);
+        while (m.find()) {
+            values.add(m.group(1));
+        }
+
+        return values;
+    }
+
 
 
 }
