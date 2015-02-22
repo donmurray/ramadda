@@ -24,14 +24,25 @@
 
   <type name="geo_gpx"  description="GPX GPS File"  category="GIS Data" handler="org.ramadda.plugins.map.GpxTypeHandler" pattern=".*\.gpx$">
      <property name="icon" value="/map/tracklog.gif"/>
-<wiki_inner>
+<wiki>
 <![CDATA[
-<div class="inset">
++row
++col-md-9 class="entry-page-main"
 {{map width="800" height="450" details="true"}}
 {{information}}
+-col
++col-md-3
+<div class="entry-page-info">
+{{tools includeicon="true" title="Services" message=""}}
+<br>
+{{list includeicon="true" details="false" entries="siblings,links"  message="" \
+box.maxheight="200" box.class="entry-sidebox" prefix="====Related====" xblock.s\
+how="true" xblock.title="Related" xblock.open="false"}}
 </div>
+-col
+-row
 ]]>
-</wiki_inner>
+</wikir>
    </type>
 
 
