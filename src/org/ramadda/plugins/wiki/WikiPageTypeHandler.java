@@ -397,9 +397,9 @@ public class WikiPageTypeHandler extends ExtensibleGroupTypeHandler {
         String buttons =
             getRepository().getWikiManager().makeWikiEditBar(request, entry,
                 textAreaId);
-        String textWidget = buttons + HtmlUtils.br()
-                            + HtmlUtils.textArea(ARG_WIKI_TEXTAREA, wikiText,
-                                50, 80, HtmlUtils.id(textAreaId));
+        String textWidget = buttons + HtmlUtils.br() +
+            HtmlUtils.textArea(ARG_WIKI_TEXTAREA, wikiText,
+                               50, 100, HtmlUtils.id(textAreaId));
 
         /*
         String right = HtmlUtils.div(help.toString(),

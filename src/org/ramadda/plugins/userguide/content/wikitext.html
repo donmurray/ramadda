@@ -74,6 +74,15 @@ For tables its best just to use HTML table markup.
 <subhead intoc="false" id="display">Layout and Display Markup</subhead>
 There are a number of helper layout tags that make it easy to do page layout and display.
 
+<a name="snippet"></a>
+<b>Snippet</b><br>
+A number of the layouts below (e.g,, table layout) will include a snippet of descriptive text from the entry that is being displayed. The snippet text is defined in the description of the entry with:
+<pre>
+Some description here.
+&lt;snippet&gt;This is the snippet&lt;/snippet&gt;
+More description
+</pre>
+
 <b>Inset</b>
 By default, a page has no margins on the left-side. If you have normal text layout you can make an inset with "+inset":
 <pre>
@@ -89,6 +98,9 @@ This by default gives a 20px left and right margin. To change this you can add a
 ...
 -inset
 </pre>
+
+
+
 
 
 <b>Sections</b><br>
