@@ -2296,10 +2296,9 @@ public class PointOutputHandler extends RecordOutputHandler {
 
 
         Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE, "",
-                                                new Date());
+                                                null);
 
         if ((dateRange[0] != null) || (dateRange[1] != null)) {
-            System.err.println("date:" + dateRange[0] + " " + dateRange[1]);
             filters.add(new TimeFilter(dateRange[0], dateRange[1]));
         }
 

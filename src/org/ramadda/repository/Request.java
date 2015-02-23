@@ -1959,8 +1959,7 @@ public class Request implements Constants, Cloneable {
             return new Date[] { null, null };
         }
 
-        //        System.err.println("from:" + fromDate);
-        //        System.err.println("to:" + toDate);
+        System.err.println("from:" + fromDate+": to:" + toDate+":");
         if (!Utils.stringDefined(fromDate) && !Utils.stringDefined(toDate)) {
             return new Date[] { dflt,dflt };
         }
@@ -1969,7 +1968,6 @@ public class Request implements Constants, Cloneable {
             dflt = new Date();
         }
         Date[] range = DateUtil.getDateRange(fromDate, toDate, dflt);
-
         //        System.err.println("dateRange:" + fromDate + " date:" + range[0]);
         return range;
     }
