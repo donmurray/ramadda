@@ -143,7 +143,7 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                 continue;
             }
             Service service = ((ServiceOutputHandler)outputHandler).getService();
-            if(!service.isEnabled()) continue;
+            if(service == null || !service.isEnabled()) continue;
 
             String url = "/service/" + service.getId();
             apis.add(Json.map(SU.ATTR_PATH, Json.quote(url),
