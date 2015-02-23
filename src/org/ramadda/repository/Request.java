@@ -1961,7 +1961,9 @@ public class Request implements Constants, Cloneable {
 
         //        System.err.println("from:" + fromDate);
         //        System.err.println("to:" + toDate);
-
+        if (!Utils.stringDefined(fromDate) && !Utils.stringDefined(toDate)) {
+            return new Date[] { dflt,dflt };
+        }
 
         if (dflt == null) {
             dflt = new Date();
