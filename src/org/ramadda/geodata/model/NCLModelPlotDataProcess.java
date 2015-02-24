@@ -236,6 +236,8 @@ public class NCLModelPlotDataProcess extends Service {
         } else if (SimpleUnit.isCompatible(units,  "kg m-1 s-2") ||
                    SimpleUnit.isCompatible(units,  "Pa")) {
             sb.append(HtmlUtils.hidden(ARG_NCL_UNITS, "hPa"));
+        } else if (SimpleUnit.isCompatible(units,  "kg m-2")) {
+            sb.append(HtmlUtils.hidden(ARG_NCL_UNITS, "mm"));
         }
         // TODO:  For now, don't get value from request.  May not
         // be valid if variable changes.

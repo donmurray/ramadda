@@ -1120,6 +1120,7 @@ begin
       ;---Leave some room for the leftmost and rightmost tickmark labels.
       resP@gsnPanelLeft               = 0.05
       resP@gsnPanelRight              = 0.95
+      resP@gsnPanelCenter = False
 
       ;---figure out how to lay out the panels
       numPanels = dimsizes(plots)
@@ -1139,7 +1140,7 @@ begin
               panels = (/numRows,3/)
             else
               numRows = numPanels/2+1
-              panels = (/numRows,3/)
+              panels = (/numRows,2/)
             end if
           end if
         end if

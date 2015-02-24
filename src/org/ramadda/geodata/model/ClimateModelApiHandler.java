@@ -51,6 +51,7 @@ import ucar.unidata.util.TwoFacedObject;
 import java.io.File;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
@@ -510,7 +511,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         String json = request.getString("json", (String) null);
         if (json != null) {
-            return processJsonRequest(request, json);
+            return processJsonRequest(request, type);
         }
         boolean returnjson = request.get("returnjson", false);
 
@@ -1093,10 +1094,12 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         }
 
 
-        List[] pair = getEntryManager().getEntries(request, clauses,
+        List<Entry>[] pair = getEntryManager().getEntries(request, clauses,
                           typeHandler.getGranuleTypeHandler());
-
-        return pair[1];
+        
+        List<Entry> entries = getEntryUtil().sortEntriesOnName(pair[1], false);
+        //return pair[1];
+        return entries;
     }
 
     /**
@@ -1163,7 +1166,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
      *
      * @throws Exception  problem with processing
      */
-    private Result processJsonRequest(Request request, String what)
+    private Result processJsonRequest(Request request, String type)
             throws Exception {
 
 
@@ -1238,14 +1241,22 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                         .getUniqueColumnValues(entry, columnIdx, clauses, false));
         }
         StringBuilder sb = new StringBuilder();
+        boolean showBlank = !((type.equals(ARG_ACTION_ENS_COMPARE) && 
+                               myColumn.getName().equals("ensemble")) ||
+                               (type.equals(ARG_ACTION_MULTI_COMPARE) && 
+                                myColumn.getName().equals("model")));
         if (myColumn.isEnumeration()) {
             List<TwoFacedObject> tfos = typeHandler.getValueList(entry,
                                             values, myColumn);
-            tfos.add(0, new TwoFacedObject(""));
+            if (showBlank) {
+                tfos.add(0, new TwoFacedObject(""));
+            }
             String json = Json.tfoList(tfos);
             sb.append(json);
         } else {
-            values.add(0, "");
+            if (showBlank) {
+              values.add(0, "");
+            }
             String json = Json.list(values, true);
             sb.append(json);
         }
