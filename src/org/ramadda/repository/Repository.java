@@ -593,7 +593,6 @@ public class Repository extends RepositoryBase implements RequestHandler,
      */
     public boolean isRegistered() {
         return true;
-        //
         //        return isRegistered;
     }
 
@@ -1170,18 +1169,6 @@ public class Repository extends RepositoryBase implements RequestHandler,
         String thanks = toks.get(2);
         isRegistered = thanks.equals("thanks");
         //        System.err.println(id +" - " + users +" - " + thanks + " - " + isRegistered);
-    }
-
-    /**
-     * _more_
-     *
-     * @param users _more_
-     *
-     * @return _more_
-     */
-    public String makeRegistration(int users) {
-        return Utils.obfuscate("" + ((int) (Math.random() * 10000000)) + "-"
-                               + users + "-" + "thanks");
     }
 
 

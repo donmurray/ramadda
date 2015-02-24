@@ -10,6 +10,21 @@ body {
    padding: 0px;
 }
 
+.reg-outer {
+   margin: 10px;
+}
+
+.reg-radio {
+   margin: 10px;
+}
+
+.reg-fields {
+   margin: 10px;
+   margin-left: 40px;
+}
+
+
+
 //Resets for bootstrap
 
 h1 {
@@ -2437,15 +2452,16 @@ a.toggleblocklabellink:visited {
 
 .ramadda-register {
    border-radius: 4px;
-   display: inline-block;
+   //display: inline-block;
    background-color: #ffffcc;
-   margin: 5px;
-   margin-left: 30px;
-   padding: 2px;
-   padding-left: 8px;
-   padding-right: 8px;
+   margin: 8px;
+   margin-left: 100px;
+   margin-right: 100px;
+   padding: 3px;
    border : 1px #999 solid;
+   text-align: center;
 }
+
 
 
 .admin-block {

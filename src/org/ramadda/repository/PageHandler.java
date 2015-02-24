@@ -117,9 +117,7 @@ public class PageHandler extends RepositoryManager {
 
     /** _more_ */
     public static final String REGISTER_MESSAGE =
-        "<div class=\"ramadda-register\">Thank you for trying RAMADDA. This is shareware. To register this server please "
-        + button
-        + " or visit <a target=register href=\"http://geodesystems.com/repository/alias/register\">Geode Systems</a></div>";
+        "<div class=\"ramadda-register\">Thank you for trying <a href=\"http://geodesystems.com\">Geode System's</a> RAMADDA repository. This is an unregistered version of the software. <a class=\"btn btn-primary\" role=\"button\" target=register href=\"http://geodesystems.com/repository/registration/register\">Please register</a></div>";
 
 
     /** _more_ */

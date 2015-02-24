@@ -76,7 +76,6 @@ import java.util.jar.*;
 
 import java.util.regex.*;
 import java.util.zip.*;
-import java.util.zip.*;
 
 
 
@@ -131,6 +130,8 @@ public class PluginManager extends RepositoryManager {
 
     /** _more_ */
     private MyClassLoader classLoader;
+
+    File   tmpPluginsDir;
 
     /** _more_ */
     private Properties properties;
@@ -304,7 +305,7 @@ public class PluginManager extends RepositoryManager {
         //The false says not to scour
         TempDir tempDir = getStorageManager().makeTempDir("tmpplugins",
                               false);
-        File   tmpPluginsDir = tempDir.getDir();
+        tmpPluginsDir = tempDir.getDir();
         File   dir           = getStorageManager().getPluginsDir();
         File[] files         = dir.listFiles();
         Arrays.sort(files);
@@ -333,8 +334,7 @@ public class PluginManager extends RepositoryManager {
                 continue;
             }
             try {
-                processPluginFile(pluginFile, pluginSB, classLoader,
-                                  tmpPluginsDir);
+                processPluginFile(pluginFile, pluginSB, classLoader, true);
             } catch (Exception exc) {
                 System.err.println("RAMADDA: Error loading plugin:"
                                    + pluginFile);
@@ -392,13 +392,12 @@ public class PluginManager extends RepositoryManager {
      * @param pluginFile _more_
      * @param pluginSB _more_
      * @param classLoader _more_
-     * @param tmpPluginsDir _more_
      *
      * @throws Exception On badness
      */
     private void processPluginFile(String pluginFile, StringBuffer pluginSB,
                                    MultiJarClassLoader classLoader,
-                                   File tmpPluginsDir)
+                                   boolean top)
             throws Exception {
 
         File tmpPluginFile = new File(pluginFile);
@@ -424,8 +423,7 @@ public class PluginManager extends RepositoryManager {
                     getStorageManager().getFileOutputStream(tmpFile);
                 IOUtil.writeTo(zin, fos);
                 IOUtil.close(fos);
-                processPluginFile(tmpFile.toString(), pluginSB, classLoader,
-                                  tmpPluginsDir);
+                processPluginFile(tmpFile.toString(), pluginSB, classLoader, false);
             }
             zin.close();
         } else if (pluginFile.toLowerCase().endsWith(".jar")) {
@@ -600,6 +598,7 @@ public class PluginManager extends RepositoryManager {
     protected boolean checkFile(String file, boolean fromPlugin) {
         allFiles.add(file);
 
+
         if (file.indexOf("api.xml") >= 0) {
             if (fromPlugin) {
                 pluginStat("Api", file);
@@ -647,11 +646,18 @@ public class PluginManager extends RepositoryManager {
                 pluginStat("Properties", file);
                 propertyFiles.add(file);
             }
+        } else if (file.endsWith(".jar") && file.indexOf("htdocs")<0) {
+            try {
+            System.err.println("jar file: " + file);
+            File tmpFile = new File(IOUtil.joinDir(tmpPluginsDir, IOUtil.getFileTail(file)));
+            System.err.println ("Extracting jar and writing to: " + tmpFile);
+            IOUtil.writeTo(getStorageManager().getInputStream(file), new FileOutputStream(tmpFile));
+            processPluginFile(tmpFile.toString(), pluginSB, classLoader, false);
+            } catch(Exception exc) {
+                throw new RuntimeException(exc);
+            }
         } else {
-            //            if (fromPlugin) 
-            //                pluginStat("Unknown", file);
             pluginFiles.add(file);
-
             return false;
         }
 
@@ -828,6 +834,9 @@ public class PluginManager extends RepositoryManager {
                                         JarEntry jarEntry) {
             String path = super.defineResource(jarFilePath, jarEntry);
             checkFile(path, true);
+
+
+
             String entryName = jarEntry.getName();
             int    idx       = entryName.indexOf("htdocs/");
 
