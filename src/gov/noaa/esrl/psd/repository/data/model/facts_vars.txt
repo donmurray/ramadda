@@ -32,6 +32,9 @@ dtas:Near-Surface Dew Point Temperature
 velpot:Velocity Potential
 stream:Streamfunction
 trop:WMO-defined Tropopause Pressure
+mrso:Total Soil Moisture Content
+rsns:Surface Net Shortwave Radiation
+rtns:Surface Net Thermal Radiation
 #
 # Old mostly ECHAM5 names
 #

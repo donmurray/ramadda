@@ -3,6 +3,8 @@ echam5:ECHAM5
 cam4:CAM4
 ccm4:CCM4
 geos-5:GEOS
+AM3:GFDL AM3
+am3:GFDL AM3
 
 # Reanalyses
 20thC_ReanV2:20th Century Reanalysis V2
