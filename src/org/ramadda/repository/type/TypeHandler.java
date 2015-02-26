@@ -1474,9 +1474,9 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void addToEntryNode(Entry entry, Element node) throws Exception {
+    public void addToEntryNode(Request request, Entry entry, Element node) throws Exception {
         if (parent != null) {
-            parent.addToEntryNode(entry, node);
+            parent.addToEntryNode(request, entry, node);
         }
     }
 

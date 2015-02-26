@@ -146,8 +146,11 @@ public class AccessManager extends RepositoryManager {
                 Permission.ACTION_VIEWCHILDREN, UserManager.ROLE_ANY));
         mainEntry.addPermission(new Permission(Permission.ACTION_FILE,
                 UserManager.ROLE_ANY));
+        mainEntry.addPermission(new Permission(Permission.ACTION_EXPORT,
+                UserManager.ROLE_NONE));
         mainEntry.addPermission(new Permission(Permission.ACTION_EDIT,
                 UserManager.ROLE_NONE));
+
         mainEntry.addPermission(new Permission(Permission.ACTION_NEW,
                 UserManager.ROLE_NONE));
         mainEntry.addPermission(new Permission(Permission.ACTION_DELETE,
@@ -702,6 +705,11 @@ public class AccessManager extends RepositoryManager {
             throws Exception {
         //        if(entry.getIsLocalFile()) return false;
         return canDoAction(request, entry, Permission.ACTION_EDIT);
+    }
+
+    public boolean canExportEntry(Request request, Entry entry)
+            throws Exception {
+        return canDoAction(request, entry, Permission.ACTION_EXPORT);
     }
 
 

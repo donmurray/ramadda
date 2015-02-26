@@ -4882,6 +4882,12 @@ public class EntryManager extends RepositoryManager {
             throw new IllegalArgumentException("Unable to find entry:"
                     + request);
         }
+
+        if(!getAccessManager().canExportEntry(request, entry)) {
+            throw new IllegalArgumentException(
+                                               "Cannot export entry");
+        }
+
         List<Entry> entries = new ArrayList<Entry>();
         entries.add(entry);
 

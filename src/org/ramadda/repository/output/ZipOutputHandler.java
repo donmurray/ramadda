@@ -150,8 +150,10 @@ public class ZipOutputHandler extends OutputHandler {
     public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
 
+
+
         if (state.entry != null) {
-            if (getAccessManager().canDownload(request, state.entry)) {
+            if (getAccessManager().canDownload(request, state.entry) && getAccessManager().canExportEntry(request, state.entry)) {
                 /* don't add the .zip to the URL. This now gets set below in setReturnFilename
                 links.add(
                     makeLink(
@@ -454,6 +456,15 @@ public class ZipOutputHandler extends OutputHandler {
                             8000);
         }
         for (Entry entry : entries) {
+            //Check for access
+            if ( !getAccessManager().canDownload(request, entry)) {
+                continue;
+            }
+
+            if(!getAccessManager().canExportEntry(request, entry)) {
+                continue;
+            }
+
             //Not sure why I wasn't dealing with synthetic entries here
             //if (getEntryManager().isSynthEntry(entry.getId())) {
             //                continue;
@@ -501,10 +512,6 @@ public class ZipOutputHandler extends OutputHandler {
             }
 
 
-            //            getLogManager().logInfo("Zip generated size =" + sizeProcessed);
-            if ( !getAccessManager().canDownload(request, entry)) {
-                continue;
-            }
 
 
             String path = entry.getResource().getPath();

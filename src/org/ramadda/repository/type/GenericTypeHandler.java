@@ -1345,8 +1345,9 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @throws Exception on badness
      */
-    public void addToEntryNode(Entry entry, Element node) throws Exception {
-        super.addToEntryNode(entry, node);
+    @Override
+    public void addToEntryNode(Request request, Entry entry, Element node) throws Exception {
+        super.addToEntryNode(request, entry, node);
 
 
         if ( !haveDatabaseTable()) {

@@ -75,6 +75,13 @@ public class BlobTypeHandler extends GenericTypeHandler {
 
 
 
+    public void putEntryProperty(Entry entry, String key, Object value) throws Exception {
+        Hashtable props = getProperties(entry);
+        props.put(key, value);
+        setProperties(entry, props);
+    }
+
+
     /**
      * _more_
      *
