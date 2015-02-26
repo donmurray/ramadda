@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2014 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -27,6 +27,7 @@ import org.ramadda.repository.metadata.*;
 import org.ramadda.repository.output.*;
 import org.ramadda.repository.type.*;
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Utils;
 
 
 import org.w3c.dom.*;
@@ -129,34 +130,47 @@ public class BiblioTypeHandler extends GenericTypeHandler {
     /* (non-Javadoc)
      * @see org.ramadda.repository.type.TypeHandler#getHtmlDisplay(org.ramadda.repository.Request, org.ramadda.repository.Entry)
      */
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     @Override
-    public Result getHtmlDisplay(Request request, Entry entry) throws Exception {
+    public Result getHtmlDisplay(Request request, Entry entry)
+            throws Exception {
         StringBuilder sb = new StringBuilder();
         GregorianCalendar cal =
-                new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
+            new GregorianCalendar(RepositoryUtil.TIMEZONE_DEFAULT);
         cal.setTime(new Date(entry.getStartDate()));
         Object[] values = entry.getTypeHandler().getEntryValues(entry);
         int      idx    = 0;
-        String  author = values[idx++].toString();
-        String  type   = values[idx++].toString();
+        String   author = values[idx++].toString();
+        String   type   = values[idx++].toString();
         if (type.toString().equals("Journal Article")) {
-            String title = entry.getName();
+            String title       = entry.getName();
             Object institution = values[idx++];
-            String others = values[idx++].toString();
-            String authors = formatAuthors(author, others);
-            String pub = values[idx++].toString();
-            String volume = values[idx++].toString();
-            String issue = values[idx++].toString();
-            String pages = values[idx++].toString();
-            String doi = values[idx++].toString();
-            sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV, "style=\"max-width:700px;\""));
+            String others      = Utils.toString(values[idx++]);
+            String authors     = formatAuthors(author, others);
+            String pub         = Utils.toString(values[idx++]);
+            String volume      = Utils.toString(values[idx++]);
+            String issue       = Utils.toString(values[idx++]);
+            String pages       = Utils.toString(values[idx++]);
+            String doi         = Utils.toString(values[idx++]);
+            sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
+                                     "style=\"max-width:700px;\""));
             sb.append(authors);
             sb.append(", ");
             sb.append(cal.get(GregorianCalendar.YEAR));
             sb.append(": ");
             sb.append(title);
-            if (!title.endsWith(".")) {
-              sb.append(".");
+            if ( !title.endsWith(".")) {
+                sb.append(".");
             }
             sb.append(" ");
             sb.append(HtmlUtils.italics(pub));
@@ -172,21 +186,30 @@ public class BiblioTypeHandler extends GenericTypeHandler {
             }
             if (doi != null) {
                 sb.append(" doi: ");
-                if (!doi.startsWith("http")) {
-                    doi = "http://dx.doi.org/"+doi;
+                if ( !doi.startsWith("http")) {
+                    doi = "http://dx.doi.org/" + doi;
                 }
                 sb.append(HtmlUtils.href(doi, doi));
             }
             sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
+
             return new Result("", sb);
-            
+
         } else {
             return super.getHtmlDisplay(request, entry);
         }
     }
-    
+
+    /**
+     * _more_
+     *
+     * @param primary _more_
+     * @param others _more_
+     *
+     * @return _more_
+     */
     private String formatAuthors(String primary, String others) {
-        return primary+", "+others;
+        return primary + ", " + others;
     }
 
 }

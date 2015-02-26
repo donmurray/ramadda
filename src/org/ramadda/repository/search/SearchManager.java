@@ -1335,7 +1335,6 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
         if (searchProviders == null) {
             System.err.println(
                 "SearchManager.doSearch- making searchProviders");
-            System.err.println("   plugin:" + pluginSearchProviders);
             List<SearchProvider> tmp = new ArrayList<SearchProvider>();
             tmp.add(
                 new SearchProvider.RamaddaSearchProvider(getRepository()));

@@ -172,6 +172,14 @@ public class Utils {
 
 
 
+
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     public static boolean stringUndefined(String s) {
         return !stringDefined(s);
     }
@@ -496,8 +504,11 @@ public class Utils {
      * @throws Exception _more_
      */
     public static void main(String args[]) throws Exception {
-        if(true) {
-            System.err.println(Utils.obfuscate("jeff.mcwhirter@gmail.com") + "-"   + Utils.obfuscate("5") + "-" + Utils.obfuscate("thanks"));
+        if (true) {
+            System.err.println(Utils.obfuscate("jeff.mcwhirter@gmail.com")
+                               + "-" + Utils.obfuscate("5") + "-"
+                               + Utils.obfuscate("thanks"));
+
             return;
         }
 
@@ -1371,7 +1382,10 @@ public class Utils {
      * @return _more_
      */
     public static String obfuscate(String s) {
-        while(s.length()<8) s +=" ";
+        while (s.length() < 8) {
+            s += " ";
+        }
+
         return encodeBase64(rot13(s).getBytes());
     }
 
@@ -1434,5 +1448,19 @@ public class Utils {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param o _more_
+     *
+     * @return _more_
+     */
+    public static String toString(Object o) {
+        if (o == null) {
+            return "";
+        }
+
+        return o.toString();
+    }
 
 }
