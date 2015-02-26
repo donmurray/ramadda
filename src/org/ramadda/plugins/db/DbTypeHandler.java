@@ -499,12 +499,15 @@ public class DbTypeHandler extends BlobTypeHandler {
      *
      * @throws Exception _more_
      */
-    public void addToEntryNode(Entry entry, Element node) throws Exception {
-        super.addToEntryNode(entry, node);
-        List<Object[]> valueList = readValues(Clause.eq(COL_ID,
-                                       entry.getId()), "", -1);
-        Element dbvalues = XmlUtil.create(TAG_DBVALUES, node);
-        XmlUtil.createCDataNode(dbvalues, xmlEncoder.toXml(valueList, false));
+    @Override
+    public void addToEntryNode(Request request, Entry entry, Element node) throws Exception {
+        super.addToEntryNode(request, entry, node);
+        if(getAccessManager().canDoAction(request,  entry, Permission.ACTION_FILE)) {
+            List<Object[]> valueList = readValues(Clause.eq(COL_ID,
+                                                            entry.getId()), "", -1);
+            Element dbvalues = XmlUtil.create(TAG_DBVALUES, node);
+            XmlUtil.createCDataNode(dbvalues, xmlEncoder.toXml(valueList, false));
+        }
     }
 
 
@@ -859,8 +862,7 @@ public class DbTypeHandler extends BlobTypeHandler {
                 setProperties(entry, props);
                 getEntryManager().updateEntry(request, entry);
             } else {
-                Object[] values = tableHandler.getValues(makeClause(entry,
-                                      request.getString(ARG_DBID, "")));
+                Object[] values = getValues(entry, request.getString(ARG_DBID, ""));
                 putProp("posx", values, new Integer(posx));
                 putProp("posy", values, new Integer(posy));
                 doStore(entry, values, false);
@@ -2134,10 +2136,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         StringBuilder sb       = new StringBuilder();
         List<String>  colNames = tableHandler.getColumnNames();
-        Object[]      values   = ((dbid != null)
-                                  ? tableHandler.getValues(makeClause(entry,
-                                      dbid))
-                                  : tableHandler.makeEntryValueArray());
+        Object[]      values   = getValues(entry, dbid);
         initializeValueArray(request, dbid, values);
         for (Column column : columns) {
             if ( !isNew && !column.getEditable()) {
@@ -2177,13 +2176,17 @@ public class DbTypeHandler extends BlobTypeHandler {
      */
     protected void initializeValueArray(Request request, String dbid,
                                         Object[] values) {
+        initializeValueArray(request, dbid, request.getUser().getId(), values);
+    }
+
+     protected void initializeValueArray(Request request, String dbid, String user, Object[] values) {
         //The first entry is the db_id
         values[IDX_DBID] = ((dbid == null)
                             ? getRepository().getGUID()
                             : dbid);
 
         if (dbid == null) {
-            values[IDX_DBUSER]       = request.getUser().getId();
+            values[IDX_DBUSER]       = user;
             values[IDX_DBCREATEDATE] = new Date();
             values[IDX_DBPROPS]      = "";
         }
@@ -4393,7 +4396,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         Object[]      values     = null;
         if (dbid != null) {
-            values = tableHandler.getValues(makeClause(entry, dbid));
+            values = getValues(entry, dbid);
             formBuffer.append(HtmlUtils.hidden(ARG_DBID, dbid));
             formBuffer.append(HtmlUtils.hidden(ARG_DBID_SELECTED, dbid));
         }
@@ -4453,6 +4456,15 @@ public class DbTypeHandler extends BlobTypeHandler {
         }
 
         return new Result(getTitle(), sb);
+    }
+
+
+    public Object[] getValues(Entry entry, String dbid) throws Exception {
+        Object[]      values   = ((dbid != null)
+                                  ? tableHandler.getValues(makeClause(entry,
+                                                                      dbid))
+                                  : tableHandler.makeEntryValueArray());
+        return values;
     }
 
     /**
@@ -4540,7 +4552,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
 
 
-        Object[] values = tableHandler.getValues(makeClause(entry, dbid));
+        Object[] values = getValues(entry, dbid);
 
         getHtml(request, sb, entry, values);
         if (asXml) {

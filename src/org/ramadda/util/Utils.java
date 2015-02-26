@@ -172,6 +172,13 @@ public class Utils {
 
 
 
+    public static boolean stringUndefined(String s) {
+        return !stringDefined(s);
+    }
+
+
+
+
 
 
     /**
@@ -489,6 +496,12 @@ public class Utils {
      * @throws Exception _more_
      */
     public static void main(String args[]) throws Exception {
+        if(true) {
+            System.err.println(Utils.obfuscate("jeff.mcwhirter@gmail.com") + "-"   + Utils.obfuscate("5") + "-" + Utils.obfuscate("thanks"));
+            return;
+        }
+
+
         if (true) {
             System.out.println(extractPatterns(IOUtil.readContents(args[0]),
                     args[1]));
@@ -1358,6 +1371,7 @@ public class Utils {
      * @return _more_
      */
     public static String obfuscate(String s) {
+        while(s.length()<8) s +=" ";
         return encodeBase64(rot13(s).getBytes());
     }
 
