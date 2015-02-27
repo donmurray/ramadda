@@ -1463,4 +1463,26 @@ public class Utils {
         return o.toString();
     }
 
+
+
+    /**
+     * _more_
+     *
+     * @param props _more_
+     * @param key _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
+    public static double getProperty(Hashtable props, String key,
+                                     double dflt) {
+        String s = Misc.getProperty(props, key, (String) null);
+        if (stringUndefined(s)) {
+            return dflt;
+        }
+
+        return Double.parseDouble(s);
+    }
+
+
 }
