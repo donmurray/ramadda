@@ -1011,7 +1011,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         boolean embedded = request.get(ARG_EMBEDDED, false);
         if (Utils.stringDefined(entry.getDescription())) {
-            sb.append(entry.getDescription());
+            sb.append(getWikiManager().wikifyEntry(request, entry,entry.getDescription()));
             sb.append(HtmlUtils.br());
         }
 
