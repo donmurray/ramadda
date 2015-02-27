@@ -247,6 +247,8 @@ public class Column implements DataTypes, Constants {
     /** _more_ */
     private String description;
 
+    private String htmlTemplate;
+
 
     /** _more_ */
     private String type;
@@ -401,6 +403,8 @@ public class Column implements DataTypes, Constants {
         }
 
         description    = getAttributeOrTag(element, ATTR_DESCRIPTION, label);
+
+        htmlTemplate = Utils.getAttributeOrTag(element, "htmlTemplate",(String) null);
 
         type = Utils.getAttributeOrTag(element, ATTR_TYPE, DATATYPE_STRING);
         changeType     = getAttributeOrTag(element, ATTR_CHANGETYPE, false);
@@ -842,10 +846,11 @@ public class Column implements DataTypes, Constants {
      *
      * @throws Exception _more_
      */
-    public void formatValue(Entry entry, Appendable sb, String output,
+    public void formatValue(Entry entry, Appendable result, String output,
                             Object[] values, SimpleDateFormat sdf)
             throws Exception {
 
+        Appendable sb  = new StringBuilder();
         boolean csv       = Misc.equals(output, OUTPUT_CSV);
         String  delimiter = csv
                             ? "|"
@@ -986,6 +991,13 @@ public class Column implements DataTypes, Constants {
             }
             sb.append(s);
         }
+
+        if(htmlTemplate!=null) {
+            result.append(htmlTemplate.replace("${value}", sb.toString()));
+        } else {
+            result.append(sb.toString());
+        }
+
     }
 
 
