@@ -8,24 +8,24 @@ function dbRowOut(rowId) {
 }
 
 function dbRowClick(event, divId, url) {
-    row = Utils.getDomObject(divId);
+    row = GuiUtils.getDomObject(divId);
     if(!row) return;
-    left = Utils.getLeft(row.obj);
-    eventX = Utils.getEventX(event);
+    left = GuiUtils.getLeft(row.obj);
+    eventX = GuiUtils.getEventX(event);
     //Don't pick up clicks on the left side
     if(eventX-left<50) return;
-    Utils.loadXML( url, dbHandleXml,divId);
+    GuiUtils.loadXML( url, dbHandleXml,divId);
 }
 
 
 function dbHandleXml(request,divId) {
-    row = Utils.getDomObject(divId);
+    row = GuiUtils.getDomObject(divId);
     if(!row) return;
-    div = Utils.getDomObject("tooltipdiv");
+    div = GuiUtils.getDomObject("tooltipdiv");
     if(!div) return;
     var xmlDoc=request.responseXML.documentElement;
     text = getChildText(xmlDoc);
-    Utils.setPosition(div, Utils.getLeft(row.obj), Utils.getBottom(row.obj));
+    GuiUtils.setPosition(div, GuiUtils.getLeft(row.obj), GuiUtils.getBottom(row.obj));
 
     div.obj.innerHTML = "<div class=tooltip-inner><div id=\"tooltipwrapper\" ><table><tr valign=top><img width=\"16\" onmousedown=\"hideEntryPopup();\" id=\"tooltipclose\"  src=" + icon_close +"></td><td>" + text+"</table></div></div>";
     showObject(div);
@@ -33,10 +33,10 @@ function dbHandleXml(request,divId) {
 
 
 function stickyDragEnd(id, url) {
-    div  = Utils.getDomObject(id);
+    div  = GuiUtils.getDomObject(id);
     if(!div) return;
     url = url +"&posx=" + div.style.left +"&posy=" + div.style.top;
-    Utils.loadXML( url, stickyNOOP,id);
+    GuiUtils.loadXML( url, stickyNOOP,id);
 }
 
 
