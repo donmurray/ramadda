@@ -670,6 +670,7 @@ public class EntryManager extends RepositoryManager {
 
         Result result = processEntryShow(request, entry);
 
+
         return addEntryHeader(request, entry, result);
     }
 
@@ -765,6 +766,10 @@ public class EntryManager extends RepositoryManager {
         if (entry == null) {
             return result;
         }
+        if (Utils.stringUndefined(result.getTitle())) {
+            result.setTitle(entry.getName());
+        }
+
         if (entry == null) {
             entry = getTopGroup();
         }
@@ -1604,9 +1609,9 @@ public class EntryManager extends RepositoryManager {
         if (request.defined(ARG_ENTRYID)) {
             entry = getEntry(request);
         }
-        StringBuilder sb    = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append(HtmlUtils.sectionOpen());
-        Entry         group = addEntryForm(request, entry, sb);
+        Entry group = addEntryForm(request, entry, sb);
         sb.append(HtmlUtils.sectionClose());
         if (entry == null) {
             return addEntryHeader(request, group,
@@ -1657,6 +1662,7 @@ public class EntryManager extends RepositoryManager {
 
         if ((entry != null) && entry.getIsLocalFile()) {
             sb.append(msg("This is a local file and cannot be edited"));
+
             return group;
         }
 
@@ -3686,7 +3692,7 @@ public class EntryManager extends RepositoryManager {
 
         Entry         group = findGroup(request);
         StringBuilder sb    = new StringBuilder();
-        sb.append(HtmlUtils.section(msg("Choose entry type"),null));
+        sb.append(HtmlUtils.section(msg("Choose entry type"), null));
         Hashtable<String, CategoryBuffer> superCatMap = new Hashtable<String,
                                                             CategoryBuffer>();
         List<String>   superCats = new ArrayList<String>();
@@ -4883,9 +4889,8 @@ public class EntryManager extends RepositoryManager {
                     + request);
         }
 
-        if(!getAccessManager().canExportEntry(request, entry)) {
-            throw new IllegalArgumentException(
-                                               "Cannot export entry");
+        if ( !getAccessManager().canExportEntry(request, entry)) {
+            throw new IllegalArgumentException("Cannot export entry");
         }
 
         List<Entry> entries = new ArrayList<Entry>();
