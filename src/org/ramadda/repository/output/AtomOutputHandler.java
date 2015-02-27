@@ -301,7 +301,7 @@ public class AtomOutputHandler extends OutputHandler {
             }
 
             for (Metadata metadata : inheritedMetadata) {
-                logInfo("addMetadata with inherited metadata:" + metadata);
+                //                logInfo("addMetadata with inherited metadata:" + metadata);
                 addMetadata(request, entry, doc, root, metadata,
                             metadataHandlers);
             }
@@ -355,17 +355,16 @@ public class AtomOutputHandler extends OutputHandler {
             getMetadataManager().findHandler(metadata.getType());
         if (metadataHandler == null) {
             logError("Could not find metadata handler for:" + metadata, null);
-
             return;
         }
 
 
         if ( !metadataHandler.addMetadataToXml(request, "atom", entry,
                 metadata, doc, root)) {
-            logInfo("addMetadata:" + metadata + " no mapping to atom");
+            //            logInfo("addMetadata:" + metadata + " no mapping to atom");
             if ( !metadataHandler.addMetadataToXml(request, "dif", entry,
                     metadata, doc, root)) {
-                System.err.println("could not add metadata to ATOM");
+                //                System.err.println("could not add metadata to ATOM");
             }
 
         }
