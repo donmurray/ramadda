@@ -150,7 +150,7 @@ public class YouTubeVideoTypeHandler extends GenericTypeHandler {
         sb.append(XmlUtil.attr("width", width));
         sb.append(XmlUtil.attr("height", height));
         String playerId = "video_" + (idCnt++);
-        String embedUrl = "http://www.youtube.com/embed/" + id;
+        String embedUrl = "//www.youtube.com/embed/" + id;
         embedUrl += "?enablejsapi=1";
         embedUrl += "&autoplay=0";
         embedUrl += "&playerapiid=" + playerId;
