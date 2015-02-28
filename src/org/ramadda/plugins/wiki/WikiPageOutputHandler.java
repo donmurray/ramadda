@@ -242,7 +242,7 @@ public class WikiPageOutputHandler extends HtmlOutputHandler {
                                              HtmlUtils.id(ARG_WIKI_TEXT)));
                 sb.append(HtmlUtils.formClose());
 
-                return makeLinksResult(request, msg("Wiki"), sb,
+                return makeLinksResult(request, entry.getName(), sb,
                                        new State(entry));
             }
         }
@@ -261,7 +261,7 @@ public class WikiPageOutputHandler extends HtmlOutputHandler {
                 getAssociationManager().getAssociations(request, entry);
         }
 
-        return makeLinksResult(request, msg("Wiki"), sb, new State(entry));
+        return makeLinksResult(request, entry.getName(), sb, new State(entry));
     }
 
 

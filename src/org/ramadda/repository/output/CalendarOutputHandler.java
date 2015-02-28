@@ -251,7 +251,7 @@ public class CalendarOutputHandler extends OutputHandler {
             allEntries.addAll(subGroups);
             //            makeTimeline(request, allEntries, sb, "height: 300px;");
             makeTimeline(request, group, allEntries, sb, "height: 300px;");
-            result = makeLinksResult(request, msg("Timeline"), sb,
+            result = makeLinksResult(request, msg("Timeline") + " - " + group.getName(), sb,
                                      new State(group, subGroups, entries));
 
             return result;
