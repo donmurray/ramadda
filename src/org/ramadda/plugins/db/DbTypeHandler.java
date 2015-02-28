@@ -753,9 +753,8 @@ public class DbTypeHandler extends BlobTypeHandler {
      *
      * @return _more_
      */
-    public String getTitle() {
-        return getDescription();
-
+    public String getTitle(Request request, Entry entry) {
+        return entry.getName();
     }
 
 
@@ -826,7 +825,7 @@ public class DbTypeHandler extends BlobTypeHandler {
                 getPageHandler().showDialogWarning(
                     msg("You do not have permission to view database")));
 
-            return new Result(getTitle(), sb);
+            return new Result(getTitle(request, entry), sb);
         }
 
 
@@ -1806,7 +1805,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         StringBuilder sb = new StringBuilder();
         addViewHeader(request, entry, sb, VIEW_SEARCH, 0, false);
         sb.append(insetHtml(getSearchForm(request, entry)));
-        return new Result(getTitle(), sb);
+        return new Result(getTitle(request, entry), sb);
     }
 
 
@@ -1932,7 +1931,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         sb.append(HtmlUtils.formClose());
 
-        return new Result(getTitle(), sb);
+        return new Result(getTitle(request, entry), sb);
     }
 
 
@@ -2334,7 +2333,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         sb.append(HtmlUtils.formTableClose());
         sb.append(HtmlUtils.formClose());
 
-        return new Result(getTitle(), sb);
+        return new Result(getTitle(request, entry), sb);
     }
 
 
@@ -2541,7 +2540,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         makeTable(request, entry, valueList, fromSearch, sb, true,
                   showHeaderLinks && !request.get(ARG_EMBEDDED, false));
 
-        return new Result(getTitle(), sb);
+        return new Result(getTitle(request, entry), sb);
     }
 
 
@@ -2832,7 +2831,7 @@ public class DbTypeHandler extends BlobTypeHandler {
                 hb.append(HtmlUtils.br());
                 hb.append(
                     getPageHandler().showDialogNote(
-                        msgLabel("No entries in") + getTitle()));
+                        msgLabel("No entries in") + getTitle(request, entry)));
             } else {
                 hb.append(
                     getPageHandler().showDialogNote(msg("Nothing found")));
@@ -3175,7 +3174,7 @@ public class DbTypeHandler extends BlobTypeHandler {
                                     "" + width)));
         sb.append("</tr></table>");
 
-        return new Result(getTitle(), sb);
+        return new Result(getTitle(request, entry), sb);
 
     }
 
@@ -3445,7 +3444,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         }
 
-        return new Result(getTitle(), sb);
+        return new Result(getTitle(request, entry), sb);
 
     }
 
@@ -3552,7 +3551,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         }
         sb.append("</table>");
 
-        return new Result(getTitle(), sb);
+        return new Result(getTitle(request, entry), sb);
     }
 
 
@@ -3728,7 +3727,7 @@ public class DbTypeHandler extends BlobTypeHandler {
             sb.append(block);
         }
 
-        return new Result(getTitle(), sb);
+        return new Result(getTitle(request, entry), sb);
     }
 
 
@@ -3864,7 +3863,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         sb.append(
             "<div id=\"chart_div\" style=\"width: 800px; height: 500px;\"></div>\n");
 
-        return new Result(getTitle(), sb);
+        return new Result(getTitle(request, entry), sb);
     }
 
 
@@ -4008,7 +4007,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         calendarOutputHandler.outputCalendar(request, calEntries, sb, false);
 
-        return new Result(getTitle(), sb);
+        return new Result(getTitle(request, entry), sb);
     }
 
 
@@ -4152,7 +4151,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         sb.append(HtmlUtils.script(js.toString()));
 
-        return new Result(getTitle(), sb);
+        return new Result(getTitle(request, entry), sb);
     }
 
 
@@ -4455,7 +4454,7 @@ public class DbTypeHandler extends BlobTypeHandler {
             }
         }
 
-        return new Result(getTitle(), sb);
+        return new Result(getTitle(request, entry), sb);
     }
 
 
@@ -4563,7 +4562,7 @@ public class DbTypeHandler extends BlobTypeHandler {
             return new Result("", xml, "text/xml");
         }
 
-        return new Result(getTitle(), sb);
+        return new Result(getTitle(request, entry), sb);
     }
 
     /**
