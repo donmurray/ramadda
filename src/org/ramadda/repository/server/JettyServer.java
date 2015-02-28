@@ -23,13 +23,27 @@ package org.ramadda.repository.server;
 
 import org.eclipse.jetty.server.Server;
 // Jetty 8 
-import org.eclipse.jetty.server.ssl.SslSocketConnector;
+//import org.eclipse.jetty.server.ssl.SslSocketConnector;
 // Jetty 9
-//import org.eclipse.jetty.server.ServerConnector;
-//import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
+
+
+
+
+import org.eclipse.jetty.http.HttpVersion;
+import org.eclipse.jetty.server.Connector;
+import org.eclipse.jetty.server.HttpConfiguration;
+import org.eclipse.jetty.server.HttpConnectionFactory;
+import org.eclipse.jetty.server.SecureRequestCustomizer;
+import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
+
 
 import org.ramadda.repository.Constants;
 import org.ramadda.repository.Repository;
@@ -245,7 +259,8 @@ public class JettyServer implements Constants {
 
         repository.getLogManager().logInfo(
             "SSL: creating ssl connection on port:" + sslPort);
-        /*
+
+        /*****
         // Jetty <7
         SslSocketConnector sslSocketConnector = new SslSocketConnector();
         sslSocketConnector.setKeystore(keystore.toString());
@@ -257,25 +272,50 @@ public class JettyServer implements Constants {
         sslSocketConnector.setPort(sslPort);
         server.addConnector(sslSocketConnector);
         */
+
         // Jetty 7,8,&9
+        /*
         SslContextFactory sslContext = new SslContextFactory();
         sslContext.setKeyStorePath(keystore.toString());
-        // The password for the key store
         sslContext.setKeyStorePassword(password);
-        // The password (if any) for the specific key within the key store
         sslContext.setKeyManagerPassword(keyPassword);
         sslContext.setTrustStorePassword(password);
-        // Jetty 7&8
+        */
+        
+         
+        /**** Jetty 7&8
         SslSocketConnector sslSocketConnector =
             new SslSocketConnector(sslContext);
         sslSocketConnector.setPort(sslPort);
         server.addConnector(sslSocketConnector);
-        /* Jetty 9 - not sure this is correct
+        */
+        /*
+          Jetty 9
         SslConnectionFactory sslFactory = new SslConnectionFactory(sslContext, "http/1.1");
         ServerConnector sslConnector = new ServerConnector(server, sslFactory);
         sslConnector.setPort(sslPort);
         server.addConnector(sslConnector);
         */
+
+
+        HttpConfiguration http_config = new HttpConfiguration();
+        http_config.setSecureScheme("https");
+        http_config.setSecurePort(sslPort);
+        http_config.setOutputBufferSize(32768);
+
+        SslContextFactory sslContextFactory = new SslContextFactory();
+        sslContextFactory.setKeyStorePath(keystore.toString());
+        sslContextFactory.setKeyStorePassword(password);
+        sslContextFactory.setKeyManagerPassword(keyPassword);
+
+        HttpConfiguration https_config = new HttpConfiguration(http_config);
+        https_config.addCustomizer(new SecureRequestCustomizer());
+        ServerConnector https = new ServerConnector(server,
+                                                    new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
+                                                    new HttpConnectionFactory(https_config));
+        https.setPort(sslPort);
+        https.setIdleTimeout(500000);
+        server.addConnector(https);
 
         repository.setHttpsPort(sslPort);
     }
