@@ -3051,8 +3051,12 @@ public class Repository extends RepositoryBase implements RequestHandler,
         debugSession("RAMADDA.handleRequest:" + request.getRequestPath());
 
         Result result;
-        if ( !acceptRobots() && request.getIsRobot()) {
-            return getNoRobotsResult(request);
+        if(request.getIsRobot()) {
+            if ( !acceptRobots()) {
+                return getNoRobotsResult(request);
+            }
+            //Sleep a second to slow the google bot down
+            Misc.sleep(1000);
         }
 
         if (debug) {
