@@ -23,6 +23,52 @@ Note: This release is now using Java JDK 1.7 and will no longer run under Java 1
 
 
 
+<h2>What's new in version 1.8?</h2>
+This is primarily a bug fix release and is the last source snapshot under the original RAMADDA MIT license.
+<ul>
+<li> The plugins build and release process was changed There are now 3 plugin collections - coreplugins, geoplugins and bioplugins.
+If you have previously installed the allplugins then RAMADDA will automatically delete the allplugins.jar and install the
+core and geo plugins.
+</ul>
+
+
+
+
+<h2>Upgrading</h2>
+
+<div class="boxquote">
+Note: Many users ask if upgrading RAMADDA will effect any existing content. All of the content and files are kept in the RAMADDA home directory and in the database. As long as those directories remain untouched there should not be any problem in upgrading. However, you will need to update any plugins you have installed in the RAMADDA plugins directory. 
+</div>
+
+
+To update an existing RAMADDA install:
+
+<ul>
+
+<li> Update plugins
+<ul>
+<li> As noted above there are now 3 plugin collections - core, geo and bio. If you have the allplugins.jar installed then
+RAMADDA will update appropriately.
+
+<li> If you have other plugins installed then you should update them to the latest <a href="http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/plugins/">versions</a>.
+
+</ul>
+
+<li> Install the new server
+
+<ul>
+
+
+<li> If you are running stand-alone then download and unzip the
+<a href="http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/ramadda<%ramadda.version%>.zip/download">ramadda<%ramadda.version%>.zip</a>. You will need to adjust your scripts to point to the ramadda<%ramadda.version%> directory.
+
+<li> If you are running under Tomcat or Glassfish download and install the 
+<a href="http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/repository.war">repository.war</a>
+
+</ul>
+</ul>
+
+
 <h2>What's new in version 1.7?</h2>
 <ul> 
   <li> <a href="services.html">Service integration framework</a> - easily incorporate server side command line tools into RAMADDA. RAMADDA repositories will list all available services at:
@@ -48,44 +94,6 @@ We've integrated a number of tools -
 <li> Note: The 1.7 release  is SVN revision r4901
 </ul>
 
-
-<h2>Upgrading</h2>
-
-<div class="boxquote">
-Note: Many users ask if upgrading RAMADDA will effect any existing content. All of the content and files are kept in the RAMADDA home directory and in the database. As long as those directories remain untouched there should not be any problem in upgrading. However, you will need to update any plugins you have installed in the RAMADDA plugins directory. 
-</div>
-
-
-To update an existing RAMADDA install:
-
-<ul>
-
-<li> Update plugins
-<ul>
-<li> If you have installed the old allplugins.<i>zip</i> then delete the file and install  the new 
-<a href="http://sourceforge.net/projects/ramadda/files/<%ramadda.version%>/allplugins.jar/download">allplugins.jar</a>.
-Plugins are installed in the <i>&lt;ramadda home&gt;/plugins</i> directory. 
-If you currently have allplugins.jar installed  then RAMADDA will update it automatically.
-
-<li> If you have the pointplugin.jar installed then delete it. It is now provided in the core.
-
-<li> If you have other plugins installed then you should update them to the latest <a href="http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/plugins/">versions</a>.
-
-</ul>
-
-<li> Install the new server
-
-<ul>
-
-
-<li> If you are running stand-alone then download and unzip the
-<a href="http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/ramadda<%ramadda.version%>.zip/download">ramadda<%ramadda.version%>.zip</a>. You will need to adjust your scripts to point to the ramadda<%ramadda.version%> directory.
-
-<li> If you are running under Tomcat or Glassfish download and install the 
-<a href="http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/repository.war">repository.war</a>
-
-</ul>
-</ul>
 
 
 <h2>What's new in version 1.6?</h2>
