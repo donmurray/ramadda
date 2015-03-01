@@ -462,6 +462,9 @@ public class GpxTypeHandler extends GenericTypeHandler {
      */
     @Override
     public boolean addToMap(Request request, Entry entry, MapInfo map) {
+        if(!entry.isFile()) {
+            return true;
+        }
         try {
             Element root = readXml(entry);
             int     cnt  = 0;
@@ -538,7 +541,7 @@ public class GpxTypeHandler extends GenericTypeHandler {
             }
 
         } catch (Exception exc) {
-            throw new RuntimeException(exc);
+            getLogManager().logError("GpxTypeHandler.addToMap:" + entry.getName(), exc);
         }
 
         return false;
