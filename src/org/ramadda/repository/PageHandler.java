@@ -2306,8 +2306,6 @@ public class PageHandler extends RepositoryManager {
         s = s.replace("&#38;nbsp&#59;", "&nbsp;");
         s = s.replaceAll("PREOPEN", "<pre>");
         s = s.replaceAll("PRECLOSE", "</pre>");
-        System.err.println("s:" + s);
-
         return s;
     }
 

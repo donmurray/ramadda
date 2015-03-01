@@ -3056,8 +3056,13 @@ public class Repository extends RepositoryBase implements RequestHandler,
                 return getNoRobotsResult(request);
             }
             //Sleep a second to slow the google bot down
-            System.err.println("Sleeping for the bot:" + request +" " + request.getUserAgent());
-            Misc.sleepSeconds(20);
+            if(request.getUserAgent().indexOf("www.majestic12.co.uk")>=0) {
+                System.err.println("Sleeping for the bad bot:" + request +" " + request.getUserAgent());
+                Misc.sleepSeconds(30);
+            } else {
+                //Slow the googlebot down
+                Misc.sleepSeconds(1);
+            }
         }
 
         if (debug) {
