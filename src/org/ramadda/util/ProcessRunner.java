@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -42,7 +42,7 @@ public class ProcessRunner extends Thread {
     /** the process */
     ProcessBuilder processBuilder;
 
-    /** _more_          */
+    /** _more_ */
     Process process;
 
     /** a flag for whether the process is finished */
@@ -57,16 +57,16 @@ public class ProcessRunner extends Thread {
     /** timeout */
     private long timeoutSeconds = 0;
 
-    /** _more_          */
+    /** _more_ */
     private PrintWriter stdOutPrintWriter;
 
-    /** _more_          */
+    /** _more_ */
     private PrintWriter stdErrPrintWriter;
 
-    /** _more_          */
+    /** _more_ */
     private StreamEater isg;
 
-    /** _more_          */
+    /** _more_ */
     private StreamEater esg;
 
 
@@ -177,6 +177,7 @@ public class ProcessRunner extends Thread {
                 //                Trace.msg("***** Timed out");
                 processTimedOut = true;
                 process.destroy();
+
                 return;
             }
         }

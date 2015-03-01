@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -202,19 +202,19 @@ public class RecordField {
     private double missingValue = Double.NaN;
 
 
-    /** _more_          */
+    /** _more_ */
     public static final RecordField FIELD_LATITUDE =
         new RecordField("recordLatitude", "Latitude", "", 0, "");
 
-    /** _more_          */
+    /** _more_ */
     public static final RecordField FIELD_LONGITUDE =
         new RecordField("recordLongitude", "Longitude", "", 0, "");
 
-    /** _more_          */
+    /** _more_ */
     public static final RecordField FIELD_ELEVATION =
         new RecordField("recordElevation", "Elevation", "", 0, "");
 
-    /** _more_          */
+    /** _more_ */
     public static final RecordField FIELD_DATE =
         new RecordField("recordDate", "Date", "", 0, "", TYPE_DATE, "Date",
                         0, false, false);

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -380,8 +380,12 @@ public class PointOutputHandler extends RecordOutputHandler {
      * @return _more_
      */
     public RecordEntry doMakeEntry(Request request, Entry entry) {
-        RecordTypeHandler typeHandler =  (RecordTypeHandler) entry.getTypeHandler();
-        return new PointEntry((PointOutputHandler)typeHandler.getRecordOutputHandler(), request, entry);
+        RecordTypeHandler typeHandler =
+            (RecordTypeHandler) entry.getTypeHandler();
+
+        return new PointEntry(
+            (PointOutputHandler) typeHandler.getRecordOutputHandler(),
+            request, entry);
     }
 
 
@@ -683,14 +687,19 @@ public class PointOutputHandler extends RecordOutputHandler {
             } catch (Exception noop) {}
             getLogManager().logError("processing point request", exc);
             //Special handling for json requests
-            if (formats.size() == 1 && formats.contains(OUTPUT_JSON.getId())) {
-                String message = "Error processing point request:" + exc;
-                String code = "error";
-                StringBuffer json = new StringBuffer();
-                json.append(Json.map("error",Json.quote(message),"errorcode", Json.quote(code)));
+            if ((formats.size() == 1)
+                    && formats.contains(OUTPUT_JSON.getId())) {
+                String       message = "Error processing point request:"
+                                       + exc;
+                String       code    = "error";
+                StringBuffer json    = new StringBuffer();
+                json.append(Json.map("error", Json.quote(message),
+                                     "errorcode", Json.quote(code)));
                 Result errorResult = new Result("", json, Json.MIMETYPE);
+
                 return errorResult;
             }
+
             return makeRequestErrorResult(request, exc.getMessage());
         }
     }
@@ -793,25 +802,27 @@ public class PointOutputHandler extends RecordOutputHandler {
         if (outputType.equals(OUTPUT_FORM)) {
             return getPointFormHandler().outputEntryForm(request, entry);
         }
-        boolean asynchronous  = request.get(ARG_ASYNCH, false);
+        boolean          asynchronous = request.get(ARG_ASYNCH, false);
         boolean doingPublish = request.defined(ARG_PUBLISH_ENTRY + "_hidden");
         List<PointEntry> pointEntries = new ArrayList<PointEntry>();
         pointEntries.add((PointEntry) doMakeEntry(request, entry));
         if ( !doingPublish && !asynchronous) {
             //Note - normally the POH here is "this" POH but for Lidar types over in the nlasplugin
             //We want to get the LidarOutputHandler
-            PointOutputHandler pointOutputHandler = pointEntries.get(0).getPointOutputHandler();
-            Result result = pointOutputHandler.processEntries(request, entry, false,
-                                                              pointEntries, null);
+            PointOutputHandler pointOutputHandler =
+                pointEntries.get(0).getPointOutputHandler();
+            Result result = pointOutputHandler.processEntries(request, entry,
+                                false, pointEntries, null);
             if (result != null) {
                 return result;
             }
             StringBuffer sb = new StringBuffer();
             if ( !outputType.equals(OUTPUT_FORM)) {
                 sb.append(
-                          getPageHandler().showDialogError(
-                                                           "Unknown output type:" + outputType));
+                    getPageHandler().showDialogError(
+                        "Unknown output type:" + outputType));
             }
+
             return getPointFormHandler().outputEntryForm(request, entry);
         }
 
@@ -836,7 +847,10 @@ public class PointOutputHandler extends RecordOutputHandler {
     public Result outputEntryChart(Request request, OutputType outputType,
                                    Entry entry)
             throws Exception {
-        StringBuffer sb    = new StringBuffer(getWikiManager().getStandardChartDisplay(request,  entry));
+        StringBuffer sb = new StringBuffer(
+                              getWikiManager().getStandardChartDisplay(
+                                  request, entry));
+
         return new Result("", sb);
     }
 
@@ -996,9 +1010,10 @@ public class PointOutputHandler extends RecordOutputHandler {
         if ( !doingPublish && !asynchronous) {
             //Note - normally the POH here is "this" POH but for Lidar types over in the nlasplugin
             //We want to get the LidarOutputHandler
-            PointOutputHandler pointOutputHandler = pointEntries.get(0).getPointOutputHandler();
-            Result result = pointOutputHandler.processEntries(request, group, false,
-                                           pointEntries, null);
+            PointOutputHandler pointOutputHandler =
+                pointEntries.get(0).getPointOutputHandler();
+            Result result = pointOutputHandler.processEntries(request, group,
+                                false, pointEntries, null);
             if (result != null) {
                 return result;
             }
@@ -1055,10 +1070,11 @@ public class PointOutputHandler extends RecordOutputHandler {
                                         jobInfo.getJobId()));
         }
         if (formats.contains(OUTPUT_JSON.getId())) {
-            if(!asynch) {
+            if ( !asynch) {
                 String tail = IOUtil.stripExtension(entry.getName());
-                request.setReturnFilename(tail +".json");
-                request.getHttpServletResponse().setContentType(Json.MIMETYPE);
+                request.setReturnFilename(tail + ".json");
+                request.getHttpServletResponse().setContentType(
+                    Json.MIMETYPE);
                 request.setCORSHeaderOnResponse();
             }
             visitors.add(makeJsonVisitor(request, entry, pointEntries,
@@ -2114,7 +2130,7 @@ public class PointOutputHandler extends RecordOutputHandler {
      * @param services _more_
      */
     public void getServiceInfos(Request request, Entry entry,
-                            List<ServiceInfo> services) {
+                                List<ServiceInfo> services) {
         super.getServiceInfos(request, entry, services);
         if ( !canHandleEntry(entry)) {
             return;
@@ -2128,11 +2144,10 @@ public class PointOutputHandler extends RecordOutputHandler {
             lasProduct = OUTPUT_LAS.toString();
         }
         String[][] values = {
-            { OUTPUT_JSON.toString(), "Point JSON", ".json",
-              ICON_POINTS,"&max=${numpoints}" }, 
+            { OUTPUT_JSON.toString(), "Point JSON", ".json", ICON_POINTS,
+              "&max=${numpoints}" },
             { OUTPUT_LATLONALTCSV.toString(), "Lat/Lon/Alt CSV", ".csv",
-              ICON_POINTS }, 
-            { lasProduct, "LAS 1.2", ".las", ICON_POINTS },
+              ICON_POINTS }, { lasProduct, "LAS 1.2", ".las", ICON_POINTS },
             { OUTPUT_KMZ.toString(), ".kmz", "Google Earth KMZ",
               getIconUrl(request, ICON_KML) }
         };
@@ -2145,11 +2160,11 @@ public class PointOutputHandler extends RecordOutputHandler {
             if (product == null) {
                 continue;
             }
-            String name   = tuple[1];
-            String suffix = tuple[2];
-            String icon   = tuple[3];
+            String name      = tuple[1];
+            String suffix    = tuple[2];
+            String icon      = tuple[3];
             String extraArgs = "";
-            if(tuple.length >=5) {
+            if (tuple.length >= 5) {
                 extraArgs = tuple[4];
             }
             url = HtmlUtils.url(getRepository().URL_ENTRY_SHOW + "/"
@@ -2162,9 +2177,9 @@ public class PointOutputHandler extends RecordOutputHandler {
                 //                ARG_BBOX,  macro(ARG_BBOX), 
                 //                ARG_DEFAULTBBOX, dfltBbox
             }, false);
-            url+= extraArgs;
+            url += extraArgs;
             services.add(new ServiceInfo(product, name,
-                                     request.getAbsoluteUrl(url), icon));
+                                         request.getAbsoluteUrl(url), icon));
         }
     }
 
@@ -2296,7 +2311,7 @@ public class PointOutputHandler extends RecordOutputHandler {
 
 
         Date[] dateRange = request.getDateRange(ARG_FROMDATE, ARG_TODATE, "",
-                                                null);
+                               null);
 
         if ((dateRange[0] != null) || (dateRange[1] != null)) {
             filters.add(new TimeFilter(dateRange[0], dateRange[1]));
@@ -2391,9 +2406,8 @@ public class PointOutputHandler extends RecordOutputHandler {
      * @return _more_
      */
     public boolean canHandleEntry(Entry entry) {
-        return 
-            entry.getTypeHandler().isType("type_point") ||
-            entry.getTypeHandler().isType("lidar"); 
+        return entry.getTypeHandler().isType("type_point")
+               || entry.getTypeHandler().isType("lidar");
     }
 
 
@@ -2420,6 +2434,7 @@ public class PointOutputHandler extends RecordOutputHandler {
 
         if (entry.getTypeHandler() instanceof PointCollectionTypeHandler) {
             links.add(makeLink(request, state.getEntry(), OUTPUT_FORM));
+
             return;
         }
 

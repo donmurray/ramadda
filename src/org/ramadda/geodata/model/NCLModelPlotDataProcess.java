@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -21,21 +21,6 @@
 package org.ramadda.geodata.model;
 
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import org.ramadda.service.Service;
-import org.ramadda.service.ServiceInput;
-import org.ramadda.service.ServiceOperand;
-import org.ramadda.service.ServiceOutput;
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
 import org.ramadda.repository.Constants;
 import org.ramadda.repository.Entry;
@@ -45,15 +30,34 @@ import org.ramadda.repository.Request;
 import org.ramadda.repository.Resource;
 import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.type.TypeHandler;
+
+import org.ramadda.service.Service;
+import org.ramadda.service.ServiceInput;
+import org.ramadda.service.ServiceOperand;
+import org.ramadda.service.ServiceOutput;
 import org.ramadda.util.GeoUtils;
 import org.ramadda.util.HtmlUtils;
 
 import ucar.nc2.dt.GridDatatype;
 import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.units.SimpleUnit;
+
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
+
+
+import java.io.File;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Map;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 
 /**
@@ -128,20 +132,25 @@ public class NCLModelPlotDataProcess extends Service {
      * @param request  the Request
      * @param input    the process input
      * @param sb       the form
+     * @param argPrefix _more_
+     * @param label _more_
      *
      *
      * @throws Exception  problem getting the information for the form
      */
     @Override
-        public void addToForm(Request request, ServiceInput input, Appendable sb, String argPrefix, String label)
+    public void addToForm(Request request, ServiceInput input, Appendable sb,
+                          String argPrefix, String label)
             throws Exception {
 
-        String type = input.getProperty("type", 
-                ClimateModelApiHandler.ARG_ACTION_COMPARE).toString();
-        boolean handleMultiple = type.equals(ClimateModelApiHandler.ARG_ACTION_MULTI_COMPARE) ||
-                                 type.equals(ClimateModelApiHandler.ARG_ACTION_ENS_COMPARE);
+        String type =
+            input.getProperty(
+                "type", ClimateModelApiHandler.ARG_ACTION_COMPARE).toString();
+        boolean handleMultiple =
+            type.equals(ClimateModelApiHandler.ARG_ACTION_MULTI_COMPARE)
+            || type.equals(ClimateModelApiHandler.ARG_ACTION_ENS_COMPARE);
         sb.append(HtmlUtils.formTable());
-        Entry first = input.getEntries().get(0);
+        Entry  first = input.getEntries().get(0);
 
         String units = "";
 
@@ -150,30 +159,30 @@ public class NCLModelPlotDataProcess extends Service {
         GridDataset dataset =
             dataOutputHandler.getCdmManager().getGridDataset(first,
                 first.getResource().getPath());
-        if(dataset!=null) {
+        if (dataset != null) {
             List<GridDatatype> grids = dataset.getGrids();
             GridDatatype       grid  = grids.get(0);
             units = grid.getUnitsString();
         }
 
-        String space1 =  HtmlUtils.space(1);
-        String space2 =  HtmlUtils.space(1);
+        String space1 = HtmlUtils.space(1);
+        String space2 = HtmlUtils.space(1);
 
-        if (input.getOperands().size() > 1 && !handleMultiple) {
+        if ((input.getOperands().size() > 1) && !handleMultiple) {
             StringBuilder buttons = new StringBuilder();
-            buttons.append(HtmlUtils.radio(
-                                           ARG_NCL_OUTPUT, "diff",
-                                           RepositoryManager.getShouldButtonBeSelected(
-                                                                                       request, ARG_NCL_OUTPUT, "diff",
-                                                                                       true)));
+            buttons.append(
+                HtmlUtils.radio(
+                    ARG_NCL_OUTPUT, "diff",
+                    RepositoryManager.getShouldButtonBeSelected(
+                        request, ARG_NCL_OUTPUT, "diff", true)));
             buttons.append(space1);
             buttons.append(Repository.msg("Difference"));
             buttons.append(space2);
-            buttons.append(HtmlUtils.radio(
-                                           ARG_NCL_OUTPUT, "comp",
-                                           RepositoryManager.getShouldButtonBeSelected(
-                                                                                       request, ARG_NCL_OUTPUT, "comp",
-                                                                                       false)));
+            buttons.append(
+                HtmlUtils.radio(
+                    ARG_NCL_OUTPUT, "comp",
+                    RepositoryManager.getShouldButtonBeSelected(
+                        request, ARG_NCL_OUTPUT, "comp", false)));
             buttons.append(space1);
             buttons.append(Repository.msg("Separate Plots"));
 
@@ -183,60 +192,57 @@ public class NCLModelPlotDataProcess extends Service {
             sb.append(HtmlUtils.hidden(ARG_NCL_OUTPUT, "comp"));
         }
         StringBuilder plotTypes = new StringBuilder();
-        plotTypes.append(HtmlUtils.radio(
-                                         NCLOutputHandler.ARG_NCL_PLOTTYPE, "png",
-                                         RepositoryManager.getShouldButtonBeSelected(
-                                                                                     request, NCLOutputHandler.ARG_NCL_PLOTTYPE, "png",
-                                                                                     true)));
+        plotTypes.append(
+            HtmlUtils.radio(
+                NCLOutputHandler.ARG_NCL_PLOTTYPE, "png",
+                RepositoryManager.getShouldButtonBeSelected(
+                    request, NCLOutputHandler.ARG_NCL_PLOTTYPE, "png",
+                    true)));
         plotTypes.append(space1);
         plotTypes.append(Repository.msg("Map (Image)"));
         plotTypes.append(space2);
-        plotTypes.append(HtmlUtils.radio(
-                                         NCLOutputHandler.ARG_NCL_PLOTTYPE, "kmz",
-                                         RepositoryManager.getShouldButtonBeSelected(
-                                                                                     request,
-                                                                                     NCLOutputHandler.ARG_NCL_PLOTTYPE,
-                                                                                     "kmz", false)));
+        plotTypes.append(
+            HtmlUtils.radio(
+                NCLOutputHandler.ARG_NCL_PLOTTYPE, "kmz",
+                RepositoryManager.getShouldButtonBeSelected(
+                    request, NCLOutputHandler.ARG_NCL_PLOTTYPE, "kmz",
+                    false)));
         plotTypes.append(space1);
         plotTypes.append(Repository.msg("Google Earth"));
 
 
-        sb.append(
-            HtmlUtils.formEntry(
-                Repository.msgLabel("Plot Type"),
-                plotTypes.toString()));
+        sb.append(HtmlUtils.formEntry(Repository.msgLabel("Plot Type"),
+                                      plotTypes.toString()));
 
         // units
-        if (SimpleUnit.isCompatible(units,  "K")) {
+        if (SimpleUnit.isCompatible(units, "K")) {
             StringBuilder unitsSB = new StringBuilder();
-            unitsSB.append(HtmlUtils.radio(
-                                           ARG_NCL_UNITS, "K",
-                                           RepositoryManager.getShouldButtonBeSelected(
-                                                                                       request, ARG_NCL_UNITS, "K",
-                                                                                       true)));
+            unitsSB.append(
+                HtmlUtils.radio(
+                    ARG_NCL_UNITS, "K",
+                    RepositoryManager.getShouldButtonBeSelected(
+                        request, ARG_NCL_UNITS, "K", true)));
             unitsSB.append(space1);
             unitsSB.append(Repository.msg("Kelvin"));
             unitsSB.append(space2);
-            unitsSB.append(HtmlUtils.radio(
-                                       ARG_NCL_UNITS, "degC",
-                                       RepositoryManager.getShouldButtonBeSelected(
-                                           request, ARG_NCL_UNITS, "degC",
-                                           false)));
+            unitsSB.append(
+                HtmlUtils.radio(
+                    ARG_NCL_UNITS, "degC",
+                    RepositoryManager.getShouldButtonBeSelected(
+                        request, ARG_NCL_UNITS, "degC", false)));
             unitsSB.append(space1);
             unitsSB.append(Repository.msg("Celsius"));
 
 
-            sb.append(
-                HtmlUtils.formEntry(
-                    Repository.msgLabel("Plot Units"),
-                    unitsSB.toString()));
-        } else if (SimpleUnit.isCompatible(units,  "kg m-2 s-1") ||
-                   SimpleUnit.isCompatible(units,  "mm/day")) {
+            sb.append(HtmlUtils.formEntry(Repository.msgLabel("Plot Units"),
+                                          unitsSB.toString()));
+        } else if (SimpleUnit.isCompatible(units, "kg m-2 s-1")
+                   || SimpleUnit.isCompatible(units, "mm/day")) {
             sb.append(HtmlUtils.hidden(ARG_NCL_UNITS, "mm/day"));
-        } else if (SimpleUnit.isCompatible(units,  "kg m-1 s-2") ||
-                   SimpleUnit.isCompatible(units,  "Pa")) {
+        } else if (SimpleUnit.isCompatible(units, "kg m-1 s-2")
+                   || SimpleUnit.isCompatible(units, "Pa")) {
             sb.append(HtmlUtils.hidden(ARG_NCL_UNITS, "hPa"));
-        } else if (SimpleUnit.isCompatible(units,  "kg m-2")) {
+        } else if (SimpleUnit.isCompatible(units, "kg m-2")) {
             sb.append(HtmlUtils.hidden(ARG_NCL_UNITS, "mm"));
         }
         // TODO:  For now, don't get value from request.  May not
@@ -272,14 +278,16 @@ public class NCLModelPlotDataProcess extends Service {
      * @param request  the request
      * @param info _more_
      * @param input    the ServiceInput
+     * @param argPrefix _more_
      *
      * @return  the output
      *
      * @throws Exception  problems generating the output
      */
     @Override
-    public ServiceOutput evaluate(Request request, ServiceInput input, String argPrefix)
-           throws Exception {
+    public ServiceOutput evaluate(Request request, ServiceInput input,
+                                  String argPrefix)
+            throws Exception {
 
         List<Entry>          outputEntries = new ArrayList<Entry>();
         List<ServiceOperand> ops           = input.getOperands();
@@ -594,13 +602,13 @@ public class NCLModelPlotDataProcess extends Service {
     private boolean checkForValidEntries(List<Entry> entries) {
         // TODO: change this when we can handle more than one entry (e.g. daily data)
         if (entries.isEmpty()) {
-        //if (entries.isEmpty() || (entries.size() > 1)) {
+            //if (entries.isEmpty() || (entries.size() > 1)) {
             return false;
         }
         SortedSet<String> uniqueModels =
-                Collections.synchronizedSortedSet(new TreeSet<String>());
+            Collections.synchronizedSortedSet(new TreeSet<String>());
         SortedSet<String> uniqueMembers =
-                Collections.synchronizedSortedSet(new TreeSet<String>());
+            Collections.synchronizedSortedSet(new TreeSet<String>());
         for (Entry entry : entries) {
             if ( !(entry.getTypeHandler()
                     instanceof ClimateModelFileTypeHandler)) {
@@ -610,19 +618,21 @@ public class NCLModelPlotDataProcess extends Service {
             uniqueMembers.add(entry.getValue(3).toString());
         }
         // one model, one member
-        if (uniqueModels.size() == 1 && uniqueMembers.size() == 1) {
+        if ((uniqueModels.size() == 1) && (uniqueMembers.size() == 1)) {
             return true;
         }
         // multi-model multi-ensemble - don't want to think about this
-        if (uniqueModels.size() >= 1 && uniqueMembers.size() > 1) {
+        if ((uniqueModels.size() >= 1) && (uniqueMembers.size() > 1)) {
             return false;
         }
         // single model, multi-ensemble - can't handle yet
-        if (uniqueModels.size() > 1 && uniqueMembers.size() > 1) {
+        if ((uniqueModels.size() > 1) && (uniqueMembers.size() > 1)) {
             return true;
         }
+
         return true;
     }
+
     /**
      * Is this enabled?
      *

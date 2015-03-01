@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -193,15 +193,18 @@ public class CsvVisitor extends RecordVisitor {
             if (getter == null) {
                 if (field.isTypeString()) {
                     String svalue = record.getStringValue(field.getParamId());
-                    svalue = svalue.replaceAll(COLUMN_DELIMITER, encodedDelimiter);
+                    svalue = svalue.replaceAll(COLUMN_DELIMITER,
+                            encodedDelimiter);
                     pw.append(svalue);
                 } else {
                     double value = record.getValue(field.getParamId());
                     pw.append("" + value);
                 }
             } else {
-                String svalue = getter.getStringValue(record, field, visitInfo);
-                svalue = svalue.replaceAll(COLUMN_DELIMITER, encodedDelimiter);
+                String svalue = getter.getStringValue(record, field,
+                                    visitInfo);
+                svalue = svalue.replaceAll(COLUMN_DELIMITER,
+                                           encodedDelimiter);
                 pw.append(svalue);
             }
         }

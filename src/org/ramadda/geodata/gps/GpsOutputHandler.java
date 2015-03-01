@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -25,8 +25,8 @@ package org.ramadda.geodata.gps;
 
 
 import org.ramadda.repository.*;
-import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.auth.*;
+import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.output.*;
 import org.ramadda.repository.type.*;
 
@@ -763,9 +763,10 @@ public class GpsOutputHandler extends OutputHandler {
             System.err.println("work dir:" + workDir + " rinex file:"
                                + rinexFile);
             System.err.println("args:" + args);
-            JobManager.CommandResults  results  = getRepository().getJobManager().executeCommand(args, workDir);
-            String   errorMsg = results.getStderrMsg();
-            String   outMsg   = results.getStdoutMsg();
+            JobManager.CommandResults results =
+                getRepository().getJobManager().executeCommand(args, workDir);
+            String errorMsg = results.getStderrMsg();
+            String outMsg   = results.getStdoutMsg();
             sb.append("<li>");
             sb.append(rawEntry.getName());
 

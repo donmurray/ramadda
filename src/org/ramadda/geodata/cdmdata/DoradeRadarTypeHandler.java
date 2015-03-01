@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -23,8 +23,8 @@ package org.ramadda.geodata.cdmdata;
 
 import org.ramadda.data.util.CdmUtil;
 import org.ramadda.repository.Entry;
-import org.ramadda.repository.Request;
 import org.ramadda.repository.Repository;
+import org.ramadda.repository.Request;
 import org.ramadda.util.Utils;
 
 import org.w3c.dom.Element;
@@ -68,11 +68,14 @@ public class DoradeRadarTypeHandler extends RadarTypeHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      *
      * @throws Exception _more_
      */
-    public void initializeNewEntry(Request request, Entry entry) throws Exception {
+    public void initializeNewEntry(Request request, Entry entry)
+            throws Exception {
         Object[]   values = entry.getTypeHandler().getEntryValues(entry);
         File       f      = entry.getFile();
         NetcdfFile ncf    = NetcdfFile.open(f.toString());

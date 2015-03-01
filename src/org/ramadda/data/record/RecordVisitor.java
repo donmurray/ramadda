@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -53,8 +53,11 @@ public abstract class RecordVisitor {
      *
      * @param file file we just visited
      * @param visitInfo visit info
+     *
+     * @throws Exception _more_
      */
-    public void finished(RecordFile file, VisitInfo visitInfo) throws Exception {}
+    public void finished(RecordFile file, VisitInfo visitInfo)
+            throws Exception {}
 
     /**
      * _more_

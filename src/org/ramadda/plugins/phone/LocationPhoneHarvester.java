@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -129,7 +129,8 @@ public class LocationPhoneHarvester extends PhoneHarvester {
         Entry       entry =
             typeHandler.createEntry(getRepository().getGUID());
         Date        date        = new Date();
-        Object[]    values      = typeHandler.makeEntryValues(new Hashtable());
+        Object[]    values      =
+            typeHandler.makeEntryValues(new Hashtable());
         String      desc        = "";
         String      name        = "";
         values[0] = info.getFromPhone();

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -21,16 +21,18 @@
 package org.ramadda.geodata.model;
 
 
-import org.ramadda.service.Service;
-import org.ramadda.service.ServiceInput;
-import org.ramadda.service.ServiceOperand;
-import org.ramadda.service.ServiceOutput;
 //import org.ramadda.geodata.cdmdata.CDOOutputHandler;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
 import org.ramadda.repository.Request;
 import org.ramadda.repository.Result;
 import org.ramadda.repository.type.CollectionTypeHandler;
+
+
+import org.ramadda.service.Service;
+import org.ramadda.service.ServiceInput;
+import org.ramadda.service.ServiceOperand;
+import org.ramadda.service.ServiceOutput;
 import org.ramadda.util.HtmlUtils;
 
 import org.w3c.dom.Element;
@@ -250,7 +252,8 @@ JQ.button(
             tmpSB.append(msg("Select"));
             tmpSB.append(HtmlUtils.br());
             ServiceOperand op = new ServiceOperand(entry);
-            process.addToForm(request, new ServiceInput(op), tmpSB, null, null);
+            process.addToForm(request, new ServiceInput(op), tmpSB, null,
+                              null);
             processTabs.add(
                 HtmlUtils.div(
                     tmpSB.toString(), HtmlUtils.style("min-height:200px;")));

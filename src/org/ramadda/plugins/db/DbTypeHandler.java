@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -46,8 +46,8 @@ import org.ramadda.util.XmlUtils;
 
 import org.ramadda.util.text.CsvUtil;
 import org.ramadda.util.text.Filter;
-import org.ramadda.util.text.Visitor;
 import org.ramadda.util.text.Processor;
+import org.ramadda.util.text.Visitor;
 
 
 import org.w3c.dom.*;
@@ -95,9 +95,11 @@ import java.util.TimeZone;
 
 public class DbTypeHandler extends BlobTypeHandler {
 
-    public static final String PROP_ANONFORM_ENABLED= "anonform.enabled";
+    /** _more_          */
+    public static final String PROP_ANONFORM_ENABLED = "anonform.enabled";
 
-    public static final String PROP_ANONFORM_MESSAGE= "anonform.message";
+    /** _more_          */
+    public static final String PROP_ANONFORM_MESSAGE = "anonform.message";
 
     /** _more_ */
     public static final int DEFAULT_MAX = DB_VIEW_ROWS;
@@ -466,11 +468,9 @@ public class DbTypeHandler extends BlobTypeHandler {
 
 
         setCategory(XmlUtil.getAttributeFromTree(tableNode,
-                                         TypeHandler.ATTR_CATEGORY,
-                                         "Database"));
+                TypeHandler.ATTR_CATEGORY, "Database"));
         setSuperCategory(XmlUtil.getAttributeFromTree(tableNode,
-                                                      "supercategory",
-                                                      ""));
+                "supercategory", ""));
         tableHandler = new GenericTypeHandler(repository, "db_" + tableName,
                 desc) {
             protected String getEnumValueKey(Column column, Entry entry) {
@@ -494,19 +494,24 @@ public class DbTypeHandler extends BlobTypeHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      * @param node _more_
      *
      * @throws Exception _more_
      */
     @Override
-    public void addToEntryNode(Request request, Entry entry, Element node) throws Exception {
+    public void addToEntryNode(Request request, Entry entry, Element node)
+            throws Exception {
         super.addToEntryNode(request, entry, node);
-        if(getAccessManager().canDoAction(request,  entry, Permission.ACTION_FILE)) {
+        if (getAccessManager().canDoAction(request, entry,
+                                           Permission.ACTION_FILE)) {
             List<Object[]> valueList = readValues(Clause.eq(COL_ID,
-                                                            entry.getId()), "", -1);
+                                           entry.getId()), "", -1);
             Element dbvalues = XmlUtil.create(TAG_DBVALUES, node);
-            XmlUtil.createCDataNode(dbvalues, xmlEncoder.toXml(valueList, false));
+            XmlUtil.createCDataNode(dbvalues,
+                                    xmlEncoder.toXml(valueList, false));
         }
     }
 
@@ -751,6 +756,9 @@ public class DbTypeHandler extends BlobTypeHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
+     * @param entry _more_
      * @return _more_
      */
     public String getTitle(Request request, Entry entry) {
@@ -831,11 +839,13 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         Hashtable props = getProperties(entry);
 
-        boolean doAnonForm = Misc.getProperty(props, PROP_ANONFORM_ENABLED,false);
-        if(doAnonForm && !getAccessManager().canEditEntry(request, entry)) {
+        boolean doAnonForm = Misc.getProperty(props, PROP_ANONFORM_ENABLED,
+                                 false);
+        if (doAnonForm && !getAccessManager().canEditEntry(request, entry)) {
             if (request.exists(ARG_DB_CREATE)) {
                 return handleNewOrEdit(request, entry, null, doAnonForm);
             }
+
             return handleForm(request, entry, null, true, doAnonForm);
         }
 
@@ -855,13 +865,14 @@ public class DbTypeHandler extends BlobTypeHandler {
             String posx = request.getString("posx", "").replace("px", "");
             String posy = request.getString("posy", "").replace("px", "");
             if (request.exists(ARG_DB_STICKYLABEL)) {
-                String    label = request.getString(ARG_DB_STICKYLABEL, "");
+                String label = request.getString(ARG_DB_STICKYLABEL, "");
                 props.put(PROP_STICKY_POSX + "." + label, posx);
                 props.put(PROP_STICKY_POSY + "." + label, posy);
                 setProperties(entry, props);
                 getEntryManager().updateEntry(request, entry);
             } else {
-                Object[] values = getValues(entry, request.getString(ARG_DBID, ""));
+                Object[] values = getValues(entry,
+                                            request.getString(ARG_DBID, ""));
                 putProp("posx", values, new Integer(posx));
                 putProp("posy", values, new Integer(posy));
                 doStore(entry, values, false);
@@ -911,7 +922,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
             return handleNewOrEdit(request, entry,
                                    request.getString(ARG_DBID,
-                                                     (String) null), false);
+                                       (String) null), false);
         }
 
         if (request.exists(ARG_DB_SEARCHFORM)) {
@@ -1000,22 +1011,26 @@ public class DbTypeHandler extends BlobTypeHandler {
             throws Exception {
 
         Hashtable props = getProperties(entry);
-        boolean doAnonForm = Misc.getProperty(props, PROP_ANONFORM_ENABLED,false);
-        if(doAnonForm) {
-            if(!getAccessManager().canEditEntry(request, entry)) {
+        boolean doAnonForm = Misc.getProperty(props, PROP_ANONFORM_ENABLED,
+                                 false);
+        if (doAnonForm) {
+            if ( !getAccessManager().canEditEntry(request, entry)) {
                 addStyleSheet(sb);
+
                 return;
             }
         }
 
         boolean embedded = request.get(ARG_EMBEDDED, false);
         if (Utils.stringDefined(entry.getDescription())) {
-            sb.append(getWikiManager().wikifyEntry(request, entry,entry.getDescription()));
+            sb.append(getWikiManager().wikifyEntry(request, entry,
+                    entry.getDescription()));
             sb.append(HtmlUtils.br());
         }
 
         if (embedded) {
             addStyleSheet(sb);
+
             return;
         }
 
@@ -1082,10 +1097,13 @@ public class DbTypeHandler extends BlobTypeHandler {
      * @param headerToks _more_
      * @param baseUrl _more_
      * @param addNext _more_
+     *
+     * @throws Exception _more_
      */
     public void addHeaderItems(Request request, Entry entry, String view,
                                List<String> headerToks, String baseUrl,
-                               boolean[] addNext) throws Exception {
+                               boolean[] addNext)
+            throws Exception {
 
         if (showInHeader(VIEW_TABLE)) {
             if (view.equals(VIEW_TABLE)) {
@@ -1098,8 +1116,9 @@ public class DbTypeHandler extends BlobTypeHandler {
         }
 
         boolean canEdit = getAccessManager().canEditEntry(request, entry);
-        boolean canDoNew = getAccessManager().canDoAction(request, entry, Permission.ACTION_NEW);
-        
+        boolean canDoNew = getAccessManager().canDoAction(request, entry,
+                               Permission.ACTION_NEW);
+
 
         if (canDoNew && showInHeader(VIEW_NEW)) {
             if (view.equals(VIEW_NEW)) {
@@ -1481,17 +1500,28 @@ public class DbTypeHandler extends BlobTypeHandler {
      * @param request _more_
      * @param entry _more_
      * @param formBuffer _more_
+     *
+     * @throws Exception _more_
      */
     public void addToEditForm(Request request, Entry entry,
-                              Appendable formBuffer) throws Exception {
-        Hashtable props  = getProperties(entry);
+                              Appendable formBuffer)
+            throws Exception {
+        Hashtable props = getProperties(entry);
 
 
-        formBuffer.append(HtmlUtils.formEntry("", HtmlUtils.checkbox(PROP_ANONFORM_ENABLED,"true",Misc.getProperty(props, PROP_ANONFORM_ENABLED,false))+ " " +
-                                              msg("Allow anonymous form submission")));
-        formBuffer.append(HtmlUtils.formEntry(msgLabel("Message"), HtmlUtils.input(PROP_ANONFORM_MESSAGE,Misc.getProperty(props, PROP_ANONFORM_MESSAGE,""), 
-                                                                                   HtmlUtils.SIZE_80) +" " +
-                                              msg("What to show the user after they create an item")));
+        formBuffer.append(
+            HtmlUtils.formEntry(
+                "",
+                HtmlUtils.checkbox(
+                    PROP_ANONFORM_ENABLED, "true",
+                    Misc.getProperty(
+                        props, PROP_ANONFORM_ENABLED, false)) + " "
+                            + msg("Allow anonymous form submission")));
+        formBuffer.append(HtmlUtils.formEntry(msgLabel("Message"),
+                HtmlUtils.input(PROP_ANONFORM_MESSAGE,
+                    Misc.getProperty(props, PROP_ANONFORM_MESSAGE, ""),
+                        HtmlUtils.SIZE_80) + " "
+                            + msg("What to show the user after they create an item")));
     }
 
 
@@ -1650,11 +1680,13 @@ public class DbTypeHandler extends BlobTypeHandler {
                                         Entry parent, boolean newEntry)
             throws Exception {
         super.initializeEntryFromForm(request, entry, parent, newEntry);
-        Hashtable props          = getProperties(entry);
+        Hashtable props = getProperties(entry);
 
 
-        props.put(PROP_ANONFORM_ENABLED,request.get(PROP_ANONFORM_ENABLED,false)+"");
-        props.put(PROP_ANONFORM_MESSAGE,request.getString(PROP_ANONFORM_MESSAGE,""));
+        props.put(PROP_ANONFORM_ENABLED,
+                  request.get(PROP_ANONFORM_ENABLED, false) + "");
+        props.put(PROP_ANONFORM_MESSAGE,
+                  request.getString(PROP_ANONFORM_MESSAGE, ""));
 
         String stickyLabelString = request.getString(PROP_STICKY_LABELS, "");
         props.put(PROP_STICKY_LABELS,
@@ -1805,6 +1837,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         StringBuilder sb = new StringBuilder();
         addViewHeader(request, entry, sb, VIEW_SEARCH, 0, false);
         sb.append(insetHtml(getSearchForm(request, entry)));
+
         return new Result(getTitle(request, entry), sb);
     }
 
@@ -2042,7 +2075,7 @@ public class DbTypeHandler extends BlobTypeHandler {
             throws Exception {
         final List<Object[]> valueList = new ArrayList<Object[]>();
         int                  cnt       = 0;
-        Visitor          info      = new Visitor();
+        Visitor              info      = new Visitor();
         info.setInput(new BufferedInputStream(source));
         info.setSkip(1);
         info.getProcessor().addProcessor(new Processor() {
@@ -2051,7 +2084,7 @@ public class DbTypeHandler extends BlobTypeHandler {
                                       org.ramadda.util.text.Row row,
                                       String line) {
                 try {
-                    System.err.println ("Line:" + line);
+                    System.err.println("Line:" + line);
                     Object[] values = tableHandler.makeEntryValueArray();
                     initializeValueArray(request, null, values);
 
@@ -2096,20 +2129,23 @@ public class DbTypeHandler extends BlobTypeHandler {
      * @param request _more_
      * @param entry _more_
      * @param dbid _more_
+     * @param fromAnonForm _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Result handleNewOrEdit(Request request, Entry entry, String dbid, boolean fromAnonForm)
+    public Result handleNewOrEdit(Request request, Entry entry, String dbid,
+                                  boolean fromAnonForm)
             throws Exception {
         if (request.exists(ARG_DB_COPY)) {
             dbid = null;
         }
 
         boolean isNew = dbid == null;
-        if (!fromAnonForm && (request.exists(ARG_DB_BULK_TEXT)
-                              || request.exists(ARG_DB_BULK_FILE))) {
+        if ( !fromAnonForm
+                && (request.exists(ARG_DB_BULK_TEXT)
+                    || request.exists(ARG_DB_BULK_FILE))) {
             InputStream source = null;
             String      bulkContent;
             if (request.exists(ARG_DB_BULK_FILE)) {
@@ -2146,12 +2182,14 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         doStore(entry, values, dbid == null);
 
-        if(fromAnonForm) {
-            Hashtable      props = getProperties(entry);
-            String message = Misc.getProperty(props, PROP_ANONFORM_MESSAGE,"");
-            if(!Utils.stringDefined(message)) {
+        if (fromAnonForm) {
+            Hashtable props = getProperties(entry);
+            String message = Misc.getProperty(props, PROP_ANONFORM_MESSAGE,
+                                 "");
+            if ( !Utils.stringDefined(message)) {
                 message = "Thank you for submitting an entry";
             }
+
             return new Result("", new StringBuffer(insetHtml(message)));
         }
 
@@ -2175,10 +2213,20 @@ public class DbTypeHandler extends BlobTypeHandler {
      */
     protected void initializeValueArray(Request request, String dbid,
                                         Object[] values) {
-        initializeValueArray(request, dbid, request.getUser().getId(), values);
+        initializeValueArray(request, dbid, request.getUser().getId(),
+                             values);
     }
 
-     protected void initializeValueArray(Request request, String dbid, String user, Object[] values) {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param dbid _more_
+     * @param user _more_
+     * @param values _more_
+     */
+    protected void initializeValueArray(Request request, String dbid,
+                                        String user, Object[] values) {
         //The first entry is the db_id
         values[IDX_DBID] = ((dbid == null)
                             ? getRepository().getGUID()
@@ -2580,7 +2628,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         Hashtable        entryProps = getProperties(entry);
 
         StringBuilder    chartJS    = new StringBuilder();
-        StringBuilder hb = new StringBuilder();
+        StringBuilder    hb         = new StringBuilder();
         //        GoogleChart.addChartImport(sb);
         if (doForm) {
             String formUrl = request.url(getRepository().URL_ENTRY_SHOW);
@@ -2831,7 +2879,8 @@ public class DbTypeHandler extends BlobTypeHandler {
                 hb.append(HtmlUtils.br());
                 hb.append(
                     getPageHandler().showDialogNote(
-                        msgLabel("No entries in") + getTitle(request, entry)));
+                        msgLabel("No entries in")
+                        + getTitle(request, entry)));
             } else {
                 hb.append(
                     getPageHandler().showDialogNote(msg("Nothing found")));
@@ -4373,6 +4422,7 @@ public class DbTypeHandler extends BlobTypeHandler {
      * @param entry _more_
      * @param dbid _more_
      * @param forEdit _more_
+     * @param doAnonForm _more_
      *
      * @return _more_
      *
@@ -4403,9 +4453,8 @@ public class DbTypeHandler extends BlobTypeHandler {
 
 
         StringBuilder buttons = new StringBuilder();
-        if(doAnonForm) {
-            buttons.append(HtmlUtils.submit(msg("Submit"),
-                                            ARG_DB_CREATE));
+        if (doAnonForm) {
+            buttons.append(HtmlUtils.submit(msg("Submit"), ARG_DB_CREATE));
         } else if (forEdit) {
             if (dbid == null) {
                 buttons.append(HtmlUtils.submit(msg("Create entry"),
@@ -4444,8 +4493,9 @@ public class DbTypeHandler extends BlobTypeHandler {
                             validateJavascript.toString()));
         formBuffer.append(HtmlUtils.script(script));
 
-        if(doAnonForm) {
-            sb.append(insetHtml(entry.getDescription() +HtmlUtils.p() + formBuffer));
+        if (doAnonForm) {
+            sb.append(insetHtml(entry.getDescription() + HtmlUtils.p()
+                                + formBuffer));
         } else {
             if (forEdit && (dbid == null)) {
                 createBulkForm(request, entry, sb, formBuffer);
@@ -4458,11 +4508,21 @@ public class DbTypeHandler extends BlobTypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     * @param dbid _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Object[] getValues(Entry entry, String dbid) throws Exception {
-        Object[]      values   = ((dbid != null)
-                                  ? tableHandler.getValues(makeClause(entry,
-                                                                      dbid))
-                                  : tableHandler.makeEntryValueArray());
+        Object[] values = ((dbid != null)
+                           ? tableHandler.getValues(makeClause(entry, dbid))
+                           : tableHandler.makeEntryValueArray());
+
         return values;
     }
 
@@ -4519,13 +4579,20 @@ public class DbTypeHandler extends BlobTypeHandler {
             (List<String>) Misc.newList(formBuffer.toString(),
                                         bulkSB.toString());
         String contents = OutputHandler.makeTabs(tabTitles, tabContents,
-                                                 true);
+                              true);
         Utils.append(sb, insetHtml(contents));
     }
 
 
+    /**
+     * _more_
+     *
+     * @param html _more_
+     *
+     * @return _more_
+     */
     private String insetHtml(Object html) {
-        return HtmlUtils.insetDiv(html.toString(), 0,10,0,10);
+        return HtmlUtils.insetDiv(html.toString(), 0, 10, 0, 10);
     }
 
 

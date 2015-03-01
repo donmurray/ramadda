@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -21,12 +21,14 @@
 package org.ramadda.bio.image;
 
 
-
-import org.ramadda.service.Service;
-import org.ramadda.service.ServiceOutput;
 import org.ramadda.repository.*;
 import org.ramadda.repository.metadata.Metadata;
 import org.ramadda.repository.type.*;
+
+
+
+import org.ramadda.service.Service;
+import org.ramadda.service.ServiceOutput;
 import org.ramadda.util.Utils;
 
 
@@ -128,6 +130,8 @@ public class DicomTypeHandler extends GenericTypeHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      * @param service _more_
      * @param output _more_
@@ -135,9 +139,10 @@ public class DicomTypeHandler extends GenericTypeHandler {
      * @throws Exception _more_
      */
     @Override
-    public void handleServiceResults(Request request, Entry entry, Service service,
-                                     ServiceOutput output)
+    public void handleServiceResults(Request request, Entry entry,
+                                     Service service, ServiceOutput output)
             throws Exception {
+
         super.handleServiceResults(request, entry, service, output);
 
         List<Entry> entries = output.getEntries();
@@ -196,41 +201,52 @@ public class DicomTypeHandler extends GenericTypeHandler {
             column.setValue(entry, values, value);
         }
 
-        String dateString  = null;
-        String timeString  = null;
-        
+        String dateString = null;
+        String timeString = null;
+
         //Look for date/time
-        for(String[]pair: new String[][]{{"00080022","00080032"},{"00080020","00080030"}}) {
+        for (String[] pair : new String[][] {
+            { "00080022", "00080032" }, { "00080020", "00080030" }
+        }) {
             dateString = tagToValue.get(pair[0]);
-            if(dateString == null) continue;
+            if (dateString == null) {
+                continue;
+            }
             timeString = tagToValue.get(pair[1]);
+
             break;
         }
 
 
         Date date = null;
-        if(dateString!=null) {
-            dateString = dateString.replaceAll("\\.","");
+        if (dateString != null) {
+            dateString = dateString.replaceAll("\\.", "");
             //For now don't parse the time as there are a number of formats that I've seen
             timeString = null;
-            if(timeString!=null) {
-                timeString = timeString.replaceAll(":","");
+            if (timeString != null) {
+                timeString = timeString.replaceAll(":", "");
             }
             try {
-            if(timeString!=null) {
-                date  = RepositoryUtil.makeDateFormat("yyyyMMdd HHmmss").parse(dateString+" " + timeString);
-            } else {
-                date  = RepositoryUtil.makeDateFormat("yyyyMMdd").parse(dateString);
-            }
-            } catch(Exception exc) {
-                getLogManager().logError("Dicom. parsing date:" + exc +" date:" + dateString +" time:" + timeString);
+                if (timeString != null) {
+                    date = RepositoryUtil.makeDateFormat(
+                        "yyyyMMdd HHmmss").parse(
+                        dateString + " " + timeString);
+                } else {
+                    date = RepositoryUtil.makeDateFormat("yyyyMMdd").parse(
+                        dateString);
+                }
+            } catch (Exception exc) {
+                getLogManager().logError("Dicom. parsing date:" + exc
+                                         + " date:" + dateString + " time:"
+                                         + timeString);
             }
         }
 
-        if(date!=null) {
+        if (date != null) {
             entry.setStartDate(date.getTime());
             entry.setEndDate(date.getTime());
         }
+
 
     }
 

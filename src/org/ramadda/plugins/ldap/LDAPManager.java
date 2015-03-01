@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -541,6 +541,11 @@ public class LDAPManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
         return ldapUrl;
     }

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -17,6 +17,7 @@
 * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
 * DEALINGS IN THE SOFTWARE.
 */
+
 package org.ramadda.data.point.netcdf;
 
 
@@ -48,26 +49,26 @@ import java.util.List;
  *
  *
  * @version        $version$, Wed, Feb 19, '14
- * @author         Enter your name here...    
+ * @author         Enter your name here...
  */
 public class NetcdfSinglePointGridRecord extends DataRecord {
 
-    /** _more_          */
+    /** _more_ */
     private GridDataset dataset;
 
-    /** _more_          */
+    /** _more_ */
     private GridAsPointDataset gapd;
 
-    /** _more_          */
+    /** _more_ */
     private double lat;
 
-    /** _more_          */
+    /** _more_ */
     private double lon;
 
-    /** _more_          */
+    /** _more_ */
     private List<CalendarDate> dates;
 
-    /** _more_          */
+    /** _more_ */
     private Iterator<CalendarDate> timeIterator;
 
     /** _more_ */

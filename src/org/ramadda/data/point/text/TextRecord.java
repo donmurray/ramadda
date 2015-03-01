@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -62,7 +62,7 @@ public class TextRecord extends DataRecord {
     /** _more_ */
     private String[] tokens;
 
-    /** _more_          */
+    /** _more_ */
     private int[] fixedWidth = null;
 
     /** _more_ */
@@ -247,6 +247,7 @@ public class TextRecord extends DataRecord {
      */
     @Override
     public ReadStatus read(RecordIO recordIO) throws Exception {
+
         String line = null;
         try {
             int fieldCnt;
@@ -315,13 +316,12 @@ public class TextRecord extends DataRecord {
                     values[fieldCnt] = Double.NaN;
                 } else {
                     double dValue;
-                    if(idxX == fieldCnt  || idxY == fieldCnt) {
+                    if ((idxX == fieldCnt) || (idxY == fieldCnt)) {
                         dValue = ucar.unidata.util.Misc.decodeLatLon(tok);
                     } else {
-                        dValue  = Double.parseDouble(tok);
+                        dValue = Double.parseDouble(tok);
                     }
-                    values[fieldCnt] =
-                        field.convertValue(dValue);
+                    values[fieldCnt] = field.convertValue(dValue);
                     if (isMissingValue(field, values[fieldCnt])) {
                         values[fieldCnt] = Double.NaN;
                     }
@@ -343,8 +343,10 @@ public class TextRecord extends DataRecord {
             return ReadStatus.OK;
         } catch (Exception exc) {
             System.err.println("Line:" + line);
+
             throw exc;
         }
+
 
 
     }

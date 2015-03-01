@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -136,10 +136,12 @@ public class NoaaCarbonPointFile extends NoaaPointFile {
                 makeField(FIELD_YEAR, ""), makeField(FIELD_MONTH, ""),
                 makeField(FIELD_DAY, ""),
                 makeField(FIELD_HOUR, attrType(TYPE_STRING)),
-                makeField(parameter, attrSortOrder(10), attrChartable(), attrMissing(-999.990)),
+                makeField(parameter, attrSortOrder(10), attrChartable(),
+                          attrMissing(-999.990)),
                 makeField(FIELD_STANDARD_DEVIATION, attrChartable(),
                           attrMissing(-99.990)),
-                makeField(FIELD_NUMBER_OF_MEASUREMENTS, attrSortOrder(5), attrChartable()),
+                makeField(FIELD_NUMBER_OF_MEASUREMENTS, attrSortOrder(5),
+                          attrChartable()),
                 makeField(FIELD_QC_FLAG, attrType(TYPE_STRING)),
                 makeField(FIELD_INTAKE_HEIGHT),
                 makeField(FIELD_INSTRUMENT, attrType(TYPE_STRING)),
@@ -154,9 +156,12 @@ public class NoaaCarbonPointFile extends NoaaPointFile {
                           attrValue("" + station.getLongitude())),
                 makeField(FIELD_YEAR, ""), makeField(FIELD_MONTH, ""),
                 makeField(FIELD_DAY, ""),
-                makeField(parameter, attrChartable(),  attrSortOrder(5), attrMissing(-999.990)),
-                makeField(FIELD_STANDARD_DEVIATION, attrChartable(),  attrSortOrder(4), attrMissing(-99.990)),
-                makeField(FIELD_NUMBER_OF_MEASUREMENTS, attrChartable(), attrSortOrder(3)),
+                makeField(parameter, attrChartable(), attrSortOrder(5),
+                          attrMissing(-999.990)),
+                makeField(FIELD_STANDARD_DEVIATION, attrChartable(),
+                          attrSortOrder(4), attrMissing(-99.990)),
+                makeField(FIELD_NUMBER_OF_MEASUREMENTS, attrChartable(),
+                          attrSortOrder(3)),
                 makeField(FIELD_QC_FLAG, attrType(TYPE_STRING)),
             });
         } else {

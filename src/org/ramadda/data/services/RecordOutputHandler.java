@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -129,7 +129,7 @@ public class RecordOutputHandler extends OutputHandler implements RecordConstant
      * @param jobManager _more_
      */
     protected void setRecordJobManager(RecordJobManager jobManager) {
-        if(this.jobManager==null) {
+        if (this.jobManager == null) {
             this.jobManager = jobManager;
         }
     }
@@ -271,8 +271,13 @@ public class RecordOutputHandler extends OutputHandler implements RecordConstant
         return "record";
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int getProductDirTTLHours() {
-        return getRepository().getProperty(PROP_TTL, 7)*24;
+        return getRepository().getProperty(PROP_TTL, 7) * 24;
     }
 
 
@@ -850,7 +855,7 @@ public class RecordOutputHandler extends OutputHandler implements RecordConstant
      * @param services _more_
      */
     public void getServiceInfos(Request request, Entry entry,
-                            List<ServiceInfo> services) {}
+                                List<ServiceInfo> services) {}
 
 
     /**

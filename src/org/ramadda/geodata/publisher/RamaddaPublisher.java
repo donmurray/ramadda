@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -147,7 +147,7 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
     private InteractiveRepositoryClient repositoryClient;
 
 
-    /** _more_          */
+    /** _more_ */
     private boolean isImport;
 
     /**
@@ -474,16 +474,22 @@ public class RamaddaPublisher extends ucar.unidata.idv.publish
                     if (bbox != null) {
                         southFld.setText(
                             getIdv().getDisplayConventions().formatLatLon(
-                                                                          Math.max(-90, bbox.getY())));
+                                Math.max(-90, bbox.getY())));
                         northFld.setText(
                             getIdv().getDisplayConventions().formatLatLon(
-                                                                          Math.min(90, (bbox.getY() + bbox.getHeight()))));
+                                Math.min(
+                                    90, (bbox.getY() + bbox.getHeight()))));
                         westFld.setText(
                             getIdv().getDisplayConventions().formatLatLon(
-                                                                          Math.max(-180, Misc.normalizeLongitude(bbox.getX()))));
+                                Math.max(
+                                    -180,
+                                    Misc.normalizeLongitude(bbox.getX()))));
                         eastFld.setText(
                             getIdv().getDisplayConventions().formatLatLon(
-                                                                          Math.min(180, Misc.normalizeLongitude(bbox.getX() + bbox.getWidth()))));
+                                Math.min(
+                                    180,
+                                    Misc.normalizeLongitude(
+                                        bbox.getX() + bbox.getWidth()))));
                     }
                 }
                 Animation anim = fromViewManager.getAnimation();

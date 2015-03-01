@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -21,10 +21,6 @@
 package org.ramadda.geodata.model;
 
 
-import org.ramadda.service.Service;
-import org.ramadda.service.ServiceInput;
-import org.ramadda.service.ServiceOperand;
-import org.ramadda.service.ServiceOutput;
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
@@ -32,6 +28,12 @@ import org.ramadda.repository.Request;
 import org.ramadda.repository.Resource;
 import org.ramadda.repository.type.GranuleTypeHandler;
 import org.ramadda.repository.type.TypeHandler;
+
+
+import org.ramadda.service.Service;
+import org.ramadda.service.ServiceInput;
+import org.ramadda.service.ServiceOperand;
+import org.ramadda.service.ServiceOutput;
 import org.ramadda.util.HtmlUtils;
 
 import ucar.nc2.dt.grid.GridDataset;
@@ -96,12 +98,15 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
      * @param request _more_
      * @param input _more_
      * @param sb _more_
+     * @param argPrefix _more_
+     * @param label _more_
      *
      *
      * @throws Exception _more_
      */
     @Override
-        public void addToForm(Request request, ServiceInput input, Appendable sb, String argPrefix, String label)
+    public void addToForm(Request request, ServiceInput input, Appendable sb,
+                          String argPrefix, String label)
             throws Exception {
         sb.append(HtmlUtils.formTable());
         makeInputForm(request, input, sb, argPrefix);
@@ -114,6 +119,7 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
      * @param request  the Request
      * @param input    the ServiceInput
      * @param sb       the StringBuilder
+     * @param argPrefix _more_
      *
      * @throws Exception  problem making stuff
      */
@@ -155,13 +161,15 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
      * @param request _more_
      * @param info _more_
      * @param input _more_
+     * @param argPrefix _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
     @Override
-      public ServiceOutput evaluate(Request request, ServiceInput input, String argPrefix)
+    public ServiceOutput evaluate(Request request, ServiceInput input,
+                                  String argPrefix)
             throws Exception {
         if ( !canHandle(input)) {
             throw new Exception("Illegal data type");

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -967,15 +967,18 @@ public class IdvOutputHandler extends OutputHandler implements IdvConstants {
         List<DataChoice> choices =
             (List<DataChoice>) dataSource.getDataChoices();
         for (DataChoice dataChoice : choices) {
-            if(dataChoice instanceof DerivedDataChoice)
-                idToChoice.put(StringUtil.camelCase(dataChoice.getDescription()), dataChoice);
-            else
+            if (dataChoice instanceof DerivedDataChoice) {
+                idToChoice.put(
+                    StringUtil.camelCase(dataChoice.getDescription()),
+                    dataChoice);
+            } else {
                 idToChoice.put(dataChoice.getName(), dataChoice);
+            }
         }
 
-        List params     = request.get(ARG_PARAM, new ArrayList());
+        List params = request.get(ARG_PARAM, new ArrayList());
         //System.out.print("YYYYYYYY " + params.size() + "  HH " + params.get(0).toString());
-        int  displayIdx = -1;
+        int displayIdx = -1;
         for (int i = 0; i < params.size(); i++) {
             String param = (String) params.get(i);
             if (param.length() == 0) {
@@ -1139,11 +1142,14 @@ public class IdvOutputHandler extends OutputHandler implements IdvConstants {
                                        ARG_COLORTABLE + displayIdx) + ","
                                            + HtmlUtils.squote(
                                                colorTable.getName()));
-                String call2 =
-                    HtmlUtils.call("HtmlUtil.setHtml", HtmlUtils.squote(ARG_COLORTABLE
-                        + "_html" + displayIdx) + ","
-                            + HtmlUtils.squote(colorTable.getName() + " "
-                                + img));
+                String call2 = HtmlUtils.call(
+                                   "HtmlUtil.setHtml",
+                                   HtmlUtils.squote(
+                                       ARG_COLORTABLE + "_html"
+                                       + displayIdx) + ","
+                                           + HtmlUtils.squote(
+                                               colorTable.getName() + " "
+                                               + img));
                 String call = call1 + ";" + call2;
                 catSB.append(HtmlUtils.mouseClickHref(call, div));
             }
@@ -1192,13 +1198,14 @@ public class IdvOutputHandler extends OutputHandler implements IdvConstants {
                               HtmlUtils.id(ARG_COLORTABLE + "_html"
                                            + displayIdx)) }, 2));
 
-            String call = HtmlUtils.call("HtmlUtil.setFormValue",
-                                         "'" + ARG_COLORTABLE + displayIdx
-                                         + "','" + "" + "'") + ";"
-                                             + HtmlUtils.call("HtmlUtil.setHtml",
-                                                 "'" + ARG_COLORTABLE
-                                                 + "_html" + displayIdx
-                                                 + "','" + "-default-" + "'");
+            String call =
+                HtmlUtils.call("HtmlUtil.setFormValue",
+                               "'" + ARG_COLORTABLE + displayIdx + "','" + ""
+                               + "'") + ";"
+                                      + HtmlUtils.call("HtmlUtil.setHtml",
+                                          "'" + ARG_COLORTABLE + "_html"
+                                          + displayIdx + "','" + "-default-"
+                                          + "'");
             ctsb.append(HtmlUtils.mouseClickHref(call, "Use default"));
             for (String ctcat : ctCats) {
                 ctsb.append(HtmlUtils.makeShowHideBlock(ctcat,
@@ -1442,12 +1449,13 @@ public class IdvOutputHandler extends OutputHandler implements IdvConstants {
                 catMap.put(catName, tfos);
                 cats.add(catName);
             }
-            if(dataChoice instanceof DerivedDataChoice)
+            if (dataChoice instanceof DerivedDataChoice) {
                 tfos.add(new TwoFacedObject("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-                                        + label, label));
-            else
+                                            + label, label));
+            } else {
                 tfos.add(new TwoFacedObject("&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
-                        + label, dataChoice.getName()));
+                                            + label, dataChoice.getName()));
+            }
         }
 
         for (String cat : cats) {

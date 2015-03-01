@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -419,29 +419,30 @@ public class PhoneHarvester extends Harvester {
 
 
         List<String> urls = new ArrayList<String>();
-        for(int i=0;i<10;i++) {
-            if(!request.defined("MediaUrl" + i)) {
+        for (int i = 0; i < 10; i++) {
+            if ( !request.defined("MediaUrl" + i)) {
                 break;
             }
-            String url  = request.getString("MediaUrl" + i);
+            String url = request.getString("MediaUrl" + i);
             url = java.net.URLDecoder.decode(url, "UTF-8");
 
             urls.add(url);
-            System.err.println ("url:" + url);
+            System.err.println("url:" + url);
         }
 
 
-        if(urls.size()>0) {
+        if (urls.size() > 0) {
             if ( !session.getCanAdd()) {
                 msg.append("No permission to add\nEnter:\npass <password>");
+
                 return true;
             }
-            for(String url: urls) {
+            for (String url : urls) {
                 String tail = IOUtil.getFileTail(url);
-                File newFile = getStorageManager().getTmpFile(request,
-                                                              tail);
-                
-                InputStream fromStream = getStorageManager().getInputStream(url);
+                File newFile = getStorageManager().getTmpFile(request, tail);
+
+                InputStream fromStream =
+                    getStorageManager().getInputStream(url);
                 OutputStream toStream =
                     getStorageManager().getFileOutputStream(newFile);
                 try {
@@ -450,12 +451,13 @@ public class PhoneHarvester extends Harvester {
                     IOUtil.close(toStream);
                     IOUtil.close(fromStream);
                 }
-                type = null;
-                newFile = getStorageManager().moveToStorage(request,
-                                                            newFile);
-                
-                addEntry(info,currentEntry, type, msg,tail, cleanUpText(message), newFile.toString());
+                type    = null;
+                newFile = getStorageManager().moveToStorage(request, newFile);
+
+                addEntry(info, currentEntry, type, msg, tail,
+                         cleanUpText(message), newFile.toString());
             }
+
             return true;
         }
 
@@ -741,7 +743,7 @@ public class PhoneHarvester extends Harvester {
                 break;
             }
 
-            
+
             if (type == null) {
                 String[] cmds  = {
                     "folder", "mkdir", "wiki", "blog", "sms", "note"
@@ -825,30 +827,45 @@ public class PhoneHarvester extends Harvester {
         }
 
 
-        addEntry(info,currentEntry, type, msg,name, cleanedInputText, null);
+        addEntry(info, currentEntry, type, msg, name, cleanedInputText, null);
 
         return true;
     }
 
-    private void addEntry(PhoneInfo info, Entry currentEntry, String type, Appendable msg, String name, String cleanedInputText, String resource) throws Exception {
+    /**
+     * _more_
+     *
+     * @param info _more_
+     * @param currentEntry _more_
+     * @param type _more_
+     * @param msg _more_
+     * @param name _more_
+     * @param cleanedInputText _more_
+     * @param resource _more_
+     *
+     * @throws Exception _more_
+     */
+    private void addEntry(PhoneInfo info, Entry currentEntry, String type,
+                          Appendable msg, String name,
+                          String cleanedInputText, String resource)
+            throws Exception {
         if ( !currentEntry.isGroup()) {
             msg.append("ERROR: Not a folder:\n" + currentEntry.getName());
+
             return;
         }
 
         TypeHandler typeHandler = null;
-        if(type!=null) {
+        if (type != null) {
             typeHandler = getRepository().getTypeHandler(type);
-        }  else if(resource!=null) {
+        } else if (resource != null) {
             typeHandler = getEntryManager().findDefaultTypeHandler(resource);
         } else {
             typeHandler = getRepository().getTypeHandler("file");
         }
-        Entry       entry =
-            typeHandler.createEntry(getRepository().getGUID());
-        Date        date        = new Date();
-        Object[]    values      =
-            typeHandler.makeEntryValues(new Hashtable());
+        Entry    entry  = typeHandler.createEntry(getRepository().getGUID());
+        Date     date   = new Date();
+        Object[] values = typeHandler.makeEntryValues(new Hashtable());
         if (type.equals("phone_sms")) {
             values[0] = info.getFromPhone();
             values[1] = info.getToPhone();
@@ -858,8 +875,11 @@ public class PhoneHarvester extends Harvester {
         }
 
         entry.initEntry(name, cleanedInputText, currentEntry, getUser(),
-                        resource!=null?new Resource(resource):new Resource(), "", date.getTime(), date.getTime(),
-                        date.getTime(), date.getTime(), values);
+                        (resource != null)
+                        ? new Resource(resource)
+                        : new Resource(), "", date.getTime(), date.getTime(),
+                                          date.getTime(), date.getTime(),
+                                          values);
 
 
         double[] location = org.ramadda.util.GeoUtils.getLocationFromAddress(

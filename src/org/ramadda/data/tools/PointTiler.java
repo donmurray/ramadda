@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -189,7 +189,7 @@ public class PointTiler extends RecordTool {
         if ((message != null) && (message.length() > 0)) {
             System.err.println("Error:" + message);
         }
-        
+
         System.err.println(
             "usage: PointTiler\n\t-class <class path of point file reader (see README)>\n\t-bounds <north> <west> <south> <east>\n\t-calcbounds (use the bounds of the input files)\n\t-size <size of major axis> (used with -calcbounds minor access size is calculated)\n\t-width <number of grid columns> -height <number of grid rows>\n\t-skip <decimation factor>\n\t-destination <destination directory>\n\t-suffix <file suffix - note: if .csv then we write out a csv file>\n\t-prefix <file prefix>\n\t<input files>");
 

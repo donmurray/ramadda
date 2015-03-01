@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -268,7 +268,7 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
      *
      * @throws Exception On badness
      */
-@Override
+    @Override
     public void initializeCopiedEntry(Entry entry, Entry originalEntry)
             throws Exception {
         super.initializeCopiedEntry(entry, originalEntry);
@@ -333,13 +333,23 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
         return recordFile;
     }
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private String getPath(Entry entry) throws Exception {
         String path;
-        if(entry.isFile()) {
+        if (entry.isFile()) {
             path = entry.getFile().toString();
         } else {
             path = entry.getResource().getPath();
         }
+
         return path;
     }
 
@@ -365,8 +375,8 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
         }
 
 
-        return (RecordFile) getRecordFileFactory().doMakeRecordFile(getPath(entry),
-                properties);
+        return (RecordFile) getRecordFileFactory().doMakeRecordFile(
+            getPath(entry), properties);
     }
 
 
@@ -386,10 +396,10 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
             throws Exception {
         Class c = Misc.findClass(className);
         Constructor ctor = Misc.findConstructor(c, new Class[] { String.class,
-                                                                 Hashtable.class });
+                Hashtable.class });
         if (ctor != null) {
             return (RecordFile) ctor.newInstance(new Object[] {
-                    getPath(entry),
+                getPath(entry),
                 properties });
         }
         ctor = Misc.findConstructor(c, new Class[] { String.class });
@@ -429,10 +439,13 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
     public boolean canHandleResource(String path, String filename) {
         try {
             boolean ok = getRecordFileFactory().canLoad(path);
-            if(ok) return true;
+            if (ok) {
+                return true;
+            }
         } catch (Exception exc) {
             //            return false;
         }
+
         return super.canHandleResource(path, filename);
     }
 
@@ -498,7 +511,7 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
      */
     @Override
     public void getServiceInfos(Request request, Entry entry,
-                            List<ServiceInfo> services) {
+                                List<ServiceInfo> services) {
         super.getServiceInfos(request, entry, services);
         getRecordOutputHandler().getServiceInfos(request, entry, services);
     }

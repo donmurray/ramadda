@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -72,7 +72,7 @@ public class WikiPageTypeHandler extends ExtensibleGroupTypeHandler {
 
     /**
      *   The url argument of the text area. Note: this has to be of the form that the Column class handles in a save
-     * _more_ 
+     * _more_
      */
     public static final String ARG_WIKI_TEXTAREA = Column.ARG_EDIT_PREFIX
                                                    + "wikipage.wikitext";
@@ -397,9 +397,9 @@ public class WikiPageTypeHandler extends ExtensibleGroupTypeHandler {
         String buttons =
             getRepository().getWikiManager().makeWikiEditBar(request, entry,
                 textAreaId);
-        String textWidget = buttons + HtmlUtils.br() +
-            HtmlUtils.textArea(ARG_WIKI_TEXTAREA, wikiText,
-                               50, 100, HtmlUtils.id(textAreaId));
+        String textWidget = buttons + HtmlUtils.br()
+                            + HtmlUtils.textArea(ARG_WIKI_TEXTAREA, wikiText,
+                                50, 100, HtmlUtils.id(textAreaId));
 
         /*
         String right = HtmlUtils.div(help.toString(),

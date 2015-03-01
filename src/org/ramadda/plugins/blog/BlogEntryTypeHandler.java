@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -111,6 +111,18 @@ public class BlogEntryTypeHandler extends ExtensibleGroupTypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param group _more_
+     * @param subGroups _more_
+     * @param entries _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result getHtmlDisplay(Request request, Entry group,
                                  List<Entry> subGroups, List<Entry> entries)
             throws Exception {
@@ -140,11 +152,12 @@ public class BlogEntryTypeHandler extends ExtensibleGroupTypeHandler {
             group = null;
         }
         String entryHtml = weblogOutputHandler.getBlogEntry(request, entry,
-                                                            true);
+                               true);
         entryHtml = HtmlUtils.div(entryHtml,
                                   HtmlUtils.cssClass("blog-entries"));
         StringBuilder sb = new StringBuilder();
         weblogOutputHandler.wrapContent(request, group, sb, entryHtml);
+
         return new Result("", sb);
     }
 

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -635,8 +635,9 @@ public abstract class PointFile extends RecordFile implements Cloneable,
         boolean verbose = true;
         for (int argIdx = 0; argIdx < args.length; argIdx++) {
             String arg = args[argIdx];
-            if(arg.equals("-noverbose")) {
+            if (arg.equals("-noverbose")) {
                 verbose = false;
+
                 continue;
             }
             try {
@@ -646,13 +647,13 @@ public abstract class PointFile extends RecordFile implements Cloneable,
                             String.class }).newInstance(new Object[] { arg });
                 StringBuffer sb = new StringBuffer();
                 pointFile.runCheck(arg, sb);
-                if(verbose) {
+                if (verbose) {
                     System.err.println(sb);
                 }
             } catch (Exception exc) {
                 System.err.println("Error:" + exc + " file:" + arg);
                 exc.printStackTrace();
-                if(verbose) {
+                if (verbose) {
                     return;
                 }
             }

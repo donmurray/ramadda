@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -91,12 +91,15 @@ public class GpsTypeHandler extends GenericTypeHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      *
      * @throws Exception On badness
      */
     @Override
-    public void initializeNewEntry(Request request, Entry entry) throws Exception {
+    public void initializeNewEntry(Request request, Entry entry)
+            throws Exception {
         super.initializeNewEntry(request, entry);
         //        Misc.printStack("GpsTypeHandler.initializeNewEntry",10,null);
         initializeGpsEntry(entry);

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -85,7 +85,7 @@ public class Visitor implements Cloneable {
     /** _more_ */
     private Converter.ColumnSelector selector;
 
-    /** _more_          */
+    /** _more_ */
     private Filter.FilterGroup filter = new Filter.FilterGroup();
 
     /** _more_ */
@@ -235,6 +235,7 @@ public class Visitor implements Cloneable {
                         inQuote = false;
                         if (nextChar == NEWLINE) {
                             nextChar = -1;
+
                             //                            sb.append("\t************** new line:" + inQuote+"\n");
                             break;
                         }

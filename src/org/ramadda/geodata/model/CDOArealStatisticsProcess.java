@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -21,10 +21,6 @@
 package org.ramadda.geodata.model;
 
 
-
-import org.ramadda.service.ServiceInput;
-import org.ramadda.service.ServiceOperand;
-import org.ramadda.service.ServiceOutput;
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
 import org.ramadda.repository.Association;
 import org.ramadda.repository.Entry;
@@ -33,6 +29,12 @@ import org.ramadda.repository.Request;
 import org.ramadda.repository.Resource;
 import org.ramadda.repository.type.GranuleTypeHandler;
 import org.ramadda.repository.type.TypeHandler;
+
+
+
+import org.ramadda.service.ServiceInput;
+import org.ramadda.service.ServiceOperand;
+import org.ramadda.service.ServiceOutput;
 import org.ramadda.util.HtmlUtils;
 
 import ucar.nc2.dt.GridDatatype;
@@ -50,6 +52,7 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.StringUtil;
 
 import ucar.visad.data.CalendarDateTime;
+
 import visad.util.ThreadManager;
 
 
@@ -67,6 +70,7 @@ import java.util.TreeSet;
  */
 public class CDOArealStatisticsProcess extends CDODataProcess {
 
+    /** _more_          */
     String type = null;
 
     /**
@@ -102,11 +106,14 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @param request  the Request
      * @param input    the ServiceInput
      * @param sb       the form
+     * @param argPrefix _more_
+     * @param label _more_
      *
      * @throws Exception  problem adding to the form
      */
     @Override
-        public void addToForm(Request request, ServiceInput input, Appendable sb, String argPrefix, String label)
+    public void addToForm(Request request, ServiceInput input, Appendable sb,
+                          String argPrefix, String label)
             throws Exception {
         sb.append(HtmlUtils.formTable());
         makeInputForm(request, input, sb, argPrefix);
@@ -119,13 +126,14 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @param request  the Request
      * @param input    the ServiceInput
      * @param sb       the StringBuilder
+     * @param argPrefix _more_
      *
      * @throws Exception  problem making stuff
      */
     private void makeInputForm(Request request, ServiceInput input,
                                Appendable sb, String argPrefix)
             throws Exception {
-        
+
         Entry first = input.getEntries().get(0);
 
         CdmDataOutputHandler dataOutputHandler =
@@ -159,28 +167,31 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @param request  The request
      * @param info _more_
      * @param input  the  data process input
+     * @param argPrefix _more_
      *
      * @return  the processed data
      *
      * @throws Exception  problem processing
      */
     @Override
-     public ServiceOutput evaluate(Request request, ServiceInput input, String argPrefix)
+    public ServiceOutput evaluate(Request request, ServiceInput input,
+                                  String argPrefix)
             throws Exception {
-        
-        final Request myRequest = request;
-        final ServiceInput myInput = input;
-        final String argP = argPrefix;
+
+        final Request      myRequest = request;
+        final ServiceInput myInput   = input;
+        final String       argP      = argPrefix;
 
         if ( !canHandle(input)) {
             throw new Exception("Illegal data type");
         }
 
-        final List<ServiceOperand> outputEntries = new ArrayList<ServiceOperand>();
-        int                  opNum         = 0;
+        final List<ServiceOperand> outputEntries =
+            new ArrayList<ServiceOperand>();
+        int     opNum      = 0;
         boolean useThreads = false;
         ThreadManager threadManager =
-                new ThreadManager("CDOArealStatistics.evaluate");
+            new ThreadManager("CDOArealStatistics.evaluate");
         for (final ServiceOperand op : input.getOperands()) {
             Entry oneOfThem = op.getEntries().get(0);
             Entry collection = GranuleTypeHandler.getCollectionEntry(request,
@@ -190,16 +201,17 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                 frequency = collection.getValues()[0].toString();
             }
             if (frequency.toLowerCase().indexOf("mon") >= 0) {
-                if (!useThreads) {
-                    outputEntries.add(processMonthlyRequest(request, input, op,
-                          opNum));
+                if ( !useThreads) {
+                    outputEntries.add(processMonthlyRequest(request, input,
+                            op, opNum));
                 } else {
                     final int myOp = opNum;
                     threadManager.addRunnable(new ThreadManager.MyRunnable() {
                         public void run() throws Exception {
                             try {
-                                ServiceOperand so = processMonthlyRequest(myRequest, myInput, op,
-                                        myOp);
+                                ServiceOperand so =
+                                    processMonthlyRequest(myRequest, myInput,
+                                        op, myOp);
                                 if (so != null) {
                                     synchronized (outputEntries) {
                                         outputEntries.add(so);
@@ -214,7 +226,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
 
             }
             if (input.getOperands().size() <= 2) {
-               opNum++;
+                opNum++;
             }
         }
         if (useThreads) {
@@ -224,7 +236,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                 ve.printStackTrace();
             }
         }
-        
+
 
         return new ServiceOutput(outputEntries);
     }
@@ -394,8 +406,9 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                     File tmpFile = new File(outFile.toString() + "." + i);
                     getOutputHandler().addDateSelectServices(newRequest,
                             oneOfThem, savedServices, opNum);
-                    getOutputHandler().addLevelSelectServices(newRequest, oneOfThem,
-                                  savedServices, CdmDataOutputHandler.ARG_LEVEL);
+                    getOutputHandler().addLevelSelectServices(newRequest,
+                            oneOfThem, savedServices,
+                            CdmDataOutputHandler.ARG_LEVEL);
                     System.err.println("cmds:" + savedServices);
                     savedServices.add(oneOfThem.getResource().getPath());
                     savedServices.add(tmpFile.toString());
@@ -435,8 +448,9 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                     File tmpFile = new File(outFile.toString() + "." + i);
                     getOutputHandler().addDateSelectServices(newRequest,
                             oneOfThem, savedServices, opNum);
-                    getOutputHandler().addLevelSelectServices(newRequest, oneOfThem,
-                                  savedServices, CdmDataOutputHandler.ARG_LEVEL);
+                    getOutputHandler().addLevelSelectServices(newRequest,
+                            oneOfThem, savedServices,
+                            CdmDataOutputHandler.ARG_LEVEL);
                     System.err.println("cmds:" + savedServices);
                     savedServices.add(oneOfThem.getResource().getPath());
                     savedServices.add(tmpFile.toString());
@@ -724,13 +738,13 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
     private boolean checkForValidEntries(List<Entry> entries) {
         // TODO: change this when we can handle more than one entry (e.g. daily data)
         if (entries.isEmpty()) {
-        //if (entries.isEmpty() || (entries.size() > 1)) {
+            //if (entries.isEmpty() || (entries.size() > 1)) {
             return false;
         }
         SortedSet<String> uniqueModels =
-                Collections.synchronizedSortedSet(new TreeSet<String>());
+            Collections.synchronizedSortedSet(new TreeSet<String>());
         SortedSet<String> uniqueMembers =
-                Collections.synchronizedSortedSet(new TreeSet<String>());
+            Collections.synchronizedSortedSet(new TreeSet<String>());
         for (Entry entry : entries) {
             if ( !(entry.getTypeHandler()
                     instanceof ClimateModelFileTypeHandler)) {
@@ -740,20 +754,21 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             uniqueMembers.add(entry.getValue(3).toString());
         }
         // one model, one member
-        if (uniqueModels.size() == 1 && uniqueMembers.size() == 1) {
+        if ((uniqueModels.size() == 1) && (uniqueMembers.size() == 1)) {
             return true;
         }
         // multi-model multi-ensemble - don't want to think about this
-        if (uniqueModels.size() >= 1 && uniqueMembers.size() > 1) {
+        if ((uniqueModels.size() >= 1) && (uniqueMembers.size() > 1)) {
             return false;
         }
         // single model, multi-ensemble - can't handle yet
-        if (uniqueModels.size() > 1 && uniqueMembers.size() > 1) {
+        if ((uniqueModels.size() > 1) && (uniqueMembers.size() > 1)) {
             return true;
         }
+
         return true;
     }
-    
+
     /**
      * Add the statitics widget
      *
@@ -796,8 +811,9 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                               ServiceInput input)
             throws Exception {
 
-        String type = input.getProperty("type", 
-               ClimateModelApiHandler.ARG_ACTION_COMPARE).toString();
+        String type =
+            input.getProperty(
+                "type", ClimateModelApiHandler.ARG_ACTION_COMPARE).toString();
         List<GridDataset> grids = new ArrayList<GridDataset>();
         for (ServiceOperand op : input.getOperands()) {
             Entry first = op.getEntries().get(0);
@@ -822,16 +838,19 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @param request  the Request
      * @param sb       the StringBuilder to add to
      * @param grids    list of grids to use
+     * @param type _more_
      *
      * @throws Exception _more_
      */
     private void makeYearsWidget(Request request, Appendable sb,
                                  List<GridDataset> grids, String type)
             throws Exception {
-        int grid = 0;
+
+        int grid     = 0;
         int numGrids = grids.size();
-        boolean handleMultiple = type.equals(ClimateModelApiHandler.ARG_ACTION_MULTI_COMPARE) ||
-                                 type.equals(ClimateModelApiHandler.ARG_ACTION_ENS_COMPARE);
+        boolean handleMultiple =
+            type.equals(ClimateModelApiHandler.ARG_ACTION_MULTI_COMPARE)
+            || type.equals(ClimateModelApiHandler.ARG_ACTION_ENS_COMPARE);
         /* If we are doing a compare, we make widgets for each grid.  If we are doing
          * a multi compare, we make one from the intersection of all grids
          */
@@ -839,7 +858,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         for (GridDataset dataset : grids) {
             List<CalendarDate> dates =
                 CdmDataOutputHandler.getGridDates(dataset);
-            if ( !dates.isEmpty() && grid == 0) {
+            if ( !dates.isEmpty() && (grid == 0)) {
                 CalendarDate cd  = dates.get(0);
                 Calendar     cal = cd.getCalendar();
                 if (cal != null) {
@@ -872,28 +891,31 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             }
             if (handleMultiple) {
                 if (grid == 0) {
-                   commonYears.addAll(years);
+                    commonYears.addAll(years);
                 } else {
                     commonYears.retainAll(years);
                 }
-                if (grid < numGrids-1) {
+                if (grid < numGrids - 1) {
                     grid++;
+
                     continue;
                 } else {
                     years = commonYears;
                 }
-            } 
-            
-            String yearNum = (grid == 0 || handleMultiple)
+            }
+
+            String yearNum = ((grid == 0) || handleMultiple)
                              ? ""
                              : String.valueOf(grid + 1);
-            String yrLabel = (grids.size() == 1 || handleMultiple)
+            String yrLabel = ((grids.size() == 1) || handleMultiple)
                              ? "Start"
                              : (grid == 0)
                                ? "First Dataset:<br>Start"
                                : "Second Dataset:<br>Start";
             yrLabel = Repository.msgLabel(yrLabel);
-            if (grid > 0 && type.equals(ClimateModelApiHandler.ARG_ACTION_COMPARE)) {
+            if ((grid > 0)
+                    && type.equals(
+                        ClimateModelApiHandler.ARG_ACTION_COMPARE)) {
                 years.add(0, "");
             }
             int endIndex = 0;
@@ -933,6 +955,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                                                                                                                                 .msg("(comma separated)")));
             grid++;
         }
+
     }
 
 }

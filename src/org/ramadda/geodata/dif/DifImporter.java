@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -82,8 +82,8 @@ public class DifImporter extends ImportHandler {
      * @param formBuffer _more_
      */
     @Override
-     public void addImportTypes(List<TwoFacedObject> importTypes,
-                                Appendable formBuffer) {
+    public void addImportTypes(List<TwoFacedObject> importTypes,
+                               Appendable formBuffer) {
         super.addImportTypes(importTypes, formBuffer);
         importTypes.add(new TwoFacedObject("Dif Import", TYPE_DIF));
         //        formBuffer.append(HtmlUtils.formEntry(msgLabel("DIF Type"), HtmlUtils.input(ARG_DIF_TYPE,"")));

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -115,16 +115,20 @@ public class PointTypeHandler extends RecordTypeHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      *
      * @throws Exception On badness
      */
     @Override
-     public void initializeNewEntry(Request request, Entry entry) throws Exception {
+    public void initializeNewEntry(Request request, Entry entry)
+            throws Exception {
         //        System.err.println (getClass().getName()+".initNewEntry");
         if (anySuperTypesOfThisType()) {
             //            System.err.println ("has super");
             super.initializeNewEntry(request, entry);
+
             return;
         }
 
@@ -149,7 +153,8 @@ public class PointTypeHandler extends RecordTypeHandler {
         List<PointEntry> pointEntries = new ArrayList<PointEntry>();
         pointEntries.add(pointEntry);
         PointMetadataHarvester metadataHarvester =
-            ((PointTypeHandler)entry.getTypeHandler()).doMakeMetadataHarvester(pointEntry);
+            ((PointTypeHandler) entry.getTypeHandler())
+                .doMakeMetadataHarvester(pointEntry);
         //        System.err.println (getClass().getName()+"  - scanning file:" + metadataHarvester.getClass().getName());
         visitorGroup.addVisitor(metadataHarvester);
         final File quickScanFile = pointEntry.getQuickScanFile();
@@ -168,7 +173,8 @@ public class PointTypeHandler extends RecordTypeHandler {
                         null);
         dos.close();
         log("initialize new entry: count=" + metadataHarvester.getCount());
-        ((PointTypeHandler)entry.getTypeHandler()).handleHarvestedMetadata(pointEntry, metadataHarvester);
+        ((PointTypeHandler) entry.getTypeHandler()).handleHarvestedMetadata(
+            pointEntry, metadataHarvester);
         log("initialize new entry: done");
 
     }
@@ -215,9 +221,11 @@ public class PointTypeHandler extends RecordTypeHandler {
      *
      * @param request _more_
      * @param entry _more_
+     * @param fromImport _more_
      */
     @Override
-    public void doFinalEntryInitialization(Request request, Entry entry, boolean fromImport) {
+    public void doFinalEntryInitialization(Request request, Entry entry,
+                                           boolean fromImport) {
         try {
             super.doFinalEntryInitialization(request, entry, fromImport);
             if ( !anySuperTypesOfThisType()) {
@@ -313,16 +321,27 @@ public class PointTypeHandler extends RecordTypeHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param tag _more_
+     *
+     * @return _more_
+     */
     @Override
     public String getUrlForWiki(Request request, Entry entry, String tag) {
         if (tag.equals(WikiConstants.WIKI_TAG_CHART)
                 || tag.equals(WikiConstants.WIKI_TAG_DISPLAY)) {
             try {
-                return ((PointOutputHandler)getRecordOutputHandler()).getJsonUrl(request, entry);
-            } catch(Exception exc) {
+                return ((PointOutputHandler) getRecordOutputHandler())
+                    .getJsonUrl(request, entry);
+            } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
         }
+
         return super.getUrlForWiki(request, entry, tag);
     }
 
@@ -360,9 +379,11 @@ public class PointTypeHandler extends RecordTypeHandler {
                 pointEntry.getBinaryPointFile().visit(metadata2,
                         new VisitInfo(VisitInfo.QUICKSCAN_NO), null);
                 List<double[]> polygon = llg.getBoundingPolygon();
-                StringBuilder[] sb = new StringBuilder[] { new StringBuilder(),
-                        new StringBuilder(), new StringBuilder(),
-                        new StringBuilder() };
+                StringBuilder[] sb = new StringBuilder[] {
+                                         new StringBuilder(),
+                                         new StringBuilder(),
+                                         new StringBuilder(),
+                                         new StringBuilder() };
                 int idx = 0;
                 for (double[] point : polygon) {
                     String toAdd = point[0] + "," + point[1] + ";";
@@ -465,7 +486,7 @@ public class PointTypeHandler extends RecordTypeHandler {
      */
     @Override
     public void getServiceInfos(Request request, Entry entry,
-                            List<ServiceInfo> services) {
+                                List<ServiceInfo> services) {
         super.getServiceInfos(request, entry, services);
         String url;
         String dfltBbox = entry.getWest() + "," + entry.getSouth() + ","

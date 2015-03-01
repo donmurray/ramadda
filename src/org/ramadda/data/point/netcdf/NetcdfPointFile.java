@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -46,8 +46,8 @@ import ucar.unidata.util.StringUtil;
 import java.io.*;
 
 import java.util.ArrayList;
-import java.util.Hashtable;
 import java.util.Formatter;
+import java.util.Hashtable;
 import java.util.List;
 
 
@@ -89,9 +89,11 @@ public class NetcdfPointFile extends PointFile {
      * ctor
      *
      * @param filename _more_
+     * @param properties _more_
      * @throws IOException On badness
      */
-    public NetcdfPointFile(String filename, Hashtable properties) throws IOException {
+    public NetcdfPointFile(String filename, Hashtable properties)
+            throws IOException {
         super(filename, properties);
     }
 
@@ -103,14 +105,16 @@ public class NetcdfPointFile extends PointFile {
      * @return _more_
      */
     public List<RecordField> doMakeFields() {
-        
-        Hashtable<String,RecordField> dfltFields = new Hashtable<String,RecordField>();
-        String fieldsProperty = getProperty("fields","NONE");
-        boolean defaultChartable = getProperty("chartable", "true").equals("true");
-        if(fieldsProperty!=null) {
+
+        Hashtable<String, RecordField> dfltFields = new Hashtable<String,
+                                                        RecordField>();
+        String fieldsProperty = getProperty("fields", "NONE");
+        boolean defaultChartable = getProperty("chartable",
+                                       "true").equals("true");
+        if (fieldsProperty != null) {
             List<RecordField> fields = doMakeFields(fieldsProperty);
-            for(RecordField field: fields) {
-                if(field.getChartable())  {
+            for (RecordField field : fields) {
+                if (field.getChartable()) {
                     defaultChartable = false;
                 }
                 dfltFields.put(field.getName(), field);
@@ -125,7 +129,7 @@ public class NetcdfPointFile extends PointFile {
                                        cnt++, "degrees"));
 
             RecordField dateField = new RecordField("date", "Date", "Date",
-                                       cnt++, "");
+                                        cnt++, "");
             dateField.setType(dateField.TYPE_DATE);
             fields.add(dateField);
 
@@ -136,13 +140,13 @@ public class NetcdfPointFile extends PointFile {
                 if ( !Utils.stringDefined(label)) {
                     label = var.getShortName();
                 }
-                String unit = var.getUnitsString();
+                String      unit  = var.getUnitsString();
                 RecordField field = dfltFields.get(var.getShortName());
-                if(field == null) {
-                    field = new RecordField(var.getShortName(),
-                                            label, label, cnt++, unit);
+                if (field == null) {
+                    field = new RecordField(var.getShortName(), label, label,
+                                            cnt++, unit);
                     if ((var.getDataType() == DataType.STRING)
-                        || (var.getDataType() == DataType.CHAR)) {
+                            || (var.getDataType() == DataType.CHAR)) {
                         field.setType(field.TYPE_STRING);
                     } else {
                         field.setChartable(defaultChartable);

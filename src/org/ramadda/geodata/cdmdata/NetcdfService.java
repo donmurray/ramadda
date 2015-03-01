@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -21,13 +21,14 @@
 package org.ramadda.geodata.cdmdata;
 
 
-import org.ramadda.service.*;
-
-import org.ramadda.service.Service;
-
 import org.ramadda.repository.*;
 import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.output.*;
+
+
+import org.ramadda.service.*;
+
+import org.ramadda.service.Service;
 import org.ramadda.util.HtmlUtils;
 
 import org.ramadda.util.TempDir;
@@ -96,65 +97,78 @@ public class NetcdfService extends Service {
      * @param request _more_
      * @param input _more_
      * @param sb _more_
+     * @param argPrefix _more_
+     * @param label _more_
      *
      * @throws Exception _more_
      */
     @Override
-   public void addToForm(Request request, ServiceInput input, Appendable sb, String argPrefix,String label)
-        throws Exception {
+    public void addToForm(Request request, ServiceInput input, Appendable sb,
+                          String argPrefix, String label)
+            throws Exception {
 
 
 
-        List<Entry>          entries           = input.getEntries();
-        Entry                entry             = ((entries.size() == 0)
-                                                  ? null
-                                                  : entries.get(0));
-        if(entry==null) {
-            for(ServiceArg inputArg: getInputs()) {
-                if(inputArg.isEntry()) {
-                    entry  =  getEntry(request,  argPrefix,  inputArg);
+        List<Entry> entries = input.getEntries();
+        Entry       entry   = ((entries.size() == 0)
+                               ? null
+                               : entries.get(0));
+        if (entry == null) {
+            for (ServiceArg inputArg : getInputs()) {
+                if (inputArg.isEntry()) {
+                    entry = getEntry(request, argPrefix, inputArg);
+
                     break;
                 }
-            }            
+            }
         }
 
 
-        if(entry!=null) {
+        if (entry != null) {
             addMetadata(request, input, entry.getResource().getPath());
         }
 
         super.addToForm(request, input, sb, argPrefix, label);
     }
 
-    private void addMetadata(Request request, ServiceInput input, String path) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param input _more_
+     * @param path _more_
+     *
+     * @throws Exception _more_
+     */
+    private void addMetadata(Request request, ServiceInput input, String path)
+            throws Exception {
         CdmDataOutputHandler dataOutputHandler = getDataOutputHandler();
-        NetcdfDataset dataset =
-            NetcdfDataset.openDataset(path);
-            List<Variable>       variables  = dataset.getVariables();
-            List<TwoFacedObject> coordNames = new ArrayList<TwoFacedObject>();
-            List<TwoFacedObject> varNames   = new ArrayList<TwoFacedObject>();
-            for (Variable var : variables) {
-                if (var instanceof CoordinateAxis) {
-                    coordNames.add(new TwoFacedObject(var.getName(),
-                                                      var.getShortName()));
-                }
-                varNames.add(new TwoFacedObject(var.getName(),
-                                                var.getShortName()));
+        NetcdfDataset        dataset = NetcdfDataset.openDataset(path);
+        List<Variable>       variables         = dataset.getVariables();
+        List<TwoFacedObject> coordNames = new ArrayList<TwoFacedObject>();
+        List<TwoFacedObject> varNames = new ArrayList<TwoFacedObject>();
+        for (Variable var : variables) {
+            if (var instanceof CoordinateAxis) {
+                coordNames.add(new TwoFacedObject(var.getName(),
+                        var.getShortName()));
             }
-            
-            // If it's a grid, get the list of times.
-            GridDataset gds = new GridDataset(dataset);
-            List<CalendarDate> dates = dataOutputHandler.getGridDates(gds);
-            List<Date> dateList = new ArrayList<Date>(dates.size());
-            for (CalendarDate cdate :dates) {
-                dateList.add(cdate.toDate());
-            }
-            gds.close();
-            dataset.close();
-            
-            input.putProperty("varNames", varNames);
-            input.putProperty("coordNames", coordNames);
-            input.putProperty("dateList", dateList);
+            varNames.add(new TwoFacedObject(var.getName(),
+                                            var.getShortName()));
+        }
+
+        // If it's a grid, get the list of times.
+        GridDataset        gds      = new GridDataset(dataset);
+        List<CalendarDate> dates    = dataOutputHandler.getGridDates(gds);
+        List<Date>         dateList = new ArrayList<Date>(dates.size());
+        for (CalendarDate cdate : dates) {
+            dateList.add(cdate.toDate());
+        }
+        gds.close();
+        dataset.close();
+
+        input.putProperty("varNames", varNames);
+        input.putProperty("coordNames", coordNames);
+        input.putProperty("dateList", dateList);
 
     }
 

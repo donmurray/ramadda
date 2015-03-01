@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -1568,7 +1568,7 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
      */
     @Override
     public void getServiceInfos(Request request, Entry entry,
-                            List<ServiceInfo> services) {
+                                List<ServiceInfo> services) {
         super.getServiceInfos(request, entry, services);
         if ( !getCdmManager().canLoadAsCdm(entry)) {
             return;
@@ -1963,19 +1963,19 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
 
         //Bridge the ramadda servlet to the opendap servlet
         NcDODSServlet servlet = new NcDODSServlet(request, entry, ncFile) {
-@Override
+            @Override
             public ServletConfig getServletConfig() {
                 return request.getHttpServlet().getServletConfig();
             }
-@Override
+            @Override
             public ServletContext getServletContext() {
                 return request.getHttpServlet().getServletContext();
             }
-@Override
+            @Override
             public String getServletInfo() {
                 return request.getHttpServlet().getServletInfo();
             }
-@Override
+            @Override
             public Enumeration getInitParameterNames() {
                 return request.getHttpServlet().getInitParameterNames();
             }

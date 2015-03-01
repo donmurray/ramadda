@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -42,9 +42,16 @@ import java.util.List;
  */
 public class MultiMonthFile extends CsvFile {
 
+    /** _more_          */
     String varName = null;
+
+    /** _more_          */
     String varDesc = null;
+
+    /** _more_          */
     double missing = -99.9;
+
+    /** _more_          */
     String unit = "";
 
     /**
@@ -61,13 +68,19 @@ public class MultiMonthFile extends CsvFile {
      * The constructor
      *
      * @param filename file
+     * @param varName _more_
+     * @param varDesc _more_
+     * @param unit _more_
+     * @param missing _more_
      * @throws IOException On badness
      */
-    public MultiMonthFile(String filename, String varName, String varDesc, String unit, double missing) throws IOException {
+    public MultiMonthFile(String filename, String varName, String varDesc,
+                          String unit, double missing)
+            throws IOException {
         super(filename);
         this.varName = varName;
         this.varDesc = varDesc;
-        this.unit = unit;
+        this.unit    = unit;
         this.missing = missing;
     }
 

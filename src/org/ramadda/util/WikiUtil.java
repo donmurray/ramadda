@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -65,7 +65,10 @@ public class WikiUtil {
     /** _more_ */
     public static final String PROP_NOHEADING = "noheading";
 
+    /** _more_          */
     public static final String PROP_NOP = "nop";
+
+    /** _more_          */
     public static final String PROP_DOP = "dop";
 
     /** _more_ */
@@ -332,7 +335,9 @@ public class WikiUtil {
     public String wikify(String text, WikiPageHandler handler) {
 
 
-        if(text.startsWith("<wiki>")) text = text.substring("<wiki>".length());
+        if (text.startsWith("<wiki>")) {
+            text = text.substring("<wiki>".length());
+        }
         StringBuffer mainBuffer = new StringBuffer();
         List<String> toks       = splitOnNoWiki(text);
         boolean      isText     = true;
@@ -476,22 +481,28 @@ public class WikiUtil {
             }
             if (tline.equals("-row")) {
                 buff.append("</div>");
+
                 continue;
             }
             if (tline.equals("-div")) {
                 buff.append("</div>");
+
                 continue;
             }
-            if (tline.startsWith("+pagehead")) { 
-                String weight = StringUtil.findPattern(tline,"-([0-9]+)");
-                if(weight==null) weight = "8";
+            if (tline.startsWith("+pagehead")) {
+                String weight = StringUtil.findPattern(tline, "-([0-9]+)");
+                if (weight == null) {
+                    weight = "8";
+                }
                 buff.append("<div class=\"row\">");
-                buff.append("<div class=\"col-md-" + weight +"\">");
+                buff.append("<div class=\"col-md-" + weight + "\">");
                 buff.append("<div class=\"jumbotron\">");
+
                 continue;
             }
             if (tline.startsWith("-pagehead")) {
                 buff.append("</div></div></div>");
+
                 continue;
             }
             if (tline.equals("+jumbo")) {
@@ -506,72 +517,84 @@ public class WikiUtil {
             }
 
             if (tline.startsWith("+inset")) {
-                List<String> toks = StringUtil.splitUpTo(tline, " ", 2);
+                List<String>  toks  = StringUtil.splitUpTo(tline, " ", 2);
                 StringBuilder extra = new StringBuilder();
-                if(toks.size()>1) {
+                if (toks.size() > 1) {
                     StringBuilder styles = new StringBuilder();
-                    for(String side: new String[]{"top","left","bottom","right"}) {
+                    for (String side : new String[] { "top", "left", "bottom",
+                            "right" }) {
                         String v = getAttribute(tline, side);
-                        if(v!=null) {
-                            styles.append("margin-" + side+":" + v +"px;");
+                        if (v != null) {
+                            styles.append("margin-" + side + ":" + v + "px;");
                         }
                     }
 
-                    if(styles.length()>0) {
+                    if (styles.length() > 0) {
                         extra.append(HtmlUtils.style(styles.toString()));
                     }
                 }
 
-                buff.append(HtmlUtils.open("div",HtmlUtils.cssClass("inset") + extra));
+                buff.append(HtmlUtils.open("div",
+                                           HtmlUtils.cssClass("inset")
+                                           + extra));
+
                 continue;
             }
             if (tline.equals("-inset")) {
                 buff.append("</div>");
+
                 continue;
             }
-            if (tline.startsWith("+info-sec") || tline.startsWith("+section")) {
+            if (tline.startsWith("+info-sec")
+                    || tline.startsWith("+section")) {
 
-                String label = getAttribute(tline,"label");
-                String classArg = getAttribute(tline,"class");
-                String extraArg = getAttribute(tline,"style");
-                boolean doEvenOdd  = tline.indexOf("#")>=0;
-                String extraClass = "";
-                String extraAttr = (extraArg==null?  "":" style=\"" + extraArg+"\" ");
-                if(doEvenOdd) {
-                    Integer scnt = (Integer) getProperty("section-cnt");
+                String  label      = getAttribute(tline, "label");
+                String  classArg   = getAttribute(tline, "class");
+                String  extraArg   = getAttribute(tline, "style");
+                boolean doEvenOdd  = tline.indexOf("#") >= 0;
+                String  extraClass = "";
+                String  extraAttr  = ((extraArg == null)
+                                      ? ""
+                                      : " style=\"" + extraArg + "\" ");
+                if (doEvenOdd) {
+                    Integer scnt  = (Integer) getProperty("section-cnt");
                     boolean first = false;
-                    if(scnt == null) {
+                    if (scnt == null) {
                         scnt  = new Integer(-1);
                         first = true;
                     }
-                    int newCnt = scnt.intValue()+1;
-                    if(((float)newCnt/2.0) ==(int) ((float)newCnt/2.0)) {
+                    int newCnt = scnt.intValue() + 1;
+                    if (((float) newCnt / 2.0)
+                            == (int) ((float) newCnt / 2.0)) {
                         extraClass = "ramadda-section-even";
-                    } else  {
+                    } else {
                         extraClass = "ramadda-section-odd";
                     }
-                    if(first)  {
+                    if (first) {
                         extraClass = "ramadda-section-first";
                     }
                     putProperty("section-cnt", new Integer(newCnt));
                 }
-                if(classArg!=null) {
-                    extraClass=classArg;
+                if (classArg != null) {
+                    extraClass = classArg;
                 }
 
-                String clazz =  "ramadda-section " + extraClass;
+                String clazz = "ramadda-section " + extraClass;
                 buff.append("<div class=\"");
                 buff.append(clazz);
-                buff.append("\"   " + extraAttr +">");
-                if(label!=null) {
+                buff.append("\"   " + extraAttr + ">");
+                if (label != null) {
                     buff.append("<h2>");
                     buff.append(label);
                     buff.append("</h2>");
                 }
+
                 continue;
             }
-            if (tline.startsWith("-info-sec") || tline.startsWith("-section")) {
+            if (tline.startsWith("-info-sec")
+                    || tline.startsWith("-section")) {
                 buff.append("</div>");
+
                 continue;
             }
 
@@ -587,7 +610,11 @@ public class WikiUtil {
             }
 
             if (tline.startsWith("+mini")) {
-                buff.append(HtmlUtils.open("div", HtmlUtils.cssClass("minitron " +getAttribute(tline,"class",""))));
+                buff.append(HtmlUtils.open("div",
+                                           HtmlUtils.cssClass("minitron "
+                                               + getAttribute(tline, "class",
+                                                   ""))));
+
                 continue;
             }
             if (tline.equals("-mini")) {
@@ -596,16 +623,20 @@ public class WikiUtil {
                 continue;
             }
             if (tline.startsWith("+col-")) {
-                List<String> toks = StringUtil.splitUpTo(tline, " ", 2);
+                List<String>  toks  = StringUtil.splitUpTo(tline, " ", 2);
                 StringBuilder extra = new StringBuilder();
-                String clazz = toks.get(0).substring(1);
-                if(toks.size()>1) {
+                String        clazz = toks.get(0).substring(1);
+                if (toks.size() > 1) {
                     String attrs = toks.get(1);
-                    String style = getAttribute(attrs,"style");
-                    if(style!=null) extra.append(HtmlUtils.style(style));
-                    clazz = clazz + " " + getAttribute(attrs,"class","");
+                    String style = getAttribute(attrs, "style");
+                    if (style != null) {
+                        extra.append(HtmlUtils.style(style));
+                    }
+                    clazz = clazz + " " + getAttribute(attrs, "class", "");
                 }
-                buff.append(HtmlUtils.open("div", HtmlUtils.cssClass(clazz) + extra));
+                buff.append(HtmlUtils.open("div",
+                                           HtmlUtils.cssClass(clazz)
+                                           + extra));
 
                 continue;
             }
@@ -861,18 +892,37 @@ public class WikiUtil {
 
 
 
+    /**
+     * _more_
+     *
+     * @param line _more_
+     * @param attr _more_
+     *
+     * @return _more_
+     */
     private String getAttribute(String line, String attr) {
         return getAttribute(line, attr, null);
     }
 
+    /**
+     * _more_
+     *
+     * @param line _more_
+     * @param attr _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
     private String getAttribute(String line, String attr, String dflt) {
-        String v = StringUtil.findPattern(line,attr+"\\s*=\\s*\\\"(.*?)\\\"");
-        if(v == null) {
-            v = StringUtil.findPattern(line,attr+"\\s*=\\s*([^\\s]+)");
+        String v = StringUtil.findPattern(line,
+                                          attr + "\\s*=\\s*\\\"(.*?)\\\"");
+        if (v == null) {
+            v = StringUtil.findPattern(line, attr + "\\s*=\\s*([^\\s]+)");
         }
-        if(v == null) {
+        if (v == null) {
             return dflt;
         }
+
         return v;
     }
 

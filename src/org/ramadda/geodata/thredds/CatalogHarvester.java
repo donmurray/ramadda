@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -553,8 +553,8 @@ public class CatalogHarvester extends Harvester {
             metadataList.add(makeImportMetadata(group.getId(),
                     catalogUrlPath));
             insertMetadata(group, metadataList);
-            String crumbs = getPageHandler().getBreadCrumbs(getRequest(), group,
-                                getBaseGroup());
+            String crumbs = getPageHandler().getBreadCrumbs(getRequest(),
+                                group, getBaseGroup());
             crumbs = crumbs.replace("class=", "xclass=");
             groups.add(crumbs);
             groupCnt++;
@@ -708,7 +708,8 @@ public class CatalogHarvester extends Harvester {
                         createDate, createDate, createDate, createDate, null);
 
         entries.add(entry);
-        typeHandler.initializeNewEntry(getRepository().getTmpRequest(), entry);
+        typeHandler.initializeNewEntry(getRepository().getTmpRequest(),
+                                       entry);
         List<Metadata> metadataList = new ArrayList<Metadata>();
         CatalogOutputHandler.collectMetadata(repository, metadataList, node);
         metadataList.add(makeImportMetadata(entry.getId(), catalogUrlPath));

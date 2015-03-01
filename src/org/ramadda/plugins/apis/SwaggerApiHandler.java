@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -26,10 +26,10 @@ import org.ramadda.data.services.RecordConstants;
 
 import org.ramadda.repository.*;
 import org.ramadda.repository.output.*;
-import org.ramadda.service.Service;
-import org.ramadda.service.ServiceArg;
 import org.ramadda.repository.type.*;
 import org.ramadda.repository.util.DateArgument;
+import org.ramadda.service.Service;
+import org.ramadda.service.ServiceArg;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Json;
 import org.ramadda.util.Utils;
@@ -138,17 +138,21 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                           SU.ATTR_DESCRIPTION,
                           Json.quote("Grid subset API")));
 
-        for(OutputHandler outputHandler: getRepository().getOutputHandlers()) {
-            if(!(outputHandler instanceof ServiceOutputHandler)) {
+        for (OutputHandler outputHandler :
+                getRepository().getOutputHandlers()) {
+            if ( !(outputHandler instanceof ServiceOutputHandler)) {
                 continue;
             }
-            Service service = ((ServiceOutputHandler)outputHandler).getService();
-            if(service == null || !service.isEnabled()) continue;
+            Service service =
+                ((ServiceOutputHandler) outputHandler).getService();
+            if ((service == null) || !service.isEnabled()) {
+                continue;
+            }
 
             String url = "/service/" + service.getId();
             apis.add(Json.map(SU.ATTR_PATH, Json.quote(url),
                               SU.ATTR_DESCRIPTION,
-                              Json.quote(" API for "  + service.getLabel())));
+                              Json.quote(" API for " + service.getLabel())));
 
 
 
@@ -211,20 +215,29 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processSwaggerServiceRequest(Request request)
             throws Exception {
         List<String> toks = StringUtil.split(request.getRequestPath(), "/",
                                              true, true);
-        String       type        = toks.get(toks.size() - 1);
-        Service service = getRepository().getJobManager().getService(type);
+        String       type = toks.get(toks.size() - 1);
+        Service service   = getRepository().getJobManager().getService(type);
 
-        List<String> apis        = new ArrayList<String>();
+        List<String> apis = new ArrayList<String>();
         apis.add(getServiceApi(request, service));
 
         List<String> doc =
             SU.createDocument(request.getAbsoluteUrl(""),
                               getRepository().URL_ENTRY_SHOW.toString(),
-                              new String[] { }, apis);
+                              new String[] {}, apis);
 
         return returnJson(request, new StringBuffer(Json.map(doc)));
     }
@@ -234,6 +247,7 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
      *
      * @param request _more_
      * @param typeHandler _more_
+     * @param service _more_
      *
      * @return _more_
      *
@@ -246,43 +260,47 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
                                        "Output type  -don't change",
                                        service.getId(), true));
 
-        List<ServiceArg> args  = new ArrayList<ServiceArg>();
+        List<ServiceArg> args = new ArrayList<ServiceArg>();
         //TODO: We get everything including intermediate entries
         service.collectArgs(args);
-        for(ServiceArg arg: args) {
-            if(arg.isValueArg()) {
+        for (ServiceArg arg : args) {
+            if (arg.isValueArg()) {
                 continue;
             }
             String type = SU.TYPE_STRING;
-            if(arg.isInt()) type = SU.TYPE_INTEGER;
-            else if(arg.isFloat()) type = SU.TYPE_FLOAT;
+            if (arg.isInt()) {
+                type = SU.TYPE_INTEGER;
+            } else if (arg.isFloat()) {
+                type = SU.TYPE_FLOAT;
+            }
             //TODO: enums
-            if(arg.isFlag()) {
+            if (arg.isFlag()) {
                 if (arg.getGroup() != null) {
                     parameters.add(SU.getParameter(arg.getGroup(),
-                                                   arg.getLabel(), null, arg.isRequired(), type));
+                            arg.getLabel(), null, arg.isRequired(), type));
                 } else {
-                    parameters.add(SU.getParameter(service.getUrlArg(null, arg.getName()),
-                                                   arg.getLabel(), null, arg.isRequired(), type));
+                    parameters.add(SU.getParameter(service.getUrlArg(null,
+                            arg.getName()), arg.getLabel(), null,
+                                            arg.isRequired(), type));
                 }
             } else {
-                String label = arg.getLabel();
+                String label  = arg.getLabel();
                 String urlArg = service.getUrlArg(null, arg.getName());
-                if(arg.isEntry()) {
+                if (arg.isEntry()) {
                     label = "Entry ID";
                     //TODO: Not sure what to do here as this is most likely an intermediate arg
-                    if(arg.isPrimaryEntry()) {
+                    if (arg.isPrimaryEntry()) {
                         urlArg = ARG_ENTRYID;
                     } else {
                         continue;
                     }
                 }
-                parameters.add(SU.getParameter(urlArg,
-                                               label, null, arg.isPrimaryEntry() || arg.isRequired(), type));
+                parameters.add(SU.getParameter(urlArg, label, null,
+                        arg.isPrimaryEntry() || arg.isRequired(), type));
             }
         }
 
-          
+
         /*
         List<Column> columns = typeHandler.getColumns();
         if (columns != null) {
@@ -308,9 +326,14 @@ public class SwaggerApiHandler extends RepositoryManager implements RequestHandl
         */
 
         List<String> operations = new ArrayList<String>();
-        operations.add(Json.map(SU.createOperation("API for " + service.getLabel(), "API to call: " + service.getLabel(), service.getId(), parameters, new ArrayList<String>())));
+        operations.add(Json.map(SU.createOperation("API for "
+                + service.getLabel(), "API to call: " + service.getLabel(),
+                                      service.getId(), parameters,
+                                      new ArrayList<String>())));
 
-        return Json.map(SU.createApi(getRepository().URL_ENTRY_SHOW.toString(), operations));
+        return Json.map(
+            SU.createApi(
+                getRepository().URL_ENTRY_SHOW.toString(), operations));
     }
 
 

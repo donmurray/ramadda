@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -60,6 +60,7 @@ public class EsriServiceImporter extends ImportHandler {
     /** _more_ */
     public static final String TAG_SERVICES = "services";
 
+    /** _more_          */
     public static final String TAG_COPYRIGHT_TEXT = "copyrightText";
 
     /** _more_ */
@@ -413,7 +414,7 @@ public class EsriServiceImporter extends ImportHandler {
 
         entry.setDescription(description.toString());
         Object[] values = entry.getTypeHandler().getEntryValues(entry);
-        String wkid = null;
+        String   wkid   = null;
         if (obj.has(TAG_FULLEXTENT)) {
             JSONObject extent = obj.getJSONObject(TAG_FULLEXTENT);
             if (extent.has(TAG_SPATIALREFERENCE)) {
@@ -441,9 +442,9 @@ public class EsriServiceImporter extends ImportHandler {
 
         values[0] = id;
         if (obj.has(TAG_COPYRIGHT_TEXT)) {
-            values[1] =  obj.get(TAG_COPYRIGHT_TEXT) + "";
+            values[1] = obj.get(TAG_COPYRIGHT_TEXT) + "";
         }
-        values[2] =  wkid;
+        values[2] = wkid;
 
 
         entries.add(entry);

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -47,8 +47,8 @@ import ucar.nc2.dataset.CoordinateAxis;
 import ucar.nc2.dataset.CoordinateAxis1D;
 import ucar.nc2.dataset.CoordinateSystem;
 import ucar.nc2.dataset.NetcdfDataset;
-import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.dt.GridCoordSystem;
+import ucar.nc2.dt.grid.GridDataset;
 
 import ucar.nc2.time.Calendar;
 import ucar.nc2.time.CalendarDate;
@@ -428,7 +428,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
         Metadata      metadata        = null;
         String        varName         = null;
         NetcdfDataset dataset         = null;
-        GridDataset   gridDataset             = null;
+        GridDataset   gridDataset     = null;
         boolean       haveDate        = false;
         StringBuffer  descriptionAttr = new StringBuffer();
         try {
@@ -493,8 +493,8 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 }
 
                 boolean isStartTime = isStartTimeAttribute(name);
-                boolean isEndTime = isEndTimeAttribute(name);
-                
+                boolean isEndTime   = isEndTimeAttribute(name);
+
                 if (isStartTime || isEndTime) {
                     Date date = getDate(value);
                     //                    System.err.println(name +" " + date);
@@ -504,6 +504,7 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                         extra.put(ARG_TODATE, date);
                     }
                     haveDate = true;
+
                     continue;
                 }
                 if (shortForm) {
@@ -772,17 +773,23 @@ public class ThreddsMetadataHandler extends MetadataHandler {
                 }
 
                 LatLonRect llr = null;
-                for (ucar.nc2.dt.GridDataset.Gridset gridset : gridDataset.getGridsets()) {
-                    GridCoordSystem gridCoordSys = gridset.getGeoCoordSystem();
+                for (ucar.nc2.dt.GridDataset.Gridset gridset :
+                        gridDataset.getGridsets()) {
+                    GridCoordSystem gridCoordSys =
+                        gridset.getGeoCoordSystem();
                     llr = gridCoordSys.getLatLonBoundingBox();
+
                     break;
                 }
 
                 if (llr != null) {
                     System.err.println("llr:" + llr);
-                    System.err.println("crosses dateline:" + llr.crossDateline() +
-                                       " upperLeft:" + llr.getUpperLeftPoint().getLongitude() + 
-                                       " upperRight:" + llr.getUpperRightPoint().getLongitude());
+                    System.err.println(
+                        "crosses dateline:" + llr.crossDateline()
+                        + " upperLeft:"
+                        + llr.getUpperLeftPoint().getLongitude()
+                        + " upperRight:"
+                        + llr.getUpperRightPoint().getLongitude());
 
 
 

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -29,19 +29,22 @@ public class GoogleChart {
      * _more_
      *
      * @param sb _more_
+     *
+     * @throws Exception _more_
      */
     public static void addChartImport(Appendable sb) throws Exception {
         StringBuilder js = new StringBuilder();
-        js.append("if ((typeof ramaddaLoadedGoogleCharts === 'undefined')) {\n");
+        js.append(
+            "if ((typeof ramaddaLoadedGoogleCharts === 'undefined')) {\n");
         js.append("ramaddaLoadedGoogleCharts=true;\n");
-        js.append("google.load('visualization', '1.0', {'packages':['corechart']});\n");
-        js.append("google.load('visualization', '1.0', {'packages':['motionchart']});\n");
+        js.append(
+            "google.load('visualization', '1.0', {'packages':['corechart']});\n");
+        js.append(
+            "google.load('visualization', '1.0', {'packages':['motionchart']});\n");
 
         js.append("}\n");
         sb.append(HtmlUtils.importJS("https://www.google.com/jsapi"));
-        sb.append(
-            HtmlUtils.script(
-                             js.toString()));
+        sb.append(HtmlUtils.script(js.toString()));
         //        // Set a callback to run when the Google Visualization API is loaded.
         //        google.setOnLoadCallback(drawChart);
     }

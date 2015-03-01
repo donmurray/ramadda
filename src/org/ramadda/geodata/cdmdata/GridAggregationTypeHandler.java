@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -154,9 +154,11 @@ public class GridAggregationTypeHandler extends ExtensibleGroupTypeHandler {
      *
      * @param request  the Request
      * @param entry    the Entry
+     * @param fromImport _more_
      */
     @Override
-    public void doFinalEntryInitialization(Request request, Entry entry, boolean fromImport) {
+    public void doFinalEntryInitialization(Request request, Entry entry,
+                                           boolean fromImport) {
         //Call this to force an initial ingest
         try {
             if (getIngest(entry)) {
@@ -510,7 +512,7 @@ public class GridAggregationTypeHandler extends ExtensibleGroupTypeHandler {
      */
     @Override
     public void getServiceInfos(Request request, Entry entry,
-                            List<ServiceInfo> services) {
+                                List<ServiceInfo> services) {
         super.getServiceInfos(request, entry, services);
 
         /*

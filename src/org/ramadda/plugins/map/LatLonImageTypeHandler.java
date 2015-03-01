@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -84,13 +84,13 @@ public class LatLonImageTypeHandler extends GenericTypeHandler {
     @Override
     public boolean addToMap(Request request, Entry entry, MapInfo map) {
 
-        if (!entry.hasAreaDefined()) {
+        if ( !entry.hasAreaDefined()) {
             return false;
         }
 
         //Only set the width if the latlonentry is the main displayed entry
 
-        if(entry.getId().equals(request.getString(ARG_ENTRYID,""))) {
+        if (entry.getId().equals(request.getString(ARG_ENTRYID, ""))) {
             int width  = (int) entry.getValue(0, -1);
             int height = (int) entry.getValue(1, -1);
             if ((width > 0) && (height > 0)) {
@@ -106,17 +106,16 @@ public class LatLonImageTypeHandler extends GenericTypeHandler {
                 entry);
 
         boolean visible = false;
-        if(request.getExtraProperty("wmslayershow") == null) {
-            request.putExtraProperty("wmslayershow","true");
+        if (request.getExtraProperty("wmslayershow") == null) {
+            request.putExtraProperty("wmslayershow", "true");
             visible = true;
         }
 
         map.addJS(HtmlUtils.call("theMap.addImageLayer",
                                  HtmlUtils.jsMakeArgs(new String[] {
-                                         HtmlUtils.squote(entry.getId()),
-                                         HtmlUtils.squote(entry.getName()), HtmlUtils.squote(url),
-            ""+visible,
-            "" + entry.getNorth(), "" + entry.getWest(),
+            HtmlUtils.squote(entry.getId()),
+            HtmlUtils.squote(entry.getName()), HtmlUtils.squote(url),
+            "" + visible, "" + entry.getNorth(), "" + entry.getWest(),
             "" + entry.getSouth(), "" + entry.getEast(), "400", "400"
         }, false)));
 

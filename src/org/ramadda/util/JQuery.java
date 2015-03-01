@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -125,9 +125,12 @@ public class JQuery {
      * @param code _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
     public static String button(String label, String id, Appendable js,
-                                String code) throws Exception {
+                                String code)
+            throws Exception {
         String html = HtmlUtils.tag("button", HtmlUtils.id(id), label);
         js.append(
             JQuery.select(JQuery.id(id))
@@ -146,9 +149,12 @@ public class JQuery {
      * @param code _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
     public static String makeButton(String label, String id, Appendable js,
-                                    String code) throws Exception {
+                                    String code)
+            throws Exception {
         String html = HtmlUtils.tag("button", HtmlUtils.id(id), label);
         js.append(JQuery.select(JQuery.id(id))
                   + ".button().click(function(event){\n" + code + "\n});\n");

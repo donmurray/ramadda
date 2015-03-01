@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -409,7 +409,8 @@ public class CatalogOutputHandler extends OutputHandler {
                     request.remove(ARG_SKIP);
                     String url = request.url(repository.URL_ENTRY_SHOW,
                                              ARG_ENTRYID, group.getId(),
-                                             ARG_OUTPUT, OUTPUT_CATALOG.toString(),
+                                             ARG_OUTPUT,
+                                             OUTPUT_CATALOG.toString(),
                                              ARG_SKIP, "" + (skip + max),
                                              ARG_MAX, "" + max);
 
@@ -433,7 +434,8 @@ public class CatalogOutputHandler extends OutputHandler {
                         != null)) {
                 String urlPath = HtmlUtils.url("/latest", ARG_ENTRYID,
                                      group.getId(), ARG_LATESTOPENDAP,
-                                     "true", ARG_OUTPUT, OUTPUT_CATALOG.toString());
+                                     "true", ARG_OUTPUT,
+                                     OUTPUT_CATALOG.toString());
                 addService(catalogInfo, SERVICE_LATEST,
                            getEntryManager().getFullEntryShowUrl(request),
                            "Resolver");
@@ -623,7 +625,7 @@ public class CatalogOutputHandler extends OutputHandler {
         String path = f.toString();
         path = path.replace("\\", "/");
 
-        int           cnt      = 0;
+        int               cnt      = 0;
         List<ServiceInfo> services = new ArrayList<ServiceInfo>();
         entry.getTypeHandler().getServiceInfos(request, entry, services);
         boolean didOpendap = false;
@@ -782,10 +784,10 @@ public class CatalogOutputHandler extends OutputHandler {
 
 
         if (WmsImageOutputHandler.isLatLonImage(entry)) {
-            String url = request.entryUrl(
-                             getRepository().URL_ENTRY_SHOW, entry,
-                             ARG_OUTPUT,
-                             WmsImageOutputHandler.OUTPUT_WMS_CAPABILITIES.toString());
+            String url =
+                request.entryUrl(
+                    getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
+                    WmsImageOutputHandler.OUTPUT_WMS_CAPABILITIES.toString());
             Element ref = XmlUtil.create(catalogInfo.doc,
                                          CatalogUtil.TAG_CATALOGREF, parent,
                                          new String[] {
@@ -936,7 +938,8 @@ public class CatalogOutputHandler extends OutputHandler {
             } else {
                 String url =  /* "http://localhost:8080"+*/
                     request.url(repository.URL_ENTRY_SHOW, ARG_ENTRYID,
-                                group.getId(), ARG_OUTPUT, OUTPUT_CATALOG.toString());
+                                group.getId(), ARG_OUTPUT,
+                                OUTPUT_CATALOG.toString());
 
                 Element ref = XmlUtil.create(catalogInfo.doc,
                                              CatalogUtil.TAG_CATALOGREF,

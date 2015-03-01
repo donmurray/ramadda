@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -1673,25 +1673,30 @@ public class SqlUtil {
                     lastResultSet = stmt.getResultSet();
                     if (lastResultSet == null) {
                         checkClose();
+
                         return null;
                     }
                     if ( !lastResultSet.next()) {
                         checkClose();
+
                         return null;
                     }
                     //Run through the offset
                     while (offset-- > 0) {
                         if ( !lastResultSet.next()) {
                             checkClose();
+
                             return null;
                         }
                     }
                     cnt++;
+
                     return lastResultSet;
                 }
 
                 if (lastResultSet.next()) {
                     cnt++;
+
                     return lastResultSet;
                 }
 
@@ -1699,8 +1704,9 @@ public class SqlUtil {
                     lastResultSet.close();
                 }
                 lastResultSet = stmt.getResultSet();
-                if(lastResultSet == null) {
+                if (lastResultSet == null) {
                     checkClose();
+
                     return null;
                 }
                 if (lastResultSet.next()) {
@@ -2308,7 +2314,7 @@ public class SqlUtil {
      * Interface description
      *
      *
-     * @author         Enter your name here...    
+     * @author         Enter your name here...
      */
     public static interface ResultsHandler {
 

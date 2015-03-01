@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -116,9 +116,9 @@ public class SwitchyardPointFile extends SingleSiteTextFile {
             if (latString == null) {
                 String[] pts =
                     Utils.findPatterns(
-                                       hdr,
-                                       ".*\\s+([\\d\\.]+)\\s*deg\\s*([\\d\\.]+)\\s*min\\s*N .*([\\d\\.]+)\\s*deg\\s*([\\d\\.]+)\\s*min");
-                if(pts!=null) {
+                        hdr,
+                        ".*\\s+([\\d\\.]+)\\s*deg\\s*([\\d\\.]+)\\s*min\\s*N .*([\\d\\.]+)\\s*deg\\s*([\\d\\.]+)\\s*min");
+                if (pts != null) {
                     latString = pts[0] + ":" + pts[1];
                     lonString = pts[2] + ":" + pts[3];
                 }
@@ -168,17 +168,20 @@ public class SwitchyardPointFile extends SingleSiteTextFile {
                 makeField(FIELD_LONGITUDE, attrValue(lon)),
                 makeField(FIELD_DATE, attrType(TYPE_DATE), attrValue(dttm),
                           attrFormat("yyyy-MM-dd HH:mm")),
-                makeField(FIELD_DEPTH,  attrs + attrUnit(UNIT_METERS)),
+                makeField(FIELD_DEPTH, attrs + attrUnit(UNIT_METERS)),
                 makeField(FIELD_PRESSURE, attrs + attrUnit("dbar")),
                 makeField("In_Situ_Temperature",
-                          attrSortOrder(10)+ attrs + attrUnit(UNIT_CELSIUS)),
+                          attrSortOrder(10) + attrs + attrUnit(UNIT_CELSIUS)),
                 ( !addPotentialTemp
                   ? null
                   : makeField(FIELD_POTENTIAL_TEMPERATURE,
                               attrs + attrUnit(UNIT_CELSIUS))),
-                makeField(FIELD_CONDUCTIVITY, attrSortOrder(10)+ attrs + attrUnit("S/m")),
-                makeField(FIELD_SALINITY, attrSortOrder(10)+ attrs + attrUnit("psu")),
-                makeField(FIELD_SIGMA, attrSortOrder(10)+ attrs + attrUnit("-theta")),
+                makeField(FIELD_CONDUCTIVITY,
+                          attrSortOrder(10) + attrs + attrUnit("S/m")),
+                makeField(FIELD_SALINITY,
+                          attrSortOrder(10) + attrs + attrUnit("psu")),
+                makeField(FIELD_SIGMA,
+                          attrSortOrder(10) + attrs + attrUnit("-theta")),
                 /*
                 makeField("Dissolved_Oxygen_ML_L",  attrs +  attrUnit("ml/l")),
                 makeField("Dissolved_Oxygen_MG_L",  attrs +  attrUnit("mg/l")),
@@ -203,7 +206,8 @@ public class SwitchyardPointFile extends SingleSiteTextFile {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
-        String s = "Station 1 (Cast 2)              84deg 01.763min N   65deg 09.247min W              2003-5-6/1730 GMT";
+        String s =
+            "Station 1 (Cast 2)              84deg 01.763min N   65deg 09.247min W              2003-5-6/1730 GMT";
         PointFile.test(args, SwitchyardPointFile.class);
     }
 

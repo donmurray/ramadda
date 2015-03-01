@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -21,10 +21,6 @@
 package org.ramadda.geodata.model;
 
 
-import org.ramadda.service.Service;
-import org.ramadda.service.ServiceInput;
-import org.ramadda.service.ServiceOutput;
-import org.ramadda.service.ServiceProvider;
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
 
 import org.ramadda.repository.Entry;
@@ -39,6 +35,12 @@ import org.ramadda.repository.map.MapBoxProperties;
 import org.ramadda.repository.map.MapInfo;
 import org.ramadda.repository.output.OutputHandler;
 import org.ramadda.repository.output.OutputType;
+
+
+import org.ramadda.service.Service;
+import org.ramadda.service.ServiceInput;
+import org.ramadda.service.ServiceOutput;
+import org.ramadda.service.ServiceProvider;
 import org.ramadda.util.GeoUtils;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.TempDir;
@@ -779,13 +781,12 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
                             + msgLabel("End")
                             + HtmlUtils.select(
                                 ARG_CDO_ENDMONTH, MONTHS,
-                                request.getString(
-                                    ARG_CDO_ENDMONTH,
-                                    null), HtmlUtils.title(
-                                    //MONTHS.get(
-                                    //    MONTHS.size()
-                                    //    - 1).getId().toString()), HtmlUtils.title(
-                                            "Select the ending month"))));
+                                request.getString(ARG_CDO_ENDMONTH, null),
+                                HtmlUtils.title(
+        //MONTHS.get(
+        //    MONTHS.size()
+        //    - 1).getId().toString()), HtmlUtils.title(
+        "Select the ending month"))));
     }
 
     /**
@@ -834,10 +835,10 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
                                 ARG_CDO_ENDYEAR, years,
                                 request.getString(
                                     ARG_CDO_ENDYEAR,
-                                      years.get(0)), HtmlUtils.title(
-                                    //years.get(
-                                    //    years.size() - 1)), HtmlUtils.title(
-                                            "Select the ending year"))));
+                                    years.get(0)), HtmlUtils.title(
+        //years.get(
+        //    years.size() - 1)), HtmlUtils.title(
+        "Select the ending year"))));
     }
 
     /**
@@ -1462,6 +1463,8 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
          * @param request  the Request
          * @param input    the ServiceInput
          * @param sb       the form
+         * @param argPrefix _more_
+         * @param label _more_
          *
          *
          * @throws Exception  problem adding to the form
@@ -1526,14 +1529,16 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
          * @param request  The request
          * @param info _more_
          * @param input  the  data process input
+         * @param argPrefix _more_
          *
          * @return  the processed data
          *
          * @throws Exception  problem processing
          */
         @Override
-        public ServiceOutput evaluate(Request request, ServiceInput input, String argPrefix)
-               throws Exception {
+        public ServiceOutput evaluate(Request request, ServiceInput input,
+                                      String argPrefix)
+                throws Exception {
 
             Entry  oneOfThem = input.getEntries().get(0);
             String tail      = getStorageManager().getFileTail(oneOfThem);

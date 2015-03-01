@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -353,8 +353,9 @@ public class PointFormHandler extends RecordFormHandler {
             throws Exception {
         boolean showUrl = request.get(ARG_SHOWURL, false);
 
-        String formId   = HtmlUtils.getUniqueId("form_");
-        sb.append(request.formPost(getRepository().URL_ENTRY_SHOW, HtmlUtils.id(formId)));
+        String  formId  = HtmlUtils.getUniqueId("form_");
+        sb.append(request.formPost(getRepository().URL_ENTRY_SHOW,
+                                   HtmlUtils.id(formId)));
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, group.getId()));
         sb.append(HtmlUtils.hidden(ARG_RECORDENTRY_CHECK, "true"));
 
@@ -414,9 +415,10 @@ public class PointFormHandler extends RecordFormHandler {
 
         addToGroupForm(request, group, sb, recordEntries, extra);
         sb.append(HtmlUtils.formTableClose());
-       
+
         sb.append(HtmlUtils.submit(msg("Get Data"), ARG_GETDATA));
-        OutputHandler.addUrlShowingForm(sb, formId, "[\".*OpenLayers_Control.*\"]");
+        OutputHandler.addUrlShowingForm(sb, formId,
+                                        "[\".*OpenLayers_Control.*\"]");
         sb.append(HtmlUtils.formClose());
 
         return new Result("", sb);
@@ -457,15 +459,17 @@ public class PointFormHandler extends RecordFormHandler {
             throws Exception {
         RecordEntry recordEntry =
             getPointOutputHandler().doMakeEntry(request, entry);
-        String formId   = HtmlUtils.getUniqueId("form_");
-        sb.append(request.formPost(getRepository().URL_ENTRY_SHOW, HtmlUtils.id(formId)));
+        String formId = HtmlUtils.getUniqueId("form_");
+        sb.append(request.formPost(getRepository().URL_ENTRY_SHOW,
+                                   HtmlUtils.id(formId)));
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
         addToEntryForm(request, entry, sb, recordEntry);
         sb.append("<tr><td>");
         sb.append(HtmlUtils.submit(msg("Get Data"), ARG_GETDATA));
         sb.append("</td><td></td></tr>");
         sb.append(HtmlUtils.formTableClose());
-        OutputHandler.addUrlShowingForm(sb, formId, "[\".*OpenLayers_Control.*\"]");
+        OutputHandler.addUrlShowingForm(sb, formId,
+                                        "[\".*OpenLayers_Control.*\"]");
         sb.append(HtmlUtils.formClose());
 
         return new Result("", sb);
@@ -741,15 +745,21 @@ public class PointFormHandler extends RecordFormHandler {
             new ArrayList<HtmlUtils.Selector>();
 
         //Do this so we get the LidarOutputHandler in case of a lidar entry
-        ((PointEntry)recordEntry).getPointOutputHandler().getPointFormats(pointFormats, forGroup);
+        ((PointEntry) recordEntry).getPointOutputHandler().getPointFormats(
+            pointFormats, forGroup);
         getGridFormats(gridFormats, forGroup);
         List<List<HtmlUtils.Selector>> formatLists =
             new ArrayList<List<HtmlUtils.Selector>>();
         formatLists.add(pointFormats);
         formatLists.add(gridFormats);
 
-        sb.append(HtmlUtils.formTable(
-                                      HtmlUtils.cssClass("formtable") + HtmlUtils.attrs(HtmlUtils.ATTR_CELLPADDING, "0", HtmlUtils.ATTR_CELLSPACING, "0", HtmlUtils.ATTR_WIDTH, "100%")));
+        sb.append(
+            HtmlUtils.formTable(
+                HtmlUtils.cssClass("formtable")
+                + HtmlUtils.attrs(
+                    HtmlUtils.ATTR_CELLPADDING, "0",
+                    HtmlUtils.ATTR_CELLSPACING, "0", HtmlUtils.ATTR_WIDTH,
+                    "100%")));
         sb.append("<tr><td width=15%>");
         sb.append(HtmlUtils.submit(msg("Get Data"), ARG_GETDATA));
         sb.append("</td><td></td></tr>");

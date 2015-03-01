@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -148,9 +148,10 @@ public class FormInfo {
          * @param message _more_
          */
         public void error(Appendable js, String message) {
-            Utils.append(js, HtmlUtils.call("alert", HtmlUtils.squote(message)));
+            Utils.append(js,
+                         HtmlUtils.call("alert", HtmlUtils.squote(message)));
             Utils.append(js, "event.preventDefault();\n");
-            Utils.append(js,"return;\n");
+            Utils.append(js, "return;\n");
         }
 
     }
@@ -192,10 +193,11 @@ public class FormInfo {
          * @param js _more_
          */
         public void addJavascriptValidation(Appendable js) {
-            Utils.append(js, "if(!GuiUtils.inputValueOk(" + HtmlUtils.squote(id) + ","
-                      + value + "," + (min
-                                       ? "true"
-                                       : "false") + ")) {\n");
+            Utils.append(js,
+                         "if(!GuiUtils.inputValueOk(" + HtmlUtils.squote(id)
+                         + "," + value + "," + (min
+                    ? "true"
+                    : "false") + ")) {\n");
             String message;
             if (min) {
                 message = "Error: " + label + " is < " + value;
@@ -203,7 +205,7 @@ public class FormInfo {
                 message = "Error: " + label + " is > " + value;
             }
             error(js, message);
-            Utils.append(js,"}\n");
+            Utils.append(js, "}\n");
         }
 
 
@@ -241,12 +243,13 @@ public class FormInfo {
          * @param js _more_
          */
         public void addJavascriptValidation(Appendable js) {
-            Utils.append(js, "if(!GuiUtils.inputLengthOk(" + HtmlUtils.squote(id) + ","
-                      + length + ")) {\n");
+            Utils.append(js,
+                         "if(!GuiUtils.inputLengthOk(" + HtmlUtils.squote(id)
+                         + "," + length + ")) {\n");
             String message = "Error: " + label
                              + " is too long. Max length is " + length;
             error(js, message);
-            Utils.append(js,"}\n");
+            Utils.append(js, "}\n");
         }
 
 

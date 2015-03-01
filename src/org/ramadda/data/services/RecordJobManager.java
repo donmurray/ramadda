@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -674,9 +674,12 @@ public class RecordJobManager extends JobManager implements RecordConstants {
      *
      * @param request _more_
      * @param sb _more_
+     *
+     * @throws Exception _more_
      */
-@Override
-    public void addHtmlHeader(Request request, Appendable sb) throws Exception {
+    @Override
+    public void addHtmlHeader(Request request, Appendable sb)
+            throws Exception {
         try {
             //            getRecordOutputHandler().makeApiHeader(request, sb);
         } catch (Exception exc) {
@@ -761,9 +764,11 @@ public class RecordJobManager extends JobManager implements RecordConstants {
                 try {
                     //Note - normally the POH here is "this" POH but for Lidar types over in the nlasplugin
                     //We want to get the LidarOutputHandler
-                    PointOutputHandler pointOutputHandler = (PointOutputHandler)recordEntries.get(0).getOutputHandler();
-                    pointOutputHandler.processEntries(request, entry, true, recordEntries,
-                                                      jobInfo.getJobId());
+                    PointOutputHandler pointOutputHandler =
+                        (PointOutputHandler) recordEntries.get(
+                            0).getOutputHandler();
+                    pointOutputHandler.processEntries(request, entry, true,
+                            recordEntries, jobInfo.getJobId());
                     if ( !jobOK(jobInfo.getJobId())) {
                         return;
                     }

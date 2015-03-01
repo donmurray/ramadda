@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -86,7 +86,9 @@ public class PointApiHandler extends RepositoryManager {
         Entry              entry = getEntryManager().getEntry(request);
         request.getHttpServletResponse().setContentType("test/json");
         //Set a default of 500 for num points
-        request.put(RecordFormHandler.ARG_NUMPOINTS, request.getString(RecordFormHandler.ARG_NUMPOINTS, "500"));
+        request.put(RecordFormHandler.ARG_NUMPOINTS,
+                    request.getString(RecordFormHandler.ARG_NUMPOINTS,
+                                      "500"));
 
         request.put(ARG_OUTPUT, poh.OUTPUT_PRODUCT.getId());
         request.put(ARG_PRODUCT, poh.OUTPUT_JSON.toString());
@@ -97,12 +99,22 @@ public class PointApiHandler extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result processDataRequest(Request request) throws Exception {
         PointOutputHandler poh   = getPointOutputHandler();
         Entry              entry = getEntryManager().getEntry(request);
         request.put(ARG_OUTPUT, poh.OUTPUT_PRODUCT.getId());
         request.put(ARG_PRODUCT, poh.OUTPUT_JSON.toString());
         request.put(RecordConstants.ARG_ASYNCH, "false");
+
         return poh.outputEntry(request, poh.OUTPUT_PRODUCT, entry);
     }
 

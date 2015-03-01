@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -66,15 +66,13 @@ public class DifOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final OutputType OUTPUT_DIF_XML =
-        new OutputType("Dif-XML", "dif.xml",
-                       OutputType.TYPE_FEEDS, "",
+        new OutputType("Dif-XML", "dif.xml", OutputType.TYPE_FEEDS, "",
                        ICON_DIF);
 
 
     /** _more_ */
     public static final OutputType OUTPUT_DIF_TEXT =
-        new OutputType("Dif-Text", "dif.text",
-                       OutputType.TYPE_FEEDS, "",
+        new OutputType("Dif-Text", "dif.text", OutputType.TYPE_FEEDS, "",
                        ICON_DIF);
 
 

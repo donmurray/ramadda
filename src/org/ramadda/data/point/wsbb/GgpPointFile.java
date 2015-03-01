@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -108,6 +108,7 @@ public class GgpPointFile extends CsvFile {
      */
     @Override
     public VisitInfo prepareToVisit(VisitInfo visitInfo) throws Exception {
+
         StringBuffer desc = new StringBuffer();
         //Set some of the properties
         putProperty(PROP_DELIMITER, " ");
@@ -129,25 +130,30 @@ public class GgpPointFile extends CsvFile {
                      longitude           = 0,
                      elevation           = 0;
 
-        String gravityUnit = "V";
-        String pressureUnit = "hPa";
+        String       gravityUnit         = "V";
+        String       pressureUnit        = "hPa";
 
         //The header lines can be in different order so look at each one
         for (String line : headerLines) {
             if (line.indexOf("yyyymmdd") >= 0) {
-                    gravityUnit = StringUtil.findPattern(line, ".*gravity\\(([^\\)]+)\\).*");
-                    pressureUnit = StringUtil.findPattern(line, ".*pressure\\(([^\\)]+)\\).*");
-                    if(gravityUnit == null) {
-                        System.err.println("ggp: could not read gravity unit:" +line);
-                        gravityUnit = "V";
-                    }
-                    if(pressureUnit == null) {
-                        System.err.println("ggp: could not read pressure unit:" +line);
-                        pressureUnit = "hPa";
-                    }
-                    continue;
+                gravityUnit = StringUtil.findPattern(line,
+                        ".*gravity\\(([^\\)]+)\\).*");
+                pressureUnit = StringUtil.findPattern(line,
+                        ".*pressure\\(([^\\)]+)\\).*");
+                if (gravityUnit == null) {
+                    System.err.println("ggp: could not read gravity unit:"
+                                       + line);
+                    gravityUnit = "V";
+                }
+                if (pressureUnit == null) {
+                    System.err.println("ggp: could not read pressure unit:"
+                                       + line);
+                    pressureUnit = "hPa";
+                }
+
+                continue;
             }
-                
+
             List<String> toks = StringUtil.splitUpTo(line, ":", 2);
             if (toks.size() == 2) {
                 String name  = toks.get(0);
@@ -220,6 +226,7 @@ public class GgpPointFile extends CsvFile {
         });
 
         return visitInfo;
+
     }
 
 

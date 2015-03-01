@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -107,12 +107,12 @@ public class PdbTypeHandler extends GenericTypeHandler {
                 break;
             }
             if (line.startsWith("TITLE ")) {
-                String title = read(line,"TITLE "); 
+                String title = read(line, "TITLE ");
                 title = title.trim();
                 titles.add(title);
             } else if (line.startsWith("REMARK ")) {
-                String remark = read(line,"REMARK ");
-                if(Utils.stringDefined(remark)) {
+                String remark = read(line, "REMARK ");
+                if (Utils.stringDefined(remark)) {
                     remarks.add(remark);
                 }
             } else if (line.startsWith("EXPDATA ")) {
@@ -121,9 +121,8 @@ public class PdbTypeHandler extends GenericTypeHandler {
                         line.substring("EXPDATA ".length()), "", "", "", ""));
 
             } else if (line.startsWith("KEYWDS ")) {
-                keywords.addAll(
-                    StringUtil.split(read(line,"KEYWDS "), ",", true,
-                                     true));
+                keywords.addAll(StringUtil.split(read(line, "KEYWDS "), ",",
+                        true, true));
             } else if (line.startsWith("COMPND ")) {
                 String tmp = read(line, "COMPND ");
                 if (tmp.startsWith("MOL_ID") || (compounds.size() == 0)) {

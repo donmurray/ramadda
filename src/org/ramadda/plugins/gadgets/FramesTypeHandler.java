@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -42,13 +42,13 @@ import java.util.List;
 public class FramesTypeHandler extends GenericTypeHandler {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String LAYOUT_TABLE = "table";
 
-    /** _more_          */
+    /** _more_ */
     public static final String LAYOUT_TABS = "tabs";
 
-    /** _more_          */
+    /** _more_ */
     public static final String LAYOUT_ACCORDIAN = "accordian";
 
     /**

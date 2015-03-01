@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2013 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -86,9 +86,8 @@ public class TwitterSearchTypeHandler extends GenericTypeHandler {
             return new Result(msg("Twitter Search"), sb);
         }
 
-        String template =
-            getRepository().getResource(
-                "/org/ramadda/plugins/gadgets/template.html");
+        String template = getRepository().getResource(
+                              "/org/ramadda/plugins/gadgets/template.html");
         String string      = entry.getValue(0, "");
         String width       = entry.getValue(1, "350");
         String height      = entry.getValue(2, "300");
