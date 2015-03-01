@@ -3056,7 +3056,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
                 return getNoRobotsResult(request);
             }
             //Sleep a second to slow the google bot down
-            Misc.sleep(1000);
+            System.err.println("Sleeping for the bot:" + request +" " + request.getUserAgent());
+            Misc.sleepSeconds(20);
         }
 
         if (debug) {
