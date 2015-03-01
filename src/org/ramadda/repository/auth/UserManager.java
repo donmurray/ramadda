@@ -1,5 +1,5 @@
-/**
-* Copyright 2008-2014 Geode Systems LLC
+/*
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -110,7 +110,11 @@ public class UserManager extends RepositoryManager {
 
     /** _more_ */
     public static final String ARG_USER_NEW = "user.new";
+
+    /** _more_          */
     public static final String ARG_USER_IMPORT = "userimport";
+
+    /** _more_          */
     public static final String ARG_USER_EXPORT = "userexport";
 
 
@@ -1003,7 +1007,8 @@ public class UserManager extends RepositoryManager {
         user.setDescription(request.getString(ARG_USER_DESCRIPTION,
                 user.getDescription()));
         user.setEmail(request.getString(ARG_USER_EMAIL, user.getEmail()));
-        user.setTemplate(request.getString(ARG_USER_TEMPLATE, user.getTemplate()));
+        user.setTemplate(request.getString(ARG_USER_TEMPLATE,
+                                           user.getTemplate()));
         user.setLanguage(request.getString(ARG_USER_LANGUAGE,
                                            user.getLanguage()));
         user.setQuestion(request.getString(ARG_USER_QUESTION,
@@ -1085,6 +1090,7 @@ public class UserManager extends RepositoryManager {
         if (request.defined(ARG_USER_DELETE_CONFIRM)) {
             request.ensureAuthToken();
             deleteUser(user);
+
             return new Result(request.url(getRepositoryBase().URL_USER_LIST));
         }
 
@@ -1528,24 +1534,28 @@ public class UserManager extends RepositoryManager {
 
         if (request.defined(ARG_USER_DELETE_CONFIRM)) {
             sb.append(HtmlUtils.p());
-            for(User user: users) {
+            for (User user : users) {
                 deleteUser(user);
                 sb.append("Deleted user: " + user.getId());
                 sb.append(HtmlUtils.p());
             }
+
             return getAdmin().makeResult(request, msg("Delete Users"), sb);
         } else if (request.defined(ARG_USER_DELETE)) {
             request.formPostWithAuthToken(sb, URL_USER_SELECT_DO);
             sb.append(HtmlUtils.p());
-            sb.append(getPageHandler().showDialogNote(msg("Are you sure you want to delete these users?")));
-            sb.append(HtmlUtils.submit(msg("Yes, really delete these users"), ARG_USER_DELETE_CONFIRM));
+            sb.append(
+                getPageHandler().showDialogNote(
+                    msg("Are you sure you want to delete these users?")));
+            sb.append(HtmlUtils.submit(msg("Yes, really delete these users"),
+                                       ARG_USER_DELETE_CONFIRM));
             sb.append(HtmlUtils.space(2));
             sb.append(HtmlUtils.submit(msg("Cancel"), ARG_USER_CANCEL));
 
             sb.append(HtmlUtils.p());
-            for(User user: users) {
+            for (User user : users) {
                 String userCbx = HtmlUtils.checkbox("user_" + user.getId(),
-                                                    "true", true, "");
+                                     "true", true, "");
                 sb.append(userCbx);
                 sb.append(HtmlUtils.space(1));
                 sb.append(user.getId());
@@ -1554,6 +1564,7 @@ public class UserManager extends RepositoryManager {
                 sb.append(HtmlUtils.br());
             }
             sb.append(HtmlUtils.formClose());
+
             return getAdmin().makeResult(request, msg("Delete Users"), sb);
         }
 
@@ -1755,7 +1766,7 @@ public class UserManager extends RepositoryManager {
         StringBuffer usersHtml = new StringBuffer();
         StringBuffer rolesHtml = new StringBuffer();
 
-        StringBuffer sb         = new StringBuffer();
+        StringBuffer sb        = new StringBuffer();
 
 
         sb.append(request.form(URL_USER_NEW_FORM));
@@ -1780,15 +1791,17 @@ public class UserManager extends RepositoryManager {
         //        addActivity(request, request.getUser(),  ACTIVITY_PASSWORD_CHANGE, "");
 
         request.formPostWithAuthToken(usersHtml, URL_USER_SELECT_DO);
-        usersHtml.append(HtmlUtils.open("table", HtmlUtils.cssClass("ramadda-user-table")));
+        usersHtml.append(
+            HtmlUtils.open(
+                "table", HtmlUtils.cssClass("ramadda-user-table")));
         usersHtml.append(HtmlUtils.row(HtmlUtils.cols("",
-                                                      HtmlUtils.bold(msg("Edit"))  + HtmlUtils.space(2),
-                                                      HtmlUtils.bold(msg("ID"))    + HtmlUtils.space(2),
-                                                      HtmlUtils.bold(msg("Name"))  + HtmlUtils.space(2),
-                                                      HtmlUtils.bold(msg("Email")) + HtmlUtils.space(2), 
-                                                      HtmlUtils.bold(msg("Admin")) + HtmlUtils.space(2), 
-                                                      HtmlUtils.bold(msg("Guest")) + HtmlUtils.space(2), 
-                                                      HtmlUtils.bold(msg("Log")))));
+                HtmlUtils.bold(msg("Edit")) + HtmlUtils.space(2),
+                HtmlUtils.bold(msg("ID")) + HtmlUtils.space(2),
+                HtmlUtils.bold(msg("Name")) + HtmlUtils.space(2),
+                HtmlUtils.bold(msg("Email")) + HtmlUtils.space(2),
+                HtmlUtils.bold(msg("Admin")) + HtmlUtils.space(2),
+                HtmlUtils.bold(msg("Guest")) + HtmlUtils.space(2),
+                HtmlUtils.bold(msg("Log")))));
 
         for (User user : users) {
             String userEditLink = HtmlUtils.href(
@@ -1820,13 +1833,14 @@ public class UserManager extends RepositoryManager {
 
 
 
-            String row = HtmlUtils.row(HtmlUtils.cols(userCbx,
-                                                userEditLink, userProfileLink,
-                                                user.getName(),
-                                                /*user.getRolesAsString("<br>"),*/
-                                                user.getEmail(), "" + user.getAdmin(),
-                                                      "" + user.getIsGuest(),userLogLink),
-                                       HtmlUtils.cssClass("ramadda-user-row " + (user.getAdmin()?"ramadda-user-admin":"")));
+            String row = HtmlUtils.row(HtmlUtils.cols(userCbx, userEditLink,
+                             userProfileLink, user.getName(),
+            /*user.getRolesAsString("<br>"),*/
+            user.getEmail(), "" + user.getAdmin(), "" + user.getIsGuest(),
+                             userLogLink), HtmlUtils.cssClass(
+                                 "ramadda-user-row " + (user.getAdmin()
+                    ? "ramadda-user-admin"
+                    : "")));
             usersHtml.append(row);
 
             List<String> roles = user.getRoles();
@@ -1847,9 +1861,11 @@ public class UserManager extends RepositoryManager {
         usersHtml.append("</table>");
 
         usersHtml.append(HtmlUtils.p());
-        usersHtml.append(HtmlUtils.submit(msg("Export Selected Users"), ARG_USER_EXPORT));
+        usersHtml.append(HtmlUtils.submit(msg("Export Selected Users"),
+                                          ARG_USER_EXPORT));
         usersHtml.append(HtmlUtils.space(2));
-        usersHtml.append(HtmlUtils.submit(msg("Delete Selected Users"), ARG_USER_DELETE));
+        usersHtml.append(HtmlUtils.submit(msg("Delete Selected Users"),
+                                          ARG_USER_DELETE));
 
         usersHtml.append(HtmlUtils.formClose());
 
@@ -1864,10 +1880,10 @@ public class UserManager extends RepositoryManager {
 
 
 
-        List         tabTitles  = new ArrayList();
-        List         tabContent = new ArrayList();
+        List tabTitles  = new ArrayList();
+        List tabContent = new ArrayList();
 
-        int          showTab    = request.get(ARG_SHOWTAB, 0);
+        int  showTab    = request.get(ARG_SHOWTAB, 0);
         tabTitles.add(msg("User List"));
         tabContent.add(usersHtml.toString());
 
@@ -2232,8 +2248,11 @@ public class UserManager extends RepositoryManager {
      * @param sb _more_
      *
      * @return The result
+     *
+     * @throws Exception _more_
      */
-    public Result makeResult(Request request, String title, Appendable sb) throws Exception {
+    public Result makeResult(Request request, String title, Appendable sb)
+            throws Exception {
         StringBuilder headerSB = new StringBuilder();
         addUserHeader(request, headerSB);
         headerSB.append(sb);
@@ -2263,8 +2282,11 @@ public class UserManager extends RepositoryManager {
      *
      * @param request the request
      * @param sb _more_
+     *
+     * @throws Exception _more_
      */
-    public void addUserHeader(Request request, Appendable sb) throws Exception {
+    public void addUserHeader(Request request, Appendable sb)
+            throws Exception {
         User             user    = request.getUser();
         boolean          useAnon = user.getAnonymous() || user.getIsGuest();
         List<RequestUrl> links   = userUrls;
@@ -2357,7 +2379,10 @@ public class UserManager extends RepositoryManager {
                 request.url(getRepositoryBase().URL_USER_HOME);
 
             if (makePopup) {
-                prefix.append(HtmlUtils.href(settingsUrl, label, HtmlUtils.cssClass("ramadda-user-settings-link")));
+                prefix.append(
+                    HtmlUtils.href(
+                        settingsUrl, label,
+                        HtmlUtils.cssClass("ramadda-user-settings-link")));
                 prefix.append(HtmlUtils.space(2));
             } else {
                 extras.add("");
@@ -2506,9 +2531,9 @@ public class UserManager extends RepositoryManager {
     public Result processHome(Request request) throws Exception {
         boolean responseAsXml = request.getString(ARG_RESPONSE,
                                     "").equals(RESPONSE_XML);
-        StringBuilder sb   = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append(HtmlUtils.openInset());
-        User         user = request.getUser();
+        User user = request.getUser();
         if (user.getAnonymous()) {
             if (responseAsXml) {
                 return new Result(XmlUtil.tag(TAG_RESPONSE,
@@ -2569,6 +2594,7 @@ public class UserManager extends RepositoryManager {
         }
 
         sb.append(HtmlUtils.closeInset());
+
         return makeResult(request, "User Home", sb);
     }
 
@@ -3617,7 +3643,8 @@ public class UserManager extends RepositoryManager {
             String extra = results.getString(col++);
             String ip    = results.getString(col++);
             sb.append(HtmlUtils.row(HtmlUtils.cols(firstCol, what,
-                                                   getPageHandler().formatDate(dttm), ip), HtmlUtils.cssClass("ramadda-user-activity")));
+                    getPageHandler().formatDate(dttm),
+                    ip), HtmlUtils.cssClass("ramadda-user-activity")));
 
             cnt++;
         }

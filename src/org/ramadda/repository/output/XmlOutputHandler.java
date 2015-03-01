@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -181,7 +181,6 @@ public class XmlOutputHandler extends OutputHandler {
      *
      * @param request   the Request
      * @param entry     the Entry
-     * @param zos       the output
      * @param fileWriter _more_
      * @param doc       the document to add to
      * @param parent    the parent Entry
@@ -209,8 +208,7 @@ public class XmlOutputHandler extends OutputHandler {
             getPageHandler().formatDate(new Date(entry.getEndDate())),
             ATTR_CREATEDATE,
             getPageHandler().formatDate(new Date(entry.getCreateDate())),
-            ATTR_PATH,
-            entry.getFullName(false)
+            ATTR_PATH, entry.getFullName(false)
         });
 
 

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -445,11 +445,11 @@ public class ImageOutputHandler extends OutputHandler {
         sb.append(HtmlUtils.space(2));
         sb.append(HtmlUtils.submitImage(iconUrl(ICON_ANTIROTATE),
                                         ARG_IMAGE_EDIT_ROTATE_LEFT,
-                                        msg("Rotate Left"),""));
+                                        msg("Rotate Left"), ""));
         sb.append(HtmlUtils.space(2));
         sb.append(HtmlUtils.submitImage(iconUrl(ICON_ROTATE),
                                         ARG_IMAGE_EDIT_ROTATE_RIGHT,
-                                        msg("Rotate Right"),""));
+                                        msg("Rotate Right"), ""));
         File entryDir = getStorageManager().getEntryDir(entry.getId(), false);
         File original = new File(entryDir + "/" + "originalimage");
         if (original.exists()) {

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -89,23 +89,24 @@ public class PluginManager extends RepositoryManager {
     public static final String PLUGIN_ALL =
         "/org/ramadda/repository/resources/plugins/allplugins.jar";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PLUGIN_CORE =
         "/org/ramadda/repository/resources/plugins/coreplugins.jar";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PLUGIN_GEO =
         "/org/ramadda/repository/resources/plugins/geoplugins.jar";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PLUGIN_BIO =
         "/org/ramadda/repository/resources/plugins/bioplugins.jar";
 
 
     //This should be a properties file but...
 
-    /** _more_          */
-    public static final String[] PLUGINS = { PLUGIN_CORE, PLUGIN_GEO, PLUGIN_BIO };
+    /** _more_ */
+    public static final String[] PLUGINS = { PLUGIN_CORE, PLUGIN_GEO,
+                                             PLUGIN_BIO };
 
 
 
@@ -131,7 +132,8 @@ public class PluginManager extends RepositoryManager {
     /** _more_ */
     private MyClassLoader classLoader;
 
-    File   tmpPluginsDir;
+    /** _more_          */
+    File tmpPluginsDir;
 
     /** _more_ */
     private Properties properties;
@@ -306,8 +308,8 @@ public class PluginManager extends RepositoryManager {
         TempDir tempDir = getStorageManager().makeTempDir("tmpplugins",
                               false);
         tmpPluginsDir = tempDir.getDir();
-        File   dir           = getStorageManager().getPluginsDir();
-        File[] files         = dir.listFiles();
+        File   dir   = getStorageManager().getPluginsDir();
+        File[] files = dir.listFiles();
         Arrays.sort(files);
         List<File> plugins     = new ArrayList<File>();
         List<File> lastPlugins = new ArrayList<File>();
@@ -392,6 +394,7 @@ public class PluginManager extends RepositoryManager {
      * @param pluginFile _more_
      * @param pluginSB _more_
      * @param classLoader _more_
+     * @param top _more_
      *
      * @throws Exception On badness
      */
@@ -423,7 +426,8 @@ public class PluginManager extends RepositoryManager {
                     getStorageManager().getFileOutputStream(tmpFile);
                 IOUtil.writeTo(zin, fos);
                 IOUtil.close(fos);
-                processPluginFile(tmpFile.toString(), pluginSB, classLoader, false);
+                processPluginFile(tmpFile.toString(), pluginSB, classLoader,
+                                  false);
             }
             zin.close();
         } else if (pluginFile.toLowerCase().endsWith(".jar")) {
@@ -646,18 +650,23 @@ public class PluginManager extends RepositoryManager {
                 pluginStat("Properties", file);
                 propertyFiles.add(file);
             }
-        } else if (file.endsWith(".jar") && file.indexOf("htdocs")<0) {
+        } else if (file.endsWith(".jar") && (file.indexOf("htdocs") < 0)) {
             try {
-            System.err.println("jar file: " + file);
-            File tmpFile = new File(IOUtil.joinDir(tmpPluginsDir, IOUtil.getFileTail(file)));
-            System.err.println ("Extracting jar and writing to: " + tmpFile);
-            IOUtil.writeTo(getStorageManager().getInputStream(file), new FileOutputStream(tmpFile));
-            processPluginFile(tmpFile.toString(), pluginSB, classLoader, false);
-            } catch(Exception exc) {
+                System.err.println("jar file: " + file);
+                File tmpFile = new File(IOUtil.joinDir(tmpPluginsDir,
+                                   IOUtil.getFileTail(file)));
+                System.err.println("Extracting jar and writing to: "
+                                   + tmpFile);
+                IOUtil.writeTo(getStorageManager().getInputStream(file),
+                               new FileOutputStream(tmpFile));
+                processPluginFile(tmpFile.toString(), pluginSB, classLoader,
+                                  false);
+            } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
         } else {
             pluginFiles.add(file);
+
             return false;
         }
 

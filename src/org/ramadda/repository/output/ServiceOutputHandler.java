@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -21,15 +21,15 @@
 package org.ramadda.repository.output;
 
 
+import org.ramadda.repository.*;
+import org.ramadda.repository.job.JobManager;
+import org.ramadda.repository.type.*;
+
+
 import org.ramadda.service.OutputDefinition;
 import org.ramadda.service.Service;
 import org.ramadda.service.ServiceInput;
 import org.ramadda.service.ServiceOutput;
-
-
-import org.ramadda.repository.*;
-import org.ramadda.repository.job.JobManager;
-import org.ramadda.repository.type.*;
 
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Utils;
@@ -64,7 +64,7 @@ public class ServiceOutputHandler extends OutputHandler {
     /** _more_ */
     public static final String ARG_ASYNCH = "asynch";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_TOXML = "toxml";
 
     /** _more_ */
@@ -641,8 +641,9 @@ public class ServiceOutputHandler extends OutputHandler {
 
             return output;
         } catch (Exception exc) {
-            Throwable thr  = ucar.unidata.util.LogUtil.getInnerException(exc);
+            Throwable thr = ucar.unidata.util.LogUtil.getInnerException(exc);
             thr.printStackTrace();
+
             return new ServiceOutput(false, thr.toString());
         }
 

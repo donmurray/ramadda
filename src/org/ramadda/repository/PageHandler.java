@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -117,7 +117,7 @@ public class PageHandler extends RepositoryManager {
 
     /** _more_ */
     public static final String REGISTER_MESSAGE =
-        "<div class=\"ramadda-register\">Thank you for trying <a href=\"http://geodesystems.com\">Geode System's</a> RAMADDA repository. This is an unregistered version of the software. <a class=\"btn btn-primary\" role=\"button\" target=register href=\"http://geodesystems.com/repository/registration/register\">Please register</a></div>";
+        "<div class=\"ramadda-register\">Thank you for trying <a href=\"http://geodesystems.com\">Geode System's</a> RAMADDA repository. This is the shareware version of the software. &nbsp;&nbsp; <a class=\"btn btn-primary\" role=\"button\" target=register href=\"http://geodesystems.com/repository/alias/ramadda_registration\">Please register</a></div>";
 
 
     /** _more_ */

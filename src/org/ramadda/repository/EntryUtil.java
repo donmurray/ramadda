@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -362,9 +362,9 @@ public class EntryUtil extends RepositoryManager {
                     Integer i2 =
                         (Integer) e2.getTypeHandler().getEntryValue(e2,
                             sortOrderFieldIndex);
-                    if(i1<0 && i2>=0) {
+                    if ((i1 < 0) && (i2 >= 0)) {
                         result = 1;
-                    } else  if(i2<0 && i1>=0) {
+                    } else if ((i2 < 0) && (i1 >= 0)) {
                         result = -1;
                     } else {
                         result = i1.compareTo(i2);

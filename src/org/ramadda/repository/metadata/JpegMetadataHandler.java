@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -28,10 +28,10 @@ import com.drew.metadata.*;
 import com.drew.metadata.exif.*;
 import com.drew.metadata.iptc.IptcDirectory;
 
+import org.ramadda.repository.*;
+
 
 import org.ramadda.util.Utils;
-
-import org.ramadda.repository.*;
 
 import ucar.unidata.ui.ImageUtils;
 
@@ -103,11 +103,12 @@ public class JpegMetadataHandler extends MetadataHandler {
             }
             Image newImage = ImageUtils.resize(image, 300, -1);
             ImageUtils.waitOnImage(newImage);
-            String thumbFile = IOUtil.stripExtension(entry.getName())  + "_thumb.";
-            if(path.toLowerCase().endsWith("gif")) {
-                thumbFile+= "gif";
+            String thumbFile = IOUtil.stripExtension(entry.getName())
+                               + "_thumb.";
+            if (path.toLowerCase().endsWith("gif")) {
+                thumbFile += "gif";
             } else {
-                thumbFile+= "jpg";            
+                thumbFile += "jpg";
             }
 
 

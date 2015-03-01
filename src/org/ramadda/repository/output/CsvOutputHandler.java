@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -123,7 +123,11 @@ public class CsvOutputHandler extends OutputHandler {
 
     /** _more_ */
     public static final String ARG_DELIMITER = "delimiter";
+
+    /** _more_          */
     public static final String ARG_FIXEDWIDTH = "fixedwidth";
+
+    /** _more_          */
     public static final String ARG_FULLHEADER = "fullheader";
 
 
@@ -140,10 +144,10 @@ public class CsvOutputHandler extends OutputHandler {
     protected Result listEntries(Request request, List<Entry> entries)
             throws Exception {
 
-        String delimiter = request.getString(ARG_DELIMITER, ",");
-        boolean fixedWidth = request.get(ARG_FIXEDWIDTH, false);
+        String  delimiter      = request.getString(ARG_DELIMITER, ",");
+        boolean fixedWidth     = request.get(ARG_FIXEDWIDTH, false);
         boolean showFullHeader = request.get(ARG_FULLHEADER, false);
-        String filler = request.getString("filler"," ");
+        String  filler         = request.getString("filler", " ");
 
         String fieldsArg =
             request.getString(
@@ -229,7 +233,7 @@ public class CsvOutputHandler extends OutputHandler {
                                 tmp += ",";
                             }
                             tmp += column.getName();
-                            if(fixedWidth) {
+                            if (fixedWidth) {
                                 tmp += ((maxStringSize[col] > 0)
                                         ? "(max:" + maxStringSize[col] + ")"
                                         : "");
@@ -242,7 +246,7 @@ public class CsvOutputHandler extends OutputHandler {
                         headerString = headerString.replace(",fields", tmp);
                     }
                 }
-                if(showFullHeader) {
+                if (showFullHeader) {
                     sb.append("#fields=");
                 }
                 sb.append(headerString);
@@ -268,17 +272,18 @@ public class CsvOutputHandler extends OutputHandler {
                 } else if (field.equals("entry_url")) {
                     String url = request.url(repository.URL_ENTRY_SHOW,
                                              ARG_ENTRYID, entry.getId());
-                    url  = HtmlUtils.urlEncodeSpace(url);
+                    url = HtmlUtils.urlEncodeSpace(url);
                     url = request.getAbsoluteUrl(url);
                     sb.append(url);
                 } else if (field.equals("url")) {
                     if (entry.getResource().isUrl()) {
                         sb.append(
-                                  entry.getTypeHandler().getResourcePath(
-                                                                                             request, entry));
+                            entry.getTypeHandler().getResourcePath(
+                                request, entry));
                     } else if (entry.getResource().isFile()) {
-                        String url = entry.getTypeHandler().getEntryResourceUrl(
-                                                                                request, entry);
+                        String url =
+                            entry.getTypeHandler().getEntryResourceUrl(
+                                request, entry);
                         url = HtmlUtils.urlEncodeSpace(url);
                         url = request.getAbsoluteUrl(url);
                         sb.append(url);
@@ -314,7 +319,7 @@ public class CsvOutputHandler extends OutputHandler {
                             }
                             String s = sanitize(column.getString(values));
                             sb.append(s);
-                            if(fixedWidth) {
+                            if (fixedWidth) {
                                 if (column.isString()) {
                                     int length = s.length();
                                     while (length < maxStringSize[col]) {
@@ -345,10 +350,11 @@ public class CsvOutputHandler extends OutputHandler {
                     if (column != null) {
                         String s = sanitize(column.getString(values));
                         sb.append(s);
-                        if(fixedWidth) {
+                        if (fixedWidth) {
                             if (column.isString()) {
                                 int length = s.length();
-                                while (length < maxStringSize[column.getColumnIndex()]) {
+                                while (length
+                                        < maxStringSize[column.getColumnIndex()]) {
                                     sb.append(filler);
                                     length++;
                                 }

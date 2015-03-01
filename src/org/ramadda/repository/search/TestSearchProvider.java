@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -26,10 +26,11 @@ import org.ramadda.repository.type.*;
 
 import org.ramadda.repository.util.ServerInfo;
 
+import java.net.URL;
+
 import java.util.ArrayList;
 import java.util.List;
 
-import java.net.URL;
 
 /**
  * Class description
@@ -41,9 +42,10 @@ import java.net.URL;
 public class TestSearchProvider extends SearchProvider {
 
 
-    /** _more_          */
+    /** _more_ */
     private String externalUrl;
 
+    /** _more_          */
     private String name;
 
     /**
@@ -70,7 +72,7 @@ public class TestSearchProvider extends SearchProvider {
             if (args.size() > 1) {
                 name = args.get(1);
             } else {
-                name  = externalUrl;
+                name = externalUrl;
             }
         }
     }
@@ -132,10 +134,10 @@ public class TestSearchProvider extends SearchProvider {
         if (externalUrl != null) {
             request = request.cloneMe();
             String url = applyMacros(request, externalUrl);
-            Runnable runnable = getSearchManager().makeRunnable(request, 
-                                                                new ServerInfo(new URL(url), this.name,""),
-                                                                getEntryManager().getDummyGroup(),
-                                                                results, null, null);
+            Runnable runnable =
+                getSearchManager().makeRunnable(request,
+                    new ServerInfo(new URL(url), this.name, ""),
+                    getEntryManager().getDummyGroup(), results, null, null);
             runnable.run();
         } else {
             System.err.println("TestSearchProvider.getEntries");

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -25,8 +25,6 @@ import org.apache.commons.httpclient.Credentials;
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.UsernamePasswordCredentials;
 import org.apache.commons.httpclient.auth.AuthScope;
-
-import org.ramadda.service.Service;
 
 import org.ramadda.repository.admin.Admin;
 import org.ramadda.repository.admin.AdminHandler;
@@ -63,6 +61,8 @@ import org.ramadda.repository.type.Column;
 import org.ramadda.repository.type.GroupTypeHandler;
 import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.repository.util.ServerInfo;
+
+import org.ramadda.service.Service;
 import org.ramadda.sql.Clause;
 import org.ramadda.sql.SqlUtil;
 import org.ramadda.util.HtmlUtils;

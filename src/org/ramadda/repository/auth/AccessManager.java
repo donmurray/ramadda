@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -707,6 +707,16 @@ public class AccessManager extends RepositoryManager {
         return canDoAction(request, entry, Permission.ACTION_EDIT);
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public boolean canExportEntry(Request request, Entry entry)
             throws Exception {
         return canDoAction(request, entry, Permission.ACTION_EXPORT);
@@ -782,7 +792,10 @@ public class AccessManager extends RepositoryManager {
                 cols.append(HtmlUtils.cols(StringUtil.join("<br>", roles)));
             }
         }
-        sb.append(HtmlUtils.row(cols.toString(), HtmlUtils.cssClass("ramadda-access-summary")));
+        sb.append(
+            HtmlUtils.row(
+                cols.toString(),
+                HtmlUtils.cssClass("ramadda-access-summary")));
         listAccess(request,
                    getEntryManager().getEntry(request,
                        entry.getParentEntryId()), sb);
@@ -917,10 +930,12 @@ public class AccessManager extends RepositoryManager {
         StringBuffer header =
             new StringBuffer(HtmlUtils.cols(HtmlUtils.bold(msg("Entry"))));
         for (int i = 0; i < Permission.ACTIONS.length; i++) {
-            header.append(
-                HtmlUtils.cols(msg(Permission.ACTION_NAMES[i])));
+            header.append(HtmlUtils.cols(msg(Permission.ACTION_NAMES[i])));
         }
-        currentAccess.append(HtmlUtils.row(header.toString(), HtmlUtils.cssClass("ramadda-access-summary-header")));
+        currentAccess.append(
+            HtmlUtils.row(
+                header.toString(),
+                HtmlUtils.cssClass("ramadda-access-summary-header")));
 
         listAccess(request, entry, currentAccess);
         currentAccess.append(HtmlUtils.close(HtmlUtils.TAG_TABLE));

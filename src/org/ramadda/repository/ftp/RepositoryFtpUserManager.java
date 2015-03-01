@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -106,7 +106,9 @@ public class RepositoryFtpUserManager implements org.ramadda.repository
                 //                ftpManager.logInfo("name:" + name + " password:" + password);
                 if ( !ftpManager.getRepository().getUserManager()
                         .isPasswordValid(name, password)) {
-                    ftpManager.getRepository().getLogManager().logInfoAndPrint("FTP: incorrect password for user:"+ name);
+                    ftpManager.getRepository().getLogManager()
+                        .logInfoAndPrint("FTP: incorrect password for user:"
+                                         + name);
 
                     return null;
                 }

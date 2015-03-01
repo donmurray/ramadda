@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -61,7 +61,7 @@ public interface WikiConstants {
     /** _more_ */
     public static final String ATTR_PADDING = "padding";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_MARGIN = "margin";
 
     /** border color */
@@ -367,7 +367,7 @@ public interface WikiConstants {
     /** wiki import */
     public static final String WIKI_TAG_TABS = "tabs";
 
-    /** _more_          */
+    /** _more_ */
     public static final String WIKI_TAG_BOOTSTRAP = "bootstrap";
 
     /** _more_ */

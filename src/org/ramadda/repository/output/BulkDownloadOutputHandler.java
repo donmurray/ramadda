@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -434,11 +434,11 @@ public class BulkDownloadOutputHandler extends OutputHandler {
                                               output);
                 String destOutputFile = destFile + "." + suffix;
 
-                String message = "downloading " + destOutputFile;
+                String message        = "downloading " + destOutputFile;
                 if (output.equals(XmlOutputHandler.OUTPUT_XMLENTRY.getId())) {
                     destOutputFile = ".this.ramadda.xml";
                     appendDownloadMetadata(request, entry, sb, command);
-                    message = "downloading metadata for " +  dirName;
+                    message = "downloading metadata for " + dirName;
                 }
                 sb.append(cmd("echo " + qt(message)));
 

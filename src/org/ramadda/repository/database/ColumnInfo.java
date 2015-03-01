@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -88,8 +88,13 @@ public class ColumnInfo {
         this.size     = size;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
-        return "Column: " + name + " " + type +" size:" + size +" " ;
+        return "Column: " + name + " " + type + " size:" + size + " ";
     }
 
     /**
@@ -132,7 +137,8 @@ public class ColumnInfo {
         } else if (typeName.equalsIgnoreCase("text")) {
             return TYPE_CLOB;
         } else {
-            throw new IllegalArgumentException("Unknown database type:" + type + " " + typeName);
+            throw new IllegalArgumentException("Unknown database type:"
+                    + type + " " + typeName);
             //            throw new IllegalArgumentException("Unknown sqltype:" + type);
         }
     }

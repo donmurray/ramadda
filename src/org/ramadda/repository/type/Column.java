@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -247,6 +247,7 @@ public class Column implements DataTypes, Constants {
     /** _more_ */
     private String description;
 
+    /** _more_          */
     private String htmlTemplate;
 
 
@@ -268,6 +269,7 @@ public class Column implements DataTypes, Constants {
     /** _more_ */
     private boolean isIndex;
 
+    /** _more_          */
     private boolean isWiki;
 
     /** _more_ */
@@ -294,7 +296,7 @@ public class Column implements DataTypes, Constants {
                                                     String>();
 
 
-    /** _more_          */
+    /** _more_ */
     private String alias;
 
 
@@ -402,9 +404,10 @@ public class Column implements DataTypes, Constants {
             dateParser = new SimpleDateFormat(dttmFormat);
         }
 
-        description    = getAttributeOrTag(element, ATTR_DESCRIPTION, label);
+        description = getAttributeOrTag(element, ATTR_DESCRIPTION, label);
 
-        htmlTemplate = Utils.getAttributeOrTag(element, "htmlTemplate",(String) null);
+        htmlTemplate = Utils.getAttributeOrTag(element, "htmlTemplate",
+                (String) null);
 
         type = Utils.getAttributeOrTag(element, ATTR_TYPE, DATATYPE_STRING);
         changeType     = getAttributeOrTag(element, ATTR_CHANGETYPE, false);
@@ -839,7 +842,7 @@ public class Column implements DataTypes, Constants {
      * _more_
      *
      * @param entry _more_
-     * @param sb _more_
+     * @param result _more_
      * @param output _more_
      * @param values _more_
      * @param sdf _more_
@@ -850,11 +853,11 @@ public class Column implements DataTypes, Constants {
                             Object[] values, SimpleDateFormat sdf)
             throws Exception {
 
-        Appendable sb  = new StringBuilder();
-        boolean csv       = Misc.equals(output, OUTPUT_CSV);
-        String  delimiter = csv
-                            ? "|"
-                            : ",";
+        Appendable sb        = new StringBuilder();
+        boolean    csv       = Misc.equals(output, OUTPUT_CSV);
+        String     delimiter = csv
+                               ? "|"
+                               : ",";
         if (isType(DATATYPE_LATLON)) {
             sb.append(toLatLonString(values, offset));
             sb.append(delimiter);
@@ -897,11 +900,11 @@ public class Column implements DataTypes, Constants {
                 sb.append(dateTimeFormat.format((Date) values[offset]));
             }
         } else if (isType(DATATYPE_DATE)) {
-            if(values[offset] == null) {
+            if (values[offset] == null) {
                 sb.append("null");
             } else {
                 if (sdf != null) {
-                    sb.append(sdf.format((Date) values[offset]));             
+                    sb.append(sdf.format((Date) values[offset]));
                 } else {
                     sb.append(dateFormat.format((Date) values[offset]));
                 }
@@ -992,7 +995,7 @@ public class Column implements DataTypes, Constants {
             sb.append(s);
         }
 
-        if(htmlTemplate!=null) {
+        if (htmlTemplate != null) {
             result.append(htmlTemplate.replace("${value}", sb.toString()));
         } else {
             result.append(sb.toString());
@@ -1242,14 +1245,15 @@ public class Column implements DataTypes, Constants {
             valueIdx++;
         } else if (isType(DATATYPE_BOOLEAN)) {
             String value = results.getString(valueIdx);
-            if(value == null || value.length()==0) {
+            if ((value == null) || (value.length() == 0)) {
                 value = dflt;
             }
-            if(value == null) {
+            if (value == null) {
                 value = "0";
             }
 
-            values[offset] = new Boolean(value.equals("true") || value.equals("1"));
+            values[offset] = new Boolean(value.equals("true")
+                                         || value.equals("1"));
             valueIdx++;
         } else if (isDate()) {
             values[offset] =
@@ -2013,23 +2017,24 @@ public class Column implements DataTypes, Constants {
                 }
             } else {
                 String domId = HtmlUtils.getUniqueId("input_");
-                if (rows > 1 || isWiki) {
+                if ((rows > 1) || isWiki) {
                     if (isType(DATATYPE_LIST)) {
                         value = StringUtil.join("\n",
                                 StringUtil.split(value, ",", true, true));
                     }
                     String buttons = "";
-                    if(isWiki) {
+                    if (isWiki) {
                         buttons =
-                            getRepository().getWikiManager().makeWikiEditBar(request, entry,
-                                                                             domId) + HtmlUtils.br();
+                            getRepository().getWikiManager().makeWikiEditBar(
+                                request, entry, domId) + HtmlUtils.br();
                     }
                     int areaRows = rows;
-                    if(areaRows<=1 && isWiki) {
+                    if ((areaRows <= 1) && isWiki) {
                         areaRows = 50;
                     }
-                    widget = buttons + HtmlUtils.textArea(urlArg, value, areaRows, columns,
-                                                          HtmlUtils.id(domId));
+                    widget = buttons
+                             + HtmlUtils.textArea(urlArg, value, areaRows,
+                                 columns, HtmlUtils.id(domId));
                 } else {
                     widget = HtmlUtils.input(urlArg, value,
                                              HtmlUtils.id(domId) + " size=\""
@@ -2349,21 +2354,21 @@ public class Column implements DataTypes, Constants {
         } else if (isEnumeration()) {
             values[offset] = value;
         } else if (isType(DATATYPE_BOOLEAN)) {
-            if(Utils.stringDefined(value)) {
+            if (Utils.stringDefined(value)) {
                 values[offset] = new Boolean(value);
             } else {
                 values[offset] = new Boolean(false);
             }
         } else if (isType(DATATYPE_INT)) {
-            if(Utils.stringDefined(value)) {
+            if (Utils.stringDefined(value)) {
                 values[offset] = new Integer(value);
             } else {
                 values[offset] = new Integer(0);
             }
         } else if (isType(DATATYPE_PERCENTAGE) || isDouble()) {
-            if(Utils.stringDefined(value)) {
+            if (Utils.stringDefined(value)) {
                 values[offset] = new Double(value);
-            }   else {
+            } else {
                 values[offset] = new Double(0);
             }
         } else if (isType(DATATYPE_ENTRY)) {
@@ -2384,7 +2389,7 @@ public class Column implements DataTypes, Constants {
      * @throws Exception _more_
      */
     private Date parseDate(String value) throws Exception {
-        if(!Utils.stringDefined(value)) {
+        if ( !Utils.stringDefined(value)) {
             return null;
         }
 
@@ -3013,6 +3018,11 @@ public class Column implements DataTypes, Constants {
         return editable;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean getAddToForm() {
         return addToForm;
     }

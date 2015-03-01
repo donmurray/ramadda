@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -103,7 +103,7 @@ public class ZipOutputHandler extends OutputHandler {
         new OutputType("Zip and Download Files", "zip.zipgroup",
                        OutputType.TYPE_FILE, "", ICON_ZIP);
 
-    /** _more_          */
+    /** _more_ */
     public static final OutputType OUTPUT_EXPORT =
         new OutputType("Export Entries", "zip.export", OutputType.TYPE_FILE,
                        "", ICON_ZIP);
@@ -153,7 +153,9 @@ public class ZipOutputHandler extends OutputHandler {
 
 
         if (state.entry != null) {
-            if (getAccessManager().canDownload(request, state.entry) && getAccessManager().canExportEntry(request, state.entry)) {
+            if (getAccessManager().canDownload(request, state.entry)
+                    && getAccessManager().canExportEntry(request,
+                        state.entry)) {
                 /* don't add the .zip to the URL. This now gets set below in setReturnFilename
                 links.add(
                     makeLink(
@@ -161,9 +163,7 @@ public class ZipOutputHandler extends OutputHandler {
                         "/" + IOUtil.stripExtension(state.entry.getName())
                         + ".zip"));
                 */
-                links.add(
-                    makeLink(
-                             request, state.entry, OUTPUT_ZIP));
+                links.add(makeLink(request, state.entry, OUTPUT_ZIP));
             }
 
             return;
@@ -193,9 +193,7 @@ public class ZipOutputHandler extends OutputHandler {
                         "/" + IOUtil.stripExtension(state.group.getName())
                         + ".zip"));
                 */
-                links.add(
-                    makeLink(
-                             request, state.group, OUTPUT_ZIPGROUP));
+                links.add(makeLink(request, state.group, OUTPUT_ZIPGROUP));
             } else {
                 links.add(makeLink(request, state.group, OUTPUT_ZIP));
             }
@@ -313,6 +311,7 @@ public class ZipOutputHandler extends OutputHandler {
     public Result toZip(Request request, String prefix, List<Entry> entries,
                         boolean recurse, boolean forExport)
             throws Exception {
+
         OutputStream os        = null;
         boolean      doingFile = false;
         File         tmpFile   = null;
@@ -331,15 +330,16 @@ public class ZipOutputHandler extends OutputHandler {
         if ( !ok) {
             return new Result(
                 "Error",
-                new StringBuffer(getPageHandler().showDialogError(
-                                                                  "Size of request has exceeded maximum size")));
+                new StringBuffer(
+                    getPageHandler().showDialogError(
+                        "Size of request has exceeded maximum size")));
         }
 
         //Now set the return file name
-        if (prefix.length()==0) {
+        if (prefix.length() == 0) {
             request.setReturnFilename("entry.zip");
         } else {
-            request.setReturnFilename(prefix+ ".zip");
+            request.setReturnFilename(prefix + ".zip");
         }
 
         Result     result         = new Result();
@@ -400,6 +400,7 @@ public class ZipOutputHandler extends OutputHandler {
         }
         if (doingFile) {
             IOUtil.close(os);
+
             return new Result(
                 "", getStorageManager().getFileInputStream(tmpFile),
                 getMimeType(OUTPUT_ZIP));
@@ -414,6 +415,7 @@ public class ZipOutputHandler extends OutputHandler {
         }
 
         return result;
+
     }
 
 
@@ -461,7 +463,7 @@ public class ZipOutputHandler extends OutputHandler {
                 continue;
             }
 
-            if(!getAccessManager().canExportEntry(request, entry)) {
+            if ( !getAccessManager().canExportEntry(request, entry)) {
                 continue;
             }
 

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -89,6 +89,7 @@ public class SessionManager extends RepositoryManager {
     /** _more_ */
     private String cookieName;
 
+    /** _more_          */
     private boolean topRepository = false;
 
 
@@ -119,9 +120,8 @@ public class SessionManager extends RepositoryManager {
     public SessionManager(Repository repository) {
         super(repository);
         this.topRepository = (repository.getParentRepository() == null);
-        if(topRepository) {
-        } else {
-        }
+        if (topRepository) {}
+        else {}
         this.cookieName = "ramadda"
                           + repository.getUrlBase().replaceAll("/", "_")
                           + "_session";
@@ -306,11 +306,13 @@ public class SessionManager extends RepositoryManager {
         String id = request.getSessionId();
         if (id == null) {
             request.putExtraProperty(key, value);
+
             return;
         }
         UserSession session = getSession(id);
         if (session == null) {
             request.putExtraProperty(key, value);
+
             return;
         }
         session.putProperty(key, value);
@@ -709,7 +711,7 @@ public class SessionManager extends RepositoryManager {
             } else if (cookieName.equals(COOKIE_NAME)) {
                 //For backwards compatability
                 cookies.add(cookieValue);
-            } 
+            }
         }
 
 

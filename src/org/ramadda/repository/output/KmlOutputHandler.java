@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -241,9 +241,9 @@ public class KmlOutputHandler extends OutputHandler {
                 request.remove(ARG_SKIP);
                 String url = request.url(repository.URL_ENTRY_SHOW,
                                          ARG_ENTRYID, group.getId(),
-                                         ARG_OUTPUT, OUTPUT_KML.toString(), ARG_SKIP,
-                                         "" + (skip + max), ARG_MAX,
-                                         "" + max);
+                                         ARG_OUTPUT, OUTPUT_KML.toString(),
+                                         ARG_SKIP, "" + (skip + max),
+                                         ARG_MAX, "" + max);
 
                 url = request.getAbsoluteUrl(url);
                 Element link = KmlUtil.networkLink(defaultFolder, "More...",
@@ -459,8 +459,8 @@ public class KmlOutputHandler extends OutputHandler {
             return request.getAbsoluteUrl(
                 request.url(
                     request.getRepository().URL_ENTRY_SHOW, ARG_ENTRYID,
-                    entry.getId(), ARG_OUTPUT, OUTPUT_KML.toString(), ARG_VISIBLE,
-                    "true"));
+                    entry.getId(), ARG_OUTPUT, OUTPUT_KML.toString(),
+                    ARG_VISIBLE, "true"));
         }
         if ( !isKml(entry)) {
             return null;

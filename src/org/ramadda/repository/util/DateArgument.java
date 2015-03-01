@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -41,7 +41,7 @@ public class DateArgument implements Constants {
 
     /** _more_ */
     public static final DateArgument ARG_DATA = new DateArgument(TYPE_DATA,
-                                                                 ARG_DATA_DATE, "Date");
+                                                    ARG_DATA_DATE, "Date");
 
     /** _more_ */
     public static final DateArgument ARG_CREATE =

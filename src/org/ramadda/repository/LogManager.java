@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -40,10 +40,11 @@ import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringUtil;
 
-import java.sql.SQLException;
 import java.io.*;
 
 import java.io.FileNotFoundException;
+
+import java.sql.SQLException;
 
 
 import java.util.ArrayList;
@@ -450,7 +451,7 @@ public class LogManager extends RepositoryManager {
      * @param exc _more_
      */
     public void logError(Logger log, String message, Throwable exc) {
-        System.err.println ("LOG ERROR:" + exc);
+        System.err.println("LOG ERROR:" + exc);
         message = encode(message);
         Throwable thr = null;
         if (exc != null) {
@@ -472,12 +473,17 @@ public class LogManager extends RepositoryManager {
                           + "\n</stack>");
                 System.err.println("RAMADDA ERROR:" + message);
                 System.err.println(stackTrace);
-                if(thr instanceof SQLException) {
+                if (thr instanceof SQLException) {
                     SQLException sqlException = (SQLException) thr;
-                    while((sqlException = sqlException.getNextException())!=null) {
-                        log.error("getNextException:" + "\n<stack>\n" + sqlException + "\n" + LogUtil.getStackTrace(sqlException)
+                    while ((sqlException = sqlException.getNextException())
+                            != null) {
+                        log.error("getNextException:" + "\n<stack>\n"
+                                  + sqlException + "\n"
+                                  + LogUtil.getStackTrace(sqlException)
                                   + "\n</stack>");
-                        System.err.println("getNextException:" + sqlException + "\n" + LogUtil.getStackTrace(sqlException));
+                        System.err.println(
+                            "getNextException:" + sqlException + "\n"
+                            + LogUtil.getStackTrace(sqlException));
                     }
                 }
 

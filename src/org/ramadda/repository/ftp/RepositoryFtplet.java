@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -212,7 +212,6 @@ public class RepositoryFtplet extends DefaultFtplet {
      * _more_
      *
      * @param session _more_
-     * @param request _more_
      * @param ftpRequest _more_
      * @param reply _more_
      *
@@ -375,13 +374,10 @@ public class RepositoryFtplet extends DefaultFtplet {
      * _more_
      *
      * @param session _more_
-     * @param request _more_
      * @param ftpRequest _more_
      * @param message _more_
      *
      * @return _more_
-     *
-     * @throws Exception _more_
      *
      * @throws FtpException _more_
      * @throws IOException _more_

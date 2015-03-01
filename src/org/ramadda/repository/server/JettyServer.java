@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -21,17 +21,6 @@
 package org.ramadda.repository.server;
 
 
-import org.eclipse.jetty.server.Server;
-// Jetty 8 
-//import org.eclipse.jetty.server.ssl.SslSocketConnector;
-// Jetty 9
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.SslConnectionFactory;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.ssl.SslContextFactory;
-
-
 
 
 import org.eclipse.jetty.http.HttpVersion;
@@ -39,9 +28,20 @@ import org.eclipse.jetty.server.Connector;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
+
+
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.server.Server;
+// Jetty 8 
+//import org.eclipse.jetty.server.ssl.SslSocketConnector;
+// Jetty 9
+import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.server.SslConnectionFactory;
+import org.eclipse.jetty.servlet.ServletContextHandler;
+import org.eclipse.jetty.servlet.ServletHolder;
+import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
 
@@ -260,18 +260,18 @@ public class JettyServer implements Constants {
         repository.getLogManager().logInfo(
             "SSL: creating ssl connection on port:" + sslPort);
 
-        /*****
-        // Jetty <7
-        SslSocketConnector sslSocketConnector = new SslSocketConnector();
-        sslSocketConnector.setKeystore(keystore.toString());
-        // The password for the key store
-        sslSocketConnector.setPassword(password);
-        // The password (if any) for the specific key within the key store
-        sslSocketConnector.setKeyPassword(keyPassword);
-        sslSocketConnector.setTrustPassword(password);
-        sslSocketConnector.setPort(sslPort);
-        server.addConnector(sslSocketConnector);
-        */
+        /**
+         * // Jetty <7
+         * SslSocketConnector sslSocketConnector = new SslSocketConnector();
+         * sslSocketConnector.setKeystore(keystore.toString());
+         * // The password for the key store
+         * sslSocketConnector.setPassword(password);
+         * // The password (if any) for the specific key within the key store
+         * sslSocketConnector.setKeyPassword(keyPassword);
+         * sslSocketConnector.setTrustPassword(password);
+         * sslSocketConnector.setPort(sslPort);
+         * server.addConnector(sslSocketConnector);
+         */
 
         // Jetty 7,8,&9
         /*
@@ -281,14 +281,15 @@ public class JettyServer implements Constants {
         sslContext.setKeyManagerPassword(keyPassword);
         sslContext.setTrustStorePassword(password);
         */
-        
-         
-        /**** Jetty 7&8
-        SslSocketConnector sslSocketConnector =
-            new SslSocketConnector(sslContext);
-        sslSocketConnector.setPort(sslPort);
-        server.addConnector(sslSocketConnector);
-        */
+
+
+        /**
+         * ** Jetty 7&8
+         * SslSocketConnector sslSocketConnector =
+         *   new SslSocketConnector(sslContext);
+         * sslSocketConnector.setPort(sslPort);
+         * server.addConnector(sslSocketConnector);
+         */
         /*
           Jetty 9
         SslConnectionFactory sslFactory = new SslConnectionFactory(sslContext, "http/1.1");
@@ -310,9 +311,14 @@ public class JettyServer implements Constants {
 
         HttpConfiguration https_config = new HttpConfiguration(http_config);
         https_config.addCustomizer(new SecureRequestCustomizer());
-        ServerConnector https = new ServerConnector(server,
-                                                    new SslConnectionFactory(sslContextFactory,HttpVersion.HTTP_1_1.asString()),
-                                                    new HttpConnectionFactory(https_config));
+        ServerConnector https =
+            new ServerConnector(
+                server,
+                new SslConnectionFactory(
+                    sslContextFactory,
+                    HttpVersion.HTTP_1_1
+                        .asString()), new HttpConnectionFactory(
+                            https_config));
         https.setPort(sslPort);
         https.setIdleTimeout(500000);
         server.addConnector(https);

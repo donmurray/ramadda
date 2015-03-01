@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -21,11 +21,6 @@
 package org.ramadda.repository.type;
 
 
-import org.ramadda.service.Service;
-import org.ramadda.service.ServiceInput;
-import org.ramadda.service.ServiceOutput;
-
-
 import org.ramadda.repository.*;
 import org.ramadda.repository.auth.*;
 import org.ramadda.repository.database.*;
@@ -39,6 +34,11 @@ import org.ramadda.repository.search.SearchManager;
 import org.ramadda.repository.search.SpecialSearch;
 import org.ramadda.repository.util.DateArgument;
 import org.ramadda.repository.util.RequestArgument;
+
+
+import org.ramadda.service.Service;
+import org.ramadda.service.ServiceInput;
+import org.ramadda.service.ServiceOutput;
 
 import org.ramadda.sql.Clause;
 import org.ramadda.sql.SqlUtil;
@@ -249,6 +249,7 @@ public class TypeHandler extends RepositoryManager {
     public static final String PROP_FIELD_FILE_PATTERN = "field_file_pattern";
 
 
+    /** _more_          */
     public static final String PROP_INGEST_LINKS = "ingestLinks";
 
 
@@ -410,8 +411,6 @@ public class TypeHandler extends RepositoryManager {
 
     /**
      * _more_
-     *
-     * @param entryNode _more_
      *
      * @param node _more_
      *
@@ -1469,12 +1468,15 @@ public class TypeHandler extends RepositoryManager {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      * @param node _more_
      *
      * @throws Exception _more_
      */
-    public void addToEntryNode(Request request, Entry entry, Element node) throws Exception {
+    public void addToEntryNode(Request request, Entry entry, Element node)
+            throws Exception {
         if (parent != null) {
             parent.addToEntryNode(request, entry, node);
         }
@@ -2933,20 +2935,24 @@ public class TypeHandler extends RepositoryManager {
 
         if (parent != null) {
             parent.initializeNewEntry(request, entry);
-        } 
+        }
 
-        
+
         //Check if we're supposed to extract urls from the file
-        if(getProperty(PROP_INGEST_LINKS,"false").equals("true") && entry.getResource().isFile()) {
-            String contents  = IOUtil.readContents(getStorageManager().getFileInputStream(entry.getFile()));
-            for(String url: Utils.extractPatterns(contents,"(https?://[^\"' \\),]+)")) {
+        if (getProperty(PROP_INGEST_LINKS, "false").equals("true")
+                && entry.getResource().isFile()) {
+            String contents = IOUtil.readContents(
+                                  getStorageManager().getFileInputStream(
+                                      entry.getFile()));
+            for (String url :
+                    Utils.extractPatterns(contents,
+                                          "(https?://[^\"' \\),]+)")) {
                 entry.addMetadata(new Metadata(getRepository().getGUID(),
-                                               entry.getId(),
-                                               ContentMetadataHandler.TYPE_URL,
-                                               false, url, url, "", "", ""));
+                        entry.getId(), ContentMetadataHandler.TYPE_URL,
+                        false, url, url, "", "", ""));
             }
         }
-        
+
 
 
         //Do we extract metadata from the file path
@@ -3769,12 +3775,15 @@ public class TypeHandler extends RepositoryManager {
                             domId = ARG_DESCRIPTION;
                             formInfo.addSizeValidation("Description", domId,
                                     EntryManager.MAX_DESCRIPTION_LENGTH);
-                            String textWidget = HtmlUtils.textArea(ARG_DESCRIPTION,
-                                                                   desc, rows,
-                                                                   getProperty(entry,
-                                                                               "form.description.columns",
-                                                                               100), HtmlUtils.id(ARG_DESCRIPTION));
-                            sb.append(HtmlUtils.formEntryTop(msgLabel("Wiki Text"), textWidget));
+                            String textWidget =
+                                HtmlUtils.textArea(ARG_DESCRIPTION, desc,
+                                    rows,
+                                    getProperty(entry,
+                                        "form.description.columns",
+                                        100), HtmlUtils.id(ARG_DESCRIPTION));
+                            sb.append(
+                                HtmlUtils.formEntryTop(
+                                    msgLabel("Wiki Text"), textWidget));
                             sb.append("</td></tr>");
                         }
                     }

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -147,22 +147,24 @@ public abstract class OrderedGroupTypeHandler extends ExtensibleGroupTypeHandler
             sb.append("<tr valign=top><td>");
             if (cnt > 0) {
                 sb.append(HtmlUtils.submitImage(iconUrl(ICON_UPARROW),
-                                                ARG_MOVE_UP + "." + entry.getId(), msg("Move up"),""));
+                        ARG_MOVE_UP + "." + entry.getId(), msg("Move up"),
+                        ""));
             }
             sb.append("</td><td>");
             if (cnt < entries.size() - 1) {
                 sb.append(HtmlUtils.submitImage(iconUrl(ICON_DOWNARROW),
-                                                ARG_MOVE_DOWN + "." + entry.getId(), msg("Move down"),""));
+                        ARG_MOVE_DOWN + "." + entry.getId(),
+                        msg("Move down"), ""));
             }
             sb.append("</td><td>");
             cnt++;
 
             String url = null;
-            if(getAccessManager().canEditEntry(request, entry)) {
+            if (getAccessManager().canEditEntry(request, entry)) {
                 url = request.entryUrl(getRepository().URL_ENTRY_FORM, entry);
             }
             EntryLink link = getEntryManager().getAjaxLink(request, entry,
-                                                           getEntryDisplayName(entry), url);
+                                 getEntryDisplayName(entry), url);
             addListLink(request, entry, link, sb);
             sb.append("</td></tr>");
         }

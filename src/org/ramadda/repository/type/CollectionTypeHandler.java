@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -90,7 +90,7 @@ public class CollectionTypeHandler extends ExtensibleGroupTypeHandler {
 
     /** _more_ */
     public static final String REQUEST_DOWNLOAD = "download";
-    
+
     /** _more_ */
     public static final String REQUEST_BULKDOWNLOAD = "bulkdownload";
 
@@ -158,8 +158,9 @@ public class CollectionTypeHandler extends ExtensibleGroupTypeHandler {
     public BulkDownloadOutputHandler getBulkDownloadOutputHandler() {
         if (bulkDownloadOutputHandler == null) {
             bulkDownloadOutputHandler =
-                (BulkDownloadOutputHandler) getRepository().getOutputHandler(
-                    org.ramadda.repository.output.BulkDownloadOutputHandler.class);
+                (BulkDownloadOutputHandler) getRepository()
+                    .getOutputHandler(org.ramadda.repository.output
+                        .BulkDownloadOutputHandler.class);
         }
 
         return bulkDownloadOutputHandler;
@@ -652,8 +653,7 @@ public class CollectionTypeHandler extends ExtensibleGroupTypeHandler {
         if (what.equals(REQUEST_SEARCH) || request.defined(ARG_SEARCH)) {
             StringBuffer json = new StringBuffer();
             getRepository().getJsonOutputHandler().makeJson(request,
-                                            processSearch(request, entry),
-                                            json);
+                    processSearch(request, entry), json);
 
             //            System.err.println(json);
             return new Result("", json, "application/json");
@@ -662,7 +662,7 @@ public class CollectionTypeHandler extends ExtensibleGroupTypeHandler {
         if (what.equals(REQUEST_DOWNLOAD)) {
             return processDownloadRequest(request, entry);
         }
-        
+
         if (what.equals(REQUEST_BULKDOWNLOAD)) {
             return processBulkDownloadRequest(request, entry);
         }
@@ -683,11 +683,13 @@ public class CollectionTypeHandler extends ExtensibleGroupTypeHandler {
     public Result processBulkDownloadRequest(Request request, Entry entry)
             throws Exception {
         request.setReturnFilename(entry.getName() + "_download.sh");
-        StringBuilder sb      = new StringBuilder();
+        StringBuilder             sb   = new StringBuilder();
         BulkDownloadOutputHandler bdoh = getBulkDownloadOutputHandler();
         bdoh.process(request, sb, entry, processSearch(request, entry, true),
-                                           false, true);
-        return new Result("", sb, bdoh.getMimeType(BulkDownloadOutputHandler.OUTPUT_CURL));
+                     false, true);
+
+        return new Result(
+            "", sb, bdoh.getMimeType(BulkDownloadOutputHandler.OUTPUT_CURL));
     }
 
     /**

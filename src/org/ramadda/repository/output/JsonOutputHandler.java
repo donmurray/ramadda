@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -171,6 +171,7 @@ public class JsonOutputHandler extends OutputHandler {
         StringBuilder sb = new StringBuilder();
         makeJson(request, allEntries, sb);
         request.setCORSHeaderOnResponse();
+
         return new Result("", sb, Json.MIMETYPE);
     }
 
@@ -184,8 +185,7 @@ public class JsonOutputHandler extends OutputHandler {
      *
      * @throws Exception _more_
      */
-    public void makeJson(Request request, List<Entry> entries,
-                         Appendable sb)
+    public void makeJson(Request request, List<Entry> entries, Appendable sb)
             throws Exception {
         List<String> items = new ArrayList<String>();
         for (Entry entry : entries) {
@@ -233,10 +233,11 @@ public class JsonOutputHandler extends OutputHandler {
         Json.quoteAttr(items, "id", entry.getId());
         Json.quoteAttr(items, "name", entry.getName());
         Json.quoteAttr(items, "description", entry.getDescription());
-        TypeHandler type = entry.getTypeHandler();
-        String typeJson = type.getJson(request);
+        TypeHandler type     = entry.getTypeHandler();
+        String      typeJson = type.getJson(request);
         //        Json.quoteAttr(items, "type", entry.getType());
-        typeJson = Json.mapAndQuote("id",type.getType(),"name",type.getLabel());
+        typeJson = Json.mapAndQuote("id", type.getType(), "name",
+                                    type.getLabel());
         Json.attr(items, "type", Json.quote(type.getType()));
         Json.attr(items, "typeName", Json.quote(type.getLabel()));
         //
@@ -252,15 +253,18 @@ public class JsonOutputHandler extends OutputHandler {
             */
         }
 
-        Json.quoteAttr(items, "icon",
-                       request.getAbsoluteUrl(getPageHandler().getIconUrl(request, entry)));
+        Json.quoteAttr(
+            items, "icon",
+            request.getAbsoluteUrl(
+                getPageHandler().getIconUrl(request, entry)));
 
         Json.quoteAttr(items, "parent", entry.getParentEntryId());
-        if(entry.getIsRemoteEntry()) {
+        if (entry.getIsRemoteEntry()) {
             Json.attr(items, "isRemote", "true");
             ServerInfo server = entry.getRemoteServer();
-            Json.attr(items, "remoteRepository", Json.map("url",Json.quote(server.getUrl()),"name",
-                                                    Json.quote(server.getLabel())));
+            Json.attr(items, "remoteRepository",
+                      Json.map("url", Json.quote(server.getUrl()), "name",
+                               Json.quote(server.getLabel())));
             Json.quoteAttr(items, "remoteUrl", entry.getRemoteUrl());
         }
 
@@ -277,12 +281,23 @@ public class JsonOutputHandler extends OutputHandler {
         }
 
         if (entry.hasAreaDefined()) {
-            double [] center = entry.getCenter();
-            Json.attr(items, "geometry", Json.map("type",Json.quote("Point"),"coordinates",Json.list(""+center[1],""+center[0])));
-            Json.attr(items, "bbox", Json.list(""+entry.getWest(),""+entry.getSouth(),""+entry.getEast(), ""+entry.getNorth()));
-        } else if  (entry.hasLocationDefined()) {
-            Json.attr(items, "geometry", Json.map("type",Json.quote("Point"),"coordinates",Json.list(""+entry.getLongitude(),""+entry.getLatitude())));
-            Json.attr(items, "bbox", Json.list(""+entry.getLongitude(),""+entry.getLatitude(),""+entry.getLongitude(), ""+entry.getLatitude()));
+            double[] center = entry.getCenter();
+            Json.attr(items, "geometry",
+                      Json.map("type", Json.quote("Point"), "coordinates",
+                               Json.list("" + center[1], "" + center[0])));
+            Json.attr(items, "bbox",
+                      Json.list("" + entry.getWest(), "" + entry.getSouth(),
+                                "" + entry.getEast(), "" + entry.getNorth()));
+        } else if (entry.hasLocationDefined()) {
+            Json.attr(items, "geometry",
+                      Json.map("type", Json.quote("Point"), "coordinates",
+                               Json.list("" + entry.getLongitude(),
+                                         "" + entry.getLatitude())));
+            Json.attr(items, "bbox",
+                      Json.list("" + entry.getLongitude(),
+                                "" + entry.getLatitude(),
+                                "" + entry.getLongitude(),
+                                "" + entry.getLatitude()));
         }
 
         if (entry.hasAltitudeTop()) {
@@ -299,17 +314,19 @@ public class JsonOutputHandler extends OutputHandler {
         }
 
 
-        TypeHandler   typeHandler = entry.getTypeHandler();
+        TypeHandler       typeHandler = entry.getTypeHandler();
         List<ServiceInfo> services    = new ArrayList<ServiceInfo>();
         typeHandler.getServiceInfos(request, entry, services);
         List<String> jsonServiceInfos = new ArrayList<String>();
         for (ServiceInfo service : services) {
-            jsonServiceInfos.add(Json.map("url", Json.quote(service.getUrl()),
-                                      "relType",
-                                      Json.quote(service.getType()), "name",
-                                      Json.quote(service.getName()),
-                                      "mimeType",
-                                      Json.quote(service.getMimeType())));
+            jsonServiceInfos.add(Json.map("url",
+                                          Json.quote(service.getUrl()),
+                                          "relType",
+                                          Json.quote(service.getType()),
+                                          "name",
+                                          Json.quote(service.getName()),
+                                          "mimeType",
+                                          Json.quote(service.getMimeType())));
         }
 
         items.add("services");
@@ -346,8 +363,8 @@ public class JsonOutputHandler extends OutputHandler {
             Json.quoteAttr(items, "md5", "");
         }
 
-        List<String> attrs     = new ArrayList<String>();
-        List<String> ids     = new ArrayList<String>();
+        List<String> attrs = new ArrayList<String>();
+        List<String> ids   = new ArrayList<String>();
 
         // Add special columns to the entries depending on the type
         if (request.get(ARG_EXTRACOLUMNS, true)) {
@@ -367,26 +384,26 @@ public class JsonOutputHandler extends OutputHandler {
                     columnNames.add(name);
                     columnLabels.add(column.getLabel());
                     //                    Json.attr(items, "column." + name, Json.quote(value));
-                    extraColumns.add(Json.map(new String[] { name, Json.quote(value) }));
+                    extraColumns.add(Json.map(new String[] { name,
+                            Json.quote(value) }));
                     ids.add(name);
                     attrs.add(Json.mapAndQuote(new String[] {
-                                "id", name,
-                                "type","attribute",
-                                "label",column.getLabel(),
-                                "value",value}));
+                        "id", name, "type", "attribute", "label",
+                        column.getLabel(), "value", value
+                    }));
                 }
             }
-         /*
-         {
-            "id":"a2280667-f564-4c4f-8527-99e12955b1c1",
-            "label":"Tag",
-            "type":"enum_tag",
-            "attr1":"some tag 2",
-            "attr2":"",
-            "attr3":"",
-            "attr4":""
-         },
-        */
+            /*
+            {
+               "id":"a2280667-f564-4c4f-8527-99e12955b1c1",
+               "label":"Tag",
+               "type":"enum_tag",
+               "attr1":"some tag 2",
+               "attr2":"",
+               "attr3":"",
+               "attr4":""
+            },
+           */
 
 
             //            Json.attr(items, "columnNames", Json.list(columnNames, true));
@@ -428,11 +445,12 @@ public class JsonOutputHandler extends OutputHandler {
                         continue;
                     }
 
-                    List<String> mapItems = new ArrayList<String>();
+                    List<String> mapItems   = new ArrayList<String>();
                     List<String> valueItems = new ArrayList<String>();
                     Json.quoteAttr(mapItems, "id", metadata.getId());
                     Json.quoteAttr(mapItems, "type", metadata.getType());
-                    Json.quoteAttr(mapItems, "label",metadataType.getLabel());
+                    Json.quoteAttr(mapItems, "label",
+                                   metadataType.getLabel());
 
                     int attrIdx = 1;
                     //We always add the four attributes to have always the same structure

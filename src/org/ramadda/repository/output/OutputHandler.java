@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -603,7 +603,7 @@ public class OutputHandler extends RepositoryManager {
      * @param services  the list of ServiceInfos to add to
      */
     public void getServiceInfos(Request request, Entry entry,
-                            List<ServiceInfo> services) {}
+                                List<ServiceInfo> services) {}
 
 
     /**
@@ -683,10 +683,12 @@ public class OutputHandler extends RepositoryManager {
     public void addOutputLink(Request request, Entry entry, List<Link> links,
                               OutputType type)
             throws Exception {
-        links.add(new Link(request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                            entry, ARG_OUTPUT,
-                                            type.toString()), iconUrl(type.getIcon()),
-                                                type.getLabel(), type));
+        links.add(
+            new Link(
+                request.entryUrl(
+                    getRepository().URL_ENTRY_SHOW, entry, ARG_OUTPUT,
+                    type.toString()), iconUrl(type.getIcon()),
+                                      type.getLabel(), type));
 
     }
 
@@ -903,19 +905,21 @@ public class OutputHandler extends RepositoryManager {
             throws Exception {
 
 
-        String selectorId = elementId + (type==null?"_type":"_" + type);
+        String selectorId = elementId + ((type == null)
+                                         ? "_type"
+                                         : "_" + type);
         String event = HtmlUtils.call("selectInitialClick",
                                       HtmlUtils.comma("event",
                                           HtmlUtils.squote(selectorId),
                                           HtmlUtils.squote(elementId),
                                           HtmlUtils.squote("" + allEntries),
-                                          (type == null
-                                          ? "null"
-                                           : HtmlUtils.squote(type)),
-                                                      (entry != null
-                                                       ? HtmlUtils.squote(entry.getId())
-                                                       : "null"),
-                                                      HtmlUtils.squote(request.getString(ARG_ENTRYTYPE,""))));
+                                          ((type == null)
+                                           ? "null"
+                                           : HtmlUtils.squote(type)), ((entry
+                                               != null)
+                ? HtmlUtils.squote(entry.getId())
+                : "null"), HtmlUtils.squote(request.getString(ARG_ENTRYTYPE,
+                    ""))));
         String clearEvent = HtmlUtils.call("clearSelect",
                                            HtmlUtils.squote(selectorId));
         String link = HtmlUtils.mouseClickHref(event, label,
@@ -1048,8 +1052,8 @@ public class OutputHandler extends RepositoryManager {
         List<Link> links = new ArrayList<Link>();
 
         link = new Link(request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                         entry, ARG_OUTPUT, output.toString(),
-                                         ARG_PREVIOUS,
+                                         entry, ARG_OUTPUT,
+                                         output.toString(), ARG_PREVIOUS,
                                          "true"), iconUrl(ICON_LEFT),
                                              "View Previous Entry");
 
@@ -1057,7 +1061,8 @@ public class OutputHandler extends RepositoryManager {
         link.setLinkType(OutputType.TYPE_VIEW);
         links.add(link);
         link = new Link(request.entryUrl(getRepository().URL_ENTRY_SHOW,
-                                         entry, ARG_OUTPUT, output.toString(), ARG_NEXT,
+                                         entry, ARG_OUTPUT,
+                                         output.toString(), ARG_NEXT,
                                          "true"), iconUrl(ICON_RIGHT),
                                              "View Next Entry");
         link.setLinkType(OutputType.TYPE_VIEW);
@@ -2200,11 +2205,24 @@ public class OutputHandler extends RepositoryManager {
     public void addPublishWidget(Request request, Entry entry, Appendable sb,
                                  String header, boolean addNameField)
             throws Exception {
-        addPublishWidget(request, entry,sb, header, addNameField, true);
+        addPublishWidget(request, entry, sb, header, addNameField, true);
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param sb _more_
+     * @param header _more_
+     * @param addNameField _more_
+     * @param addMetadataField _more_
+     *
+     * @throws Exception _more_
+     */
     public void addPublishWidget(Request request, Entry entry, Appendable sb,
-                                 String header, boolean addNameField, boolean addMetadataField)
+                                 String header, boolean addNameField,
+                                 boolean addMetadataField)
             throws Exception {
         if (request.getUser().getAnonymous()) {
             return;
@@ -2218,7 +2236,9 @@ public class OutputHandler extends RepositoryManager {
 
         String select = OutputHandler.getSelect(request, ARG_PUBLISH_ENTRY,
                             "Select folder", false, null, entry);
-        String addMetadata = !addMetadataField?"":HtmlUtils.checkbox(ARG_METADATA_ADD,
+        String addMetadata = !addMetadataField
+                             ? ""
+                             : HtmlUtils.checkbox(ARG_METADATA_ADD,
                                  HtmlUtils.VALUE_TRUE,
                                  request.get(ARG_METADATA_ADD,
                                              false)) + msg("Add properties");

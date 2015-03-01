@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -31,8 +31,8 @@ import org.ramadda.sql.*;
 
 import org.ramadda.sql.SqlUtil;
 import org.ramadda.util.HtmlUtils;
-import org.ramadda.util.Utils;
 import org.ramadda.util.Json;
+import org.ramadda.util.Utils;
 
 
 
@@ -320,9 +320,11 @@ public class GraphOutputHandler extends OutputHandler {
         js.append("function createGraph" + divId + "() {\n");
         sb.append(HtmlUtils.importJS(fileUrl("/lib/d3/d3.v3.min.js")));
         sb.append(HtmlUtils.importJS(fileUrl("/d3graph.js")));
-        sb.append(HtmlUtils.div("",HtmlUtils.style("width:" + width + ";height:"
-                                                   + height) + HtmlUtils.id(divId)
-                                + HtmlUtils.cssClass("graph-div")));
+        sb.append(HtmlUtils.div("",
+                                HtmlUtils.style("width:" + width + ";height:"
+                                    + height) + HtmlUtils.id(divId)
+                                        + HtmlUtils.cssClass("graph-div")));
+
         return divId;
     }
 

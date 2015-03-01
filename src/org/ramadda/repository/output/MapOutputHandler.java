@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -170,15 +170,17 @@ public class MapOutputHandler extends OutputHandler {
             getMapManager().getGoogleEarth(request, entriesToUse, sb, -1, -1,
                                            true, false);
 
-            return makeLinksResult(request, msg("Google Earth") +" - " + entry.getName(), sb,
-                                   new State(entry));
+            return makeLinksResult(request,
+                                   msg("Google Earth") + " - "
+                                   + entry.getName(), sb, new State(entry));
         }
 
         MapInfo map = getMapManager().getMap(request, entriesToUse, sb, 700,
                                              500, true,
                                              new boolean[] { false });
 
-        return makeLinksResult(request, msg("Map")  +" - " + entry.getName(), sb, new State(entry));
+        return makeLinksResult(request, msg("Map") + " - " + entry.getName(),
+                               sb, new State(entry));
     }
 
 
@@ -207,7 +209,8 @@ public class MapOutputHandler extends OutputHandler {
             sb.append(HtmlUtils.b(msg(LABEL_NO_ENTRIES_FOUND))
                       + HtmlUtils.p());
 
-            return makeLinksResult(request, msg("Map") +" - " + group.getName(), sb,
+            return makeLinksResult(request,
+                                   msg("Map") + " - " + group.getName(), sb,
                                    new State(group, subGroups, entries));
         }
 
@@ -216,8 +219,9 @@ public class MapOutputHandler extends OutputHandler {
             getMapManager().getGoogleEarth(request, entriesToUse, sb, -1, -1,
                                            true, false);
 
-            return makeLinksResult(request, msg("Google Earth")  +" - " + group.getName(), sb,
-                                   new State(group));
+            return makeLinksResult(request,
+                                   msg("Google Earth") + " - "
+                                   + group.getName(), sb, new State(group));
         }
 
 
@@ -226,8 +230,8 @@ public class MapOutputHandler extends OutputHandler {
                                              500, false, haveBearingLines,
                                              true, null);
 
-        return makeLinksResult(request, msg("Map")  +" - " + group.getName(), sb,
-                               new State(group, subGroups, entries));
+        return makeLinksResult(request, msg("Map") + " - " + group.getName(),
+                               sb, new State(group, subGroups, entries));
     }
 
 

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -1340,13 +1340,16 @@ public class GenericTypeHandler extends TypeHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
      * @param entry _more_
      * @param node _more_
      *
      * @throws Exception on badness
      */
     @Override
-    public void addToEntryNode(Request request, Entry entry, Element node) throws Exception {
+    public void addToEntryNode(Request request, Entry entry, Element node)
+            throws Exception {
         super.addToEntryNode(request, entry, node);
 
 

@@ -1,5 +1,5 @@
 /*
-* Copyright 2008-2014 Geode Systems LLC
+* Copyright 2008-2015 Geode Systems LLC
 *
 * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
 * software and associated documentation files (the "Software"), to deal in the Software 
@@ -442,7 +442,6 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
     /**
      * _more_
      *
-     * @param dbId _more_
      *
      * @param prefix _more_
      *
@@ -1408,7 +1407,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                 } else if (type == ColumnInfo.TYPE_CLOB) {
                     sql.append(convertType("clob", column.getSize()));
                 } else {
-                    throw new IllegalStateException ("Unknown column type:" + type);
+                    throw new IllegalStateException("Unknown column type:"
+                            + type);
                 }
             }
             sql.append(");\n");
@@ -1423,7 +1423,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
 
         //        System.err.println(drop);
         //        System.err.println(sql);
-        
+
         //TODO: 
         //        loadSql(drop.toString(), true, false);
         loadSql(convertSql(sql.toString()), false, true);
@@ -1544,6 +1544,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
      */
     public List<TableInfo> getTableInfos(Connection connection, boolean all)
             throws Exception {
+
         DatabaseMetaData dbmd = connection.getMetaData();
         ResultSet tables = dbmd.getTables(null, null, null,
                                           new String[] { "TABLE" });
@@ -1554,33 +1555,35 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             //                System.err.println (rsmd.getColumnName(col));
         }
         List<TableInfo> tableInfos = new ArrayList<TableInfo>();
-        HashSet<String> seen = new HashSet<String>();
+        HashSet<String> seen       = new HashSet<String>();
 
 
 
         while (tables.next()) {
-            String  tableName = tables.getString("TABLE_NAME");
-            String  tn        = tableName.toLowerCase();
+            String tableName = tables.getString("TABLE_NAME");
+            String tn        = tableName.toLowerCase();
 
-            if(tn.equals("participant")) {
+            if (tn.equals("participant")) {
                 //a hack due to some old bad derby db I have
                 continue;
             }
 
 
             //Just in case
-            if(seen.contains(tn))  {
-                System.err.println ("Warning: duplicate table:" + tableName);
+            if (seen.contains(tn)) {
+                System.err.println("Warning: duplicate table:" + tableName);
+
                 continue;
-            } 
+            }
             seen.add(tn);
 
 
-            boolean ok        = true;
+            boolean ok = true;
             for (TypeHandler typeHandler :
                     getRepository().getTypeHandlers()) {
                 if ( !typeHandler.shouldExportTable(tn)) {
                     ok = false;
+
                     break;
                 }
             }
@@ -1621,26 +1624,26 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                         type = java.sql.Types.CLOB;
                         //Just come up with some size
 
-                        if(size<=0) {
+                        if (size <= 0) {
                             size = 36000;
                         }
                     } else if (typeName.toLowerCase().equals("longtext")) {
                         type = java.sql.Types.CLOB;
                         //Just come up with some size
-                        if(size<=0) {
+                        if (size <= 0) {
                             size = 36000;
                         }
                     }
                 }
                 if (typeName.equalsIgnoreCase("text")) {
-                    if(size<=0) {
-                        size  = 36000;
+                    if (size <= 0) {
+                        size = 36000;
                     }
                 }
 
                 columns.add(new ColumnInfo(colName, typeName, type, size));
-                if(tn.indexOf("wiki")>=0) {
-                    System.err.println ("COLS:" + columns);
+                if (tn.indexOf("wiki") >= 0) {
+                    System.err.println("COLS:" + columns);
                 }
             }
 
@@ -1648,6 +1651,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         }
 
         return tableInfos;
+
     }
 
 
@@ -1698,7 +1702,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                 ResultSet        results;
                 dos.writeInt(DUMPTAG_TABLE);
                 writeString(dos, tableInfo.getName());
-                if(skip.contains(tableInfo.getName().toLowerCase())) {
+                if (skip.contains(tableInfo.getName().toLowerCase())) {
                     continue;
                 }
                 while ((results = iter.getNext()) != null) {
