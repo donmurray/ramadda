@@ -3861,16 +3861,32 @@ public class HtmlUtils {
 
 
     /**
-     * _more_
+     * Add an accordian of sections to the page
      *
-     * @param sb _more_
-     * @param titles _more_
-     * @param contents _more_
+     * @param sb        the StringBuilder/StringBuffer to append to
+     * @param titles    the title for each section
+     * @param contents  the contents of each section
      *
-     * @throws Exception _more_
+     * @throws Exception  some problem
      */
     public static void makeAccordian(Appendable sb, List<String> titles,
                                      List<String> contents)
+            throws Exception {
+        makeAccordian(sb, titles, contents, false);
+    }
+
+    /**
+     * Add an accordian of sections to the page
+     *
+     * @param sb        the StringBuilder/StringBuffer to append to
+     * @param titles    the title for each section
+     * @param contents  the contents of each section
+     * @param collapse  set the sections to be collapsed initially
+     *
+     * @throws Exception  some problem
+     */
+    public static void makeAccordian(Appendable sb, List<String> titles,
+                                     List<String> contents, boolean collapse)
             throws Exception {
 
         String accordianId = "accordion_" + (blockCnt++);
@@ -3894,7 +3910,7 @@ public class HtmlUtils {
         }
         sb.append("</div>");
         String args =
-            "autoHeight: false, navigation: true, collapsible: true";
+            "autoHeight: false, navigation: true, collapsible: true, active: "+!collapse;
         sb.append(HtmlUtils.script("$(function() {\n$(\"#" + accordianId
                                    + "\" ).accordion({" + args + "});});\n"));
     }
