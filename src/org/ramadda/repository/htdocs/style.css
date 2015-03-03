@@ -68,7 +68,7 @@ h3 {
     color: black;
 }
 
-.ramadda-section h2 {
+.ramadda-section-header, .ramadda-section h2 {
    font-size:20pt;
    padding: 0px;
    margin: 0px;
@@ -1415,6 +1415,7 @@ a.image-link {
 
 .subheader-container {
    margin-top:10px;
+   text-align: center;
 }
 
 snippet {
@@ -2435,6 +2436,7 @@ a.toggleblocklabellink:visited {
   padding-top:5px;
   border : 1px black solid;
   background-color : #ffffcc;
+  max-width: 500px;
   /* Shadow effect */
   /* offset left, top, thickness, color with alpha */
   -webkit-box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);

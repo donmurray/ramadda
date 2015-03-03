@@ -2420,14 +2420,20 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * _more_
      */
     public void clearAllCaches() {
-        for (OutputHandler outputHandler : outputHandlers) {
-            outputHandler.clearCache();
+        synchronized(outputHandlers) {
+            for (OutputHandler outputHandler : new ArrayList<OutputHandler>(outputHandlers)) {
+                outputHandler.clearCache();
+            }
         }
-        for (TypeHandler typeHandler : allTypeHandlers) {
-            typeHandler.clearCache();
+        synchronized(allTypeHandlers) {
+            for (TypeHandler typeHandler : new ArrayList<TypeHandler>(allTypeHandlers)) {
+                typeHandler.clearCache();
+            }
         }
-        for (RepositoryManager manager : repositoryManagers) {
-            manager.clearCache();
+        synchronized(repositoryManagers) {
+            for (RepositoryManager manager : repositoryManagers) {
+                manager.clearCache();
+            }
         }
         resources = new Hashtable();
         try {

@@ -96,7 +96,32 @@ import javax.mail.internet.MimeMessage;
 public class Admin extends RepositoryManager {
 
     /** _more_ */
+    public static final String ACTION_SHUTDOWN = "action.shutdown";
+
+
+    /** _more_ */
+    public static final String ACTION_CLEARCACHE = "action.clearcache";
+
+    /** _more_ */
+    public static final String ACTION_NEWDB = "action.newdb";
+
+    /** _more_ */
+    public static final String ACTION_DUMPDB = "action.dumpb";
+
+    public static final String ACTION_CHANGEPATHS = "action.changepaths";
+
+    public static final String ARG_CHANGEPATHS_CONFIRM = "changepathsconfirm";
+    public static final String ARG_CHANGEPATHS_PATTERN = "changepathspattern";
+    public static final String ARG_CHANGEPATHS_TO = "changepathsto";
+
+
+    public static final String ARG_REPLACE_PATTERN= "replacepattern";
+    public static final String ARG_REPLACE_WITH = "replacewith";
+
+
+    /** _more_ */
     public static final String ARG_ADMIN_ADMINCREATED = "admin.admincreated";
+
 
     /** _more_ */
     public static final String ARG_ADMIN_INSTALLCOMPLETE =
@@ -1061,7 +1086,7 @@ public class Admin extends RepositoryManager {
         StringBuffer sb = new StringBuffer();
         request.formPostWithAuthToken(sb, URL_ADMIN_SETTINGS_DO, null);
         String size = HtmlUtils.SIZE_60;
-        sb.append(HtmlUtils.p());
+        sb.append(HtmlUtils.sectionOpen());
         sb.append(HtmlUtils.submit(msg("Change Settings")));
         sb.append(HtmlUtils.br());
         StringBuffer csb = new StringBuffer();
@@ -1385,6 +1410,7 @@ public class Admin extends RepositoryManager {
         sb.append(HtmlUtils.submit(msg("Change Settings")));
         sb.append(HtmlUtils.formClose());
 
+        sb.append(HtmlUtils.sectionClose());
         return makeResult(request, msg("Settings"), sb);
 
     }
@@ -1615,6 +1641,7 @@ public class Admin extends RepositoryManager {
      */
     public Result adminAccess(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
+        sb.append(HtmlUtils.sectionOpen());
         sb.append(msgHeader("Access Overview"));
 
         Statement statement =
@@ -1667,6 +1694,7 @@ public class Admin extends RepositoryManager {
             sb.append(HtmlUtils.row(HtmlUtils.colspan("<hr>", 3)));
         }
         sb.append("</table>");
+        sb.append(HtmlUtils.sectionClose());
 
         return makeResult(request, msg("Access Overview"), sb);
     }
@@ -1788,6 +1816,8 @@ public class Admin extends RepositoryManager {
 
 
         StringBuffer sb = new StringBuffer();
+        sb.append(HtmlUtils.sectionOpen());
+
         sb.append(HtmlUtils.makeShowHideBlock(msg("System Status"),
                 statusSB.toString(), false));
 
@@ -1809,6 +1839,7 @@ public class Admin extends RepositoryManager {
         sb.append(HtmlUtils.makeShowHideBlock(msg("Database Statistics"),
                 dbSB.toString(), false));
 
+        sb.append(HtmlUtils.sectionClose());
         return makeResult(request, msg("System"), sb);
     }
 
@@ -1849,6 +1880,7 @@ public class Admin extends RepositoryManager {
         }
 
         StringBuffer sb = new StringBuffer();
+        sb.append(HtmlUtils.sectionOpen());
         //        sb.append(msgHeader("SQL"));
         sb.append(HtmlUtils.p());
         sb.append(HtmlUtils.href(request.url(URL_ADMIN_TABLES),
@@ -1871,6 +1903,7 @@ public class Admin extends RepositoryManager {
         sb.append("SQL File: ");
         sb.append(HtmlUtils.fileInput(ARG_SQLFILE, HtmlUtils.SIZE_60));
         sb.append(HtmlUtils.formClose());
+        sb.append(HtmlUtils.sectionClose());
         sb.append("<table>");
         if (query == null) {
             return makeResult(request, msg("SQL"), sb);
@@ -2106,6 +2139,31 @@ public class Admin extends RepositoryManager {
     public Result adminCleanup(Request request) throws Exception {
 
         StringBuffer sb = new StringBuffer();
+
+        StringBuilder filePathSB = new StringBuilder();
+        filePathSB.append(HtmlUtils.sectionOpen());
+        filePathSB.append(HtmlUtils.h3("Change file paths"));
+            
+        request.formPostWithAuthToken(filePathSB, URL_ADMIN_CLEANUP, "");
+        filePathSB.append("Change the stored file path for all entries that match the following pattern");
+        filePathSB.append(HtmlUtils.formTable());
+        filePathSB.append(HtmlUtils.formEntry(msgLabel("File Pattern"), HtmlUtils.input(ARG_CHANGEPATHS_PATTERN,request.getString(ARG_CHANGEPATHS_PATTERN,""),HtmlUtils.SIZE_50)));
+        filePathSB.append(HtmlUtils.formEntry(msgLabel("Change to"), HtmlUtils.input(ARG_CHANGEPATHS_TO,request.getString(ARG_CHANGEPATHS_TO, ""),HtmlUtils.SIZE_50)));
+
+        filePathSB.append(HtmlUtils.formTableClose());
+        filePathSB.append(HtmlUtils.submit(msg("Change file paths"), ACTION_CHANGEPATHS));
+        filePathSB.append(HtmlUtils.space(2));
+        filePathSB.append(HtmlUtils.checkbox(ARG_CHANGEPATHS_CONFIRM, "true",
+                                             false));
+
+        filePathSB.append(HtmlUtils.space(2));
+        filePathSB.append("Yes, I really want to change all of the file paths");
+        filePathSB.append(HtmlUtils.sectionClose());
+
+        filePathSB.append(HtmlUtils.formClose());
+
+
+
         if (request.defined(ACTION_STOP)) {
             runningCleanup = false;
             cleanupTS++;
@@ -2124,6 +2182,16 @@ public class Admin extends RepositoryManager {
             return new Result(request.url(URL_ADMIN_CLEANUP));
         } else if (request.defined(ACTION_CLEARCACHE)) {
             getRepository().clearAllCaches();
+        } else if (request.defined(ACTION_CHANGEPATHS)) {
+            if (request.defined(ARG_CHANGEPATHS_PATTERN)) {
+                StringBuilder tmp = new StringBuilder();
+                getRepository().getEntryManager().changeResourcePaths(request, request.getString(ARG_CHANGEPATHS_PATTERN,""),request.getString(ARG_CHANGEPATHS_TO,""), tmp, request.get(ARG_CHANGEPATHS_CONFIRM, false));
+                sb.append(HtmlUtils.div(tmp.toString(), HtmlUtils.style("max-height:300px; overflow-y: auto;")));
+            } else {
+                sb.append("Change paths fields required");
+            }
+            sb.append(filePathSB);
+            return makeResult(request, msg("Change File Paths"), sb);
         } else if (request.defined(ACTION_SHUTDOWN)) {
             request.ensureAuthToken();
             if (getRepository().getShutdownEnabled()) {
@@ -2142,7 +2210,7 @@ public class Admin extends RepositoryManager {
             }
         }
 
-        request.formPostWithAuthToken(sb, URL_ADMIN_CLEANUP, "");
+
         String status = cleanupStatus.toString();
         if (runningCleanup) {
             sb.append(msg("Database clean up is running"));
@@ -2157,55 +2225,52 @@ public class Admin extends RepositoryManager {
             //            sb.append(HtmlUtils.submit(msg("Start cleanup"), ACTION_START));
 
 
-            sb.append("<p>");
-            sb.append(HtmlUtils.submit(msg("Clear all caches"),
-                                       ACTION_CLEARCACHE));
+
+            request.formPostWithAuthToken(sb, URL_ADMIN_CLEANUP, "");
+           
+            sb.append(HtmlUtils.section(HtmlUtils.h3( msg("Caches")) +HtmlUtils.submit(msg("Clear all caches"), ACTION_CLEARCACHE)));
+            sb.append(HtmlUtils.formClose());
 
 
-            sb.append("<p><br>");
-            sb.append(
-                HtmlUtils.submit(
-                    msg("Reinitialize Database Connection"), ACTION_NEWDB));
+
+
+            StringBuffer tmp = new StringBuffer();
+            tmp.append(HtmlUtils.submit(msg("Clear all passwords"), ACTION_PASSWORDS_CLEAR));
+            tmp.append(HtmlUtils.space(2));
+            tmp.append(HtmlUtils.checkbox(ARG_PASSWORDS_CLEAR_CONFIRM, "true", false));
+            tmp.append(HtmlUtils.space(1));
+            tmp.append(msg("Yes, I really want to delete all passwords"));
+            tmp.append(HtmlUtils.br());
+            tmp.append(getPageHandler().showDialogNote(
+                                                       "Note:  All users including you will have to reset their passwords. If you do not have email enabled then only the admin will be able to reset the passwords. So, if you do this then right away, while your session is active, go and change your password. If things go bad and you can't login at all see the  <a href=\"http://ramadda.org/repository/userguide/faq.html#faq1_cat1_6\">FAQ</a> post."));
+
+            request.formPostWithAuthToken(sb, URL_ADMIN_CLEANUP, "");
+            sb.append(HtmlUtils.section( HtmlUtils.h3(msg("Clear Passwords")) + tmp.toString()));
+            sb.append(HtmlUtils.formClose());
+
+
+
+            request.formPostWithAuthToken(sb, URL_ADMIN_CLEANUP, "");
+            sb.append(HtmlUtils.section(HtmlUtils.h3(msg("Export Database")) + msg(
+                                            "You can write out the database for backup or transfer to a new database") +
+                                        "<p>" +
+                                        HtmlUtils.submit(msg("Export the database"), ACTION_DUMPDB)));
+
+            sb.append(HtmlUtils.formClose());
+
+            sb.append(filePathSB);
 
             if (getRepository().getShutdownEnabled()) {
-                sb.append("<p><br>");
-                sb.append(HtmlUtils.submit(msg("Shutdown server"),
-                                           ACTION_SHUTDOWN));
-                sb.append(HtmlUtils.space(2));
-                sb.append(HtmlUtils.checkbox(ARG_SHUTDOWN_CONFIRM, "true",
-                                             false));
-                sb.append(HtmlUtils.space(1));
-                sb.append(msg("Yes, I really want to shutdown the server"));
+                request.formPostWithAuthToken(sb, URL_ADMIN_CLEANUP, "");
+                sb.append(HtmlUtils.section(HtmlUtils.h3(msg("Shutdown")) + HtmlUtils.submit(msg("Shutdown server"),  ACTION_SHUTDOWN) +
+                                            HtmlUtils.space(2) +
+                                            HtmlUtils.checkbox(ARG_SHUTDOWN_CONFIRM, "true",  false)  +
+                                            HtmlUtils.space(1) +
+                                            msg("Yes, I really want to shutdown the server")));
+                sb.append(HtmlUtils.formClose());
             }
 
 
-
-            sb.append("<p><hr>");
-            sb.append(HtmlUtils.submit(msg("Clear all passwords"),
-                                       ACTION_PASSWORDS_CLEAR));
-            sb.append(HtmlUtils.space(2));
-            sb.append(HtmlUtils.checkbox(ARG_PASSWORDS_CLEAR_CONFIRM, "true",
-                                         false));
-            sb.append(HtmlUtils.space(1));
-            sb.append(msg("Yes, I really want to delete all passwords"));
-            sb.append(HtmlUtils.br());
-            sb.append(
-                getPageHandler().showDialogNote(
-                    "Note:  All users including you will have to reset their passwords. If you do not have email enabled then only the admin will be able to reset the passwords. So, if you do this then right away, while your session is active, go and change your password. If things go bad and you can't login at all see the  <a href=\"http://ramadda.org/repository/userguide/faq.html#faq1_cat1_6\">FAQ</a> post."));
-
-
-
-
-
-            /*
-            sb.append("<p>");
-            sb.append(
-                msg(
-                "You can write out the database for backup or transfer to a new database"));
-            sb.append("<p>");
-            sb.append(HtmlUtils.submit(msg("Export the database"),
-                                      ACTION_DUMPDB));
-            */
         }
         sb.append("</form>");
         if (status.length() > 0) {

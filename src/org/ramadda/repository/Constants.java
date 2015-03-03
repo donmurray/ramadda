@@ -1842,21 +1842,9 @@ public interface Constants {
     /** _more_ */
     public static final String ACTION_ADD = "action.add";
 
-    /** _more_ */
-    public static final String ACTION_SHUTDOWN = "action.shutdown";
 
     /** _more_ */
     public static final String ACTION_CLEAR = "action.clear";
-
-    /** _more_ */
-    public static final String ACTION_CLEARCACHE = "action.clearcache";
-
-
-    /** _more_ */
-    public static final String ACTION_NEWDB = "action.newdb";
-
-    /** _more_ */
-    public static final String ACTION_DUMPDB = "action.dumpb";
 
     /** _more_ */
     public static final String ACTION_COPY = "action.copy";

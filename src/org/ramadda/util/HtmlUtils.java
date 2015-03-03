@@ -1032,6 +1032,11 @@ public class HtmlUtils {
     }
 
 
+    public static String section(String content) {
+        return section(content, null);
+    }
+
+
     /**
      * _more_
      *

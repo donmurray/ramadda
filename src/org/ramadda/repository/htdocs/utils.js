@@ -63,12 +63,21 @@ var GuiUtils = {
         return base + encodeURIComponent(url);
     },
 
+    showingError: false,
     handleError: function(error, extra) {
         console.log(error);
-        alert("An error has occurred: " + error);
         if(extra) {
             console.log(extra);
         }
+        //Do this later as we are getting errors when the user clicks away from this page
+        setTimeout(function(){ 
+                if(this.showingError) {
+                    return;
+                }
+                this.showingError = true;
+                alert("An error has occurred: " + error);
+                this.showingError = false;
+            }, 2000);
         closeFormLoadingDialog ();
     },
     isJsonError: function(data) {

@@ -2214,13 +2214,17 @@ public class PageHandler extends RepositoryManager {
         String header =
             StringUtil.join("<span class=\"subheader-sep\">|</span>", links);
 
-        return HtmlUtils.tag(HtmlUtils.TAG_CENTER,
+        String label = onLabel == null? "":HtmlUtils.div(HtmlUtils.h2(msg(onLabel)), HtmlUtils.cssClass("ramadda-section"));
+
+        return HtmlUtils.tag(HtmlUtils.TAG_DIV,
+                             HtmlUtils.cssClass("subheader-container"),
+                             header + label);
+/*        return HtmlUtils.tag(HtmlUtils.TAG_CENTER,
                              HtmlUtils.cssClass("subheader-container"),
                              HtmlUtils.tag(HtmlUtils.TAG_SPAN,
                                            HtmlUtils.cssClass("subheader"),
-                                           header)) + ((onLabel == null)
-                ? ""
-                : HtmlUtils.p() + msgHeader(onLabel));
+                                           header) + label;
+*/
     }
 
 

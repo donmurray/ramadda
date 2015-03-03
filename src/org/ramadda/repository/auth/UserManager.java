@@ -1769,6 +1769,7 @@ public class UserManager extends RepositoryManager {
         StringBuffer sb        = new StringBuffer();
 
 
+        sb.append(HtmlUtils.sectionOpen());
         sb.append(request.form(URL_USER_NEW_FORM));
         sb.append(HtmlUtils.submit(msg("Create New User")));
         sb.append(HtmlUtils.formClose());
@@ -1903,7 +1904,7 @@ public class UserManager extends RepositoryManager {
         tabTitles.set(showTab, tabTitles.get(showTab));
         sb.append(HtmlUtils.p());
         sb.append(OutputHandler.makeTabs(tabTitles, tabContent, true));
-
+        sb.append(HtmlUtils.sectionOpen());
         return getAdmin().makeResult(request, msg("Users"), sb);
     }
 

@@ -4912,6 +4912,12 @@ public class EntryManager extends RepositoryManager {
      */
     public Result processEntryImport(Request request) throws Exception {
         Entry                group       = findGroup(request);
+
+        if ( !getAccessManager().canDoAction(request, group,
+                                             Permission.ACTION_NEW)) {
+            throw new AccessException("You cannot import", request);
+        }
+
         StringBuilder        sb          = new StringBuilder();
         StringBuilder        extraForm   = new StringBuilder();
         List<TwoFacedObject> importTypes = new ArrayList<TwoFacedObject>();
@@ -9383,13 +9389,40 @@ public class EntryManager extends RepositoryManager {
         }
 
         return entry;
-
-
     }
 
 
 
+    public void changeResourcePaths(Request request, String pattern, String to, Appendable html, boolean doit) throws Exception {
+        Clause clause = Clause.like(Tables.ENTRIES.COL_RESOURCE, "%" + pattern +"%");
+        Statement stmt  = getDatabaseManager().select(Tables.ENTRIES.COL_ID+"," + Tables.ENTRIES.COL_RESOURCE,
+                                                      Tables.ENTRIES.NAME,clause,null);
+        SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
+        ResultSet        results = null;
+        String[] colNames = new String[]{Tables.ENTRIES.COL_RESOURCE};
+        html.append("<ul>");
+        int cnt = 0;
+        while ((results = iter.getNext()) != null) {
+            String id = results.getString(1);
+            String resource= results.getString(2);
+            String newValue = resource.replace(pattern, to);
+            cnt++;
+            if(cnt<=100) {
+                html.append("<li> " + HtmlUtils.href(getRepository().URL_ENTRY_SHOW+"?" + ARG_ENTRYID +"=" + id, resource) +"   to: " + newValue);
+                if(cnt == 100) {
+                    html.append("<li> ...");
+                }
+            }
+            if(doit) {
+                getDatabaseManager().update(Tables.ENTRIES.NAME, Tables.ENTRIES.COL_ID, id,colNames, new String[]{resource});
+            }
+        }
+        html.append("</ul>");
+        if(cnt == 0) {
+            html.append(msg("Nothing found"));
+        }
+        getDatabaseManager().closeStatement(stmt);
 
-
+    }
 
 }

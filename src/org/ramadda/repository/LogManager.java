@@ -686,6 +686,7 @@ public class LogManager extends RepositoryManager {
         File         theFile  = null;
         boolean      didOne   = false;
 
+        sb.append(HtmlUtils.sectionOpen());
         sb.append("Logs are in: " + HtmlUtils.italics(f.toString()));
         sb.append(HtmlUtils.p());
 
@@ -734,6 +735,7 @@ public class LogManager extends RepositoryManager {
             getErrorLog(request, sb, theFile);
         }
 
+        sb.append(HtmlUtils.sectionClose());
         return getAdmin().makeResult(request, msg("Logs"), sb);
     }
 

@@ -475,6 +475,7 @@ public class LocalRepositoryManager extends RepositoryManager {
         }
 
         StringBuffer sb = new StringBuffer();
+        sb.append(HtmlUtils.sectionOpen());
 
         if (request.defined(ARG_LOCAL_NEW)) {
             request.ensureAuthToken();
@@ -494,7 +495,7 @@ public class LocalRepositoryManager extends RepositoryManager {
 
         }
 
-        sb.append(HtmlUtils.formTable(""));
+        sb.append("<table>");
         boolean didone = false;
         for (Local local : readLocals()) {
             if ( !didone) {
@@ -542,8 +543,8 @@ public class LocalRepositoryManager extends RepositoryManager {
                     HtmlUtils.cols(
                         HtmlUtils.href(
                             getChildUrlBase(local.id),
-                            local.id) /*,contact*/, local.status,
-                                statusSB.toString(), statusSB2.toString())));
+                            local.id) /*,contact*/, HtmlUtils.inset(local.status, 0,10,0,10),
+                        statusSB.toString(), HtmlUtils.inset(statusSB2.toString(),0,10,0,10))));
         }
         sb.append(HtmlUtils.formTableClose());
         sb.append(HtmlUtils.p());
@@ -593,10 +594,8 @@ public class LocalRepositoryManager extends RepositoryManager {
                     msg("Create new repository"), ARG_LOCAL_NEW)));
 
         sb.append(HtmlUtils.formTableClose());
-
         sb.append(HtmlUtils.formClose());
-
-
+        sb.append(HtmlUtils.sectionClose());
         return getAdmin().makeResult(request, "Administration", sb);
 
     }

@@ -245,8 +245,7 @@ public class RegistryManager extends RepositoryManager {
             checkApi();
         }
 
-
-        sb.append(HtmlUtils.p());
+        sb.append(HtmlUtils.sectionOpen());
         sb.append(request.form(URL_REGISTRY_REMOTESERVERS, ""));
         sb.append(HtmlUtils.submit(msg("Change Selected"), ARG_SUBMIT));
         sb.append(HtmlUtils.submit(msg("Delete Selected"), ARG_DELETE));
@@ -299,6 +298,7 @@ public class RegistryManager extends RepositoryManager {
         sb.append(HtmlUtils.submit("Reload from Registry Servers",
                                    ARG_REGISTRY_RELOAD));
         sb.append(HtmlUtils.formClose());
+        sb.append(HtmlUtils.sectionClose());
 
 
         return getAdmin().makeResult(request, msg("Remote Servers"), sb);

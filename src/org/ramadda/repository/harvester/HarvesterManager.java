@@ -615,6 +615,7 @@ public class HarvesterManager extends RepositoryManager {
 
         //        sb.append(msgHeader("Harvesters"));
         request.formPostWithAuthToken(sb, URL_HARVESTERS_NEW);
+        sb.append(HtmlUtils.sectionOpen());
         sb.append(HtmlUtils.submit(msg("New Harvester")));
         sb.append(HtmlUtils.formClose());
 
@@ -624,6 +625,7 @@ public class HarvesterManager extends RepositoryManager {
                     request.getString(ARG_MESSAGE, "")));
         }
         makeHarvestersList(request, harvesters, sb);
+        sb.append(HtmlUtils.sectionClose());
 
         return getAdmin().makeResult(request, msg("Harvesters"), sb);
     }

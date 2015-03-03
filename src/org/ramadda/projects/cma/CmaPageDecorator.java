@@ -68,6 +68,7 @@ public class CmaPageDecorator extends PageDecorator {
      *
      * @return _more_
      */
+    /*
     @Override
     public String getDefaultOutputType(Repository repository,
                                        Request request, Entry entry,
@@ -133,7 +134,7 @@ public class CmaPageDecorator extends PageDecorator {
         return null;
     }
 
-
+    */
 
     /**
      * Decorate the html. This allows you to do anything with the HTML for the given entry
