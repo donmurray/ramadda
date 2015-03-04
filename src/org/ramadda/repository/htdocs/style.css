@@ -69,10 +69,10 @@ h3 {
 }
 
 .ramadda-section-header, .ramadda-section h2 {
-   font-size:20pt;
+   font-size:18pt;
    padding: 0px;
    margin: 0px;
-   margin-bottom: 4px;
+   margin-bottom: 2px;
    font-weight: 300;
    color: #000;
    text-align: center;
@@ -87,13 +87,11 @@ h3 {
     margin:0px;
     padding:0px;  
     font-size:12pt;
-    color: #444;
-    padding-left:70px;
-    padding-right:70px;
-    padding-top:10px;
-    padding-bottom:10px;
+    padding-left:60px;
+    padding-right:60px;
+    padding-top:8px;
+    padding-bottom:8px;
     border-bottom:1px #ccc   dotted;
-    margin: 0px;
 }
 
 .ramadda-section-wide  {
