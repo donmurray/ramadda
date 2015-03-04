@@ -270,22 +270,11 @@ public class GeoUtils {
      */
     public static void main(String[] args) throws Exception {
         for (String arg : args) {
-            for (String address :
-                    StringUtil.split(IOUtil.readContents(arg, (String) null),
-                                     "\n", true, true)) {
-                List<String> toks = StringUtil.splitUpTo(address, ",", 2);
-                address = toks.get(0);
-                double[] loc = getLocationFromAddress(address
-                                   + ", Boulder CO");
-                if (loc == null) {
-                    System.out.println(address + "," + "NA");
-                } else {
-                    String extra = (toks.size() > 1)
-                                   ? "," + toks.get(1)
-                                   : "";
-                    System.out.println(address + "," + loc[0] + "," + loc[1]
-                                       + extra);
-                }
+            double[] loc = getLocationFromAddress(arg);
+            if (loc == null) {
+                System.out.println("NA");
+            } else {
+                System.out.println(loc[0] + "," + loc[1]);
             }
         }
         if (true) {

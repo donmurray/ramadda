@@ -335,6 +335,8 @@ public class ZipOutputHandler extends OutputHandler {
                         "Size of request has exceeded maximum size")));
         }
 
+
+
         //Now set the return file name
         if (prefix.length() == 0) {
             request.setReturnFilename("entry.zip");
@@ -344,7 +346,6 @@ public class ZipOutputHandler extends OutputHandler {
 
         Result     result         = new Result();
         FileWriter fileWriter     = null;
-
 
 
         boolean    writeToDisk    = request.get(ARG_WRITETODISK, false);
@@ -459,11 +460,8 @@ public class ZipOutputHandler extends OutputHandler {
         }
         for (Entry entry : entries) {
             //Check for access
-            if ( !getAccessManager().canDownload(request, entry)) {
-                continue;
-            }
-
             if ( !getAccessManager().canExportEntry(request, entry)) {
+                System.err.println ("can't export " +  request.getUser().getAdmin());
                 continue;
             }
 
@@ -472,17 +470,6 @@ public class ZipOutputHandler extends OutputHandler {
             //                continue;
             //            }
             counter[0]++;
-            //We are getting some weirdness in the database connections so lets
-            //sleep a bit every 100 entries we see
-            /*
-              For now comment this out
-            if (counter[0] % 100 == 0) {
-//                System.err.println("zip count:" + counter[0] + " "
-//                                   + new Date());
-                Misc.sleep(10);
-            }
-            */
-
             //Don't get big files
             if (request.defined(ARG_MAXFILESIZE) && entry.isFile()) {
                 if (entry.getFile().length()
@@ -497,9 +484,11 @@ public class ZipOutputHandler extends OutputHandler {
                     getRepository().getXmlOutputHandler().getEntryTag(null,
                         entry, fileWriter, entriesRoot.getOwnerDocument(),
                         entriesRoot, true, level != 0);
+                System.err.println ("exporting:" + XmlUtil.toString(entryNode));
             }
 
             if (entry.isGroup() && recurse) {
+                System.err.println ("doing group");
                 Entry group = (Entry) entry;
                 List<Entry> children = getEntryManager().getChildren(request,
                                            group);
@@ -514,7 +503,9 @@ public class ZipOutputHandler extends OutputHandler {
             }
 
 
-
+            if ( !getAccessManager().canDownload(request, entry)) {
+                continue;
+            }
 
             String path = entry.getResource().getPath();
             String name = getStorageManager().getFileTail(entry);

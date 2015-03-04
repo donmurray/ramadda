@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<metadata>
+  <handler category="Tags" >
+    <type id="resilience_risk" name="Risk" entrytype="type_resilience_project" values="aging_infrastructure:Aging Infrastructure,chronic_energy_shortages:Chronic Energy Shortages,disease_outbreak:Disease Outbreak,drought:Drought,earthquake:Earthquake,economic_shifts:Economic Shifts,flooding_coastal_and_rainfall:Flooding (Coastal and Rainfall),heat_wave:Heat Wave,high_unemployment:High Unemployment,infrastructure_failure:Infrastructure Failure,lack_of_affordable_housing:Lack of Affordable Housing,landslide:Landslide,pollution_or_environmental_degredation:Pollution or Environmental Degredation,poor_transportation_system:Poor Transportation System,refugees:Refugees,resource_scarcity:Resource Scarcity,riot_or_civil_unrest:Riot or Civil Unrest,social_inequity:Social Inequity,terrorism:Terrorism,tsunami:Tsunami,wildfires:Wildfires">
+      <element id="risk" name="Risk" type="enumerationplus"/>
+    </type>
+  </handler>
+</metadata>

@@ -1,7 +1,7 @@
 <types supercategory="Development">
 
 
-  <type name="type_resilience_project"  description="Resiliency Project" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Community"      >
+  <type name="type_resilience_project"  description="Resiliency Project" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Community"     metadata="resilience_risk" >
      <property name="icon" value="/community/globe-share.png"/>
 
      <property name="form.file.show" value="false"/>
@@ -12,32 +12,41 @@
      <property name="search.tabs" value="earth,list,timeline"/>
      <property name="search.metadatatypes" value="project_person"/>
      <column name="status"  type="enumerationplus"  values="active:Active,inactive:Inactive" label="Status" cansearch="true"/>
-     <column name="project_type"  type="enumerationplus"  label="Project Type" cansearch="true"/>
+     <column name="project_type"  type="enumerationplus"  label="Project Type" cansearch="true" values="undp_aap:UNDP African Adaptation Program,100cities:Rockefeller 100 Cities Project"/>
     <column name="country" type="enumerationplus" label="Country" values="file:/org/ramadda/plugins/community/resources/countries.txt" showinhtml="true" cansearch="true"/>
-     <wiki><![CDATA[
-{{noheading}}
-+pagehead-8
-<h2>{{name}}</h2>
-{{description wikify="true"}}
--pagehead
+<children><![CDATA[
+<entries>
+<entry  name="People"  type="group"/>
+<entry  name="Documents"  type="group"/>
+<entry  name="Data"  type="group"/>
+</entries>
+]]>
+</children>
 
+     <wiki><![CDATA[
++inset
 +row
-+col-md-9
-==Information==
++col-md-8
+<div class="wiki-h1">Resiliency Project: {{name}}</div>
+<div style="max-height: 400px; overflow-y: auto;margin:5px;">
+{{description wikify="true"}}
+</div>
 <table class="formtable">
 {{resource row.label="URL:"  message=""}}
 {{field name="project_type" row.label="Type:"}}
 {{field name="status" row.label="Status:"}}
 {{field name="country" row.label="Country:"}}
 </table>
-{{tree title="Documents" details="false" showtoggle="false" message="" prefix="==Documents=="}}
+{{tree details="false" showtoggle="false" prefix="==Content==" message="No documents" }}
+<p>
+{{properties metadata.types="!resilience_risk" message="" }}
 -col
-
-+col-md-3
++col-md-4
 {{image src="::*" message="" width="300"}}
 <p>
 {{mapentry width="350" message=""}}
 <p>
+{{properties metadata.types="resilience_risk" message="" }}
 -col
 -row
 
