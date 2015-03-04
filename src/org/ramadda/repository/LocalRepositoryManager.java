@@ -91,10 +91,6 @@ public class LocalRepositoryManager extends RepositoryManager {
     /** _more_ */
     public static final String ARG_LOCAL_CHANGE = "local.change";
 
-    /** _more_ */
-    public static final String ARG_LOCAL_STATUS = "local.status";
-
-    //    public static final String ARG_LOCAL_ = "local.id";
 
     /** _more_ */
     public static final String STATUS_ACTIVE = "active";
@@ -104,6 +100,10 @@ public class LocalRepositoryManager extends RepositoryManager {
 
     /** _more_ */
     public static final String STATUS_DELETED = "deleted";
+
+    public static final String ARG_LOCAL_DELETE = "local_delete";
+    public static final String ARG_LOCAL_STOP = "local_stop";
+    public static final String ARG_LOCAL_START = "local_start";
 
 
     /*
@@ -492,59 +492,53 @@ public class LocalRepositoryManager extends RepositoryManager {
         if (request.defined(ARG_LOCAL_CHANGE)) {
             request.ensureAuthToken();
             processLocalChange(request, sb);
-
         }
 
-        sb.append("<table>");
+        sb.append("<table width=80% border=0>");
         boolean didone = false;
         for (Local local : readLocals()) {
             if ( !didone) {
-                sb.append(
-                    HtmlUtils.row(
-                        HtmlUtils.cols(
-                            "<b>Repository</b>" /*,"<b>Contact</b>"*/,
-                            "<b>Status</b>", "<b>Action</b>")));
+                sb.append(HtmlUtils.row(HtmlUtils.cols(
+                                                       HtmlUtils.insetDiv(HtmlUtils.b("Repository"),10,10,10,10),
+                                                       HtmlUtils.insetDiv(HtmlUtils.b(""),10,10,10,10)),
+                                        " valign=bottom "));
             }
             didone = true;
             StringBuffer statusSB  = new StringBuffer();
-            StringBuffer statusSB2 = new StringBuffer();
 
             request.formPostWithAuthToken(statusSB,
                                           getAdmin().URL_ADMIN_LOCAL);
+            statusSB.append(msgLabel("Status") + " " + local.status);
+            statusSB.append(HtmlUtils.br());
             statusSB.append(HtmlUtils.hidden(ARG_LOCAL_ID, local.id));
+            statusSB.append(HtmlUtils.hidden(ARG_LOCAL_CHANGE, "true"));
+
+
             if (local.status.equals(STATUS_ACTIVE)) {
                 statusSB.append(HtmlUtils.submit(msg("Stop Repository"),
-                        ARG_LOCAL_CHANGE));
-                statusSB.append(HtmlUtils.hidden(ARG_LOCAL_STATUS,
-                        STATUS_STOPPED));
+                        ARG_LOCAL_STOP));
             } else if (local.status.equals(STATUS_STOPPED)) {
                 statusSB.append(HtmlUtils.submit(msg("Start Repository"),
-                        ARG_LOCAL_CHANGE));
-                statusSB.append(HtmlUtils.hidden(ARG_LOCAL_STATUS,
-                        STATUS_ACTIVE));
+                        ARG_LOCAL_START));
+            }
+
+
+            if (local.status.equals(STATUS_STOPPED)) {
+                statusSB.append(HtmlUtils.space(1));
+                statusSB.append(HtmlUtils.hidden(ARG_LOCAL_ID, local.id));
+                statusSB.append(HtmlUtils.submit(msg("Remove Repository"),
+                                                  ARG_LOCAL_DELETE));
+                statusSB.append(HtmlUtils.checkbox(ARG_LOCAL_SURE, "true",
+                        false) + " " + msg("Yes, remove this repository"));
             }
             statusSB.append(HtmlUtils.formClose());
 
-            if (local.status.equals(STATUS_STOPPED)) {
-                request.formPostWithAuthToken(statusSB2,
-                        getAdmin().URL_ADMIN_LOCAL);
-                statusSB2.append(HtmlUtils.space(1));
-                statusSB2.append(HtmlUtils.hidden(ARG_LOCAL_ID, local.id));
-                statusSB2.append(HtmlUtils.hidden(ARG_LOCAL_STATUS,
-                        STATUS_DELETED));
-                statusSB2.append(HtmlUtils.submit(msg("Remove Repository"),
-                        ARG_LOCAL_CHANGE));
-                statusSB2.append(HtmlUtils.checkbox(ARG_LOCAL_SURE, "true",
-                        false) + " " + msg("Yes, remove this repository"));
-                statusSB2.append(HtmlUtils.formClose());
-            }
+            String link = HtmlUtils.insetDiv(HtmlUtils.href(getChildUrlBase(local.id), local.id),10,10,10,10);
+            String form = HtmlUtils.insetDiv(statusSB.toString(), 10,10,10,10);
             sb.append(
-                HtmlUtils.rowTop(
-                    HtmlUtils.cols(
-                        HtmlUtils.href(
-                            getChildUrlBase(local.id),
-                            local.id) /*,contact*/, HtmlUtils.inset(local.status, 0,10,0,10),
-                        statusSB.toString(), HtmlUtils.inset(statusSB2.toString(),0,10,0,10))));
+                HtmlUtils.row(
+                              HtmlUtils.cols(link, form),
+                              " valign=top "));
         }
         sb.append(HtmlUtils.formTableClose());
         sb.append(HtmlUtils.p());
@@ -610,11 +604,13 @@ public class LocalRepositoryManager extends RepositoryManager {
      */
     private void processLocalChange(Request request, StringBuffer sb)
             throws Exception {
-        String status = request.getString(ARG_LOCAL_STATUS, "");
+
+        String status = null;
         String id     = request.getString(ARG_LOCAL_ID, "");
-        if (status.equals(STATUS_ACTIVE)) {
+        if (request.exists(ARG_LOCAL_START)) {
             Repository child = startLocalRepository(id, new Properties());
-        } else if (status.equals(STATUS_STOPPED)) {
+            status = STATUS_ACTIVE;
+        } else if (request.exists(ARG_LOCAL_STOP)) {
             Repository child = children.get(id);
             if (child == null) {
                 sb.append(
@@ -627,7 +623,8 @@ public class LocalRepositoryManager extends RepositoryManager {
             getRepository().removeChildRepository(child);
             children.remove(id);
             childrenIds.remove(id);
-        } else if (status.equals(STATUS_DELETED)) {
+            status = STATUS_STOPPED;
+        } else if (request.exists(ARG_LOCAL_DELETE)) {
             if ( !request.get(ARG_LOCAL_SURE, false)) {
                 sb.append(
                     getPageHandler().showDialogError(
@@ -642,9 +639,7 @@ public class LocalRepositoryManager extends RepositoryManager {
 
             return;
         } else {
-            sb.append(getPageHandler().showDialogError("Unknown status:"
-                    + status));
-
+            sb.append(getPageHandler().showDialogError("Unknown action"));
             return;
         }
         getDatabaseManager().update(

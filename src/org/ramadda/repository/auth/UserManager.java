@@ -1096,6 +1096,9 @@ public class UserManager extends RepositoryManager {
 
 
         StringBuffer sb = new StringBuffer();
+        sb.append(HtmlUtils.sectionOpen());
+        sb.append(HtmlUtils.h2(msgLabel("User")+HtmlUtils.space(1) + user.getId()));
+
         if (request.defined(ARG_USER_CHANGE)) {
             request.ensureAuthToken();
             if ( !checkAndSetNewPassword(request, user)) {
@@ -1115,9 +1118,7 @@ public class UserManager extends RepositoryManager {
         }
 
 
-        sb.append(RepositoryUtil.header(msgLabel("User") + HtmlUtils.space(1)
-                                        + user.getId()));
-        sb.append(HtmlUtils.p());
+
         request.formPostWithAuthToken(sb, getRepositoryBase().URL_USER_EDIT);
         sb.append(HtmlUtils.hidden(ARG_USER_ID, user.getId()));
         if (request.defined(ARG_USER_DELETE)) {
@@ -1144,9 +1145,11 @@ public class UserManager extends RepositoryManager {
                 makePasswordForm(request, user, sb);
             }
             sb.append(HtmlUtils.p());
-            sb.append(buttons);
+            //            sb.append(buttons);
         }
         sb.append(HtmlUtils.formClose());
+
+        sb.append(HtmlUtils.sectionClose());
 
         return getAdmin().makeResult(request,
                                      msgLabel("User") + user.getLabel(), sb);

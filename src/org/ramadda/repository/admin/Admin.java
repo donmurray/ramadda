@@ -1088,7 +1088,7 @@ public class Admin extends RepositoryManager {
         String size = HtmlUtils.SIZE_60;
         sb.append(HtmlUtils.sectionOpen());
         sb.append(HtmlUtils.submit(msg("Change Settings")));
-        sb.append(HtmlUtils.br());
+        sb.append(HtmlUtils.p());
         StringBuffer csb = new StringBuffer();
         csb.append(HtmlUtils.formTable());
 
@@ -1400,14 +1400,18 @@ public class Admin extends RepositoryManager {
         osb.append(HtmlUtils.formTableClose());
 
 
-        sb.append(makeConfigBlock("Site and Contact Information",
-                                  csb.toString()));
-        sb.append(makeConfigBlock("Access", asb.toString()));
-        sb.append(makeConfigBlock("Display", dsb.toString()));
-        sb.append(makeConfigBlock("Available Output Types", osb.toString()));
+        List<String> titles = new ArrayList<String>();
+        List<String> tabs   = new ArrayList<String>();
 
-
-        sb.append(HtmlUtils.submit(msg("Change Settings")));
+        titles.add("Site and Contact Information");
+        tabs.add(csb.toString());
+        titles.add("Access");
+        tabs.add(asb.toString());
+        titles.add("Display");
+        tabs.add(dsb.toString());
+        titles.add("Available Output Types");
+        tabs.add(osb.toString());
+        HtmlUtils.makeAccordian(sb, titles, tabs);
         sb.append(HtmlUtils.formClose());
 
         sb.append(HtmlUtils.sectionClose());
@@ -1817,27 +1821,31 @@ public class Admin extends RepositoryManager {
 
         StringBuffer sb = new StringBuffer();
         sb.append(HtmlUtils.sectionOpen());
+        List<String> titles = new ArrayList<String>();
+        List<String> tabs   = new ArrayList<String>();
 
-        sb.append(HtmlUtils.makeShowHideBlock(msg("System Status"),
-                statusSB.toString(), false));
+        titles.add(msg("System Status"));
+        tabs.add(HtmlUtils.section(statusSB.toString()));
 
-        sb.append(HtmlUtils.makeShowHideBlock(msg("System Disk"),
-                stateSB.toString(), false));
+        titles.add(msg("System Disk"));
+        tabs.add(HtmlUtils.section(stateSB.toString()));
 
         StringBuffer pluginsSB = new StringBuffer();
         getRepository().getPluginManager().addStatusInfo(request, pluginsSB);
-        sb.append(HtmlUtils.makeShowHideBlock(msg("Plugins"),
-                pluginsSB.toString(), false));
 
-        sb.append(HtmlUtils.makeShowHideBlock(msg("API"), apiSB.toString(),
-                false));
+        titles.add(msg("Plugins"));
+        tabs.add(HtmlUtils.section(pluginsSB.toString()));
 
-        sb.append(HtmlUtils.makeShowHideBlock(msg("Output Handlers"),
-                outputSB.toString(), false));
+        titles.add(msg("API"));
+        tabs.add(HtmlUtils.section(apiSB.toString()));
+        
+        titles.add(msg("Output Handlers"));
+        tabs.add(HtmlUtils.section(outputSB.toString()));
 
-
-        sb.append(HtmlUtils.makeShowHideBlock(msg("Database Statistics"),
-                dbSB.toString(), false));
+        titles.add(msg("Database Statistics"));
+        tabs.add(HtmlUtils.section(dbSB.toString()));
+        
+        HtmlUtils.makeAccordian(sb, titles, tabs);
 
         sb.append(HtmlUtils.sectionClose());
         return makeResult(request, msg("System"), sb);

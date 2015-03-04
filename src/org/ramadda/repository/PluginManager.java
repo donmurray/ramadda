@@ -584,10 +584,11 @@ public class PluginManager extends RepositoryManager {
                 HtmlUtils.SIZE_60));
         formBuffer.append(HtmlUtils.submit("Upload new plugin file"));
         formBuffer.append(HtmlUtils.formClose());
-        formBuffer.append(HtmlUtils.br());
-        formBuffer.append(msg("Installed Plugins"));
+
+        formBuffer.append(HtmlUtils.p());
+        formBuffer.append(HtmlUtils.h2(msg("Installed Plugins")));
         formBuffer.append(HtmlUtils.table(pluginSB.toString()));
-        sb.append(formBuffer);
+        sb.append(formBuffer.toString());
     }
 
 

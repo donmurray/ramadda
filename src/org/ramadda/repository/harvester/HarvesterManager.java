@@ -471,6 +471,7 @@ public class HarvesterManager extends RepositoryManager {
         sb.append(formSB);
         sb.append(buttons);
         sb.append(HtmlUtils.formClose());
+        sb.append(HtmlUtils.sectionClose());
 
         return getAdmin().makeResult(request, msg("Edit Harvester"), sb);
     }
@@ -519,6 +520,7 @@ public class HarvesterManager extends RepositoryManager {
                         HtmlUtils.submit(msg("Yes"), ARG_DELETE_CONFIRM),
                         HtmlUtils.submit(msg("Cancel"), ARG_CANCEL_DELETE))));
             sb.append(HtmlUtils.formClose());
+            sb.append(HtmlUtils.sectionClose());
 
             return getAdmin().makeResult(request, msg("Edit Harvester"), sb);
         }
@@ -548,7 +550,8 @@ public class HarvesterManager extends RepositoryManager {
      */
     private void makeFormHeader(Request request, Harvester harvester,
                                 StringBuffer sb) {
-        sb.append(header(msgLabel("Harvester") + harvester.getName()));
+        sb.append(HtmlUtils.sectionOpen());
+        sb.append(HtmlUtils.h2(msgLabel("Harvester") + " " +harvester.getName()));
         request.formPostWithAuthToken(sb, URL_HARVESTERS_CHANGE);
         sb.append(HtmlUtils.hidden(ARG_HARVESTER_ID, harvester.getId()));
     }
