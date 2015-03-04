@@ -55,7 +55,6 @@ import org.ramadda.repository.output.WikiManager;
 import org.ramadda.repository.output.XmlOutputHandler;
 import org.ramadda.repository.output.ZipOutputHandler;
 import org.ramadda.repository.search.SearchManager;
-import org.ramadda.repository.server.JettyServer;
 
 import org.ramadda.repository.type.Column;
 import org.ramadda.repository.type.GroupTypeHandler;
@@ -233,8 +232,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
                        ICON_FILELISTING);
 
 
-    /** the jetty server */
-    private JettyServer jettyServer;
+    /** the stand alone server */
+    private Object standAloneServer;
 
 
     /** The UserManager */
@@ -639,22 +638,21 @@ public class Repository extends RepositoryBase implements RequestHandler,
 
 
     /**
-     *  Set the JettyServer property.
+     *  Set the standAlone server property.
      *
-     *  @param value The new value for JettyServer
+     *  @param value The new value for standAlone server
      */
-    public void setJettyServer(JettyServer value) {
-        jettyServer = value;
+    public void setStandAloneServer(Object value) {
+        standAloneServer = value;
     }
 
     /**
-     *  Get the JettyServer property.
+     * _more_
      *
-     *  @return The JettyServer
+     * @return _more_
      */
-
-    public JettyServer getJettyServer() {
-        return jettyServer;
+    public Object getStandAloneServer() {
+        return standAloneServer;
     }
 
     /**
@@ -794,7 +792,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @return _more_
      */
     public boolean getShutdownEnabled() {
-        return jettyServer != null;
+        return standAloneServer != null;
     }
 
     /**
@@ -803,7 +801,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @return _more_
      */
     public boolean isRunningStandAlone() {
-        return jettyServer != null;
+        return standAloneServer != null;
     }
 
     /**
@@ -2420,17 +2418,19 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * _more_
      */
     public void clearAllCaches() {
-        synchronized(outputHandlers) {
-            for (OutputHandler outputHandler : new ArrayList<OutputHandler>(outputHandlers)) {
+        synchronized (outputHandlers) {
+            for (OutputHandler outputHandler :
+                    new ArrayList<OutputHandler>(outputHandlers)) {
                 outputHandler.clearCache();
             }
         }
-        synchronized(allTypeHandlers) {
-            for (TypeHandler typeHandler : new ArrayList<TypeHandler>(allTypeHandlers)) {
+        synchronized (allTypeHandlers) {
+            for (TypeHandler typeHandler :
+                    new ArrayList<TypeHandler>(allTypeHandlers)) {
                 typeHandler.clearCache();
             }
         }
-        synchronized(repositoryManagers) {
+        synchronized (repositoryManagers) {
             for (RepositoryManager manager : repositoryManagers) {
                 manager.clearCache();
             }
@@ -3057,13 +3057,14 @@ public class Repository extends RepositoryBase implements RequestHandler,
         debugSession("RAMADDA.handleRequest:" + request.getRequestPath());
 
         Result result;
-        if(request.getIsRobot()) {
+        if (request.getIsRobot()) {
             if ( !acceptRobots()) {
                 return getNoRobotsResult(request);
             }
             //Sleep a second to slow the google bot down
-            if(request.getUserAgent().indexOf("www.majestic12.co.uk")>=0) {
-                System.err.println("Sleeping for the bad bot:" + request +" " + request.getUserAgent());
+            if (request.getUserAgent().indexOf("www.majestic12.co.uk") >= 0) {
+                System.err.println("Sleeping for the bad bot:" + request
+                                   + " " + request.getUserAgent());
                 Misc.sleepSeconds(30);
             } else {
                 //Slow the googlebot down

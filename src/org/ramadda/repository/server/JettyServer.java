@@ -31,10 +31,6 @@ import org.eclipse.jetty.server.SecureRequestCustomizer;
 
 
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.Server;
-// Jetty 8 
-//import org.eclipse.jetty.server.ssl.SslSocketConnector;
-// Jetty 9
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
@@ -44,22 +40,15 @@ import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 
-
 import org.ramadda.repository.Constants;
 import org.ramadda.repository.Repository;
 
 import ucar.unidata.util.LogUtil;
-//import org.eclipse.jetty.servlet.Context;
-
-
-
 
 import java.io.File;
 
 import java.util.Hashtable;
 import java.util.Properties;
-
-
 
 
 /**
@@ -166,7 +155,7 @@ public class JettyServer implements Constants {
         ServletHolder holder     = new ServletHolder(servlet);
         context.addServlet(holder, path + "/*");
         servletToHolder.put(servlet, holder);
-        repository.setJettyServer(this);
+        repository.setStandAloneServer(this);
 
         return servlet;
     }
@@ -259,73 +248,30 @@ public class JettyServer implements Constants {
 
         repository.getLogManager().logInfo(
             "SSL: creating ssl connection on port:" + sslPort);
-
-        /**
-         * // Jetty <7
-         * SslSocketConnector sslSocketConnector = new SslSocketConnector();
-         * sslSocketConnector.setKeystore(keystore.toString());
-         * // The password for the key store
-         * sslSocketConnector.setPassword(password);
-         * // The password (if any) for the specific key within the key store
-         * sslSocketConnector.setKeyPassword(keyPassword);
-         * sslSocketConnector.setTrustPassword(password);
-         * sslSocketConnector.setPort(sslPort);
-         * server.addConnector(sslSocketConnector);
-         */
-
-        // Jetty 7,8,&9
-        /*
-        SslContextFactory sslContext = new SslContextFactory();
-        sslContext.setKeyStorePath(keystore.toString());
-        sslContext.setKeyStorePassword(password);
-        sslContext.setKeyManagerPassword(keyPassword);
-        sslContext.setTrustStorePassword(password);
-        */
-
-
-        /**
-         * ** Jetty 7&8
-         * SslSocketConnector sslSocketConnector =
-         *   new SslSocketConnector(sslContext);
-         * sslSocketConnector.setPort(sslPort);
-         * server.addConnector(sslSocketConnector);
-         */
-        /*
-          Jetty 9
-        SslConnectionFactory sslFactory = new SslConnectionFactory(sslContext, "http/1.1");
-        ServerConnector sslConnector = new ServerConnector(server, sslFactory);
-        sslConnector.setPort(sslPort);
-        server.addConnector(sslConnector);
-        */
-
-
-        HttpConfiguration http_config = new HttpConfiguration();
-        http_config.setSecureScheme("https");
-        http_config.setSecurePort(sslPort);
-        http_config.setOutputBufferSize(32768);
+        HttpConfiguration httpConfig = new HttpConfiguration();
+        httpConfig.setSecureScheme("https");
+        httpConfig.setSecurePort(sslPort);
+        httpConfig.setOutputBufferSize(32768);
 
         SslContextFactory sslContextFactory = new SslContextFactory();
         sslContextFactory.setKeyStorePath(keystore.toString());
         sslContextFactory.setKeyStorePassword(password);
         sslContextFactory.setKeyManagerPassword(keyPassword);
 
-        HttpConfiguration https_config = new HttpConfiguration(http_config);
-        https_config.addCustomizer(new SecureRequestCustomizer());
-        ServerConnector https =
+        HttpConfiguration httpsConfig = new HttpConfiguration(httpConfig);
+        httpsConfig.addCustomizer(new SecureRequestCustomizer());
+        ServerConnector httpsConnector =
             new ServerConnector(
                 server,
                 new SslConnectionFactory(
                     sslContextFactory,
                     HttpVersion.HTTP_1_1
-                        .asString()), new HttpConnectionFactory(
-                            https_config));
-        https.setPort(sslPort);
-        https.setIdleTimeout(500000);
-        server.addConnector(https);
-
+                        .asString()), new HttpConnectionFactory(httpsConfig));
+        httpsConnector.setPort(sslPort);
+        httpsConnector.setIdleTimeout(500000);
+        server.addConnector(httpsConnector);
         repository.setHttpsPort(sslPort);
     }
-
 
 
 

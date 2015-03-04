@@ -25,9 +25,7 @@ import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.FileUploadException;
 import org.apache.commons.fileupload.disk.*;
 
-
 import org.apache.commons.fileupload.servlet.ServletFileUpload;
-
 import org.apache.commons.io.IOUtils;
 
 import org.ramadda.repository.*;
@@ -35,10 +33,7 @@ import org.ramadda.repository.*;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.LogUtil;
 
-
-
 import ucar.unidata.util.Misc;
-
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.WrapperException;
 
@@ -51,15 +46,11 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
-
 import java.util.Hashtable;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import java.util.Properties;
-
-import java.util.StringTokenizer;
 
 import javax.servlet.*;
 import javax.servlet.http.*;
@@ -87,7 +78,7 @@ public class RepositoryServlet extends HttpServlet implements Constants {
     private Repository repository;
 
     /** _more_ */
-    private JettyServer jettyServer;
+    private Object standAloneServer;
 
 
     /**
@@ -100,18 +91,18 @@ public class RepositoryServlet extends HttpServlet implements Constants {
     /**
      * _more_
      *
-     * @param jettyServer _more_
+     * @param standAloneServer _more_
      * @param args _more_
      * @param port _more_
      * @param properties _more_
      *
      * @throws Exception _more_
      */
-    public RepositoryServlet(JettyServer jettyServer, String[] args,
+    public RepositoryServlet(Object standAloneServer, String[] args,
                              int port, Properties properties)
             throws Exception {
-        this.jettyServer = jettyServer;
-        this.args        = args;
+        this.standAloneServer = standAloneServer;
+        this.args             = args;
         createRepository(port, properties, false);
     }
 
@@ -316,7 +307,7 @@ public class RepositoryServlet extends HttpServlet implements Constants {
                 // create a org.ramadda.repository.Result object and transpose the relevant info into a HttpServletResponse object
                 repositoryResult =
                     repository.handleRequest(repositoryRequest);
-                if (jettyServer != null) {
+                if (standAloneServer != null) {
                     //We are running stand-alone so nothing is doing logging
 
                 }

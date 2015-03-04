@@ -306,7 +306,6 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
      */
     public Result processSearchRequest(Request request) throws Exception {
 
-
         StringBuffer sb     = new StringBuffer();
         Result       result = processSearchRequest(request, sb);
         if (result != null) {
@@ -421,7 +420,7 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
 
         makeHeader(request, sb);
 
-
+        sb.append(HtmlUtils.sectionOpen());
 
         StringBuffer formSB = new StringBuffer();
         makeSearchForm(request, formSB);
@@ -562,8 +561,7 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
             tabs = OutputHandler.makeTabs(tabTitles, tabContents, true);
         }
         if (request.get(ARG_SEARCH_SHOWHEADER, true)) {
-            sb.append(HtmlUtils.div(label,
-                                    HtmlUtils.cssClass("search-header")));
+            sb.append(HtmlUtils.h2(label));
         }
 
         StringBuffer rightSide = new StringBuffer();
@@ -585,6 +583,8 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
         } else {
             sb.append(rightSide);
         }
+        sb.append(HtmlUtils.sectionClose());
+
 
         sb.append(HtmlUtils.script(js.toString()));
 

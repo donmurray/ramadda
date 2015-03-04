@@ -910,9 +910,11 @@ public class AssociationManager extends RepositoryManager {
             getAssociationsSearchForm(request, sb);
         } else {
             getAssociationsSearchForm(request, sb);
+            sb.append(HtmlUtils.sectionOpen());
             getRepository().getHtmlOutputHandler().showNext(request, cnt, sb);
             sb.append(getAssociationManager().getAssociationList(request,
                     associations, null, false));
+            sb.append(HtmlUtils.sectionClose());
         }
 
         return getSearchManager().makeResult(request,
@@ -949,8 +951,10 @@ public class AssociationManager extends RepositoryManager {
      *
      * @throws Exception On badness
      */
-    private void getAssociationsSearchForm(Request request, StringBuffer sb)
+    private void getAssociationsSearchForm(Request request, Appendable sb)
             throws Exception {
+
+        sb.append(HtmlUtils.sectionOpen());
         sb.append(HtmlUtils
             .form(request
                 .url(getRepository().getSearchManager()
@@ -987,6 +991,7 @@ public class AssociationManager extends RepositoryManager {
         sb.append(buttons);
         sb.append(HtmlUtils.p());
         sb.append(HtmlUtils.formClose());
+        sb.append(HtmlUtils.sectionClose());
 
     }
 
