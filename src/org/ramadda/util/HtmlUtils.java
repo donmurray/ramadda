@@ -1064,6 +1064,11 @@ public class HtmlUtils {
         return open(TAG_DIV, cssClass("ramadda-section"));
     }
 
+    public static String sectionOpen(String label) {
+        return open(TAG_DIV, cssClass("ramadda-section")) + 
+            h2(label);
+    }
+
     /**
      * _more_
      *

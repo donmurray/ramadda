@@ -917,6 +917,8 @@ public class AccessManager extends RepositoryManager {
 
 
         StringBuffer sb    = new StringBuffer();
+        sb.append(HtmlUtils.sectionOpen());
+        sb.append(HtmlUtils.h2(msg("Define Access Rights")));
         Entry        entry = getEntryManager().getEntry(request);
 
         if ( !canSetAccess(request, entry)) {
@@ -1021,6 +1023,7 @@ public class AccessManager extends RepositoryManager {
         sb.append(HtmlUtils.submit(msg("Change Access")));
         sb.append(HtmlUtils.formClose());
 
+        sb.append(HtmlUtils.sectionClose());
         return getEntryManager().makeEntryEditResult(request, entry,
                 msg("Edit Access"), sb);
 

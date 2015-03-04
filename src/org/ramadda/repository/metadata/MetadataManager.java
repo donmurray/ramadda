@@ -1425,7 +1425,9 @@ public class MetadataManager extends RepositoryManager {
     public Result processMetadataAddForm(Request request) throws Exception {
         StringBuffer sb    = new StringBuffer();
         Entry        entry = getEntryManager().getEntry(request);
-        sb.append(HtmlUtils.p());
+        sb.append(HtmlUtils.sectionOpen());
+        sb.append(HtmlUtils.h2(msg("Add Metadata")));
+
 
         if (request.get(ARG_METADATA_CLIPBOARD_PASTE, false)) {
             List<Metadata> clipboard = getMetadataFromClipboard(request);
@@ -1465,6 +1467,7 @@ public class MetadataManager extends RepositoryManager {
             sb.append(HtmlUtils.formTableClose());
         }
 
+        sb.append(HtmlUtils.sectionClose());
         return getEntryManager().makeEntryEditResult(request, entry,
                 msg("Add Property"), sb);
     }
@@ -1478,7 +1481,7 @@ public class MetadataManager extends RepositoryManager {
      *
      * @throws Exception On badness
      */
-    private void makeAddList(Request request, Entry entry, StringBuffer sb)
+    private void makeAddList(Request request, Entry entry, Appendable sb)
             throws Exception {
         List<String>   groups    = new ArrayList<String>();
         Hashtable      groupMap  = new Hashtable();
@@ -1536,16 +1539,14 @@ public class MetadataManager extends RepositoryManager {
             groupSB.append(NEWLINE);
         }
 
-        for (String name : groups) {
-            //                sb.append(header(name));
-            StringBuffer tmp = new StringBuffer();
-            tmp.append("<ul>");
-            tmp.append(groupMap.get(name));
-            tmp.append("</ul>");
-            sb.append(HtmlUtils.makeShowHideBlock(name, tmp.toString(),
-                    false));
+        List<String> titles = new ArrayList<String>();
+        List<String> tabs = new ArrayList<String>();
 
+        for (String name : groups) {
+            titles.add(name);
+            tabs.add(HtmlUtils.insetDiv(groupMap.get(name).toString(),5,10,5,10));
         }
+        HtmlUtils.makeAccordian(sb, titles, tabs);
     }
 
 

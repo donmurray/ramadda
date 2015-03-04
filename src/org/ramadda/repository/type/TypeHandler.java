@@ -3769,7 +3769,7 @@ public class TypeHandler extends RepositoryManager {
                                 getRepository().getWikiManager()
                                     .makeWikiEditBar(request, entry,
                                         ARG_DESCRIPTION) + HtmlUtils.br();
-                            sb.append("<tr><td colspan=2>");
+                            sb.append("<tr><td></td><td>");
                             sb.append(buttons);
                             //                    sb.append(HtmlUtils.br());
                             domId = ARG_DESCRIPTION;
