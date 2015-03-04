@@ -634,7 +634,7 @@ function Entry(props) {
                 var names =  [];
                 for(var i=0;i<this.attributes.length;i++) {
                     var attr = this.attributes[i];
-                    names.push(attr.label);
+                    names.push(attr.id);
                 }
                 return names;
             },
