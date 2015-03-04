@@ -1411,7 +1411,7 @@ public class Admin extends RepositoryManager {
         tabs.add(dsb.toString());
         titles.add("Available Output Types");
         tabs.add(osb.toString());
-        HtmlUtils.makeAccordian(sb, titles, tabs);
+        HtmlUtils.makeAccordian(sb, titles, tabs, true);
         sb.append(HtmlUtils.formClose());
 
         sb.append(HtmlUtils.sectionClose());
