@@ -407,6 +407,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
     /** _more_ */
     public static boolean debug = true;
 
+
+
     /** _more_ */
     private static boolean debugSession = false;
 
@@ -1148,6 +1150,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
         if ( !debugSession) {
             debugSession = getProperty("ramadda.debug.session", false);
         }
+
+
         checkRegistration();
     }
 
@@ -3278,7 +3282,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
 
             return sslRedirect;
         }
-        //        println(absoluteUrl(request.getUrl()));
+
 
         request.setApiMethod(apiMethod);
         apiMethod.incrNumberOfCalls();
@@ -3313,6 +3317,9 @@ public class Repository extends RepositoryBase implements RequestHandler,
                 throw exc;
             }
         }
+
+        getLogManager().writeTestLog(request);
+
 
         return result;
     }

@@ -133,6 +133,8 @@ public class LogManager extends RepositoryManager {
     /** _more_ */
     public static boolean debug = true;
 
+    private  boolean makeTestLog = false;
+
 
     /** _more_ */
     private List<LogEntry> log = new ArrayList<LogEntry>();
@@ -148,6 +150,7 @@ public class LogManager extends RepositoryManager {
     public LogManager(Repository repository) {
         super(repository);
         LOGGER_OK = repository.getProperty(PROP_USELOG4J, true);
+        makeTestLog  = getProperty("ramadda.maketestlog", false);
     }
 
 
@@ -155,6 +158,14 @@ public class LogManager extends RepositoryManager {
      * _more_
      */
     public void init() {}
+
+
+    public void writeTestLog(Request request) {
+        if(makeTestLog && !request.isPost()) {
+            System.out.println(getRepository().absoluteUrl(request.getUrl()));
+        }
+    }
+
 
 
     /**
