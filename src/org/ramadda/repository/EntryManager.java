@@ -3884,7 +3884,7 @@ public class EntryManager extends RepositoryManager {
                     + request);
         }
         StringBuilder sb = new StringBuilder();
-        sb.append(HtmlUtils.sectionOpen(msgLabel("Entry Action") + " " + entry.getName()));
+        sb.append(HtmlUtils.sectionOpen(msgLabel("Entry Actions") + " " + entry.getName()));
 
         sb.append(getEntryActionsTable(request, entry, OutputType.TYPE_ALL));
         sb.append(HtmlUtils.sectionClose());

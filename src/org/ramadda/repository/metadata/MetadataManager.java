@@ -1426,8 +1426,7 @@ public class MetadataManager extends RepositoryManager {
     public Result processMetadataAddForm(Request request) throws Exception {
         StringBuffer sb    = new StringBuffer();
         Entry        entry = getEntryManager().getEntry(request);
-        sb.append(HtmlUtils.sectionOpen());
-        sb.append(HtmlUtils.h2(msg("Add Metadata")));
+        sb.append(HtmlUtils.sectionOpen(msgLabel("Add Property") + " " + entry.getName()));
 
 
         if (request.get(ARG_METADATA_CLIPBOARD_PASTE, false)) {
