@@ -18,7 +18,7 @@
 * DEALINGS IN THE SOFTWARE.
 */
 
-package org.ramadda.plugins.forum;
+package org.ramadda.dev.forum;
 
 
 import org.ramadda.repository.*;
@@ -28,31 +28,7 @@ import org.ramadda.repository.output.*;
 import org.ramadda.repository.type.*;
 
 
-import org.ramadda.sql.Clause;
-
-
-import org.ramadda.sql.SqlUtil;
-import org.ramadda.sql.SqlUtil;
-
-import org.ramadda.util.HtmlUtils;
-
-
 import org.w3c.dom.*;
-
-import ucar.unidata.util.DateUtil;
-import ucar.unidata.util.HttpServer;
-import ucar.unidata.util.IOUtil;
-import ucar.unidata.util.LogUtil;
-import ucar.unidata.util.Misc;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.WikiUtil;
-import ucar.unidata.xml.XmlUtil;
-
-import java.sql.PreparedStatement;
-
-import java.sql.ResultSet;
-import java.sql.Statement;
-
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -66,46 +42,26 @@ import java.util.Properties;
  *
  *
  */
-public class ForumTypeHandler extends ExtensibleGroupTypeHandler {
+public class ForumThreadTypeHandler extends GenericTypeHandler {
 
 
     /** _more_ */
-    public static String TYPE_FORUM = "forum";
+    public static String TYPE_FORUMTHREAD = "forumthread";
 
 
     /**
      * _more_
      *
      * @param repository _more_
-     * @param entryNode _more_
+     * @param threadNode _more_
+     * @param node _more_
      *
      * @throws Exception _more_
      */
-    public ForumTypeHandler(Repository repository, Element entryNode)
+    public ForumThreadTypeHandler(Repository repository, Element node)
             throws Exception {
-        super(repository, entryNode);
+        super(repository, node);
     }
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param group _more_
-     * @param subGroups _more_
-     * @param entries _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public Result getHtmlDisplay(Request request, Entry group,
-                                 List<Entry> subGroups, List<Entry> entries)
-            throws Exception {
-        return null;
-    }
-
-
 
 
 }

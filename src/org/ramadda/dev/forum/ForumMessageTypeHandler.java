@@ -18,7 +18,7 @@
 * DEALINGS IN THE SOFTWARE.
 */
 
-package org.ramadda.plugins.forum;
+package org.ramadda.dev.forum;
 
 
 import org.ramadda.repository.*;
