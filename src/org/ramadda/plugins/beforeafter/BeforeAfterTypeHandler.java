@@ -178,7 +178,6 @@ public class BeforeAfterTypeHandler extends GenericTypeHandler {
                 if ((dim.width > 0) && (dim.height > 0)) {
                     dimensions.put(entry1.getId(), dim);
                 }
-                System.err.println(dim);
             }
 
             int width  = 600;
