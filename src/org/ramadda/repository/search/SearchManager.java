@@ -781,7 +781,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
         String buttons;
 
 
-        if (servers.size() > 0) {
+        if (false && servers.size() > 0) {
             buttons =
                 HtmlUtils.buttons(
                     HtmlUtils.submit(
@@ -926,12 +926,14 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                 serverSB.append(server.getHref(" target=\"server\" "));
                 serverSB.append(HtmlUtils.br());
             }
+            /*
             sb.append(
                 HtmlUtils.makeShowHideBlock(
                     msg("Remote Search Settings"),
                     HtmlUtils.div(
                         serverSB.toString(),
                         HtmlUtils.cssClass(CSS_CLASS_SERVER)), false));
+            */
         }
 
 
