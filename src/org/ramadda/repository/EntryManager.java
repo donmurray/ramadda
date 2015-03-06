@@ -1604,6 +1604,11 @@ public class EntryManager extends RepositoryManager {
         }
         StringBuilder sb = new StringBuilder();
         sb.append(HtmlUtils.sectionOpen());
+        if(entry!=null) {
+            sb.append(HtmlUtils.h2(msgLabel("Edit") + " " + entry.getName()));
+        } else {
+            sb.append(HtmlUtils.h2(msg("New Entry")));
+        }                                   
         Entry group = addEntryForm(request, entry, sb);
         sb.append(HtmlUtils.sectionClose());
         if (entry == null) {
@@ -3105,9 +3110,11 @@ public class EntryManager extends RepositoryManager {
                     ARG_CANCEL)));
         fb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
         fb.append(HtmlUtils.formClose());
+        sb.append(HtmlUtils.sectionOpen(msgLabel("Delete Entry") + " " + entry.getName()));
         sb.append(getPageHandler().showDialogQuestion(inner.toString(),
                 fb.toString()));
 
+        sb.append(HtmlUtils.sectionClose());
         return makeEntryEditResult(request, entry,
                                    msg("Entry delete confirm"), sb);
     }
