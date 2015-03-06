@@ -3884,13 +3884,10 @@ public class EntryManager extends RepositoryManager {
                     + request);
         }
         StringBuilder sb = new StringBuilder();
-
-        sb.append(header("All Entry Actions"));
-
+        sb.append(HtmlUtils.sectionOpen(msgLabel("Entry Action") + " " + entry.getName()));
 
         sb.append(getEntryActionsTable(request, entry, OutputType.TYPE_ALL));
-
-        //                                       OutputType.TYPE_FEEDS));
+        sb.append(HtmlUtils.sectionClose());
         return addEntryHeader(request, entry,
                               new Result(msg("Entry Actions"), sb));
     }
