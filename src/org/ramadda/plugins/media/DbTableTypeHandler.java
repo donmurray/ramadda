@@ -275,12 +275,12 @@ public class DbTableTypeHandler extends TabularTypeHandler {
         if (orClauses.size() > 0) {
             andClauses.add(Clause.or(orClauses));
         }
-        SqlUtil.debug = true;
+        //        SqlUtil.debug = true;
         Statement stmt = SqlUtil.select(connection, what,
                                         Misc.newList(table),
                                         Clause.and(andClauses), "", max, 0);
 
-        SqlUtil.debug = false;
+        //        SqlUtil.debug = false;
         SqlUtil.Iterator   iter = new SqlUtil.Iterator(stmt);
         ResultSet          results;
         ResultSetMetaData  rsmd = null;
