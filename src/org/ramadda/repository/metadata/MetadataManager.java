@@ -1335,7 +1335,7 @@ public class MetadataManager extends RepositoryManager {
 
 
         List<Metadata> metadataList = getMetadata(entry);
-        sb.append(HtmlUtils.p());
+        sb.append(HtmlUtils.sectionOpen(msgLabel("Edit Properties") + " " + entry.getName()));
         if (metadataList.size() == 0) {
             sb.append(
                 getPageHandler().showDialogNote(
@@ -1406,6 +1406,7 @@ public class MetadataManager extends RepositoryManager {
             sb.append(HtmlUtils.formClose());
         }
 
+        sb.append(HtmlUtils.sectionClose());
         return getEntryManager().makeEntryEditResult(request, entry,
                 msg("Edit Properties"), sb);
 
