@@ -972,10 +972,11 @@ public class DbTypeHandler extends BlobTypeHandler {
 
 
 
-
     public void addViewFooter(Request request, Entry entry, Appendable sb)
         throws Exception {
-        sb.append(HtmlUtils.sectionClose());
+        if(!request.get(ARG_EMBEDDED, false)) {
+            sb.append(HtmlUtils.sectionClose());
+        }
     }
 
 
@@ -1067,7 +1068,9 @@ public class DbTypeHandler extends BlobTypeHandler {
         }
 
 
-        sb.append(HtmlUtils.sectionOpen(null,false));
+        if(!request.get(ARG_EMBEDDED, false)) {
+            sb.append(HtmlUtils.sectionOpen(null,false));
+        }
 
 
         if (fromSearch) {
@@ -2580,7 +2583,8 @@ public class DbTypeHandler extends BlobTypeHandler {
                                   "/" + entry.getName() + ".csv"));
             }
         }
-        if ( !request.get(ARG_EMBEDDED, false)) {
+        boolean embedded =  request.get(ARG_EMBEDDED, false);
+        if ( !embedded) {
             addViewHeader(request, entry, sb, VIEW_TABLE, valueList.size(),
                           fromSearch,
                           StringUtil.join("&nbsp;|&nbsp;", links));
@@ -2590,7 +2594,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         makeTable(request, entry, valueList, fromSearch, sb, true,
                   showHeaderLinks && !request.get(ARG_EMBEDDED, false));
 
-        if ( !request.get(ARG_EMBEDDED, false)) {
+        if ( !embedded) {
             addViewFooter(request, entry, sb);
         }
 
