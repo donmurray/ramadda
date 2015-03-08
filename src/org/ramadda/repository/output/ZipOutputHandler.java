@@ -461,7 +461,7 @@ public class ZipOutputHandler extends OutputHandler {
         for (Entry entry : entries) {
             //Check for access
             if ( !getAccessManager().canExportEntry(request, entry)) {
-                System.err.println ("can't export " +  request.getUser().getAdmin());
+                //                System.err.println ("can't export " +  request.getUser().getAdmin());
                 continue;
             }
 
