@@ -124,6 +124,11 @@ h3 {
     padding-top:0px;    
 }
 
+.ramadda-section-noline  {
+    padding-top:0px;    
+    border-bottom:0px #000;
+}
+
 .ramadda-documentation  {
   margin-top:10px;
   margin-left:10px;

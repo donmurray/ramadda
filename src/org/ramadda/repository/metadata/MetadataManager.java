@@ -1146,7 +1146,8 @@ public class MetadataManager extends RepositoryManager {
 
         StringBuffer    sb      = new StringBuffer();
         if ( !request.responseInJson()) {
-            sb.append(header);
+            sb.append(HtmlUtils.sectionOpen(msg("Browse Metadata")));
+            sb.append(HtmlUtils.center(header));
             sb.append(HtmlUtils.hr());
         }
         doMakeTagCloudOrList(request, metadataType, sb, doCloud, 0);
@@ -1156,6 +1157,7 @@ public class MetadataManager extends RepositoryManager {
             return new Result("", sb, Json.MIMETYPE);
         }
 
+        sb.append(HtmlUtils.sectionClose());
         return getSearchManager().makeResult(request,
                                              msg(type.getLabel() + " Cloud"),
                                              sb);
