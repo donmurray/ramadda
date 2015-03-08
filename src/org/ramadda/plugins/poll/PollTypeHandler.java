@@ -173,7 +173,11 @@ public class PollTypeHandler extends BlobTypeHandler {
             return "Who can add to poll";
         }
 
-        return "Who can view poll results";
+        if (type.equals(Permission.ACTION_TYPE2)) {
+            return "Who can view poll results";
+        }
+
+        return super.getTypePermissionName(type);
     }
 
 
@@ -240,14 +244,13 @@ public class PollTypeHandler extends BlobTypeHandler {
 
         boolean canEditEntry = getAccessManager().canEditEntry(request,
                                    entry);
+        boolean canAdd = canEditEntry || hasSecret
+                         || getAccessManager().canDoAction(request, entry,
+                             Permission.ACTION_TYPE1);
 
-        if ( !canEditEntry && !hasSecret) {
-            return new Result(
-                "Poll",
-                new StringBuffer(
-                    getPageHandler().showDialogError(
-                        "No access to view poll")));
-        }
+        boolean canView = getAccessManager().canDoAction(request, entry,
+                              Permission.ACTION_TYPE2);
+
 
         List<String> choices = (List<String>) props.get(ATTR_CHOICES);
         if (choices == null) {
@@ -268,6 +271,7 @@ public class PollTypeHandler extends BlobTypeHandler {
         }
         StringBuffer sb = new StringBuffer();
 
+        sb.append(HtmlUtils.sectionOpen(entry.getName()));
         if (canEditEntry) {
             sb.append(msgLabel("Use this link to allow others to edit"));
             sb.append(
@@ -285,15 +289,25 @@ public class PollTypeHandler extends BlobTypeHandler {
         sb.append(HtmlUtils.p());
         boolean changed = false;
 
+        if ( !canAdd && !canView) {
+            sb.append(
+                getPageHandler().showDialogNote(
+                    "No access to view or add to poll"));
+            sb.append(HtmlUtils.sectionClose());
+
+            return new Result(entry.getName(), sb);
+        }
 
         //NOTICE: Use getEncodedString below which does an entity encoding of the possibly anonymous input
         if (request.exists(ACTION_ADDRESPONSE)) {
-            if ( !canEditEntry && !hasSecret) {
-                return new Result(
-                    "Poll",
-                    new StringBuffer(
-                        getPageHandler().showDialogError(
-                            "No access to change poll")));
+            if ( !canAdd) {
+                sb.append(
+                    getPageHandler().showDialogNote(
+                        "No access to view or add to poll"));
+                sb.append(HtmlUtils.sectionClose());
+
+                return new Result(entry.getName(), sb);
+
             }
             PollResponse response =
                 new PollResponse(request.getEncodedString(ARG_RESPONSE, ""),
@@ -330,6 +344,9 @@ public class PollTypeHandler extends BlobTypeHandler {
 
         //If there was a change then redirect back to here
         if (changed) {
+            sb.append(
+                      getPageHandler().showDialogNote("Thanks, your response has been recorded"));
+            /*
             if (hasSecret) {
                 return new Result(
                     request.entryUrl(
@@ -339,18 +356,21 @@ public class PollTypeHandler extends BlobTypeHandler {
                 return new Result(
                     request.entryUrl(getRepository().URL_ENTRY_SHOW, entry));
             }
+            */
         }
 
-        sb.append(request.form(getRepository().URL_ENTRY_SHOW,
-                               HtmlUtils.attr("name", "entryform")));
+        if (canAdd) {
+            sb.append(request.form(getRepository().URL_ENTRY_SHOW,
+                                   HtmlUtils.attr("name", "entryform")));
 
-        sb.append(HtmlUtils.p());
-        sb.append(HtmlUtils.submit(msg("Add Response"), ""));
-        sb.append(HtmlUtils.p());
-        sb.append(HtmlUtils.hidden(ACTION_ADDRESPONSE, ""));
-        sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
-        if (hasSecret) {
-            sb.append(HtmlUtils.hidden(ATTR_SECRET, secretFromUrl));
+            sb.append(HtmlUtils.p());
+            sb.append(HtmlUtils.submit(msg("Add Response"), ""));
+            sb.append(HtmlUtils.p());
+            sb.append(HtmlUtils.hidden(ACTION_ADDRESPONSE, ""));
+            sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
+            if (hasSecret) {
+                sb.append(HtmlUtils.hidden(ATTR_SECRET, secretFromUrl));
+            }
         }
 
         sb.append(
@@ -373,38 +393,35 @@ public class PollTypeHandler extends BlobTypeHandler {
         headerRow.append("</tr>");
         sb.append(headerRow);
 
-        for (PollResponse response : responses) {
-            sb.append("<tr>");
-            if (canEditEntry) {
-                String deleteHref = HtmlUtils.href(
-                                        request.entryUrl(
-                                            getRepository().URL_ENTRY_SHOW,
-                                            entry, ACTION_DELETERESPONSE,
-                                            response.getId()), HtmlUtils.img(
-                                                getRepository().iconUrl(
-                                                    ICON_DELETE)));
+        if (canView) {
+            for (PollResponse response : responses) {
+                sb.append("<tr>");
+                if (canEditEntry) {
+                    String deleteHref =
+                        HtmlUtils.href(
+                            request.entryUrl(
+                                getRepository().URL_ENTRY_SHOW, entry,
+                                ACTION_DELETERESPONSE,
+                                response.getId()), HtmlUtils.img(
+                                    getRepository().iconUrl(ICON_DELETE)));
 
-                sb.append(HtmlUtils.col(deleteHref));
-            }
-            sb.append(HtmlUtils.col(response.getWhat() + "&nbsp;"));
-            for (String choice : choices) {
-                String selected = response.get(choice);
-                if (selected != null) {
-                    sb.append(
-                        HtmlUtils.col(
-                            selected,
-                            HtmlUtils.cssClass("poll-response-yes")));
-                } else {
-                    sb.append(
-                        HtmlUtils.col(
-                            "&nbsp;",
-                            HtmlUtils.cssClass("poll-response-no")));
+                    sb.append(HtmlUtils.col(deleteHref));
                 }
+                sb.append(HtmlUtils.col(response.getWhat() + "&nbsp;"));
+                for (String choice : choices) {
+                    String selected = response.get(choice);
+                    if (selected != null) {
+                        sb.append(HtmlUtils.col(selected,
+                                HtmlUtils.cssClass("poll-response-yes")));
+                    } else {
+                        sb.append(HtmlUtils.col("&nbsp;",
+                                HtmlUtils.cssClass("poll-response-no")));
+                    }
+                }
+                sb.append(HtmlUtils.col(response.getComment() + "&nbsp;"));
+                sb.append("</tr>");
             }
-            sb.append(HtmlUtils.col(response.getComment() + "&nbsp;"));
-            sb.append("</tr>");
         }
-
 
         String input = HtmlUtils.input(ARG_RESPONSE, "",
                                        HtmlUtils.SIZE_30
@@ -412,25 +429,27 @@ public class PollTypeHandler extends BlobTypeHandler {
         String commentInput = HtmlUtils.input(ARG_COMMENT, "",
                                   HtmlUtils.SIZE_30
                                   + HtmlUtils.cssClass("poll-input"));
-        sb.append("<tr>");
-
-        if (canEditEntry) {
-            sb.append(HtmlUtils.col("&nbsp;"));
-        }
-        sb.append(HtmlUtils.col(input));
-        List typesPlus = new ArrayList(types);
-        typesPlus.add(0, new TwoFacedObject("----", ""));
-        for (String choice : choices) {
-            if (types.size() == 1) {
-                sb.append(HtmlUtils.col(HtmlUtils.checkbox("response."
-                        + choice, types.get(0), false) + " " + types.get(0)));
-            } else {
-                sb.append(HtmlUtils.col(HtmlUtils.select("response."
-                        + choice, typesPlus)));
+        if (canAdd) {
+            sb.append("<tr>");
+            if (canEditEntry) {
+                sb.append(HtmlUtils.col("&nbsp;"));
             }
+            sb.append(HtmlUtils.col(input));
+            List typesPlus = new ArrayList(types);
+            typesPlus.add(0, new TwoFacedObject("----", ""));
+            for (String choice : choices) {
+                if (types.size() == 1) {
+                    sb.append(HtmlUtils.col(HtmlUtils.checkbox("response."
+                            + choice, types.get(0), false) + " "
+                                + types.get(0)));
+                } else {
+                    sb.append(HtmlUtils.col(HtmlUtils.select("response."
+                            + choice, typesPlus)));
+                }
+            }
+            sb.append(HtmlUtils.col(commentInput));
+            sb.append("</tr>");
         }
-        sb.append(HtmlUtils.col(commentInput));
-        sb.append("</tr>");
         if (responses.size() > 0) {
             //            sb.append(headerRow);
         }
@@ -438,11 +457,15 @@ public class PollTypeHandler extends BlobTypeHandler {
 
         sb.append("</table>");
 
-        sb.append(HtmlUtils.p());
-        sb.append(HtmlUtils.submit(msg("Add Response"), ""));
-        sb.append("</form>");
+        if (canAdd) {
+            sb.append(HtmlUtils.br());
+            sb.append(HtmlUtils.submit(msg("Add Response"), ""));
+            sb.append("</form>");
+        }
 
-        return new Result("Poll", sb);
+        sb.append(HtmlUtils.sectionClose());
+
+        return new Result(entry.getName(), sb);
     }
 
 
