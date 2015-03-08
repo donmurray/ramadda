@@ -1065,8 +1065,12 @@ public class HtmlUtils {
     }
 
     public static String sectionOpen(String label) {
-        return open(TAG_DIV, cssClass("ramadda-section")) + 
-            h2(label);
+        return sectionOpen(label, true);
+    }
+
+    public static String sectionOpen(String label, boolean line) {
+        return open(TAG_DIV, cssClass(line ? "ramadda-section  ramadda-section-noline":"ramadda-section")) + 
+            (Utils.stringDefined(label)?HtmlUtils.h2(label):"");
     }
 
     /**
@@ -3864,6 +3868,15 @@ public class HtmlUtils {
         return "  size=" + quote("" + size) + " ";
     }
 
+
+    public static void makeAccordian(Appendable sb, String title, String contents) 
+        throws Exception {
+        List<String> titles = new ArrayList<String>();
+        List<String> tabs = new ArrayList<String>();
+        titles.add(title);
+        tabs.add(contents);
+        makeAccordian(sb, titles, tabs, true);
+    }
 
     /**
      * Add an accordian of sections to the page

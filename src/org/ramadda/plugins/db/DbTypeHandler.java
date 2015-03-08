@@ -973,6 +973,12 @@ public class DbTypeHandler extends BlobTypeHandler {
 
 
 
+    public void addViewFooter(Request request, Entry entry, Appendable sb)
+        throws Exception {
+        sb.append(HtmlUtils.sectionClose());
+    }
+
+
     /**
      * _more_
      *
@@ -1009,7 +1015,6 @@ public class DbTypeHandler extends BlobTypeHandler {
                               String view, int numValues, boolean fromSearch,
                               String extraLinks)
             throws Exception {
-
         Hashtable props = getProperties(entry);
         boolean doAnonForm = Misc.getProperty(props, PROP_ANONFORM_ENABLED,
                                  false);
@@ -1060,6 +1065,9 @@ public class DbTypeHandler extends BlobTypeHandler {
             sb.append(HtmlUtils.div(extraLinks,
                                     HtmlUtils.cssClass("dbheader")));
         }
+
+
+        sb.append(HtmlUtils.sectionOpen(null,false));
 
 
         if (fromSearch) {
@@ -1801,13 +1809,10 @@ public class DbTypeHandler extends BlobTypeHandler {
                     + msg("Search across all databases")));
         }
         advanced.append(HtmlUtils.formTableClose());
-        sb.append("<tr><td colspan=2>");
-        sb.append(
-            HtmlUtils.makeShowHideBlock(
-                HtmlUtils.div(
-                    msg("Advanced..."),
-                    HtmlUtils.cssClass(
-                        "formgroupheader")), advanced.toString(), false));
+        sb.append("<tr><td colspan=3>");
+        List<String> titles = new ArrayList<String>();
+        List<String> tabs = new ArrayList<String>();
+        HtmlUtils.makeAccordian(sb,msg("Advanced..."), HtmlUtils.inset(advanced.toString(),0,20,10,0));
         sb.append("</td></tr>");
 
         sb.append(formEntry(request, "",
@@ -1837,6 +1842,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         StringBuilder sb = new StringBuilder();
         addViewHeader(request, entry, sb, VIEW_SEARCH, 0, false);
         sb.append(insetHtml(getSearchForm(request, entry)));
+        addViewFooter(request, entry, sb);
 
         return new Result(getTitle(request, entry), sb);
     }
@@ -1958,6 +1964,7 @@ public class DbTypeHandler extends BlobTypeHandler {
                                 msg("Yes"), ARG_DB_DELETECONFIRM) + HtmlUtils
                                     .space(2) + HtmlUtils
                                     .submit(msg("Cancel"), ARG_DB_LIST)));
+            addViewFooter(request, entry, sb);
         }
 
 
@@ -2500,24 +2507,19 @@ public class DbTypeHandler extends BlobTypeHandler {
                              String rowId, String divId) {
         String xmlUrl = getViewUrl(request, entry, "" + values[IDX_DBID])
                         + "&result=xml";
-        String event = HtmlUtils.onMouseOver(
-                           HtmlUtils.call(
-                               "dbRowOver",
-                               HtmlUtils.squote(
-                                   rowId))) + HtmlUtils.onMouseOut(
-                                       HtmlUtils.call(
-                                           "dbRowOut",
-                                           HtmlUtils.squote(
-                                               rowId))) + HtmlUtils.onMouseClick(
-                                                   HtmlUtils.call(
-                                                       "dbRowClick",
-                                                       "event,"
-                                                       + HtmlUtils.squote(
-                                                           divId) + ","
-                                                               + HtmlUtils.squote(
-                                                                   xmlUrl)));
+        rowId = HtmlUtils.squote(rowId);
+        divId= HtmlUtils.squote(divId);
+        String popupId=  HtmlUtils.squote("dbrowpopup_" + entry.getId());
+        StringBuilder sb = new StringBuilder();
+        sb.append(HtmlUtils.onMouseOver(HtmlUtils.call("dbRowOver", rowId)));
+        sb.append(HtmlUtils.onMouseOut(HtmlUtils.call("dbRowOut", rowId)));
+        sb.append(HtmlUtils.onMouseClick(HtmlUtils.call("dbRowClick", 
+                                                        HtmlUtils.comma("event",
+                                                                        rowId,
+                                                                        popupId,
+                                                                        HtmlUtils.squote(xmlUrl)))));
 
-        return event;
+        return sb.toString();
     }
 
 
@@ -2587,6 +2589,10 @@ public class DbTypeHandler extends BlobTypeHandler {
         }
         makeTable(request, entry, valueList, fromSearch, sb, true,
                   showHeaderLinks && !request.get(ARG_EMBEDDED, false));
+
+        if ( !request.get(ARG_EMBEDDED, false)) {
+            addViewFooter(request, entry, sb);
+        }
 
         return new Result(getTitle(request, entry), sb);
     }
@@ -2732,6 +2738,9 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         Hashtable<String, Double> sums = new Hashtable<String, Double>();
 
+        String popupId = "dbrowpopup_" + entry.getId();
+        hb.append(HtmlUtils.div("",HtmlUtils.id(popupId)+HtmlUtils.cssClass("ramadda-popup")));
+
         for (int cnt = 0; cnt < valueList.size(); cnt++) {
             Object[] values = valueList.get(cnt);
             String   rowId  = "row_" + values[IDX_DBID];
@@ -2742,11 +2751,14 @@ public class DbTypeHandler extends BlobTypeHandler {
             hb.append(HtmlUtils.open(HtmlUtils.TAG_TR,
                                      HtmlUtils.attrs(HtmlUtils.ATTR_VALIGN,
                                          "top") + HtmlUtils.cssClass("dbrow")
-                                             + HtmlUtils.id(rowId) + event));
-            hb.append(
-                "<td width=\"10\" style=\"white-space:nowrap;\"><div id=\""
-                + divId + "\" >");
-
+                                             + HtmlUtils.id(rowId)));
+            
+            hb.append(HtmlUtils.open(HtmlUtils.TAG_TD, 
+                                     HtmlUtils.attr("width","10")+
+                                     HtmlUtils.style("white-space:nowrap;")));
+            hb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
+                                     HtmlUtils.cssClass("ramadda-db-div") +
+                                     HtmlUtils.id(divId)));
             String dbid  = (String) values[IDX_DBID];
             String cbxId = ARG_DBID + (cnt);
             String call =
@@ -2798,9 +2810,9 @@ public class DbTypeHandler extends BlobTypeHandler {
                     sums.put(column.getName(), d);
                 }
                 if (column.isString()) {
-                    hb.append("<td>");
+                    hb.append(HtmlUtils.open(HtmlUtils.TAG_TD,event));
                 } else {
-                    hb.append("<td align=\"right\">");
+                    hb.append(HtmlUtils.open(HtmlUtils.TAG_TD,event+HtmlUtils.attr("align","right")));
                 }
 
 
@@ -3063,6 +3075,8 @@ public class DbTypeHandler extends BlobTypeHandler {
                           fromSearch, links);
         }
 
+
+
         Column  theColumn = null;
         boolean bbox      = true;
         for (Column column : tableHandler.getColumns()) {
@@ -3143,6 +3157,9 @@ public class DbTypeHandler extends BlobTypeHandler {
             StringBuilder theSB = entryList;
             if (mapCategoryColumn != null) {
                 String cat = mapCategoryColumn.getString(values);
+                if(cat == null) {
+                    cat = "";
+                }
                 theSB = catMap.get(cat);
                 if (theSB == null) {
                     theSB = new StringBuilder();
@@ -3223,6 +3240,9 @@ public class DbTypeHandler extends BlobTypeHandler {
                                     "" + width)));
         sb.append("</tr></table>");
 
+        if ( !request.get(ARG_EMBEDDED, false)) {
+            addViewFooter(request, entry, sb);
+        }
         return new Result(getTitle(request, entry), sb);
 
     }
@@ -3493,6 +3513,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         }
 
+        addViewFooter(request, entry, sb);
         return new Result(getTitle(request, entry), sb);
 
     }
@@ -3535,9 +3556,6 @@ public class DbTypeHandler extends BlobTypeHandler {
                                msg("Category View"));
         addViewHeader(request, entry, sb, VIEW_GRID + gridColumn.getName(),
                       valueList.size(), fromSearch, links);
-
-
-
 
         List<TwoFacedObject> enumValues = getEnumValues(request, entry,
                                               gridColumn);
@@ -3600,6 +3618,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         }
         sb.append("</table>");
 
+        addViewFooter(request, entry, sb);
         return new Result(getTitle(request, entry), sb);
     }
 
@@ -3739,6 +3758,7 @@ public class DbTypeHandler extends BlobTypeHandler {
                       VIEW_CATEGORY + gridColumn.getName(), valueList.size(),
                       fromSearch, links);
 
+
         Hashtable<String, StringBuilder> map = new Hashtable<String,
                                                    StringBuilder>();
         List<String> rowValues = new ArrayList<String>();
@@ -3766,16 +3786,16 @@ public class DbTypeHandler extends BlobTypeHandler {
                                         + HtmlUtils.id(rowId) + event));
             cnt++;
         }
-        for (String rowValue : rowValues) {
-            String block = HtmlUtils.makeShowHideBlock(
-                               rowValue,
-                               HtmlUtils.div(
-                                   map.get(rowValue).toString(),
-                                   HtmlUtils.cssClass(
-                                       "dbcategoryblock")), false);
-            sb.append(block);
-        }
 
+        List<String> titles = new ArrayList<String>();
+        List<String> tabs = new ArrayList<String>();
+
+        for (String rowValue : rowValues) {
+            titles.add(rowValue);
+            tabs.add(HtmlUtils.insetDiv(map.get(rowValue).toString(),0,20,10,0));
+        }
+        HtmlUtils.makeAccordian(sb,titles, tabs, false);
+        addViewFooter(request, entry, sb);
         return new Result(getTitle(request, entry), sb);
     }
 
@@ -3912,6 +3932,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         sb.append(
             "<div id=\"chart_div\" style=\"width: 800px; height: 500px;\"></div>\n");
 
+        addViewFooter(request, entry, sb);
         return new Result(getTitle(request, entry), sb);
     }
 
@@ -3977,6 +3998,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         tmp = StringUtil.replace(tmp, "${loadurl}", url);
         sb.append(tmp);
 
+        addViewFooter(request, entry, sb);
         return new Result("", sb);
     }
 
@@ -4011,6 +4033,8 @@ public class DbTypeHandler extends BlobTypeHandler {
         CalendarOutputHandler calendarOutputHandler =
             (CalendarOutputHandler) getRepository().getOutputHandler(
                 CalendarOutputHandler.OUTPUT_CALENDAR);
+
+
 
         List<CalendarOutputHandler.CalendarEntry> calEntries =
             new ArrayList<CalendarOutputHandler.CalendarEntry>();
@@ -4056,6 +4080,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         calendarOutputHandler.outputCalendar(request, calEntries, sb, false);
 
+        addViewFooter(request, entry, sb);
         return new Result(getTitle(request, entry), sb);
     }
 
@@ -4200,6 +4225,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         sb.append(HtmlUtils.script(js.toString()));
 
+        addViewFooter(request, entry, sb);
         return new Result(getTitle(request, entry), sb);
     }
 
@@ -4504,6 +4530,7 @@ public class DbTypeHandler extends BlobTypeHandler {
             }
         }
 
+        addViewFooter(request, entry, sb);
         return new Result(getTitle(request, entry), sb);
     }
 
@@ -4617,10 +4644,12 @@ public class DbTypeHandler extends BlobTypeHandler {
         }
 
 
-
         Object[] values = getValues(entry, dbid);
 
         getHtml(request, sb, entry, values);
+        if ( !asXml) {
+            addViewFooter(request, entry, sb);
+        }
         if (asXml) {
             StringBuilder xml = new StringBuilder("<contents>\n");
             XmlUtils.appendCdata(xml, sb.toString());

@@ -7,28 +7,49 @@ function dbRowOut(rowId) {
     $("#"+ rowId).css("background-color",  "#fff");
 }
 
-function dbRowClick(event, divId, url) {
+function dbRowClick(event, divId, popupId, url) {
     row = GuiUtils.getDomObject(divId);
-    if(!row) return;
-    left = GuiUtils.getLeft(row.obj);
-    eventX = GuiUtils.getEventX(event);
-    //Don't pick up clicks on the left side
-    if(eventX-left<50) return;
-    GuiUtils.loadXML( url, dbHandleXml,divId);
+    if(!row) {
+        return;
+    }
+    GuiUtils.loadXML( url, dbHandleXml,{divId:divId,popupId:popupId});
 }
 
 
-function dbHandleXml(request,divId) {
-    row = GuiUtils.getDomObject(divId);
-    if(!row) return;
-    div = GuiUtils.getDomObject("tooltipdiv");
-    if(!div) return;
+function dbHidePopup(popupId) {
+    $("#" +popupId).hide();
+}
+
+function dbHandleDummy(event) {
+    console.log("handleDummy");
+    if(event.preventDefault) {
+        event.preventDefault();
+    } else {
+	event.returnValue = false;
+        return false;
+    }
+}
+
+
+function dbHandleXml(request,args) {
+    var divId = args.divId;
+    var popupId = args.popupId;
+    var src = $("#" + divId);
+    var popup = $("#" +popupId);
     var xmlDoc=request.responseXML.documentElement;
     text = getChildText(xmlDoc);
-    GuiUtils.setPosition(div, GuiUtils.getLeft(row.obj), GuiUtils.getBottom(row.obj));
+    var call = "dbHidePopup(\'" + popupId +"\');";
+    popup.html("<div><table width=100%><tr valign=top><td><img width=\"16\" onmousedown=\"" + call +"\" id=\"tooltipclose\"  src=" + icon_close +"></td><td>" + text+"</td></table></div>");
 
-    div.obj.innerHTML = "<div class=tooltip-inner><div id=\"tooltipwrapper\" ><table><tr valign=top><img width=\"16\" onmousedown=\"hideEntryPopup();\" id=\"tooltipclose\"  src=" + icon_close +"></td><td>" + text+"</table></div></div>";
-    showObject(div);
+    popup.show();
+    popup.position({
+            of: src,
+                my: "left top",
+                at: "left bottom",
+                collision: "none none"
+                });
+    popup.show();
+
 }
 
 
