@@ -62,7 +62,7 @@ h2 {
 
 /* LEFT NAVIGATION */
 #leftNavContainer {
-        width: 19em;
+        max-width: 19em;
         float: left;
         margin-right: 2em;
 }
