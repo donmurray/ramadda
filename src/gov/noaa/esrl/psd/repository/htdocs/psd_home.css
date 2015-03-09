@@ -1,0 +1,280 @@
+/* ESRL OVERRIDES */
+body>div {
+        font-size: small;
+        line-height: 1;
+        font-family: arial;
+}
+
+#major_nav {
+        background-color: #FFFFE1;
+        color: #000066;
+        font-size: 110%;
+}
+
+#container {
+        width: 83em;
+        margin: auto;
+        background: white;      
+}
+
+#content {
+        border: none;
+        font-size: 100%;
+}
+
+/* override psd style for dd*/
+#content dl dd {
+        margin-bottom: 0;
+}
+
+
+h2 {
+        color: #663366;
+}
+
+/* --------------PSD HOME STYLES-------------*/
+
+.tagLine {
+        font-family: calibri/*'Adobe Caslon Pro', 'Hoefler Text', Georgia, Garamond, Times, serif*/;
+        line-height: 1.2;
+        font-size: 140%;
+        margin: 0.5em 1em 2em 1em;
+        color: #444444;
+}
+
+.attn {
+        font-weight: bold;
+        font-size: 90%;
+        font-style: normal;
+        color: black;
+        margin-top: 1em;
+        line-height: 1.25;
+        width: 58em;
+        text-align: left;
+}
+
+/* -----------LEFT SIDE OF HOME PAGE------------- */
+#homeLeft {
+        float: left;
+        position: relative;
+        width: 60em;
+}
+
+/* LEFT NAVIGATION */
+#leftNavContainer {
+        width: 19em;
+        float: left;
+        margin-right: 2em;
+}
+
+#leftNav {
+        margin-left: 1em;
+}
+
+#leftNav a {font-size: small;}
+#leftNav a:hover {font-size: small; color: black; text-decoration: none;}
+#leftNav a:visited {font-size: small;}
+
+#leftNav div.h2Box {
+        margin:  0;
+        margin-bottom: 0.15em;  
+        padding: 0.4em 0.4em 0.4em 0.5em;
+        background-color: rgb(67,138,202); 
+        border-top-left-radius: 0.8em;  
+        border-top-right-radius: 0.8em;         
+}
+
+#leftNav h2{
+        font-size: medium;
+        color: white;
+        background: transparent;
+        font-family: calibri;
+        margin-left: 0.2em;
+}
+
+#leftBox dl {
+}
+
+#leftNav dd{
+        text-align: left;
+}
+
+#leftNav ul {
+        width: 100%;
+        margin-left: 0;
+        margin-top: 0.5em;
+        /*
+        list-style: none;
+        text-indent: -1em;
+        */
+}
+
+#content ul li:before {
+        content: "\00BB \0020";
+        color: purple;  
+        font-weight: normal;
+}
+
+#leftNav li {
+        border-bottom: 1px dotted #999;
+}
+
+#leftNav li:hover {
+        background: #FFFFCC;
+}
+
+
+/* SLIDESHOW */
+#slideShowContainer {
+        float: left;
+        position: relative;
+        width: 38em;
+        height: 26em;
+        position: relative;
+}
+
+#slideShow {
+        position: relative;
+        width: inherit;
+        height: inherit;
+        background-color: rgb(235,235,235);
+        padding-bottom: 1.6em;
+        -moz-box-shadow: 0.4em 0.4em 0.4em #666;
+        -webkit-box-shadow: 0.4em 0.4em 0.4em #666;
+}
+
+#spotlightTitle {
+        width: inherit;
+        text-align: center;
+        font-weight: bold;
+        font-family: calibri;
+        padding-top: 0.25em;
+        letter-spacing:0.1em;   
+        font-size: medium;
+        color: #999;
+}
+
+#imageContainer { 
+        position: relative;
+        margin: 0.4em 0 0 1.5em;
+        height: auto;
+        width: 33.35em;
+}  
+
+#imageContainer img { 
+        position: absolute;
+        width: 35em;
+        height: 24em;
+        left: 0;
+        top: 0;
+        opacity: -0.01;
+}       
+
+#captionArea {
+        position: absolute;
+        bottom: 1.7em;
+        left: 0;
+        padding: 0.75em 0 3em 0.5em; 
+        margin-top: 16.75em;
+        margin-left: 1.5em;
+        width: 34.5em;
+        height: 1.8em;
+        background-color: rgba(0,0,0,0.6);
+        border-top: 1px solid white;
+}
+
+#captionArea a {
+        color: white;
+        text-decoration: none;
+}
+
+#slideControl {
+        float: left; 
+        padding-left: 0.25em;
+        padding-top: 0.25em;
+        width: 5.25em;
+}
+
+#slideControl img {
+        width: 1.5em;
+        height: 1.5em;
+}
+
+
+#captionContainer {
+        float: left;
+        display: block;
+        margin-left: 1em;
+        width: 24em;
+        font-family: calibri;
+        font-size: 114%;
+        color: white;
+}
+
+#captionContainer h3 {
+        font-size: 120%;
+        font-weight: normal;
+        padding-bottom: 0.25em;
+}
+
+@font-face {
+  font-family: 'Raleway';
+  font-style: normal;
+  font-weight: 100;
+  src: local('Raleway Thin'), local('Raleway-Thin'), url(http://themes.googleusercontent.com/static/fonts/raleway/v6/RJMlAoFXXQEzZoMSUteGWLO3LdcAZYWl9Si6vvxL-qU.woff) format('woff');
+}
+
+/* -----------RIGHT SIDE OF HOME PAGE------------- */
+#homeRight {
+        float: left;
+        position: relative;
+        width: 20em;
+        height: auto;
+        margin-left: 1em;
+        font-family: calibri;   
+}
+
+/* NEWS */
+#news {
+        height: auto;
+        position: relative;
+        background: transparent;
+}
+
+#news img {
+        height: 95px;
+        width: 210px;
+}
+
+#news div.h2Box {
+        margin:  0;
+        padding: 0.4em 0.4em 0.4em 0.5em;
+        background-color: rgb(67,138,202); 
+        border-top-left-radius: 0.8em;  
+        border-top-right-radius: 0.8em;         
+}
+
+#news div.h2Box h2{
+        font-size: medium;
+        color: white;
+        background: transparent;
+        font-family: calibri;
+        margin-left: 0.2em;
+}
+
+/* STYLES FOR VERTICAL NEWS ACCORDION ARE IN jquery-home.css */
+
+/* SCIENCE HIGHLIGHTS */
+#rsrchContainer {
+        clear: both;
+        margin: 0 1.5em 0 1em;
+}
+
+#rsrch {
+        font-size: small;       
+        color: #333333;
+}
+
+#rsrch table img {
+        padding-right: 0.2em;
+}
