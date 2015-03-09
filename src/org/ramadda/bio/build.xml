@@ -1,21 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
-<project basedir="../../../../" default="plugins" name="Ramadda Plugins">
+<project basedir="../../../../" default="plugins" name="Bio Plugins">
 
     <target name="init">
        <tstamp>
          <format property="date" pattern="yyyy-MM-dd HH:mm z" timezone="UTC"/>
        </tstamp>
-        <property name="src_dir" value="${basedir}/src"/>
-
-        <property name="dist_dir" value="${basedir}/dist"/>
-        <mkdir dir="${dist_dir}"/>
-
-        <property name="plugindest_dir" value="${dist_dir}/plugins"/>
-        <mkdir dir="${plugindest_dir}"/>
-
-        <property name="compile_dir" value="${src_dir}"/>
+        <property file="${basedir}/build.properties"/>
     </target>
 
     <target name="clean" depends="init" >
@@ -25,7 +16,7 @@
     </target>
 
     <target name="plugins" depends="init">
-      <echo message="Building RAMADDA plugins"/>
+      <echo message="Building Bio plugins"/>
       <ant antfile="${src_dir}/org/ramadda/bio/biotypes/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/bio/image/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/bio/genomics/build.xml" inheritAll="false"/>

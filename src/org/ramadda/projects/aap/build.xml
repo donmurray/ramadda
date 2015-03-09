@@ -3,7 +3,7 @@
     <target name="plugin">
       <property name="plugin" value="aap"/>
       <property name="plugin_dir" value="org/ramadda/projects/${plugin}"/>
-      <property name="plugin_dest" value="projectplugins"/>
+      <property name="plugin_group" value="projectplugins"/>
       <ant antfile="${basedir}/build.xml" target="plugin_build"/>
     </target>
 </project>

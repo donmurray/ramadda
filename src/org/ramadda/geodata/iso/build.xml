@@ -3,7 +3,7 @@
     <target name="plugin">
       <property name="plugin" value="iso"/>
       <property name="plugin_dir" value="org/ramadda/geodata/${plugin}"/>
-      <property name="plugin_dest" value="geoplugins"/>
+      <property name="plugin_group" value="geoplugins"/>
       <ant antfile="${basedir}/build.xml" target="plugin_build"/>
     </target>
 </project>

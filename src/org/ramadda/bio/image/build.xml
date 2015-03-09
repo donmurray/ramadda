@@ -3,7 +3,7 @@
     <target name="plugin">
       <property name="plugin" value="bioimage"/>
       <property name="plugin_dir" value="org/ramadda/bio/image"/>
-      <property name="plugin_dest" value="bioplugins"/>
+      <property name="plugin_group" value="bioplugins"/>
       <ant antfile="${basedir}/build.xml" target="plugin_build"/>
     </target>
 </project>

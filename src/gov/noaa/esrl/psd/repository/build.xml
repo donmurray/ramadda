@@ -1,91 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<project basedir="../../../../../../" default="plugin" name="PSD_Repository">
 
-
-<project basedir="../../../../../../" default="all" name="PSD_Repository">
-
-
-    <target name="init">
+  <target name="init">
        <tstamp>
          <format property="date" pattern="yyyy-MM-dd HH:mm z" timezone="UTC"/>
        </tstamp>
-        <property  name="version" value="1.0"/>
-
-
-        <property name="srcdir" value="${basedir}/src"/>
-        <property name="libdir" value="${basedir}/lib"/>
-
-        <property name="distdir" value="${basedir}/dist"/>
-        <mkdir dir="${distdir}"/>
-
-        <property name="releasedir" value="${distdir}/repository" />
-        <property name="tmpjardir" value="${distdir}/tmpjardir" />
-        <property name="tika_jar" value="${libdir}/tika-app-1.1.jar" />
-
-        <property  name="build.sysclasspath" value="ignore"/>
-        <property name="classpath" value="${tika_jar}:${libdir}/idv.jar:${libdir}/ramaddalib.jar:${libdir}/ramaddatds.jar:${libdir}/servlet-api.jar"/>
-        <property name="pluginjar" value="${distdir}/psdramadda.last.plugin.jar"/>
-
-        <property name="compiledir" value="${srcdir}"/>
-        <property name="failonerror" value="true"/>
-        <property name="srcversion" value="1.6"/>
-
+        <property file="${basedir}/build.properties"/>
     </target>
 
-    <target name="clean" depends="init" >
+    <target name="plugin">
+      <property name="plugin" value="psdramadda"/>
+      <property name="plugin_dir" value="gov/noaa/esrl/psd/repository"/>
+      <property name="plugin_group" value="miscplugins"/>
+      <property name="plugin_jar" value="${plugin}.last.plugin.jar"/>
+      <property name="plugin_extra_class" value="gov/noaa/**/*.class"/>
+      <property name="plugin_extra_src" value="gov/noaa/**/*.java"/>
+      <ant antfile="${basedir}/build.xml" target="plugin_build"/>
+    </target>
+
+
+   <target name="clean" depends="init" >
         <delete>
-            <fileset dir="${compiledir}/gov" includes="**/*.class"/>
+            <fileset dir="src/gov/noaa/esrl/psd/repository" includes="**/*.class"/>
         </delete>
-        <delete file="${pluginjar}"/>
-    </target>
-
-    <target name="compile" depends="init">
-        <javac
-            classpath="${classpath}"
-            debug="true"
-            source="${srcversion}"
-            deprecation="false" 
-            destdir="${compiledir}"
-            failonerror="${failonerror}" 
-            nowarn="true"
-            srcdir="${srcdir}"
-	    fork="true"
-            memoryMaximumSize="512m"
-            target="1.6"
-        >
-        <include name="gov/**/*.java"/>
-    </javac>
-  </target>
-
-
-    <target name="all" depends="clean,compile,plugin">
-    </target>
-
-    <target name="plugin" depends="init" >
-        <jar 
-            basedir="${compiledir}"
-            update="false"
-            compress="true"
-            jarfile="${pluginjar}">
-            <include name="gov/noaa/esrl/psd/**/*.class"/> 
-            <exclude name="gov/noaa/esrl/psd/**/*.java"/> 
-            <!--
-            <exclude name="gov/noaa/esrl/psd/repository/data/model/**"/> 
-            -->
-            <include name="gov/noaa/esrl/psd/repository/htdocs/**/*.css"/> 
-            <include name="gov/noaa/esrl/psd/repository/htdocs/**/*.png"/> 
-            <include name="gov/noaa/esrl/psd/repository/htdocs/**/*.gif"/> 
-            <include name="gov/noaa/esrl/psd/repository/data/**/*.xml"/> 
-            <include name="gov/noaa/esrl/psd/repository/data/**/*.txt"/> 
-            <include name="gov/noaa/esrl/psd/repository/resources/**/*.csv"/> 
-            <include name="gov/noaa/esrl/psd/repository/resources/**/*.txt"/> 
-            <include name="gov/noaa/esrl/psd/repository/resources/**/*.xml"/> 
-            <include name="gov/noaa/esrl/psd/repository/resources/**/*.html"/> 
-            <include name="gov/noaa/esrl/psd/repository/resources/**/*.jnlp"/> 
-            <include name="gov/noaa/esrl/psd/repository/resources/**/*.properties"/> 
-	    </jar>
-        <copy overwrite="true"  todir="${user.home}/.ramadda/plugins">
-             <fileset file="${pluginjar}"/>
-        </copy>
     </target>
 
 </project>

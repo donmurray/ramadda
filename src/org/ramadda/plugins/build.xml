@@ -1,21 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-
-<project basedir="../../../../" default="plugins" name="Ramadda Plugins">
+<project basedir="../../../../" default="plugins" name="Core Plugins">
 
     <target name="init">
        <tstamp>
          <format property="date" pattern="yyyy-MM-dd HH:mm z" timezone="UTC"/>
        </tstamp>
-        <property name="src_dir" value="${basedir}/src"/>
-
-        <property name="dist_dir" value="${basedir}/dist"/>
-        <mkdir dir="${dist_dir}"/>
-
-        <property name="plugindest_dir" value="${dist_dir}/plugins"/>
-        <mkdir dir="${plugindest_dir}"/>
-
-        <property name="compile_dir" value="${src_dir}"/>
+        <property file="${basedir}/build.properties"/>
     </target>
 
     <target name="clean" depends="init" >
@@ -25,7 +16,7 @@
     </target>
 
     <target name="plugins" depends="init">
-      <echo message="Building RAMADDA plugins"/>
+      <echo message="Building core plugins"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/apis/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/beforeafter/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/biblio/build.xml" inheritAll="false"/>
@@ -58,15 +49,9 @@
       <ant antfile="${src_dir}/org/ramadda/plugins/phone/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/mail/build.xml" inheritAll="false"/>
 
-
 <!--
-      <ant antfile="${src_dir}/org/ramadda/plugins/map/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/personfinder/build.xml" inheritAll="false"/>
 -->
-
-      <copy overwrite="true"  todir="${plugindest_dir}">
-          <fileset file="${src_dir}/org/ramadda/plugins/README"/>
-     </copy>
     </target>
 
 
@@ -75,7 +60,7 @@
       <copy overwrite="true"  todir="${user.home}/.ramadda/plugins">
           <fileset file="${src_dir}/org/ramadda/plugins/misc/*"/>
       </copy>
-     <copy overwrite="true"  todir="${plugindest_dir}">
+     <copy overwrite="true"  todir="${plugin_destdir}">
           <fileset file="${src_dir}/org/ramadda/plugins/misc/*"/>
      </copy>
 
