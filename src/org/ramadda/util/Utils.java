@@ -432,8 +432,8 @@ public class Utils {
      * @return _more_
      */
     public static Constructor findConstructor(Class c, Class[] paramTypes) {
-        ArrayList     allCtors     = new ArrayList();
-        Constructor[] constructors = c.getConstructors();
+        ArrayList<Object> allCtors     = new ArrayList<Object>();
+        Constructor[]     constructors = c.getConstructors();
         if (constructors.length == 0) {
             System.err.println(
                 "*** Could not find any constructors for class:"
@@ -1482,6 +1482,27 @@ public class Utils {
         }
 
         return Double.parseDouble(s);
+    }
+
+    /**
+     * _more_
+     *
+     * @param l _more_
+     *
+     * @return _more_
+     */
+    public static String[] toStringArray(List l) {
+        String[] a = new String[l.size()];
+        for (int i = 0; i < l.size(); i++) {
+            Object o = l.get(i);
+            if (o == null) {
+                a[i] = null;
+            } else {
+                a[i] = o.toString();
+            }
+        }
+
+        return a;
     }
 
 

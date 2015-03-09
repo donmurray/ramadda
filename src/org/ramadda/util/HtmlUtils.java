@@ -1032,6 +1032,13 @@ public class HtmlUtils {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param content _more_
+     *
+     * @return _more_
+     */
     public static String section(String content) {
         return section(content, null);
     }
@@ -1064,13 +1071,32 @@ public class HtmlUtils {
         return open(TAG_DIV, cssClass("ramadda-section"));
     }
 
+    /**
+     * _more_
+     *
+     * @param label _more_
+     *
+     * @return _more_
+     */
     public static String sectionOpen(String label) {
         return sectionOpen(label, true);
     }
 
+    /**
+     * _more_
+     *
+     * @param label _more_
+     * @param line _more_
+     *
+     * @return _more_
+     */
     public static String sectionOpen(String label, boolean line) {
-        return open(TAG_DIV, cssClass(line ? "ramadda-section  ramadda-section-noline":"ramadda-section")) + 
-            (Utils.stringDefined(label)?HtmlUtils.h2(label):"");
+        return open(TAG_DIV, cssClass(line
+                                      ? "ramadda-section  ramadda-section-noline"
+                                      : "ramadda-section")) + (Utils
+                                          .stringDefined(label)
+                ? HtmlUtils.h2(label)
+                : "");
     }
 
     /**
@@ -1275,7 +1301,7 @@ public class HtmlUtils {
      * @return _more_
      */
     public static String url(String path, List args) {
-        return url(path, Misc.listToStringArray(args));
+        return url(path, Utils.toStringArray(args));
     }
 
 
@@ -3869,10 +3895,20 @@ public class HtmlUtils {
     }
 
 
-    public static void makeAccordian(Appendable sb, String title, String contents) 
-        throws Exception {
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     * @param title _more_
+     * @param contents _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void makeAccordian(Appendable sb, String title,
+                                     String contents)
+            throws Exception {
         List<String> titles = new ArrayList<String>();
-        List<String> tabs = new ArrayList<String>();
+        List<String> tabs   = new ArrayList<String>();
         titles.add(title);
         tabs.add(contents);
         makeAccordian(sb, titles, tabs, true);
@@ -3928,7 +3964,8 @@ public class HtmlUtils {
         }
         sb.append("</div>");
         String args =
-            "autoHeight: false, navigation: true, collapsible: true, active: "+!collapse;
+            "autoHeight: false, navigation: true, collapsible: true, active: "
+            + !collapse;
         sb.append(HtmlUtils.script("$(function() {\n$(\"#" + accordianId
                                    + "\" ).accordion({" + args + "});});\n"));
     }
