@@ -1337,7 +1337,7 @@ public class MetadataManager extends RepositoryManager {
 
 
         List<Metadata> metadataList = getMetadata(entry);
-        sb.append(HtmlUtils.sectionOpen(msgLabel("Edit Properties") + " " + entry.getName()));
+        getPageHandler().entrySectionOpen(request, entry, sb, "Edit Properties");
         if (metadataList.size() == 0) {
             sb.append(
                 getPageHandler().showDialogNote(
@@ -1408,7 +1408,7 @@ public class MetadataManager extends RepositoryManager {
             sb.append(HtmlUtils.formClose());
         }
 
-        sb.append(HtmlUtils.sectionClose());
+        getPageHandler().entrySectionClose(request, entry, sb);
         return getEntryManager().makeEntryEditResult(request, entry,
                 msg("Edit Properties"), sb);
 
@@ -1428,7 +1428,8 @@ public class MetadataManager extends RepositoryManager {
     public Result processMetadataAddForm(Request request) throws Exception {
         StringBuffer sb    = new StringBuffer();
         Entry        entry = getEntryManager().getEntry(request);
-        sb.append(HtmlUtils.sectionOpen(msgLabel("Add Property") + " " + entry.getName()));
+        getPageHandler().entrySectionOpen(request, entry, sb, "Add Property");
+
 
 
         if (request.get(ARG_METADATA_CLIPBOARD_PASTE, false)) {
@@ -1469,7 +1470,7 @@ public class MetadataManager extends RepositoryManager {
             sb.append(HtmlUtils.formTableClose());
         }
 
-        sb.append(HtmlUtils.sectionClose());
+        getPageHandler().entrySectionClose(request, entry, sb);
         return getEntryManager().makeEntryEditResult(request, entry,
                 msg("Add Property"), sb);
     }

@@ -3453,4 +3453,22 @@ public class PageHandler extends RepositoryManager {
     }
 
 
+    public void entrySectionOpen(Request request, Entry entry, Appendable sb, String title) throws Exception {
+        entrySectionOpen(request, entry, sb, title, false);
+    }
+
+    public void entrySectionOpen(Request request, Entry entry, Appendable sb, String title, boolean showLine) throws Exception {
+        sb.append(HtmlUtils.sectionOpen(null, showLine));
+        if(entry!=null)
+            sb.append(HtmlUtils.h2(entry.getName() +": " + msg(title)));
+        else
+            sb.append(HtmlUtils.h2(msg(title)));
+
+    }
+
+    public void entrySectionClose(Request request, Entry entry, Appendable sb) throws Exception {
+        sb.append(HtmlUtils.sectionClose());
+    }
+
+
 }

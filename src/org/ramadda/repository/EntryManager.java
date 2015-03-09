@@ -1314,7 +1314,11 @@ public class EntryManager extends RepositoryManager {
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
 
 
-        sb.append(HtmlUtils.sectionOpen(msg("Spatial and Temporal Metadata")));
+        getPageHandler().entrySectionOpen(request, entry, sb, "Extended Edit", true);
+
+
+        sb.append(HtmlUtils.h3("Spatial and Temporal Metadata"));
+
         sb.append(HtmlUtils.labeledCheckbox(ARG_EXTEDIT_SPATIAL, "true",
                                             false, "Set spatial metadata"));
         sb.append(HtmlUtils.p());
@@ -1329,9 +1333,10 @@ public class EntryManager extends RepositoryManager {
         sb.append(HtmlUtils.submit(msg("Set spatial and temporal metadata"),
                                    ARG_EXTEDIT_EDIT));
 
-        sb.append(HtmlUtils.sectionClose());
 
-        sb.append(HtmlUtils.sectionOpen(msg("File Listing")));
+
+
+        sb.append(HtmlUtils.h3("File Listing"));
         sb.append(HtmlUtils.checkbox(ARG_EXTEDIT_REPORT_MISSING, "true",
                                      true) + " " + msg("Show missing files")
                                            + "<p>");
@@ -1340,13 +1345,12 @@ public class EntryManager extends RepositoryManager {
         sb.append(HtmlUtils.submit(msg("Generate File Listing"),
                                    ARG_EXTEDIT_REPORT));
 
-        sb.append(HtmlUtils.sectionClose());
 
-
+               
         List<HtmlUtils.Selector> tfos = getTypeHandlerSelectors(request,
                                             true, true, entry);
 
-        sb.append(HtmlUtils.sectionOpen(msg("Change Entry Type")));
+        sb.append(HtmlUtils.h3("Change Entry Type"));
         sb.append(msgLabel("New type"));
         sb.append(HtmlUtils.space(1));
 
@@ -1371,13 +1375,12 @@ public class EntryManager extends RepositoryManager {
         sb.append(HtmlUtils.submit(msg("Change type of this entry"),
                                    ARG_EXTEDIT_CHANGETYPE));
         sb.append(HtmlUtils.formClose());
-        sb.append(HtmlUtils.sectionClose());
         sb.append(request.form(getRepository().URL_ENTRY_EXTEDIT,
                                HtmlUtils.attr("name", "entryform")));
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
 
 
-        sb.append(HtmlUtils.sectionOpen(msg("Change Descendents Entry Type")));
+        sb.append(HtmlUtils.h3("Change Descendents Entry Type"));
         sb.append(HtmlUtils.formTable());
         sb.append(HtmlUtils.formEntry(msgLabel("Old type"),
                                       HtmlUtils.select(ARG_EXTEDIT_OLDTYPE,
@@ -1407,9 +1410,7 @@ public class EntryManager extends RepositoryManager {
                 ARG_EXTEDIT_CHANGETYPE_RECURSE));
 
         sb.append(HtmlUtils.formClose());
-        sb.append(HtmlUtils.sectionClose());
-
-        return makeEntryEditResult(request, entry, "Entry Walk", sb);
+        return makeEntryEditResult(request, entry, "Extended Edit", sb);
 
     }
 
@@ -1602,15 +1603,12 @@ public class EntryManager extends RepositoryManager {
         if (request.defined(ARG_ENTRYID)) {
             entry = getEntry(request);
         }
+        StringBuilder tmp = new StringBuilder();
         StringBuilder sb = new StringBuilder();
-        sb.append(HtmlUtils.sectionOpen());
-        if(entry!=null) {
-            sb.append(HtmlUtils.h2(msgLabel("Edit") + " " + entry.getName()));
-        } else {
-            sb.append(HtmlUtils.h2(msg("New Entry")));
-        }                                   
-        Entry group = addEntryForm(request, entry, sb);
-        sb.append(HtmlUtils.sectionClose());
+        Entry group = addEntryForm(request, entry, tmp);
+        getPageHandler().entrySectionOpen(request, entry!=null?entry:group, sb, (entry!=null?"Edit":"New Entry"));
+        sb.append(tmp);
+        getPageHandler().entrySectionClose(request, entry, sb);
         if (entry == null) {
             return addEntryHeader(request, group,
                                   new Result(msg("Add Entry"), sb));
@@ -3110,11 +3108,11 @@ public class EntryManager extends RepositoryManager {
                     ARG_CANCEL)));
         fb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
         fb.append(HtmlUtils.formClose());
-        sb.append(HtmlUtils.sectionOpen(msgLabel("Delete Entry") + " " + entry.getName()));
+        getPageHandler().entrySectionOpen(request, entry, sb, "Delete Entry");
         sb.append(getPageHandler().showDialogQuestion(inner.toString(),
                 fb.toString()));
 
-        sb.append(HtmlUtils.sectionClose());
+        getPageHandler().entrySectionClose(request, entry, sb);
         return makeEntryEditResult(request, entry,
                                    msg("Entry delete confirm"), sb);
     }
@@ -3692,7 +3690,8 @@ public class EntryManager extends RepositoryManager {
 
         Entry         group = findGroup(request);
         StringBuilder sb    = new StringBuilder();
-        sb.append(HtmlUtils.section(msg("Choose entry type"), null));
+
+
         Hashtable<String, CategoryBuffer> superCatMap = new Hashtable<String,
                                                             CategoryBuffer>();
         List<String>   superCats = new ArrayList<String>();
@@ -3804,8 +3803,9 @@ public class EntryManager extends RepositoryManager {
             inner.append("</div>");
         }
 
+        getPageHandler().entrySectionOpen(request, group, sb, "Choose entry type");
         sb.append(HtmlUtils.insetDiv(inner.toString(), 10, 20, 0, 0));
-
+        getPageHandler().entrySectionClose(request, group, sb);
         return makeEntryEditResult(request, group, "Create Entry", sb);
     }
 
@@ -3884,10 +3884,11 @@ public class EntryManager extends RepositoryManager {
                     + request);
         }
         StringBuilder sb = new StringBuilder();
-        sb.append(HtmlUtils.sectionOpen(msgLabel("Entry Actions") + " " + entry.getName()));
+        getPageHandler().entrySectionOpen(request, entry, sb, "Entry Actions");
 
         sb.append(getEntryActionsTable(request, entry, OutputType.TYPE_ALL));
-        sb.append(HtmlUtils.sectionClose());
+        getPageHandler().entrySectionClose(request, entry, sb);
+
         return addEntryHeader(request, entry,
                               new Result(msg("Entry Actions"), sb));
     }
@@ -4163,7 +4164,8 @@ public class EntryManager extends RepositoryManager {
             boolean       didOne = false;
             StringBuilder sb     = new StringBuilder();
 
-            sb.append(HtmlUtils.sectionOpen("Copy/Move/Link"));
+
+            sb.append(HtmlUtils.sectionOpen(msg("Copy/Move/Link")));
 
             /*
             List<Entry>  cart      = getUserManager().getCart(request);
@@ -4255,6 +4257,7 @@ public class EntryManager extends RepositoryManager {
             */
 
             sb.append(HtmlUtils.sectionClose());
+
 
             return addEntryHeader(request, entries.get(0),
                                   new Result(msg("Entry Move/Copy"), sb));
@@ -4373,13 +4376,12 @@ public class EntryManager extends RepositoryManager {
             fb.append(HtmlUtils.submit(msg("Cancel"), ARG_CANCEL));
             fb.append(HtmlUtils.formClose());
             StringBuilder contents = new StringBuilder();
-            contents.append(HtmlUtils.sectionOpen("Copy/Move/Link"));
+            sb.append(HtmlUtils.sectionOpen(msg("Copy/Move/Link")));
             contents.append(getPageHandler().showDialogQuestion(
                                                                 sb.toString(), fb.toString()));
 
-            contents.append(HtmlUtils.sectionClose());
+            sb.append(HtmlUtils.sectionClose());
             Result result = new Result(msg("Move confirm"), contents);
-
             return addEntryHeader(request, toEntry, result);
         }
 
