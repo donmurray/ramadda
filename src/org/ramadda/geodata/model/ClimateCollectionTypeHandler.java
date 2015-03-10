@@ -34,6 +34,7 @@ import org.ramadda.service.ServiceInput;
 import org.ramadda.service.ServiceOperand;
 import org.ramadda.service.ServiceOutput;
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.WikiUtil;
 
 import org.w3c.dom.Element;
 
@@ -128,7 +129,15 @@ public class ClimateCollectionTypeHandler extends CollectionTypeHandler {
 
 
         StringBuilder sb = new StringBuilder();
-        sb.append(entry.getDescription());
+        //sb.append(entry.getDescription());
+        WikiUtil wikiUtil = new WikiUtil();
+        wikiUtil.setMakeHeadings(false);
+        wikiUtil.setMobile(request.isMobile());
+        if ( !request.isAnonymous()) {
+            wikiUtil.setUser(request.getUser().getId());
+        }
+        sb.append(wikiUtil.wikify(entry.getDescription(), null));
+
         StringBuilder js     = new StringBuilder();
         String        formId = openForm(request, entry, sb, js);
 
