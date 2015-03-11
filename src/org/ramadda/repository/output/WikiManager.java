@@ -2942,7 +2942,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             if (entry != null) {
                 if (addChildren) {
                     List<Entry> children =
-                        getEntryManager().getChildrenAll(request, entry);
+                        getEntryManager().getChildrenAll(request, entry, null);
                     entries.addAll(children);
                 } else {
                     entries.add(entry);

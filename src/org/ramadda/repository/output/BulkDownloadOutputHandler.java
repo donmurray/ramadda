@@ -28,6 +28,7 @@ import org.ramadda.repository.Request;
 import org.ramadda.repository.Result;
 import org.ramadda.repository.auth.AuthorizationMethod;
 import org.ramadda.repository.harvester.Harvester;
+import org.ramadda.repository.util.SelectInfo;
 
 
 import org.ramadda.util.HtmlUtils;
@@ -216,6 +217,10 @@ public class BulkDownloadOutputHandler extends OutputHandler {
                               List<Entry> entries)
             throws Exception {
 
+        //For the download get all children entries
+        if(!request.defined(ARG_MAX)) {
+            request.put(ARG_MAX,"20000");
+        }
         if ((group != null) && group.isDummy()) {
             request.setReturnFilename("Search_Results_download.sh");
         }
@@ -305,7 +310,7 @@ public class BulkDownloadOutputHandler extends OutputHandler {
                     continue;
                 }
                 List<Entry> subEntries =
-                    getEntryManager().getChildrenAll(request, entry);
+                    getEntryManager().getChildrenAll(request, entry, new SelectInfo(null, 20000));
 
                 if (includeGroupOutputs || (subEntries.size() > 0)) {
                     writeGroupScript(request, entry, sb, command,
@@ -549,6 +554,12 @@ public class BulkDownloadOutputHandler extends OutputHandler {
         }
 
 
+    }
+
+
+    @Override
+    public int getMaxEntryCount() {
+        return 20000;
     }
 
 

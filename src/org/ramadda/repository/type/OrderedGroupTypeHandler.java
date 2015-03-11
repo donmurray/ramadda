@@ -28,6 +28,7 @@ import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Utils;
 import org.ramadda.util.WikiUtil;
 
+import org.ramadda.repository.util.SelectInfo;
 
 import org.w3c.dom.*;
 
@@ -219,7 +220,7 @@ public abstract class OrderedGroupTypeHandler extends ExtensibleGroupTypeHandler
     public List<Entry> getChildrenEntries(Request request, Entry entry)
             throws Exception {
         return getEntryUtil().getEntriesWithType(
-            getEntryManager().getChildrenAll(request, entry), getChildType());
+                                                 getEntryManager().getChildrenAll(request, entry, null), getChildType());
 
     }
 

@@ -1979,7 +1979,9 @@ public class OutputHandler extends RepositoryManager {
     }
 
 
-
+    public int getMaxEntryCount() {
+        return -1;
+    }
 
     /**
      *  Set the MaxConnections property.
@@ -1989,6 +1991,7 @@ public class OutputHandler extends RepositoryManager {
     public void setMaxConnections(int value) {
         this.maxConnections = value;
     }
+
 
     /**
      *  Get the MaxConnections property.

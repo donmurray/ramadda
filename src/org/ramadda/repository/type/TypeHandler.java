@@ -34,7 +34,7 @@ import org.ramadda.repository.search.SearchManager;
 import org.ramadda.repository.search.SpecialSearch;
 import org.ramadda.repository.util.DateArgument;
 import org.ramadda.repository.util.RequestArgument;
-
+import org.ramadda.repository.util.SelectInfo;
 
 import org.ramadda.service.Service;
 import org.ramadda.service.ServiceInput;
@@ -5255,10 +5255,10 @@ public class TypeHandler extends RepositoryManager {
      */
     public void getChildrenEntries(Request request, Entry group,
                                    List<Entry> entries,
-                                   List<Entry> subGroups, List<Clause> where)
+                                   List<Entry> subGroups, SelectInfo select)
             throws Exception {
-        List<String> ids = getEntryManager().getChildIds(request, group,
-                               where);
+        System.err.println("TypeHandler.getChildrenEntries:" + select);
+        List<String> ids = getEntryManager().getChildIds(request, group, select);
         List<Entry> myEntries   = new ArrayList<Entry>();
         List<Entry> mySubGroups = new ArrayList<Entry>();
         for (String id : ids) {
