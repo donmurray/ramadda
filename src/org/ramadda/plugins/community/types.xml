@@ -83,10 +83,6 @@
 <div style="max-height: 400px; overflow-y: auto;margin:5px;">
 {{description wikify="true"}}
 </div>
-<table class="formtable">
-{{resource row.label="URL:"  message=""}}
-</table>
-
 {{information}}
 
 {{properties xxxprefix="==Properties==" message=""}}
