@@ -31,6 +31,7 @@ import org.ramadda.repository.type.*;
 
 import org.ramadda.sql.Clause;
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.repository.util.SelectInfo;
 
 
 import org.w3c.dom.*;
@@ -132,14 +133,15 @@ public class NotebookTypeHandler extends ExtensibleGroupTypeHandler {
      *
      * @throws Exception _more_
      */
+@Override
     public void getChildrenEntries(Request request, Entry group,
                                    List<Entry> entries,
-                                   List<Entry> subGroups, List<Clause> where)
+                                   List<Entry> subGroups, SelectInfo select)
             throws Exception {
         if ( !request.defined(ARG_OUTPUT) && !request.defined(ARG_LETTER)) {
             return;
         }
-        super.getChildrenEntries(request, group, entries, subGroups, where);
+        super.getChildrenEntries(request, group, entries, subGroups, select);
     }
 
 

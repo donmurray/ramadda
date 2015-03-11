@@ -27,6 +27,7 @@ import org.ramadda.repository.database.*;
 import org.ramadda.repository.metadata.*;
 import org.ramadda.repository.output.*;
 import org.ramadda.repository.type.*;
+import org.ramadda.repository.util.SelectInfo;
 
 
 import org.ramadda.sql.Clause;
@@ -152,12 +153,12 @@ public class GlossaryTypeHandler extends ExtensibleGroupTypeHandler {
     public void xxxgetChildrenEntries(Request request, Entry group,
                                       List<Entry> entries,
                                       List<Entry> subGroups,
-                                      List<Clause> where)
+                                      SelectInfo select)
             throws Exception {
         if ( !request.defined(ARG_OUTPUT) && !request.defined(ARG_LETTER)) {
             return;
         }
-        super.getChildrenEntries(request, group, entries, subGroups, where);
+        super.getChildrenEntries(request, group, entries, subGroups, select);
     }
 
     /**

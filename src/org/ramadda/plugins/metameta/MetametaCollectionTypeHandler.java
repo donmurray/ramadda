@@ -115,7 +115,7 @@ public class MetametaCollectionTypeHandler extends MetametaGroupTypeHandler {
             MetametaDictionaryTypeHandler defTypeHandler =
                 (MetametaDictionaryTypeHandler) defEntry.getTypeHandler();
             List<Entry> fields = getEntryManager().getChildrenAll(request,
-                                     defEntry);
+                                                                  defEntry, null);
             defTypeHandler.generateDbXml(request, xml, defEntry, fields);
         }
         xml.append(XmlUtil.closeTag("tables"));
@@ -142,7 +142,7 @@ public class MetametaCollectionTypeHandler extends MetametaGroupTypeHandler {
             MetametaDictionaryTypeHandler defTypeHandler =
                 (MetametaDictionaryTypeHandler) defEntry.getTypeHandler();
             List<Entry> fields = getEntryManager().getChildrenAll(request,
-                                     defEntry);
+                                                                  defEntry, null);
             defTypeHandler.generateEntryXml(request, xml, defEntry, fields);
         }
         xml.append(XmlUtil.closeTag(TAG_TYPES));

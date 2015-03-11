@@ -1,6 +1,5 @@
 <types supercategory="Development">
 
-
   <type name="type_resilience_project"  description="Resiliency Project" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Community"     metadata="resilience_risk" >
      <property name="icon" value="/community/globe-share.png"/>
 
@@ -14,6 +13,7 @@
      <column name="status"  type="enumerationplus"  values="active:Active,inactive:Inactive" label="Status" cansearch="true"/>
      <column name="project_type"  type="enumerationplus"  label="Project Type" cansearch="true" values="undp_aap:UNDP African Adaptation Program,100cities:Rockefeller 100 Cities Project"/>
     <column name="country" type="enumerationplus" label="Country" values="file:/org/ramadda/plugins/community/resources/countries.txt" showinhtml="true" cansearch="true"/>
+
 <children><![CDATA[
 <entries>
 <entry  name="People"  type="group"/>
@@ -44,9 +44,63 @@
 +col-md-4
 {{image src="::*" message="" width="300"}}
 <p>
-{{mapentry width="350" message=""}}
+{{mapentry width="300" message=""}}
 <p>
 {{properties metadata.types="resilience_risk" message="" }}
+-col
+-row
+
+]]>
+</wiki>
+   </type>
+
+
+
+
+  <type name="type_resilience_assessment"  description="Resiliency Assessment" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Community"     metadata="assessment_purpose,assessment_practice,assessment_sponsor,assessment_interaction,assessment_output,assessment_outcome" >
+     <property name="icon" value="/community/text_list_bullets.png"/>
+
+     <property name="form.file.show" value="true"/>
+     <property name="form.url.show" value="true"/>
+     <property name="form.datatype.show" value="false"/>
+     <property name="form.altitude.show" value="false"/>
+     <property name="form.altitude.top.show" value="false"/>
+
+     <property name="search.metadatatypes" value="assessment_purpose,assessment_practice,assessment_sponsor,assessment_interaction,assessment_output,assessment_outcome"/>
+
+     <column name="authors"  type="string" label="Authors" size="500" cansearch="true"/>
+     <column name="organization"  type="string" label="Organization" cansearch="true"/>
+     <column name="country" type="enumerationplus" label="Country" values="file:/org/ramadda/plugins/community/resources/countries.txt" showinhtml="true" cansearch="true"/>
+     <column name="location"  type="string" label="Location" cansearch="true"/>
+     <column name="ecoregion"  type="enumerationplus" label="Ecoregion" cansearch="true" values="file:/org/ramadda/plugins/community/resources/biomes.txt"/>
+
+
+     <wiki><![CDATA[
++inset
++row
++col-md-8
+<div class="wiki-h1">Resiliency Assessment: {{name}}</div>
+<div style="max-height: 400px; overflow-y: auto;margin:5px;">
+{{description wikify="true"}}
+</div>
+<table class="formtable">
+{{resource row.label="URL:"  message=""}}
+</table>
+
+{{information}}
+
+{{properties xxxprefix="==Properties==" message=""}}
+
+
+{{tree details="false" showtoggle="false" prefix="==Content==" message="No documents" }}
+
+
+-col
++col-md-4
+{{image src="::*" message="" width="300"}}
+<p>
+{{mapentry width="300" message=""}}
+<p>
 -col
 -row
 

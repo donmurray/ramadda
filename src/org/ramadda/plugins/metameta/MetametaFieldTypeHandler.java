@@ -165,7 +165,7 @@ public class MetametaFieldTypeHandler extends MetametaFieldTypeHandlerBase {
         if (idx < 0) {
             int maxIndex = -1;
             List<Entry> siblings = getEntryManager().getChildrenAll(request,
-                                       parent);
+                                                                    parent, null);
             for (Entry sibling : siblings) {
                 if (sibling.getTypeHandler().isType(TYPE)) {
                     int siblingIndex = ((Integer) getEntryValue(sibling,
