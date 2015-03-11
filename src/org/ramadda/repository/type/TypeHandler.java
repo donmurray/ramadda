@@ -5257,7 +5257,6 @@ public class TypeHandler extends RepositoryManager {
                                    List<Entry> entries,
                                    List<Entry> subGroups, SelectInfo select)
             throws Exception {
-        System.err.println("TypeHandler.getChildrenEntries:" + select);
         List<String> ids = getEntryManager().getChildIds(request, group, select);
         List<Entry> myEntries   = new ArrayList<Entry>();
         List<Entry> mySubGroups = new ArrayList<Entry>();
