@@ -114,6 +114,16 @@ To get the full page layout like on <a href="http://ramadda.org/repository">rama
 
 If you append a "#" then the row number is kept track of and an even/odd color scheme is applied. 
 
+<pre>
++section  #
+...
+-section
++section  #
+...
+-section
+</pre>
+
+
 If you add label="..." then a header is added.
 
 The normal use is:
@@ -130,6 +140,30 @@ The normal use is:
 -section
 </pre>
 
+You can change the background color/image by specifying one of the classes:
+
+<pre>
++section class="ramadda-section-map"
+...
+-section
++section class="ramadda-section-lightpink"
+...
+-section
++section class="ramadda-section-lightblue"
+...
+-section
++section class="ramadda-section-lightgreen"
+...
+-section
+</pre>
+
+You can also add a CSS style descriptor
+
+<pre>
++section style="background: #888; border: 1px red solid;"
+...
+-section
+</pre>
 
 <b>Grid Layout</b><br>
 There is support for the <a href="http://getbootstrap.com/">Bootstrap</a> CSS grid system.
@@ -145,7 +179,7 @@ This is some text and some more test. Lorem ipsum
 </div>
 
 
-To add RAMADDA's "minittron" smaller banner do
+To add RAMADDA's "minitron" smaller banner do
 <pre>+mini
 &lt;h2&gt;Heading&lt;/h2&gt;
 This is some text and some more test. Lorem ipsum
