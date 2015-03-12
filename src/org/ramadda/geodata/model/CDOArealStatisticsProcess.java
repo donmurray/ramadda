@@ -185,11 +185,16 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         if ( !canHandle(input)) {
             throw new Exception("Illegal data type");
         }
+        String type =
+                input.getProperty(
+                    "type", ClimateModelApiHandler.ARG_ACTION_COMPARE).toString();
+
 
         final List<ServiceOperand> outputEntries =
             new ArrayList<ServiceOperand>();
         int     opNum      = 0;
-        boolean useThreads = false;
+        int     numThreads      = Math.min(input.getOperands().size(), 6);
+        boolean useThreads = false || numThreads > 2;
         ThreadManager threadManager =
             new ThreadManager("CDOArealStatistics.evaluate");
         for (final ServiceOperand op : input.getOperands()) {
@@ -206,6 +211,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                             op, opNum));
                 } else {
                     final int myOp = opNum;
+                    System.out.println("making thread "+opNum);
                     threadManager.addRunnable(new ThreadManager.MyRunnable() {
                         public void run() throws Exception {
                             try {
@@ -231,14 +237,69 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         }
         if (useThreads) {
             try {
-                threadManager.runInParallel(opNum);
+                System.out.println("Running in "+numThreads+" threads");
+                threadManager.runInParallel(numThreads);
             } catch (Exception ve) {
                 ve.printStackTrace();
             }
         }
-
+        if (type.equals(ClimateModelApiHandler.ARG_ACTION_MULTI_COMPARE)
+                || type.equals(ClimateModelApiHandler.ARG_ACTION_ENS_COMPARE)) {
+            addEnsembleMean(request, input, outputEntries, type);
+        }
 
         return new ServiceOutput(outputEntries);
+    }
+    
+    /**
+     * Add the ensemble mean to list of output entries
+     */
+    public void addEnsembleMean(Request request, ServiceInput dpi, List<ServiceOperand> ops, String type) throws Exception {
+        Entry oneOfThem = ops.get(0).getEntries().get(0);
+        Object[] values = oneOfThem.getValues();
+        StringBuilder fileName = new StringBuilder();
+        fileName.append(oneOfThem.getValue(4));
+        fileName.append("_MultiModel_");
+        fileName.append(oneOfThem.getValue(2));
+        fileName.append("_mean_");
+        String       id        = getRepository().getGUID();
+        String       newName = fileName + id + ".nc";
+        /*
+        String tail =
+            getOutputHandler().getStorageManager().getFileTail(oneOfThem);
+        String       id        = getRepository().getGUID();
+        String       newName = IOUtil.stripExtension(tail) + "_MMM_" + id + ".nc";
+        */
+        File outFile = new File(IOUtil.joinDir(dpi.getProcessDir(), newName));
+        List<String> commands  = initCDOService();
+        commands.add("-ensmean");
+        for (ServiceOperand op : ops) {
+            List<Entry> entries = op.getEntries();
+            for (Entry e : entries) {
+                commands.add(e.getResource().getPath());
+            }
+        }
+        commands.add(outFile.toString());
+        System.out.println(commands);
+        StringBuilder outputName = new StringBuilder();
+        outputName.append("Multi-Model Ensemble Mean");
+        runProcess(commands, dpi.getProcessDir(), outFile);
+        Resource resource = new Resource(outFile, Resource.TYPE_LOCAL_FILE);
+        TypeHandler myHandler = getRepository().getTypeHandler("cdm_grid",
+                                    false, true);
+        Entry outputEntry = new Entry(myHandler, true, outputName.toString());
+        outputEntry.setResource(resource);
+        Object[] newValues = cloneValues(values);
+        newValues[1] = "MultiModel";
+        newValues[3] = "mean";
+        outputEntry.setValues(newValues);
+        // Add in lineage and associations
+        outputEntry.addAssociation(new Association(getRepository().getGUID(),
+                "generated product", "product generated from",
+                oneOfThem.getId(), outputEntry.getId()));
+        getOutputHandler().getEntryManager().writeEntryXmlFile(request,
+                outputEntry);
+        ops.add(new ServiceOperand(outputName.toString(), outputEntry));
     }
 
     /**
@@ -622,6 +683,8 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                                     false, true);
         Entry outputEntry = new Entry(myHandler, true, outputName.toString());
         outputEntry.setResource(resource);
+        Object[] newValues = cloneValues(values);
+        outputEntry.setValues(newValues);
         // Add in lineage and associations
         outputEntry.addAssociation(new Association(getRepository().getGUID(),
                 "generated product", "product generated from",
@@ -640,6 +703,17 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         return new ServiceOperand(outputName.toString(), outputEntry);
     }
 
+    /**
+     * Clone the entry values
+     * @param values the values from the entry
+     * @return a clone of the values
+     */
+    private Object[] cloneValues(Object[] values) {
+        Object[] newValues = new Object[values.length];
+        System.arraycopy(values,  0,  newValues,  0, values.length);
+        return newValues;
+    }
+    
     /**
      * _more_
      *
