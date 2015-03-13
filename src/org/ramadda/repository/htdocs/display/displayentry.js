@@ -1,7 +1,7 @@
 
 var DISPLAY_ENTRYLIST = "entrylist";
 var DISPLAY_ENTRYDISPLAY = "entrydisplay";
-var DISPLAY_ENTRY_ALBUM = "entryalbum";
+var DISPLAY_ENTRY_GALLERY = "entrygallery";
 var DISPLAY_OPERANDS = "operands";
 var DISPLAY_METADATA = "metadata";
 var DISPLAY_TIMELINE = "timeline";
@@ -18,7 +18,7 @@ var ID_TREE_LINK = "treelink";
 
 addGlobalDisplayType({type: DISPLAY_ENTRYLIST, label:"Entry List",requiresData:false,category:"Entry Displays"});
 addGlobalDisplayType({type: DISPLAY_ENTRYDISPLAY, label:"Entry Display",requiresData:false,category:"Entry Displays"});
-addGlobalDisplayType({type: DISPLAY_ENTRY_ALBUM, label:"Entry Album",requiresData:false,category:"Entry Displays"});
+addGlobalDisplayType({type: DISPLAY_ENTRY_GALLERY, label:"Entry Gallery",requiresData:false,category:"Entry Displays"});
 //addGlobalDisplayType({type: DISPLAY_OPERANDS, label:"Operands",requiresData:false,category:"Entry Displays"});
 addGlobalDisplayType({type: DISPLAY_METADATA, label:"Metadata Table",requiresData:false,category:"Entry Displays"});
 
@@ -1046,9 +1046,9 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 
 
 
-function RamaddaEntryalbumDisplay(displayManager, id, properties) {
+function RamaddaGalleryDisplay(displayManager, id, properties) {
     var SUPER;
-    RamaddaUtil.inherit(this, SUPER = new RamaddaSearcher(displayManager, id, DISPLAY_ENTRY_ALBUM, properties));
+    RamaddaUtil.inherit(this, SUPER = new RamaddaSearcher(displayManager, id, DISPLAY_ENTRY_GALLERY, properties));
     addRamaddaDisplay(this);
     RamaddaUtil.defineMembers(this, {
             haveDisplayed: false,
@@ -1099,14 +1099,14 @@ function RamaddaEntryalbumDisplay(displayManager, id, properties) {
                     this.writeHtml(ID_FOOTER_RIGHT, this.footerRight);
                 }
 
-                //Don: this gets the album html then writes it out. 
-                var html  = this.getEntriesAlbum(entries);
+                //Don: this gets the gallery html then writes it out. 
+                var html  = this.getEntriesGallery(entries);
                 this.writeHtml(ID_ENTRIES, html);
                 //Don: Do any final fancy box things here after the html is written out
 
                 this.getDisplayManager().handleEventEntriesChanged(this, entries);
             },
-            getEntriesAlbum:function (entries) {
+            getEntriesGallery:function (entries) {
                 var nonImageHtml = "";
                 var html = "";
                 var imageCnt = 0;
@@ -1122,7 +1122,7 @@ function RamaddaEntryalbumDisplay(displayManager, id, properties) {
                         imageCnt++;
                         html  += HtmlUtil.tag(TAG_IMG,["src", entry.getResourceUrl(), ATTR_WIDTH,"500",ATTR_ID,
                                                   this.getDomId("entry_" + entry.getIdForDom()),
-                                                       "entryid",entry.getIdForDom(), ATTR_CLASS,"display-entryalbum-entry"]) +"<br>" +
+                                                       "entryid",entry.getIdForDom(), ATTR_CLASS,"display-entrygallery-entry"]) +"<br>" +
                             link+"<p>";
                     } else  {
                         var icon = entry.getIconImage([ATTR_TITLE,"View entry"]);
@@ -1141,7 +1141,7 @@ function RamaddaEntryalbumDisplay(displayManager, id, properties) {
                         //Don: right now I just replicate what I do above
                         newHtml  += HtmlUtil.tag(TAG_IMG,["src", entry.getResourceUrl(), ATTR_WIDTH,"500",ATTR_ID,
                                                           this.getDomId("entry_" + entry.getIdForDom()),
-                                                          "entryid",entry.getIdForDom(), ATTR_CLASS,"display-entryalbum-entry"]) +"<br>" +
+                                                          "entryid",entry.getIdForDom(), ATTR_CLASS,"display-entrygallery-entry"]) +"<br>" +
                             link+"<p>";
 
                     }

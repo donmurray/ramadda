@@ -344,6 +344,7 @@ function DisplayManager(argId,argProperties) {
                         func = window[names[i]];
                         break;
                     }
+
                 }
                 if(func==null) {
                     console.log("Error: could not find display function:" + type);

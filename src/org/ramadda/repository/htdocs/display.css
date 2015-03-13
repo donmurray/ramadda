@@ -470,11 +470,11 @@
 }
 
 
-.display-entryalbum {
+.display-entrygallery {
 
 }
 
-.display-entryalbum-content   { 
+.display-entrygallery-content   { 
    padding: 10px;
    border:1px #ccc solid; 
    min-height: 400px;
