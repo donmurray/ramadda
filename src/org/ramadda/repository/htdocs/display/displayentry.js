@@ -1044,6 +1044,7 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
 }
 
 
+var  RamaddaListDisplay = RamaddaEntrylistDisplay;
 
 
 function RamaddaGalleryDisplay(displayManager, id, properties) {
