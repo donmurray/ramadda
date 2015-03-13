@@ -58,6 +58,7 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
@@ -1371,11 +1372,11 @@ public class GenericTypeHandler extends TypeHandler {
      * @throws Exception on badness
      */
     @Override
-    public void addToSpecialSearchForm(Request request, Appendable formBuffer)
+        public void addToSpecialSearchForm(Request request, Appendable formBuffer, HashSet<String> fieldsToShow)
             throws Exception {
-        super.addToSpecialSearchForm(request, formBuffer);
+        super.addToSpecialSearchForm(request, formBuffer, fieldsToShow);
         addColumnsToSearchForm(request, formBuffer, new ArrayList<Clause>(),
-                               true, false);
+                               true, false, fieldsToShow);
     }
 
 
@@ -1395,7 +1396,7 @@ public class GenericTypeHandler extends TypeHandler {
             throws Exception {
         super.addToSearchForm(request, formBuffer, where, advancedForm);
         addColumnsToSearchForm(request, formBuffer, where, advancedForm,
-                               true);
+                               true, null);
     }
 
 
@@ -1414,12 +1415,17 @@ public class GenericTypeHandler extends TypeHandler {
                                        Appendable formBuffer,
                                        List<Clause> where,
                                        boolean advancedForm,
-                                       boolean makeToggleBox)
+                                       boolean makeToggleBox, 
+                                       HashSet<String> fieldsToShow)
             throws Exception {
         Appendable typeSB = (makeToggleBox
                              ? new StringBuilder()
                              : formBuffer);
         for (Column column : columns) {
+            if(fieldsToShow!=null && !fieldsToShow.contains(column.getName())) {
+                
+                continue;
+            }
             column.addToSearchForm(request, typeSB, where);
         }
 

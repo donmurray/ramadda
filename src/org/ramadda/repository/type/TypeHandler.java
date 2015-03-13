@@ -4268,10 +4268,10 @@ public class TypeHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void addToSpecialSearchForm(Request request, Appendable formBuffer)
+    public void addToSpecialSearchForm(Request request, Appendable formBuffer, HashSet<String> fieldsToShow)
             throws Exception {
         if (parent != null) {
-            parent.addToSpecialSearchForm(request, formBuffer);
+            parent.addToSpecialSearchForm(request, formBuffer, fieldsToShow);
         }
     }
 
@@ -4340,7 +4340,6 @@ public class TypeHandler extends RepositoryManager {
                                          request.getString(ARG_USER_ID,
                                              ""))));
         }
-
 
         List<TypeHandler> typeHandlers = getRepository().getTypeHandlers();
         if (true || (typeHandlers.size() > 1)) {

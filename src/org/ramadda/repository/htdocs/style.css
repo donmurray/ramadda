@@ -32,7 +32,7 @@ h1 {
 }
 
 h2 {
-   font-size:170%;
+   font-size:160%;
 }
 
 h3 {
@@ -64,12 +64,17 @@ h3 {
 .ramadda-main {
 }
 
-.ramadda-section h2 a, .ramadda-section h2 a:visited {
+.ramadda-section-header a, .ramadda-section-header  a:visited {
     color: black;
 }
 
-.ramadda-section-header, .ramadda-section h2 {
+.ramadda-section h2 {
+   font-weight: 300;
+}
+
+.ramadda-section-header {
    font-size:18pt;
+   font-size:170%;
    padding: 0px;
    margin: 0px;
    margin-bottom: 2px;

@@ -504,11 +504,11 @@ public class Utils {
      * @throws Exception _more_
      */
     public static void main(String args[]) throws Exception {
-        if (true) {
-            System.err.println(Utils.obfuscate("jeff.mcwhirter@gmail.com")
-                               + "-" + Utils.obfuscate("5") + "-"
-                               + Utils.obfuscate("thanks"));
 
+        if (true) {
+            String s = "asdasda<p></p>\nsds\n<p></p>\nasdasdas";
+            s = s.replaceAll(".*<p></p>[\\n\\r]+", "");
+            System.err.println (s);
             return;
         }
 

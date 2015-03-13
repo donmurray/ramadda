@@ -676,6 +676,12 @@ function Entry(props) {
             getFilename : function () {
                 return this.filename;
             }, 
+            isImage: function() {
+                return this.hasResource() && this.getFilename().search(/(\.png|\.jpg|\.jpeg|\.gif)/i)>=0;
+            },
+            hasResource: function() {
+                return this.getFilename()!=null;
+            },
             getResourceUrl : function () {
                 var rurl = this.getRamadda().getRoot() + "/entry/get";
                 if (this.getFilename() != null) {

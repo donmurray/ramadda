@@ -290,9 +290,6 @@
 //   max-width: 400px;
 }
 
-.display-entrylist {
-
-}
 
 .display-repositories-select {
    max-width:200px;
@@ -401,15 +398,30 @@
 }
 
 
+.display-entrylist {
+
+}
+
+.display-entrylist-content   { 
+   min-width: 250px;
+   min-height: 200px;
+   border:1px #ccc solid; 
+   overflow-y: auto;
+   max-height: 300px;
+}
+
+
+.display-entrylist-list { 
+       list-style-type: none; 
+       margin: 0; 
+       padding: 0; 
+}
+
+
 .display-entrylist-list  .ui-selected { 
      background: #e0f0ff; 
 }
 
-.display-entrylist-list { 
-        list-style-type: none; 
-        margin: 0; 
-        padding: 0; 
-}
 
 .display-entrylist-list li { 
       vertical-align: center;
@@ -458,18 +470,21 @@
 }
 
 
+.display-entryalbum {
+
+}
+
+.display-entryalbum-content   { 
+   padding: 10px;
+   border:1px #ccc solid; 
+   min-height: 400px;
+   overflow-y: auto;
+}
+
 .ui-selected  .display-entrylist-details {
    background-color : #fff;
 }
 
-.display-entrylist .display-entries-content   { 
-   min-width: 250px;
-   min-height: 200px;
-   border:1px #ccc solid; 
-   overflow-y: auto;
-   max-height: 300px;
-//   margin: 4px;
-}
 
 .display-entry-toolbar {
    display: none;

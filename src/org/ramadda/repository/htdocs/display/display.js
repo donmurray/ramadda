@@ -238,6 +238,15 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             getType: function() {
                 return this.type;
             },
+            getClass: function(suffix) {
+                if(suffix == null) {
+                    return this.getBaseClass();
+                }
+                return this.getBaseClass()+"-" + suffix;
+            },
+            getBaseClass: function() {
+                return "display-" + this.getType();
+            },
             setDisplayManager: function(cm) {
                 this.displayManager = cm;
                 this.setDisplayParent(cm.getLayoutManager());

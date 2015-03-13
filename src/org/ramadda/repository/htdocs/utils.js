@@ -285,6 +285,7 @@ var GuiUtils = {
 var TAG_A = "a";
 var TAG_B = "b";
 var TAG_DIV = "div";
+var TAG_IMG = "img";
 var TAG_LI = "li";
 var TAG_SELECT = "select";
 var TAG_OPTION = "option";

@@ -148,6 +148,10 @@ public interface WikiConstants {
     /** first attribute */
     public static final String ATTR_FIRST = "first";
 
+    public static final String ATTR_FIELDS = "fields";
+
+    public static final String ATTR_METADATA = "metadata";
+
     /** _more_ */
     public static final String ATTR_LAST = "last";
 

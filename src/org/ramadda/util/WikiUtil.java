@@ -584,9 +584,7 @@ public class WikiUtil {
                 buff.append(clazz);
                 buff.append("\"   " + extraAttr + ">");
                 if (label != null) {
-                    buff.append("<h2>");
-                    buff.append(label);
-                    buff.append("</h2>");
+                    buff.append(HtmlUtils.div(label, HtmlUtils.cssClass("ramadda-section-header")));
                 }
 
                 continue;
@@ -732,7 +730,7 @@ public class WikiUtil {
         StringBuffer sb      = new StringBuffer();
         int          baseIdx = 0;
         while (true) {
-            int idx1 = s.indexOf("{{", baseIdx);
+            int idx1 = s.indexOf(TAG_PREFIX, baseIdx);
             if (idx1 < 0) {
                 sb.append(s.substring(baseIdx));
 

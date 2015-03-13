@@ -178,7 +178,10 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                             new WikiTag(WIKI_TAG_MENU),
                             new WikiTag(WIKI_TAG_ENTRYID),
                             new WikiTag(WIKI_TAG_SEARCH,
-                                        attrs(ATTR_TYPE, "", ARG_MAX, "10",
+                                        attrs(ATTR_TYPE, "", 
+                                              ATTR_FIELDS,"",
+                                              ATTR_METADATA,"",
+                                              ARG_MAX, "10",
                                               ARG_SEARCH_SHOWFORM, "false",
                                               SpecialSearch.ATTR_TABS,
                                               SpecialSearch
@@ -261,7 +264,9 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 return "";
             }
 
+            property = property.replaceAll("//[^\\n\\r]*[\\n|\\r]+", "");
 
+            property = property.replaceAll(".*<p></p>[\\n\\r]+", "");
             property = property.replaceAll("\\n", " ");
             property = property.replaceAll("\r", "");
 
@@ -1300,6 +1305,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             return getEntryManager().getEntryActionsTable(request, entry,
                     type);
         } else if (theTag.equals(WIKI_TAG_SEARCH)) {
+
             String type = Misc.getProperty(props, ATTR_TYPE,
                                            Misc.getProperty(props, ATTR_ID,
                                                TypeHandler.TYPE_ANY));
@@ -1310,6 +1316,17 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             }
             String  incomingMax = request.getString(ARG_MAX, (String) null);
             Request myRequest   = copyRequest(request, props);
+
+            //Pass the wiki attribute into the request to the special search
+            String fields = Misc.getProperty(props, ATTR_FIELDS,(String)null);
+            if(fields!=null) {
+                myRequest.put(SpecialSearch.ARG_FIELDS,fields);
+            } 
+
+            String metadata = Misc.getProperty(props, ATTR_METADATA, (String)null);
+            if(metadata!=null) {
+                myRequest.put(SpecialSearch.ARG_METADATA,metadata);
+            } 
 
             if ( !myRequest.defined(ARG_SEARCH_SHOWHEADER)) {
                 myRequest.put(ARG_SEARCH_SHOWHEADER, "false");
@@ -1332,7 +1349,6 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             }
             SpecialSearch ss = typeHandler.getSpecialSearch();
             ss.processSearchRequest(myRequest, sb);
-
             return sb.toString();
         } else if (theTag.equals(WIKI_TAG_APPLY)) {
             StringBuilder style = new StringBuilder(Misc.getProperty(props,

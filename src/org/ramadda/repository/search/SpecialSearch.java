@@ -1,22 +1,22 @@
 /*
-* Copyright 2008-2015 Geode Systems LLC
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-* software and associated documentation files (the "Software"), to deal in the Software 
-* without restriction, including without limitation the rights to use, copy, modify, 
-* merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
-* permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies 
-* or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-* PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-* OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
-*/
+ * Copyright 2008-2015 Geode Systems LLC
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
+ * software and associated documentation files (the "Software"), to deal in the Software 
+ * without restriction, including without limitation the rights to use, copy, modify, 
+ * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
+ * permit persons to whom the Software is furnished to do so, subject to the following conditions:
+ * 
+ * The above copyright notice and this permission notice shall be included in all copies 
+ * or substantial portions of the Software.
+ * 
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
+ * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
+ * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
+ * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
+ * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
+ * DEALINGS IN THE SOFTWARE.
+ */
 
 package org.ramadda.repository.search;
 
@@ -59,6 +59,9 @@ import java.util.List;
  * @version $Revision: 1.3 $
  */
 public class SpecialSearch extends RepositoryManager implements RequestHandler {
+
+    public static final String ARG_FIELDS = "fields";
+    public static final String ARG_METADATA = "metadata";
 
     /** _more_ */
     public static final String ATTR_TABS = "tabs";
@@ -150,7 +153,7 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
      * @throws Exception _more_
      */
     public SpecialSearch(Repository repository, Element node, Hashtable props)
-            throws Exception {
+        throws Exception {
         super(repository);
         init(node, props);
     }
@@ -167,20 +170,20 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
           search.synthetic.fields="authors"
           search.synthetic.authors.label="Authors"
           search.synthetic.authors.fields="primary_author,other_authors"
-         */
+        */
         String syntheticIds =
             (String) typeHandler.getProperty("search.synthetic.fields", null);
         if (syntheticIds != null) {
             for (String id :
-                    StringUtil.split(syntheticIds, ",", true, true)) {
+                     StringUtil.split(syntheticIds, ",", true, true)) {
                 String label =
                     (String) typeHandler.getProperty("search.synthetic." + id
-                        + ".label", id);
+                                                     + ".label", id);
                 String fieldString =
                     (String) typeHandler.getProperty("search.synthetic." + id
-                        + ".fields", null);
+                                                     + ".fields", null);
                 syntheticFields.add(new SyntheticField(id, label,
-                        StringUtil.split(fieldString, ",", true, true)));
+                                                       StringUtil.split(fieldString, ",", true, true)));
             }
         }
 
@@ -192,13 +195,13 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
             }
         }
         String tabsToUse = (String) typeHandler.getProperty("search.tabs",
-                               TAB_LIST);
+                                                            TAB_LIST);
         tabs.addAll(StringUtil.split(tabsToUse, ",", true, true));
 
         searchOpen = typeHandler.getProperty("search.searchopen",
                                              "true").equals("true");
         doSearchInitially = typeHandler.getProperty("search.initsearch",
-                "false").equals("true");
+                                                    "false").equals("true");
         showText = typeHandler.getProperty("search.form.text.show",
                                            "true").equals("true");
         showName = typeHandler.getProperty("search.form.name.show",
@@ -274,7 +277,7 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
      * @throws Exception _more_
      */
     public Result processCapabilitiesRequest(Request request)
-            throws Exception {
+        throws Exception {
         request.put(ARG_OUTPUT, "atom");
         request.put(ARG_TYPE, theType);
         //        request.put("atom.id", theType);
@@ -306,7 +309,7 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
      */
     public Result processSearchRequest(Request request) throws Exception {
 
-        StringBuffer sb     = new StringBuffer();
+        StringBuilder sb     = new StringBuilder();
         Result       result = processSearchRequest(request, sb);
         if (result != null) {
             return result;
@@ -314,7 +317,7 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
         result = new Result("Search", sb);
 
         return getRepository().getEntryManager().addEntryHeader(request,
-                getRepository().getEntryManager().getTopGroup(), result);
+                                                                getRepository().getEntryManager().getTopGroup(), result);
     }
 
 
@@ -332,7 +335,7 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
      * @throws Exception _more_
      */
     public Result processSearchRequest(Request request, Appendable sb)
-            throws Exception {
+        throws Exception {
 
 
         int contentsWidth  = 750;
@@ -343,6 +346,8 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
         List<Entry> entries    = new ArrayList<Entry>();
         List<Entry> groups     = new ArrayList<Entry>();
         boolean     refinement = request.exists(ARG_SEARCH_REFINE);
+
+
 
 
         if ( !request.exists(ARG_MAX)) {
@@ -373,7 +378,7 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
                             Column column = typeHandler.getColumn(columnName);
                             if (column != null) {
                                 column.addTextSearch(request.getString(id),
-                                        extra);
+                                                     extra);
                             }
                         }
                     }
@@ -387,7 +392,7 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
 
             List[] groupAndEntries =
                 getRepository().getEntryManager().getEntries(request,
-                    criteriaSB, extra);
+                                                             criteriaSB, extra);
             groups  = (List<Entry>) groupAndEntries[0];
             entries = (List<Entry>) groupAndEntries[1];
             allEntries.addAll(groups);
@@ -400,8 +405,8 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
                 getRepository().getOutputHandler(request);
 
             return outputHandler.outputGroup(
-                request, null, getEntryManager().getDummyGroup(), groups,
-                entries);
+                                             request, null, getEntryManager().getDummyGroup(), groups,
+                                             entries);
         }
 
         if (request.exists("timelinexml")) {
@@ -427,7 +432,7 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
 
 
         MapInfo map = getRepository().getMapManager().createMap(request,
-                          contentsWidth, contentsHeight, true);
+                                                                contentsWidth, contentsHeight, true);
 
         getMapManager().addToMap(request, map, allEntries, false, null, true);
         Rectangle2D.Double bounds = getEntryManager().getBounds(allEntries);
@@ -443,22 +448,22 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
         //        map.centerOn(bounds);
         map.addJS(map.getVariableName() + ".initMap(true);\n");
         if (request.defined(ARG_AREA_NORTH) && request.defined(ARG_AREA_WEST)
-                && request.defined(ARG_AREA_SOUTH)
-                && request.defined(ARG_AREA_EAST)) {
+            && request.defined(ARG_AREA_SOUTH)
+            && request.defined(ARG_AREA_EAST)) {
             map.addJS(
-                HtmlUtils.call(
-                    map.getVariableName() + ".setSelectionBox",
-                    request.get(ARG_AREA_NORTH, 0.0) + ","
-                    + request.get(ARG_AREA_WEST, 0.0) + ","
-                    + request.get(ARG_AREA_SOUTH, 0.0) + ","
-                    + request.get(ARG_AREA_EAST, 0.0)));
+                      HtmlUtils.call(
+                                     map.getVariableName() + ".setSelectionBox",
+                                     request.get(ARG_AREA_NORTH, 0.0) + ","
+                                     + request.get(ARG_AREA_WEST, 0.0) + ","
+                                     + request.get(ARG_AREA_SOUTH, 0.0) + ","
+                                     + request.get(ARG_AREA_EAST, 0.0)));
 
         }
 
 
 
         String initParams = HtmlUtils.squote(ARG_AREA) + "," + true + ","
-                            + "0";
+            + "0";
         map.addJS(map.getVariableName() + ".setSelection(" + initParams
                   + ");\n");
         map.centerOn(bounds);
@@ -468,13 +473,13 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
 
         String tabsProp = request.getString("search.tabs",
                                             request.getString("tabs",
-                                                (String) null));
+                                                              (String) null));
         if (tabsProp != null) {
             tabsToUse = StringUtil.split(tabsProp, ",", true, true);
         }
 
         boolean georeferencedResults = tabsToUse.contains(TAB_MAP)
-                                       || tabsToUse.contains(TAB_EARTH);
+            || tabsToUse.contains(TAB_EARTH);
 
 
         List<String> tabContents = new ArrayList<String>();
@@ -483,23 +488,23 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
 
 
         getRepository().getCalendarOutputHandler().makeTimeline(request, null,  //Pass null for the main entry
-                allEntries, timelineSB,
-                "width:" + contentsWidth + "px; height: " + contentsHeight
-                + "px;");
+                                                                allEntries, timelineSB,
+                                                                "width:" + contentsWidth + "px; height: " + contentsHeight
+                                                                + "px;");
 
 
         StringBuffer mapSB = new StringBuffer(
-                                 HtmlUtils.italics(
-                                     msg("Shift-drag to select region")));
+                                              HtmlUtils.italics(
+                                                                msg("Shift-drag to select region")));
         mapSB.append(map.getHtml());
 
         if (refinement) {
             tabTitles.add(msg("Results"));
             tabContents.add(
-                HtmlUtils.div(
-                    getPageHandler().showDialogNote(
-                        "Search criteria refined"), HtmlUtils.style(
-                        "min-width:" + minWidth + "px")));
+                            HtmlUtils.div(
+                                          getPageHandler().showDialogNote(
+                                                                          "Search criteria refined"), HtmlUtils.style(
+                                                                                                                      "min-width:" + minWidth + "px")));
         } else if ( !doSearch) {
             tabTitles.add(msg("Results"));
             tabContents.add("");
@@ -508,46 +513,46 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
             if (allEntries.size() == 0) {
                 tabTitles.add(msg("Results"));
                 tabContents.add(
-                    HtmlUtils.div(
-                        getPageHandler().showDialogNote(
-                            LABEL_NO_ENTRIES_FOUND), HtmlUtils.style(
-                            "min-width:" + minWidth + "px")));
+                                HtmlUtils.div(
+                                              getPageHandler().showDialogNote(
+                                                                              LABEL_NO_ENTRIES_FOUND), HtmlUtils.style(
+                                                                                                                       "min-width:" + minWidth + "px")));
             } else {
                 for (String tab : tabsToUse) {
                     if (tab.equals(TAB_LIST)) {
                         StringBuffer listSB = new StringBuffer();
                         makeEntryList(request, listSB, allEntries);
                         tabContents.add(HtmlUtils.div(listSB.toString(),
-                                HtmlUtils.style("min-width:" + minWidth
-                                    + "px")));
+                                                      HtmlUtils.style("min-width:" + minWidth
+                                                                      + "px")));
                         tabTitles.add(HtmlUtils.img(iconUrl(ICON_LIST)) + " "
                                       + msg("List"));
                     } else if (tab.equals(TAB_MAP)) {
                         tabContents.add(HtmlUtils.div(mapSB.toString(),
-                                HtmlUtils.style("min-width:" + minWidth
-                                    + "px")));
+                                                      HtmlUtils.style("min-width:" + minWidth
+                                                                      + "px")));
                         tabTitles.add(HtmlUtils.img(iconUrl(ICON_MAP)) + " "
                                       + msg("Map"));
                     } else if (tab.equals(TAB_TIMELINE)) {
                         tabContents.add(HtmlUtils.div(timelineSB.toString(),
-                                HtmlUtils.style("min-width:" + minWidth
-                                    + "px")));
+                                                      HtmlUtils.style("min-width:" + minWidth
+                                                                      + "px")));
                         tabTitles.add(HtmlUtils.img(iconUrl(ICON_TIMELINE))
                                       + " " + msg("Timeline"));
                     } else if (tab.equals(TAB_EARTH)
                                && getMapManager().isGoogleEarthEnabled(
-                                   request)) {
+                                                                       request)) {
                         StringBuffer earthSB = new StringBuffer();
                         getMapManager().getGoogleEarth(
-                            request, allEntries, earthSB,
-                            contentsWidth - MapManager.EARTH_ENTRIES_WIDTH,
-                            contentsHeight, true, false);
+                                                       request, allEntries, earthSB,
+                                                       contentsWidth - MapManager.EARTH_ENTRIES_WIDTH,
+                                                       contentsHeight, true, false);
                         tabContents.add(HtmlUtils.div(earthSB.toString(),
-                                HtmlUtils.style("min-width:" + minWidth
-                                    + "px")));
+                                                      HtmlUtils.style("min-width:" + minWidth
+                                                                      + "px")));
                         tabTitles.add(
-                            HtmlUtils.img(iconUrl(ICON_GOOGLEEARTH)) + " "
-                            + msg("Earth"));
+                                      HtmlUtils.img(iconUrl(ICON_GOOGLEEARTH)) + " "
+                                      + msg("Earth"));
                     }
                 }
             }
@@ -566,19 +571,19 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
 
         StringBuffer rightSide = new StringBuffer();
         getRepository().getHtmlOutputHandler().showNext(request,
-                allEntries.size(), rightSide);
+                                                        allEntries.size(), rightSide);
         rightSide.append(tabs);
 
         boolean showForm = request.get(ARG_SEARCH_SHOWFORM, true);
         if (showForm) {
             sb.append(
-                "<table width=100% border=0 cellpadding=0 cellspacing=0><tr valign=top>");
+                      "<table width=100% border=0 cellpadding=0 cellspacing=0><tr valign=top>");
             sb.append(HtmlUtils.col(formSB.toString(), ""));
             sb.append(
-                HtmlUtils.col(
-                    rightSide.toString(),
-                    HtmlUtils.style("min-width:" + minWidth + "px;")
-                    + HtmlUtils.attr(HtmlUtils.ATTR_ALIGN, "left")));
+                      HtmlUtils.col(
+                                    rightSide.toString(),
+                                    HtmlUtils.style("min-width:" + minWidth + "px;")
+                                    + HtmlUtils.attr(HtmlUtils.ATTR_ALIGN, "left")));
             sb.append("</table>");
         } else {
             sb.append(rightSide);
@@ -604,48 +609,65 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
      * @throws Exception _more_
      */
     private void makeSearchForm(Request request, Appendable formSB)
-            throws Exception {
+        throws Exception {
+        boolean showDefault  = true;
 
+
+        List<String> metadataTypesToUse =  metadataTypes;
+        if(request.defined(ARG_METADATA)) {
+            metadataTypesToUse =  StringUtil.split(request.getString(ARG_METADATA, ""),",",true,true);
+        }
+
+        List<String> fieldsList = StringUtil.split(request.getString(ARG_FIELDS,""),",",true,true);
+
+
+        HashSet<String> fieldsToShow = null;
+
+        if(fieldsList.size()>0) {
+            fieldsToShow = new HashSet<String>();
+            fieldsToShow.addAll(fieldsList);
+            showDefault = false;
+        }
 
         formSB.append("<div style=\"min-width:200px;\">");
         formSB.append(request.form(URL_SEARCH,
                                    HtmlUtils.attr(HtmlUtils.ATTR_NAME,
-                                       "apisearchform")));
+                                                  "apisearchform")));
         formSB.append(HtmlUtils.br());
         formSB.append(HtmlUtils.formTable());
-        if (showText) {
+        if (showDefault && showText) {
             formSB.append(HtmlUtils.formEntry(msgLabel("Text"),
-                    HtmlUtils.input(ARG_TEXT,
-                                    request.getString(ARG_TEXT, ""),
-                                    HtmlUtils.SIZE_15 + " autofocus ")));
+                                              HtmlUtils.input(ARG_TEXT,
+                                                              request.getString(ARG_TEXT, ""),
+                                                              HtmlUtils.SIZE_15 + " autofocus ")));
         }
 
-        if (showName) {
+        if (showDefault && showName) {
             formSB.append(HtmlUtils.formEntry(msgLabel("Name"),
-                    HtmlUtils.input(ARG_NAME,
-                                    request.getString(ARG_NAME, ""),
-                                    HtmlUtils.SIZE_15 + " autofocus ")));
+                                              HtmlUtils.input(ARG_NAME,
+                                                              request.getString(ARG_NAME, ""),
+                                                              HtmlUtils.SIZE_15 + " autofocus ")));
         }
 
-        if (showDesc) {
+        if (showDefault && showDesc) {
             formSB.append(HtmlUtils.formEntry(msgLabel("Description"),
-                    HtmlUtils.input(ARG_DESCRIPTION,
-                                    request.getString(ARG_DESCRIPTION, ""),
-                                    HtmlUtils.SIZE_15 + " autofocus ")));
+                                              HtmlUtils.input(ARG_DESCRIPTION,
+                                                              request.getString(ARG_DESCRIPTION, ""),
+                                                              HtmlUtils.SIZE_15 + " autofocus ")));
         }
 
-        if (showDate) {
+        if (showDefault && showDate) {
             TypeHandler.addDateSearch(getRepository(), request, formSB,
                                       DateArgument.ARG_DATA, false);
 
         }
 
-        if (showArea) {
+        if (showDefault && showArea) {
             String[] nwse = new String[] {
-                                request.getString(ARG_AREA_NORTH, ""),
-                                request.getString(ARG_AREA_WEST, ""),
-                                request.getString(ARG_AREA_SOUTH, ""),
-                                request.getString(ARG_AREA_EAST, ""), };
+                request.getString(ARG_AREA_NORTH, ""),
+                request.getString(ARG_AREA_WEST, ""),
+                request.getString(ARG_AREA_SOUTH, ""),
+                request.getString(ARG_AREA_EAST, ""), };
 
             MapInfo selectMap =
                 getRepository().getMapManager().createMap(request, true);
@@ -655,23 +677,27 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
         }
 
 
-        for (SyntheticField field : syntheticFields) {
-            String id = field.id;
-            formSB.append(formEntry(request, msgLabel(field.label),
-                                    HtmlUtils.input(id,
-                                        request.getString(id, ""),
-                                        HtmlUtils.SIZE_20)));
+        if(showDefault) { 
+            for (SyntheticField field : syntheticFields) {
+                String id = field.id;
+                formSB.append(formEntry(request, msgLabel(field.label),
+                                        HtmlUtils.input(id,
+                                                        request.getString(id, ""),
+                                                        HtmlUtils.SIZE_20)));
+            }
         }
 
-        typeHandler.addToSpecialSearchForm(request, formSB);
 
-        for (String type : metadataTypes) {
+        typeHandler.addToSpecialSearchForm(request, formSB,fieldsToShow);
+
+
+        for (String type : metadataTypesToUse) {
             MetadataType metadataType =
                 getRepository().getMetadataManager().findType(type);
             if (metadataType != null) {
                 StringBuffer tmpsb = new StringBuffer();
                 metadataType.getHandler().addToSearchForm(request, tmpsb,
-                        metadataType);
+                                                          metadataType);
                 formSB.append(tmpsb);
             }
         }
@@ -680,8 +706,8 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
 
         StringBuffer buttons = new StringBuffer();
         buttons.append(HtmlUtils.buttons(HtmlUtils.submit(msg("Search"),
-                ARG_SEARCH_SUBMIT), HtmlUtils.submit(msg("Refine"),
-                    ARG_SEARCH_REFINE)));
+                                                          ARG_SEARCH_SUBMIT), HtmlUtils.submit(msg("Refine"),
+                                                                                               ARG_SEARCH_REFINE)));
 
 
         boolean doSearch = true;
@@ -693,35 +719,35 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
 
 
             for (OutputType outputType : new OutputType[] {
-                KmlOutputHandler.OUTPUT_KML, ZipOutputHandler.OUTPUT_ZIPTREE,
-                AtomOutputHandler.OUTPUT_ATOM, JsonOutputHandler.OUTPUT_JSON,
-                CsvOutputHandler.OUTPUT_CSV, ZipOutputHandler.OUTPUT_EXPORT,
-                BulkDownloadOutputHandler.OUTPUT_CURL
-            }) {
+                    KmlOutputHandler.OUTPUT_KML, ZipOutputHandler.OUTPUT_ZIPTREE,
+                    AtomOutputHandler.OUTPUT_ATOM, JsonOutputHandler.OUTPUT_JSON,
+                    CsvOutputHandler.OUTPUT_CSV, ZipOutputHandler.OUTPUT_EXPORT,
+                    BulkDownloadOutputHandler.OUTPUT_CURL
+                }) {
                 if (outputType.getIcon() != null) {
                     links.append(
-                        HtmlUtils.img(iconUrl(outputType.getIcon())));
+                                 HtmlUtils.img(iconUrl(outputType.getIcon())));
                     links.append(" ");
                 }
 
                 links.append(
-                    HtmlUtils.href(
-                        baseUrl + "&"
-                        + HtmlUtils.arg(
-                            ARG_OUTPUT,
-                            outputType.toString()), outputType.getLabel()));
+                             HtmlUtils.href(
+                                            baseUrl + "&"
+                                            + HtmlUtils.arg(
+                                                            ARG_OUTPUT,
+                                                            outputType.toString()), outputType.getLabel()));
                 links.append(HtmlUtils.br());
             }
             buttons.append(HtmlUtils.makeShowHideBlock(msg("More..."),
-                    links.toString(), false));
+                                                       links.toString(), false));
         }
 
 
         if (request.exists(ARG_USER_ID)) {
             formSB.append(HtmlUtils.formEntry(msgLabel("User"),
-                    HtmlUtils.input(ARG_USER_ID,
-                                    request.getString(ARG_USER_ID, ""),
-                                    HtmlUtils.SIZE_20)));
+                                              HtmlUtils.input(ARG_USER_ID,
+                                                              request.getString(ARG_USER_ID, ""),
+                                                              HtmlUtils.SIZE_20)));
         }
 
         formSB.append(HtmlUtils.formEntry("", buttons.toString()));
@@ -744,9 +770,9 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
      */
     public void makeEntryList(Request request, Appendable sb,
                               List<Entry> entries)
-            throws Exception {
+        throws Exception {
         getRepository().getHtmlOutputHandler().makeTable(request, entries,
-                sb);
+                                                         sb);
     }
 
     /**
