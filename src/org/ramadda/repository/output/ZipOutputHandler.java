@@ -484,11 +484,10 @@ public class ZipOutputHandler extends OutputHandler {
                     getRepository().getXmlOutputHandler().getEntryTag(null,
                         entry, fileWriter, entriesRoot.getOwnerDocument(),
                         entriesRoot, true, level != 0);
-                System.err.println ("exporting:" + XmlUtil.toString(entryNode));
+                //                System.err.println ("exporting:" + XmlUtil.toString(entryNode));
             }
 
             if (entry.isGroup() && recurse) {
-                System.err.println ("doing group");
                 Entry group = (Entry) entry;
                 List<Entry> children = getEntryManager().getChildren(request,
                                            group);
