@@ -358,7 +358,7 @@ public class Admin extends RepositoryManager {
     private StringBuffer getLicenseForm() throws Exception {
         StringBuffer sb = new StringBuffer();
         String license = getStorageManager().readSystemResource(
-                             "/org/ramadda/repository/resources/license.txt");
+                             "/org/ramadda/repository/resources/ramadda_license.txt");
         sb.append(HtmlUtils.textArea("", license, 20, 75));
         sb.append("<p>");
         sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
