@@ -68,6 +68,14 @@ h3 {
     color: black;
 }
 
+.ramadda-admin-note {
+       display:inline-block;
+       width:850px;                    
+//       margin-top: 5px;
+       margin-bottom: 15px;
+}
+
+
 .ramadda-section h2 {
    font-weight: 300;
 }
@@ -1058,6 +1066,7 @@ label {
 .ramadda-heading-1 {
    border-bottom: 1px #999 solid;
    font-weight: bold;
+   font-weight: 500;
    padding-left: 10px;
    padding-top: 3px;
    padding-bottom: 0px;
@@ -2267,7 +2276,7 @@ a.toggleblocklabellink:visited {
 
 
 .formlabel, .formlabeltop {
-  font-weight: bold;
+  font-weight: 500;
   text-align:right;
   vertical-align: top;
   color: #000;
@@ -2550,7 +2559,8 @@ a.toggleblocklabellink:visited {
 
 .wiki-h3, .wiki-h4, .wiki-h5, .wiki-h6 {
 	border-bottom: none;
-	font-weight: bold;
+        font-weight: 500;
+//	font-weight: bold;
 }
 .wiki-h3 { xfont-size: 130%; }
 .wiki-h4 { xfont-size: 110%; color: #888;}

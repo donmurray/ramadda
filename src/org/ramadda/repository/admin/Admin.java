@@ -245,6 +245,9 @@ public class Admin extends RepositoryManager {
     private Hashtable<String, AdminHandler> adminHandlerMap =
         new Hashtable<String, AdminHandler>();
 
+    private Boolean installationComplete;
+
+
 
     /**
      * _more_
@@ -279,8 +282,11 @@ public class Admin extends RepositoryManager {
      * @return _more_
      */
     public boolean getInstallationComplete() {
-        return getRepository().getDbProperty(ARG_ADMIN_INSTALLCOMPLETE,
-                                             false);
+        if(installationComplete==null) {
+            installationComplete = new Boolean(getRepository().getDbProperty(ARG_ADMIN_INSTALLCOMPLETE,
+                                                                             false));
+        }
+        return installationComplete.booleanValue();
     }
 
 
@@ -359,7 +365,7 @@ public class Admin extends RepositoryManager {
         StringBuffer sb = new StringBuffer();
         String license = getStorageManager().readSystemResource(
                              "/org/ramadda/repository/resources/ramadda_license.txt");
-        sb.append(HtmlUtils.textArea("", license, 20, 75));
+        sb.append(HtmlUtils.textArea("", license, 20, 120));
         sb.append("<p>");
         sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
                                  HtmlUtils.cssClass(CSS_CLASS_HIGHLIGHT)));
@@ -368,11 +374,14 @@ public class Admin extends RepositoryManager {
         sb.append(
             "I agree to the above terms and conditions of use of the RAMADDA software");
         sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
-        sb.append("<p>");
-
+        sb.append(HtmlUtils.br());
         return sb;
     }
 
+
+    private String note(String s) {
+        return "<div class=\"ramadda-admin-note\">" + s +"</div>\n";
+    }
 
     /**
      * _more_
@@ -392,17 +401,17 @@ public class Admin extends RepositoryManager {
             didIt(ARG_ADMIN_LICENSEREAD);
         }
 
-        if ( !haveDone(ARG_ADMIN_INSTALLNOTICESHOWN)) {
+        if(request.exists(ARG_ADMIN_INSTALLNOTICESHOWN)) {
+            didIt(ARG_ADMIN_INSTALLNOTICESHOWN);
+        }
+        if (!haveDone(ARG_ADMIN_INSTALLNOTICESHOWN)) {
             title = "Installation";
-            sb.append(
-                getPageHandler().showDialogNote(
-                    "<div style=\"width: 500px;\">Thank you for trying out Geode System's RAMADDA Repository. Listed below is the RAMADDA home directory and database information. If you want to change these settings please consult the <a target=\"other\" href=\"" + HELP_ROOT + "/userguide/installing.html#home\">documentation</a> before continuing with the installation process.</div>"));
+            sb.append(note("Thank you for trying out Geode System's RAMADDA Repository. Listed below is the RAMADDA home directory and database information. If you want to change these settings please consult the <a target=\"other\" href=\"" + HELP_ROOT + "/userguide/installing.html#home\">documentation</a> before continuing with the installation process."));
             sb.append(HtmlUtils.formTable());
             getStorageManager().addInfo(sb);
             getDatabaseManager().addInfo(sb);
-            sb.append(HtmlUtils.formEntry("", HtmlUtils.submit(msg("Next"))));
+            sb.append(HtmlUtils.formEntry("", HtmlUtils.submit(msg("Next"),ARG_ADMIN_INSTALLNOTICESHOWN)));
             sb.append(HtmlUtils.formTableClose());
-            didIt(ARG_ADMIN_INSTALLNOTICESHOWN);
         } else if ( !haveDone(ARG_ADMIN_LICENSEREAD)) {
             title = "License";
             sb.append(getLicenseForm());
@@ -454,6 +463,8 @@ public class Admin extends RepositoryManager {
                     getUserManager().makeOrUpdateUser(user, false);
                     didIt(ARG_ADMIN_ADMINCREATED);
                     didIt(ARG_ADMIN_INSTALLCOMPLETE);
+                    //Make  sure to clear this so it gets read again
+                    installationComplete = null;
 
                     String[] propArgs = new String[] { PROP_REPOSITORY_NAME,
                             PROP_HOSTNAME, PROP_PORT, PROP_REPOSITORY_NAME,
@@ -476,10 +487,7 @@ public class Admin extends RepositoryManager {
                     //NOT NOW:
                     //                    getRegistryManager().applyInstallForm(request);
 
-                    sb.append(
-                        getPageHandler().showDialogNote(
-                            "Initial configuration process is complete."));
-                    sb.append(HtmlUtils.p());
+                    sb.append(note("Initial configuration process is complete."));
 
                     Entry topEntry = getEntryManager().getTopGroup();
                     topEntry.setName(request.getString(PROP_REPOSITORY_NAME,
@@ -535,7 +543,12 @@ public class Admin extends RepositoryManager {
                                 msg("Error") + "<br>" + errorBuffer));
                     }
 
-                    return new Result("", sb);
+                    StringBuilder html = new StringBuilder();
+                    html.append(HtmlUtils.sectionOpen());
+                    html.append(HtmlUtils.h2("RAMADDA Install"));
+                    html.append(sb);
+                    html.append(HtmlUtils.sectionClose());
+                    return new Result("Repository Initialization", html);
                 }
             }
 
@@ -543,16 +556,13 @@ public class Admin extends RepositoryManager {
                 sb.append(getPageHandler().showDialogError(msg("Error")
                         + "<br>" + errorBuffer));
             }
-            sb.append("Please enter the following information.");
-            sb.append(
-                " This information is used to configure your RAMADDA server and is not sent anywhere.");
+            sb.append(note("Please enter the following information. This information is used to configure your RAMADDA server and is not sent anywhere."));
             String required1 =
                 " <span class=\"ramadda-required-field\">* required</span>";
             String required2 =
                 " <span class=\"ramadda-required-field\">*</span>";
-            sb.append(request.form(getRepository().URL_INSTALL));
             sb.append(HtmlUtils.formTable());
-            sb.append(HtmlUtils.colspan(msgHeader("Administrator Login"), 2));
+            sb.append(HtmlUtils.row(HtmlUtils.colspan(msgHeader("Administrator Login"), 2)));
             sb.append(
                 HtmlUtils.formEntry(
                     msgLabel("ID"),
@@ -579,7 +589,7 @@ public class Admin extends RepositoryManager {
                     HtmlUtils.password(UserManager.ARG_USER_PASSWORD2)
                     + required2));
 
-            sb.append(HtmlUtils.colspan(msgHeader("Server Information"), 2));
+            sb.append(HtmlUtils.row(HtmlUtils.colspan(msgHeader("Server Information"), 2)));
             String hostname = "";
             String port     = "";
             if (request.getHttpServletRequest() != null) {
@@ -601,24 +611,6 @@ public class Admin extends RepositoryManager {
                             getRepository().getProperty(
                                 PROP_REPOSITORY_NAME,
                                 "RAMADDA Repository")), HtmlUtils.SIZE_60)));
-            sb.append(
-                HtmlUtils.formEntryTop(
-                    msgLabel("Description"),
-                    HtmlUtils.textArea(
-                        PROP_REPOSITORY_DESCRIPTION,
-                        getProperty(PROP_REPOSITORY_DESCRIPTION, ""), 5,
-                        60)));
-
-            /*
-            sb.append(HtmlUtils
-                .formEntry(msgLabel("Hostname"), HtmlUtils
-                    .input(PROP_HOSTNAME, hostname, HtmlUtils
-                        .SIZE_60) + " (Use  &quot;ipaddress&quot; for dynamic IPS)"));
-            sb.append(HtmlUtils.formEntry(msgLabel("HTTP Port"),
-                                          HtmlUtils.input(PROP_PORT, port,
-                                              HtmlUtils.SIZE_10)));
-            */
-            sb.append(HtmlUtils.colspan(msgHeader("Plugins"), 2));
 
             sb.append(
                 HtmlUtils.formEntry(
@@ -631,23 +623,19 @@ public class Admin extends RepositoryManager {
                         HtmlUtils.checkbox("plugin." + plugin, "true", true)
                         + " " + "Install plugin: "
                         + IOUtil.stripExtension(IOUtil.getFileTail(plugin))));
-                sb.append(HtmlUtils.br());
             }
-
-
-            //NOT NOW
-            //sb.append(HtmlUtils.colspan(msgHeader("Registry"), 2));
-            //            getRegistryManager().addToInstallForm(request, sb);
-
             sb.append(HtmlUtils.formTableClose());
-            sb.append(HtmlUtils.p());
+            sb.append(HtmlUtils.br());
             sb.append(HtmlUtils.submit(msg("Initialize Server")));
         }
 
+
         StringBuffer finalSB = new StringBuffer();
         finalSB.append(request.form(getRepository().URL_INSTALL));
-        //        finalSB.append(msgHeader(title));
-        finalSB.append(HtmlUtils.section(sb.toString(), title));
+        finalSB.append(HtmlUtils.sectionOpen());
+        finalSB.append(HtmlUtils.h2(title));
+        finalSB.append(sb);
+        finalSB.append(HtmlUtils.sectionClose());
         finalSB.append(HtmlUtils.formClose());
 
         return new Result(msg(title), finalSB);

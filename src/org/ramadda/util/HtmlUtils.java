@@ -1054,7 +1054,7 @@ public class HtmlUtils {
      */
     public static String section(String content, String title) {
         if (title != null) {
-            return div(tag("h2", "", title) + content,
+            return div(tag(TAG_DIV, cssClass("ramadda-section-header"), title) + content,
                        cssClass("ramadda-section"));
         }
 

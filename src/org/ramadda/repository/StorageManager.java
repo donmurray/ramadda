@@ -351,7 +351,6 @@ public class StorageManager extends RepositoryManager {
             } else {}
         }
         repositoryDir = new File(repositoryDirProperty);
-        System.out.println("RAMADDA: home directory: " + repositoryDir);
         if ( !repositoryDir.exists()) {
             makeDirRecursive(repositoryDir);
         }

@@ -908,14 +908,16 @@ public class Repository extends RepositoryBase implements RequestHandler,
         initServer();
         StringBuilder statusMsg =
             new StringBuilder("RAMADDA: repository started");
-        statusMsg.append("  --  Version:"
+        statusMsg.append("  --  Home dir: " + getStorageManager().getRepositoryDir());
+
+        statusMsg.append("  --  Version: "
                          + getProperty(PROP_BUILD_VERSION, "1.0"));
-        statusMsg.append("  --  Build Date:"
+        statusMsg.append("  --  Build Date: "
                          + getProperty(PROP_BUILD_DATE, "N/A"));
-        getLogManager().logInfoAndPrint(statusMsg.toString());
-        getLogManager().logInfoAndPrint("RAMADDA: using Java version: "
+        statusMsg.append(" -- Java version: "
                                         + getProperty(PROP_JAVA_VERSION,
-                                            "N/A"));
+                                                      "N/A"));
+        getLogManager().logInfoAndPrint(statusMsg.toString());
     }
 
     /**

@@ -421,7 +421,7 @@ public class PageHandler extends RepositoryManager {
                 HtmlUtils.cssClass("ramadda-system-message")) + content;
         }
 
-        if ( !getRepository().isRegistered()) {
+        if ( !getRepository().isRegistered() && getAdmin().getInstallationComplete()) {
             content = REGISTER_MESSAGE + content;
         }
 

@@ -3780,7 +3780,7 @@ public class TypeHandler extends RepositoryManager {
                                     rows,
                                     getProperty(entry,
                                         "form.description.columns",
-                                        100), HtmlUtils.id(ARG_DESCRIPTION));
+                                        120), HtmlUtils.id(ARG_DESCRIPTION));
                             sb.append(
                                 HtmlUtils.formEntryTop(
                                     msgLabel("Wiki Text"), textWidget));

@@ -20,9 +20,8 @@
 
 
 <entry parent="utilities" name="Metadata List" type="wikipage" >
-<wikitext>
-== Metadata Listing ==
-
+<wikitext><![CDATA[
++section label="{{name}}"
 {{display   
 type="metadata"  
 orientation="vertical"
@@ -31,7 +30,8 @@ layoutHere="true"
 showMetadata="false"
 innerHeight="200" 
 }}
-</wikitext>
+-section
+]]></wikitext>
 </entry>
 
 
@@ -63,9 +63,8 @@ search
 
 
 <entry parent="utilities" name="Search Page" type="wikipage" >
-<wikitext>
-== Search ==
-
+<wikitext><![CDATA[
++section label="{{name}}"
 {{display   
 type="entrylist"  
 orientation="vertical"
@@ -74,7 +73,8 @@ layoutHere="true"
 showMetadata="false"
 innerHeight="200" 
 }}
-</wikitext>
+-section
+]]></wikitext>
 </entry>
 
 

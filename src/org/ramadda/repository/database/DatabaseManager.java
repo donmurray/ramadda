@@ -259,7 +259,6 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
             } catch (Exception exc) {
                 logError("Closing data source", exc);
             }
-            System.err.println("DatabaseManager:reInitialize");
             dataSource = doMakeDataSource();
         }
     }
@@ -322,8 +321,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                     getRepository().getProperty("db.name", "repository"));
 
             connectionURL = connectionURL.trim();
-            System.err.println("RAMADDA: DatabaseManager connection url:"
-                               + connectionURL + " user name:" + userName);
+            System.err.println("RAMADDA: DatabaseManager connection url:"                              + connectionURL + " user name:" + userName);
 
             String encryptPassword =
                 getStorageManager().getEncryptionPassword();
@@ -414,10 +412,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
         ds.setRemoveAbandonedOnBorrow(true);
         ds.setRemoveAbandonedOnMaintenance(true);
 
-        System.err.println("DatabaseManager.makeDataSource: url="
-                           + connectionUrl);
-        System.err.println("JDBC driver class:" + driverClassName
-                           + " db type:" + dbType);
+        //        System.err.println("DatabaseManager.makeDataSource: url="  + connectionUrl);
+        //        System.err.println("JDBC driver class:" + driverClassName + " db type:" + dbType);
 
         ds.setDriverClassName(driverClassName);
         ds.setUsername(userName);
