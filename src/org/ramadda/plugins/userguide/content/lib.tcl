@@ -1,7 +1,11 @@
 
+##
+## Note: the lib.tcl is generated during the build process from lib.tcl.template
+##
+
 gen::setDoTclEvaluation 1
 gen::setTargetDir ../htdocs/userguide
-gen::defineMacro {<%ramadda.version%>} {1.8b}
+gen::defineMacro {<%ramadda.version%>} {1.7}
 
 
 namespace eval wiki {}

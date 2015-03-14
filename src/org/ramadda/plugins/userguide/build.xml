@@ -13,6 +13,8 @@
     <target name="userguide">
       <echo message="Generating user guide content"/>
       <property file="${basedir}/build.properties"/>
+      <echo message="Building docs for version: ${version}"/>
+
 <!--
     copy the lib.tcl.template to lib.tcl so we get the version added
 -->
