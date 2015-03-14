@@ -133,8 +133,7 @@ public class LogManager extends RepositoryManager {
     /** _more_ */
     public static boolean debug = true;
 
-    private  boolean makeTestLog = false;
-
+    private PrintWriter testLogWriter;
 
     /** _more_ */
     private List<LogEntry> log = new ArrayList<LogEntry>();
@@ -150,19 +149,27 @@ public class LogManager extends RepositoryManager {
     public LogManager(Repository repository) {
         super(repository);
         LOGGER_OK = repository.getProperty(PROP_USELOG4J, true);
-        makeTestLog  = getProperty("ramadda.maketestlog", false);
     }
 
 
     /**
      * _more_
      */
-    public void init() {}
+    public void init() {
+    }
+
+    public void initLogs() throws Exception {
+        String testLog = getProperty("ramadda.log.test", (String) null); 
+        if(testLog!=null) {
+            testLogWriter = new PrintWriter(new FileOutputStream(new File(testLog)));
+        }
+    }
 
 
     public void writeTestLog(Request request) {
-        if(makeTestLog && !request.isPost()) {
-            System.out.println(getRepository().absoluteUrl(request.getUrl()));
+        if(testLogWriter!=null  && !request.isPost() && !request.getIsRobot() && request.isAnonymous()) {
+            testLogWriter.println(getRepository().absoluteUrl(request.getUrl()));
+            testLogWriter.flush();
         }
     }
 

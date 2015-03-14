@@ -1314,6 +1314,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
         }
 
         getHarvesterManager().initHarvesters();
+        getLogManager().initLogs();
+
 
         //Do this in a thread because (on macs) it hangs sometimes)
         Misc.run(this, "getFtpManager");
