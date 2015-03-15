@@ -2049,6 +2049,11 @@ public class Column implements DataTypes, Constants {
             }
         }
 
+        //xxxx
+        if (required) {
+            widget = widget +" " + HtmlUtils.span("* " + msg("required"),HtmlUtils.cssClass("ramadda-required-field"));
+        }
+
         return typeHandler.getFormWidget(request, entry, this, widget);
     }
 

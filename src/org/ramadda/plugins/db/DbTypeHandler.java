@@ -404,6 +404,8 @@ public class DbTypeHandler extends BlobTypeHandler {
     /** _more_ */
     protected List<Column> columnsToUse;
 
+
+
     /** _more_ */
     private Column dfltSortColumn;
 
@@ -765,6 +767,18 @@ public class DbTypeHandler extends BlobTypeHandler {
         return entry.getName();
     }
 
+
+    public List<Column> getColumns() {
+        return columns;
+    }
+
+    public Column getColumn(String name) {
+        return columnMap.get(name);
+    }
+
+    protected GenericTypeHandler getTableTypeHandler() {
+        return tableHandler;
+    }
 
     /**
      * _more_
