@@ -754,9 +754,23 @@ public class Entry implements Cloneable {
      * @return The Values
      */
     public Object[] getValues() {
-        return values;
+        return getValues(false);
     }
 
+    /**
+     * Get the Values property
+     * @param clone true to clone the values
+     * @return the values or a clone of them
+     */
+    public Object[] getValues(boolean clone) {
+        if (values == null || !clone) {
+            return values;
+        }
+        Object[] newValues = new Object[values.length];
+        System.arraycopy(values,  0,  newValues,  0, values.length);
+        return newValues;
+    }
+    
     /**
      * _more_
      *
