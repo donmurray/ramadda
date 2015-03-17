@@ -1,0 +1,103 @@
+/* override PSD & RAMADDA defaults */
+
+/* Override bootstrap box stuff */
+#footer, #banner, #major_header, #search {
+  box-sizing: content-box;
+}
+
+.content {
+   min-height: 400px;
+   max-height: none;
+   border: 0px #aaa solid;
+   padding-top:5px;
+}
+
+#major_nav {
+   height: auto;
+}
+
+.ui-button {
+    color: #000;
+}
+
+#search input {
+    color: #000;
+}
+
+.outercontents {
+   padding-top: 0px;
+}
+
+.innercontent {
+   padding-top: 5px;
+   padding-left: 5px;
+   min-height: 400px;
+   max-height: none;
+}
+
+#leftNav h2 {
+   margin: 0em 0.2em 0em 0em;
+   font-weight: bold;
+}
+
+
+/*
+
+.header a:hover  {color:red;}
+.header a {color:black;}
+.header_label {font-size:24px;}
+*/
+
+/*
+
+.entrymenubar {
+   margin-top:5px;
+   background-repeat: repeat-x;
+   background-image:none;
+   padding-top:0px;
+}
+
+.entrymenulink {
+    color: #000000;
+    font-weight: bold;
+}
+
+.navlinks {
+  margin-top:3px;
+  border-bottom: 1px #444 solid;
+}
+
+.subnavoncomp  {
+   background-color:#ffffff;
+   border: 1px #000 solid; 
+   border-bottom: 2px white solid; 
+   padding-left:5;   
+   padding-right:5;   
+   padding-bottom:0px;   
+}
+
+.subnavoffcomp  {
+   background-color:#efefef;
+
+   border-bottom: 0px #999 solid; 
+   border-top: 1px #999 solid; 
+   border-left: 1px #999 solid; 
+   border-right: 1px #999 solid; 
+   padding-left:5;   
+   padding-right:5;   
+   padding-top:2px;   
+   padding-bottom:0px;   
+}
+
+.subnavoffcomp, .subnavoncomp    {
+   border-top-left-radius: 6px;
+   border-top-right-radius: 6px;
+   -moz-border-radius-topleft: 6px;
+   -moz-border-radius-topright: 6px;
+   -webkit-border-top-left-radius: 6px;
+   -webkit-border-top-right-radius: 6px;
+   margin-left:3px;
+   margin-right:3px;
+}
+*/
+
