@@ -532,9 +532,15 @@ var HtmlUtil =  {
                 if(cnt>0) url += "&";
                 cnt++;
                 url += encodeURIComponent(item.name) + "=" + encodeURIComponent(item.value);
+                console.log(item.name +"=" + item.value);
             });
-        var base = window.location.protocol+ "://" + window.location.host;
+
+        var base = window.location.protocol+ "//" + window.location.host;
+        console.log("protocol:" + window.location.protocol);
+        console.log("base:" + base);
+        console.log("url:" + url);
         url = base + url;                        
+        console.log("final:" + url);
         $("#" + outputId).html(HtmlUtil.div(["class","ramadda-form-url"],  HtmlUtil.href(url, HtmlUtil.image(ramaddaBaseUrl +"/icons/link.png")) +" " + url));
     },
     makeUrlShowingForm: function(formId, outputId, skip) {
