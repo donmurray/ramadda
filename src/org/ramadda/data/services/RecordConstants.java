@@ -197,6 +197,8 @@ public interface RecordConstants extends Constants {
     /** url arg */
     public static final String ARG_HILLSHADE_ANGLE = "hillshade.angle";
 
+    public static final String ARG_HEADER = "header";
+
     /** url arg */
     public static final String ARG_WAVEFORM_DISPLAY = "waveform.display";
 

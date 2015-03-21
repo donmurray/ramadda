@@ -664,6 +664,9 @@ public class PointFormHandler extends RecordFormHandler {
                                                  "true", true) + " "
                                                      + msg("Asynchronous")));
 
+        processSB.append(HtmlUtils.formEntry(msgLabel("Alternate header"),
+                                             HtmlUtils.input(ARG_HEADER,"") +" " + "Enter 'none' for no header"));
+
         processSB.append(
             HtmlUtils.formEntry(
                 "",

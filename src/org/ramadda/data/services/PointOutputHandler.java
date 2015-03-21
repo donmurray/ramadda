@@ -1190,7 +1190,10 @@ public class PointOutputHandler extends RecordOutputHandler {
                                          ARG_ENTRYID, mainEntry.getId()));
                     visitInfo.putProperty(CsvVisitor.PROP_SOURCE, url);
                     csvVisitor = new CsvVisitor(getThePrintWriter(),
-                            getFields(request, record.getFields()));
+                                                getFields(request, record.getFields()));
+                    if(request.defined(ARG_HEADER)) {
+                        csvVisitor.setAltHeader(request.getString(ARG_HEADER,""));
+                    }
                 }
                 if ( !jobOK(jobId)) {
                     return false;

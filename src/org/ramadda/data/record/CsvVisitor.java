@@ -57,6 +57,8 @@ public class CsvVisitor extends RecordVisitor {
     /** _more_ */
     private boolean printedHeader = false;
 
+    private String altHeader = null;
+
     /**
      * _more_
      *
@@ -144,33 +146,40 @@ public class CsvVisitor extends RecordVisitor {
         if ( !printedHeader) {
             printedHeader = true;
             cnt           = 0;
-            comment("");
-            pw.append("#" + PROP_FIELDS + "=");
-            for (RecordField field : fields) {
-                //Skip the fake ones
-                if (field.getSynthetic()) {
-                    continue;
+            if(altHeader!=null) {
+                if(!altHeader.equals("none") && altHeader.length()>0) {
+                    pw.append(altHeader);
+                    pw.append("\n");
                 }
-                //Skip the arrays
-                if (field.getArity() > 1) {
-                    continue;
+            } else {
+                comment("");
+                pw.append("#" + PROP_FIELDS + "=");
+                for (RecordField field : fields) {
+                    //Skip the fake ones
+                    if (field.getSynthetic()) {
+                        continue;
+                    }
+                    //Skip the arrays
+                    if (field.getArity() > 1) {
+                        continue;
+                    }
+                    if (cnt > 0) {
+                        pw.append(COLUMN_DELIMITER);
+                    }
+                    cnt++;
+                    field.printCsvHeader(visitInfo, pw);
                 }
-                if (cnt > 0) {
-                    pw.append(COLUMN_DELIMITER);
+                pw.append("\n");
+                String source = (String) visitInfo.getProperty(PROP_SOURCE);
+                if (source != null) {
+                    property(PROP_SOURCE, source);
                 }
-                cnt++;
-                field.printCsvHeader(visitInfo, pw);
+                property(PROP_GENERATOR, "Ramadda http://ramadda.org");
+                property(PROP_CREATE_DATE, IsoUtil.format(new Date()));
+                property(PROP_DELIMITER, COLUMN_DELIMITER);
+                property(PROP_MISSING, MISSING);
+                comment("Here comes the data");
             }
-            pw.append("\n");
-            String source = (String) visitInfo.getProperty(PROP_SOURCE);
-            if (source != null) {
-                property(PROP_SOURCE, source);
-            }
-            property(PROP_GENERATOR, "Ramadda http://ramadda.org");
-            property(PROP_CREATE_DATE, IsoUtil.format(new Date()));
-            property(PROP_DELIMITER, COLUMN_DELIMITER);
-            property(PROP_MISSING, MISSING);
-            comment("Here comes the data");
         }
         String encodedDelimiter = Utils.hexEncode(COLUMN_DELIMITER);
         cnt = 0;
@@ -211,6 +220,10 @@ public class CsvVisitor extends RecordVisitor {
         pw.append("\n");
 
         return true;
+    }
+
+    public void setAltHeader(String s) {
+        altHeader = s;
     }
 
 }
