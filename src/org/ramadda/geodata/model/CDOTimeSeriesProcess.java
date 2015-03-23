@@ -196,32 +196,15 @@ public class CDOTimeSeriesProcess extends CDODataProcess {
     }
 
     /**
-     * _more_
-     *
-     * @param dpi _more_
-     *
-     * @return _more_
+     * @overrride
      */
-    @Override
-    public boolean canHandle(ServiceInput dpi) {
-        // TODO Auto-generated method stub
-        if ( !getOutputHandler().isEnabled()) {
+    protected boolean checkForValidEntries(List<Entry> entries) {
+        Entry firstEntry = entries.get(0);
+        if ( !(firstEntry.getTypeHandler()
+                instanceof ClimateModelFileTypeHandler)) {
             return false;
         }
-        for (ServiceOperand op : dpi.getOperands()) {
-            List<Entry> entries = op.getEntries();
-            // TODO: change this when we can handle more than one entry (e.g. daily data)
-            //if (entries.isEmpty() || (entries.size() > 1)) {
-            //    return false;
-            //}
-            Entry firstEntry = entries.get(0);
-            if ( !(firstEntry.getTypeHandler()
-                    instanceof ClimateModelFileTypeHandler)) {
-                return false;
-            }
-        }
-
-        return true;
+       return true;
     }
 
     /**

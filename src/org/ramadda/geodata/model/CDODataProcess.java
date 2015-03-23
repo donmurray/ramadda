@@ -37,6 +37,7 @@ import org.ramadda.repository.type.TypeHandler;
 
 import org.ramadda.service.Service;
 import org.ramadda.service.ServiceInput;
+import org.ramadda.service.ServiceOperand;
 import org.ramadda.sql.Clause;
 import org.ramadda.util.HtmlUtils;
 
@@ -270,4 +271,100 @@ public abstract class CDODataProcess extends Service {
                                            + Repository.msg("Anomaly")));
     }
 
+    /**
+     * Can we handle this input
+     *
+     * @param input  the input
+     *
+     * @return true if we can, otherwise false
+     */
+    public boolean canHandle(ServiceInput input) {
+        if ( !getOutputHandler().isEnabled()) {
+            return false;
+        }
+
+        for (ServiceOperand op : input.getOperands()) {
+            if (checkForValidEntries(op.getEntries())) {
+                continue;
+            } else {
+                return false;
+            }
+        }
+
+        return true;
+    }
+    
+    /**
+     * Check for valid entries.  Subclasses need override as necessary
+     * @param entries  list of entries
+     * @return
+     */
+    protected abstract boolean checkForValidEntries(List<Entry> entries);
+        
+    /**
+     * _more_
+     *
+     * @param years _more_
+     * @param offset _more_
+     *
+     * @return _more_
+     */
+    protected String makeCDOYearsString(List<Integer> years, int offset) {
+        StringBuilder buf = new StringBuilder();
+        for (int year = 0; year < years.size(); year++) {
+            buf.append(years.get(year) + offset);
+            if (year < years.size() - 1) {
+                buf.append(",");
+            }
+        }
+
+        return buf.toString();
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param oneOfThem _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    protected boolean doMonthsSpanYearEnd(Request request, Entry oneOfThem)
+            throws Exception {
+        if (request.defined(CDOOutputHandler.ARG_CDO_MONTHS)
+                && request.getString(
+                    CDOOutputHandler.ARG_CDO_MONTHS).equalsIgnoreCase(
+                    "all")) {
+            return false;
+        }
+        // Can't handle years requests yet.
+        //if (request.defined(CDOOutputHandler.ARG_CDO_YEARS)
+        //        || request.defined(CDOOutputHandler.ARG_CDO_YEARS + "1")) {
+        //    return false;
+        //}
+        if (request.defined(CDOOutputHandler.ARG_CDO_STARTMONTH)
+                || request.defined(CDOOutputHandler.ARG_CDO_ENDMONTH)) {
+            int startMonth =
+                request.defined(CDOOutputHandler.ARG_CDO_STARTMONTH)
+                ? request.get(CDOOutputHandler.ARG_CDO_STARTMONTH, 1)
+                : 1;
+            int endMonth = request.defined(CDOOutputHandler.ARG_CDO_ENDMONTH)
+                           ? request.get(CDOOutputHandler.ARG_CDO_ENDMONTH,
+                                         startMonth)
+                           : startMonth;
+            // if they requested all months, no need to do a select on month
+            if ((startMonth == 1) && (endMonth == 12)) {
+                return false;
+            }
+            if (endMonth > startMonth) {
+                return false;
+            } else if (startMonth > endMonth) {
+                return true;
+            }
+        }
+
+        return false;
+    }
 }

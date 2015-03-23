@@ -195,6 +195,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         int     opNum      = 0;
         int     numThreads      = Math.min(input.getOperands().size(), 6);
         boolean useThreads = false || numThreads > 2;
+        System.err.println("Using threads: "+useThreads);
         ThreadManager threadManager =
             new ThreadManager("CDOArealStatistics.evaluate");
         for (final ServiceOperand op : input.getOperands()) {
@@ -203,7 +204,8 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                                    oneOfThem);
             String frequency = "Monthly";
             if (collection != null) {
-                frequency = collection.getValues()[0].toString();
+                //frequency = collection.getValues()[0].toString();
+                frequency = collection.getValue(0).toString();
             }
             if (frequency.toLowerCase().indexOf("mon") >= 0) {
                 if ( !useThreads) {
@@ -256,7 +258,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      */
     public void addEnsembleMean(Request request, ServiceInput dpi, List<ServiceOperand> ops, String type) throws Exception {
         Entry oneOfThem = ops.get(0).getEntries().get(0);
-        Object[] values = oneOfThem.getValues();
+        Object[] values = oneOfThem.getValues(true);
         StringBuilder fileName = new StringBuilder();
         fileName.append(oneOfThem.getValue(4));
         fileName.append("_MultiModel_");
@@ -289,7 +291,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                                     false, true);
         Entry outputEntry = new Entry(myHandler, true, outputName.toString());
         outputEntry.setResource(resource);
-        Object[] newValues = cloneValues(values);
+        Object[] newValues = values;
         newValues[1] = "MultiModel";
         newValues[3] = "mean";
         outputEntry.setValues(newValues);
@@ -340,23 +342,27 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             dataOutputHandler.getCdmManager().getGridDataset(oneOfThem,
                 oneOfThem.getResource().getPath());
         CalendarDateRange dateRange = dataset.getCalendarDateRange();
-        int firstDataYear = Integer.parseInt(
+        int firstDataYearMM = Integer.parseInt(
                                 new CalendarDateTime(
                                     dateRange.getStart()).formattedString(
-                                    "yyyy",
+                                    "yyyyMM",
                                     CalendarDateTime.DEFAULT_TIMEZONE));
-        int lastDataYear = Integer.parseInt(
+        int firstDataYear = firstDataYearMM/100;
+        int firstDataMonth = firstDataYearMM%100;
+        int lastDataYearMM = Integer.parseInt(
                                new CalendarDateTime(
                                    dateRange.getEnd()).formattedString(
-                                   "yyyy",
+                                   "yyyyMM",
                                    CalendarDateTime.DEFAULT_TIMEZONE));
+        int lastDataYear = lastDataYearMM/100;
+        int lastDataMonth = lastDataYearMM%100;
         if ((dataset == null) || dataset.getGrids().isEmpty()) {
             throw new Exception("No grids found");
         }
         String varname  =
             ((GridDatatype) dataset.getGrids().get(0)).getName();
 
-        Object[] values = oneOfThem.getValues();
+        Object[] values = oneOfThem.getValues(true);
         String tail =
             getOutputHandler().getStorageManager().getFileTail(oneOfThem);
         String       id        = getRepository().getGUID();
@@ -405,6 +411,9 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                                     ? ""
                                     : "" + (opNum + 1);
             boolean      haveYears;
+            // find the start & end month of the request
+            int requestStartMonth = request.get(CDOOutputHandler.ARG_CDO_STARTMONTH, 1);
+            int requestEndMonth = request.get(CDOOutputHandler.ARG_CDO_ENDMONTH, 1);
             if (opNum == 0) {
                 haveYears = request.defined(CDOOutputHandler.ARG_CDO_YEARS);
             } else {
@@ -429,6 +438,11 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                 List<String> yearList = StringUtil.split(yearString, ",",
                                             true, true);
                 for (String year : yearList) {
+                    int iyear = Integer.parseInt(year);
+                    if (iyear <= firstDataYear || iyear > lastDataYear ||
+                            (iyear == lastDataYear && requestEndMonth > lastDataMonth)) {
+                        continue;
+                    }
                     years.add(Integer.parseInt(year));
                 }
                 for (int i = 0; i < 2; i++) {
@@ -441,24 +455,12 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                     newRequest.remove(CDOOutputHandler.ARG_CDO_ENDYEAR
                                       + opStr);
                     if (i == 0) {  // last half of previous year
-                        String yearsToUse = makeYearsString(years, -1);
-                        /*
-                        if ((year - 1 < firstDataYear)
-                                || (year - 1 > lastDataYear)) {
-                            continue;
-                        }
-                        */
+                        String yearsToUse = makeCDOYearsString(years, -1);
                         newRequest.put(CDOOutputHandler.ARG_CDO_ENDMONTH, 12);
                         newRequest.put(CDOOutputHandler.ARG_CDO_YEARS
                                        + opStr, yearsToUse);
                     } else {  // first half of current year
-                        String yearsToUse = makeYearsString(years, 0);
-                        /*
-                        if ((year < firstDataYear)
-                                || (year > lastDataYear)) {
-                            continue;
-                        }
-                        */
+                        String yearsToUse = makeCDOYearsString(years, 0);
                         newRequest.put(CDOOutputHandler.ARG_CDO_STARTMONTH,
                                        1);
                         newRequest.put(CDOOutputHandler.ARG_CDO_YEARS
@@ -486,6 +488,16 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                     request.get(CDOOutputHandler.ARG_CDO_ENDYEAR + opStr,
                                 request.get(CDOOutputHandler.ARG_CDO_ENDYEAR,
                                             1979));
+                // can't go back before the beginning of data or past the last data
+                if (startYear <= firstDataYear) {
+                    startYear = firstDataYear + 1;
+                }
+                if (endYear < lastDataYear) {
+                    endYear = lastDataYear;
+                }
+                if (endYear == lastDataYear && requestEndMonth > lastDataMonth) {
+                    endYear = lastDataYear - 1;
+                }
                 for (int i = 0; i < 2; i++) {
                     List<String> savedServices = new ArrayList(commands);
                     Request      newRequest    = request.cloneMe();
@@ -683,8 +695,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                                     false, true);
         Entry outputEntry = new Entry(myHandler, true, outputName.toString());
         outputEntry.setResource(resource);
-        Object[] newValues = cloneValues(values);
-        outputEntry.setValues(newValues);
+        outputEntry.setValues(values);
         // Add in lineage and associations
         outputEntry.addAssociation(new Association(getRepository().getGUID(),
                 "generated product", "product generated from",
@@ -703,113 +714,13 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         return new ServiceOperand(outputName.toString(), outputEntry);
     }
 
-    /**
-     * Clone the entry values
-     * @param values the values from the entry
-     * @return a clone of the values
-     */
-    private Object[] cloneValues(Object[] values) {
-        Object[] newValues = new Object[values.length];
-        System.arraycopy(values,  0,  newValues,  0, values.length);
-        return newValues;
-    }
-    
-    /**
-     * _more_
-     *
-     * @param years _more_
-     * @param offset _more_
-     *
-     * @return _more_
-     */
-    private String makeYearsString(List<Integer> years, int offset) {
-        StringBuilder buf = new StringBuilder();
-        for (int year = 0; year < years.size(); year++) {
-            buf.append(years.get(year) + offset);
-            if (year < years.size() - 1) {
-                buf.append(",");
-            }
-        }
-
-        return buf.toString();
-    }
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param oneOfThem _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    private boolean doMonthsSpanYearEnd(Request request, Entry oneOfThem)
-            throws Exception {
-        if (request.defined(CDOOutputHandler.ARG_CDO_MONTHS)
-                && request.getString(
-                    CDOOutputHandler.ARG_CDO_MONTHS).equalsIgnoreCase(
-                    "all")) {
-            return false;
-        }
-        // Can't handle years requests yet.
-        //if (request.defined(CDOOutputHandler.ARG_CDO_YEARS)
-        //        || request.defined(CDOOutputHandler.ARG_CDO_YEARS + "1")) {
-        //    return false;
-        //}
-        if (request.defined(CDOOutputHandler.ARG_CDO_STARTMONTH)
-                || request.defined(CDOOutputHandler.ARG_CDO_ENDMONTH)) {
-            int startMonth =
-                request.defined(CDOOutputHandler.ARG_CDO_STARTMONTH)
-                ? request.get(CDOOutputHandler.ARG_CDO_STARTMONTH, 1)
-                : 1;
-            int endMonth = request.defined(CDOOutputHandler.ARG_CDO_ENDMONTH)
-                           ? request.get(CDOOutputHandler.ARG_CDO_ENDMONTH,
-                                         startMonth)
-                           : startMonth;
-            // if they requested all months, no need to do a select on month
-            if ((startMonth == 1) && (endMonth == 12)) {
-                return false;
-            }
-            if (endMonth > startMonth) {
-                return false;
-            } else if (startMonth > endMonth) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    /**
-     * Can we handle this input
-     *
-     * @param input  the input
-     *
-     * @return true if we can, otherwise false
-     */
-    public boolean canHandle(ServiceInput input) {
-        if ( !getOutputHandler().isEnabled()) {
-            return false;
-        }
-
-        for (ServiceOperand op : input.getOperands()) {
-            if (checkForValidEntries(op.getEntries())) {
-                continue;
-            } else {
-                return false;
-            }
-        }
-
-        return true;
-    }
 
     /**
      * Check for valid entries
      * @param entries  list of entries
      * @return
      */
-    private boolean checkForValidEntries(List<Entry> entries) {
+    protected boolean checkForValidEntries(List<Entry> entries) {
         // TODO: change this when we can handle more than one entry (e.g. daily data)
         if (entries.isEmpty()) {
             //if (entries.isEmpty() || (entries.size() > 1)) {

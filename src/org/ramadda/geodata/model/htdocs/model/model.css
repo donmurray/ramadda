@@ -86,6 +86,7 @@ label.selector {
     border: none;
     margin-left: .25em;
     margin-right: .25em;
+    min-height: 5em;
 }
 
 .formtable td {

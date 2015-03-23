@@ -293,6 +293,9 @@ public class NCLModelPlotDataProcess extends Service {
         List<ServiceOperand> ops           = input.getOperands();
         StringBuffer         fileList      = new StringBuffer();
         StringBuffer         nameList      = new StringBuffer();
+        StringBuffer         modelList      = new StringBuffer();
+        StringBuffer         ensList      = new StringBuffer();
+        StringBuffer         expList      = new StringBuffer();
         Entry                inputEntry    = null;
         boolean              haveOne       = false;
         for (ServiceOperand op : ops) {
@@ -303,10 +306,16 @@ public class NCLModelPlotDataProcess extends Service {
                 if (haveOne) {
                     fileList.append(",");
                     nameList.append(";");
+                    modelList.append(";");
+                    expList.append(";");
+                    ensList.append(";");
                 }
                 //fileList.append("\"");
                 fileList.append(entry.getResource().toString());
                 nameList.append(op.getDescription());
+                modelList.append(entry.getValue(1));
+                expList.append(entry.getValue(2));
+                ensList.append(entry.getValue(3));
                 //fileList.append("\"");
                 haveOne = true;
             }
@@ -347,6 +356,9 @@ public class NCLModelPlotDataProcess extends Service {
         envMap.put("wks_name", wksName);
         envMap.put("ncfiles", fileList.toString());
         envMap.put("titles", nameList.toString());
+        envMap.put("models", modelList.toString());
+        envMap.put("exps", expList.toString());
+        envMap.put("ens", ensList.toString());
         envMap.put("productdir", input.getProcessDir().toString());
         envMap.put("plot_type", plotType);
         envMap.put("output", outputType);
