@@ -21,7 +21,9 @@
 package org.ramadda.geodata.model;
 
 
+import org.ramadda.data.services.NoaaPsdMonthlyClimateIndexTypeHandler;
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
+import org.ramadda.geodata.cdmdata.GridTypeHandler;
 import org.ramadda.repository.Constants;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
@@ -149,8 +151,21 @@ public class NCLModelPlotDataProcess extends Service {
         boolean handleMultiple =
             type.equals(ClimateModelApiHandler.ARG_ACTION_MULTI_COMPARE)
             || type.equals(ClimateModelApiHandler.ARG_ACTION_ENS_COMPARE);
+        boolean isCorrelation = 
+            type.equals(ClimateModelApiHandler.ARG_ACTION_CORRELATION);
         sb.append(HtmlUtils.formTable());
-        Entry  first = input.getEntries().get(0);
+        //List<Entry> entries = input.getEntries();
+        Entry first = getFirstGridEntry(input);
+        /*
+        for (Entry entry : entries) {
+            TypeHandler mytype = entry.getTypeHandler();
+            if (mytype instanceof ClimateModelFileTypeHandler ||
+                mytype instanceof GridTypeHandler) {
+                first = entry;
+                break;
+            }
+        }
+        */
 
         String units = "";
 
@@ -168,7 +183,7 @@ public class NCLModelPlotDataProcess extends Service {
         String space1 = HtmlUtils.space(1);
         String space2 = HtmlUtils.space(1);
 
-        if ((input.getOperands().size() > 1) && !handleMultiple) {
+        if ((input.getOperands().size() > 1) && !handleMultiple && !isCorrelation) {
             StringBuilder buttons = new StringBuilder();
             buttons.append(
                 HtmlUtils.radio(
@@ -188,62 +203,66 @@ public class NCLModelPlotDataProcess extends Service {
 
             sb.append(HtmlUtils.formEntry(Repository.msgLabel("Plot As"),
                                           buttons.toString()));
+        } else if (isCorrelation){
+            sb.append(HtmlUtils.hidden(ARG_NCL_OUTPUT, "corr"));
         } else {
             sb.append(HtmlUtils.hidden(ARG_NCL_OUTPUT, "comp"));
         }
-        StringBuilder plotTypes = new StringBuilder();
-        plotTypes.append(
-            HtmlUtils.radio(
-                NCLOutputHandler.ARG_NCL_PLOTTYPE, "png",
-                RepositoryManager.getShouldButtonBeSelected(
-                    request, NCLOutputHandler.ARG_NCL_PLOTTYPE, "png",
-                    true)));
-        plotTypes.append(space1);
-        plotTypes.append(Repository.msg("Map (Image)"));
-        plotTypes.append(space2);
-        plotTypes.append(
-            HtmlUtils.radio(
-                NCLOutputHandler.ARG_NCL_PLOTTYPE, "kmz",
-                RepositoryManager.getShouldButtonBeSelected(
-                    request, NCLOutputHandler.ARG_NCL_PLOTTYPE, "kmz",
-                    false)));
-        plotTypes.append(space1);
-        plotTypes.append(Repository.msg("Google Earth"));
-
-
-        sb.append(HtmlUtils.formEntry(Repository.msgLabel("Plot Type"),
-                                      plotTypes.toString()));
-
-        // units
-        if (SimpleUnit.isCompatible(units, "K")) {
-            StringBuilder unitsSB = new StringBuilder();
-            unitsSB.append(
+        if (!isCorrelation) {
+            StringBuilder plotTypes = new StringBuilder();
+            plotTypes.append(
                 HtmlUtils.radio(
-                    ARG_NCL_UNITS, "K",
+                    NCLOutputHandler.ARG_NCL_PLOTTYPE, "png",
                     RepositoryManager.getShouldButtonBeSelected(
-                        request, ARG_NCL_UNITS, "K", true)));
-            unitsSB.append(space1);
-            unitsSB.append(Repository.msg("Kelvin"));
-            unitsSB.append(space2);
-            unitsSB.append(
+                        request, NCLOutputHandler.ARG_NCL_PLOTTYPE, "png",
+                        true)));
+            plotTypes.append(space1);
+            plotTypes.append(Repository.msg("Map (Image)"));
+            plotTypes.append(space2);
+            plotTypes.append(
                 HtmlUtils.radio(
-                    ARG_NCL_UNITS, "degC",
+                    NCLOutputHandler.ARG_NCL_PLOTTYPE, "kmz",
                     RepositoryManager.getShouldButtonBeSelected(
-                        request, ARG_NCL_UNITS, "degC", false)));
-            unitsSB.append(space1);
-            unitsSB.append(Repository.msg("Celsius"));
-
-
-            sb.append(HtmlUtils.formEntry(Repository.msgLabel("Plot Units"),
-                                          unitsSB.toString()));
-        } else if (SimpleUnit.isCompatible(units, "kg m-2 s-1")
-                   || SimpleUnit.isCompatible(units, "mm/day")) {
-            sb.append(HtmlUtils.hidden(ARG_NCL_UNITS, "mm/day"));
-        } else if (SimpleUnit.isCompatible(units, "kg m-1 s-2")
-                   || SimpleUnit.isCompatible(units, "Pa")) {
-            sb.append(HtmlUtils.hidden(ARG_NCL_UNITS, "hPa"));
-        } else if (SimpleUnit.isCompatible(units, "kg m-2")) {
-            sb.append(HtmlUtils.hidden(ARG_NCL_UNITS, "mm"));
+                        request, NCLOutputHandler.ARG_NCL_PLOTTYPE, "kmz",
+                        false)));
+            plotTypes.append(space1);
+            plotTypes.append(Repository.msg("Google Earth"));
+    
+    
+            sb.append(HtmlUtils.formEntry(Repository.msgLabel("Plot Type"),
+                                          plotTypes.toString()));
+    
+            // units
+            if (SimpleUnit.isCompatible(units, "K")) {
+                StringBuilder unitsSB = new StringBuilder();
+                unitsSB.append(
+                    HtmlUtils.radio(
+                        ARG_NCL_UNITS, "K",
+                        RepositoryManager.getShouldButtonBeSelected(
+                            request, ARG_NCL_UNITS, "K", true)));
+                unitsSB.append(space1);
+                unitsSB.append(Repository.msg("Kelvin"));
+                unitsSB.append(space2);
+                unitsSB.append(
+                    HtmlUtils.radio(
+                        ARG_NCL_UNITS, "degC",
+                        RepositoryManager.getShouldButtonBeSelected(
+                            request, ARG_NCL_UNITS, "degC", false)));
+                unitsSB.append(space1);
+                unitsSB.append(Repository.msg("Celsius"));
+    
+    
+                sb.append(HtmlUtils.formEntry(Repository.msgLabel("Plot Units"),
+                                              unitsSB.toString()));
+            } else if (SimpleUnit.isCompatible(units, "kg m-2 s-1")
+                       || SimpleUnit.isCompatible(units, "mm/day")) {
+                sb.append(HtmlUtils.hidden(ARG_NCL_UNITS, "mm/day"));
+            } else if (SimpleUnit.isCompatible(units, "kg m-1 s-2")
+                       || SimpleUnit.isCompatible(units, "Pa")) {
+                sb.append(HtmlUtils.hidden(ARG_NCL_UNITS, "hPa"));
+            } else if (SimpleUnit.isCompatible(units, "kg m-2")) {
+                sb.append(HtmlUtils.hidden(ARG_NCL_UNITS, "mm"));
+            }
         }
         // TODO:  For now, don't get value from request.  May not
         // be valid if variable changes.
@@ -271,6 +290,24 @@ public class NCLModelPlotDataProcess extends Service {
 
 
     }
+    
+    private Entry getFirstGridEntry(ServiceInput input) {
+        List<Entry> entries = input.getEntries();
+        Entry first = null;
+        for (Entry entry : entries) {
+            if (isGridEntry(entry)) {
+                first = entry;
+                break;
+            }
+        }
+        return first;
+    }
+    
+    private boolean isGridEntry(Entry entry) {
+        TypeHandler mytype = entry.getTypeHandler();
+        return mytype instanceof ClimateModelFileTypeHandler ||
+            mytype instanceof GridTypeHandler;
+    }
 
     /**
      * Process the request
@@ -296,16 +333,18 @@ public class NCLModelPlotDataProcess extends Service {
         StringBuffer         modelList      = new StringBuffer();
         StringBuffer         ensList      = new StringBuffer();
         StringBuffer         expList      = new StringBuffer();
-        Entry                inputEntry    = null;
+        Entry                inputEntry    = getFirstGridEntry(input);
         boolean              haveOne       = false;
+        boolean              haveGrid      = false;
         for (ServiceOperand op : ops) {
 
             List<Entry> opEntries = op.getEntries();
-            inputEntry = opEntries.get(0);
             for (Entry entry : opEntries) {
                 if (haveOne) {
                     fileList.append(",");
                     nameList.append(";");
+                }
+                if (haveGrid) {
                     modelList.append(";");
                     expList.append(";");
                     ensList.append(";");
@@ -313,9 +352,12 @@ public class NCLModelPlotDataProcess extends Service {
                 //fileList.append("\"");
                 fileList.append(entry.getResource().toString());
                 nameList.append(op.getDescription());
-                modelList.append(entry.getValue(1));
-                expList.append(entry.getValue(2));
-                ensList.append(entry.getValue(3));
+                if (isGridEntry(entry)) {
+                    modelList.append(entry.getValue(1));
+                    expList.append(entry.getValue(2));
+                    ensList.append(entry.getValue(3));
+                    haveGrid = true;
+                }
                 //fileList.append("\"");
                 haveOne = true;
             }
@@ -624,6 +666,9 @@ public class NCLModelPlotDataProcess extends Service {
         for (Entry entry : entries) {
             if ( !(entry.getTypeHandler()
                     instanceof ClimateModelFileTypeHandler)) {
+                if (entry.getTypeHandler() instanceof NoaaPsdMonthlyClimateIndexTypeHandler) {
+                    continue;
+                }
                 return false;
             }
             uniqueModels.add(entry.getValue(1).toString());

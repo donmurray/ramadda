@@ -161,6 +161,10 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             if (process.isEnabled()) {
                 processes.add(process);
             }
+            process = new NCLModelPlotDataProcess(repository);
+            if (process.isEnabled()) {
+                processes.add(process);
+            }
         }
 
         return processes;

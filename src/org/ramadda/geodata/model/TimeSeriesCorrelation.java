@@ -1,10 +1,12 @@
 package org.ramadda.geodata.model;
 
 import java.io.File;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.Iterator;
 import java.util.List;
 import java.util.SortedSet;
 import java.util.TimeZone;
@@ -23,6 +25,7 @@ import org.ramadda.service.ServiceOperand;
 import org.ramadda.service.ServiceOutput;
 import org.ramadda.util.HtmlUtils;
 
+//import ucar.ma2.Range.Iterator;
 import ucar.nc2.dt.GridDatatype;
 import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.time.Calendar;
@@ -252,6 +255,64 @@ public class TimeSeriesCorrelation extends CDODataProcess {
     }
         
     /**
+     * Get the list of common years between the grids and time series
+     * @param request
+     * @param sb
+     * @param input
+     * @return
+     * @throws Exception
+     */
+    private Date[] getCommonDateRange(Request request, ServiceInput input) throws Exception {
+        List<GridDataset> grids = new ArrayList<GridDataset>();
+        Entry tsEntry = null;
+        List<Entry> entries = input.getEntries();
+        for (Entry e : entries) {
+            if (e.getTypeHandler() instanceof ClimateModelFileTypeHandler) {
+                CdmDataOutputHandler dataOutputHandler =
+                    getOutputHandler().getDataOutputHandler();
+                GridDataset dataset =
+                    dataOutputHandler.getCdmManager().getGridDataset(e,
+                    e.getResource().getPath());
+                if (dataset != null) {
+                    grids.add(dataset);
+                }
+            } else if (e.getTypeHandler() instanceof NoaaPsdMonthlyClimateIndexTypeHandler) {
+                tsEntry = e;
+            }
+        }
+        int grid = 0;
+        int numGrids = grids.size();
+        Date[] commonDateRange = new Date[2];
+        for (GridDataset dataset : grids) {
+            List<CalendarDate> dates =
+                CdmDataOutputHandler.getGridDates(dataset);
+            Date first = dates.get(0).toDate();
+            Date last = dates.get(dates.size()-1).toDate();
+            if (commonDateRange[0] == null) {
+                commonDateRange[0] = first;
+            } else if (first.compareTo(commonDateRange[0]) > 0){
+                commonDateRange[0] = first;
+            }
+            if (commonDateRange[1] == null) {
+                commonDateRange[1] = dates.get(dates.size()-1).toDate();
+            } else if (last.compareTo(commonDateRange[0]) < 0){
+                commonDateRange[1] = last;
+            }
+        }
+        // Get the years from the time series
+        Date[] tsRange = getTimeSeriesDateRange(getTimeSeriesData(request, tsEntry));
+        if (tsRange[0].compareTo(commonDateRange[0]) > 0) {
+            commonDateRange[0] = tsRange[0];
+        }
+        if (tsRange[1].compareTo(commonDateRange[1]) < 0) {
+            commonDateRange[1] = tsRange[1];
+        }
+        Misc.printArray("daterange", commonDateRange);
+        return commonDateRange;
+        
+    }
+
+    /**
      * Get the list of years from the time series
      * @param tsEntry
      * @return
@@ -392,7 +453,7 @@ public class TimeSeriesCorrelation extends CDODataProcess {
             }
         }
         for (Entry tsEntry : tsEntries) {
-            ServiceOperand so = processTimeSeriesData(request, input, tsEntry);
+            outputEntries.add(processTimeSeriesData(request, input, tsEntry));
         }
         
         for (Entry gridEntry : gridEntries) {
@@ -792,7 +853,8 @@ public class TimeSeriesCorrelation extends CDODataProcess {
     
     private ServiceOperand processTimeSeriesData(Request request, ServiceInput input, Entry tsEntry) throws Exception {
         TimeSeriesData tsd = getTimeSeriesData(request, tsEntry);
-        Date[] range = getTimeSeriesDateRange(tsd);
+        //Date[] range = getTimeSeriesDateRange(tsd);
+        Date[] range = getCommonDateRange(request,input);
         // find the start & end month of the request
         int requestStartMonth = request.get(CDOOutputHandler.ARG_CDO_STARTMONTH, 1);
         int requestEndMonth = request.get(CDOOutputHandler.ARG_CDO_ENDMONTH, 1);
@@ -846,7 +908,7 @@ public class TimeSeriesCorrelation extends CDODataProcess {
                 if (endYear == lastDataYear && requestEndMonth > lastDataMonth) {
                     endYear = lastDataYear - 1;
                 }
-                years = makeYears(startYear, endYear);
+                years = makeYears(startYear-1, endYear-1);
                 
             }
             numMonths = requestEndMonth + (12-requestStartMonth+1);
@@ -863,6 +925,7 @@ public class TimeSeriesCorrelation extends CDODataProcess {
             years = makeYears(startYear, endYear);
             
         }
+        int numYears = years.size();
         List<TimeSeriesRecord> subset = new ArrayList<TimeSeriesRecord>();
         GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
         GregorianCalendar cal2 = new GregorianCalendar(TimeZone.getTimeZone("GMT"));
@@ -871,17 +934,21 @@ public class TimeSeriesCorrelation extends CDODataProcess {
         cal.set(GregorianCalendar.MINUTE, 0);
         cal.set(GregorianCalendar.SECOND, 0);
         cal.set(GregorianCalendar.MILLISECOND, 0);
-        cal.set(GregorianCalendar.YEAR, years.get(years.size()-1));
+        int endyear = years.get(numYears-1);
+        if (spanYears) {
+           endyear += 1;
+        }
+        cal.set(GregorianCalendar.YEAR, endyear);
         cal.set(GregorianCalendar.MONTH, requestEndMonth-1);
         Date endDate = cal.getTime();
         cal.set(GregorianCalendar.YEAR, years.get(0));
         cal.set(GregorianCalendar.MONTH, requestStartMonth-1);
         Date startDate = cal.getTime();
-        System.out.println("start: "+startDate);
-        System.out.println("end: "+endDate);
+        //System.out.println("start: "+startDate);
+        //System.out.println("end: "+endDate);
         int mcntr = 0;
         int ycntr = 0;
-        int maxyears = years.size()-1;
+        int maxyears = numYears-1;
         for (TimeSeriesRecord tsr : tsd.getRecords()) {
             Date d = tsr.getDate();
             if (d.compareTo(startDate) < 0 ||
@@ -895,7 +962,7 @@ public class TimeSeriesCorrelation extends CDODataProcess {
             if (cal2.get(GregorianCalendar.MONTH) < cal.get(GregorianCalendar.MONTH)) {
                 continue;
             }
-            System.err.println(d);
+            System.err.println(tsr);
             subset.add(tsr);
             if (mcntr < numMonths-1) {
                 cal.add(GregorianCalendar.MONTH, 1);
@@ -907,7 +974,57 @@ public class TimeSeriesCorrelation extends CDODataProcess {
                 mcntr = 0;
             }
         }
-        return null; 
+        StringBuilder name = new StringBuilder();
+        name.append(tsEntry.getDescription());
+        name.append(": ");
+        name.append(MONTHS[requestStartMonth-1]);
+        if (requestStartMonth != requestEndMonth) {
+            name.append("-");
+            name.append(MONTHS[requestEndMonth-1]);
+        }
+        name.append(" ");
+        name.append(startYear);
+        if (startYear != endYear) {
+            name.append("-");
+            name.append(endYear);
+        }
+        
+        TimeSeriesData output = new TimeSeriesData(name.toString());
+        Iterator<TimeSeriesRecord> iter = subset.iterator();
+        while (iter.hasNext()) {
+            double value = 0;
+            Date d = null;
+            for (int i = 0; i < numMonths; i++) {
+                TimeSeriesRecord r = iter.next();
+                value += r.getValue();
+                d = r.getDate();
+            }
+            value = value/numMonths;
+            TimeSeriesRecord avg = new TimeSeriesRecord(d,value);
+            output.addRecord(avg);
+        }
+        String csv = output.toString();
+        //System.out.println(csv);
+        String       id        = getRepository().getGUID();
+        String       newName = tsEntry.getName() + "_" + id + ".csv";
+        File outFile = new File(IOUtil.joinDir(input.getProcessDir(), newName));
+        OutputStream os = getStorageManager().getFileOutputStream(outFile);
+        os.write(csv.getBytes());
+        os.flush();
+        os.close();
+        Resource resource = new Resource(outFile, Resource.TYPE_LOCAL_FILE);
+        TypeHandler myHandler = getRepository().getTypeHandler("point_text",
+                                    false, true);
+        Entry outputEntry = new Entry(myHandler, true, name.toString());
+        outputEntry.setResource(resource);
+        // Add in lineage and associations
+        outputEntry.addAssociation(new Association(getRepository().getGUID(),
+                "generated product", "product generated from",
+                tsEntry.getId(), outputEntry.getId()));
+        getOutputHandler().getEntryManager().writeEntryXmlFile(request,
+                outputEntry);
+
+        return new ServiceOperand(name.toString(), outputEntry);
     }
     
     private List<Integer> makeYears(int start, int end) {
@@ -940,6 +1057,31 @@ public class TimeSeriesCorrelation extends CDODataProcess {
         public void addRecord(TimeSeriesRecord record) {
             records.add(record);
         }
+        
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("# ");
+            sb.append(name);
+            sb.append("\n");
+            sb.append("# Generated on: ");
+            try {
+                sb.append(new DateTime());
+            } catch (Exception e) {
+                sb.append(new Date());
+            }
+            sb.append("\n");
+            for (TimeSeriesRecord r : records) {
+                try {
+                    sb.append(new DateTime(r.getDate()));
+                } catch (Exception e) {
+                    sb.append(r.getDate());
+                }
+                sb.append(",");
+                sb.append(Misc.format(r.getValue()));
+                sb.append("\n");
+            }
+            return sb.toString();
+        }
     }
     
     class TimeSeriesRecord {
@@ -958,6 +1100,10 @@ public class TimeSeriesCorrelation extends CDODataProcess {
         
         public double getValue() {
             return value;
+        }
+        
+        public String toString() {
+            return date.toString() + ": " + Misc.format(value);
         }
         
     }

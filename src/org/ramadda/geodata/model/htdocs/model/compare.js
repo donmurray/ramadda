@@ -3,6 +3,7 @@ var ARG_ACTION_SEARCH = "action.search";
 var TYPE_IMAGE = "type_image";
 var TYPE_KMZ = "geo_kml";
 var TYPE_NC = "cdm_grid";
+var TYPE_CSV = "point_text";
 var TYPE_TS = "type_single_point_grid_netcdf";
 
 function CollectionForm(formId, type, args) {
@@ -149,6 +150,8 @@ function CollectionForm(formId, type, args) {
                         kmz = entry;
                     } else if (typeid === TYPE_TS) {
                         tsfiles.push(entry);
+                    } else if (typeid === TYPE_CSV) {
+                        plotfiles.push(entry);
                     } else {
                         continue;
                     }
