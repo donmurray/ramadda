@@ -64,6 +64,11 @@ h3 {
 .ramadda-main {
 }
 
+h2 a,   h2 a:visited {
+    color: black;
+}
+
+
 .ramadda-section-header a, .ramadda-section-header  a:visited {
     color: black;
 }
