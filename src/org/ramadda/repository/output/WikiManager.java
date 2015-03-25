@@ -4292,7 +4292,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
     public void addDisplayImports(Request request, StringBuilder sb)
             throws Exception {
 
-        System.err.println ("WikiManager.addDisplayImports"):
+        System.err.println ("WikiManager.addDisplayImports");
         getMapManager().addMapImports(request, sb);
 
         if (request.getExtraProperty("initchart") == null) {
