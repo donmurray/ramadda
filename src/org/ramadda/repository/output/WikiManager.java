@@ -4330,6 +4330,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             sb.append(HtmlUtils.importJS(fileUrl("/display/display.js")));
             sb.append(
                 HtmlUtils.importJS(fileUrl("/display/displayentry.js")));
+            getMapManager().addMapImports(request, sb);
+
             sb.append(HtmlUtils.importJS(fileUrl("/display/displaymap.js")));
             sb.append(
                 HtmlUtils.importJS(fileUrl("/display/displaychart.js")));

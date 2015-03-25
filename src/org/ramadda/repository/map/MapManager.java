@@ -157,6 +157,14 @@ public class MapManager extends RepositoryManager {
         return mapInfo;
     }
 
+    public void addMapImports(Request request, Appendable sb)  throws Exception {
+        if (request.getExtraProperty("initmap") == null) {
+            sb.append(getHtmlImports());
+            request.putExtraProperty("initmap", "");
+        }
+
+    }
+
 
     /** the base for the openlayers URL */
     private static final String OPENLAYERS_BASE = "/lib/openlayers";
