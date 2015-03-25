@@ -148,9 +148,8 @@ public class MapManager extends RepositoryManager {
         if ( !showMaps()) {
             return mapInfo;
         }
-
         
-        String key = forSelection?KEY2:KEY1;
+        String key = KEY2;
         if (request.getExtraProperty(key) == null) {
             mapInfo.addHtml(getHtmlImports());
             request.putExtraProperty(key, "");
@@ -187,24 +186,17 @@ public class MapManager extends RepositoryManager {
         StringBuilder sb = new StringBuilder();
         sb.append(HtmlUtils.cssLink(getRepository().htdocsUrl(OPENLAYERS_BASE
                 + "/theme/default/style.css")));
-        sb.append("\n");
-        sb.append("\n");
         sb.append(
             HtmlUtils.importJS(
                 getRepository().htdocsUrl(
                     OPENLAYERS_BASE + "/OpenLayers.js")));
-        sb.append("\n");
         sb.append(
             HtmlUtils.importJS(
-                "https://maps.google.com/maps/api/js?v=3.5&amp;sensor=false"));
-        sb.append("\n");
+                "https://maps.google.com/maps/api/js?v=3.5&sensor=false"));
         sb.append(
             HtmlUtils.importJS(getRepository().htdocsUrl("/ramaddamap.js")));
-        sb.append("\n");
         sb.append(
             HtmlUtils.cssLink(getRepository().htdocsUrl("/ramaddamap.css")));
-        sb.append("\n");
-
         return sb.toString();
     }
 
