@@ -4292,13 +4292,11 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
     public void addDisplayImports(Request request, StringBuilder sb)
             throws Exception {
 
-        if (request.getExtraProperty("initmap") == null) {
-            sb.append(getMapManager().getHtmlImports());
-            request.putExtraProperty("initmap", "");
-        }
+        System.err.println ("WikiManager.addDisplayImports"):
+        getMapManager().addMapImports(request, sb);
 
         if (request.getExtraProperty("initchart") == null) {
-            request.putExtraProperty("initchart", "");
+            request.putExtraProperty("initchart", "added");
             sb.append(HtmlUtils.comment("chart imports"));
             sb.append(HtmlUtils.importJS("https://www.google.com/jsapi"));
             sb.append(
@@ -4331,8 +4329,6 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             sb.append(
                 HtmlUtils.importJS(fileUrl("/display/displayentry.js")));
 
-            sb.append(HtmlUtils.comment("map imports"));
-            getMapManager().addMapImports(request, sb);
 
             sb.append(HtmlUtils.importJS(fileUrl("/display/displaymap.js")));
             sb.append(

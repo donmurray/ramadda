@@ -159,9 +159,12 @@ public class MapManager extends RepositoryManager {
 
 
     public void addMapImports(Request request, Appendable sb)  throws Exception {
+        System.err.println("addMapImports:" +request.getExtraProperty("initmap"));
         if (request.getExtraProperty("initmap") == null) {
+            System.err.println("adding them");
+            sb.append(HtmlUtils.comment("map imports"));
             sb.append(getHtmlImports());
-            request.putExtraProperty("initmap", "");
+            request.putExtraProperty("initmap", "added");
         }
 
     }
