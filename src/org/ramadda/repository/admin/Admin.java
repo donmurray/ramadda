@@ -544,7 +544,7 @@ public class Admin extends RepositoryManager {
                     }
 
                     StringBuilder html = new StringBuilder();
-                    html.append(HtmlUtils.sectionOpen());
+                    html.append(HtmlUtils.sectionOpen(null,false));
                     html.append(HtmlUtils.h2("RAMADDA Install"));
                     html.append(sb);
                     html.append(HtmlUtils.sectionClose());
@@ -632,7 +632,7 @@ public class Admin extends RepositoryManager {
 
         StringBuffer finalSB = new StringBuffer();
         finalSB.append(request.form(getRepository().URL_INSTALL));
-        finalSB.append(HtmlUtils.sectionOpen());
+        finalSB.append(HtmlUtils.sectionOpen(null, false));
         finalSB.append(HtmlUtils.h2(title));
         finalSB.append(sb);
         finalSB.append(HtmlUtils.sectionClose());
@@ -1004,15 +1004,12 @@ public class Admin extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public Result makeResult(Request request, String title, StringBuffer sb)
+    public Result makeResult(Request request, String title, Appendable sb)
             throws Exception {
-        StringBuffer headerSB = new StringBuffer();
-        addHeader(request, headerSB);
+        StringBuilder headerSB = new StringBuilder();
+        getPageHandler().makeLinksHeader(request, headerSB, adminUrls, "");
         headerSB.append(sb);
-        sb = headerSB;
-        Result result = new Result(title, sb);
-
-        return addHeaderToAncillaryPage(request, result);
+        return new Result(title, headerSB);
     }
 
     /**
@@ -1021,8 +1018,8 @@ public class Admin extends RepositoryManager {
      * @param request _more_
      * @param sb _more_
      */
-    public void addHeader(Request request, StringBuffer sb) {
-        sb.append(getPageHandler().makeHeader(request, adminUrls, ""));
+    public void xaddHeader(Request request, Appendable sb) throws Exception {
+
     }
 
 
@@ -1070,11 +1067,10 @@ public class Admin extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result adminSettings(Request request) throws Exception {
-
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         request.formPostWithAuthToken(sb, URL_ADMIN_SETTINGS_DO, null);
         String size = HtmlUtils.SIZE_60;
-        sb.append(HtmlUtils.sectionOpen());
+        sb.append(HtmlUtils.sectionOpen(null, false));
         sb.append(HtmlUtils.submit(msg("Change Settings")));
         sb.append(HtmlUtils.p());
         StringBuffer csb = new StringBuffer();
@@ -1401,7 +1397,6 @@ public class Admin extends RepositoryManager {
         tabs.add(osb.toString());
         HtmlUtils.makeAccordian(sb, titles, tabs, true);
         sb.append(HtmlUtils.formClose());
-
         sb.append(HtmlUtils.sectionClose());
         return makeResult(request, msg("Settings"), sb);
 
@@ -1633,7 +1628,7 @@ public class Admin extends RepositoryManager {
      */
     public Result adminAccess(Request request) throws Exception {
         StringBuffer sb = new StringBuffer();
-        sb.append(HtmlUtils.sectionOpen());
+        sb.append(HtmlUtils.sectionOpen(null, false));
         sb.append(msgHeader("Access Overview"));
 
         Statement statement =
@@ -1808,7 +1803,7 @@ public class Admin extends RepositoryManager {
 
 
         StringBuffer sb = new StringBuffer();
-        sb.append(HtmlUtils.sectionOpen());
+        sb.append(HtmlUtils.sectionOpen(null, false ));
         List<String> titles = new ArrayList<String>();
         List<String> tabs   = new ArrayList<String>();
 
@@ -1876,7 +1871,7 @@ public class Admin extends RepositoryManager {
         }
 
         StringBuffer sb = new StringBuffer();
-        sb.append(HtmlUtils.sectionOpen());
+        sb.append(HtmlUtils.sectionOpen(null, false ));
         //        sb.append(msgHeader("SQL"));
         sb.append(HtmlUtils.p());
         sb.append(HtmlUtils.href(request.url(URL_ADMIN_TABLES),
@@ -2137,7 +2132,7 @@ public class Admin extends RepositoryManager {
         StringBuffer sb = new StringBuffer();
 
         StringBuilder filePathSB = new StringBuilder();
-        filePathSB.append(HtmlUtils.sectionOpen());
+        filePathSB.append(HtmlUtils.sectionOpen(null, false ));
         filePathSB.append(HtmlUtils.h3("Change file paths"));
             
         request.formPostWithAuthToken(filePathSB, URL_ADMIN_CLEANUP, "");

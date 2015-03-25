@@ -419,7 +419,7 @@ public class HarvesterManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processForm(Request request) throws Exception {
-        StringBuffer sb = new StringBuffer();
+
         Harvester harvester =
             findHarvester(request.getString(ARG_HARVESTER_ID));
         if (harvester == null) {
@@ -442,8 +442,8 @@ public class HarvesterManager extends RepositoryManager {
             return new Result(request.url(URL_HARVESTERS_LIST));
         }
 
+        StringBuffer sb = new StringBuffer();
         makeFormHeader(request, harvester, sb);
-
 
         String xmlLink = HtmlUtils.href(
                              HtmlUtils.url(
@@ -550,7 +550,7 @@ public class HarvesterManager extends RepositoryManager {
      */
     private void makeFormHeader(Request request, Harvester harvester,
                                 StringBuffer sb) {
-        sb.append(HtmlUtils.sectionOpen());
+        sb.append(HtmlUtils.sectionOpen(null, false));
         sb.append(HtmlUtils.h2(msgLabel("Harvester") + " " +harvester.getName()));
         request.formPostWithAuthToken(sb, URL_HARVESTERS_CHANGE);
         sb.append(HtmlUtils.hidden(ARG_HARVESTER_ID, harvester.getId()));
@@ -618,7 +618,7 @@ public class HarvesterManager extends RepositoryManager {
 
         //        sb.append(msgHeader("Harvesters"));
         request.formPostWithAuthToken(sb, URL_HARVESTERS_NEW);
-        sb.append(HtmlUtils.sectionOpen());
+        sb.append(HtmlUtils.sectionOpen(null, false));
         sb.append(HtmlUtils.submit(msg("New Harvester")));
         sb.append(HtmlUtils.formClose());
 

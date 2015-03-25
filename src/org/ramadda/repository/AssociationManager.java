@@ -875,7 +875,7 @@ public class AssociationManager extends RepositoryManager {
      */
     public Result processSearchAssociations(Request request)
             throws Exception {
-        StringBuffer sb      = new StringBuffer();
+        StringBuilder sb      = new StringBuilder();
         String       type    = request.getString(ARG_TYPE, "").trim();
         String       name    = request.getString(ARG_NAME, "").trim();
         List<Clause> clauses = new ArrayList<Clause>();
@@ -910,7 +910,7 @@ public class AssociationManager extends RepositoryManager {
             getAssociationsSearchForm(request, sb);
         } else {
             getAssociationsSearchForm(request, sb);
-            sb.append(HtmlUtils.sectionOpen());
+            sb.append(HtmlUtils.sectionOpen(null, false));
             getRepository().getHtmlOutputHandler().showNext(request, cnt, sb);
             sb.append(getAssociationManager().getAssociationList(request,
                     associations, null, false));
@@ -954,7 +954,7 @@ public class AssociationManager extends RepositoryManager {
     private void getAssociationsSearchForm(Request request, Appendable sb)
             throws Exception {
 
-        sb.append(HtmlUtils.sectionOpen());
+        sb.append(HtmlUtils.sectionOpen(null, false));
         sb.append(HtmlUtils
             .form(request
                 .url(getRepository().getSearchManager()

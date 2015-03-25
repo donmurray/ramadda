@@ -507,7 +507,8 @@ input, password, fileinput,textarea {
    background-color:#fafafa;
 }
 
-.entry-table  td {
+
+.ramadda-td, .entry-table  td {
     padding-top: 6px;
     padding-bottom: 4px;
     padding-left: 0.5em;
@@ -1430,14 +1431,16 @@ a.image-link {
   text-decoration: underline;
 }
 
+
+snippet {
+   display:inline;
+}
+
 .subheader-container {
    margin-top:10px;
    text-align: center;
 }
 
-snippet {
-   display:inline;
-}
 
 .subheader {
    display:inline;
@@ -1461,6 +1464,16 @@ snippet {
 .subheader-off a {
 }
 
+.subheader-container h2 {
+   font-size:18pt;
+   font-size:170%;
+   padding: 0px;
+   margin: 0px;
+   margin-bottom: 2px;
+   font-weight: 300;
+   color: #000;
+   text-align: center;
+}
 
 
 .nav {

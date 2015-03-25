@@ -155,7 +155,8 @@ public class CopyAction extends MonitorAction {
      * @param monitor _more_
      * @param sb _more_
      */
-    public void addToEditForm(EntryMonitor monitor, StringBuffer sb) {
+    @Override
+     public void addToEditForm(EntryMonitor monitor, Appendable sb) throws Exception  {
         sb.append(HtmlUtils.formTable());
         sb.append(HtmlUtils.colspan("Copy Action", 2));
         try {

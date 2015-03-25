@@ -248,7 +248,7 @@ public class RepositoryBase implements Constants, RepositorySource {
 
     /** _more_ */
     public final RequestUrl URL_USER_HOME = new RequestUrl(this,
-                                                "/user/home", "User Home");
+                                                "/user/home", "Favorites");
 
     /** _more_ */
     public final RequestUrl URL_USER_PROFILE = new RequestUrl(this,

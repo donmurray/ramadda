@@ -134,7 +134,7 @@ public abstract class MonitorAction implements Constants, Cloneable {
      * @param monitor _more_
      * @param sb _more_
      */
-    public void addToEditForm(EntryMonitor monitor, StringBuffer sb) {}
+    public void addToEditForm(EntryMonitor monitor, Appendable sb) throws Exception {}
 
     /**
      * _more_

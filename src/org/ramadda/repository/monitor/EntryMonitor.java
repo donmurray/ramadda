@@ -244,8 +244,7 @@ public class EntryMonitor implements Constants {
      *
      * @throws Exception _more_
      */
-    public void addToEditForm(Request request, StringBuffer sb)
-            throws Exception {
+     public void addToEditForm(Request request, Appendable sb) throws Exception  {
         StringBuffer stateSB = new StringBuffer();
 
         stateSB.append(HtmlUtils.formTable());

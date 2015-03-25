@@ -2189,8 +2189,7 @@ public class PageHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    public String makeHeader(Request request, List<RequestUrl> urls,
-                             String arg) {
+    public void makeLinksHeader(Request request, Appendable sb, List<RequestUrl> urls,   String arg) throws Exception {
         List<String> links   = new ArrayList();
         String       type    = request.getRequestPath();
         String       onLabel = null;
@@ -2211,20 +2210,14 @@ public class PageHandler extends RepositoryManager {
                                      HtmlUtils.cssClass("subheader-off")));
             //            }
         }
-        String header =
-            StringUtil.join("<span class=\"subheader-sep\">|</span>", links);
-
-        String label = onLabel == null? "":HtmlUtils.div(HtmlUtils.h2(msg(onLabel)), HtmlUtils.cssClass("ramadda-section"));
-
-        return HtmlUtils.tag(HtmlUtils.TAG_DIV,
-                             HtmlUtils.cssClass("subheader-container"),
-                             header + label);
-/*        return HtmlUtils.tag(HtmlUtils.TAG_CENTER,
-                             HtmlUtils.cssClass("subheader-container"),
-                             HtmlUtils.tag(HtmlUtils.TAG_SPAN,
-                                           HtmlUtils.cssClass("subheader"),
-                                           header) + label;
-*/
+        StringBuilder header = new StringBuilder(StringUtil.join("<span class=\"subheader-sep\">|</span>", links));
+        header.append("\n");
+        if(Utils.stringDefined(onLabel)) {
+            header.append(HtmlUtils.div(HtmlUtils.h2(msg(onLabel))));
+        }
+        sb.append(HtmlUtils.tag(HtmlUtils.TAG_DIV,
+                                HtmlUtils.cssClass("subheader-container"),
+                                header.toString()));
     }
 
 

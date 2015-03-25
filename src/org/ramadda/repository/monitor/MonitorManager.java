@@ -346,13 +346,8 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
                     ARG_MONITOR_ID, monitor.getId()));
         }
 
-        StringBuffer sb = new StringBuffer();
-        String listLink =
-            HtmlUtils.href(getRepositoryBase().URL_USER_MONITORS.toString(),
-                           msg("Monitor List"));
-        sb.append(HtmlUtils.p());
-        sb.append(HtmlUtils.center(HtmlUtils.b(listLink)));
-
+        StringBuilder sb = new StringBuilder();
+        sb.append(HtmlUtils.sectionOpen(null, false));
         sb.append(msgLabel("Monitor"));
         sb.append(HtmlUtils.space(1));
         sb.append(monitor.getName());
@@ -374,6 +369,7 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
                     fb.toString()));
             sb.append(HtmlUtils.formClose());
 
+            sb.append(HtmlUtils.sectionClose());
             return getUserManager().makeResult(request,
                     msg("Monitor Delete"), sb);
         }
@@ -390,6 +386,7 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
 
         sb.append(HtmlUtils.formClose());
 
+        sb.append(HtmlUtils.sectionClose());
         return getUserManager().makeResult(request,
                                            msg("Edit Entry Monitor"), sb);
     }
@@ -501,7 +498,7 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
                 || request.getUser().getIsGuest()) {
             throw new IllegalArgumentException("Cannot access monitors");
         }
-        StringBuffer sb = new StringBuffer();
+        StringBuilder sb = new StringBuilder();
         List<EntryMonitor> monitors = getEditableMonitors(request,
                                           getEntryMonitors());
         if (request.exists(ARG_MONITOR_ID)) {
@@ -527,7 +524,7 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
             return processMonitorCreate(request);
         }
 
-        sb.append(HtmlUtils.br());
+        sb.append(HtmlUtils.sectionOpen(null, false));
         sb.append(HtmlUtils.open(HtmlUtils.TAG_TABLE));
         sb.append(HtmlUtils.open(HtmlUtils.TAG_TR));
 
@@ -571,7 +568,7 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
                                          "top") + ( !monitor.isActive()
                     ? HtmlUtils.attr(HtmlUtils.ATTR_BGCOLOR, "#cccccc")
                     : "")));
-            sb.append(HtmlUtils.open(HtmlUtils.TAG_TD));
+            sb.append(HtmlUtils.open(HtmlUtils.TAG_TD, HtmlUtils.cssClass("ramadda-td")));
             sb.append(
                 HtmlUtils.href(
                     HtmlUtils.url(
@@ -591,12 +588,10 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
                 sb.append(msg("not active"));
             }
             sb.append(HtmlUtils.close(HtmlUtils.TAG_TD));
-
-
-            sb.append(HtmlUtils.col(monitor.getName()));
-            sb.append(HtmlUtils.col(monitor.getUser().getLabel()));
-            sb.append(HtmlUtils.col(monitor.getSearchSummary()));
-            sb.append(HtmlUtils.col(monitor.getActionSummary()));
+            sb.append(HtmlUtils.col(monitor.getName(),             HtmlUtils.cssClass("ramadda-td")));
+            sb.append(HtmlUtils.col(monitor.getUser().getLabel(),             HtmlUtils.cssClass("ramadda-td")));
+            sb.append(HtmlUtils.col(monitor.getSearchSummary(),             HtmlUtils.cssClass("ramadda-td")));
+            sb.append(HtmlUtils.col(monitor.getActionSummary(),             HtmlUtils.cssClass("ramadda-td")));
             sb.append(HtmlUtils.close(HtmlUtils.TAG_TR));
 
             if ((monitor.getLastError() != null)
@@ -615,6 +610,7 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
         }
         sb.append(HtmlUtils.close(HtmlUtils.TAG_TABLE));
 
+        sb.append(HtmlUtils.sectionClose());
         return getUserManager().makeResult(request, msg("Entry Monitors"),
                                            sb);
 

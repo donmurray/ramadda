@@ -751,7 +751,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
         sb.append("\n");
 
         TypeHandler typeHandler = getRepository().getTypeHandler(request);
-        sb.append(HtmlUtils.sectionOpen());
+        sb.append(HtmlUtils.sectionOpen(null, false));
         sb.append(
             HtmlUtils.form(
                 getSearchUrl(request),
@@ -992,7 +992,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                                              true, true);
         String lastTok = toks.get(toks.size() - 1);
         if (lastTok.equals("type")) {
-            sb.append(HtmlUtils.sectionOpen());
+            sb.append(HtmlUtils.sectionOpen(null, false));
             addSearchByTypeList(request, sb);
             sb.append(HtmlUtils.sectionClose());
         } else {
@@ -1306,17 +1306,12 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
      *
      * @throws Exception _more_
      */
-    public Result makeResult(Request request, String title, StringBuffer sb)
+    public Result makeResult(Request request, String title, Appendable sb)
             throws Exception {
-        StringBuffer headerSB = new StringBuffer();
-        headerSB.append(getPageHandler().makeHeader(request, getSearchUrls(),
-                ""));
-        //        headerSB.append(HtmlUtils.openInset());
-        headerSB.append(sb);
-        //        headerSB.append(HtmlUtils.closeInset());
-        sb = headerSB;
-        Result result = new Result(title, sb);
-
+        StringBuilder headerSB = new StringBuilder();
+        getPageHandler().makeLinksHeader(request, headerSB, getSearchUrls(), "");
+        headerSB.append(sb.toString());
+        Result result = new Result(title, headerSB);
         return addHeaderToAncillaryPage(request, result);
     }
 
@@ -1538,10 +1533,9 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
         makeSearchForm(request, textSearch, true, searchForm);
 
         StringBuffer header = new StringBuffer();
-        header.append(getPageHandler().makeHeader(request, getSearchUrls(),
-                ""));
+        getPageHandler().makeLinksHeader(request,  header, getSearchUrls(),  "");
 
-        header.append(HtmlUtils.sectionOpen());
+        header.append(HtmlUtils.sectionOpen(null, false));
         header.append(HtmlUtils.h2(msg("Search Results")));
 
         if (foundAny) {
@@ -1577,9 +1571,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
         if (theGroup.isDummy()) {
             return addHeaderToAncillaryPage(request, result);
         }
-
         header.append(HtmlUtils.sectionOpen());
-
         return getEntryManager().addEntryHeader(request, theGroup, result);
     }
 

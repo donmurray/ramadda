@@ -1079,7 +1079,7 @@ public class HtmlUtils {
      * @return _more_
      */
     public static String sectionOpen(String label) {
-        return sectionOpen(label, true);
+        return sectionOpen(label, false);
     }
 
     /**
@@ -1091,12 +1091,13 @@ public class HtmlUtils {
      * @return _more_
      */
     public static String sectionOpen(String label, boolean line) {
-        return open(TAG_DIV, cssClass(line
-                                      ? "ramadda-section  ramadda-section-noline"
-                                      : "ramadda-section")) + (Utils
-                                          .stringDefined(label)
-                ? HtmlUtils.h2(label)
-                : "");
+        String html =  open(TAG_DIV, cssClass(line
+                                              ? "ramadda-section"
+                                              : "ramadda-section ramadda-section-noline"));
+        if (Utils.stringDefined(label)) {
+            html +=  HtmlUtils.h2(label);
+        }
+        return html;
     }
 
     /**
