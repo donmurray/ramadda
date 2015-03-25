@@ -149,22 +149,26 @@ public class MapManager extends RepositoryManager {
             return mapInfo;
         }
 
-        if (request.getExtraProperty("initmap") == null) {
+        
+        String key = forSelection?KEY2:KEY1;
+        if (request.getExtraProperty(key) == null) {
             mapInfo.addHtml(getHtmlImports());
-            request.putExtraProperty("initmap", "");
+            request.putExtraProperty(key, "");
         }
 
         return mapInfo;
     }
 
 
+    private static final String KEY1= "initmap";
+    private static final String KEY2= "initmap2";
+
     public void addMapImports(Request request, Appendable sb)  throws Exception {
-        System.err.println("addMapImports:" +request.getExtraProperty("initmap"));
-        if (request.getExtraProperty("initmap") == null) {
-            System.err.println("adding them");
+        String key = KEY1;
+        if (request.getExtraProperty(key) == null) {
             sb.append(HtmlUtils.comment("map imports"));
             sb.append(getHtmlImports());
-            request.putExtraProperty("initmap", "added");
+            request.putExtraProperty(key, "added");
         }
 
     }
