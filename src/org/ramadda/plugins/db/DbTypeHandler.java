@@ -485,6 +485,7 @@ public class DbTypeHandler extends BlobTypeHandler {
 
             public Clause getEnumValuesClause(Column column, Entry entry)
                     throws Exception {
+                if(entry == null) return null;
                 return Clause.eq(COL_ID, entry.getId());
             }
         };
