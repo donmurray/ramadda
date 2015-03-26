@@ -501,12 +501,13 @@ public class NCLModelPlotDataProcess extends Service {
         }
 
         boolean haveAnom = fileList.toString().indexOf("anom") >= 0;
+        boolean isCorrelation = outputType.equals("corr");
         String  colormap = "rainbow";
-        if (outputType.equals("diff") || haveAnom) {
+        if (outputType.equals("diff") || haveAnom || isCorrelation) {
             colormap = "testcmap";
         }
         envMap.put("colormap", colormap);
-        envMap.put("anom", Boolean.toString(haveAnom));
+        envMap.put("anom", Boolean.toString(haveAnom || isCorrelation));
         envMap.put(
             "annotation",
             getRepository().getProperty(Constants.PROP_REPOSITORY_NAME, ""));

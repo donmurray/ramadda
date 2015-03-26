@@ -18,6 +18,25 @@ load "$NCL_RESOURCES/remove_middle_contours.ncl"
 load "$NCL_RESOURCES/change_units.ncl"
 ;************************************************
 
+;*****************************************************************
+; Check for an array of all the same value
+;*****************************************************************
+undef("check_array_equal")
+function check_array_equal(vals[*]:string)
+
+local newval, first;
+
+begin
+  numvals = dimsizes(vals)
+  first = vals[0];
+  do idx=1,numvals-1
+    newval = vals[idx]
+    if (newval .ne. first) then
+       return False
+    end if
+  end do
+  return True
+end
 
 ;*****************************************************************
 ; Function: set_kml_map_defaults
@@ -629,6 +648,7 @@ begin
   return vartitle
 end
 
+
 ;************************************************
 ; Procedure: plotmap
 ;
@@ -640,13 +660,15 @@ end
 ;          opts - allow passing optional args
 ;***********************************************
 undef("plotmap")
-procedure plotmap(files[*]:string, wks_name:string, wks_type:string,  opts:logical)
+procedure plotmap(files:numeric, wks_name:string, wks_type:string,  opts:logical)
 local data, numfiles, plots, dodiff, doPanel, isanom
 
 begin
 
-  numfiles = dimsizes(files)
-  data = readdata(files(0), opts) 
+  numdims = dimsizes(files)
+  numfiles = numdims(0)
+  ;data = readdata(files(0), opts) 
+  data = files(0,:,:)
   plots = new(numfiles,graphic)
   dodiff = opts@outtype .eq. "diff" .and. numfiles .eq. 2
   isanom = opts@isanom
@@ -822,7 +844,8 @@ begin
     end if
     if (numfiles .gt. 1) then
       do i = 1,numfiles-1
-        newdata = readdata(files(i),opts)
+        ;newdata = readdata(files(i),opts)
+        newdata = files(i,:,:)
         data = subData(data,newdata)
         if (numtitles .ge. i .and. \
             (.not. ismissing(plottitles(i))) .and. \
@@ -833,7 +856,8 @@ begin
       end do
     end if
     rescf@tiMainString        = plottitle
-    mydata = data(0,:,:)
+    ;mydata = data(0,:,:)
+    mydata = data
     rescf@gsnLeftString = setvartitle(mydata, opts, isanom, level, levelunit)
     if (doGoogle) then
       set_kml_map_defaults(rescf) ; turn off many options
@@ -862,7 +886,8 @@ begin
     delete(mydata)
   else 
     if (.not. doGoogle) then
-      mydata = data(0,:,:)
+      ;mydata = data(0,:,:)
+      mydata = data
       rescf@gsnLeftString = setvartitle(mydata, opts, isanom, level, levelunit)
       if ((.not. ismissing(plottitles(0))) .and. (plottitles(0) .ne. "")) then
         rescf@tiMainString        = plottitles(0)
@@ -892,8 +917,9 @@ begin
       ;end if
       delete(mydata)
       do i = 1,numfiles-1
-        nextdata = readdata(files(i),opts)
-        mydata = nextdata(0,:,:)
+        ;nextdata = readdata(files(i),opts)
+        ;mydata = nextdata(0,:,:)
+        mydata = files(i,:,:)
         rescf@gsnLeftString = setvartitle(mydata, opts, isanom, level, levelunit)
         if ((.not. ismissing(plottitles(i))) .and. (plottitles(i) .ne. "")) then
           rescf@tiMainString        = plottitles(i)
@@ -995,8 +1021,9 @@ begin
             end if
             gsn_reverse_colormap(wks)
           end if
-          nextdata = readdata(files(i),opts)
-          mydata = nextdata(0,:,:)
+          ;nextdata = readdata(files(i),opts)
+          ;mydata = nextdata(0,:,:)
+          mydata = files(i,:,:)
           gplot = gsn_csm_contour_map_ce(wks,mydata,rescf)
           ;if (isanom .and. cint .eq. 0) then
           if (isanom .or. \
@@ -1135,7 +1162,7 @@ begin
             numRows = numPanels/4+1
             panels = (/numRows,4/)
           else 
-            if (numPanels .gt. 6) then
+            if (numPanels .gt. 4) then
               numRows = numPanels/3+1
               panels = (/numRows,3/)
             else
@@ -1165,6 +1192,117 @@ begin
     end if
   end if
 
+end
+
+;************************************************
+; Procedure: plotcorr
+;
+; Purpose: plot correlation map(s)
+;
+; Params:  files  - the data files to plot
+;          wks_name - workstation name
+;          wks_type - workstation type (x11, png, etc)
+;          opts - allow passing optional args
+;***********************************************
+undef("plotcorr")
+procedure plotcorr(files[*]:string, wks_name:string, wks_type:string,  opts:logical)
+
+local tsdata, ncdata, rawdata, vals
+
+begin
+  numfiles = dimsizes(files);
+  do i = 0,1
+    onefile = files(i)
+    suffix = get_file_suffix(onefile, 0)
+    if (suffix .eq. ".csv") then
+      ;print("reading csv file")
+      lines = asciiread(onefile, -1, "string")
+      nlines = dimsizes(lines)
+      ncols = 2
+      nl = 0;
+      ;; pare off the comments
+      do while (nl.lt.nlines)
+        first = str_get_cols(lines(nl),0,0)
+        if (first .eq. "#") then
+          nl = nl +1
+          continue
+        else
+          vals = lines(nl:nlines-1)
+          ;printVarSummary(vals);
+          break
+        end if
+      end do
+      ;; now split it apart
+      dates = str_get_field(vals, 1, ",")
+      year   = stringtointeger(str_get_cols(dates,0,3))
+      month  = stringtointeger(str_get_cols(dates,5,6))
+      day    = stringtointeger(str_get_cols(dates,8,9))
+      hour   = stringtointeger(str_get_cols(dates,11,12))
+      minute = stringtointeger(str_get_cols(dates,14,15))
+      sec    = stringtointeger(str_get_cols(dates,17,18))
+      units  = "hours since 1901-01-01 00:00:00"
+
+      time   = ut_inv_calendar(year,month,day,hour,minute,sec, units, 0)
+
+      time!0          = "time"
+      time@long_name  = "time"
+      time@description= "time"
+      time@units      =  units
+      time&time       =  time        ; make coordinate variable
+      ;printVarSummary(time)
+      values = stringtofloat(str_get_field(vals, 2, ","))
+      values!0        = "time"
+      values&time     = time
+      ;printVarSummary(values)
+    else
+      ;print("reading nc file")
+      ncdata = readdata(onefile, opts)
+      ;printVarSummary(ncdata)
+    end if
+  end do
+  corr = escorc_n(values,ncdata,0,0)
+  corr!0  = "lat"
+  corr!1  = "lon"
+  corr&lat = ncdata&lat
+  corr&lon = ncdata&lon
+  corr@units=""
+  corr@long_name="Correlation"
+  
+  ;printVarSummary(corr)
+  shape = dimsizes(corr)
+  cdata = new((/1,shape(0),shape(1)/),float)
+  cdata(0,:,:) = corr
+  printVarSummary(cdata)
+  plotmap(cdata,wks_name,wks_type,opts)
+  
+end 
+
+;************************************************
+; Procedure: plotcomp
+;
+; Purpose: plot map(s)
+;
+; Params:  files  - the data files to plot
+;          wks_name - workstation name
+;          wks_type - workstation type (x11, png, etc)
+;          opts - allow passing optional args
+;***********************************************
+undef("plotcomp")
+procedure plotcomp(files[*]:string, wks_name:string, wks_type:string,  opts:logical)
+local data, numfiles, onetime, alldata, doPanel, isanom
+
+begin
+   data = readdata(files(0), opts)
+   numfiles = dimsizes(files)
+   onetime = data(0,:,:)
+   xys = dimsizes(onetime)
+   alldata = new((/numfiles,xys(0),xys(1)/),float)
+   alldata(0,:,:) = onetime
+   do i = 1,numfiles-1
+      alldata(i,:,:) = readdata(files(i), opts)
+   end do
+   printVarSummary(alldata)
+   plotmap(alldata,wks_name,wks_type,opts)
 end
 
 ;**************************************************
@@ -1202,6 +1340,33 @@ begin
     titles = new((/numfiles/),string)
   else 
     titles=str_split(tmptitles,";")
+  end if
+  
+  ;models
+  tmpmodels=getenv("models")
+  if (ismissing(tmpmodels)) then 
+    numfiles = dimsizes(ncfiles)
+    models = new((/numfiles/),string)
+  else 
+    models=str_split(tmpmodels,";")
+  end if
+  
+  ;experiments
+  tmpexps=getenv("exps")
+  if (ismissing(tmpexps)) then 
+    numfiles = dimsizes(ncfiles)
+    exps = new((/numfiles/),string)
+  else 
+    exps=str_split(tmpexps,";")
+  end if
+  
+  ;ensembles
+  tmpens=getenv("ens")
+  if (ismissing(tmpens)) then 
+    numfiles = dimsizes(ncfiles)
+    ens = new((/numfiles/),string)
+  else 
+    ens=str_split(tmpens,";")
   end if
   
   ;logo
@@ -1312,7 +1477,11 @@ begin
   options@meridian=meridian
   options@logo=logo
   
-  plotmap(ncfiles, wks_name, "png", options)
+  if (outType .eq. "corr") then
+      plotcorr(ncfiles, wks_name, "png", options)
+  else
+      plotcomp(ncfiles, wks_name, "png", options)
+  end if
   
   status_exit(0)
 

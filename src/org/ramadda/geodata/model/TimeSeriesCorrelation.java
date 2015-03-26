@@ -916,7 +916,7 @@ public class TimeSeriesCorrelation extends CDODataProcess {
             numMonths = requestEndMonth-requestStartMonth+1;
             startYear = request.get(CDOOutputHandler.ARG_CDO_STARTYEAR, 1979);
             endYear = request.get(CDOOutputHandler.ARG_CDO_ENDYEAR, startYear);
-            if (requestEndMonth > lastDataMonth) {
+            if (endYear == lastDataYear && requestEndMonth > lastDataMonth) {
                 endYear -= 1;
             }
             if (startYear < firstDataYear) {
