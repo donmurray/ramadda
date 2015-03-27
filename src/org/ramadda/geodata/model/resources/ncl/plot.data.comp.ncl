@@ -989,8 +989,7 @@ begin
     else ;; doGoogle
 
       ;; Make the first plot to get the labelbar
-      mydata = data(0,:,:)
-      mydata = mask_data(mydata,masktype,maskdata)
+      mydata = mask_data(data,masktype,maskdata)
 ;;      ;; make title for labelbar
 ;;      vartitle = setvartitle(mydata, opts, isanom, level, levelunit)
 
