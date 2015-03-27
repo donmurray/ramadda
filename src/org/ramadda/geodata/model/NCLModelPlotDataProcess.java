@@ -70,21 +70,26 @@ public class NCLModelPlotDataProcess extends Service {
     /** The nclOutputHandler */
     NCLOutputHandler nclOutputHandler;
 
+    /** prefix for ncl commands */
+    public final static String ARG_NCL_PREFIX = "ncl.";
 
     /** output type */
-    public final static String ARG_NCL_OUTPUT = "ncl.output";
+    public final static String ARG_NCL_OUTPUT = ARG_NCL_PREFIX + "output";
 
-    /** output type */
-    public final static String ARG_NCL_UNITS = "ncl.units";
+    /** mask type */
+    public final static String ARG_NCL_MASKTYPE = ARG_NCL_PREFIX + "masktype";
+
+    /** units arg */
+    public final static String ARG_NCL_UNITS = ARG_NCL_PREFIX + "units";
 
     /** contour interval argument */
-    private static final String ARG_NCL_CINT = "ncl.cint";
+    private static final String ARG_NCL_CINT = ARG_NCL_PREFIX + "cint";
 
     /** contour minimum argument */
-    private static final String ARG_NCL_CMIN = "ncl.cmin";
+    private static final String ARG_NCL_CMIN = ARG_NCL_PREFIX + "cmin";
 
     /** contour maximum argument */
-    private static final String ARG_NCL_CMAX = "ncl.cmax";
+    private static final String ARG_NCL_CMAX = ARG_NCL_PREFIX + "cmax";
 
     /**
      * Create a new map process
@@ -264,6 +269,35 @@ public class NCLModelPlotDataProcess extends Service {
                 sb.append(HtmlUtils.hidden(ARG_NCL_UNITS, "mm"));
             }
         }
+        // Mask buttons
+        StringBuilder mbuttons = new StringBuilder();
+        mbuttons.append(
+            HtmlUtils.radio(
+                ARG_NCL_MASKTYPE, "none",
+                RepositoryManager.getShouldButtonBeSelected(
+                    request, ARG_NCL_MASKTYPE, "none", true)));
+        mbuttons.append(space1);
+        mbuttons.append(Repository.msg("None"));
+        mbuttons.append(space2);
+        mbuttons.append(
+            HtmlUtils.radio(
+                ARG_NCL_MASKTYPE, "ocean",
+                RepositoryManager.getShouldButtonBeSelected(
+                    request, ARG_NCL_MASKTYPE, "ocean", false)));
+        mbuttons.append(space1);
+        mbuttons.append(Repository.msg("Ocean"));
+        mbuttons.append(space2);
+        mbuttons.append(
+            HtmlUtils.radio(
+                ARG_NCL_MASKTYPE, "land",
+                RepositoryManager.getShouldButtonBeSelected(
+                    request, ARG_NCL_MASKTYPE, "land", false)));
+        mbuttons.append(space1);
+        mbuttons.append(Repository.msg("Land"));
+
+        sb.append(HtmlUtils.formEntry(Repository.msgLabel("Data Mask"),
+                                      mbuttons.toString()));
+        
         // TODO:  For now, don't get value from request.  May not
         // be valid if variable changes.
         // Contour interval
@@ -374,6 +408,7 @@ public class NCLModelPlotDataProcess extends Service {
             suffix = "png";
         }
         String outputType = request.getString(ARG_NCL_OUTPUT, "comp");
+        String maskType = request.getString(ARG_NCL_MASKTYPE, "none");
         File outFile = new File(IOUtil.joinDir(input.getProcessDir(),
                            wksName) + "." + suffix);
         CdmDataOutputHandler dataOutputHandler =
@@ -404,6 +439,7 @@ public class NCLModelPlotDataProcess extends Service {
         envMap.put("productdir", input.getProcessDir().toString());
         envMap.put("plot_type", plotType);
         envMap.put("output", outputType);
+        envMap.put("mask", maskType);
 
         Hashtable    args     = request.getArgs();
         List<String> varNames = new ArrayList<String>();

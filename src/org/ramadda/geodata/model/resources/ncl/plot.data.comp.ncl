@@ -648,6 +648,38 @@ begin
   return vartitle
 end
 
+;************************************************
+; Function: mask data
+;
+; Purpose:  mask the data
+;
+; Params: data  - the data to mask
+;         masktype - the type of mask
+;         maskdata - the mask
+;
+; Return:  the masked data
+;************************************************
+undef("mask_data")
+function mask_data(data[*][*]:float, masktype:string, lsdata[*][*]:byte)
+local lsm
+
+begin
+
+   if (masktype .eq. "none") then
+     return data
+   else
+     lsm  = landsea_mask(lsdata,data&lat,data&lon)
+     if (masktype .eq. "ocean") then
+       data = mask(data,lsm.eq.0,False)
+     else
+       data = mask(data,lsm.ge.1,False)
+     end if
+     return data
+   end if
+   return data
+
+end
+
 
 ;************************************************
 ; Procedure: plotmap
@@ -678,7 +710,15 @@ begin
   ;print(plottitles)
   numtitles = dimsizes(plottitles)
   usepolar = opts@usepolar
-  
+  if (isatt(opts,"mask") .and. .not.(opts@mask .eq. "none")) then
+     a = addfile("$NCARG_ROOT/lib/ncarg/data/cdf/landsea.nc","r")
+     maskdata = a->LSMASK
+     masktype = opts@mask
+  else
+     maskdata = new((/1,1/),byte)
+     masktype = "none"
+  end if
+
 
   rescf = True;
   ;rescf@gsnAddCyclic          = (addCyclic .eq. "true")    ; turn off if subset
@@ -788,7 +828,7 @@ begin
     ;rescf@vpYF = .95
     ;rescf@vpWidthF = .85
     ;rescf@vpHeightF= .5*ratio
-    rescf@cnLineLabelsOn=True
+    rescf@cnLineLabelsOn=False
     rescf@cnLineLabelPlacementMode = "Computed"
     rescf@cnLineLabelAngleF=0
     rescf@cnConstFLabelFontHeightF=0.010
@@ -856,8 +896,8 @@ begin
       end do
     end if
     rescf@tiMainString        = plottitle
-    ;mydata = data(0,:,:)
-    mydata = data
+    mydata = data(0,:,:)
+    mydata = mask_data(mydata,masktype,maskdata)
     rescf@gsnLeftString = setvartitle(mydata, opts, isanom, level, levelunit)
     if (doGoogle) then
       set_kml_map_defaults(rescf) ; turn off many options
@@ -887,7 +927,7 @@ begin
   else 
     if (.not. doGoogle) then
       ;mydata = data(0,:,:)
-      mydata = data
+      mydata = mask_data(data,masktype,maskdata)
       rescf@gsnLeftString = setvartitle(mydata, opts, isanom, level, levelunit)
       if ((.not. ismissing(plottitles(0))) .and. (plottitles(0) .ne. "")) then
         rescf@tiMainString        = plottitles(0)
@@ -917,9 +957,8 @@ begin
       ;end if
       delete(mydata)
       do i = 1,numfiles-1
-        ;nextdata = readdata(files(i),opts)
-        ;mydata = nextdata(0,:,:)
         mydata = files(i,:,:)
+        mydata = mask_data(mydata,masktype,maskdata)
         rescf@gsnLeftString = setvartitle(mydata, opts, isanom, level, levelunit)
         if ((.not. ismissing(plottitles(i))) .and. (plottitles(i) .ne. "")) then
           rescf@tiMainString        = plottitles(i)
@@ -945,13 +984,13 @@ begin
         ;  addAnnotation(wks,opts@annotation)
         ;end if
         delete(mydata)
-        delete(nextdata)
       end do
 
     else ;; doGoogle
 
       ;; Make the first plot to get the labelbar
       mydata = data(0,:,:)
+      mydata = mask_data(mydata,masktype,maskdata)
 ;;      ;; make title for labelbar
 ;;      vartitle = setvartitle(mydata, opts, isanom, level, levelunit)
 
@@ -1021,9 +1060,8 @@ begin
             end if
             gsn_reverse_colormap(wks)
           end if
-          ;nextdata = readdata(files(i),opts)
-          ;mydata = nextdata(0,:,:)
           mydata = files(i,:,:)
+          mydata = mask_data(mydata,masktype,maskdata)
           gplot = gsn_csm_contour_map_ce(wks,mydata,rescf)
           ;if (isanom .and. cint .eq. 0) then
           if (isanom .or. \
@@ -1033,7 +1071,6 @@ begin
             gplot = gsn_csm_contour_map_ce(wks,mydata,res2)
           end if
           delete(mydata)
-          delete(nextdata)
 
           kml = make_kml_image(kml, name, wks, gplot, kres, rescf, False)
 
@@ -1272,7 +1309,7 @@ begin
   shape = dimsizes(corr)
   cdata = new((/1,shape(0),shape(1)/),float)
   cdata(0,:,:) = corr
-  printVarSummary(cdata)
+  ;printVarSummary(cdata)
   plotmap(cdata,wks_name,wks_type,opts)
   
 end 
@@ -1398,6 +1435,11 @@ begin
     outType = "diff"
   end if
 
+  maskType=getenv("mask")
+  if (ismissing(maskType)) then
+    maskType = "none"
+  end if
+
   anom=getenv("anom")
   if (.not. ismissing(anom)) then
     isanom = anom .eq. "true"
@@ -1458,6 +1500,7 @@ begin
   options = True
   options@plottype=plotType
   options@outtype=outType
+  options@mask=maskType
   options@product_dir=productDir
   options@variable=variable
   options@level=level
