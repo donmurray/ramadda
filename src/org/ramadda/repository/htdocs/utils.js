@@ -276,8 +276,17 @@ var GuiUtils = {
             return false;
         }
         return true;
+    },
+    inputIsRequired: function (domId, rangeValue, min) {
+        var value = $("#"+ domId).val();
+        if(value == null || value.trim().length==0) {
+            closeFormLoadingDialog ();
+            return false;
+        }
+        return true;
     }
 
+    
 
 };
 
