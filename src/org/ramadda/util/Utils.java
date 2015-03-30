@@ -1381,12 +1381,10 @@ public class Utils {
      *
      * @return _more_
      */
-    public static String obfuscate(String s) {
-        while (s.length() < 8) {
-            s += " ";
-        }
-
-        return encodeBase64(rot13(s).getBytes());
+    public static String obfuscate(String s, boolean base64) {
+        if(base64)
+            return encodeBase64(rot13(s).getBytes());
+        return rot13(s);
     }
 
     /**
@@ -1396,8 +1394,10 @@ public class Utils {
      *
      * @return _more_
      */
-    public static String unobfuscate(String s) {
-        return rot13(new String(decodeBase64(s)));
+    public static String unobfuscate(String s, boolean base64) {
+        if(base64)
+            return rot13(new String(decodeBase64(s)));
+        return rot13(s);
     }
 
 

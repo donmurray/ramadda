@@ -57,7 +57,7 @@ public class FormInfo {
      *
      * @param js _more_
      */
-    public void addJavascriptValidation(Appendable js) {
+    public void addJavascriptValidation(Appendable js) throws Exception {
         for (Constraint constraint : constraints) {
             constraint.addJavascriptValidation(js);
         }
@@ -139,7 +139,8 @@ public class FormInfo {
          *
          * @param js _more_
          */
-        public void addJavascriptValidation(Appendable js) {}
+        public void addJavascriptValidation(Appendable js) throws Exception  {
+        }
 
         /**
          * _more_
@@ -192,7 +193,8 @@ public class FormInfo {
          *
          * @param js _more_
          */
-        public void addJavascriptValidation(Appendable js) {
+        @Override
+        public void addJavascriptValidation(Appendable js) throws Exception {
             Utils.append(js,
                          "if(!GuiUtils.inputValueOk(" + HtmlUtils.squote(id)
                          + "," + value + "," + (min
@@ -242,7 +244,8 @@ public class FormInfo {
          *
          * @param js _more_
          */
-        public void addJavascriptValidation(Appendable js) {
+        @Override
+        public void addJavascriptValidation(Appendable js) throws Exception {
             Utils.append(js,
                          "if(!GuiUtils.inputLengthOk(" + HtmlUtils.squote(id)
                          + "," + length + ")) {\n");
@@ -281,8 +284,9 @@ public class FormInfo {
          *
          * @param js _more_
          */
-        public void addJavascriptValidation(StringBuffer js) {
-            js.append("if(!inputIsRequired(" + HtmlUtils.squote(id)
+        @Override
+        public void addJavascriptValidation(Appendable js) throws Exception {
+            js.append("if(!GuiUtils.inputIsRequired(" + HtmlUtils.squote(id)
                       + ")) {\n");
             String message = "Error: " + label + " is required";
             error(js, message);
