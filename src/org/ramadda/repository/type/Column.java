@@ -1886,7 +1886,9 @@ public class Column implements DataTypes, Constants {
             String value = ((dflt != null)
                             ? dflt
                             : "");
-            if (values != null) {
+            if (request.defined(urlArg)) {
+                value = request.getString(urlArg);
+            } else  if (values != null) {
                 value = (String) toString(values, offset);
             }
             widget = HtmlUtils.select(urlArg, enumValues, value,
@@ -1895,7 +1897,9 @@ public class Column implements DataTypes, Constants {
             String value = ((dflt != null)
                             ? dflt
                             : "");
-            if (values != null) {
+            if (request.defined(urlArg)) {
+                value = request.getString(urlArg);
+            } else if (values != null) {
                 value = (String) toString(values, offset);
             }
             List enums = getEnumPlusValues(request, entry);
@@ -2049,7 +2053,6 @@ public class Column implements DataTypes, Constants {
             }
         }
 
-        //xxxx
         if (required) {
             widget = widget +" " + HtmlUtils.span("* " + msg("required"),HtmlUtils.cssClass("ramadda-required-field"));
         }
