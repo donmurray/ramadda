@@ -1024,6 +1024,9 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                                                  arrow);
 
 
+
+
+                    entryName = HtmlUtil.tag(TAG_A,[ATTR_HREF, entry.getEntryUrl()],entryName);
                     var left =   HtmlUtil.div([ATTR_STYLE," white-space: nowrap;  overflow-x:none; max-width:300px;"],open +" " + link +" " +  entryName);
 
                     var details = HtmlUtil.div([ATTR_ID,this.getDomId(ID_DETAILS+entry.getIdForDom()), ATTR_CLASS,this.getClass("details")],HtmlUtil.div([ATTR_CLASS,this.getClass("details-inner"),ATTR_ID,this.getDomId(ID_DETAILS_INNER+entry.getIdForDom())],""));
