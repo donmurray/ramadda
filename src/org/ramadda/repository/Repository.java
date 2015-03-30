@@ -593,8 +593,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @return _more_
      */
     public boolean isRegistered() {
-        //        return true;
-        return isRegistered;
+        return true;
+        //        return isRegistered;
     }
 
 
