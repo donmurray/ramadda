@@ -593,8 +593,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @return _more_
      */
     public boolean isRegistered() {
-        return true;
-        //        return isRegistered;
+        //        return true;
+        return isRegistered;
     }
 
 
@@ -1164,15 +1164,20 @@ public class Repository extends RepositoryBase implements RequestHandler,
         isRegistered = false;
         String registrationKey = getProperty(PROP_REGISTER_KEY, "");
         List<String> toks =
-            StringUtil.split(Utils.unobfuscate(registrationKey), "-");
+            StringUtil.split(Utils.unobfuscate(registrationKey,true), ":");
         if (toks.size() != 3) {
             return;
         }
         String id     = toks.get(0);
-        String users  = toks.get(1);
-        String thanks = toks.get(2);
-        isRegistered = thanks.equals("thanks");
-        //        System.err.println(id +" - " + users +" - " + thanks + " - " + isRegistered);
+        String thanks = Utils.unobfuscate(toks.get(1),false);
+        int users = 0;
+        try  {
+            users  = new Integer(toks.get(2)).intValue();
+        } catch(Exception exc) {
+            return;
+        }
+
+        isRegistered = thanks.trim().equals("namaste");
     }
 
 
@@ -4771,7 +4776,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
     public Result processDocs(Request request) throws Exception {
         StringBuilder  sb      = new StringBuilder();
         List<String[]> docUrls = getPluginManager().getDocUrls();
-        sb.append(msgHeader("Available documentation"));
+        sb.append(HtmlUtils.sectionOpen(msg("Available documentation"), false));
         if (docUrls.size() == 0) {
             sb.append(
                 getPageHandler().showDialogNote(
@@ -4785,7 +4790,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
             sb.append("<br>&nbsp;");
         }
         sb.append("</ul>");
-
+        sb.append(HtmlUtils.sectionClose());
         return new Result("Documentation", sb);
     }
 

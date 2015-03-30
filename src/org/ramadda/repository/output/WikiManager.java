@@ -578,9 +578,9 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
 
         if (inDiv) {
-            sb.append(HtmlUtils.open("div", attrs));
+            sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV, attrs));
         } else {
-            sb.append(HtmlUtils.open("div", HtmlUtils.style(((align != null)
+            sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV, HtmlUtils.style(((align != null)
                     ? "float:" + align + ";"
                     : "") + " display:inline-block;text-align:center")));
         }
@@ -591,7 +591,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 HtmlUtils.span(
                     caption, HtmlUtils.cssClass("wiki-image-caption")));
         }
-        sb.append(HtmlUtils.close("div"));
+        sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
 
         return sb.toString();
 
@@ -808,14 +808,14 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         }
 
         if (wrapInADiv) {
-            sb.append(HtmlUtils.open("div", ((cssClass != null)
+            sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV, ((cssClass != null)
                                              ? HtmlUtils.cssClass(cssClass)
                                              : "") + HtmlUtils.style(
                                              style.toString())));
         }
         sb.append(result);
         if (wrapInADiv) {
-            sb.append(HtmlUtils.close("div"));
+            sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
         }
 
         if (suffix != null) {
@@ -1703,7 +1703,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                     innerStyle.append("max-height:" + maxHeight + "px;");
                     innerStyle.append("overflow-y: auto;");
                 }
-                //                sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("row")));
+                //                sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV, HtmlUtils.cssClass("row")));
                 int rowCnt = 0;
                 int colCnt = 100;
                 int weight = 12 / columns;
@@ -1713,7 +1713,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                     colCnt++;
                     if (colCnt >= columns) {
                         if (rowCnt > 0) {
-                            sb.append(HtmlUtils.close("div"));
+                            sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
                             if (doLine) {
                                 sb.append("<hr>");
                             } else {
@@ -1721,7 +1721,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                             }
                         }
                         rowCnt++;
-                        sb.append(HtmlUtils.open("div",
+                        sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
                                 HtmlUtils.cssClass("row")));
                         colCnt = 0;
                     }
@@ -1729,13 +1729,13 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                     if ((weights != null) && (i < weights.size())) {
                         weightString = weights.get(i);
                     }
-                    sb.append(HtmlUtils.open("div",
+                    sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
                                              HtmlUtils.cssClass("col-md-"
                                                  + weightString)));
-                    sb.append(HtmlUtils.open("div",
+                    sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
                                              HtmlUtils.cssClass("minitron")));
 
-                    sb.append(HtmlUtils.tag("h2", "",
+                    sb.append(HtmlUtils.tag(HtmlUtils.TAG_H2, "",
                                             HtmlUtils.href(urls.get(i),
                                                 titles.get(i))));
 
@@ -1745,10 +1745,10 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                             HtmlUtils.cssClass("bs-inner")
                                             + HtmlUtils.attr("style",
                                                 innerStyle.toString())));
-                    sb.append(HtmlUtils.close("div"));
-                    sb.append(HtmlUtils.close("div"));
+                    sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
+                    sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
                 }
-                sb.append(HtmlUtils.close("div"));
+                sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
 
                 return sb.toString();
             } else if (doingSlideshow) {
@@ -4292,7 +4292,6 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
     public void addDisplayImports(Request request, StringBuilder sb)
             throws Exception {
 
-        System.err.println ("WikiManager.addDisplayImports");
         getMapManager().addMapImports(request, sb);
 
         if (request.getExtraProperty("initchart") == null) {
