@@ -1,247 +1,248 @@
-#NA:Not Available
+NONE:Select a country
 US:United States
-CA:Canada
-AD:Andorra
-AE:United Arab Emirates
 AF:Afghanistan
-AG:Antigua and Barbuda
-AI:Anguilla
-AL:Albania
-AM:Armenia
-AN:Netherlands Antilles
-AO:Angola
-AQ:Antarctica
-AR:Argentina
-AS:American Samoa
-AT:Austria
-AU:Australia
-AW:Aruba
 AX:Aland Islands
+AL:Albania
+DZ:Algeria
+AS:American Samoa
+AD:Andorra
+AO:Angola
+AI:Anguilla
+AQ:Antarctica
+AG:Antigua and Barbuda
+AR:Argentina
+AM:Armenia
+AW:Aruba
+AU:Australia
+AT:Austria
 AZ:Azerbaijan
-BA:Bosnia and Herzegovina
-BB:Barbados
-BD:Bangladesh
-BE:Belgium
-BF:Burkina Faso
-BG:Bulgaria
 BH:Bahrain
-BI:Burundi
-BJ:Benin
-BL:Saint Barthelemy
-BM:Bermuda
-BN:Brunei
-BO:Bolivia
-BR:Brazil
-BS:The Bahamas
-BT:Bhutan
-BV:Bouvet Island
-BW:Botswana
+BD:Bangladesh
+BB:Barbados
 BY:Belarus
+BE:Belgium
 BZ:Belize
-CC:Cocos (Keeling) Islands
-CD:Democratic Republic of the Congo
-CF:Central African Republic
-CG:Republic of the Congo
-CH:Switzerland
-CI:Ivory Coast
-CK:Cook Islands
-CL:Chile
-CM:Cameroon
+BJ:Benin
+BM:Bermuda
+BT:Bhutan
+BO:Bolivia
+BA:Bosnia and Herzegovina
+BW:Botswana
+BV:Bouvet Island
+BR:Brazil
+IO:British Indian Ocean Territory
+VG:British Virgin Islands
+BN:Brunei
+BG:Bulgaria
+BF:Burkina Faso
+MM:Burma
+BI:Burundi
+KH:Cambodia
 CN:China
-CO:Colombia
-CR:Costa Rica
-CU:Cuba
+CM:Cameroon
+CA:Canada
 CV:Cape Verde
+KY:Cayman Islands
+CF:Central African Republic
+TD:Chad
+CL:Chile
 CX:Christmas Island
+CC:Cocos (Keeling) Islands
+CO:Colombia
+KM:Comoros
+CK:Cook Islands
+CR:Costa Rica
+HR:Croatia
+CU:Cuba
 CY:Cyprus
 CZ:Czech Republic
-DE:Germany
-DJ:Djibouti
+CD:Democratic Republic of the Congo
 DK:Denmark
+DJ:Djibouti
 DM:Dominica
 DO:Dominican Republic
-DZ:Algeria
 EC:Ecuador
-EE:Estonia
 EG:Egypt
-EH:Western Sahara
+SV:El Salvador
+GQ:Equatorial Guinea
 ER:Eritrea
-ES:Spain
+EE:Estonia
 ET:Ethiopia
-FI:Finland
-FJ:Fiji
 FK:Falkland Islands
-FM:Micronesia
 FO:Faroe Islands
+FJ:Fiji
+FI:Finland
 FR:France
-GA:Gabon
-GB:United Kingdom
-GD:Grenada
-GE:Georgia
 GF:French Guiana
-GG:Guernsey
+PF:French Polynesia
+TF:French Southern and Antarctic Lands
+GA:Gabon
+GE:Georgia
+DE:Germany
 GH:Ghana
 GI:Gibraltar
-GL:Greenland
-GM:The Gambia
-GN:Guinea
-GP:Guadeloupe
-GQ:Equatorial Guinea
 GR:Greece
-GS:South Georgia and South Sandwich Islands
-GT:Guatemala
+GL:Greenland
+GD:Grenada
+GP:Guadeloupe
 GU:Guam
+GT:Guatemala
+GG:Guernsey
+GN:Guinea
 GW:Guinea-Bissau
 GY:Guyana
-HK:Hong Kong
+HT:Haiti
 HM:Heard Island and McDonald Islands
 HN:Honduras
-HR:Croatia
-HT:Haiti
+HK:Hong Kong
 HU:Hungary
-ID:Indonesia
-IE:Ireland
-IL:Israel
-IM:Isle of Man
-IN:India
-IO:British Indian Ocean Territory
-IQ:Iraq
-IR:Iran
 IS:Iceland
+IN:India
+ID:Indonesia
+IR:Iran
+IQ:Iraq
+IE:Ireland
+IM:Isle of Man
+IL:Israel
 IT:Italy
-JE:Jersey
+CI:Ivory Coast
 JM:Jamaica
-JO:Jordan
 JP:Japan
-KE:Kenya
-KG:Kyrgyzstan
-KH:Cambodia
-KI:Kiribati
-KM:Comoros
-KN:Saint Kitts and Nevis
-KP:North Korea
-KR:South Korea
-KW:Kuwait
-KY:Cayman Islands
+JE:Jersey
+JO:Jordan
 KZ:Kazakhstan
+KE:Kenya
+KI:Kiribati
+KW:Kuwait
+KG:Kyrgyzstan
 LA:Laos
+LV:Latvia
 LB:Lebanon
-LC:Saint Lucia
-LI:Liechtenstein
-LK:Sri Lanka
-LR:Liberia
 LS:Lesotho
+LR:Liberia
+LY:Libya
+LI:Liechtenstein
 LT:Lithuania
 LU:Luxembourg
-LV:Latvia
-LY:Libya
-MA:Morocco
-MC:Monaco
-MD:Moldova
-ME:Montenegro
-MF:Saint Martin
-MG:Madagascar
-MH:Marshall Islands
-MK:Macedonia
-ML:Mali
-MM:Burma
-MN:Mongolia
 MO:Macau
-MP:Northern Mariana Islands
+MK:Macedonia
+MG:Madagascar
+MW:Malawi
+MY:Malaysia
+MV:Maldives
+ML:Mali
+MT:Malta
+MH:Marshall Islands
 MQ:Martinique
 MR:Mauritania
-MS:Montserrat
-MT:Malta
 MU:Mauritius
-MV:Maldives
-MW:Malawi
+YT:Mayotte
 MX:Mexico
-MY:Malaysia
+FM:Micronesia
+MD:Moldova
+MC:Monaco
+MN:Mongolia
+ME:Montenegro
+MS:Montserrat
+MA:Morocco
 MZ:Mozambique
 NA:Namibia
-NC:New Caledonia
-NE:Niger
-NF:Norfolk Island
-NG:Nigeria
-NI:Nicaragua
-NL:Netherlands
-NO:Norway
-NP:Nepal
 NR:Nauru
-NU:Niue
+NP:Nepal
+NL:Netherlands
+AN:Netherlands Antilles
+NC:New Caledonia
 NZ:New Zealand
+NI:Nicaragua
+NE:Niger
+NG:Nigeria
+NU:Niue
+NF:Norfolk Island
+KP:North Korea
+MP:Northern Mariana Islands
+NO:Norway
 OM:Oman
-PA:Panama
-PE:Peru
-PF:French Polynesia
-PG:Papua New Guinea
-PH:Philippines
 PK:Pakistan
-PL:Poland
-PM:Saint Pierre and Miquelon
-PN:Pitcairn Islands
-PR:Puerto Rico
-PS:Palesinian Territory
-PT:Portugal
 PW:Palau
+PS:Palesinian Territory
+PA:Panama
+PG:Papua New Guinea
 PY:Paraguay
+PE:Peru
+PH:Philippines
+PN:Pitcairn Islands
+PL:Poland
+PT:Portugal
+PR:Puerto Rico
 QA:Qatar
+CG:Republic of the Congo
 RE:Reunion
 RO:Romania
-RS:Serbia
 RU:Russian Federation
 RW:Rwanda
-SA:Saudi Arabia
-SB:Solomon Islands
-SC:Seychelles
-SD:Sudan
-SE:Sweden
-SG:Singapore
+BL:Saint Barthelemy
 SH:Saint Helena
-SI:Slovenia
-SJ:Svalbard
-SK:Slovakia
-SL:Sierra Leone
+KN:Saint Kitts and Nevis
+LC:Saint Lucia
+MF:Saint Martin
+PM:Saint Pierre and Miquelon
+VC:Saint Vincent and the Grenadines
+WS:Samoa
 SM:San Marino
-SN:Senegal
-SO:Somalia
-SR:Suriname
 ST:Sao Tome and Principe
-SV:El Salvador
-SY:Syria
+SA:Saudi Arabia
+SN:Senegal
+RS:Serbia
+SC:Seychelles
+SL:Sierra Leone
+SG:Singapore
+SK:Slovakia
+SI:Slovenia
+SB:Solomon Islands
+SO:Somalia
+ZA:South Africa
+GS:South Georgia and South Sandwich Islands
+KR:South Korea
+ES:Spain
+LK:Sri Lanka
+SD:Sudan
+SR:Suriname
+SJ:Svalbard
 SZ:Swaziland
-TC:Turks and Caicos Islands
-TD:Chad
-TF:French Southern and Antarctic Lands
-TG:Togo
-TH:Thailand
-TJ:Tajikistan
-TK:Tokelau
-TL:Timor-Leste
-TM:Turkmenistan
-TN:Tunisia
-TO:Tonga
-TR:Turkey
-TT:Trinidad and Tobago
-TV:Tuvalu
+SE:Sweden
+CH:Switzerland
+SY:Syria
 TW:Taiwan
+TJ:Tajikistan
 TZ:Tanzania
-UA:Ukraine
+TH:Thailand
+BS:The Bahamas
+GM:The Gambia
+TL:Timor-Leste
+TG:Togo
+TK:Tokelau
+TO:Tonga
+TT:Trinidad and Tobago
+TN:Tunisia
+TR:Turkey
+TM:Turkmenistan
+TC:Turks and Caicos Islands
+TV:Tuvalu
 UG:Uganda
+UA:Ukraine
+AE:United Arab Emirates
+GB:United Kingdom
 UM:United States Minor Outlying Islands
 UY:Uruguay
 UZ:Uzbekistan
-VA:Vatican City
-VC:Saint Vincent and the Grenadines
-VE:Venezuela
-VG:British Virgin Islands
-VI:Virgin Islands
-VN:Vietnam
 VU:Vanuatu
+VA:Vatican City
+VE:Venezuela
+VN:Vietnam
+VI:Virgin Islands
 WF:Wallis and Futuna
-WS:Samoa
+EH:Western Sahara
 YE:Yemen
-YT:Mayotte
-ZA:South Africa
 ZM:Zambia
+ZW:Zimbabwe
 ZW:Zimbabwe
