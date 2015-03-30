@@ -1080,10 +1080,21 @@ public class Admin extends RepositoryManager {
         csb.append(HtmlUtils.row(HtmlUtils.colspan(msgHeader("Registration"),
                 2)));
 
+
+        String regKey = getProperty(PROP_REGISTER_KEY, "");
         csb.append(HtmlUtils.formEntry(msgLabel("Key"),
                                        HtmlUtils.input(PROP_REGISTER_KEY,
-                                           getProperty(PROP_REGISTER_KEY,
-                                               ""), HtmlUtils.SIZE_40)));
+                                                       regKey, HtmlUtils.SIZE_40)));
+
+        if(getRepository().isRegistered()) {
+            csb.append(HtmlUtils.formEntry("","Registered"));
+        } else {
+            if(Utils.stringDefined(regKey)) {
+                csb.append(HtmlUtils.formEntry("","Invalid registration"));
+            } else {
+                csb.append(HtmlUtils.formEntry("","Not registered"));
+            }
+        }
 
         csb.append(
             HtmlUtils.row(
