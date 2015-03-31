@@ -1739,9 +1739,16 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                             HtmlUtils.href(urls.get(i),
                                                 titles.get(i))));
 
+                    String displayHtml = contents.get(i);
                     String snippet = getSnippet(request, child);
+                    if(Utils.stringDefined(snippet)) {
+                        snippet =  wikifyEntry(request, child, snippet,
+                                               false, null, null);
+                        displayHtml = snippet += displayHtml;
+                    }
 
-                    sb.append(HtmlUtils.div(snippet + contents.get(i),
+
+                    sb.append(HtmlUtils.div(displayHtml,
                                             HtmlUtils.cssClass("bs-inner")
                                             + HtmlUtils.attr("style",
                                                 innerStyle.toString())));
