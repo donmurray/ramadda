@@ -64,20 +64,22 @@ var GuiUtils = {
     },
 
     showingError: false,
+    pageUnloading: false,
     handleError: function(error, extra) {
+        if(this.pageUnloading) {
+            return;
+        }
         console.log(error);
         if(extra) {
             console.log(extra);
         }
-        //Do this later as we are getting errors when the user clicks away from this page
-        setTimeout(function(){ 
-                if(this.showingError) {
-                    return;
-                }
-                this.showingError = true;
-                alert("An error has occurred: " + error);
-                this.showingError = false;
-            }, 2000);
+
+        if(this.showingError) {
+            return;
+        }
+        this.showingError = true;
+        alert(error);
+        this.showingError = false;
         closeFormLoadingDialog ();
     },
     isJsonError: function(data) {
@@ -661,4 +663,9 @@ var RamaddaUtil = {
 }
 
 
+//Set a flag so we know not to show error dialogs above
+$(window).on('beforeunload', function(){
+        GuiUtils.pageUnloading = true;
+        return null;
+    });
 

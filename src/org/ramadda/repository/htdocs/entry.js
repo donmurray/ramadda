@@ -254,12 +254,16 @@ function Ramadda(repositoryRoot) {
                                 callback(theRamadda, theRamadda.entryTypes);
                             }
                         }).done(function(jqxhr, textStatus, error) {
-                                //                                console.log("JSON done:" +textStatus);
+                                //console.log("getEntryTypes.done:" +textStatus+ " error:" + error);
                         }).always(function(jqxhr, textStatus, error) {
-                                //                                console.log("Always:" +textStatus);
+                                //console.log("getEntryTypes.always:" +textStatus+ " error:" + error);
                         }).fail(function(jqxhr, textStatus, error) {
-                            var err = textStatus + " --  " + error;
-                            GuiUtils.handleError("Error reading entry types:" + err, "URL:" + url);
+                                //console.log("getEntryTypes.fail:" +textStatus + " error:" + error);
+                            var err = "";
+                            if(error && error.length>0) {
+                                err += ":  " + error;
+                            }
+                            GuiUtils.handleError("An error has occurred reading entry types" + err, "URL:" + url);
                             });
                 }
                 return this.entryTypes;
@@ -742,7 +746,7 @@ function EntryList(repository, jsonUrl, listener, doSearch) {
                     listener = this.listener;
                 }
                 var _this = this;
-                console.log("json:" + this.url);
+                console.log("search url:" + this.url);
                 var jqxhr = $.getJSON( this.url, function(data, status, jqxhr) {
                         if(GuiUtils.isJsonError(data)) {
                             return;
@@ -751,8 +755,7 @@ function EntryList(repository, jsonUrl, listener, doSearch) {
                         _this.createEntries(data, listener);
                     })
                     .fail(function(jqxhr, textStatus, error) {
-                            //                            console.log("ERROR:" + jqxhr.responseText);
-                            GuiUtils.handleError("error doing search:" +error, _this.url);
+                            GuiUtils.handleError("An error occurred doing search:" +error, _this.url);
                             console.log("listener:" + listener.handleSearchError);
                             if(listener.handleSearchError) {
                                 listener.handleSearchError(_this.url,error);
