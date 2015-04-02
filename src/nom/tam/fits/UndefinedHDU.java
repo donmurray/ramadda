@@ -1,3 +1,8 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits;
 /* Copyright: Thomas McGlynn 1997-1999.
  * This code may be used for any purpose, non-commercial
@@ -8,20 +13,21 @@ package nom.tam.fits;
  * improvements, enhancements and bug fixes.
  */
 
+
 import nom.tam.util.ArrayFuncs;
 
-/** Holder for unknown data types. */
-public class UndefinedHDU
-        extends BasicHDU {
 
-    /** Build an image HDU using the supplied data.
+/** Holder for unknown data types. */
+public class UndefinedHDU extends BasicHDU {
+
+    /**
+     * Build an image HDU using the supplied data.
      * @param h the header for this HDU
      * @param d the data used to build the image.
      * @exception FitsException if there was a problem with the data.
      */
-    public UndefinedHDU(Header h, Data d)
-            throws FitsException {
-        myData = d;
+    public UndefinedHDU(Header h, Data d) throws FitsException {
+        myData   = d;
         myHeader = h;
 
     }
@@ -30,47 +36,69 @@ public class UndefinedHDU
      * header.
      * @return <CODE>true</CODE> if this HDU has a valid header.
      */
+
+    /**
+     * _more_
+     *
+     * @param hdr _more_
+     *
+     * @return _more_
+     */
     public static boolean isHeader(Header hdr) {
-        if (hdr.getStringValue("XTENSION") != null
-                && hdr.getIntValue("NAXIS", -1) >= 0) {
+        if ((hdr.getStringValue("XTENSION") != null)
+                && (hdr.getIntValue("NAXIS", -1) >= 0)) {
             return true;
         }
+
         return false;
     }
 
-    /** Check if we can use the following object as
+    /**
+     * Check if we can use the following object as
      *  in an Undefined FITS block.  We allow this
      *  so long as computeLSize can get a size.  Note
      *  that computeLSize may be wrong!
      *  @param o    The Object being tested.
+     *
+     * @return _more_
      */
     public static boolean isData(Object o) {
         return ArrayFuncs.computeLSize(o) > 0;
     }
 
-    /** Create a Data object to correspond to the header description.
+    /**
+     * Create a Data object to correspond to the header description.
      * @return An unfilled Data object which can be used to read
      *         in the data for this HDU.
      * @exception FitsException if the image extension could not be created.
      */
-    public Data manufactureData()
-            throws FitsException {
+    public Data manufactureData() throws FitsException {
         return manufactureData(myHeader);
     }
 
-    public static Data manufactureData(Header hdr)
-            throws FitsException {
+    /**
+     * _more_
+     *
+     * @param hdr _more_
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
+     */
+    public static Data manufactureData(Header hdr) throws FitsException {
         return new UndefinedData(hdr);
     }
 
-    /** Create a  header that describes the given
+    /**
+     * Create a  header that describes the given
      * image data.
      * @param d The image to be described.
+     *
+     * @return _more_
      * @exception FitsException if the object does not contain
-     *		valid image data.
+     *          valid image data.
      */
-    public static Header manufactureHeader(Data d)
-            throws FitsException {
+    public static Header manufactureHeader(Data d) throws FitsException {
 
         Header h = new Header();
         d.fillHeader(h);
@@ -78,17 +106,27 @@ public class UndefinedHDU
         return h;
     }
 
-    /** Encapsulate an object as an ImageHDU. */
+    /**
+     * Encapsulate an object as an ImageHDU. 
+     *
+     * @param o _more_
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
+     */
     public static Data encapsulate(Object o) throws FitsException {
         return new UndefinedData(o);
     }
 
-    /** Print out some information about this HDU.
+    /**
+     * Print out some information about this HDU.
      */
     public void info() {
 
         System.out.println("  Unhandled/Undefined/Unknown Type");
-        System.out.println("  XTENSION=" + myHeader.getStringValue("XTENSION").trim());
+        System.out.println("  XTENSION="
+                           + myHeader.getStringValue("XTENSION").trim());
         System.out.println("  Apparent size:" + myData.getTrueSize());
     }
 }

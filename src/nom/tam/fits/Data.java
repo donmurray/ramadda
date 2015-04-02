@@ -1,4 +1,12 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits;
+
+
+import nom.tam.util.*;
 
 /* Copyright: Thomas McGlynn 1997-1999.
  * This code may be used for any purpose, non-commercial
@@ -9,14 +17,16 @@ package nom.tam.fits;
  * improvements, enhancements and bug fixes.
  */
 import java.io.*;
-import nom.tam.util.*;
 
-/** This class provides methods to access the data segment of an
+
+/**
+ * This class provides methods to access the data segment of an
  * HDU.
  */
 public abstract class Data implements FitsElement {
 
-    /** This is the object which contains the actual data for the HDU.
+    /**
+     * This is the object which contains the actual data for the HDU.
      * <ul>
      *  <li> For images and primary data this is a simple (but possibly
      *       multi-dimensional) primitive array.  When group data is
@@ -29,41 +39,63 @@ public abstract class Data implements FitsElement {
      *       (more or less) dimensionality.
      *  </ul>
      */
+
     /** The starting location of the data when last read */
     protected long fileOffset = -1;
+
     /** The size of the data when last read */
     protected long dataSize;
+
     /** The inputstream used. */
     protected RandomAccess input;
 
-    /** Get the file offset */
+    /**
+     * Get the file offset 
+     *
+     * @return _more_
+     */
     public long getFileOffset() {
         return fileOffset;
     }
 
-    /** Set the fields needed for a re-read */
+    /**
+     * Set the fields needed for a re-read 
+     *
+     * @param o _more_
+     */
     protected void setFileOffset(Object o) {
         if (o instanceof RandomAccess) {
             fileOffset = FitsUtil.findOffset(o);
-            dataSize = getTrueSize();
-            input = (RandomAccess) o;
+            dataSize   = getTrueSize();
+            input      = (RandomAccess) o;
         }
     }
 
-    /** Write the data -- including any buffering needed
+    /**
+     * Write the data -- including any buffering needed
      * @param o  The output stream on which to write the data.
+     *
+     * @throws FitsException _more_
      */
     public abstract void write(ArrayDataOutput o) throws FitsException;
 
-    /** Read a data array into the current object and if needed position
+    /**
+     * Read a data array into the current object and if needed position
      * to the beginning of the next FITS block.
      * @param i The input data stream
+     *
+     * @throws FitsException _more_
      */
     public abstract void read(ArrayDataInput i) throws FitsException;
 
+    /**
+     * _more_
+     *
+     * @throws FitsException _more_
+     */
     public void rewrite() throws FitsException {
 
-        if (!rewriteable()) {
+        if ( !rewriteable()) {
             throw new FitsException("Illegal attempt to rewrite data");
         }
 
@@ -76,42 +108,78 @@ public abstract class Data implements FitsElement {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean reset() {
         try {
             FitsUtil.reposition(input, fileOffset);
+
             return true;
         } catch (Exception e) {
             return false;
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean rewriteable() {
-        if (input == null
-                || fileOffset < 0
-                || (getTrueSize() + 2879) / 2880 != (dataSize + 2879) / 2880) {
+        if ((input == null) || (fileOffset < 0)
+                || (getTrueSize() + 2879) / 2880
+                   != (dataSize + 2879) / 2880) {
             return false;
         } else {
             return true;
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     abstract long getTrueSize();
 
-    /** Get the size of the data element in bytes */
+    /**
+     * Get the size of the data element in bytes 
+     *
+     * @return _more_
+     */
     public long getSize() {
         return FitsUtil.addPadding(getTrueSize());
     }
 
-    /** Return the data array object.
+    /**
+     * Return the data array object.
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
      */
     public abstract Object getData() throws FitsException;
 
-    /** Return the non-FITS data object */
+    /**
+     * Return the non-FITS data object 
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
+     */
     public Object getKernel() throws FitsException {
         return getData();
     }
 
-    /** Modify a header to point to this data
+    /**
+     * Modify a header to point to this data
+     *
+     * @param head _more_
+     *
+     * @throws FitsException _more_
      */
     abstract void fillHeader(Header head) throws FitsException;
 }

@@ -1,22 +1,14 @@
-/*
-* Copyright 2008-2015 Geode Systems LLC
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-* software and associated documentation files (the "Software"), to deal in the Software 
-* without restriction, including without limitation the rights to use, copy, modify, 
-* merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
-* permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies 
-* or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-* PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-* OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 package org.ramadda.util;
 
@@ -508,7 +500,8 @@ public class Utils {
         if (true) {
             String s = "asdasda<p></p>\nsds\n<p></p>\nasdasdas";
             s = s.replaceAll(".*<p></p>[\\n\\r]+", "");
-            System.err.println (s);
+            System.err.println(s);
+
             return;
         }
 
@@ -1378,12 +1371,15 @@ public class Utils {
      * _more_
      *
      * @param s _more_
+     * @param base64 _more_
      *
      * @return _more_
      */
     public static String obfuscate(String s, boolean base64) {
-        if(base64)
+        if (base64) {
             return encodeBase64(rot13(s).getBytes());
+        }
+
         return rot13(s);
     }
 
@@ -1391,12 +1387,15 @@ public class Utils {
      * _more_
      *
      * @param s _more_
+     * @param base64 _more_
      *
      * @return _more_
      */
     public static String unobfuscate(String s, boolean base64) {
-        if(base64)
+        if (base64) {
             return rot13(new String(decodeBase64(s)));
+        }
+
         return rot13(s);
     }
 

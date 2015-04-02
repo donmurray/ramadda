@@ -1,4 +1,10 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits;
+
 
 /*
  * Copyright: Thomas McGlynn 1997-1999.
@@ -10,29 +16,40 @@ package nom.tam.fits;
  * improvements, enhancements and bug fixes -- including
  * this class.
  */
-/** This class describes methods to access and manipulate the individual
+
+/**
+ * This class describes methods to access and manipulate the individual
  * cards for a FITS Header.
  */
 public class HeaderCard {
 
     /** The keyword part of the card (set to null if there's no keyword) */
     private String key;
+
     /** The value part of the card (set to null if there's no value) */
     private String value;
+
     /** The comment part of the card (set to null if there's no comment) */
     private String comment;
+
     /** Does this card represent a nullable field. ? */
     private boolean nullable;
+
     /** A flag indicating whether or not this is a string value */
     private boolean isString;
+
     /** Maximum length of a FITS keyword field */
     public static final int MAX_KEYWORD_LENGTH = 8;
+
     /** Maximum length of a FITS value field */
     public static final int MAX_VALUE_LENGTH = 70;
-    /** padding for building card images */
-    private static String space80 = "                                                                                ";
 
-    /** Create a HeaderCard from its component parts
+    /** padding for building card images */
+    private static String space80 =
+        "                                                                                ";
+
+    /**
+     * Create a HeaderCard from its component parts
      * @param key keyword (null for a comment)
      * @param value value (null for a comment or keyword without an '=')
      * @param comment comment
@@ -44,7 +61,8 @@ public class HeaderCard {
         isString = false;
     }
 
-    /** Create a HeaderCard from its component parts
+    /**
+     * Create a HeaderCard from its component parts
      * @param key keyword (null for a comment)
      * @param value value (null for a comment or keyword without an '=')
      * @param comment comment
@@ -52,11 +70,14 @@ public class HeaderCard {
      */
     public HeaderCard(String key, boolean value, String comment)
             throws HeaderCardException {
-        this(key, value ? "T" : "F", comment);
+        this(key, value
+                  ? "T"
+                  : "F", comment);
         isString = false;
     }
 
-    /** Create a HeaderCard from its component parts
+    /**
+     * Create a HeaderCard from its component parts
      * @param key keyword (null for a comment)
      * @param value value (null for a comment or keyword without an '=')
      * @param comment comment
@@ -68,7 +89,8 @@ public class HeaderCard {
         isString = false;
     }
 
-    /** Create a HeaderCard from its component parts
+    /**
+     * Create a HeaderCard from its component parts
      * @param key keyword (null for a comment)
      * @param value value (null for a comment or keyword without an '=')
      * @param comment comment
@@ -80,7 +102,8 @@ public class HeaderCard {
         isString = false;
     }
 
-    /** Create a HeaderCard from its component parts
+    /**
+     * Create a HeaderCard from its component parts
      * @param key keyword (null for a comment)
      * @param value value (null for a comment or keyword without an '=')
      * @param comment comment
@@ -91,7 +114,8 @@ public class HeaderCard {
         this(key, value, comment, false);
     }
 
-    /** Create a comment style card.
+    /**
+     * Create a comment style card.
      *  This constructor builds a card which has no value.
      *  This may be either a comment style card in which case the
      *  nullable field should be false, or a value field which
@@ -100,44 +124,55 @@ public class HeaderCard {
      *  @param key      The key for the comment or nullable field.
      *  @param comment  The comment
      *  @param nullable Is this a nullable field or a comment-style card?
+     *
+     * @throws HeaderCardException _more_
      */
     public HeaderCard(String key, String comment, boolean nullable)
             throws HeaderCardException {
         this(key, null, comment, nullable);
     }
 
-    /** Create a string from a double making sure that it's
+    /**
+     * Create a string from a double making sure that it's
      *  not more than 20 characters long.
      *  Probably would be better if we had a way to override this
      *  since we can loose precision for some doubles.
+     *
+     * @param input _more_
+     *
+     * @return _more_
      */
     private static String dblString(double input) {
         String value = String.valueOf(input);
         if (value.length() > 20) {
-            value = new java.util.Formatter().format("%20.13G", input).out().toString();
+            value = new java.util.Formatter().format("%20.13G",
+                    input).out().toString();
         }
+
         return value;
     }
 
-    /** Create a HeaderCard from its component parts
+    /**
+     * Create a HeaderCard from its component parts
      * @param key      Keyword (null for a COMMENT)
      * @param value    Value
      * @param comment  Comment
      * @param nullable Is this a nullable value card?
      * @exception HeaderCardException for any invalid keyword or value
      */
-    public HeaderCard(String key, String value, String comment, boolean nullable)
+    public HeaderCard(String key, String value, String comment,
+                      boolean nullable)
             throws HeaderCardException {
-        if (comment != null && comment.startsWith("ntf::")) {
-            String ckey = comment.substring(5); // Get rid of ntf:: prefix
+        if ((comment != null) && comment.startsWith("ntf::")) {
+            String ckey = comment.substring(5);  // Get rid of ntf:: prefix
             comment = HeaderCommentsMap.getComment(ckey);
         }
-        if (key == null && value != null) {
+        if ((key == null) && (value != null)) {
             throw new HeaderCardException("Null keyword with non-null value");
         }
 
-        if (key != null && key.length() > MAX_KEYWORD_LENGTH) {
-            if (!FitsFactory.getUseHierarch()
+        if ((key != null) && (key.length() > MAX_KEYWORD_LENGTH)) {
+            if ( !FitsFactory.getUseHierarch()
                     || !key.substring(0, 9).equals("HIERARCH.")) {
                 throw new HeaderCardException("Keyword too long");
             }
@@ -152,7 +187,8 @@ public class HeaderCard {
 
             if (value.startsWith("'")) {
                 if (value.charAt(value.length() - 1) != '\'') {
-                    throw new HeaderCardException("Missing end quote in string value");
+                    throw new HeaderCardException(
+                        "Missing end quote in string value");
                 }
 
                 value = value.substring(1, value.length() - 1).trim();
@@ -160,30 +196,32 @@ public class HeaderCard {
             }
         }
 
-        this.key = key;
-        this.value = value;
-        this.comment = comment;
+        this.key      = key;
+        this.value    = value;
+        this.comment  = comment;
         this.nullable = nullable;
-        isString = true;
+        isString      = true;
     }
 
-    /** Create a HeaderCard from a FITS card image
+    /**
+     * Create a HeaderCard from a FITS card image
      * @param card the 80 character card image
      */
     public HeaderCard(String card) {
-        key = null;
-        value = null;
-        comment = null;
+
+        key      = null;
+        value    = null;
+        comment  = null;
         isString = false;
 
         if (card.length() > 80) {
             card = card.substring(0, 80);
         }
 
-        if (FitsFactory.getUseHierarch()
-                && card.length() > 9
+        if (FitsFactory.getUseHierarch() && (card.length() > 9)
                 && card.substring(0, 9).equals("HIERARCH ")) {
             hierarchCard(card);
+
             return;
         }
 
@@ -194,6 +232,7 @@ public class HeaderCard {
         // treat short lines as special keywords
         if (card.length() < 9) {
             key = card;
+
             return;
         }
 
@@ -202,8 +241,9 @@ public class HeaderCard {
 
         // if it is an empty key, assume the remainder of the card is a comment
         if (key.length() == 0) {
-            key = "";
+            key     = "";
             comment = card.substring(8);
+
             return;
         }
 
@@ -211,6 +251,7 @@ public class HeaderCard {
         if (key.equals("COMMENT") || key.equals("HISTORY")
                 || !card.substring(8, 10).equals("= ")) {
             comment = card.substring(8).trim();
+
             return;
         }
 
@@ -220,10 +261,11 @@ public class HeaderCard {
         // If there is no value/comment part, we are done.
         if (valueAndComment.length() == 0) {
             value = "";
+
             return;
         }
 
-        int vend = -1;
+        int     vend  = -1;
         boolean quote = false;
 
         // If we have a ' then find the matching  '.
@@ -243,8 +285,9 @@ public class HeaderCard {
                 // if we did not find a matching single-quote...
                 if (vend == -1) {
                     // pretend this is a comment card
-                    key = null;
+                    key     = null;
                     comment = card;
+
                     return;
                 }
 
@@ -289,43 +332,49 @@ public class HeaderCard {
             int slashLoc = valueAndComment.indexOf('/');
             if (slashLoc != -1) {
                 comment = valueAndComment.substring(slashLoc + 1).trim();
-                value = valueAndComment.substring(0, slashLoc).trim();
+                value   = valueAndComment.substring(0, slashLoc).trim();
             } else {
                 value = valueAndComment;
             }
         }
+
     }
 
-    /** Process HIERARCH style cards...
+    /**
+     * Process HIERARCH style cards...
      *  HIERARCH LEV1 LEV2 ...  = value / comment
      *  The keyword for the card will be "HIERARCH.LEV1.LEV2..."
      *  A '/' is assumed to start a comment.
+     *
+     * @param card _more_
      */
     private void hierarchCard(String card) {
 
-        String name = "";
-        String token = null;
+        String name      = "";
+        String token     = null;
         String separator = "";
-        int[] tokLimits;
-        int posit = 0;
-        int commStart = -1;
+        int[]  tokLimits;
+        int    posit     = 0;
+        int    commStart = -1;
 
         // First get the hierarchy levels
         while ((tokLimits = getToken(card, posit)) != null) {
             token = card.substring(tokLimits[0], tokLimits[1]);
-            if (!token.equals("=")) {
-                name += separator + token;
+            if ( !token.equals("=")) {
+                name      += separator + token;
                 separator = ".";
             } else {
                 tokLimits = getToken(card, tokLimits[1]);
                 if (tokLimits != null) {
                     token = card.substring(tokLimits[0], tokLimits[1]);
                 } else {
-                    key = name;
-                    value = null;
+                    key     = name;
+                    value   = null;
                     comment = null;
+
                     return;
                 }
+
                 break;
             }
             posit = tokLimits[1];
@@ -335,9 +384,10 @@ public class HeaderCard {
 
         // At the end?
         if (tokLimits == null) {
-            value = null;
-            comment = null;
+            value    = null;
+            comment  = null;
             isString = false;
+
             return;
         }
 
@@ -346,47 +396,54 @@ public class HeaderCard {
         if (token.charAt(0) == '\'') {
             // Find the next undoubled quote...
             isString = true;
-            if (token.length() > 1 && token.charAt(1) == '\''
-                    && (token.length() == 2 || token.charAt(2) != '\'')) {
-                value = "";
+            if ((token.length() > 1) && (token.charAt(1) == '\'')
+                    && ((token.length() == 2) || (token.charAt(2) != '\''))) {
+                value     = "";
                 commStart = tokLimits[0] + 2;
             } else if (card.length() < tokLimits[0] + 2) {
-                value = null;
-                comment = null;
+                value    = null;
+                comment  = null;
                 isString = false;
+
                 return;
             } else {
                 int i;
                 for (i = tokLimits[0] + 1; i < card.length(); i += 1) {
                     if (card.charAt(i) == '\'') {
                         if (i == card.length() - 1) {
-                            value = card.substring(tokLimits[0] + 1, i);
+                            value     = card.substring(tokLimits[0] + 1, i);
                             commStart = i + 1;
+
                             break;
                         } else if (card.charAt(i + 1) == '\'') {
                             // Doubled quotes.
                             i += 1;
+
                             continue;
                         } else {
-                            value = card.substring(tokLimits[0] + 1, i);
+                            value     = card.substring(tokLimits[0] + 1, i);
                             commStart = i + 1;
+
                             break;
                         }
                     }
                 }
             }
             if (commStart < 0) {
-                value = null;
-                comment = null;
+                value    = null;
+                comment  = null;
                 isString = false;
+
                 return;
             }
             for (int i = commStart; i < card.length(); i += 1) {
                 if (card.charAt(i) == '/') {
                     comment = card.substring(i + 1).trim();
+
                     break;
                 } else if (card.charAt(i) != ' ') {
                     comment = null;
+
                     break;
                 }
             }
@@ -394,10 +451,10 @@ public class HeaderCard {
             isString = false;
             int sl = token.indexOf('/');
             if (sl == 0) {
-                value = null;
+                value   = null;
                 comment = card.substring(tokLimits[0] + 1);
             } else if (sl > 0) {
-                value = token.substring(0, sl);
+                value   = token.substring(0, sl);
                 comment = card.substring(tokLimits[0] + sl + 1);
             } else {
                 value = token;
@@ -405,9 +462,11 @@ public class HeaderCard {
                 for (int i = tokLimits[1]; i < card.length(); i += 1) {
                     if (card.charAt(i) == '/') {
                         comment = card.substring(i + 1).trim();
+
                         break;
                     } else if (card.charAt(i) != ' ') {
                         comment = null;
+
                         break;
                     }
                 }
@@ -415,9 +474,15 @@ public class HeaderCard {
         }
     }
 
-    /** Get the next token.  Can't use StringTokenizer
+    /**
+     * Get the next token.  Can't use StringTokenizer
      *  since we sometimes need to know the position within
      *  the string.
+     *
+     * @param card _more_
+     * @param posit _more_
+     *
+     * @return _more_
      */
     private int[] getToken(String card, int posit) {
 
@@ -433,68 +498,94 @@ public class HeaderCard {
         }
 
         if (card.charAt(i) == '=') {
-            return new int[]{i, i + 1};
+            return new int[] { i, i + 1 };
         }
 
         int j;
         for (j = i + 1; j < card.length(); j += 1) {
-            if (card.charAt(j) == ' ' || card.charAt(j) == '=') {
+            if ((card.charAt(j) == ' ') || (card.charAt(j) == '=')) {
                 break;
             }
         }
-        return new int[]{i, j};
+
+        return new int[] { i, j };
     }
 
-    /** Does this card contain a string value?
+    /**
+     * Does this card contain a string value?
+     *
+     * @return _more_
      */
     public boolean isStringValue() {
         return isString;
     }
 
-    /** Is this a key/value card?
+    /**
+     * Is this a key/value card?
+     *
+     * @return _more_
      */
     public boolean isKeyValuePair() {
-        return (key != null && value != null);
+        return ((key != null) && (value != null));
     }
 
-    /** Set the key.
+    /**
+     * Set the key.
+     *
+     * @param newKey _more_
      */
     void setKey(String newKey) {
         key = newKey;
     }
 
-    /** Return the keyword from this card
+    /**
+     * Return the keyword from this card
+     *
+     * @return _more_
      */
     public String getKey() {
         return key;
     }
 
-    /** Return the value from this card
+    /**
+     * Return the value from this card
+     *
+     * @return _more_
      */
     public String getValue() {
         return value;
     }
 
-    /** Set the value for this card.
+    /**
+     * Set the value for this card.
+     *
+     * @param update _more_
      */
     public void setValue(String update) {
         value = update;
     }
 
-    /** Return the comment from this card
+    /**
+     * Return the comment from this card
+     *
+     * @return _more_
      */
     public String getComment() {
         return comment;
     }
 
-    /** Return the 80 character card image
+    /**
+     * Return the 80 character card image
+     *
+     * @return _more_
      */
     public String toString() {
         StringBuffer buf = new StringBuffer(80);
 
         // start with the keyword, if there is one
         if (key != null) {
-            if (key.length() > 9 && key.substring(0, 9).equals("HIERARCH.")) {
+            if ((key.length() > 9)
+                    && key.substring(0, 9).equals("HIERARCH.")) {
                 return hierarchToString();
             }
             buf.append(key);
@@ -503,7 +594,7 @@ public class HeaderCard {
             }
         }
 
-        if (value != null || nullable) {
+        if ((value != null) || nullable) {
             buf.append("= ");
 
             if (value != null) {
@@ -542,7 +633,7 @@ public class HeaderCard {
                 buf.append(" / ");
             }
 
-        } else if (comment != null && comment.startsWith("= ")) {
+        } else if ((comment != null) && comment.startsWith("= ")) {
             buf.append("  ");
         }
 
@@ -565,25 +656,31 @@ public class HeaderCard {
         return buf.toString();
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     private String hierarchToString() {
 
 
-        StringBuffer b = new StringBuffer(80);
-        int p = 0;
-        String space = "";
+        StringBuffer b     = new StringBuffer(80);
+        int          p     = 0;
+        String       space = "";
         while (p < key.length()) {
             int q = key.indexOf('.', p);
             if (q < 0) {
                 b.append(space + key.substring(p));
+
                 break;
             } else {
                 b.append(space + key.substring(p, q));
             }
             space = " ";
-            p = q + 1;
+            p     = q + 1;
         }
 
-        if (value != null || nullable) {
+        if ((value != null) || nullable) {
             b.append("= ");
 
             if (value != null) {
@@ -597,14 +694,16 @@ public class HeaderCard {
                     avail -= 3 + comment.length();
                 }
 
-                if (avail > 0 && b.length() < 29) {
-                    b.append(space80.substring(0, Math.min(avail, 29 - b.length())));
+                if ((avail > 0) && (b.length() < 29)) {
+                    b.append(space80.substring(0,
+                            Math.min(avail, 29 - b.length())));
                 }
 
                 if (isString) {
                     b.append('\'');
-                } else if (avail > 0 && value.length() < 10) {
-                    b.append(space80.substring(0, Math.min(avail, 10 - value.length())));
+                } else if ((avail > 0) && (value.length() < 10)) {
+                    b.append(space80.substring(0,
+                            Math.min(avail, 10 - value.length())));
                 }
                 b.append(value);
                 if (isString) {
@@ -628,6 +727,7 @@ public class HeaderCard {
         if (card.length() > 80) {
             card = card.substring(0, 80);
         }
+
         return card;
     }
 }

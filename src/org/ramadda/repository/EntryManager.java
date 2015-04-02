@@ -1,21 +1,7 @@
-/*
-* Copyright 2008-2015 Geode Systems LLC
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-* software and associated documentation files (the "Software"), to deal in the Software 
-* without restriction, including without limitation the rights to use, copy, modify, 
-* merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
-* permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies 
-* or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-* PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-* OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
 
 package org.ramadda.repository;
@@ -908,8 +894,9 @@ public class EntryManager extends RepositoryManager {
         List<Entry>  entries     = new ArrayList<Entry>();
         List<Entry>  subGroups   = new ArrayList<Entry>();
         try {
-            typeHandler.getChildrenEntries(request, group, entries,
-                                           subGroups, new SelectInfo(where, outputHandler.getMaxEntryCount()));
+            typeHandler.getChildrenEntries(
+                request, group, entries, subGroups,
+                new SelectInfo(where, outputHandler.getMaxEntryCount()));
         } catch (Exception exc) {
             exc.printStackTrace();
             request.put(ARG_MESSAGE,
@@ -1315,7 +1302,8 @@ public class EntryManager extends RepositoryManager {
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
 
 
-        getPageHandler().entrySectionOpen(request, entry, sb, "Extended Edit", true);
+        getPageHandler().entrySectionOpen(request, entry, sb,
+                                          "Extended Edit", true);
 
 
         sb.append(HtmlUtils.h3("Spatial and Temporal Metadata"));
@@ -1347,7 +1335,7 @@ public class EntryManager extends RepositoryManager {
                                    ARG_EXTEDIT_REPORT));
 
 
-               
+
         List<HtmlUtils.Selector> tfos = getTypeHandlerSelectors(request,
                                             true, true, entry);
 
@@ -1411,6 +1399,7 @@ public class EntryManager extends RepositoryManager {
                 ARG_EXTEDIT_CHANGETYPE_RECURSE));
 
         sb.append(HtmlUtils.formClose());
+
         return makeEntryEditResult(request, entry, "Extended Edit", sb);
 
     }
@@ -1604,10 +1593,14 @@ public class EntryManager extends RepositoryManager {
         if (request.defined(ARG_ENTRYID)) {
             entry = getEntry(request);
         }
-        StringBuilder tmp = new StringBuilder();
-        StringBuilder sb = new StringBuilder();
-        Entry group = addEntryForm(request, entry, tmp);
-        getPageHandler().entrySectionOpen(request, entry!=null?entry:group, sb, (entry!=null?"Edit":"New Entry"));
+        StringBuilder tmp   = new StringBuilder();
+        StringBuilder sb    = new StringBuilder();
+        Entry         group = addEntryForm(request, entry, tmp);
+        getPageHandler().entrySectionOpen(request, (entry != null)
+                ? entry
+                : group, sb, ((entry != null)
+                              ? "Edit"
+                              : "New Entry"));
         sb.append(tmp);
         getPageHandler().entrySectionClose(request, entry, sb);
         if (entry == null) {
@@ -3114,6 +3107,7 @@ public class EntryManager extends RepositoryManager {
                 fb.toString()));
 
         getPageHandler().entrySectionClose(request, entry, sb);
+
         return makeEntryEditResult(request, entry,
                                    msg("Entry delete confirm"), sb);
     }
@@ -3804,9 +3798,11 @@ public class EntryManager extends RepositoryManager {
             inner.append("</div>");
         }
 
-        getPageHandler().entrySectionOpen(request, group, sb, "Choose entry type");
+        getPageHandler().entrySectionOpen(request, group, sb,
+                                          "Choose entry type");
         sb.append(HtmlUtils.insetDiv(inner.toString(), 10, 20, 0, 0));
         getPageHandler().entrySectionClose(request, group, sb);
+
         return makeEntryEditResult(request, group, "Create Entry", sb);
     }
 
@@ -3885,7 +3881,8 @@ public class EntryManager extends RepositoryManager {
                     + request);
         }
         StringBuilder sb = new StringBuilder();
-        getPageHandler().entrySectionOpen(request, entry, sb, "Entry Actions");
+        getPageHandler().entrySectionOpen(request, entry, sb,
+                                          "Entry Actions");
 
         sb.append(getEntryActionsTable(request, entry, OutputType.TYPE_ALL));
         getPageHandler().entrySectionClose(request, entry, sb);
@@ -4055,11 +4052,13 @@ public class EntryManager extends RepositoryManager {
         List<Entry> entries    = new ArrayList();
         boolean     doAll      = request.defined("getall");
         boolean     doSelected = request.defined("getselected");
-        String      arg     = (doAll?ARG_ALLENTRY:ARG_SELENTRY);
+        String      arg        = (doAll
+                                  ? ARG_ALLENTRY
+                                  : ARG_SELENTRY);
 
-        for(Object s: request.get(arg, new ArrayList<String>())) {
-            String id = s.toString();
-            Entry entry = getEntry(request, id);
+        for (Object s : request.get(arg, new ArrayList<String>())) {
+            String id    = s.toString();
+            Entry  entry = getEntry(request, id);
             if (entry != null) {
                 entries.add(entry);
             }
@@ -4367,11 +4366,13 @@ public class EntryManager extends RepositoryManager {
             fb.append(HtmlUtils.formClose());
             StringBuilder contents = new StringBuilder();
             sb.append(HtmlUtils.sectionOpen(msg("Copy/Move/Link")));
-            contents.append(getPageHandler().showDialogQuestion(
-                                                                sb.toString(), fb.toString()));
+            contents.append(
+                getPageHandler().showDialogQuestion(
+                    sb.toString(), fb.toString()));
 
             sb.append(HtmlUtils.sectionClose());
             Result result = new Result(msg("Move confirm"), contents);
+
             return addEntryHeader(request, toEntry, result);
         }
 
@@ -4910,7 +4911,7 @@ public class EntryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result processEntryImport(Request request) throws Exception {
-        Entry                group       = findGroup(request);
+        Entry group = findGroup(request);
 
         if ( !getAccessManager().canDoAction(request, group,
                                              Permission.ACTION_NEW)) {
@@ -6621,9 +6622,10 @@ public class EntryManager extends RepositoryManager {
         List<Entry> allEntries    = new ArrayList<Entry>();
 
 
-        Statement statement =
-            typeHandler.select(request, Tables.ENTRIES.COLUMNS, clauses,
-                               getQueryOrderAndLimit(request,   false, null, new SelectInfo()));
+        Statement statement = typeHandler.select(request,
+                                  Tables.ENTRIES.COLUMNS, clauses,
+                                  getQueryOrderAndLimit(request, false, null,
+                                      new SelectInfo()));
 
         ResultSet        results;
         SqlUtil.Iterator iter = getDatabaseManager().getIterator(statement);
@@ -7585,12 +7587,14 @@ public class EntryManager extends RepositoryManager {
      *
      * @param request _more_
      * @param parentEntry _more_
+     * @param select _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public List<Entry> getChildrenAll(Request request, Entry parentEntry, SelectInfo select )
+    public List<Entry> getChildrenAll(Request request, Entry parentEntry,
+                                      SelectInfo select)
             throws Exception {
         List<Entry> children = new ArrayList<Entry>();
         if ( !parentEntry.isGroup()) {
@@ -7659,15 +7663,19 @@ public class EntryManager extends RepositoryManager {
      * @param request _more_
      * @param group _more_
      * @param where _more_
+     * @param select _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public List<String> getChildIds(Request request, Entry group, SelectInfo select)
+    public List<String> getChildIds(Request request, Entry group,
+                                    SelectInfo select)
             throws Exception {
 
-        List<Clause> where = (select==null?null:select.getWhere());
+        List<Clause> where = ((select == null)
+                              ? null
+                              : select.getWhere());
         //        System.err.println("get Child ids:" + group);
         List<String> ids          = new ArrayList<String>();
         boolean      isSynthEntry = isSynthEntry(group.getId());
@@ -9390,32 +9398,55 @@ public class EntryManager extends RepositoryManager {
 
 
 
-    public void changeResourcePaths(Request request, String pattern, String to, Appendable html, boolean doit) throws Exception {
-        Clause clause = Clause.like(Tables.ENTRIES.COL_RESOURCE, "%" + pattern +"%");
-        Statement stmt  = getDatabaseManager().select(Tables.ENTRIES.COL_ID+"," + Tables.ENTRIES.COL_RESOURCE,
-                                                      Tables.ENTRIES.NAME,clause,null);
-        SqlUtil.Iterator iter = getDatabaseManager().getIterator(stmt);
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param pattern _more_
+     * @param to _more_
+     * @param html _more_
+     * @param doit _more_
+     *
+     * @throws Exception _more_
+     */
+    public void changeResourcePaths(Request request, String pattern,
+                                    String to, Appendable html, boolean doit)
+            throws Exception {
+        Clause clause = Clause.like(Tables.ENTRIES.COL_RESOURCE,
+                                    "%" + pattern + "%");
+        Statement stmt =
+            getDatabaseManager().select(
+                Tables.ENTRIES.COL_ID + "," + Tables.ENTRIES.COL_RESOURCE,
+                Tables.ENTRIES.NAME, clause, null);
+        SqlUtil.Iterator iter    = getDatabaseManager().getIterator(stmt);
         ResultSet        results = null;
-        String[] colNames = new String[]{Tables.ENTRIES.COL_RESOURCE};
+        String[] colNames = new String[] { Tables.ENTRIES.COL_RESOURCE };
         html.append("<ul>");
         int cnt = 0;
         while ((results = iter.getNext()) != null) {
-            String id = results.getString(1);
-            String resource= results.getString(2);
+            String id       = results.getString(1);
+            String resource = results.getString(2);
             String newValue = resource.replace(pattern, to);
             cnt++;
-            if(cnt<=100) {
-                html.append("<li> " + HtmlUtils.href(getRepository().URL_ENTRY_SHOW+"?" + ARG_ENTRYID +"=" + id, resource) +"   to: " + newValue);
-                if(cnt == 100) {
+            if (cnt <= 100) {
+                html.append("<li> "
+                            + HtmlUtils.href(getRepository().URL_ENTRY_SHOW
+                                             + "?" + ARG_ENTRYID + "="
+                                             + id, resource) + "   to: "
+                                                 + newValue);
+                if (cnt == 100) {
                     html.append("<li> ...");
                 }
             }
-            if(doit) {
-                getDatabaseManager().update(Tables.ENTRIES.NAME, Tables.ENTRIES.COL_ID, id,colNames, new String[]{resource});
+            if (doit) {
+                getDatabaseManager().update(Tables.ENTRIES.NAME,
+                                            Tables.ENTRIES.COL_ID, id,
+                                            colNames,
+                                            new String[] { resource });
             }
         }
         html.append("</ul>");
-        if(cnt == 0) {
+        if (cnt == 0) {
             html.append(msg("Nothing found"));
         }
         getDatabaseManager().closeStatement(stmt);
@@ -9428,6 +9459,7 @@ public class EntryManager extends RepositoryManager {
      * @param request The request
      * @param addOrderBy _more_
      * @param forEntry _more_
+     * @param select _more_
      *
      * @return _more_
      */
@@ -9450,9 +9482,11 @@ public class EntryManager extends RepositoryManager {
         String  order     = " DESC ";
         boolean haveOrder = request.exists(ARG_ASCENDING);
         String  by        = null;
-        int     max       = (select==null?-1:select.getMaxCount());
+        int     max       = ((select == null)
+                             ? -1
+                             : select.getMaxCount());
 
-        if(max<=0)  {
+        if (max <= 0) {
             max = DB_MAX_ROWS;
         }
 

@@ -1,4 +1,14 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.util.test;
+
+
+import junit.framework.JUnit4TestAdapter;
+
+import nom.tam.util.Cursor;
 
 /* Copyright: Thomas McGlynn 1999.
  * This code may be used for any purpose, non-commercial
@@ -7,13 +17,16 @@ package nom.tam.util.test;
  * derived software.
  */
 import nom.tam.util.HashedList;
-import nom.tam.util.Cursor;
-import java.util.*;
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import junit.framework.JUnit4TestAdapter;
 
-/** This class tests and illustrates the use
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+import java.util.*;
+
+
+/**
+ * This class tests and illustrates the use
  *  of the HashedList class.  Tests are in three
  *  parts.
  *  <p>
@@ -37,14 +50,17 @@ import junit.framework.JUnit4TestAdapter;
  */
 public class HashedListTest {
 
+    /**
+     * _more_
+     */
     @Test
     public void testCollection() {
 
         HashedList h1 = new HashedList();
         HashedList h2 = new HashedList();
 
-        Cursor i = h1.iterator(0);
-        Iterator j;
+        Cursor     i  = h1.iterator(0);
+        Iterator   j;
 
         // Add a few unkeyed rows.
 
@@ -134,6 +150,9 @@ public class HashedListTest {
 
     }
 
+    /**
+     * _more_
+     */
     @Test
     public void testIterator() {
 
@@ -173,6 +192,9 @@ public class HashedListTest {
         assertEquals("n6", false, j.hasNext());
     }
 
+    /**
+     * _more_
+     */
     @Test
     public void TestCursor() {
 
@@ -223,6 +245,12 @@ public class HashedListTest {
         assertEquals("prev(5)", false, j.hasPrev());
     }
 
+    /**
+     * _more_
+     *
+     * @param h _more_
+     * @param msg _more_
+     */
     void show(HashedList h, String msg) {
         Iterator t = h.iterator();
         System.out.println("\n Looking at list:" + msg);

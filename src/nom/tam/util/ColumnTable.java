@@ -1,4 +1,10 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.util;
+
 
 /*
  * Copyright: Thomas McGlynn 1997-1998.
@@ -8,9 +14,12 @@ package nom.tam.util;
  * derived software.
  */
 import java.io.*;
+
 import java.lang.reflect.Array;
 
-/** A data table is conventionally considered to consist of rows and
+
+/**
+ * A data table is conventionally considered to consist of rows and
  * columns, where the structure within each column is constant, but
  * different columns may have different structures.  I.e., structurally
  * columns may differ but rows are identical.
@@ -33,41 +42,74 @@ public class ColumnTable implements DataTable {
 
     /** The columns to be read/written */
     private Object[] arrays;
+
     /** The number of elements in a row for each column */
     private int[] sizes;
+
     /** The number of rows */
     private int nrow;
+
     /** The number or rows to read/write in one I/O. */
     private int chunk;
+
     /** The size of a row in bytes */
     private int rowSize;
-    /** The base type of each row (using the second character
+
+    /**
+     * The base type of each row (using the second character
      * of the [x class names of the arrays.
      */
     private char[] types;
+
+    /** _more_          */
     private Class[] bases;
     // The following arrays are used to avoid having to check
     // casts during the I/O loops.
     // They point to elements of arrays.
+
+    /** _more_          */
     private byte[][] bytePointers;
+
+    /** _more_          */
     private short[][] shortPointers;
+
+    /** _more_          */
     private int[][] intPointers;
+
+    /** _more_          */
     private long[][] longPointers;
+
+    /** _more_          */
     private float[][] floatPointers;
+
+    /** _more_          */
     private double[][] doublePointers;
+
+    /** _more_          */
     private char[][] charPointers;
+
+    /** _more_          */
     private boolean[][] booleanPointers;
 
-    /** Create the object after checking consistency.
+    /**
+     * Create the object after checking consistency.
      * @param arrays  An array of one-d primitive arrays.
      * @param sizes   The number of elements in each row
      *                for the corresponding column
+     *
+     * @throws TableException _more_
      */
     public ColumnTable(Object[] arrays, int[] sizes) throws TableException {
         setup(arrays, sizes);
     }
 
-    /** Actually perform the initialization.
+    /**
+     * Actually perform the initialization.
+     *
+     * @param arrays _more_
+     * @param sizes _more_
+     *
+     * @throws TableException _more_
      */
     protected void setup(Object[] arrays, int[] sizes) throws TableException {
 
@@ -77,19 +119,26 @@ public class ColumnTable implements DataTable {
 
     }
 
-    /** Get the number of rows in the table.
+    /**
+     * Get the number of rows in the table.
+     *
+     * @return _more_
      */
     public int getNRows() {
         return nrow;
     }
 
-    /** Get the number of columns in the table.
+    /**
+     * Get the number of columns in the table.
+     *
+     * @return _more_
      */
     public int getNCols() {
         return arrays.length;
     }
 
-    /** Get a particular column.
+    /**
+     * Get a particular column.
      * @param col The column desired.
      * @return an object containing the column data desired.
      *         This will be an instance of a 1-d primitive array.
@@ -112,8 +161,9 @@ public class ColumnTable implements DataTable {
      */
     public void setColumn(int col, Object newColumn) throws TableException {
 
-        boolean reset = newColumn.getClass() != arrays[col].getClass()
-                || Array.getLength(newColumn) != Array.getLength(arrays[col]);
+        boolean reset = (newColumn.getClass() != arrays[col].getClass())
+                        || (Array.getLength(newColumn)
+                            != Array.getLength(arrays[col]));
         arrays[col] = newColumn;
         if (reset) {
             setup(arrays, sizes);
@@ -124,42 +174,54 @@ public class ColumnTable implements DataTable {
         }
     }
 
-    /** Add a column */
+    /**
+     * Add a column 
+     *
+     * @param newColumn _more_
+     * @param size _more_
+     *
+     * @throws TableException _more_
+     */
     public void addColumn(Object newColumn, int size) throws TableException {
 
         String classname = newColumn.getClass().getName();
-        nrow = checkColumnConsistency(newColumn, classname, nrow, size);
+        nrow    = checkColumnConsistency(newColumn, classname, nrow, size);
 
         rowSize += nrow * ArrayFuncs.getBaseLength(newColumn);
 
         getNumberOfRows();
 
-        int ncol = arrays.length;
+        int      ncol      = arrays.length;
 
         Object[] newArrays = new Object[ncol + 1];
-        int[] newSizes = new int[ncol + 1];
-        Class[] newBases = new Class[ncol + 1];
-        char[] newTypes = new char[ncol + 1];
+        int[]    newSizes  = new int[ncol + 1];
+        Class[]  newBases  = new Class[ncol + 1];
+        char[]   newTypes  = new char[ncol + 1];
 
         System.arraycopy(arrays, 0, newArrays, 0, ncol);
         System.arraycopy(sizes, 0, newSizes, 0, ncol);
         System.arraycopy(bases, 0, newBases, 0, ncol);
         System.arraycopy(types, 0, newTypes, 0, ncol);
 
-        arrays = newArrays;
-        sizes = newSizes;
-        bases = newBases;
-        types = newTypes;
+        arrays       = newArrays;
+        sizes        = newSizes;
+        bases        = newBases;
+        types        = newTypes;
 
         arrays[ncol] = newColumn;
-        sizes[ncol] = size;
-        bases[ncol] = ArrayFuncs.getBaseClass(newColumn);
-        types[ncol] = classname.charAt(1);
+        sizes[ncol]  = size;
+        bases[ncol]  = ArrayFuncs.getBaseClass(newColumn);
+        types[ncol]  = classname.charAt(1);
         addPointer(newColumn);
     }
 
-    /** Add a row to the table.  This method is very inefficient
+    /**
+     * Add a row to the table.  This method is very inefficient
      *  for adding multiple rows and should be avoided if possible.
+     *
+     * @param row _more_
+     *
+     * @throws TableException _more_
      */
     public void addRow(Object[] row) throws TableException {
 
@@ -176,13 +238,16 @@ public class ColumnTable implements DataTable {
             }
 
             for (int i = 0; i < row.length; i += 1) {
-                if (row[i].getClass() != arrays[i].getClass()
-                        || Array.getLength(row[i]) != sizes[i]) {
-                    throw new TableException("Row column mismatch at column:" + i);
+                if ((row[i].getClass() != arrays[i].getClass())
+                        || (Array.getLength(row[i]) != sizes[i])) {
+                    throw new TableException("Row column mismatch at column:"
+                                             + i);
                 }
-                Object xarray = ArrayFuncs.newInstance(bases[i], (nrow + 1) * sizes[i]);
+                Object xarray = ArrayFuncs.newInstance(bases[i],
+                                    (nrow + 1) * sizes[i]);
                 System.arraycopy(arrays[i], 0, xarray, 0, nrow * sizes[i]);
-                System.arraycopy(row[i], 0, xarray, nrow * sizes[i], sizes[i]);
+                System.arraycopy(row[i], 0, xarray, nrow * sizes[i],
+                                 sizes[i]);
                 arrays[i] = xarray;
             }
             initializePointers();
@@ -190,7 +255,8 @@ public class ColumnTable implements DataTable {
         }
     }
 
-    /** Get a element of the table.
+    /**
+     * Get a element of the table.
      * @param row The row desired.
      * @param col The column desired.
      * @return A primitive array containing the information.  Note
@@ -201,10 +267,12 @@ public class ColumnTable implements DataTable {
 
         Object x = ArrayFuncs.newInstance(bases[col], sizes[col]);
         System.arraycopy(arrays[col], sizes[col] * row, x, 0, sizes[col]);
+
         return x;
     }
 
-    /** Modify an element of the table.
+    /**
+     * Modify an element of the table.
      * @param row The row containing the element.
      * @param col The column containing the element.
      * @param x   The new datum.  This should be 1-d primitive
@@ -213,12 +281,11 @@ public class ColumnTable implements DataTable {
      *                           is not of the same type as
      *                           the data it replaces.
      */
-    public void setElement(int row, int col, Object x)
-            throws TableException {
+    public void setElement(int row, int col, Object x) throws TableException {
 
         String classname = x.getClass().getName();
 
-        if (!classname.equals("[" + types[col])) {
+        if ( !classname.equals("[" + types[col])) {
             throw new TableException("setElement: Incompatible element type");
         }
 
@@ -229,7 +296,8 @@ public class ColumnTable implements DataTable {
         System.arraycopy(x, 0, arrays[col], sizes[col] * row, sizes[col]);
     }
 
-    /** Get a row of data.
+    /**
+     * Get a row of data.
      * @param  row The row desired.
      * @return An array of objects each containing a primitive array.
      */
@@ -239,19 +307,23 @@ public class ColumnTable implements DataTable {
         for (int col = 0; col < arrays.length; col += 1) {
             x[col] = getElement(row, col);
         }
+
         return x;
     }
 
-    /** Modify a row of data.
+    /**
+     * Modify a row of data.
      * @param row The row to be modified.
      * @param x   The data to be modified.  This should be an
      *            array of objects.  It is described as an Object
      *            here since other table implementations may
      *            use other methods to store the data (e.g., @see nom.tam.util.ColumnTable)
+     *
+     * @throws TableException _more_
      */
     public void setRow(int row, Object x) throws TableException {
 
-        if (!(x instanceof Object[])) {
+        if ( !(x instanceof Object[])) {
             throw new TableException("setRow: Incompatible row");
         }
 
@@ -260,7 +332,8 @@ public class ColumnTable implements DataTable {
         }
     }
 
-    /** Check that the columns and sizes are consistent.
+    /**
+     * Check that the columns and sizes are consistent.
      * Inconsistencies include:
      * <ul>
      * <li> arrays and sizes have different lengths.
@@ -270,6 +343,8 @@ public class ColumnTable implements DataTable {
      * </ul>
      * @param arrays The arrays defining the columns.
      * @param sizes  The number of elements in each row for the column.
+     *
+     * @throws TableException _more_
      */
     protected void checkArrayConsistency(Object[] arrays, int[] sizes)
             throws TableException {
@@ -279,11 +354,12 @@ public class ColumnTable implements DataTable {
 
         // First check that the lengths of the two arrays are the same.
         if (arrays.length != sizes.length) {
-            throw new TableException("readArraysAsColumns: Incompatible arrays and sizes.");
+            throw new TableException(
+                "readArraysAsColumns: Incompatible arrays and sizes.");
         }
 
         // Now check that that we fill up all of the arrays exactly.
-        int ratio = 0;
+        int ratio   = 0;
         int rowSize = 0;
 
         this.types = new char[arrays.length];
@@ -296,36 +372,52 @@ public class ColumnTable implements DataTable {
 
             String classname = arrays[i].getClass().getName();
 
-            ratio = checkColumnConsistency(arrays[i], classname, ratio, sizes[i]);
+            ratio = checkColumnConsistency(arrays[i], classname, ratio,
+                                           sizes[i]);
 
-            rowSize += sizes[i] * ArrayFuncs.getBaseLength(arrays[i]);
+            rowSize  += sizes[i] * ArrayFuncs.getBaseLength(arrays[i]);
             types[i] = classname.charAt(1);
             bases[i] = ArrayFuncs.getBaseClass(arrays[i]);
         }
 
-        this.nrow = ratio;
+        this.nrow    = ratio;
         this.rowSize = rowSize;
-        this.arrays = arrays;
-        this.sizes = sizes;
+        this.arrays  = arrays;
+        this.sizes   = sizes;
     }
 
-    private int checkColumnConsistency(Object data, String classname, int ratio, int size)
+    /**
+     * _more_
+     *
+     * @param data _more_
+     * @param classname _more_
+     * @param ratio _more_
+     * @param size _more_
+     *
+     * @return _more_
+     *
+     * @throws TableException _more_
+     */
+    private int checkColumnConsistency(Object data, String classname,
+                                       int ratio, int size)
             throws TableException {
 
 
-        if (classname.charAt(0) != '[' || classname.length() != 2) {
+        if ((classname.charAt(0) != '[') || (classname.length() != 2)) {
             throw new TableException("Non-primitive array for column");
         }
 
         int thisSize = Array.getLength(data);
-        if ((thisSize == 0 && size != 0 && ratio != 0)
-                || (thisSize != 0 && size == 0)) {
-            throw new TableException("Size mismatch in column: " + thisSize + " != " + size);
+        if (((thisSize == 0) && (size != 0) && (ratio != 0))
+                || ((thisSize != 0) && (size == 0))) {
+            throw new TableException("Size mismatch in column: " + thisSize
+                                     + " != " + size);
         }
 
         // The row size must evenly divide the size of the array.
-        if (size != 0 && thisSize % size != 0) {
-            throw new TableException("Row size does not divide array for column");
+        if ((size != 0) && (thisSize % size != 0)) {
+            throw new TableException(
+                "Row size does not divide array for column");
         }
 
         // Finally the ratio of sizes must be the same for all columns -- this
@@ -334,8 +426,9 @@ public class ColumnTable implements DataTable {
         if (size > 0) {
             thisRatio = thisSize / size;
 
-            if (ratio != 0 && (thisRatio != ratio)) {
-                throw new TableException("Different number of rows in different columns");
+            if ((ratio != 0) && (thisRatio != ratio)) {
+                throw new TableException(
+                    "Different number of rows in different columns");
             }
         }
         if (thisRatio > 0) {
@@ -346,7 +439,8 @@ public class ColumnTable implements DataTable {
 
     }
 
-    /** Calculate the number of rows to read/write at a time.
+    /**
+     * Calculate the number of rows to read/write at a time.
      */
     protected void getNumberOfRows() {
 
@@ -368,7 +462,8 @@ public class ColumnTable implements DataTable {
 
     }
 
-    /** Set the pointer arrays for the eight primitive types
+    /**
+     * Set the pointer arrays for the eight primitive types
      * to point to the appropriate elements of arrays.
      */
     protected void initializePointers() {
@@ -376,175 +471,238 @@ public class ColumnTable implements DataTable {
         int nbyte, nshort, nint, nlong, nfloat, ndouble, nchar, nboolean;
 
         // Count how many of each type we have.
-        nbyte = 0;
-        nshort = 0;
-        nint = 0;
-        nlong = 0;
-        nfloat = 0;
-        ndouble = 0;
-        nchar = 0;
+        nbyte    = 0;
+        nshort   = 0;
+        nint     = 0;
+        nlong    = 0;
+        nfloat   = 0;
+        ndouble  = 0;
+        nchar    = 0;
         nboolean = 0;
 
         for (int col = 0; col < arrays.length; col += 1) {
             switch (types[col]) {
 
-                case 'B':
-                    nbyte += 1;
-                    break;
-                case 'S':
-                    nshort += 1;
-                    break;
-                case 'I':
-                    nint += 1;
-                    break;
-                case 'J':
-                    nlong += 1;
-                    break;
-                case 'F':
-                    nfloat += 1;
-                    break;
-                case 'D':
-                    ndouble += 1;
-                    break;
-                case 'C':
-                    nchar += 1;
-                    break;
-                case 'Z':
-                    nboolean += 1;
-                    break;
+              case 'B' :
+                  nbyte += 1;
+
+                  break;
+
+              case 'S' :
+                  nshort += 1;
+
+                  break;
+
+              case 'I' :
+                  nint += 1;
+
+                  break;
+
+              case 'J' :
+                  nlong += 1;
+
+                  break;
+
+              case 'F' :
+                  nfloat += 1;
+
+                  break;
+
+              case 'D' :
+                  ndouble += 1;
+
+                  break;
+
+              case 'C' :
+                  nchar += 1;
+
+                  break;
+
+              case 'Z' :
+                  nboolean += 1;
+
+                  break;
             }
         }
 
         // Allocate the pointer arrays.  Note that many will be
         // zero-length.
 
-        bytePointers = new byte[nbyte][];
-        shortPointers = new short[nshort][];
-        intPointers = new int[nint][];
-        longPointers = new long[nlong][];
-        floatPointers = new float[nfloat][];
-        doublePointers = new double[ndouble][];
-        charPointers = new char[nchar][];
+        bytePointers    = new byte[nbyte][];
+        shortPointers   = new short[nshort][];
+        intPointers     = new int[nint][];
+        longPointers    = new long[nlong][];
+        floatPointers   = new float[nfloat][];
+        doublePointers  = new double[ndouble][];
+        charPointers    = new char[nchar][];
         booleanPointers = new boolean[nboolean][];
 
         // Now set the pointers.
-        nbyte = 0;
-        nshort = 0;
-        nint = 0;
-        nlong = 0;
-        nfloat = 0;
-        ndouble = 0;
-        nchar = 0;
+        nbyte    = 0;
+        nshort   = 0;
+        nint     = 0;
+        nlong    = 0;
+        nfloat   = 0;
+        ndouble  = 0;
+        nchar    = 0;
         nboolean = 0;
 
         for (int col = 0; col < arrays.length; col += 1) {
             switch (types[col]) {
 
-                case 'B':
-                    bytePointers[nbyte] = (byte[]) arrays[col];
-                    nbyte += 1;
-                    break;
-                case 'S':
-                    shortPointers[nshort] = (short[]) arrays[col];
-                    nshort += 1;
-                    break;
-                case 'I':
-                    intPointers[nint] = (int[]) arrays[col];
-                    nint += 1;
-                    break;
-                case 'J':
-                    longPointers[nlong] = (long[]) arrays[col];
-                    nlong += 1;
-                    break;
-                case 'F':
-                    floatPointers[nfloat] = (float[]) arrays[col];
-                    nfloat += 1;
-                    break;
-                case 'D':
-                    doublePointers[ndouble] = (double[]) arrays[col];
-                    ndouble += 1;
-                    break;
-                case 'C':
-                    charPointers[nchar] = (char[]) arrays[col];
-                    nchar += 1;
-                    break;
-                case 'Z':
-                    booleanPointers[nboolean] = (boolean[]) arrays[col];
-                    nboolean += 1;
-                    break;
+              case 'B' :
+                  bytePointers[nbyte] = (byte[]) arrays[col];
+                  nbyte               += 1;
+
+                  break;
+
+              case 'S' :
+                  shortPointers[nshort] = (short[]) arrays[col];
+                  nshort                += 1;
+
+                  break;
+
+              case 'I' :
+                  intPointers[nint] = (int[]) arrays[col];
+                  nint              += 1;
+
+                  break;
+
+              case 'J' :
+                  longPointers[nlong] = (long[]) arrays[col];
+                  nlong               += 1;
+
+                  break;
+
+              case 'F' :
+                  floatPointers[nfloat] = (float[]) arrays[col];
+                  nfloat                += 1;
+
+                  break;
+
+              case 'D' :
+                  doublePointers[ndouble] = (double[]) arrays[col];
+                  ndouble                 += 1;
+
+                  break;
+
+              case 'C' :
+                  charPointers[nchar] = (char[]) arrays[col];
+                  nchar               += 1;
+
+                  break;
+
+              case 'Z' :
+                  booleanPointers[nboolean] = (boolean[]) arrays[col];
+                  nboolean                  += 1;
+
+                  break;
             }
         }
     }
 
     // Add a pointer in the pointer lists.
+
+    /**
+     * _more_
+     *
+     * @param data _more_
+     *
+     * @throws TableException _more_
+     */
     protected void addPointer(Object data) throws TableException {
         String classname = data.getClass().getName();
-        char type = classname.charAt(1);
+        char   type      = classname.charAt(1);
 
         switch (type) {
-            case 'B': {
-                byte[][] xb = new byte[bytePointers.length + 1][];
-                System.arraycopy(bytePointers, 0, xb, 0, bytePointers.length);
-                xb[bytePointers.length] = (byte[]) data;
-                bytePointers = xb;
-                break;
-            }
-            case 'Z': {
-                boolean[][] xb = new boolean[booleanPointers.length + 1][];
-                System.arraycopy(booleanPointers, 0, xb, 0, booleanPointers.length);
-                xb[booleanPointers.length] = (boolean[]) data;
-                booleanPointers = xb;
-                break;
-            }
-            case 'S': {
-                short[][] xb = new short[shortPointers.length + 1][];
-                System.arraycopy(shortPointers, 0, xb, 0, shortPointers.length);
-                xb[shortPointers.length] = (short[]) data;
-                shortPointers = xb;
-                break;
-            }
-            case 'C': {
-                char[][] xb = new char[charPointers.length + 1][];
-                System.arraycopy(charPointers, 0, xb, 0, charPointers.length);
-                xb[charPointers.length] = (char[]) data;
-                charPointers = xb;
-                break;
-            }
-            case 'I': {
-                int[][] xb = new int[intPointers.length + 1][];
-                System.arraycopy(intPointers, 0, xb, 0, intPointers.length);
-                xb[intPointers.length] = (int[]) data;
-                intPointers = xb;
-                break;
-            }
-            case 'J': {
-                long[][] xb = new long[longPointers.length + 1][];
-                System.arraycopy(longPointers, 0, xb, 0, longPointers.length);
-                xb[longPointers.length] = (long[]) data;
-                longPointers = xb;
-                break;
-            }
-            case 'F': {
-                float[][] xb = new float[floatPointers.length + 1][];
-                System.arraycopy(floatPointers, 0, xb, 0, floatPointers.length);
-                xb[floatPointers.length] = (float[]) data;
-                floatPointers = xb;
-                break;
-            }
-            case 'D': {
-                double[][] xb = new double[doublePointers.length + 1][];
-                System.arraycopy(doublePointers, 0, xb, 0, doublePointers.length);
-                xb[doublePointers.length] = (double[]) data;
-                doublePointers = xb;
-                break;
-            }
-            default:
-                throw new TableException("Invalid type for added column:" + classname);
+
+          case 'B' : {
+              byte[][] xb = new byte[bytePointers.length + 1][];
+              System.arraycopy(bytePointers, 0, xb, 0, bytePointers.length);
+              xb[bytePointers.length] = (byte[]) data;
+              bytePointers            = xb;
+
+              break;
+          }
+
+          case 'Z' : {
+              boolean[][] xb = new boolean[booleanPointers.length + 1][];
+              System.arraycopy(booleanPointers, 0, xb, 0,
+                               booleanPointers.length);
+              xb[booleanPointers.length] = (boolean[]) data;
+              booleanPointers            = xb;
+
+              break;
+          }
+
+          case 'S' : {
+              short[][] xb = new short[shortPointers.length + 1][];
+              System.arraycopy(shortPointers, 0, xb, 0, shortPointers.length);
+              xb[shortPointers.length] = (short[]) data;
+              shortPointers            = xb;
+
+              break;
+          }
+
+          case 'C' : {
+              char[][] xb = new char[charPointers.length + 1][];
+              System.arraycopy(charPointers, 0, xb, 0, charPointers.length);
+              xb[charPointers.length] = (char[]) data;
+              charPointers            = xb;
+
+              break;
+          }
+
+          case 'I' : {
+              int[][] xb = new int[intPointers.length + 1][];
+              System.arraycopy(intPointers, 0, xb, 0, intPointers.length);
+              xb[intPointers.length] = (int[]) data;
+              intPointers            = xb;
+
+              break;
+          }
+
+          case 'J' : {
+              long[][] xb = new long[longPointers.length + 1][];
+              System.arraycopy(longPointers, 0, xb, 0, longPointers.length);
+              xb[longPointers.length] = (long[]) data;
+              longPointers            = xb;
+
+              break;
+          }
+
+          case 'F' : {
+              float[][] xb = new float[floatPointers.length + 1][];
+              System.arraycopy(floatPointers, 0, xb, 0, floatPointers.length);
+              xb[floatPointers.length] = (float[]) data;
+              floatPointers            = xb;
+
+              break;
+          }
+
+          case 'D' : {
+              double[][] xb = new double[doublePointers.length + 1][];
+              System.arraycopy(doublePointers, 0, xb, 0,
+                               doublePointers.length);
+              xb[doublePointers.length] = (double[]) data;
+              doublePointers            = xb;
+
+              break;
+          }
+
+          default :
+              throw new TableException("Invalid type for added column:"
+                                       + classname);
         }
     }
 
-    /** Read a table.
+    /**
+     * Read a table.
      * @param is The input stream to read from.
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
      */
     public int read(ArrayDataInput is) throws IOException {
 
@@ -553,71 +711,80 @@ public class ColumnTable implements DataTable {
         // While we have not finished reading the table..
         for (int row = 0; row < nrow; row += 1) {
 
-            int ibyte = 0;
-            int ishort = 0;
-            int iint = 0;
-            int ilong = 0;
-            int ichar = 0;
-            int ifloat = 0;
-            int idouble = 0;
+            int ibyte    = 0;
+            int ishort   = 0;
+            int iint     = 0;
+            int ilong    = 0;
+            int ichar    = 0;
+            int ifloat   = 0;
+            int idouble  = 0;
             int iboolean = 0;
 
             // Loop over the columns within the row.
             for (int col = 0; col < arrays.length; col += 1) {
 
                 int arrOffset = sizes[col] * row;
-                int size = sizes[col];
+                int size      = sizes[col];
 
                 switch (types[col]) {
-                    // In anticpated order of use.
-                    case 'I':
-                        int[] ia = intPointers[iint];
-                        iint += 1;
-                        is.read(ia, arrOffset, size);
-                        break;
 
-                    case 'S':
-                        short[] s = shortPointers[ishort];
-                        ishort += 1;
-                        is.read(s, arrOffset, size);
-                        break;
+                  // In anticpated order of use.
+                  case 'I' :
+                      int[] ia = intPointers[iint];
+                      iint += 1;
+                      is.read(ia, arrOffset, size);
 
-                    case 'B':
-                        byte[] b = bytePointers[ibyte];
-                        ibyte += 1;
-                        is.read(b, arrOffset, size);
-                        break;
+                      break;
 
-                    case 'F':
-                        float[] f = floatPointers[ifloat];
-                        ifloat += 1;
-                        is.read(f, arrOffset, size);
-                        break;
+                  case 'S' :
+                      short[] s = shortPointers[ishort];
+                      ishort += 1;
+                      is.read(s, arrOffset, size);
 
-                    case 'D':
-                        double[] d = doublePointers[idouble];
-                        idouble += 1;
-                        is.read(d, arrOffset, size);
-                        break;
+                      break;
 
-                    case 'C':
-                        char[] c = charPointers[ichar];
-                        ichar += 1;
-                        is.read(c, arrOffset, size);
-                        break;
+                  case 'B' :
+                      byte[] b = bytePointers[ibyte];
+                      ibyte += 1;
+                      is.read(b, arrOffset, size);
 
-                    case 'J':
-                        long[] l = longPointers[ilong];
-                        ilong += 1;
-                        is.read(l, arrOffset, size);
-                        break;
+                      break;
 
-                    case 'Z':
+                  case 'F' :
+                      float[] f = floatPointers[ifloat];
+                      ifloat += 1;
+                      is.read(f, arrOffset, size);
 
-                        boolean[] bool = booleanPointers[iboolean];
-                        iboolean += 1;
-                        is.read(bool, arrOffset, size);
-                        break;
+                      break;
+
+                  case 'D' :
+                      double[] d = doublePointers[idouble];
+                      idouble += 1;
+                      is.read(d, arrOffset, size);
+
+                      break;
+
+                  case 'C' :
+                      char[] c = charPointers[ichar];
+                      ichar += 1;
+                      is.read(c, arrOffset, size);
+
+                      break;
+
+                  case 'J' :
+                      long[] l = longPointers[ilong];
+                      ilong += 1;
+                      is.read(l, arrOffset, size);
+
+                      break;
+
+                  case 'Z' :
+
+                      boolean[] bool = booleanPointers[iboolean];
+                      iboolean += 1;
+                      is.read(bool, arrOffset, size);
+
+                      break;
                 }
             }
         }
@@ -626,8 +793,13 @@ public class ColumnTable implements DataTable {
         return rowSize * nrow;
     }
 
-    /** Write a table.
+    /**
+     * Write a table.
      * @param os the output stream to write to.
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
      */
     public int write(ArrayDataOutput os) throws IOException {
 
@@ -637,70 +809,79 @@ public class ColumnTable implements DataTable {
 
         for (int row = 0; row < nrow; row += 1) {
 
-            int ibyte = 0;
-            int ishort = 0;
-            int iint = 0;
-            int ilong = 0;
-            int ichar = 0;
-            int ifloat = 0;
-            int idouble = 0;
+            int ibyte    = 0;
+            int ishort   = 0;
+            int iint     = 0;
+            int ilong    = 0;
+            int ichar    = 0;
+            int ifloat   = 0;
+            int idouble  = 0;
             int iboolean = 0;
 
             // Loop over the columns within the row.
             for (int col = 0; col < arrays.length; col += 1) {
 
                 int arrOffset = sizes[col] * row;
-                int size = sizes[col];
+                int size      = sizes[col];
 
                 switch (types[col]) {
-                    // In anticpated order of use.
-                    case 'I':
-                        int[] ia = intPointers[iint];
-                        iint += 1;
-                        os.write(ia, arrOffset, size);
-                        break;
 
-                    case 'S':
-                        short[] s = shortPointers[ishort];
-                        ishort += 1;
-                        os.write(s, arrOffset, size);
-                        break;
+                  // In anticpated order of use.
+                  case 'I' :
+                      int[] ia = intPointers[iint];
+                      iint += 1;
+                      os.write(ia, arrOffset, size);
 
-                    case 'B':
-                        byte[] b = bytePointers[ibyte];
-                        ibyte += 1;
-                        os.write(b, arrOffset, size);
-                        break;
+                      break;
 
-                    case 'F':
-                        float[] f = floatPointers[ifloat];
-                        ifloat += 1;
-                        os.write(f, arrOffset, size);
-                        break;
+                  case 'S' :
+                      short[] s = shortPointers[ishort];
+                      ishort += 1;
+                      os.write(s, arrOffset, size);
 
-                    case 'D':
-                        double[] d = doublePointers[idouble];
-                        idouble += 1;
-                        os.write(d, arrOffset, size);
-                        break;
+                      break;
 
-                    case 'C':
-                        char[] c = charPointers[ichar];
-                        ichar += 1;
-                        os.write(c, arrOffset, size);
-                        break;
+                  case 'B' :
+                      byte[] b = bytePointers[ibyte];
+                      ibyte += 1;
+                      os.write(b, arrOffset, size);
 
-                    case 'J':
-                        long[] l = longPointers[ilong];
-                        ilong += 1;
-                        os.write(l, arrOffset, size);
-                        break;
+                      break;
 
-                    case 'Z':
-                        boolean[] bool = booleanPointers[iboolean];
-                        iboolean += 1;
-                        os.write(bool, arrOffset, size);
-                        break;
+                  case 'F' :
+                      float[] f = floatPointers[ifloat];
+                      ifloat += 1;
+                      os.write(f, arrOffset, size);
+
+                      break;
+
+                  case 'D' :
+                      double[] d = doublePointers[idouble];
+                      idouble += 1;
+                      os.write(d, arrOffset, size);
+
+                      break;
+
+                  case 'C' :
+                      char[] c = charPointers[ichar];
+                      ichar += 1;
+                      os.write(c, arrOffset, size);
+
+                      break;
+
+                  case 'J' :
+                      long[] l = longPointers[ilong];
+                      ilong += 1;
+                      os.write(l, arrOffset, size);
+
+                      break;
+
+                  case 'Z' :
+                      boolean[] bool = booleanPointers[iboolean];
+                      iboolean += 1;
+                      os.write(bool, arrOffset, size);
+
+                      break;
                 }
 
             }
@@ -711,37 +892,52 @@ public class ColumnTable implements DataTable {
         return rowSize * nrow;
     }
 
-    /** Get the base classes of the columns.
+    /**
+     * Get the base classes of the columns.
      * @return An array of Class objects, one for each column.
      */
     public Class[] getBases() {
         return bases;
     }
 
-    /** Get the characters describing the base classes of the columns.
+    /**
+     * Get the characters describing the base classes of the columns.
      * @return An array of char's, one for each column.
      */
     public char[] getTypes() {
         return types;
     }
 
-    /** Get the actual data arrays */
+    /**
+     * Get the actual data arrays 
+     *
+     * @return _more_
+     */
     public Object[] getColumns() {
         return arrays;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public int[] getSizes() {
         return sizes;
     }
 
-    /** Delete a row from the table.
+    /**
+     * Delete a row from the table.
      *  @param row  The row (0-indexed) to be deleted.
+     *
+     * @throws TableException _more_
      */
     public void deleteRow(int row) throws TableException {
         deleteRows(row, 1);
     }
 
-    /** Delete a contiguous set of rows from the table.
+    /**
+     * Delete a contiguous set of rows from the table.
      *  @param row    The row (0-indexed) to be deleted.
      *  @param length The number of rows to be deleted.
      *  @throws TableException if the request goes outside
@@ -749,9 +945,10 @@ public class ColumnTable implements DataTable {
      */
     public void deleteRows(int row, int length) throws TableException {
 
-        if (row < 0 || length < 0 || row + length > nrow) {
-            throw new TableException("Invalid request to delete rows start: " + row + " length:" + length
-                    + " for table with " + nrow + " rows.");
+        if ((row < 0) || (length < 0) || (row + length > nrow)) {
+            throw new TableException("Invalid request to delete rows start: "
+                                     + row + " length:" + length
+                                     + " for table with " + nrow + " rows.");
         }
 
         if (length == 0) {
@@ -760,24 +957,28 @@ public class ColumnTable implements DataTable {
 
         for (int col = 0; col < arrays.length; col += 1) {
 
-            int sz = sizes[col];
-            int newSize = sz * (nrow - length);
-            Object newArr = ArrayFuncs.newInstance(bases[col], newSize);
+            int    sz      = sizes[col];
+            int    newSize = sz * (nrow - length);
+            Object newArr  = ArrayFuncs.newInstance(bases[col], newSize);
 
             // Copy whatever comes before the deletion
             System.arraycopy(arrays[col], 0, newArr, 0, row * sz);
 
             // Copy whatever comes after the deletion
-            System.arraycopy(arrays[col], (row + length) * sz, newArr, row * sz, (nrow - row - length) * sz);
+            System.arraycopy(arrays[col], (row + length) * sz, newArr,
+                             row * sz, (nrow - row - length) * sz);
             arrays[col] = newArr;
         }
         nrow -= length;
         initializePointers();
     }
 
-    /** Delete a contiguous set of columns from the table.
+    /**
+     * Delete a contiguous set of columns from the table.
      *  @param start  The first column (0-indexed) to be deleted.
      *  @param len    The number of columns to be deleted.
+     *
+     * @return _more_
      *  @throws TableException if the request goes outside
      *          the boundaries of the table or if the length is negative.
      */
@@ -785,9 +986,10 @@ public class ColumnTable implements DataTable {
 
         int ncol = arrays.length;
 
-        if (start < 0 || len < 0 || start + len > ncol) {
-            throw new TableException("Invalid request to delete columns start: " + start + " length:" + len
-                    + " for table with " + ncol + " columns.");
+        if ((start < 0) || (len < 0) || (start + len > ncol)) {
+            throw new TableException(
+                "Invalid request to delete columns start: " + start
+                + " length:" + len + " for table with " + ncol + " columns.");
         }
 
         if (len == 0) {
@@ -802,9 +1004,9 @@ public class ColumnTable implements DataTable {
         ncol -= len;
 
         Object[] newArrays = new Object[ncol];
-        int[] newSizes = new int[ncol];
-        Class[] newBases = new Class[ncol];
-        char[] newTypes = new char[ncol];
+        int[]    newSizes  = new int[ncol];
+        Class[]  newBases  = new Class[ncol];
+        char[]   newTypes  = new char[ncol];
 
         System.arraycopy(arrays, 0, newArrays, 0, start);
         System.arraycopy(sizes, 0, newSizes, 0, start);
@@ -820,11 +1022,12 @@ public class ColumnTable implements DataTable {
 
 
         arrays = newArrays;
-        sizes = newSizes;
-        bases = newBases;
-        types = newTypes;
+        sizes  = newSizes;
+        bases  = newBases;
+        types  = newTypes;
 
         initializePointers();
+
         return rowSize;
     }
 }

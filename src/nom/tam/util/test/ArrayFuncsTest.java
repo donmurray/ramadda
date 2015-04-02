@@ -1,3 +1,8 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 /*
  * ArrayFuncsTest.java
  * JUnit based test
@@ -6,10 +11,15 @@
  */
 package nom.tam.util.test;
 
+
 import junit.framework.*;
-import java.lang.reflect.*;
-import java.util.Arrays;
+
 import nom.tam.util.ArrayFuncs;
+
+import java.lang.reflect.*;
+
+import java.util.Arrays;
+
 
 /**
  *
@@ -17,15 +27,28 @@ import nom.tam.util.ArrayFuncs;
  */
 public class ArrayFuncsTest extends TestCase {
 
+    /**
+     * _more_
+     *
+     * @param testName _more_
+     */
     public ArrayFuncsTest(String testName) {
         super(testName);
     }
 
-    protected void setUp() throws Exception {
-    }
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void setUp() throws Exception {}
 
-    protected void tearDown() throws Exception {
-    }
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    protected void tearDown() throws Exception {}
 
     /**
      * Test of computeSize method, of class nom.tam.util.ArrayFuncs.
@@ -33,10 +56,10 @@ public class ArrayFuncsTest extends TestCase {
     public void testComputeSize() {
         System.out.println("computeSize");
 
-        Object o = null;
+        Object o         = null;
 
-        int expResult = 0;
-        int result = ArrayFuncs.computeSize(o);
+        int    expResult = 0;
+        int    result    = ArrayFuncs.computeSize(o);
         assertEquals(expResult, result);
         int[][] x = new int[2][3];
         assertEquals(ArrayFuncs.computeSize(x), 24);
@@ -44,15 +67,15 @@ public class ArrayFuncsTest extends TestCase {
         assertEquals(ArrayFuncs.computeSize("1234"), 4);
         assertEquals(ArrayFuncs.computeSize(new Object()), 0);
         assertEquals(ArrayFuncs.computeSize(new Double[5]), 0);
-        assertEquals(ArrayFuncs.computeSize(new Double[]{
-                    new Double(0), new Double(1), new Double(2)}), 24);
+        assertEquals(ArrayFuncs.computeSize(new Double[] { new Double(0),
+                new Double(1), new Double(2) }), 24);
         assertEquals(ArrayFuncs.computeLSize(x), 24);
         assertEquals(ArrayFuncs.computeLSize(new double[3]), 24);
         assertEquals(ArrayFuncs.computeLSize("1234"), 4);
         assertEquals(ArrayFuncs.computeLSize(new Object()), 0);
         assertEquals(ArrayFuncs.computeLSize(new Double[5]), 0);
-        assertEquals(ArrayFuncs.computeLSize(new Double[]{
-                    new Double(0), new Double(1), new Double(2)}), 24);
+        assertEquals(ArrayFuncs.computeLSize(new Double[] { new Double(0),
+                new Double(1), new Double(2) }), 24);
     }
 
     /**
@@ -73,7 +96,9 @@ public class ArrayFuncsTest extends TestCase {
      * Test of deepClone method, of class nom.tam.util.ArrayFuncs.
      */
     public void testDeepClone() {
-        int[][] test = {{0, 1}, {2, 3}, {4, 5}};
+        int[][] test   = {
+            { 0, 1 }, { 2, 3 }, { 4, 5 }
+        };
         int[][] result = (int[][]) nom.tam.util.ArrayFuncs.deepClone(test);
 
         for (int i = 0; i < test.length; i += 1) {
@@ -83,21 +108,41 @@ public class ArrayFuncsTest extends TestCase {
         }
     }
 
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Thu, Apr 2, '15
+     * @author         Enter your name here...    
+     */
     public class CloneTest implements Cloneable {
 
+        /** _more_          */
         public int value = 2;
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public Object clone() {
             try {
                 return super.clone();
-            } catch (Exception e) {
-            }
+            } catch (Exception e) {}
+
             return null;
         }
 
+        /**
+         * _more_
+         *
+         * @param x _more_
+         *
+         * @return _more_
+         */
         public boolean equals(Object x) {
             return (x instanceof CloneTest)
-                    && (((CloneTest) x).value == this.value);
+                   && (((CloneTest) x).value == this.value);
         }
     }
 
@@ -107,12 +152,12 @@ public class ArrayFuncsTest extends TestCase {
     public void testGenericClone() {
         System.out.println("genericClone");
 
-        Object o = new int[]{1, 2, 3};
+        Object o      = new int[] { 1, 2, 3 };
 
         Object result = nom.tam.util.ArrayFuncs.genericClone(o);
 
-        int[] x = (int[]) o;
-        int[] y = (int[]) result;
+        int[]  x      = (int[]) o;
+        int[]  y      = (int[]) result;
         for (int i = 0; i < x.length; i += 1) {
             assertEquals(x[i], y[i]);
         }
@@ -129,7 +174,9 @@ public class ArrayFuncsTest extends TestCase {
     public void testCopyArray() {
         System.out.println("copyArray");
 
-        double[] start = new double[]{1, 2, 3, 4, 5, 6};
+        double[] start  = new double[] {
+            1, 2, 3, 4, 5, 6
+        };
         double[] finish = new double[6];
         ArrayFuncs.copyArray(start, finish);
         assertTrue(ArrayFuncs.arrayEquals(start, finish));
@@ -141,14 +188,14 @@ public class ArrayFuncsTest extends TestCase {
     public void testGetDimensions() {
         System.out.println("getDimensions");
 
-        Object o = null;
-        int[] expResult = null;
-        int[] result = nom.tam.util.ArrayFuncs.getDimensions(o);
+        Object o         = null;
+        int[]  expResult = null;
+        int[]  result    = nom.tam.util.ArrayFuncs.getDimensions(o);
         assertEquals(expResult, result);
 
         assertEquals(ArrayFuncs.getDimensions(new Integer(0)).length, 0);
         int[][] test = new int[2][3];
-        int[] dims = ArrayFuncs.getDimensions(test);
+        int[]   dims = ArrayFuncs.getDimensions(test);
         assertEquals(dims.length, 2);
         assertEquals(dims[0], 2);
         assertEquals(dims[1], 3);
@@ -160,7 +207,7 @@ public class ArrayFuncsTest extends TestCase {
     public void testGetBaseArray() {
 
         int[][][] test = new int[2][3][4];
-        byte b = 0;
+        byte      b    = 0;
         ArrayFuncs.testPattern(test, b);
 
         assertEquals(ArrayFuncs.getBaseArray(test), test[0][0]);
@@ -198,8 +245,8 @@ public class ArrayFuncsTest extends TestCase {
     public void testGenerateArray() {
         System.out.println("generateArray");
 
-        Class baseType = int.class;
-        int[] dims = {2, 3, 4};
+        Class  baseType = int.class;
+        int[]  dims     = { 2, 3, 4 };
 
         Object result = nom.tam.util.ArrayFuncs.generateArray(baseType, dims);
         assertEquals(result.getClass(), int[][][].class);
@@ -216,11 +263,11 @@ public class ArrayFuncsTest extends TestCase {
     public void testTestPattern() {
         System.out.println("testPattern");
 
-        byte start = 2;
-        int[] arr = new int[8];
+        byte  start     = 2;
+        int[] arr       = new int[8];
 
-        byte expResult = 0;
-        byte result = nom.tam.util.ArrayFuncs.testPattern(arr, start);
+        byte  expResult = 0;
+        byte  result    = nom.tam.util.ArrayFuncs.testPattern(arr, start);
         assertEquals(result, (byte) (start + arr.length));
         assertEquals(start, arr[0]);
         assertEquals(start + arr.length - 1, arr[arr.length - 1]);
@@ -232,9 +279,9 @@ public class ArrayFuncsTest extends TestCase {
     public void testFlatten() {
         System.out.println("flatten");
 
-        int[][][] test = new int[2][3][4];
+        int[][][] test   = new int[2][3][4];
 
-        int[] result = (int[]) ArrayFuncs.flatten(test);
+        int[]     result = (int[]) ArrayFuncs.flatten(test);
         assertEquals(result.length, 24);
     }
 
@@ -244,10 +291,14 @@ public class ArrayFuncsTest extends TestCase {
     public void testCurl() {
         System.out.println("curl");
 
-        int[] dimens = new int[]{2, 3, 4};
-        int[] test = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23};
+        int[] dimens = new int[] { 2, 3, 4 };
+        int[] test   = {
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18,
+            19, 20, 21, 22, 23
+        };
 
-        int[][][] res = (int[][][]) nom.tam.util.ArrayFuncs.curl(test, dimens);
+        int[][][] res = (int[][][]) nom.tam.util.ArrayFuncs.curl(test,
+                            dimens);
         assertEquals(res.length, 2);
         assertEquals(res[0].length, 3);
         assertEquals(res[0][0].length, 4);
@@ -262,10 +313,11 @@ public class ArrayFuncsTest extends TestCase {
     public void testMimicArray() {
         System.out.println("mimicArray");
 
-        int[][] array = new int[2][3];
-        Class newType = double.class;
+        int[][] array   = new int[2][3];
+        Class   newType = double.class;
 
-        double[][] result = (double[][]) nom.tam.util.ArrayFuncs.mimicArray(array, newType);
+        double[][] result =
+            (double[][]) nom.tam.util.ArrayFuncs.mimicArray(array, newType);
         assertEquals(result.length, array.length);
         assertEquals(result[0].length, array[0].length);
     }
@@ -276,16 +328,20 @@ public class ArrayFuncsTest extends TestCase {
     public void testConvertArray() {
         System.out.println("convertArray");
 
-        int[][] array = {{1, 2, 3}, {4, 5, 6}};
-        Class newType = double.class;
+        int[][] array   = {
+            { 1, 2, 3 }, { 4, 5, 6 }
+        };
+        Class   newType = double.class;
 
-        boolean reuse = true;
-        double[][] dres = (double[][]) ArrayFuncs.convertArray(array, newType, reuse);
+        boolean reuse   = true;
+        double[][] dres = (double[][]) ArrayFuncs.convertArray(array,
+                              newType, reuse);
         assertEquals(dres.length, array.length);
         assertEquals(dres[0].length, array[0].length);
 
         newType = int.class;
-        int[][] ires = (int[][]) ArrayFuncs.convertArray(array, newType, true);
+        int[][] ires = (int[][]) ArrayFuncs.convertArray(array, newType,
+                           true);
         assertEquals(array, ires);
 
         ires = (int[][]) ArrayFuncs.convertArray(array, newType, false);
@@ -299,7 +355,9 @@ public class ArrayFuncsTest extends TestCase {
     public void testCopyInto() {
         System.out.println("copyInto");
 
-        int[][] x = {{2, 3, 4}, {5, 6, 7}};
+        int[][]    x = {
+            { 2, 3, 4 }, { 5, 6, 7 }
+        };
         double[][] y = new double[2][3];
 
         ArrayFuncs.copyInto(x, y);
@@ -314,10 +372,18 @@ public class ArrayFuncsTest extends TestCase {
     public void testArrayEquals() {
         System.out.println("arrayEquals");
 
-        int[][] x = {{1, 2, 3}, {4, 5, 6}};
-        int[][] y = {{1, 2, 3}, {4, 5, 6}};
-        int[][] z = {{1, 2, 3}, {4, 5, 7}};
-        int[][] t = {{1, 2, 3}, {4, 5, 6}, {7, 8, 9}};
+        int[][] x = {
+            { 1, 2, 3 }, { 4, 5, 6 }
+        };
+        int[][] y = {
+            { 1, 2, 3 }, { 4, 5, 6 }
+        };
+        int[][] z = {
+            { 1, 2, 3 }, { 4, 5, 7 }
+        };
+        int[][] t = {
+            { 1, 2, 3 }, { 4, 5, 6 }, { 7, 8, 9 }
+        };
 
 
         assertTrue(ArrayFuncs.arrayEquals(null, null));
@@ -333,8 +399,8 @@ public class ArrayFuncsTest extends TestCase {
      */
     public void testDoubleArrayEquals() {
 
-        double x[] = {1, 2, 3};
-        double y[] = {1, 2, 3};
+        double x[] = { 1, 2, 3 };
+        double y[] = { 1, 2, 3 };
         System.out.println("doubleArrayEquals");
 
         double tol = 0.0;
@@ -350,8 +416,8 @@ public class ArrayFuncsTest extends TestCase {
      * Test of floatArrayEquals method, of class nom.tam.util.ArrayFuncs.
      */
     public void testFloatArrayEquals() {
-        float x[] = {1f, 2f, 3f};
-        float y[] = {1f, 2f, 3f};
+        float x[] = { 1f, 2f, 3f };
+        float y[] = { 1f, 2f, 3f };
         System.out.println("floatArrayEquals");
 
         float tol = 0.0F;

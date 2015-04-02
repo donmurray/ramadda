@@ -1,22 +1,54 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.util.test;
 
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
+
 import junit.framework.JUnit4TestAdapter;
 
-/** This class tests the ByteFormatter and ByteParser classes.
+/**
+ * This class tests the ByteFormatter and ByteParser classes.
  */
 import nom.tam.util.*;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 import java.util.Arrays;
 
+
+/**
+ * Class description
+ *
+ *
+ * @version        $version$, Thu, Apr 2, '15
+ * @author         Enter your name here...    
+ */
 public class ByteFormatParseTest {
 
+    /** _more_          */
     byte[] buffer = new byte[100000];
+
+    /** _more_          */
     ByteFormatter bf = new ByteFormatter();
+
+    /** _more_          */
     ByteParser bp = new ByteParser(buffer);
+
+    /** _more_          */
     int offset = 0;
+
+    /** _more_          */
     int cnt = 0;
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     @Test
     public void testInt() throws Exception {
 
@@ -44,7 +76,7 @@ public class ByteFormatParseTest {
         int colSize = 12;
         while (cnt < tint.length) {
             offset = bf.format(tint[cnt], buffer, offset, colSize);
-            cnt += 1;
+            cnt    += 1;
             if (cnt % 8 == 0) {
                 offset = bf.format("\n", buffer, offset, 1);
             }
@@ -65,10 +97,10 @@ public class ByteFormatParseTest {
         // Now do it with left-aligned numbers.
         bf.setAlign(false);
         bp.setFillFields(true);
-        offset = 0;
+        offset  = 0;
         colSize = 12;
-        cnt = 0;
-        offset = 0;
+        cnt     = 0;
+        offset  = 0;
         while (cnt < tint.length) {
             int oldOffset = offset;
             offset = bf.format(tint[cnt], buffer, offset, colSize);
@@ -94,13 +126,13 @@ public class ByteFormatParseTest {
             }
         }
 
-        offset = 0;
+        offset  = 0;
         colSize = 12;
-        cnt = 0;
-        offset = 0;
+        cnt     = 0;
+        offset  = 0;
         while (cnt < tint.length) {
             offset = bf.format(tint[cnt], buffer, offset, colSize);
-            cnt += 1;
+            cnt    += 1;
             if (cnt % 8 == 0) {
                 offset = bf.format("\n", buffer, offset, 1);
             }
@@ -111,14 +143,14 @@ public class ByteFormatParseTest {
 
         bf.setAlign(false);
 
-        offset = 0;
+        offset  = 0;
         colSize = 12;
-        cnt = 0;
-        offset = 0;
+        cnt     = 0;
+        offset  = 0;
         while (cnt < tint.length) {
             offset = bf.format(tint[cnt], buffer, offset, colSize);
             offset = bf.format(" ", buffer, offset, 1);
-            cnt += 1;
+            cnt    += 1;
         }
         myStr = new String(buffer, 0, offset);
         String[] array = myStr.split(" ");
@@ -141,7 +173,8 @@ public class ByteFormatParseTest {
             if (i < 6) {
                 assertEquals("TestTrunc" + i, test, new String(buffer, 0, 6));
             } else {
-                assertEquals("TestTrunc" + i, "******", new String(buffer, 0, 6));
+                assertEquals("TestTrunc" + i, "******",
+                             new String(buffer, 0, 6));
             }
             val *= 10;
         }
@@ -164,6 +197,11 @@ public class ByteFormatParseTest {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     @Test
     public void testLong() throws Exception {
 
@@ -203,6 +241,11 @@ public class ByteFormatParseTest {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     @Test
     public void testFloat() throws Exception {
 
@@ -214,7 +257,8 @@ public class ByteFormatParseTest {
 
         float[] flt = new float[100];
         for (int i = 6; i < flt.length; i += 1) {
-            flt[i] = (float) (2 * (Math.random() - 0.5) * Math.pow(10, 60 * (Math.random() - 0.5)));
+            flt[i] = (float) (2 * (Math.random() - 0.5)
+                              * Math.pow(10, 60 * (Math.random() - 0.5)));
         }
 
         flt[0] = Float.MAX_VALUE;
@@ -229,11 +273,11 @@ public class ByteFormatParseTest {
         bf.setAlign(true);
 
         offset = 0;
-        cnt = 0;
+        cnt    = 0;
 
         while (cnt < flt.length) {
             offset = bf.format(flt[cnt], buffer, offset, 24);
-            cnt += 1;
+            cnt    += 1;
             if (cnt % 4 == 0) {
                 offset = bf.format("\n", buffer, offset, 1);
             }
@@ -246,7 +290,7 @@ public class ByteFormatParseTest {
 
             float chk = bp.getFloat(24);
 
-            float dx = Math.abs(chk - flt[i]);
+            float dx  = Math.abs(chk - flt[i]);
             if (flt[i] != 0) {
                 dx = dx / Math.abs(flt[i]);
             }
@@ -263,6 +307,11 @@ public class ByteFormatParseTest {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     @Test
     public void testDouble() throws Exception {
 
@@ -274,7 +323,8 @@ public class ByteFormatParseTest {
 
         double[] dbl = new double[100];
         for (int i = 6; i < dbl.length; i += 1) {
-            dbl[i] = 2 * (Math.random() - 0.5) * Math.pow(10, 60 * (Math.random() - 0.5));
+            dbl[i] = 2 * (Math.random() - 0.5)
+                     * Math.pow(10, 60 * (Math.random() - 0.5));
         }
 
         dbl[0] = Double.MAX_VALUE;
@@ -288,10 +338,10 @@ public class ByteFormatParseTest {
         bf.setTruncationThrow(false);
         bf.setAlign(true);
         offset = 0;
-        cnt = 0;
+        cnt    = 0;
         while (cnt < dbl.length) {
             offset = bf.format(dbl[cnt], buffer, offset, 25);
-            cnt += 1;
+            cnt    += 1;
             if (cnt % 4 == 0) {
                 offset = bf.format("\n", buffer, offset, 1);
             }
@@ -303,7 +353,7 @@ public class ByteFormatParseTest {
 
             double chk = bp.getDouble(25);
 
-            double dx = Math.abs(chk - dbl[i]);
+            double dx  = Math.abs(chk - dbl[i]);
             if (dbl[i] != 0) {
                 dx = dx / Math.abs(dbl[i]);
             }
@@ -321,6 +371,11 @@ public class ByteFormatParseTest {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     @Test
     public void testBoolean() throws Exception {
 
@@ -340,6 +395,11 @@ public class ByteFormatParseTest {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     @Test
     public void testString() throws Exception {
 

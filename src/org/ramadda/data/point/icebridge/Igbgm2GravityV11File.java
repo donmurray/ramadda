@@ -1,22 +1,14 @@
-/*
-* Copyright 2008-2015 Geode Systems LLC
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-* software and associated documentation files (the "Software"), to deal in the Software 
-* without restriction, including without limitation the rights to use, copy, modify, 
-* merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
-* permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies 
-* or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-* PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-* OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 package org.ramadda.data.point.icebridge;
 
@@ -84,63 +76,63 @@ public class Igbgm2GravityV11File extends org.ramadda.data.point.text
      *
      *
      * @version        $version$, Sat, Feb 28, '15
-     * @author         Enter your name here...    
+     * @author         Enter your name here...
      */
     public static class Igbgm2GravityV11Record extends org.ramadda.data.point
         .PointRecord {
 
-        /** _more_          */
+        /** _more_ */
         public static final int ATTR_FIRST =
             org.ramadda.data.point.PointRecord.ATTR_LAST;
 
-        /** _more_          */
+        /** _more_ */
         public static final List<RecordField> FIELDS =
             new ArrayList<RecordField>();
 
-        /** _more_          */
+        /** _more_ */
         public static final int ATTR_YEAR = ATTR_FIRST + 1;
 
-        /** _more_          */
+        /** _more_ */
         public static final RecordField RECORDATTR_YEAR;
 
-        /** _more_          */
+        /** _more_ */
         public static final int ATTR_DAYOFYEAR = ATTR_FIRST + 2;
 
-        /** _more_          */
+        /** _more_ */
         public static final RecordField RECORDATTR_DAYOFYEAR;
 
-        /** _more_          */
+        /** _more_ */
         public static final int ATTR_SECONDOFDAY = ATTR_FIRST + 3;
 
-        /** _more_          */
+        /** _more_ */
         public static final RecordField RECORDATTR_SECONDOFDAY;
 
-        /** _more_          */
+        /** _more_ */
         public static final int ATTR_LONGITUDE = ATTR_FIRST + 4;
 
-        /** _more_          */
+        /** _more_ */
         public static final RecordField RECORDATTR_LONGITUDE;
 
-        /** _more_          */
+        /** _more_ */
         public static final int ATTR_LATITUDE = ATTR_FIRST + 5;
 
-        /** _more_          */
+        /** _more_ */
         public static final RecordField RECORDATTR_LATITUDE;
 
-        /** _more_          */
+        /** _more_ */
         public static final int ATTR_AIRCRAFTHEIGHT = ATTR_FIRST + 6;
 
-        /** _more_          */
+        /** _more_ */
         public static final RecordField RECORDATTR_AIRCRAFTHEIGHT;
 
-        /** _more_          */
+        /** _more_ */
         public static final int ATTR_FREEAIRGRAVITYDISTURBANCE = ATTR_FIRST
                                                                  + 7;
 
-        /** _more_          */
+        /** _more_ */
         public static final RecordField RECORDATTR_FREEAIRGRAVITYDISTURBANCE;
 
-        /** _more_          */
+        /** _more_ */
         public static final int ATTR_LAST = ATTR_FIRST + 8;
 
 
@@ -261,25 +253,25 @@ public class Igbgm2GravityV11File extends org.ramadda.data.point.text
         }
 
 
-        /** _more_          */
+        /** _more_ */
         int year;
 
-        /** _more_          */
+        /** _more_ */
         int dayOfYear;
 
-        /** _more_          */
+        /** _more_ */
         int secondOfDay;
 
-        /** _more_          */
+        /** _more_ */
         double longitude;
 
-        /** _more_          */
+        /** _more_ */
         double latitude;
 
-        /** _more_          */
+        /** _more_ */
         double aircraftHeight;
 
-        /** _more_          */
+        /** _more_ */
         double freeAirGravityDisturbance;
 
 

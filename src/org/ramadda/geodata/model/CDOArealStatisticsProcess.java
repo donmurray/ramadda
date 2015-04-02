@@ -1,22 +1,14 @@
-/*
-* Copyright 2008-2015 Geode Systems LLC
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-* software and associated documentation files (the "Software"), to deal in the Software 
-* without restriction, including without limitation the rights to use, copy, modify, 
-* merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
-* permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies 
-* or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-* PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-* OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 package org.ramadda.geodata.model;
 
@@ -70,7 +62,7 @@ import java.util.TreeSet;
  */
 public class CDOArealStatisticsProcess extends CDODataProcess {
 
-    /** _more_          */
+    /** _more_ */
     String type = null;
 
     /**
@@ -186,16 +178,16 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             throw new Exception("Illegal data type");
         }
         String type =
-                input.getProperty(
-                    "type", ClimateModelApiHandler.ARG_ACTION_COMPARE).toString();
+            input.getProperty(
+                "type", ClimateModelApiHandler.ARG_ACTION_COMPARE).toString();
 
 
         final List<ServiceOperand> outputEntries =
             new ArrayList<ServiceOperand>();
         int     opNum      = 0;
-        int     numThreads      = Math.min(input.getOperands().size(), 6);
-        boolean useThreads = false || numThreads > 2;
-        System.err.println("Using threads: "+useThreads);
+        int     numThreads = Math.min(input.getOperands().size(), 6);
+        boolean useThreads = false || (numThreads > 2);
+        System.err.println("Using threads: " + useThreads);
         ThreadManager threadManager =
             new ThreadManager("CDOArealStatistics.evaluate");
         for (final ServiceOperand op : input.getOperands()) {
@@ -213,7 +205,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                             op, opNum));
                 } else {
                     final int myOp = opNum;
-                    System.out.println("making thread "+opNum);
+                    System.out.println("making thread " + opNum);
                     threadManager.addRunnable(new ThreadManager.MyRunnable() {
                         public void run() throws Exception {
                             try {
@@ -239,33 +231,43 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         }
         if (useThreads) {
             try {
-                System.out.println("Running in "+numThreads+" threads");
+                System.out.println("Running in " + numThreads + " threads");
                 threadManager.runInParallel(numThreads);
             } catch (Exception ve) {
                 ve.printStackTrace();
             }
         }
         if (type.equals(ClimateModelApiHandler.ARG_ACTION_MULTI_COMPARE)
-                || type.equals(ClimateModelApiHandler.ARG_ACTION_ENS_COMPARE)) {
+                || type.equals(
+                    ClimateModelApiHandler.ARG_ACTION_ENS_COMPARE)) {
             addEnsembleMean(request, input, outputEntries, type);
         }
 
         return new ServiceOutput(outputEntries);
     }
-    
+
     /**
      * Add the ensemble mean to list of output entries
+     *
+     * @param request _more_
+     * @param dpi _more_
+     * @param ops _more_
+     * @param type _more_
+     *
+     * @throws Exception _more_
      */
-    public void addEnsembleMean(Request request, ServiceInput dpi, List<ServiceOperand> ops, String type) throws Exception {
-        Entry oneOfThem = ops.get(0).getEntries().get(0);
-        Object[] values = oneOfThem.getValues(true);
-        StringBuilder fileName = new StringBuilder();
+    public void addEnsembleMean(Request request, ServiceInput dpi,
+                                List<ServiceOperand> ops, String type)
+            throws Exception {
+        Entry         oneOfThem = ops.get(0).getEntries().get(0);
+        Object[]      values    = oneOfThem.getValues(true);
+        StringBuilder fileName  = new StringBuilder();
         fileName.append(oneOfThem.getValue(4));
         fileName.append("_MultiModel_");
         fileName.append(oneOfThem.getValue(2));
         fileName.append("_mean_");
-        String       id        = getRepository().getGUID();
-        String       newName = fileName + id + ".nc";
+        String id      = getRepository().getGUID();
+        String newName = fileName + id + ".nc";
         /*
         String tail =
             getOutputHandler().getStorageManager().getFileTail(oneOfThem);
@@ -273,7 +275,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         String       newName = IOUtil.stripExtension(tail) + "_MMM_" + id + ".nc";
         */
         File outFile = new File(IOUtil.joinDir(dpi.getProcessDir(), newName));
-        List<String> commands  = initCDOService();
+        List<String> commands = initCDOService();
         commands.add("-ensmean");
         for (ServiceOperand op : ops) {
             List<Entry> entries = op.getEntries();
@@ -343,19 +345,19 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                 oneOfThem.getResource().getPath());
         CalendarDateRange dateRange = dataset.getCalendarDateRange();
         int firstDataYearMM = Integer.parseInt(
-                                new CalendarDateTime(
-                                    dateRange.getStart()).formattedString(
-                                    "yyyyMM",
-                                    CalendarDateTime.DEFAULT_TIMEZONE));
-        int firstDataYear = firstDataYearMM/100;
-        int firstDataMonth = firstDataYearMM%100;
+                                  new CalendarDateTime(
+                                      dateRange.getStart()).formattedString(
+                                      "yyyyMM",
+                                      CalendarDateTime.DEFAULT_TIMEZONE));
+        int firstDataYear  = firstDataYearMM / 100;
+        int firstDataMonth = firstDataYearMM % 100;
         int lastDataYearMM = Integer.parseInt(
-                               new CalendarDateTime(
-                                   dateRange.getEnd()).formattedString(
-                                   "yyyyMM",
-                                   CalendarDateTime.DEFAULT_TIMEZONE));
-        int lastDataYear = lastDataYearMM/100;
-        int lastDataMonth = lastDataYearMM%100;
+                                 new CalendarDateTime(
+                                     dateRange.getEnd()).formattedString(
+                                     "yyyyMM",
+                                     CalendarDateTime.DEFAULT_TIMEZONE));
+        int lastDataYear  = lastDataYearMM / 100;
+        int lastDataMonth = lastDataYearMM % 100;
         if ((dataset == null) || dataset.getGrids().isEmpty()) {
             throw new Exception("No grids found");
         }
@@ -412,8 +414,10 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                                     : "" + (opNum + 1);
             boolean      haveYears;
             // find the start & end month of the request
-            int requestStartMonth = request.get(CDOOutputHandler.ARG_CDO_STARTMONTH, 1);
-            int requestEndMonth = request.get(CDOOutputHandler.ARG_CDO_ENDMONTH, 1);
+            int requestStartMonth =
+                request.get(CDOOutputHandler.ARG_CDO_STARTMONTH, 1);
+            int requestEndMonth =
+                request.get(CDOOutputHandler.ARG_CDO_ENDMONTH, 1);
             if (opNum == 0) {
                 haveYears = request.defined(CDOOutputHandler.ARG_CDO_YEARS);
             } else {
@@ -439,8 +443,9 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                                             true, true);
                 for (String year : yearList) {
                     int iyear = Integer.parseInt(year);
-                    if (iyear <= firstDataYear || iyear > lastDataYear ||
-                            (iyear == lastDataYear && requestEndMonth > lastDataMonth)) {
+                    if ((iyear <= firstDataYear) || (iyear > lastDataYear)
+                            || ((iyear == lastDataYear)
+                                && (requestEndMonth > lastDataMonth))) {
                         continue;
                     }
                     years.add(Integer.parseInt(year));
@@ -495,7 +500,8 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                 if (endYear < lastDataYear) {
                     endYear = lastDataYear;
                 }
-                if (endYear == lastDataYear && requestEndMonth > lastDataMonth) {
+                if ((endYear == lastDataYear)
+                        && (requestEndMonth > lastDataMonth)) {
                     endYear = lastDataYear - 1;
                 }
                 for (int i = 0; i < 2; i++) {

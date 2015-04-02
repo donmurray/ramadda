@@ -1,22 +1,14 @@
-/*
-* Copyright 2008-2015 Geode Systems LLC
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-* software and associated documentation files (the "Software"), to deal in the Software 
-* without restriction, including without limitation the rights to use, copy, modify, 
-* merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
-* permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies 
-* or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-* PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-* OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 package org.ramadda.plugins.db;
 
@@ -95,10 +87,10 @@ import java.util.TimeZone;
 
 public class DbTypeHandler extends BlobTypeHandler {
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_ANONFORM_ENABLED = "anonform.enabled";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_ANONFORM_MESSAGE = "anonform.message";
 
     /** _more_ */
@@ -485,7 +477,10 @@ public class DbTypeHandler extends BlobTypeHandler {
 
             public Clause getEnumValuesClause(Column column, Entry entry)
                     throws Exception {
-                if(entry == null) return null;
+                if (entry == null) {
+                    return null;
+                }
+
                 return Clause.eq(COL_ID, entry.getId());
             }
         };
@@ -769,14 +764,31 @@ public class DbTypeHandler extends BlobTypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<Column> getColumns() {
         return columns;
     }
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     *
+     * @return _more_
+     */
     public Column getColumn(String name) {
         return columnMap.get(name);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     protected GenericTypeHandler getTableTypeHandler() {
         return tableHandler;
     }
@@ -987,9 +999,18 @@ public class DbTypeHandler extends BlobTypeHandler {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
     public void addViewFooter(Request request, Entry entry, Appendable sb)
-        throws Exception {
-        if(!request.get(ARG_EMBEDDED, false)) {
+            throws Exception {
+        if ( !request.get(ARG_EMBEDDED, false)) {
             sb.append(HtmlUtils.sectionClose());
         }
     }
@@ -1083,8 +1104,8 @@ public class DbTypeHandler extends BlobTypeHandler {
         }
 
 
-        if(!request.get(ARG_EMBEDDED, false)) {
-            sb.append(HtmlUtils.sectionOpen(null,false));
+        if ( !request.get(ARG_EMBEDDED, false)) {
+            sb.append(HtmlUtils.sectionOpen(null, false));
         }
 
 
@@ -1829,8 +1850,10 @@ public class DbTypeHandler extends BlobTypeHandler {
         advanced.append(HtmlUtils.formTableClose());
         sb.append("<tr><td colspan=3>");
         List<String> titles = new ArrayList<String>();
-        List<String> tabs = new ArrayList<String>();
-        HtmlUtils.makeAccordian(sb,msg("Advanced..."), HtmlUtils.inset(advanced.toString(),0,20,10,0));
+        List<String> tabs   = new ArrayList<String>();
+        HtmlUtils.makeAccordian(sb, msg("Advanced..."),
+                                HtmlUtils.inset(advanced.toString(), 0, 20,
+                                    10, 0));
         sb.append("</td></tr>");
 
         sb.append(formEntry(request, "",
@@ -2526,16 +2549,14 @@ public class DbTypeHandler extends BlobTypeHandler {
         String xmlUrl = getViewUrl(request, entry, "" + values[IDX_DBID])
                         + "&result=xml";
         rowId = HtmlUtils.squote(rowId);
-        divId= HtmlUtils.squote(divId);
-        String popupId=  HtmlUtils.squote("dbrowpopup_" + entry.getId());
+        divId = HtmlUtils.squote(divId);
+        String popupId   = HtmlUtils.squote("dbrowpopup_" + entry.getId());
         StringBuilder sb = new StringBuilder();
         sb.append(HtmlUtils.onMouseOver(HtmlUtils.call("dbRowOver", rowId)));
         sb.append(HtmlUtils.onMouseOut(HtmlUtils.call("dbRowOut", rowId)));
-        sb.append(HtmlUtils.onMouseClick(HtmlUtils.call("dbRowClick", 
-                                                        HtmlUtils.comma("event",
-                                                                        rowId,
-                                                                        popupId,
-                                                                        HtmlUtils.squote(xmlUrl)))));
+        sb.append(HtmlUtils.onMouseClick(HtmlUtils.call("dbRowClick",
+                HtmlUtils.comma("event", rowId, popupId,
+                                HtmlUtils.squote(xmlUrl)))));
 
         return sb.toString();
     }
@@ -2598,7 +2619,7 @@ public class DbTypeHandler extends BlobTypeHandler {
                                   "/" + entry.getName() + ".csv"));
             }
         }
-        boolean embedded =  request.get(ARG_EMBEDDED, false);
+        boolean embedded = request.get(ARG_EMBEDDED, false);
         if ( !embedded) {
             addViewHeader(request, entry, sb, VIEW_TABLE, valueList.size(),
                           fromSearch,
@@ -2755,10 +2776,12 @@ public class DbTypeHandler extends BlobTypeHandler {
             hb.append("</tr>");
         }
 
-        Hashtable<String, Double> sums = new Hashtable<String, Double>();
+        Hashtable<String, Double> sums    = new Hashtable<String, Double>();
 
-        String popupId = "dbrowpopup_" + entry.getId();
-        hb.append(HtmlUtils.div("",HtmlUtils.id(popupId)+HtmlUtils.cssClass("ramadda-popup")));
+        String                    popupId = "dbrowpopup_" + entry.getId();
+        hb.append(HtmlUtils.div("",
+                                HtmlUtils.id(popupId)
+                                + HtmlUtils.cssClass("ramadda-popup")));
 
         for (int cnt = 0; cnt < valueList.size(); cnt++) {
             Object[] values = valueList.get(cnt);
@@ -2771,13 +2794,15 @@ public class DbTypeHandler extends BlobTypeHandler {
                                      HtmlUtils.attrs(HtmlUtils.ATTR_VALIGN,
                                          "top") + HtmlUtils.cssClass("dbrow")
                                              + HtmlUtils.id(rowId)));
-            
-            hb.append(HtmlUtils.open(HtmlUtils.TAG_TD, 
-                                     HtmlUtils.attr("width","10")+
-                                     HtmlUtils.style("white-space:nowrap;")));
+
+            hb.append(
+                HtmlUtils.open(
+                    HtmlUtils.TAG_TD,
+                    HtmlUtils.attr("width", "10")
+                    + HtmlUtils.style("white-space:nowrap;")));
             hb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
-                                     HtmlUtils.cssClass("ramadda-db-div") +
-                                     HtmlUtils.id(divId)));
+                                     HtmlUtils.cssClass("ramadda-db-div")
+                                     + HtmlUtils.id(divId)));
             String dbid  = (String) values[IDX_DBID];
             String cbxId = ARG_DBID + (cnt);
             String call =
@@ -2829,9 +2854,12 @@ public class DbTypeHandler extends BlobTypeHandler {
                     sums.put(column.getName(), d);
                 }
                 if (column.isString()) {
-                    hb.append(HtmlUtils.open(HtmlUtils.TAG_TD,event));
+                    hb.append(HtmlUtils.open(HtmlUtils.TAG_TD, event));
                 } else {
-                    hb.append(HtmlUtils.open(HtmlUtils.TAG_TD,event+HtmlUtils.attr("align","right")));
+                    hb.append(HtmlUtils.open(HtmlUtils.TAG_TD,
+                                             event
+                                             + HtmlUtils.attr("align",
+                                                 "right")));
                 }
 
 
@@ -3176,7 +3204,7 @@ public class DbTypeHandler extends BlobTypeHandler {
             StringBuilder theSB = entryList;
             if (mapCategoryColumn != null) {
                 String cat = mapCategoryColumn.getString(values);
-                if(cat == null) {
+                if (cat == null) {
                     cat = "";
                 }
                 theSB = catMap.get(cat);
@@ -3262,6 +3290,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         if ( !request.get(ARG_EMBEDDED, false)) {
             addViewFooter(request, entry, sb);
         }
+
         return new Result(getTitle(request, entry), sb);
 
     }
@@ -3533,6 +3562,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         }
 
         addViewFooter(request, entry, sb);
+
         return new Result(getTitle(request, entry), sb);
 
     }
@@ -3638,6 +3668,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         sb.append("</table>");
 
         addViewFooter(request, entry, sb);
+
         return new Result(getTitle(request, entry), sb);
     }
 
@@ -3807,14 +3838,16 @@ public class DbTypeHandler extends BlobTypeHandler {
         }
 
         List<String> titles = new ArrayList<String>();
-        List<String> tabs = new ArrayList<String>();
+        List<String> tabs   = new ArrayList<String>();
 
         for (String rowValue : rowValues) {
             titles.add(rowValue);
-            tabs.add(HtmlUtils.insetDiv(map.get(rowValue).toString(),0,20,10,0));
+            tabs.add(HtmlUtils.insetDiv(map.get(rowValue).toString(), 0, 20,
+                                        10, 0));
         }
-        HtmlUtils.makeAccordian(sb,titles, tabs, false);
+        HtmlUtils.makeAccordian(sb, titles, tabs, false);
         addViewFooter(request, entry, sb);
+
         return new Result(getTitle(request, entry), sb);
     }
 
@@ -3952,6 +3985,7 @@ public class DbTypeHandler extends BlobTypeHandler {
             "<div id=\"chart_div\" style=\"width: 800px; height: 500px;\"></div>\n");
 
         addViewFooter(request, entry, sb);
+
         return new Result(getTitle(request, entry), sb);
     }
 
@@ -4018,6 +4052,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         sb.append(tmp);
 
         addViewFooter(request, entry, sb);
+
         return new Result("", sb);
     }
 
@@ -4100,6 +4135,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         calendarOutputHandler.outputCalendar(request, calEntries, sb, false);
 
         addViewFooter(request, entry, sb);
+
         return new Result(getTitle(request, entry), sb);
     }
 
@@ -4245,6 +4281,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         sb.append(HtmlUtils.script(js.toString()));
 
         addViewFooter(request, entry, sb);
+
         return new Result(getTitle(request, entry), sb);
     }
 
@@ -4550,6 +4587,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         }
 
         addViewFooter(request, entry, sb);
+
         return new Result(getTitle(request, entry), sb);
     }
 

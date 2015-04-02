@@ -1,4 +1,10 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits;
+
 
 /*
  * Copyright: Thomas McGlynn 1997-1998.
@@ -11,15 +17,29 @@ package nom.tam.fits;
  */
 
 /* This class was contributed by David Glowacki */
-public class HeaderCardException
-        extends FitsException {
 
+/**
+ * Class description
+ *
+ *
+ * @version        $version$, Thu, Apr 2, '15
+ * @author         Enter your name here...    
+ */
+public class HeaderCardException extends FitsException {
+
+    /**
+     * _more_
+     */
     public HeaderCardException() {
         super();
     }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     */
     public HeaderCardException(String s) {
         super(s);
     }
 }
-

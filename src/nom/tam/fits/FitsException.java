@@ -1,4 +1,10 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits;
+
 
 /*
  * Copyright: Thomas McGlynn 1997-1999.
@@ -9,16 +15,38 @@ package nom.tam.fits;
  * Many thanks to David Glowacki (U. Wisconsin) for substantial
  * improvements, enhancements and bug fixes.
  */
+
+/**
+ * Class description
+ *
+ *
+ * @version        $version$, Thu, Apr 2, '15
+ * @author         Enter your name here...    
+ */
 public class FitsException extends Exception {
 
+    /**
+     * _more_
+     */
     public FitsException() {
         super();
     }
 
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     */
     public FitsException(String msg) {
         super(msg);
     }
 
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     * @param reason _more_
+     */
     public FitsException(String msg, Exception reason) {
         super(msg, reason);
     }

@@ -1,21 +1,7 @@
-/*
-* Copyright 2008-2015 Geode Systems LLC
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-* software and associated documentation files (the "Software"), to deal in the Software 
-* without restriction, including without limitation the rights to use, copy, modify, 
-* merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
-* permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies 
-* or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-* PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-* OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
 
 package org.ramadda.repository;
@@ -421,7 +407,8 @@ public class PageHandler extends RepositoryManager {
                 HtmlUtils.cssClass("ramadda-system-message")) + content;
         }
 
-        if ( !getRepository().isRegistered() && getAdmin().getInstallationComplete()) {
+        if ( !getRepository().isRegistered()
+                && getAdmin().getInstallationComplete()) {
             content = REGISTER_MESSAGE + content;
         }
 
@@ -2184,12 +2171,17 @@ public class PageHandler extends RepositoryManager {
      * _more_
      *
      * @param request The request
+     * @param sb _more_
      * @param urls _more_
      * @param arg _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public void makeLinksHeader(Request request, Appendable sb, List<RequestUrl> urls,   String arg) throws Exception {
+    public void makeLinksHeader(Request request, Appendable sb,
+                                List<RequestUrl> urls, String arg)
+            throws Exception {
         List<String> links   = new ArrayList();
         String       type    = request.getRequestPath();
         String       onLabel = null;
@@ -2210,9 +2202,12 @@ public class PageHandler extends RepositoryManager {
                                      HtmlUtils.cssClass("subheader-off")));
             //            }
         }
-        StringBuilder header = new StringBuilder(StringUtil.join("<span class=\"subheader-sep\">|</span>", links));
+        StringBuilder header =
+            new StringBuilder(
+                StringUtil.join(
+                    "<span class=\"subheader-sep\">|</span>", links));
         header.append("\n");
-        if(Utils.stringDefined(onLabel)) {
+        if (Utils.stringDefined(onLabel)) {
             header.append(HtmlUtils.div(HtmlUtils.h2(msg(onLabel))));
         }
         sb.append(HtmlUtils.tag(HtmlUtils.TAG_DIV,
@@ -2303,6 +2298,7 @@ public class PageHandler extends RepositoryManager {
         s = s.replace("&#38;nbsp&#59;", "&nbsp;");
         s = s.replaceAll("PREOPEN", "<pre>");
         s = s.replaceAll("PRECLOSE", "</pre>");
+
         return s;
     }
 
@@ -3446,20 +3442,56 @@ public class PageHandler extends RepositoryManager {
     }
 
 
-    public void entrySectionOpen(Request request, Entry entry, Appendable sb, String title) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param sb _more_
+     * @param title _more_
+     *
+     * @throws Exception _more_
+     */
+    public void entrySectionOpen(Request request, Entry entry, Appendable sb,
+                                 String title)
+            throws Exception {
         entrySectionOpen(request, entry, sb, title, false);
     }
 
-    public void entrySectionOpen(Request request, Entry entry, Appendable sb, String title, boolean showLine) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param sb _more_
+     * @param title _more_
+     * @param showLine _more_
+     *
+     * @throws Exception _more_
+     */
+    public void entrySectionOpen(Request request, Entry entry, Appendable sb,
+                                 String title, boolean showLine)
+            throws Exception {
         sb.append(HtmlUtils.sectionOpen(null, showLine));
-        if(entry!=null)
-            sb.append(HtmlUtils.h2(entry.getName() +": " + msg(title)));
-        else
+        if (entry != null) {
+            sb.append(HtmlUtils.h2(entry.getName() + ": " + msg(title)));
+        } else {
             sb.append(HtmlUtils.h2(msg(title)));
+        }
 
     }
 
-    public void entrySectionClose(Request request, Entry entry, Appendable sb) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    public void entrySectionClose(Request request, Entry entry, Appendable sb)
+            throws Exception {
         sb.append(HtmlUtils.sectionClose());
     }
 

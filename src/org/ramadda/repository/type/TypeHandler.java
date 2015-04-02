@@ -1,22 +1,14 @@
-/*
-* Copyright 2008-2015 Geode Systems LLC
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-* software and associated documentation files (the "Software"), to deal in the Software 
-* without restriction, including without limitation the rights to use, copy, modify, 
-* merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
-* permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies 
-* or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-* PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-* OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 package org.ramadda.repository.type;
 
@@ -249,7 +241,7 @@ public class TypeHandler extends RepositoryManager {
     public static final String PROP_FIELD_FILE_PATTERN = "field_file_pattern";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_INGEST_LINKS = "ingestLinks";
 
 
@@ -4265,10 +4257,13 @@ public class TypeHandler extends RepositoryManager {
      *
      * @param request The request
      * @param formBuffer _more_
+     * @param fieldsToShow _more_
      *
      * @throws Exception _more_
      */
-    public void addToSpecialSearchForm(Request request, Appendable formBuffer, HashSet<String> fieldsToShow)
+    public void addToSpecialSearchForm(Request request,
+                                       Appendable formBuffer,
+                                       HashSet<String> fieldsToShow)
             throws Exception {
         if (parent != null) {
             parent.addToSpecialSearchForm(request, formBuffer, fieldsToShow);
@@ -5249,6 +5244,7 @@ public class TypeHandler extends RepositoryManager {
      * @param entries _more_
      * @param subGroups _more_
      * @param where _more_
+     * @param select _more_
      *
      * @throws Exception _more_
      */
@@ -5256,7 +5252,8 @@ public class TypeHandler extends RepositoryManager {
                                    List<Entry> entries,
                                    List<Entry> subGroups, SelectInfo select)
             throws Exception {
-        List<String> ids = getEntryManager().getChildIds(request, group, select);
+        List<String> ids = getEntryManager().getChildIds(request, group,
+                               select);
         List<Entry> myEntries   = new ArrayList<Entry>();
         List<Entry> mySubGroups = new ArrayList<Entry>();
         for (String id : ids) {

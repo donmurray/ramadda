@@ -1,10 +1,19 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.util;
 
+
 import java.io.UnsupportedEncodingException;
+
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/** This class provides routines
+
+/**
+ * This class provides routines
  *  for efficient parsing of data stored in a byte array.
  *  This routine is optimized (in theory at least!) for efficiency
  *  rather than accuracy.  The values read in for doubles or floats
@@ -35,95 +44,123 @@ public class ByteParser {
 
     /** Array being parsed */
     private byte[] input;
+
     /** Current offset into input. */
     private int offset;
+
     /** Length of last parsed value */
     private int numberLength;
+
     /** Did we find a sign last time we checked? */
     private boolean foundSign;
+
     /** Do we fill up fields? */
     private boolean fillFields = false;
 
-    /** Construct a parser.
-     * @param input	The byte array to be parsed.
+    /**
+     * Construct a parser.
+     * @param input     The byte array to be parsed.
      *                 Note that the array can be re-used by
      *                 refilling its contents and resetting the offset.
      */
     public ByteParser(byte[] input) {
-        this.input = input;
+        this.input  = input;
         this.offset = 0;
     }
 
-    /** Set the buffer for the parser */
+    /**
+     * Set the buffer for the parser 
+     *
+     * @param buf _more_
+     */
     public void setBuffer(byte[] buf) {
-        this.input = buf;
+        this.input  = buf;
         this.offset = 0;
     }
 
-    /** Get the buffer being used by the parser */
+    /**
+     * Get the buffer being used by the parser 
+     *
+     * @return _more_
+     */
     public byte[] getBuffer() {
         return input;
     }
 
-    /** Set the offset into the array.
-     * @param offset	The desired offset from the beginning
+    /**
+     * Set the offset into the array.
+     * @param offset    The desired offset from the beginning
      *                  of the array.
      */
     public void setOffset(int offset) {
         this.offset = offset;
     }
 
-    /** Do we require a field to completely fill up the specified
+    /**
+     * Do we require a field to completely fill up the specified
      * length (with optional leading and trailing white space.
-    @param flag	Is filling required?
+     * @param flag Is filling required?
      */
     public void setFillFields(boolean flag) {
         fillFields = flag;
     }
 
-    /** Get the current offset
-    @return The current offset within the buffer.
+    /**
+     * Get the current offset
+     * @return The current offset within the buffer.
      */
     public int getOffset() {
         return offset;
     }
 
-    /** Get the number of characters used to parse the previous
+    /**
+     * Get the number of characters used to parse the previous
      *  number (or the length of the previous String returned).
+     *
+     * @return _more_
      */
     public int getNumberLength() {
         return numberLength;
     }
 
-    /** Read in the buffer until a double is read.  This will read
+    /**
+     * Read in the buffer until a double is read.  This will read
      * the entire buffer if fillFields is set.
      * @return The value found.
+     *
+     * @throws FormatException _more_
      */
     public double getDouble() throws FormatException {
         return getDouble(input.length - offset);
     }
 
-    /** Look for a double in the buffer.
+    /**
+     * Look for a double in the buffer.
      * Leading spaces are ignored.
-     * @param length	The maximum number of characters
+     * @param length    The maximum number of characters
      *                  used to parse this number.  If fillFields
      *                  is specified then exactly only whitespace may follow
      *                  a valid double value.
+     *
+     * @return _more_
+     *
+     * @throws FormatException _more_
      */
     public double getDouble(int length) throws FormatException {
 
-        int startOffset = offset;
+        int     startOffset = offset;
 
-        boolean error = true;
+        boolean error       = true;
 
-        double number = 0;
-        int i = 0;
+        double  number      = 0;
+        int     i           = 0;
 
         // Skip initial blanks.
         length -= skipWhite(length);
 
         if (length == 0) {
             numberLength = offset - startOffset;
+
             return 0;
         }
 
@@ -133,48 +170,51 @@ public class ByteParser {
         }
 
         // Look for the special strings NaN, Inf,
-        if (length >= 3
-                && (input[offset] == 'n' || input[offset] == 'N')
-                && (input[offset + 1] == 'a' || input[offset + 1] == 'A')
-                && (input[offset + 2] == 'n' || input[offset + 2] == 'N')) {
+        if ((length >= 3)
+                && ((input[offset] == 'n') || (input[offset] == 'N'))
+                && ((input[offset + 1] == 'a') || (input[offset + 1] == 'A'))
+                && ((input[offset + 2] == 'n')
+                    || (input[offset + 2] == 'N'))) {
 
             number = Double.NaN;
             length -= 3;
             offset += 3;
 
             // Look for the longer string first then try the shorter.
-        } else if (length >= 8
-                && (input[offset] == 'i' || input[offset] == 'I')
-                && (input[offset + 1] == 'n' || input[offset + 1] == 'N')
-                && (input[offset + 2] == 'f' || input[offset + 2] == 'F')
-                && (input[offset + 3] == 'i' || input[offset + 3] == 'I')
-                && (input[offset + 4] == 'n' || input[offset + 4] == 'N')
-                && (input[offset + 5] == 'i' || input[offset + 5] == 'I')
-                && (input[offset + 6] == 't' || input[offset + 6] == 'T')
-                && (input[offset + 7] == 'y' || input[offset + 7] == 'Y')) {
+        } else if ((length >= 8)
+                && ((input[offset] == 'i') || (input[offset] == 'I'))
+                && ((input[offset + 1] == 'n') || (input[offset + 1] == 'N'))
+                && ((input[offset + 2] == 'f') || (input[offset + 2] == 'F'))
+                && ((input[offset + 3] == 'i') || (input[offset + 3] == 'I'))
+                && ((input[offset + 4] == 'n') || (input[offset + 4] == 'N'))
+                && ((input[offset + 5] == 'i') || (input[offset + 5] == 'I'))
+                && ((input[offset + 6] == 't') || (input[offset + 6] == 'T'))
+                && ((input[offset + 7] == 'y')
+                    || (input[offset + 7] == 'Y'))) {
             number = Double.POSITIVE_INFINITY;
             length -= 8;
             offset += 8;
 
-        } else if (length >= 3
-                && (input[offset] == 'i' || input[offset] == 'I')
-                && (input[offset + 1] == 'n' || input[offset + 1] == 'N')
-                && (input[offset + 2] == 'f' || input[offset + 2] == 'F')) {
+        } else if ((length >= 3)
+                   && ((input[offset] == 'i') || (input[offset] == 'I'))
+                   && ((input[offset + 1] == 'n')
+                       || (input[offset + 1] == 'N')) && ((input[offset + 2]
+                           == 'f') || (input[offset + 2] == 'F'))) {
             number = Double.POSITIVE_INFINITY;
             length -= 3;
             offset += 3;
 
         } else {
 
-            number = getBareInteger(length);   // This will update offset
-            length -= numberLength;            // Set by getBareInteger
+            number = getBareInteger(length);  // This will update offset
+            length -= numberLength;           // Set by getBareInteger
 
             if (numberLength > 0) {
                 error = false;
             }
 
             // Check for fractional values after decimal
-            if (length > 0 && input[offset] == '.') {
+            if ((length > 0) && (input[offset] == '.')) {
 
                 offset += 1;
                 length -= 1;
@@ -190,8 +230,9 @@ public class ByteParser {
             }
 
             if (error) {
-                offset = startOffset;
+                offset       = startOffset;
                 numberLength = 0;
+
                 throw new FormatException("Invalid real field");
             }
 
@@ -199,8 +240,8 @@ public class ByteParser {
             if (length > 0) {
 
                 // Our Fortran heritage means that we allow 'D' for the exponent indicator.
-                if (input[offset] == 'e' || input[offset] == 'E'
-                        || input[offset] == 'd' || input[offset] == 'D') {
+                if ((input[offset] == 'e') || (input[offset] == 'E')
+                        || (input[offset] == 'd') || (input[offset] == 'D')) {
 
                     offset += 1;
                     length -= 1;
@@ -217,7 +258,10 @@ public class ByteParser {
                         if (exponent * sign > -300) {
                             number *= Math.pow(10., exponent * sign);
                         } else {
-                            number = 1.e-300 * (number * Math.pow(10., exponent * sign + 300));
+                            number = 1.e-300
+                                     * (number
+                                        * Math.pow(10.,
+                                            exponent * sign + 300));
                         }
                         length -= numberLength;
                     }
@@ -225,83 +269,125 @@ public class ByteParser {
             }
         }
 
-        if (fillFields && length > 0) {
+        if (fillFields && (length > 0)) {
 
             if (isWhite(length)) {
                 offset += length;
             } else {
                 numberLength = 0;
-                offset = startOffset;
+                offset       = startOffset;
+
                 throw new FormatException("Non-blanks following real.");
             }
         }
 
         numberLength = offset - startOffset;
+
         return mantissaSign * number;
     }
 
-    /** Get a floating point value from the buffer.  (see getDouble(int())
+    /**
+     * Get a floating point value from the buffer.  (see getDouble(int())
+     *
+     * @return _more_
+     *
+     * @throws FormatException _more_
      */
     public float getFloat() throws FormatException {
         return (float) getDouble(input.length - offset);
     }
 
-    /** Get a floating point value in a region of the buffer */
+    /**
+     * Get a floating point value in a region of the buffer 
+     *
+     * @param length _more_
+     *
+     * @return _more_
+     *
+     * @throws FormatException _more_
+     */
     public float getFloat(int length) throws FormatException {
         return (float) getDouble(length);
     }
 
-    /** Convert a region of the buffer to an integer */
+    /**
+     * Convert a region of the buffer to an integer 
+     *
+     * @param length _more_
+     *
+     * @return _more_
+     *
+     * @throws FormatException _more_
+     */
     public int getInt(int length) throws FormatException {
         int startOffset = offset;
 
         length -= skipWhite(length);
         if (length == 0) {
             numberLength = offset - startOffset;
+
             return 0;
         }
 
-        int number = 0;
-        boolean error = true;
+        int     number = 0;
+        boolean error  = true;
 
-        int sign = checkSign();
+        int     sign   = checkSign();
         if (foundSign) {
             length -= 1;
         }
 
-        while (length > 0 && input[offset] >= '0' && input[offset] <= '9') {
+        while ((length > 0) && (input[offset] >= '0')
+                && (input[offset] <= '9')) {
             number = number * 10 + input[offset] - '0';
             offset += 1;
             length -= 1;
-            error = false;
+            error  = false;
         }
 
         if (error) {
             numberLength = 0;
-            offset = startOffset;
+            offset       = startOffset;
+
             throw new FormatException("Invalid Integer");
         }
 
-        if (length > 0 && fillFields) {
+        if ((length > 0) && fillFields) {
             if (isWhite(length)) {
                 offset += length;
             } else {
                 numberLength = 0;
-                offset = startOffset;
+                offset       = startOffset;
+
                 throw new FormatException("Non-white following integer");
             }
         }
 
         numberLength = offset - startOffset;
+
         return sign * number;
     }
 
-    /** Look for an integer at the beginning of the buffer */
+    /**
+     * Look for an integer at the beginning of the buffer 
+     *
+     * @return _more_
+     *
+     * @throws FormatException _more_
+     */
     public int getInt() throws FormatException {
         return getInt(input.length - offset);
     }
 
-    /** Look for a long in a specified region of the buffer */
+    /**
+     * Look for a long in a specified region of the buffer 
+     *
+     * @param length _more_
+     *
+     * @return _more_
+     *
+     * @throws FormatException _more_
+     */
     public long getLong(int length) throws FormatException {
 
         int startOffset = offset;
@@ -310,60 +396,83 @@ public class ByteParser {
         length -= skipWhite(length);
         if (length == 0) {
             numberLength = offset - startOffset;
+
             return 0;
         }
 
-        long number = 0;
-        boolean error = true;
+        long    number = 0;
+        boolean error  = true;
 
-        long sign = checkSign();
+        long    sign   = checkSign();
         if (foundSign) {
             length -= 1;
         }
 
-        while (length > 0 && input[offset] >= '0' && input[offset] <= '9') {
+        while ((length > 0) && (input[offset] >= '0')
+                && (input[offset] <= '9')) {
             number = number * 10 + input[offset] - '0';
-            error = false;
+            error  = false;
             offset += 1;
             length -= 1;
         }
 
         if (error) {
             numberLength = 0;
-            offset = startOffset;
+            offset       = startOffset;
+
             throw new FormatException("Invalid long number");
         }
 
-        if (length > 0 && fillFields) {
+        if ((length > 0) && fillFields) {
             if (isWhite(length)) {
                 offset += length;
             } else {
-                offset = startOffset;
+                offset       = startOffset;
                 numberLength = 0;
+
                 throw new FormatException("Non-white following long");
             }
         }
         numberLength = offset - startOffset;
+
         return sign * number;
     }
 
-    /** Get a string
+    /**
+     * Get a string
      * @param length  The length of the string.
+     *
+     * @return _more_
      */
     public String getString(int length) {
 
         String s = AsciiFuncs.asciiString(input, offset, length);
-        offset += length;
+        offset       += length;
         numberLength = length;
+
         return s;
     }
 
-    /** Get a boolean value from the beginning of the buffer */
+    /**
+     * Get a boolean value from the beginning of the buffer 
+     *
+     * @return _more_
+     *
+     * @throws FormatException _more_
+     */
     public boolean getBoolean() throws FormatException {
         return getBoolean(input.length - offset);
     }
 
-    /** Get a boolean value from a specified region of the buffer */
+    /**
+     * Get a boolean value from a specified region of the buffer 
+     *
+     * @param length _more_
+     *
+     * @return _more_
+     *
+     * @throws FormatException _more_
+     */
     public boolean getBoolean(int length) throws FormatException {
 
         int startOffset = offset;
@@ -373,48 +482,59 @@ public class ByteParser {
         }
 
         boolean value = false;
-        if (input[offset] == 'T' || input[offset] == 't') {
+        if ((input[offset] == 'T') || (input[offset] == 't')) {
             value = true;
-        } else if (input[offset] != 'F' && input[offset] != 'f') {
+        } else if ((input[offset] != 'F') && (input[offset] != 'f')) {
             numberLength = 0;
-            offset = startOffset;
+            offset       = startOffset;
+
             throw new FormatException("Invalid boolean value");
         }
         offset += 1;
         length -= 1;
 
-        if (fillFields && length > 0) {
+        if (fillFields && (length > 0)) {
             if (isWhite(length)) {
                 offset += length;
             } else {
                 numberLength = 0;
-                offset = startOffset;
+                offset       = startOffset;
+
                 throw new FormatException("Non-white following boolean");
             }
         }
         numberLength = offset - startOffset;
+
         return value;
     }
 
-    /** Skip bytes in the buffer */
+    /**
+     * Skip bytes in the buffer 
+     *
+     * @param nBytes _more_
+     */
     public void skip(int nBytes) {
         offset += nBytes;
     }
 
-    /** Get the integer value starting at the current position.
+    /**
+     * Get the integer value starting at the current position.
      * This routine returns a double rather than an int/long
      * to enable it to read very long integers (with reduced
      * precision) such as 111111111111111111111111111111111111111111.
      * Note that this routine does set numberLength.
      *
-     * @param length	The maximum number of characters to use.
+     * @param length    The maximum number of characters to use.
+     *
+     * @return _more_
      */
     private double getBareInteger(int length) {
 
-        int startOffset = offset;
-        double number = 0;
+        int    startOffset = offset;
+        double number      = 0;
 
-        while (length > 0 && input[offset] >= '0' && input[offset] <= '9') {
+        while ((length > 0) && (input[offset] >= '0')
+                && (input[offset] <= '9')) {
 
             number *= 10;
             number += input[offset] - '0';
@@ -422,35 +542,44 @@ public class ByteParser {
             length -= 1;
         }
         numberLength = offset - startOffset;
+
         return number;
     }
 
-    /** Skip white space.  This routine skips with space in
+    /**
+     * Skip white space.  This routine skips with space in
      * the input and returns the number of character skipped.
      * White space is defined as ' ', '\t', '\n' or '\r'
      *
      * @param length The maximum number of characters to skip.
+     *
+     * @return _more_
      */
     public int skipWhite(int length) {
 
         int i;
         for (i = 0; i < length; i += 1) {
-            if (input[offset + i] != ' ' && input[offset + i] != '\t'
-                    && input[offset + i] != '\n' && input[offset + i] != '\r') {
+            if ((input[offset + i] != ' ') && (input[offset + i] != '\t')
+                    && (input[offset + i] != '\n')
+                    && (input[offset + i] != '\r')) {
                 break;
             }
         }
 
         offset += i;
+
         return i;
 
     }
 
-    /** Find the sign for a number .
+    /**
+     * Find the sign for a number .
      * This routine looks for a sign (+/-) at the current location
      * and return +1/-1 if one is found, or +1 if not.
      * The foundSign boolean is set if a sign is found and offset is
      * incremented.
+     *
+     * @return _more_
      */
     private int checkSign() {
 
@@ -458,24 +587,30 @@ public class ByteParser {
 
         if (input[offset] == '+') {
             foundSign = true;
-            offset += 1;
+            offset    += 1;
+
             return 1;
         } else if (input[offset] == '-') {
             foundSign = true;
-            offset += 1;
+            offset    += 1;
+
             return -1;
         }
 
         return 1;
     }
 
-    /** Is a region blank?
+    /**
+     * Is a region blank?
      * @param length The length of the region to be tested
+     *
+     * @return _more_
      */
     private boolean isWhite(int length) {
-        int oldOffset = offset;
-        boolean value = skipWhite(length) == length;
+        int     oldOffset = offset;
+        boolean value     = skipWhite(length) == length;
         offset = oldOffset;
+
         return value;
     }
 }

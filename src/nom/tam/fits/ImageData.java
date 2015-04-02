@@ -1,9 +1,17 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits;
 
-import java.lang.reflect.Array;
+
 import nom.tam.image.ImageTiler;
 import nom.tam.util.*;
+
 import java.io.*;
+
+import java.lang.reflect.Array;
 
 
 /* Copyright: Thomas McGlynn 1997-1999.
@@ -15,7 +23,9 @@ import java.io.*;
  * Many thanks to David Glowacki (U. Wisconsin) for substantial
  * improvements, enhancements and bug fixes.
  */
-/** This class instantiates FITS primary HDU and IMAGE extension data.
+
+/**
+ * This class instantiates FITS primary HDU and IMAGE extension data.
  * Essentially these data are a primitive multi-dimensional array.
  * <p>
  * Starting in version 0.9 of the FITS library, this routine
@@ -32,7 +42,9 @@ public class ImageData extends Data {
 
     /** The size of the data */
     long byteSize;
-    /** The actual array of data.  This
+
+    /**
+     * The actual array of data.  This
      *  is normally a multi-dimensional primitive array.
      *  It may be null until the getData() routine is
      *  invoked, or it may be filled by during the read
@@ -43,34 +55,59 @@ public class ImageData extends Data {
     /** This class describes an array */
     protected class ArrayDesc {
 
+        /** _more_          */
         int[] dims;
+
+        /** _more_          */
         Class type;
 
+        /**
+         * _more_
+         *
+         * @param dims _more_
+         * @param type _more_
+         */
         ArrayDesc(int[] dims, Class type) {
             this.dims = dims;
             this.type = type;
         }
     }
+
     /** A description of what the data should look like */
     ArrayDesc dataDescription;
 
-    /** This inner class allows the ImageTiler
+    /**
+     * This inner class allows the ImageTiler
      *  to see if the user has read in the data.
      */
     protected class ImageDataTiler extends nom.tam.image.ImageTiler {
 
+        /**
+         * _more_
+         *
+         * @param o _more_
+         * @param offset _more_
+         * @param d _more_
+         */
         ImageDataTiler(RandomAccess o, long offset, ArrayDesc d) {
             super(o, offset, d.dims, d.type);
         }
 
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
         public Object getMemoryImage() {
             return dataArray;
         }
     }
+
     /** The image tiler associated with this image. */
     private ImageTiler tiler;
 
-    /** Create an array from a header description.
+    /**
+     * Create an array from a header description.
      * This is typically how data will be created when reading
      * FITS data from a file where the header is read first.
      * This creates an empty array.
@@ -82,23 +119,32 @@ public class ImageData extends Data {
         dataDescription = parseHeader(h);
     }
 
+    /**
+     * _more_
+     *
+     * @param h _more_
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
+     */
     protected ArrayDesc parseHeader(Header h) throws FitsException {
 
-        int bitpix;
-        int type;
-        int ndim;
-        int[] dims;
+        int    bitpix;
+        int    type;
+        int    ndim;
+        int[]  dims;
 
-        int i;
+        int    i;
 
         Object dataArray;
 
-        Class baseClass;
+        Class  baseClass;
 
 
-        int gCount = h.getIntValue("GCOUNT", 1);
-        int pCount = h.getIntValue("PCOUNT", 0);
-        if (gCount > 1 || pCount != 0) {
+        int    gCount = h.getIntValue("GCOUNT", 1);
+        int    pCount = h.getIntValue("PCOUNT", 0);
+        if ((gCount > 1) || (pCount != 0)) {
             throw new FitsException("Group data treated as images");
         }
 
@@ -134,79 +180,97 @@ public class ImageData extends Data {
             if (cdim < 0) {
                 throw new FitsException("Invalid array dimension:" + cdim);
             }
-            byteSize *= cdim;
+            byteSize           *= cdim;
             dims[ndim - i - 1] = cdim;
         }
         byteSize *= Math.abs(bitpix) / 8;
         if (ndim == 0) {
             byteSize = 0;
         }
+
         return new ArrayDesc(dims, baseClass);
     }
 
-    /** Create the equivalent of a null data element.
+    /**
+     * Create the equivalent of a null data element.
      */
     public ImageData() {
         dataArray = new byte[0];
-        byteSize = 0;
+        byteSize  = 0;
     }
 
-    /** Create an ImageData object using the specified object to
+    /**
+     * Create an ImageData object using the specified object to
      * initialize the data array.
      * @param x The initial data array.  This should be a primitive
      *          array but this is not checked currently.
      */
     public ImageData(Object x) {
         dataArray = x;
-        byteSize = ArrayFuncs.computeLSize(x);
+        byteSize  = ArrayFuncs.computeLSize(x);
     }
 
-    /** Fill header with keywords that describe
+    /**
+     * Fill header with keywords that describe
      * image data.
      * @param head The FITS header
      * @exception FitsException if the object does not contain
-     *		valid image data.
+     *          valid image data.
      */
     protected void fillHeader(Header head) throws FitsException {
 
 
         if (dataArray == null) {
             head.nullImage();
+
             return;
         }
 
         String classname = dataArray.getClass().getName();
 
-        int[] dimens = ArrayFuncs.getDimensions(dataArray);
+        int[]  dimens    = ArrayFuncs.getDimensions(dataArray);
 
-        if (dimens == null || dimens.length == 0) {
+        if ((dimens == null) || (dimens.length == 0)) {
             throw new FitsException("Image data object not array");
         }
 
 
         int bitpix;
         switch (classname.charAt(dimens.length)) {
-            case 'B':
-                bitpix = 8;
-                break;
-            case 'S':
-                bitpix = 16;
-                break;
-            case 'I':
-                bitpix = 32;
-                break;
-            case 'J':
-                bitpix = 64;
-                break;
-            case 'F':
-                bitpix = -32;
-                break;
-            case 'D':
-                bitpix = -64;
-                break;
-            default:
-                throw new FitsException("Invalid Object Type for FITS data:"
-                        + classname.charAt(dimens.length));
+
+          case 'B' :
+              bitpix = 8;
+
+              break;
+
+          case 'S' :
+              bitpix = 16;
+
+              break;
+
+          case 'I' :
+              bitpix = 32;
+
+              break;
+
+          case 'J' :
+              bitpix = 64;
+
+              break;
+
+          case 'F' :
+              bitpix = -32;
+
+              break;
+
+          case 'D' :
+              bitpix = -64;
+
+              break;
+
+          default :
+              throw new FitsException("Invalid Object Type for FITS data:"
+                                      + classname.charAt(dimens.length));
         }
 
         // if this is neither a primary header nor an image extension,
@@ -221,12 +285,19 @@ public class ImageData extends Data {
             }
             head.setNaxis(i, dimens[dimens.length - i]);
         }
-        head.addValue("EXTEND", true,"ntf::imagedata:extend:1");  // Just in case!
+        head.addValue("EXTEND", true, "ntf::imagedata:extend:1");  // Just in case!
         head.addValue("PCOUNT", 0, "ntf::imagedata:pcount:1");
         head.addValue("GCOUNT", 1, "ntf::imagedata:gcount:1");
 
     }
 
+    /**
+     * _more_
+     *
+     * @param i _more_
+     *
+     * @throws FitsException _more_
+     */
     public void read(ArrayDataInput i) throws FitsException {
 
         // Don't need to read null data (noted by Jens Knudstrup)
@@ -238,8 +309,8 @@ public class ImageData extends Data {
 
         if (i instanceof RandomAccess) {
             tiler = new ImageDataTiler((RandomAccess) i,
-                    ((RandomAccess) i).getFilePointer(),
-                    dataDescription);
+                                       ((RandomAccess) i).getFilePointer(),
+                                       dataDescription);
             try {
                 // Handle long skips.
                 i.skipBytes(byteSize);
@@ -263,12 +334,20 @@ public class ImageData extends Data {
         try {
             i.skipBytes(pad);
         } catch (EOFException e) {
-            throw new PaddingException("Error skipping padding after image", this);
+            throw new PaddingException("Error skipping padding after image",
+                                       this);
         } catch (IOException e) {
             throw new FitsException("Error skipping padding after image");
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param o _more_
+     *
+     * @throws FitsException _more_
+     */
     public void write(ArrayDataOutput o) throws FitsException {
 
         // Don't need to write null data (noted by Jens Knudstrup)
@@ -286,7 +365,7 @@ public class ImageData extends Data {
                     throw new FitsException("Error attempting to fill image");
                 }
 
-            } else if (dataArray == null && dataDescription != null) {
+            } else if ((dataArray == null) && (dataDescription != null)) {
                 // Need to create an array to match a specified header.
                 dataArray = ArrayFuncs.newInstance(dataDescription.type,
                         dataDescription.dims);
@@ -306,21 +385,28 @@ public class ImageData extends Data {
         FitsUtil.pad(o, getTrueSize());
     }
 
-    /** Get the size in bytes of the data */
+    /**
+     * Get the size in bytes of the data 
+     *
+     * @return _more_
+     */
     protected long getTrueSize() {
         return byteSize;
     }
 
-    /** Return the actual data.
+    /**
+     * Return the actual data.
      *  Note that this may return a null when
      *  the data is not readable.  It might be better
      *  to throw a FitsException, but this is
      *  a very commonly called method and we prefered
      *  not to change how users must invoke it.
+     *
+     * @return _more_
      */
     public Object getData() {
 
-        if (dataArray == null && tiler != null) {
+        if ((dataArray == null) && (tiler != null)) {
             try {
                 dataArray = tiler.getCompleteImage();
             } catch (Exception e) {
@@ -331,10 +417,20 @@ public class ImageData extends Data {
         return dataArray;
     }
 
+    /**
+     * _more_
+     *
+     * @param tiler _more_
+     */
     void setTiler(ImageTiler tiler) {
         this.tiler = tiler;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public ImageTiler getTiler() {
         return tiler;
     }

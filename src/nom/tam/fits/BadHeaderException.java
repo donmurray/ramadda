@@ -1,4 +1,10 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits;
+
 
 /*
  * Copyright: Thomas McGlynn 1997-1998.
@@ -10,16 +16,25 @@ package nom.tam.fits;
  * Many thanks to David Glowacki (U. Wisconsin) for substantial
  * improvements, enhancements and bug fixes.
  */
-/** This exception indicates that an error
+
+/**
+ * This exception indicates that an error
  * was detected while parsing a FITS header record.
  */
-public class BadHeaderException
-        extends FitsException {
+public class BadHeaderException extends FitsException {
 
+    /**
+     * _more_
+     */
     public BadHeaderException() {
         super();
     }
 
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     */
     public BadHeaderException(String msg) {
         super(msg);
     }

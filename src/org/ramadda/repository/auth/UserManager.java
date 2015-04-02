@@ -1,22 +1,14 @@
-/*
-* Copyright 2008-2015 Geode Systems LLC
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-* software and associated documentation files (the "Software"), to deal in the Software 
-* without restriction, including without limitation the rights to use, copy, modify, 
-* merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
-* permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies 
-* or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-* PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-* OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 package org.ramadda.repository.auth;
 
@@ -111,10 +103,10 @@ public class UserManager extends RepositoryManager {
     /** _more_ */
     public static final String ARG_USER_NEW = "user.new";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_USER_IMPORT = "userimport";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_USER_EXPORT = "userexport";
 
 
@@ -360,12 +352,25 @@ public class UserManager extends RepositoryManager {
     }
 
 
-    private Result addHeader(Request request, Appendable sb, String title) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param sb _more_
+     * @param title _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Result addHeader(Request request, Appendable sb, String title)
+            throws Exception {
         Appendable html = new StringBuilder();
         html.append(HtmlUtils.sectionOpen(title, false));
         html.append(sb.toString());
         html.append(HtmlUtils.sectionClose());
         Result result = new Result(title, html);
+
         return addHeader(request, result);
     }
 
@@ -388,6 +393,7 @@ public class UserManager extends RepositoryManager {
         StringBuilder headerSB = new StringBuilder();
         addUserHeader(request, headerSB);
         headerSB.append(sb);
+
         return addHeader(request, new Result(title, headerSB));
     }
 
@@ -1152,7 +1158,8 @@ public class UserManager extends RepositoryManager {
 
         StringBuffer sb = new StringBuffer();
         sb.append(HtmlUtils.sectionOpen(null, false));
-        sb.append(HtmlUtils.h2(msgLabel("User")+HtmlUtils.space(1) + user.getId()));
+        sb.append(HtmlUtils.h2(msgLabel("User") + HtmlUtils.space(1)
+                               + user.getId()));
 
         if (request.defined(ARG_USER_CHANGE)) {
             request.ensureAuthToken();
@@ -1410,6 +1417,7 @@ public class UserManager extends RepositoryManager {
 
             if ( !ok) {
                 makeNewUserForm(request, sb);
+
                 return getAdmin().makeResult(request, msg("New User"), sb);
             }
         }
@@ -1962,6 +1970,7 @@ public class UserManager extends RepositoryManager {
         sb.append(HtmlUtils.p());
         sb.append(OutputHandler.makeTabs(tabTitles, tabContent, true));
         sb.append(HtmlUtils.sectionClose());
+
         return getAdmin().makeResult(request, msg("Users"), sb);
     }
 
@@ -2082,7 +2091,7 @@ public class UserManager extends RepositoryManager {
      * @throws Exception On badness
      */
     public Result processCart(Request request) throws Exception {
-        String       action = request.getString(ARG_ACTION, "");
+        String action = request.getString(ARG_ACTION, "");
         if (action.equals(ACTION_CLEAR)) {
             getCart(request).clear();
         } else if (action.equals(ACTION_ADD)) {
@@ -2113,7 +2122,8 @@ public class UserManager extends RepositoryManager {
      * @throws Exception On badness
      */
     public Result showCart(Request request) throws Exception {
-        StringBuilder sb     = new StringBuilder();
+
+        StringBuilder sb = new StringBuilder();
         sb.append(HtmlUtils.sectionOpen(null, false));
         request.appendMessage(sb);
         List<Entry> entries = getCart(request);
@@ -2126,6 +2136,7 @@ public class UserManager extends RepositoryManager {
 
         if (entries.size() == 0) {
             sb.append(HtmlUtils.sectionClose());
+
             return makeResult(request, msg("User Cart"), sb);
         }
 
@@ -2217,7 +2228,7 @@ public class UserManager extends RepositoryManager {
                     String cbxId = "checkbox_" + HtmlUtils.blockCnt++;
                     String links =
                         HtmlUtils.checkbox(
-                                           ARG_SELENTRY, entry.getId(), false,
+                            ARG_SELENTRY, entry.getId(), false,
                             HtmlUtils.attrs(
                                 HtmlUtils.ATTR_ID, cbxId,
                                 HtmlUtils.ATTR_ONCLICK,
@@ -2294,7 +2305,9 @@ public class UserManager extends RepositoryManager {
 
 
         sb.append(HtmlUtils.sectionClose());
+
         return makeResult(request, "User Cart", sb);
+
 
     }
 
@@ -2436,8 +2449,8 @@ public class UserManager extends RepositoryManager {
             return addHeader(
                 request,
                 new StringBuffer(
-                                 getPageHandler().showDialogError(
-                                                                  "Favorites not allowed")), msg("Favorites"));
+                    getPageHandler().showDialogError(
+                        "Favorites not allowed")), msg("Favorites"));
         }
         String entryId = request.getString(ARG_ENTRYID, BLANK);
 
@@ -2445,12 +2458,11 @@ public class UserManager extends RepositoryManager {
             Entry entry = getEntryManager().getEntry(request, entryId);
             if (entry == null) {
                 return addHeader(
-                    request,
-                    new StringBuffer(
-                                     getPageHandler().showDialogError(
-                                                                      getRepository().translate(
-                                                                                                request,
-                                                                                                "Cannot find or access entry"))),                     msg("Favorites"));
+                    request, new StringBuffer(
+                        getPageHandler().showDialogError(
+                            getRepository().translate(
+                                request, "Cannot find or access entry"))), msg(
+                                    "Favorites"));
             }
 
             addFavorites(request, user, (List<Entry>) Misc.newList(entry));
@@ -2544,6 +2556,7 @@ public class UserManager extends RepositoryManager {
             sb.append(getPageHandler().showDialogWarning(msg));
             sb.append(makeLoginForm(request));
             sb.append(HtmlUtils.sectionClose());
+
             return addHeader(request, sb, msg("User Home"));
         } else {
             request.appendMessage(sb);
@@ -2585,6 +2598,7 @@ public class UserManager extends RepositoryManager {
                     + " icon to add it to your list of favorites"));
         }
         sb.append(HtmlUtils.sectionClose());
+
         return makeResult(request, msg("Favorites"), sb);
     }
 
@@ -3083,7 +3097,8 @@ public class UserManager extends RepositoryManager {
                             }
                             getDatabaseManager().closeAndReleaseConnection(
                                 statement);
-                            return addHeader(request,sb, msg("Login"));
+
+                            return addHeader(request, sb, msg("Login"));
                         }
                     }
                     getDatabaseManager().closeAndReleaseConnection(statement);
@@ -3364,6 +3379,7 @@ public class UserManager extends RepositoryManager {
         StringBuilder sb = new StringBuilder();
         sb.append(getPageHandler().showDialogNote(msg("You are logged out")));
         sb.append(makeLoginForm(request));
+
         return addHeader(request, sb, "Logout");
     }
 
@@ -3661,9 +3677,9 @@ public class UserManager extends RepositoryManager {
         if (result != null) {
             return result;
         }
-        StringBuilder sb   = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         sb.append(HtmlUtils.sectionOpen(null, false));
-        User         user = request.getUser();
+        User user = request.getUser();
         request.appendMessage(sb);
         sb.append(HtmlUtils.p());
         sb.append(msgHeader("User Settings"));
@@ -3699,6 +3715,7 @@ public class UserManager extends RepositoryManager {
         sb.append(HtmlUtils.formTableClose());
 
         sb.append(HtmlUtils.sectionClose());
+
         return makeResult(request, msg("User Settings"), sb);
     }
 

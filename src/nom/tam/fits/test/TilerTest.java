@@ -1,16 +1,27 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits.test;
 
+
+import junit.framework.JUnit4TestAdapter;
+
 import nom.tam.fits.*;
-import nom.tam.util.*;
 import nom.tam.image.ImageTiler;
-import java.io.*;
+import nom.tam.util.*;
 
 
 import org.junit.Test;
-import static org.junit.Assert.assertEquals;
-import junit.framework.JUnit4TestAdapter;
 
-/** This class tests the ImageTiler.  It
+import static org.junit.Assert.assertEquals;
+
+import java.io.*;
+
+
+/**
+ * This class tests the ImageTiler.  It
  *  first creates a FITS file and then reads
  *  it back and allows the user to select
  *  tiles.  The values of the corner and center
@@ -19,14 +30,25 @@ import junit.framework.JUnit4TestAdapter;
  */
 public class TilerTest {
 
-    void doTile(String test,
-            float[][] data,
-            ImageTiler t,
-            int x, int y, int nx, int ny)
+    /**
+     * _more_
+     *
+     * @param test _more_
+     * @param data _more_
+     * @param t _more_
+     * @param x _more_
+     * @param y _more_
+     * @param nx _more_
+     * @param ny _more_
+     *
+     * @throws Exception _more_
+     */
+    void doTile(String test, float[][] data, ImageTiler t, int x, int y,
+                int nx, int ny)
             throws Exception {
 
         float[] tile = new float[nx * ny];
-        t.getTile(tile, new int[]{y, x}, new int[]{ny, nx});
+        t.getTile(tile, new int[] { y, x }, new int[] { ny, nx });
 
 
         float sum0 = 0;
@@ -42,6 +64,11 @@ public class TilerTest {
         assertEquals("Tiler" + test, sum0, sum1, 0);
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     @Test
     public void test() throws Exception {
 
@@ -53,7 +80,7 @@ public class TilerTest {
             }
         }
 
-        Fits f = new Fits();
+        Fits         f  = new Fits();
 
         BufferedFile bf = new BufferedFile("tiler1.fits", "rw");
         f.addHDU(Fits.makeHDU(data));
@@ -63,7 +90,7 @@ public class TilerTest {
 
         f = new Fits("tiler1.fits");
 
-        ImageHDU h = (ImageHDU) f.readHDU();
+        ImageHDU   h = (ImageHDU) f.readHDU();
 
         ImageTiler t = h.getTiler();
         doTile("t1", data, t, 200, 200, 50, 50);

@@ -1,21 +1,7 @@
-/*
-* Copyright 2008-2015 Geode Systems LLC
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-* software and associated documentation files (the "Software"), to deal in the Software 
-* without restriction, including without limitation the rights to use, copy, modify, 
-* merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
-* permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies 
-* or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-* PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-* OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
 
 package org.ramadda.repository;
@@ -101,8 +87,13 @@ public class LocalRepositoryManager extends RepositoryManager {
     /** _more_ */
     public static final String STATUS_DELETED = "deleted";
 
+    /** _more_ */
     public static final String ARG_LOCAL_DELETE = "local_delete";
+
+    /** _more_ */
     public static final String ARG_LOCAL_STOP = "local_stop";
+
+    /** _more_ */
     public static final String ARG_LOCAL_START = "local_start";
 
 
@@ -498,13 +489,17 @@ public class LocalRepositoryManager extends RepositoryManager {
         boolean didone = false;
         for (Local local : readLocals()) {
             if ( !didone) {
-                sb.append(HtmlUtils.row(HtmlUtils.cols(
-                                                       HtmlUtils.insetDiv(HtmlUtils.b("Repository"),10,10,10,10),
-                                                       HtmlUtils.insetDiv(HtmlUtils.b(""),10,10,10,10)),
-                                        " valign=bottom "));
+                sb.append(
+                    HtmlUtils.row(
+                        HtmlUtils.cols(
+                            HtmlUtils.insetDiv(
+                                HtmlUtils.b("Repository"), 10, 10, 10,
+                                10), HtmlUtils.insetDiv(
+                                    HtmlUtils.b(""), 10, 10, 10,
+                                    10)), " valign=bottom "));
             }
             didone = true;
-            StringBuffer statusSB  = new StringBuffer();
+            StringBuffer statusSB = new StringBuffer();
 
             request.formPostWithAuthToken(statusSB,
                                           getAdmin().URL_ADMIN_LOCAL);
@@ -527,18 +522,19 @@ public class LocalRepositoryManager extends RepositoryManager {
                 statusSB.append(HtmlUtils.space(1));
                 statusSB.append(HtmlUtils.hidden(ARG_LOCAL_ID, local.id));
                 statusSB.append(HtmlUtils.submit(msg("Remove Repository"),
-                                                  ARG_LOCAL_DELETE));
+                        ARG_LOCAL_DELETE));
                 statusSB.append(HtmlUtils.checkbox(ARG_LOCAL_SURE, "true",
                         false) + " " + msg("Yes, remove this repository"));
             }
             statusSB.append(HtmlUtils.formClose());
 
-            String link = HtmlUtils.insetDiv(HtmlUtils.href(getChildUrlBase(local.id), local.id),10,10,10,10);
-            String form = HtmlUtils.insetDiv(statusSB.toString(), 10,10,10,10);
-            sb.append(
-                HtmlUtils.row(
-                              HtmlUtils.cols(link, form),
-                              " valign=top "));
+            String link =
+                HtmlUtils.insetDiv(HtmlUtils.href(getChildUrlBase(local.id),
+                    local.id), 10, 10, 10, 10);
+            String form = HtmlUtils.insetDiv(statusSB.toString(), 10, 10, 10,
+                                             10);
+            sb.append(HtmlUtils.row(HtmlUtils.cols(link, form),
+                                    " valign=top "));
         }
         sb.append(HtmlUtils.formTableClose());
         sb.append(HtmlUtils.p());
@@ -590,6 +586,7 @@ public class LocalRepositoryManager extends RepositoryManager {
         sb.append(HtmlUtils.formTableClose());
         sb.append(HtmlUtils.formClose());
         sb.append(HtmlUtils.sectionClose());
+
         return getAdmin().makeResult(request, "Administration", sb);
 
     }
@@ -640,6 +637,7 @@ public class LocalRepositoryManager extends RepositoryManager {
             return;
         } else {
             sb.append(getPageHandler().showDialogError("Unknown action"));
+
             return;
         }
         getDatabaseManager().update(

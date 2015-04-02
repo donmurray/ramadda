@@ -1,13 +1,24 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits.test;
 
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
+
 import junit.framework.JUnit4TestAdapter;
 
-import nom.tam.util.*;
 import nom.tam.fits.*;
 
-/** This class tests the AsciiTableHDU and AsciiTable FITS
+import nom.tam.util.*;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+
+/**
+ * This class tests the AsciiTableHDU and AsciiTable FITS
  *  classes and implicitly the ByteFormatter and ByteParser
  *  classes in the nam.tam.util library.
  *  Tests include:
@@ -24,6 +35,11 @@ import nom.tam.fits.*;
  */
 public class AsciiTableTest {
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     Object[] getSampleCols() {
 
         float[] realCol = new float[50];
@@ -32,26 +48,45 @@ public class AsciiTableTest {
             realCol[i] = 10000.F * (i) * (i) * (i) + 1;
         }
 
-        int[] intCol = (int[]) ArrayFuncs.convertArray(realCol, int.class);
-        long[] longCol = (long[]) ArrayFuncs.convertArray(realCol, long.class);
-        double[] doubleCol = (double[]) ArrayFuncs.convertArray(realCol, double.class);
+        int[]  intCol  = (int[]) ArrayFuncs.convertArray(realCol, int.class);
+        long[] longCol = (long[]) ArrayFuncs.convertArray(realCol,
+                             long.class);
+        double[] doubleCol = (double[]) ArrayFuncs.convertArray(realCol,
+                                 double.class);
 
         String[] strCol = new String[realCol.length];
 
         for (int i = 0; i < realCol.length; i += 1) {
             strCol[i] = "ABC" + String.valueOf(realCol[i]) + "CDE";
         }
-        return new Object[]{realCol, intCol, longCol, doubleCol, strCol};
+
+        return new Object[] { realCol, intCol, longCol, doubleCol, strCol };
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     Fits makeAsciiTable() throws Exception {
         Object[] cols = getSampleCols();
         // Create the new ASCII table.
         Fits f = new Fits();
         f.addHDU(Fits.makeHDU(cols));
+
         return f;
     }
 
+    /**
+     * _more_
+     *
+     * @param f _more_
+     * @param name _more_
+     *
+     * @throws Exception _more_
+     */
     public void writeFile(Fits f, String name) throws Exception {
         BufferedFile bf = new BufferedFile(name, "rw");
         f.write(bf);
@@ -59,6 +94,11 @@ public class AsciiTableTest {
         bf.close();
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     @Test
     public void test() throws Exception {
         createByColumn();
@@ -70,51 +110,76 @@ public class AsciiTableTest {
         delete();
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     public void createByColumn() throws Exception {
         Fits f = makeAsciiTable();
         writeFile(f, "at1.fits");
 
         // Read back the data from the file.
         f = new Fits("at1.fits");
-        AsciiTableHDU hdu = (AsciiTableHDU) f.getHDU(1);
+        AsciiTableHDU hdu     = (AsciiTableHDU) f.getHDU(1);
 
-        Object[] inputs = getSampleCols();
-        Object[] outputs = (Object[]) hdu.getKernel();
+        Object[]      inputs  = getSampleCols();
+        Object[]      outputs = (Object[]) hdu.getKernel();
 
         for (int i = 0; i < 50; i += 1) {
             ((String[]) outputs[4])[i] = ((String[]) outputs[4])[i].trim();
         }
 
         for (int j = 0; j < 5; j += 1) {
-            assertEquals("ByCol:" + j, true, ArrayFuncs.arrayEquals(inputs[j], outputs[j], 1.e-6, 1.e-14));
+            assertEquals("ByCol:" + j, true,
+                         ArrayFuncs.arrayEquals(inputs[j], outputs[j], 1.e-6,
+                             1.e-14));
         }
 
     }
 
+    /**
+     * _more_
+     *
+     * @param i _more_
+     *
+     * @return _more_
+     */
     Object[] getRow(int i) {
-        return new Object[]{
-                    new int[]{i},
-                    new float[]{i},
-                    new String[]{"Str" + i}
-                };
+        return new Object[] { new int[] { i }, new float[] { i },
+                              new String[] { "Str" + i } };
     }
 
+    /**
+     * _more_
+     *
+     * @param max _more_
+     *
+     * @return _more_
+     */
     Object[] getRowBlock(int max) {
-        Object[] o = new Object[]{new int[max], new float[max], new String[max]};
+        Object[] o = new Object[] { new int[max], new float[max],
+                                    new String[max] };
         for (int i = 0; i < max; i += 1) {
-            ((int[]) o[0])[i] = i;
-            ((float[]) o[1])[i] = i;
+            ((int[]) o[0])[i]    = i;
+            ((float[]) o[1])[i]  = i;
             ((String[]) o[2])[i] = "Str" + i;
         }
+
         return o;
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     public void createByRow() throws Exception {
 
         // Create a table row by row .
-        Fits f = new Fits();
+        Fits       f    = new Fits();
         AsciiTable data = new AsciiTable();
-        Object[] row = new Object[4];
+        Object[]   row  = new Object[4];
 
         for (int i = 0; i < 50; i += 1) {
             data.addRow(getRow(i));
@@ -128,12 +193,12 @@ public class AsciiTableTest {
         f = new Fits("at2.fits");
 
         Object[] output = (Object[]) f.getHDU(1).getKernel();
-        Object[] input = getRowBlock(50);
+        Object[] input  = getRowBlock(50);
 
         for (int i = 0; i < 50; i += 1) {
-            String[] str = (String[]) output[2];
+            String[] str  = (String[]) output[2];
             String[] istr = (String[]) input[2];
-            int len1 = str[1].length();
+            int      len1 = str[1].length();
             str[i] = str[i].trim();
             // The first row would have set the length for all the
             // remaining rows...
@@ -143,36 +208,55 @@ public class AsciiTableTest {
         }
 
         for (int j = 0; j < 3; j += 1) {
-            assertEquals("ByRow:" + j, true, ArrayFuncs.arrayEquals(input[j], output[j], 1.e-6, 1.e-14));
+            assertEquals("ByRow:" + j, true,
+                         ArrayFuncs.arrayEquals(input[j], output[j], 1.e-6,
+                             1.e-14));
         }
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     public void readByRow() throws Exception {
 
-        Fits f = new Fits("at1.fits");
-        Object[] cols = getSampleCols();
+        Fits          f    = new Fits("at1.fits");
+        Object[]      cols = getSampleCols();
 
-        AsciiTableHDU hdu = (AsciiTableHDU) f.getHDU(1);
-        AsciiTable data = (AsciiTable) hdu.getData();
+        AsciiTableHDU hdu  = (AsciiTableHDU) f.getHDU(1);
+        AsciiTable    data = (AsciiTable) hdu.getData();
 
         for (int i = 0; i < data.getNRows(); i += 1) {
             assertEquals("Rows:" + i, 50, data.getNRows());
             Object[] row = data.getRow(i);
-            assertEquals("Ascii Rows: float" + i, 1.F, ((float[]) cols[0])[i] / ((float[]) row[0])[0], 1.e-6);
-            assertEquals("Ascii Rows: int" + i, ((int[]) cols[1])[i], ((int[]) row[1])[0]);
-            assertEquals("Ascii Rows: long" + i, ((long[]) cols[2])[i], ((long[]) row[2])[0]);
-            assertEquals("Ascii Rows: double" + i, 1., ((double[]) cols[3])[i] / ((double[]) row[3])[0], 1.e-14);
+            assertEquals("Ascii Rows: float" + i, 1.F,
+                         ((float[]) cols[0])[i] / ((float[]) row[0])[0],
+                         1.e-6);
+            assertEquals("Ascii Rows: int" + i, ((int[]) cols[1])[i],
+                         ((int[]) row[1])[0]);
+            assertEquals("Ascii Rows: long" + i, ((long[]) cols[2])[i],
+                         ((long[]) row[2])[0]);
+            assertEquals("Ascii Rows: double" + i, 1.,
+                         ((double[]) cols[3])[i] / ((double[]) row[3])[0],
+                         1.e-14);
             String[] st = (String[]) row[4];
             st[0] = st[0].trim();
-            assertEquals("Ascii Rows: Str" + i, ((String[]) cols[4])[i], ((String[]) row[4])[0]);
+            assertEquals("Ascii Rows: Str" + i, ((String[]) cols[4])[i],
+                         ((String[]) row[4])[0]);
         }
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     public void readByColumn() throws Exception {
-        Fits f = new Fits("at1.fits");
-        AsciiTableHDU hdu = (AsciiTableHDU) f.getHDU(1);
-        AsciiTable data = (AsciiTable) hdu.getData();
-        Object[] cols = getSampleCols();
+        Fits          f    = new Fits("at1.fits");
+        AsciiTableHDU hdu  = (AsciiTableHDU) f.getHDU(1);
+        AsciiTable    data = (AsciiTable) hdu.getData();
+        Object[]      cols = getSampleCols();
 
         assertEquals("Number of rows", data.getNRows(), 50);
         assertEquals("Number of columns", data.getNCols(), 5);
@@ -185,41 +269,53 @@ public class AsciiTableTest {
                     st[i] = st[i].trim();
                 }
             }
-            assertEquals("Ascii Columns:" + j, true, ArrayFuncs.arrayEquals(cols[j], col, 1.e-6, 1.e-14));
+            assertEquals("Ascii Columns:" + j, true,
+                         ArrayFuncs.arrayEquals(cols[j], col, 1.e-6, 1.e-14));
         }
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     public void readByElement() throws Exception {
 
-        Fits f = new Fits("at2.fits");
-        AsciiTableHDU hdu = (AsciiTableHDU) f.getHDU(1);
-        AsciiTable data = (AsciiTable) hdu.getData();
+        Fits          f    = new Fits("at2.fits");
+        AsciiTableHDU hdu  = (AsciiTableHDU) f.getHDU(1);
+        AsciiTable    data = (AsciiTable) hdu.getData();
 
 
         for (int i = 0; i < data.getNRows(); i += 1) {
             Object[] row = (Object[]) data.getRow(i);
             for (int j = 0; j < data.getNCols(); j += 1) {
                 Object val = data.getElement(i, j);
-                assertEquals("Ascii readElement", true, ArrayFuncs.arrayEquals(val, row[j]));
+                assertEquals("Ascii readElement", true,
+                             ArrayFuncs.arrayEquals(val, row[j]));
             }
         }
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     public void modifyTable() throws Exception {
 
-        Fits f = new Fits("at1.fits");
-        Object[] samp = getSampleCols();
+        Fits          f    = new Fits("at1.fits");
+        Object[]      samp = getSampleCols();
 
-        AsciiTableHDU hdu = (AsciiTableHDU) f.getHDU(1);
-        AsciiTable data = (AsciiTable) hdu.getData();
-        float[] f1 = (float[]) data.getColumn(0);
-        float[] f2 = (float[]) f1.clone();
+        AsciiTableHDU hdu  = (AsciiTableHDU) f.getHDU(1);
+        AsciiTable    data = (AsciiTable) hdu.getData();
+        float[]       f1   = (float[]) data.getColumn(0);
+        float[]       f2   = (float[]) f1.clone();
         for (int i = 0; i < f2.length; i += 1) {
             f2[i] = 2 * f2[i];
         }
 
         data.setColumn(0, f2);
-        f1 = new float[]{3.14159f};
+        f1 = new float[] { 3.14159f };
         data.setElement(3, 0, f1);
 
         hdu.setNullString(0, "**INVALID**");
@@ -227,35 +323,35 @@ public class AsciiTableTest {
         data.setNull(6, 0, true);
 
         Object[] row = new Object[5];
-        row[0] = new float[]{6.28f};
-        row[1] = new int[]{22};
-        row[2] = new long[]{0};
-        row[3] = new double[]{-3};
-        row[4] = new String[]{"A string"};
+        row[0] = new float[] { 6.28f };
+        row[1] = new int[] { 22 };
+        row[2] = new long[] { 0 };
+        row[3] = new double[] { -3 };
+        row[4] = new String[] { "A string" };
 
         data.setRow(5, row);
 
-        data.setElement(4, 2, new long[]{54321});
+        data.setElement(4, 2, new long[] { 54321 });
 
         BufferedFile bf = new BufferedFile("at1x.fits", "rw");
         f.write(bf);
 
 
         f = new Fits("at1x.fits");
-        AsciiTable tab = (AsciiTable) f.getHDU(1).getData();
-        Object[] kern = (Object[]) tab.getKernel();
+        AsciiTable tab  = (AsciiTable) f.getHDU(1).getData();
+        Object[]   kern = (Object[]) tab.getKernel();
 
-        float[] fx = (float[]) kern[0];
-        int[] ix = (int[]) kern[1];
-        long[] lx = (long[]) kern[2];
-        double[] dx = (double[]) kern[3];
-        String[] sx = (String[]) kern[4];
+        float[]    fx   = (float[]) kern[0];
+        int[]      ix   = (int[]) kern[1];
+        long[]     lx   = (long[]) kern[2];
+        double[]   dx   = (double[]) kern[3];
+        String[]   sx   = (String[]) kern[4];
 
-        float[] fy = (float[]) samp[0];
-        int[] iy = (int[]) samp[1];
-        long[] ly = (long[]) samp[2];
-        double[] dy = (double[]) samp[3];
-        String[] sy = (String[]) samp[4];
+        float[]    fy   = (float[]) samp[0];
+        int[]      iy   = (int[]) samp[1];
+        long[]     ly   = (long[]) samp[2];
+        double[]   dy   = (double[]) samp[3];
+        String[]   sy   = (String[]) samp[4];
 
         assertEquals("Null", true, tab.isNull(6, 0));
         assertEquals("Null2", false, tab.isNull(5, 0));
@@ -278,12 +374,18 @@ public class AsciiTableTest {
         Object[] r5 = (Object[]) data.getRow(5);
         String[] st = (String[]) r5[4];
         st[0] = st[0].trim();
-        assertEquals("row5", true, ArrayFuncs.arrayEquals(row, r5, 1.e-6, 1.e-14));
+        assertEquals("row5", true,
+                     ArrayFuncs.arrayEquals(row, r5, 1.e-6, 1.e-14));
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     public void delete() throws Exception {
 
-        Fits f = new Fits("at1.fits");
+        Fits     f  = new Fits("at1.fits");
 
         TableHDU th = (TableHDU) f.getHDU(1);
         assertEquals("delrBef", 50, th.getNRows());
@@ -293,7 +395,7 @@ public class AsciiTableTest {
         f.write(bf);
         bf.close();
 
-        f = new Fits("at1y.fits");
+        f  = new Fits("at1y.fits");
         th = (TableHDU) f.getHDU(1);
         assertEquals("delrAft2", 48, th.getNRows());
 
@@ -306,32 +408,37 @@ public class AsciiTableTest {
         f.write(bf);
         bf.close();
 
-        f = new Fits("at1z.fits");
+        f  = new Fits("at1z.fits");
         th = (TableHDU) f.getHDU(1);
         assertEquals("delcAft3", 1, th.getNCols());
     }
 
     // Make sure that null ASCII strings still
     // have a least one character in the output column.
-    @Test public void nullAscii() throws Exception {
+
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    @Test
+    public void nullAscii() throws Exception {
         BufferedFile bf = new BufferedFile("at3.fits", "rw");
-        Object[] o = new Object[]{
-           new String[]{null,null, null},
-           new String[]{"","", ""},
-           new String[]{null, "", null},
-           new String[]{" ", " ", " "},
-           new String[]{"abc", "def", null}
-        };
+        Object[] o = new Object[] { new String[] { null, null, null },
+                                    new String[] { "", "", "" },
+                                    new String[] { null, "", null },
+                                    new String[] { " ", " ", " " },
+                                    new String[] { "abc", "def", null } };
 
         BasicHDU ahdu = FitsFactory.HDUFactory(o);
-        Fits f = new Fits();
+        Fits     f    = new Fits();
         f.addHDU(ahdu);
         f.write(bf);
         bf.close();
 
         f = new Fits("at3.fits");
         BasicHDU bhdu = f.getHDU(1);
-        Header hdr = bhdu.getHeader();
+        Header   hdr  = bhdu.getHeader();
         assertEquals(hdr.getStringValue("TFORM1"), "A1");
         assertEquals(hdr.getStringValue("TFORM2"), "A1");
         assertEquals(hdr.getStringValue("TFORM3"), "A1");

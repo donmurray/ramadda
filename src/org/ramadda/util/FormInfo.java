@@ -1,22 +1,14 @@
-/*
-* Copyright 2008-2015 Geode Systems LLC
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-* software and associated documentation files (the "Software"), to deal in the Software 
-* without restriction, including without limitation the rights to use, copy, modify, 
-* merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
-* permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies 
-* or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-* PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-* OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 // $Id: StringUtil.java,v 1.53 2007/06/01 17:02:44 jeffmc Exp $
 
@@ -56,6 +48,8 @@ public class FormInfo {
      * _more_
      *
      * @param js _more_
+     *
+     * @throws Exception _more_
      */
     public void addJavascriptValidation(Appendable js) throws Exception {
         for (Constraint constraint : constraints) {
@@ -138,9 +132,10 @@ public class FormInfo {
          * _more_
          *
          * @param js _more_
+         *
+         * @throws Exception _more_
          */
-        public void addJavascriptValidation(Appendable js) throws Exception  {
-        }
+        public void addJavascriptValidation(Appendable js) throws Exception {}
 
         /**
          * _more_
@@ -192,6 +187,8 @@ public class FormInfo {
          * _more_
          *
          * @param js _more_
+         *
+         * @throws Exception _more_
          */
         @Override
         public void addJavascriptValidation(Appendable js) throws Exception {
@@ -243,6 +240,8 @@ public class FormInfo {
          * _more_
          *
          * @param js _more_
+         *
+         * @throws Exception _more_
          */
         @Override
         public void addJavascriptValidation(Appendable js) throws Exception {
@@ -283,6 +282,8 @@ public class FormInfo {
          * _more_
          *
          * @param js _more_
+         *
+         * @throws Exception _more_
          */
         @Override
         public void addJavascriptValidation(Appendable js) throws Exception {

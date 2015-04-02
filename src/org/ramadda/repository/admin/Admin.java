@@ -1,22 +1,14 @@
-/*
-* Copyright 2008-2015 Geode Systems LLC
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-* software and associated documentation files (the "Software"), to deal in the Software 
-* without restriction, including without limitation the rights to use, copy, modify, 
-* merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
-* permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies 
-* or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-* PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-* OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 package org.ramadda.repository.admin;
 
@@ -108,14 +100,23 @@ public class Admin extends RepositoryManager {
     /** _more_ */
     public static final String ACTION_DUMPDB = "action.dumpb";
 
+    /** _more_ */
     public static final String ACTION_CHANGEPATHS = "action.changepaths";
 
+    /** _more_ */
     public static final String ARG_CHANGEPATHS_CONFIRM = "changepathsconfirm";
+
+    /** _more_ */
     public static final String ARG_CHANGEPATHS_PATTERN = "changepathspattern";
+
+    /** _more_ */
     public static final String ARG_CHANGEPATHS_TO = "changepathsto";
 
 
-    public static final String ARG_REPLACE_PATTERN= "replacepattern";
+    /** _more_ */
+    public static final String ARG_REPLACE_PATTERN = "replacepattern";
+
+    /** _more_ */
     public static final String ARG_REPLACE_WITH = "replacewith";
 
 
@@ -245,6 +246,7 @@ public class Admin extends RepositoryManager {
     private Hashtable<String, AdminHandler> adminHandlerMap =
         new Hashtable<String, AdminHandler>();
 
+    /** _more_ */
     private Boolean installationComplete;
 
 
@@ -282,10 +284,12 @@ public class Admin extends RepositoryManager {
      * @return _more_
      */
     public boolean getInstallationComplete() {
-        if(installationComplete==null) {
-            installationComplete = new Boolean(getRepository().getDbProperty(ARG_ADMIN_INSTALLCOMPLETE,
-                                                                             false));
+        if (installationComplete == null) {
+            installationComplete = new Boolean(
+                getRepository().getDbProperty(
+                    ARG_ADMIN_INSTALLCOMPLETE, false));
         }
+
         return installationComplete.booleanValue();
     }
 
@@ -363,7 +367,9 @@ public class Admin extends RepositoryManager {
      */
     private StringBuffer getLicenseForm() throws Exception {
         StringBuffer sb = new StringBuffer();
-        String license = getStorageManager().readSystemResource("/org/ramadda/repository/resources/ramadda_license.txt");
+        String license =
+            getStorageManager().readSystemResource(
+                "/org/ramadda/repository/resources/ramadda_license.txt");
 
         sb.append(HtmlUtils.textArea("", license, 20, 120));
         sb.append("<p>");
@@ -375,12 +381,20 @@ public class Admin extends RepositoryManager {
             "I agree to the above terms and conditions of use of the RAMADDA software");
         sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
         sb.append(HtmlUtils.br());
+
         return sb;
     }
 
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     */
     private String note(String s) {
-        return "<div class=\"ramadda-admin-note\">" + s +"</div>\n";
+        return "<div class=\"ramadda-admin-note\">" + s + "</div>\n";
     }
 
     /**
@@ -401,16 +415,19 @@ public class Admin extends RepositoryManager {
             didIt(ARG_ADMIN_LICENSEREAD);
         }
 
-        if(request.exists(ARG_ADMIN_INSTALLNOTICESHOWN)) {
+        if (request.exists(ARG_ADMIN_INSTALLNOTICESHOWN)) {
             didIt(ARG_ADMIN_INSTALLNOTICESHOWN);
         }
-        if (!haveDone(ARG_ADMIN_INSTALLNOTICESHOWN)) {
+        if ( !haveDone(ARG_ADMIN_INSTALLNOTICESHOWN)) {
             title = "Installation";
-            sb.append(note("Thank you for trying out Geode System's RAMADDA Repository. Listed below is the RAMADDA home directory and database information. If you want to change these settings please consult the <a target=\"other\" href=\"" + HELP_ROOT + "/userguide/installing.html#home\">documentation</a> before continuing with the installation process."));
+            sb.append(
+                note("Thank you for trying out Geode System's RAMADDA Repository. Listed below is the RAMADDA home directory and database information. If you want to change these settings please consult the <a target=\"other\" href=\"" + HELP_ROOT + "/userguide/installing.html#home\">documentation</a> before continuing with the installation process."));
             sb.append(HtmlUtils.formTable());
             getStorageManager().addInfo(sb);
             getDatabaseManager().addInfo(sb);
-            sb.append(HtmlUtils.formEntry("", HtmlUtils.submit(msg("Next"),ARG_ADMIN_INSTALLNOTICESHOWN)));
+            sb.append(HtmlUtils.formEntry("",
+                                          HtmlUtils.submit(msg("Next"),
+                                              ARG_ADMIN_INSTALLNOTICESHOWN)));
             sb.append(HtmlUtils.formTableClose());
         } else if ( !haveDone(ARG_ADMIN_LICENSEREAD)) {
             title = "License";
@@ -487,7 +504,8 @@ public class Admin extends RepositoryManager {
                     //NOT NOW:
                     //                    getRegistryManager().applyInstallForm(request);
 
-                    sb.append(note("Initial configuration process is complete."));
+                    sb.append(
+                        note("Initial configuration process is complete."));
 
                     Entry topEntry = getEntryManager().getTopGroup();
                     topEntry.setName(request.getString(PROP_REPOSITORY_NAME,
@@ -544,10 +562,11 @@ public class Admin extends RepositoryManager {
                     }
 
                     StringBuilder html = new StringBuilder();
-                    html.append(HtmlUtils.sectionOpen(null,false));
+                    html.append(HtmlUtils.sectionOpen(null, false));
                     html.append(HtmlUtils.h2("RAMADDA Install"));
                     html.append(sb);
                     html.append(HtmlUtils.sectionClose());
+
                     return new Result("Repository Initialization", html);
                 }
             }
@@ -556,13 +575,16 @@ public class Admin extends RepositoryManager {
                 sb.append(getPageHandler().showDialogError(msg("Error")
                         + "<br>" + errorBuffer));
             }
-            sb.append(note("Please enter the following information. This information is used to configure your RAMADDA server and is not sent anywhere."));
+            sb.append(
+                note("Please enter the following information. This information is used to configure your RAMADDA server and is not sent anywhere."));
             String required1 =
                 " <span class=\"ramadda-required-field\">* required</span>";
             String required2 =
                 " <span class=\"ramadda-required-field\">*</span>";
             sb.append(HtmlUtils.formTable());
-            sb.append(HtmlUtils.row(HtmlUtils.colspan(msgHeader("Administrator Login"), 2)));
+            sb.append(
+                HtmlUtils.row(
+                    HtmlUtils.colspan(msgHeader("Administrator Login"), 2)));
             sb.append(
                 HtmlUtils.formEntry(
                     msgLabel("ID"),
@@ -589,7 +611,9 @@ public class Admin extends RepositoryManager {
                     HtmlUtils.password(UserManager.ARG_USER_PASSWORD2)
                     + required2));
 
-            sb.append(HtmlUtils.row(HtmlUtils.colspan(msgHeader("Server Information"), 2)));
+            sb.append(
+                HtmlUtils.row(
+                    HtmlUtils.colspan(msgHeader("Server Information"), 2)));
             String hostname = "";
             String port     = "";
             if (request.getHttpServletRequest() != null) {
@@ -1009,6 +1033,7 @@ public class Admin extends RepositoryManager {
         StringBuilder headerSB = new StringBuilder();
         getPageHandler().makeLinksHeader(request, headerSB, adminUrls, "");
         headerSB.append(sb);
+
         return new Result(title, headerSB);
     }
 
@@ -1017,10 +1042,10 @@ public class Admin extends RepositoryManager {
      *
      * @param request _more_
      * @param sb _more_
+     *
+     * @throws Exception _more_
      */
-    public void xaddHeader(Request request, Appendable sb) throws Exception {
-
-    }
+    public void xaddHeader(Request request, Appendable sb) throws Exception {}
 
 
 
@@ -1067,6 +1092,7 @@ public class Admin extends RepositoryManager {
      * @throws Exception _more_
      */
     public Result adminSettings(Request request) throws Exception {
+
         StringBuilder sb = new StringBuilder();
         request.formPostWithAuthToken(sb, URL_ADMIN_SETTINGS_DO, null);
         String size = HtmlUtils.SIZE_60;
@@ -1084,15 +1110,15 @@ public class Admin extends RepositoryManager {
         String regKey = getProperty(PROP_REGISTER_KEY, "");
         csb.append(HtmlUtils.formEntry(msgLabel("Key"),
                                        HtmlUtils.input(PROP_REGISTER_KEY,
-                                                       regKey, HtmlUtils.SIZE_40)));
+                                           regKey, HtmlUtils.SIZE_40)));
 
-        if(getRepository().isRegistered()) {
-            csb.append(HtmlUtils.formEntry("","Registered"));
+        if (getRepository().isRegistered()) {
+            csb.append(HtmlUtils.formEntry("", "Registered"));
         } else {
-            if(Utils.stringDefined(regKey)) {
-                csb.append(HtmlUtils.formEntry("","Invalid registration"));
+            if (Utils.stringDefined(regKey)) {
+                csb.append(HtmlUtils.formEntry("", "Invalid registration"));
             } else {
-                csb.append(HtmlUtils.formEntry("","Not registered"));
+                csb.append(HtmlUtils.formEntry("", "Not registered"));
             }
         }
 
@@ -1228,6 +1254,7 @@ public class Admin extends RepositoryManager {
                 HtmlUtils.textArea(PROP_ADMIN_PHRASES, phrases, 5, 60)));
 
 
+        /*
         dsb.append(
             HtmlUtils.formEntryTop(
                 msgLabel("Facebook Comments API Key"),
@@ -1241,7 +1268,7 @@ public class Admin extends RepositoryManager {
                     PROP_RATINGS_ENABLE, "true",
                     getProperty(PROP_RATINGS_ENABLE, false))));
 
-
+        */
 
         dsb.append(HtmlUtils.formEntryTop(msgLabel("Google Maps Keys"), "<table><tr valign=top><td>"
                 + HtmlUtils.textArea(PROP_GOOGLEAPIKEYS, getProperty(PROP_GOOGLEAPIKEYS, ""), 5, 80)
@@ -1409,7 +1436,9 @@ public class Admin extends RepositoryManager {
         HtmlUtils.makeAccordian(sb, titles, tabs, true);
         sb.append(HtmlUtils.formClose());
         sb.append(HtmlUtils.sectionClose());
+
         return makeResult(request, msg("Settings"), sb);
+
 
     }
 
@@ -1527,7 +1556,7 @@ public class Admin extends RepositoryManager {
 
 
         getRepository().writeGlobal(request, PROP_GOOGLEAPIKEYS, true);
-        getRepository().writeGlobal(request, PROP_FACEBOOK_CONNECT_KEY);
+        //        getRepository().writeGlobal(request, PROP_FACEBOOK_CONNECT_KEY);
         getRepository().writeGlobal(PROP_NOSTYLE,
                                     "" + request.get(PROP_NOSTYLE, false));
 
@@ -1814,7 +1843,7 @@ public class Admin extends RepositoryManager {
 
 
         StringBuffer sb = new StringBuffer();
-        sb.append(HtmlUtils.sectionOpen(null, false ));
+        sb.append(HtmlUtils.sectionOpen(null, false));
         List<String> titles = new ArrayList<String>();
         List<String> tabs   = new ArrayList<String>();
 
@@ -1832,16 +1861,17 @@ public class Admin extends RepositoryManager {
 
         titles.add(msg("API"));
         tabs.add(HtmlUtils.section(apiSB.toString()));
-        
+
         titles.add(msg("Output Handlers"));
         tabs.add(HtmlUtils.section(outputSB.toString()));
 
         titles.add(msg("Database Statistics"));
         tabs.add(HtmlUtils.section(dbSB.toString()));
-        
+
         HtmlUtils.makeAccordian(sb, titles, tabs);
 
         sb.append(HtmlUtils.sectionClose());
+
         return makeResult(request, msg("System"), sb);
     }
 
@@ -1882,7 +1912,7 @@ public class Admin extends RepositoryManager {
         }
 
         StringBuffer sb = new StringBuffer();
-        sb.append(HtmlUtils.sectionOpen(null, false ));
+        sb.append(HtmlUtils.sectionOpen(null, false));
         //        sb.append(msgHeader("SQL"));
         sb.append(HtmlUtils.p());
         sb.append(HtmlUtils.href(request.url(URL_ADMIN_TABLES),
@@ -2140,26 +2170,35 @@ public class Admin extends RepositoryManager {
      */
     public Result adminCleanup(Request request) throws Exception {
 
-        StringBuffer sb = new StringBuffer();
+        StringBuffer  sb         = new StringBuffer();
 
         StringBuilder filePathSB = new StringBuilder();
-        filePathSB.append(HtmlUtils.sectionOpen(null, false ));
+        filePathSB.append(HtmlUtils.sectionOpen(null, false));
         filePathSB.append(HtmlUtils.h3("Change file paths"));
-            
+
         request.formPostWithAuthToken(filePathSB, URL_ADMIN_CLEANUP, "");
-        filePathSB.append("Change the stored file path for all entries that match the following pattern");
+        filePathSB.append(
+            "Change the stored file path for all entries that match the following pattern");
         filePathSB.append(HtmlUtils.formTable());
-        filePathSB.append(HtmlUtils.formEntry(msgLabel("File Pattern"), HtmlUtils.input(ARG_CHANGEPATHS_PATTERN,request.getString(ARG_CHANGEPATHS_PATTERN,""),HtmlUtils.SIZE_50)));
-        filePathSB.append(HtmlUtils.formEntry(msgLabel("Change to"), HtmlUtils.input(ARG_CHANGEPATHS_TO,request.getString(ARG_CHANGEPATHS_TO, ""),HtmlUtils.SIZE_50)));
+        filePathSB.append(HtmlUtils.formEntry(msgLabel("File Pattern"),
+                HtmlUtils.input(ARG_CHANGEPATHS_PATTERN,
+                                request.getString(ARG_CHANGEPATHS_PATTERN,
+                                    ""), HtmlUtils.SIZE_50)));
+        filePathSB.append(HtmlUtils.formEntry(msgLabel("Change to"),
+                HtmlUtils.input(ARG_CHANGEPATHS_TO,
+                                request.getString(ARG_CHANGEPATHS_TO, ""),
+                                HtmlUtils.SIZE_50)));
 
         filePathSB.append(HtmlUtils.formTableClose());
-        filePathSB.append(HtmlUtils.submit(msg("Change file paths"), ACTION_CHANGEPATHS));
+        filePathSB.append(HtmlUtils.submit(msg("Change file paths"),
+                                           ACTION_CHANGEPATHS));
         filePathSB.append(HtmlUtils.space(2));
         filePathSB.append(HtmlUtils.checkbox(ARG_CHANGEPATHS_CONFIRM, "true",
                                              false));
 
         filePathSB.append(HtmlUtils.space(2));
-        filePathSB.append("Yes, I really want to change all of the file paths");
+        filePathSB.append(
+            "Yes, I really want to change all of the file paths");
         filePathSB.append(HtmlUtils.sectionClose());
 
         filePathSB.append(HtmlUtils.formClose());
@@ -2187,12 +2226,20 @@ public class Admin extends RepositoryManager {
         } else if (request.defined(ACTION_CHANGEPATHS)) {
             if (request.defined(ARG_CHANGEPATHS_PATTERN)) {
                 StringBuilder tmp = new StringBuilder();
-                getRepository().getEntryManager().changeResourcePaths(request, request.getString(ARG_CHANGEPATHS_PATTERN,""),request.getString(ARG_CHANGEPATHS_TO,""), tmp, request.get(ARG_CHANGEPATHS_CONFIRM, false));
-                sb.append(HtmlUtils.div(tmp.toString(), HtmlUtils.style("max-height:300px; overflow-y: auto;")));
+                getRepository().getEntryManager().changeResourcePaths(
+                    request, request.getString(ARG_CHANGEPATHS_PATTERN, ""),
+                    request.getString(ARG_CHANGEPATHS_TO, ""), tmp,
+                    request.get(ARG_CHANGEPATHS_CONFIRM, false));
+                sb.append(
+                    HtmlUtils.div(
+                        tmp.toString(),
+                        HtmlUtils.style(
+                            "max-height:300px; overflow-y: auto;")));
             } else {
                 sb.append("Change paths fields required");
             }
             sb.append(filePathSB);
+
             return makeResult(request, msg("Change File Paths"), sb);
         } else if (request.defined(ACTION_SHUTDOWN)) {
             request.ensureAuthToken();
@@ -2229,34 +2276,45 @@ public class Admin extends RepositoryManager {
 
 
             request.formPostWithAuthToken(sb, URL_ADMIN_CLEANUP, "");
-           
-            sb.append(HtmlUtils.section(HtmlUtils.h3( msg("Caches")) +HtmlUtils.submit(msg("Clear all caches"), ACTION_CLEARCACHE)));
+
+            sb.append(
+                HtmlUtils.section(
+                    HtmlUtils.h3(msg("Caches"))
+                    + HtmlUtils.submit(
+                        msg("Clear all caches"), ACTION_CLEARCACHE)));
             sb.append(HtmlUtils.formClose());
 
 
 
 
             StringBuffer tmp = new StringBuffer();
-            tmp.append(HtmlUtils.submit(msg("Clear all passwords"), ACTION_PASSWORDS_CLEAR));
+            tmp.append(HtmlUtils.submit(msg("Clear all passwords"),
+                                        ACTION_PASSWORDS_CLEAR));
             tmp.append(HtmlUtils.space(2));
-            tmp.append(HtmlUtils.checkbox(ARG_PASSWORDS_CLEAR_CONFIRM, "true", false));
+            tmp.append(HtmlUtils.checkbox(ARG_PASSWORDS_CLEAR_CONFIRM,
+                                          "true", false));
             tmp.append(HtmlUtils.space(1));
             tmp.append(msg("Yes, I really want to delete all passwords"));
             tmp.append(HtmlUtils.br());
-            tmp.append(getPageHandler().showDialogNote(
-                                                       "Note:  All users including you will have to reset their passwords. If you do not have email enabled then only the admin will be able to reset the passwords. So, if you do this then right away, while your session is active, go and change your password. If things go bad and you can't login at all see the  <a href=\"http://ramadda.org/repository/userguide/faq.html#faq1_cat1_6\">FAQ</a> post."));
+            tmp.append(
+                getPageHandler().showDialogNote(
+                    "Note:  All users including you will have to reset their passwords. If you do not have email enabled then only the admin will be able to reset the passwords. So, if you do this then right away, while your session is active, go and change your password. If things go bad and you can't login at all see the  <a href=\"http://ramadda.org/repository/userguide/faq.html#faq1_cat1_6\">FAQ</a> post."));
 
             request.formPostWithAuthToken(sb, URL_ADMIN_CLEANUP, "");
-            sb.append(HtmlUtils.section( HtmlUtils.h3(msg("Clear Passwords")) + tmp.toString()));
+            sb.append(HtmlUtils.section(HtmlUtils.h3(msg("Clear Passwords"))
+                                        + tmp.toString()));
             sb.append(HtmlUtils.formClose());
 
 
 
             request.formPostWithAuthToken(sb, URL_ADMIN_CLEANUP, "");
-            sb.append(HtmlUtils.section(HtmlUtils.h3(msg("Export Database")) + msg(
-                                            "You can write out the database for backup or transfer to a new database") +
-                                        "<p>" +
-                                        HtmlUtils.submit(msg("Export the database"), ACTION_DUMPDB)));
+            sb.append(
+                HtmlUtils.section(
+                    HtmlUtils.h3(msg("Export Database"))
+                    + msg("You can write out the database for backup or transfer to a new database")
+                    + "<p>"
+                    + HtmlUtils.submit(
+                        msg("Export the database"), ACTION_DUMPDB)));
 
             sb.append(HtmlUtils.formClose());
 
@@ -2264,11 +2322,12 @@ public class Admin extends RepositoryManager {
 
             if (getRepository().getShutdownEnabled()) {
                 request.formPostWithAuthToken(sb, URL_ADMIN_CLEANUP, "");
-                sb.append(HtmlUtils.section(HtmlUtils.h3(msg("Shutdown")) + HtmlUtils.submit(msg("Shutdown server"),  ACTION_SHUTDOWN) +
-                                            HtmlUtils.space(2) +
-                                            HtmlUtils.checkbox(ARG_SHUTDOWN_CONFIRM, "true",  false)  +
-                                            HtmlUtils.space(1) +
-                                            msg("Yes, I really want to shutdown the server")));
+                sb.append(HtmlUtils.section(HtmlUtils.h3(msg("Shutdown"))
+                        + HtmlUtils.submit(msg("Shutdown server"), ACTION_SHUTDOWN)
+                        + HtmlUtils.space(2)
+                        + HtmlUtils.checkbox(ARG_SHUTDOWN_CONFIRM, "true", false)
+                        + HtmlUtils.space(1)
+                        + msg("Yes, I really want to shutdown the server")));
                 sb.append(HtmlUtils.formClose());
             }
 

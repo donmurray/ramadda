@@ -1,4 +1,15 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.util;
+
+
+import java.io.EOFException;
+import java.io.File;
+import java.io.FileDescriptor;
+import java.io.IOException;
 
 /* Copyright: Thomas McGlynn 1997-1999.
  * This code may be used for any purpose, non-commercial
@@ -6,7 +17,9 @@ package nom.tam.util;
  * in the source code or included in or referred to in any
  * derived software.
  */
-/** This class is intended for high performance I/O in scientific applications.
+
+/**
+ * This class is intended for high performance I/O in scientific applications.
  * It adds buffering to the RandomAccessFile and also
  * provides efficient handling of arrays.  Primitive arrays
  * may be written using a single method call.  Large buffers
@@ -38,56 +51,90 @@ package nom.tam.util;
  *
  */
 import java.io.RandomAccessFile;
-import java.io.File;
-import java.io.FileDescriptor;
-import java.io.IOException;
-import java.io.EOFException;
 
-public class BufferedFile
-        implements ArrayDataInput, ArrayDataOutput, RandomAccess {
+
+/**
+ * Class description
+ *
+ *
+ * @version        $version$, Thu, Apr 2, '15
+ * @author         Enter your name here...    
+ */
+public class BufferedFile implements ArrayDataInput, ArrayDataOutput,
+                                     RandomAccess {
 
     /** The current offset into the buffer */
     private int bufferOffset;
+
     /** The number of valid characters in the buffer */
     private int bufferLength;
+
     /** The declared length of the buffer array */
     private int bufferSize;
+
     /** Counter used in reading arrays */
     private long primitiveArrayCount;
+
     /** The data buffer. */
     private byte[] buffer;
+
     /** The underlying access to the file system */
     private RandomAccessFile raf;
+
     /** The offset of the beginning of the current buffer */
     private long fileOffset;
+
     /** Is the buffer being used for input or output */
     private boolean doingInput;
 
-    /** Create a read-only buffered file */
+    /**
+     * Create a read-only buffered file 
+     *
+     * @param filename _more_
+     *
+     * @throws IOException _more_
+     */
     public BufferedFile(String filename) throws IOException {
         this(filename, "r", 32768);
     }
 
-    /** Create a buffered file with the given mode.
+    /**
+     * Create a buffered file with the given mode.
      *  @param filename The file to be accessed.
      *  @param mode     A string composed of "r" and "w" for
      *                  read and write access.
+     *
+     * @throws IOException _more_
      */
     public BufferedFile(String filename, String mode) throws IOException {
         this(filename, mode, 32768);
     }
 
-    /** Create a buffered file from a File descriptor */
+    /**
+     * Create a buffered file from a File descriptor 
+     *
+     * @param file _more_
+     *
+     * @throws IOException _more_
+     */
     public BufferedFile(File file) throws IOException {
         this(file, "r", 32768);
     }
 
-    /** Create a buffered file from a File descriptor */
+    /**
+     * Create a buffered file from a File descriptor 
+     *
+     * @param file _more_
+     * @param mode _more_
+     *
+     * @throws IOException _more_
+     */
     public BufferedFile(File file, String mode) throws IOException {
         this(file, mode, 32768);
     }
 
-    /** Create a buffered file with the given mode and a specified
+    /**
+     * Create a buffered file with the given mode and a specified
      *  buffer size.
      *  @param filename The file to be accessed.
      *  @param mode     A string composed of "r" and "w" indicating
@@ -96,46 +143,78 @@ public class BufferedFile
      *                  substantially larger than 100 bytes and
      *                  defaults to 32768 bytes in the other
      *                  constructors.
+     *
+     * @throws IOException _more_
      */
-    public BufferedFile(String filename, String mode, int bufferSize) throws IOException {
+    public BufferedFile(String filename, String mode, int bufferSize)
+            throws IOException {
 
         File file = new File(filename);
         initialize(file, mode, bufferSize);
     }
 
-    /** Create a buffered file from a file descriptor */
-    public BufferedFile(File file, String mode, int bufferSize) throws IOException {
+    /**
+     * Create a buffered file from a file descriptor 
+     *
+     * @param file _more_
+     * @param mode _more_
+     * @param bufferSize _more_
+     *
+     * @throws IOException _more_
+     */
+    public BufferedFile(File file, String mode, int bufferSize)
+            throws IOException {
         initialize(file, mode, bufferSize);
     }
 
-    protected void initialize(File file, String mode, int bufferSize) throws IOException {
+    /**
+     * _more_
+     *
+     * @param file _more_
+     * @param mode _more_
+     * @param bufferSize _more_
+     *
+     * @throws IOException _more_
+     */
+    protected void initialize(File file, String mode, int bufferSize)
+            throws IOException {
 
-        raf = new RandomAccessFile(file, mode);
-        buffer = new byte[bufferSize];
-        bufferOffset = 0;
-        bufferLength = 0;
-        fileOffset = 0;
+        raf             = new RandomAccessFile(file, mode);
+        buffer          = new byte[bufferSize];
+        bufferOffset    = 0;
+        bufferLength    = 0;
+        fileOffset      = 0;
         this.bufferSize = bufferSize;
 
     }
 
-    /** Create a buffered file using a mapped
-
-
-    /** Read an entire byte array.
+    /**
+     * Create a buffered file using a mapped
+     *
+     *
+     * /** Read an entire byte array.
      *  Note BufferedFile will return a partially filled array
      *  only at an end-of-file.
      *  @param buf The array to be filled.
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
      */
     public int read(byte[] buf) throws IOException {
         return read(buf, 0, buf.length);
     }
 
-    /** Read into a segment of a byte array.
+    /**
+     * Read into a segment of a byte array.
      *  @param buf    The array to be filled.
      *  @param offset The starting location for input.
      *  @param len    The number of bytes to be read.  Fewer bytes
      *                will be read if an EOF is reached.
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
      */
     public int read(byte[] buf, int offset, int len) throws IOException {
 
@@ -152,10 +231,11 @@ public class BufferedFile
                     get = bufferLength - bufferOffset;
                 }
                 System.arraycopy(buffer, bufferOffset, buf, offset, get);
-                len -= get;
+                len          -= get;
                 bufferOffset += get;
-                offset += get;
-                total += get;
+                offset       += get;
+                total        += get;
+
                 continue;
 
             } else {
@@ -170,8 +250,9 @@ public class BufferedFile
                     }
                 } catch (EOFException e) {
                     if (bufferLength > 0) {
-                        System.arraycopy(buffer, 0, buf, offset, bufferLength);
-                        total += bufferLength;
+                        System.arraycopy(buffer, 0, buf, offset,
+                                         bufferLength);
+                        total        += bufferLength;
                         bufferLength = 0;
                     }
                     if (total == 0) {
@@ -186,14 +267,19 @@ public class BufferedFile
         return total;
     }
 
-    /** This should only be used when a small number of
+    /**
+     * This should only be used when a small number of
      * bytes is required (substantially smaller than
      * bufferSize.
+     *
+     * @param needBytes _more_
+     *
+     * @throws IOException _more_
      */
     private void checkBuffer(int needBytes) throws IOException {
 
         // Check if the buffer has some pending output.
-        if (!doingInput && bufferOffset > 0) {
+        if ( !doingInput && (bufferOffset > 0)) {
             flush();
         }
         doingInput = true;
@@ -213,7 +299,7 @@ public class BufferedFile
         if (len > 0) {
             System.arraycopy(buffer, bufferOffset, buffer, 0, len);
         }
-        needBytes -= len;
+        needBytes    -= len;
         bufferLength = len;
         bufferOffset = 0;
 
@@ -222,26 +308,39 @@ public class BufferedFile
             if (len < 0) {
                 throw new EOFException();
             }
-            needBytes -= len;
+            needBytes    -= len;
             bufferLength += len;
         }
     }
 
-    /** Read a byte */
+    /**
+     * Read a byte 
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     public int read() throws IOException {
         checkBuffer(1);
         bufferOffset += 1;
+
         return buffer[bufferOffset - 1];
     }
 
-    /** Skip from the current position.
+    /**
+     * Skip from the current position.
      *  @param offset The number of bytes from the
      *                current position.  This may
      *                be negative.
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
      */
     public long skip(long offset) throws IOException {
 
-        if (offset > 0 && fileOffset + bufferOffset + offset > raf.length()) {
+        if ((offset > 0)
+                && (fileOffset + bufferOffset + offset > raf.length())) {
             offset = raf.length() - fileOffset - bufferOffset;
             seek(raf.length());
         } else if (fileOffset + bufferOffset + offset < 0) {
@@ -250,22 +349,29 @@ public class BufferedFile
         } else {
             seek(fileOffset + bufferOffset + offset);
         }
+
         return offset;
     }
 
-    /** Move to the current offset from the beginning of the file.
+    /**
+     * Move to the current offset from the beginning of the file.
      *  A user may move past the end of file but this
      *  does not extend the file unless data is written there.
+     *
+     * @param offsetFromStart _more_
+     *
+     * @throws IOException _more_
      */
     public void seek(long offsetFromStart) throws IOException {
 
-        if (!doingInput) {
+        if ( !doingInput) {
             // Have to flush before a seek...
             flush();
         }
 
         // Are we within the current buffer?
-        if (fileOffset <= offsetFromStart && offsetFromStart < fileOffset + bufferLength) {
+        if ((fileOffset <= offsetFromStart)
+                && (offsetFromStart < fileOffset + bufferLength)) {
             bufferOffset = (int) (offsetFromStart - fileOffset);
         } else {
 
@@ -283,143 +389,226 @@ public class BufferedFile
         }
     }
 
-    /** Read a boolean
+    /**
+     * Read a boolean
      * @return a boolean generated from the next
      *                     byte in the input.
+     *
+     * @throws IOException _more_
      */
     public boolean readBoolean() throws IOException {
         return convertToBoolean();
     }
 
-    /** Get a boolean from the buffer */
+    /**
+     * Get a boolean from the buffer 
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     private boolean convertToBoolean() throws IOException {
         checkBuffer(1);
         bufferOffset += 1;
+
         return buffer[bufferOffset - 1] == 1;
     }
 
-    /** Read a byte
+    /**
+     * Read a byte
      *  @return the next byte in the input.
+     *
+     * @throws IOException _more_
      */
     public byte readByte() throws IOException {
         checkBuffer(1);
         bufferOffset += 1;
+
         return buffer[bufferOffset - 1];
     }
 
-    /** Read an unsigned byte.
+    /**
+     * Read an unsigned byte.
      *  @return the unsigned value of the next byte as
      *          an integer.
+     *
+     * @throws IOException _more_
      */
     public int readUnsignedByte() throws IOException {
         checkBuffer(1);
         bufferOffset += 1;
+
         return buffer[bufferOffset - 1] | 0x00ff;
     }
 
-    /** Read an int
+    /**
+     * Read an int
      *  @return an integer read from the input.
+     *
+     * @throws IOException _more_
      */
     public int readInt() throws IOException {
         return convertToInt();
     }
 
-    /** Get an integer value from the buffer */
+    /**
+     * Get an integer value from the buffer 
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     private int convertToInt() throws IOException {
         checkBuffer(4);
         int x = bufferOffset;
-        int i = buffer[x] << 24 | (buffer[x + 1] & 0xFF) << 16 | (buffer[x + 2] & 0xFF) << 8 | (buffer[x + 3] & 0xFF);
+        int i = buffer[x] << 24 | (buffer[x + 1] & 0xFF) << 16
+                | (buffer[x + 2] & 0xFF) << 8 | (buffer[x + 3] & 0xFF);
         bufferOffset += 4;
+
         return i;
     }
 
-    /** Read a short
+    /**
+     * Read a short
      *  @return a short read from the input.
+     *
+     * @throws IOException _more_
      */
     public short readShort() throws IOException {
         return convertToShort();
     }
 
-    /** Get a short from the buffer */
+    /**
+     * Get a short from the buffer 
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     private short convertToShort() throws IOException {
         checkBuffer(2);
-        short s = (short) (buffer[bufferOffset] << 8 | (buffer[bufferOffset + 1] & 0xFF));
+        short s = (short) (buffer[bufferOffset] << 8
+                           | (buffer[bufferOffset + 1] & 0xFF));
         bufferOffset += 2;
+
         return s;
     }
 
-    /** Read an unsigned short.
+    /**
+     * Read an unsigned short.
      *  @return an unsigned short value as an integer.
+     *
+     * @throws IOException _more_
      */
     public int readUnsignedShort() throws IOException {
         return readShort() & 0xFFFF;
     }
 
-    /** Read a char
+    /**
+     * Read a char
      *  @return a char read from the input.
+     *
+     * @throws IOException _more_
      */
     public char readChar() throws IOException {
         return convertToChar();
     }
 
-    /** Get a char from the buffer */
+    /**
+     * Get a char from the buffer 
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     private char convertToChar() throws IOException {
         checkBuffer(2);
-        char c = (char) (buffer[bufferOffset] << 8 | (buffer[bufferOffset + 1] & 0xFF));
+        char c = (char) (buffer[bufferOffset] << 8
+                         | (buffer[bufferOffset + 1] & 0xFF));
         bufferOffset += 2;
+
         return c;
     }
 
-    /** Read a long.
+    /**
+     * Read a long.
      *  @return a long value read from the input.
+     *
+     * @throws IOException _more_
      */
     public long readLong() throws IOException {
         return convertToLong();
     }
 
-    /** Get a long value from the buffer */
+    /**
+     * Get a long value from the buffer 
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     private long convertToLong() throws IOException {
         checkBuffer(8);
         int x = bufferOffset;
 
-        int i1 = buffer[x] << 24 | (buffer[x + 1] & 0xFF) << 16 | (buffer[x + 2] & 0xFF) << 8 | (buffer[x + 3] & 0xFF);
-        int i2 = buffer[x + 4] << 24 | (buffer[x + 5] & 0xFF) << 16 | (buffer[x + 6] & 0xFF) << 8 | (buffer[x + 7] & 0xFF);
+        int i1 = buffer[x] << 24 | (buffer[x + 1] & 0xFF) << 16
+                 | (buffer[x + 2] & 0xFF) << 8 | (buffer[x + 3] & 0xFF);
+        int i2 = buffer[x + 4] << 24 | (buffer[x + 5] & 0xFF) << 16
+                 | (buffer[x + 6] & 0xFF) << 8 | (buffer[x + 7] & 0xFF);
         bufferOffset += 8;
 
         return (((long) i1) << 32) | (((long) i2) & 0x00000000ffffffffL);
     }
 
-    /** Read a float.
+    /**
+     * Read a float.
      *  @return a float value read from the input.
+     *
+     * @throws IOException _more_
      */
     public float readFloat() throws IOException {
         return Float.intBitsToFloat(convertToInt());
     }
 
-    /** Read a double.
+    /**
+     * Read a double.
      *  @return a double value read from the input.
+     *
+     * @throws IOException _more_
      */
     public double readDouble() throws IOException {
         return Double.longBitsToDouble(convertToLong());
     }
 
-    /** Read a byte array fully.
+    /**
+     * Read a byte array fully.
      *  Since the read method of this class reads an entire
      *  buffer, the only difference with readFully is that
      *  readFully will signal an EOF if the buffer cannot be filled.
+     *
+     * @param b _more_
+     *
+     * @throws IOException _more_
      */
     public void readFully(byte[] b) throws IOException {
         readFully(b, 0, b.length);
     }
 
-    /** Read a byte array fully.
+    /**
+     * Read a byte array fully.
      *  Since the read method of this class reads an entire
      *  buffer, the only difference with readFully is that
      *  readFully will signal an EOF if the buffer cannot be filled.
+     *
+     * @param b _more_
+     * @param off _more_
+     * @param len _more_
+     *
+     * @throws IOException _more_
      */
     public void readFully(byte[] b, int off, int len) throws IOException {
 
-        if (off < 0 || len < 0 || off + len > b.length) {
+        if ((off < 0) || (len < 0) || (off + len > b.length)) {
             throw new IOException("Attempt to read outside byte array");
         }
 
@@ -428,17 +617,33 @@ public class BufferedFile
         }
     }
 
-    /** Skip the number of bytes.
+    /**
+     * Skip the number of bytes.
      *  This differs from the skip method in that
      *  it will throw an EOF if a forward skip cannot
      *  be fully accomplished...  (However that isn't
      *  supposed to happen with a random access file,
      *  so there is probably no operational difference).
+     *
+     * @param toSkip _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
      */
     public int skipBytes(int toSkip) throws IOException {
         return (int) skipBytes((long) toSkip);
     }
 
+    /**
+     * _more_
+     *
+     * @param toSkip _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     public long skipBytes(long toSkip) throws IOException {
 
         // Note that we allow negative skips...
@@ -449,8 +654,11 @@ public class BufferedFile
         }
     }
 
-    /** Read a string encoded as a UTF.
+    /**
+     * Read a string encoded as a UTF.
      *  @return the string.
+     *
+     * @throws IOException _more_
      */
     public String readUTF() throws IOException {
         checkBuffer(-1);
@@ -465,8 +673,11 @@ public class BufferedFile
         return utf;
     }
 
-    /** Read a line of input.
+    /**
+     * Read a line of input.
      *  @return the next line.
+     *
+     * @throws IOException _more_
      */
     public String readLine() throws IOException {
 
@@ -482,7 +693,8 @@ public class BufferedFile
         return line;
     }
 
-    /** This routine provides efficient reading of arrays of any primitive type.
+    /**
+     * This routine provides efficient reading of arrays of any primitive type.
      *  @deprecated  The readLArray(Object) routine should be used to
      *               ensure that large arrays which read more than
      *               two-gigabytes return the proper value.
@@ -490,16 +702,25 @@ public class BufferedFile
      *
      *  @param o  The object to be read.  It must be an array of a primitive type,
      *           or an array of Object's.
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
      */
     public int readArray(Object o) throws IOException {
         return (int) readLArray(o);
     }
 
-    /** This routine provides efficient reading of arrays of any primitive
+    /**
+     * This routine provides efficient reading of arrays of any primitive
      *  type.
      *  @param o  The object to be read.  It must be an arraof of a primtive type
      *            (or any dimension), or an array of Objects which contains
      *            pointers to primitive arrays or other object arrays.
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
      */
     public long readLArray(Object o) throws IOException {
 
@@ -511,9 +732,19 @@ public class BufferedFile
         // true we need to synchronize this call.
 
         primitiveArrayCount = 0;
+
         return primitiveArrayRecurse(o);
     }
 
+    /**
+     * _more_
+     *
+     * @param o _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     protected long primitiveArrayRecurse(Object o) throws IOException {
 
         if (o == null) {
@@ -523,7 +754,9 @@ public class BufferedFile
         String className = o.getClass().getName();
 
         if (className.charAt(0) != '[') {
-            throw new IOException("Invalid object passed to BufferedDataInputStream.readArray:" + className);
+            throw new IOException(
+                "Invalid object passed to BufferedDataInputStream.readArray:"
+                + className);
         }
 
         // Is this a multidimensional array?  If so process recursively.
@@ -535,53 +768,104 @@ public class BufferedFile
 
             // This is a one-d array.  Process it using our special functions.
             switch (className.charAt(1)) {
-                case 'Z':
-                    primitiveArrayCount += read((boolean[]) o, 0, ((boolean[]) o).length);
-                    break;
-                case 'B':
-                    int len = read((byte[]) o, 0, ((byte[]) o).length);
-                    break;
-                case 'C':
-                    primitiveArrayCount += read((char[]) o, 0, ((char[]) o).length);
-                    break;
-                case 'S':
-                    primitiveArrayCount += read((short[]) o, 0, ((short[]) o).length);
-                    break;
-                case 'I':
-                    primitiveArrayCount += read((int[]) o, 0, ((int[]) o).length);
-                    break;
-                case 'J':
-                    primitiveArrayCount += read((long[]) o, 0, ((long[]) o).length);
-                    break;
-                case 'F':
-                    primitiveArrayCount += read((float[]) o, 0, ((float[]) o).length);
-                    break;
-                case 'D':
-                    primitiveArrayCount += read((double[]) o, 0, ((double[]) o).length);
-                    break;
-                case 'L':
 
-                    // Handle an array of Objects by recursion.  Anything
-                    // else is an error.
-                    if (className.equals("[Ljava.lang.Object;")) {
-                        for (int i = 0; i < ((Object[]) o).length; i += 1) {
-                            primitiveArrayRecurse(((Object[]) o)[i]);
-                        }
-                    } else {
-                        throw new IOException("Invalid object passed to BufferedFile.readPrimitiveArray: " + className);
-                    }
-                    break;
-                default:
-                    throw new IOException("Invalid object passed to BufferedDataInputStream.readArray: " + className);
+              case 'Z' :
+                  primitiveArrayCount += read((boolean[]) o, 0,
+                          ((boolean[]) o).length);
+
+                  break;
+
+              case 'B' :
+                  int len = read((byte[]) o, 0, ((byte[]) o).length);
+
+                  break;
+
+              case 'C' :
+                  primitiveArrayCount += read((char[]) o, 0,
+                          ((char[]) o).length);
+
+                  break;
+
+              case 'S' :
+                  primitiveArrayCount += read((short[]) o, 0,
+                          ((short[]) o).length);
+
+                  break;
+
+              case 'I' :
+                  primitiveArrayCount += read((int[]) o, 0,
+                          ((int[]) o).length);
+
+                  break;
+
+              case 'J' :
+                  primitiveArrayCount += read((long[]) o, 0,
+                          ((long[]) o).length);
+
+                  break;
+
+              case 'F' :
+                  primitiveArrayCount += read((float[]) o, 0,
+                          ((float[]) o).length);
+
+                  break;
+
+              case 'D' :
+                  primitiveArrayCount += read((double[]) o, 0,
+                          ((double[]) o).length);
+
+                  break;
+
+              case 'L' :
+
+                  // Handle an array of Objects by recursion.  Anything
+                  // else is an error.
+                  if (className.equals("[Ljava.lang.Object;")) {
+                      for (int i = 0; i < ((Object[]) o).length; i += 1) {
+                          primitiveArrayRecurse(((Object[]) o)[i]);
+                      }
+                  } else {
+                      throw new IOException(
+                          "Invalid object passed to BufferedFile.readPrimitiveArray: "
+                          + className);
+                  }
+
+                  break;
+
+              default :
+                  throw new IOException(
+                      "Invalid object passed to BufferedDataInputStream.readArray: "
+                      + className);
             }
         }
+
         return primitiveArrayCount;
     }
 
+    /**
+     * _more_
+     *
+     * @param b _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     public int read(boolean[] b) throws IOException {
         return read(b, 0, b.length);
     }
 
+    /**
+     * _more_
+     *
+     * @param b _more_
+     * @param start _more_
+     * @param length _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     public int read(boolean[] b, int start, int length) throws IOException {
 
         int i = start;
@@ -589,16 +873,37 @@ public class BufferedFile
             for (; i < start + length; i += 1) {
                 b[i] = convertToBoolean();
             }
+
             return length;
         } catch (EOFException e) {
             return eofCheck(e, start, i, 1);
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     public int read(short[] s) throws IOException {
         return read(s, 0, s.length);
     }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     * @param start _more_
+     * @param length _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     public int read(short[] s, int start, int length) throws IOException {
 
         int i = start;
@@ -606,16 +911,37 @@ public class BufferedFile
             for (; i < start + length; i += 1) {
                 s[i] = convertToShort();
             }
+
             return length * 2;
         } catch (EOFException e) {
             return eofCheck(e, start, i, 2);
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param c _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     public int read(char[] c) throws IOException {
         return read(c, 0, c.length);
     }
 
+    /**
+     * _more_
+     *
+     * @param c _more_
+     * @param start _more_
+     * @param length _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     public int read(char[] c, int start, int length) throws IOException {
 
         int i = start;
@@ -623,16 +949,37 @@ public class BufferedFile
             for (; i < start + length; i += 1) {
                 c[i] = convertToChar();
             }
+
             return length * 2;
         } catch (EOFException e) {
             return eofCheck(e, start, i, 2);
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param i _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     public int read(int[] i) throws IOException {
         return read(i, 0, i.length);
     }
 
+    /**
+     * _more_
+     *
+     * @param i _more_
+     * @param start _more_
+     * @param length _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     public int read(int[] i, int start, int length) throws IOException {
 
         int ii = start;
@@ -640,16 +987,37 @@ public class BufferedFile
             for (; ii < start + length; ii += 1) {
                 i[ii] = convertToInt();
             }
+
             return length * 4;
         } catch (EOFException e) {
             return eofCheck(e, start, ii, 4);
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param l _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     public int read(long[] l) throws IOException {
         return read(l, 0, l.length);
     }
 
+    /**
+     * _more_
+     *
+     * @param l _more_
+     * @param start _more_
+     * @param length _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     public int read(long[] l, int start, int length) throws IOException {
 
         int i = start;
@@ -657,6 +1025,7 @@ public class BufferedFile
             for (; i < start + length; i += 1) {
                 l[i] = convertToLong();
             }
+
             return length * 8;
         } catch (EOFException e) {
             return eofCheck(e, start, i, 8);
@@ -664,10 +1033,30 @@ public class BufferedFile
 
     }
 
+    /**
+     * _more_
+     *
+     * @param f _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     public int read(float[] f) throws IOException {
         return read(f, 0, f.length);
     }
 
+    /**
+     * _more_
+     *
+     * @param f _more_
+     * @param start _more_
+     * @param length _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     public int read(float[] f, int start, int length) throws IOException {
 
         int i = start;
@@ -675,16 +1064,37 @@ public class BufferedFile
             for (; i < start + length; i += 1) {
                 f[i] = Float.intBitsToFloat(convertToInt());
             }
+
             return length * 4;
         } catch (EOFException e) {
             return eofCheck(e, start, i, 4);
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param d _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     public int read(double[] d) throws IOException {
         return read(d, 0, d.length);
     }
 
+    /**
+     * _more_
+     *
+     * @param d _more_
+     * @param start _more_
+     * @param length _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
     public int read(double[] d, int start, int length) throws IOException {
 
         int i = start;
@@ -692,13 +1102,25 @@ public class BufferedFile
             for (; i < start + length; i += 1) {
                 d[i] = Double.longBitsToDouble(convertToLong());
             }
+
             return length * 8;
         } catch (EOFException e) {
             return eofCheck(e, start, i, 8);
         }
     }
 
-    /** See if an exception should be thrown during an array read. */
+    /**
+     * See if an exception should be thrown during an array read. 
+     *
+     * @param e _more_
+     * @param start _more_
+     * @param index _more_
+     * @param length _more_
+     *
+     * @return _more_
+     *
+     * @throws EOFException _more_
+     */
     private int eofCheck(EOFException e, int start, int index, int length)
             throws EOFException {
         if (start == index) {
@@ -708,7 +1130,13 @@ public class BufferedFile
         }
     }
 
-    /**** Output Routines ****/
+    /**
+     * ** Output Routines ***
+     *
+     * @param need _more_
+     *
+     * @throws IOException _more_
+     */
     private void needBuffer(int need) throws IOException {
 
         if (doingInput) {
@@ -716,7 +1144,7 @@ public class BufferedFile
             fileOffset += bufferOffset;
             raf.seek(fileOffset);
 
-            doingInput = false;
+            doingInput   = false;
 
             bufferOffset = 0;
             bufferLength = 0;
@@ -724,19 +1152,42 @@ public class BufferedFile
 
         if (bufferOffset + need >= bufferSize) {
             raf.write(buffer, 0, bufferOffset);
-            fileOffset += bufferOffset;
+            fileOffset   += bufferOffset;
             bufferOffset = 0;
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param buf _more_
+     *
+     * @throws IOException _more_
+     */
     public void write(int buf) throws IOException {
         convertFromByte(buf);
     }
 
+    /**
+     * _more_
+     *
+     * @param buf _more_
+     *
+     * @throws IOException _more_
+     */
     public void write(byte[] buf) throws IOException {
         write(buf, 0, buf.length);
     }
 
+    /**
+     * _more_
+     *
+     * @param buf _more_
+     * @param offset _more_
+     * @param length _more_
+     *
+     * @throws IOException _more_
+     */
     public void write(byte[] buf, int offset, int length) throws IOException {
 
         if (length < bufferSize) {
@@ -753,30 +1204,34 @@ public class BufferedFile
 
             raf.write(buf, offset, length);
 
-            fileOffset += length;
+            fileOffset   += length;
 
-            doingInput = false;
+            doingInput   = false;
             bufferOffset = 0;
             bufferLength = 0;
         }
     }
 
-    /** Flush output buffer if necessary.
+    /**
+     * Flush output buffer if necessary.
      *  This method is not present in RandomAccessFile
      *  but users may need to call flush to ensure
      *  that data has been written.
+     *
+     * @throws IOException _more_
      */
     public void flush() throws IOException {
 
-        if (!doingInput && bufferOffset > 0) {
+        if ( !doingInput && (bufferOffset > 0)) {
             raf.write(buffer, 0, bufferOffset);
-            fileOffset += bufferOffset;
+            fileOffset   += bufferOffset;
             bufferOffset = 0;
             bufferLength = 0;
         }
     }
 
-    /** Clear up any pending output at cleanup.
+    /**
+     * Clear up any pending output at cleanup.
      */
     protected void finalize() {
         try {
@@ -784,18 +1239,27 @@ public class BufferedFile
                 flush();
                 close();
             }
-        } catch (Exception e) {
-        }
+        } catch (Exception e) {}
     }
 
-    /** Write a boolean value
+    /**
+     * Write a boolean value
      * @param b  The value to be written.  Externally true is represented as
      *           a byte of 1 and false as a byte value of 0.
+     *
+     * @throws IOException _more_
      */
     public void writeBoolean(boolean b) throws IOException {
         convertFromBoolean(b);
     }
 
+    /**
+     * _more_
+     *
+     * @param b _more_
+     *
+     * @throws IOException _more_
+     */
     private void convertFromBoolean(boolean b) throws IOException {
         needBuffer(1);
         if (b) {
@@ -806,23 +1270,47 @@ public class BufferedFile
         bufferOffset += 1;
     }
 
-    /** Write a byte value.
+    /**
+     * Write a byte value.
+     *
+     * @param b _more_
+     *
+     * @throws IOException _more_
      */
     public void writeByte(int b) throws IOException {
         convertFromByte(b);
     }
 
+    /**
+     * _more_
+     *
+     * @param b _more_
+     *
+     * @throws IOException _more_
+     */
     private void convertFromByte(int b) throws IOException {
         needBuffer(1);
         buffer[bufferOffset++] = (byte) b;
     }
 
-    /** Write an integer value.
+    /**
+     * Write an integer value.
+     *
+     * @param i _more_
+     *
+     * @throws IOException _more_
      */
     public void writeInt(int i) throws IOException {
         convertFromInt(i);
     }
 
+    /**
+     * _more_
+     *
+     * @param i _more_
+     *
+     * @throws IOException _more_
+     */
     private void convertFromInt(int i) throws IOException {
 
         needBuffer(4);
@@ -832,13 +1320,25 @@ public class BufferedFile
         buffer[bufferOffset++] = (byte) i;
     }
 
-    /** Write a short value.
+    /**
+     * Write a short value.
+     *
+     * @param s _more_
+     *
+     * @throws IOException _more_
      */
     public void writeShort(int s) throws IOException {
 
         convertFromShort(s);
     }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @throws IOException _more_
+     */
     private void convertFromShort(int s) throws IOException {
         needBuffer(2);
 
@@ -846,24 +1346,48 @@ public class BufferedFile
         buffer[bufferOffset++] = (byte) s;
     }
 
-    /** Write a char value.
+    /**
+     * Write a char value.
+     *
+     * @param c _more_
+     *
+     * @throws IOException _more_
      */
     public void writeChar(int c) throws IOException {
         convertFromChar(c);
     }
 
+    /**
+     * _more_
+     *
+     * @param c _more_
+     *
+     * @throws IOException _more_
+     */
     private void convertFromChar(int c) throws IOException {
         needBuffer(2);
         buffer[bufferOffset++] = (byte) (c >>> 8);
         buffer[bufferOffset++] = (byte) c;
     }
 
-    /** Write a long value.
+    /**
+     * Write a long value.
+     *
+     * @param l _more_
+     *
+     * @throws IOException _more_
      */
     public void writeLong(long l) throws IOException {
         convertFromLong(l);
     }
 
+    /**
+     * _more_
+     *
+     * @param l _more_
+     *
+     * @throws IOException _more_
+     */
     private void convertFromLong(long l) throws IOException {
         needBuffer(8);
 
@@ -877,27 +1401,45 @@ public class BufferedFile
         buffer[bufferOffset++] = (byte) l;
     }
 
-    /** Write a float value.
+    /**
+     * Write a float value.
+     *
+     * @param f _more_
+     *
+     * @throws IOException _more_
      */
     public void writeFloat(float f) throws IOException {
         convertFromInt(Float.floatToIntBits(f));
     }
 
-    /** Write a double value.
+    /**
+     * Write a double value.
+     *
+     * @param d _more_
+     *
+     * @throws IOException _more_
      */
     public void writeDouble(double d) throws IOException {
         convertFromLong(Double.doubleToLongBits(d));
     }
 
-    /** Write a string using the local protocol to convert char's to bytes.
+    /**
+     * Write a string using the local protocol to convert char's to bytes.
      *
      * @param s   The string to be written.
+     *
+     * @throws IOException _more_
      */
     public void writeBytes(String s) throws IOException {
         write(s.getBytes(), 0, s.length());
     }
 
-    /** Write a string as an array of chars.
+    /**
+     * Write a string as an array of chars.
+     *
+     * @param s _more_
+     *
+     * @throws IOException _more_
      */
     public void writeChars(String s) throws IOException {
 
@@ -907,7 +1449,12 @@ public class BufferedFile
         }
     }
 
-    /** Write a string as a UTF.
+    /**
+     * Write a string as a UTF.
+     *
+     * @param s _more_
+     *
+     * @throws IOException _more_
      */
     public void writeUTF(String s) throws IOException {
         flush();
@@ -915,7 +1462,8 @@ public class BufferedFile
         fileOffset = raf.getFilePointer();
     }
 
-    /** This routine provides efficient writing of arrays of any primitive type.
+    /**
+     * This routine provides efficient writing of arrays of any primitive type.
      * The String class is also handled but it is an error to invoke this
      * method with an object that is not an array of these types.  If the
      * array is multidimensional, then it calls itself recursively to write
@@ -927,12 +1475,16 @@ public class BufferedFile
      *
      * @param o  The object to be written.  It must be an array of a primitive
      *           type, Object, or String.
+     *
+     * @throws IOException _more_
      */
     public void writeArray(Object o) throws IOException {
         String className = o.getClass().getName();
 
         if (className.charAt(0) != '[') {
-            throw new IOException("Invalid object passed to BufferedFile.writeArray:" + className);
+            throw new IOException(
+                "Invalid object passed to BufferedFile.writeArray:"
+                + className);
         }
 
         // Is this a multidimensional array?  If so process recursively.
@@ -944,69 +1496,120 @@ public class BufferedFile
 
             // This is a one-d array.  Process it using our special functions.
             switch (className.charAt(1)) {
-                case 'Z':
-                    write((boolean[]) o, 0, ((boolean[]) o).length);
-                    break;
-                case 'B':
-                    write((byte[]) o, 0, ((byte[]) o).length);
-                    break;
-                case 'C':
-                    write((char[]) o, 0, ((char[]) o).length);
-                    break;
-                case 'S':
-                    write((short[]) o, 0, ((short[]) o).length);
-                    break;
-                case 'I':
-                    write((int[]) o, 0, ((int[]) o).length);
-                    break;
-                case 'J':
-                    write((long[]) o, 0, ((long[]) o).length);
-                    break;
-                case 'F':
-                    write((float[]) o, 0, ((float[]) o).length);
-                    break;
-                case 'D':
-                    write((double[]) o, 0, ((double[]) o).length);
-                    break;
-                case 'L':
 
-                    // Handle two exceptions: an array of strings, or an
-                    // array of objects. .
-                    if (className.equals("[Ljava.lang.String;")) {
-                        write((String[]) o, 0, ((String[]) o).length);
-                    } else if (className.equals("[Ljava.lang.Object;")) {
-                        for (int i = 0; i < ((Object[]) o).length; i += 1) {
-                            writeArray(((Object[]) o)[i]);
-                        }
-                    } else {
-                        throw new IOException("Invalid object passed to BufferedFile.write: " + className);
-                    }
-                    break;
-                default:
-                    throw new IOException("Invalid object passed to BufferedFile.write: " + className);
+              case 'Z' :
+                  write((boolean[]) o, 0, ((boolean[]) o).length);
+
+                  break;
+
+              case 'B' :
+                  write((byte[]) o, 0, ((byte[]) o).length);
+
+                  break;
+
+              case 'C' :
+                  write((char[]) o, 0, ((char[]) o).length);
+
+                  break;
+
+              case 'S' :
+                  write((short[]) o, 0, ((short[]) o).length);
+
+                  break;
+
+              case 'I' :
+                  write((int[]) o, 0, ((int[]) o).length);
+
+                  break;
+
+              case 'J' :
+                  write((long[]) o, 0, ((long[]) o).length);
+
+                  break;
+
+              case 'F' :
+                  write((float[]) o, 0, ((float[]) o).length);
+
+                  break;
+
+              case 'D' :
+                  write((double[]) o, 0, ((double[]) o).length);
+
+                  break;
+
+              case 'L' :
+
+                  // Handle two exceptions: an array of strings, or an
+                  // array of objects. .
+                  if (className.equals("[Ljava.lang.String;")) {
+                      write((String[]) o, 0, ((String[]) o).length);
+                  } else if (className.equals("[Ljava.lang.Object;")) {
+                      for (int i = 0; i < ((Object[]) o).length; i += 1) {
+                          writeArray(((Object[]) o)[i]);
+                      }
+                  } else {
+                      throw new IOException(
+                          "Invalid object passed to BufferedFile.write: "
+                          + className);
+                  }
+
+                  break;
+
+              default :
+                  throw new IOException(
+                      "Invalid object passed to BufferedFile.write: "
+                      + className);
             }
         }
 
     }
 
-    /** Write an array of booleans.
+    /**
+     * Write an array of booleans.
+     *
+     * @param b _more_
+     *
+     * @throws IOException _more_
      */
     public void write(boolean[] b) throws IOException {
         write(b, 0, b.length);
     }
 
+    /**
+     * _more_
+     *
+     * @param b _more_
+     * @param start _more_
+     * @param length _more_
+     *
+     * @throws IOException _more_
+     */
     public void write(boolean[] b, int start, int length) throws IOException {
         for (int i = start; i < start + length; i += 1) {
             convertFromBoolean(b[i]);
         }
     }
 
-    /** Write an array of shorts.
+    /**
+     * Write an array of shorts.
+     *
+     * @param s _more_
+     *
+     * @throws IOException _more_
      */
     public void write(short[] s) throws IOException {
         write(s, 0, s.length);
     }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     * @param start _more_
+     * @param length _more_
+     *
+     * @throws IOException _more_
+     */
     public void write(short[] s, int start, int length) throws IOException {
 
         for (int i = start; i < start + length; i += 1) {
@@ -1014,12 +1617,26 @@ public class BufferedFile
         }
     }
 
-    /** Write an array of char's.
+    /**
+     * Write an array of char's.
+     *
+     * @param c _more_
+     *
+     * @throws IOException _more_
      */
     public void write(char[] c) throws IOException {
         write(c, 0, c.length);
     }
 
+    /**
+     * _more_
+     *
+     * @param c _more_
+     * @param start _more_
+     * @param length _more_
+     *
+     * @throws IOException _more_
+     */
     public void write(char[] c, int start, int length) throws IOException {
 
         for (int i = start; i < start + length; i += 1) {
@@ -1027,24 +1644,52 @@ public class BufferedFile
         }
     }
 
-    /** Write an array of int's.
+    /**
+     * Write an array of int's.
+     *
+     * @param i _more_
+     *
+     * @throws IOException _more_
      */
     public void write(int[] i) throws IOException {
         write(i, 0, i.length);
     }
 
+    /**
+     * _more_
+     *
+     * @param i _more_
+     * @param start _more_
+     * @param length _more_
+     *
+     * @throws IOException _more_
+     */
     public void write(int[] i, int start, int length) throws IOException {
         for (int ii = start; ii < start + length; ii += 1) {
             convertFromInt(i[ii]);
         }
     }
 
-    /** Write an array of longs.
+    /**
+     * Write an array of longs.
+     *
+     * @param l _more_
+     *
+     * @throws IOException _more_
      */
     public void write(long[] l) throws IOException {
         write(l, 0, l.length);
     }
 
+    /**
+     * _more_
+     *
+     * @param l _more_
+     * @param start _more_
+     * @param length _more_
+     *
+     * @throws IOException _more_
+     */
     public void write(long[] l, int start, int length) throws IOException {
 
         for (int i = start; i < start + length; i += 1) {
@@ -1052,24 +1697,52 @@ public class BufferedFile
         }
     }
 
-    /** Write an array of floats.
+    /**
+     * Write an array of floats.
+     *
+     * @param f _more_
+     *
+     * @throws IOException _more_
      */
     public void write(float[] f) throws IOException {
         write(f, 0, f.length);
     }
 
+    /**
+     * _more_
+     *
+     * @param f _more_
+     * @param start _more_
+     * @param length _more_
+     *
+     * @throws IOException _more_
+     */
     public void write(float[] f, int start, int length) throws IOException {
         for (int i = start; i < start + length; i += 1) {
             convertFromInt(Float.floatToIntBits(f[i]));
         }
     }
 
-    /** Write an array of doubles.
+    /**
+     * Write an array of doubles.
+     *
+     * @param d _more_
+     *
+     * @throws IOException _more_
      */
     public void write(double[] d) throws IOException {
         write(d, 0, d.length);
     }
 
+    /**
+     * _more_
+     *
+     * @param d _more_
+     * @param start _more_
+     * @param length _more_
+     *
+     * @throws IOException _more_
+     */
     public void write(double[] d, int start, int length) throws IOException {
 
         for (int i = start; i < start + length; i += 1) {
@@ -1077,33 +1750,57 @@ public class BufferedFile
         }
     }
 
-    /** Write an array of Strings -- equivalent to calling writeBytes for each string.
+    /**
+     * Write an array of Strings -- equivalent to calling writeBytes for each string.
+     *
+     * @param s _more_
+     *
+     * @throws IOException _more_
      */
     public void write(String[] s) throws IOException {
         write(s, 0, s.length);
     }
 
+    /**
+     * _more_
+     *
+     * @param s _more_
+     * @param start _more_
+     * @param length _more_
+     *
+     * @throws IOException _more_
+     */
     public void write(String[] s, int start, int length) throws IOException {
         for (int i = start; i < start + length; i += 1) {
             writeBytes(s[i]);
         }
     }
 
-    /** Close the file */
+    /**
+     * Close the file 
+     *
+     * @throws IOException _more_
+     */
     public void close() throws IOException {
         flush();
         raf.close();
     }
 
-    /** Get the file descriptor associated with
+    /**
+     * Get the file descriptor associated with
      *  this stream.  Note that this returns the file
      *  descriptor of the associated RandomAccessFile.
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
      */
     public FileDescriptor getFD() throws IOException {
         return raf.getFD();
     }
 
-    /** Get the channel associated with
+    /**
+     * Get the channel associated with
      *  this file.  Note that this returns the channel
      *  of the associated RandomAccessFile.
      *  Note that since the BufferedFile buffers the I/O's to the
@@ -1111,25 +1808,37 @@ public class BufferedFile
      *  different than the offset of the BufferedFile.  This
      *  is different than for a RandomAccessFile where the
      *  offsets are guaranteed to be the same.
+     *
+     * @return _more_
      */
     public java.nio.channels.FileChannel getChannel() {
         return raf.getChannel();
     }
 
-    /** Get the current length of the file.
+    /**
+     * Get the current length of the file.
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
      */
     public long length() throws IOException {
         flush();
+
         return raf.length();
     }
 
-    /** Get the current offset into the file.
+    /**
+     * Get the current offset into the file.
+     *
+     * @return _more_
      */
     public long getFilePointer() {
         return fileOffset + bufferOffset;
     }
 
-    /** Set the length of the file.  This method calls
+    /**
+     * Set the length of the file.  This method calls
      *  the method of the same name in RandomAccessFile which
      *  is only available in JDK1.2 and greater.  This method
      *  may be deleted for compilation with earlier versions.
@@ -1137,6 +1846,8 @@ public class BufferedFile
      * @param newLength The number of bytes at which the file
      *                  is set.
      *
+     *
+     * @throws IOException _more_
      */
     public void setLength(long newLength) throws IOException {
 

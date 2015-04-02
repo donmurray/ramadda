@@ -1,22 +1,14 @@
-/*
-* Copyright 2008-2015 Geode Systems LLC
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-* software and associated documentation files (the "Software"), to deal in the Software 
-* without restriction, including without limitation the rights to use, copy, modify, 
-* merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
-* permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies 
-* or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-* PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-* OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 package org.ramadda.repository.output;
 
@@ -580,7 +572,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         if (inDiv) {
             sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV, attrs));
         } else {
-            sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV, HtmlUtils.style(((align != null)
+            sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
+                                     HtmlUtils.style(((align != null)
                     ? "float:" + align + ";"
                     : "") + " display:inline-block;text-align:center")));
         }
@@ -809,9 +802,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
         if (wrapInADiv) {
             sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV, ((cssClass != null)
-                                             ? HtmlUtils.cssClass(cssClass)
-                                             : "") + HtmlUtils.style(
-                                             style.toString())));
+                    ? HtmlUtils.cssClass(cssClass)
+                    : "") + HtmlUtils.style(style.toString())));
         }
         sb.append(result);
         if (wrapInADiv) {
@@ -1318,15 +1310,17 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             Request myRequest   = copyRequest(request, props);
 
             //Pass the wiki attribute into the request to the special search
-            String fields = Misc.getProperty(props, ATTR_FIELDS,(String)null);
-            if(fields!=null) {
-                myRequest.put(SpecialSearch.ARG_FIELDS,fields);
-            } 
+            String fields = Misc.getProperty(props, ATTR_FIELDS,
+                                             (String) null);
+            if (fields != null) {
+                myRequest.put(SpecialSearch.ARG_FIELDS, fields);
+            }
 
-            String metadata = Misc.getProperty(props, ATTR_METADATA, (String)null);
-            if(metadata!=null) {
-                myRequest.put(SpecialSearch.ARG_METADATA,metadata);
-            } 
+            String metadata = Misc.getProperty(props, ATTR_METADATA,
+                                  (String) null);
+            if (metadata != null) {
+                myRequest.put(SpecialSearch.ARG_METADATA, metadata);
+            }
 
             if ( !myRequest.defined(ARG_SEARCH_SHOWHEADER)) {
                 myRequest.put(ARG_SEARCH_SHOWHEADER, "false");
@@ -1349,6 +1343,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             }
             SpecialSearch ss = typeHandler.getSpecialSearch();
             ss.processSearchRequest(myRequest, sb);
+
             return sb.toString();
         } else if (theTag.equals(WIKI_TAG_APPLY)) {
             StringBuilder style = new StringBuilder(Misc.getProperty(props,
@@ -1740,10 +1735,10 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                                 titles.get(i))));
 
                     String displayHtml = contents.get(i);
-                    String snippet = getSnippet(request, child);
-                    if(Utils.stringDefined(snippet)) {
-                        snippet =  wikifyEntry(request, child, snippet,
-                                               false, null, null);
+                    String snippet     = getSnippet(request, child);
+                    if (Utils.stringDefined(snippet)) {
+                        snippet = wikifyEntry(request, child, snippet, false,
+                                null, null);
                         displayHtml = snippet += displayHtml;
                     }
 
@@ -2965,7 +2960,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             if (entry != null) {
                 if (addChildren) {
                     List<Entry> children =
-                        getEntryManager().getChildrenAll(request, entry, null);
+                        getEntryManager().getChildrenAll(request, entry,
+                            null);
                     entries.addAll(children);
                 } else {
                     entries.add(entry);

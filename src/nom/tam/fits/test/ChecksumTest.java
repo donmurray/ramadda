@@ -1,3 +1,8 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
@@ -5,13 +10,18 @@
 
 package nom.tam.fits.test;
 
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
+
 import junit.framework.JUnit4TestAdapter;
 
 import nom.tam.fits.*;
 import nom.tam.util.*;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
 import java.io.*;
+
 
 /**
  *
@@ -19,10 +29,18 @@ import java.io.*;
  */
 public class ChecksumTest {
 
-    @Test public void testChecksum() throws Exception {
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
+    @Test
+    public void testChecksum() throws Exception {
 
-        int[][] data = new int[][] {{1,2}, {3,4}, {5,6}};
-        Fits f = new Fits();
+        int[][]  data = new int[][] {
+            { 1, 2 }, { 3, 4 }, { 5, 6 }
+        };
+        Fits     f    = new Fits();
         BasicHDU bhdu = FitsFactory.HDUFactory(data);
         f.addHDU(bhdu);
 
@@ -32,8 +50,8 @@ public class ChecksumTest {
         f.write(bdos);
         bdos.close();
         byte[] stream = bs.toByteArray();
-        long chk = Fits.checksum(stream);
-        int val = (int)chk;
+        long   chk    = Fits.checksum(stream);
+        int    val    = (int) chk;
 
         assertEquals("CheckSum test", -1, val);
     }

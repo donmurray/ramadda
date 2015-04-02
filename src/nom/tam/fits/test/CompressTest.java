@@ -1,33 +1,51 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits.test;
 
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
+
 import junit.framework.JUnit4TestAdapter;
+
+import nom.tam.fits.*;
 
 import nom.tam.image.*;
 import nom.tam.util.*;
-import nom.tam.fits.*;
 
-import java.net.URL;
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 
-/** Test reading .Z and .gz compressed files.
+import java.net.URL;
+
+
+/**
+ * Test reading .Z and .gz compressed files.
  */
 public class CompressTest {
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     @Test
     public void testgz() throws Exception {
 
         File fil = new File(".");
         System.out.println("File is:" + fil.getCanonicalPath());
-        Fits f = new Fits("http://heasarc.gsfc.nasa.gov/FTP/asca/data/rev2/43021000/images/ad43021000gis25670_lo.totsky.gz");
+        Fits f =
+            new Fits(
+                "http://heasarc.gsfc.nasa.gov/FTP/asca/data/rev2/43021000/images/ad43021000gis25670_lo.totsky.gz");
 
-        BasicHDU h = f.readHDU();
-        int[][] data = (int[][]) h.getKernel();
-        double sum = 0;
+        BasicHDU h    = f.readHDU();
+        int[][]  data = (int[][]) h.getKernel();
+        double   sum  = 0;
         for (int i = 0; i < data.length; i += 1) {
             for (int j = 0; j < data[i].length; j += 1) {
                 sum += data[i][j];
@@ -36,14 +54,21 @@ public class CompressTest {
         assertEquals("ZCompress", sum, 296915., 0);
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     @Test
     public void testZ() throws Exception {
 
-        Fits f = new Fits("http://heasarc.gsfc.nasa.gov/FTP/rosat/data/pspc/processed_data/600000/rp600245n00/rp600245n00_im1.fits.Z");
+        Fits f =
+            new Fits(
+                "http://heasarc.gsfc.nasa.gov/FTP/rosat/data/pspc/processed_data/600000/rp600245n00/rp600245n00_im1.fits.Z");
 
-        BasicHDU h = f.readHDU();
+        BasicHDU  h    = f.readHDU();
         short[][] data = (short[][]) h.getKernel();
-        double sum = 0;
+        double    sum  = 0;
         for (int i = 0; i < data.length; i += 1) {
             for (int j = 0; j < data[i].length; j += 1) {
                 sum += data[i][j];
@@ -52,6 +77,11 @@ public class CompressTest {
         assertEquals("ZCompress", sum, 91806., 0);
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     @Test
     public void testStream() throws Exception {
         InputStream is;
@@ -85,6 +115,11 @@ public class CompressTest {
         assertEquals("Stream9", 300, streamRead(is, true, true));
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     @Test
     public void testFile() throws Exception {
         File is = new File("test.fits");
@@ -109,6 +144,11 @@ public class CompressTest {
         assertEquals("File9", 300, fileRead(is, true, true));
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     @Test
     public void testString() throws Exception {
         String is = "test.fits";
@@ -134,6 +174,11 @@ public class CompressTest {
 
     }
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     @Test
     public void testURL() throws Exception {
         String is = "test.fits";
@@ -158,14 +203,24 @@ public class CompressTest {
         assertEquals("String8", 300, urlRead(is, true, true));
     }
 
-    int urlRead(String is, boolean comp, boolean useComp)
-            throws Exception {
-        File fil = new File(is);
+    /**
+     * _more_
+     *
+     * @param is _more_
+     * @param comp _more_
+     * @param useComp _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    int urlRead(String is, boolean comp, boolean useComp) throws Exception {
+        File   fil  = new File(is);
 
         String path = fil.getCanonicalPath();
-        URL u = new URL("file://" + path);
+        URL    u    = new URL("file://" + path);
 
-        Fits f;
+        Fits   f;
         if (useComp) {
             f = new Fits(u, comp);
         } else {
@@ -176,6 +231,17 @@ public class CompressTest {
         return total(data);
     }
 
+    /**
+     * _more_
+     *
+     * @param is _more_
+     * @param comp _more_
+     * @param useComp _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     int streamRead(InputStream is, boolean comp, boolean useComp)
             throws Exception {
         Fits f;
@@ -190,8 +256,18 @@ public class CompressTest {
         return total(data);
     }
 
-    int fileRead(File is, boolean comp, boolean useComp)
-            throws Exception {
+    /**
+     * _more_
+     *
+     * @param is _more_
+     * @param comp _more_
+     * @param useComp _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    int fileRead(File is, boolean comp, boolean useComp) throws Exception {
         Fits f;
         if (useComp) {
             f = new Fits(is, comp);
@@ -203,6 +279,17 @@ public class CompressTest {
         return total(data);
     }
 
+    /**
+     * _more_
+     *
+     * @param is _more_
+     * @param comp _more_
+     * @param useComp _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     int stringRead(String is, boolean comp, boolean useComp)
             throws Exception {
         Fits f;
@@ -216,6 +303,13 @@ public class CompressTest {
         return total(data);
     }
 
+    /**
+     * _more_
+     *
+     * @param data _more_
+     *
+     * @return _more_
+     */
     int total(short[][] data) {
         int total = 0;
         for (int i = 0; i < data.length; i += 1) {
@@ -223,6 +317,7 @@ public class CompressTest {
                 total += data[i][j];
             }
         }
+
         return total;
     }
 }

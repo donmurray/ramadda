@@ -1,21 +1,13 @@
-/*
- * Copyright 2008-2015 Geode Systems LLC
- *
- * Permission is hereby granted, free of charge, to any person obtaining a copy of this 
- * software and associated documentation files (the "Software"), to deal in the Software 
- * without restriction, including without limitation the rights to use, copy, modify, 
- * merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
- * permit persons to whom the Software is furnished to do so, subject to the following conditions:
- * 
- * The above copyright notice and this permission notice shall be included in all copies 
- * or substantial portions of the Software.
- * 
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
- * INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
- * PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
- * FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
- * OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
- * DEALINGS IN THE SOFTWARE.
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
  */
 
 package org.ramadda.plugins.slack;
@@ -66,15 +58,34 @@ import java.util.Properties;
 public class SlackHarvester extends Harvester {
 
 
+    /** _more_ */
     public static final String SLACK_TOKEN = "token";
+
+    /** _more_ */
     public static final String SLACK_TEAM_ID = "team_id";
+
+    /** _more_ */
     public static final String SLACK_TEAM_DOMAIN = "team_domain";
+
+    /** _more_ */
     public static final String SLACK_CHANNEL_ID = "channel_id";
+
+    /** _more_ */
     public static final String SLACK_CHANNEL_NAME = "channel_name";
+
+    /** _more_ */
     public static final String SLACK_TIMESTAMP = "timestamp";
+
+    /** _more_ */
     public static final String SLACK_USER_ID = "user_id";
+
+    /** _more_ */
     public static final String SLACK_USER_NAME = "user_name";
+
+    /** _more_ */
     public static final String SLACK_TEXT = "text";
+
+    /** _more_ */
     public static final String SLACK_TRIGGER_WORD = "trigger_word";
 
 
@@ -110,7 +121,7 @@ public class SlackHarvester extends Harvester {
      * @throws Exception _more_
      */
     public SlackHarvester(Repository repository, Element node)
-        throws Exception {
+            throws Exception {
         super(repository, node);
     }
 
@@ -150,7 +161,7 @@ public class SlackHarvester extends Harvester {
      */
     public void applyState(Element element) throws Exception {
         super.applyState(element);
-        if(token!=null) {
+        if (token != null) {
             element.setAttribute(ATTR_TOKEN, token);
         }
     }
@@ -178,32 +189,41 @@ public class SlackHarvester extends Harvester {
      * @throws Exception _more_
      */
     public void createEditForm(Request request, StringBuffer sb)
-        throws Exception {
+            throws Exception {
         super.createEditForm(request, sb);
 
         addBaseGroupSelect(ATTR_BASEGROUP, sb);
-        sb.append(
-                  HtmlUtils.formEntry(
-                                      msgLabel("Slack Token"),
-                                      HtmlUtils.input(ATTR_TOKEN, token, HtmlUtils.SIZE_60)
-                                      + " "
-                                      + "Token from Slack"));
+        sb.append(HtmlUtils.formEntry(msgLabel("Slack Token"),
+                                      HtmlUtils.input(ATTR_TOKEN, token,
+                                          HtmlUtils.SIZE_60) + " "
+                                              + "Token from Slack"));
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     public Result handleRequest(Request request) throws Exception {
-        if(!Utils.stringDefined(token) ||
-           !Misc.equals(token, request.getString(SLACK_TOKEN,"none"))) {
+        if ( !Utils.stringDefined(token)
+                || !Misc.equals(token,
+                                request.getString(SLACK_TOKEN, "none"))) {
             return null;
         }
 
-        String channelId = request.getString(SLACK_CHANNEL_ID,"");
-        String channelName = request.getString(SLACK_CHANNEL_NAME,"");
-        String userId = request.getString(SLACK_USER_ID,"");
-        String userName = request.getString(SLACK_USER_NAME,"");
-        String text = request.getString(SLACK_TEXT, "");
-        StringBuffer sb = new StringBuffer();
+        String       channelId   = request.getString(SLACK_CHANNEL_ID, "");
+        String       channelName = request.getString(SLACK_CHANNEL_NAME, "");
+        String       userId      = request.getString(SLACK_USER_ID, "");
+        String       userName    = request.getString(SLACK_USER_NAME, "");
+        String       text        = request.getString(SLACK_TEXT, "");
+        StringBuffer sb          = new StringBuffer();
         sb.append("Channel: " + channelName);
+
         return new Result("", sb);
     }
 

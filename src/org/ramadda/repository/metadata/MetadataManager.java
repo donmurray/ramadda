@@ -1,22 +1,14 @@
-/*
-* Copyright 2008-2015 Geode Systems LLC
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-* software and associated documentation files (the "Software"), to deal in the Software 
-* without restriction, including without limitation the rights to use, copy, modify, 
-* merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
-* permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies 
-* or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-* PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-* OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 package org.ramadda.repository.metadata;
 
@@ -1158,6 +1150,7 @@ public class MetadataManager extends RepositoryManager {
         }
 
         sb.append(HtmlUtils.sectionClose());
+
         return getSearchManager().makeResult(request,
                                              msg(type.getLabel() + " Cloud"),
                                              sb);
@@ -1337,7 +1330,8 @@ public class MetadataManager extends RepositoryManager {
 
 
         List<Metadata> metadataList = getMetadata(entry);
-        getPageHandler().entrySectionOpen(request, entry, sb, "Edit Properties");
+        getPageHandler().entrySectionOpen(request, entry, sb,
+                                          "Edit Properties");
         if (metadataList.size() == 0) {
             sb.append(
                 getPageHandler().showDialogNote(
@@ -1409,6 +1403,7 @@ public class MetadataManager extends RepositoryManager {
         }
 
         getPageHandler().entrySectionClose(request, entry, sb);
+
         return getEntryManager().makeEntryEditResult(request, entry,
                 msg("Edit Properties"), sb);
 
@@ -1471,6 +1466,7 @@ public class MetadataManager extends RepositoryManager {
         }
 
         getPageHandler().entrySectionClose(request, entry, sb);
+
         return getEntryManager().makeEntryEditResult(request, entry,
                 msg("Add Property"), sb);
     }
@@ -1543,11 +1539,12 @@ public class MetadataManager extends RepositoryManager {
         }
 
         List<String> titles = new ArrayList<String>();
-        List<String> tabs = new ArrayList<String>();
+        List<String> tabs   = new ArrayList<String>();
 
         for (String name : groups) {
             titles.add(name);
-            tabs.add(HtmlUtils.insetDiv(groupMap.get(name).toString(),5,10,5,10));
+            tabs.add(HtmlUtils.insetDiv(groupMap.get(name).toString(), 5, 10,
+                                        5, 10));
         }
         HtmlUtils.makeAccordian(sb, titles, tabs);
     }

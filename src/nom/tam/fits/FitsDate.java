@@ -1,4 +1,12 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits;
+
+
+import java.text.DecimalFormat;
 
 /*
  * Copyright: Thomas McGlynn 1997-1998.
@@ -13,27 +21,48 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
-import java.text.DecimalFormat;
 
+
+/**
+ * Class description
+ *
+ *
+ * @version        $version$, Thu, Apr 2, '15
+ * @author         Enter your name here...    
+ */
 public class FitsDate {
 
+    /** _more_          */
     private int year = -1;
+
+    /** _more_          */
     private int month = -1;
+
+    /** _more_          */
     private int mday = -1;
+
+    /** _more_          */
     private int hour = -1;
+
+    /** _more_          */
     private int minute = -1;
+
+    /** _more_          */
     private int second = -1;
+
+    /** _more_          */
     private int millisecond = -1;
+
+    /** _more_          */
     private Date date = null;
 
     /**
      * Convert a FITS date string to a Java <CODE>Date</CODE> object.
-     * @param dStr	the FITS date
-     * @exception FitsException	if <CODE>dStr</CODE> does not
-     *					contain a valid FITS date.
+     * @param dStr      the FITS date
+     * @exception FitsException if <CODE>dStr</CODE> does not
+     *                                  contain a valid FITS date.
      */
-    public FitsDate(String dStr)
-            throws FitsException {
+    public FitsDate(String dStr) throws FitsException {
         // if the date string is null, we are done
         if (dStr == null) {
             return;
@@ -52,7 +81,7 @@ public class FitsDate {
 
             // ... and there is a "/" in the string...
             first = dStr.indexOf('-');
-            if (first == 4 && first < len) {
+            if ((first == 4) && (first < len)) {
 
                 // ... this must be an new-style date
                 buildNewDate(dStr, first, len);
@@ -61,7 +90,7 @@ public class FitsDate {
             } else {
 
                 first = dStr.indexOf('/');
-                if (first > 1 && first < len) {
+                if ((first > 1) && (first < len)) {
 
                     // ... this must be an old-style date
                     buildOldDate(dStr, first, len);
@@ -74,15 +103,22 @@ public class FitsDate {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param dStr _more_
+     * @param first _more_
+     * @param len _more_
+     */
     private void buildOldDate(String dStr, int first, int len) {
         int middle = dStr.indexOf('/', first + 1);
-        if (middle > first + 2 && middle < len) {
+        if ((middle > first + 2) && (middle < len)) {
 
             try {
 
-                year = Integer.parseInt(dStr.substring(middle + 1)) + 1900;
+                year  = Integer.parseInt(dStr.substring(middle + 1)) + 1900;
                 month = Integer.parseInt(dStr.substring(first + 1, middle));
-                mday = Integer.parseInt(dStr.substring(0, first));
+                mday  = Integer.parseInt(dStr.substring(0, first));
 
             } catch (NumberFormatException e) {
 
@@ -91,27 +127,34 @@ public class FitsDate {
         }
     }
 
-    private void parseTime(String tStr)
-            throws FitsException {
+    /**
+     * _more_
+     *
+     * @param tStr _more_
+     *
+     * @throws FitsException _more_
+     */
+    private void parseTime(String tStr) throws FitsException {
         int first = tStr.indexOf(':');
         if (first < 0) {
             throw new FitsException("Bad time");
         }
 
-        int len = tStr.length();
+        int len    = tStr.length();
 
         int middle = tStr.indexOf(':', first + 1);
-        if (middle > first + 2 && middle < len) {
+        if ((middle > first + 2) && (middle < len)) {
 
-            if (middle + 3 < len && tStr.charAt(middle + 3) == '.') {
-                double d = Double.valueOf(tStr.substring(middle + 3)).doubleValue();
+            if ((middle + 3 < len) && (tStr.charAt(middle + 3) == '.')) {
+                double d = Double.valueOf(tStr.substring(middle
+                               + 3)).doubleValue();
                 millisecond = (int) (d * 1000);
 
-                len = middle + 3;
+                len         = middle + 3;
             }
 
             try {
-                hour = Integer.parseInt(tStr.substring(0, first));
+                hour   = Integer.parseInt(tStr.substring(0, first));
                 minute = Integer.parseInt(tStr.substring(first + 1, middle));
                 second = Integer.parseInt(tStr.substring(middle + 1, len));
             } catch (NumberFormatException e) {
@@ -120,23 +163,32 @@ public class FitsDate {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @param dStr _more_
+     * @param first _more_
+     * @param len _more_
+     *
+     * @throws FitsException _more_
+     */
     private void buildNewDate(String dStr, int first, int len)
             throws FitsException {
         // find the middle separator
         int middle = dStr.indexOf('-', first + 1);
-        if (middle > first + 2 && middle < len) {
+        if ((middle > first + 2) && (middle < len)) {
 
             try {
 
                 // if this date string includes a time...
-                if (middle + 3 < len && dStr.charAt(middle + 3) == 'T') {
+                if ((middle + 3 < len) && (dStr.charAt(middle + 3) == 'T')) {
 
                     // ... try to parse the time
                     try {
                         parseTime(dStr.substring(middle + 4));
                     } catch (FitsException e) {
-                        throw new FitsException("Bad time in FITS date string \""
-                                + dStr + "\"");
+                        throw new FitsException(
+                            "Bad time in FITS date string \"" + dStr + "\"");
                     }
 
                     // we got the time; mark the end of the date string
@@ -144,25 +196,27 @@ public class FitsDate {
                 }
 
                 // parse date string
-                year = Integer.parseInt(dStr.substring(0, first));
+                year  = Integer.parseInt(dStr.substring(0, first));
                 month = Integer.parseInt(dStr.substring(first + 1, middle));
-                mday = Integer.parseInt(dStr.substring(middle + 1, len));
+                mday  = Integer.parseInt(dStr.substring(middle + 1, len));
 
             } catch (NumberFormatException e) {
 
                 // yikes, something failed; reset everything
-                year = month = mday = hour = minute = second = millisecond = -1;
+                year = month = mday = hour = minute = second = millisecond =
+                    -1;
             }
         }
     }
 
-    /** Get a Java Date object corresponding to this
+    /**
+     * Get a Java Date object corresponding to this
      *  FITS date.
      *  @return The Java Date object.
      */
     public Date toDate() {
-        if (date == null && year != -1) {
-            TimeZone tz = TimeZone.getTimeZone("GMT");
+        if ((date == null) && (year != -1)) {
+            TimeZone          tz  = TimeZone.getTimeZone("GMT");
             GregorianCalendar cal = new GregorianCalendar(tz);
 
             cal.set(Calendar.YEAR, year);
@@ -194,34 +248,44 @@ public class FitsDate {
         return date;
     }
 
-    /** Return the current date in FITS date format */
+    /**
+     * Return the current date in FITS date format 
+     *
+     * @return _more_
+     */
     public static String getFitsDateString() {
         return getFitsDateString(new Date(), true);
     }
 
-    /** Create FITS format date string Java Date object.
-     *  @param epoch	The epoch to be converted to FITS format.
+    /**
+     * Create FITS format date string Java Date object.
+     *  @param epoch    The epoch to be converted to FITS format.
+     *
+     * @return _more_
      */
     public static String getFitsDateString(Date epoch) {
         return getFitsDateString(epoch, true);
     }
 
-    /** Create FITS format date string.
+    /**
+     * Create FITS format date string.
      *  Note that the date is not rounded.
      *  @param epoch           The epoch to be converted to FITS format.
-     *  @param timeOfDay	Should time of day information be included?
+     *  @param timeOfDay        Should time of day information be included?
+     *
+     * @return _more_
      */
     public static String getFitsDateString(Date epoch, boolean timeOfDay) {
 
         try {
-            GregorianCalendar cal = new GregorianCalendar(
-                    TimeZone.getTimeZone("GMT"));
+            GregorianCalendar cal =
+                new GregorianCalendar(TimeZone.getTimeZone("GMT"));
 
 
             cal.setTime(epoch);
 
-            StringBuffer fitsDate = new StringBuffer();
-            DecimalFormat df = new DecimalFormat("0000");
+            StringBuffer  fitsDate = new StringBuffer();
+            DecimalFormat df       = new DecimalFormat("0000");
             fitsDate.append(df.format(cal.get(Calendar.YEAR)));
             fitsDate.append("-");
             df = new DecimalFormat("00");
@@ -250,6 +314,11 @@ public class FitsDate {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String toString() {
         if (year == -1) {
             return "";
@@ -307,21 +376,29 @@ public class FitsDate {
         return buf.toString();
     }
 
+    /**
+     * _more_
+     *
+     * @param args _more_
+     */
     public static void testArgs(String args[]) {
         for (int i = 0; i < args.length; i++) {
 
             try {
                 FitsDate fd = new FitsDate(args[i]);
                 System.out.println("\"" + args[i] + "\" => " + fd + " => "
-                        + fd.toDate());
+                                   + fd.toDate());
             } catch (Exception e) {
                 System.err.println("Date \"" + args[i] + "\" threw "
-                        + e.getClass().getName() + "(" + e.getMessage()
-                        + ")");
+                                   + e.getClass().getName() + "("
+                                   + e.getMessage() + ")");
             }
         }
     }
 
+    /**
+     * _more_
+     */
     public static void autotest() {
         String[] good = new String[6];
         good[0] = "20/09/79";
@@ -354,6 +431,11 @@ public class FitsDate {
         testArgs(badMisc);
     }
 
+    /**
+     * _more_
+     *
+     * @param args _more_
+     */
     public static void main(String args[]) {
         if (args.length == 0) {
             autotest();

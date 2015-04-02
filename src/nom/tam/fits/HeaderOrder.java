@@ -1,21 +1,39 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits;
 
-/** This class implements a comparator which ensures
+
+/**
+ * This class implements a comparator which ensures
  *  that FITS keywords are written out in a proper order.
  */
 public class HeaderOrder implements java.util.Comparator {
 
-    /** Can two cards be exchanged when being written out? */
+    /**
+     * Can two cards be exchanged when being written out? 
+     *
+     * @param a _more_
+     * @param b _more_
+     *
+     * @return _more_
+     */
     public boolean equals(Object a, Object b) {
         return compare(a, b) == 0;
     }
 
-    /** Which order should the cards indexed by these keys
+    /**
+     * Which order should the cards indexed by these keys
      *  be written out?  This method assumes that the
      *  arguments are either the FITS Header keywords as
      *  strings, and some other type (or null) for comment
      *  style keywords.
      *
+     *
+     * @param a _more_
+     * @param b _more_
      * @return -1 if the first argument should be written first <br>
      *          1 if the second argument should be written first <br>
      *          0 if either is legal.
@@ -27,13 +45,13 @@ public class HeaderOrder implements java.util.Comparator {
 
         String c1, c2;
 
-        if (a != null && a instanceof String) {
+        if ((a != null) && (a instanceof String)) {
             c1 = (String) a;
         } else {
             c1 = " ";
         }
 
-        if (b != null && b instanceof String) {
+        if ((b != null) && (b instanceof String)) {
             c2 = (String) b;
         } else {
             c2 = " ";
@@ -80,13 +98,14 @@ public class HeaderOrder implements java.util.Comparator {
                     return 1;
                 }
             }
+
             return -1;
         }
 
         if (naxisN(c2) > 0) {
             return 1;
         }
-        
+
         // The EXTEND keyword is no longer required in the FITS standard
         // but in earlier versions of the standard it was required to
         // be here if present in the primary data array.
@@ -141,16 +160,23 @@ public class HeaderOrder implements java.util.Comparator {
         return 0;
     }
 
-    /** Find the index for NAXISn keywords */
+    /**
+     * Find the index for NAXISn keywords 
+     *
+     * @param key _more_
+     *
+     * @return _more_
+     */
     private int naxisN(String key) {
 
-        if (key.length() > 5 && key.substring(0, 5).equals("NAXIS")) {
+        if ((key.length() > 5) && key.substring(0, 5).equals("NAXIS")) {
             for (int i = 5; i < key.length(); i += 1) {
 
                 boolean number = true;
-                char c = key.charAt(i);
-                if ('0' > c || c > '9') {
+                char    c      = key.charAt(i);
+                if (('0' > c) || (c > '9')) {
                     number = false;
+
                     break;
                 }
                 if (number) {
@@ -158,6 +184,7 @@ public class HeaderOrder implements java.util.Comparator {
                 }
             }
         }
+
         return -1;
     }
 }

@@ -1,32 +1,48 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits.test;
 
-import nom.tam.util.*;
-import nom.tam.fits.*;
 
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
 import junit.framework.JUnit4TestAdapter;
 
-/** Test random groups formats in FITS data.
+import nom.tam.fits.*;
+
+import nom.tam.util.*;
+
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+
+/**
+ * Test random groups formats in FITS data.
  *    Write and read random groups data
  */
 public class RandomGroupsTest {
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     @Test
     public void test() throws Exception {
 
-        float[][] fa = new float[20][20];
-        float[] pa = new float[3];
+        float[][]    fa   = new float[20][20];
+        float[]      pa   = new float[3];
 
-        BufferedFile bf = new BufferedFile("rg1.fits", "rw");
+        BufferedFile bf   = new BufferedFile("rg1.fits", "rw");
 
-        Object[][] data = new Object[1][2];
+        Object[][]   data = new Object[1][2];
         data[0][0] = pa;
         data[0][1] = fa;
 
         // First lets write out the file painfully group by group.
         BasicHDU hdu = Fits.makeHDU(data);
-        Header hdr = hdu.getHeader();
+        Header   hdr = hdu.getHeader();
         // Change the number of groups
         hdr.addValue("GCOUNT", 20, "Number of groups");
         hdr.write(bf);
@@ -43,14 +59,15 @@ public class RandomGroupsTest {
             bf.writeArray(data);
         }
 
-        byte[] padding = new byte[FitsUtil.padding(20 * ArrayFuncs.computeLSize(data))];
+        byte[] padding =
+            new byte[FitsUtil.padding(20 * ArrayFuncs.computeLSize(data))];
         bf.write(padding);
 
         bf.flush();
         bf.close();
 
         // Read back the data.
-        Fits f = new Fits("rg1.fits");
+        Fits       f    = new Fits("rg1.fits");
         BasicHDU[] hdus = f.read();
 
         data = (Object[][]) hdus[0].getKernel();
@@ -60,10 +77,12 @@ public class RandomGroupsTest {
             pa = (float[]) data[i][0];
             fa = (float[][]) data[i][1];
             for (int j = 0; j < pa.length; j += 1) {
-                assertEquals("paramTest:" + i + " " + j, (float) (i + j), pa[j], 0);
+                assertEquals("paramTest:" + i + " " + j, (float) (i + j),
+                             pa[j], 0);
             }
             for (int j = 0; j < fa.length; j += 1) {
-                assertEquals("dataTest:" + i + " " + j, (float) (i * j), fa[j][j], 0);
+                assertEquals("dataTest:" + i + " " + j, (float) (i * j),
+                             fa[j][j], 0);
             }
         }
 
@@ -79,17 +98,19 @@ public class RandomGroupsTest {
         bf.flush();
         bf.close();
 
-        f = new Fits("rg2.fits");
+        f    = new Fits("rg2.fits");
         data = (Object[][]) f.read()[0].getKernel();
         for (int i = 0; i < data.length; i += 1) {
 
             pa = (float[]) data[i][0];
             fa = (float[][]) data[i][1];
             for (int j = 0; j < pa.length; j += 1) {
-                assertEquals("paramTest:" + i + " " + j, (float) (i + j), pa[j], 0);
+                assertEquals("paramTest:" + i + " " + j, (float) (i + j),
+                             pa[j], 0);
             }
             for (int j = 0; j < fa.length; j += 1) {
-                assertEquals("dataTest:" + i + " " + j, (float) (i * j), fa[j][j], 0);
+                assertEquals("dataTest:" + i + " " + j, (float) (i * j),
+                             fa[j][j], 0);
             }
         }
     }

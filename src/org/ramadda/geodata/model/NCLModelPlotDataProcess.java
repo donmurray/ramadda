@@ -1,22 +1,14 @@
-/*
-* Copyright 2008-2015 Geode Systems LLC
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-* software and associated documentation files (the "Software"), to deal in the Software 
-* without restriction, including without limitation the rights to use, copy, modify, 
-* merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
-* permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies 
-* or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-* PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-* OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 package org.ramadda.geodata.model;
 
@@ -156,7 +148,7 @@ public class NCLModelPlotDataProcess extends Service {
         boolean handleMultiple =
             type.equals(ClimateModelApiHandler.ARG_ACTION_MULTI_COMPARE)
             || type.equals(ClimateModelApiHandler.ARG_ACTION_ENS_COMPARE);
-        boolean isCorrelation = 
+        boolean isCorrelation =
             type.equals(ClimateModelApiHandler.ARG_ACTION_CORRELATION);
         sb.append(HtmlUtils.formTable());
         //List<Entry> entries = input.getEntries();
@@ -188,7 +180,8 @@ public class NCLModelPlotDataProcess extends Service {
         String space1 = HtmlUtils.space(1);
         String space2 = HtmlUtils.space(1);
 
-        if ((input.getOperands().size() > 1) && !handleMultiple && !isCorrelation) {
+        if ((input.getOperands().size() > 1) && !handleMultiple
+                && !isCorrelation) {
             StringBuilder buttons = new StringBuilder();
             buttons.append(
                 HtmlUtils.radio(
@@ -208,12 +201,12 @@ public class NCLModelPlotDataProcess extends Service {
 
             sb.append(HtmlUtils.formEntry(Repository.msgLabel("Plot As"),
                                           buttons.toString()));
-        } else if (isCorrelation){
+        } else if (isCorrelation) {
             sb.append(HtmlUtils.hidden(ARG_NCL_OUTPUT, "corr"));
         } else {
             sb.append(HtmlUtils.hidden(ARG_NCL_OUTPUT, "comp"));
         }
-        if (!isCorrelation) {
+        if ( !isCorrelation) {
             StringBuilder plotTypes = new StringBuilder();
             plotTypes.append(
                 HtmlUtils.radio(
@@ -232,33 +225,31 @@ public class NCLModelPlotDataProcess extends Service {
                         false)));
             plotTypes.append(space1);
             plotTypes.append(Repository.msg("Google Earth"));
-    
-    
+
+
             sb.append(HtmlUtils.formEntry(Repository.msgLabel("Plot Type"),
                                           plotTypes.toString()));
-    
+
             // units
             if (SimpleUnit.isCompatible(units, "K")) {
                 StringBuilder unitsSB = new StringBuilder();
-                unitsSB.append(
-                    HtmlUtils.radio(
-                        ARG_NCL_UNITS, "K",
-                        RepositoryManager.getShouldButtonBeSelected(
-                            request, ARG_NCL_UNITS, "K", true)));
+                unitsSB.append(HtmlUtils.radio(ARG_NCL_UNITS, "K",
+                        RepositoryManager.getShouldButtonBeSelected(request,
+                            ARG_NCL_UNITS, "K", true)));
                 unitsSB.append(space1);
                 unitsSB.append(Repository.msg("Kelvin"));
                 unitsSB.append(space2);
-                unitsSB.append(
-                    HtmlUtils.radio(
-                        ARG_NCL_UNITS, "degC",
-                        RepositoryManager.getShouldButtonBeSelected(
-                            request, ARG_NCL_UNITS, "degC", false)));
+                unitsSB.append(HtmlUtils.radio(ARG_NCL_UNITS, "degC",
+                        RepositoryManager.getShouldButtonBeSelected(request,
+                            ARG_NCL_UNITS, "degC", false)));
                 unitsSB.append(space1);
                 unitsSB.append(Repository.msg("Celsius"));
-    
-    
-                sb.append(HtmlUtils.formEntry(Repository.msgLabel("Plot Units"),
-                                              unitsSB.toString()));
+
+
+                sb.append(
+                    HtmlUtils.formEntry(
+                        Repository.msgLabel("Plot Units"),
+                        unitsSB.toString()));
             } else if (SimpleUnit.isCompatible(units, "kg m-2 s-1")
                        || SimpleUnit.isCompatible(units, "mm/day")) {
                 sb.append(HtmlUtils.hidden(ARG_NCL_UNITS, "mm/day"));
@@ -297,7 +288,7 @@ public class NCLModelPlotDataProcess extends Service {
 
         sb.append(HtmlUtils.formEntry(Repository.msgLabel("Data Mask"),
                                       mbuttons.toString()));
-        
+
         // TODO:  For now, don't get value from request.  May not
         // be valid if variable changes.
         // Contour interval
@@ -324,23 +315,40 @@ public class NCLModelPlotDataProcess extends Service {
 
 
     }
-    
+
+    /**
+     * _more_
+     *
+     * @param input _more_
+     *
+     * @return _more_
+     */
     private Entry getFirstGridEntry(ServiceInput input) {
         List<Entry> entries = input.getEntries();
-        Entry first = null;
+        Entry       first   = null;
         for (Entry entry : entries) {
             if (isGridEntry(entry)) {
                 first = entry;
+
                 break;
             }
         }
+
         return first;
     }
-    
+
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     private boolean isGridEntry(Entry entry) {
         TypeHandler mytype = entry.getTypeHandler();
-        return mytype instanceof ClimateModelFileTypeHandler ||
-            mytype instanceof GridTypeHandler;
+
+        return (mytype instanceof ClimateModelFileTypeHandler)
+               || (mytype instanceof GridTypeHandler);
     }
 
     /**
@@ -364,9 +372,9 @@ public class NCLModelPlotDataProcess extends Service {
         List<ServiceOperand> ops           = input.getOperands();
         StringBuffer         fileList      = new StringBuffer();
         StringBuffer         nameList      = new StringBuffer();
-        StringBuffer         modelList      = new StringBuffer();
-        StringBuffer         ensList      = new StringBuffer();
-        StringBuffer         expList      = new StringBuffer();
+        StringBuffer         modelList     = new StringBuffer();
+        StringBuffer         ensList       = new StringBuffer();
+        StringBuffer         expList       = new StringBuffer();
         Entry                inputEntry    = getFirstGridEntry(input);
         boolean              haveOne       = false;
         boolean              haveGrid      = false;
@@ -408,7 +416,7 @@ public class NCLModelPlotDataProcess extends Service {
             suffix = "png";
         }
         String outputType = request.getString(ARG_NCL_OUTPUT, "comp");
-        String maskType = request.getString(ARG_NCL_MASKTYPE, "none");
+        String maskType   = request.getString(ARG_NCL_MASKTYPE, "none");
         File outFile = new File(IOUtil.joinDir(input.getProcessDir(),
                            wksName) + "." + suffix);
         CdmDataOutputHandler dataOutputHandler =
@@ -536,9 +544,9 @@ public class NCLModelPlotDataProcess extends Service {
             envMap.put("meridian", center);
         }
 
-        boolean haveAnom = fileList.toString().indexOf("anom") >= 0;
+        boolean haveAnom      = fileList.toString().indexOf("anom") >= 0;
         boolean isCorrelation = outputType.equals("corr");
-        String  colormap = "rainbow";
+        String  colormap      = "rainbow";
         if (outputType.equals("diff") || haveAnom || isCorrelation) {
             colormap = "testcmap";
         }
@@ -703,9 +711,11 @@ public class NCLModelPlotDataProcess extends Service {
         for (Entry entry : entries) {
             if ( !(entry.getTypeHandler()
                     instanceof ClimateModelFileTypeHandler)) {
-                if (entry.getTypeHandler() instanceof NoaaPsdMonthlyClimateIndexTypeHandler) {
+                if (entry.getTypeHandler()
+                        instanceof NoaaPsdMonthlyClimateIndexTypeHandler) {
                     continue;
                 }
+
                 return false;
             }
             uniqueModels.add(entry.getValue(1).toString());

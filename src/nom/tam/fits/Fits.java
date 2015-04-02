@@ -1,4 +1,12 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits;
+
+
+import nom.tam.util.*;
 
 /*
  * Copyright: Thomas McGlynn 1997-1999.
@@ -8,12 +16,14 @@ package nom.tam.fits;
  * derived software.
  */
 import java.io.*;
+
 import java.net.*;
+
 import java.util.*;
 
-import nom.tam.util.*;
 
-/** This class provides access to routines to allow users
+/**
+ * This class provides access to routines to allow users
  * to read and write FITS files.
  * <p>
  *
@@ -73,26 +83,34 @@ import nom.tam.util.*;
  */
 public class Fits {
 
-    /** The input stream associated with this Fits object.
+    /**
+     * The input stream associated with this Fits object.
      */
     private ArrayDataInput dataStr;
 
-    /** A vector of HDUs that have been added to this
+    /**
+     * A vector of HDUs that have been added to this
      * Fits object.
      */
     private Vector hduList = new Vector();
 
-    /** Has the input stream reached the EOF?
+    /**
+     * Has the input stream reached the EOF?
      */
     private boolean atEOF;
 
-    /** The last offset we reached.
+    /**
+     * The last offset we reached.
      *  A -1 is used to indicate that we
      *  cannot use the offset.
      */
     private long lastFileOffset = -1;
 
-    /** Indicate the version of these classes */
+    /**
+     * Indicate the version of these classes 
+     *
+     * @return _more_
+     */
     public static String version() {
 
         // Version 0.1: Original test FITS classes -- 9/96
@@ -135,7 +153,7 @@ public class Fits {
         //               to TableData, TableHDU, AsciiTable, BinaryTable and util/ColumnTable.
         //               Row deletions were suggested by code of R. Mathar but this works
         //               on all types of tables and implements the deletions at a lower level.
-        //		  Completely revised util.HashedList to use more standard features from
+        //                Completely revised util.HashedList to use more standard features from
         //               Collections.  The HashedList now melds a HashMap and ArrayList
         //               Added sort to HashedList function to enable sorting of the list.
         //               The logic now uses a simple index for the iterators rather than
@@ -356,54 +374,66 @@ public class Fits {
         return "1.081";
     }
 
-    /** Create an empty Fits object which is not
+    /**
+     * Create an empty Fits object which is not
      * associated with an input stream.
      */
-    public Fits() {
-    }
+    public Fits() {}
 
-    /** Create a Fits object associated with
+    /**
+     * Create a Fits object associated with
      * the given data stream.
      * Compression is determined from the first few bytes of the stream.
      * @param str The data stream.
+     *
+     * @throws FitsException _more_
      */
     public Fits(InputStream str) throws FitsException {
         streamInit(str, false);
     }
 
-    /** Create a Fits object associated with a data stream.
+    /**
+     * Create a Fits object associated with a data stream.
      * @param str The data stream.
      * @param compressed Is the stream compressed?  This is  currently ignored.
      *   Compression is determined from the first two bytes in the stream.
+     *
+     * @throws FitsException _more_
      */
-    public Fits(InputStream str, boolean compressed)
-            throws FitsException {
+    public Fits(InputStream str, boolean compressed) throws FitsException {
         streamInit(str);
     }
 
-    /** Initialize the stream.
+    /**
+     * Initialize the stream.
      *  @param str The user specified input stream
      *  @param seekable ignored
+     *
+     * @throws FitsException _more_
      */
     protected void streamInit(InputStream str, boolean seekable)
             throws FitsException {
         streamInit(str);
     }
 
-    /** Do the stream initialization.
+    /**
+     * Do the stream initialization.
      *
      * @param str The input stream.
      * @param compressed Is this data compressed?  This flag
      * is ignored.  The compression is determined from the stream content.
      * @param seekable Can one seek on the stream.  This parameter is ignored.
+     *
+     * @throws FitsException _more_
      */
     protected void streamInit(InputStream str, boolean compressed,
-            boolean seekable)
+                              boolean seekable)
             throws FitsException {
         streamInit(str);
     }
 
-    /** Initialize the input stream.  Mostly this
+    /**
+     * Initialize the input stream.  Mostly this
      *  checks to see if the stream is compressed and
      *  wraps the stream if necessary.  Even if the
      *  stream is not compressed, it will likely be wrapped
@@ -423,7 +453,8 @@ public class Fits {
         }
     }
 
-    /** Initialize using buffered random access.
+    /**
+     * Initialize using buffered random access.
      *  This implies that the data is uncompressed.
      * @param f
      * @throws FitsException
@@ -431,7 +462,7 @@ public class Fits {
     protected void randomInit(File f) throws FitsException {
 
         String permissions = "r";
-        if (!f.exists() || !f.canRead()) {
+        if ( !f.exists() || !f.canRead()) {
             throw new FitsException("Non-existent or unreadable file");
         }
         if (f.canWrite()) {
@@ -446,28 +477,38 @@ public class Fits {
         }
     }
 
-    /** Associate FITS object with a File.  If the file is
+    /**
+     * Associate FITS object with a File.  If the file is
      *  compressed a stream will be used, otherwise random access
      *  will be supported.
      * @param myFile The File object.
+     *
+     * @throws FitsException _more_
      */
     public Fits(File myFile) throws FitsException {
         this(myFile, FitsUtil.isCompressed(myFile));
     }
 
-    /** Associate the Fits object with a File
+    /**
+     * Associate the Fits object with a File
      * @param myFile The File object.
      * @param compressed Is the data compressed?
+     *
+     * @throws FitsException _more_
      */
     public Fits(File myFile, boolean compressed) throws FitsException {
         fileInit(myFile, compressed);
     }
 
-    /** Get a stream from the file and then use the stream initialization.
+    /**
+     * Get a stream from the file and then use the stream initialization.
      * @param myFile  The File to be associated.
      * @param compressed Is the data compressed?
+     *
+     * @throws FitsException _more_
      */
-    protected void fileInit(File myFile, boolean compressed) throws FitsException {
+    protected void fileInit(File myFile, boolean compressed)
+            throws FitsException {
 
         try {
             if (compressed) {
@@ -477,11 +518,13 @@ public class Fits {
                 randomInit(myFile);
             }
         } catch (IOException e) {
-            throw new FitsException("Unable to create Input Stream from File: " + myFile);
+            throw new FitsException(
+                "Unable to create Input Stream from File: " + myFile);
         }
     }
 
-    /** Associate the FITS object with a file or URL.
+    /**
+     * Associate the FITS object with a file or URL.
      *
      * The string is assumed to be a URL if it begins one of the
      * protocol strings.
@@ -492,12 +535,13 @@ public class Fits {
      * @param filename  The name of the file or URL to be processed.
      * @exception FitsException Thrown if unable to find or open
      *                          a file or URL from the string given.
-     **/
+     */
     public Fits(String filename) throws FitsException {
         this(filename, FitsUtil.isCompressed(filename));
     }
 
-    /** Associate the FITS object with a file or URL.
+    /**
+     * Associate the FITS object with a file or URL.
      *
      * The string is assumed to be a URL if it begins one of the
      * protocol strings.
@@ -506,9 +550,10 @@ public class Fits {
      * All string comparisons are case insensitive.
      *
      * @param filename  The name of the file or URL to be processed.
+     * @param compressed _more_
      * @exception FitsException Thrown if unable to find or open
      *                          a file or URL from the string given.
-     **/
+     */
     public Fits(String filename, boolean compressed) throws FitsException {
 
         InputStream inp;
@@ -517,12 +562,13 @@ public class Fits {
             throw new FitsException("Null FITS Identifier String");
         }
 
-        int len = filename.length();
-        String lc = filename.toLowerCase();
+        int    len = filename.length();
+        String lc  = filename.toLowerCase();
         try {
-            URL test = new URL(filename);
-            InputStream is = FitsUtil.getURLStream(new URL(filename), 0);
+            URL         test = new URL(filename);
+            InputStream is   = FitsUtil.getURLStream(new URL(filename), 0);
             streamInit(is);
+
             return;
         } catch (Exception e) {
             // Just try it as a file
@@ -531,12 +577,15 @@ public class Fits {
         File fil = new File(filename);
         if (fil.exists()) {
             fileInit(fil, compressed);
+
             return;
         }
 
 
         try {
-            InputStream str = ClassLoader.getSystemClassLoader().getResourceAsStream(filename);
+            InputStream str =
+                ClassLoader.getSystemClassLoader().getResourceAsStream(
+                    filename);
             streamInit(str);
         } catch (Exception e) {
             //
@@ -544,7 +593,8 @@ public class Fits {
 
     }
 
-    /** Associate the FITS object with a given uncompressed URL
+    /**
+     * Associate the FITS object with a given uncompressed URL
      * @param myURL  The URL to be associated with the FITS file.
      * @param compressed Compression flag, ignored.
      * @exception FitsException Thrown if unable to use the specified URL.
@@ -553,7 +603,8 @@ public class Fits {
         this(myURL);
     }
 
-    /** Associate the FITS object with a given URL
+    /**
+     * Associate the FITS object with a given URL
      * @param myURL
      * @exception FitsException Thrown if unable to find or open
      *                          a file or URL from the string given.
@@ -566,11 +617,14 @@ public class Fits {
         }
     }
 
-    /** Return all HDUs for the Fits object.   If the
+    /**
+     * Return all HDUs for the Fits object.   If the
      * FITS file is associated with an external stream make
      * sure that we have exhausted the stream.
      * @return an array of all HDUs in the Fits object.  Returns
      * null if there are no HDUs associated with this object.
+     *
+     * @throws FitsException _more_
      */
     public BasicHDU[] read() throws FitsException {
 
@@ -584,27 +638,34 @@ public class Fits {
 
         BasicHDU[] hdus = new BasicHDU[size];
         hduList.copyInto(hdus);
+
         return hdus;
     }
 
-    /** Read the next HDU on the default input stream.
+    /**
+     * Read the next HDU on the default input stream.
      * @return The HDU read, or null if an EOF was detected.
      * Note that null is only returned when the EOF is detected immediately
      * at the beginning of reading the HDU.
+     *
+     * @throws FitsException _more_
+     * @throws IOException _more_
      */
     public BasicHDU readHDU() throws FitsException, IOException {
 
-        if (dataStr == null || atEOF) {
+        if ((dataStr == null) || atEOF) {
             return null;
         }
 
-        if (dataStr instanceof nom.tam.util.RandomAccess && lastFileOffset > 0) {
+        if ((dataStr instanceof nom.tam.util.RandomAccess)
+                && (lastFileOffset > 0)) {
             FitsUtil.reposition(dataStr, lastFileOffset);
         }
 
         Header hdr = Header.readHeader(dataStr);
         if (hdr == null) {
             atEOF = true;
+
             return null;
         }
 
@@ -613,6 +674,7 @@ public class Fits {
             datum.read(dataStr);
         } catch (PaddingException e) {
             e.updateHeader(hdr);
+
             throw e;
         }
 
@@ -620,11 +682,16 @@ public class Fits {
         BasicHDU nextHDU = FitsFactory.HDUFactory(hdr, datum);
 
         hduList.addElement(nextHDU);
+
         return nextHDU;
     }
 
-    /** Skip HDUs on the associate input stream.
+    /**
+     * Skip HDUs on the associate input stream.
      * @param n The number of HDUs to be skipped.
+     *
+     * @throws FitsException _more_
+     * @throws IOException _more_
      */
     public void skipHDU(int n) throws FitsException, IOException {
         for (int i = 0; i < n; i += 1) {
@@ -632,7 +699,11 @@ public class Fits {
         }
     }
 
-    /** Skip the next HDU on the default input stream.
+    /**
+     * Skip the next HDU on the default input stream.
+     *
+     * @throws FitsException _more_
+     * @throws IOException _more_
      */
     public void skipHDU() throws FitsException, IOException {
 
@@ -642,6 +713,7 @@ public class Fits {
             Header hdr = new Header(dataStr);
             if (hdr == null) {
                 atEOF = true;
+
                 return;
             }
             int dataSize = (int) hdr.getDataSize();
@@ -649,12 +721,16 @@ public class Fits {
         }
     }
 
-    /** Return the n'th HDU.
+    /**
+     * Return the n'th HDU.
      * If the HDU is already read simply return a pointer to the
      * cached data.  Otherwise read the associated stream
      * until the n'th HDU is read.
      * @param n The index of the HDU to be read.  The primary HDU is index 0.
      * @return The n'th HDU or null if it could not be found.
+     *
+     * @throws FitsException _more_
+     * @throws IOException _more_
      */
     public BasicHDU getHDU(int n) throws FitsException, IOException {
 
@@ -675,10 +751,14 @@ public class Fits {
         }
     }
 
-    /** Read to the end of the associated input stream */
+    /**
+     * Read to the end of the associated input stream 
+     *
+     * @throws FitsException _more_
+     */
     private void readToEnd() throws FitsException {
 
-        while (dataStr != null && !atEOF) {
+        while ((dataStr != null) && !atEOF) {
             try {
                 if (readHDU() == null) {
                     break;
@@ -689,43 +769,52 @@ public class Fits {
         }
     }
 
-    /** Return the number of HDUs in the Fits object.   If the
+    /**
+     * Return the number of HDUs in the Fits object.   If the
      * FITS file is associated with an external stream make
      * sure that we have exhausted the stream.
      * @return number of HDUs.
      * @deprecated The meaning of size of ambiguous.  Use
+     *
+     * @throws FitsException _more_
      */
     public int size() throws FitsException {
         readToEnd();
+
         return getNumberOfHDUs();
     }
 
-    /** Add an HDU to the Fits object.  Users may intermix
+    /**
+     * Add an HDU to the Fits object.  Users may intermix
      * calls to functions which read HDUs from an associated
      * input stream with the addHDU and insertHDU calls,
      * but should be careful to understand the consequences.
      *
      * @param myHDU  The HDU to be added to the end of the FITS object.
+     *
+     * @throws FitsException _more_
      */
-    public void addHDU(BasicHDU myHDU)
-            throws FitsException {
+    public void addHDU(BasicHDU myHDU) throws FitsException {
         insertHDU(myHDU, getNumberOfHDUs());
     }
 
-    /** Insert a FITS object into the list of HDUs.
+    /**
+     * Insert a FITS object into the list of HDUs.
      *
      * @param myHDU The HDU to be inserted into the list of HDUs.
      * @param n     The location at which the HDU is to be inserted.
+     *
+     * @throws FitsException _more_
      */
-    public void insertHDU(BasicHDU myHDU, int n)
-            throws FitsException {
+    public void insertHDU(BasicHDU myHDU, int n) throws FitsException {
 
         if (myHDU == null) {
             return;
         }
 
-        if (n < 0 || n > getNumberOfHDUs()) {
-            throw new FitsException("Attempt to insert HDU at invalid location: " + n);
+        if ((n < 0) || (n > getNumberOfHDUs())) {
+            throw new FitsException(
+                "Attempt to insert HDU at invalid location: " + n);
         }
 
         try {
@@ -759,22 +848,26 @@ public class Fits {
 
     }
 
-    /** Delete an HDU from the HDU list.
+    /**
+     * Delete an HDU from the HDU list.
      *
      * @param n  The index of the HDU to be deleted.
      *           If n is 0 and there is more than one HDU present, then
      *           the next HDU will be converted from an image to
      *           primary HDU if possible.  If not a dummy header HDU
      *           will then be inserted.
+     *
+     * @throws FitsException _more_
      */
     public void deleteHDU(int n) throws FitsException {
         int size = getNumberOfHDUs();
-        if (n < 0 || n >= size) {
-            throw new FitsException("Attempt to delete non-existent HDU:" + n);
+        if ((n < 0) || (n >= size)) {
+            throw new FitsException("Attempt to delete non-existent HDU:"
+                                    + n);
         }
         try {
             hduList.removeElementAt(n);
-            if (n == 0 && size > 1) {
+            if ((n == 0) && (size > 1)) {
                 BasicHDU newFirst = (BasicHDU) hduList.elementAt(0);
                 if (newFirst.canBePrimary()) {
                     newFirst.setPrimaryHDU(true);
@@ -783,27 +876,32 @@ public class Fits {
                 }
             }
         } catch (NoSuchElementException e) {
-            throw new FitsException("Internal Error: hduList Vector Inconsitency");
+            throw new FitsException(
+                "Internal Error: hduList Vector Inconsitency");
         }
     }
 
-    /** Write a Fits Object to an external Stream.
+    /**
+     * Write a Fits Object to an external Stream.
      *
      * @param os  A DataOutput stream.
+     *
+     * @throws FitsException _more_
      */
     public void write(DataOutput os) throws FitsException {
 
         ArrayDataOutput obs;
-        boolean newOS = false;
+        boolean         newOS = false;
 
         if (os instanceof ArrayDataOutput) {
             obs = (ArrayDataOutput) os;
         } else if (os instanceof DataOutputStream) {
             newOS = true;
-            obs = new BufferedDataOutputStream((DataOutputStream) os);
+            obs   = new BufferedDataOutputStream((DataOutputStream) os);
         } else {
-            throw new FitsException("Cannot create ArrayDataOutput from class "
-                    + os.getClass().getName());
+            throw new FitsException(
+                "Cannot create ArrayDataOutput from class "
+                + os.getClass().getName());
         }
 
         BasicHDU hh;
@@ -813,7 +911,9 @@ public class Fits {
                 hh.write(obs);
             } catch (ArrayIndexOutOfBoundsException e) {
                 e.printStackTrace();
-                throw new FitsException("Internal Error: Vector Inconsistency" + e);
+
+                throw new FitsException(
+                    "Internal Error: Vector Inconsistency" + e);
             }
         }
         if (newOS) {
@@ -821,12 +921,14 @@ public class Fits {
                 obs.flush();
                 obs.close();
             } catch (IOException e) {
-                System.err.println("Warning: error closing FITS output stream");
+                System.err.println(
+                    "Warning: error closing FITS output stream");
             }
         }
         try {
             if (obs instanceof BufferedFile) {
-                ((BufferedFile) obs).setLength(((BufferedFile) obs).getFilePointer());
+                ((BufferedFile) obs).setLength(
+                    ((BufferedFile) obs).getFilePointer());
             }
         } catch (IOException e) {
             // Ignore problems...
@@ -834,10 +936,14 @@ public class Fits {
 
     }
 
-    /** Read a FITS file from an InputStream object.
+    /**
+     * Read a FITS file from an InputStream object.
      *
      * @param is The InputStream stream whence the FITS information
      *            is found.
+     *
+     * @throws FitsException _more_
+     * @throws IOException _more_
      */
     public void read(InputStream is) throws FitsException, IOException {
 
@@ -858,7 +964,8 @@ public class Fits {
 
     }
 
-    /** Get the current number of HDUs in the Fits object.
+    /**
+     * Get the current number of HDUs in the Fits object.
      * @return The number of HDU's in the object.
      * @deprecated See getNumberOfHDUs()
      */
@@ -866,14 +973,16 @@ public class Fits {
         return hduList.size();
     }
 
-    /** Get the current number of HDUs in the Fits object.
+    /**
+     * Get the current number of HDUs in the Fits object.
      * @return The number of HDU's in the object.
      */
     public int getNumberOfHDUs() {
         return hduList.size();
     }
 
-    /** Get the data stream used for the Fits Data.
+    /**
+     * Get the data stream used for the Fits Data.
      * @return The associated data stream.  Users may wish to
      *         call this function after opening a Fits object when
      *         they wish detailed control for writing some part of the FITS file.
@@ -882,49 +991,71 @@ public class Fits {
         return dataStr;
     }
 
-    /** Set the data stream to be used for future input.
+    /**
+     * Set the data stream to be used for future input.
      *
      * @param stream The data stream to be used.
      */
     public void setStream(ArrayDataInput stream) {
-        dataStr = stream;
-        atEOF = false;
+        dataStr        = stream;
+        atEOF          = false;
         lastFileOffset = -1;
     }
 
-    /** Create an HDU from the given header.
+    /**
+     * Create an HDU from the given header.
      *  @param h  The header which describes the FITS extension
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
      */
     public static BasicHDU makeHDU(Header h) throws FitsException {
         Data d = FitsFactory.dataFactory(h);
+
         return FitsFactory.HDUFactory(h, d);
     }
 
-    /** Create an HDU from the given data kernel.
+    /**
+     * Create an HDU from the given data kernel.
      *  @param o The data to be described in this HDU.
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
      */
     public static BasicHDU makeHDU(Object o) throws FitsException {
         return FitsFactory.HDUFactory(o);
     }
 
-    /** Create an HDU from the given Data.
+    /**
+     * Create an HDU from the given Data.
      *  @param datum The data to be described in this HDU.
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
      */
     public static BasicHDU makeHDU(Data datum) throws FitsException {
         Header hdr = new Header();
         datum.fillHeader(hdr);
+
         return FitsFactory.HDUFactory(hdr, datum);
     }
 
     /**
      * Add or update the CHECKSUM keyword.
      * @param hdu the  HDU to be updated.
+     *
+     * @throws java.io.IOException _more_
+     * @throws nom.tam.fits.FitsException _more_
      * @throws nom.tam.fits.HeaderCardException
      * @author R J Mathar
      * @since 2005-10-05
      */
     public static void setChecksum(BasicHDU hdu)
-            throws nom.tam.fits.HeaderCardException, nom.tam.fits.FitsException, java.io.IOException {
+            throws nom.tam.fits.HeaderCardException,
+                   nom.tam.fits.FitsException, java.io.IOException {
         /* the next line with the delete is needed to avoid some unexpected
          *  problems with non.tam.fits.Header.checkCard() which otherwise says
          *  it expected PCOUNT and found DATE.
@@ -946,31 +1077,32 @@ public class Fits {
          * the correct implementation is in the write() interface.
          */
         ByteArrayOutputStream hduByteImage = new ByteArrayOutputStream();
-        BufferedDataOutputStream bdos = new BufferedDataOutputStream(hduByteImage);
+        BufferedDataOutputStream bdos =
+            new BufferedDataOutputStream(hduByteImage);
 
         // DATASUM keyword.
         hdu.getData().write(bdos);
         bdos.flush();
-        byte[] data = hduByteImage.toByteArray();
-        long checksum = checksum(data);
+        byte[] data     = hduByteImage.toByteArray();
+        long   checksum = checksum(data);
         hdu.write(new BufferedDataOutputStream(hduByteImage));
         long csd = checksum(data);
-        hdu.getHeader().addValue("DATASUM", ""+csd, "Checksum of data");
-        
+        hdu.getHeader().addValue("DATASUM", "" + csd, "Checksum of data");
+
         // We already have the checsum of the data.  Lets compute it for
         // the header.
         hduByteImage.reset();
         hdu.getHeader().write(bdos);
         bdos.flush();
         data = hduByteImage.toByteArray();
-        
-        long csh = checksum(data);
-        
+
+        long csh   = checksum(data);
+
         long cshdu = csh + csd;
         // If we had a carry it should go into the
         // beginning.
-        while ( (cshdu & 0xFFFFFFFF00000000L) != 0) {
-            cshdu = (cshdu&0xFFFFFFFFL) + 1;
+        while ((cshdu & 0xFFFFFFFF00000000L) != 0) {
+            cshdu = (cshdu & 0xFFFFFFFFL) + 1;
         }
         /* This time we do not use a deleteKey() to ensure that the keyword is replaced "in place".
          * Note that the value of the checksum is actually independent to a permutation of the
@@ -981,13 +1113,16 @@ public class Fits {
 
     /**
      * Add or Modify the CHECKSUM keyword in all headers.
+     *
+     * @throws java.io.IOException _more_
      * @throws nom.tam.fits.HeaderCardException
      * @throws nom.tam.fits.FitsException
      * @author R J Mathar
      * @since 2005-10-05
      */
     public void setChecksum()
-            throws nom.tam.fits.HeaderCardException, nom.tam.fits.FitsException, java.io.IOException {
+            throws nom.tam.fits.HeaderCardException,
+                   nom.tam.fits.FitsException, java.io.IOException {
         for (int i = 0; i < getNumberOfHDUs(); i += 1) {
             setChecksum(getHDU(i));
         }
@@ -1010,8 +1145,8 @@ public class Fits {
      * @since 2005-10-05
      */
     public static long checksum(final byte[] data) {
-        long hi = 0;
-        long lo = 0;
+        long      hi  = 0;
+        long      lo  = 0;
         final int len = 2 * (data.length / 4);
         // System.out.println(data.length + " bytes") ;
         final int remain = data.length % 4;
@@ -1041,46 +1176,54 @@ public class Fits {
 
         long hicarry = hi >>> 16;
         long locarry = lo >>> 16;
-        while (hicarry != 0 || locarry != 0) {
-            hi = (hi & 0xffffL) + locarry;
-            lo = (lo & 0xffffL) + hicarry;
+        while ((hicarry != 0) || (locarry != 0)) {
+            hi      = (hi & 0xffffL) + locarry;
+            lo      = (lo & 0xffffL) + hicarry;
             hicarry = hi >>> 16;
             locarry = lo >>> 16;
         }
+
         return (hi << 16) + lo;
     }
 
     /**
      * Encode a 32bit integer according to the Seaman-Pence proposal.
      * @param c the checksum previously calculated
+     * @param compl _more_
      * @return the encoded string of 16 bytes.
      * @see http://heasarc.gsfc.nasa.gov/docs/heasarc/ofwg/docs/general/checksum/node14.html#SECTION00035000000000000000
      * @author R J Mathar
      * @since 2005-10-05
      */
     private static String checksumEnc(final long c, final boolean compl) {
-        byte[] asc = new byte[16];
-        final int[] exclude = {0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f, 0x40, 0x5b, 0x5c, 0x5d, 0x5e, 0x5f, 0x60};
-        final long[] mask = {0xff000000L, 0xff0000L, 0xff00L, 0xffL};
-        final int offset = 0x30;	/* ASCII 0 (zero */
-        final long value = compl ? ~c : c;
+        byte[]      asc     = new byte[16];
+        final int[] exclude = {
+            0x3a, 0x3b, 0x3c, 0x3d, 0x3e, 0x3f, 0x40, 0x5b, 0x5c, 0x5d, 0x5e,
+            0x5f, 0x60
+        };
+        final long[] mask   = { 0xff000000L, 0xff0000L, 0xff00L, 0xffL };
+        final int    offset = 0x30;  /* ASCII 0 (zero */
+        final long   value  = compl
+                              ? ~c
+                              : c;
         for (int i = 0; i < 4; i++) {
-            final int byt = (int) ((value & mask[i]) >>> (24 - 8 * i));	// each byte becomes four
-            final int quotient = byt / 4 + offset;
+            final int byt = (int) ((value & mask[i]) >>> (24 - 8 * i));  // each byte becomes four
+            final int quotient  = byt / 4 + offset;
             final int remainder = byt % 4;
-            int[] ch = new int[4];
+            int[]     ch        = new int[4];
             for (int j = 0; j < 4; j++) {
                 ch[j] = quotient;
             }
 
             ch[0] += remainder;
             boolean check = true;
-            for (; check;) // avoid ASCII punctuation
+            for (; check; )  // avoid ASCII punctuation
             {
                 check = false;
                 for (int k = 0; k < exclude.length; k++) {
                     for (int j = 0; j < 4; j += 2) {
-                        if (ch[j] == exclude[k] || ch[j + 1] == exclude[k]) {
+                        if ((ch[j] == exclude[k])
+                                || (ch[j + 1] == exclude[k])) {
                             ch[j]++;
                             ch[j + 1]--;
                             check = true;
@@ -1089,7 +1232,8 @@ public class Fits {
                 }
             }
 
-            for (int j = 0; j < 4; j++) // assign the bytes
+            for (int j = 0; j < 4;
+                    j++)  // assign the bytes
             {
                 asc[4 * j + i] = (byte) (ch[j]);
             }
@@ -1098,10 +1242,12 @@ public class Fits {
         // shift the bytes 1 to the right circularly.
         try {
             String resul = AsciiFuncs.asciiString(asc, 15, 1);
+
             return resul.concat(AsciiFuncs.asciiString(asc, 0, 15));
         } catch (Exception e) {
             // Impossible I hope
             System.err.println("CheckSum Error finding ASCII encoding");
+
             return null;
         }
     }

@@ -1,9 +1,18 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits;
 
+
 import nom.tam.util.*;
+
 import java.io.*;
 
-/** This class supports the FITS heap.  This
+
+/**
+ * This class supports the FITS heap.  This
  *  is currently used for variable length columns
  *  in binary tables.
  */
@@ -11,36 +20,53 @@ public class FitsHeap implements FitsElement {
 
     /** The storage buffer */
     private byte[] heap;
+
     /** The current used size of the buffer <= heap.length */
     private int heapSize;
+
     /** The offset within a file where the heap begins */
     private long fileOffset = -1;
+
     /** Has the heap ever been expanded? */
     private boolean expanded = false;
+
     /** The stream the last read used */
     private ArrayDataInput input;
-    /** Our current offset into the heap.  When we read from
+
+    /**
+     * Our current offset into the heap.  When we read from
      *  the heap we use a byte array input stream.  So long
      *  as we continue to read further into the heap, we can
      *  continue to use the same stream, but we need to
      *  recreate the stream whenever we skip backwards.
      */
     private int heapOffset = 0;
+
     /** A stream used to read the heap data */
     private BufferedDataInputStream bstr;
 
-    /** Create a heap of a given size. */
+    /**
+     * Create a heap of a given size. 
+     *
+     * @param size _more_
+     */
     FitsHeap(int size) {
-        heap = new byte[size];
+        heap     = new byte[size];
         heapSize = size;
     }
 
-    /** Read the heap */
+    /**
+     * Read the heap 
+     *
+     * @param str _more_
+     *
+     * @throws FitsException _more_
+     */
     public void read(ArrayDataInput str) throws FitsException {
 
         if (str instanceof RandomAccess) {
             fileOffset = FitsUtil.findOffset(str);
-            input = str;
+            input      = str;
         }
 
         if (heap != null) {
@@ -54,7 +80,13 @@ public class FitsHeap implements FitsElement {
         bstr = null;
     }
 
-    /** Write the heap */
+    /**
+     * Write the heap 
+     *
+     * @param str _more_
+     *
+     * @throws FitsException _more_
+     */
     public void write(ArrayDataOutput str) throws FitsException {
         try {
             str.write(heap, 0, heapSize);
@@ -63,13 +95,23 @@ public class FitsHeap implements FitsElement {
         }
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean rewriteable() {
-        return fileOffset >= 0 && input instanceof ArrayDataOutput && !expanded;
+        return (fileOffset >= 0) && (input instanceof ArrayDataOutput)
+               && !expanded;
     }
 
-    /** Attempt to rewrite the heap with the current contents.
+    /**
+     * Attempt to rewrite the heap with the current contents.
      *  Note that no checking is done to make sure that the
      *  heap does not extend past its prior boundaries.
+     *
+     * @throws FitsException _more_
+     * @throws IOException _more_
      */
     public void rewrite() throws IOException, FitsException {
         if (rewriteable()) {
@@ -82,27 +124,36 @@ public class FitsHeap implements FitsElement {
 
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean reset() {
         try {
             FitsUtil.reposition(input, fileOffset);
+
             return true;
         } catch (Exception e) {
             return false;
         }
     }
 
-    /** Get data from the heap.
+    /**
+     * Get data from the heap.
      *  @param offset The offset at which the data begins.
      *  @param array  The array to be extracted.
+     *
+     * @throws FitsException _more_
      */
     public void getData(int offset, Object array) throws FitsException {
 
         try {
             // Can we reuse the existing byte stream?
-            if (bstr == null || heapOffset > offset) {
+            if ((bstr == null) || (heapOffset > offset)) {
                 heapOffset = 0;
                 bstr = new BufferedDataInputStream(
-                        new ByteArrayInputStream(heap));
+                    new ByteArrayInputStream(heap));
             }
 
             bstr.skipBytes(offset - heapOffset);
@@ -110,13 +161,17 @@ public class FitsHeap implements FitsElement {
             heapOffset += bstr.readLArray(array);
 
         } catch (IOException e) {
-            throw new FitsException("Error decoding heap area at offset=" + offset
-                    + ".  Exception: Exception " + e);
+            throw new FitsException("Error decoding heap area at offset="
+                                    + offset + ".  Exception: Exception "
+                                    + e);
         }
     }
 
-    /** Check if the Heap can accommodate a given requirement.
+    /**
+     * Check if the Heap can accommodate a given requirement.
      *  If not expand the heap.
+     *
+     * @param need _more_
      */
     void expandHeap(int need) {
 
@@ -135,7 +190,15 @@ public class FitsHeap implements FitsElement {
         }
     }
 
-    /** Add some data to the heap. */
+    /**
+     * Add some data to the heap. 
+     *
+     * @param data _more_
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
+     */
     int putData(Object data) throws FitsException {
 
         long lsize = ArrayFuncs.computeLSize(data);
@@ -152,7 +215,8 @@ public class FitsHeap implements FitsElement {
             o.flush();
             o.close();
         } catch (IOException e) {
-            throw new FitsException("Unable to write variable column length data");
+            throw new FitsException(
+                "Unable to write variable column length data");
         }
 
         System.arraycopy(bo.toByteArray(), 0, heap, heapSize, size);
@@ -162,17 +226,29 @@ public class FitsHeap implements FitsElement {
         return oldOffset;
     }
 
-    /** Return the size of the Heap */
+    /**
+     * Return the size of the Heap 
+     *
+     * @return _more_
+     */
     public int size() {
         return heapSize;
     }
 
-    /** Return the size of the heap using the more bean compatbile format */
+    /**
+     * Return the size of the heap using the more bean compatbile format 
+     *
+     * @return _more_
+     */
     public long getSize() {
         return size();
     }
 
-    /** Get the file offset of the heap */
+    /**
+     * Get the file offset of the heap 
+     *
+     * @return _more_
+     */
     public long getFileOffset() {
         return fileOffset;
     }

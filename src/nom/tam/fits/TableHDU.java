@@ -1,19 +1,32 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits;
 
-import java.util.Iterator;
+
 import nom.tam.util.Cursor;
 
-/** This class allows FITS binary and ASCII tables to
+import java.util.Iterator;
+
+
+/**
+ * This class allows FITS binary and ASCII tables to
  *  be accessed via a common interface.
  *
  *  Bug Fix: 3/28/01 to findColumn.
  */
 public abstract class TableHDU extends BasicHDU {
 
+    /** _more_          */
     private TableData table;
+
+    /** _more_          */
     private int currentColumn;
 
-    /** Create the TableHDU.  Note that this
+    /**
+     * Create the TableHDU.  Note that this
      *  will normally only be invoked by subclasses
      *  in the FITS package.
      * @param td  The data for the table.
@@ -22,115 +35,199 @@ public abstract class TableHDU extends BasicHDU {
         table = td;
     }
 
-    /** Get a specific row of the table */
+    /**
+     * Get a specific row of the table 
+     *
+     * @param row _more_
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
+     */
     public Object[] getRow(int row) throws FitsException {
         return table.getRow(row);
     }
 
-    /** Get a specific column of the table where
+    /**
+     * Get a specific column of the table where
      *  the column name is specified using the TTYPEn keywords
      *  in the header.
      * @param colName  The name of the column to be extracted.
+     *
+     * @return _more_
      * @throws FitsException
      */
     public Object getColumn(String colName) throws FitsException {
         return getColumn(findColumn(colName));
     }
 
-    /** Get a specific column from the table using 0-based column
+    /**
+     * Get a specific column from the table using 0-based column
      *  indexing.
+     *
+     * @param col _more_
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
      */
     public Object getColumn(int col) throws FitsException {
         return table.getColumn(col);
     }
 
-    /** Get all of the columns of the table.
+    /**
+     * Get all of the columns of the table.
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
      */
     public Object[] getColumns() throws FitsException {
         Object[] result = new Object[getNCols()];
         for (int i = 0; i < result.length; i += 1) {
             result[i] = getColumn(i);
         }
+
         return result;
     }
 
-    /** Get a specific element of the table using 0-based indices.
+    /**
+     * Get a specific element of the table using 0-based indices.
      *
+     *
+     * @param row _more_
+     * @param col _more_
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
      */
     public Object getElement(int row, int col) throws FitsException {
         return table.getElement(row, col);
     }
 
-    /** Update a row within a table.
+    /**
+     * Update a row within a table.
      *
+     *
+     * @param row _more_
+     * @param newRow _more_
+     *
+     * @throws FitsException _more_
      */
     public void setRow(int row, Object[] newRow) throws FitsException {
         table.setRow(row, newRow);
     }
 
-    /** Update a column within a table.  The new column should have the
+    /**
+     * Update a column within a table.  The new column should have the
      *  same format as the column being replaced.
+     *
+     * @param colName _more_
+     * @param newCol _more_
+     *
+     * @throws FitsException _more_
      */
-    public void setColumn(String colName, Object newCol) throws FitsException {
+    public void setColumn(String colName, Object newCol)
+            throws FitsException {
         setColumn(findColumn(colName), newCol);
     }
 
-    /** Update a column within a table.  The new column should have the same
+    /**
+     * Update a column within a table.  The new column should have the same
      *   format ast the column being replaced.
+     *
+     * @param col _more_
+     * @param newCol _more_
+     *
+     * @throws FitsException _more_
      */
     public void setColumn(int col, Object newCol) throws FitsException {
         table.setColumn(col, newCol);
     }
 
-    /** Update a single element within the table.
+    /**
+     * Update a single element within the table.
+     *
+     * @param row _more_
+     * @param col _more_
+     * @param element _more_
+     *
+     * @throws FitsException _more_
      */
-    public void setElement(int row, int col, Object element) throws FitsException {
+    public void setElement(int row, int col, Object element)
+            throws FitsException {
         table.setElement(row, col, element);
     }
 
-    /** Add a row to the end of the table. If this is the first row,
+    /**
+     * Add a row to the end of the table. If this is the first row,
      *  then this will add appropriate columns for each of the entries.
+     *
+     * @param newRow _more_
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
      */
     public int addRow(Object[] newRow) throws FitsException {
 
         int row = table.addRow(newRow);
         myHeader.addValue("NAXIS2", row, "ntf::tablehdu:naxis2:1");
+
         return row;
     }
 
-    /** Find the 0-based column index corresponding to a particular
+    /**
+     * Find the 0-based column index corresponding to a particular
      *  column name.
+     *
+     * @param colName _more_
+     *
+     * @return _more_
      */
     public int findColumn(String colName) {
 
         for (int i = 0; i < getNCols(); i += 1) {
 
             String val = myHeader.getStringValue("TTYPE" + (i + 1));
-            if (val != null && val.trim().equals(colName)) {
+            if ((val != null) && val.trim().equals(colName)) {
                 return i;
             }
         }
+
         return -1;
     }
 
-    /** Add a column to the table. */
+    /**
+     * Add a column to the table. 
+     *
+     * @param data _more_
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
+     */
     public abstract int addColumn(Object data) throws FitsException;
 
-    /** Get the number of columns for this table
+    /**
+     * Get the number of columns for this table
      * @return The number of columns in the table.
      */
     public int getNCols() {
         return table.getNCols();
     }
 
-    /** Get the number of rows for this table
+    /**
+     * Get the number of rows for this table
      * @return The number of rows in the table.
      */
     public int getNRows() {
         return table.getNRows();
     }
 
-    /** Get the name of a column in the table.
+    /**
+     * Get the name of a column in the table.
      * @param index The 0-based column index.
      * @return The column name.
      * @exception FitsException if an invalid index was requested.
@@ -141,15 +238,26 @@ public abstract class TableHDU extends BasicHDU {
         if (ttype != null) {
             ttype = ttype.trim();
         }
+
         return ttype;
     }
 
+    /**
+     * _more_
+     *
+     * @param index _more_
+     * @param name _more_
+     * @param comment _more_
+     *
+     * @throws FitsException _more_
+     */
     public void setColumnName(int index, String name, String comment)
             throws FitsException {
         setColumnMeta(index, "TTYPE", name, comment, true);
     }
 
-    /** Specify column metadata for a given column in a way that
+    /**
+     * Specify column metadata for a given column in a way that
      *  allows all of the column metadata for a given column
      *  to be organized together.
      *
@@ -161,60 +269,115 @@ public abstract class TableHDU extends BasicHDU {
      *                (true), or immediately before the TFORM card (false).
      * @throws FitsException
      */
-    public void setColumnMeta(int index, String key, String value, String comment, boolean after)
+    public void setColumnMeta(int index, String key, String value,
+                              String comment, boolean after)
             throws FitsException {
         setCurrentColumn(index, after);
         myHeader.addValue(key + (index + 1), value, comment);
     }
 
-    /** Convenience method for getting column data.  Note that this works
+    /**
+     * Convenience method for getting column data.  Note that this works
      *  only for metadata that returns a string value.  This is equivalent
      *  to getStringValue(type+index);
+     *
+     * @param index _more_
+     * @param type _more_
+     *
+     * @return _more_
      */
     public String getColumnMeta(int index, String type) {
-        return myHeader.getStringValue(type+(index+1));
+        return myHeader.getStringValue(type + (index + 1));
     }
 
-    public void setColumnMeta(int index, String key, String value, String comment)
+    /**
+     * _more_
+     *
+     * @param index _more_
+     * @param key _more_
+     * @param value _more_
+     * @param comment _more_
+     *
+     * @throws FitsException _more_
+     */
+    public void setColumnMeta(int index, String key, String value,
+                              String comment)
             throws FitsException {
         setColumnMeta(index, key, value, comment, true);
     }
 
-    public void setColumnMeta(int index, String key, long value, String comment, boolean after)
+    /**
+     * _more_
+     *
+     * @param index _more_
+     * @param key _more_
+     * @param value _more_
+     * @param comment _more_
+     * @param after _more_
+     *
+     * @throws FitsException _more_
+     */
+    public void setColumnMeta(int index, String key, long value,
+                              String comment, boolean after)
             throws FitsException {
         setCurrentColumn(index, after);
         myHeader.addValue(key + (index + 1), value, comment);
     }
 
-    public void setColumnMeta(int index, String key, double value, String comment, boolean after)
+    /**
+     * _more_
+     *
+     * @param index _more_
+     * @param key _more_
+     * @param value _more_
+     * @param comment _more_
+     * @param after _more_
+     *
+     * @throws FitsException _more_
+     */
+    public void setColumnMeta(int index, String key, double value,
+                              String comment, boolean after)
             throws FitsException {
         setCurrentColumn(index, after);
         myHeader.addValue(key + (index + 1), value, comment);
     }
 
-    public void setColumnMeta(int index, String key, boolean value, String comment, boolean after)
+    /**
+     * _more_
+     *
+     * @param index _more_
+     * @param key _more_
+     * @param value _more_
+     * @param comment _more_
+     * @param after _more_
+     *
+     * @throws FitsException _more_
+     */
+    public void setColumnMeta(int index, String key, boolean value,
+                              String comment, boolean after)
             throws FitsException {
         setCurrentColumn(index, after);
         myHeader.addValue(key + (index + 1), value, comment);
     }
 
-    /** Get the FITS type of a column in the table.
+    /**
+     * Get the FITS type of a column in the table.
      * @param index The 0-based index of the column.
      * @return The FITS type.
      * @exception FitsException if an invalid index was requested.
      */
-    public String getColumnFormat(int index)
-            throws FitsException {
+    public String getColumnFormat(int index) throws FitsException {
         int flds = myHeader.getIntValue("TFIELDS", 0);
-        if (index < 0 || index >= flds) {
-            throw new FitsException("Bad column index " + index + " (only " + flds
-                    + " columns)");
+        if ((index < 0) || (index >= flds)) {
+            throw new FitsException("Bad column index " + index + " (only "
+                                    + flds + " columns)");
         }
 
         return myHeader.getStringValue("TFORM" + (index + 1)).trim();
     }
 
-    /** Set the cursor in the header to point after the
+    /**
+     * Set the cursor in the header to point after the
      * metadata for the specified column
      * @param col  The 0-based index of the column
      */
@@ -222,7 +385,8 @@ public abstract class TableHDU extends BasicHDU {
         setCurrentColumn(col, true);
     }
 
-    /** Set the cursor in the header to point either before the
+    /**
+     * Set the cursor in the header to point either before the
      *  TFORM value or after the column metadat
      * @param col    The 0-based index of the column
      * @param after  True if the cursor should be placed after the existing column
@@ -245,6 +409,8 @@ public abstract class TableHDU extends BasicHDU {
      * changes to AsciiTable so that it can be done easily for both Binary and ASCII tables.
      * @param row the (0-based) index of the first row to be deleted.
      * @throws FitsExcpetion if an error occurs.
+     *
+     * @throws FitsException _more_
      */
     public void deleteRows(final int row) throws FitsException {
         deleteRows(row, getNRows() - row);
@@ -256,14 +422,15 @@ public abstract class TableHDU extends BasicHDU {
      * in the ColumnTable class abd AsciiTable so that we can do
      * it for all FITS tables.
      * @param firstRow the (0-based) index of the first row to be deleted.
-     *	This is zero-based indexing: 0<=firstrow< number of rows.
+     *  This is zero-based indexing: 0<=firstrow< number of rows.
      * @param nRow the total number of rows to be deleted.
      * @throws FitsException  If an error occurs in the deletion.
      */
-    public void deleteRows(final int firstRow, int nRow) throws FitsException {
+    public void deleteRows(final int firstRow, int nRow)
+            throws FitsException {
 
         // Just ignore invalid requests.
-        if (nRow <= 0 || firstRow >= getNRows() || nRow <= 0) {
+        if ((nRow <= 0) || (firstRow >= getNRows()) || (nRow <= 0)) {
             return;
         }
 
@@ -276,38 +443,62 @@ public abstract class TableHDU extends BasicHDU {
         myHeader.setNaxis(2, getNRows());
     }
 
-    /** Delete a set of columns from a table.
+    /**
+     * Delete a set of columns from a table.
+     *
+     * @param column _more_
+     * @param len _more_
+     *
+     * @throws FitsException _more_
      */
-    public void deleteColumnsIndexOne(int column, int len) throws FitsException {
+    public void deleteColumnsIndexOne(int column, int len)
+            throws FitsException {
         deleteColumnsIndexZero(column - 1, len);
     }
 
-    /** Delete a set of columns from a table.
+    /**
+     * Delete a set of columns from a table.
+     *
+     * @param column _more_
+     * @param len _more_
+     *
+     * @throws FitsException _more_
      */
-    public void deleteColumnsIndexZero(int column, int len) throws FitsException {
+    public void deleteColumnsIndexZero(int column, int len)
+            throws FitsException {
         deleteColumnsIndexZero(column, len, columnKeyStems());
     }
 
-    /** Delete a set of columns from a table.
+    /**
+     * Delete a set of columns from a table.
      *  @param column The one-indexed start column.
      *  @param len    The number of columns to delete.
      *  @param fields Stems for the header fields to be removed
      *                for the table.
+     *
+     * @throws FitsException _more_
      */
-    public void deleteColumnsIndexOne(int column, int len, String[] fields) throws FitsException {
+    public void deleteColumnsIndexOne(int column, int len, String[] fields)
+            throws FitsException {
         deleteColumnsIndexZero(column - 1, len, fields);
     }
 
-    /** Delete a set of columns from a table.
+    /**
+     * Delete a set of columns from a table.
      *  @param column The zero-indexed start column.
      *  @param len    The number of columns to delete.
      *  @param fields Stems for the header fields to be removed
      *                for the table.
+     *
+     * @throws FitsException _more_
      */
-    public void deleteColumnsIndexZero(int column, int len, String[] fields) throws FitsException {
+    public void deleteColumnsIndexZero(int column, int len, String[] fields)
+            throws FitsException {
 
-        if (column < 0 || len < 0 || column + len > getNCols()) {
-            throw new FitsException("Illegal columns deletion request- Start:" + column + " Len:" + len + " from table with " + getNCols() + " columns");
+        if ((column < 0) || (len < 0) || (column + len > getNCols())) {
+            throw new FitsException(
+                "Illegal columns deletion request- Start:" + column + " Len:"
+                + len + " from table with " + getNCols() + " columns");
         }
 
         if (len == 0) {
@@ -343,9 +534,12 @@ public abstract class TableHDU extends BasicHDU {
         table.updateAfterDelete(ncol, myHeader);
     }
 
-    /** Get the stems of the keywords that are associated
+    /**
+     * Get the stems of the keywords that are associated
      *  with table columns.  Users can supplement this
      *  with their own and call the appropriate deleteColumns fields.
+     *
+     * @return _more_
      */
     public abstract String[] columnKeyStems();
 }

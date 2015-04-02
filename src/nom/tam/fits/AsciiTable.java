@@ -1,61 +1,85 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits;
 
+
 import nom.tam.util.*;
-import java.lang.reflect.Array;
-import java.io.IOException;
+
 import java.io.EOFException;
+import java.io.IOException;
+
+import java.lang.reflect.Array;
+
 
 /** An ASCII table. */
 public class AsciiTable extends Data implements TableData {
 
     /** The number of rows in the table */
     private int nRows;
+
     /** The number of fields in the table */
     private int nFields;
+
     /** The number of bytes in a row */
     private int rowLen;
+
     /** The null string for the field */
     private String[] nulls;
+
     /** The type of data in the field */
     private Class[] types;
+
     /** The offset from the beginning of the row at which the field starts */
     private int[] offsets;
+
     /** The number of bytes in the field */
     private int[] lengths;
+
     /** The byte buffer used to read/write the ASCII table */
     private byte[] buffer;
+
     /** Markers indicating fields that are null */
     private boolean[] isNull;
-    /** An array of arrays giving the data in the table in
+
+    /**
+     * An array of arrays giving the data in the table in
      * binary numbers
      */
     private Object[] data;
-    /** The parser used to convert from buffer to data.
+
+    /**
+     * The parser used to convert from buffer to data.
      */
     ByteParser bp;
+
     /** The actual stream used to input data */
     ArrayDataInput currInput;
 
-    /** Create an ASCII table given a header
+    /**
+     * Create an ASCII table given a header
      * @param hdr   The header describing the table
      * @throws FitsException
      */
     public AsciiTable(Header hdr) throws FitsException {
 
-        nRows = hdr.getIntValue("NAXIS2");
+        nRows   = hdr.getIntValue("NAXIS2");
         nFields = hdr.getIntValue("TFIELDS");
-        rowLen = hdr.getIntValue("NAXIS1");
+        rowLen  = hdr.getIntValue("NAXIS1");
 
-        types = new Class[nFields];
+        types   = new Class[nFields];
         offsets = new int[nFields];
         lengths = new int[nFields];
-        nulls = new String[nFields];
+        nulls   = new String[nFields];
 
         for (int i = 0; i < nFields; i += 1) {
             offsets[i] = hdr.getIntValue("TBCOL" + (i + 1)) - 1;
             String s = hdr.getStringValue("TFORM" + (i + 1));
-            if (offsets[i] < 0 || s == null) {
-                throw new FitsException("Invalid Specification for column:" + (i + 1));
+            if ((offsets[i] < 0) || (s == null)) {
+                throw new FitsException("Invalid Specification for column:"
+                                        + (i + 1));
             }
             s = s.trim();
             char c = s.charAt(0);
@@ -66,23 +90,31 @@ public class AsciiTable extends Data implements TableData {
             lengths[i] = Integer.parseInt(s);
 
             switch (c) {
-                case 'A':
-                    types[i] = String.class;
-                    break;
-                case 'I':
-                    if (lengths[i] > 10) {
-                        types[i] = long.class;
-                    } else {
-                        types[i] = int.class;
-                    }
-                    break;
-                case 'F':
-                case 'E':
-                    types[i] = float.class;
-                    break;
-                case 'D':
-                    types[i] = double.class;
-                    break;
+
+              case 'A' :
+                  types[i] = String.class;
+
+                  break;
+
+              case 'I' :
+                  if (lengths[i] > 10) {
+                      types[i] = long.class;
+                  } else {
+                      types[i] = int.class;
+                  }
+
+                  break;
+
+              case 'F' :
+              case 'E' :
+                  types[i] = float.class;
+
+                  break;
+
+              case 'D' :
+                  types[i] = double.class;
+
+                  break;
             }
 
             nulls[i] = hdr.getStringValue("TNULL" + (i + 1));
@@ -95,20 +127,21 @@ public class AsciiTable extends Data implements TableData {
     /** Create an empty ASCII table */
     public AsciiTable() {
 
-        data = new Object[0];
-        buffer = null;
+        data    = new Object[0];
+        buffer  = null;
         nFields = 0;
-        nRows = 0;
-        rowLen = 0;
-        types = new Class[0];
+        nRows   = 0;
+        rowLen  = 0;
+        types   = new Class[0];
         lengths = new int[0];
         offsets = new int[0];
-        nulls = new String[0];
+        nulls   = new String[0];
     }
 
-    /** Read in an ASCII table.  Reading is deferred if
+    /**
+     * Read in an ASCII table.  Reading is deferred if
      *  we are reading from a random access device
-     * @param str 
+     * @param str
      * @throws FitsException
      */
 
@@ -139,15 +172,25 @@ public class AsciiTable extends Data implements TableData {
         try {
             str.skipBytes(FitsUtil.padding(nRows * rowLen));
         } catch (EOFException e) {
-            throw new PaddingException("EOF skipping padding after ASCII Table:" + e, this);
+            throw new PaddingException(
+                "EOF skipping padding after ASCII Table:" + e, this);
         } catch (IOException e) {
-            throw new FitsException("Error skipping padding after ASCII Table:" + e);
+            throw new FitsException(
+                "Error skipping padding after ASCII Table:" + e);
         }
     }
 
-    /** Read some data into the buffer.
+    /**
+     * Read some data into the buffer.
+     *
+     * @param size _more_
+     * @param offset _more_
+     *
+     * @throws FitsException _more_
+     * @throws IOException _more_
      */
-    private void getBuffer(int size, long offset) throws IOException, FitsException {
+    private void getBuffer(int size, long offset)
+            throws IOException, FitsException {
 
         if (currInput == null) {
             throw new IOException("No stream open to read");
@@ -161,7 +204,8 @@ public class AsciiTable extends Data implements TableData {
         bp = new ByteParser(buffer);
     }
 
-    /** Get the ASCII table information.
+    /**
+     * Get the ASCII table information.
      *  This will actually do the read if it had previously been deferred
      * @return The table data as an Object[] array.
      * @throws FitsException
@@ -183,7 +227,9 @@ public class AsciiTable extends Data implements TableData {
                     getBuffer(nRows * rowLen, fileOffset);
 
                 } catch (IOException e) {
-                    throw new FitsException("Error in deferred read -- file closed prematurely?:" + e);
+                    throw new FitsException(
+                        "Error in deferred read -- file closed prematurely?:"
+                        + e);
                 }
                 FitsUtil.reposition(currInput, newOffset);
             }
@@ -194,7 +240,8 @@ public class AsciiTable extends Data implements TableData {
             for (int i = 0; i < nRows; i += 1) {
                 rowOffset = rowLen * i;
                 for (int j = 0; j < nFields; j += 1) {
-                    if (!extractElement(rowOffset + offsets[j], lengths[j], data, j, i, nulls[j])) {
+                    if ( !extractElement(rowOffset + offsets[j], lengths[j],
+                                         data, j, i, nulls[j])) {
                         if (isNull == null) {
                             isNull = new boolean[nRows * nFields];
                         }
@@ -208,16 +255,21 @@ public class AsciiTable extends Data implements TableData {
         return data;
     }
 
-    /** Move an element from the buffer into a data array.
+    /**
+     * Move an element from the buffer into a data array.
      * @param offset  The offset within buffer at which the element starts.
      * @param length  The number of bytes in the buffer for the element.
      * @param array   An array of objects, each of which is a simple array.
      * @param col     Which element of array is to be modified?
      * @param row     Which index into that element is to be modified?
      * @param nullFld What string signifies a null element?
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
      */
     private boolean extractElement(int offset, int length, Object[] array,
-            int col, int row, String nullFld)
+                                   int col, int row, String nullFld)
             throws FitsException {
 
         bp.setOffset(offset);
@@ -241,16 +293,19 @@ public class AsciiTable extends Data implements TableData {
             } else if (array[col] instanceof long[]) {
                 ((long[]) array[col])[row] = bp.getLong(length);
             } else {
-                throw new FitsException("Invalid type for ASCII table conversion:" + array[col]);
+                throw new FitsException(
+                    "Invalid type for ASCII table conversion:" + array[col]);
             }
         } catch (FormatException e) {
-            throw new FitsException("Error parsing data at row,col:" + row + "," + col
-                    + "  " + e);
+            throw new FitsException("Error parsing data at row,col:" + row
+                                    + "," + col + "  " + e);
         }
+
         return true;
     }
 
-    /** Get a column of data
+    /**
+     * Get a column of data
      * @param col  The 0-indexed column to be returned.
      * @return The column object -- typically as a 1-d array.
      * @throws FitsException
@@ -260,10 +315,12 @@ public class AsciiTable extends Data implements TableData {
         if (data == null) {
             getData();
         }
+
         return data[col];
     }
 
-    /** Get a row.  If the data has not yet been read just
+    /**
+     * Get a row.  If the data has not yet been read just
      *  read this row.
      * @param row The 0-indexed row to be returned.
      * @return A row of data.
@@ -279,7 +336,8 @@ public class AsciiTable extends Data implements TableData {
         }
     }
 
-    /** Get a single element as a one-d array.
+    /**
+     * Get a single element as a one-d array.
      *  We return String's as arrays for consistency though
      *  they could be returned as a scalar.
      * @param row The 0-based row
@@ -296,43 +354,63 @@ public class AsciiTable extends Data implements TableData {
         }
     }
 
-    /** Extract a single row from a table.  This returns
+    /**
+     * Extract a single row from a table.  This returns
      *  an array of Objects each of which is an array of length 1.
+     *
+     * @param row _more_
+     *
+     * @return _more_
      */
     private Object[] singleRow(int row) {
 
 
         Object[] res = new Object[nFields];
         for (int i = 0; i < nFields; i += 1) {
-            if (isNull == null || !isNull[row * nFields + i]) {
+            if ((isNull == null) || !isNull[row * nFields + i]) {
                 res[i] = ArrayFuncs.newInstance(types[i], 1);
                 System.arraycopy(data[i], row, res[i], 0, 1);
             }
         }
+
         return res;
     }
 
-    /** Extract a single element from a table.  This returns
+    /**
+     * Extract a single element from a table.  This returns
      *  an array of length 1.
+     *
+     * @param row _more_
+     * @param col _more_
+     *
+     * @return _more_
      */
     private Object singleElement(int row, int col) {
 
         Object res = null;
-        if (isNull == null || !isNull[row * nFields + col]) {
+        if ((isNull == null) || !isNull[row * nFields + col]) {
             res = ArrayFuncs.newInstance(types[col], 1);
             System.arraycopy(data[col], row, res, 0, 1);
         }
+
         return res;
     }
 
-    /** Read a single row from the table.  This returns
+    /**
+     * Read a single row from the table.  This returns
      *  a set of arrays of dimension 1.
+     *
+     * @param row _more_
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
      */
     private Object[] parseSingleRow(int row) throws FitsException {
 
-        int offset = row * rowLen;
+        int      offset = row * rowLen;
 
-        Object[] res = new Object[nFields];
+        Object[] res    = new Object[nFields];
 
         try {
             getBuffer(rowLen, fileOffset + row * rowLen);
@@ -342,18 +420,28 @@ public class AsciiTable extends Data implements TableData {
 
         for (int i = 0; i < nFields; i += 1) {
             res[i] = ArrayFuncs.newInstance(types[i], 1);
-            if (!extractElement(offsets[i], lengths[i], res, i, 0, nulls[i])) {
+            if ( !extractElement(offsets[i], lengths[i], res, i, 0,
+                                 nulls[i])) {
                 res[i] = null;
             }
         }
 
         // Invalidate buffer for future use.
         buffer = null;
+
         return res;
     }
 
-    /** Read a single element from the table.  This returns
+    /**
+     * Read a single element from the table.  This returns
      *  an array of dimension 1.
+     *
+     * @param row _more_
+     * @param col _more_
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
      */
     private Object parseSingleElement(int row, int col) throws FitsException {
 
@@ -362,22 +450,26 @@ public class AsciiTable extends Data implements TableData {
             getBuffer(lengths[col], fileOffset + row * rowLen + offsets[col]);
         } catch (IOException e) {
             buffer = null;
+
             throw new FitsException("Unable to read element");
         }
         res[0] = ArrayFuncs.newInstance(types[col], 1);
 
         if (extractElement(0, lengths[col], res, 0, 0, nulls[col])) {
             buffer = null;
+
             return res[0];
 
         } else {
 
             buffer = null;
+
             return null;
         }
     }
 
-    /** Write the data to an output stream.
+    /**
+     * Write the data to an output stream.
      * @param str  The output stream to be written to
      * @throws FitsException if any IO exception is found or
      *                       some inconsistency the FITS file arises.
@@ -394,7 +486,8 @@ public class AsciiTable extends Data implements TableData {
         if (buffer == null) {
 
             if (data == null) {
-                throw new FitsException("Attempt to write undefined ASCII Table");
+                throw new FitsException(
+                    "Attempt to write undefined ASCII Table");
             }
 
             if ((long) nRows * rowLen > Integer.MAX_VALUE) {
@@ -403,7 +496,7 @@ public class AsciiTable extends Data implements TableData {
 
             buffer = new byte[nRows * rowLen];
 
-            bp = new ByteParser(buffer);
+            bp     = new ByteParser(buffer);
             for (int i = 0; i < buffer.length; i += 1) {
                 buffer[i] = (byte) ' ';
             }
@@ -416,12 +509,13 @@ public class AsciiTable extends Data implements TableData {
 
                 for (int j = 0; j < nFields; j += 1) {
                     int offset = i * rowLen + offsets[j];
-                    int len = lengths[j];
+                    int len    = lengths[j];
 
                     try {
-                        if (isNull != null && isNull[i * nFields + j]) {
+                        if ((isNull != null) && isNull[i * nFields + j]) {
                             if (nulls[j] == null) {
-                                throw new FitsException("No null value set when needed");
+                                throw new FitsException(
+                                    "No null value set when needed");
                             }
                             bf.format(nulls[j], buffer, offset, len);
                         } else {
@@ -443,7 +537,8 @@ public class AsciiTable extends Data implements TableData {
                             }
                         }
                     } catch (TruncationException e) {
-                        System.err.println("Ignoring truncation error:" + i + "," + j);
+                        System.err.println("Ignoring truncation error:" + i
+                                           + "," + j);
                     }
                 }
             }
@@ -458,7 +553,8 @@ public class AsciiTable extends Data implements TableData {
         }
     }
 
-    /** Replace a column with new data.
+    /**
+     * Replace a column with new data.
      * @param col      The 0-based index to the column
      * @param newData  The column data.  This is typically a 1-d array.
      * @throws FitsException
@@ -468,9 +564,9 @@ public class AsciiTable extends Data implements TableData {
         if (data == null) {
             getData();
         }
-        if (col < 0 || col >= nFields
-                || newData.getClass() != data[col].getClass()
-                || Array.getLength(newData) != Array.getLength(data[col])) {
+        if ((col < 0) || (col >= nFields)
+                || (newData.getClass() != data[col].getClass())
+                || (Array.getLength(newData) != Array.getLength(data[col]))) {
             throw new FitsException("Invalid column/column mismatch:" + col);
         }
         data[col] = newData;
@@ -480,7 +576,8 @@ public class AsciiTable extends Data implements TableData {
 
     }
 
-    /** Modify a row in the table
+    /**
+     * Modify a row in the table
      * @param row       The 0-based index of the row
      * @param newData   The new data.  Each element of this array is typically
      *                  a primitive[1] array.
@@ -488,7 +585,7 @@ public class AsciiTable extends Data implements TableData {
      */
 
     public void setRow(int row, Object[] newData) throws FitsException {
-        if (row < 0 || row > nRows) {
+        if ((row < 0) || (row > nRows)) {
             throw new FitsException("Invalid row in setRow");
         }
 
@@ -499,7 +596,8 @@ public class AsciiTable extends Data implements TableData {
             try {
                 System.arraycopy(newData[i], 0, data[i], row, 1);
             } catch (Exception e) {
-                throw new FitsException("Unable to modify row: incompatible data:" + row);
+                throw new FitsException(
+                    "Unable to modify row: incompatible data:" + row);
             }
             setNull(row, i, false);
         }
@@ -509,14 +607,16 @@ public class AsciiTable extends Data implements TableData {
 
     }
 
-    /** Modify an element in the table
+    /**
+     * Modify an element in the table
      * @param row   the 0-based row
      * @param col   the 0-based column
      * @param newData The new value for the column.  Typically a primitive[1] array.
      * @throws FitsException
      */
 
-    public void setElement(int row, int col, Object newData) throws FitsException {
+    public void setElement(int row, int col, Object newData)
+            throws FitsException {
 
         if (data == null) {
             getData();
@@ -524,7 +624,8 @@ public class AsciiTable extends Data implements TableData {
         try {
             System.arraycopy(newData, 0, data[col], row, 1);
         } catch (Exception e) {
-            throw new FitsException("Incompatible element:" + row + "," + col);
+            throw new FitsException("Incompatible element:" + row + ","
+                                    + col);
         }
         setNull(row, col, false);
 
@@ -533,7 +634,8 @@ public class AsciiTable extends Data implements TableData {
 
     }
 
-    /** Mark (or unmark) an element as null.  Note that if this FITS file is latter
+    /**
+     * Mark (or unmark) an element as null.  Note that if this FITS file is latter
      *  written out, a TNULL keyword needs to be defined in the corresponding
      *  header.  This routine does not add an element for String columns.
      * @param row   The 0-based row.
@@ -554,7 +656,8 @@ public class AsciiTable extends Data implements TableData {
         buffer = null;
     }
 
-    /** See if an element is null.
+    /**
+     * See if an element is null.
      * @param row  The 0-based row
      * @param col  The 0-based column
      * @return if the given element has been nulled.
@@ -567,12 +670,13 @@ public class AsciiTable extends Data implements TableData {
         }
     }
 
-    /** Add a column to the table. Users should be cautious
+    /**
+     * Add a column to the table. Users should be cautious
      *  of calling this routine directly rather than the corresponding
      *  routine in AsciiTableHDU since this routine knows nothing
      *  of the FITS header modifications required.
      * @param newCol  the new column information.  This is typically a
-     * primitive[n] or String[n] array. 
+     * primitive[n] or String[n] array.
      * @return the number of fields in the table
      * @throws FitsException
      */
@@ -583,7 +687,7 @@ public class AsciiTable extends Data implements TableData {
 
             String[] sa = (String[]) newCol;
             for (int i = 0; i < sa.length; i += 1) {
-                if (sa[i] != null && sa[i].length() > maxLen) {
+                if ((sa[i] != null) && (sa[i].length() > maxLen)) {
                     maxLen = sa[i].length();
                 }
             }
@@ -595,7 +699,7 @@ public class AsciiTable extends Data implements TableData {
             maxLen = 20;
         } else if (newCol instanceof float[]) {
             maxLen = 16;
-        }  else {
+        } else {
             throw new FitsException("Adding invalid type to ASCII table");
         }
         addColumn(newCol, maxLen);
@@ -606,7 +710,8 @@ public class AsciiTable extends Data implements TableData {
         return nFields;
     }
 
-    /** This version of addColumn allows the user to override
+    /**
+     * This version of addColumn allows the user to override
      *  the default length associated with each column type.
      * @param newCol    The new column data
      * @param length    the requested length for the column
@@ -615,19 +720,20 @@ public class AsciiTable extends Data implements TableData {
      */
     public int addColumn(Object newCol, int length) throws FitsException {
 
-        if (nFields > 0 && Array.getLength(newCol) != nRows) {
-            throw new FitsException("New column has different number of rows");
+        if ((nFields > 0) && (Array.getLength(newCol) != nRows)) {
+            throw new FitsException(
+                "New column has different number of rows");
         }
 
         if (nFields == 0) {
             nRows = Array.getLength(newCol);
         }
 
-        Object[] newData = new Object[nFields + 1];
-        int[] newOffsets = new int[nFields + 1];
-        int[] newLengths = new int[nFields + 1];
-        Class[] newTypes = new Class[nFields + 1];
-        String[] newNulls = new String[nFields + 1];
+        Object[] newData    = new Object[nFields + 1];
+        int[]    newOffsets = new int[nFields + 1];
+        int[]    newLengths = new int[nFields + 1];
+        Class[]  newTypes   = new Class[nFields + 1];
+        String[] newNulls   = new String[nFields + 1];
 
         System.arraycopy(data, 0, newData, 0, nFields);
         System.arraycopy(offsets, 0, newOffsets, 0, nFields);
@@ -635,18 +741,18 @@ public class AsciiTable extends Data implements TableData {
         System.arraycopy(types, 0, newTypes, 0, nFields);
         System.arraycopy(nulls, 0, newNulls, 0, nFields);
 
-        data = newData;
-        offsets = newOffsets;
-        lengths = newLengths;
-        types = newTypes;
-        nulls = newNulls;
+        data             = newData;
+        offsets          = newOffsets;
+        lengths          = newLengths;
+        types            = newTypes;
+        nulls            = newNulls;
 
         newData[nFields] = newCol;
         offsets[nFields] = rowLen + 1;
         lengths[nFields] = length;
-        types[nFields] = ArrayFuncs.getBaseClass(newCol);
+        types[nFields]   = ArrayFuncs.getBaseClass(newCol);
 
-        rowLen += length + 1;
+        rowLen           += length + 1;
         if (isNull != null) {
             boolean[] newIsNull = new boolean[nRows * (nFields + 1)];
             // Fix the null pointers.
@@ -669,7 +775,8 @@ public class AsciiTable extends Data implements TableData {
         return nFields;
     }
 
-    /** Add a row to the FITS table.
+    /**
+     * Add a row to the FITS table.
      * @param newRow   The new row data.
      * @return The number of rows after this is added.
      * @throws FitsException
@@ -706,7 +813,8 @@ public class AsciiTable extends Data implements TableData {
         return nRows;
     }
 
-    /** Delete rows from a FITS table
+    /**
+     * Delete rows from a FITS table
      * @param start The first (0-indexed) row to be deleted.
      * @param len   The number of rows to be deleted.
      * @throws FitsException
@@ -714,7 +822,7 @@ public class AsciiTable extends Data implements TableData {
 
     public void deleteRows(int start, int len) throws FitsException {
 
-        if (nRows == 0 || start < 0 || start >= nRows || len <= 0) {
+        if ((nRows == 0) || (start < 0) || (start >= nRows) || (len <= 0)) {
             return;
         }
         if (start + len > nRows) {
@@ -725,7 +833,8 @@ public class AsciiTable extends Data implements TableData {
             for (int i = 0; i < nFields; i += 1) {
                 Object o = ArrayFuncs.newInstance(types[i], nRows - len);
                 System.arraycopy(data[i], 0, o, 0, start);
-                System.arraycopy(data[i], start + len, o, start, nRows - len - start);
+                System.arraycopy(data[i], start + len, o, start,
+                                 nRows - len - start);
                 data[i] = o;
             }
             nRows -= len;
@@ -734,18 +843,23 @@ public class AsciiTable extends Data implements TableData {
         }
     }
 
-    /** Set the null string for a columns.
+    /**
+     * Set the null string for a columns.
      *  This is not a public method since we
      *  want users to call the method in AsciiTableHDU
      *  and update the header also.
+     *
+     * @param col _more_
+     * @param newNull _more_
      */
     void setNullString(int col, String newNull) {
-        if (col >= 0 && col < nulls.length) {
+        if ((col >= 0) && (col < nulls.length)) {
             nulls[col] = newNull;
         }
     }
 
-    /** Return the size of the data section
+    /**
+     * Return the size of the data section
      * @return The size in bytes of the data section, not includeing the padding.
      */
 
@@ -753,7 +867,8 @@ public class AsciiTable extends Data implements TableData {
         return (long) (nRows) * rowLen;
     }
 
-    /** Fill in a header with information that points to this
+    /**
+     * Fill in a header with information that points to this
      *  data.
      * @param hdr The header to be updated with information appropriate
      * to the current table data.
@@ -770,9 +885,13 @@ public class AsciiTable extends Data implements TableData {
             Cursor iter = hdr.iterator();
             iter.setKey("NAXIS2");
             iter.next();
-            iter.add("PCOUNT", new HeaderCard("PCOUNT", 0,"ntf::asciitable:pcount:1"));
-            iter.add("GCOUNT", new HeaderCard("GCOUNT", 1, "ntf::asciitable:gcount:1"));
-            iter.add("TFIELDS", new HeaderCard("TFIELDS", nFields, "ntf::asciitable:tfields:1"));
+            iter.add("PCOUNT",
+                     new HeaderCard("PCOUNT", 0, "ntf::asciitable:pcount:1"));
+            iter.add("GCOUNT",
+                     new HeaderCard("GCOUNT", 1, "ntf::asciitable:gcount:1"));
+            iter.add("TFIELDS",
+                     new HeaderCard("TFIELDS", nFields,
+                                    "ntf::asciitable:tfields:1"));
 
             for (int i = 0; i < nFields; i += 1) {
                 addColInfo(i, iter);
@@ -784,13 +903,22 @@ public class AsciiTable extends Data implements TableData {
 
     }
 
+    /**
+     * _more_
+     *
+     * @param col _more_
+     * @param iter _more_
+     *
+     * @return _more_
+     *
+     * @throws HeaderCardException _more_
+     */
     int addColInfo(int col, Cursor iter) throws HeaderCardException {
 
         String tform = null;
         if (types[col] == String.class) {
             tform = "A" + lengths[col];
-        } else if (types[col] == int.class
-                || types[col] == long.class) {
+        } else if ((types[col] == int.class) || (types[col] == long.class)) {
             tform = "I" + lengths[col];
         } else if (types[col] == float.class) {
             tform = "E" + lengths[col] + ".0";
@@ -801,11 +929,15 @@ public class AsciiTable extends Data implements TableData {
         key = "TFORM" + (col + 1);
         iter.add(key, new HeaderCard(key, tform, "ntf::asciitable:tformN:1"));
         key = "TBCOL" + (col + 1);
-        iter.add(key, new HeaderCard(key, offsets[col] + 1, "ntf::asciitable:tbcolN:1"));
+        iter.add(key,
+                 new HeaderCard(key, offsets[col] + 1,
+                                "ntf::asciitable:tbcolN:1"));
+
         return lengths[col];
     }
 
-    /** Get the number of rows in the table
+    /**
+     * Get the number of rows in the table
      * @return The number of rows.
      */
 
@@ -813,7 +945,8 @@ public class AsciiTable extends Data implements TableData {
         return nRows;
     }
 
-    /** Get the number of columns in the table
+    /**
+     * Get the number of columns in the table
      * @return The number of columns
      */
 
@@ -821,14 +954,16 @@ public class AsciiTable extends Data implements TableData {
         return nFields;
     }
 
-    /** Get the number of bytes in a row
+    /**
+     * Get the number of bytes in a row
      * @return The number of bytes for a single row in the table.
      */
     public int getRowLen() {
         return rowLen;
     }
 
-    /** Delete columns from the table.
+    /**
+     * Delete columns from the table.
      * @param start  The first, 0-indexed, column to be deleted.
      * @param len    The number of columns to be deleted.
      * @throws FitsException
@@ -838,11 +973,11 @@ public class AsciiTable extends Data implements TableData {
 
         getData();
 
-        Object[] newData = new Object[nFields - len];
-        int[] newOffsets = new int[nFields - len];
-        int[] newLengths = new int[nFields - len];
-        Class[] newTypes = new Class[nFields - len];
-        String[] newNulls = new String[nFields - len];
+        Object[] newData    = new Object[nFields - len];
+        int[]    newOffsets = new int[nFields - len];
+        int[]    newLengths = new int[nFields - len];
+        Class[]  newTypes   = new Class[nFields - len];
+        String[] newNulls   = new String[nFields - len];
 
         // Copy in the initial stuff...
         System.arraycopy(data, 0, newData, 0, start);
@@ -852,24 +987,28 @@ public class AsciiTable extends Data implements TableData {
         System.arraycopy(nulls, 0, newNulls, 0, start);
 
         // Copy in the final
-        System.arraycopy(data, start + len, newData, start, nFields - start - len);
+        System.arraycopy(data, start + len, newData, start,
+                         nFields - start - len);
         // Don't do the offsets here.
-        System.arraycopy(lengths, start + len, newLengths, start, nFields - start - len);
-        System.arraycopy(types, start + len, newTypes, start, nFields - start - len);
-        System.arraycopy(nulls, start + len, newNulls, start, nFields - start - len);
+        System.arraycopy(lengths, start + len, newLengths, start,
+                         nFields - start - len);
+        System.arraycopy(types, start + len, newTypes, start,
+                         nFields - start - len);
+        System.arraycopy(nulls, start + len, newNulls, start,
+                         nFields - start - len);
 
         for (int i = start; i < start + len; i += 1) {
             rowLen -= (lengths[i] + 1);
         }
 
-        data = newData;
+        data    = newData;
         offsets = newOffsets;
         lengths = newLengths;
-        types = newTypes;
-        nulls = newNulls;
+        types   = newTypes;
+        nulls   = newNulls;
 
         if (isNull != null) {
-            boolean found = false;
+            boolean   found     = false;
 
             boolean[] newIsNull = new boolean[nRows * (nFields - len)];
             for (int i = 0; i < nRows; i += 1) {
@@ -877,7 +1016,7 @@ public class AsciiTable extends Data implements TableData {
                 int newOff = (nFields - len) * i;
                 for (int col = 0; col < start; col += 1) {
                     newIsNull[newOff + col] = isNull[oldOff + col];
-                    found = found || isNull[oldOff + col];
+                    found                   = found || isNull[oldOff + col];
                 }
                 for (int col = start + len; col < nFields; col += 1) {
                     newIsNull[newOff + col - len] = isNull[oldOff + col];
@@ -892,24 +1031,27 @@ public class AsciiTable extends Data implements TableData {
         }
 
         // Invalidate the buffer
-        buffer = null;
+        buffer  = null;
 
         nFields -= len;
     }
 
-    /** This is called after we delete columns.  The HDU
+    /**
+     * This is called after we delete columns.  The HDU
      *  doesn't know how to update the TBCOL entries.
      * @param oldNCol   The number of columns we had before deletion.
      * @param hdr       The associated header.
      * @throws FitsException
      */
 
-    public void updateAfterDelete(int oldNCol, Header hdr) throws FitsException {
+    public void updateAfterDelete(int oldNCol, Header hdr)
+            throws FitsException {
 
         int offset = 0;
         for (int i = 0; i < nFields; i += 1) {
             offsets[i] = offset;
-            hdr.addValue("TBCOL" + (i + 1), offset + 1, "ntf::asciitable:tbcolN:2");
+            hdr.addValue("TBCOL" + (i + 1), offset + 1,
+                         "ntf::asciitable:tbcolN:2");
             offset += lengths[i] + 1;
         }
         for (int i = nFields; i < oldNCol; i += 1) {

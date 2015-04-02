@@ -1,3 +1,8 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits;
 /* Copyright: Thomas McGlynn 1997-1998.
  * This code may be used for any purpose, non-commercial
@@ -8,32 +13,42 @@ package nom.tam.fits;
  * improvements, enhancements and bug fixes.
  */
 
-import nom.tam.util.ArrayFuncs;
-import nom.tam.util.BufferedDataInputStream;
+
 import nom.tam.image.ImageTiler;
 
-/** FITS image header/data unit */
-public class ImageHDU
-        extends BasicHDU {
+import nom.tam.util.ArrayFuncs;
+import nom.tam.util.BufferedDataInputStream;
 
-    /** Build an image HDU using the supplied data.
+
+/** FITS image header/data unit */
+public class ImageHDU extends BasicHDU {
+
+    /**
+     * Build an image HDU using the supplied data.
      * @param h the header for the image.
      * @param d the data used in the image.
      * @exception FitsException if there was a problem with the data.
      */
-    public ImageHDU(Header h, Data d)
-            throws FitsException {
-        myData = d;
+    public ImageHDU(Header h, Data d) throws FitsException {
+        myData   = d;
         myHeader = h;
 
     }
 
-    /** Indicate that Images can appear at the beginning of a FITS dataset */
+    /**
+     * Indicate that Images can appear at the beginning of a FITS dataset 
+     *
+     * @return _more_
+     */
     protected boolean canBePrimary() {
         return true;
     }
 
-    /** Change the Image from/to primary */
+    /**
+     * Change the Image from/to primary 
+     *
+     * @param status _more_
+     */
     protected void setPrimaryHDU(boolean status) {
 
         try {
@@ -49,13 +64,16 @@ public class ImageHDU
         }
     }
 
-    /** Check that this HDU has a valid header for this type.
+    /**
+     * Check that this HDU has a valid header for this type.
+     *
+     * @param hdr _more_
      * @return <CODE>true</CODE> if this HDU has a valid header.
      */
     public static boolean isHeader(Header hdr) {
         boolean found = false;
         found = hdr.getBooleanValue("SIMPLE");
-        if (!found) {
+        if ( !found) {
             String s = hdr.getStringValue("XTENSION");
             if (s != null) {
                 if (s.trim().equals("IMAGE") || s.trim().equals("IUEIMAGE")) {
@@ -63,19 +81,23 @@ public class ImageHDU
                 }
             }
         }
-        if (!found) {
+        if ( !found) {
             return false;
         }
+
         return !hdr.getBooleanValue("GROUPS");
     }
 
-    /** Check if this object can be described as a FITS image.
+    /**
+     * Check if this object can be described as a FITS image.
      *  @param o    The Object being tested.
+     *
+     * @return _more_
      */
     public static boolean isData(Object o) {
         String s = o.getClass().getName();
 
-        int i;
+        int    i;
         for (i = 0; i < s.length(); i += 1) {
             if (s.charAt(i) != '[') {
                 break;
@@ -84,36 +106,46 @@ public class ImageHDU
 
         // Allow all non-boolean/Object arrays.
         // This does not check the rectangularity of the array though.
-        if (i <= 0 || s.charAt(i) == 'L' || s.charAt(i) == 'Z') {
+        if ((i <= 0) || (s.charAt(i) == 'L') || (s.charAt(i) == 'Z')) {
             return false;
         } else {
             return true;
         }
     }
 
-    /** Create a Data object to correspond to the header description.
+    /**
+     * Create a Data object to correspond to the header description.
      * @return An unfilled Data object which can be used to read
      *         in the data for this HDU.
      * @exception FitsException if the image extension could not be created.
      */
-    public Data manufactureData()
-            throws FitsException {
+    public Data manufactureData() throws FitsException {
         return manufactureData(myHeader);
     }
 
-    public static Data manufactureData(Header hdr)
-            throws FitsException {
+    /**
+     * _more_
+     *
+     * @param hdr _more_
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
+     */
+    public static Data manufactureData(Header hdr) throws FitsException {
         return new ImageData(hdr);
     }
 
-    /** Create a  header that describes the given
+    /**
+     * Create a  header that describes the given
      * image data.
      * @param d The image to be described.
+     *
+     * @return _more_
      * @exception FitsException if the object does not contain
-     *		valid image data.
+     *          valid image data.
      */
-    public static Header manufactureHeader(Data d)
-            throws FitsException {
+    public static Header manufactureHeader(Data d) throws FitsException {
 
         if (d == null) {
             return null;
@@ -125,16 +157,30 @@ public class ImageHDU
         return h;
     }
 
-    /** Encapsulate an object as an ImageHDU. */
+    /**
+     * Encapsulate an object as an ImageHDU. 
+     *
+     * @param o _more_
+     *
+     * @return _more_
+     *
+     * @throws FitsException _more_
+     */
     public static Data encapsulate(Object o) throws FitsException {
         return new ImageData(o);
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public ImageTiler getTiler() {
         return ((ImageData) myData).getTiler();
     }
 
-    /** Print out some information about this HDU.
+    /**
+     * Print out some information about this HDU.
      */
     public void info() {
         if (isHeader(myHeader)) {
@@ -144,12 +190,13 @@ public class ImageHDU
         }
 
         System.out.println("      Header Information:");
-        System.out.println("         BITPIX=" + myHeader.getIntValue("BITPIX", -1));
+        System.out.println("         BITPIX="
+                           + myHeader.getIntValue("BITPIX", -1));
         int naxis = myHeader.getIntValue("NAXIS", -1);
         System.out.println("         NAXIS=" + naxis);
         for (int i = 1; i <= naxis; i += 1) {
             System.out.println("         NAXIS" + i + "="
-                    + myHeader.getIntValue("NAXIS" + i, -1));
+                               + myHeader.getIntValue("NAXIS" + i, -1));
         }
 
         System.out.println("      Data information:");
@@ -157,8 +204,9 @@ public class ImageHDU
             if (myData.getData() == null) {
                 System.out.println("        No Data");
             } else {
-                System.out.println("         "
-                        + ArrayFuncs.arrayDescription(myData.getData()));
+                System.out.println(
+                    "         "
+                    + ArrayFuncs.arrayDescription(myData.getData()));
             }
         } catch (Exception e) {
             System.out.println("      Unable to get data");

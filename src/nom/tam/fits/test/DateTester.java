@@ -1,17 +1,30 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits.test;
 
-import org.junit.Test;
-import static org.junit.Assert.assertEquals;
+
 import junit.framework.JUnit4TestAdapter;
 
 import nom.tam.fits.FitsDate;
 
-/** Test the FITS date class.
+import org.junit.Test;
+
+import static org.junit.Assert.assertEquals;
+
+
+/**
+ * Test the FITS date class.
  *  This class is derived from the internal testing utilities
  *  in FitsDate written by David Glowacki.
  */
 public class DateTester {
 
+    /**
+     * _more_
+     */
     @Test
     public void test() {
 
@@ -38,9 +51,17 @@ public class DateTester {
         assertEquals("t1", false, testArg("nn/nn/nn"));
     }
 
+    /**
+     * _more_
+     *
+     * @param arg _more_
+     *
+     * @return _more_
+     */
     boolean testArg(String arg) {
         try {
             FitsDate fd = new FitsDate(arg);
+
             return true;
         } catch (Exception e) {
             return false;

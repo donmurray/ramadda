@@ -1,12 +1,18 @@
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+*/
 package nom.tam.fits;
 
+
 /**
- * This exception is thrown if an error is found 
+ * This exception is thrown if an error is found
  * reading the padding following a valid FITS HDU.
  * This padding is required by the FITS standard, but
  * some FITS writes forego writing it.  To access such data
  * users can use something like:
- * 
+ *
  * <code>
  *     Fits f = new Fits("somefile");
  *     try {
@@ -21,33 +27,60 @@ package nom.tam.fits;
  */
 public class PaddingException extends FitsException {
 
-    /** The HDU where the error happened.
+    /**
+     * The HDU where the error happened.
      */
     private BasicHDU truncatedHDU;
 
-    /** 
+    /**
      * When the error is thrown, the data object being
      * read must be supplied.  We initially create a dummy
      * header for this.  If someone is reading the entire
      * HDU, then they can trap the exception and set the header
      * to the appropriate value.
+     *
+     * @param datum _more_
+     *
+     * @throws FitsException _more_
      */
     public PaddingException(Data datum) throws FitsException {
         truncatedHDU = FitsFactory.HDUFactory(datum.getKernel());
         // We want to use the original Data object... so
-        truncatedHDU = FitsFactory.HDUFactory(truncatedHDU.getHeader(), datum);
+        truncatedHDU = FitsFactory.HDUFactory(truncatedHDU.getHeader(),
+                datum);
     }
 
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     * @param datum _more_
+     *
+     * @throws FitsException _more_
+     */
     public PaddingException(String msg, Data datum) throws FitsException {
         super(msg);
         truncatedHDU = FitsFactory.HDUFactory(datum.getKernel());
-        truncatedHDU = FitsFactory.HDUFactory(truncatedHDU.getHeader(), datum);
+        truncatedHDU = FitsFactory.HDUFactory(truncatedHDU.getHeader(),
+                datum);
     }
 
+    /**
+     * _more_
+     *
+     * @param hdr _more_
+     *
+     * @throws FitsException _more_
+     */
     void updateHeader(Header hdr) throws FitsException {
         truncatedHDU = FitsFactory.HDUFactory(hdr, truncatedHDU.getData());
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public BasicHDU getTruncatedHDU() {
         return truncatedHDU;
     }

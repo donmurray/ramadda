@@ -1,22 +1,14 @@
-/*
-* Copyright 2008-2015 Geode Systems LLC
-*
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-* software and associated documentation files (the "Software"), to deal in the Software 
-* without restriction, including without limitation the rights to use, copy, modify, 
-* merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
-* permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies 
-* or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-* PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-* OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
+/**
+* Copyright (c) 2008-2015 Geode Systems LLC
+* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 package org.ramadda.geodata.model;
 
@@ -176,6 +168,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
      *
      * @param request  the Request
      * @param dpi   the input
+     * @param type _more_
      *
      * @return  a Result
      *
@@ -495,7 +488,8 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
      *
      * @throws Exception on badness
      */
-    public Result processCorrelationRequest(Request request) throws Exception {
+    public Result processCorrelationRequest(Request request)
+            throws Exception {
         return handleRequest(request, ARG_ACTION_CORRELATION);
     }
 
@@ -591,7 +585,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                     continue;
                 }
                 if (type.equals(ARG_ACTION_MULTI_COMPARE)
-                        || type.equals(ARG_ACTION_ENS_COMPARE)) { 
+                        || type.equals(ARG_ACTION_ENS_COMPARE)) {
                     for (Entry e : entries) {
                         operands.add(new ServiceOperand(e.getName(),
                                 Misc.newList(e)));
@@ -605,20 +599,22 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             if (type.equals(ARG_ACTION_CORRELATION)) {
                 Entry tsEntry = getTimeSeriesEntry(request);
                 if (tsEntry != null) {
-                   operands.add(new ServiceOperand(tsEntry.getName(), tsEntry));
+                    operands.add(new ServiceOperand(tsEntry.getName(),
+                            tsEntry));
                 } else {
                     if (returnjson) {
                         StringBuilder data = new StringBuilder();
                         data.append(Json.mapAndQuote("Error",
                                 "You need to select a time series"));
+
                         return new Result("", data, Json.MIMETYPE);
-                    } /*else {
-                        tmp.append(
-                            getPageHandler().showDialogError(
-                                "You need to select all fields"));
-                    } */
+                    }  /*else {
+                         tmp.append(
+                             getPageHandler().showDialogError(
+                                 "You need to select all fields"));
+                     } */
                 }
-                
+
             }
         }
 
@@ -798,8 +794,8 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         sb.append(HtmlUtils.open("td", "width=\"800px\" "));
         sb.append(HtmlUtils.open("div", HtmlUtils.cssClass("model-header")));
         if (hasOperands) {
-            if (type.equals(ARG_ACTION_COMPARE) ||
-                type.equals(ARG_ACTION_CORRELATION)) {
+            if (type.equals(ARG_ACTION_COMPARE)
+                    || type.equals(ARG_ACTION_CORRELATION)) {
                 sb.append(
                     HtmlUtils.submit(
                         msg("Make Plot"), type,
@@ -844,7 +840,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         List<String> datasetTitles =
             new ArrayList<String>(collectionArgs.length);
         for (String collection : collectionArgs) {
-            
+
             StringBuilder dsb = new StringBuilder();
 
             //dsb.append(HtmlUtils.formTable());
@@ -970,11 +966,13 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         } else {
             sb.append("<td>");
         }
-        if (type.equals(ARG_ACTION_COMPARE) || 
-                type.equals(ARG_ACTION_TIMESERIES) ||
-                type.equals(ARG_ACTION_CORRELATION)) {
-            sb.append(HtmlUtils.div(msg(datasetTitles.get(0)),
-                                HtmlUtils.cssClass("model-dataset_title")));
+        if (type.equals(ARG_ACTION_COMPARE)
+                || type.equals(ARG_ACTION_TIMESERIES)
+                || type.equals(ARG_ACTION_CORRELATION)) {
+            sb.append(
+                HtmlUtils.div(
+                    msg(datasetTitles.get(0)),
+                    HtmlUtils.cssClass("model-dataset_title")));
         }
         sb.append(HtmlUtils.div(datasets.get(0),
                                 HtmlUtils.cssClass("model-dataset")));
@@ -1108,20 +1106,41 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private Entry getTimeSeriesEntry(Request request) throws Exception {
-        String arg = getFieldSelectArg(ARG_COLLECTION2, 0);
+        String arg     = getFieldSelectArg(ARG_COLLECTION2, 0);
         String entryId = request.getString(arg, "");
         if (entryId.isEmpty()) {
             return null;
         }
         Entry e = getEntryManager().getEntry(request, entryId);
+
         return e;
     }
 
 
-    private String makeTimeSeriesSelectors(Request request, String formId) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param formId _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private String makeTimeSeriesSelectors(Request request, String formId)
+            throws Exception {
         List<Entry> entries = findTimeSeriesEntries(request);
-        if (entries == null || entries.isEmpty()) {
+        if ((entries == null) || entries.isEmpty()) {
             return "No Time Series Found";
         }
         List values = new ArrayList();
@@ -1129,30 +1148,34 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         for (Entry e : entries) {
             values.add(new TwoFacedObject(e.getDescription(), e.getId()));
         }
-        StringBuilder dsb = new StringBuilder();
-        String arg = getFieldSelectArg(ARG_COLLECTION2, 0);
-        List<String> selectors = new ArrayList<String>();
-        String extraSelect = "";
-        String selectedValue = request.getString(arg, "");
+        StringBuilder dsb           = new StringBuilder();
+        String        arg           = getFieldSelectArg(ARG_COLLECTION2, 0);
+        List<String>  selectors     = new ArrayList<String>();
+        String        extraSelect   = "";
+        String        selectedValue = request.getString(arg, "");
         String selectBox =
             HtmlUtils.select(arg, values, selectedValue,
                              HtmlUtils.cssClass("select_widget")
                              + HtmlUtils.attr("id",
-                                 getFieldSelectId(formId,
-                                     ARG_COLLECTION2,
+                                 getFieldSelectId(formId, ARG_COLLECTION2,
                                      0)) + extraSelect);
         String select = "<label class=\"selector\" for=\""
-                        + getFieldSelectId(formId, ARG_COLLECTION2,
-                            0) + "\">"
-                                + msgLabel("Climate Index")
-                                + "</label>" + selectBox;
+                        + getFieldSelectId(formId, ARG_COLLECTION2, 0)
+                        + "\">" + msgLabel("Climate Index") + "</label>"
+                        + selectBox;
 
         selectors.add(select);
         addSelectorTable(dsb, selectors);
-        
+
         return dsb.toString();
     }
-    
+
+    /**
+     * _more_
+     *
+     * @param dsb _more_
+     * @param selectors _more_
+     */
     private void addSelectorTable(StringBuilder dsb, List<String> selectors) {
         dsb.append(
             "<table cellspacing=\"3px\" cellpadding=\"2px\" align=\"center\">\n");
@@ -1164,8 +1187,18 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
         }
         dsb.append("</tr></table>\n");
     }
-    
-    private List<Entry> findTimeSeriesEntries(Request request) throws Exception {
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private List<Entry> findTimeSeriesEntries(Request request)
+            throws Exception {
         Request tmpRequest = new Request(getRepository(), request.getUser());
 
         tmpRequest.put(ARG_TYPE, "type_psd_monthly_climate_index");
@@ -1207,7 +1240,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
      * @throws Exception  problem with search
      */
     private List<Entry> findModelEntries(Request request, String collection,
-                                    Entry entry, int collectionCnt)
+                                         Entry entry, int collectionCnt)
             throws Exception {
         CollectionTypeHandler typeHandler =
             (CollectionTypeHandler) entry.getTypeHandler();
