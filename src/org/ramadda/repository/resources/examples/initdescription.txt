@@ -1,7 +1,7 @@
 <wiki>
 <!-- 
-Hi. Be cool, this is just RAMADDA's wiki text.
-The wiki tag above tell's RAMADDA to treat this description as wiki
+Be cool, this is just RAMADDA's wiki text.
+The wiki tag above tells RAMADDA to treat this description as wiki
 The +section, +row, +col etc tags do the layout
 There are docs here: http://geodesystems.com/repository/userguide/wikitext.html
 -->

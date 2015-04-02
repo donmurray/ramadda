@@ -1,21 +1,9 @@
-/*
-* Copyright 2008-2015 Geode Systems LLC
+/**
+* Copyright (C) 2008-2015 Geode Systems LLC
 *
-* Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-* software and associated documentation files (the "Software"), to deal in the Software 
-* without restriction, including without limitation the rights to use, copy, modify, 
-* merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
-* permit persons to whom the Software is furnished to do so, subject to the following conditions:
-* 
-* The above copyright notice and this permission notice shall be included in all copies 
-* or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-* PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-* OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
+* This software is licensed under the Geode Systems LLC RAMADDA License. A copy of this license can 
+* be found in the source distribution in the file ramadda_license.txt 
+* The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
 
 package org.ramadda.repository;
@@ -908,15 +896,15 @@ public class Repository extends RepositoryBase implements RequestHandler,
         initServer();
         StringBuilder statusMsg =
             new StringBuilder("RAMADDA: repository started");
-        statusMsg.append("  --  Home dir: " + getStorageManager().getRepositoryDir());
+        statusMsg.append("  --  Home dir: "
+                         + getStorageManager().getRepositoryDir());
 
         statusMsg.append("  --  Version: "
                          + getProperty(PROP_BUILD_VERSION, "1.0"));
         statusMsg.append("  --  Build Date: "
                          + getProperty(PROP_BUILD_DATE, "N/A"));
         statusMsg.append(" -- Java version: "
-                                        + getProperty(PROP_JAVA_VERSION,
-                                                      "N/A"));
+                         + getProperty(PROP_JAVA_VERSION, "N/A"));
         getLogManager().logInfoAndPrint(statusMsg.toString());
     }
 
@@ -1164,16 +1152,16 @@ public class Repository extends RepositoryBase implements RequestHandler,
         isRegistered = false;
         String registrationKey = getProperty(PROP_REGISTER_KEY, "");
         List<String> toks =
-            StringUtil.split(Utils.unobfuscate(registrationKey,true), ":");
+            StringUtil.split(Utils.unobfuscate(registrationKey, true), ":");
         if (toks.size() != 3) {
             return;
         }
         String id     = toks.get(0);
-        String thanks = Utils.unobfuscate(toks.get(1),false);
-        int users = 0;
-        try  {
-            users  = new Integer(toks.get(2)).intValue();
-        } catch(Exception exc) {
+        String thanks = Utils.unobfuscate(toks.get(1), false);
+        int    users  = 0;
+        try {
+            users = new Integer(toks.get(2)).intValue();
+        } catch (Exception exc) {
             return;
         }
 
@@ -4776,7 +4764,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
     public Result processDocs(Request request) throws Exception {
         StringBuilder  sb      = new StringBuilder();
         List<String[]> docUrls = getPluginManager().getDocUrls();
-        sb.append(HtmlUtils.sectionOpen(msg("Available documentation"), false));
+        sb.append(HtmlUtils.sectionOpen(msg("Available documentation"),
+                                        false));
         if (docUrls.size() == 0) {
             sb.append(
                 getPageHandler().showDialogNote(
@@ -4791,6 +4780,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
         }
         sb.append("</ul>");
         sb.append(HtmlUtils.sectionClose());
+
         return new Result("Documentation", sb);
     }
 

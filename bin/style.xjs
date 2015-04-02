@@ -1136,22 +1136,12 @@
     <object class="jindent.settings.StringArraySetting">
      <string>java.headerTemplate</string>
      <void property="value">
-      <string>/*
-* Copyright 2008-2015 Geode Systems LLC
+      <string>/**
+* Copyright (C) 2008-2015 Geode Systems LLC
 *
-* This software is licensed under the Geode Systems RAMADDA License.
-* A copy of this license can be found in the source distribution in the file 
-* ramadda_license.txt or at http://geodesystems.com/repository/userguide/license.html
-* 
-* The above copyright notice and this permission notice shall be included in all copies 
-* or substantial portions of the Software.
-* 
-* THE SOFTWARE IS PROVIDED &quot;AS IS&quot;, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-* INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR 
-* PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE 
-* FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR 
-* OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER 
-* DEALINGS IN THE SOFTWARE.
+* This software is licensed under the Geode Systems LLC RAMADDA License. A copy of this license can 
+* be found in the source distribution in the file ramadda_license.txt 
+* The above copyright notice shall be included in all copies or substantial portions of the Software.
 */</string>
      </void>
     </object>
