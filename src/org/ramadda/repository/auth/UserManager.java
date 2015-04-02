@@ -2217,7 +2217,7 @@ public class UserManager extends RepositoryManager {
                     String cbxId = "checkbox_" + HtmlUtils.blockCnt++;
                     String links =
                         HtmlUtils.checkbox(
-                            "entry_" + entry.getId(), "true", false,
+                                           ARG_SELENTRY, entry.getId(), false,
                             HtmlUtils.attrs(
                                 HtmlUtils.ATTR_ID, cbxId,
                                 HtmlUtils.ATTR_ONCLICK,

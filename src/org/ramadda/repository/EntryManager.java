@@ -4055,21 +4055,10 @@ public class EntryManager extends RepositoryManager {
         List<Entry> entries    = new ArrayList();
         boolean     doAll      = request.defined("getall");
         boolean     doSelected = request.defined("getselected");
-        String      prefix     = (doAll
-                                  ? "all_"
-                                  : "entry_");
+        String      arg     = (doAll?ARG_ALLENTRY:ARG_SELENTRY);
 
-        for (Enumeration keys = request.keys(); keys.hasMoreElements(); ) {
-            String id = (String) keys.nextElement();
-            if (doSelected) {
-                if ( !request.get(id, false)) {
-                    continue;
-                }
-            }
-            if ( !id.startsWith(prefix)) {
-                continue;
-            }
-            id = id.substring(prefix.length());
+        for(Object s: request.get(arg, new ArrayList<String>())) {
+            String id = s.toString();
             Entry entry = getEntry(request, id);
             if (entry != null) {
                 entries.add(entry);

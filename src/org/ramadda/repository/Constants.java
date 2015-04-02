@@ -788,6 +788,10 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_ENTRYID = "entryid";
 
+
+    public static final String ARG_SELENTRY = "selentry";
+    public static final String ARG_ALLENTRY = "allentry";
+
     /** _more_ */
     public static final String ARG_ENTRY_TIMESTAMP = "entry.timestamp";
 
