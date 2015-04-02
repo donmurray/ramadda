@@ -639,11 +639,8 @@ public class PluginManager extends RepositoryManager {
             }
         } else if (file.endsWith(".jar") && (file.indexOf("htdocs") < 0)) {
             try {
-                System.err.println("jar file: " + file);
                 File tmpFile = new File(IOUtil.joinDir(tmpPluginsDir,
                                    IOUtil.getFileTail(file)));
-                System.err.println("Extracting jar and writing to: "
-                                   + tmpFile);
                 IOUtil.writeTo(getStorageManager().getInputStream(file),
                                new FileOutputStream(tmpFile));
                 processPluginFile(tmpFile.toString(), pluginSB, classLoader,
