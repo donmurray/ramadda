@@ -463,7 +463,9 @@ var HtmlUtil =  {
     closeTag : function(tagName) {
         return  "</" + tagName +">\n";
     },
-
+    urlArg: function(name, value) {
+        return name  + "=" + this.encodeURIComponent(value);
+    },
     attr : function(name, value) {
         return " " + name +"=" + this.qt(value) +" ";
     },
