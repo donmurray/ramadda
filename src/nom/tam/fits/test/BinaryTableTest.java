@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.fits.test;
 
 
@@ -46,61 +52,61 @@ import java.lang.reflect.*;
  */
 public class BinaryTableTest {
 
-    /** _more_          */
+    /** _more_ */
     byte[] bytes = new byte[50];
 
-    /** _more_          */
+    /** _more_ */
     byte[][] bits = new byte[50][2];
 
-    /** _more_          */
+    /** _more_ */
     boolean[] bools = new boolean[50];
 
-    /** _more_          */
+    /** _more_ */
     short[][] shorts = new short[50][3];
 
-    /** _more_          */
+    /** _more_ */
     int[] ints = new int[50];
 
-    /** _more_          */
+    /** _more_ */
     float[][][] floats = new float[50][4][4];
 
-    /** _more_          */
+    /** _more_ */
     double[] doubles = new double[50];
 
-    /** _more_          */
+    /** _more_ */
     long[] longs = new long[50];
 
-    /** _more_          */
+    /** _more_ */
     String[] strings = new String[50];
 
-    /** _more_          */
+    /** _more_ */
     float[][] vf = new float[50][];
 
-    /** _more_          */
+    /** _more_ */
     short[][] vs = new short[50][];
 
-    /** _more_          */
+    /** _more_ */
     double[][] vd = new double[50][];
 
-    /** _more_          */
+    /** _more_ */
     boolean[][] vbool = new boolean[50][];
 
-    /** _more_          */
+    /** _more_ */
     float[][][] vc = new float[50][][];
 
-    /** _more_          */
+    /** _more_ */
     double[][][] vdc = new double[50][][];
 
-    /** _more_          */
+    /** _more_ */
     float[][] complex = new float[50][2];
 
-    /** _more_          */
+    /** _more_ */
     float[][][] complex_arr = new float[50][4][2];
 
-    /** _more_          */
+    /** _more_ */
     double[][] dcomplex = new double[50][2];
 
-    /** _more_          */
+    /** _more_ */
     double[][][] dcomplex_arr = new double[50][4][2];
 
     /**

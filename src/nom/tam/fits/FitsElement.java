@@ -4,11 +4,6 @@
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
 
-/**
- * This inteface describes allows uses to easily perform
- *  basic I/O operations
- *  on a FITS element.
- */
 package nom.tam.fits;
 
 
@@ -21,7 +16,7 @@ import java.io.IOException;
  * Interface description
  *
  *
- * @author         Enter your name here...    
+ * @author         Enter your name here...
  */
 public interface FitsElement {
 
@@ -63,14 +58,14 @@ public interface FitsElement {
     public long getFileOffset();
 
     /**
-     * Can this element be rewritten? 
+     * Can this element be rewritten?
      *
      * @return _more_
      */
     public boolean rewriteable();
 
     /**
-     * The size of this element in bytes 
+     * The size of this element in bytes
      *
      * @return _more_
      */

@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.fits;
 
 
@@ -123,7 +129,7 @@ public class AsciiTableHDU extends TableHDU {
     }
 
     /**
-     * Create a header to match the input data. 
+     * Create a header to match the input data.
      *
      * @param d _more_
      *
@@ -189,7 +195,7 @@ public class AsciiTableHDU extends TableHDU {
     }
 
     /**
-     * See if an element is null 
+     * See if an element is null
      *
      * @param row _more_
      * @param col _more_
@@ -201,7 +207,7 @@ public class AsciiTableHDU extends TableHDU {
     }
 
     /**
-     * Set the null string for a column 
+     * Set the null string for a column
      *
      * @param col _more_
      * @param newNull _more_
@@ -218,7 +224,7 @@ public class AsciiTableHDU extends TableHDU {
     }
 
     /**
-     * Add a column 
+     * Add a column
      *
      * @param newCol _more_
      *

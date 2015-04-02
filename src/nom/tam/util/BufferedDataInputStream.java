@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.util;
 
 
@@ -63,10 +69,10 @@ import java.io.InputStreamReader;
  */
 public class BufferedDataInputStream extends BufferedInputStream implements ArrayDataInput {
 
-    /** _more_          */
+    /** _more_ */
     private long primitiveArrayCount;
 
-    /** _more_          */
+    /** _more_ */
     private byte[] bb = new byte[8];
 
     /**
@@ -646,7 +652,7 @@ public class BufferedDataInputStream extends BufferedInputStream implements Arra
     }
 
     /**
-     * Read a boolean array 
+     * Read a boolean array
      *
      * @param b _more_
      *
@@ -694,7 +700,7 @@ public class BufferedDataInputStream extends BufferedInputStream implements Arra
     }
 
     /**
-     * Read a short array 
+     * Read a short array
      *
      * @param s _more_
      *
@@ -707,7 +713,7 @@ public class BufferedDataInputStream extends BufferedInputStream implements Arra
     }
 
     /**
-     * Read a short array 
+     * Read a short array
      *
      * @param s _more_
      * @param start _more_
@@ -736,7 +742,7 @@ public class BufferedDataInputStream extends BufferedInputStream implements Arra
     }
 
     /**
-     * Read a character array 
+     * Read a character array
      *
      * @param c _more_
      *
@@ -749,7 +755,7 @@ public class BufferedDataInputStream extends BufferedInputStream implements Arra
     }
 
     /**
-     * Read a character array 
+     * Read a character array
      *
      * @param c _more_
      * @param start _more_
@@ -778,7 +784,7 @@ public class BufferedDataInputStream extends BufferedInputStream implements Arra
     }
 
     /**
-     * Read an integer array 
+     * Read an integer array
      *
      * @param i _more_
      *
@@ -791,7 +797,7 @@ public class BufferedDataInputStream extends BufferedInputStream implements Arra
     }
 
     /**
-     * Read an integer array 
+     * Read an integer array
      *
      * @param i _more_
      * @param start _more_
@@ -823,7 +829,7 @@ public class BufferedDataInputStream extends BufferedInputStream implements Arra
     }
 
     /**
-     * Read a long array 
+     * Read a long array
      *
      * @param l _more_
      *
@@ -836,7 +842,7 @@ public class BufferedDataInputStream extends BufferedInputStream implements Arra
     }
 
     /**
-     * Read a long array 
+     * Read a long array
      *
      * @param l _more_
      * @param start _more_
@@ -870,7 +876,7 @@ public class BufferedDataInputStream extends BufferedInputStream implements Arra
     }
 
     /**
-     * Read a float array 
+     * Read a float array
      *
      * @param f _more_
      *
@@ -883,7 +889,7 @@ public class BufferedDataInputStream extends BufferedInputStream implements Arra
     }
 
     /**
-     * Read a float array 
+     * Read a float array
      *
      * @param f _more_
      * @param start _more_
@@ -914,7 +920,7 @@ public class BufferedDataInputStream extends BufferedInputStream implements Arra
     }
 
     /**
-     * Read a double array 
+     * Read a double array
      *
      * @param d _more_
      *
@@ -927,7 +933,7 @@ public class BufferedDataInputStream extends BufferedInputStream implements Arra
     }
 
     /**
-     * Read a double array 
+     * Read a double array
      *
      * @param d _more_
      * @param start _more_
@@ -985,7 +991,7 @@ public class BufferedDataInputStream extends BufferedInputStream implements Arra
     }
 
     /**
-     * Represent the stream as a string 
+     * Represent the stream as a string
      *
      * @return _more_
      */

@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.util;
 
 
@@ -41,10 +47,10 @@ public final class ByteFormatter {
     /** Internal buffers used in formatting fields */
     private byte[] tbuf1 = new byte[32];
 
-    /** _more_          */
+    /** _more_ */
     private byte[] tbuf2 = new byte[32];
 
-    /** _more_          */
+    /** _more_ */
     private static final double ilog10 = 1. / Math.log(10);
 
     /** Should we truncate overflows or just run over limit */
@@ -116,7 +122,7 @@ public final class ByteFormatter {
     }
 
     /**
-     * Should truncations cause a truncation overflow? 
+     * Should truncations cause a truncation overflow?
      *
      * @param throwException _more_
      */
@@ -384,7 +390,7 @@ public final class ByteFormatter {
     }
 
     /**
-     * Insert a string at the beginning of an array 
+     * Insert a string at the beginning of an array
      *
      * @param val _more_
      * @param array _more_

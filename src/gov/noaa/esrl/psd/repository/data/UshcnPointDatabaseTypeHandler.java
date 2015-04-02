@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package gov.noaa.esrl.psd.repository.data;
 
 
@@ -40,23 +46,23 @@ import java.util.List;
  *
  *
  * @version        $version$, Thu, Apr 2, '15
- * @author         Enter your name here...    
+ * @author         Enter your name here...
  */
 public class UshcnPointDatabaseTypeHandler extends PointDatabaseTypeHandler {
 
-    /** _more_          */
+    /** _more_ */
     private static final String BLANK_DELIM = "\\s+";
 
-    /** _more_          */
+    /** _more_ */
     private static final String MISSING_VALUE = "-99.99";
 
-    /** _more_          */
+    /** _more_ */
     private static final String MISSING_VALUE1 = "-99.99";
 
-    /** _more_          */
+    /** _more_ */
     private static final String MISSING_VALUE2 = "-9999";
 
-    /** _more_          */
+    /** _more_ */
     private static final String COL_STATION = "obStation";
 
     /**
@@ -428,7 +434,7 @@ public class UshcnPointDatabaseTypeHandler extends PointDatabaseTypeHandler {
 
     }
 
-    /** _more_          */
+    /** _more_ */
     private static int[] idx = { 0, 9, 34, 43, 53 };
 
 
@@ -458,20 +464,20 @@ public class UshcnPointDatabaseTypeHandler extends PointDatabaseTypeHandler {
      *
      *
      * @version        $version$, Thu, Apr 2, '15
-     * @author         Enter your name here...    
+     * @author         Enter your name here...
      */
     public static class DayValue {
 
-        /** _more_          */
+        /** _more_ */
         private String day;
 
-        /** _more_          */
+        /** _more_ */
         private double value;
 
-        /** _more_          */
+        /** _more_ */
         private Date date;
 
-        /** _more_          */
+        /** _more_ */
         private static SimpleDateFormat formatter =
             new SimpleDateFormat("yyyy-MM-dd");
 

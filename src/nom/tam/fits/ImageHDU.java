@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.fits;
 /* Copyright: Thomas McGlynn 1997-1998.
  * This code may be used for any purpose, non-commercial
@@ -36,7 +42,7 @@ public class ImageHDU extends BasicHDU {
     }
 
     /**
-     * Indicate that Images can appear at the beginning of a FITS dataset 
+     * Indicate that Images can appear at the beginning of a FITS dataset
      *
      * @return _more_
      */
@@ -45,7 +51,7 @@ public class ImageHDU extends BasicHDU {
     }
 
     /**
-     * Change the Image from/to primary 
+     * Change the Image from/to primary
      *
      * @param status _more_
      */
@@ -158,7 +164,7 @@ public class ImageHDU extends BasicHDU {
     }
 
     /**
-     * Encapsulate an object as an ImageHDU. 
+     * Encapsulate an object as an ImageHDU.
      *
      * @param o _more_
      *

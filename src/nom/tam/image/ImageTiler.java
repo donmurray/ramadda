@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.image;
 
 
@@ -20,16 +26,16 @@ import java.lang.reflect.Array;
  */
 public class ImageTiler {
 
-    /** _more_          */
+    /** _more_ */
     RandomAccess f;
 
-    /** _more_          */
+    /** _more_ */
     long fileOffset;
 
-    /** _more_          */
+    /** _more_ */
     int[] dims;
 
-    /** _more_          */
+    /** _more_ */
     Class base;
 
     /**

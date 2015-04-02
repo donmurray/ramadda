@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.fits;
 
 
@@ -63,25 +69,25 @@ public class BinaryTable extends Data implements TableData {
      */
     private boolean warnedOnVariableConversion = false;
 
-    /** _more_          */
+    /** _more_ */
     final static int COL_CONSTANT = 0;
 
-    /** _more_          */
+    /** _more_ */
     final static int COL_VARYING = 1;
 
-    /** _more_          */
+    /** _more_ */
     final static int COL_COMPLEX = 2;
 
-    /** _more_          */
+    /** _more_ */
     final static int COL_STRING = 4;
 
-    /** _more_          */
+    /** _more_ */
     final static int COL_BOOLEAN = 8;
 
-    /** _more_          */
+    /** _more_ */
     final static int COL_BIT = 16;
 
-    /** _more_          */
+    /** _more_ */
     final static int COL_LONGVARY = 32;
 
     /**
@@ -235,7 +241,7 @@ public class BinaryTable extends Data implements TableData {
     }
 
     /**
-     * Create a binary table from an existing ColumnTable 
+     * Create a binary table from an existing ColumnTable
      *
      * @param tab _more_
      */
@@ -293,7 +299,7 @@ public class BinaryTable extends Data implements TableData {
     }
 
     /**
-     * Process one column from a FITS Header 
+     * Process one column from a FITS Header
      *
      * @param header _more_
      * @param col _more_
@@ -459,7 +465,7 @@ public class BinaryTable extends Data implements TableData {
     }
 
     /**
-     * Get the type in the TFORM field 
+     * Get the type in the TFORM field
      *
      * @param tform _more_
      *
@@ -477,7 +483,7 @@ public class BinaryTable extends Data implements TableData {
     }
 
     /**
-     * Get the type in a varying length column TFORM 
+     * Get the type in a varying length column TFORM
      *
      * @param tform _more_
      *
@@ -498,7 +504,7 @@ public class BinaryTable extends Data implements TableData {
     }
 
     /**
-     * Get the explicit or implied length of the TFORM field 
+     * Get the explicit or implied length of the TFORM field
      *
      * @param tform _more_
      *
@@ -517,7 +523,7 @@ public class BinaryTable extends Data implements TableData {
     }
 
     /**
-     * Get an unsigned number at the beginning of a string 
+     * Get an unsigned number at the beginning of a string
      *
      * @param tform _more_
      *
@@ -691,7 +697,7 @@ public class BinaryTable extends Data implements TableData {
     }
 
     /**
-     * Update the header to reflect the details of a given column 
+     * Update the header to reflect the details of a given column
      *
      * @param h _more_
      * @param col _more_
@@ -1616,7 +1622,7 @@ public class BinaryTable extends Data implements TableData {
     }
 
     /**
-     * Read table, heap and padding 
+     * Read table, heap and padding
      *
      * @param i _more_
      *
@@ -1675,7 +1681,7 @@ public class BinaryTable extends Data implements TableData {
     }
 
     /**
-     * Write the table, heap and padding 
+     * Write the table, heap and padding
      *
      * @param os _more_
      *
@@ -2110,7 +2116,7 @@ public class BinaryTable extends Data implements TableData {
     }
 
     /**
-     * What is the offset to the heap 
+     * What is the offset to the heap
      *
      * @return _more_
      */
@@ -2119,7 +2125,7 @@ public class BinaryTable extends Data implements TableData {
     }
 
     /**
-     * Does this column have variable length arrays? 
+     * Does this column have variable length arrays?
      *
      * @param col _more_
      *
@@ -2130,7 +2136,7 @@ public class BinaryTable extends Data implements TableData {
     }
 
     /**
-     * Does this column have variable length arrays? 
+     * Does this column have variable length arrays?
      *
      * @param col _more_
      *
@@ -2141,7 +2147,7 @@ public class BinaryTable extends Data implements TableData {
     }
 
     /**
-     * Is this column a string column 
+     * Is this column a string column
      *
      * @param col _more_
      *
@@ -2152,7 +2158,7 @@ public class BinaryTable extends Data implements TableData {
     }
 
     /**
-     * Is this column complex? 
+     * Is this column complex?
      *
      * @param col _more_
      *
@@ -2163,7 +2169,7 @@ public class BinaryTable extends Data implements TableData {
     }
 
     /**
-     * Is this column a boolean column 
+     * Is this column a boolean column
      *
      * @param col _more_
      *
@@ -2174,7 +2180,7 @@ public class BinaryTable extends Data implements TableData {
     }
 
     /**
-     * Is this column a bit column 
+     * Is this column a bit column
      *
      * @param col _more_
      *
@@ -2206,7 +2212,7 @@ public class BinaryTable extends Data implements TableData {
     }
 
     /**
-     * Update the header after a deletion. 
+     * Update the header after a deletion.
      *
      * @param oldNcol _more_
      * @param hdr _more_

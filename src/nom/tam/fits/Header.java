@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.fits;
 
 
@@ -69,7 +75,7 @@ public class Header implements FitsElement {
     /** Offset of this Header in the FITS file */
     private long fileOffset = -1;
 
-    /** _more_          */
+    /** _more_ */
     private List<HeaderCard> duplicates;
 
     /** Input descriptor last time header was read */
@@ -150,7 +156,7 @@ public class Header implements FitsElement {
     }
 
     /**
-     * Create the data element corresponding to the current header 
+     * Create the data element corresponding to the current header
      *
      * @return _more_
      *
@@ -222,7 +228,7 @@ public class Header implements FitsElement {
     }
 
     /**
-     * Find the number of cards in the header 
+     * Find the number of cards in the header
      *
      * @return _more_
      */
@@ -231,7 +237,7 @@ public class Header implements FitsElement {
     }
 
     /**
-     * Get an iterator over the header cards 
+     * Get an iterator over the header cards
      *
      * @return _more_
      */
@@ -240,7 +246,7 @@ public class Header implements FitsElement {
     }
 
     /**
-     * Get the offset of this header 
+     * Get the offset of this header
      *
      * @return _more_
      */
@@ -305,7 +311,7 @@ public class Header implements FitsElement {
     }
 
     /**
-     * Get the size of the header in bytes 
+     * Get the size of the header in bytes
      *
      * @return _more_
      */
@@ -748,7 +754,7 @@ public class Header implements FitsElement {
     }
 
     /**
-     * Were duplicate header keys found when this record was read in? 
+     * Were duplicate header keys found when this record was read in?
      *
      * @return _more_
      */
@@ -850,7 +856,7 @@ public class Header implements FitsElement {
     }
 
     /**
-     * Rewrite the header. 
+     * Rewrite the header.
      *
      * @throws FitsException _more_
      * @throws IOException _more_
@@ -869,7 +875,7 @@ public class Header implements FitsElement {
     }
 
     /**
-     * Reset the file pointer to the beginning of the header 
+     * Reset the file pointer to the beginning of the header
      *
      * @return _more_
      */
@@ -884,7 +890,7 @@ public class Header implements FitsElement {
     }
 
     /**
-     * Can the header be rewritten without rewriting the entire file? 
+     * Can the header be rewritten without rewriting the entire file?
      *
      * @return _more_
      */
@@ -1434,7 +1440,7 @@ public class Header implements FitsElement {
     }
 
     /**
-     * *** Deprecated methods ******
+     * *** Deprecated methods
      *
      * @return _more_
      */
@@ -1551,7 +1557,7 @@ public class Header implements FitsElement {
     }
 
     /**
-     * Get the next card in the Header using the current iterator 
+     * Get the next card in the Header using the current iterator
      *
      * @return _more_
      */

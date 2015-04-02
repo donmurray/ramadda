@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.fits;
 
 
@@ -30,7 +36,7 @@ import java.lang.reflect.Array;
 /** FITS binary table header/data unit */
 public class BinaryTableHDU extends TableHDU {
 
-    /** _more_          */
+    /** _more_ */
     private BinaryTable table;
 
     /** The standard column keywords for a binary table. */
@@ -91,7 +97,7 @@ public class BinaryTableHDU extends TableHDU {
     }
 
     /**
-     * Encapsulate data in a BinaryTable data type 
+     * Encapsulate data in a BinaryTable data type
      *
      * @param o _more_
      *

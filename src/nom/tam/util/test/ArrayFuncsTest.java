@@ -3,12 +3,7 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
-/*
- * ArrayFuncsTest.java
- * JUnit based test
- *
- * Created on December 2, 2007, 7:19 PM
- */
+
 package nom.tam.util.test;
 
 
@@ -113,11 +108,11 @@ public class ArrayFuncsTest extends TestCase {
      *
      *
      * @version        $version$, Thu, Apr 2, '15
-     * @author         Enter your name here...    
+     * @author         Enter your name here...
      */
     public class CloneTest implements Cloneable {
 
-        /** _more_          */
+        /** _more_ */
         public int value = 2;
 
         /**

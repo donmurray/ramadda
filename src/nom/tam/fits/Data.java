@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.fits;
 
 
@@ -50,7 +56,7 @@ public abstract class Data implements FitsElement {
     protected RandomAccess input;
 
     /**
-     * Get the file offset 
+     * Get the file offset
      *
      * @return _more_
      */
@@ -59,7 +65,7 @@ public abstract class Data implements FitsElement {
     }
 
     /**
-     * Set the fields needed for a re-read 
+     * Set the fields needed for a re-read
      *
      * @param o _more_
      */
@@ -146,7 +152,7 @@ public abstract class Data implements FitsElement {
     abstract long getTrueSize();
 
     /**
-     * Get the size of the data element in bytes 
+     * Get the size of the data element in bytes
      *
      * @return _more_
      */
@@ -164,7 +170,7 @@ public abstract class Data implements FitsElement {
     public abstract Object getData() throws FitsException;
 
     /**
-     * Return the non-FITS data object 
+     * Return the non-FITS data object
      *
      * @return _more_
      *

@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.util;
 
 
@@ -61,34 +67,34 @@ public class ColumnTable implements DataTable {
      */
     private char[] types;
 
-    /** _more_          */
+    /** _more_ */
     private Class[] bases;
     // The following arrays are used to avoid having to check
     // casts during the I/O loops.
     // They point to elements of arrays.
 
-    /** _more_          */
+    /** _more_ */
     private byte[][] bytePointers;
 
-    /** _more_          */
+    /** _more_ */
     private short[][] shortPointers;
 
-    /** _more_          */
+    /** _more_ */
     private int[][] intPointers;
 
-    /** _more_          */
+    /** _more_ */
     private long[][] longPointers;
 
-    /** _more_          */
+    /** _more_ */
     private float[][] floatPointers;
 
-    /** _more_          */
+    /** _more_ */
     private double[][] doublePointers;
 
-    /** _more_          */
+    /** _more_ */
     private char[][] charPointers;
 
-    /** _more_          */
+    /** _more_ */
     private boolean[][] booleanPointers;
 
     /**
@@ -175,7 +181,7 @@ public class ColumnTable implements DataTable {
     }
 
     /**
-     * Add a column 
+     * Add a column
      *
      * @param newColumn _more_
      * @param size _more_
@@ -909,7 +915,7 @@ public class ColumnTable implements DataTable {
     }
 
     /**
-     * Get the actual data arrays 
+     * Get the actual data arrays
      *
      * @return _more_
      */

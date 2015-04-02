@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 // Member of the utility package.
 // Modified July 20, 2009 to handle very large arrays
 // in some contexts.
@@ -1349,7 +1355,7 @@ public class ArrayFuncs implements PrimitiveInfo {
     }
 
     /**
-     * Compare two double arrays using a given tolerance 
+     * Compare two double arrays using a given tolerance
      *
      * @param x _more_
      * @param y _more_
@@ -1373,7 +1379,7 @@ public class ArrayFuncs implements PrimitiveInfo {
     }
 
     /**
-     * Compare two float arrays using a given tolerance 
+     * Compare two float arrays using a given tolerance
      *
      * @param x _more_
      * @param y _more_
@@ -1396,7 +1402,7 @@ public class ArrayFuncs implements PrimitiveInfo {
     }
 
     /**
-     * Dump an array on the given print steam 
+     * Dump an array on the given print steam
      *
      * @param p _more_
      * @param arr _more_

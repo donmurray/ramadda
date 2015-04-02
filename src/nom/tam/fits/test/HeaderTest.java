@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.fits.test;
 
 
@@ -21,7 +27,7 @@ import static org.junit.Assert.assertEquals;
  *
  *
  * @version        $version$, Thu, Apr 2, '15
- * @author         Enter your name here...    
+ * @author         Enter your name here...
  */
 public class HeaderTest {
 
@@ -73,7 +79,7 @@ public class HeaderTest {
     }
 
     /**
-     * Confirm initial location versus EXTEND keyword (V. Forchi). 
+     * Confirm initial location versus EXTEND keyword (V. Forchi).
      *
      * @throws Exception _more_
      */

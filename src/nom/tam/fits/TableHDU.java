@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.fits;
 
 
@@ -19,10 +25,10 @@ import java.util.Iterator;
  */
 public abstract class TableHDU extends BasicHDU {
 
-    /** _more_          */
+    /** _more_ */
     private TableData table;
 
-    /** _more_          */
+    /** _more_ */
     private int currentColumn;
 
     /**
@@ -36,7 +42,7 @@ public abstract class TableHDU extends BasicHDU {
     }
 
     /**
-     * Get a specific row of the table 
+     * Get a specific row of the table
      *
      * @param row _more_
      *
@@ -200,7 +206,7 @@ public abstract class TableHDU extends BasicHDU {
     }
 
     /**
-     * Add a column to the table. 
+     * Add a column to the table.
      *
      * @param data _more_
      *

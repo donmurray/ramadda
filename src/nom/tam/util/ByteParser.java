@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.util;
 
 
@@ -69,7 +75,7 @@ public class ByteParser {
     }
 
     /**
-     * Set the buffer for the parser 
+     * Set the buffer for the parser
      *
      * @param buf _more_
      */
@@ -79,7 +85,7 @@ public class ByteParser {
     }
 
     /**
-     * Get the buffer being used by the parser 
+     * Get the buffer being used by the parser
      *
      * @return _more_
      */
@@ -298,7 +304,7 @@ public class ByteParser {
     }
 
     /**
-     * Get a floating point value in a region of the buffer 
+     * Get a floating point value in a region of the buffer
      *
      * @param length _more_
      *
@@ -311,7 +317,7 @@ public class ByteParser {
     }
 
     /**
-     * Convert a region of the buffer to an integer 
+     * Convert a region of the buffer to an integer
      *
      * @param length _more_
      *
@@ -369,7 +375,7 @@ public class ByteParser {
     }
 
     /**
-     * Look for an integer at the beginning of the buffer 
+     * Look for an integer at the beginning of the buffer
      *
      * @return _more_
      *
@@ -380,7 +386,7 @@ public class ByteParser {
     }
 
     /**
-     * Look for a long in a specified region of the buffer 
+     * Look for a long in a specified region of the buffer
      *
      * @param length _more_
      *
@@ -454,7 +460,7 @@ public class ByteParser {
     }
 
     /**
-     * Get a boolean value from the beginning of the buffer 
+     * Get a boolean value from the beginning of the buffer
      *
      * @return _more_
      *
@@ -465,7 +471,7 @@ public class ByteParser {
     }
 
     /**
-     * Get a boolean value from a specified region of the buffer 
+     * Get a boolean value from a specified region of the buffer
      *
      * @param length _more_
      *
@@ -509,7 +515,7 @@ public class ByteParser {
     }
 
     /**
-     * Skip bytes in the buffer 
+     * Skip bytes in the buffer
      *
      * @param nBytes _more_
      */

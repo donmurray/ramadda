@@ -3,12 +3,7 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
-/* Copyright: Thomas McGlynn 1999.
- * This code may be used for any purpose, non-commercial
- * or commercial so long as this copyright notice is retained
- * in the source code or included in or referred to in any
- * derived software.
- */
+
 package nom.tam.util.test;
 
 
@@ -872,7 +867,7 @@ public class BufferedFileTester {
         System.out.println("Done BufferedFile Tests");
     }
 
-    /** _more_          */
+    /** _more_ */
     static long lastTime;
 
     /**

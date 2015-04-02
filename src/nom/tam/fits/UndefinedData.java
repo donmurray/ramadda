@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.fits;
 
 
@@ -30,7 +36,7 @@ public class UndefinedData extends Data {
     /** The size of the data */
     long byteSize;
 
-    /** _more_          */
+    /** _more_ */
     byte[] data;
 
     /**
@@ -161,7 +167,7 @@ public class UndefinedData extends Data {
     }
 
     /**
-     * Get the size in bytes of the data 
+     * Get the size in bytes of the data
      *
      * @return _more_
      */

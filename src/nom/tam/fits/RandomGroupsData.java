@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.fits;
 /* Copyright: Thomas McGlynn 1998.
  * This code may be used for any purpose, non-commercial
@@ -31,7 +37,7 @@ import java.io.IOException;
  */
 public class RandomGroupsData extends Data {
 
-    /** _more_          */
+    /** _more_ */
     private Object[][] dataArray;
 
     /**
@@ -52,7 +58,7 @@ public class RandomGroupsData extends Data {
     }
 
     /**
-     * Get the size of the actual data element. 
+     * Get the size of the actual data element.
      *
      * @return _more_
      */
@@ -68,7 +74,7 @@ public class RandomGroupsData extends Data {
     }
 
     /**
-     * Read the RandomGroupsData 
+     * Read the RandomGroupsData
      *
      * @param str _more_
      *
@@ -97,7 +103,7 @@ public class RandomGroupsData extends Data {
     }
 
     /**
-     * Write the RandomGroupsData 
+     * Write the RandomGroupsData
      *
      * @param str _more_
      *

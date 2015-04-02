@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.util;
 
 
@@ -46,27 +52,27 @@ public interface PrimitiveInfo {
     /** Index of last element of above arrays referring to a numeric type */
     int LAST_NUMERIC = 6;
 
-    /** _more_          */
+    /** _more_ */
     int BYTE_INDEX = 0;
 
-    /** _more_          */
+    /** _more_ */
     int SHORT_INDEX = 1;
 
-    /** _more_          */
+    /** _more_ */
     int CHAR_INDEX = 2;
 
-    /** _more_          */
+    /** _more_ */
     int INT_INDEX = 3;
 
-    /** _more_          */
+    /** _more_ */
     int LONG_INDEX = 4;
 
-    /** _more_          */
+    /** _more_ */
     int FLOAT_INDEX = 5;
 
-    /** _more_          */
+    /** _more_ */
     int DOUBLE_INDEX = 6;
 
-    /** _more_          */
+    /** _more_ */
     int BOOLEAN_INDEX = 7;
 }

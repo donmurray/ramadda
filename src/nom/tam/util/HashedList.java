@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.util;
 
 
@@ -46,7 +52,7 @@ import java.util.HashMap;
  *
  *
  * @version        $version$, Thu, Apr 2, '15
- * @author         Enter your name here...    
+ * @author         Enter your name here...
  */
 public class HashedList implements Collection {
 
@@ -67,7 +73,7 @@ public class HashedList implements Collection {
      *
      *
      * @version        $version$, Thu, Apr 2, '15
-     * @author         Enter your name here...    
+     * @author         Enter your name here...
      */
     private class HashedListIterator implements Cursor {
 
@@ -87,7 +93,7 @@ public class HashedList implements Collection {
         }
 
         /**
-         * Is there another element? 
+         * Is there another element?
          *
          * @return _more_
          */
@@ -96,7 +102,7 @@ public class HashedList implements Collection {
         }
 
         /**
-         * Is there a previous element? 
+         * Is there a previous element?
          *
          * @return _more_
          */
@@ -105,7 +111,7 @@ public class HashedList implements Collection {
         }
 
         /**
-         * Get the next entry. 
+         * Get the next entry.
          *
          * @return _more_
          *
@@ -125,7 +131,7 @@ public class HashedList implements Collection {
         }
 
         /**
-         * Get the previous entry. 
+         * Get the previous entry.
          *
          * @return _more_
          *
@@ -203,7 +209,7 @@ public class HashedList implements Collection {
     }
 
     /**
-     * Add an element to the end of the list. 
+     * Add an element to the end of the list.
      *
      * @param reference _more_
      *
@@ -219,7 +225,7 @@ public class HashedList implements Collection {
     }
 
     /**
-     * Add a keyed element to the end of the list. 
+     * Add a keyed element to the end of the list.
      *
      * @param key _more_
      * @param reference _more_
@@ -390,7 +396,7 @@ public class HashedList implements Collection {
     }
 
     /**
-     * Return the n'th entry from the beginning. 
+     * Return the n'th entry from the beginning.
      *
      * @param n _more_
      *
@@ -425,7 +431,7 @@ public class HashedList implements Collection {
     }
 
     /**
-     * Check if the key is included in the list 
+     * Check if the key is included in the list
      *
      * @param key _more_
      *
@@ -436,7 +442,7 @@ public class HashedList implements Collection {
     }
 
     /**
-     * Return the number of elements in the list. 
+     * Return the number of elements in the list.
      *
      * @return _more_
      */
@@ -468,7 +474,7 @@ public class HashedList implements Collection {
     }
 
     /**
-     * Does the HashedList contain this element? 
+     * Does the HashedList contain this element?
      *
      * @param o _more_
      *
@@ -491,7 +497,7 @@ public class HashedList implements Collection {
     }
 
     /**
-     * Is the HashedList empty? 
+     * Is the HashedList empty?
      *
      * @return _more_
      */
@@ -500,7 +506,7 @@ public class HashedList implements Collection {
     }
 
     /**
-     * Remove all the elements that are found in another collection. 
+     * Remove all the elements that are found in another collection.
      *
      * @param c _more_
      *
@@ -517,7 +523,7 @@ public class HashedList implements Collection {
     }
 
     /**
-     * Retain only elements contained in another collection  
+     * Retain only elements contained in another collection
      *
      * @param c _more_
      *
@@ -539,7 +545,7 @@ public class HashedList implements Collection {
     }
 
     /**
-     * Convert to an array of objects 
+     * Convert to an array of objects
      *
      * @return _more_
      */

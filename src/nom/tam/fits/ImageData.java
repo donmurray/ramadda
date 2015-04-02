@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.fits;
 
 
@@ -55,10 +61,10 @@ public class ImageData extends Data {
     /** This class describes an array */
     protected class ArrayDesc {
 
-        /** _more_          */
+        /** _more_ */
         int[] dims;
 
-        /** _more_          */
+        /** _more_ */
         Class type;
 
         /**
@@ -386,7 +392,7 @@ public class ImageData extends Data {
     }
 
     /**
-     * Get the size in bytes of the data 
+     * Get the size in bytes of the data
      *
      * @return _more_
      */

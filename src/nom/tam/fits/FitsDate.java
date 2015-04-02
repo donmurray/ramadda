@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.fits;
 
 
@@ -28,32 +34,32 @@ import java.util.TimeZone;
  *
  *
  * @version        $version$, Thu, Apr 2, '15
- * @author         Enter your name here...    
+ * @author         Enter your name here...
  */
 public class FitsDate {
 
-    /** _more_          */
+    /** _more_ */
     private int year = -1;
 
-    /** _more_          */
+    /** _more_ */
     private int month = -1;
 
-    /** _more_          */
+    /** _more_ */
     private int mday = -1;
 
-    /** _more_          */
+    /** _more_ */
     private int hour = -1;
 
-    /** _more_          */
+    /** _more_ */
     private int minute = -1;
 
-    /** _more_          */
+    /** _more_ */
     private int second = -1;
 
-    /** _more_          */
+    /** _more_ */
     private int millisecond = -1;
 
-    /** _more_          */
+    /** _more_ */
     private Date date = null;
 
     /**
@@ -249,7 +255,7 @@ public class FitsDate {
     }
 
     /**
-     * Return the current date in FITS date format 
+     * Return the current date in FITS date format
      *
      * @return _more_
      */

@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.fits;
 
 
@@ -45,11 +51,11 @@ import java.util.zip.GZIPInputStream;
  */
 public class FitsUtil {
 
-    /** _more_          */
+    /** _more_ */
     private static boolean wroteCheckingError = false;
 
     /**
-     * Reposition a random access stream to a requested offset 
+     * Reposition a random access stream to a requested offset
      *
      * @param o _more_
      * @param offset _more_
@@ -79,7 +85,7 @@ public class FitsUtil {
     }
 
     /**
-     * Find out where we are in a random access file 
+     * Find out where we are in a random access file
      *
      * @param o _more_
      *
@@ -95,7 +101,7 @@ public class FitsUtil {
     }
 
     /**
-     * How many bytes are needed to fill the last 2880 block? 
+     * How many bytes are needed to fill the last 2880 block?
      *
      * @param size _more_
      *
@@ -123,7 +129,7 @@ public class FitsUtil {
     }
 
     /**
-     * Total size of blocked FITS element 
+     * Total size of blocked FITS element
      *
      * @param size _more_
      *
@@ -264,7 +270,7 @@ public class FitsUtil {
     }
 
     /**
-     * Is a file compressed? 
+     * Is a file compressed?
      *
      * @param test _more_
      *
@@ -378,7 +384,7 @@ public class FitsUtil {
     }
 
     /**
-     * Convert bytes to Strings 
+     * Convert bytes to Strings
      *
      * @param o _more_
      * @param maxLen _more_
@@ -456,7 +462,7 @@ public class FitsUtil {
     }
 
     /**
-     * Convert an array of booleans to bytes 
+     * Convert an array of booleans to bytes
      *
      * @param bool _more_
      *
@@ -475,7 +481,7 @@ public class FitsUtil {
     }
 
     /**
-     * Convert an array of bytes to booleans 
+     * Convert an array of bytes to booleans
      *
      * @param byt _more_
      *
@@ -544,7 +550,7 @@ public class FitsUtil {
     }
 
     /**
-     * Add padding to an output stream. 
+     * Add padding to an output stream.
      *
      * @param stream _more_
      * @param size _more_
@@ -557,7 +563,7 @@ public class FitsUtil {
     }
 
     /**
-     * Add padding to an output stream. 
+     * Add padding to an output stream.
      *
      * @param stream _more_
      * @param size _more_
@@ -649,14 +655,14 @@ public class FitsUtil {
  *
  *
  * @version        $version$, Thu, Apr 2, '15
- * @author         Enter your name here...    
+ * @author         Enter your name here...
  */
 class CloseIS extends FilterInputStream {
 
-    /** _more_          */
+    /** _more_ */
     InputStream i;
 
-    /** _more_          */
+    /** _more_ */
     OutputStream o;
 
     /**

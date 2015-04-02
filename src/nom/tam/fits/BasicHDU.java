@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.fits;
 
 
@@ -31,22 +37,22 @@ import java.util.Iterator;
  */
 public abstract class BasicHDU implements FitsElement {
 
-    /** _more_          */
+    /** _more_ */
     public static final int BITPIX_BYTE = 8;
 
-    /** _more_          */
+    /** _more_ */
     public static final int BITPIX_SHORT = 16;
 
-    /** _more_          */
+    /** _more_ */
     public static final int BITPIX_INT = 32;
 
-    /** _more_          */
+    /** _more_ */
     public static final int BITPIX_LONG = 64;
 
-    /** _more_          */
+    /** _more_ */
     public static final int BITPIX_FLOAT = -32;
 
-    /** _more_          */
+    /** _more_ */
     public static final int BITPIX_DOUBLE = -64;
 
     /** The associated header. */
@@ -111,7 +117,7 @@ public abstract class BasicHDU implements FitsElement {
     }
 
     /**
-     * Get the associated header 
+     * Get the associated header
      *
      * @return _more_
      */
@@ -120,7 +126,7 @@ public abstract class BasicHDU implements FitsElement {
     }
 
     /**
-     * Get the starting offset of the HDU 
+     * Get the starting offset of the HDU
      *
      * @return _more_
      */
@@ -138,7 +144,7 @@ public abstract class BasicHDU implements FitsElement {
     }
 
     /**
-     * Get the non-FITS data object 
+     * Get the non-FITS data object
      *
      * @return _more_
      */
@@ -245,7 +251,7 @@ public abstract class BasicHDU implements FitsElement {
     }
 
     /**
-     * Is the HDU rewriteable 
+     * Is the HDU rewriteable
      *
      * @return _more_
      */
@@ -254,7 +260,7 @@ public abstract class BasicHDU implements FitsElement {
     }
 
     /**
-     * Rewrite the HDU 
+     * Rewrite the HDU
      *
      * @throws FitsException _more_
      * @throws IOException _more_
@@ -529,7 +535,7 @@ public abstract class BasicHDU implements FitsElement {
     }
 
     /**
-     * Reset the input stream to the beginning of the HDU, i.e., the beginning of the header 
+     * Reset the input stream to the beginning of the HDU, i.e., the beginning of the header
      *
      * @return _more_
      */
@@ -538,7 +544,7 @@ public abstract class BasicHDU implements FitsElement {
     }
 
     /**
-     * Indicate that an HDU is the first element of a FITS file. 
+     * Indicate that an HDU is the first element of a FITS file.
      *
      * @param newPrimary _more_
      *
@@ -596,7 +602,7 @@ public abstract class BasicHDU implements FitsElement {
     }
 
     /**
-     * Add information to the header 
+     * Add information to the header
      *
      * @param key _more_
      * @param val _more_
@@ -652,7 +658,7 @@ public abstract class BasicHDU implements FitsElement {
     }
 
     /**
-     * Get an HDU without content 
+     * Get an HDU without content
      *
      * @return _more_
      */

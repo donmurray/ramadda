@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.fits;
 
 
@@ -107,7 +113,7 @@ public class Fits {
     private long lastFileOffset = -1;
 
     /**
-     * Indicate the version of these classes 
+     * Indicate the version of these classes
      *
      * @return _more_
      */
@@ -752,7 +758,7 @@ public class Fits {
     }
 
     /**
-     * Read to the end of the associated input stream 
+     * Read to the end of the associated input stream
      *
      * @throws FitsException _more_
      */

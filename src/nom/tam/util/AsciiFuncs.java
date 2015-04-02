@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 /*
  * This class provides conversions to ASCII strings without breaking
  * compatibility with Java 1.5.
@@ -22,11 +28,11 @@ import java.util.logging.Logger;
  */
 public class AsciiFuncs {
 
-    /** _more_          */
+    /** _more_ */
     public final static String ASCII = "US-ASCII";
 
     /**
-     * Convert to ASCII or return null if not compatible 
+     * Convert to ASCII or return null if not compatible
      *
      * @param buf _more_
      *
@@ -37,7 +43,7 @@ public class AsciiFuncs {
     }
 
     /**
-     * Convert to ASCII or return null if not compatible 
+     * Convert to ASCII or return null if not compatible
      *
      * @param buf _more_
      * @param start _more_
@@ -58,7 +64,7 @@ public class AsciiFuncs {
     }
 
     /**
-     * Convert an ASCII string to bytes 
+     * Convert an ASCII string to bytes
      *
      * @param in _more_
      *

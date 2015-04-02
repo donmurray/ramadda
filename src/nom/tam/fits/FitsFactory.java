@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.fits;
 
 
@@ -20,16 +26,16 @@ package nom.tam.fits;
  */
 public class FitsFactory {
 
-    /** _more_          */
+    /** _more_ */
     private static boolean useAsciiTables = true;
 
-    /** _more_          */
+    /** _more_ */
     private static boolean useHierarch = false;
 
-    /** _more_          */
+    /** _more_ */
     private static boolean checkAsciiStrings = false;
 
-    /** _more_          */
+    /** _more_ */
     private static boolean allowTerminalJunk = false;
 
     /**
@@ -43,7 +49,7 @@ public class FitsFactory {
     }
 
     /**
-     * Get the current status of ASCII table writing 
+     * Get the current status of ASCII table writing
      *
      * @return _more_
      */
@@ -52,7 +58,7 @@ public class FitsFactory {
     }
 
     /**
-     * Enable/Disable hierarchical keyword processing. 
+     * Enable/Disable hierarchical keyword processing.
      *
      * @param flag _more_
      */
@@ -74,7 +80,7 @@ public class FitsFactory {
     }
 
     /**
-     * Get the current status for string checking. 
+     * Get the current status for string checking.
      *
      * @return _more_
      */
@@ -83,7 +89,7 @@ public class FitsFactory {
     }
 
     /**
-     * Are we processing HIERARCH style keywords 
+     * Are we processing HIERARCH style keywords
      *
      * @return _more_
      */
@@ -92,7 +98,7 @@ public class FitsFactory {
     }
 
     /**
-     * Do we allow junk after a valid FITS file? 
+     * Do we allow junk after a valid FITS file?
      *
      * @param flag _more_
      */

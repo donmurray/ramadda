@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.fits;
 
 
@@ -46,7 +52,7 @@ public class FitsHeap implements FitsElement {
     private BufferedDataInputStream bstr;
 
     /**
-     * Create a heap of a given size. 
+     * Create a heap of a given size.
      *
      * @param size _more_
      */
@@ -56,7 +62,7 @@ public class FitsHeap implements FitsElement {
     }
 
     /**
-     * Read the heap 
+     * Read the heap
      *
      * @param str _more_
      *
@@ -81,7 +87,7 @@ public class FitsHeap implements FitsElement {
     }
 
     /**
-     * Write the heap 
+     * Write the heap
      *
      * @param str _more_
      *
@@ -191,7 +197,7 @@ public class FitsHeap implements FitsElement {
     }
 
     /**
-     * Add some data to the heap. 
+     * Add some data to the heap.
      *
      * @param data _more_
      *
@@ -227,7 +233,7 @@ public class FitsHeap implements FitsElement {
     }
 
     /**
-     * Return the size of the Heap 
+     * Return the size of the Heap
      *
      * @return _more_
      */
@@ -236,7 +242,7 @@ public class FitsHeap implements FitsElement {
     }
 
     /**
-     * Return the size of the heap using the more bean compatbile format 
+     * Return the size of the heap using the more bean compatbile format
      *
      * @return _more_
      */
@@ -245,7 +251,7 @@ public class FitsHeap implements FitsElement {
     }
 
     /**
-     * Get the file offset of the heap 
+     * Get the file offset of the heap
      *
      * @return _more_
      */

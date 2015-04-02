@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package nom.tam.util;
 
 
@@ -58,7 +64,7 @@ import java.io.RandomAccessFile;
  *
  *
  * @version        $version$, Thu, Apr 2, '15
- * @author         Enter your name here...    
+ * @author         Enter your name here...
  */
 public class BufferedFile implements ArrayDataInput, ArrayDataOutput,
                                      RandomAccess {
@@ -88,7 +94,7 @@ public class BufferedFile implements ArrayDataInput, ArrayDataOutput,
     private boolean doingInput;
 
     /**
-     * Create a read-only buffered file 
+     * Create a read-only buffered file
      *
      * @param filename _more_
      *
@@ -111,7 +117,7 @@ public class BufferedFile implements ArrayDataInput, ArrayDataOutput,
     }
 
     /**
-     * Create a buffered file from a File descriptor 
+     * Create a buffered file from a File descriptor
      *
      * @param file _more_
      *
@@ -122,7 +128,7 @@ public class BufferedFile implements ArrayDataInput, ArrayDataOutput,
     }
 
     /**
-     * Create a buffered file from a File descriptor 
+     * Create a buffered file from a File descriptor
      *
      * @param file _more_
      * @param mode _more_
@@ -154,7 +160,7 @@ public class BufferedFile implements ArrayDataInput, ArrayDataOutput,
     }
 
     /**
-     * Create a buffered file from a file descriptor 
+     * Create a buffered file from a file descriptor
      *
      * @param file _more_
      * @param mode _more_
@@ -314,7 +320,7 @@ public class BufferedFile implements ArrayDataInput, ArrayDataOutput,
     }
 
     /**
-     * Read a byte 
+     * Read a byte
      *
      * @return _more_
      *
@@ -401,7 +407,7 @@ public class BufferedFile implements ArrayDataInput, ArrayDataOutput,
     }
 
     /**
-     * Get a boolean from the buffer 
+     * Get a boolean from the buffer
      *
      * @return _more_
      *
@@ -452,7 +458,7 @@ public class BufferedFile implements ArrayDataInput, ArrayDataOutput,
     }
 
     /**
-     * Get an integer value from the buffer 
+     * Get an integer value from the buffer
      *
      * @return _more_
      *
@@ -479,7 +485,7 @@ public class BufferedFile implements ArrayDataInput, ArrayDataOutput,
     }
 
     /**
-     * Get a short from the buffer 
+     * Get a short from the buffer
      *
      * @return _more_
      *
@@ -515,7 +521,7 @@ public class BufferedFile implements ArrayDataInput, ArrayDataOutput,
     }
 
     /**
-     * Get a char from the buffer 
+     * Get a char from the buffer
      *
      * @return _more_
      *
@@ -541,7 +547,7 @@ public class BufferedFile implements ArrayDataInput, ArrayDataOutput,
     }
 
     /**
-     * Get a long value from the buffer 
+     * Get a long value from the buffer
      *
      * @return _more_
      *
@@ -1110,7 +1116,7 @@ public class BufferedFile implements ArrayDataInput, ArrayDataOutput,
     }
 
     /**
-     * See if an exception should be thrown during an array read. 
+     * See if an exception should be thrown during an array read.
      *
      * @param e _more_
      * @param start _more_
@@ -1131,7 +1137,7 @@ public class BufferedFile implements ArrayDataInput, ArrayDataOutput,
     }
 
     /**
-     * ** Output Routines ***
+     * ** Output Routines
      *
      * @param need _more_
      *
@@ -1777,7 +1783,7 @@ public class BufferedFile implements ArrayDataInput, ArrayDataOutput,
     }
 
     /**
-     * Close the file 
+     * Close the file
      *
      * @throws IOException _more_
      */

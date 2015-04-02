@@ -3,6 +3,12 @@
 * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
+
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 package gov.noaa.esrl.psd.repository.data.model;
 
 
@@ -24,13 +30,13 @@ import java.util.regex.Matcher;
  *
  *
  * @version        $version$, Thu, Apr 2, '15
- * @author         Enter your name here...    
+ * @author         Enter your name here...
  */
 public class CMIP5ModelFileTypeHandler extends ClimateModelFileTypeHandler {
 
     //var_model_experiment_member
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMIP5_FILE_REGEX =
         "([^_]+)_([^_]+)_([^_]+)_([^_]+)_(r\\d+i\\d+p\\d+)(_([^_.]+))?(\\.1x1)?.nc";
 

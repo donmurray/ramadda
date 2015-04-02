@@ -4,12 +4,6 @@
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
 
-/**
- * Copyright (c) 2008-2015 Geode Systems LLC
- * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
- * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
- */
-
 // $Id: StringUtil.java,v 1.53 2007/06/01 17:02:44 jeffmc Exp $
 
 
