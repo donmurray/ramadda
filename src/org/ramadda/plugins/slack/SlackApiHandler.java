@@ -1,8 +1,14 @@
+/*
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
+
 /**
-* Copyright (c) 2008-2015 Geode Systems LLC
-* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
-* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
-*/
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 package org.ramadda.plugins.slack;
 
@@ -73,9 +79,9 @@ public class SlackApiHandler extends RepositoryManager implements RequestHandler
             if (harvester instanceof SlackHarvester) {
                 if (harvester.getActiveOnStart()) {
                     harvesters.add((SlackHarvester) harvester);
-                    System.err.println ("slack harvester:");
+                    System.err.println("slack harvester:");
                 } else {
-                    System.err.println ("slack harvester: not active");
+                    System.err.println("slack harvester: not active");
                 }
             }
         }
