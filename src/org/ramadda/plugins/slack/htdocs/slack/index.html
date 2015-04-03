@@ -19,7 +19,7 @@ Slack will send the "some text" to a URL that you configure. That external serve
 <h3>Configure Slack</h3>
 In Slack go to the Integrations page for your team. Under Configured Integrations add a Slash Command. You can choose any command (I've used "/r" or "/ramadda"). Once you add the Slash Command Integration you need to configure it.  In the URL field enter your RAMADDA repository URL, e.g.:
 <pre>
-https://your_host.com/repository/slack/api
+<a href="https://${hostname}${urlroot}/slack/slack/api">https://${hostname}${urlroot}/slack/slack/api</a>
 </pre>
 <p>
 The Token is important. This is what tells RAMADDA that its OK to respond to Slack commands. Copy and paste the Token. 

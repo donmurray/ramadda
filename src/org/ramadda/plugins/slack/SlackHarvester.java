@@ -579,8 +579,10 @@ public class SlackHarvester extends Harvester {
             sb.append(msg);
             sb.append("\n");
         }
-        sb.append("/ramadda search <search text>\nls\npwd");
 
+        sb.append("Navigation:\n/ramadda ls or pwd or cd\n");
+        sb.append("Search:\n/ramadda search <search text>\n");
+        sb.append("New:\n/ramadda new (folder|wiki|blog|note) Name of entry; Optional description\n");
         return new Result("", sb);
     }
 
