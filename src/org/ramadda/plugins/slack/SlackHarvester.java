@@ -76,6 +76,8 @@ public class SlackHarvester extends Harvester {
     /** _more_          */
     public static final String CMD_NEW = "new";
 
+    public static final String CMD_DOWNLOAD = "download";
+
     /** _more_          */
     public static final String SLACK_PAYLOAD = "payload";
 
@@ -333,10 +335,7 @@ public class SlackHarvester extends Harvester {
         request.put(ARG_TEXT, text);
         List[] pair = getEntryManager().getEntries(request);
         pair[0].addAll(pair[1]);
-        StringBuffer sb = new StringBuffer();
-        makeEntryLinks(request, sb, (List<Entry>) pair[0]);
-
-        return makeResult(request, sb);
+        return makeEntryResult(request, "Search Results", (List<Entry>) pair[0]);
     }
 
 
@@ -377,13 +376,12 @@ public class SlackHarvester extends Harvester {
         Entry        parent   = getCurrentEntry(request);
         StringBuffer sb       = new StringBuffer();
         List<Entry>  children = getEntryManager().getChildren(request,
-                                    parent);
-        makeEntryLinks(request, sb, children);
+                                                              parent);
+        String attach = makeEntryLinks(request, sb, children);
         if (children.size() == 0) {
             return new Result("", new StringBuffer("No children entries"));
         }
-
-        return makeResult(request, sb);
+        return makeEntryResult(request, "Listing", children);
     }
 
 
@@ -414,11 +412,10 @@ public class SlackHarvester extends Harvester {
         StringBuffer sb       = new StringBuffer();
         List<Entry>  children = new ArrayList<Entry>();
         children.add(newEntry);
-        sb.append("ok\n");
-        makeEntryLinks(request, sb, children);
-
-        return makeResult(request, sb);
+        return makeEntryResult(request, "Current entry:", children);
     }
+
+
 
     /**
      * _more_
@@ -435,10 +432,7 @@ public class SlackHarvester extends Harvester {
         StringBuffer sb       = new StringBuffer();
         List<Entry>  children = new ArrayList<Entry>();
         children.add(parent);
-        sb.append("Current entry:\n");
-        makeEntryLinks(request, sb, children);
-
-        return makeResult(request, sb);
+        return makeEntryResult(request, "Current entry:", children);
     }
 
     /**
@@ -495,10 +489,7 @@ public class SlackHarvester extends Harvester {
         }
         cwd.put(getSlackUserId(request), entry.getId());
         children.add(entry);
-        sb.append("New entry:\n");
-        makeEntryLinks(request, sb, children);
-
-        return makeResult(request, sb);
+        return makeEntryResult(request, "New entry:", children);        
     }
 
 
@@ -513,17 +504,66 @@ public class SlackHarvester extends Harvester {
      *
      * @throws Exception _more_
      */
-    private Appendable makeEntryLinks(Request request, Appendable sb,
-                                      List<Entry> entries)
+    private String makeEntryLinks(Request request, Appendable sb,
+                                  List<Entry> entries)
             throws Exception {
-        for (Entry entry : entries) {
-            String url = request.getAbsoluteUrl(
-                             request.entryUrl(
-                                 getRepository().URL_ENTRY_SHOW, entry));
-            sb.append("<" + url + "|" + entry.getName() + ">\n");
-        }
 
-        return sb;
+        /*
+        "attachments": [
+                        {
+                            "fallback": "Required plain-text summary of the attachment.",
+                                "color": "#36a64f",
+                                "pretext": "Optional text that appears above the attachment block",
+                                "author_name": "Bobby Tables",
+                                "author_link": "http://flickr.com/bobby/",
+                                "author_icon": "http://flickr.com/icons/bobby.jpg",
+                                "title": "Slack API Documentation",
+                                "title_link": "https://api.slack.com/",
+                                "text": "Optional text that appears within the attachment",
+                                "fields": [
+                                           {
+                                               "title": "Priority",
+                                                   "value": "High",
+                                                   "short": false
+                                                   }
+                                           ],
+
+                                "image_url": "http://my-website.com/path/to/image.jpg"
+                                }
+    ]
+            */
+
+        List<String> maps = new ArrayList<String>();
+        for (Entry entry : entries) {
+            List<String> map = new ArrayList<String>();
+            sb.append("<" + getEntryUrl(request, entry) + "|" + entry.getName() + ">\n");
+
+
+            map.add("title");
+            map.add(Json.quote(entry.getName()));
+            map.add("title_link");
+            map.add(Json.quote(getEntryUrl(request, entry)));
+            map.add("fallback");
+            map.add(Json.quote(entry.getName()));
+            map.add("text");
+            map.add(Json.quote(entry.getDescription()));            
+            List<String> fields = new ArrayList<String>();
+            /*
+            fields.add(Json.map("title", Json.quote("From date"), 
+                                "value",Json.quote(getWikiManager().formatDate(request,  new Date(entry.getCreateDate()), entry))));
+            */
+            if(entry.getResource().isImage()) {
+                map.add("image_url");
+                map.add(Json.quote(request.getAbsoluteUrl(getRepository().getHtmlOutputHandler().getImageUrl(request, entry, true))));
+            }
+            map.add("fields");
+            map.add(Json.list(fields));
+
+            maps.add(Json.map(map));
+        }
+        String attachments = Json.list(maps);
+        System.err.println ("attachments:" + attachments);
+        return attachments;
     }
 
 
@@ -537,13 +577,18 @@ public class SlackHarvester extends Harvester {
      *
      * @throws Exception _more_
      */
-    private Result makeResult(Request request, Appendable sb)
+    private Result makeResult(Request request, Appendable sb, String attachments)
             throws Exception {
         if (Utils.stringDefined(webHook)) {
             StringBuilder json = new StringBuilder();
             List<String>  map  = new ArrayList<String>();
+            if(attachments!=null) {
+                map.add("attachments");
+                map.add(attachments);
+            } 
             map.add("text");
             map.add(Json.quote(sb.toString()));
+
             //            map.add(Json.quote("results"));
             map.add("username");
             map.add(Json.quote("RAMADDA"));
@@ -561,6 +606,43 @@ public class SlackHarvester extends Harvester {
         }
 
         return new Result("", new StringBuffer(sb.toString()));
+    }
+
+
+
+    private Result makeEntryResult(Request request, String message, List<Entry> entries) 
+            throws Exception {
+        StringBuffer sb       = new StringBuffer();
+        if (!Utils.stringDefined(webHook)) {
+            sb.append(message);
+            sb.append("\n");
+        }
+        String attachments = makeEntryLinks(request, sb, entries);
+        if (!Utils.stringDefined(webHook)) {
+            return new Result("", sb);
+        }
+
+        StringBuilder json = new StringBuilder();
+        List<String>  map  = new ArrayList<String>();
+        if(attachments!=null) {
+            map.add("attachments");
+            map.add(attachments);
+        } 
+        map.add("text");
+        map.add(Json.quote(message));
+        map.add("username");
+        map.add(Json.quote("RAMADDA"));
+        if (request.defined(SLACK_CHANNEL_ID)) {
+            map.add("channel");
+            map.add(Json.quote(request.getString(SLACK_CHANNEL_ID, "")));
+        }
+        json.append(Json.map(map));
+        List<HttpFormEntry> formEntries = new ArrayList<HttpFormEntry>();
+        formEntries.add(HttpFormEntry.hidden(SLACK_PAYLOAD, json.toString()));
+        String[] result = HttpFormEntry.doPost(formEntries, webHook);
+        System.err.println("Slack results:" + result[0] + " " + result[1]);
+
+        return new Result("", new StringBuffer(""));
     }
 
     /**
@@ -686,6 +768,16 @@ public class SlackHarvester extends Harvester {
         return entry;
     }
 
+
+    private String getEntryUrl(Request request, Entry entry) throws Exception {
+        return    request.getAbsoluteUrl(
+                                         request.entryUrl(
+                                                          getRepository().URL_ENTRY_SHOW, entry));
+    }
+
+
+    public static class SlackInfo {
+    }
 
 
 }
