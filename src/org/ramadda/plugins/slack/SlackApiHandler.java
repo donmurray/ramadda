@@ -70,9 +70,13 @@ public class SlackApiHandler extends RepositoryManager implements RequestHandler
     public List<SlackHarvester> getHarvesters() {
         List<SlackHarvester> harvesters = new ArrayList<SlackHarvester>();
         for (Harvester harvester : getHarvesterManager().getHarvesters()) {
-            if (harvester.getActiveOnStart()
-                    && (harvester instanceof SlackHarvester)) {
-                harvesters.add((SlackHarvester) harvester);
+            if (harvester instanceof SlackHarvester) {
+                if (harvester.getActiveOnStart()) {
+                    harvesters.add((SlackHarvester) harvester);
+                    System.err.println ("slack harvester:");
+                } else {
+                    System.err.println ("slack harvester: not active");
+                }
             }
         }
 

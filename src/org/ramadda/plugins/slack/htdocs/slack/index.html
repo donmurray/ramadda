@@ -2,8 +2,72 @@
 <title>Slack Integration</title>
 <body>
 
+<div class="ramadda-section">
+<h2>Integrating Slack and RAMADDA</h2>
+<img src="${urlroot}/slack/slack-logo.jpg" width="450" align="right">
+<a href="https://slack.com/">Slack</a> is a powerful group communication platform and provides the ability to integrate external services. 
+You can integrate  Slack with RAMADDA and create wiki pages, web log posts and other content in RAMADDA from Slack as well as search and navigate through tour RAMADDA content.
+<p><br>
+Here's what you need to do to set this up. This assumes you have an account on Slack and a RAMADDA server set up. Slack provides what they call a Slash Command - a way where when you type something like:
+<p>
+<pre>
+/some_command some text
+</pre>
+<p>
+Slack will send the "some text" to a URL that you configure. That external server (like RAMADDA) can respond to the command.
+
+<h3>Configure Slack</h3>
+In Slack go to the Integrations page for your team. Under Configured Integrations add a Slash Command. You can choose any command (I've used "/r" or "/ramadda"). Once you add the Slash Command Integration you need to configure it.  In the URL field enter your RAMADDA repository URL, e.g.:
+<pre>
+https://your_host.com/repository/slack/api
+</pre>
+<p>
+The Token is important. This is what tells RAMADDA that its OK to respond to Slack commands. Copy and paste the Token. 
+
+<h3>Configure RAMADDA</h3>
+Now, go to your RAMADDA repository and log in as an admin. Under the Admin-&gt;Harvesters page add a New Harvester. From the list cchoose Slack Harvester. Under the Run Settings check on "Active on Start Up". And copy the token into the Tokens field. You can have any number of Slack Slash commands configured and have them all communicate with this one harvester. Conversely you can have any number of harvesters that handle different Slash commands.
+<br>
+Under the Base Folder select a RAMADDA entry. This is the root of the content that this particular Slash command will be able to navigate and create entries under.
+<br>
+The Slack Web Hook API URL is the way that RAMDDA can talk back to Slack. To enable this create an Incoming Web Hook in your Slack team and copy the URL that Slack provides into the RAMADDA harvester. If a Web Hook is provided then the responses from RAMADDA will be sent to the Slack Channel as a archived message. If it is not provided then responses are sent directly back to the user and are not part of the Channel.
+<br>
+Save the Slack Harvester and you should be good to go. 
+
+<h3>RAMADDA/Slack Interface</h3>
+You can do a number of things in RAMADDA through Slack. 
+<p>
+Search:
+<pre>
+/r search some search text
+</pre>
+<br>
+
+The interface lets you navigate around RAMADDA like a command line:
+<pre>
+#Show the current entry 
+/r pwd
+
+#List the sub-entries of the current entry
+/r ls
+
+#change directory to a sub folder
+/r cd some folder
+
+#change directory to the top-level entry
+/r cd
+
+#cd up a couple
+/r cd ../..
+</pre>
+
+<br>
+Create wiki pages, web logs and other entries
+<pre>
+/r new &lt;folder|wiki|blog|note&gt; New entry name ; Optional description or wiki text
+</pre>
 
 
+</div>
 </body>
 </html>
 
