@@ -4,6 +4,12 @@
 * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
 */
 
+/**
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
+
 package org.ramadda.repository;
 
 
@@ -9561,6 +9567,53 @@ public class EntryManager extends RepositoryManager {
 
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param baseGroup _more_
+     * @param dir _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Entry getRelativeEntry(Request request, Entry baseGroup,
+                                  String dir)
+            throws Exception {
+        dir = dir.trim();
+        if (dir.length() == 0) {
+            return baseGroup;
+        } else if (dir.startsWith("/")) {
+            return findEntryWithName(request, baseGroup, dir);
+        } else if (dir.startsWith("..")) {
+            Entry   currentEntry      = baseGroup;
+            boolean haveSeenBaseGroup = false;
+            for (String tok : StringUtil.split(dir, "/", true, true)) {
+                if (currentEntry.equals(baseGroup)) {
+                    haveSeenBaseGroup = true;
+                }
+                if (tok.equals("..")) {
+                    if (haveSeenBaseGroup) {
+                        break;
+                    }
+                    currentEntry = currentEntry.getParentEntry();
+                } else {
+                    Entry childEntry =
+                        getEntryManager().findEntryWithName(request,
+                            currentEntry, tok);
+                    if (childEntry == null) {
+                        return null;
+                    }
+                    currentEntry = childEntry;
+                }
+            }
+
+            return currentEntry;
+        } else {
+            return findEntryWithName(request, baseGroup, dir);
+        }
+    }
 
 
 
