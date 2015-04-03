@@ -2139,7 +2139,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
      *
      * @return _more_
      */
-    private String getSnippet(Request request, Entry child) {
+    public String getSnippet(Request request, Entry child) {
         String snippet = StringUtil.findPattern(child.getDescription(),
                              "(?s)<snippet>(.*)</snippet>");
         if (snippet != null) {

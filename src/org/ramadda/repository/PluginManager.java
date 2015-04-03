@@ -162,6 +162,8 @@ public class PluginManager extends RepositoryManager {
     /** _more_ */
     private List<Class> adminHandlerClasses = new ArrayList<Class>();
 
+    private List<Class> specialClasses = new ArrayList<Class>();
+
 
     /** _more_ */
     private List<PageDecorator> pageDecorators =
@@ -736,6 +738,8 @@ public class PluginManager extends RepositoryManager {
                 return;
             }
             seenClasses.add(key);
+
+
             if (ImportHandler.class.isAssignableFrom(c)) {
                 //                System.out.println("class:" + c.getName());
                 pluginStat("Import handler", c.getName());
@@ -811,6 +815,8 @@ public class PluginManager extends RepositoryManager {
                 //                                System.out.println("class:" + c.getName());
                 pluginStat("Harvester", c.getName());
                 getHarvesterManager().addHarvesterType(c);
+            } else {
+                specialClasses.add(c);
             }
         }
 
@@ -997,5 +1003,9 @@ public class PluginManager extends RepositoryManager {
      */
     public List<Class> getAdminHandlerClasses() {
         return adminHandlerClasses;
+    }
+
+    public List<Class> getSpecialClasses() {
+        return specialClasses;
     }
 }

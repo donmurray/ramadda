@@ -86,6 +86,11 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
     }
 
 
+    public void addClass(Class c) throws Exception {
+        MonitorAction action  = (MonitorAction) c.newInstance();
+        actions.add(action);
+    }
+
     /**
      * _more_
      *
@@ -99,6 +104,16 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
         //        actions.add(new FtpAction());
         actions.add(new LdmAction());
         actions.add(new ExecAction());
+
+
+
+        for(Class c: getRepository().getPluginManager().getSpecialClasses()) {
+            if (MonitorAction.class.isAssignableFrom(c)) {
+                addClass(c);
+            }
+        }
+
+
     }
 
 

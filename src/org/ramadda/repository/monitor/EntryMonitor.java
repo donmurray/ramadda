@@ -622,7 +622,7 @@ public class EntryMonitor implements Constants {
      *
      * @return _more_
      */
-    protected Repository getRepository() {
+    public Repository getRepository() {
         return repository;
     }
 
@@ -651,7 +651,7 @@ public class EntryMonitor implements Constants {
      * @param message _more_
      * @param exc _more_
      */
-    protected void handleError(String message, Exception exc) {
+    public void handleError(String message, Exception exc) {
         lastError = message + "<br>" + exc + "<br>" + ((exc != null)
                 ? LogUtil.getStackTrace(exc)
                 : "");
