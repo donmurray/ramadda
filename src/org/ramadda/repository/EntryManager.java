@@ -9611,6 +9611,15 @@ public class EntryManager extends RepositoryManager {
 
             return currentEntry;
         } else {
+            if (dir.matches("\\d+")) {
+                int index = new Integer(dir).intValue();
+                index--;
+                List<Entry> children = getEntryManager().getChildren(request,baseGroup);
+                if ((index < 0) || (index >= children.size())) {
+                    return null;
+                }
+                return children.get(index);
+            }
             return findEntryWithName(request, baseGroup, dir);
         }
     }
