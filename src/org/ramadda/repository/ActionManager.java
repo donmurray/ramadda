@@ -104,7 +104,7 @@ public class ActionManager extends RepositoryManager {
         }
 
 
-        sb.append(msgHeader("Action: " + action.getName()));
+        sb.append(HtmlUtils.sectionOpen("Action: " + action.getName(), false));
         if (request.exists(ARG_CANCEL)) {
             action.setRunning(false);
             actions.remove(id);
@@ -141,6 +141,7 @@ public class ActionManager extends RepositoryManager {
                 sb.append(HtmlUtils.formClose());
             }
         }
+        sb.append(HtmlUtils.sectionClose());
         Result result = new Result(msg("Status"), sb);
         if (action.entry != null) {
             return getEntryManager().addEntryHeader(request, action.entry,

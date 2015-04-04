@@ -236,6 +236,8 @@ public class SlackHarvester extends Harvester {
             return processLs(request, rest);
         } else if (cmd.equals(SlackUtil.CMD_PWD)) {
             return processPwd(request, rest);
+        } else if (cmd.equals(SlackUtil.CMD_DESC)) {
+            return processDesc(request, rest);
         } else if (cmd.equals(SlackUtil.CMD_NEW)) {
             return processNew(request, rest);
         } else if (cmd.equals(SlackUtil.CMD_CD)) {
@@ -277,6 +279,18 @@ public class SlackHarvester extends Harvester {
         return SlackUtil.makeEntryResult(getRepository(), request,
                                          "Search Results",
                                          (List<Entry>) pair[0], webHook);
+    }
+
+
+    private Result processDesc(Request request, String text)
+            throws Exception {
+        Entry        entry = getCurrentEntry(request);
+        if (entry == null) {
+            return getUsage(request, "No current entry");
+        }
+        return SlackUtil.makeEntryResult(getRepository(), request,
+                                         entry.getDescription(),
+                                         null, webHook);
     }
 
 
@@ -352,12 +366,8 @@ public class SlackHarvester extends Harvester {
         }
 
         cwd.put(SlackUtil.getSlackUserId(request), newEntry.getId());
-        StringBuffer sb       = new StringBuffer();
-        List<Entry>  children = new ArrayList<Entry>();
-        children.add(newEntry);
-
         return SlackUtil.makeEntryResult(getRepository(), request,
-                                         "Current entry:", children, webHook);
+                                         "Current entry:", toList(newEntry), webHook);
     }
 
 
@@ -373,13 +383,9 @@ public class SlackHarvester extends Harvester {
      * @throws Exception _more_
      */
     private Result processPwd(Request request, String text) throws Exception {
-        Entry        parent   = getCurrentEntry(request);
-        StringBuffer sb       = new StringBuffer();
-        List<Entry>  children = new ArrayList<Entry>();
-        children.add(parent);
-
+        Entry        entry   = getCurrentEntry(request);
         return SlackUtil.makeEntryResult(getRepository(), request,
-                                         "Current entry:", children, webHook);
+                                         "Current entry:", toList(entry), webHook);
     }
 
     /**
@@ -428,7 +434,7 @@ public class SlackHarvester extends Harvester {
                             "new <folder|blog|wiki|note> name;description");
         }
 
-        List<Entry>  children = new ArrayList<Entry>();
+
 
         StringBuffer msg      = new StringBuffer();
         Entry entry = addEntry(request, parent, theType, name, desc, msg);
@@ -436,10 +442,8 @@ public class SlackHarvester extends Harvester {
             return getUsage(request, msg.toString());
         }
         cwd.put(SlackUtil.getSlackUserId(request), entry.getId());
-        children.add(entry);
-
         return SlackUtil.makeEntryResult(getRepository(), request,
-                                         "New entry:", children, webHook);
+                                         "New entry:", toList(entry), webHook);
     }
 
 
@@ -543,5 +547,10 @@ public class SlackHarvester extends Harvester {
      */
     public static class SlackInfo {}
 
+    private List<Entry> toList(Entry entry) {
+        List<Entry>  l = new ArrayList<Entry>();
+        l.add(entry);
+        return l;
+    }
 
 }

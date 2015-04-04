@@ -60,6 +60,8 @@ public class SlackUtil {
     /** _more_ */
     public static final String CMD_PWD = "pwd";
 
+    public static final String CMD_DESC = "desc";
+
     /** _more_ */
     public static final String CMD_LS = "ls";
 
@@ -183,6 +185,9 @@ public class SlackUtil {
                                         Request request, Appendable sb,
                                         List<Entry> entries)
             throws Exception {
+        if(entries==null) {
+            return null;
+        }
 
         /*
         "attachments": [
@@ -231,13 +236,19 @@ public class SlackUtil {
             map.add(Json.quote(entry.getName()));
             map.add("color");
             map.add("#00FCF4");
-            StringBuffer desc = new StringBuffer(entry.getDescription());
+
+
+            StringBuffer desc = new StringBuffer();
+            String snippet= request.getRepository().getWikiManager().getSnippet(request, entry);
+            if(Utils.stringDefined(snippet)) {
+                desc.append(snippet);
+                desc.append("\n");
+            }
             Link downloadLink = entry.getTypeHandler().getEntryDownloadLink(request, entry);
             if (downloadLink != null) {
-                desc.append("\n");
                 desc.append("<" + downloadLink.getUrl() + "|"   + IOUtil.getFileTail(entry.getResource().getPath()) + ">\n");
+                desc.append("\n");
             }
-
             
 
             map.add("text");
