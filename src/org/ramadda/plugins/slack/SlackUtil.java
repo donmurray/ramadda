@@ -3,11 +3,6 @@
  * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
  * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
  */
-/*
- * Copyright (c) 2008-2015 Geode Systems LLC
- * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
- * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
- */
 
 package org.ramadda.plugins.slack;
 
@@ -73,6 +68,7 @@ public class SlackUtil {
 
     /** _more_ */
     public static final String CMD_NEW = "new";
+    public static final String CMD_APPEND = "append";
 
     /** _more_ */
     public static final String CMD_DOWNLOAD = "download";
@@ -214,20 +210,38 @@ public class SlackUtil {
             */
 
         List<String> maps = new ArrayList<String>();
+
+        int cnt = 0; 
         for (Entry entry : entries) {
+            cnt++;
             List<String> map = new ArrayList<String>();
             sb.append("<" + getEntryUrl(repository, request, entry) + "|"
                       + entry.getName() + ">\n");
 
 
             map.add("title");
-            map.add(Json.quote(entry.getName()));
+            String name = entry.getName();
+            if(entries.size()>1) {
+                name = "#" + cnt +" " + name;
+            }
+            map.add(Json.quote(name));
             map.add("title_link");
             map.add(Json.quote(getEntryUrl(repository, request, entry)));
             map.add("fallback");
             map.add(Json.quote(entry.getName()));
+            map.add("color");
+            map.add("#00FCF4");
+            StringBuffer desc = new StringBuffer(entry.getDescription());
+            Link downloadLink = entry.getTypeHandler().getEntryDownloadLink(request, entry);
+            if (downloadLink != null) {
+                desc.append("\n");
+                desc.append("<" + downloadLink.getUrl() + "|"   + IOUtil.getFileTail(entry.getResource().getPath()) + ">\n");
+            }
+
+            
+
             map.add("text");
-            map.add(Json.quote(entry.getDescription()));
+            map.add(Json.quote(desc.toString()));
             List<String> fields = new ArrayList<String>();
             /*
             fields.add(Json.map("title", Json.quote("From date"),

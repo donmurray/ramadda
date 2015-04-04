@@ -343,8 +343,7 @@ public class SlackHarvester extends Harvester {
     private Result processCd(Request request, String text) throws Exception {
         text = text.trim();
         Entry parent = getCurrentEntry(request);
-        Entry newEntry = getEntryManager().getRelativeEntry(request, parent,
-                             text);
+        Entry newEntry = getEntryManager().getRelativeEntry(request, getBaseGroup(), parent,  text);
         if (newEntry == null) {
             return new Result("", new StringBuffer("No such entry"));
         }
@@ -411,6 +410,7 @@ public class SlackHarvester extends Harvester {
         String   desc = (toks.size() > 1)
                         ? toks.get(1)
                         : "";
+        desc = desc.replace("\\n","\n");
         String[] cmds = { "folder", "wiki", "blog", "note" };
         String[] types = { TypeHandler.TYPE_GROUP, "wikipage", "blogentry",
                            "notes_note" };

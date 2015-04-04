@@ -1,12 +1,6 @@
-/**
-* Copyright (c) 2008-2015 Geode Systems LLC
-* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
-* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
-*/
-
-/**
+/*
  * Copyright (c) 2008-2015 Geode Systems LLC
- * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
  * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
  */
 
@@ -9572,25 +9566,27 @@ public class EntryManager extends RepositoryManager {
      *
      * @param request _more_
      * @param baseGroup _more_
+     * @param base _more_
+     * @param current _more_
      * @param dir _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Entry getRelativeEntry(Request request, Entry baseGroup,
+    public Entry getRelativeEntry(Request request, Entry base, Entry current,
                                   String dir)
             throws Exception {
         dir = dir.trim();
         if (dir.length() == 0) {
-            return baseGroup;
+            return current;
         } else if (dir.startsWith("/")) {
-            return findEntryWithName(request, baseGroup, dir);
+            return findEntryWithName(request, base, dir);
         } else if (dir.startsWith("..")) {
-            Entry   currentEntry      = baseGroup;
+            Entry   currentEntry      = current;
             boolean haveSeenBaseGroup = false;
             for (String tok : StringUtil.split(dir, "/", true, true)) {
-                if (currentEntry.equals(baseGroup)) {
+                if (currentEntry.equals(base)) {
                     haveSeenBaseGroup = true;
                 }
                 if (tok.equals("..")) {
@@ -9614,13 +9610,16 @@ public class EntryManager extends RepositoryManager {
             if (dir.matches("\\d+")) {
                 int index = new Integer(dir).intValue();
                 index--;
-                List<Entry> children = getEntryManager().getChildren(request,baseGroup);
+                List<Entry> children = getEntryManager().getChildren(request,
+                                           current);
                 if ((index < 0) || (index >= children.size())) {
                     return null;
                 }
+
                 return children.get(index);
             }
-            return findEntryWithName(request, baseGroup, dir);
+
+            return findEntryWithName(request, current, dir);
         }
     }
 
