@@ -1,7 +1,7 @@
 
 End User License Agreement (EULA) for RAMADDA SOFTWARE
 April 2, 2015
-Copyright (C) 2008-2015 Geode Systems LLC
+Copyright (c) 2008-2015 Geode Systems LLC
 
 This End User License Agreement (EULA) for RAMADDA SOFTWARE provided by Geode Systems LLC (including documentation) expresses the terms for use subject to the following conditions. Geode Systems LLC is the owner of RAMADDA SOFTWARE (including documentation) (called the Software), and all copyrights and all other rights, title and interest in the Software. 
 
