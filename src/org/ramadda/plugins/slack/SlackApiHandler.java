@@ -57,8 +57,6 @@ public class SlackApiHandler extends RepositoryManager implements RequestHandler
      *     ctor
      *
      *     @param repository the repository
-     *     @param node xml from api.xml
-     *     @param props propertiesn
      *
      *     @throws Exception on badness
      */

@@ -54,7 +54,8 @@ import java.util.Properties;
  */
 public class SlackHarvester extends Harvester {
 
-
+    /** _more_          */
+    public static final String ARG_COMMAND = "command";
 
     /** _more_ */
     private String tokens;
@@ -220,15 +221,22 @@ public class SlackHarvester extends Harvester {
         String       text = SlackUtil.getSlackText(request);
         List<String> toks = StringUtil.splitUpTo(text, " ", 2);
 
-        if (toks.size() < 1) {
-            return getUsage(request, "No command given");
+        String       cmd  = request.getString(ARG_COMMAND, (String) null);
+
+
+        if (cmd == null) {
+            if (toks.size() == 0) {
+                return getUsage(request, "No command given");
+            }
+            cmd = toks.get(0);
+            toks.remove(0);
         }
 
         String rest = "";
-        if (toks.size() == 2) {
-            rest = toks.get(1);
+        if (toks.size() > 0) {
+            rest = toks.get(0);
         }
-        String cmd = toks.get(0);
+
         System.err.println("command:" + cmd);
         if (cmd.equals(SlackUtil.CMD_SEARCH)) {
             return processSearch(request, rest);
@@ -299,9 +307,13 @@ public class SlackHarvester extends Harvester {
             return getUsage(request, "No current entry");
         }
 
-        return SlackUtil.makeEntryResult(getRepository(), request,
-                                         entry.getDescription(), null,
-                                         webHook);
+        String desc = "Description:" + entry.getDescription();
+        if ( !Utils.stringDefined(desc)) {
+            desc = "    ";
+        }
+
+        return SlackUtil.makeEntryResult(getRepository(), request, desc,
+                                         null, webHook);
     }
 
 

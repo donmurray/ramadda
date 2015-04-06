@@ -60,7 +60,7 @@ public class SlackUtil {
     /** _more_ */
     public static final String CMD_PWD = "pwd";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_DESC = "desc";
 
     /** _more_ */
@@ -72,7 +72,7 @@ public class SlackUtil {
     /** _more_ */
     public static final String CMD_NEW = "new";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_APPEND = "append";
 
     /** _more_ */
@@ -153,8 +153,8 @@ public class SlackUtil {
             map.add("attachments");
             map.add(attachments);
         }
-        map.add("text");
-        map.add(Json.quote(message));
+        map.add(SLACK_TEXT);
+        map.add(Json.quote(message + "\n"));
         map.add("username");
         map.add(Json.quote("RAMADDA"));
         if ((request != null) && request.defined(SLACK_CHANNEL_ID)) {
@@ -162,6 +162,7 @@ public class SlackUtil {
             map.add(Json.quote(request.getString(SLACK_CHANNEL_ID, "")));
         }
         json.append(Json.map(map));
+        System.err.println("Slack message:" + json);
         List<HttpFormEntry> formEntries = new ArrayList<HttpFormEntry>();
         formEntries.add(HttpFormEntry.hidden(SLACK_PAYLOAD, json.toString()));
         String[] result = HttpFormEntry.doPost(formEntries, webHook);
@@ -238,7 +239,7 @@ public class SlackUtil {
             map.add("fallback");
             map.add(Json.quote(entry.getName()));
             map.add("color");
-            map.add("#00FCF4");
+            map.add(Json.quote("#00FCF4"));
 
 
             StringBuffer desc = new StringBuffer();
