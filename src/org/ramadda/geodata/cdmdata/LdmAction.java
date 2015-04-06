@@ -4,7 +4,7 @@
  * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
  */
 
-package org.ramadda.geodata.thredds;
+package org.ramadda.geodata.cdmdata;
 
 
 import org.ramadda.repository.*;
