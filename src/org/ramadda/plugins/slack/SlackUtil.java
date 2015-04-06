@@ -55,30 +55,6 @@ import java.util.Properties;
 public class SlackUtil {
 
     /** _more_ */
-    public static final String CMD_SEARCH = "search";
-
-    /** _more_ */
-    public static final String CMD_PWD = "pwd";
-
-    /** _more_ */
-    public static final String CMD_DESC = "desc";
-
-    /** _more_ */
-    public static final String CMD_LS = "ls";
-
-    /** _more_ */
-    public static final String CMD_CD = "cd";
-
-    /** _more_ */
-    public static final String CMD_NEW = "new";
-
-    /** _more_ */
-    public static final String CMD_APPEND = "append";
-
-    /** _more_ */
-    public static final String CMD_DOWNLOAD = "download";
-
-    /** _more_ */
     public static final String SLACK_PAYLOAD = "payload";
 
 

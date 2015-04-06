@@ -773,34 +773,14 @@ public class PhoneHarvester extends Harvester {
 
         Entry  parent           = currentEntry;
         if (doAppend) {
-            //TODO: handle wiki and update the entry better
-            if (currentEntry.getTypeHandler().getType().equals("wikipage")) {
-                cleanedInputText = cleanedInputText.replaceAll("<br>", "\n");
-                Object[] values =
-                    currentEntry.getTypeHandler().getEntryValues(
-                        currentEntry);
-                if (values[0] == null) {
-                    values[0] = cleanedInputText;
-                } else {
-                    values[0] = values[0] + " " + cleanedInputText;
-                }
-            } else {
-                currentEntry.setDescription(currentEntry.getDescription()
-                                            + "<br>" + cleanedInputText);
-            }
-            getEntryManager().updateEntry(getRequest(), currentEntry);
+            getEntryManager().appendText(getRequest(), currentEntry, cleanedInputText);
             msg.append("appended to:\n" + getEntryInfo(currentEntry));
-
             return true;
         }
-
-
         if ( !defined(name)) {
             name = "SMS Entry";
         }
         name = name.trim();
-
-
 
 
 

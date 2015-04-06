@@ -54,6 +54,32 @@ import java.util.Properties;
  */
 public class SlackHarvester extends Harvester {
 
+    /** _more_ */
+    public static final String CMD_SEARCH = "search";
+
+    /** _more_ */
+    public static final String CMD_PWD = "pwd";
+
+    /** _more_ */
+    public static final String CMD_DESC = "desc";
+
+    public static final String CMD_APPEND = "append";
+
+    /** _more_ */
+    public static final String CMD_LS = "ls";
+
+    /** _more_ */
+    public static final String CMD_CD = "cd";
+
+    /** _more_ */
+    public static final String CMD_NEW = "new";
+
+    /** _more_ */
+    public static final String CMD_DOWNLOAD = "download";
+
+
+
+
     /** _more_          */
     public static final String ARG_COMMAND = "command";
 
@@ -238,17 +264,19 @@ public class SlackHarvester extends Harvester {
         }
 
         System.err.println("command:" + cmd);
-        if (cmd.equals(SlackUtil.CMD_SEARCH)) {
+        if (cmd.equals(CMD_SEARCH)) {
             return processSearch(request, rest);
-        } else if (cmd.equals(SlackUtil.CMD_LS)) {
+        } else if (cmd.equals(CMD_LS)) {
             return processLs(request, rest);
-        } else if (cmd.equals(SlackUtil.CMD_PWD)) {
+        } else if (cmd.equals(CMD_PWD)) {
             return processPwd(request, rest);
-        } else if (cmd.equals(SlackUtil.CMD_DESC)) {
+        } else if (cmd.equals(CMD_DESC)) {
             return processDesc(request, rest);
-        } else if (cmd.equals(SlackUtil.CMD_NEW)) {
+        } else if (cmd.equals(CMD_APPEND)) {
+            return processAppend(request, rest);
+        } else if (cmd.equals(CMD_NEW)) {
             return processNew(request, rest);
-        } else if (cmd.equals(SlackUtil.CMD_CD)) {
+        } else if (cmd.equals(CMD_CD)) {
             return processCd(request, rest);
         } else {
             return getUsage(request, "Unknown command: " + cmd);
@@ -313,6 +341,19 @@ public class SlackHarvester extends Harvester {
         }
 
         return SlackUtil.makeEntryResult(getRepository(), request, desc,
+                                         null, webHook);
+    }
+
+
+    private Result processAppend(Request request, String text)
+            throws Exception {
+        Entry entry = getCurrentEntry(request);
+        if (entry == null) {
+            return getUsage(request, "No current entry");
+        }
+
+        getEntryManager().appendText(getRequest(), entry, text);
+        return SlackUtil.makeEntryResult(getRepository(), request,"Text appended",
                                          null, webHook);
     }
 

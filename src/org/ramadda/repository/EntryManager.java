@@ -9626,6 +9626,30 @@ public class EntryManager extends RepositoryManager {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param text _more_
+     *
+     * @throws Exception _more_
+     */
+    public void appendText(Request request, Entry entry, String text)
+            throws Exception {
+        if (entry.getTypeHandler().getType().equals("wikipage")) {
+            text = text.replaceAll("<br>", "\n");
+            Object[] values = entry.getTypeHandler().getEntryValues(entry);
+            if (values[0] == null) {
+                values[0] = text;
+            } else {
+                values[0] = values[0] + "\n" + text;
+            }
+        } else {
+            entry.setDescription(entry.getDescription() + "<br>" + text);
+        }
+        updateEntry(request, entry);
+    }
 
 
 }
