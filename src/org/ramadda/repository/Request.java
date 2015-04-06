@@ -1,8 +1,8 @@
-/**
-* Copyright (c) 2008-2015 Geode Systems LLC
-* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
-* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
-*/
+/*
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 package org.ramadda.repository;
 
@@ -803,11 +803,11 @@ public class Request implements Constants, Cloneable {
      * @return _more_
      */
     public String getAbsoluteUrl(String url) {
-        int port = getServerPort();
+        int    port     = getServerPort();
         String protocol = "http";
-        if(httpServletRequest!=null) {
-            protocol = StringUtil.split(httpServletRequest.getScheme(),
-                                        "/", true, true).get(0);
+        if (httpServletRequest != null) {
+            protocol = StringUtil.split(httpServletRequest.getScheme(), "/",
+                                        true, true).get(0);
         }
         //        System.err.println("Request.getAbsoluteUrl:" + protocol +" port:" + port);
         if (port == 80) {

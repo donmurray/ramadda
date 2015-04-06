@@ -1,8 +1,8 @@
-/**
-* Copyright (c) 2008-2015 Geode Systems LLC
-* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
-* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
-*/
+/*
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 package org.ramadda.repository;
 
@@ -104,7 +104,8 @@ public class ActionManager extends RepositoryManager {
         }
 
 
-        sb.append(HtmlUtils.sectionOpen("Action: " + action.getName(), false));
+        sb.append(HtmlUtils.sectionOpen("Action: " + action.getName(),
+                                        false));
         if (request.exists(ARG_CANCEL)) {
             action.setRunning(false);
             actions.remove(id);

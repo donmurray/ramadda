@@ -1,8 +1,8 @@
-/**
-* Copyright (c) 2008-2015 Geode Systems LLC
-* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
-* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
-*/
+/*
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 package org.ramadda.repository.monitor;
 
@@ -68,6 +68,7 @@ public class EntryMonitor implements Constants {
     /** _more_ */
     private boolean enabled = true;
 
+    /** _more_          */
     private boolean onlyNew = true;
 
     /** _more_ */
@@ -206,11 +207,14 @@ public class EntryMonitor implements Constants {
             lastError = "";
         }
 
-        setName(request.getString(MonitorManager.ARG_MONITOR_NAME, getName()));
+        setName(request.getString(MonitorManager.ARG_MONITOR_NAME,
+                                  getName()));
         setEnabled(request.get(MonitorManager.ARG_MONITOR_ENABLED, false));
         setOnlyNew(request.get(MonitorManager.ARG_MONITOR_ONLYNEW, false));
-        Date[] dateRange = request.getDateRange(MonitorManager.ARG_MONITOR_FROMDATE,
-                               MonitorManager.ARG_MONITOR_TODATE, new Date());
+        Date[] dateRange =
+            request.getDateRange(MonitorManager.ARG_MONITOR_FROMDATE,
+                                 MonitorManager.ARG_MONITOR_TODATE,
+                                 new Date());
         fromDate = dateRange[0];
         toDate   = dateRange[1];
 
@@ -237,37 +241,36 @@ public class EntryMonitor implements Constants {
         StringBuffer stateSB = new StringBuffer();
 
         stateSB.append(HtmlUtils.formTable());
-        stateSB.append(HtmlUtils.formEntry(getRepository().msgLabel("Name"),
-                                           HtmlUtils.input(MonitorManager.ARG_MONITOR_NAME,
-                                               getName(),
-                                                   HtmlUtils.SIZE_70)));
+        stateSB.append(
+            HtmlUtils.formEntry(
+                getRepository().msgLabel("Name"),
+                HtmlUtils.input(
+                    MonitorManager.ARG_MONITOR_NAME, getName(),
+                    HtmlUtils.SIZE_70)));
         stateSB.append(
             HtmlUtils.formEntry(
                 getRepository().msgLabel("Enabled"),
                 HtmlUtils.checkbox(
-                    MonitorManager.ARG_MONITOR_ENABLED, "true", getEnabled())));
+                    MonitorManager.ARG_MONITOR_ENABLED, "true",
+                    getEnabled())));
 
         stateSB.append(
             HtmlUtils.formEntry(
                 getRepository().msgLabel("Only check new entries"),
                 HtmlUtils.checkbox(
-                                   MonitorManager.ARG_MONITOR_ONLYNEW, "true", getOnlyNew())));
+                    MonitorManager.ARG_MONITOR_ONLYNEW, "true",
+                    getOnlyNew())));
 
         stateSB.append(
-            HtmlUtils
-                .formEntry(
-                    getRepository().msgLabel("Valid Date Range"),
-                    getRepository().getPageHandler()
-                        .makeDateInput(
-                            request, MonitorManager.ARG_MONITOR_FROMDATE, "monitorform",
-                            getFromDate()) + " " + getRepository().msg("To")
-                                           + " "
-                                           + getRepository().getPageHandler()
-                                               .makeDateInput(
-                                                   request,
-                                                       MonitorManager.ARG_MONITOR_TODATE,
-                                                           "monitorform",
-                                                               getToDate())));
+            HtmlUtils.formEntry(
+                getRepository().msgLabel("Valid Date Range"),
+                getRepository().getPageHandler().makeDateInput(
+                    request, MonitorManager.ARG_MONITOR_FROMDATE,
+                    "monitorform", getFromDate()) + " "
+                        + getRepository().msg("To") + " "
+                        + getRepository().getPageHandler().makeDateInput(
+                            request, MonitorManager.ARG_MONITOR_TODATE,
+                            "monitorform", getToDate())));
 
 
 
@@ -722,6 +725,7 @@ public class EntryMonitor implements Constants {
      * _more_
      *
      * @param entry _more_
+     * @param isNew _more_
      *
      * @return _more_
      *
@@ -765,12 +769,14 @@ public class EntryMonitor implements Constants {
      *
      * @param filter _more_
      * @param entry _more_
+     * @param isNew _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public boolean checkEntry(Filter filter, Entry entry, boolean isNew) throws Exception {
+    public boolean checkEntry(Filter filter, Entry entry, boolean isNew)
+            throws Exception {
         boolean ok    = false;
         String  field = filter.getField();
         Object  value = filter.getValue();
@@ -917,6 +923,7 @@ public class EntryMonitor implements Constants {
      * _more_
      *
      * @param entry _more_
+     * @param isNew _more_
      */
     protected void entryMatched(final Entry entry, final boolean isNew) {
         Misc.run(new Runnable() {
@@ -935,6 +942,7 @@ public class EntryMonitor implements Constants {
      * _more_
      *
      * @param entry _more_
+     * @param isNew _more_
      */
     protected void entryMatchedInner(Entry entry, boolean isNew) {
         System.err.println(getName() + " matched entry: " + entry);
@@ -1030,23 +1038,23 @@ public class EntryMonitor implements Constants {
 
 
 
-/**
-Set the OnlyNew property.
+    /**
+     * Set the OnlyNew property.
+     *
+     * @param value The new value for OnlyNew
+     */
+    public void setOnlyNew(boolean value) {
+        onlyNew = value;
+    }
 
-@param value The new value for OnlyNew
-**/
-public void setOnlyNew (boolean value) {
-	onlyNew = value;
-}
-
-/**
-Get the OnlyNew property.
-
-@return The OnlyNew
-**/
-public boolean getOnlyNew () {
-	return onlyNew;
-}
+    /**
+     * Get the OnlyNew property.
+     *
+     * @return The OnlyNew
+     */
+    public boolean getOnlyNew() {
+        return onlyNew;
+    }
 
     /**
      *  Set the FromDate property.

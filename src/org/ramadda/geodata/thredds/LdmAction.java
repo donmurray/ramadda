@@ -1,15 +1,15 @@
-/**
-* Copyright (c) 2008-2015 Geode Systems LLC
-* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
-* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
-*/
+/*
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 package org.ramadda.geodata.thredds;
 
 
 import org.ramadda.repository.*;
-import org.ramadda.repository.monitor.*;
 import org.ramadda.repository.auth.*;
+import org.ramadda.repository.monitor.*;
 
 import org.ramadda.util.HtmlUtils;
 
@@ -209,9 +209,11 @@ public class LdmAction extends MonitorAction {
      *
      * @param monitor _more_
      * @param entry _more_
+     * @param isNew _more_
      */
     @Override
-    public void entryMatched(EntryMonitor monitor, Entry entry,  boolean isNew) {
+    public void entryMatched(EntryMonitor monitor, Entry entry,
+                             boolean isNew) {
         try {
             Resource resource = entry.getResource();
             if ( !resource.isFile()) {

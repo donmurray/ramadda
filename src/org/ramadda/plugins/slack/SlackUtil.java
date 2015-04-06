@@ -60,6 +60,7 @@ public class SlackUtil {
     /** _more_ */
     public static final String CMD_PWD = "pwd";
 
+    /** _more_          */
     public static final String CMD_DESC = "desc";
 
     /** _more_ */
@@ -70,6 +71,8 @@ public class SlackUtil {
 
     /** _more_ */
     public static final String CMD_NEW = "new";
+
+    /** _more_          */
     public static final String CMD_APPEND = "append";
 
     /** _more_ */
@@ -185,7 +188,7 @@ public class SlackUtil {
                                         Request request, Appendable sb,
                                         List<Entry> entries)
             throws Exception {
-        if(entries==null) {
+        if (entries == null) {
             return null;
         }
 
@@ -216,7 +219,7 @@ public class SlackUtil {
 
         List<String> maps = new ArrayList<String>();
 
-        int cnt = 0; 
+        int          cnt  = 0;
         for (Entry entry : entries) {
             cnt++;
             List<String> map = new ArrayList<String>();
@@ -226,8 +229,8 @@ public class SlackUtil {
 
             map.add("title");
             String name = entry.getName();
-            if(entries.size()>1) {
-                name = "#" + cnt +" " + name;
+            if (entries.size() > 1) {
+                name = "#" + cnt + " " + name;
             }
             map.add(Json.quote(name));
             map.add("title_link");
@@ -239,17 +242,23 @@ public class SlackUtil {
 
 
             StringBuffer desc = new StringBuffer();
-            String snippet= request.getRepository().getWikiManager().getSnippet(request, entry);
-            if(Utils.stringDefined(snippet)) {
+            String snippet =
+                request.getRepository().getWikiManager().getSnippet(request,
+                    entry);
+            if (Utils.stringDefined(snippet)) {
                 desc.append(snippet);
                 desc.append("\n");
             }
-            Link downloadLink = entry.getTypeHandler().getEntryDownloadLink(request, entry);
+            Link downloadLink =
+                entry.getTypeHandler().getEntryDownloadLink(request, entry);
             if (downloadLink != null) {
-                desc.append("<" + downloadLink.getUrl() + "|"   + IOUtil.getFileTail(entry.getResource().getPath()) + ">\n");
+                desc.append(
+                    "<" + downloadLink.getUrl() + "|"
+                    + IOUtil.getFileTail(entry.getResource().getPath())
+                    + ">\n");
                 desc.append("\n");
             }
-            
+
 
             map.add("text");
             map.add(Json.quote(desc.toString()));

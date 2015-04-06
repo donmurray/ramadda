@@ -1,6 +1,6 @@
-/**
+/*
  * Copyright (c) 2008-2015 Geode Systems LLC
- * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
  * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
  */
 
@@ -26,11 +26,11 @@ import java.util.List;
  */
 public class SlackAction extends MonitorAction {
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_WEBHOOK = "webhook";
 
 
-    /** _more_          */
+    /** _more_ */
     private String webhook;
 
 
@@ -126,18 +126,22 @@ public class SlackAction extends MonitorAction {
      *
      * @param monitor _more_
      * @param entry _more_
+     * @param isNew _more_
      */
     @Override
-    public void entryMatched(EntryMonitor monitor, Entry entry, boolean isNew) {
+    public void entryMatched(EntryMonitor monitor, Entry entry,
+                             boolean isNew) {
         try {
             super.entryMatched(monitor, entry, isNew);
             List<Entry> entries = new ArrayList<Entry>();
             entries.add(entry);
-            SlackUtil.makeEntryResult(
-                monitor.getRepository(),
-                new Request(monitor.getRepository(), null),
-                (isNew?"New":"Modified") +" "  + entry.getTypeHandler().getLabel(), entries,
-                getWebhook());
+            SlackUtil.makeEntryResult(monitor.getRepository(),
+                                      new Request(monitor.getRepository(),
+                                          null), (isNew
+                    ? "New"
+                    : "Modified") + " "
+                                  + entry.getTypeHandler()
+                                      .getLabel(), entries, getWebhook());
         } catch (Exception exc) {
             monitor.handleError("Error posting to Monitor   ", exc);
         }

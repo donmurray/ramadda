@@ -1,8 +1,8 @@
-/**
-* Copyright (c) 2008-2015 Geode Systems LLC
-* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
-* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
-*/
+/*
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 package org.ramadda.repository;
 
@@ -162,6 +162,7 @@ public class PluginManager extends RepositoryManager {
     /** _more_ */
     private List<Class> adminHandlerClasses = new ArrayList<Class>();
 
+    /** _more_ */
     private List<Class> specialClasses = new ArrayList<Class>();
 
 
@@ -1005,6 +1006,11 @@ public class PluginManager extends RepositoryManager {
         return adminHandlerClasses;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public List<Class> getSpecialClasses() {
         return specialClasses;
     }

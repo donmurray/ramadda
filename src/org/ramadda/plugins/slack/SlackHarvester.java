@@ -282,15 +282,26 @@ public class SlackHarvester extends Harvester {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param text _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private Result processDesc(Request request, String text)
             throws Exception {
-        Entry        entry = getCurrentEntry(request);
+        Entry entry = getCurrentEntry(request);
         if (entry == null) {
             return getUsage(request, "No current entry");
         }
+
         return SlackUtil.makeEntryResult(getRepository(), request,
-                                         entry.getDescription(),
-                                         null, webHook);
+                                         entry.getDescription(), null,
+                                         webHook);
     }
 
 
@@ -357,7 +368,8 @@ public class SlackHarvester extends Harvester {
     private Result processCd(Request request, String text) throws Exception {
         text = text.trim();
         Entry parent = getCurrentEntry(request);
-        Entry newEntry = getEntryManager().getRelativeEntry(request, getBaseGroup(), parent,  text);
+        Entry newEntry = getEntryManager().getRelativeEntry(request,
+                             getBaseGroup(), parent, text);
         if (newEntry == null) {
             return new Result("", new StringBuffer("No such entry"));
         }
@@ -366,8 +378,10 @@ public class SlackHarvester extends Harvester {
         }
 
         cwd.put(SlackUtil.getSlackUserId(request), newEntry.getId());
+
         return SlackUtil.makeEntryResult(getRepository(), request,
-                                         "Current entry:", toList(newEntry), webHook);
+                                         "Current entry:", toList(newEntry),
+                                         webHook);
     }
 
 
@@ -383,9 +397,11 @@ public class SlackHarvester extends Harvester {
      * @throws Exception _more_
      */
     private Result processPwd(Request request, String text) throws Exception {
-        Entry        entry   = getCurrentEntry(request);
+        Entry entry = getCurrentEntry(request);
+
         return SlackUtil.makeEntryResult(getRepository(), request,
-                                         "Current entry:", toList(entry), webHook);
+                                         "Current entry:", toList(entry),
+                                         webHook);
     }
 
     /**
@@ -412,11 +428,11 @@ public class SlackHarvester extends Harvester {
 
         String type = toks.get(0);
         toks = StringUtil.splitUpTo(toks.get(1), ";", 2);
-        String   name = toks.get(0);
-        String   desc = (toks.size() > 1)
-                        ? toks.get(1)
-                        : "";
-        desc = desc.replace("\\n","\n");
+        String name = toks.get(0);
+        String desc = (toks.size() > 1)
+                      ? toks.get(1)
+                      : "";
+        desc = desc.replace("\\n", "\n");
         String[] cmds = { "folder", "wiki", "blog", "note" };
         String[] types = { TypeHandler.TYPE_GROUP, "wikipage", "blogentry",
                            "notes_note" };
@@ -436,14 +452,17 @@ public class SlackHarvester extends Harvester {
 
 
 
-        StringBuffer msg      = new StringBuffer();
-        Entry entry = addEntry(request, parent, theType, name, desc, msg);
+        StringBuffer msg = new StringBuffer();
+        Entry entry      = addEntry(request, parent, theType, name, desc,
+                                    msg);
         if (entry == null) {
             return getUsage(request, msg.toString());
         }
         cwd.put(SlackUtil.getSlackUserId(request), entry.getId());
+
         return SlackUtil.makeEntryResult(getRepository(), request,
-                                         "New entry:", toList(entry), webHook);
+                                         "New entry:", toList(entry),
+                                         webHook);
     }
 
 
@@ -543,13 +562,21 @@ public class SlackHarvester extends Harvester {
      *
      *
      * @version        $version$, Fri, Apr 3, '15
-     * @author         Enter your name here...    
+     * @author         Enter your name here...
      */
     public static class SlackInfo {}
 
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
     private List<Entry> toList(Entry entry) {
-        List<Entry>  l = new ArrayList<Entry>();
+        List<Entry> l = new ArrayList<Entry>();
         l.add(entry);
+
         return l;
     }
 

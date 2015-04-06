@@ -1,8 +1,8 @@
-/**
-* Copyright (c) 2008-2015 Geode Systems LLC
-* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
-* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
-*/
+/*
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 package org.ramadda.repository.monitor;
 
@@ -65,6 +65,7 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
     /** _more_ */
     public static final String ARG_MONITOR_CHANGE = "monitorchange";
 
+    /** _more_          */
     public static final String ARG_MONITOR_ONLYNEW = "onlynew";
 
     /** _more_ */
@@ -120,8 +121,15 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param c _more_
+     *
+     * @throws Exception _more_
+     */
     public void addClass(Class c) throws Exception {
-        MonitorAction action  = (MonitorAction) c.newInstance();
+        MonitorAction action = (MonitorAction) c.newInstance();
         actions.add(action);
     }
 
@@ -136,7 +144,8 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
         //        actions.add(new FtpAction());
         actions.add(new ExecAction());
 
-        for(Class c: getRepository().getPluginManager().getSpecialClasses()) {
+        for (Class c :
+                getRepository().getPluginManager().getSpecialClasses()) {
             if (MonitorAction.class.isAssignableFrom(c)) {
                 addClass(c);
             }
@@ -235,8 +244,7 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
      *
      * @param entryIds _more_
      */
-    public void entriesDeleted(List<String> entryIds) {
-    }
+    public void entriesDeleted(List<String> entryIds) {}
 
 
     /**
@@ -248,7 +256,14 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
         handleEntriesChanged(entries, true);
     }
 
-    private void handleEntriesChanged(final List<Entry> entries, final boolean isNew) {
+    /**
+     * _more_
+     *
+     * @param entries _more_
+     * @param isNew _more_
+     */
+    private void handleEntriesChanged(final List<Entry> entries,
+                                      final boolean isNew) {
         Misc.run(new Runnable() {
             public void run() {
                 handleEntriesChangedInner(entries, isNew);
@@ -261,8 +276,10 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
      * _more_
      *
      * @param entries _more_
+     * @param isNew _more_
      */
-    private void handleEntriesChangedInner(List<Entry> entries, boolean isNew) {
+    private void handleEntriesChangedInner(List<Entry> entries,
+                                           boolean isNew) {
         try {
             List<EntryMonitor> tmpMonitors;
             synchronized (monitors) {
@@ -271,8 +288,8 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
             for (Entry entry : entries) {
                 //                System.err.println("check entry: " + entry);
                 for (EntryMonitor entryMonitor : tmpMonitors) {
-                    if(!isNew) {
-                        if(!entryMonitor.getOnlyNew()) {
+                    if ( !isNew) {
+                        if ( !entryMonitor.getOnlyNew()) {
                             continue;
                         }
                     }
@@ -583,13 +600,14 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
             String form = request.form(getRepositoryBase().URL_USER_MONITORS)
                           + HtmlUtils
                               .submit(
-                                      msgLabel("New") + templateAction.getActionLabel(),
-                                  ARG_MONITOR_CREATE) + HtmlUtils
-                                      .hidden(
-                                          ARG_MONITOR_TYPE,
-                                          templateAction
-                                              .getActionName()) + HtmlUtils
-                                                  .formClose();
+                                  msgLabel("New")
+                                  + templateAction
+                                      .getActionLabel(), ARG_MONITOR_CREATE) + HtmlUtils
+                                          .hidden(
+                                              ARG_MONITOR_TYPE,
+                                              templateAction
+                                                  .getActionName()) + HtmlUtils
+                                                      .formClose();
             sb.append(HtmlUtils.col(form));
         }
 
