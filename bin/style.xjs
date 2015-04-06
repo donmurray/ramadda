@@ -3417,7 +3417,7 @@
     <object class="jindent.settings.StringSetting">
      <string>cpp.headerDetectionIncludeKeys</string>
      <void property="value">
-      <string>Copyright </string>
+      <string> Copyright (c)</string>
      </void>
     </object>
    </void>
@@ -6901,7 +6901,7 @@
     <object class="jindent.settings.INumberSetting">
      <string>java.headerDetectionSmartMode</string>
      <void property="value">
-      <int>10</int>
+      <int>3</int>
      </void>
     </object>
    </void>

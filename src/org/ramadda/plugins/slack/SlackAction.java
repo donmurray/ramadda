@@ -1,9 +1,3 @@
-/*
- * Copyright (c) 2008-2015 Geode Systems LLC
- * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
- * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
- */
-
 /**
  * Copyright (c) 2008-2015 Geode Systems LLC
  * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file
@@ -133,15 +127,16 @@ public class SlackAction extends MonitorAction {
      * @param monitor _more_
      * @param entry _more_
      */
-    protected void entryMatched(EntryMonitor monitor, Entry entry) {
+    @Override
+    public void entryMatched(EntryMonitor monitor, Entry entry, boolean isNew) {
         try {
-            super.entryMatched(monitor, entry);
+            super.entryMatched(monitor, entry, isNew);
             List<Entry> entries = new ArrayList<Entry>();
             entries.add(entry);
             SlackUtil.makeEntryResult(
                 monitor.getRepository(),
                 new Request(monitor.getRepository(), null),
-                "New " + entry.getTypeHandler().getLabel(), entries,
+                (isNew?"New":"Modified") +" "  + entry.getTypeHandler().getLabel(), entries,
                 getWebhook());
         } catch (Exception exc) {
             monitor.handleError("Error posting to Monitor   ", exc);

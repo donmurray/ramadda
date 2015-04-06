@@ -1,8 +1,8 @@
-/**
-* Copyright (c) 2008-2015 Geode Systems LLC
-* This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
-* ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
-*/
+/*
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ * This Software is licensed under the Geode Systems RAMADDA License available in the source distribution in the file 
+ * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
+ */
 
 package org.ramadda.util;
 
@@ -1370,11 +1370,12 @@ public class Utils {
      * @return _more_
      */
     public static String obfuscate(String s, boolean base64) {
+        s = rot13(s);
         if (base64) {
-            return encodeBase64(rot13(s).getBytes());
+            return encodeBase64(s.getBytes());
         }
 
-        return rot13(s);
+        return s;
     }
 
     /**
