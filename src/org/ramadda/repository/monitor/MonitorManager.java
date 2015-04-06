@@ -63,6 +63,40 @@ import java.util.Properties;
 public class MonitorManager extends RepositoryManager implements EntryChecker {
 
     /** _more_ */
+    public static final String ARG_MONITOR_CHANGE = "monitorchange";
+
+    public static final String ARG_MONITOR_ONLYNEW = "onlynew";
+
+    /** _more_ */
+    public static final String ARG_MONITOR_CREATE = "monitorcreate";
+
+    /** _more_ */
+    public static final String ARG_MONITOR_DELETE = "monitordelete";
+
+    /** _more_ */
+    public static final String ARG_MONITOR_DELETE_CONFIRM =
+        "monitordeletefconfirm";
+
+    /** _more_ */
+    public static final String ARG_MONITOR_ENABLED = "monitor_enabled";
+
+    /** _more_ */
+    public static final String ARG_MONITOR_FROMDATE = "monitor_fromdate";
+
+    /** _more_ */
+    public static final String ARG_MONITOR_ID = "monitorid";
+
+    /** _more_ */
+    public static final String ARG_MONITOR_NAME = "monitor_name";
+
+    /** _more_ */
+    public static final String ARG_MONITOR_TODATE = "monitor_todate";
+
+    /** _more_ */
+    public static final String ARG_MONITOR_TYPE = "monitortype";
+
+
+    /** _more_ */
     private List<EntryMonitor> monitors = new ArrayList<EntryMonitor>();
 
 
@@ -102,10 +136,7 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
         //actions.add(new TwitterAction());
         actions.add(new CopyAction());
         //        actions.add(new FtpAction());
-        actions.add(new LdmAction());
         actions.add(new ExecAction());
-
-
 
         for(Class c: getRepository().getPluginManager().getSpecialClasses()) {
             if (MonitorAction.class.isAssignableFrom(c)) {
@@ -197,14 +228,17 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
      *
      * @param entries _more_
      */
-    public void entriesModified(final List<Entry> entries) {}
+    public void entriesModified(final List<Entry> entries) {
+        handleEntriesChanged(entries, false);
+    }
 
     /**
      * _more_
      *
      * @param entryIds _more_
      */
-    public void entriesDeleted(List<String> entryIds) {}
+    public void entriesDeleted(List<String> entryIds) {
+    }
 
 
     /**
@@ -213,19 +247,24 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
      * @param entries _more_
      */
     public void entriesCreated(final List<Entry> entries) {
+        handleEntriesChanged(entries, true);
+    }
+
+    private void handleEntriesChanged(final List<Entry> entries, final boolean isNew) {
         Misc.run(new Runnable() {
             public void run() {
-                checkNewEntriesInner(entries);
+                handleEntriesChangedInner(entries, isNew);
             }
         });
     }
+
 
     /**
      * _more_
      *
      * @param entries _more_
      */
-    private void checkNewEntriesInner(List<Entry> entries) {
+    private void handleEntriesChangedInner(List<Entry> entries, boolean isNew) {
         try {
             List<EntryMonitor> tmpMonitors;
             synchronized (monitors) {
@@ -234,7 +273,12 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
             for (Entry entry : entries) {
                 //                System.err.println("check entry: " + entry);
                 for (EntryMonitor entryMonitor : tmpMonitors) {
-                    entryMonitor.checkEntry(entry);
+                    if(!isNew) {
+                        if(!entryMonitor.getOnlyNew()) {
+                            continue;
+                        }
+                    }
+                    entryMonitor.checkEntry(entry, isNew);
                 }
             }
         } catch (Exception exc) {
@@ -541,7 +585,7 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
             String form = request.form(getRepositoryBase().URL_USER_MONITORS)
                           + HtmlUtils
                               .submit(
-                                  templateAction.getActionLabel(),
+                                      msgLabel("New") + templateAction.getActionLabel(),
                                   ARG_MONITOR_CREATE) + HtmlUtils
                                       .hidden(
                                           ARG_MONITOR_TYPE,

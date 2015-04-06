@@ -141,7 +141,7 @@ public abstract class MonitorAction implements Constants, Cloneable {
      * @param monitor _more_
      * @param entry _more_
      */
-    protected void entryMatched(EntryMonitor monitor, Entry entry) {}
+    public void entryMatched(EntryMonitor monitor, Entry entry, boolean isNew) {}
 
 
 

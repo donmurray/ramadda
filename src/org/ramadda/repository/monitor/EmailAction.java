@@ -122,7 +122,8 @@ public class EmailAction extends PasswordAction {
      * @param monitor _more_
      * @param entry _more_
      */
-    protected void entryMatched(EntryMonitor monitor, Entry entry) {
+    @Override
+    public void entryMatched(EntryMonitor monitor, Entry entry, boolean isNew) {
         try {
             String from = monitor.getUser().getEmail();
             if ((from == null) || (from.trim().length() == 0)) {

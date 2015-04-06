@@ -68,6 +68,8 @@ public class EntryMonitor implements Constants {
     /** _more_ */
     private boolean enabled = true;
 
+    private boolean onlyNew = true;
+
     /** _more_ */
     private List<Filter> filters = new ArrayList<Filter>();
 
@@ -200,15 +202,15 @@ public class EntryMonitor implements Constants {
      * @throws Exception _more_
      */
     public void applyEditForm(Request request) throws Exception {
-
         if (request.get(ARG_CLEARERROR, false)) {
             lastError = "";
         }
 
-        setName(request.getString(ARG_MONITOR_NAME, getName()));
-        setEnabled(request.get(ARG_MONITOR_ENABLED, false));
-        Date[] dateRange = request.getDateRange(ARG_MONITOR_FROMDATE,
-                               ARG_MONITOR_TODATE, new Date());
+        setName(request.getString(MonitorManager.ARG_MONITOR_NAME, getName()));
+        setEnabled(request.get(MonitorManager.ARG_MONITOR_ENABLED, false));
+        setOnlyNew(request.get(MonitorManager.ARG_MONITOR_ONLYNEW, false));
+        Date[] dateRange = request.getDateRange(MonitorManager.ARG_MONITOR_FROMDATE,
+                               MonitorManager.ARG_MONITOR_TODATE, new Date());
         fromDate = dateRange[0];
         toDate   = dateRange[1];
 
@@ -236,14 +238,20 @@ public class EntryMonitor implements Constants {
 
         stateSB.append(HtmlUtils.formTable());
         stateSB.append(HtmlUtils.formEntry(getRepository().msgLabel("Name"),
-                                           HtmlUtils.input(ARG_MONITOR_NAME,
+                                           HtmlUtils.input(MonitorManager.ARG_MONITOR_NAME,
                                                getName(),
                                                    HtmlUtils.SIZE_70)));
         stateSB.append(
             HtmlUtils.formEntry(
                 getRepository().msgLabel("Enabled"),
                 HtmlUtils.checkbox(
-                    ARG_MONITOR_ENABLED, "true", getEnabled())));
+                    MonitorManager.ARG_MONITOR_ENABLED, "true", getEnabled())));
+
+        stateSB.append(
+            HtmlUtils.formEntry(
+                getRepository().msgLabel("Only check new entries"),
+                HtmlUtils.checkbox(
+                                   MonitorManager.ARG_MONITOR_ONLYNEW, "true", getOnlyNew())));
 
         stateSB.append(
             HtmlUtils
@@ -251,13 +259,13 @@ public class EntryMonitor implements Constants {
                     getRepository().msgLabel("Valid Date Range"),
                     getRepository().getPageHandler()
                         .makeDateInput(
-                            request, ARG_MONITOR_FROMDATE, "monitorform",
+                            request, MonitorManager.ARG_MONITOR_FROMDATE, "monitorform",
                             getFromDate()) + " " + getRepository().msg("To")
                                            + " "
                                            + getRepository().getPageHandler()
                                                .makeDateInput(
                                                    request,
-                                                       ARG_MONITOR_TODATE,
+                                                       MonitorManager.ARG_MONITOR_TODATE,
                                                            "monitorform",
                                                                getToDate())));
 
@@ -719,7 +727,7 @@ public class EntryMonitor implements Constants {
      *
      * @throws Exception _more_
      */
-    public boolean checkEntry(Entry entry) throws Exception {
+    public boolean checkEntry(Entry entry, boolean isNew) throws Exception {
         if ( !isActive()) {
             return false;
         }
@@ -738,14 +746,14 @@ public class EntryMonitor implements Constants {
 
 
         for (Filter filter : filters) {
-            boolean ok = checkEntry(filter, entry);
+            boolean ok = checkEntry(filter, entry, isNew);
             //            System.err.println("Checking " + ok + " filter=" + filter);
             if ( !ok) {
                 //                System.err.println("filter not OK");
                 return false;
             }
         }
-        entryMatched(entry);
+        entryMatched(entry, isNew);
 
         return true;
     }
@@ -762,7 +770,7 @@ public class EntryMonitor implements Constants {
      *
      * @throws Exception _more_
      */
-    public boolean checkEntry(Filter filter, Entry entry) throws Exception {
+    public boolean checkEntry(Filter filter, Entry entry, boolean isNew) throws Exception {
         boolean ok    = false;
         String  field = filter.getField();
         Object  value = filter.getValue();
@@ -910,11 +918,11 @@ public class EntryMonitor implements Constants {
      *
      * @param entry _more_
      */
-    protected void entryMatched(final Entry entry) {
+    protected void entryMatched(final Entry entry, final boolean isNew) {
         Misc.run(new Runnable() {
             public void run() {
                 try {
-                    entryMatchedInner(entry);
+                    entryMatchedInner(entry, isNew);
                 } catch (Exception exc) {
                     handleError("Error handle entry matched", exc);
                 }
@@ -928,10 +936,10 @@ public class EntryMonitor implements Constants {
      *
      * @param entry _more_
      */
-    protected void entryMatchedInner(Entry entry) {
+    protected void entryMatchedInner(Entry entry, boolean isNew) {
         System.err.println(getName() + " matched entry: " + entry);
         for (MonitorAction action : actions) {
-            action.entryMatched(this, entry);
+            action.entryMatched(this, entry, isNew);
         }
     }
 
@@ -1019,6 +1027,26 @@ public class EntryMonitor implements Constants {
     public boolean getEnabled() {
         return enabled;
     }
+
+
+
+/**
+Set the OnlyNew property.
+
+@param value The new value for OnlyNew
+**/
+public void setOnlyNew (boolean value) {
+	onlyNew = value;
+}
+
+/**
+Get the OnlyNew property.
+
+@return The OnlyNew
+**/
+public boolean getOnlyNew () {
+	return onlyNew;
+}
 
     /**
      *  Set the FromDate property.

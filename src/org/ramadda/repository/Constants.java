@@ -1036,36 +1036,6 @@ public interface Constants {
     public static final String PROP_ENABLE_FILE_LISTING =
         "ramadda.enable_file_listing";
 
-    /** _more_ */
-    public static final String ARG_MONITOR_CHANGE = "monitorchange";
-
-    /** _more_ */
-    public static final String ARG_MONITOR_CREATE = "monitorcreate";
-
-    /** _more_ */
-    public static final String ARG_MONITOR_DELETE = "monitordelete";
-
-    /** _more_ */
-    public static final String ARG_MONITOR_DELETE_CONFIRM =
-        "monitordeletefconfirm";
-
-    /** _more_ */
-    public static final String ARG_MONITOR_ENABLED = "monitor_enabled";
-
-    /** _more_ */
-    public static final String ARG_MONITOR_FROMDATE = "monitor_fromdate";
-
-    /** _more_ */
-    public static final String ARG_MONITOR_ID = "monitorid";
-
-    /** _more_ */
-    public static final String ARG_MONITOR_NAME = "monitor_name";
-
-    /** _more_ */
-    public static final String ARG_MONITOR_TODATE = "monitor_todate";
-
-    /** _more_ */
-    public static final String ARG_MONITOR_TYPE = "monitortype";
 
     /** _more_ */
     public static final String ARG_MONTH = "month";

@@ -209,7 +209,8 @@ public class LdmAction extends MonitorAction {
      * @param monitor _more_
      * @param entry _more_
      */
-    protected void entryMatched(EntryMonitor monitor, Entry entry) {
+    @Override
+    public void entryMatched(EntryMonitor monitor, Entry entry,  boolean isNew) {
         try {
             Resource resource = entry.getResource();
             if ( !resource.isFile()) {

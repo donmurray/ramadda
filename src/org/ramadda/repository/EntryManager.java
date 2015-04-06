@@ -7326,7 +7326,7 @@ public class EntryManager extends RepositoryManager {
         }
 
 
-        Misc.run(getRepository(), "checkNewEntries", entries);
+        Misc.run(getRepository(), isNew?"checkNewEntries":"checkModifiedEntries", entries);
     }
 
 

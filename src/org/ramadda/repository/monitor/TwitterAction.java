@@ -136,9 +136,10 @@ public class TwitterAction extends PasswordAction {
      * @param monitor _more_
      * @param entry _more_
      */
-    protected void entryMatched(EntryMonitor monitor, Entry entry) {
+    @Override
+    public void entryMatched(EntryMonitor monitor, Entry entry, boolean isNew) {
         try {
-            super.entryMatched(monitor, entry);
+            super.entryMatched(monitor, entry, isNew);
 
             twitter4j.Twitter twitter =
                 new twitter4j.Twitter(getRemoteUserId(), getPassword());
