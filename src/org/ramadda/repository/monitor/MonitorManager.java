@@ -289,7 +289,7 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
                 //                System.err.println("check entry: " + entry);
                 for (EntryMonitor entryMonitor : tmpMonitors) {
                     if ( !isNew) {
-                        if ( !entryMonitor.getOnlyNew()) {
+                        if (entryMonitor.getOnlyNew()) {
                             continue;
                         }
                     }
