@@ -579,8 +579,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @return _more_
      */
     public boolean isRegistered() {
-        return true;
-        //        return isRegistered;
+        //        return true;
+        return isRegistered;
     }
 
 
@@ -1151,7 +1151,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
         String registrationKey = getProperty(PROP_REGISTER_KEY, "");
         //id:keyword:date:users
         List<String> toks = StringUtil.split(registrationKey, ":");
-        if (toks.size() != 3) {
+        if (toks.size() != 4) {
             return;
         }
         String id    = toks.get(0);
