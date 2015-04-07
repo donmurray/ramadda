@@ -1150,17 +1150,25 @@ public class Repository extends RepositoryBase implements RequestHandler,
         String registrationKey = getProperty(PROP_REGISTER_KEY, "");
         //id:keyword:date:users
         List<String> toks = StringUtil.split(registrationKey, ":");
+        //        System.err.println("reg toks:" + toks);
         if (toks.size() != 4) {
+            System.err.println("bad # toks");
             return;
         }
         String id    = toks.get(0);
         String key   = Utils.unobfuscate(toks.get(1), true);
         String date  = Utils.unobfuscate(toks.get(2), true);
         int    users = 0;
+        /*
+        System.err.println("id:" + id);
+        System.err.println("key:" + key);
+        System.err.println("date:" + date);
+        */
         try {
-            users = new Integer(Utils.unobfuscate(toks.get(2),
+            users = new Integer(Utils.unobfuscate(toks.get(3),
                     true)).intValue();
         } catch (Exception exc) {
+            System.err.println("bad users");
             return;
         }
         isRegistered = key.trim().equals("namaste");
