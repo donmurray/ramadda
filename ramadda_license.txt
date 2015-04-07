@@ -16,6 +16,3 @@ EXCEPT AS EXPRESSLY SET FORTH IN THIS AGREEMENT, NEITHER RECIPIENT NOR ANY CONTR
 INDEMNITY. You agree to indemnify and hold Geode Systems LLC,  and its subsidiaries, affiliates, officers, agents, employees, partners and licensors harmless from any claim or demand, including but not limited to reasonable attorneys' fees, made by any third party due to or arising out of any content you submit, post, transmit or otherwise make available through use of the Software, your use of the the Software, your connection to the Geode Systems LLC, or your violation of the EULA, or your violation of any rights of any another.
 
 This Agreement is the entire agreement and incorporates all previous agreements. This Agreement is governed by the laws of the State of Colorado and the intellectual property laws of the United States of America. No party to this Agreement will bring a legal action under this Agreement more than one year after the cause of action arose. Each party waives its rights to a jury trial in any resulting litigation. Venue for any action, if any may arise, is Boulder, Colorado.
-
-
-
