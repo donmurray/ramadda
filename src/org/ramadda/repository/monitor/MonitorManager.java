@@ -170,19 +170,26 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
         ResultSet        results;
         while ((results = iter.getNext()) != null) {
             String       xml     = results.getString(1);
-            EntryMonitor monitor =
-                (EntryMonitor) Repository.decodeObject(xml);
-            if (monitor != null) {
-                monitor.setRepository(getRepository());
-                monitors.add(monitor);
-            } else {
-                /*
-                System.err.println ("could not create monitor:" + xml);
-                System.err.println ("messages:" + xmlEncoder.getErrorMessages());
-                for(Exception exc: (List<Exception>)xmlEncoder.getExceptions()) {
-                    exc.printStackTrace();
+
+            try {
+                xml = xml.replace("org.ramadda.repository.monitor.LdmAction",
+                                  "org.ramadda.geodata.cdmdata.LdmAction");
+                EntryMonitor monitor =
+                    (EntryMonitor) Repository.decodeObject(xml);
+                if (monitor != null) {
+                    monitor.setRepository(getRepository());
+                    monitors.add(monitor);
+                } else {
+                    /*
+                      System.err.println ("could not create monitor:" + xml);
+                      System.err.println ("messages:" + xmlEncoder.getErrorMessages());
+                      for(Exception exc: (List<Exception>)xmlEncoder.getExceptions()) {
+                      exc.printStackTrace();
+                      }
+                    */
                 }
-                */
+            } catch(Exception ignore) {
+                System.err.println ("No monitor class found: " + ignore);
             }
         }
     }
