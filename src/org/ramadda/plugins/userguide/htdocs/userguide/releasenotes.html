@@ -44,15 +44,13 @@ RAMADDA version 2.0 is now available for download at:
 http://sourceforge.net/projects/ramadda/files/ramadda2.0/</a>
 </ul>
 
-<div class="boxquote">
-Note: This release is now using Java JDK 1.7 and will no longer run under Java 1.6. Please update your runtimes as needed.
-</div>
 
 
+<h2>What's new in version 2.0?</h2>
 
-<h2>What's new in version 1.8?</h2>
-This is primarily a bug fix release and is the last source snapshot under the original RAMADDA MIT license.
 <ul>
+<li>  This is the first release under the new <a href="https://geodesystems.com/repository/alias/ramadda_registration">RAMADDA Geode Systems License</a>.
+<li> Lots of bug fixes and user interface improvements
 <li> The plugins build and release process was changed There are now 3 plugin collections - coreplugins, geoplugins and bioplugins.
 If you have previously installed the allplugins then RAMADDA will automatically delete the allplugins.jar and install the
 core and geo plugins.
@@ -77,7 +75,7 @@ To update an existing RAMADDA install:
 <li> As noted above there are now 3 plugin collections - core, geo and bio. If you have the allplugins.jar installed then
 RAMADDA will update appropriately.
 
-<li> If you have other plugins installed then you should update them to the latest <a href="http://sourceforge.net/projects/ramadda/files/ramadda2.0/plugins/">versions</a>.
+<li> If you have individual  plugins installed then you should update them to the latest <a href="http://sourceforge.net/projects/ramadda/files/ramadda2.0/plugins/">versions</a>.
 
 </ul>
 
@@ -147,44 +145,6 @@ Note: The  1.6 release fixes a long-standing but recently discovered issue that 
 </ul>
 
 The 1.6 release  is SVN revision r4079
-
-
-
-<a name="passwords"></a>
-<h2>Password Exposure</h2>
-
-Up until and including  RAMADDA V1.6B there is the possibility to have clear text passwords written out in the server side access logs. The 1.6 release fixes this problem.
-
-We strongly recommend users take the following steps:
-<ul>
-<li> Delete any of the access.log or repository.log files in your <i>&lt;ramadda home&gt;/logs</i> directory on your server.   If you are running RAMADDA from within Apache and/or Tomcat they too may have the passwords exposed in their access logs. 
-<li> Upgrade to the latest 1.6 release and change your  RAMADDA passwords. 
-There is a new Admin-&gt;Maintenance-&gt;Clear All Passwords service that allows you to
-clear all of the passwords held in the RAMADDA user database.
-<li> Some RAMADDA html templates may import resources (e.g., style sheets, images) from servers other than RAMADDA.  In that case, passwords may also  be exposed in those server logs in the REFERER HTTP argument.
-</ul>
-
-
-
-
-
-
-
-<b>What happened?</b><br>
-When you are visiting any page in RAMADDA the Login link that is shown has an extra <i>redirect</i> argument which is the URL of the  page you are viewing. Normally, if you are viewing a page and then go to login, after a successful login you will be redirected back to the original page.
-<p>
-
-The exposure comes about in the following way:
-<ul>
-<li> Go to the login page and enter an incorrect  password or userid and attempt to login
-<li> The result page will show the login error. But, the  Login link in the upper right will have as its redirect argument the original credentials. If you then login correctly through the form there is no problem.
-<li> However,  if you click on the Login link again then login successfully you will be redirected back to the login page with your original credentials showing up in the URL. This results in your password being passed back to the server as the REFERER URL for that page and any resources the page loads. 
-</ul>
-
-
-My apologies for this problem. I strive to make RAMADDA secure but this slipped through the cracks.  If you have any questions please <a href="mailto:jeff.mcwhirter@gmail.com">contact me</a>.
-
--Jeff McWhirter
 
 
 
