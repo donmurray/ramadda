@@ -4,6 +4,8 @@
 #This script installs some base packages, Postgres and then RAMADDA
 #
 
+ramaddaVersion=2.0
+
 
 OS_REDHAT="redhat"
 OS_AMAZON="amazon_linux"
@@ -13,7 +15,7 @@ dir=`dirname $0`
 userdir=`dirname $dir`
 promptUser=1
 yumArg=""
-ramaddaVersion=1.7
+
 
 ramaddaDownload="http://downloads.sourceforge.net/project/ramadda/ramadda${ramaddaVersion}/ramaddaserver.zip"
 serviceName="ramadda"
