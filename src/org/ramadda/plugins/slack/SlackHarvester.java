@@ -63,6 +63,7 @@ public class SlackHarvester extends Harvester {
     /** _more_ */
     public static final String CMD_DESC = "desc";
 
+    /** _more_          */
     public static final String CMD_APPEND = "append";
 
     /** _more_ */
@@ -80,8 +81,12 @@ public class SlackHarvester extends Harvester {
 
 
 
+
+    /** plain old command is a slack argument so we use ramadda_command */
+    public static final String ARG_COMMAND = "ramadda_command";
+
     /** _more_          */
-    public static final String ARG_COMMAND = "command";
+    public static final String ARG_TYPE = "ramadda_type";
 
     /** _more_ */
     private String tokens;
@@ -245,39 +250,37 @@ public class SlackHarvester extends Harvester {
 
         System.err.println("slack request: " + request);
         String       text = SlackUtil.getSlackText(request);
-        List<String> toks = StringUtil.splitUpTo(text, " ", 2);
-
         String       cmd  = request.getString(ARG_COMMAND, (String) null);
-
-
+        List<String> toks;
         if (cmd == null) {
+            toks = StringUtil.splitUpTo(text, " ", 2);
             if (toks.size() == 0) {
                 return getUsage(request, "No command given");
             }
             cmd = toks.get(0);
             toks.remove(0);
+            if (toks.size() > 0) {
+                text = toks.get(0);
+            } else {
+                text = "";
+            }
         }
 
-        String rest = "";
-        if (toks.size() > 0) {
-            rest = toks.get(0);
-        }
-
-        System.err.println("command:" + cmd);
+        System.err.println("SlackHarvester: command=" + cmd);
         if (cmd.equals(CMD_SEARCH)) {
-            return processSearch(request, rest);
+            return processSearch(request, text);
         } else if (cmd.equals(CMD_LS)) {
-            return processLs(request, rest);
+            return processLs(request, text);
         } else if (cmd.equals(CMD_PWD)) {
-            return processPwd(request, rest);
+            return processPwd(request, text);
         } else if (cmd.equals(CMD_DESC)) {
-            return processDesc(request, rest);
+            return processDesc(request, text);
         } else if (cmd.equals(CMD_APPEND)) {
-            return processAppend(request, rest);
+            return processAppend(request, text);
         } else if (cmd.equals(CMD_NEW)) {
-            return processNew(request, rest);
+            return processNew(request, text);
         } else if (cmd.equals(CMD_CD)) {
-            return processCd(request, rest);
+            return processCd(request, text);
         } else {
             return getUsage(request, "Unknown command: " + cmd);
         }
@@ -345,6 +348,16 @@ public class SlackHarvester extends Harvester {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param text _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
     private Result processAppend(Request request, String text)
             throws Exception {
         Entry entry = getCurrentEntry(request);
@@ -353,8 +366,9 @@ public class SlackHarvester extends Harvester {
         }
 
         getEntryManager().appendText(getRequest(), entry, text);
-        return SlackUtil.makeEntryResult(getRepository(), request,"Text appended",
-                                         null, webHook);
+
+        return SlackUtil.makeEntryResult(getRepository(), request,
+                                         "Text appended", null, webHook);
     }
 
 
@@ -471,16 +485,25 @@ public class SlackHarvester extends Harvester {
         Entry        parent = getCurrentEntry(request);
         StringBuffer sb     = new StringBuffer();
 
-        //new folder name;
-
-        List<String> toks = StringUtil.splitUpTo(text, " ", 2);
-        if (toks.size() != 2) {
-            return getUsage(request,
-                            "new <folder|blog|wiki|note> name;description");
+        List<String> toks;
+        //new <type> <name>|<description>
+        String type = request.getString(ARG_TYPE, (String) null);
+        if (type == null) {
+            toks = StringUtil.splitUpTo(text, " ", 2);
+            if (toks.size() == 0) {
+                return getUsage(
+                    request,
+                    "new <folder or blog or wiki or note> name|description");
+            }
+            type = toks.get(0);
+            toks.remove(0);
+            if (toks.size() > 0) {
+                text = toks.get(0);
+            } else {
+                text = "";
+            }
         }
-
-        String type = toks.get(0);
-        toks = StringUtil.splitUpTo(toks.get(1), ";", 2);
+        toks = StringUtil.splitUpTo(text, "|", 2);
         String name = toks.get(0);
         String desc = (toks.size() > 1)
                       ? toks.get(1)
@@ -541,7 +564,7 @@ public class SlackHarvester extends Harvester {
         sb.append("Navigation:\n/ramadda ls or pwd or cd\n");
         sb.append("Search:\n/ramadda search <search text>\n");
         sb.append(
-            "New:\n/ramadda new (folder|wiki|blog|note) Name of entry; Optional description\n");
+            "New:\n/ramadda new (folder or wiki or blog ornote) Name of entry | Optional description\n");
 
         return new Result("", sb);
     }
