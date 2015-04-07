@@ -138,11 +138,11 @@ public class SlackUtil {
             map.add(Json.quote(request.getString(SLACK_CHANNEL_ID, "")));
         }
         json.append(Json.map(map));
-        System.err.println("Slack message:" + json);
         List<HttpFormEntry> formEntries = new ArrayList<HttpFormEntry>();
         formEntries.add(HttpFormEntry.hidden(SLACK_PAYLOAD, json.toString()));
+        System.err.println("SlackHarvester: posting to slack");
         String[] result = HttpFormEntry.doPost(formEntries, webHook);
-        System.err.println("Slack results:" + result[0] + " " + result[1]);
+        System.err.println("SlackHarvester: results:" + result[0] + " " + result[1]);
 
         return new Result("", new StringBuffer(""));
     }
@@ -258,8 +258,7 @@ public class SlackUtil {
             maps.add(Json.map(map));
         }
         String attachments = Json.list(maps);
-        System.err.println("attachments:" + attachments);
-
+        //        System.err.println("attachments:" + attachments);
         return attachments;
     }
 
@@ -317,7 +316,7 @@ public class SlackUtil {
      * @return _more_
      */
     public static String getSlackText(Request request) {
-        return request.getString(SLACK_TEXT, "");
+        return request.getString(SLACK_TEXT, "").trim();
     }
 
     /**

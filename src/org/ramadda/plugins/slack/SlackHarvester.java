@@ -126,6 +126,10 @@ public class SlackHarvester extends Harvester {
     }
 
 
+    public void debug(String msg) {
+        System.err.println("SlackHarvester: " + msg);
+    }
+
 
     /**
      * _more_
@@ -235,64 +239,86 @@ public class SlackHarvester extends Harvester {
 
         String tokenFromSlack = request.getString(SlackUtil.SLACK_TOKEN,
                                     "none");
+        //        debug("handleRequest");
         boolean ok = false;
         for (String token : StringUtil.split(tokens, "\n", true, true)) {
             if (Misc.equals(token, tokenFromSlack)) {
+                //                debug("slack token:" +tokenFromSlack +" my:" + token);
                 ok = true;
-
                 break;
             }
         }
 
         if ( !ok) {
+            debug("tokens did not match");
             return null;
         }
 
-        System.err.println("slack request: " + request);
-        String       text = SlackUtil.getSlackText(request);
-        String       cmd  = request.getString(ARG_COMMAND, (String) null);
-        List<String> toks;
-        if (cmd == null) {
-            toks = StringUtil.splitUpTo(text, " ", 2);
-            if (toks.size() == 0) {
-                return getUsage(request, "No command given");
+        String       textFromSlack = SlackUtil.getSlackText(request);
+        List<String> commandToks =  StringUtil.split(textFromSlack, ";", false,false);
+        if(commandToks.size()==0) {
+            commandToks.add("");
+        }
+        debug("slack text:" +textFromSlack);
+        debug("command toks:" + commandToks);
+        // /cd foo; ls; new wiki name|description
+        Result result = null;
+        //debug("request:" + request);
+        for(String commandTok: commandToks) {
+            debug("command tok:" + commandTok);
+            commandTok = commandTok.trim();
+            if(commandTok.startsWith("/")) {
+                commandTok = commandTok.substring(1);
             }
-            cmd = toks.get(0);
-            toks.remove(0);
-            if (toks.size() > 0) {
-                text = toks.get(0);
+            String text= commandTok;
+            String       cmd  = request.getString(ARG_COMMAND, (String) null);
+            List<String> toks;
+            if (cmd == null) {
+                toks = StringUtil.splitUpTo(text, " ", 2);
+                if (toks.size() == 0) {
+                    return getUsage(request, "No command given");
+                }
+                cmd = toks.get(0);
+                toks.remove(0);
+                if (toks.size() > 0) {
+                    text = toks.get(0);
+                } else {
+                    text = "";
+                }
+            }
+
+            debug("checking command:" + cmd);
+            if (cmd.equals(CMD_SEARCH)) {
+                result =  processSearch(request, text);
+            } else if (cmd.equals(CMD_LS)) {
+                result =  processLs(request, text);
+            } else if (cmd.equals(CMD_PWD)) {
+                result =  processPwd(request, text);
+            } else if (cmd.equals(CMD_DESC)) {
+                result =  processDesc(request, text);
+            } else if (cmd.equals(CMD_APPEND)) {
+                result =  processAppend(request, text);
+            } else if (cmd.equals(CMD_NEW)) {
+                result =  processNew(request, text);
+            } else if (cmd.equals(CMD_CD)) {
+                result =  processCd(request, text);
             } else {
-                text = "";
+                result =  getUsage(request, "Unknown command: " + cmd);
             }
+            //Remove any default args
+            request.remove(ARG_COMMAND);        
+            request.remove(ARG_TYPE);        
         }
 
-        System.err.println("SlackHarvester: command=" + cmd);
-        if (cmd.equals(CMD_SEARCH)) {
-            return processSearch(request, text);
-        } else if (cmd.equals(CMD_LS)) {
-            return processLs(request, text);
-        } else if (cmd.equals(CMD_PWD)) {
-            return processPwd(request, text);
-        } else if (cmd.equals(CMD_DESC)) {
-            return processDesc(request, text);
-        } else if (cmd.equals(CMD_APPEND)) {
-            return processAppend(request, text);
-        } else if (cmd.equals(CMD_NEW)) {
-            return processNew(request, text);
-        } else if (cmd.equals(CMD_CD)) {
-            return processCd(request, text);
-        } else {
-            return getUsage(request, "Unknown command: " + cmd);
+        //TODO: 
+        if(result!=null) {
+            return result;
         }
 
-        /*
-        StringBuffer sb          = new StringBuffer();
-        if(Utils.stringDefined(webHook)) {
-        }
+        return getUsage(request, "Unknown command: " + textFromSlack);
 
-        return new Result("", sb);
-        */
     }
+
 
     /**
      * _more_
