@@ -1140,7 +1140,6 @@ public class Repository extends RepositoryBase implements RequestHandler,
         }
 
 
-        checkRegistration();
     }
 
     /**
@@ -1314,6 +1313,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
 
         //Initialize the local repositories in a thread
         Misc.run(getLocalRepositoryManager(), "initializeLocalRepositories");
+
+        checkRegistration();
     }
 
 
