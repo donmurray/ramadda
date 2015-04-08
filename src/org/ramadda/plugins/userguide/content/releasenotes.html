@@ -17,6 +17,19 @@ RAMADDA version <%ramadda.version%> is now available for download at:
 http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/</a>
 </ul>
 
+The easiest way to try out RAMADDA is with the stand-alone repository available in
+<a href="http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/ramaddaserver.zip">
+ramaddaserver.zip</a>.
+On a Mac or Linux machine all you need is Java installed on your machine. Download and unzip the file and run:
+<pre>
+cd ramaddaserver
+sh ramadda.sh
+</pre>
+
+If you run with Tomcat or another servlet container the WAR file is available at:
+<a href="http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/repository.war">
+repository.war</a>.
+
 
 
 <h2>What's new in version 2.0?</h2>
@@ -25,13 +38,13 @@ http://sourceforge.net/projects/ramadda/files/ramadda<%ramadda.version%>/</a>
 <li>  This is the first release under the new <a href="license.html">Geode Systems RAMADDA License</a>. Going forward RAMADDA development will no longer be under the prior MIT Open Source license.
 You can run the shareware version of RAMADDA, pay a modest per/user license fee or you can use it for free
 if you are part of a non-profit organization. Register <a href="https://geodesystems.com/repository/alias/ramadda_registration">here</a>.
-<li> This release has tons of bug fixes and user interface improvements.
 <li> There are now 3 plugin collections - coreplugins, geoplugins and bioplugins.
 If you have previously installed the allplugins then RAMADDA will automatically delete the allplugins.jar and install the
 core and geo plugins. 
 <li> The bioplugins provides support for a variety of genomics and medical image data. These services are meant for research and academic purposes only.
 <li> The RAMADDA <a href="https://geodesystems.com/repository/slack/index.html">Slack plugin</a>  provides integration services with the team communciation tool Slack.
-<li> Note: The 2.0 release  source code is available for personal review from SourceForge under SVN revision r5188.
+<li> This release has numerous bug fixes and user interface improvements.
+<li> Note: The 2.0 release  source code is available for your personal review from SourceForge under SVN revision r5188.
 <pre>
 svn checkout -r 5188 svn://svn.code.sf.net/p/ramadda/code/ ramadda-code
 </pre>
