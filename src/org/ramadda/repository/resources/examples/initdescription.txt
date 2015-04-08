@@ -5,42 +5,35 @@ The wiki tag above tells RAMADDA to treat this description as wiki
 The +section, +row, +col etc tags do the layout
 There are docs here: http://geodesystems.com/repository/userguide/wikitext.html
 -->
-+section label="Welcome" #
++section label="Welcome to RAMADDA" #
 +row
 +col-md-4
 <div class=shadow-box>
-Thank you for trying Geode System's RAMADDA repository. We think its pretty cool and we hope you think so too. 
+Thank you for trying the Geode Systems RAMADDA repository. We think its pretty useful and we hope you think so too. 
 If you have any problems or suggestions please send  a note to 
 <a href="mailto:jeff.mcwhirter@gmail.com">jeff.mcwhirter@gmail.com</a>.
-<br>
+<br><br>
 Thanks,<br>
 Jeff McWhirter<br>
-President<br>
-Geode Systems, LLC
 </div>
 -col
 +col-md-8
 ===Next Steps===
-* <a target="_registration" href="http://geodesystems.com/alias/ramadda_registration"  target=_other>Register</a> this RAMADDA server.
-* <a href="${root}/entry/form?entryid=${topid}">Edit</a> this page (<a target="_docs" href="http://geodesystems.com/repository/userguide/wikitext.html">documentation</a>)
+* <a  href="${root}/user/login">Login</a> to administer your RAMADDA site.
+* <a target="_registration" href="http://geodesystems.com/alias/ramadda_registration">Register</a> your RAMADDA server.
 * Join the <a href="https://lists.sourceforge.net/lists/listinfo/ramadda-users" target=_other>RAMADDA mailing list</a>.
 * Use the RAMADDA <a href="https://sourceforge.net/projects/ramadda/support">SourceForge support form</a> or send questions to <a href="mailto:jeff.mcwhirter@gmail.com">me</a>
-* Create new <a href="${root}/entry/form?group=${topid}&type=group">folders</a> or upload <a href="${root}/entry/form?group=${topid}&type=file">files</a>. More actions under the <img src="${root}/icons/menu_arrow.gif"> button above.
+* <a href="${root}/entry/form?entryid=${topid}">Edit</a> this page (you must login to edit) - Check out the <a target="_docs" href="http://geodesystems.com/repository/userguide/wikitext.html">documentation</a>
+*  You can create new <a href="${root}/entry/form?group=${topid}&type=group">folders</a> or upload <a href="${root}/entry/form?group=${topid}&type=file">files</a>. 
+* There are a number of ways to view this page and a number of other editing actions that you can take through the popup menu above (<img src="${root}/icons/menu_arrow.gif">). You can also see all available actions for this page at the <a href="${root}/entry/links">Actions page</a>.  
 <p>
 -col
 -row
 -section
-+section label="Content" #
-Here are some folders to get you started
++section label="Your Content" #
+
+Here are some folders to get you started. Feel free to add, delete or rename any of this content.
 
 {{tree showtoggle="false"}}
-
--section
-+section label="Examples" #
-There are lots of ways to display content. You can show things in tabs - 
-{{tabs  tag="html"  showlink="true"  includeicon="false"  textposition="left"  }}
-
-Or in an accordian layout - 
-{{accordian  tag="html"  showlink="true"  includeicon="false"  textposition="left"  }}
 
 -section

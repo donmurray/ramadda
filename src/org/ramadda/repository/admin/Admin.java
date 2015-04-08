@@ -365,17 +365,13 @@ public class Admin extends RepositoryManager {
             getStorageManager().readSystemResource(
                 "/org/ramadda/repository/resources/ramadda_license.txt");
 
-        sb.append(HtmlUtils.textArea("", license, 20, 120));
-        sb.append("<p>");
+        sb.append(HtmlUtils.textArea("", license, 10, 120));
         sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
-                                 HtmlUtils.cssClass(CSS_CLASS_HIGHLIGHT)));
+                                 HtmlUtils.cssClass(CSS_CLASS_HIGHLIGHT) + HtmlUtils.style("display:inline-block;padding:8px;margin:8px;")));
         sb.append(HtmlUtils.checkbox("agree", "1"));
-        sb.append(HtmlUtils.space(1));
-        sb.append(
-            "I agree to the above terms and conditions of use of the RAMADDA software");
+        sb.append(HtmlUtils.space(2));
+        sb.append("I agree to the above license and conditions of use of the RAMADDA software");
         sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
-        sb.append(HtmlUtils.br());
-
         return sb;
     }
 
@@ -415,16 +411,14 @@ public class Admin extends RepositoryManager {
         if ( !haveDone(ARG_ADMIN_INSTALLNOTICESHOWN)) {
             title = "Installation";
             sb.append(
-                note("Thank you for trying out Geode System's RAMADDA Repository. Listed below is the RAMADDA home directory and database information. If you want to change these settings please consult the <a target=\"other\" href=\"" + HELP_ROOT + "/userguide/installing.html#home\">documentation</a> before continuing with the installation process."));
+                note("Thank you for trying out the Geode Systems RAMADDA Repository. Listed below is the RAMADDA home directory and database information. If you want to change these settings please consult the <a target=\"other\" href=\"" + HELP_ROOT + "/userguide/installing.html#home\">documentation</a> before continuing with the installation process."));
             sb.append(HtmlUtils.formTable());
             getStorageManager().addInfo(sb);
             getDatabaseManager().addInfo(sb);
-            sb.append(HtmlUtils.formEntry("",
-                                          HtmlUtils.submit(msg("Next"),
-                                              ARG_ADMIN_INSTALLNOTICESHOWN)));
             sb.append(HtmlUtils.formTableClose());
+            sb.append(HtmlUtils.submit(msg("Next"), ARG_ADMIN_INSTALLNOTICESHOWN));
         } else if ( !haveDone(ARG_ADMIN_LICENSEREAD)) {
-            title = "License";
+            title = "License and Conditions of Use";
             sb.append(getLicenseForm());
             sb.append(HtmlUtils.submit(msg("Next")));
         } else if ( !haveDone(ARG_ADMIN_ADMINCREATED)) {
@@ -547,7 +541,9 @@ public class Admin extends RepositoryManager {
                         getRepository().loadPluginResources();
                     }
 
+                    //                    System.err.println("Adding init entries");
                     addInitEntries(user);
+                    //                    System.err.println("done Adding init entries");
                     sb.append(getUserManager().makeLoginForm(request));
                     if (errorBuffer.length() > 0) {
                         sb.append(
@@ -569,8 +565,7 @@ public class Admin extends RepositoryManager {
                 sb.append(getPageHandler().showDialogError(msg("Error")
                         + "<br>" + errorBuffer));
             }
-            sb.append(
-                note("Please enter the following information. This information is used to configure your RAMADDA server and is not sent anywhere."));
+            sb.append("Please enter the following information. This information is used to configure your RAMADDA server and is not sent anywhere.");
             String required1 =
                 " <span class=\"ramadda-required-field\">* required</span>";
             String required2 =
@@ -687,9 +682,11 @@ public class Admin extends RepositoryManager {
         }
         Element root       = XmlUtil.getRoot(initEntriesXml);
         Request tmpRequest = getRepository().getRequest(user);
+        //        System.err.println("entry xml");
         List<Entry> newEntries =
             getEntryManager().processEntryXml(tmpRequest, root, null,
                 new Hashtable<String, File>());
+        //        System.err.println("after entry xml");
     }
 
 
