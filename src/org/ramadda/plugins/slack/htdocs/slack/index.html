@@ -24,6 +24,11 @@ In Slack go to the Integrations page for your team. Under Configured Integration
 <p>
 The Token is important. This is what tells RAMADDA that its OK to respond to Slack commands. Copy and paste the Token. 
 
+
+
+
+
+
 <h3>Configure RAMADDA</h3>
 Now, go to your RAMADDA repository and log in as an admin. Under the Admin-&gt;Harvesters page add a New Harvester. From the list cchoose Slack Harvester. Under the Run Settings check on "Active on Start Up". And copy the token into the Tokens field. You can have any number of Slack Slash commands configured and have them all communicate with this one harvester. Conversely you can have any number of harvesters that handle different Slash commands.
 <br>
@@ -60,6 +65,13 @@ The interface lets you navigate around RAMADDA like a command line:
 /r cd ../..
 </pre>
 
+You can enter multiple commands on one line separated by a semi-colon:
+<pre>
+/r pwd; ls; cd;
+</pre>
+
+
+
 <br>
 Create wiki pages, web logs and other entries
 <pre>
@@ -67,7 +79,26 @@ Create wiki pages, web logs and other entries
 </pre>
 
 
-</div>
+<p>
+You can also define a slash command that has the RAMADDA command predefined. So you can add a slash command, e.g. "/cd", that maps to the URL:
+<pre>
+<a href="https://${hostname}${urlroot}/slack/slack/api">https://${hostname}${urlroot}/slack/slack/api?ramadda_command=cd</a>
+</pre>
+Create multiple slash commands, e.g.:
+<pre>
+<a href="https://${hostname}${urlroot}/slack/slack/api">https://${hostname}${urlroot}/slack/slack/api?ramadda_command=ls</a>
+<a href="https://${hostname}${urlroot}/slack/slack/api">https://${hostname}${urlroot}/slack/slack/api?ramadda_command=pwd</a>
+<a href="https://${hostname}${urlroot}/slack/slack/api">https://${hostname}${urlroot}/slack/slack/api?ramadda_command=new</a>
+</pre>
+
+Now in Slack you would just do:
+<pre>
+/cd &gt;some_entry&lt;
+/ls
+/etc
+</pre>
+
+
 
 
 <h3>RAMADDA Monitors and Slack Integration</h3>
@@ -76,6 +107,8 @@ You can add a monitor to your RAMADDA repository that will post a message to Sla
 Login to your RAMADDA and go to your User Settings-&gt;Monitors page.  Create a new Slack Monitor, specify is valid date range and any search
 criteria (e.g.,text, spatial, type). Enter the  Incoming Web Hook URL you get from Slack. A link will be posted to slack when a new entry is created
 that meets the search criteria.
+
+</div>
 
 </body>
 </html>
