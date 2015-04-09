@@ -420,6 +420,7 @@ public class Admin extends RepositoryManager {
         } else if ( !haveDone(ARG_ADMIN_LICENSEREAD)) {
             title = "License and Conditions of Use";
             sb.append(getLicenseForm());
+            sb.append(HtmlUtils.br());
             sb.append(HtmlUtils.submit(msg("Next")));
         } else if ( !haveDone(ARG_ADMIN_ADMINCREATED)) {
             title = "Administrator";
