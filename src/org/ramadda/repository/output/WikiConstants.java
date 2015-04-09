@@ -22,6 +22,9 @@ public interface WikiConstants {
     /** _more_ */
     public static final String ATTR_ALIGN = "align";
 
+    /** _more_          */
+    public static final String ATTR_ANNOTATE = "annotate";
+
     /** _more_ */
     public static final String ATTR_BLOCK_SHOW = "block.show";
 
@@ -61,6 +64,17 @@ public interface WikiConstants {
 
     /** _more_ */
     public static final String ATTR_DECORATE = "decorate";
+
+    /** _more_          */
+    public static final String ATTR_SKIP_LINES = "skipLines";
+
+    /** _more_          */
+    public static final String ATTR_MAX_LINES = "maxLines";
+
+    /** _more_          */
+    public static final String ATTR_FORCE = "force";
+
+
 
     /** maximum attribute */
     public static final String ATTR_MAX = "max";
@@ -279,6 +293,9 @@ public interface WikiConstants {
 
     /** _more_ */
     public static final String WIKI_TAG_GROUP = "group";
+
+    /** _more_          */
+    public static final String WIKI_TAG_EMBED = "embed";
 
     /** _more_ */
     public static final String WIKI_TAG_CHART = "chart";

@@ -35,10 +35,16 @@ import org.ramadda.util.Json;
 import org.ramadda.util.Utils;
 import org.ramadda.util.WikiUtil;
 
+import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
+
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 
 import java.net.URL;
 
@@ -81,6 +87,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                             new WikiTag(WIKI_TAG_HTML),
                             new WikiTag(WIKI_TAG_SIMPLE, attrs(ATTR_TEXTPOSITION, POS_LEFT)),
                             new WikiTag(WIKI_TAG_IMPORT, attrs(ATTR_ENTRY,"")),
+                            new WikiTag(WIKI_TAG_EMBED, attrs(ATTR_ENTRY,"",ATTR_SKIP_LINES,"0",ATTR_MAX_LINES,"1000",ATTR_FORCE,"false",ATTR_MAXHEIGHT,"300",ATTR_ANNOTATE,"false")),
                             new WikiTag(WIKI_TAG_FIELD, attrs("name", ""))),
         new WikiTagCategory("Layout", 
                             new WikiTag(WIKI_TAG_LINKS, attrs(
@@ -1014,6 +1021,53 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                     Misc.getProperty(props, ATTR_TITLE, "Layout"));
         } else if (theTag.equals(WIKI_TAG_NAME)) {
             return getEntryDisplayName(entry);
+        } else if (theTag.equals(WIKI_TAG_EMBED)) {
+            if ( !entry.isFile()
+                    || ( !isTextFile(entry.getResource().getPath())
+                         && !Misc.getProperty(props, ATTR_FORCE, false))) {
+                return "Entry isn't a text file";
+            }
+            StringBuilder txt = new StringBuilder("");
+
+            InputStream fis = getStorageManager().getFileInputStream(
+                                  entry.getResource().getPath());
+            BufferedReader br =
+                new BufferedReader(new InputStreamReader(fis));
+            int     skipLines  = Misc.getProperty(props, ATTR_SKIP_LINES, 0);
+            int     maxLines   = Misc.getProperty(props, ATTR_MAX_LINES,
+                                     1000);
+            int     maxHeight  = Misc.getProperty(props, ATTR_MAXHEIGHT, 300);
+            boolean annotate   = Misc.getProperty(props, ATTR_ANNOTATE,
+                                     false);
+            int     lineNumber = 0;
+            int     cnt        = 0;
+            String  line;
+            while ((line = br.readLine()) != null) {
+                lineNumber++;
+                if (skipLines > 0) {
+                    skipLines--;
+
+                    continue;
+                }
+                cnt++;
+                line = line.replaceAll("<", "&lt;");
+                line = line.replaceAll(">", "&gt;");
+                if (annotate) {
+                    txt.append("#");
+                    txt.append(lineNumber);
+                    txt.append(": ");
+                }
+                txt.append(line);
+                txt.append("\n");
+                if (cnt > maxLines) {
+                    break;
+                }
+            }
+            IOUtil.close(fis);
+
+            return HtmlUtils.pre(txt.toString(),
+                                 HtmlUtils.style("max-height:" + maxHeight
+                                     + "px; overflow-y:auto;"));
         } else if (theTag.equals(WIKI_TAG_FIELD)) {
             String name = Misc.getProperty(props, ATTR_FIELDNAME,
                                            (String) null);
