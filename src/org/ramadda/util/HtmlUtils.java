@@ -1201,7 +1201,20 @@ public class HtmlUtils {
      * @return _more_
      */
     public static String pre(String content) {
-        return tag(TAG_PRE, "", content);
+        return pre(content, "");
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param content _more_
+     * @param attrs _more_
+     *
+     * @return _more_
+     */
+    public static String pre(String content, String attrs) {
+        return tag(TAG_PRE, attrs, content);
     }
 
 
