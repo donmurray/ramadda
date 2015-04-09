@@ -58,6 +58,7 @@ import java.net.*;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
@@ -867,5 +868,33 @@ public class RepositoryManager implements RepositorySource, Constants,
 
         return dflt;
     }
+
+
+
+    /** _more_          */
+    private HashSet<String> textSuffixes;
+
+    /**
+     * _more_
+     *
+     * @param file _more_
+     *
+     * @return _more_
+     */
+    public boolean isTextFile(String file) {
+        String suffix = IOUtil.getFileExtension(file);
+        suffix = suffix.replace(".", "");
+        if (textSuffixes == null) {
+            HashSet<String> tmp = new HashSet<String>();
+            tmp.addAll(
+                StringUtil.split(
+                    getRepository().getProperty("ramadda.suffixes.text", ""),
+                    ",", true, true));
+            textSuffixes = tmp;
+        }
+
+        return textSuffixes.contains(suffix.toLowerCase());
+    }
+
 
 }
