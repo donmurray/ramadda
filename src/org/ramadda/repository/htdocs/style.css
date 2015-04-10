@@ -1497,8 +1497,12 @@ snippet {
    color: black;
 }
 
-.metadatagroup {
-  padding-right: 5px;
+.ramadda-metadata-form {
+   padding-left: 10px;
+}
+
+.ramadda-metadata-html {
+   padding-left: 10px;
 }
 
 

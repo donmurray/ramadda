@@ -1335,15 +1335,16 @@ public class MetadataManager extends RepositoryManager {
         } else {
             request.uploadFormWithAuthToken(sb, URL_METADATA_CHANGE);
             sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
-            sb.append(HtmlUtils.submit(msg("Change")));
-            sb.append(HtmlUtils.space(2));
-            sb.append(HtmlUtils.submit(msg("Delete selected"),
-                                       ARG_METADATA_DELETE));
-            sb.append(HtmlUtils.buttonSpace());
-            sb.append(HtmlUtils.submit(msg("Copy selected to clipboard"),
-                                       ARG_METADATA_CLIPBOARD_COPY));
-            //            sb.append(HtmlUtils.formTable());
-            sb.append(HtmlUtils.br());
+            String buttons = HtmlUtils.buttons(
+                                 HtmlUtils.submit(msg("Change")),
+                                 HtmlUtils.submit(
+                                     msg("Delete selected"),
+                                     ARG_METADATA_DELETE), HtmlUtils.submit(
+                                         msg("Copy selected to clipboard"),
+                                         ARG_METADATA_CLIPBOARD_COPY));
+            sb.append(buttons);
+            List<String> titles   = new ArrayList<String>();
+            List<String> contents = new ArrayList<String>();
             for (Metadata metadata : metadataList) {
                 metadata.setEntry(entry);
                 MetadataHandler metadataHandler =
@@ -1374,25 +1375,23 @@ public class MetadataManager extends RepositoryManager {
                                         "event", HtmlUtils.squote("cbx_"),
                                         HtmlUtils.squote(cbxId)))));
 
-                StringBuffer metadataEntry = new StringBuffer();
+                StringBuilder metadataEntry = new StringBuilder();
                 metadataEntry.append(HtmlUtils.formTable());
+                metadataEntry.append(HtmlUtils.formEntry("",
+                        cbx + HtmlUtils.space(2) + msg("Select")));
                 metadataEntry.append(html[1]);
                 metadataEntry.append(HtmlUtils.formTableClose());
-                sb.append(
-                    HtmlUtils.makeShowHideBlock(
-                        cbx + HtmlUtils.space(1) + html[0],
-                        HtmlUtils.div(
-                            metadataEntry.toString(),
-                            HtmlUtils.cssClass("metadatagroup")), false));
+                titles.add(html[0]);
+                String content = HtmlUtils.div(
+                                     metadataEntry.toString(),
+                                     HtmlUtils.cssClass(
+                                         "ramadda-metadata-form"));
+                contents.add(content);
             }
-            sb.append(HtmlUtils.p());
-            sb.append(HtmlUtils.submit(msg("Change")));
-            sb.append(HtmlUtils.buttonSpace());
-            sb.append(HtmlUtils.submit(msg("Delete Selected"),
-                                       ARG_METADATA_DELETE));
-            sb.append(HtmlUtils.buttonSpace());
-            sb.append(HtmlUtils.submit(msg("Copy selected to clipboard"),
-                                       ARG_METADATA_CLIPBOARD_COPY));
+            sb.append(HtmlUtils.beginInset(10, 10, 10, 10));
+            HtmlUtils.makeAccordian(sb, titles, contents);
+            sb.append(HtmlUtils.endInset());
+            sb.append(buttons);
             sb.append(HtmlUtils.formClose());
         }
 

@@ -977,7 +977,7 @@ public class MetadataType extends MetadataTypeBase {
             List<MetadataElement> children = getChildren();
             content.append(HtmlUtils.formTable());
             for (MetadataElement element : children) {
-                MetadataElement.FormInfo formInfo =
+                MetadataElement.MetadataHtml formInfo =
                     element.getHtml(request, entry, this, metadata,
                                     metadata.getAttr(cnt), 0);
                 if (formInfo != null) {
@@ -1057,22 +1057,31 @@ public class MetadataType extends MetadataTypeBase {
             throws Exception {
 
         String lbl = (String) request.getExtraProperty(PROP_METADATA_LABEL);
+        String firstValue = null;
         if (lbl == null) {
             lbl = msgLabel(getName());
         }
         String submit = HtmlUtils.submit(msg("Add") + HtmlUtils.space(1)
                                          + getName());
-        String       cancel = HtmlUtils.submit(msg("Cancel"), ARG_CANCEL);
+        String        cancel = HtmlUtils.submit(msg("Cancel"), ARG_CANCEL);
 
 
-        StringBuffer sb     = new StringBuffer();
+        StringBuilder sb     = new StringBuilder();
 
         if ( !forEdit) {
             sb.append(header(msgLabel("Add") + getName()));
         }
-        sb.append(HtmlUtils.br());
         String lastGroup = null;
         for (MetadataElement element : getChildren()) {
+            if (forEdit && (firstValue == null)) {
+                MetadataElement.MetadataHtml metadataHtml =
+                    element.getHtml(request, entry, this, metadata,
+                                    metadata.getAttr(element.getIndex()), 0);
+                if (metadataHtml != null) {
+                    firstValue = metadataHtml.getHtml();
+                }
+            }
+
             if ((element.getGroup() != null)
                     && !Misc.equals(element.getGroup(), lastGroup)) {
                 lastGroup = element.getGroup();
@@ -1117,6 +1126,9 @@ public class MetadataType extends MetadataTypeBase {
         }
 
 
+        if (firstValue != null) {
+            lbl = lbl + " " + firstValue;
+        }
 
         return new String[] { lbl, sb.toString() };
     }

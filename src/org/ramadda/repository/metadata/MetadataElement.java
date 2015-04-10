@@ -338,9 +338,10 @@ public class MetadataElement extends MetadataTypeBase implements DataTypes {
      *
      * @throws Exception _more_
      */
-    public FormInfo getHtml(Request request, Entry entry, MetadataType type,
-                            Metadata containerMetadata, String value,
-                            int depth)
+    public MetadataHtml getHtml(Request request, Entry entry,
+                                MetadataType type,
+                                Metadata containerMetadata, String value,
+                                int depth)
             throws Exception {
 
         if ((value == null) || dataType.equals(DATATYPE_SKIP)) {
@@ -356,7 +357,7 @@ public class MetadataElement extends MetadataTypeBase implements DataTypes {
             String url = getImageUrl(request, entry, containerMetadata, this,
                                      null);
             if (url != null) {
-                return new FormInfo(
+                return new MetadataHtml(
                     "",
                     HtmlUtils.img(
                         url, HtmlUtils.cssClass("ramadda-metadata-image")));
@@ -378,10 +379,11 @@ public class MetadataElement extends MetadataTypeBase implements DataTypes {
             List<StringBuffer> subEntries = new ArrayList<StringBuffer>();
             boolean            anyChildrenGroups = false;
             for (Metadata metadata : childMetadata) {
-                List<FormInfo>        formInfos = new ArrayList<FormInfo>();
-                List<MetadataElement> children  = getChildren();
+                List<MetadataHtml> formInfos   =
+                    new ArrayList<MetadataHtml>();
+                List<MetadataElement> children = getChildren();
                 for (MetadataElement element : children) {
-                    FormInfo formInfo =
+                    MetadataHtml formInfo =
                         element.getHtml(request, entry, type, metadata,
                                         metadata.getAttr(element.getIndex()),
                                         depth + 1);
@@ -396,7 +398,7 @@ public class MetadataElement extends MetadataTypeBase implements DataTypes {
                     formInfos.add(formInfo);
                 }
                 StringBuffer subEntrySB = null;
-                for (FormInfo formInfo : formInfos) {
+                for (MetadataHtml formInfo : formInfos) {
                     if ((formInfo.content.length() > 0)
                             || (children.size() > 1)) {
                         if (subEntrySB == null) {
@@ -447,7 +449,7 @@ public class MetadataElement extends MetadataTypeBase implements DataTypes {
                     + HtmlUtils.div(
                         entriesSB.toString(),
                         HtmlUtils.id(id)
-                        + HtmlUtils.cssClass("metadatagroup")) + "</td></tr>");
+                        + HtmlUtils.cssClass("ramadda-metadata-html")) + "</td></tr>");
                 tmp.append(HtmlUtils.formTableClose());
                 if (initJS.length() > 0) {
                     tmp.append(HtmlUtils.script(initJS));
@@ -482,7 +484,7 @@ public class MetadataElement extends MetadataTypeBase implements DataTypes {
             }
 
             //            sb.append(HtmlUtils.formEntry(name, html));
-            return new FormInfo(name, html);
+            return new MetadataHtml(name, html);
         }
 
         return null;
@@ -543,7 +545,7 @@ public class MetadataElement extends MetadataTypeBase implements DataTypes {
      * @version        $version$, Mon, Sep 5, '11
      * @author         Enter your name here...
      */
-    public static class FormInfo {
+    public static class MetadataHtml {
 
         /** _more_ */
         public String label;
@@ -560,7 +562,7 @@ public class MetadataElement extends MetadataTypeBase implements DataTypes {
          * @param label _more_
          * @param content _more_
          */
-        public FormInfo(String label, String content) {
+        public MetadataHtml(String label, String content) {
             this.label   = label;
             this.content = content;
         }
@@ -571,8 +573,27 @@ public class MetadataElement extends MetadataTypeBase implements DataTypes {
          * @return _more_
          */
         public String toString() {
-            return "formInfo:" + label + " " + content;
+            return "MetadataHtml:" + label + " " + content;
         }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public String getLabel() {
+            return label;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public String getHtml() {
+            return content;
+        }
+
     }
 
 
@@ -965,7 +986,7 @@ public class MetadataElement extends MetadataTypeBase implements DataTypes {
                     "",
                     HtmlUtils.div(
                         entriesSB.toString(),
-                        HtmlUtils.cssClass("metadatagroup")), true));
+                        HtmlUtils.cssClass("ramadda-metadata-form")), true));
 
             return sb.toString();
         } else {
