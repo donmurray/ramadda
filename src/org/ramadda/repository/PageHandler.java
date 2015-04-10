@@ -96,14 +96,10 @@ public class PageHandler extends RepositoryManager {
         new GregorianCalendar(TIMEZONE_UTC);
 
 
-    /** _more_ */
-    private static String button =
-        "<a href=\"https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=SA4AUEBEYSHBY&no_shipping=1&return=https%3A%2F%2Fgeodesystems.com%3A8081%2Frepository%2Falias%2Fcheckout&image_url=https%3A%2F%2Fgeodesystems.com%3A8081%2Frepository%2Fimages%2Fgeodesystems.png\" target=\"_purhase\">make a donation</a>";
 
-
-    /** _more_ */
+    /** _more_          */
     public static final String REGISTER_MESSAGE =
-        "<div class=\"ramadda-register\">Thank you for trying the <a href=\"http://geodesystems.com\">Geode Systems</a> RAMADDA repository. This is the shareware version of the software. &nbsp;&nbsp; <a class=\"btn btn-primary\" role=\"button\" target=register href=\"http://geodesystems.com/repository/alias/ramadda_registration\">Please register</a></div>";
+        "<div class=\"ramadda-register\">Thank you for trying the <a href=\"http://geodesystems.com\">Geode Systems</a> RAMADDA repository. This is the shareware version of the software. &nbsp;&nbsp; <a class=\"btn btn-primary\" role=\"button\" target=register href=\"https://geodesystems.com/repository/alias/ramadda_registration\">Please register</a></div>";
 
 
     /** _more_ */
@@ -2175,7 +2171,6 @@ public class PageHandler extends RepositoryManager {
      * @param urls _more_
      * @param arg _more_
      *
-     * @return _more_
      *
      * @throws Exception _more_
      */

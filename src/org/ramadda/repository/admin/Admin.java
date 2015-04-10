@@ -1109,7 +1109,7 @@ public class Admin extends RepositoryManager {
         String regKey = getProperty(PROP_REGISTER_KEY, "");
         csb.append(HtmlUtils.formEntry(msgLabel("Key"),
                                        HtmlUtils.input(PROP_REGISTER_KEY,
-                                           regKey, HtmlUtils.SIZE_70)));
+                                           regKey, HtmlUtils.SIZE_90)));
 
         if (getRepository().isRegistered()) {
             csb.append(HtmlUtils.formEntry("", "Registered"));
