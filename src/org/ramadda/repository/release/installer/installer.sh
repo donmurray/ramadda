@@ -4,7 +4,7 @@
 #This script installs some base packages, Postgres and then RAMADDA
 #
 
-ramaddaVersion=2.0
+ramaddaVersion=@VERSION@
 
 
 OS_REDHAT="redhat"
