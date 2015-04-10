@@ -359,20 +359,25 @@ public class Admin extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    private StringBuffer getLicenseForm() throws Exception {
+    public String getLicenseForm() throws Exception {
         StringBuffer sb = new StringBuffer();
         String license =
             getStorageManager().readSystemResource(
                 "/org/ramadda/repository/resources/ramadda_license.txt");
 
+        license = license.replace("(C)", "&copy;");
+        license = license.replace("(c)", "&copy;");
         sb.append(HtmlUtils.textArea("", license, 10, 120));
+
         sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
-                                 HtmlUtils.cssClass(CSS_CLASS_HIGHLIGHT) + HtmlUtils.style("display:inline-block;padding:8px;margin:8px;")));
-        sb.append(HtmlUtils.checkbox("agree", "1"));
+                                 HtmlUtils.cssClass("registration-agree")));
+        sb.append(HtmlUtils.checkbox(ARG_AGREE, "true", false));
         sb.append(HtmlUtils.space(2));
-        sb.append("I agree to the above license and conditions of use of the RAMADDA software");
+        sb.append(
+            "I agree to the above license and conditions of use for the RAMADDA software");
         sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
-        return sb;
+
+        return sb.toString();
     }
 
 
@@ -401,7 +406,7 @@ public class Admin extends RepositoryManager {
         StringBuffer sb    = new StringBuffer();
         String       title = "";
 
-        if (Misc.equals("1", request.getString("agree", ""))) {
+        if (request.get(ARG_AGREE, false)) {
             didIt(ARG_ADMIN_LICENSEREAD);
         }
 
@@ -416,14 +421,15 @@ public class Admin extends RepositoryManager {
             getStorageManager().addInfo(sb);
             getDatabaseManager().addInfo(sb);
             sb.append(HtmlUtils.formTableClose());
-            sb.append(HtmlUtils.submit(msg("Next"), ARG_ADMIN_INSTALLNOTICESHOWN));
+            sb.append(HtmlUtils.submit(msg("Next"),
+                                       ARG_ADMIN_INSTALLNOTICESHOWN));
         } else if ( !haveDone(ARG_ADMIN_LICENSEREAD)) {
             title = "License and Conditions of Use";
             sb.append(getLicenseForm());
             sb.append(HtmlUtils.br());
             sb.append(HtmlUtils.submit(msg("Next")));
         } else if ( !haveDone(ARG_ADMIN_ADMINCREATED)) {
-            title = "Administrator";
+            title = "Configuration";
             String       id          = "admin";
             String       name        = "Administrator";
 
@@ -566,7 +572,8 @@ public class Admin extends RepositoryManager {
                 sb.append(getPageHandler().showDialogError(msg("Error")
                         + "<br>" + errorBuffer));
             }
-            sb.append("Please enter the following information. This information is used to configure your RAMADDA server and is not sent anywhere.");
+            sb.append(
+                "Please enter the following information. This information is used to configure your RAMADDA server and is not sent anywhere.");
             String required1 =
                 " <span class=\"ramadda-required-field\">* required</span>";
             String required2 =

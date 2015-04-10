@@ -336,6 +336,8 @@ public interface Constants {
     /** _more_ */
     public static final String ARG_ICON = "ramadda.icon";
 
+    /** _more_          */
+    public static final String ARG_AGREE = "agree";
 
 
     /** _more_ */

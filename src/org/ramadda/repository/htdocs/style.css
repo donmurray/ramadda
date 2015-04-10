@@ -759,6 +759,18 @@ padding-right-rtl-source: physical;
    padding: 5px;
 }
 
+
+.registration-agree {
+   font-weight: bold; 
+   background: #FFFFCC;
+   padding: 5px;
+   display:inline-block;
+   padding:6px;
+   margin-top:8px;
+   margin-bottom:8px;
+}
+
+
 .ramadda-error-label {
     color:#F00;
     font-weight: bold;
