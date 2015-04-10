@@ -1125,8 +1125,8 @@ public class MetadataType extends MetadataTypeBase {
                                           + cancel));
         }
 
-
-        if (firstValue != null) {
+        //Only show the value if its simple text
+        if (firstValue != null && firstValue.indexOf("<")<0) {
             lbl = lbl + " " + firstValue;
         }
 
