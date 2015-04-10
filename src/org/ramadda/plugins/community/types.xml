@@ -72,7 +72,6 @@
      <column name="organization"  type="string" label="Organization" cansearch="true"/>
      <column name="country" type="enumerationplus" label="Country" values="file:/org/ramadda/plugins/community/resources/countries.txt" showinhtml="true" cansearch="true"/>
      <column name="location"  type="string" label="Location" cansearch="true"/>
-     <column name="ecoregion"  type="enumerationplus" label="Ecoregion" cansearch="true" values="file:/org/ramadda/plugins/community/resources/biomes.txt"/>
 
 
      <wiki><![CDATA[
