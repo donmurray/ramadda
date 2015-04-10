@@ -282,7 +282,7 @@ CREATE TABLE  pointdatametadata (
        vartype varchar(100));
 
 
-CREATE INDEX POINTDATAMETADATA_INDEX_TABLENAME ON pointdatametadata (TABLENAME);
+---- CREATE INDEX POINTDATAMETADATA_INDEX_TABLENAME ON pointdatametadata (TABLENAME);
 
 
 
