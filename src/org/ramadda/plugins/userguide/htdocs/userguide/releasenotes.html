@@ -44,25 +44,13 @@ RAMADDA version 2.0 is now available for download at:
 http://sourceforge.net/projects/ramadda/files/ramadda2.0/</a>
 </ul>
 
-The easiest way to try out RAMADDA is with the stand-alone repository available in
-<a href="http://sourceforge.net/projects/ramadda/files/ramadda2.0/ramaddaserver.zip">
-ramaddaserver.zip</a>.
-On a Mac or Linux machine all you need is Java installed on your machine. Download and unzip the file and run:
-<pre>
-cd ramaddaserver
-sh ramadda.sh
-</pre>
-
-If you run with Tomcat or another servlet container the WAR file is available at:
-<a href="http://sourceforge.net/projects/ramadda/files/ramadda2.0/repository.war">
-repository.war</a>.
-
+See the <a href="installing.html">Installation Guide</a> for more information.
 
 
 <h2>What's new in version 2.0?</h2>
 
 <ul>
-<li>  This is the first release under the new <a href="license.html">Geode Systems RAMADDA License</a>. Going forward RAMADDA development will no longer be under the prior MIT Open Source license.
+<li>  This is the first release under the new <a href="license.html">Geode Systems RAMADDA License</a>. 
 You can run the shareware version of RAMADDA, pay a modest per/user license fee or you can use it for free
 if you are part of a non-profit organization. Register <a href="https://geodesystems.com/repository/alias/ramadda_registration">here</a>.
 <li> There are now 3 plugin collections - coreplugins, geoplugins and bioplugins.
@@ -79,11 +67,13 @@ svn checkout -r 5188 svn://svn.code.sf.net/p/ramadda/code/ ramadda-code
 
 
 
-<h2>Upgrading</h2>
+
+<h2>Installing and Upgrading</h2>
 
 <div class="boxquote">
 Note: Many users ask if upgrading RAMADDA will effect any existing content. All of the content and files are kept in the RAMADDA home directory and in the database. As long as those directories remain untouched there should not be any problem in upgrading. However, you will need to update any plugins you have installed in the RAMADDA plugins directory. 
 </div>
+
 
 
 To update an existing RAMADDA install:
@@ -92,24 +82,18 @@ To update an existing RAMADDA install:
 
 <li> Update plugins
 <ul>
-<li> As noted above there are now 3 plugin collections - core, geo and bio. If you have the allplugins.jar installed then RAMADDA will update appropriately.
+<li> As noted above there are now 3 plugin collections - core, geo and bio. If you have the old allplugins.jar installed then RAMADDA will update appropriately. 
 
 <li> If you have individual  plugins installed then you should update them to the latest <a href="http://sourceforge.net/projects/ramadda/files/ramadda2.0/plugins/">versions</a>.
 
 </ul>
 
-<li> Install the new server
-
-<ul>
-
-
 <li> If you are running stand-alone then download and unzip the
-<a href="http://sourceforge.net/projects/ramadda/files/ramadda2.0/ramadda2.0.zip/download">ramadda2.0.zip</a>. You will need to adjust your scripts to point to the ramadda2.0 directory.
+<a href="http://sourceforge.net/projects/ramadda/files/ramadda2.0/ramaddaserver.zip/download">ramaddaserver.zip</a>. 
 
-<li> If you are running under Tomcat or Glassfish download and install the 
+<li> If you are running under Tomcat or Glassfish then download and install the 
 <a href="http://sourceforge.net/projects/ramadda/files/ramadda2.0/repository.war">repository.war</a>
 
-</ul>
 </ul>
 
 
