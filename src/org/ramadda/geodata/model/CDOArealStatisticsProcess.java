@@ -8,10 +8,12 @@ package org.ramadda.geodata.model;
 
 
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
+import org.ramadda.repository.ApiMethod;
 import org.ramadda.repository.Association;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
 import org.ramadda.repository.Request;
+import org.ramadda.repository.RequestHandler;
 import org.ramadda.repository.Resource;
 import org.ramadda.repository.type.GranuleTypeHandler;
 import org.ramadda.repository.type.TypeHandler;
@@ -36,6 +38,7 @@ import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.TwoFacedObject;
 
 import ucar.visad.data.CalendarDateTime;
 
@@ -120,6 +123,19 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                                Appendable sb, String argPrefix)
             throws Exception {
 
+        List<NamedTimePeriod> periods = null;
+        ApiMethod api = request.getApiMethod();
+        if (api != null) {
+            RequestHandler handler = api.getRequestHandler();
+            if (handler != null && handler instanceof ClimateModelApiHandler) {
+                String group = null;
+                if (request.defined(ClimateModelApiHandler.ARG_EVENT_GROUP)) {
+                    group = request.getString(ClimateModelApiHandler.ARG_EVENT_GROUP, null);
+                    periods = ((ClimateModelApiHandler)handler).getNamedTimePeriods(group);
+                }
+            }
+        }
+        
         Entry first = input.getEntries().get(0);
 
         CdmDataOutputHandler dataOutputHandler =
@@ -135,7 +151,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
 
         addStatsWidget(request, sb);
 
-        addTimeWidget(request, sb, input);
+        addTimeWidget(request, sb, input, periods);
 
         LatLonRect llr = null;
         if (dataset != null) {
@@ -793,7 +809,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @throws Exception  problem making datasets
      */
     public void addTimeWidget(Request request, Appendable sb,
-                              ServiceInput input)
+                              ServiceInput input, List<NamedTimePeriod> periods)
             throws Exception {
 
         String type =
@@ -812,10 +828,37 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             }
 
         }
-        CDOOutputHandler.makeMonthsWidget(request, sb, null);
-        makeYearsWidget(request, sb, grids, type);
+        if ((periods == null) || (periods.isEmpty())) {
+            CDOOutputHandler.makeMonthsWidget(request, sb, null);
+            makeYearsWidget(request, sb, grids, type);
+        } else {
+            makeEventsWidget(request, sb, periods, type);
+        }
     }
 
+    private void makeEventsWidget(Request request, Appendable sb, 
+            List<NamedTimePeriod> periods, String type) throws Exception {
+        List<TwoFacedObject> values = new ArrayList<TwoFacedObject>();
+        NamedTimePeriod selectedEvent = periods.get(0);
+        String event = null;
+        if (request.defined(ClimateModelApiHandler.ARG_EVENT)) {
+            event = request.getString(ClimateModelApiHandler.ARG_EVENT);
+        }
+        for (NamedTimePeriod period : periods) {
+            String value = period.getId() + ";" + period.getStartMonth() + ";"
+                               + period.getEndMonth() + ";" + period.getYears();
+            TwoFacedObject item = new TwoFacedObject(period.getName(), value);
+            values.add(item);
+        }
+        sb.append(HtmlUtils.hidden(CDOOutputHandler.ARG_CDO_STARTMONTH,selectedEvent.getStartMonth()));
+        sb.append(HtmlUtils.hidden(CDOOutputHandler.ARG_CDO_ENDMONTH,selectedEvent.getEndMonth()));
+        sb.append(HtmlUtils.hidden(CDOOutputHandler.ARG_CDO_YEARS,selectedEvent.getYears()));
+        sb.append(
+            HtmlUtils.formEntry(Repository.msgLabel("Events"), 
+                HtmlUtils.select(
+                    ClimateModelApiHandler.ARG_EVENT, values, event)));
+        
+    }
 
     /**
      * Add the year selection widget

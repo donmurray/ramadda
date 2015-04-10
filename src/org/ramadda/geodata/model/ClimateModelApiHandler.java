@@ -33,6 +33,7 @@ import org.w3c.dom.Element;
 
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
 
@@ -86,12 +87,19 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
     /** shortcut to JQuery class */
     private static final JQuery JQ = null;
 
+    public static final String ARG_EVENT = "event";
+    public static final String ARG_EVENT_GROUP = "event_group";
+
     /** the collection type */
     private String collectionType;
 
     /** ttl cache */
     private TTLCache<Object, Object> cache = new TTLCache<Object,
                                                  Object>(60 * 60 * 1000);
+    /** _more_ */
+    private List<NamedTimePeriod> namedTimePeriods;
+
+
 
     /**
      * ctor
@@ -1538,5 +1546,101 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
 
         return collections;
     }
+    
+    /**
+     * Get the named time periods
+     *
+     * @return  the list of named time periods (may be empty)
+     */
+    public List<NamedTimePeriod> getNamedTimePeriods() throws Exception {
+        return getNamedTimePeriods(null);
+    }
 
+    /**
+     * Get the named time periods in the given group
+     *
+     * @param group  group name
+     *
+     * @return  the list of periods
+     */
+    public List<NamedTimePeriod> getNamedTimePeriods(String group) throws Exception {
+        if (namedTimePeriods == null) {
+            loadNamedTimePeriods();
+        }
+        if (group == null) {
+            return namedTimePeriods;
+        }
+        List<NamedTimePeriod> events = new ArrayList<NamedTimePeriod>();
+        for (NamedTimePeriod ntp : namedTimePeriods) {
+            if (ntp.isGroup(group)) {
+                events.add(ntp);
+            }
+        }
+
+        return events;
+    }
+
+    /**
+     * Load the NamedTimePeriods
+     *
+     * @throws Exception problem reading files
+     */
+    protected void loadNamedTimePeriods() throws Exception {
+        if (namedTimePeriods != null) return;
+        namedTimePeriods = new ArrayList<NamedTimePeriod>();
+        List<String> timePeriodFiles = new ArrayList<String>();
+        List<String> allFiles       = getPluginManager().getAllFiles();
+        for (String f : allFiles) {
+            if (f.endsWith("events.txt")) {
+                timePeriodFiles.add(f);
+            }
+        }
+
+        /*  Maybe we can add this later
+        String dir = getStorageManager().getSystemResourcePath() + "/geo";
+        List<String> listing = getRepository().getListing(dir, getClass());
+        for (String f : listing) {
+            if (f.endsWith("events.csv")) {
+                timePeriodFiles.add(f);
+            }
+        }
+        */
+
+        for (String path : timePeriodFiles) {
+            String contents =
+                getStorageManager().readUncheckedSystemResource(path,
+                    (String) null);
+            if (contents == null) {
+                getLogManager().logInfoAndPrint("RAMADDA: could not read:"
+                        + path);
+
+                continue;
+            }
+            //Name;ID;startMonth;endMonth;years
+            //Group
+            List<String> lines = StringUtil.split(contents, "\n", true, true);
+            // get rid of comment
+            if (lines.get(0).startsWith("#")) {
+                lines.remove(0); 
+            }
+            String group = lines.get(0);
+            lines.remove(0);
+            for (String line : lines) {
+                List<String> toks = StringUtil.split(line, ";");
+                if (toks.size() != 5) {
+                    throw new IllegalArgumentException("Bad named time period line:"
+                            + line + "\nFile:" + path);
+                }
+
+
+                namedTimePeriods.add(
+                    new NamedTimePeriod(
+                        toks.get(0), toks.get(1), group,
+                        Integer.parseInt(toks.get(2)),
+                        Integer.parseInt(toks.get(3)),
+                        toks.get(4)));
+            }
+
+        }
+    }
 }

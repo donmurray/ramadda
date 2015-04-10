@@ -155,7 +155,8 @@ function CollectionForm(formId, type, args) {
                     } else {
                         continue;
                     }
-                    zipentries += "&selentry=" + entry.getId();
+                    zipentries += "&" + HtmlUtil.urlArg("selentry",entry.getId());
+                    //zipentries += "&selentry=" + entry.getId();
                 }
                 html += this.outputImages(images);
                 html += this.outputKMZ(kmz);

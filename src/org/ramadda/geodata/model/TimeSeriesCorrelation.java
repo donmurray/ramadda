@@ -1072,7 +1072,7 @@ public class TimeSeriesCorrelation extends CDODataProcess {
                     < cal.get(GregorianCalendar.MONTH)) {
                 continue;
             }
-            System.err.println(tsr);
+            //System.err.println(tsr);
             subset.add(tsr);
             if (mcntr < numMonths - 1) {
                 cal.add(GregorianCalendar.MONTH, 1);
