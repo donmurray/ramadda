@@ -17,16 +17,10 @@ import org.ramadda.repository.RequestHandler;
 import org.ramadda.repository.Resource;
 import org.ramadda.repository.type.GranuleTypeHandler;
 import org.ramadda.repository.type.TypeHandler;
-
-
-
 import org.ramadda.service.ServiceInput;
 import org.ramadda.service.ServiceOperand;
 import org.ramadda.service.ServiceOutput;
 import org.ramadda.util.HtmlUtils;
-
-import ucar.nc2.dt.GridDatatype;
-import ucar.nc2.dt.GridDatatype;
 
 import ucar.nc2.dt.GridDatatype;
 import ucar.nc2.dt.grid.GridDataset;
@@ -59,7 +53,7 @@ import java.util.TreeSet;
  */
 public class CDOArealStatisticsProcess extends CDODataProcess {
 
-    /** _more_ */
+    /** the type of request */
     String type = null;
 
     /**
@@ -74,13 +68,13 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
     }
 
     /**
-     * _more_
+     * Initialize the form javascript
      *
-     * @param request _more_
-     * @param js _more_
-     * @param formVar _more_
+     * @param request  the request
+     * @param js       the javascript
+     * @param formVar  the form variable
      *
-     * @throws Exception _more_
+     * @throws Exception problems
      */
     public void initFormJS(Request request, Appendable js, String formVar)
             throws Exception {
@@ -95,8 +89,8 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @param request  the Request
      * @param input    the ServiceInput
      * @param sb       the form
-     * @param argPrefix _more_
-     * @param label _more_
+     * @param argPrefix  the argument prefix
+     * @param label      the label
      *
      * @throws Exception  problem adding to the form
      */
@@ -115,7 +109,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @param request  the Request
      * @param input    the ServiceInput
      * @param sb       the StringBuilder
-     * @param argPrefix _more_
+     * @param argPrefix  the argument prefix
      *
      * @throws Exception  problem making stuff
      */
@@ -124,18 +118,22 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             throws Exception {
 
         List<NamedTimePeriod> periods = null;
-        ApiMethod api = request.getApiMethod();
+        ApiMethod             api     = request.getApiMethod();
         if (api != null) {
             RequestHandler handler = api.getRequestHandler();
-            if (handler != null && handler instanceof ClimateModelApiHandler) {
+            if ((handler != null)
+                    && (handler instanceof ClimateModelApiHandler)) {
                 String group = null;
                 if (request.defined(ClimateModelApiHandler.ARG_EVENT_GROUP)) {
-                    group = request.getString(ClimateModelApiHandler.ARG_EVENT_GROUP, null);
-                    periods = ((ClimateModelApiHandler)handler).getNamedTimePeriods(group);
+                    group = request.getString(
+                        ClimateModelApiHandler.ARG_EVENT_GROUP, null);
+                    periods =
+                        ((ClimateModelApiHandler) handler)
+                            .getNamedTimePeriods(group);
                 }
             }
         }
-        
+
         Entry first = input.getEntries().get(0);
 
         CdmDataOutputHandler dataOutputHandler =
@@ -167,9 +165,8 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * Process the request
      *
      * @param request  The request
-     * @param info _more_
      * @param input  the  data process input
-     * @param argPrefix _more_
+     * @param argPrefix the argument prefix
      *
      * @return  the processed data
      *
@@ -259,12 +256,12 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
     /**
      * Add the ensemble mean to list of output entries
      *
-     * @param request _more_
-     * @param dpi _more_
-     * @param ops _more_
-     * @param type _more_
+     * @param request the request
+     * @param dpi     the service input
+     * @param ops     the service operands
+     * @param type    the type of request
      *
-     * @throws Exception _more_
+     * @throws Exception problems
      */
     public void addEnsembleMean(Request request, ServiceInput dpi,
                                 List<ServiceOperand> ops, String type)
@@ -776,7 +773,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @param request  the Request
      * @param sb       the HTML
      *
-     * @throws Exception _more_
+     * @throws Exception problems
      */
     public void addStatsWidget(Request request, Appendable sb)
             throws Exception {
@@ -805,11 +802,13 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @param request  the Request
      * @param sb       the HTML page
      * @param input    the input
+     * @param periods  the time periods
      *
      * @throws Exception  problem making datasets
      */
     public void addTimeWidget(Request request, Appendable sb,
-                              ServiceInput input, List<NamedTimePeriod> periods)
+                              ServiceInput input,
+                              List<NamedTimePeriod> periods)
             throws Exception {
 
         String type =
@@ -836,28 +835,49 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         }
     }
 
-    private void makeEventsWidget(Request request, Appendable sb, 
-            List<NamedTimePeriod> periods, String type) throws Exception {
-        List<TwoFacedObject> values = new ArrayList<TwoFacedObject>();
-        NamedTimePeriod selectedEvent = periods.get(0);
-        String event = null;
+    /**
+     * Make a widget for named time periods
+     *
+     * @param request  the request
+     * @param sb       the form
+     * @param periods  the periods
+     * @param type     the type of request
+     *
+     * @throws Exception problems
+     */
+    private void makeEventsWidget(Request request, Appendable sb,
+                                  List<NamedTimePeriod> periods, String type)
+            throws Exception {
+        String group =
+            request.getString(ClimateModelApiHandler.ARG_EVENT_GROUP, null);
+        List<TwoFacedObject> values        = new ArrayList<TwoFacedObject>();
+        NamedTimePeriod      selectedEvent = periods.get(0);
+        String               event         = null;
         if (request.defined(ClimateModelApiHandler.ARG_EVENT)) {
             event = request.getString(ClimateModelApiHandler.ARG_EVENT);
         }
         for (NamedTimePeriod period : periods) {
-            String value = period.getId() + ";" + period.getStartMonth() + ";"
-                               + period.getEndMonth() + ";" + period.getYears();
+            String value = period.getId() + ";" + period.getStartMonth()
+                           + ";" + period.getEndMonth() + ";"
+                           + period.getYears();
             TwoFacedObject item = new TwoFacedObject(period.getName(), value);
             values.add(item);
         }
-        sb.append(HtmlUtils.hidden(CDOOutputHandler.ARG_CDO_STARTMONTH,selectedEvent.getStartMonth()));
-        sb.append(HtmlUtils.hidden(CDOOutputHandler.ARG_CDO_ENDMONTH,selectedEvent.getEndMonth()));
-        sb.append(HtmlUtils.hidden(CDOOutputHandler.ARG_CDO_YEARS,selectedEvent.getYears()));
+        sb.append(HtmlUtils.hidden(CDOOutputHandler.ARG_CDO_STARTMONTH,
+                                   selectedEvent.getStartMonth()));
+        sb.append(HtmlUtils.hidden(CDOOutputHandler.ARG_CDO_ENDMONTH,
+                                   selectedEvent.getEndMonth()));
+        sb.append(HtmlUtils.hidden(CDOOutputHandler.ARG_CDO_YEARS,
+                                   selectedEvent.getYears()));
+        if ((group == null) || group.equals("all")) {
+            group = "Events";
+        }
         sb.append(
-            HtmlUtils.formEntry(Repository.msgLabel("Events"), 
+            HtmlUtils.formEntry(
+                Repository.msgLabel(group),
                 HtmlUtils.select(
                     ClimateModelApiHandler.ARG_EVENT, values, event)));
-        
+
     }
 
     /**
@@ -866,9 +886,9 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      * @param request  the Request
      * @param sb       the StringBuilder to add to
      * @param grids    list of grids to use
-     * @param type _more_
+     * @param type     the type of request
      *
-     * @throws Exception _more_
+     * @throws Exception problems
      */
     private void makeYearsWidget(Request request, Appendable sb,
                                  List<GridDataset> grids, String type)
