@@ -667,7 +667,7 @@ public class TimeSeriesCorrelation extends CDODataProcess {
                 if (startYear <= firstDataYear) {
                     startYear = firstDataYear + 1;
                 }
-                if (endYear < lastDataYear) {
+                if (endYear > lastDataYear) {
                     endYear = lastDataYear;
                 }
                 if ((endYear == lastDataYear)

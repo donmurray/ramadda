@@ -411,36 +411,37 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         //getOutputHandler().addLevelSelectServices(request, oneOfThem,
         //        commands, CdmDataOutputHandler.ARG_LEVEL);
         commands.add("-selname," + varname);
+        String       opStr    = (opNum == 0)
+                                ? ""
+                                : "" + (opNum + 1);
+        Request timeRequest = handleNamedTimePeriod(request, opStr);
         // Handle the case where the months span the year end (e.g. DJF)
         // Break it up into two requests
-        if (doMonthsSpanYearEnd(request, oneOfThem)) {
+        if (doMonthsSpanYearEnd(timeRequest, oneOfThem)) {
             System.out.println("months span the year end");
             List<String> tmpFiles = new ArrayList<String>();
-            String       opStr    = (opNum == 0)
-                                    ? ""
-                                    : "" + (opNum + 1);
             boolean      haveYears;
             // find the start & end month of the request
             int requestStartMonth =
-                request.get(CDOOutputHandler.ARG_CDO_STARTMONTH, 1);
+                timeRequest.get(CDOOutputHandler.ARG_CDO_STARTMONTH, 1);
             int requestEndMonth =
-                request.get(CDOOutputHandler.ARG_CDO_ENDMONTH, 1);
-            if (opNum == 0) {
-                haveYears = request.defined(CDOOutputHandler.ARG_CDO_YEARS);
-            } else {
-                haveYears = request.defined(CDOOutputHandler.ARG_CDO_YEARS
+                timeRequest.get(CDOOutputHandler.ARG_CDO_ENDMONTH, 1);
+            //if (opNum == 0) {
+            //    haveYears = timeRequest.defined(CDOOutputHandler.ARG_CDO_YEARS);
+            //} else {
+            haveYears = timeRequest.defined(CDOOutputHandler.ARG_CDO_YEARS
                                             + opStr);
                 /*
                         (request.defined(CDOOutputHandler.ARG_CDO_YEARS) &&
                          !(request.defined(CDOOutputHandler.ARG_CDO_STARTYEAR+opStr) &&
                            request.defined(CDOOutputHandler.ARG_CDO_ENDYEAR+opStr)));
                            */
-            }
+            //}
             if (haveYears) {
                 List<Integer> years = new ArrayList<Integer>();
-                String yearString = request.getString(
+                String yearString = timeRequest.getString(
                                         CDOOutputHandler.ARG_CDO_YEARS
-                                        + opStr, request.getString(
+                                        + opStr, timeRequest.getString(
                                             CDOOutputHandler.ARG_CDO_YEARS,
                                             null));
                 if (yearString != null) {
@@ -459,7 +460,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                 }
                 for (int i = 0; i < 2; i++) {
                     List<String> savedServices = new ArrayList(commands);
-                    Request      newRequest    = request.cloneMe();
+                    Request      newRequest    = timeRequest.cloneMe();
                     newRequest.remove(CDOOutputHandler.ARG_CDO_STARTYEAR);
                     newRequest.remove(CDOOutputHandler.ARG_CDO_ENDYEAR);
                     newRequest.remove(CDOOutputHandler.ARG_CDO_STARTYEAR
@@ -491,20 +492,20 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                     tmpFiles.add(tmpFile.toString());
                 }
             } else {
-                int startYear = request.get(
+                int startYear = timeRequest.get(
                                     CDOOutputHandler.ARG_CDO_STARTYEAR
-                                    + opStr, request.get(
+                                    + opStr, timeRequest.get(
                                         CDOOutputHandler.ARG_CDO_STARTYEAR,
                                         1979));
                 int endYear =
-                    request.get(CDOOutputHandler.ARG_CDO_ENDYEAR + opStr,
-                                request.get(CDOOutputHandler.ARG_CDO_ENDYEAR,
+                    timeRequest.get(CDOOutputHandler.ARG_CDO_ENDYEAR + opStr,
+                                timeRequest.get(CDOOutputHandler.ARG_CDO_ENDYEAR,
                                             1979));
                 // can't go back before the beginning of data or past the last data
                 if (startYear <= firstDataYear) {
                     startYear = firstDataYear + 1;
                 }
-                if (endYear < lastDataYear) {
+                if (endYear > lastDataYear) {
                     endYear = lastDataYear;
                 }
                 if ((endYear == lastDataYear)
@@ -513,7 +514,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                 }
                 for (int i = 0; i < 2; i++) {
                     List<String> savedServices = new ArrayList(commands);
-                    Request      newRequest    = request.cloneMe();
+                    Request      newRequest    = timeRequest.cloneMe();
                     // just in case
                     newRequest.remove(CDOOutputHandler.ARG_CDO_YEARS);
                     newRequest.remove(CDOOutputHandler.ARG_CDO_YEARS + opStr);
@@ -561,9 +562,9 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             runProcess(commands, dpi.getProcessDir(), outFile);
 
         } else {
-            getOutputHandler().addDateSelectServices(request, oneOfThem,
+            getOutputHandler().addDateSelectServices(timeRequest, oneOfThem,
                     commands, opNum);
-            getOutputHandler().addLevelSelectServices(request, oneOfThem,
+            getOutputHandler().addLevelSelectServices(timeRequest, oneOfThem,
                     commands, CdmDataOutputHandler.ARG_LEVEL);
 
             System.err.println("cmds:" + commands);
@@ -584,14 +585,14 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             //   - region
             //   - level
             //   - month range
-            getOutputHandler().addStatServices(request, climEntry, commands);
-            getOutputHandler().addAreaSelectServices(request, climEntry,
+            getOutputHandler().addStatServices(timeRequest, climEntry, commands);
+            getOutputHandler().addAreaSelectServices(timeRequest, climEntry,
                     commands);
             commands.add("-remapbil,r360x180");
             commands.add("-selname," + varname);
-            getOutputHandler().addMonthSelectServices(request, climEntry,
+            getOutputHandler().addMonthSelectServices(timeRequest, climEntry,
                     commands);
-            getOutputHandler().addLevelSelectServices(request, climEntry,
+            getOutputHandler().addLevelSelectServices(timeRequest, climEntry,
                     commands, CdmDataOutputHandler.ARG_LEVEL);
 
             //System.err.println("clim cmds:" + commands);
@@ -644,16 +645,16 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                          ? ""
                          : String.valueOf(opNum + 1);
         int    startMonth, endMonth;
-        if (request.getString(
+        if (timeRequest.getString(
                 CDOOutputHandler.ARG_CDO_MONTHS).equalsIgnoreCase("all")) {
             startMonth = 1;
             endMonth   = 12;
         } else {
-            startMonth = request.defined(CDOOutputHandler.ARG_CDO_STARTMONTH)
-                         ? request.get(CDOOutputHandler.ARG_CDO_STARTMONTH, 1)
+            startMonth = timeRequest.defined(CDOOutputHandler.ARG_CDO_STARTMONTH)
+                         ? timeRequest.get(CDOOutputHandler.ARG_CDO_STARTMONTH, 1)
                          : 1;
-            endMonth = request.defined(CDOOutputHandler.ARG_CDO_ENDMONTH)
-                       ? request.get(CDOOutputHandler.ARG_CDO_ENDMONTH,
+            endMonth = timeRequest.defined(CDOOutputHandler.ARG_CDO_ENDMONTH)
+                       ? timeRequest.get(CDOOutputHandler.ARG_CDO_ENDMONTH,
                                      startMonth)
                        : startMonth;
         }
@@ -665,31 +666,31 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             outputName.append(MONTHS[endMonth - 1]);
         }
         outputName.append(" ");
-        if (request.defined(CDOOutputHandler.ARG_CDO_YEARS + yearNum)) {
+        if (timeRequest.defined(CDOOutputHandler.ARG_CDO_YEARS + yearNum)) {
             outputName.append(
-                request.getString(CDOOutputHandler.ARG_CDO_YEARS + yearNum));
-        } else if (request.defined(CDOOutputHandler.ARG_CDO_YEARS)
-                   && !(request.defined(
+                timeRequest.getString(CDOOutputHandler.ARG_CDO_YEARS + yearNum));
+        } else if (timeRequest.defined(CDOOutputHandler.ARG_CDO_YEARS)
+                   && !(timeRequest.defined(
                        CDOOutputHandler.ARG_CDO_STARTYEAR
-                       + yearNum) || request.defined(
+                       + yearNum) || timeRequest.defined(
                            CDOOutputHandler.ARG_CDO_ENDYEAR + yearNum))) {
             outputName.append(
-                request.getString(CDOOutputHandler.ARG_CDO_YEARS));
+                timeRequest.getString(CDOOutputHandler.ARG_CDO_YEARS));
         } else {
             String startYear =
-                request.defined(CDOOutputHandler.ARG_CDO_STARTYEAR + yearNum)
-                ? request.getString(CDOOutputHandler.ARG_CDO_STARTYEAR
+                timeRequest.defined(CDOOutputHandler.ARG_CDO_STARTYEAR + yearNum)
+                ? timeRequest.getString(CDOOutputHandler.ARG_CDO_STARTYEAR
                                     + yearNum)
-                : request.defined(CDOOutputHandler.ARG_CDO_STARTYEAR)
-                  ? request.getString(CDOOutputHandler.ARG_CDO_STARTYEAR, "")
+                : timeRequest.defined(CDOOutputHandler.ARG_CDO_STARTYEAR)
+                  ? timeRequest.getString(CDOOutputHandler.ARG_CDO_STARTYEAR, "")
                   : "";
-            String endYear = request.defined(CDOOutputHandler.ARG_CDO_ENDYEAR
+            String endYear = timeRequest.defined(CDOOutputHandler.ARG_CDO_ENDYEAR
                                              + yearNum)
-                             ? request.getString(
+                             ? timeRequest.getString(
                                  CDOOutputHandler.ARG_CDO_ENDYEAR + yearNum)
-                             : request.defined(
+                             : timeRequest.defined(
                                  CDOOutputHandler.ARG_CDO_ENDYEAR)
-                               ? request.getString(
+                               ? timeRequest.getString(
                                    CDOOutputHandler.ARG_CDO_ENDYEAR,
                                    startYear)
                                : startYear;
@@ -720,13 +721,34 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                     "product generated from", climEntry.getId(),
                     outputEntry.getId()));
         }
-        getOutputHandler().getEntryManager().writeEntryXmlFile(request,
+        getOutputHandler().getEntryManager().writeEntryXmlFile(timeRequest,
                 outputEntry);
 
         //return new ServiceOperand(outputEntry.getName(), outputEntry);
         return new ServiceOperand(outputName.toString(), outputEntry);
     }
 
+
+    private Request handleNamedTimePeriod(Request request, String opStr) {
+        if (!request.defined(ClimateModelApiHandler.ARG_EVENT)) {
+            return request;
+        }
+        Request newRequest = request.cloneMe();
+        String eventString = newRequest.getString(ClimateModelApiHandler.ARG_EVENT);
+        if (eventString == null) {
+            return request;
+        }
+        List<String> toks = StringUtil.split(eventString, ";");
+        if (toks.size() != 4) {
+            System.err.println("Bad named time period: " + eventString);
+            return request;
+        }
+        newRequest.remove(ClimateModelApiHandler.ARG_EVENT);
+        newRequest.put(CDOOutputHandler.ARG_CDO_STARTMONTH, toks.get(1));
+        newRequest.put(CDOOutputHandler.ARG_CDO_ENDMONTH, toks.get(2));
+        newRequest.put(CDOOutputHandler.ARG_CDO_YEARS+opStr, toks.get(3));
+        return newRequest;
+    }
 
     /**
      * Check for valid entries
@@ -863,12 +885,14 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             TwoFacedObject item = new TwoFacedObject(period.getName(), value);
             values.add(item);
         }
+        /*
         sb.append(HtmlUtils.hidden(CDOOutputHandler.ARG_CDO_STARTMONTH,
                                    selectedEvent.getStartMonth()));
         sb.append(HtmlUtils.hidden(CDOOutputHandler.ARG_CDO_ENDMONTH,
                                    selectedEvent.getEndMonth()));
         sb.append(HtmlUtils.hidden(CDOOutputHandler.ARG_CDO_YEARS,
                                    selectedEvent.getYears()));
+        */
         if ((group == null) || group.equals("all")) {
             group = "Events";
         }

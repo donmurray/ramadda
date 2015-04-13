@@ -786,6 +786,11 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                                        request.getString(ARG_FREQUENCY)));
         }
 
+        if (request.defined(ARG_EVENT_GROUP)) {
+            sb.append(HtmlUtils.hidden(ARG_EVENT_GROUP,
+                                       request.getString(ARG_EVENT_GROUP)));
+        }
+
         sb.append(
             "<table cellpadding=\"2\"><tr valign=\"center\" align=\"left\">\n");
         sb.append(HtmlUtils.open("td", "width=\"400px\""));
