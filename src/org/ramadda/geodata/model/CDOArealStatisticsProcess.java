@@ -746,7 +746,14 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         newRequest.remove(ClimateModelApiHandler.ARG_EVENT);
         newRequest.put(CDOOutputHandler.ARG_CDO_STARTMONTH, toks.get(1));
         newRequest.put(CDOOutputHandler.ARG_CDO_ENDMONTH, toks.get(2));
-        newRequest.put(CDOOutputHandler.ARG_CDO_YEARS+opStr, toks.get(3));
+        String years = toks.get(3);
+        if (years.indexOf("/")>0) {
+            List<String> ytoks = StringUtil.split(years, "/");
+            newRequest.put(CDOOutputHandler.ARG_CDO_STARTYEAR+opStr, ytoks.get(0));
+            newRequest.put(CDOOutputHandler.ARG_CDO_ENDYEAR+opStr, ytoks.get(1));
+        } else {
+            newRequest.put(CDOOutputHandler.ARG_CDO_YEARS+opStr, toks.get(3));
+        }
         return newRequest;
     }
 

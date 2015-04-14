@@ -1631,6 +1631,10 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
             String group = lines.get(0);
             lines.remove(0);
             for (String line : lines) {
+                // skip comments
+                if (line.startsWith("#")) { 
+                    continue;
+                }
                 List<String> toks = StringUtil.split(line, ";");
                 if (toks.size() != 5) {
                     throw new IllegalArgumentException("Bad named time period line:"
