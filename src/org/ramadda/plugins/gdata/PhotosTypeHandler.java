@@ -187,6 +187,7 @@ public class PhotosTypeHandler extends GdataTypeHandler {
      *
      * @throws Exception _more_
      */
+    @Override
     public List<String> getSynthIds(Request request, Entry mainEntry,
                                     Entry parentEntry, String synthId)
             throws Exception {

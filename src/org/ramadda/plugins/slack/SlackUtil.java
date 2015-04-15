@@ -54,6 +54,17 @@ import java.util.Properties;
  */
 public class SlackUtil {
 
+
+    public static final String SEARCH_URL = "https://slack.com/api/search.all";
+    public static final String ARG_TOKEN = "token"; 
+    public static final String ARG_QUERY = "query"; 
+    public static final String ARG_SORT = "sort"; 
+    public static final String ARG_SORT_DIR = "sort_dir"; 
+    public static final String ARG_COUNT = "count"; 
+    public static final String ARG_PAGE = "page"; 
+
+
+
     /** _more_ */
     public static final String SLACK_PAYLOAD = "payload";
 

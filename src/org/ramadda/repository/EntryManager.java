@@ -6709,6 +6709,21 @@ public class EntryManager extends RepositoryManager {
 
     /**
      * _more_
+     *
+     * @param parentEntry _more_
+     * @param subId _more_
+     *
+     * @return _more_
+     */
+    public String createSynthId(Entry parentEntry, String subId) {
+        return Repository.ID_PREFIX_SYNTH + parentEntry.getId() + ":" + subId;
+    }
+
+
+
+
+    /**
+     * _more_
      */
     public void clearSeenResources() {
         seenResources = new HashSet();

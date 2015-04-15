@@ -87,17 +87,6 @@ public class FeedTypeHandler extends GenericTypeHandler {
         return ids;
     }
 
-    /**
-     * _more_
-     *
-     * @param parentEntry _more_
-     * @param subId _more_
-     *
-     * @return _more_
-     */
-    public String getSynthId(Entry parentEntry, String subId) {
-        return Repository.ID_PREFIX_SYNTH + parentEntry.getId() + ":" + subId;
-    }
 
 
     /**
@@ -181,7 +170,7 @@ public class FeedTypeHandler extends GenericTypeHandler {
 
 
 
-            Entry entry = new Entry(getSynthId(mainEntry, guid), this, false);
+            Entry entry = new Entry(getEntryManager().createSynthId(mainEntry, guid), this, false);
             Date  dttm  = new Date();
             for (SimpleDateFormat sdf : sdfs) {
                 try {
@@ -270,7 +259,7 @@ public class FeedTypeHandler extends GenericTypeHandler {
 
 
 
-            Entry entry = new Entry(getSynthId(mainEntry, guid), this, false);
+            Entry entry = new Entry(getEntryManager().createSynthId(mainEntry, guid), this, false);
             Date  dttm       = null;
             Date  changeDate = null;
             for (SimpleDateFormat sdf : sdfs) {
@@ -463,7 +452,7 @@ public class FeedTypeHandler extends GenericTypeHandler {
      */
     public Entry makeSynthEntry(Request request, Entry mainEntry, String id)
             throws Exception {
-        id = getSynthId(mainEntry, id);
+        id = getEntryManager().createSynthId(mainEntry, id);
         for (Entry item : getFeedEntries(request, mainEntry)) {
             if (item.getId().equals(id)) {
                 return item;
