@@ -73,9 +73,8 @@ public class ChatOutputHandler extends OutputHandler {
     /** _more_ */
     public static final int DEFAULT_PORT = -1;
 
-    /** _more_ */
-    public static final String PROP_HTML_CHATAPPLET =
-        "ramadda.html.chatapplet";
+
+
 
 
     /** _more_ */

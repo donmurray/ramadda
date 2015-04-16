@@ -1625,19 +1625,8 @@ public interface Constants {
     public static final String PROP_HOSTNAME = "ramadda.hostname";
 
     /** _more_ */
-    public static final String PROP_HTML_CHATAPPLET =
-        "ramadda.html.chatapplet";
-
-    /** _more_ */
     public static final String PROP_HTML_FOOTER = "ramadda.html.footer";
 
-    /** _more_ */
-    public static final String PROP_HTML_GRAPHAPPLET =
-        "ramadda.html.graphapplet";
-
-    /** _more_ */
-    public static final String PROP_HTML_GRAPHTEMPLATE =
-        "ramadda.html.graphtemplate";
 
     /** _more_ */
     public static final String PROP_HTML_MIMEPROPERTIES =
