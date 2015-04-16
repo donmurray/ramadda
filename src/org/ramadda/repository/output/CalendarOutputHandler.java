@@ -353,7 +353,7 @@ public class CalendarOutputHandler extends OutputHandler {
 
         String timelineApplet =
             getRepository().getResource(
-                "/org/ramadda/repository/resources/timeline.html");
+                "/org/ramadda/repository/resources/web/timeline.html");
 
         String url = request.getUrl();
         if (mainEntry != null) {
