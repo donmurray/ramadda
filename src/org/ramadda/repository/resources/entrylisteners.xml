@@ -1,4 +1,0 @@
-<entrylisteners>
-  <entrylistener class="org.ramadda.repository.listener.EmailEntryListener" name="Action: Email"/>
-  <entrylistener class="org.ramadda.repository.listener.TwitterEntryListener" name="Action: Twitter"/>
-</entrylisteners>
