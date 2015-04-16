@@ -852,7 +852,7 @@ public class PageHandler extends RepositoryManager {
             String imports = "";
             try {
                 imports = getStorageManager().readSystemResource(
-                    "/org/ramadda/repository/resources/imports.html");
+                    "/org/ramadda/repository/resources/web/imports.html");
             } catch (Exception exc) {
                 throw new RuntimeException(exc);
             }
