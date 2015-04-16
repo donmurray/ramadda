@@ -521,7 +521,7 @@ public class Admin extends RepositoryManager {
 
                     if (description == null) {
                         description = getRepository().getResource(
-                            "/org/ramadda/repository/resources/examples/initdescription.txt");
+                            "/org/ramadda/repository/resources/install/initdescription.txt");
                     }
 
                     description = description.replace("${topid}",
@@ -686,7 +686,7 @@ public class Admin extends RepositoryManager {
 
         if (initEntriesXml == null) {
             initEntriesXml = getRepository().getResource(
-                "/org/ramadda/repository/resources/examples/initentries.xml");
+                "/org/ramadda/repository/resources/install/initentries.xml");
         }
         Element root       = XmlUtil.getRoot(initEntriesXml);
         Request tmpRequest = getRepository().getRequest(user);
