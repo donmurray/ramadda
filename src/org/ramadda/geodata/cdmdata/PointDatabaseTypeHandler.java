@@ -1810,7 +1810,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
 
         if (showTimeline) {
             String timelineAppletTemplate =
-                getRepository().getResource(PROP_HTML_TIMELINEAPPLET);
+                getRepository().getResource("/org/ramadda/repository/resources/web/timelineapplet.html");
             List times  = new ArrayList();
             List labels = new ArrayList();
             List ids    = new ArrayList();
