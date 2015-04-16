@@ -1640,15 +1640,9 @@ public interface Constants {
         "ramadda.html.graphtemplate";
 
     /** _more_ */
-    public static final String PROP_HTML_IMAGEPLAYER =
-        "ramadda.html.imageplayer";
-
-    /** _more_ */
     public static final String PROP_HTML_MIMEPROPERTIES =
         "ramadda.html.mimeproperties";
 
-    /** _more_ */
-    public static final String PROP_HTML_SLIDESHOW = "ramadda.html.slideshow";
 
     /** _more_ */
     public static final String PROP_HTML_TEMPLATE = "ramadda.html.template";
@@ -1659,11 +1653,6 @@ public interface Constants {
     /** _more_ */
     public static final String PROP_HTML_TEMPLATE_DEFAULT =
         "ramadda.html.template.default";
-
-
-    /** _more_ */
-    public static final String PROP_HTML_TIMELINEAPPLET =
-        "ramadda.html.timelineapplet";
 
     /** _more_ */
     public static final String PROP_HTML_URLBASE = "ramadda.html.urlbase";

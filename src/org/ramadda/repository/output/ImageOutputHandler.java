@@ -711,7 +711,7 @@ public class ImageOutputHandler extends OutputHandler {
                           + HtmlUtils.quote(title) + ");\n");
 
             }
-            String template = repository.getResource(PROP_HTML_SLIDESHOW);
+            String template = repository.getResource("/org/ramadda/repository/resources/web/slideshow.html");
             template = template.replace("${imagelist}", sb.toString());
             template = StringUtil.replace(template, "${root}",
                                           repository.getUrlBase());
@@ -801,7 +801,7 @@ public class ImageOutputHandler extends OutputHandler {
             cnt++;
         }
 
-        String playerTemplate = repository.getResource(PROP_HTML_IMAGEPLAYER);
+        String playerTemplate = repository.getResource("/org/ramadda/repository/resources/web/imageplayer.html");
         playerTemplate = playerTemplate.replaceAll("\\$\\{imagePlayerVar\\}",
                 playerVar);
         playerTemplate =
