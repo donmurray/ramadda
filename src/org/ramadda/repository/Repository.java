@@ -1152,7 +1152,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
         List<String> toks = StringUtil.split(registrationKey, ":");
         //        System.err.println("reg toks:" + toks);
         if (toks.size() != 4) {
-            System.err.println("bad # toks");
+            //            System.err.println("bad # toks");
             return;
         }
         String id    = toks.get(0);
@@ -1168,7 +1168,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
             users = new Integer(Utils.unobfuscate(toks.get(3),
                     true)).intValue();
         } catch (Exception exc) {
-            System.err.println("bad users");
+            System.err.println("Repository.checkRegistration: error reading users:" + exc);
             return;
         }
         isRegistered = key.trim().equals("namaste");
