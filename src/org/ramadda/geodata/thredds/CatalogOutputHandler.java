@@ -652,18 +652,22 @@ public class CatalogOutputHandler extends OutputHandler {
 
 
         for (ServiceInfo service : services) {
-            String url  = service.getUrl();
             String type = service.getType();
+            String url  = service.getUrl();
             String name = service.getName();
             String icon = service.getIcon();
 
+            //Skip html
+            if(type.equals(OutputHandler.OUTPUT_HTML.getId())) {
+                continue;
+            }
             cnt++;
 
             Element subDataset = createDataset(catalogInfo, entry, dataset,
                                      name);
             addService(catalogInfo, type,
-                       "http://" + getRepository().getHostname() + ":"
-                       + getRepository().getPort());
+                       "http://" + request.getServerName()+ ":"
+                       + request.getServerPort());
             Element serviceNode = XmlUtil.create(catalogInfo.doc,
                                       CatalogUtil.TAG_ACCESS, subDataset,
                                       new String[] {
