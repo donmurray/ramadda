@@ -33,6 +33,8 @@ import ucar.nc2.units.SimpleUnit;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.TwoFacedObject;
 
 
 import java.io.File;
@@ -77,6 +79,20 @@ public class NCLModelPlotDataProcess extends Service {
     /** contour maximum argument */
     private static final String ARG_NCL_CMAX = ARG_NCL_PREFIX + "cmax";
 
+    /** colormap name */
+    private static final String ARG_NCL_COLORMAP = ARG_NCL_PREFIX + "colormap";
+
+    /** contour lines */
+    private static final String ARG_NCL_CLINES = ARG_NCL_PREFIX + "contourlines";
+    
+    /** contour labels */
+    private static final String ARG_NCL_CLABELS = ARG_NCL_PREFIX + "contourlabels";
+    
+    /** colorfill */
+    private static final String ARG_NCL_CFILL = ARG_NCL_PREFIX + "contourfill";
+    
+    private List colormaps = null;
+    
     /**
      * Create a new map process
      *
@@ -196,7 +212,25 @@ public class NCLModelPlotDataProcess extends Service {
             sb.append(HtmlUtils.formEntry(Repository.msgLabel("Plot As"),
                                           buttons.toString()));
         } else if (isCorrelation) {
-            sb.append(HtmlUtils.hidden(ARG_NCL_OUTPUT, "corr"));
+            StringBuilder buttons = new StringBuilder();
+            buttons.append(
+                HtmlUtils.radio(
+                    ARG_NCL_OUTPUT, "correlation",
+                    RepositoryManager.getShouldButtonBeSelected(
+                        request, ARG_NCL_OUTPUT, "correlation", true)));
+            buttons.append(space1);
+            buttons.append(Repository.msg("Correlation"));
+            buttons.append(space2);
+            buttons.append(
+                HtmlUtils.radio(
+                    ARG_NCL_OUTPUT, "regression",
+                    RepositoryManager.getShouldButtonBeSelected(
+                        request, ARG_NCL_OUTPUT, "regression", false)));
+            buttons.append(space1);
+            buttons.append(Repository.msg("Regression"));
+
+            sb.append(HtmlUtils.formEntry(Repository.msgLabel("Plot As"),
+                                          buttons.toString()));
         } else {
             sb.append(HtmlUtils.hidden(ARG_NCL_OUTPUT, "comp"));
         }
@@ -285,8 +319,18 @@ public class NCLModelPlotDataProcess extends Service {
 
         // TODO:  For now, don't get value from request.  May not
         // be valid if variable changes.
+        // Contour options
+        StringBuilder contourOpts = new StringBuilder();
+        contourOpts.append(HtmlUtils.labeledCheckbox(ARG_NCL_CFILL, "true", request.get(ARG_NCL_CFILL, true), "Color-fill"));
+        contourOpts.append(HtmlUtils.space(3));
+        contourOpts.append(HtmlUtils.labeledCheckbox(ARG_NCL_CLINES, "false", request.get(ARG_NCL_CLINES, false), "Lines"));
+        contourOpts.append(HtmlUtils.space(3));
+        contourOpts.append(HtmlUtils.labeledCheckbox(ARG_NCL_CLABELS, "true", request.get(ARG_NCL_CLABELS, false), "Labels"));
+        sb.append(
+            HtmlUtils.formEntry(
+                Repository.msgLabel("Contours"), contourOpts.toString()));
         // Contour interval
-        StringBuffer contourSB = new StringBuffer();
+        StringBuilder contourSB = new StringBuilder();
         contourSB.append(Repository.msg("Interval: "));
         contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CINT,
                 ARG_NCL_CINT, ""));
@@ -305,9 +349,38 @@ public class NCLModelPlotDataProcess extends Service {
                 "<div style=\"width:9em\">"
                 + Repository.msgLabel("Override Contour Defaults")
                 + "</div>", contourSB.toString()));
+        // colormaps
+        List cmaps = getColorMaps();
+        sb.append(HtmlUtils.formEntry(msgLabel("Colormap"),
+                    HtmlUtils.select(ARG_NCL_COLORMAP,
+                                     cmaps,
+                                     request.getString(ARG_NCL_COLORMAP, ""))));
+
         sb.append(HtmlUtils.formTableClose());
 
+    }
+    
+    /**
+     * Get the list of color maps
+     *
+     * @return  list
+     */
+    public List getColorMaps() throws Exception {
+        if (colormaps == null) {
+            colormaps = new ArrayList<TwoFacedObject>();
+            colormaps.add(new TwoFacedObject("Default", "default"));
+            String list = getRepository().getResource(
+                    "/org/ramadda/geodata/model/resources/ncl/colormaps.txt");
+            List<String> cmaps = StringUtil.split(list, "\n", true, true);
+            for (String cmap : cmaps) {
+                List<String> toks = StringUtil.split(cmap);
+                colormaps.add(new HtmlUtils.Selector(toks.get(1),
+                        toks.get(0),
+                        getRepository().getUrlBase() +"/model/images/"+toks.get(2)));
+            }
+        }
 
+        return colormaps;
     }
 
     /**
@@ -364,11 +437,11 @@ public class NCLModelPlotDataProcess extends Service {
 
         List<Entry>          outputEntries = new ArrayList<Entry>();
         List<ServiceOperand> ops           = input.getOperands();
-        StringBuffer         fileList      = new StringBuffer();
-        StringBuffer         nameList      = new StringBuffer();
-        StringBuffer         modelList     = new StringBuffer();
-        StringBuffer         ensList       = new StringBuffer();
-        StringBuffer         expList       = new StringBuffer();
+        StringBuilder         fileList      = new StringBuilder();
+        StringBuilder         nameList      = new StringBuilder();
+        StringBuilder         modelList     = new StringBuilder();
+        StringBuilder         ensList       = new StringBuilder();
+        StringBuilder         expList       = new StringBuilder();
         Entry                inputEntry    = getFirstGridEntry(input);
         boolean              haveOne       = false;
         boolean              haveGrid      = false;
@@ -421,7 +494,7 @@ public class NCLModelPlotDataProcess extends Service {
             throw new Exception("Not a grid");
         }
 
-        StringBuffer commandString = new StringBuffer();
+        StringBuilder commandString = new StringBuilder();
         List<String> commands      = new ArrayList<String>();
         String       ncargRoot     = nclOutputHandler.getNcargRootDir();
         commands.add(IOUtil.joinDir(ncargRoot, "bin/ncl"));
@@ -539,12 +612,18 @@ public class NCLModelPlotDataProcess extends Service {
         }
 
         boolean haveAnom      = fileList.toString().indexOf("anom") >= 0;
-        boolean isCorrelation = outputType.equals("corr");
-        String  colormap      = "rainbow";
-        if (outputType.equals("diff") || haveAnom || isCorrelation) {
-            colormap = "testcmap";
+        boolean isCorrelation = outputType.equals("correlation") || outputType.equals("regression");
+        String  colormap      = request.getString(ARG_NCL_COLORMAP, "default");
+        if (colormap.equals("default")) {
+            colormap = "rainbow";
+            if (outputType.equals("diff") || haveAnom || isCorrelation) {
+                colormap = "testcmap";
+            }
         }
         envMap.put("colormap", colormap);
+        envMap.put("clines", Boolean.toString(request.get(ARG_NCL_CLINES, false)));
+        envMap.put("clabels", Boolean.toString(request.get(ARG_NCL_CLABELS, false)));
+        envMap.put("cfill", Boolean.toString(request.get(ARG_NCL_CFILL, true)));
         envMap.put("anom", Boolean.toString(haveAnom || isCorrelation));
         envMap.put(
             "annotation",
