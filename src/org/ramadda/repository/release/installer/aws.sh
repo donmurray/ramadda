@@ -1,6 +1,6 @@
 #!/bin/sh
 
-ramaddaVersion=2.1a
+ramaddaVersion=2.0
 
 
 downloadUrl="http://downloads.sourceforge.net/project/ramadda/ramadda${ramaddaVersion}/ramaddainstaller.zip"
