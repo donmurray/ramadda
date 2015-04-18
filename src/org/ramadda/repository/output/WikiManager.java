@@ -257,11 +257,13 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 return "";
             }
 
-            property = property.replaceAll("//[^\\n\\r]*[\\n|\\r]+", "");
+
+            property = property.replaceAll("^//[^\\n\\r]*[\\n|\\r]+", "");
 
             property = property.replaceAll(".*<p></p>[\\n\\r]+", "");
             property = property.replaceAll("\\n", " ");
             property = property.replaceAll("\r", "");
+
 
             List<String> toks  = StringUtil.splitUpTo(property, " ", 2);
             String       stoks = toks.toString();
@@ -274,6 +276,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             if (toks.size() > 1) {
                 remainder = toks.get(1);
             }
+
+
             Entry theEntry = entry;
             if (tag.equals(WIKI_TAG_IMPORT)) {
                 //Old style
@@ -299,7 +303,14 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             }
 
 
+
+
+
             Hashtable tmpProps = StringUtil.parseHtmlProperties(remainder);
+
+
+
+
             Hashtable props    = new Hashtable();
             for (Enumeration keys =
                     tmpProps.keys(); keys.hasMoreElements(); ) {
@@ -4295,6 +4306,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         String displayType = Misc.getProperty(props, "type", "linechart");
         props.remove("type");
 
+ 
         for (Enumeration keys = props.keys(); keys.hasMoreElements(); ) {
             Object key   = keys.nextElement();
             Object value = props.get(key);
@@ -4323,6 +4335,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                          + ",  null,null," + HtmlUtils.quote(url)
                          + ",pointDataProps)");
         }
+
         js.append("displayManager.createDisplay("
                   + HtmlUtils.quote(displayType) + ","
                   + Json.map(propList, false) + ");\n");
