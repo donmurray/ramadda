@@ -954,7 +954,8 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                 if (type.getIsForSearch()) {
                     tfos.add(new HtmlUtils.Selector(type.getLabel(),
                             type.getId(),
-                            getRepository().iconUrl(type.getIcon())));
+                            getRepository().iconUrl(type.getIcon()), 3, 20,
+                            false));
                 }
             }
         }
