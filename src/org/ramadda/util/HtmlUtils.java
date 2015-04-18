@@ -2281,6 +2281,9 @@ public class HtmlUtils {
         /** _more_ */
         int margin = 3;
 
+        /** _more_          */
+        int padding = 20;
+
         /** _more_ */
         String label;
 
@@ -2328,10 +2331,26 @@ public class HtmlUtils {
          */
         public Selector(String label, String id, String icon, int margin,
                         boolean isHeader) {
+            this(label, id, icon, margin, 20, isHeader);
+        }
+
+        /**
+         * _more_
+         *
+         * @param label _more_
+         * @param id _more_
+         * @param icon _more_
+         * @param margin _more_
+         * @param padding _more_
+         * @param isHeader _more_
+         */
+        public Selector(String label, String id, String icon, int margin,
+                        int padding, boolean isHeader) {
             this.label    = label;
             this.id       = id;
             this.icon     = icon;
             this.margin   = margin;
+            this.padding  = padding;
             this.isHeader = isHeader;
         }
 
@@ -2401,7 +2420,8 @@ public class HtmlUtils {
                 if (selector.icon != null) {
                     extraAttr = style(
                         "margin:3px;margin-left:" + selector.margin
-                        + "px;padding-left:20px;padding-bottom:0px;padding-top:2px;background-repeat:no-repeat; background-image: url("
+                        + "px;padding-left:" + selector.padding
+                        + "px;padding-bottom:0px;padding-top:2px;background-repeat:no-repeat; background-image: url("
                         + selector.icon + ");");
                 } else if (selector.isHeader) {
                     extraAttr = style(
