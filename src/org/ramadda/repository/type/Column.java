@@ -201,6 +201,7 @@ public class Column implements DataTypes, Constants {
     /** _more_ */
     public static final String ATTR_SHOWINHTML = "showinhtml";
 
+
     /** _more_ */
     public static final String ATTR_SHOWLABEL = "showlabel";
 
@@ -323,6 +324,7 @@ public class Column implements DataTypes, Constants {
 
     /** _more_ */
     private boolean canShow = true;
+
 
     /** _more_ */
     private boolean showLabel = true;
@@ -588,8 +590,6 @@ public class Column implements DataTypes, Constants {
         col.add("" + getCanShow());
         col.add("cansearch");
         col.add("" + getCanSearch());
-        col.add("canshow");
-        col.add("" + getCanShow());
         col.add("canlist");
         col.add("" + getCanList());
         if (isEnumeration()) {
@@ -2855,6 +2855,10 @@ public class Column implements DataTypes, Constants {
         return canShow;
     }
 
+
+
+
+
     /**
      * _more_
      *
@@ -3048,9 +3052,9 @@ public class Column implements DataTypes, Constants {
      */
     public String getAttributeOrTag(Element node, String attrOrTag,
                                     String dflt)
-            throws Exception {
+        throws Exception {
         String attrValue = Utils.getAttributeOrTag(node, attrOrTag,
-                               (String) null);
+                                                   (String) null);
         if (attrValue != null) {
             properties.put(attrOrTag, attrValue);
 
@@ -3074,7 +3078,7 @@ public class Column implements DataTypes, Constants {
      */
     private boolean getAttributeOrTag(Element node, String attrOrTag,
                                       boolean dflt)
-            throws Exception {
+        throws Exception {
         String attrValue = getAttributeOrTag(node, attrOrTag, (String) null);
         if (attrValue == null) {
             return dflt;
@@ -3096,7 +3100,7 @@ public class Column implements DataTypes, Constants {
      * @throws Exception _more_
      */
     private int getAttributeOrTag(Element node, String attrOrTag, int dflt)
-            throws Exception {
+        throws Exception {
         String attrValue = getAttributeOrTag(node, attrOrTag, (String) null);
         if (attrValue == null) {
             return dflt;
@@ -3119,7 +3123,7 @@ public class Column implements DataTypes, Constants {
      */
     public double getAttributeOrTag(Element node, String attrOrTag,
                                     double dflt)
-            throws Exception {
+        throws Exception {
         String attrValue = getAttributeOrTag(node, attrOrTag, (String) null);
         if (attrValue == null) {
             return dflt;

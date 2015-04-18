@@ -1593,15 +1593,10 @@ public class EntryManager extends RepositoryManager {
         if (request.defined(ARG_ENTRYID)) {
             entry = getEntry(request);
         }
-        StringBuilder tmp   = new StringBuilder();
         StringBuilder sb    = new StringBuilder();
-        Entry         group = addEntryForm(request, entry, tmp);
-        getPageHandler().entrySectionOpen(request, (entry != null)
-                ? entry
-                : group, sb, ((entry != null)
-                              ? "Edit"
-                              : "New Entry"));
-        sb.append(tmp);
+        Entry         group = addEntryForm(request, entry, sb);
+
+
         getPageHandler().entrySectionClose(request, entry, sb);
         if (entry == null) {
             return addEntryHeader(request, group,
@@ -1647,6 +1642,12 @@ public class EntryManager extends RepositoryManager {
             type = request.getString(ARG_TYPE, (String) null);
         }
 
+        TypeHandler typeHandler = ((entry == null)
+                                   ? (type==null?null:getRepository().getTypeHandler(type))
+                                   : entry.getTypeHandler());
+
+
+
         addSessionType(request, type);
 
 
@@ -1655,6 +1656,15 @@ public class EntryManager extends RepositoryManager {
 
             return group;
         }
+
+
+        if(entry!=null) {
+            getPageHandler().entrySectionOpen(request,entry, sb, "Edit");
+        } else {
+            getPageHandler().entrySectionOpen(request,null, sb, (typeHandler!=null?msg("Create new") +" " + typeHandler.getLabel():
+                                                                 msg("Create new entry")));
+        }
+
 
 
         String formId = HtmlUtils.getUniqueId("entryform_");
@@ -1684,10 +1694,6 @@ public class EntryManager extends RepositoryManager {
                     BLANK, HtmlUtils.submit(msg("Select Type to Add"))));
             sb.append(HtmlUtils.hidden(ARG_GROUP, group.getId()));
         } else {
-            TypeHandler typeHandler = ((entry == null)
-                                       ? getRepository().getTypeHandler(type)
-                                       : entry.getTypeHandler());
-
             title = ((entry == null)
                      ? msg("Add Entry")
                      : msg("Edit Entry"));

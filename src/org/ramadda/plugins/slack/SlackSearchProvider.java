@@ -101,7 +101,7 @@ public class SlackSearchProvider extends SearchProvider {
         if(!Utils.stringDefined(token)) {
             return results;
         }
-        String url = SlackUtil.SEARCH_URL;
+        String url = SlackUtil.URL_SEARCH;
         url += "?";
         url += HtmlUtils.arg(SlackUtil.ARG_QUERY, request.getString(ARG_TEXT,""));
         url += "&";

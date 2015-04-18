@@ -4,7 +4,7 @@
  * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
  */
 
-package org.ramadda.plugins.feed;
+package org.ramadda.plugins.slack;
 
 
 
@@ -38,7 +38,7 @@ import java.util.List;
 
 /**
  */
-public class FeedTypeHandler extends ExtensibleGroupTypeHandler {
+public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
 
     /**
      * _more_
@@ -48,9 +48,22 @@ public class FeedTypeHandler extends ExtensibleGroupTypeHandler {
      *
      * @throws Exception _more_
      */
-    public FeedTypeHandler(Repository repository, Element entryNode)
+    public SlackTeamTypeHandler(Repository repository, Element entryNode)
             throws Exception {
         super(repository, entryNode);
+    }
+
+
+    public void initializeEntryFromForm(Request request, Entry entry,
+                                        Entry parent, boolean newEntry)
+        throws Exception {
+        super.initializeEntryFromForm(request, entry,  parent, newEntry);
+        if(!newEntry) {
+            return;
+        }
+
+        
+
     }
 
 
@@ -79,11 +92,12 @@ public class FeedTypeHandler extends ExtensibleGroupTypeHandler {
             return ids;
         }
 
+        /*
         for (Entry item : getFeedEntries(request, mainEntry)) {
             ids.add(item.getId());
         }
         mainEntry.setChildIds(ids);
-
+        */
         return ids;
     }
 

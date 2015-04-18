@@ -35,7 +35,7 @@ import java.util.List;
  * @author RAMADDA Development Team
  * @version $Revision: 1.3 $
  */
-public class FtpTypeHandler extends GenericTypeHandler {
+public class FtpTypeHandler extends ExtensibleGroupTypeHandler {
 
     /** _more_ */
     public static final int COL_SERVER = 0;
@@ -397,8 +397,8 @@ public class FtpTypeHandler extends GenericTypeHandler {
             }
             boolean isDir = ftpClient.changeWorkingDirectory(path);
             if (isDir) {
-                boolean checkReadme = parentEntry.getDescription().length()
-                                      == 0;
+                boolean checkReadme = parentEntry.getDescription().length()  == 0;
+                checkReadme = false;
                 long      t3    = System.currentTimeMillis();
                 FTPFile[] files = ftpClient.listFiles(path);
                 long      t4    = System.currentTimeMillis();
@@ -420,8 +420,7 @@ public class FtpTypeHandler extends GenericTypeHandler {
                                     String desc = HtmlUtils.entityEncode(
                                                       IOUtil.readInputStream(
                                                           fis));
-                                    parentEntry.setDescription("<pre>" + desc
-                                            + "</pre>");
+                                    parentEntry.setDescription(HtmlUtils.pre(desc));
                                     fis.close();
                                     ftpClient.completePendingCommand();
                                 }

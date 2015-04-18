@@ -32,7 +32,7 @@ import java.util.List;
  * @author RAMADDA Development Team
  * @version $Revision: 1.3 $
  */
-public class VirtualTypeHandler extends GenericTypeHandler {
+public class VirtualTypeHandler extends ExtensibleGroupTypeHandler {
 
 
 

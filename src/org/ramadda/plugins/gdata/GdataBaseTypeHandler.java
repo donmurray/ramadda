@@ -44,7 +44,7 @@ import java.util.Set;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class GdataBaseTypeHandler extends GenericTypeHandler {
+public class GdataBaseTypeHandler extends ExtensibleGroupTypeHandler {
 
     /**
      * _more_

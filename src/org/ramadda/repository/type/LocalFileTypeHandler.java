@@ -58,7 +58,7 @@ import java.util.Properties;
  * @author RAMADDA Development Team
  * @version $Revision: 1.3 $
  */
-public class LocalFileTypeHandler extends GenericTypeHandler {
+public class LocalFileTypeHandler extends ExtensibleGroupTypeHandler {
 
 
 

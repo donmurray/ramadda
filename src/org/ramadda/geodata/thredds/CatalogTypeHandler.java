@@ -58,7 +58,7 @@ import java.util.Properties;
  * @author IDV Development Team
  * @version $Revision: 1.3 $
  */
-public class CatalogTypeHandler extends GenericTypeHandler {
+public class CatalogTypeHandler extends ExtensibleGroupTypeHandler {
 
     /** _more_ */
     public static final String ARG_CATALOG = "catalog";
