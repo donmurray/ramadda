@@ -508,10 +508,10 @@ public class HtmlOutputHandler extends OutputHandler {
             }
         }
 
-        StringBuffer sb        = new StringBuffer();
+        StringBuilder sb        = new StringBuilder();
         boolean      doingInfo = outputType.equals(OUTPUT_INFO);
         if (doingInfo) {
-            StringBuffer suffix = new StringBuffer();
+            StringBuilder suffix = new StringBuilder();
             addDescription(request, entry, sb, true, suffix);
             String informationBlock = getInformationTabs(request, entry,
                                           false);
@@ -1096,8 +1096,8 @@ public class HtmlOutputHandler extends OutputHandler {
      * @param suffix _more_
      */
     private void addDescription(Request request, Entry entry,
-                                StringBuffer sb, boolean open,
-                                StringBuffer suffix) {
+                                Appendable sb, boolean open,
+                                Appendable suffix) throws Exception {
         String  desc   = entry.getDescription().trim();
         boolean isWiki = TypeHandler.isWikiText(desc);
         if ((desc.length() > 0) && !isWiki && !desc.equals("<nolinks>")) {
@@ -1115,10 +1115,10 @@ public class HtmlOutputHandler extends OutputHandler {
             sb.append(desc);
         }
         if (isWiki) {
-            suffix.append(HtmlUtils.p());
+            suffix.append(HtmlUtils.br());
             suffix.append(subHeader(msg("Wiki Text")));
             suffix.append(HtmlUtils.textArea("", desc, 20, 80));
-            suffix.append(HtmlUtils.p());
+            suffix.append(HtmlUtils.br());
         }
 
     }
@@ -1145,7 +1145,7 @@ public class HtmlOutputHandler extends OutputHandler {
         if (includeDescription && (desc.length() > 0)) {
             desc = processText(request, entry, desc);
             basicSB.append(desc);
-            basicSB.append("<br>");
+            basicSB.append(HtmlUtils.br());
         }
         basicSB.append(entry.getTypeHandler().getEntryContent(request, entry,
                 false, true));
@@ -1834,15 +1834,13 @@ public class HtmlOutputHandler extends OutputHandler {
             }
         }
 
-        StringBuffer sb = new StringBuffer("");
+        StringBuilder sb = new StringBuilder("");
         request.appendMessage(sb);
 
         String prefix = request.getPrefixHtml();
         if (prefix != null) {
             sb.append(prefix);
         }
-
-
 
 
         boolean hasChildren = ((subGroups.size() != 0)
@@ -1858,27 +1856,17 @@ public class HtmlOutputHandler extends OutputHandler {
 
 
         String       wikiTemplate = null;
-        StringBuffer suffix       = new StringBuffer();
+        StringBuilder suffix       = new StringBuilder();
         if ( !doingInfo && !group.isDummy()) {
             handleDefaultWiki(request, group, sb, subGroups, entries);
         } else {
             if ( !group.isDummy()) {
+                getPageHandler().entrySectionOpen(request, group, sb,
+                                                  "Entry Information", true);
                 addDescription(request, group, sb, true, suffix);
                 if ( !doSimpleListing) {
-                    String informationBlock = getInformationTabs(request,
-                                                  group, false);
-                    if (hasChildren) {
-                        sb.append(
-                            HtmlUtils.makeShowHideBlock(
-                                msg("Information"), informationBlock,
-                                request.get(ARG_SHOW_ASSOCIATIONS, doingInfo
-                                ? true
-                                : !hasChildren)));
-                    } else {
-                        sb.append(informationBlock);
-                    }
+                    sb.append(getInformationTabs(request, group, false));
                 }
-
 
                 StringBuffer metadataSB = new StringBuffer();
                 getMetadataManager().decorateEntry(request, group,
@@ -1887,7 +1875,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 if (metataDataHtml.length() > 0) {
                     sb.append(HtmlUtils.makeShowHideBlock(msg("Attachments"),
                             "<div class=\"description\">" + metadataSB
-                            + "</div>", true));
+                            + "</div>", false));
                 }
             }
 
@@ -1922,6 +1910,9 @@ public class HtmlOutputHandler extends OutputHandler {
             }
         }
 
+        if(doingInfo && !group.isDummy()) {
+            getPageHandler().entrySectionClose(request, group, sb);
+        }
         sb.append(suffix);
         String rsuffix = request.getSuffixHtml();
         if (rsuffix != null) {
