@@ -258,11 +258,11 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             }
 
 
-            property = property.replaceAll("^//[^\\n\\r]*[\\n|\\r]+", "");
-
+            property = property.replaceAll("(?m)^\\s*//.*?$", "");
             property = property.replaceAll(".*<p></p>[\\n\\r]+", "");
             property = property.replaceAll("\\n", " ");
             property = property.replaceAll("\r", "");
+
 
 
             List<String> toks  = StringUtil.splitUpTo(property, " ", 2);
@@ -4540,5 +4540,9 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         }
     }
 
-
+    public static void main(String[]args) {
+        String s = "hello there\n//some comment\nand after the comment";
+        s = s.replaceAll("(?m)^//[^$]*$", "");
+        System.err.println(s);
+    }
 }
