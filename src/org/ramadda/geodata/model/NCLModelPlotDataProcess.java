@@ -18,7 +18,6 @@ import org.ramadda.repository.Request;
 import org.ramadda.repository.Resource;
 import org.ramadda.repository.job.JobManager;
 import org.ramadda.repository.type.TypeHandler;
-
 import org.ramadda.service.Service;
 import org.ramadda.service.ServiceInput;
 import org.ramadda.service.ServiceOperand;
@@ -95,7 +94,7 @@ public class NCLModelPlotDataProcess extends Service {
     private static final String ARG_NCL_CFILL = ARG_NCL_PREFIX
                                                 + "contourfill";
 
-    /** list of colormaps          */
+    /** list of colormaps */
     private List colormaps = null;
 
     /**
