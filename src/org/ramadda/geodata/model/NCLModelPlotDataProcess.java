@@ -333,28 +333,33 @@ public class NCLModelPlotDataProcess extends Service {
         contourOpts.append(HtmlUtils.space(3));
         contourOpts.append(HtmlUtils.labeledCheckbox(ARG_NCL_CLABELS, "true",
                 request.get(ARG_NCL_CLABELS, false), "Labels"));
-        sb.append(HtmlUtils.formEntry(Repository.msgLabel("Contours"),
-                                      contourOpts.toString()));
         // Contour interval
-        StringBuilder contourSB = new StringBuilder();
-        contourSB.append(Repository.msg("Interval: "));
-        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CINT,
+        //StringBuilder contourSB = new StringBuilder();
+        contourOpts.append("</p>");
+        contourOpts.append(HtmlUtils.bold(Repository.msg("Override Defaults: ")));
+        contourOpts.append("<br>");
+        contourOpts.append(Repository.msg("Interval: "));
+        contourOpts.append(HtmlUtils.makeLatLonInput(ARG_NCL_CINT,
                 ARG_NCL_CINT, ""));
         //request.getString(ARG_NCL_CINT, "")));
-        contourSB.append("<br>");
-        contourSB.append(Repository.msg("Range: Low"));
-        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMIN,
+        contourOpts.append("<br/>");
+        contourOpts.append(Repository.msg("Range: Low"));
+        contourOpts.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMIN,
                 ARG_NCL_CMIN, ""));
         //request.getString(ARG_NCL_CMIN, "")));
-        contourSB.append(Repository.msg("High"));
-        contourSB.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMAX,
+        contourOpts.append(Repository.msg("High"));
+        contourOpts.append(HtmlUtils.makeLatLonInput(ARG_NCL_CMAX,
                 ARG_NCL_CMAX, ""));
         //request.getString(ARG_NCL_CMAX, "")));
+        /*
         sb.append(
             HtmlUtils.formEntry(
                 "<div style=\"width:9em\">"
                 + Repository.msgLabel("Override Contour Defaults")
-                + "</div>", contourSB.toString()));
+                + "</div>", contour.toString()));
+                */
+        sb.append(HtmlUtils.formEntry(Repository.msgLabel("Contours"),
+                                      contourOpts.toString()));
         // colormaps
         List cmaps = getColorMaps();
         sb.append(
