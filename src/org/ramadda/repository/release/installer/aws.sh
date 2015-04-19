@@ -26,6 +26,7 @@ readit() {
     read -p "$msg" $var
 }
 
+
 read -p "Do you want to enter your Amazon authentication (only needed one time)? [y|n]: " tmp
 case $tmp in
     ""|"y")
@@ -94,10 +95,12 @@ case $tmp in
     ;;
 esac
 
+read -p  "Set instance name to: " instanceName
 
 ipAddress=""
 
-read -p "Do you want to create the instance with image: ${imageId} type: ${instanceType} security group: ${securityGroup} ? [y|n]: " tmp
+echo "Do you want to create the instance with:\n\timage: ${imageId}\n\ttype: ${instanceType}\n\tsecurity group: ${securityGroup}\n\tInstance name: ${instanceName}"
+read -p "Enter [y|n]: " tmp
 case $tmp in
     ""|"y")
         echo "Creating instance... ";
@@ -127,21 +130,22 @@ if [ "$instanceId" == "" ]; then
 fi
 
 echo "Instance id: $instanceId"
-
-
 while [ 1  ]; do
-    read -p "Hit return to check to see if the instance is ready: "
-    aws ec2 describe-instances --instance-id "$instanceId" --output text |  grep INSTANCES | awk 'BEGIN { FS = "\t" } ; { print $16 }'  > ipaddress.txt
+    echo "Waiting for instance to come up..."
+    aws ec2 describe-instances --output text --instance-id "$instanceId"  |  grep INSTANCES | awk 'BEGIN { FS = "\t" } ; { print $16 }'  > ipaddress.txt
     ipAddress=$( cat ipaddress.txt )
     if [ "$ipAddress" == "None" ]; then
+        ipAddress="";
+    fi
+    if [ "$ipAddress" == "ebs" ]; then
         ipAddress="";
     fi
     if [ "$ipAddress" != "" ]; then
         break
     fi
-    echo "Doesn't seem ready yet. "
+    echo "Not ready yet..."
+    sleep 2;
 done
-
 
 
 if [ "$ipAddress" == "" ]; then
@@ -149,11 +153,10 @@ if [ "$ipAddress" == "" ]; then
     exit
 fi
 
-printf "Your instance will be ready to access in a minute or so:\nssh -i ${keyPair}.pem ec2-user@${ipAddress}\n\n"
+printf "Your instance will be ready to access in a minute or two. You will be able to access it at:\n   ssh -i ${keyPair}.pem ec2-user@${ipAddress}\n\n"
 
 
-read -p  "Set instance name to: " tmp
-if [ "$tmp" != "" ]; then
+if [ "$instanceName" != "" ]; then
     aws ec2 create-tags --resources ${instanceId} --tags Key=Name,Value=$tmp
 fi
 
@@ -176,21 +179,37 @@ while [ ! -f $pemFile ]; do
 done
 
 echo "We'll keep trying to ssh to the instance and update the OS "
+echo "This may take some time while the instance is coming up so have patience "
+echo "Once you are connected you will see a 'The authenticity of host ...' message. Enter 'yes' and then the yum update will run"
+echo "trying: ssh -i ${pemFile} -t  ec2-user@${ipAddress} \"sudo yum update -y\" "
+keepGoing=1;
 while [ 1  ]; do
-    echo "ssh: sudo yum update -y"
-    ssh -i ${pemFile} -t  ec2-user@${ipAddress} "sudo yum update -y"
-    read -p "Did the yum update go OK? If not have patience, it takes a minute or two [y|n]: " tmp
-    if [ "$tmp" == "y" ]; then
+    result=`ssh   -i ${pemFile} -t  ec2-user@${ipAddress} "sudo yum update -y" 2> /dev/null`
+    case ${result} in
+        "") 
+            echo "Instance isn't ready yet. We'll sleep a bit and then try again";
+            sleep 10;
+            ;;
+        *) 
+            echo "${result}"
+            echo "Instance is ready and updated"
+            keepGoing=0;
+            ;;
+    esac
+    echo "Keep going: $keepGoing"
+    if [  $keepGoing  == 0 ]; then
+        echo "DONE"
         break;
     fi
 done
+
         
 readit  "Download and install RAMADDA? [y|n]: " tmp  "OK, now we will ssh to the new instance, download and run the RAMADDA installer"
 case $tmp in
     ""|"y")
-        ssh -i ${pemFile} -t  ec2-user@${ipAddress} "wget ${downloadUrl}"
-        ssh -i ${pemFile} -t  ec2-user@${ipAddress} "unzip -o ramaddainstaller.zip"
-        ssh -i ${pemFile} -t  ec2-user@${ipAddress} "sudo sh /home/ec2-user/ramaddainstaller/installer.sh; sleep 5;"
+        ssh  -i ${pemFile} -t  ec2-user@${ipAddress} "wget ${downloadUrl}"
+        ssh  -i ${pemFile} -t  ec2-user@${ipAddress} "unzip -o ramaddainstaller.zip"
+        ssh  -i ${pemFile} -t  ec2-user@${ipAddress} "sudo sh /home/ec2-user/ramaddainstaller/installer.sh; sleep 5;"
         ;;
 esac
 
