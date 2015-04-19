@@ -46,6 +46,10 @@ import java.util.List;
 public class MapManager extends RepositoryManager {
 
 
+    /** _more_          */
+    public static final String PROP_MAPS_GOOGLE_JS = "ramadda.maps.google.js";
+
+
     /** default height for GE plugin */
     public static int DFLT_EARTH_HEIGHT = 500;
 
@@ -190,7 +194,7 @@ public class MapManager extends RepositoryManager {
                     OPENLAYERS_BASE + "/OpenLayers.js")));
         sb.append(
             HtmlUtils.importJS(
-                "https://maps.google.com/maps/api/js?v=3.5&sensor=false"));
+                getRepository().getProperty(PROP_MAPS_GOOGLE_JS, "")));
         sb.append(
             HtmlUtils.importJS(getRepository().htdocsUrl("/ramaddamap.js")));
         sb.append(
@@ -387,9 +391,7 @@ public class MapManager extends RepositoryManager {
             throws Exception {
         if (request.getExtraProperty("ge.inited") == null) {
             request.putExtraProperty("ge.inited", "true");
-            //Don't need the maps key (I think)
-            //            sb.append(HtmlUtils.importJS("http://www.google.com/jsapi" + mapsKey));
-            sb.append(HtmlUtils.importJS("https://www.google.com/jsapi"));
+            getPageHandler().addGoogleJSImport(request, sb);
             sb.append(
                 HtmlUtils.importJS(
                     getRepository().htdocsUrl("/google/googleearth.js")));

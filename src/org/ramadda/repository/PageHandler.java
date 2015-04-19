@@ -97,7 +97,7 @@ public class PageHandler extends RepositoryManager {
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String REGISTER_MESSAGE =
         "<div class=\"ramadda-register\">Thank you for trying the <a href=\"http://geodesystems.com\">Geode Systems</a> RAMADDA repository. This is the shareware version of the software. &nbsp;&nbsp; <a class=\"btn btn-primary\" role=\"button\" target=register href=\"https://geodesystems.com/repository/alias/ramadda_registration\">Please register</a></div>";
 
@@ -3489,6 +3489,27 @@ public class PageHandler extends RepositoryManager {
             throws Exception {
         sb.append(HtmlUtils.sectionClose());
     }
+
+
+    /**
+     *
+     *
+     * @param request _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addGoogleJSImport(Request request, Appendable sb)
+            throws Exception {
+        if (request.getExtraProperty("googlejsapi") == null) {
+            request.putExtraProperty("googlejsapi", "added");
+            sb.append(
+                HtmlUtils.importJS(
+                    getRepository().getProperty("ramadda.google.js", "")));
+        }
+    }
+
+
 
 
 }

@@ -1583,8 +1583,7 @@ public class PointDatabaseTypeHandler extends BlobTypeHandler {
 
             return new Result("Point Search Results", sb);
         }
-        sb.append(
-            "<script type=\"text/javascript\" src=\"http://www.google.com/jsapi\"></script>\n");
+        getPageHandler().addGoogleJSImport(request, sb);
         sb.append(
             "<script type=\"text/javascript\">\ngoogle.load('visualization', '1', {'packages':['motionchart']});\ngoogle.setOnLoadCallback(drawChart);\nfunction drawChart() {\n        var data = new google.visualization.DataTable();\n");
         sb.append("data.addRows(" + list.size() + ");\n");

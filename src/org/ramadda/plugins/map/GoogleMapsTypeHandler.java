@@ -59,7 +59,6 @@ public class GoogleMapsTypeHandler extends GenericTypeHandler {
         super(repository, entryNode);
     }
 
-    //    https://maps.google.com/maps/ms?msid=218276181447368404771.0004b5636fea4bc6d717e&msa=0
 
     /**
      * _more_
@@ -109,7 +108,6 @@ public class GoogleMapsTypeHandler extends GenericTypeHandler {
         String url     = baseUrl;
         url = url + "&output=embed";
         url = url.replaceAll("&", "&amp;");
-        //https://maps.google.com/maps/ms?msid=218276181447368404771.0004b5636fea4bc6d717e&amp;msa=0&amp;ie=UTF8&amp;t=m&amp;ll=39.99143,-105.225842&amp;spn=0.010541,0.008789&amp;output=embed
         String html =
             "<iframe width=\"${width}\" height=\"${height}\" frameborder=\"1\" scrolling=\"no\" marginheight=\"0\" marginwidth=\"0\" src=\"${url}\"></iframe>";
 

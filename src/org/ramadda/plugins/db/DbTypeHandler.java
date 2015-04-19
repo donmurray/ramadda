@@ -2669,7 +2669,6 @@ public class DbTypeHandler extends BlobTypeHandler {
 
         StringBuilder    chartJS    = new StringBuilder();
         StringBuilder    hb         = new StringBuilder();
-        //        GoogleChart.addChartImport(sb);
         if (doForm) {
             String formUrl = request.url(getRepository().URL_ENTRY_SHOW);
             hb.append(HtmlUtils.form(formUrl));
@@ -3538,17 +3537,6 @@ public class DbTypeHandler extends BlobTypeHandler {
                 }
                 sb.append("</table>\n");
 
-                /*
-                sb.append(column.getLabel());
-                sb.append(HtmlUtils.br());
-
-                String chxt = "y";
-                if(column.getType().equals(Column.DATATYPE_PERCENTAGE)) {
-                    chxt = chxt+",x";
-                }
-                sb.append(HtmlUtils.img("http://chart.apis.google.com/chart?chs=400x" + height +"&&cht=bhs&chxt=" + chxt+"&chd=t:" + StringUtil.join(",",data) +
-                                       "&chxl=0:|" + StringUtil.join("|",labels)+"|"));
-                */
                 sb.append(HtmlUtils.p());
             }
 
@@ -3886,8 +3874,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         addViewHeader(request, entry, sb, VIEW_CHART, valueList.size(),
                       fromSearch);
 
-        sb.append(
-            "<script type=\"text/javascript\" src=\"http://www.google.com/jsapi\"></script>\n");
+        getPageHandler().addGoogleJSImport(request, sb);
         sb.append(
             "<script type=\"text/javascript\">\ngoogle.load('visualization', '1', {'packages':['motionchart']});\ngoogle.setOnLoadCallback(drawChart);\nfunction drawChart() {\n        var data = new google.visualization.DataTable();\n");
         StringBuilder init      = new StringBuilder();

@@ -240,7 +240,7 @@ public class TextOutputHandler extends OutputHandler {
             HtmlUtils.importJS(
                 "http://visapi-gadgets.googlecode.com/svn/trunk/wordcloud/wc.js"));
         head.append("\n");
-        head.append(HtmlUtils.importJS("http://www.google.com/jsapi"));
+        getPageHandler().addGoogleJSImport(request, head);
         head.append("\n");
 
         sb.append("<div id=\"wcdiv\"></div>");

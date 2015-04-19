@@ -4361,7 +4361,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         if (request.getExtraProperty("initchart") == null) {
             request.putExtraProperty("initchart", "added");
             sb.append(HtmlUtils.comment("chart imports"));
-            sb.append(HtmlUtils.importJS("https://www.google.com/jsapi"));
+            getPageHandler().addGoogleJSImport(request, sb);
             sb.append(
                 HtmlUtils.script(
                     "google.load(\"visualization\", \"1\", {packages:['corechart','table']});\n"));

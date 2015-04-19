@@ -2706,16 +2706,14 @@ public class TypeHandler extends RepositoryManager {
                     msg(
                     "Search for entries of this type created by the user");
                 String userLinkId = HtmlUtils.getUniqueId("userlink_");
-                String tooltip    = "<a href=http://google.com>google</a>";
                 userSearchLink = HtmlUtils
                     .href(getSearchManager().URL_SEARCH_TYPE + "/"
                           + entry.getTypeHandler().getType() + "?"
                           + ARG_USER_ID + "=" + entry.getUser().getId() + "&"
                           + SearchManager.ARG_SEARCH_SUBMIT
                           + "=true", entry.getUser().getLabel(), HtmlUtils
-                              .id(userLinkId) + " tooltip=\"" + tooltip
-                                  + "\""
-                                  + HtmlUtils.cssClass("entry-type-search")
+                              .id(userLinkId) + 
+                          HtmlUtils.cssClass("entry-type-search")
                                   + HtmlUtils
                                       .attr(HtmlUtils
                                           .ATTR_ALT, msg(linkMsg)) + HtmlUtils
