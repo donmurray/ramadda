@@ -666,8 +666,19 @@ var RamaddaUtil = {
 
 
 //Set a flag so we know not to show error dialogs above
+/*
 $(window).on('beforeunload', function(){
         GuiUtils.pageUnloading = true;
         return null;
     });
+*/
 
+
+function pageIsUnloading() {
+    console.log("Page is unloading");
+    GuiUtils.pageUnloading = true;
+    window.onbeforeunload=null;
+    return null;
+}
+
+window.onbeforeunload = pageIsUnloading;
