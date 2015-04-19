@@ -80,19 +80,24 @@ public class NCLModelPlotDataProcess extends Service {
     private static final String ARG_NCL_CMAX = ARG_NCL_PREFIX + "cmax";
 
     /** colormap name */
-    private static final String ARG_NCL_COLORMAP = ARG_NCL_PREFIX + "colormap";
+    private static final String ARG_NCL_COLORMAP = ARG_NCL_PREFIX
+                                                   + "colormap";
 
     /** contour lines */
-    private static final String ARG_NCL_CLINES = ARG_NCL_PREFIX + "contourlines";
-    
+    private static final String ARG_NCL_CLINES = ARG_NCL_PREFIX
+                                                 + "contourlines";
+
     /** contour labels */
-    private static final String ARG_NCL_CLABELS = ARG_NCL_PREFIX + "contourlabels";
-    
+    private static final String ARG_NCL_CLABELS = ARG_NCL_PREFIX
+                                                  + "contourlabels";
+
     /** colorfill */
-    private static final String ARG_NCL_CFILL = ARG_NCL_PREFIX + "contourfill";
-    
+    private static final String ARG_NCL_CFILL = ARG_NCL_PREFIX
+                                                + "contourfill";
+
+    /** list of colormaps          */
     private List colormaps = null;
-    
+
     /**
      * Create a new map process
      *
@@ -121,13 +126,13 @@ public class NCLModelPlotDataProcess extends Service {
     }
 
     /**
-     * _more_
+     * Init the javascript for the form
      *
-     * @param request _more_
-     * @param js _more_
-     * @param formVar _more_
+     * @param request  the request
+     * @param js  the JavaScript form
+     * @param formVar the form id
      *
-     * @throws Exception _more_
+     * @throws Exception problems
      */
     public void initFormJS(Request request, Appendable js, String formVar)
             throws Exception {
@@ -141,8 +146,8 @@ public class NCLModelPlotDataProcess extends Service {
      * @param request  the Request
      * @param input    the process input
      * @param sb       the form
-     * @param argPrefix _more_
-     * @param label _more_
+     * @param argPrefix arg prefix
+     * @param label     label
      *
      *
      * @throws Exception  problem getting the information for the form
@@ -321,14 +326,16 @@ public class NCLModelPlotDataProcess extends Service {
         // be valid if variable changes.
         // Contour options
         StringBuilder contourOpts = new StringBuilder();
-        contourOpts.append(HtmlUtils.labeledCheckbox(ARG_NCL_CFILL, "true", request.get(ARG_NCL_CFILL, true), "Color-fill"));
+        contourOpts.append(HtmlUtils.labeledCheckbox(ARG_NCL_CFILL, "true",
+                request.get(ARG_NCL_CFILL, true), "Color-fill"));
         contourOpts.append(HtmlUtils.space(3));
-        contourOpts.append(HtmlUtils.labeledCheckbox(ARG_NCL_CLINES, "false", request.get(ARG_NCL_CLINES, false), "Lines"));
+        contourOpts.append(HtmlUtils.labeledCheckbox(ARG_NCL_CLINES, "false",
+                request.get(ARG_NCL_CLINES, false), "Lines"));
         contourOpts.append(HtmlUtils.space(3));
-        contourOpts.append(HtmlUtils.labeledCheckbox(ARG_NCL_CLABELS, "true", request.get(ARG_NCL_CLABELS, false), "Labels"));
-        sb.append(
-            HtmlUtils.formEntry(
-                Repository.msgLabel("Contours"), contourOpts.toString()));
+        contourOpts.append(HtmlUtils.labeledCheckbox(ARG_NCL_CLABELS, "true",
+                request.get(ARG_NCL_CLABELS, false), "Labels"));
+        sb.append(HtmlUtils.formEntry(Repository.msgLabel("Contours"),
+                                      contourOpts.toString()));
         // Contour interval
         StringBuilder contourSB = new StringBuilder();
         contourSB.append(Repository.msg("Interval: "));
@@ -351,32 +358,39 @@ public class NCLModelPlotDataProcess extends Service {
                 + "</div>", contourSB.toString()));
         // colormaps
         List cmaps = getColorMaps();
-        sb.append(HtmlUtils.formEntry(msgLabel("Colormap"),
-                    HtmlUtils.select(ARG_NCL_COLORMAP,
-                                     cmaps,
-                                     request.getString(ARG_NCL_COLORMAP, ""))));
+        sb.append(
+            HtmlUtils.formEntry(
+                msgLabel("Colormap"),
+                HtmlUtils.select(
+                    ARG_NCL_COLORMAP, cmaps,
+                    request.getString(ARG_NCL_COLORMAP, "default"),
+                    HtmlUtils.cssClass("select_widget"))));
 
         sb.append(HtmlUtils.formTableClose());
 
     }
-    
+
     /**
      * Get the list of color maps
      *
      * @return  list
+     *
+     * @throws Exception problems
      */
     public List getColorMaps() throws Exception {
         if (colormaps == null) {
             colormaps = new ArrayList<TwoFacedObject>();
             colormaps.add(new TwoFacedObject("Default", "default"));
-            String list = getRepository().getResource(
+            String list =
+                getRepository().getResource(
                     "/org/ramadda/geodata/model/resources/ncl/colormaps.txt");
             List<String> cmaps = StringUtil.split(list, "\n", true, true);
             for (String cmap : cmaps) {
                 List<String> toks = StringUtil.split(cmap);
                 colormaps.add(new HtmlUtils.Selector(toks.get(1),
                         toks.get(0),
-                        getRepository().getUrlBase() +"/model/images/"+toks.get(2)));
+                        getRepository().getUrlBase() + "/model/images/"
+                        + toks.get(2), 3, 130, false));
             }
         }
 
@@ -384,11 +398,11 @@ public class NCLModelPlotDataProcess extends Service {
     }
 
     /**
-     * _more_
+     * Get the first grid entry
      *
-     * @param input _more_
+     * @param input the operands
      *
-     * @return _more_
+     * @return  the first grid
      */
     private Entry getFirstGridEntry(ServiceInput input) {
         List<Entry> entries = input.getEntries();
@@ -405,11 +419,11 @@ public class NCLModelPlotDataProcess extends Service {
     }
 
     /**
-     * _more_
+     * Is this a grid entry
      *
-     * @param entry _more_
+     * @param entry  the entry
      *
-     * @return _more_
+     * @return  true if it's a grid
      */
     private boolean isGridEntry(Entry entry) {
         TypeHandler mytype = entry.getTypeHandler();
@@ -422,9 +436,8 @@ public class NCLModelPlotDataProcess extends Service {
      * Process the request
      *
      * @param request  the request
-     * @param info _more_
      * @param input    the ServiceInput
-     * @param argPrefix _more_
+     * @param argPrefix arg prefix
      *
      * @return  the output
      *
@@ -437,11 +450,11 @@ public class NCLModelPlotDataProcess extends Service {
 
         List<Entry>          outputEntries = new ArrayList<Entry>();
         List<ServiceOperand> ops           = input.getOperands();
-        StringBuilder         fileList      = new StringBuilder();
-        StringBuilder         nameList      = new StringBuilder();
-        StringBuilder         modelList     = new StringBuilder();
-        StringBuilder         ensList       = new StringBuilder();
-        StringBuilder         expList       = new StringBuilder();
+        StringBuilder        fileList      = new StringBuilder();
+        StringBuilder        nameList      = new StringBuilder();
+        StringBuilder        modelList     = new StringBuilder();
+        StringBuilder        ensList       = new StringBuilder();
+        StringBuilder        expList       = new StringBuilder();
         Entry                inputEntry    = getFirstGridEntry(input);
         boolean              haveOne       = false;
         boolean              haveGrid      = false;
@@ -495,8 +508,8 @@ public class NCLModelPlotDataProcess extends Service {
         }
 
         StringBuilder commandString = new StringBuilder();
-        List<String> commands      = new ArrayList<String>();
-        String       ncargRoot     = nclOutputHandler.getNcargRootDir();
+        List<String>  commands      = new ArrayList<String>();
+        String        ncargRoot     = nclOutputHandler.getNcargRootDir();
         commands.add(IOUtil.joinDir(ncargRoot, "bin/ncl"));
         commands.add(
             IOUtil.joinDir(
@@ -611,9 +624,10 @@ public class NCLModelPlotDataProcess extends Service {
             envMap.put("meridian", center);
         }
 
-        boolean haveAnom      = fileList.toString().indexOf("anom") >= 0;
-        boolean isCorrelation = outputType.equals("correlation") || outputType.equals("regression");
-        String  colormap      = request.getString(ARG_NCL_COLORMAP, "default");
+        boolean haveAnom = fileList.toString().indexOf("anom") >= 0;
+        boolean isCorrelation = outputType.equals("correlation")
+                                || outputType.equals("regression");
+        String colormap = request.getString(ARG_NCL_COLORMAP, "default");
         if (colormap.equals("default")) {
             colormap = "rainbow";
             if (outputType.equals("diff") || haveAnom || isCorrelation) {
@@ -621,9 +635,12 @@ public class NCLModelPlotDataProcess extends Service {
             }
         }
         envMap.put("colormap", colormap);
-        envMap.put("clines", Boolean.toString(request.get(ARG_NCL_CLINES, false)));
-        envMap.put("clabels", Boolean.toString(request.get(ARG_NCL_CLABELS, false)));
-        envMap.put("cfill", Boolean.toString(request.get(ARG_NCL_CFILL, true)));
+        envMap.put("clines",
+                   Boolean.toString(request.get(ARG_NCL_CLINES, false)));
+        envMap.put("clabels",
+                   Boolean.toString(request.get(ARG_NCL_CLABELS, false)));
+        envMap.put("cfill",
+                   Boolean.toString(request.get(ARG_NCL_CFILL, true)));
         envMap.put("anom", Boolean.toString(haveAnom || isCorrelation));
         envMap.put(
             "annotation",
