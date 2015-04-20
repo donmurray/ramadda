@@ -8,8 +8,8 @@
      <property name="form.area.show" value="false"/>
      <property name="form.location.show" value="false"/>
      <property name="form.date.show" value="false"/>
-     <column name="team_id" type="string"  label="Team ID"  addtoform="false" />
-     <column name="team_domain" type="string"  label="Team Domain" addtoform="false" />
+     <column name="team_id" type="string"  label="Team ID"  showinform="false" />
+     <column name="team_domain" type="string"  label="Team Domain" showinform="false" />
      <column name="token" type="password"  label="Authentication Token" columns="60" />
    </type>
 
@@ -31,8 +31,8 @@
      <property name="form.file.show" value="false"/>
      <property name="form.file.show" value="false"/>
      <property name="form.url.show" value="true"/>
-     <column name="user_id" type="string"  label="User ID" addtoform="false" />
-     <column name="user_name" type="string"  label="User Name" addtoform="false" />
+     <column name="user_id" type="string"  label="User ID" showinform="false" />
+     <column name="user_name" type="string"  label="User Name" showinform="false" />
    </type>
 
 

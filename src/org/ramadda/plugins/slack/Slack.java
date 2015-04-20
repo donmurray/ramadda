@@ -52,7 +52,7 @@ import java.util.Properties;
 
 /**
  */
-public class SlackUtil {
+public class Slack {
 
 
     public static final String URL_BASE = "https://slack.com/api";

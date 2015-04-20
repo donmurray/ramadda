@@ -40,6 +40,13 @@ import java.util.List;
  */
 public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
 
+
+    public static final int IDX_TEAM_ID = 0;
+    public static final int IDX_TEAM_DOMAIN = 1;
+    public static final int IDX_TOKEN = 2;
+
+
+
     /**
      * _more_
      *
@@ -62,8 +69,13 @@ public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
             return;
         }
 
-        
+        String token = (String)entry.getValue(IDX_TOKEN);
+        if(!Utils.stringDefined(token)) {
+            System.err.println ("No token");
+            return;
+        }
 
+        
     }
 
 

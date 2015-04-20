@@ -101,11 +101,11 @@ public class SlackSearchProvider extends SearchProvider {
         if(!Utils.stringDefined(token)) {
             return results;
         }
-        String url = SlackUtil.URL_SEARCH;
+        String url = Slack.URL_SEARCH;
         url += "?";
-        url += HtmlUtils.arg(SlackUtil.ARG_QUERY, request.getString(ARG_TEXT,""));
+        url += HtmlUtils.arg(Slack.ARG_QUERY, request.getString(ARG_TEXT,""));
         url += "&";
-        url += HtmlUtils.arg(SlackUtil.ARG_TOKEN, token);
+        url += HtmlUtils.arg(Slack.ARG_TOKEN, token);
         System.err.println ("url:" + url);
         String json = IOUtil.readContents(url);
         System.err.println ("Json:" + json);

@@ -135,7 +135,7 @@ public class SlackAction extends MonitorAction {
             super.entryMatched(monitor, entry, isNew);
             List<Entry> entries = new ArrayList<Entry>();
             entries.add(entry);
-            SlackUtil.makeEntryResult(monitor.getRepository(),
+            Slack.makeEntryResult(monitor.getRepository(),
                                       new Request(monitor.getRepository(),
                                           null), (isNew
                     ? "New"
