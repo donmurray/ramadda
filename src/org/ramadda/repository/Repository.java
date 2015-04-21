@@ -1168,7 +1168,9 @@ public class Repository extends RepositoryBase implements RequestHandler,
             users = new Integer(Utils.unobfuscate(toks.get(3),
                     true)).intValue();
         } catch (Exception exc) {
-            System.err.println("Repository.checkRegistration: error reading users:" + exc);
+            System.err.println(
+                "Repository.checkRegistration: error reading users:" + exc);
+
             return;
         }
         isRegistered = key.trim().equals("namaste");
@@ -3494,6 +3496,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
             decorate = false;
         }
 
+
         //Go through all of the htdoc roots
         for (String root : htdocRoots) {
             root = getStorageManager().localizePath(root);
@@ -3502,6 +3505,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
             try {
                 InputStream inputStream =
                     getStorageManager().getInputStream(fullPath);
+
 
                 //If its just sitting on the server then don't decorate
                 if (new File(fullPath).exists()) {
@@ -3512,12 +3516,20 @@ public class Repository extends RepositoryBase implements RequestHandler,
                     String js = IOUtil.readInputStream(inputStream);
                     js          = js.replace("${urlroot}", urlBase);
                     inputStream = new ByteArrayInputStream(js.getBytes());
-                } else if (path.endsWith(".html") && decorate) {
+                } else if (path.endsWith(".html")) {
                     String html = IOUtil.readInputStream(inputStream);
                     html = html.replace("${urlroot}", urlBase);
+                    html = html.replace("${hostname}",
+                                        request.getServerName());
 
-                    return getEntryManager().addHeaderToAncillaryPage(
-                        request, new Result(BLANK, new StringBuilder(html)));
+                    Result result = new Result(BLANK,
+                                        new StringBuilder(html));
+                    if (decorate) {
+                        return getEntryManager().addHeaderToAncillaryPage(
+                            request, result);
+                    }
+
+                    return result;
                 }
                 Result result = new Result(BLANK, inputStream, type);
                 result.setCacheOk(true);
@@ -3539,6 +3551,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
             } else if (path.endsWith(".html")) {
                 String html = IOUtil.readInputStream(inputStream);
                 html = html.replace("${urlroot}", urlBase);
+                html = html.replace("${hostname}", request.getServerName());
 
                 return getEntryManager().addHeaderToAncillaryPage(request,
                         new Result(BLANK, new StringBuilder(html)));
