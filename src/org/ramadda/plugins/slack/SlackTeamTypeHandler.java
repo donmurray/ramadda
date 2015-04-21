@@ -369,13 +369,13 @@ public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
     @Override
     public Entry makeSynthEntry(Request request, Entry teamEntry, String id)
             throws Exception {
-
         //        System.err.println("SlackTeam.makeSynthEntry id = " + id +" team:" + teamEntry.getName());
-
         String token = (String) teamEntry.getValue(IDX_TOKEN);
         if ( !Utils.stringDefined(token)) {
             return null;
         }
+
+
 
         List<String> toks      = StringUtil.split(id, ":", true, true);
         String       channelId = toks.get(0);

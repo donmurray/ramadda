@@ -87,6 +87,8 @@ public class Slack {
     /** _more_          */
     public static final String API_USERS_INFO = "users.info";
 
+    public static final String API_RTM_START = "rtm.start";
+
 
     /** _more_          */
     public static final String ARG_TOKEN = "token";
