@@ -136,12 +136,12 @@ public class SlackAction extends MonitorAction {
             List<Entry> entries = new ArrayList<Entry>();
             entries.add(entry);
             Slack.makeEntryResult(monitor.getRepository(),
-                                      new Request(monitor.getRepository(),
-                                          null), (isNew
-                    ? "New"
-                    : "Modified") + " "
-                                  + entry.getTypeHandler()
-                                      .getLabel(), entries, getWebhook());
+                                  new Request(monitor.getRepository(), null),
+                                  (isNew
+                                   ? "New"
+                                   : "Modified") + " "
+                                   + entry.getTypeHandler()
+                                       .getLabel(), entries, getWebhook());
         } catch (Exception exc) {
             monitor.handleError("Error posting to Monitor   ", exc);
         }

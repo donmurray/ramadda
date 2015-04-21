@@ -7,27 +7,26 @@
 package org.ramadda.plugins.slack;
 
 
+import org.json.*;
+
 
 import org.ramadda.repository.*;
 import org.ramadda.repository.metadata.*;
 import org.ramadda.repository.type.*;
-import org.ramadda.util.AtomUtil;
 import org.ramadda.util.HtmlUtils;
-import org.ramadda.util.RssUtil;
+import org.ramadda.util.Json;
+import org.ramadda.util.TTLCache;
 import org.ramadda.util.Utils;
-
 
 import org.w3c.dom.*;
 
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.xml.XmlUtil;
 
 import java.net.URL;
 
 import java.text.SimpleDateFormat;
-
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -40,12 +39,25 @@ import java.util.List;
  */
 public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
 
+    /** _more_          */
+    private TTLCache<String, Entry> entryCache;
 
+
+    /** _more_          */
     public static final int IDX_TEAM_ID = 0;
+
+    /** _more_          */
     public static final int IDX_TEAM_DOMAIN = 1;
+
+    /** _more_          */
     public static final int IDX_TOKEN = 2;
 
+    /** _more_          */
+    public static final int IDX_CHANNELS = 3;
 
+    /** _more_          */
+    private SimpleDateFormat displaySdf =
+        new SimpleDateFormat("MMMMM dd - HH:mm");
 
     /**
      * _more_
@@ -61,22 +73,47 @@ public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param parent _more_
+     * @param newEntry _more_
+     *
+     * @throws Exception _more_
+     */
     public void initializeEntryFromForm(Request request, Entry entry,
                                         Entry parent, boolean newEntry)
-        throws Exception {
-        super.initializeEntryFromForm(request, entry,  parent, newEntry);
-        if(!newEntry) {
+            throws Exception {
+        super.initializeEntryFromForm(request, entry, parent, newEntry);
+        if ( !newEntry) {
             return;
         }
 
-        String token = (String)entry.getValue(IDX_TOKEN);
-        if(!Utils.stringDefined(token)) {
-            System.err.println ("No token");
+        String token = (String) entry.getValue(IDX_TOKEN);
+        if ( !Utils.stringDefined(token)) {
             return;
         }
 
-        
+
+
+        JSONObject result = Slack.call(getRepository(), Slack.API_TEAM_INFO,
+                                       token);
+        if (result == null) {
+            return;
+        }
+
+        entry.setName(Json.readValue(result, "team.name", entry.getName()));
+        Object[] values = entry.getTypeHandler().getEntryValues(entry);
+        values[IDX_TEAM_ID] = Json.readValue(result, "team.id", "");
+
+        String domain = Json.readValue(result, "team.domain", "");
+        values[IDX_TEAM_DOMAIN] = domain;
+        entry.setResource(new Resource(Slack.getTeamUrl(domain)));
     }
+
+
 
 
 
@@ -84,7 +121,7 @@ public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
      * _more_
      *
      * @param request _more_
-     * @param mainEntry _more_
+     * @param teamEntry _more_
      * @param parentEntry _more_
      * @param synthId _more_
      *
@@ -92,24 +129,79 @@ public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
      *
      * @throws Exception _more_
      */
-    public List<String> getSynthIds(Request request, Entry mainEntry,
+    public List<String> getSynthIds(Request request, Entry teamEntry,
                                     Entry parentEntry, String synthId)
             throws Exception {
-        List<String> ids = mainEntry.getChildIds();
+
+        //        System.err.println("SlackTeamTypeHandler.getSynthIds:" + synthId +" parent:" + parentEntry.getName()  +" team: " + teamEntry.getName());
+        List<String> ids = parentEntry.getChildIds();
         if (ids != null) {
             return ids;
         }
         ids = new ArrayList<String>();
-        if (synthId != null) {
+
+        String teamId = (String) teamEntry.getValue(IDX_TEAM_ID);
+        if ( !Utils.stringDefined(teamId)) {
+            return ids;
+        }
+        String token = (String) teamEntry.getValue(IDX_TOKEN);
+        if ( !Utils.stringDefined(token)) {
             return ids;
         }
 
-        /*
-        for (Entry item : getFeedEntries(request, mainEntry)) {
-            ids.add(item.getId());
+        HashSet<String> channelsToShow = null;
+        String          channelIds =
+            (String) teamEntry.getValue(IDX_CHANNELS);
+        if (Utils.stringDefined(channelIds)) {
+            channelsToShow = new HashSet<String>(StringUtil.split(channelIds,
+                    "\n", true, true));
         }
-        mainEntry.setChildIds(ids);
-        */
+
+
+        if (synthId == null) {
+            //do channel listing
+            JSONObject result = Slack.call(getRepository(),
+                                           Slack.API_CHANNELS_LIST, token);
+            if (result == null) {
+                return ids;
+            }
+            JSONArray channels = result.getJSONArray("channels");
+            for (int i = 0; i < channels.length(); i++) {
+                JSONObject channel = channels.getJSONObject(i);
+                Entry channelEntry = createChannelEntry(teamEntry, channel,
+                                         channelsToShow);
+                if (channelEntry == null) {
+                    continue;
+                }
+                getEntryManager().cacheEntry(channelEntry);
+                ids.add(channelEntry.getId());
+            }
+        } else {
+            //do message listing
+            JSONObject result =
+                Slack.call(getRepository(), Slack.API_SEARCH_MESSAGES, token,
+                           HtmlUtils.arg(Slack.ARG_QUERY,
+                                         Slack.in(parentEntry.getName())));
+            if (result == null) {
+                return ids;
+            }
+            String channelId =
+                parentEntry.getValue(SlackChannelTypeHandler.IDX_CHANNEL_ID,
+                                     "");
+            JSONObject messages = result.getJSONObject("messages");
+            JSONArray  matches  = messages.getJSONArray("matches");
+            for (int i = 0; i < matches.length(); i++) {
+                JSONObject message = matches.getJSONObject(i);
+                Entry messageEntry = createMessageEntry(request, teamEntry,
+                                         channelId, message);
+                getEntryManager().cacheEntry(messageEntry);
+                ids.add(messageEntry.getId());
+            }
+
+
+        }
+        parentEntry.setChildIds(ids);
+
         return ids;
     }
 
@@ -118,305 +210,71 @@ public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
     /**
      * _more_
      *
-     * @param entry _more_
+     * @param teamEntry _more_
+     * @param channel _more_
+     * @param channelsToShow _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public TypeHandler getTypeHandlerForCopy(Entry entry) throws Exception {
-        if ( !getEntryManager().isSynthEntry(entry.getId())) {
-            return getRepository().getTypeHandler(TypeHandler.TYPE_GROUP);
-        }
-
-        return getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
-    }
-
-    /*
-<title>Heading west</title>
-    <link>http://scripting.com/stories/2011/01/25/headingWest.html</link>
-    <guid>http://scripting.com/stories/2011/01/25/headingWest.html</guid>
-    <comments>http://scripting.com/stories/2011/01/25/headingWest.html#disqus_thread</comments>
-      <description>
-    </description>
-        <pubDate>Tue, 25 Jan 2011 14:26:27 GMT</pubDate>
-</item>
-    */
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param mainEntry _more_
-     * @param items _more_
-     * @param root _more_
-     *
-     * @throws Exception _more_
-     */
-    public void processRss(Request request, Entry mainEntry,
-                           List<Entry> items, Element root)
+    private Entry createChannelEntry(Entry teamEntry, JSONObject channel,
+                                     HashSet<String> channelsToShow)
             throws Exception {
-        //        Thu, 14 Jun 2012 14:50:14 -05:00
-        SimpleDateFormat[] sdfs =
-            new SimpleDateFormat[] {
-                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz"),
-                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z"), };
-        Element channel = XmlUtil.getElement(root, RssUtil.TAG_CHANNEL);
-        if (channel == null) {
-            throw new IllegalArgumentException("No channel tag");
-        }
-        NodeList children = XmlUtil.getElements(channel, RssUtil.TAG_ITEM);
-        HashSet  seen     = new HashSet();
-        for (int childIdx = 0; childIdx < children.getLength(); childIdx++) {
-            Element item = (Element) children.item(childIdx);
-            String title = XmlUtil.getGrandChildText(item, RssUtil.TAG_TITLE,
-                               "");
-
-            String link = XmlUtil.getGrandChildText(item, RssUtil.TAG_LINK,
-                              "");
-
-
-
-            String guid = XmlUtil.getGrandChildText(item, RssUtil.TAG_GUID,
-                              link);
-            if (seen.contains(guid)) {
-                continue;
+        /*
+          "id": "C024BE91L",
+            "name": "fun",
+            "created": 1360782804,
+            "creator": "U024BE7LH",
+            "is_archived": false,
+            "is_member": false,
+            "num_members": 6,
+            "topic": {
+                "value": "Fun times",
+                "creator": "U024BE7LV",
+                "last_set": 1369677212
+            },
+            "purpose": {
+                "value": "This channel is for fun",
+                "creator": "U024BE7LH",
+                "last_set": 1360782804
             }
+        */
 
-            seen.add(guid);
-            String desc = XmlUtil.getGrandChildText(item,
-                              RssUtil.TAG_DESCRIPTION, "");
-
-
-
-            String pubDate = XmlUtil.getGrandChildText(item,
-                                 RssUtil.TAG_PUBDATE, "").trim();
-
-
-
-            Entry entry = new Entry(getEntryManager().createSynthId(mainEntry, guid), this, false);
-            Date  dttm  = new Date();
-            for (SimpleDateFormat sdf : sdfs) {
-                try {
-                    dttm = sdf.parse(pubDate);
-
-                    break;
-                } catch (Exception exc) {}
-            }
-
-            if (dttm == null) {
-                dttm = DateUtil.parse(pubDate);
-            }
-
-
-            setLocation(item, entry);
-
-
-            //Tue, 25 Jan 2011 05:00:00 GMT
-            Resource resource = new Resource(link);
-            entry.initEntry(title, desc, mainEntry, mainEntry.getUser(),
-                            resource, "", dttm.getTime(), dttm.getTime(),
-                            dttm.getTime(), dttm.getTime(), null);
-
-            items.add(entry);
-            getEntryManager().cacheEntry(entry);
-        }
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param mainEntry _more_
-     * @param items _more_
-     * @param root _more_
-     *
-     * @throws Exception _more_
-     */
-    public void processAtom(Request request, Entry mainEntry,
-                            List<Entry> items, Element root)
-            throws Exception {
-        //        Thu, 14 Jun 2012 14:50:14 -05:00
-        SimpleDateFormat[] sdfs =
-            new SimpleDateFormat[] {
-                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss zzz"),
-                new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z"), };
-        NodeList children = XmlUtil.getElements(root, AtomUtil.TAG_ENTRY);
-        HashSet  seen     = new HashSet();
-        for (int childIdx = 0; childIdx < children.getLength(); childIdx++) {
-            Element item = (Element) children.item(childIdx);
-            String title = XmlUtil.getGrandChildText(item,
-                               AtomUtil.TAG_TITLE, "");
-            String guid = XmlUtil.getGrandChildText(item, AtomUtil.TAG_ID,
-                              "" + childIdx);
-            if (seen.contains(guid)) {
-                continue;
-            }
-            seen.add(guid);
-            String desc = XmlUtil.getGrandChildText(item,
-                              AtomUtil.TAG_CONTENT, null);
-
-            if (desc == null) {
-                desc = XmlUtil.getGrandChildText(item, AtomUtil.TAG_SUMMARY,
-                        "");
-            }
-
-            String pubDate = XmlUtil.getGrandChildText(item,
-                                 AtomUtil.TAG_PUBLISHED, "").trim();
-
-            if ( !Utils.stringDefined(pubDate)) {
-                pubDate = XmlUtil.getGrandChildText(item,
-                        AtomUtil.TAG_UPDATED, "").trim();
-
-            }
-
-
-            /**
-             *   NodeList categories = XmlUtil.getElements(item, AtomUtil.TAG_CATEGORY);
-             *   for (int childIdx = 0; childIdx < categories.getLength(); childIdx++) {
-             *        Element cat= (Element) categories.item(childIdx);
-             *   }
-             */
-
-
-
-
-            Entry entry = new Entry(getEntryManager().createSynthId(mainEntry, guid), this, false);
-            Date  dttm       = null;
-            Date  changeDate = null;
-            for (SimpleDateFormat sdf : sdfs) {
-                try {
-                    //                    dttm = sdf.parse(pubDate);
-                    break;
-                } catch (Exception exc) {}
-            }
-
-
-            if (dttm == null) {
-                dttm = DateUtil.parse(pubDate);
-            }
-
-            setLocation(item, entry);
-
-            String link = XmlUtil.getGrandChildText(item,
-                              "feedburner:origLink", "");
-            //TODO: look through the link tags 
-            Resource resource = new Resource(link);
-            entry.initEntry(title, desc, mainEntry, mainEntry.getUser(),
-                            resource, "", dttm.getTime(), dttm.getTime(),
-                            dttm.getTime(), dttm.getTime(), null);
-
-            items.add(entry);
-            getEntryManager().cacheEntry(entry);
-        }
-    }
-
-
-    /**
-     * _more_
-     *
-     * @param item _more_
-     * @param entry _more_
-     *
-     * @throws Exception _more_
-     */
-    private void setLocation(Element item, Entry entry) throws Exception {
-
-        String lat = XmlUtil.getGrandChildText(item, RssUtil.TAG_GEOLAT,
-                         "").trim();
-        if (lat.length() == 0) {
-            lat = XmlUtil.getGrandChildText(item, "lat", "").trim();
-        }
-        String lon = XmlUtil.getGrandChildText(item, RssUtil.TAG_GEOLON,
-                         "").trim();
-        if (lon.length() == 0) {
-            lon = XmlUtil.getGrandChildText(item, "long", "").trim();
-        }
-
-
-        if ( !Utils.stringDefined(lat)) {
-            String point = XmlUtil.getGrandChildText(item,
-                               RssUtil.TAG_GEORSS_POINT, "").trim();
-
-            if (Utils.stringDefined(point)) {
-                List<String> toks = StringUtil.split(point, " ", true, true);
-                if (toks.size() == 2) {
-                    lat = toks.get(0);
-                    lon = toks.get(1);
-                }
+        String channelId = Json.readValue(channel, "id", "");
+        String name      = Json.readValue(channel, "name", "");
+        if (channelsToShow != null) {
+            if ( !(channelsToShow.contains(channelId)
+                    || channelsToShow.contains(name))) {
+                return null;
             }
         }
+        Date dttm = Slack.getDate(Json.readValue(channel, "created", ""));
+        String id = getEntryManager().createSynthId(teamEntry, channelId);
 
+        String topic = Json.readValue(channel, "topic.value", "");
+        String purpose = Json.readValue(channel, "purpose.value", "");
+        TypeHandler channelTypeHandler =
+            getRepository().getTypeHandler("slack_channel");
+        Entry channelEntry = new Entry(id, channelTypeHandler);
+        //        https://geodesystems.slack.com/messages/general/
 
-        if ( !Utils.stringDefined(lat)) {
-            String polygon = XmlUtil.getGrandChildText(item,
-                                 RssUtil.TAG_GEORSS_POLYGON, "").trim();
-            if (Utils.stringDefined(polygon)) {
-                StringBuffer[] sb = new StringBuffer[] { new StringBuffer(),
-                        new StringBuffer(), new StringBuffer(),
-                        new StringBuffer() };
+        String desc       = "";
+        String teamDomain = (String) teamEntry.getValue(IDX_TEAM_DOMAIN, "");
+        Resource resource =
+            new Resource(new Resource(Slack.getChannelUrl(teamDomain, name)));
+        Object[] values = channelTypeHandler.makeEntryValues(null);
 
-                List<String> toks = StringUtil.split(polygon, " ", true,
-                                        true);
-                int    idx = 0;
-                double
-                    north  = -90,
-                    west   = 180,
-                    south  = 90,
-                    east   = -180;
-                for (int i = 0; i < toks.size(); i += 2) {
-                    double latv = Double.parseDouble(toks.get(i));
-                    double lonv = Double.parseDouble(toks.get(i + 1));
-                    north = Math.max(north, latv);
-                    south = Math.min(south, latv);
-                    west  = Math.min(west, lonv);
-                    east  = Math.max(east, lonv);
-                    String toAdd = latv + "," + lonv + ";";
-                    if ((sb[idx].length() + toAdd.length())
-                            >= (Metadata.MAX_LENGTH - 100)) {
-                        idx++;
-                        if (idx >= sb.length) {
-                            break;
-                        }
-                    }
-                    sb[idx].append(toAdd);
-                    //TODO: add a closing point???
-                }
-                //For now don't add the polygon.
-                Metadata polygonMetadata =
-                    new Metadata(getRepository().getGUID(), entry.getId(),
-                                 MetadataHandler.TYPE_SPATIAL_POLYGON,
-                                 DFLT_INHERITED, sb[0].toString(),
-                                 sb[1].toString(), sb[2].toString(),
-                                 sb[3].toString(), Metadata.DFLT_EXTRA);
-                //                entry.addMetadata(polygonMetadata, false);
-                entry.setNorth(north);
-                entry.setWest(west);
-                entry.setSouth(south);
-                entry.setEast(east);
-            }
-        }
+        values[SlackChannelTypeHandler.IDX_CHANNEL_ID]      = channelId;
+        values[SlackChannelTypeHandler.IDX_CHANNEL_PURPOSE] = purpose;
 
+        channelEntry.initEntry(name, desc, teamEntry, teamEntry.getUser(),
+                               resource, "", dttm.getTime(), dttm.getTime(),
+                               dttm.getTime(), dttm.getTime(), values);
 
+        channelEntry.setMasterTypeHandler(this);
 
-
-        String elev = XmlUtil.getGrandChildText(item,
-                          RssUtil.TAG_GEORSS_ELEV, "").trim();
-
-
-        if (Utils.stringDefined(elev)) {
-            entry.setAltitude(Double.parseDouble(elev));
-        }
-
-        if ((lat.length() > 0) && (lon.length() > 0)) {
-            entry.setLocation(Double.parseDouble(lat),
-                              Double.parseDouble(lon), 0);
-        }
-
+        return channelEntry;
     }
 
 
@@ -424,69 +282,155 @@ public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
      * _more_
      *
      * @param request _more_
-     * @param mainEntry _more_
+     * @param teamEntry _more_
+     * @param channelId _more_
+     * @param message _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public List<Entry> getFeedEntries(Request request, Entry mainEntry)
+    private Entry createMessageEntry(Request request, Entry teamEntry,
+                                     String channelId, JSONObject message)
             throws Exception {
-        List<Entry> items = new ArrayList<Entry>();
-        String      url   = mainEntry.getResource().getPath();
-        if ((url == null) || (url.trim().length() == 0)) {
-            return items;
+
+        String token    = (String) teamEntry.getValue(IDX_TOKEN);
+        String userId   = Json.readValue(message, "user", "");
+        String userName = Json.readValue(message, "username", userId);
+
+        if ( !Utils.stringDefined(userId)) {
+            userId = userName;
         }
 
-        Element root;
-        try {
-            root = XmlUtil.getRoot(url, getClass());
-        } catch (Exception exc) {
-            logError("Error reading feed:" + url, exc);
-
-            return items;
+        SlackUser slackUser = getSlackUser(token, userId, userName);
+        if (slackUser != null) {
+            userName = slackUser.getName();
         }
-        if (root == null) {
-            logError("Error reading feed:" + url, null);
+        String ts    = Json.readValue(message, "ts", "");
+        Date   dttm  = Slack.getDate(ts);
+        String desc  = Json.readValue(message, "text", "");
+        String link  = Json.readValue(message, "permalink", (String) null);
+        String dttms = displaySdf.format(dttm);
+        String name  = userName + ": " + dttms;
+        channelId = Json.readValue(message, "channel.id", channelId);
 
-            return items;
-        }
-        if (root.getTagName().equals(RssUtil.TAG_RSS)) {
-            processRss(request, mainEntry, items, root);
-        } else if (root.getTagName().equals(AtomUtil.TAG_FEED)) {
-            processAtom(request, mainEntry, items, root);
+        String ramaddaChannelId = getEntryManager().createSynthId(teamEntry,
+                                      channelId);
+        Entry channelEntry = getEntryManager().getEntry(request,
+                                 ramaddaChannelId);
+
+        String id = getEntryManager().createSynthId(teamEntry,
+                        channelId + ":" + ts);
+
+        TypeHandler messageTypeHandler =
+            getRepository().getTypeHandler("slack_message");
+        Entry    messageEntry = new Entry(id, messageTypeHandler);
+        Resource resource     = (link == null)
+                                ? new Resource()
+                                : new Resource(new URL(link));
+        Object[] values       = messageTypeHandler.makeEntryValues(null);
+
+
+        values[SlackMessageTypeHandler.IDX_USER_ID]   = userId;
+        values[SlackMessageTypeHandler.IDX_USER_NAME] = userName;
+
+        if ((slackUser != null)
+                && Utils.stringDefined(slackUser.getImage48())) {
+            values[SlackMessageTypeHandler.IDX_USER_IMAGE] =
+                slackUser.getImage48();
         } else {
-            throw new IllegalArgumentException("Unknown feed type:"
-                    + root.getTagName());
-            //            getRepository().getLogManager().logError("Unknown feed type:" + root.getTagName()); 
+            values[SlackMessageTypeHandler.IDX_USER_IMAGE] =
+                getRepository().iconUrl("/slack/slack.png");
         }
 
-        return items;
+
+        messageEntry.initEntry(name, desc, channelEntry, teamEntry.getUser(),
+                               resource, "", dttm.getTime(), dttm.getTime(),
+                               dttm.getTime(), dttm.getTime(), values);
+
+        messageEntry.setMasterTypeHandler(this);
+
+        return messageEntry;
     }
+
 
 
     /**
      * _more_
      *
      * @param request _more_
-     * @param mainEntry _more_
+     * @param teamEntry _more_
      * @param id _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
-    public Entry makeSynthEntry(Request request, Entry mainEntry, String id)
+    @Override
+    public Entry makeSynthEntry(Request request, Entry teamEntry, String id)
             throws Exception {
-        id = getEntryManager().createSynthId(mainEntry, id);
-        for (Entry item : getFeedEntries(request, mainEntry)) {
-            if (item.getId().equals(id)) {
-                return item;
-            }
+
+        //        System.err.println("SlackTeam.makeSynthEntry id = " + id +" team:" + teamEntry.getName());
+
+        String token = (String) teamEntry.getValue(IDX_TOKEN);
+        if ( !Utils.stringDefined(token)) {
+            return null;
         }
 
-        return null;
+        List<String> toks      = StringUtil.split(id, ":", true, true);
+        String       channelId = toks.get(0);
+
+        JSONObject result = Slack.call(getRepository(),
+                                       Slack.API_CHANNELS_INFO, token,
+                                       HtmlUtils.arg(Slack.ARG_CHANNEL,
+                                           channelId));
+        if (result == null) {
+            return null;
+        }
+
+        HashSet<String> channelsToShow = null;
+        String          channels = (String) teamEntry.getValue(IDX_CHANNELS);
+        if (Utils.stringDefined(channels)) {
+            channelsToShow = new HashSet<String>(StringUtil.split(channels,
+                    "\n", true, true));
+        }
+
+
+        JSONObject channel = result.getJSONObject("channel");
+        Entry channelEntry = createChannelEntry(teamEntry, channel,
+                                 channelsToShow);
+        if (channelEntry == null) {
+            return null;
+        }
+        if (toks.size() == 1) {
+            return channelEntry;
+        }
+        String msgId = toks.get(1);
+
+
+        //        Slack.debug = true;
+        result = Slack.call(getRepository(), Slack.API_CHANNELS_HISTORY,
+                            token, HtmlUtils.args(new String[] {
+            Slack.ARG_CHANNEL, channelId, Slack.ARG_LATEST, msgId,
+            Slack.ARG_OLDEST, msgId, Slack.ARG_INCLUSIVE, "1"
+        }));
+        Slack.debug = false;
+        if (result == null) {
+            return null;
+        }
+
+        JSONArray messages = result.getJSONArray("messages");
+        if (messages.length() == 0) {
+            System.err.println("no messages");
+
+            return null;
+        }
+        JSONObject message = messages.getJSONObject(0);
+
+        return createMessageEntry(request, teamEntry, channelId, message);
+
     }
+
 
     /**
      * _more_
@@ -498,19 +442,6 @@ public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param entry _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    public String getIconUrl(Request request, Entry entry) throws Exception {
-        return iconUrl("/feed/blog_icon.png");
-    }
 
     /**
      * _more_
@@ -521,6 +452,41 @@ public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
      */
     public Entry createEntry(String id) {
         return new Entry(id, this, true);
+    }
+
+    /**
+     * _more_
+     *
+     * @param token _more_
+     * @param userId _more_
+     * @param userName _more_
+     *
+     * @return _more_
+     */
+    public SlackUser getSlackUser(String token, String userId,
+                                  String userName) {
+        SlackUser slackUser = SlackUser.getUser(token, userId);
+        if (slackUser != null) {
+            return slackUser;
+        }
+
+
+
+        JSONObject result = Slack.call(getRepository(), Slack.API_USERS_INFO,
+                                       token,
+                                       HtmlUtils.args(new String[] {
+                                           Slack.ARG_USER,
+                                           userId }));
+        if (result == null) {
+            return new SlackUser(token, userId, userName, null, null);
+        }
+
+        JSONObject profile = Json.readObject(result, "user.profile");
+        String     name    = Json.readValue(profile, "real_name", userId);
+        String     image24 = Json.readValue(profile, "image_24", null);
+        String     image48 = Json.readValue(profile, "image_48", null);
+
+        return new SlackUser(token, userId, name, image24, image48);
     }
 
 

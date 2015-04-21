@@ -6,7 +6,9 @@
 
 package org.ramadda.plugins.slack;
 
+
 import org.json.*;
+
 import org.ramadda.repository.*;
 import org.ramadda.repository.search.*;
 import org.ramadda.repository.type.*;
@@ -14,6 +16,7 @@ import org.ramadda.repository.type.*;
 import org.ramadda.repository.util.ServerInfo;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Utils;
+
 import ucar.unidata.util.IOUtil;
 
 import java.net.URL;
@@ -39,6 +42,7 @@ public class SlackSearchProvider extends SearchProvider {
     /** _more_ */
     private String name;
 
+    /** _more_          */
     private String token;
 
     /**
@@ -60,11 +64,11 @@ public class SlackSearchProvider extends SearchProvider {
         super(repository);
         if (args != null) {
             if (args.size() > 0) {
-                token =  args.get(0);
+                token = args.get(0);
             }
             if (args.size() > 1) {
                 name = args.get(1);
-            } 
+            }
         }
     }
 
@@ -77,6 +81,7 @@ public class SlackSearchProvider extends SearchProvider {
         if (name != null) {
             return name;
         }
+
         return "SlackSearchProvider";
     }
 
@@ -98,46 +103,52 @@ public class SlackSearchProvider extends SearchProvider {
                                   Appendable searchCriteriaSB)
             throws Exception {
         List<Entry> results = new ArrayList<Entry>();
-        if(!Utils.stringDefined(token)) {
+        if ( !Utils.stringDefined(token)) {
             return results;
         }
         String url = Slack.URL_SEARCH;
         url += "?";
-        url += HtmlUtils.arg(Slack.ARG_QUERY, request.getString(ARG_TEXT,""));
+        url += HtmlUtils.arg(Slack.ARG_QUERY,
+                             request.getString(ARG_TEXT, ""));
         url += "&";
         url += HtmlUtils.arg(Slack.ARG_TOKEN, token);
-        System.err.println ("url:" + url);
+        System.err.println("url:" + url);
         String json = IOUtil.readContents(url);
-        System.err.println ("Json:" + json);
+        System.err.println("Json:" + json);
         JSONObject obj = new JSONObject(new JSONTokener(json));
-        if(!obj.has("ok")) {
-            System.err.println ("SlackSearchProvider: no ok field in json:" + json);
+        if ( !obj.has("ok")) {
+            System.err.println("SlackSearchProvider: no ok field in json:"
+                               + json);
+
             return results;
 
         }
 
-        if(!obj.has("ok")) {
-            System.err.println ("SlackSearchProvider: no ok field in json:" + json);
+        if ( !obj.has("ok")) {
+            System.err.println("SlackSearchProvider: no ok field in json:"
+                               + json);
+
             return results;
 
         }
 
-        if(!obj.getBoolean("ok")) {
-            System.err.println ("SlackSearchProvider: ok=false:" + json);
+        if ( !obj.getBoolean("ok")) {
+            System.err.println("SlackSearchProvider: ok=false:" + json);
+
             return results;
         }
-        
+
         JSONObject messages = obj.getJSONObject("messages");
-        JSONObject files = obj.getJSONObject("files");
+        JSONObject files    = obj.getJSONObject("files");
 
-        if(messages!=null) {
+        if (messages != null) {
             JSONArray matches = messages.getJSONArray("matches");
-            for(int i=0;i<matches.length();i++) {
-                JSONObject message = matches.getJSONObject(i);                
-                String text = message.getString("text");
-                String user = message.getString("user");
-                String link = message.getString("permalink");
-                
+            for (int i = 0; i < matches.length(); i++) {
+                JSONObject message = matches.getJSONObject(i);
+                String     text    = message.getString("text");
+                String     user    = message.getString("user");
+                String     link    = message.getString("permalink");
+
                 /*
                 Entry        newEntry = new Entry(albumEntryId, this, true);
             addMetadata(newEntry, album, desc);

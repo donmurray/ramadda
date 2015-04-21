@@ -7,6 +7,8 @@
 package org.ramadda.util;
 
 
+import org.json.*;
+
 import org.w3c.dom.*;
 
 
@@ -14,6 +16,7 @@ import ucar.unidata.util.IOUtil;
 
 
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
@@ -62,6 +65,8 @@ public class Json {
 
     /** _more_ */
     public static final String FIELD_DATE = "date";
+
+
 
 
 
@@ -592,6 +597,65 @@ public class Json {
 
         sb.append(map(attrs));
 
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param obj _more_
+     * @param path _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
+    public static String readValue(JSONObject obj, String path, String dflt) {
+        List<String> toks = StringUtil.split(path, ".", true, true);
+        while (toks.size() > 1) {
+            String tok = toks.get(0);
+            toks.remove(0);
+            if ( !obj.has(tok)) {
+                return dflt;
+            }
+            obj = obj.getJSONObject(tok);
+            if (obj == null) {
+                return dflt;
+            }
+        }
+
+        String key = toks.get(0);
+        if ( !obj.has(key)) {
+            return dflt;
+        }
+        Object s = obj.get(key);
+        if (s == null) {
+            return dflt;
+        }
+
+        return s.toString();
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param obj _more_
+     * @param path _more_
+     *
+     * @return _more_
+     */
+    public static JSONObject readObject(JSONObject obj, String path) {
+        List<String> toks = StringUtil.split(path, ".", true, true);
+        while (toks.size() > 0) {
+            String tok = toks.get(0);
+            toks.remove(0);
+            obj = obj.getJSONObject(tok);
+            if (obj == null) {
+                return null;
+            }
+        }
+
+        return obj;
     }
 
 

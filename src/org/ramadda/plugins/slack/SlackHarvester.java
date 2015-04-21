@@ -63,7 +63,7 @@ public class SlackHarvester extends Harvester {
     /** _more_ */
     public static final String CMD_DESC = "desc";
 
-    /** _more_          */
+    /** _more_ */
     public static final String CMD_APPEND = "append";
 
     /** _more_ */
@@ -85,7 +85,7 @@ public class SlackHarvester extends Harvester {
     /** plain old command is a slack argument so we use ramadda_command */
     public static final String ARG_COMMAND = "ramadda_command";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_TYPE = "ramadda_type";
 
     /** _more_ */
@@ -126,6 +126,11 @@ public class SlackHarvester extends Harvester {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param msg _more_
+     */
     public void debug(String msg) {
         System.err.println("SlackHarvester: " + msg);
     }
@@ -140,10 +145,8 @@ public class SlackHarvester extends Harvester {
      */
     protected void init(Element element) throws Exception {
         super.init(element);
-        tokens = Utils.getAttributeOrTag(element, Slack.ATTR_TOKENS,
-                                         tokens);
-        webHook = XmlUtil.getAttribute(element, Slack.ATTR_WEBHOOK,
-                                       webHook);
+        tokens  = Utils.getAttributeOrTag(element, Slack.ATTR_TOKENS, tokens);
+        webHook = XmlUtil.getAttribute(element, Slack.ATTR_WEBHOOK, webHook);
     }
 
 
@@ -207,12 +210,12 @@ public class SlackHarvester extends Harvester {
         super.createEditForm(request, sb);
 
         addBaseGroupSelect(ATTR_BASEGROUP, sb);
-        sb.append(
-            HtmlUtils.formEntry(
-                msgLabel("Slack Tokens"),
-                HtmlUtils.textArea(Slack.ATTR_TOKENS, (tokens == null)
-                ? ""
-                : tokens, 4, 60) + " " + "Tokens from Slack. One per line"));
+        sb.append(HtmlUtils.formEntry(msgLabel("Slack Tokens"),
+                                      HtmlUtils.textArea(Slack.ATTR_TOKENS,
+                                          (tokens == null)
+                                          ? ""
+                                          : tokens, 4, 60) + " "
+                                          + "Tokens from Slack. One per line"));
 
         sb.append(HtmlUtils.formEntry(msgLabel("Slack Web Hook URL"),
                                       HtmlUtils.input(Slack.ATTR_WEBHOOK,
@@ -237,40 +240,42 @@ public class SlackHarvester extends Harvester {
             return null;
         }
 
-        String tokenFromSlack = request.getString(Slack.SLACK_TOKEN,
-                                    "none");
+        String tokenFromSlack = request.getString(Slack.SLACK_TOKEN, "none");
         //        debug("handleRequest");
         boolean ok = false;
         for (String token : StringUtil.split(tokens, "\n", true, true)) {
             if (Misc.equals(token, tokenFromSlack)) {
                 //                debug("slack token:" +tokenFromSlack +" my:" + token);
                 ok = true;
+
                 break;
             }
         }
 
         if ( !ok) {
             debug("tokens did not match");
+
             return null;
         }
 
-        String       textFromSlack = Slack.getSlackText(request);
-        List<String> commandToks =  StringUtil.split(textFromSlack, ";", false,false);
-        if(commandToks.size()==0) {
+        String textFromSlack = Slack.getSlackText(request);
+        List<String> commandToks = StringUtil.split(textFromSlack, ";",
+                                       false, false);
+        if (commandToks.size() == 0) {
             commandToks.add("");
         }
-        debug("slack text:" +textFromSlack);
+        debug("slack text:" + textFromSlack);
         debug("command toks:" + commandToks);
         // /cd foo; ls; new wiki name|description
         Result result = null;
         //debug("request:" + request);
-        for(String commandTok: commandToks) {
+        for (String commandTok : commandToks) {
             debug("command tok:" + commandTok);
             commandTok = commandTok.trim();
-            if(commandTok.startsWith("/")) {
+            if (commandTok.startsWith("/")) {
                 commandTok = commandTok.substring(1);
             }
-            String text= commandTok;
+            String       text = commandTok;
             String       cmd  = request.getString(ARG_COMMAND, (String) null);
             List<String> toks;
             if (cmd == null) {
@@ -289,29 +294,29 @@ public class SlackHarvester extends Harvester {
 
             debug("checking command:" + cmd);
             if (cmd.equals(CMD_SEARCH)) {
-                result =  processSearch(request, text);
+                result = processSearch(request, text);
             } else if (cmd.equals(CMD_LS)) {
-                result =  processLs(request, text);
+                result = processLs(request, text);
             } else if (cmd.equals(CMD_PWD)) {
-                result =  processPwd(request, text);
+                result = processPwd(request, text);
             } else if (cmd.equals(CMD_DESC)) {
-                result =  processDesc(request, text);
+                result = processDesc(request, text);
             } else if (cmd.equals(CMD_APPEND)) {
-                result =  processAppend(request, text);
+                result = processAppend(request, text);
             } else if (cmd.equals(CMD_NEW)) {
-                result =  processNew(request, text);
+                result = processNew(request, text);
             } else if (cmd.equals(CMD_CD)) {
-                result =  processCd(request, text);
+                result = processCd(request, text);
             } else {
-                result =  getUsage(request, "Unknown command: " + cmd);
+                result = getUsage(request, "Unknown command: " + cmd);
             }
             //Remove any default args
-            request.remove(ARG_COMMAND);        
-            request.remove(ARG_TYPE);        
+            request.remove(ARG_COMMAND);
+            request.remove(ARG_TYPE);
         }
 
         //TODO: 
-        if(result!=null) {
+        if (result != null) {
             return result;
         }
 
@@ -342,8 +347,8 @@ public class SlackHarvester extends Harvester {
         pair[0].addAll(pair[1]);
 
         return Slack.makeEntryResult(getRepository(), request,
-                                         "Search Results",
-                                         (List<Entry>) pair[0], webHook);
+                                     "Search Results", (List<Entry>) pair[0],
+                                     webHook);
     }
 
 
@@ -369,8 +374,8 @@ public class SlackHarvester extends Harvester {
             desc = "    ";
         }
 
-        return Slack.makeEntryResult(getRepository(), request, desc,
-                                         null, webHook);
+        return Slack.makeEntryResult(getRepository(), request, desc, null,
+                                     webHook);
     }
 
 
@@ -394,7 +399,7 @@ public class SlackHarvester extends Harvester {
         getEntryManager().appendText(getRequest(), entry, text);
 
         return Slack.makeEntryResult(getRepository(), request,
-                                         "Text appended", null, webHook);
+                                     "Text appended", null, webHook);
     }
 
 
@@ -436,14 +441,14 @@ public class SlackHarvester extends Harvester {
         StringBuffer sb       = new StringBuffer();
         List<Entry>  children = getEntryManager().getChildren(request,
                                     parent);
-        String attach = Slack.makeEntryLinks(getRepository(), request,
-                            sb, children);
+        String attach = Slack.makeEntryLinks(getRepository(), request, sb,
+                                             children);
         if (children.size() == 0) {
             return new Result("", new StringBuffer("No children entries"));
         }
 
         return Slack.makeEntryResult(getRepository(), request, "Listing",
-                                         children, webHook);
+                                     children, webHook);
     }
 
 
@@ -473,8 +478,8 @@ public class SlackHarvester extends Harvester {
         cwd.put(Slack.getSlackUserId(request), newEntry.getId());
 
         return Slack.makeEntryResult(getRepository(), request,
-                                         "Current entry:", toList(newEntry),
-                                         webHook);
+                                     "Current entry:", toList(newEntry),
+                                     webHook);
     }
 
 
@@ -493,8 +498,8 @@ public class SlackHarvester extends Harvester {
         Entry entry = getCurrentEntry(request);
 
         return Slack.makeEntryResult(getRepository(), request,
-                                         "Current entry:", toList(entry),
-                                         webHook);
+                                     "Current entry:", toList(entry),
+                                     webHook);
     }
 
     /**
@@ -562,9 +567,8 @@ public class SlackHarvester extends Harvester {
         }
         cwd.put(Slack.getSlackUserId(request), entry.getId());
 
-        return Slack.makeEntryResult(getRepository(), request,
-                                         "New entry:", toList(entry),
-                                         webHook);
+        return Slack.makeEntryResult(getRepository(), request, "New entry:",
+                                     toList(entry), webHook);
     }
 
 

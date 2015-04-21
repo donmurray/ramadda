@@ -7,6 +7,9 @@
 package org.ramadda.plugins.slack;
 
 
+import org.json.*;
+
+
 import org.ramadda.repository.*;
 import org.ramadda.repository.auth.*;
 import org.ramadda.repository.harvester.*;
@@ -16,9 +19,6 @@ import org.ramadda.repository.type.*;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Json;
 import org.ramadda.util.Utils;
-
-
-import org.w3c.dom.*;
 
 import ucar.unidata.ui.HttpFormEntry;
 
@@ -54,16 +54,72 @@ import java.util.Properties;
  */
 public class Slack {
 
+    /** _more_          */
+    public static boolean debug = false;
 
+    /** _more_          */
     public static final String URL_BASE = "https://slack.com/api";
+
+    /** _more_          */
     public static final String URL_SEARCH = URL_BASE + "/search.all";
 
-    public static final String ARG_TOKEN = "token"; 
-    public static final String ARG_QUERY = "query"; 
-    public static final String ARG_SORT = "sort"; 
-    public static final String ARG_SORT_DIR = "sort_dir"; 
-    public static final String ARG_COUNT = "count"; 
-    public static final String ARG_PAGE = "page"; 
+    /** _more_          */
+    public static final String API_TEAM_INFO = "team.info";
+
+    /** _more_          */
+    public static final String API_CHANNELS_LIST = "channels.list";
+
+    /** _more_          */
+    public static final String API_CHANNELS_INFO = "channels.info";
+
+    /** _more_          */
+    public static final String API_CHANNELS_HISTORY = "channels.history";
+
+    /** _more_          */
+    public static final String API_SEARCH_ALL = "search.all";
+
+    /** _more_          */
+    public static final String API_SEARCH_MESSAGES = "search.messages";
+
+    /** _more_          */
+    public static final String API_SEARCH_FILES = "search.files";
+
+    /** _more_          */
+    public static final String API_USERS_INFO = "users.info";
+
+
+    /** _more_          */
+    public static final String ARG_TOKEN = "token";
+
+    /** _more_          */
+    public static final String ARG_CHANNEL = "channel";
+
+    /** _more_          */
+    public static final String ARG_QUERY = "query";
+
+    /** _more_          */
+    public static final String ARG_SORT = "sort";
+
+    /** _more_          */
+    public static final String ARG_SORT_DIR = "sort_dir";
+
+    /** _more_          */
+    public static final String ARG_COUNT = "count";
+
+    /** _more_          */
+    public static final String ARG_PAGE = "page";
+
+    /** _more_          */
+    public static final String ARG_LATEST = "latest";
+
+    /** _more_          */
+    public static final String ARG_OLDEST = "oldest";
+
+    /** _more_          */
+    public static final String ARG_INCLUSIVE = "inclusive";
+
+    /** _more_          */
+    public static final String ARG_USER = "user";
 
 
 
@@ -106,6 +162,81 @@ public class Slack {
 
     /** _more_ */
     public static final String ATTR_WEBHOOK = "webhook";
+
+
+    /** _more_          */
+    public static final String JSON_OK = "ok";
+
+    /** _more_          */
+    public static final String JSON_ERROR = "error";
+
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param endPoint _more_
+     * @param token _more_
+     *
+     * @return _more_
+     */
+    public static JSONObject call(Repository repository, String endPoint,
+                                  String token) {
+        return call(repository, endPoint, token, null);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param endPoint _more_
+     * @param token _more_
+     * @param args _more_
+     *
+     * @return _more_
+     */
+    public static JSONObject call(Repository repository, String endPoint,
+                                  String token, String args) {
+        try {
+            if ( !Utils.stringDefined(token)) {
+                System.err.println("Slack.call:" + endPoint + " no token");
+
+                return null;
+            }
+
+            String url = URL_BASE + "/" + endPoint;
+            url += "?" + HtmlUtils.arg(ARG_TOKEN, token);
+            if (Utils.stringDefined(args)) {
+                url += "&" + args;
+            }
+            //            System.err.println ("Slack api call:" + url);
+            System.err.println("Slack.call:" + url);
+            String json = IOUtil.readContents(new URL(url));
+            if (json == null) {
+                return null;
+            }
+            JSONObject obj = new JSONObject(json);
+            if (debug) {
+                System.err.println("JSON:" + json);
+            }
+            if ( !Json.readValue(obj, Slack.JSON_OK,
+                                 "false").equals("true")) {
+                String error = Json.readValue(obj, Slack.JSON_ERROR, "");
+                repository.getLogManager().logError(
+                    "Error calling Slack API:" + endPoint + " error:"
+                    + error, null);
+
+                return null;
+            }
+
+            return obj;
+        } catch (Exception exc) {
+            repository.getLogManager().logError("Error calling Slack API:"
+                    + endPoint, exc);
+
+            return null;
+        }
+    }
 
 
     /**
@@ -155,7 +286,8 @@ public class Slack {
         formEntries.add(HttpFormEntry.hidden(SLACK_PAYLOAD, json.toString()));
         System.err.println("SlackHarvester: posting to slack");
         String[] result = HttpFormEntry.doPost(formEntries, webHook);
-        System.err.println("SlackHarvester: results:" + result[0] + " " + result[1]);
+        System.err.println("SlackHarvester: results:" + result[0] + " "
+                           + result[1]);
 
         return new Result("", new StringBuffer(""));
     }
@@ -271,6 +403,7 @@ public class Slack {
             maps.add(Json.map(map));
         }
         String attachments = Json.list(maps);
+
         //        System.err.println("attachments:" + attachments);
         return attachments;
     }
@@ -349,6 +482,62 @@ public class Slack {
             throws Exception {
         return request.getAbsoluteUrl(
             request.entryUrl(request.getRepository().URL_ENTRY_SHOW, entry));
+    }
+
+    /**
+     * _more_
+     *
+     * @param s _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Date getDate(String s) throws Exception {
+        double milliseconds = 1000 * Double.parseDouble(s);
+
+        return new Date((long) milliseconds);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param teamDomain _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static URL getTeamUrl(String teamDomain) throws Exception {
+        return new URL("https://" + teamDomain + ".slack.com/messages");
+    }
+
+    /**
+     * _more_
+     *
+     * @param teamDomain _more_
+     * @param channelId _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static URL getChannelUrl(String teamDomain, String channelId)
+            throws Exception {
+        return new URL(getTeamUrl(teamDomain) + "/" + channelId);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param what _more_
+     *
+     * @return _more_
+     */
+    public static String in(String what) {
+        return "in:" + what;
     }
 
 

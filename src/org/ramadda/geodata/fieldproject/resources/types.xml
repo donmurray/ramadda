@@ -154,7 +154,7 @@
 ==Site Information==
 <table class="formtable">
      {{resource row.label="URL:"  message=""}}
-     {{field name="short_name"  row.label="Short Name"
+     {{field name="short_name"  row.label="Short Name"}}
      {{field name="site_type"   row.label="Site Type"}}
      {{field name="status"      row.label="Status"}}
      {{field name="network"     row.label="Network"}}
