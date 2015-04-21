@@ -447,7 +447,7 @@ public class DbTypeHandler extends BlobTypeHandler {
         Element root = XmlUtil.getRoot("<type></type>");
         Element node = XmlUtil.create("column", root, new String[] {
             "name", "contents", Column.ATTR_TYPE, "clob", Column.ATTR_SIZE,
-            "256000", Column.ATTR_ADDTOFORM, "false", Column.ATTR_SHOWINHTML,
+            "256000", Column.ATTR_SHOWINFORM, "false", Column.ATTR_SHOWINHTML,
             "false"
         });
         List<Element> nodes = new ArrayList<Element>();

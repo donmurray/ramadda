@@ -146,13 +146,13 @@ public class DbAdminHandler extends AdminHandlerImpl {
                 Element idNode = XmlUtil.create(TAG_COLUMN, tableNode,
                                      new String[] {
                     "name", DbTypeHandler.COL_DBID, Column.ATTR_ISINDEX,
-                    "true", Column.ATTR_TYPE, "string", Column.ATTR_ADDTOFORM,
+                    "true", Column.ATTR_TYPE, "string", Column.ATTR_SHOWINFORM,
                     "false"
                 });
                 Element userNode = XmlUtil.create(TAG_COLUMN, tableNode,
                                        new String[] {
                     "name", DbTypeHandler.COL_DBUSER, Column.ATTR_ISINDEX,
-                    "true", Column.ATTR_TYPE, "string", Column.ATTR_ADDTOFORM,
+                    "true", Column.ATTR_TYPE, "string", Column.ATTR_SHOWINFORM,
                     "false", Column.ATTR_CANLIST, "false"
                 });
 
@@ -160,7 +160,7 @@ public class DbAdminHandler extends AdminHandlerImpl {
                                              tableNode, new String[] {
                     "name", DbTypeHandler.COL_DBCREATEDATE,
                     Column.ATTR_ISINDEX, "true", Column.ATTR_TYPE, "datetime",
-                    Column.ATTR_ADDTOFORM, "false", Column.ATTR_CANLIST,
+                    Column.ATTR_SHOWINFORM, "false", Column.ATTR_CANLIST,
                     "false"
                 });
 
@@ -168,7 +168,7 @@ public class DbAdminHandler extends AdminHandlerImpl {
                                         new String[] {
                     "name", DbTypeHandler.COL_DBPROPS, Column.ATTR_ISINDEX,
                     "false", Column.ATTR_SIZE, "5000", Column.ATTR_TYPE,
-                    "string", Column.ATTR_ADDTOFORM, "false",
+                    "string", Column.ATTR_SHOWINFORM, "false",
                     Column.ATTR_CANLIST, "false"
                 });
 
