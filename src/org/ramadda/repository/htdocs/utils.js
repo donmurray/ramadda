@@ -677,8 +677,12 @@ $(window).on('beforeunload', function(){
 function pageIsUnloading() {
     GuiUtils.pageUnloading = true;
     //    console.log("Page is unloading");
-    //Do this for  IE. Not sure why
+    //The old way
+    return  null;
+
+    //The new way for IE?
     window.onbeforeunload=confirmExit;
+
 }
 
 function confirmExit()  {
