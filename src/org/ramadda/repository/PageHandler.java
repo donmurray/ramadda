@@ -2203,7 +2203,8 @@ public class PageHandler extends RepositoryManager {
                     "<span class=\"subheader-sep\">|</span>", links));
         header.append("\n");
         if (Utils.stringDefined(onLabel)) {
-            header.append(HtmlUtils.div(HtmlUtils.h2(msg(onLabel))));
+            header.append(HtmlUtils.div(HtmlUtils.h2(msg(onLabel)), 
+                    HtmlUtils.style("margin-top: .5em")));
         }
         sb.append(HtmlUtils.tag(HtmlUtils.TAG_DIV,
                                 HtmlUtils.cssClass("subheader-container"),
