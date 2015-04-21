@@ -1039,6 +1039,9 @@ public class GenericTypeHandler extends TypeHandler {
         if (values != null) {
             for (Column column : getColumns()) {
                 if (column.isField(name)) {
+                    if (column.isPrivate()) {
+                        return null;
+                    }
                     StringBuilder tmpSB = new StringBuilder();
                     formatColumnHtmlValue(request, entry, column, tmpSB,
                                           values);

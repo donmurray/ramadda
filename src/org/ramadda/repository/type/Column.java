@@ -631,6 +631,15 @@ public class Column implements DataTypes, Constants {
      *
      * @return _more_
      */
+    public boolean isPrivate() {
+        return isType(DATATYPE_PASSWORD);
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public boolean isBoolean() {
         return isType(DATATYPE_BOOLEAN);
     }
