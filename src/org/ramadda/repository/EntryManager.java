@@ -6454,8 +6454,8 @@ public class EntryManager extends RepositoryManager {
                 String   syntheticPart = pair[1];
                 Entry    parentEntry   = null;
                 //                System.err.println ("SYNTH:" + entryId);
-                System.err.println("Parent:" + parentEntryId + " synth part:"
-                                   + syntheticPart + " entryid:" + entryId);
+                //System.err.println("Parent:" + parentEntryId + " synth part:"
+                //                   + syntheticPart + " entryid:" + entryId);
 
                 TypeHandler typeHandler = null;
 
