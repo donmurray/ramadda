@@ -69,6 +69,17 @@
        name="Author"
        searchable="false"
        displaygroup="Authors" 
+       id="metadata_author">
+      <element name="Name"/>
+      <element name="Email"/>
+      <element name="Organization"/>
+    </type>
+
+    <type
+       foruser="false"
+       name="Author"
+       searchable="false"
+       displaygroup="Authors" 
        id="content.author">
       <element name="Author"/>
     </type>

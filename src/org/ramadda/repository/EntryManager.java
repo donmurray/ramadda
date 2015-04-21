@@ -4935,7 +4935,9 @@ public class EntryManager extends RepositoryManager {
                 getRepository().getImportHandlers()) {
             importHandler.addImportTypes(importTypes, extraForm);
         }
-        sb.append(msgHeader("Import " + LABEL_ENTRIES));
+        getPageHandler().entrySectionOpen(request, group, sb,
+                                          msg("Import Entries"), true);
+
         request.uploadFormWithAuthToken(sb,
                                         getRepository().URL_ENTRY_XMLCREATE,
                                         makeFormSubmitDialog(sb,
@@ -4965,6 +4967,8 @@ public class EntryManager extends RepositoryManager {
 
         sb.append(HtmlUtils.formTableClose());
         sb.append(HtmlUtils.formClose());
+
+        getPageHandler().entrySectionClose(request, group, sb);
 
         return makeEntryEditResult(request, group, "Entry Import", sb);
     }
