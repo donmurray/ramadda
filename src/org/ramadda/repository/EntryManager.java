@@ -1643,7 +1643,9 @@ public class EntryManager extends RepositoryManager {
         }
 
         TypeHandler typeHandler = ((entry == null)
-                                   ? (type==null?null:getRepository().getTypeHandler(type))
+                                   ? ((type == null)
+                                      ? null
+                                      : getRepository().getTypeHandler(type))
                                    : entry.getTypeHandler());
 
 
@@ -1658,11 +1660,13 @@ public class EntryManager extends RepositoryManager {
         }
 
 
-        if(entry!=null) {
-            getPageHandler().entrySectionOpen(request,entry, sb, "Edit");
+        if (entry != null) {
+            getPageHandler().entrySectionOpen(request, entry, sb, "Edit");
         } else {
-            getPageHandler().entrySectionOpen(request,null, sb, (typeHandler!=null?msg("Create new") +" " + typeHandler.getLabel():
-                                                                 msg("Create new entry")));
+            getPageHandler().entrySectionOpen(request, null, sb,
+                    ((typeHandler != null)
+                     ? msg("Create new") + " " + typeHandler.getLabel()
+                     : msg("Create new entry")));
         }
 
 
@@ -6445,7 +6449,9 @@ public class EntryManager extends RepositoryManager {
                 String   parentEntryId = pair[0];
                 String   syntheticPart = pair[1];
                 Entry    parentEntry   = null;
-                //                System.err.println("Parent:" + parentEntryId +" synth part:" + syntheticPart);
+                //                System.err.println ("SYNTH:" + entryId);
+                System.err.println("Parent:" + parentEntryId + " synth part:"
+                                   + syntheticPart + " entryid:" + entryId);
 
                 TypeHandler typeHandler = null;
 

@@ -127,7 +127,7 @@ public class Column implements DataTypes, Constants {
     public static final String ATTR_CHANGETYPE = "changetype";
 
     /** _more_ */
-    public static final String ATTR_ADDTOFORM = "addtoform";
+    public static final String ATTR_SHOWINFORM = "showinform";
 
     /** _more_ */
     public static final String ATTR_GROUP = "group";
@@ -334,7 +334,7 @@ public class Column implements DataTypes, Constants {
 
 
     /** _more_ */
-    private boolean addToForm = true;
+    private boolean showInForm = true;
 
     /** _more_ */
     private Hashtable<String, String> properties = new Hashtable<String,
@@ -409,8 +409,7 @@ public class Column implements DataTypes, Constants {
         canSearch      = getAttributeOrTag(element, ATTR_CANSEARCH, false);
         advancedSearch = getAttributeOrTag(element, ATTR_ADVANCED, false);
         editable       = getAttributeOrTag(element, ATTR_EDITABLE, true);
-        addToForm      = getAttributeOrTag(element, ATTR_ADDTOFORM,
-                                           addToForm);
+        showInForm = getAttributeOrTag(element, ATTR_SHOWINFORM, showInForm);
         canShow        = getAttributeOrTag(element, ATTR_SHOWINHTML, canShow);
         showLabel      = getAttributeOrTag(element, ATTR_SHOWLABEL,
                                            showLabel);
@@ -1732,7 +1731,7 @@ public class Column implements DataTypes, Constants {
                                Appendable formBuffer, Object[] values,
                                Hashtable state, FormInfo formInfo)
             throws Exception {
-        if ( !addToForm) {
+        if ( !showInForm) {
             return;
         }
         String widget = getFormWidget(request, entry, values, formInfo);
@@ -1941,7 +1940,10 @@ public class Column implements DataTypes, Constants {
             if (values != null) {
                 value = "" + toString(values, offset);
             }
-            widget = HtmlUtils.password(urlArg, value, HtmlUtils.SIZE_10);
+            widget = HtmlUtils.password(urlArg, value,
+                                        HtmlUtils.attr("size", ((columns > 0)
+                    ? "" + columns
+                    : "10")));
         } else if (isType(DATATYPE_FILE)) {
             String value = ((dflt != null)
                             ? dflt
@@ -2164,7 +2166,7 @@ public class Column implements DataTypes, Constants {
     public void setValue(Request request, Entry entry, Object[] values)
             throws Exception {
 
-        if ( !addToForm || !editable) {
+        if ( !showInForm || !editable) {
             //            System.err.println ("not adding to form" );
             return;
         }
@@ -3024,8 +3026,8 @@ public class Column implements DataTypes, Constants {
      *
      * @return _more_
      */
-    public boolean getAddToForm() {
-        return addToForm;
+    public boolean getShowInForm() {
+        return showInForm;
     }
 
     /**
@@ -3052,9 +3054,9 @@ public class Column implements DataTypes, Constants {
      */
     public String getAttributeOrTag(Element node, String attrOrTag,
                                     String dflt)
-        throws Exception {
+            throws Exception {
         String attrValue = Utils.getAttributeOrTag(node, attrOrTag,
-                                                   (String) null);
+                               (String) null);
         if (attrValue != null) {
             properties.put(attrOrTag, attrValue);
 
@@ -3078,7 +3080,7 @@ public class Column implements DataTypes, Constants {
      */
     private boolean getAttributeOrTag(Element node, String attrOrTag,
                                       boolean dflt)
-        throws Exception {
+            throws Exception {
         String attrValue = getAttributeOrTag(node, attrOrTag, (String) null);
         if (attrValue == null) {
             return dflt;
@@ -3100,7 +3102,7 @@ public class Column implements DataTypes, Constants {
      * @throws Exception _more_
      */
     private int getAttributeOrTag(Element node, String attrOrTag, int dflt)
-        throws Exception {
+            throws Exception {
         String attrValue = getAttributeOrTag(node, attrOrTag, (String) null);
         if (attrValue == null) {
             return dflt;
@@ -3123,7 +3125,7 @@ public class Column implements DataTypes, Constants {
      */
     public double getAttributeOrTag(Element node, String attrOrTag,
                                     double dflt)
-        throws Exception {
+            throws Exception {
         String attrValue = getAttributeOrTag(node, attrOrTag, (String) null);
         if (attrValue == null) {
             return dflt;

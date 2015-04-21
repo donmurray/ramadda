@@ -2067,6 +2067,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
             List<Entry> children = getEntries(request, originalEntry, entry,
                                        props);
+
             if (children.size() == 0) {
                 return null;
             }
@@ -4306,7 +4307,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         String displayType = Misc.getProperty(props, "type", "linechart");
         props.remove("type");
 
- 
+
         for (Enumeration keys = props.keys(); keys.hasMoreElements(); ) {
             Object key   = keys.nextElement();
             Object value = props.get(key);
@@ -4540,7 +4541,12 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         }
     }
 
-    public static void main(String[]args) {
+    /**
+     * _more_
+     *
+     * @param args _more_
+     */
+    public static void main(String[] args) {
         String s = "hello there\n//some comment\nand after the comment";
         s = s.replaceAll("(?m)^//[^$]*$", "");
         System.err.println(s);

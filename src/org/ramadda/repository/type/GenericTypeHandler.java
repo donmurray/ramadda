@@ -343,7 +343,9 @@ public class GenericTypeHandler extends TypeHandler {
         //For now we just assume each column has a single value
         int idx = 0;
         for (Column column : columns) {
-            Object data = map.get(column.getName());
+            Object data = ((map == null)
+                           ? null
+                           : map.get(column.getName()));
             values[idx] = data;
             idx++;
         }
@@ -1287,7 +1289,7 @@ public class GenericTypeHandler extends TypeHandler {
             throws Exception {
         boolean hasValue = column.getString(values) != null;
 
-        if ( !column.getAddToForm()) {
+        if ( !column.getShowInForm()) {
             return;
         }
         if ((entry != null) && hasValue && !column.getEditable()) {
