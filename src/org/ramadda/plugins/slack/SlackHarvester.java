@@ -55,6 +55,15 @@ import java.util.Properties;
 public class SlackHarvester extends Harvester {
 
     /** _more_ */
+    public static final String ATTR_TOKENS = "tokens";
+
+    /** _more_ */
+    public static final String ATTR_WEBHOOK = "webhook";
+
+    public static final String ATTR_ALLOW_CREATE = "allow_create";
+
+
+    /** _more_ */
     public static final String CMD_SEARCH = "search";
 
     /** _more_ */
@@ -75,11 +84,7 @@ public class SlackHarvester extends Harvester {
     /** _more_ */
     public static final String CMD_NEW = "new";
 
-    /** _more_ */
-    public static final String CMD_DOWNLOAD = "download";
-
-
-
+    public static final String CMD_GET = "get";
 
 
     /** plain old command is a slack argument so we use ramadda_command */
@@ -93,6 +98,9 @@ public class SlackHarvester extends Harvester {
 
     /** _more_ */
     private String webHook;
+
+
+    private boolean allowCreate = false;
 
 
     /** _more_ */
@@ -145,8 +153,9 @@ public class SlackHarvester extends Harvester {
      */
     protected void init(Element element) throws Exception {
         super.init(element);
-        tokens  = Utils.getAttributeOrTag(element, Slack.ATTR_TOKENS, tokens);
-        webHook = XmlUtil.getAttribute(element, Slack.ATTR_WEBHOOK, webHook);
+        tokens  = Utils.getAttributeOrTag(element, ATTR_TOKENS, tokens);
+        webHook = XmlUtil.getAttribute(element, ATTR_WEBHOOK, webHook);
+        allowCreate = XmlUtil.getAttribute(element, ATTR_ALLOW_CREATE, false);
     }
 
 
@@ -172,13 +181,14 @@ public class SlackHarvester extends Harvester {
     public void applyState(Element element) throws Exception {
         super.applyState(element);
         if (tokens != null) {
-            Element node = XmlUtil.create(Slack.ATTR_TOKENS, element);
+            Element node = XmlUtil.create(ATTR_TOKENS, element);
             node.appendChild(XmlUtil.makeCDataNode(node.getOwnerDocument(),
                     tokens, false));
-            //            element.setAttribute(Slack.ATTR_TOKENS, tokens);
+            //            element.setAttribute(ATTR_TOKENS, tokens);
         }
+        element.setAttribute(ATTR_ALLOW_CREATE, allowCreate +"");
         if (webHook != null) {
-            element.setAttribute(Slack.ATTR_WEBHOOK, webHook);
+            element.setAttribute(ATTR_WEBHOOK, webHook);
         }
     }
 
@@ -192,8 +202,9 @@ public class SlackHarvester extends Harvester {
      */
     public void applyEditForm(Request request) throws Exception {
         super.applyEditForm(request);
-        tokens  = request.getString(Slack.ATTR_TOKENS, tokens);
-        webHook = request.getString(Slack.ATTR_WEBHOOK, webHook);
+        tokens  = request.getString(ATTR_TOKENS, tokens);
+        webHook = request.getString(ATTR_WEBHOOK, webHook);
+        allowCreate = request.get(ATTR_ALLOW_CREATE, allowCreate);
     }
 
 
@@ -211,18 +222,21 @@ public class SlackHarvester extends Harvester {
 
         addBaseGroupSelect(ATTR_BASEGROUP, sb);
         sb.append(HtmlUtils.formEntry(msgLabel("Slack Tokens"),
-                                      HtmlUtils.textArea(Slack.ATTR_TOKENS,
+                                      HtmlUtils.textArea(ATTR_TOKENS,
                                           (tokens == null)
                                           ? ""
                                           : tokens, 4, 60) + " "
                                           + "Tokens from Slack. One per line"));
 
         sb.append(HtmlUtils.formEntry(msgLabel("Slack Web Hook URL"),
-                                      HtmlUtils.input(Slack.ATTR_WEBHOOK,
+                                      HtmlUtils.input(ATTR_WEBHOOK,
                                           (webHook == null)
                                           ? ""
                                           : webHook, HtmlUtils.SIZE_70)));
 
+        sb.append(HtmlUtils.formEntry("",
+                                      HtmlUtils.checkbox(ATTR_ALLOW_CREATE, "true", allowCreate) +" " +
+                                      msgLabel("Allow creating wiki pages, notes, blog posts, etc")));
     }
 
 
@@ -301,9 +315,14 @@ public class SlackHarvester extends Harvester {
                 result = processPwd(request, text);
             } else if (cmd.equals(CMD_DESC)) {
                 result = processDesc(request, text);
+            } else if (cmd.equals(CMD_GET)) {
+                result = processGet(request, text);
             } else if (cmd.equals(CMD_APPEND)) {
                 result = processAppend(request, text);
             } else if (cmd.equals(CMD_NEW)) {
+                if(!allowCreate) {
+                    return new Result("", new StringBuilder("Sorry, but creating new entries is not allowed"));
+                }
                 result = processNew(request, text);
             } else if (cmd.equals(CMD_CD)) {
                 result = processCd(request, text);
@@ -376,6 +395,18 @@ public class SlackHarvester extends Harvester {
 
         return Slack.makeEntryResult(getRepository(), request, desc, null,
                                      webHook);
+    }
+
+
+    //TODO:
+    private Result processGet(Request request, String text)
+            throws Exception {
+        Entry entry = getCurrentEntry(request);
+        if (entry == null) {
+            return getUsage(request, "No current entry");
+        }
+        return new Result("",new StringBuilder("ok"));
+        //        return Slack.makeEntryResult(getRepository(), request, desc, null,  webHook);
     }
 
 

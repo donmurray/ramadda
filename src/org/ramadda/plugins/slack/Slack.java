@@ -159,11 +159,6 @@ public class Slack {
     /** _more_ */
     public static final String SLACK_TRIGGER_WORD = "trigger_word";
 
-    /** _more_ */
-    public static final String ATTR_TOKENS = "tokens";
-
-    /** _more_ */
-    public static final String ATTR_WEBHOOK = "webhook";
 
 
     /** _more_          */
