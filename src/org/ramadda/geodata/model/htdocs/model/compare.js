@@ -51,11 +51,15 @@ function CollectionForm(formId, type, args) {
                             return;
                         }
                     }
-                    //A hack for now but 
                     if(this.type == 'radio') {
                         if(!$(this).is(':checked')) {
                             return;
                         }
+                    }
+                    if(this.type == "checkbox") {
+                        if(!$(this).is(':checked')) {
+                            return;
+                        } 
                     }
                     if(typeof value === "string") {
                        value = [value];

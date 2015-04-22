@@ -84,15 +84,15 @@ public class NCLModelPlotDataProcess extends Service {
 
     /** contour lines */
     private static final String ARG_NCL_CLINES = ARG_NCL_PREFIX
-                                                 + "contourlines";
+                                                 + "clines";
 
     /** contour labels */
     private static final String ARG_NCL_CLABELS = ARG_NCL_PREFIX
-                                                  + "contourlabels";
+                                                  + "clabels";
 
     /** colorfill */
     private static final String ARG_NCL_CFILL = ARG_NCL_PREFIX
-                                                + "contourfill";
+                                                + "cfill";
 
     /** list of colormaps */
     private List colormaps = null;
@@ -326,17 +326,17 @@ public class NCLModelPlotDataProcess extends Service {
         // Contour options
         StringBuilder contourOpts = new StringBuilder();
         contourOpts.append(HtmlUtils.labeledCheckbox(ARG_NCL_CFILL, "true",
-                request.get(ARG_NCL_CFILL, true), "Color-fill"));
+                request.get(ARG_NCL_CFILL, request.defined(ARG_NCL_CFILL)), "Color-fill"));
         contourOpts.append(HtmlUtils.space(3));
-        contourOpts.append(HtmlUtils.labeledCheckbox(ARG_NCL_CLINES, "false",
-                request.get(ARG_NCL_CLINES, false), "Lines"));
+        contourOpts.append(HtmlUtils.labeledCheckbox(ARG_NCL_CLINES, "true",
+                request.get(ARG_NCL_CLINES, request.defined(ARG_NCL_CLINES)), "Lines"));
         contourOpts.append(HtmlUtils.space(3));
         contourOpts.append(HtmlUtils.labeledCheckbox(ARG_NCL_CLABELS, "true",
-                request.get(ARG_NCL_CLABELS, false), "Labels"));
+                request.get(ARG_NCL_CLABELS, request.defined(ARG_NCL_CLABELS)), "Labels"));
         // Contour interval
         //StringBuilder contourSB = new StringBuilder();
         contourOpts.append("</p>");
-        contourOpts.append(HtmlUtils.bold(Repository.msg("Override Defaults: ")));
+        contourOpts.append(HtmlUtils.bold(Repository.msg("Override Defaults:")));
         contourOpts.append("<br>");
         contourOpts.append(Repository.msg("Interval: "));
         contourOpts.append(HtmlUtils.makeLatLonInput(ARG_NCL_CINT,
@@ -644,7 +644,7 @@ public class NCLModelPlotDataProcess extends Service {
         envMap.put("clabels",
                    Boolean.toString(request.get(ARG_NCL_CLABELS, false)));
         envMap.put("cfill",
-                   Boolean.toString(request.get(ARG_NCL_CFILL, true)));
+                   Boolean.toString(request.get(ARG_NCL_CFILL, false)));
         envMap.put("anom", Boolean.toString(haveAnom || isCorrelation));
         envMap.put(
             "annotation",

@@ -487,7 +487,7 @@ public class TimeSeriesCorrelation extends CDODataProcess {
             throw new Exception("Illegal data type");
         }
 
-        List<ServiceOperand> outputEntries = new ArrayList<ServiceOperand>();
+        List<ServiceOperand> outputOperands = new ArrayList<ServiceOperand>();
         List<Entry>          gridEntries   = new ArrayList<Entry>();
         List<Entry>          tsEntries     = new ArrayList<Entry>();
         for (Entry oneOfThem : input.getEntries()) {
@@ -500,14 +500,14 @@ public class TimeSeriesCorrelation extends CDODataProcess {
             }
         }
         for (Entry tsEntry : tsEntries) {
-            outputEntries.add(processTimeSeriesData(request, input, tsEntry));
+            outputOperands.add(processTimeSeriesData(request, input, tsEntry));
         }
 
         for (Entry gridEntry : gridEntries) {
-            outputEntries.add(processModelData(request, input, gridEntry, 0));
+            outputOperands.add(processModelData(request, input, gridEntry, 0));
         }
 
-        return new ServiceOutput(outputEntries);
+        return new ServiceOutput(outputOperands);
     }
 
     /**

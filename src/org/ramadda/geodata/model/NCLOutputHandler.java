@@ -35,11 +35,13 @@ import ucar.nc2.dt.grid.GridDataset;
 import ucar.unidata.geoloc.LatLonRect;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
+import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -129,6 +131,9 @@ public class NCLOutputHandler extends OutputHandler {
     /** the resources directory */
     private String resourceDir;
 
+    /** the resources directory */
+    private String cmapDir;
+
     /** the path to NCL program */
     private String ncargRoot;
 
@@ -165,6 +170,7 @@ public class NCLOutputHandler extends OutputHandler {
         convertPath = getProperty(PROP_CONVERT_PATH, "convert");
         resourceDir = IOUtil.joinDir(getStorageManager().getResourceDir(),
                                      "ncl");
+        cmapDir = IOUtil.joinDir(resourceDir, "colormaps");
     }
 
     /**
@@ -183,8 +189,10 @@ public class NCLOutputHandler extends OutputHandler {
         convertPath = getProperty(PROP_CONVERT_PATH, "convert");
         resourceDir = IOUtil.joinDir(getStorageManager().getResourceDir(),
                                      "ncl");
+        cmapDir = IOUtil.joinDir(resourceDir, "colormaps");
         if (ncargRoot != null) {
-            // write out the templates
+            // write out the scripts
+            StorageManager.makeDir(resourceDir);
             for (int i = 0; i < SCRIPTS.length; i++) {
                 String nclScript =
                     getStorageManager().readSystemResource(
@@ -197,7 +205,6 @@ public class NCLOutputHandler extends OutputHandler {
                 nclScript = nclScript.replaceAll("\\$NCL_RESOURCES",
                         resourceDir);
                 nclScript = nclScript.replaceAll("%convert%", convertPath);
-                StorageManager.makeDir(resourceDir);
                 File outputFile = new File(IOUtil.joinDir(resourceDir,
                                       SCRIPTS[i]));
                 InputStream is =
@@ -207,6 +214,36 @@ public class NCLOutputHandler extends OutputHandler {
                         outputFile);
                 IOUtil.writeTo(is, os);
             }
+            // write out the colormaps
+            StorageManager.makeDir(cmapDir);
+            String list =
+                getRepository().getResource(
+                    "/org/ramadda/geodata/model/resources/ncl/colormaps.txt");
+            List<String> cmaps = StringUtil.split(list, "\n", true, true);
+            for (String cmap : cmaps) {
+                List<String> toks = StringUtil.split(cmap);
+                String rgbfile = toks.get(0)+".rgb";
+                String cmapresource;
+                try {
+                    cmapresource =
+                        getStorageManager().readSystemResource(
+                            "/org/ramadda/geodata/model/resources/ncl/colormaps/"
+                            + rgbfile);
+                    if ((cmapresource == null) || cmapresource.isEmpty()) {
+                        continue;
+                    }    
+                } catch (IOException ioe) {
+                    continue;
+                }
+                File outputFile = new File(IOUtil.joinDir(cmapDir, rgbfile));
+                InputStream is =
+                    new ByteArrayInputStream(cmapresource.getBytes());
+                OutputStream os =
+                    getStorageManager().getUncheckedFileOutputStream(
+                        outputFile);
+                IOUtil.writeTo(is, os);
+            }
+        
         }
     }
 
@@ -613,5 +650,7 @@ sb.append(HtmlUtils.form(formUrl,
         envMap.put("NCARG_ROOT", ncargRoot);
         envMap.put("NCARG_USRRESFILE",
                    IOUtil.joinDir(resourceDir, SCRIPT_HLURESFILE));
+        envMap.put("NCARG_COLORMAPS", cmapDir+":"+
+                   IOUtil.joinDir(ncargRoot, "lib/ncarg/colormaps"));
     }
 }

@@ -702,8 +702,10 @@ begin
   ;data = readdata(files(0), opts) 
   data = files(0,:,:)
   plots = new(numfiles,graphic)
-  dodiff = opts@outtype .eq. "diff" .and. numfiles .eq. 2
+  outtype = opts@outtype
+  dodiff = outtype .eq. "diff" .and. numfiles .eq. 2
   isanom = opts@isanom
+  addAnom = isanom .and. .not. (outtype .eq. "regression" .or. outtype .eq. "correlation")
   doGoogle = (opts@plottype .eq. "kmz")
   doPanel = (.not. dodiff) .and. (.not. doGoogle) .and. numfiles .gt. 1 
   plottitles = opts@titles
@@ -766,7 +768,7 @@ begin
   
   ; contour stuff
   rescf@gsnSpreadColors = True
-  rescf@cnFillOn= True          ; color fill
+  rescf@cnFillOn= opts@cfill
   rescf@cnFillMode= "AreaFill"  
 
   ; labelbar
@@ -778,6 +780,8 @@ begin
 
   rescf@tiMainFontHeightF=0.017
   rescf@tiMainFontThicknessF=.8
+  rescf@tmXTOn          = False
+  rescf@tmYROn          = False
   rescf@tmXBLabelFontHeightF=0.011
   rescf@tmYLLabelFontHeightF=0.011
   cint = opts@cint
@@ -787,6 +791,14 @@ begin
     rescf@cnLevelSpacingF = opts@cint
     rescf@cnMinLevelValF = opts@cmin
     rescf@cnMaxLevelValF = opts@cmax
+  else
+    if (outtype .eq. "correlation") then
+        rescf@cnLevelSelectionMode = "ManualLevels"
+        rescf@cnLevelSpacingF = 0.1
+        rescf@cnMinLevelValF = -1.0
+        rescf@cnMaxLevelValF = 1.0
+        cint = 0.1
+    end if
   end if
 
   
@@ -828,7 +840,8 @@ begin
     ;rescf@vpYF = .95
     ;rescf@vpWidthF = .85
     ;rescf@vpHeightF= .5*ratio
-    rescf@cnLineLabelsOn=False
+    rescf@cnLinesOn=opts@clines
+    rescf@cnLineLabelsOn=opts@clabels
     rescf@cnLineLabelPlacementMode = "Computed"
     rescf@cnLineLabelAngleF=0
     rescf@cnConstFLabelFontHeightF=0.010
@@ -863,7 +876,9 @@ begin
       newindex = NhlNewColor(wks,1.0,1.0,1.0)
       rescf@gsnCnMissingColor = newindex
     end if
-    gsn_reverse_colormap(wks)
+    if (opts@colormap .eq."testcmap") then
+        gsn_reverse_colormap(wks)
+    end if
   end if
   level = opts@level
   if (isatt(opts,"levelunit")) then
@@ -898,7 +913,7 @@ begin
     rescf@tiMainString        = plottitle
     mydata = data(0,:,:)
     mydata = mask_data(mydata,masktype,maskdata)
-    rescf@gsnLeftString = setvartitle(mydata, opts, isanom, level, levelunit)
+    rescf@gsnLeftString = setvartitle(mydata, opts, addAnom, level, levelunit)
     if (doGoogle) then
       set_kml_map_defaults(rescf) ; turn off many options
       ;;rescf@lbTitleString = rescf@gsnLeftString
@@ -928,7 +943,7 @@ begin
     if (.not. doGoogle) then
       ;mydata = data(0,:,:)
       mydata = mask_data(data,masktype,maskdata)
-      rescf@gsnLeftString = setvartitle(mydata, opts, isanom, level, levelunit)
+      rescf@gsnLeftString = setvartitle(mydata, opts, addAnom, level, levelunit)
       if ((.not. ismissing(plottitles(0))) .and. (plottitles(0) .ne. "")) then
         rescf@tiMainString        = plottitles(0)
       end if
@@ -959,7 +974,7 @@ begin
       do i = 1,numfiles-1
         mydata = files(i,:,:)
         mydata = mask_data(mydata,masktype,maskdata)
-        rescf@gsnLeftString = setvartitle(mydata, opts, isanom, level, levelunit)
+        rescf@gsnLeftString = setvartitle(mydata, opts, addAnom, level, levelunit)
         if ((.not. ismissing(plottitles(i))) .and. (plottitles(i) .ne. "")) then
           rescf@tiMainString        = plottitles(i)
         end if
@@ -991,7 +1006,7 @@ begin
       ;; Make the first plot to get the labelbar
       mydata = mask_data(data,masktype,maskdata)
 ;;      ;; make title for labelbar
-;;      vartitle = setvartitle(mydata, opts, isanom, level, levelunit)
+;;      vartitle = setvartitle(mydata, opts, addAnom, level, levelunit)
 
       name="Plot 1"
       if ((.not. ismissing(plottitles(0))) .and. (plottitles(0) .ne. "")) then
@@ -1233,7 +1248,7 @@ end
 ;************************************************
 ; Procedure: plotcorr
 ;
-; Purpose: plot correlation map(s)
+; Purpose: plot correlation/regression map(s)
 ;
 ; Params:  files  - the data files to plot
 ;          wks_name - workstation name
@@ -1296,15 +1311,24 @@ begin
       ;printVarSummary(ncdata)
     end if
   end do
-  corr = escorc_n(values,ncdata,0,0)
+  if (opts@outtype .eq. "regression") then
+    corr = regCoef_n(values,ncdata,0,0)
+  else
+    corr = escorc_n(values,ncdata,0,0)
+  end if
   corr!0  = "lat"
   corr!1  = "lon"
   corr&lat = ncdata&lat
   corr&lon = ncdata&lon
   corr@units=""
-  corr@long_name="Correlation"
+  if (opts@outtype .eq. "regression") then
+    corr@long_name="Regression"
+  else
+    corr@long_name="Correlation"
+  end if
   
-  ;printVarSummary(corr)
+  printVarSummary(corr)
+  printMinMax(corr,True)
   shape = dimsizes(corr)
   cdata = new((/1,shape(0),shape(1)/),float)
   cdata(0,:,:) = corr
@@ -1496,6 +1520,27 @@ begin
      meridian = meridian - 360
   end if
 
+  temp =getenv("cfill")
+  if (.not. ismissing(temp)) then
+    cfill = temp .eq. "true"
+  else
+    cfill = True
+  end if
+  
+  temp =getenv("clines")
+  if (.not. ismissing(temp)) then
+    clines = temp .eq. "true"
+  else
+    clines = False
+  end if
+  
+  temp = getenv("clabels")
+  if (.not. ismissing(temp)) then
+    clabels = temp .eq. "true"
+  else
+    clabels = False
+  end if
+  
   options = True
   options@plottype=plotType
   options@outtype=outType
@@ -1518,8 +1563,11 @@ begin
   options@usepolar=usepolar
   options@meridian=meridian
   options@logo=logo
+  options@cfill=cfill
+  options@clines=clines
+  options@clabels=clabels
   
-  if (outType .eq. "corr") then
+  if (outType .eq. "correlation" .or. (outType.eq."regression")) then
       plotcorr(ncfiles, wks_name, "png", options)
   else
       plotcomp(ncfiles, wks_name, "png", options)
