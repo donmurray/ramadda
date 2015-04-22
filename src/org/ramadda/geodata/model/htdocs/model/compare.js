@@ -58,7 +58,7 @@ function CollectionForm(formId, type, args) {
                     }
                     if(this.type == "checkbox") {
                         if(!$(this).is(':checked')) {
-                            return;
+                            value = "false";
                         } 
                     }
                     if(typeof value === "string") {

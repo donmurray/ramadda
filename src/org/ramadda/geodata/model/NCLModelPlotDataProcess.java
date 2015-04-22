@@ -326,13 +326,13 @@ public class NCLModelPlotDataProcess extends Service {
         // Contour options
         StringBuilder contourOpts = new StringBuilder();
         contourOpts.append(HtmlUtils.labeledCheckbox(ARG_NCL_CFILL, "true",
-                request.get(ARG_NCL_CFILL, request.defined(ARG_NCL_CFILL)), "Color-fill"));
+                request.get(ARG_NCL_CFILL, true), "Color-fill"));
         contourOpts.append(HtmlUtils.space(3));
         contourOpts.append(HtmlUtils.labeledCheckbox(ARG_NCL_CLINES, "true",
-                request.get(ARG_NCL_CLINES, request.defined(ARG_NCL_CLINES)), "Lines"));
+                request.get(ARG_NCL_CLINES, false), "Lines"));
         contourOpts.append(HtmlUtils.space(3));
         contourOpts.append(HtmlUtils.labeledCheckbox(ARG_NCL_CLABELS, "true",
-                request.get(ARG_NCL_CLABELS, request.defined(ARG_NCL_CLABELS)), "Labels"));
+                request.get(ARG_NCL_CLABELS, false), "Labels"));
         // Contour interval
         //StringBuilder contourSB = new StringBuilder();
         contourOpts.append("</p>");
