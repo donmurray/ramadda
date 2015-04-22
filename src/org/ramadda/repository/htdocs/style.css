@@ -82,7 +82,7 @@ h2 a,   h2 a:visited {
 
 
 .ramadda-section h2 {
-   font-weight: 300;
+//   font-weight: 300;
 }
 
 .ramadda-section-header {
@@ -2592,8 +2592,8 @@ a.toggleblocklabellink:visited {
 
 .wiki-h3, .wiki-h4, .wiki-h5, .wiki-h6 {
 	border-bottom: none;
-        font-weight: 500;
-//	font-weight: bold;
+//        font-weight: 500;
+	font-weight: bold;
 }
 .wiki-h3 { xfont-size: 130%; }
 .wiki-h4 { xfont-size: 110%; color: #888;}
