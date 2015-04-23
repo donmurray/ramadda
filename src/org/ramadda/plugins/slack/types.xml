@@ -2,7 +2,8 @@
 
   <type name="slack_team"  description="Slack Team" handler="org.ramadda.plugins.slack.SlackTeamTypeHandler"  >
      <property name="icon" value="/slack/slack.png"/>
-     <property name="form.name.label" value="Team Name"/>
+     <property name="form.description.label" value="Team Description"/>
+     <property name="form.name.show" value="false"/>
      <property name="form.resource.show" value="false"/>
      <property name="form.file.show" value="false"/>
      <property name="form.area.show" value="false"/>
@@ -10,7 +11,7 @@
      <property name="form.date.show" value="false"/>
      <column name="team_id" type="string"  label="Team ID"  showinform="false" />
      <column name="team_domain" type="string"  label="Team Domain" showinform="false" />
-     <column name="token" type="password"  label="Authentication Token" columns="60" />
+     <column name="token" type="password"  label="Authentication Token" columns="60" suffix="&lt;a target=&quot;_help&quot; href=&quot;${urlroot}/slack/import.html&quot;&gt;Help&lt;/a&gt;"/>
      <column name="channels_to_show"  showinhtml="false" size="500" rows="5" type="string"  label="Channels to display" suffix="Enter the Slack channel IDS for the channels you want to show" />
      <wiki><![CDATA[
 {{noheading}}

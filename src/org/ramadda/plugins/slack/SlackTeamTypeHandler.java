@@ -87,15 +87,16 @@ public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
                                         Entry parent, boolean newEntry)
             throws Exception {
         super.initializeEntryFromForm(request, entry, parent, newEntry);
+        /*
         if ( !newEntry) {
             return;
         }
+        */
 
         String token = (String) entry.getValue(IDX_TOKEN);
         if ( !Utils.stringDefined(token)) {
             return;
         }
-
 
 
         JSONObject result = Slack.call(getRepository(), Slack.API_TEAM_INFO,

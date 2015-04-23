@@ -64,27 +64,28 @@ public class SlackHarvester extends Harvester {
 
 
     /** _more_ */
-    public static final String CMD_SEARCH = "search";
+    public static final String[] CMDS_SEARCH = {"search","find"};
 
     /** _more_ */
-    public static final String CMD_PWD = "pwd";
+    public static final String[] CMDS_PWD = {"pwd","dir"};
+
 
     /** _more_ */
-    public static final String CMD_DESC = "desc";
+    public static final String[] CMDS_DESC = {"desc"};
 
     /** _more_ */
-    public static final String CMD_APPEND = "append";
+    public static final String []CMDS_APPEND = {"append"};
 
     /** _more_ */
-    public static final String CMD_LS = "ls";
+    public static final String[] CMDS_LS = {"ls","dir"};
 
     /** _more_ */
-    public static final String CMD_CD = "cd";
+    public static final String[] CMDS_CD = {"cd","go"};
 
     /** _more_ */
-    public static final String CMD_NEW = "new";
+    public static final String[] CMDS_NEW = {"new","create"};
 
-    public static final String CMD_GET = "get";
+    public static final String[] CMDS_GET = {"get"};
 
 
     /** plain old command is a slack argument so we use ramadda_command */
@@ -133,6 +134,16 @@ public class SlackHarvester extends Harvester {
         super(repository, node);
     }
 
+
+    public boolean isCommand(String command, String[] commands) {
+        if(command == null) return false;
+        for(String s: commands) {
+            if(s.equals(command)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     /**
      * _more_
@@ -307,24 +318,24 @@ public class SlackHarvester extends Harvester {
             }
 
             debug("checking command:" + cmd);
-            if (cmd.equals(CMD_SEARCH)) {
+            if (isCommand(cmd,CMDS_SEARCH)) {
                 result = processSearch(request, text);
-            } else if (cmd.equals(CMD_LS)) {
+            } else if (isCommand(cmd, CMDS_LS)) {
                 result = processLs(request, text);
-            } else if (cmd.equals(CMD_PWD)) {
+            } else if (isCommand(cmd, CMDS_PWD)) {
                 result = processPwd(request, text);
-            } else if (cmd.equals(CMD_DESC)) {
+            } else if (isCommand(cmd,CMDS_DESC)) {
                 result = processDesc(request, text);
-            } else if (cmd.equals(CMD_GET)) {
+            } else if (isCommand(cmd,CMDS_GET)) {
                 result = processGet(request, text);
-            } else if (cmd.equals(CMD_APPEND)) {
+            } else if (isCommand(cmd,CMDS_APPEND)) {
                 result = processAppend(request, text);
-            } else if (cmd.equals(CMD_NEW)) {
+            } else if (isCommand(cmd, CMDS_NEW)) {
                 if(!allowCreate) {
                     return new Result("", new StringBuilder("Sorry, but creating new entries is not allowed"));
                 }
                 result = processNew(request, text);
-            } else if (cmd.equals(CMD_CD)) {
+            } else if (isCommand(cmd, CMDS_CD)) {
                 result = processCd(request, text);
             } else {
                 result = getUsage(request, "Unknown command: " + cmd);
