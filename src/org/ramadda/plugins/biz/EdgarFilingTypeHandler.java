@@ -4,7 +4,7 @@
  * ramadda_license.txt. The above copyright notice shall be included in all copies or substantial portions of the Software.
  */
 
-package org.ramadda.plugins.edgar;
+package org.ramadda.plugins.biz;
 
 
 import org.ramadda.repository.*;
