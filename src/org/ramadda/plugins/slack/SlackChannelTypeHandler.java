@@ -43,16 +43,16 @@ import java.util.List;
  */
 public class SlackChannelTypeHandler extends ExtensibleGroupTypeHandler {
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_CHANNEL_ID = 0;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_CHANNEL_PURPOSE = 1;
 
-    /** _more_          */
+    /** _more_ */
     private SimpleDateFormat displaySdf = new SimpleDateFormat("HH:mm");
 
-    /** _more_          */
+    /** _more_ */
     private SimpleDateFormat labelSdf = new SimpleDateFormat("MMMMM dd");
 
     /**

@@ -42,7 +42,7 @@ public class SlackSearchProvider extends SearchProvider {
     /** _more_ */
     private String name;
 
-    /** _more_          */
+    /** _more_ */
     private String token;
 
     /**

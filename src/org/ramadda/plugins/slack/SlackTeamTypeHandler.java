@@ -39,23 +39,23 @@ import java.util.List;
  */
 public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
 
-    /** _more_          */
+    /** _more_ */
     private TTLCache<String, Entry> entryCache;
 
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_TEAM_ID = 0;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_TEAM_DOMAIN = 1;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_TOKEN = 2;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_CHANNELS = 3;
 
-    /** _more_          */
+    /** _more_ */
     private SimpleDateFormat displaySdf =
         new SimpleDateFormat("MMMMM dd - HH:mm");
 

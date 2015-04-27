@@ -54,74 +54,102 @@ import java.util.Properties;
  */
 public class Slack {
 
-    /** _more_          */
+    /** _more_ */
     public static boolean debug = false;
 
-    /** _more_          */
+    /** _more_ */
     public static final String URL_BASE = "https://slack.com/api";
 
-    /** _more_          */
+    /** _more_ */
     public static final String URL_SEARCH = URL_BASE + "/search.all";
 
-    /** _more_          */
+    /** _more_ */
     public static final String API_TEAM_INFO = "team.info";
 
-    /** _more_          */
+    /** _more_ */
     public static final String API_CHANNELS_LIST = "channels.list";
 
-    /** _more_          */
+    /** _more_ */
     public static final String API_CHANNELS_INFO = "channels.info";
 
-    /** _more_          */
+    /** _more_ */
     public static final String API_CHANNELS_HISTORY = "channels.history";
 
-    /** _more_          */
+    /** _more_ */
     public static final String API_SEARCH_ALL = "search.all";
 
-    /** _more_          */
+    /** _more_ */
     public static final String API_SEARCH_MESSAGES = "search.messages";
 
-    /** _more_          */
+    /** _more_ */
     public static final String API_SEARCH_FILES = "search.files";
 
     /** _more_          */
+    public static final String API_FILES_UPLOAD = "files.upload";
+
+    /** _more_ */
     public static final String API_USERS_INFO = "users.info";
 
+    /** _more_          */
     public static final String API_RTM_START = "rtm.start";
 
 
-    /** _more_          */
-    public static final String ARG_TOKEN = "token";
-
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_CHANNEL = "channel";
 
     /** _more_          */
-    public static final String ARG_QUERY = "query";
+    public static final String ARG_CHANNELS = "channels";
 
-    /** _more_          */
-    public static final String ARG_SORT = "sort";
 
-    /** _more_          */
-    public static final String ARG_SORT_DIR = "sort_dir";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_COUNT = "count";
 
     /** _more_          */
-    public static final String ARG_PAGE = "page";
+    public static final String ARG_FILE = "file";
 
     /** _more_          */
-    public static final String ARG_LATEST = "latest";
+    public static final String ARG_FILENAME = "filename";
 
-    /** _more_          */
-    public static final String ARG_OLDEST = "oldest";
-
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_INCLUSIVE = "inclusive";
 
     /** _more_          */
+    public static final String ARG_INITIAL_COMMENT = "initial_comment";
+
+    /** _more_ */
+    public static final String ARG_LATEST = "latest";
+
+
+    /** _more_ */
+    public static final String ARG_OLDEST = "oldest";
+
+    /** _more_ */
+    public static final String ARG_PAGE = "page";
+
+    /** _more_ */
+    public static final String ARG_QUERY = "query";
+
+
+    /** _more_ */
+    public static final String ARG_SORT = "sort";
+
+    /** _more_ */
+    public static final String ARG_SORT_DIR = "sort_dir";
+
+    /** _more_          */
+    public static final String ARG_TITLE = "title";
+
+    /** _more_ */
+    public static final String ARG_TOKEN = "token";
+
+
+
+    /** _more_ */
     public static final String ARG_USER = "user";
+
+
+
 
 
 
@@ -147,6 +175,8 @@ public class Slack {
     /** _more_ */
     public static final String SLACK_TIMESTAMP = "timestamp";
 
+
+
     /** _more_ */
     public static final String SLACK_USER_ID = "user_id";
 
@@ -161,10 +191,10 @@ public class Slack {
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String JSON_OK = "ok";
 
-    /** _more_          */
+    /** _more_ */
     public static final String JSON_ERROR = "error";
 
     /**
@@ -180,6 +210,19 @@ public class Slack {
                                   String token) {
         return call(repository, endPoint, token, null);
     }
+
+
+    /**
+     * _more_
+     *
+     * @param endPoint _more_
+     *
+     * @return _more_
+     */
+    public static String getSlackApiUrl(String endPoint) {
+        return URL_BASE + "/" + endPoint;
+    }
+
 
 
     /**
@@ -201,7 +244,7 @@ public class Slack {
                 return null;
             }
 
-            String url = URL_BASE + "/" + endPoint;
+            String url = getSlackApiUrl(endPoint);
             url += "?" + HtmlUtils.arg(ARG_TOKEN, token);
             if (Utils.stringDefined(args)) {
                 url += "&" + args;

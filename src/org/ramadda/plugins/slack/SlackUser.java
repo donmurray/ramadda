@@ -27,20 +27,20 @@ import java.util.Hashtable;
  */
 public class SlackUser {
 
-    /** _more_          */
+    /** _more_ */
     private static Hashtable<String, TTLCache<String, SlackUser>> cache =
         new Hashtable<String, TTLCache<String, SlackUser>>();
 
-    /** _more_          */
+    /** _more_ */
     private String id;
 
-    /** _more_          */
+    /** _more_ */
     private String name;
 
-    /** _more_          */
+    /** _more_ */
     private String image24;
 
-    /** _more_          */
+    /** _more_ */
     private String image48;
 
     /**

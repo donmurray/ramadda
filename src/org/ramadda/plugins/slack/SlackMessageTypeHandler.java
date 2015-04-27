@@ -40,13 +40,13 @@ import java.util.List;
  */
 public class SlackMessageTypeHandler extends GenericTypeHandler {
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_USER_ID = 0;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_USER_NAME = 1;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_USER_IMAGE = 2;
 
     /**
