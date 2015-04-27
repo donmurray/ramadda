@@ -308,7 +308,7 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
 
             connectionURL = connectionURL.trim();
             System.err.println("RAMADDA: DatabaseManager connection url:"
-                               + connectionURL + " user name:" + userName);
+                               + connectionURL + (userName!=null?" user name:" + userName:""));
 
             String encryptPassword =
                 getStorageManager().getEncryptionPassword();
