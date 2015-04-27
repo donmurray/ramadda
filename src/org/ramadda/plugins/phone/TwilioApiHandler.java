@@ -18,8 +18,6 @@ import org.ramadda.util.HtmlUtils;
 
 import org.w3c.dom.*;
 
-import ucar.unidata.ui.HttpFormEntry;
-
 import ucar.unidata.util.IOUtil;
 
 

@@ -9614,7 +9614,7 @@ public class EntryManager extends RepositoryManager {
         if (dir.length() == 0) {
             return current;
         } else if (dir.startsWith("/")) {
-            return findEntryWithName(request, base, dir);
+            return findEntryFromPath(request, base, dir);
         } else if (dir.startsWith("..")) {
             Entry   currentEntry      = current;
             boolean haveSeenBaseGroup = false;
@@ -9629,7 +9629,7 @@ public class EntryManager extends RepositoryManager {
                     currentEntry = currentEntry.getParentEntry();
                 } else {
                     Entry childEntry =
-                        getEntryManager().findEntryWithName(request,
+                        getEntryManager().findEntryFromPath(request,
                             currentEntry, tok);
                     if (childEntry == null) {
                         return null;
@@ -9652,7 +9652,7 @@ public class EntryManager extends RepositoryManager {
                 return children.get(index);
             }
 
-            return findEntryWithName(request, current, dir);
+            return findEntryFromPath(request, current, dir);
         }
     }
 
