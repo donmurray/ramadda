@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ */
+
+
+
 function D3Graph(div, nodes, links,width,height) {
 
     this.findNode =  function (value, field) {

@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ */
 
 var OUTPUT_JSON = "json";
 var OUTPUT_CSV = "default.csv";

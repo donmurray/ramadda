@@ -1,8 +1,6 @@
 /**
-Copyright 2008-2014 Geode Systems LLC
+Copyright 2008-2015 Geode Systems LLC
 */
-
-
 
 
 //uncomment this to add this type to the global list

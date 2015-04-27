@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ */
 
 var imageDoFirst = 1;
 function editImageClick(event, imgId, pt1x,pt1y,pt2x,pt2y) {

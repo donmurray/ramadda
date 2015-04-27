@@ -1,3 +1,8 @@
+/*
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ */
+
+
 function insertText(id,value) {
     var textComp = GuiUtils.getDomObject(id);
     if(textComp) {

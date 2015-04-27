@@ -1,6 +1,7 @@
 /**
- * Copyright 2008-2014 Geode Systems LLC
- */
+Copyright 2008-2015 Geode Systems LLC
+*/
+
 
 var DISPLAY_MAP = "map";
 

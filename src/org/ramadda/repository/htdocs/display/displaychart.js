@@ -1,8 +1,5 @@
 /**
-Copyright 2008-2014 Geode Systems LLC
-
-This package supports charting and mapping of georeferenced time series data
-It requires displaymanager.js pointdata.js
+Copyright 2008-2015 Geode Systems LLC
 */
 
 var DISPLAY_LINECHART = "linechart";

@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ */
 
 function SelectForm (formId, entryId, arg, outputDiv, selectValues) {
     this.id = formId;

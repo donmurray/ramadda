@@ -1,3 +1,6 @@
+/*
+ * Copyright (c) 2008-2015 Geode Systems LLC
+ */
 
 function NasaRepository() {
     var baseUrl =  "http://data.nasa.gov/api/get_search_results";

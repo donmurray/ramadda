@@ -1,3 +1,8 @@
+/**
+Copyright 2008-2015 Geode Systems LLC
+*/
+
+
 
 var DISPLAY_ENTRYLIST = "entrylist";
 var DISPLAY_ENTRYDISPLAY = "entrydisplay";
@@ -144,7 +149,9 @@ function RamaddaSearcher(displayManager, id, type, properties) {
             fields: null,
             formWidth: 0,
             entriesWidth: 0,
+            //List of type names from user
             types: null,
+            entryTypes: null,
             metadataTypeList: [],
     });            
 
@@ -277,7 +284,8 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                         event.preventDefault();
                     });
 
-                this.addTypes(this.types);
+
+                this.addTypes(this.entryTypes);
                 for(var i=0;i<this.metadataTypeList.length;i++) {
                     var type  = this.metadataTypeList[i];
                     this.addMetadata(type, null);
@@ -632,22 +640,40 @@ function RamaddaSearcher(displayManager, id, type, properties) {
             },
 
             findEntryType: function(typeName) {
-                if(this.types == null) return null;
-                for(var i = 0;i< this.types.length;i++) {
-                    var type = this.types[i];
+                if(this.entryTypes == null) return null;
+                for(var i = 0;i< this.entryTypes.length;i++) {
+                    var type = this.entryTypes[i];
                     if(type.getId() == typeName) return type;
                 }
                 return null;
             },
-            addTypes: function(types) {
-                if(types == null) {
+            addTypes: function(newTypes) {
+                if(newTypes == null) {
                     var theDisplay = this;
-                    types = this.getRamadda().getEntryTypes(function(ramadda, types) {theDisplay.addTypes(types);});
+                    newTypes = this.getRamadda().getEntryTypes(function(ramadda, types) {theDisplay.addTypes(types);});
                 }
-                if(types == null) {
+                if(newTypes == null) {
                     return;
                 }
-                this.types = types;
+                this.entryTypes = newTypes;
+
+                if(this.types) {
+                    var showType = {};
+                    this.types = this.types.split(",");
+                    for(var i=0;i<this.types.length;i++) {
+                        showType[this.types[i]] = true;
+                    }
+                    var tmp = [];
+                    for(var i=0;i<this.entryTypes.length;i++) {
+                        var type  = this.entryTypes[i];
+                        if(showType[type.getId()]) {
+                            tmp.push(type);
+                        }
+                    }
+                    this.entryTypes = tmp;
+                    this.types = null;
+                }
+
                 this.haveTypes = true;
                 var cats =[];
                 var catMap = {}; 
@@ -657,8 +683,8 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 //                HtmlUtil.tag(TAG_OPTION,[ATTR_TITLE,"",ATTR_VALUE,""], " Choose Type "));
                 select += HtmlUtil.tag(TAG_OPTION,[ATTR_TITLE,"",ATTR_VALUE,""],"Any Type");
 
-                for(var i = 0;i< types.length;i++) {
-                    var type = types[i];
+                for(var i = 0;i< this.entryTypes.length;i++) {
+                    var type = this.entryTypes[i];
                     //                    var style = " background: URL(" + type.getIcon() +") no-repeat;";
                     var icon =                     type.getIcon();
                     var optionAttrs  = [ATTR_TITLE,type.getLabel(),ATTR_VALUE,type.getId(),ATTR_CLASS, "display-typelist-type",
@@ -683,16 +709,16 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 }
 
                 select+=  HtmlUtil.closeTag(TAG_SELECT);
-                //                this.writeHtml(ID_TYPE_FIELD, "# " + types.length);
+                //                this.writeHtml(ID_TYPE_FIELD, "# " + entryTypes.length);
                 //                this.writeHtml(ID_TYPE_FIELD, select);
                 this.writeHtml(ID_TYPE_DIV, select);
                 this.jq(ID_TYPE_FIELD).selectBoxIt({});
                 this.addExtraForm();
            },
            getSelectedType: function() {
-                if(this.types == null) return null;
-                for(var i = 0;i< this.types.length;i++) {
-                    var type = this.types[i];
+                if(this.entryTypes == null) return null;
+                for(var i = 0;i< this.entryTypes.length;i++) {
+                    var type = this.entryTypes[i];
                     if(this.searchSettings.hasType(type.getId())) {
                         return type;
                     }
