@@ -95,8 +95,8 @@ import java.util.zip.ZipInputStream;
 public class EntryManager extends RepositoryManager {
 
     /** _more_ */
-    public static final String[] PRELOAD_CATEGORIES = { "General",
-            "Information", "Documents", "Collaboration", "Database" };
+    public static final String[] PRELOAD_CATEGORIES = {  "Documents", "General",
+                                                         "Information","Collaboration", "Database" };
 
     /** _more_ */
     public static final String ENTRYID_PROCESS = "process";

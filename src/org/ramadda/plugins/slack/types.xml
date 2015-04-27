@@ -1,4 +1,4 @@
-<types xxsupercategory="Miscellaneous" category="Communication">
+<types xxsupercategory="Miscellaneous" category="Information">
 
   <type name="slack_team"  description="Slack Team" handler="org.ramadda.plugins.slack.SlackTeamTypeHandler"  >
      <property name="icon" value="/slack/slack.png"/>

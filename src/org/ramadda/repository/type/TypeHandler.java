@@ -141,7 +141,7 @@ public class TypeHandler extends RepositoryManager {
 
 
     /** _more_ */
-    public static final String CATEGORY_DEFAULT = "General";
+    public static final String CATEGORY_DEFAULT = "Information";
 
     /** _more_ */
     public static final String TYPE_ANY = Constants.TYPE_ANY;
@@ -387,9 +387,17 @@ public class TypeHandler extends RepositoryManager {
      */
     public TypeHandler(Repository repository, String type,
                        String description) {
+        this(repository, type, description, CATEGORY_DEFAULT);
+    }
+
+    public TypeHandler(Repository repository, String type,
+                       String description, String category) {
         super(repository);
         this.type        = type;
         this.description = description;
+        if(category != null) {
+            this.category = category;
+        }
     }
 
 

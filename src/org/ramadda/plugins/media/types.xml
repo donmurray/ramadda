@@ -1,5 +1,54 @@
 <types>
 
+  <type name="type_document"  foruser="false" category="Documents" metadata="media_comment">
+
+</type>
+
+  
+  <type name="type_document_pdf"  description="PDF File" pattern=".*\.pdf" super="type_document" handler="org.ramadda.plugins.media.PdfTypeHandler" >
+     <service link="media_pdfbox_extracttext"/>
+     <service link="media_pdfbox_thumbnail" target="attachment"/>
+     <property name="icon" value="/icons/pdf.png"/>
+</type>
+  <type name="type_document_doc"  description="Microsoft Word File" pattern="(.*\.doc|.*\.docx)"  super="type_document"         handler="org.ramadda.plugins.media.MsDocTypeHandler" >
+     <property name="icon" value="/icons/doc.png"/>
+</type>
+  <type name="type_document_ppt"  description="Microsoft Powerpoint File" pattern="(.*\.ppt|.*\.pptx)"  super="type_document"   handler="org.ramadda.plugins.media.MsDocTypeHandler" >
+     <property name="icon" value="/icons/ppt.png"/>
+</type>
+
+  <type name="type_document_tabular"  description="Tabular File" foruser="false"  super="type_document"  >
+     <property name="icon" value="/icons/document-excel-csv.png"/>
+     <column name="showtable" type="boolean" label="Show table"  default="true" showinhtml="false"/>
+     <column name="showchart" type="boolean" label="Show chart"  default="true" showinhtml="false"/>
+
+     <column name="sheets" type="string"  size="500" label="Sheets"  showinhtml="false" suffix="Comma separated list of sheet numbers to show (zero based)" group="Data"/>
+     <column name="skiprows" type="int" label="Skip Rows"  default="0" showinhtml="false" suffix="How many rows to remove from the data"/>
+     <column name="skipcolumns" type="int" label="Skip columns" default="0"  showinhtml="false" suffix="How many columns to remove from the data"/>
+
+     <column name="usefirstrow" type="boolean" label="Use first row as header"  default="true" showinhtml="false" group="Header"/>
+     <column name="colheader" type="boolean" label="Show column header"  default="false" showinhtml="false"/>
+     <column name="header" type="string"  size="500" label="Header"  showinhtml="false" suffix="Comma separated list of column header labels"/>
+     <column name="rowheader" type="boolean" label="Show row header"  default="false" showinhtml="false"/>
+
+
+     <column name="widths" type="string"  size="500" label="Column widths"  showinhtml="false" suffix="Comma separated list of column widths" group="Display"/>
+     <column name="charts" type="string"  size="500" rows="5" columns="60" label="Default charts"  showinhtml="false" suffix="Specify 1 or more default charts:&lt;br&gt;type=linechart|barchart|scatterplot, xAxisIndex=0, yAxisIndex=1, sheet=0, ... &lt;br&gt;..."/>
+     <column name="search_fields" type="string"  size="2000" rows="5" columns="60" label="Search fields"  showinhtml="false" suffix="Specify 1 or more search fields"/>
+
+ </type>
+
+  <type name="type_document_xls"  description="Microsoft Excel File" pattern="(.*\.xls|.*\.xlsx)"  super="type_document_tabular"   handler="org.ramadda.plugins.media.XlsTypeHandler">
+     <property name="icon" value="/icons/xls.png"/>
+
+</type>
+
+  <type name="type_document_csv"  description="CSV File" pattern="(.*\.csv)"  super="type_document_tabular"    handler="org.ramadda.plugins.media.TabularTypeHandler">
+     <property name="icon" value="/icons/document-excel-csv.png"/>
+</type>
+
+
+
   <type name="media_youtubevideo"  
         description="YouTube Video" 
         handler="org.ramadda.plugins.media.YouTubeVideoTypeHandler" 
@@ -77,57 +126,6 @@
 </type>
 
 
-  <type name="type_document"  foruser="false" category="Documents" metadata="media_comment">
-
-</type>
-  <type name="type_document_html"  description="HTML File" pattern="(.*\.html|.*\.htm)" super="type_document" handler="org.ramadda.plugins.media.HtmlDocTypeHandler">
-     <property name="icon" value="/icons/html.png"/>
-     <column name="embed_type" type="enumeration" values="frame,full,partial,none" default="full" label="Embed style"  showinhtml="false"/>
-</type>
-
-
-  
-  <type name="type_document_pdf"  description="PDF File" pattern=".*\.pdf" super="type_document" handler="org.ramadda.plugins.media.PdfTypeHandler" >
-     <service link="media_pdfbox_extracttext"/>
-     <service link="media_pdfbox_thumbnail" target="attachment"/>
-     <property name="icon" value="/icons/pdf.png"/>
-</type>
-  <type name="type_document_doc"  description="Microsoft Word File" pattern="(.*\.doc|.*\.docx)"  super="type_document"         handler="org.ramadda.plugins.media.MsDocTypeHandler" >
-     <property name="icon" value="/icons/doc.png"/>
-</type>
-  <type name="type_document_ppt"  description="Microsoft Powerpoint File" pattern="(.*\.ppt|.*\.pptx)"  super="type_document"   handler="org.ramadda.plugins.media.MsDocTypeHandler" >
-     <property name="icon" value="/icons/ppt.png"/>
-</type>
-
-  <type name="type_document_tabular"  description="Tabular File" foruser="false"  super="type_document"  >
-     <property name="icon" value="/icons/document-excel-csv.png"/>
-     <column name="showtable" type="boolean" label="Show table"  default="true" showinhtml="false"/>
-     <column name="showchart" type="boolean" label="Show chart"  default="true" showinhtml="false"/>
-
-     <column name="sheets" type="string"  size="500" label="Sheets"  showinhtml="false" suffix="Comma separated list of sheet numbers to show (zero based)" group="Data"/>
-     <column name="skiprows" type="int" label="Skip Rows"  default="0" showinhtml="false" suffix="How many rows to remove from the data"/>
-     <column name="skipcolumns" type="int" label="Skip columns" default="0"  showinhtml="false" suffix="How many columns to remove from the data"/>
-
-     <column name="usefirstrow" type="boolean" label="Use first row as header"  default="true" showinhtml="false" group="Header"/>
-     <column name="colheader" type="boolean" label="Show column header"  default="false" showinhtml="false"/>
-     <column name="header" type="string"  size="500" label="Header"  showinhtml="false" suffix="Comma separated list of column header labels"/>
-     <column name="rowheader" type="boolean" label="Show row header"  default="false" showinhtml="false"/>
-
-
-     <column name="widths" type="string"  size="500" label="Column widths"  showinhtml="false" suffix="Comma separated list of column widths" group="Display"/>
-     <column name="charts" type="string"  size="500" rows="5" columns="60" label="Default charts"  showinhtml="false" suffix="Specify 1 or more default charts:&lt;br&gt;type=linechart|barchart|scatterplot, xAxisIndex=0, yAxisIndex=1, sheet=0, ... &lt;br&gt;..."/>
-     <column name="search_fields" type="string"  size="2000" rows="5" columns="60" label="Search fields"  showinhtml="false" suffix="Specify 1 or more search fields"/>
-
- </type>
-
-  <type name="type_document_xls"  description="Microsoft Excel File" pattern="(.*\.xls|.*\.xlsx)"  super="type_document_tabular"   handler="org.ramadda.plugins.media.XlsTypeHandler">
-     <property name="icon" value="/icons/xls.png"/>
-
-</type>
-
-  <type name="type_document_csv"  description="CSV File" pattern="(.*\.csv)"  super="type_document_tabular"    handler="org.ramadda.plugins.media.TabularTypeHandler">
-     <property name="icon" value="/icons/document-excel-csv.png"/>
-</type>
 
   <type name="type_db_table"  description="Database Table"  super="type_document_tabular"   handler="org.ramadda.plugins.media.DbTableTypeHandler"         category="Database" >
      <property name="form.resource.show" value="false"/>
@@ -146,6 +144,13 @@
      <property name="icon" value="/media/database.png"/>
 </type>
 -->
+
+  <type name="type_document_html"  description="HTML File" pattern="(.*\.html|.*\.htm)" super="type_document" handler="org.ramadda.plugins.media.HtmlDocTypeHandler">
+     <property name="icon" value="/icons/html.png"/>
+     <column name="embed_type" type="enumeration" values="frame,full,partial,none" default="full" label="Embed style"  showinhtml="false"/>
+</type>
+
+
 
 
 </types>
