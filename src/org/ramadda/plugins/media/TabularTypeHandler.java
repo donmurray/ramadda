@@ -130,6 +130,12 @@ public class TabularTypeHandler extends MsDocTypeHandler {
     }
 
 
+    @Override
+    public void addEncoding(Request request, Entry entry,
+                            String fromWhere, 
+                            StringBuilder sb)  throws Exception {
+        super.addEncoding(request, entry, fromWhere, sb);
+    }
 
     /**
      * _more_

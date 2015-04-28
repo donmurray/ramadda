@@ -1991,6 +1991,12 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
+    public void addEncoding(Request request, Entry entry,
+                            String fromWhere, 
+                            StringBuilder sb)  throws Exception {
+    }
+
+
     /**
      * _more_
      *
