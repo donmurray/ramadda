@@ -64,8 +64,9 @@ public class VirtualTypeHandler extends ExtensibleGroupTypeHandler {
      *
      * @throws Exception _more_
      */
+    @Override
     public void addColumnToEntryForm(Request request, Column column,
-                                     StringBuffer formBuffer, Entry entry,
+                                     Appendable formBuffer, Entry entry,
                                      Object[] values, Hashtable state,
                                      FormInfo formInfo)
             throws Exception {
@@ -106,6 +107,7 @@ public class VirtualTypeHandler extends ExtensibleGroupTypeHandler {
      *
      * @return _more_
      */
+    @Override
     public boolean isSynthType() {
         return true;
     }
@@ -154,13 +156,66 @@ public class VirtualTypeHandler extends ExtensibleGroupTypeHandler {
      *
      * @throws Exception _more_
      */
+@Override
     public Entry makeSynthEntry(Request request, Entry parentEntry, String id)
             throws Exception {
         return getEntryManager().getEntry(request, id);
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param parentEntry _more_
+     * @param entryNames _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+@Override
+    public Entry makeSynthEntry(Request request, Entry parentEntry,
+                                List<String> entryNames)
+            throws Exception {
+        if (entryNames.size() == 0) {
+            return null;
+        }
+        String topEntryName = entryNames.get(0);
+        List<Entry> children = getEntryManager().getChildren(request,
+                                   parentEntry);
+        if (topEntryName.matches("\\d+")) {
+            int index = new Integer(topEntryName).intValue();
+            index--;
+            if ((index >= 0) && (index < children.size())) {
+                return children.get(index);
+            }
 
+            return null;
+        }
+
+        for (Entry child : children) {
+            if (child.getName().equals(topEntryName)) {
+                entryNames.remove(0);
+
+                return getEntryManager().findEntryFromPath(request, child,
+                        StringUtil.join(Entry.PATHDELIMITER, entryNames));
+            }
+        }
+
+
+        for (Entry child : children) {
+            if (topEntryName.matches(child.getName())) {
+                entryNames.remove(0);
+
+                return getEntryManager().findEntryFromPath(request, child,
+                        StringUtil.join(Entry.PATHDELIMITER, entryNames));
+            }
+        }
+
+
+        return null;
+    }
 
 
     /**
@@ -170,6 +225,7 @@ public class VirtualTypeHandler extends ExtensibleGroupTypeHandler {
      *
      * @return _more_
      */
+    @Override
     public Entry createEntry(String id) {
         //Make the top level entry act like a group
         return new Entry(id, this, true);
