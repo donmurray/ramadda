@@ -218,7 +218,11 @@ begin
     opts@minLon = minLon
     opts@maxLon = maxLon
   end if
-  units = vardata@units
+  if (isatt(vardata,"units")) then
+    units = vardata@units
+  else
+    units = ""
+  end if
   outunits = opts@units
   ;; anomalies have to be handled separately
   if (opts@isanom .and.  (outunits .eq. "K" .or. outunits .eq. "degC")) then
@@ -709,7 +713,6 @@ begin
   doGoogle = (opts@plottype .eq. "kmz")
   doPanel = (.not. dodiff) .and. (.not. doGoogle) .and. numfiles .gt. 1 
   plottitles = opts@titles
-  ;print(plottitles)
   numtitles = dimsizes(plottitles)
   usepolar = opts@usepolar
   if (isatt(opts,"mask") .and. .not.(opts@mask .eq. "none")) then
@@ -770,6 +773,7 @@ begin
   rescf@gsnSpreadColors = True
   rescf@cnFillOn= opts@cfill
   rescf@cnFillMode= "AreaFill"  
+  rescf@lbLabelAutoStride = True
 
   ; labelbar
   if (doPanel) then
@@ -778,7 +782,9 @@ begin
     rescf@mpNationalLineThicknessF = .5     ; reduce the line thickness
   end if
 
-  rescf@tiMainFontHeightF=0.017
+  rescf@tiMainFontHeightF=0.015
+  rescf@gsnLeftStringOrthogonalPosF = 0.01
+  rescf@gsnRightStringOrthogonalPosF = 0.01
   rescf@tiMainFontThicknessF=.8
   rescf@tmXTOn          = False
   rescf@tmYROn          = False
@@ -795,11 +801,15 @@ begin
     if (outtype .eq. "correlation") then
         rescf@cnLevelSelectionMode = "ManualLevels"
         rescf@cnLevelSpacingF = 0.1
-        rescf@cnMinLevelValF = -1.0
-        rescf@cnMaxLevelValF = 1.0
+        rescf@cnMinLevelValF = -0.9
+        rescf@cnMaxLevelValF = 0.9
         cint = 0.1
+        ;rescf@lbLabelAlignment = "BoxCenters"
+        ;rescf@lbLabelAutoStride = False
     end if
   end if
+  wks_type@wkWidth                     = 1600
+  wks_type@wkHeight                    = 1600
 
   
   if (doGoogle) then
@@ -815,8 +825,8 @@ begin
     rescf@gsnCenterString = ""
     rescf@gsnRightString = ""
     rescf@gsnBoxMargin = 0.0
-    wks_type@wkWidth                     = 1600
-    wks_type@wkHeight                    = 1600
+    ;wks_type@wkWidth                     = 1600
+    ;wks_type@wkHeight                    = 1600
 
     ; label bar
     rescf@lbLabelBarOn = True;
@@ -834,12 +844,12 @@ begin
       rescf@gsnMaximize = False
     end if
     ratio = opts@ratio
-    wks_type@wkWidth                     = 800
-    wks_type@wkHeight                    = 800
-    ;rescf@vpXF = .075
-    ;rescf@vpYF = .95
-    ;rescf@vpWidthF = .85
-    ;rescf@vpHeightF= .5*ratio
+    if (.not. doPanel) then
+      wks_type@wkWidth                     = 800
+      wks_type@wkHeight                    = 800
+    end if
+
+    ;contour params
     rescf@cnLinesOn=opts@clines
     rescf@cnLineLabelsOn=opts@clabels
     rescf@cnLineLabelPlacementMode = "Computed"
@@ -848,8 +858,9 @@ begin
 
     ; label bar
     rescf@lbOrientation         = "Horizontal"   
-    rescf@pmLabelBarWidthF      = 0.4               ; default is shorter
-    rescf@pmLabelBarHeightF     = 0.075             ; default is taller
+    rescf@pmLabelBarWidthF      = 0.5               ; default is shorter
+    rescf@pmLabelBarHeightF     = 0.060             ; default is taller
+    rescf@lbTopMarginF          = 0.30
 
     ; lable bar title
     rescf@lbTitleFontHeightF = 0.013
@@ -911,8 +922,8 @@ begin
       end do
     end if
     rescf@tiMainString        = plottitle
-    mydata = data(0,:,:)
-    mydata = mask_data(mydata,masktype,maskdata)
+    ;mydata = data(0,:,:)
+    mydata = mask_data(data,masktype,maskdata)
     rescf@gsnLeftString = setvartitle(mydata, opts, addAnom, level, levelunit)
     if (doGoogle) then
       set_kml_map_defaults(rescf) ; turn off many options
@@ -1120,7 +1131,7 @@ begin
   if (doGoogle) then
 
     if (dodiff) then
-      print("doGoogle, doDiff");
+      ;print("doGoogle, doDiff");
       kres = True
         
       kres@product_dir=opts@product_dir
@@ -1176,8 +1187,12 @@ begin
 
       ; label bar
       resP@lbOrientation         = "Horizontal"   
-      resP@pmLabelBarWidthF      = 0.4               ; default is shorter
-      resP@pmLabelBarHeightF     = 0.075             ; default is taller
+      resP@lbLabelAutoStride     = "True"   
+      ;resP@pmLabelBarWidthF      = 0.4               ; default is shorter
+      ;resP@pmLabelBarHeightF     = 0.075             ; default is taller
+      resP@pmLabelBarWidthF      = 0.5               ; default is shorter
+      resP@pmLabelBarHeightF     = 0.060             ; default is taller
+      resP@lbTopMarginF          = 0.30
 
       ; label bar title
       ;resP@lbTitleString = rescf@lbTitleString
@@ -1262,11 +1277,14 @@ local tsdata, ncdata, rawdata, vals
 
 begin
   numfiles = dimsizes(files);
+  ;; TODO: handle more than one grid
   do i = 0,1
     onefile = files(i)
+    csvidx = 0
     suffix = get_file_suffix(onefile, 0)
     if (suffix .eq. ".csv") then
       ;print("reading csv file")
+      csvidx = i
       lines = asciiread(onefile, -1, "string")
       nlines = dimsizes(lines)
       ncols = 2
@@ -1311,29 +1329,37 @@ begin
       ;printVarSummary(ncdata)
     end if
   end do
+  ncidx = 1-csvidx
+  ncVarName = ncdata@long_name
   if (opts@outtype .eq. "regression") then
     corr = regCoef_n(values,ncdata,0,0)
+    corr@long_name=ncVarName + " Regression"
+    plottitle = opts@titles(ncidx) + "~C~ Regression with " + opts@titles(csvidx)
   else
     corr = escorc_n(values,ncdata,0,0)
+    corr@long_name=ncVarName + " Correlation"
+    plottitle = opts@titles(ncidx) + "~C~ Correlation with " + opts@titles(csvidx)
   end if
   corr!0  = "lat"
   corr!1  = "lon"
   corr&lat = ncdata&lat
   corr&lon = ncdata&lon
   corr@units=""
-  if (opts@outtype .eq. "regression") then
-    corr@long_name="Regression"
-  else
-    corr@long_name="Correlation"
-  end if
+  delete(opts@titles)
+  opts@titles=plottitle
   
-  printVarSummary(corr)
-  printMinMax(corr,True)
+  ;printVarSummary(corr)
+  ;printMinMax(corr,True)
   shape = dimsizes(corr)
   cdata = new((/1,shape(0),shape(1)/),float)
   cdata(0,:,:) = corr
   ;printVarSummary(cdata)
   plotmap(cdata,wks_name,wks_type,opts)
+  delete(csvidx)
+  delete(ncidx)
+  delete(corr)
+  delete(cdata)
+  delete(shape)
   
 end 
 
@@ -1361,7 +1387,7 @@ begin
    do i = 1,numfiles-1
       alldata(i,:,:) = readdata(files(i), opts)
    end do
-   printVarSummary(alldata)
+   ;printVarSummary(alldata)
    plotmap(alldata,wks_name,wks_type,opts)
 end
 

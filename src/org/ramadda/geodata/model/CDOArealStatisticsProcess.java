@@ -193,7 +193,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             new ArrayList<ServiceOperand>();
         int     opNum      = 0;
         int     numThreads = Math.min(input.getOperands().size(), 6);
-        boolean useThreads = false || (numThreads > 2);
+        boolean useThreads = (numThreads > 2) && false;
         System.err.println("Using threads: " + useThreads);
         ThreadManager threadManager =
             new ThreadManager("CDOArealStatistics.evaluate");
@@ -244,10 +244,16 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                 ve.printStackTrace();
             }
         }
+        // TODO: need to account for different units in the multi-model case
+        /*
         if (type.equals(ClimateModelApiHandler.ARG_ACTION_MULTI_COMPARE)
                 || type.equals(
                     ClimateModelApiHandler.ARG_ACTION_ENS_COMPARE)) {
-            addEnsembleMean(request, input, outputEntries, type);
+                    */
+        if (type.equals(ClimateModelApiHandler.ARG_ACTION_ENS_COMPARE)) {
+            if (outputEntries.size() > 1) {
+                addEnsembleMean(request, input, outputEntries, type);
+            }
         }
 
         return new ServiceOutput(outputEntries);
@@ -270,7 +276,11 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         Object[]      values    = oneOfThem.getValues(true);
         StringBuilder fileName  = new StringBuilder();
         fileName.append(oneOfThem.getValue(4));
-        fileName.append("_MultiModel_");
+        if (type.equals(ClimateModelApiHandler.ARG_ACTION_MULTI_COMPARE)) {
+            fileName.append("_MultiModel_");
+        } else {
+            fileName.append("_Ensemble_");
+        }
         fileName.append(oneOfThem.getValue(2));
         fileName.append("_mean_");
         String id      = getRepository().getGUID();
@@ -293,7 +303,11 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         commands.add(outFile.toString());
         System.out.println(commands);
         StringBuilder outputName = new StringBuilder();
-        outputName.append("Multi-Model Ensemble Mean");
+        if (type.equals(ClimateModelApiHandler.ARG_ACTION_MULTI_COMPARE)) {
+            outputName.append("Multi-Model Ensemble Mean");
+        } else {
+            outputName.append("Ensemble Mean");
+        }
         runProcess(commands, dpi.getProcessDir(), outFile);
         Resource resource = new Resource(outFile, Resource.TYPE_LOCAL_FILE);
         TypeHandler myHandler = getRepository().getTypeHandler("cdm_grid",
@@ -301,7 +315,11 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         Entry outputEntry = new Entry(myHandler, true, outputName.toString());
         outputEntry.setResource(resource);
         Object[] newValues = values;
-        newValues[1] = "MultiModel";
+        if (type.equals(ClimateModelApiHandler.ARG_ACTION_MULTI_COMPARE)) {
+            newValues[1] = "MultiModel";
+        } else {
+            newValues[1] = "Ensemble";
+        }
         newValues[3] = "mean";
         outputEntry.setValues(newValues);
         // Add in lineage and associations

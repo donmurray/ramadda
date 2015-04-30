@@ -52,14 +52,11 @@ import java.util.TimeZone;
 import java.util.TreeSet;
 
 
+
 /**
- * Class description
- *
- *
- * @version        $version$, Fri, Mar 27, '15
- * @author         Enter your name here...
+ * Class to handle extraction of time series for correlation/regression
  */
-public class TimeSeriesCorrelation extends CDODataProcess {
+public class CDOTimeSeriesComparison extends CDODataProcess {
 
     /**
      * Area statistics DataProcess
@@ -68,9 +65,9 @@ public class TimeSeriesCorrelation extends CDODataProcess {
      *
      * @throws Exception  problems
      */
-    public TimeSeriesCorrelation(Repository repository) throws Exception {
-        super(repository, "TIMESERIES_CORRELATION",
-              "Time Series Correlation");
+    public CDOTimeSeriesComparison(Repository repository) throws Exception {
+        super(repository, "CDO_TIMESERIES_COMPARISON",
+              "Time Series Comparison");
     }
 
     /**
@@ -166,8 +163,18 @@ public class TimeSeriesCorrelation extends CDODataProcess {
             throws Exception {
 
         CDOOutputHandler.makeMonthsWidget(request, sb, null);
-        //TODO: add in a lag widget
         makeYearsWidget(request, sb, input);
+        //TODO: add in a lag widget
+        /*
+        sb.append(HtmlUtils
+                .formEntry(Repository.msgLabel("Lag/Lead"), 
+                        HtmlUtils.input(CDOOutputHandler
+                .ARG_CDO_STARTMONTH_LAG, request
+                    .getString(CDOOutputHandler.ARG_CDO_STARTMONTH_LAG, ""), 6, HtmlUtils
+                            .title("Positive = lead, negative = lag")) + HtmlUtils
+                                .space(2) + Repository.msg("(months)")));
+        */
+
     }
 
     /**

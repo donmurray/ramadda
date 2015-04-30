@@ -92,6 +92,10 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
     /** end month identifier */
     public static final String ARG_CDO_ENDMONTH = ARG_CDO_PREFIX + "endmonth";
 
+    /** start month lag identifier */
+    public static final String ARG_CDO_STARTMONTH_LAG = ARG_CDO_PREFIX
+                                                    + "startmonth_lag";
+
     /** months identifier */
     public static final String ARG_CDO_MONTHS = ARG_CDO_PREFIX + "months";
 

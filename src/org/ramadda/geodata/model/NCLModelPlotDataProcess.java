@@ -336,7 +336,7 @@ public class NCLModelPlotDataProcess extends Service {
         // Contour interval
         //StringBuilder contourSB = new StringBuilder();
         contourOpts.append("</p>");
-        contourOpts.append(HtmlUtils.bold(Repository.msg("Override Defaults:")));
+        contourOpts.append(HtmlUtils.bold(Repository.msg("Override Contour Interval Defaults:")));
         contourOpts.append("<br>");
         contourOpts.append(Repository.msg("Interval: "));
         contourOpts.append(HtmlUtils.makeLatLonInput(ARG_NCL_CINT,
@@ -360,6 +360,8 @@ public class NCLModelPlotDataProcess extends Service {
                 */
         sb.append(HtmlUtils.formEntry(Repository.msgLabel("Contours"),
                                       contourOpts.toString()));
+        /*
+        // TODO: make this work in other browsers
         // colormaps
         List cmaps = getColorMaps();
         sb.append(
@@ -369,6 +371,7 @@ public class NCLModelPlotDataProcess extends Service {
                     ARG_NCL_COLORMAP, cmaps,
                     request.getString(ARG_NCL_COLORMAP, "default"),
                     HtmlUtils.cssClass("select_widget"))));
+        */
 
         sb.append(HtmlUtils.formTableClose());
 

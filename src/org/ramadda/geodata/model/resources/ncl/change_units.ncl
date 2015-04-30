@@ -17,7 +17,10 @@ begin
 
   ;print("unitsIn: "+unitsIn+", unitsOut: "+unitsOut)
   dataOut = dataIn
-  if ((unitsIn .ne. unitsOut) .and. (.not. ismissing(unitsOut) .and. unitsOut .ne. "")) then
+  if (ismissing(unitsIn) .or. ismissing(unitsOut)) then
+     return dataOut
+  end if
+  if ((unitsIn .ne. unitsOut) .and. (unitsOut .ne. "")) then
 
     ; Temperature
     if (unitsIn .eq. "K" .or. \

@@ -40,6 +40,10 @@
    font-weight: bold;
 }
 
+body>div {
+        min-width: 20em;
+}
+
 /*
 .formlabel, .formlabeltop {
   font-weight: 700;

@@ -219,31 +219,26 @@ public class NCLOutputHandler extends OutputHandler {
             String list =
                 getRepository().getResource(
                     "/org/ramadda/geodata/model/resources/ncl/colormaps.txt");
-            List<String> cmaps = StringUtil.split(list, "\n", true, true);
-            for (String cmap : cmaps) {
-                List<String> toks = StringUtil.split(cmap);
-                String rgbfile = toks.get(0)+".rgb";
-                String cmapresource;
-                try {
-                    cmapresource =
-                        getStorageManager().readSystemResource(
-                            "/org/ramadda/geodata/model/resources/ncl/colormaps/"
-                            + rgbfile);
+            if (list != null && !list.isEmpty()) {
+                for (String cmap : StringUtil.split(list, "\n", true, true)) {
+                    List<String> toks = StringUtil.split(cmap);
+                    String rgbfile = toks.get(0)+".rgb";
+                    String cmapresource =
+                            getRepository().getResource(
+                                "/org/ramadda/geodata/model/resources/ncl/colormaps/"
+                                + rgbfile, true);
                     if ((cmapresource == null) || cmapresource.isEmpty()) {
                         continue;
                     }    
-                } catch (IOException ioe) {
-                    continue;
+                    File outputFile = new File(IOUtil.joinDir(cmapDir, rgbfile));
+                    InputStream is =
+                        new ByteArrayInputStream(cmapresource.getBytes());
+                    OutputStream os =
+                        getStorageManager().getUncheckedFileOutputStream(
+                            outputFile);
+                    IOUtil.writeTo(is, os);
                 }
-                File outputFile = new File(IOUtil.joinDir(cmapDir, rgbfile));
-                InputStream is =
-                    new ByteArrayInputStream(cmapresource.getBytes());
-                OutputStream os =
-                    getStorageManager().getUncheckedFileOutputStream(
-                        outputFile);
-                IOUtil.writeTo(is, os);
             }
-        
         }
     }
 

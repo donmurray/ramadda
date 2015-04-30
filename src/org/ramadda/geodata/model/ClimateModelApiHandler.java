@@ -151,7 +151,7 @@ public class ClimateModelApiHandler extends RepositoryManager implements Request
                 processes.add(process);
             }
         } else if (action.equals(ARG_ACTION_CORRELATION)) {
-            Service process = new TimeSeriesCorrelation(repository);
+            Service process = new CDOTimeSeriesComparison(repository);
             if (process.isEnabled()) {
                 processes.add(process);
             }
