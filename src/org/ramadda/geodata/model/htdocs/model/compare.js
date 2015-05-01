@@ -112,7 +112,7 @@ function CollectionForm(formId, type, args) {
                             };
 
                             //This will go back to the server and get the children 
-                            processEntry.getChildrenEntries(finalCallback, "ascending=true&orderby=createdate");
+                            processEntry.getChildrenEntries(finalCallback, "ascending=true&orderby=createdate&max=9999");
                             
                         }
                     };
