@@ -446,9 +446,13 @@ public class ZipOutputHandler extends OutputHandler {
         }
         for (Entry entry : entries) {
             //Check for access
-            if ( !getAccessManager().canExportEntry(request, entry)) {
-                //                System.err.println ("can't export " +  request.getUser().getAdmin());
-                continue;
+            if (forExport) {
+                if ( !getAccessManager().canExportEntry(request, entry)) {
+                    System.err.println("can't export "
+                                       + request.getUser().getAdmin());
+
+                    continue;
+                }
             }
 
             //Not sure why I wasn't dealing with synthetic entries here
