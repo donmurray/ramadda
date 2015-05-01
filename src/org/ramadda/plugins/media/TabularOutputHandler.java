@@ -278,6 +278,41 @@ public class TabularOutputHandler extends OutputHandler {
     }
 
 
+
+    public void addEncoding(Request request, Entry entry,
+                            String fromWhere, 
+                            final StringBuilder sb)  throws Exception {
+
+        TabularVisitor     tabularVisitor = new TabularVisitor() {
+            @Override
+            public boolean visit(Visitor info, String sheet,
+                                 List<List<Object>> rows) {
+                for (List<Object> cols : rows) {
+                    int colCnt = 0;
+                    for (Object col : cols) {
+                        if (col == null) {
+                            col = "null";
+                        }
+                        String s = col.toString();
+                        if(colCnt>0) {
+                            sb.append(" | ");
+                        }
+                        sb.append(StringUtil.padLeft(s, 20));
+                        colCnt++;
+                    }
+                    sb.append("\n");
+                }
+                return false;
+            }
+        };
+
+        Visitor info  = new Visitor();
+        //        info.setSkip(getSkipRows(request, entry));
+        //        info.setMaxRows(getRowCount(request, entry, MAX_ROWS));
+        visit(request, entry, info, tabularVisitor);
+    }
+
+
     /**
      * _more_
      *
