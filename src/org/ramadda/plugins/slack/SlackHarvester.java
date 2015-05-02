@@ -467,9 +467,9 @@ public class SlackHarvester extends Harvester {
     public Slack.Args parseArgs(Request request, String text)
             throws Exception {
         System.err.println("ARGS: " + text);
-        Slack.Args args = new Slack.Args(StringUtil.split(text, " ", true,
-                              true), null);
-        String entryId = null;
+        List<String> toks    = StringUtil.split(text, " ", true, true);
+        Slack.Args   args    = new Slack.Args(toks, null);
+        String       entryId = null;
         for (String tok : args.getArgs()) {
             System.err.println("TOK: " + tok);
             if (tok.equals("-l")) {
