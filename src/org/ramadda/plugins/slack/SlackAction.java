@@ -141,7 +141,8 @@ public class SlackAction extends MonitorAction {
                                    ? "New"
                                    : "Modified") + " "
                                    + entry.getTypeHandler()
-                                       .getLabel(), entries, getWebhook());
+                                       .getLabel(), entries, getWebhook(),
+                                           false);
         } catch (Exception exc) {
             monitor.handleError("Error posting to Monitor   ", exc);
         }

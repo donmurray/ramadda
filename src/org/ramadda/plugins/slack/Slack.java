@@ -84,20 +84,20 @@ public class Slack {
     /** _more_ */
     public static final String API_SEARCH_FILES = "search.files";
 
-    /** _more_          */
+    /** _more_ */
     public static final String API_FILES_UPLOAD = "files.upload";
 
     /** _more_ */
     public static final String API_USERS_INFO = "users.info";
 
-    /** _more_          */
+    /** _more_ */
     public static final String API_RTM_START = "rtm.start";
 
 
     /** _more_ */
     public static final String ARG_CHANNEL = "channel";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_CHANNELS = "channels";
 
 
@@ -105,16 +105,16 @@ public class Slack {
     /** _more_ */
     public static final String ARG_COUNT = "count";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_FILE = "file";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_FILENAME = "filename";
 
     /** _more_ */
     public static final String ARG_INCLUSIVE = "inclusive";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_INITIAL_COMMENT = "initial_comment";
 
     /** _more_ */
@@ -137,7 +137,7 @@ public class Slack {
     /** _more_ */
     public static final String ARG_SORT_DIR = "sort_dir";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_TITLE = "title";
 
     /** _more_ */
@@ -288,6 +288,7 @@ public class Slack {
      * @param message _more_
      * @param entries _more_
      * @param webHook _more_
+     * @param showChildren _more_
      *
      * @return _more_
      *
@@ -295,14 +296,16 @@ public class Slack {
      */
     public static Result makeEntryResult(Repository repository,
                                          Request request, String message,
-                                         List<Entry> entries, String webHook)
+                                         List<Entry> entries, String webHook,
+                                         boolean showChildren)
             throws Exception {
         StringBuffer sb = new StringBuffer();
         if ( !Utils.stringDefined(webHook)) {
             sb.append(message);
             sb.append("\n");
         }
-        String attachments = makeEntryLinks(repository, request, sb, entries);
+        String attachments = makeEntryLinks(repository, request, sb, entries,
+                                            showChildren);
         if ( !Utils.stringDefined(webHook)) {
             return new Result("", sb);
         }
@@ -316,7 +319,7 @@ public class Slack {
         map.add(SLACK_TEXT);
         map.add(Json.quote(message + "\n"));
         map.add("username");
-        map.add(Json.quote("RAMADDA"));
+        map.add(Json.quote("ramadda"));
         if ((request != null) && request.defined(SLACK_CHANNEL_ID)) {
             map.add("channel");
             map.add(Json.quote(request.getString(SLACK_CHANNEL_ID, "")));
@@ -324,7 +327,7 @@ public class Slack {
         json.append(Json.map(map));
         List<HttpFormEntry> formEntries = new ArrayList<HttpFormEntry>();
         formEntries.add(HttpFormEntry.hidden(SLACK_PAYLOAD, json.toString()));
-        System.err.println("SlackHarvester: posting to slack");
+        System.err.println("SlackHarvester: posting to slack:" + json);
         String[] result = HttpFormEntry.doPost(formEntries, webHook);
         System.err.println("SlackHarvester: results:" + result[0] + " "
                            + result[1]);
@@ -341,6 +344,7 @@ public class Slack {
      * @param request _more_
      * @param sb _more_
      * @param entries _more_
+     * @param showChildren _more_
      *
      * @return _more_
      *
@@ -348,8 +352,10 @@ public class Slack {
      */
     public static String makeEntryLinks(Repository repository,
                                         Request request, Appendable sb,
-                                        List<Entry> entries)
+                                        List<Entry> entries,
+                                        boolean showChildren)
             throws Exception {
+
         if (entries == null) {
             return null;
         }
@@ -411,17 +417,28 @@ public class Slack {
                 desc.append(snippet);
                 desc.append("\n");
             }
-            Link downloadLink =
-                entry.getTypeHandler().getEntryDownloadLink(request, entry);
-            if (downloadLink != null) {
-                desc.append(
-                    "<" + downloadLink.getUrl() + "|"
-                    + IOUtil.getFileTail(entry.getResource().getPath())
-                    + ">\n");
-                desc.append("\n");
+            desc.append(makeDownloadLink(request, entry));
+            if (showChildren) {
+                int childCnt = 0;
+                for (Entry child :
+                        repository.getEntryManager().getChildren(request,
+                            entry)) {
+                    if (childCnt == 0) {
+                        //                        desc.append(":\n");
+                    }
+                    childCnt++;
+                    desc.append("    #" + childCnt + " <"
+                                + getEntryUrl(repository, request, child)
+                                + "|" + child.getName() + ">  ");
+                    desc.append(makeDownloadLink(request, child));
+                    desc.append("\n");
+                }
+
+
             }
 
-
+            map.add("mrkdwn_in");
+            map.add(Json.list(Json.quote("text"), Json.quote("pretext")));
             map.add("text");
             map.add(Json.quote(desc.toString()));
             List<String> fields = new ArrayList<String>();
@@ -446,8 +463,37 @@ public class Slack {
 
         //        System.err.println("attachments:" + attachments);
         return attachments;
+
     }
 
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static String makeDownloadLink(Request request, Entry entry)
+            throws Exception {
+
+        if ( !request.getRepository().getAccessManager().canDownload(request,
+                entry)) {
+            return "";
+        }
+        String url =
+            request.getRepository().getEntryManager().getEntryResourceUrl(
+                request, entry);
+        url = url.replace(" ", "+");
+        String size = entry.getTypeHandler().formatFileLength(
+                          entry.getResource().getFileSize());
+        String label = "(Download - " + size + ")";
+
+        return "<" + request.getAbsoluteUrl(url) + "|" + label + ">";
+    }
 
 
     /**
@@ -580,6 +626,70 @@ public class Slack {
         return "in:" + what;
     }
 
+
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Sat, May 2, '15
+     * @author         Enter your name here...    
+     */
+    public static class Args {
+
+        /** _more_          */
+        Entry entry;
+
+        /** _more_          */
+        HashSet<String> flags = new HashSet<String>();
+
+        /**
+         * _more_
+         *
+         * @param entry _more_
+         */
+        public Args(Entry entry) {
+            this.entry = entry;
+        }
+
+        /**
+         * _more_
+         *
+         * @param flag _more_
+         */
+        public void setFlag(String flag) {
+            flags.add(flag);
+        }
+
+
+        /**
+         * _more_
+         *
+         * @param flag _more_
+         *
+         * @return _more_
+         */
+        public boolean isSet(String flag) {
+            return flags.contains(flag);
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public Entry getEntry() {
+            return entry;
+        }
+
+        /**
+         * _more_
+         *
+         * @param entry _more_
+         */
+        public void setEntry(Entry entry) {
+            this.entry = entry;
+        }
+    }
 
 
 }

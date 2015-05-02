@@ -93,9 +93,17 @@ public class SlackApiHandler extends RepositoryManager implements RequestHandler
     public Result processSlackApi(Request request) throws Exception {
         Result result = null;
         for (SlackHarvester harvester : getHarvesters()) {
-            result = harvester.handleRequest(request);
-            if (result != null) {
-                break;
+            try {
+                result = harvester.handleRequest(request);
+                if (result != null) {
+                    break;
+                }
+            } catch (Exception exc) {
+                return new Result(
+                    "",
+                    new StringBuilder(
+                        "Oops, I did it again. An error has occurred:"
+                        + exc));
             }
 
         }

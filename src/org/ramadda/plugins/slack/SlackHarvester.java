@@ -76,10 +76,10 @@ public class SlackHarvester extends Harvester {
     /** _more_ */
     public static final String ATTR_WEBHOOK = "webhook";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_APITOKEN = "apitokenk";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ALLOW_CREATE = "allow_create";
 
 
@@ -105,8 +105,11 @@ public class SlackHarvester extends Harvester {
     /** _more_ */
     public static final String[] CMDS_NEW = { "new", "create" };
 
-    /** _more_          */
+    /** _more_ */
     public static final String[] CMDS_GET = { "get" };
+
+    /** _more_          */
+    public static final String[] CMDS_VIEW = { "view" };
 
 
     /** plain old command is a slack argument so we use ramadda_command */
@@ -121,16 +124,18 @@ public class SlackHarvester extends Harvester {
     /** _more_ */
     private String webHook;
 
-    /** _more_          */
+    /** _more_ */
     private String apiToken;
 
 
-    /** _more_          */
+    /** _more_ */
     private boolean allowCreate = false;
 
 
     /** _more_ */
-    private Hashtable<String, String> cwd = new Hashtable<String, String>();
+    private Hashtable<String, SlackState> slackStates = new Hashtable<String,
+                                                            SlackState>();
+
 
 
     /**
@@ -382,14 +387,14 @@ public class SlackHarvester extends Harvester {
                 result = processDesc(request, text);
             } else if (isCommand(cmd, CMDS_GET)) {
                 result = processGet(request, text);
+            } else if (isCommand(cmd, CMDS_VIEW)) {
+                result = processView(request, text);
             } else if (isCommand(cmd, CMDS_APPEND)) {
                 result = processAppend(request, text);
             } else if (isCommand(cmd, CMDS_NEW)) {
                 if ( !allowCreate) {
-                    return new Result(
-                        "",
-                        new StringBuilder(
-                            "Sorry, but creating new entries is not allowed"));
+                    return message(
+                        "Sorry, but creating new entries is not allowed");
                 }
                 result = processNew(request, text);
             } else if (isCommand(cmd, CMDS_CD)) {
@@ -415,6 +420,17 @@ public class SlackHarvester extends Harvester {
     /**
      * _more_
      *
+     * @param msg _more_
+     *
+     * @return _more_
+     */
+    private static Result message(String msg) {
+        return new Result("", new StringBuilder(msg));
+    }
+
+    /**
+     * _more_
+     *
      * @param request _more_
      * @param text _more_
      *
@@ -435,7 +451,40 @@ public class SlackHarvester extends Harvester {
 
         return Slack.makeEntryResult(getRepository(), request,
                                      "Search Results", (List<Entry>) pair[0],
-                                     webHook);
+                                     webHook, false);
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param text _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Slack.Args parseArgs(Request request, String text)
+            throws Exception {
+        System.err.println("ARGS: " + text);
+        Slack.Args   args    = new Slack.Args(null);
+        List<String> toks    = StringUtil.split(text, " ", true, true);
+        String       entryId = null;
+        for (String tok : toks) {
+            System.err.println("TOK: " + tok);
+            if (tok.equals("-l")) {
+                args.setFlag(tok);
+            } else {
+                entryId = tok;
+            }
+        }
+        if (entryId != null) {
+            Entry entry = getEntryToUse(request, entryId);
+            args.setEntry(entry);
+        }
+
+        return args;
+
     }
 
 
@@ -451,7 +500,8 @@ public class SlackHarvester extends Harvester {
      */
     private Result processDesc(Request request, String text)
             throws Exception {
-        Entry entry = getCurrentEntry(request);
+        Slack.Args args  = parseArgs(request, text);
+        Entry      entry = args.getEntry();
         if (entry == null) {
             return getUsage(request, "No current entry");
         }
@@ -462,7 +512,7 @@ public class SlackHarvester extends Harvester {
         }
 
         return Slack.makeEntryResult(getRepository(), request, desc, null,
-                                     webHook);
+                                     webHook, false);
     }
 
 
@@ -477,94 +527,80 @@ public class SlackHarvester extends Harvester {
      * @throws Exception _more_
      */
     private Result processGet(Request request, String text) throws Exception {
-        String tokenFromSlack = request.getString(Slack.SLACK_TOKEN, "none");
-        Entry  entry          = getCurrentEntry(request);
+        Slack.Args args  = parseArgs(request, text);
+        Entry      entry = args.getEntry();
         if (entry == null) {
             return getUsage(request, "No current entry");
         }
         if ( !Utils.stringDefined(apiToken)) {
-            return new Result(
-                "", new StringBuilder("RAMADDA get command not enabled."));
+            return message("RAMADDA get command not enabled.");
         }
         if ( !entry.isFile()) {
-            return new Result("",
-                              new StringBuilder("RAMADDA entry not a file"));
+            return message("RAMADDA entry not a file");
         }
         File file = new File(entry.getResource().getPath());
         //Cap at 10MB
         if (file.length() > 1000000 * 10) {
-            return new Result(
-                "", new StringBuilder("Sorry, for now too big of a file"));
+            return message("Sorry, for now too big of a file");
         }
 
-        CloseableHttpClient   client   = HttpClients.createDefault();
-        CloseableHttpResponse response = null;
+        return sendFile(getRepository(), file, apiToken,
+                        request.getString(Slack.SLACK_CHANNEL_ID, ""),
+                        entry.getName(), entry.getDescription());
 
-        try {
-            HttpPost post =
-                new HttpPost(Slack.getSlackApiUrl(Slack.API_FILES_UPLOAD));
-            FileBody filePart = new FileBody(file);
-            HttpEntity requestEntity =
-                MultipartEntityBuilder.create().addPart(
-                    Slack.ARG_FILE, filePart).addPart(
-                    Slack.ARG_FILENAME,
-                    new StringBody(
-                        getStorageManager().getOriginalFilename(
-                            file.getName()), ContentType.TEXT_PLAIN)).addPart(
-                                Slack.ARG_TOKEN,
-                                new StringBody(
-                                    apiToken,
-                                    ContentType.TEXT_PLAIN)).addPart(
-                                        Slack.ARG_TITLE,
-                                        new StringBody(
-                                            entry.getName(),
-                                            ContentType.TEXT_PLAIN)).addPart(
-                                                Slack.ARG_INITIAL_COMMENT,
-                                                new StringBody(
-                                                    entry.getDescription(),
-                                                    ContentType.TEXT_PLAIN)).addPart(
-                                                        Slack.ARG_CHANNELS,
-                                                        new StringBody(
-                                                            request.getString(
-                                                                Slack.SLACK_CHANNEL_ID,
-                                                                ""), ContentType.TEXT_PLAIN)).build();
+    }
 
-            post.setEntity(requestEntity);
-            System.out.println("executing request " + post.getRequestLine());
-            response = client.execute(post);
-            System.out.println(response.getStatusLine());
-            HttpEntity entity = response.getEntity();
-            if (entity == null) {
-                return new Result(
-                    "", new StringBuilder("Error: no http entity?"));
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param text _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Result processView(Request request, String text)
+            throws Exception {
+        Slack.Args args  = parseArgs(request, text);
+        Entry      entry = args.getEntry();
+        if (entry == null) {
+            return getUsage(request, "No current entry");
+        }
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("view of entry: " + entry.getName() + "\n");
+        int len = sb.length();
+        entry.getTypeHandler().addEncoding(request, entry, "slack.view", sb);
+
+        if (sb.length() == len) {
+            if (entry.getResource().isImage()) {
+                File file = new File(entry.getResource().getPath());
+
+                return sendFile(getRepository(), file, apiToken,
+                                request.getString(Slack.SLACK_CHANNEL_ID,
+                                    ""), entry.getName(),
+                                         entry.getDescription());
             }
-            String json = EntityUtils.toString(entity);
-            EntityUtils.consume(entity);
-            System.err.println("post response:" + json);
-            try {
-                JSONObject obj = new JSONObject(json);
-                if ( !Json.readValue(obj, Slack.JSON_OK,
-                                     "false").equals("true")) {
-                    String error = Json.readValue(obj, Slack.JSON_ERROR, "");
-
-                    return new Result(
-                        "",
-                        new StringBuilder(
-                            "Oops, got an error posting the file:" + error));
-                }
-
-                return new Result(
-                    "", new StringBuilder("Ok, file is on its way"));
-            } catch (Exception exc) {
-                return new Result("", new StringBuilder("Error:" + json));
-            }
-        } finally {
-            if (response != null) {
-                response.close();
-            }
-            client.close();
         }
 
+        return message(sb.toString());
+
+
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param s _more_
+     * @param cnt _more_
+     *
+     * @return _more_
+     */
+    private String pad(String s, int cnt) {
+        return StringUtil.padLeft(s, cnt);
     }
 
 
@@ -588,7 +624,7 @@ public class SlackHarvester extends Harvester {
         getEntryManager().appendText(getRequest(), entry, text);
 
         return Slack.makeEntryResult(getRepository(), request,
-                                     "Text appended", null, webHook);
+                                     "Text appended", null, webHook, false);
     }
 
 
@@ -602,17 +638,24 @@ public class SlackHarvester extends Harvester {
      * @throws Exception _more_
      */
     private Entry getCurrentEntry(Request request) throws Exception {
-
-        String currentId = cwd.get(Slack.getSlackUserId(request));
-        if (currentId == null) {
-            return getBaseGroup();
-        }
-        Entry entry = getEntryManager().getEntry(request, currentId);
-        if (entry == null) {
+        SlackState state = slackStates.get(getStateKey(request));
+        if (state == null) {
             return getBaseGroup();
         }
 
-        return entry;
+        return state.entry;
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     */
+    private String getStateKey(Request request) {
+        return Slack.getSlackUserId(request) + "_"
+               + Slack.getSlackChannelName(request);
     }
 
     /**
@@ -626,18 +669,47 @@ public class SlackHarvester extends Harvester {
      * @throws Exception _more_
      */
     private Result processLs(Request request, String text) throws Exception {
-        Entry        parent   = getCurrentEntry(request);
-        StringBuffer sb       = new StringBuffer();
-        List<Entry>  children = getEntryManager().getChildren(request,
-                                    parent);
-        String attach = Slack.makeEntryLinks(getRepository(), request, sb,
-                                             children);
+        Slack.Args  args     = parseArgs(request, text);
+        Entry       parent   = args.getEntry();
+
+        List<Entry> children = getEntryManager().getChildren(request, parent);
         if (children.size() == 0) {
-            return new Result("", new StringBuffer("No children entries"));
+            return message("No children entries");
         }
 
         return Slack.makeEntryResult(getRepository(), request, "Listing",
-                                     children, webHook);
+                                     children, webHook, false);
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param text _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Entry getEntryToUse(Request request, String text)
+            throws Exception {
+        text = text.trim();
+        //Check for an ID
+        Entry newEntry = getEntryManager().getEntry(request, text);
+        if (newEntry != null) {
+            return newEntry;
+        }
+
+        Entry currentEntry = getCurrentEntry(request);
+        newEntry = getEntryManager().getRelativeEntry(request,
+                getBaseGroup(), currentEntry, text);
+        if (newEntry != null) {
+            return newEntry;
+        }
+
+        return currentEntry;
     }
 
 
@@ -654,23 +726,22 @@ public class SlackHarvester extends Harvester {
      */
     private Result processCd(Request request, String text) throws Exception {
         Entry parent = getCurrentEntry(request);
-
         text = text.trim();
-
-        Entry newEntry = getEntryManager().getRelativeEntry(request,
+        Entry theEntry = getEntryManager().getRelativeEntry(request,
                              getBaseGroup(), parent, text);
-        if (newEntry == null) {
-            return new Result("", new StringBuffer("No such entry"));
+        if (theEntry == null) {
+            return message("No such entry");
         }
         if (text.length() == 0) {
-            newEntry = getBaseGroup();
+            theEntry = getBaseGroup();
         }
 
-        cwd.put(Slack.getSlackUserId(request), newEntry.getId());
+        slackStates.put(getStateKey(request), new SlackState(theEntry));
+
 
         return Slack.makeEntryResult(getRepository(), request,
-                                     "Current entry:", toList(newEntry),
-                                     webHook);
+                                     "Current entry:", toList(theEntry),
+                                     webHook, true);
     }
 
 
@@ -690,7 +761,7 @@ public class SlackHarvester extends Harvester {
 
         return Slack.makeEntryResult(getRepository(), request,
                                      "Current entry:", toList(entry),
-                                     webHook);
+                                     webHook, true);
     }
 
     /**
@@ -756,10 +827,10 @@ public class SlackHarvester extends Harvester {
         if (entry == null) {
             return getUsage(request, msg.toString());
         }
-        cwd.put(Slack.getSlackUserId(request), entry.getId());
+        slackStates.put(getStateKey(request), new SlackState(entry));
 
         return Slack.makeEntryResult(getRepository(), request, "New entry:",
-                                     toList(entry), webHook);
+                                     toList(entry), webHook, true);
     }
 
 
@@ -876,5 +947,104 @@ public class SlackHarvester extends Harvester {
 
         return l;
     }
+
+    /**
+     * Class description
+     *
+     *
+     * @version        $version$, Sat, May 2, '15
+     * @author         Enter your name here...    
+     */
+    private static class SlackState {
+
+        /** _more_          */
+        private Entry entry;
+
+        /**
+         * _more_
+         *
+         * @param entry _more_
+         */
+        public SlackState(Entry entry) {
+            this.entry = entry;
+        }
+    }
+
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param file _more_
+     * @param apiToken _more_
+     * @param channel _more_
+     * @param title _more_
+     * @param desc _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public static Result sendFile(Repository repository, File file,
+                                  String apiToken, String channel,
+                                  String title, String desc)
+            throws Exception {
+        CloseableHttpClient   client   = HttpClients.createDefault();
+        CloseableHttpResponse response = null;
+
+        try {
+            HttpPost post =
+                new HttpPost(Slack.getSlackApiUrl(Slack.API_FILES_UPLOAD));
+            FileBody               filePart = new FileBody(file);
+            MultipartEntityBuilder mpe      = MultipartEntityBuilder.create();
+
+            mpe.addPart(Slack.ARG_FILE, filePart);
+            mpe.addPart(
+                Slack.ARG_FILENAME,
+                new StringBody(
+                    repository.getStorageManager().getOriginalFilename(
+                        file.getName()), ContentType.TEXT_PLAIN));
+            mpe.addPart(Slack.ARG_TOKEN,
+                        new StringBody(apiToken, ContentType.TEXT_PLAIN));
+            mpe.addPart(Slack.ARG_TITLE,
+                        new StringBody(title, ContentType.TEXT_PLAIN));
+            mpe.addPart(Slack.ARG_INITIAL_COMMENT,
+                        new StringBody(desc, ContentType.TEXT_PLAIN));
+            mpe.addPart(Slack.ARG_CHANNELS, new StringBody(channel));
+
+            HttpEntity requestEntity = mpe.build();
+            post.setEntity(requestEntity);
+            //            System.out.println("executing request " + post.getRequestLine());
+            response = client.execute(post);
+            System.out.println(response.getStatusLine());
+            HttpEntity entity = response.getEntity();
+            if (entity == null) {
+                return message("Error: no http entity?");
+            }
+            String json = EntityUtils.toString(entity);
+            EntityUtils.consume(entity);
+            System.err.println("post response:" + json);
+            try {
+                JSONObject obj = new JSONObject(json);
+                if ( !Json.readValue(obj, Slack.JSON_OK,
+                                     "false").equals("true")) {
+                    String error = Json.readValue(obj, Slack.JSON_ERROR, "");
+
+                    return message("Oops, got an error posting the file:"
+                                   + error);
+                }
+
+                return message("Ok, file is on its way");
+            } catch (Exception exc) {
+                return message("Error:" + json);
+            }
+        } finally {
+            if (response != null) {
+                response.close();
+            }
+            client.close();
+        }
+    }
+
+
 
 }
