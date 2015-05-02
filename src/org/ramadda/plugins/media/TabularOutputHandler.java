@@ -278,58 +278,110 @@ public class TabularOutputHandler extends OutputHandler {
     }
 
 
-    public void addEncoding(Request request, Entry entry,
-                            String fromWhere, 
-                            List<String> args,
-                            final StringBuilder sb)  throws Exception {
+    /**
+     * _more_
+     *
+     * @param arg _more_
+     * @param args _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
+    private static int getArg(String arg, List<String> args, int dflt) {
+        for (int i = 0; i < args.size(); i++) {
+            if (args.get(i).equals(arg)) {
+                i++;
+                if (i < args.size()) {
+                    return new Integer(args.get(i)).intValue();
+                }
+            }
+        }
 
-        TabularVisitor     tabularVisitor = new TabularVisitor() {
+        return dflt;
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param fromWhere _more_
+     * @param args _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addEncoding(Request request, Entry entry, String fromWhere,
+                            List<String> args, final StringBuilder sb)
+            throws Exception {
+
+        final int      startCol       = getArg("-startcol", args, 0);
+        final int      endCol         = getArg("-endcol", args, 1000);
+        final int      maxCols        = getArg("-maxcols", args, 100);
+
+        final int      startRow       = getArg("-startrow", args, 0);
+        final int      endRow         = getArg("-endrow", args, 1000);
+        final int      maxRows        = getArg("-maxrows", args, 1000);
+        final int      colWidth       = getArg("-colwidth", args, 20);
+
+
+        TabularVisitor tabularVisitor = new TabularVisitor() {
             @Override
             public boolean visit(Visitor info, String sheet,
                                  List<List<Object>> rows) {
-                System.err.println ("visit: #rows=" + rows.size());
-                int maxWidth = 800;
-                int maxCols = 1;
-                int maxRows = info.getMaxRows();
+                System.err.println("visit: #rows=" + rows.size());
+                int maxWidth   = 800;
+                int padMaxCols = 1;
                 for (List<Object> cols : rows) {
-                    maxCols = Math.max(cols.size(),maxCols);
+                    padMaxCols = Math.max(cols.size(), padMaxCols);
                 }
                 for (List<Object> cols : rows) {
-                    while(cols.size()<maxCols) {
+                    while (cols.size() < padMaxCols) {
                         cols.add("");
                     }
                 }
                 int rowCnt = 0;
-                for (List<Object> cols : rows) {
-                    if(rowCnt++>maxRows) break;
-                    int colCnt = 0;
-                    //                    int colWidth = cols.size()>0?Math.max(maxWidth/cols.size(), 10):10;
-                    int colWidth = 20;
-                    for (Object col : cols) {
+                for (int rowIdx = startRow;
+                        (rowIdx < rows.size()) && (rowIdx <= endRow);
+                        rowIdx++) {
+                    if (rowCnt++ > maxRows) {
+                        break;
+                    }
+                    List<Object> cols   = rows.get(rowIdx);
+                    int          colCnt = 0;
+                    for (int colIdx = startCol;
+                            (colIdx < cols.size()) && (colIdx <= endCol);
+                            colIdx++) {
+                        if (colCnt++ > maxCols) {
+                            break;
+                        }
+                        Object col = cols.get(colIdx);
                         if (col == null) {
                             col = "null";
                         }
                         String s = col.toString();
-                        if(colCnt>0) {
+                        if (colCnt > 1) {
                             sb.append(" | ");
                         }
-                        if(s.length()>colWidth) {
-                            s = s.substring(0,colWidth-1-3) +"...";
+                        if (s.length() > colWidth) {
+                            s = s.substring(0, colWidth - 1 - 3) + "...";
                         }
-                        s = s.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;");
+                        s = s.replace("&", "&amp;").replace("<",
+                                      "&lt;").replace(">", "&gt;");
                         sb.append(StringUtil.padLeft(s, colWidth));
-                        colCnt++;
                     }
                     sb.append("\n");
                 }
+
                 return false;
             }
         };
 
-        Visitor info  = new Visitor();
+        Visitor info = new Visitor();
         info.setSkip(0);
         info.setMaxRows(100);
         visit(request, entry, info, tabularVisitor);
+        System.err.println(sb);
     }
 
 
@@ -634,6 +686,7 @@ public class TabularOutputHandler extends OutputHandler {
     public String getHtmlDisplay(Request request, Hashtable requestProps,
                                  Entry entry)
             throws Exception {
+
         //        StringBuilder tmp = new StringBuilder();
         //        addEncoding(request, entry, "", tmp);
         //        System.err.println (tmp);
@@ -794,6 +847,7 @@ public class TabularOutputHandler extends OutputHandler {
         sb.append(HtmlUtils.script(js.toString()));
 
         return sb.toString();
+
 
     }
 
@@ -973,10 +1027,17 @@ public class TabularOutputHandler extends OutputHandler {
     }
     */
 
-    public static void main(String[]args) throws Exception {
+    /**
+     * _more_
+     *
+     * @param args _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void main(String[] args) throws Exception {
         StringBuilder tmp = new StringBuilder();
         //        addEncoding(request, entry, "", tmp);
-        System.err.println (tmp);
+        System.err.println(tmp);
     }
 
 
