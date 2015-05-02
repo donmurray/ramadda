@@ -287,8 +287,21 @@ public class TabularOutputHandler extends OutputHandler {
             @Override
             public boolean visit(Visitor info, String sheet,
                                  List<List<Object>> rows) {
+                System.err.println ("visit:" + rows.size());
+                int maxWidth = 800;
+                int maxCols = 1;
+                for (List<Object> cols : rows) {
+                    maxCols = Math.max(cols.size(),maxCols);
+                }
+                for (List<Object> cols : rows) {
+                    while(cols.size()<maxCols) {
+                        cols.add("");
+                    }
+                }
                 for (List<Object> cols : rows) {
                     int colCnt = 0;
+                    //                    int colWidth = cols.size()>0?Math.max(maxWidth/cols.size(), 10):10;
+                    int colWidth = 20;
                     for (Object col : cols) {
                         if (col == null) {
                             col = "null";
@@ -297,7 +310,10 @@ public class TabularOutputHandler extends OutputHandler {
                         if(colCnt>0) {
                             sb.append(" | ");
                         }
-                        sb.append(StringUtil.padLeft(s, 20));
+                        if(s.length()>colWidth) {
+                            s = s.substring(0,colWidth-1-3) +"...";
+                        }
+                        sb.append(StringUtil.padLeft(s, colWidth));
                         colCnt++;
                     }
                     sb.append("\n");
@@ -307,8 +323,8 @@ public class TabularOutputHandler extends OutputHandler {
         };
 
         Visitor info  = new Visitor();
-        //        info.setSkip(getSkipRows(request, entry));
-        //        info.setMaxRows(getRowCount(request, entry, MAX_ROWS));
+        info.setSkip(0);
+        info.setMaxRows(100);
         visit(request, entry, info, tabularVisitor);
     }
 
@@ -614,6 +630,10 @@ public class TabularOutputHandler extends OutputHandler {
     public String getHtmlDisplay(Request request, Hashtable requestProps,
                                  Entry entry)
             throws Exception {
+        //        StringBuilder tmp = new StringBuilder();
+        //        addEncoding(request, entry, "", tmp);
+        //        System.err.println (tmp);
+
 
         if (isTabular(entry)) {
             TabularTypeHandler handler =
@@ -749,6 +769,9 @@ public class TabularOutputHandler extends OutputHandler {
         //        System.err.println(props);
 
         StringBuilder sb = new StringBuilder();
+        //        sb.append(HtmlUtils.pre(tmp.toString()));
+
+
         getRepository().getWikiManager().addDisplayImports(request, sb);
         sb.append(header(entry.getName()));
         if ( !request.get(ARG_EMBEDDED, false)) {
@@ -945,6 +968,12 @@ public class TabularOutputHandler extends OutputHandler {
 
     }
     */
+
+    public static void main(String[]args) throws Exception {
+        StringBuilder tmp = new StringBuilder();
+        //        addEncoding(request, entry, "", tmp);
+        System.err.println (tmp);
+    }
 
 
 }
