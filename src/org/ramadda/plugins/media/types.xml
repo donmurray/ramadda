@@ -89,7 +89,7 @@
         description="Quicktime Video" 
         handler="org.ramadda.plugins.media.QuicktimeTypeHandler" 
         category="Documents" 
-        pattern=".*\.mov">
+        pattern="(.*\.mov|.*\.mp4)">
      <property name="icon" value="/icons/mov.png"/>
      <service link="media.qttools.thumbnail" id="initmov"  target="attachment"/>
 </type>
