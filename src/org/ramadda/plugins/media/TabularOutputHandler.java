@@ -278,18 +278,19 @@ public class TabularOutputHandler extends OutputHandler {
     }
 
 
-
     public void addEncoding(Request request, Entry entry,
                             String fromWhere, 
+                            List<String> args,
                             final StringBuilder sb)  throws Exception {
 
         TabularVisitor     tabularVisitor = new TabularVisitor() {
             @Override
             public boolean visit(Visitor info, String sheet,
                                  List<List<Object>> rows) {
-                System.err.println ("visit:" + rows.size());
+                System.err.println ("visit: #rows=" + rows.size());
                 int maxWidth = 800;
                 int maxCols = 1;
+                int maxRows = info.getMaxRows();
                 for (List<Object> cols : rows) {
                     maxCols = Math.max(cols.size(),maxCols);
                 }
@@ -298,7 +299,9 @@ public class TabularOutputHandler extends OutputHandler {
                         cols.add("");
                     }
                 }
+                int rowCnt = 0;
                 for (List<Object> cols : rows) {
+                    if(rowCnt++>maxRows) break;
                     int colCnt = 0;
                     //                    int colWidth = cols.size()>0?Math.max(maxWidth/cols.size(), 10):10;
                     int colWidth = 20;
@@ -313,6 +316,7 @@ public class TabularOutputHandler extends OutputHandler {
                         if(s.length()>colWidth) {
                             s = s.substring(0,colWidth-1-3) +"...";
                         }
+                        s = s.replace("&","&amp;").replace("<","&lt;").replace(">","&gt;");
                         sb.append(StringUtil.padLeft(s, colWidth));
                         colCnt++;
                     }

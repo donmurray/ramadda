@@ -632,22 +632,32 @@ public class Slack {
      *
      *
      * @version        $version$, Sat, May 2, '15
-     * @author         Enter your name here...    
+     * @author         Enter your name here...
      */
     public static class Args {
 
-        /** _more_          */
-        Entry entry;
+        /** _more_ */
+        private List<String> args;
 
-        /** _more_          */
+
+        /** _more_ */
+        private Entry entry;
+
+
+
+
+        /** _more_ */
         HashSet<String> flags = new HashSet<String>();
 
         /**
          * _more_
          *
+         *
+         * @param args _more_
          * @param entry _more_
          */
-        public Args(Entry entry) {
+        public Args(List<String> args, Entry entry) {
+            this.args  = args;
             this.entry = entry;
         }
 
@@ -670,6 +680,15 @@ public class Slack {
          */
         public boolean isSet(String flag) {
             return flags.contains(flag);
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public List<String> getArgs() {
+            return args;
         }
 
         /**

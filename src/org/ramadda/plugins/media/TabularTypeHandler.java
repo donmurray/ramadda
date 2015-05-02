@@ -133,10 +133,11 @@ public class TabularTypeHandler extends MsDocTypeHandler {
     @Override
     public void addEncoding(Request request, Entry entry,
                             String fromWhere, 
+                            List<String> args,
                             StringBuilder sb)  throws Exception {
-        super.addEncoding(request, entry, fromWhere, sb);
+        super.addEncoding(request, entry, fromWhere, args, sb);
 
-        getTabularOutputHandler().addEncoding(request, entry, fromWhere, sb);
+        getTabularOutputHandler().addEncoding(request, entry, fromWhere, args, sb);
     }
 
     /**

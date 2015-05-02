@@ -390,12 +390,20 @@ public class TypeHandler extends RepositoryManager {
         this(repository, type, description, CATEGORY_DEFAULT);
     }
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param type _more_
+     * @param description _more_
+     * @param category _more_
+     */
     public TypeHandler(Repository repository, String type,
                        String description, String category) {
         super(repository);
         this.type        = type;
         this.description = description;
-        if(category != null) {
+        if (category != null) {
             this.category = category;
         }
     }
@@ -1991,10 +1999,20 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
-    public void addEncoding(Request request, Entry entry,
-                            String fromWhere, 
-                            StringBuilder sb)  throws Exception {
-    }
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param fromWhere _more_
+     * @param args _more_
+     * @param sb _more_
+     *
+     * @throws Exception _more_
+     */
+    public void addEncoding(Request request, Entry entry, String fromWhere,
+                            List<String> args, StringBuilder sb)
+            throws Exception {}
 
 
     /**
@@ -2720,19 +2738,18 @@ public class TypeHandler extends RepositoryManager {
                     msg(
                     "Search for entries of this type created by the user");
                 String userLinkId = HtmlUtils.getUniqueId("userlink_");
-                userSearchLink = HtmlUtils
-                    .href(getSearchManager().URL_SEARCH_TYPE + "/"
-                          + entry.getTypeHandler().getType() + "?"
-                          + ARG_USER_ID + "=" + entry.getUser().getId() + "&"
-                          + SearchManager.ARG_SEARCH_SUBMIT
-                          + "=true", entry.getUser().getLabel(), HtmlUtils
-                              .id(userLinkId) + 
-                          HtmlUtils.cssClass("entry-type-search")
-                                  + HtmlUtils
-                                      .attr(HtmlUtils
-                                          .ATTR_ALT, msg(linkMsg)) + HtmlUtils
-                                              .attr(HtmlUtils
-                                                  .ATTR_TITLE, linkMsg));
+                userSearchLink =
+                    HtmlUtils.href(
+                        getSearchManager().URL_SEARCH_TYPE + "/"
+                        + entry.getTypeHandler().getType() + "?"
+                        + ARG_USER_ID + "=" + entry.getUser().getId() + "&"
+                        + SearchManager.ARG_SEARCH_SUBMIT
+                        + "=true", entry.getUser().getLabel(), HtmlUtils.id(
+                            userLinkId) + HtmlUtils.cssClass(
+                            "entry-type-search") + HtmlUtils.attr(
+                            HtmlUtils.ATTR_ALT, msg(
+                                linkMsg)) + HtmlUtils.attr(
+                                    HtmlUtils.ATTR_TITLE, linkMsg));
 
 
                 sb.append(formEntry(request, msgLabel("Created by"),

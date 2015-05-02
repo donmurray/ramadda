@@ -108,7 +108,7 @@ public class SlackHarvester extends Harvester {
     /** _more_ */
     public static final String[] CMDS_GET = { "get" };
 
-    /** _more_          */
+    /** _more_ */
     public static final String[] CMDS_VIEW = { "view" };
 
 
@@ -467,10 +467,10 @@ public class SlackHarvester extends Harvester {
     public Slack.Args parseArgs(Request request, String text)
             throws Exception {
         System.err.println("ARGS: " + text);
-        Slack.Args   args    = new Slack.Args(null);
-        List<String> toks    = StringUtil.split(text, " ", true, true);
-        String       entryId = null;
-        for (String tok : toks) {
+        Slack.Args args = new Slack.Args(StringUtil.split(text, " ", true,
+                              true), null);
+        String entryId = null;
+        for (String tok : args.getArgs()) {
             System.err.println("TOK: " + tok);
             if (tok.equals("-l")) {
                 args.setFlag(tok);
@@ -569,11 +569,11 @@ public class SlackHarvester extends Harvester {
             return getUsage(request, "No current entry");
         }
         StringBuilder sb = new StringBuilder();
-
-        sb.append("view of entry: " + entry.getName() + "\n");
+        sb.append("```");
+        sb.append("Entry: " + entry.getName() + "\n");
         int len = sb.length();
-        entry.getTypeHandler().addEncoding(request, entry, "slack.view", sb);
-
+        entry.getTypeHandler().addEncoding(request, entry, "slack.view",
+                                           args.getArgs(), sb);
         if (sb.length() == len) {
             if (entry.getResource().isImage()) {
                 File file = new File(entry.getResource().getPath());
@@ -585,7 +585,13 @@ public class SlackHarvester extends Harvester {
             }
         }
 
-        return message(sb.toString());
+        sb.append("\n```");
+        System.err.println(sb);
+
+        return Slack.makeEntryResult(getRepository(), request, sb.toString(),
+                                     null, webHook, true);
+
+        //        return message(sb.toString());
 
 
     }
@@ -953,11 +959,11 @@ public class SlackHarvester extends Harvester {
      *
      *
      * @version        $version$, Sat, May 2, '15
-     * @author         Enter your name here...    
+     * @author         Enter your name here...
      */
     private static class SlackState {
 
-        /** _more_          */
+        /** _more_ */
         private Entry entry;
 
         /**
