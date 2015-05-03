@@ -7,6 +7,9 @@
 package org.ramadda.repository.harvester;
 
 
+import org.ramadda.util.FileInfo;
+
+
 import org.ramadda.util.HtmlUtils;
 
 import ucar.unidata.util.IOUtil;
@@ -27,30 +30,13 @@ import java.util.regex.*;
  *
  *
  */
-public class FileInfo {
-
-    /** tracks whether we have initialized ourselves */
-    private boolean hasInitialized = false;
-
-    /** The file */
-    private File file;
+public class HarvesterFile extends FileInfo {
 
     /** _more_ */
     private File rootDir;
 
-    /** _more_ */
-    private long time;
 
-    /** _more_ */
-    private long size = 0;
-
-    /** _more_ */
-    private int fileCount = 0;
-
-    /** _more_ */
-    private boolean isDir;
-
-    /** _more_ */
+    /** _more_          */
     private List addedFiles;
 
     /**
@@ -58,8 +44,8 @@ public class FileInfo {
      *
      * @param f the file
      */
-    public FileInfo(File f) {
-        this(f, f, f.isDirectory());
+    public HarvesterFile(File f) {
+        super(f);
 
     }
 
@@ -70,122 +56,11 @@ public class FileInfo {
      * @param rootDir _more_
      * @param isDir is file a directory
      */
-    public FileInfo(File f, File rootDir, boolean isDir) {
-        this.isDir   = isDir;
+    public HarvesterFile(File f, File rootDir, boolean isDir) {
+        super(f, isDir);
         this.rootDir = rootDir;
-        file         = f;
     }
 
-    /**
-     * _more_
-     */
-    private void doInit() {
-        time = file.lastModified();
-        if ( !isDir) {
-            size = file.length();
-        } else {
-            File[] files = file.listFiles();
-            if (files != null) {
-                fileCount = files.length;
-                for (File child : files) {
-                    size += child.length();
-                }
-            }
-        }
-        hasInitialized = true;
-    }
-
-
-    /**
-     * override hashcode
-     *
-     * @return hashcode
-     */
-    public int hashCode() {
-        return file.hashCode();
-
-    }
-
-    /**
-     * _more_
-     *
-     * @param obj _more_
-     *
-     * @return _more_
-     */
-    public boolean equals(Object obj) {
-        if ( !(obj instanceof FileInfo)) {
-            return false;
-        }
-        FileInfo that = (FileInfo) obj;
-
-        return this.file.equals(that.file);
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public boolean hasChanged() {
-        if ( !hasInitialized) {
-            doInit();
-
-            return true;
-        }
-        long newTime      = file.lastModified();
-        long newSize      = 0;
-        int  newFileCount = 0;
-
-        if (isDir) {
-            File[] files = this.file.listFiles();
-            if (files != null) {
-                newFileCount = files.length;
-                for (File child : files) {
-                    newSize += child.length();
-                }
-            }
-        } else {
-            newSize = file.length();
-        }
-
-        boolean changed = (newTime != time) || (newSize != size)
-                          || (newFileCount != fileCount);
-        time      = newTime;
-        size      = newSize;
-        fileCount = newFileCount;
-
-        return changed;
-    }
-
-    /**
-     * _more_
-     */
-    public void reset() {
-        time      = -1;
-        size      = -1;
-        fileCount = 0;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public File getFile() {
-        return file;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public boolean exists() {
-        return file.exists();
-    }
 
     /**
      * _more_
@@ -212,7 +87,7 @@ public class FileInfo {
      * @return _more_
      */
     public String toString() {
-        String s   = file.toString();
+        String s   = getFile().toString();
         List   tmp = addedFiles;
         if ((tmp != null) && (tmp.size() > 0)) {
             String fileBlock;
@@ -297,7 +172,7 @@ public class FileInfo {
                     System.err.print(".");
                 }
                 if (f.isDirectory()) {
-                    dirs.add(new FileInfo(f, f, true));
+                    dirs.add(new HarvesterFile(f, f, true));
                     //    if(dirs.size()%1000==0) System.err.print(".");
                 }
 
@@ -314,10 +189,10 @@ public class FileInfo {
         while (true) {
             long t1 = System.currentTimeMillis();
             for (FileInfo fileInfo : dirs) {
-                long oldTime = fileInfo.time;
+                long oldTime = fileInfo.getTime();
                 if (fileInfo.hasChanged()) {
                     //                    System.err.println("Changed:" + fileInfo);
-                    File[] files = fileInfo.file.listFiles();
+                    File[] files = fileInfo.getFile().listFiles();
                     for (int i = 0; i < files.length; i++) {
                         if (files[i].lastModified() > oldTime) {
                             //                            System.err.println("    " + files[i].getName());

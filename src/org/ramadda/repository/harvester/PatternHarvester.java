@@ -129,7 +129,7 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
     private boolean moveToStorage = false;
 
     /** _more_ */
-    private List<FileInfo> dirs;
+    private List<HarvesterFile> dirs;
 
     /** _more_ */
     private HashSet<File> dirMap = new HashSet<File>();
@@ -561,11 +561,12 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
             if (dirs.size() == 0) {
                 dirMsg = "No directories found<br>";
             } else {
-                List<FileInfo> dirsToUse = dirs;
+                List<HarvesterFile> dirsToUse = dirs;
                 dirMsg = "Scanning:" + dirsToUse.size() + " directories";
                 String suffix = "";
                 if (dirsToUse.size() > 50) {
-                    ArrayList<FileInfo> subset = new ArrayList<FileInfo>();
+                    ArrayList<HarvesterFile> subset =
+                        new ArrayList<HarvesterFile>();
                     while (subset.size() < 50) {
                         subset.add(dirsToUse.get(subset.size()));
                     }
@@ -613,7 +614,7 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
      *
      * @param dir _more_
      */
-    private void removeDir(FileInfo dir) {
+    private void removeDir(HarvesterFile dir) {
         dirs.remove(dir);
         dirMap.remove(dir.getFile());
     }
@@ -626,8 +627,8 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
      *
      * @return _more_
      */
-    private FileInfo addDir(File dir, File rootDir) {
-        FileInfo fileInfo = new FileInfo(dir, rootDir, true);
+    private HarvesterFile addDir(File dir, File rootDir) {
+        HarvesterFile fileInfo = new HarvesterFile(dir, rootDir, true);
         dirs.add(fileInfo);
         dirMap.add(dir);
 
@@ -667,7 +668,7 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
         newEntryCnt = 0;
         status = new StringBuffer("Looking for initial directory listing");
         long tt1 = System.currentTimeMillis();
-        dirs = new ArrayList<FileInfo>();
+        dirs = new ArrayList<HarvesterFile>();
 
         //Call init so we get the filePattern, etc.
         init();
@@ -680,7 +681,7 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
             if ( !rootDir.exists()) {
                 logHarvesterInfo("Root directory does not exist:" + rootDir);
             }
-            dirs.add(new FileInfo(rootDir));
+            dirs.add(new HarvesterFile(rootDir));
             dirs.addAll(collectDirs(rootDir, topPattern, timestamp));
             if ( !canContinueRunning(timestamp)) {
                 return;
@@ -695,7 +696,7 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
         //        System.err.println("took:" + (tt2 - tt1) + " to find initial dirs:"
         //                           + dirs.size());
 
-        for (FileInfo dir : dirs) {
+        for (HarvesterFile dir : dirs) {
             dirMap.add(dir.getFile());
         }
 
@@ -748,12 +749,12 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
      *
      * @throws Exception _more_
      */
-    public List<FileInfo> collectDirs(final File rootDir,
-                                      final Pattern topDirPattern,
-                                      final int timestamp)
+    public List<HarvesterFile> collectDirs(final File rootDir,
+                                           final Pattern topDirPattern,
+                                           final int timestamp)
             throws Exception {
-        final List<FileInfo> dirs       = new ArrayList();
-        IOUtil.FileViewer    fileViewer = new IOUtil.FileViewer() {
+        final List<HarvesterFile> dirs       = new ArrayList();
+        IOUtil.FileViewer         fileViewer = new IOUtil.FileViewer() {
             public int viewFile(File f) throws Exception {
                 if ( !canContinueRunning(timestamp)) {
                     return DO_STOP;
@@ -766,7 +767,7 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
                     if ( !okToRecurse(f)) {
                         return DO_DONTRECURSE;
                     }
-                    dirs.add(new FileInfo(f, rootDir, true));
+                    dirs.add(new HarvesterFile(f, rootDir, true));
                     status = new StringBuffer(
                         "Looking for initial directory listing<br>Found:"
                         + dirs.size() + " directories");
@@ -813,7 +814,7 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
             }
         }
 
-        return FileInfo.okToRecurse(f, this);
+        return HarvesterFile.okToRecurse(f, this);
     }
 
 
@@ -829,10 +830,10 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
     private void harvestEntries(boolean firstTime, int timestamp)
             throws Exception {
 
-        long           t1        = System.currentTimeMillis();
-        List<Entry>    entries   = new ArrayList<Entry>();
-        List<Entry>    needToAdd = new ArrayList<Entry>();
-        List<FileInfo> tmpDirs   = new ArrayList<FileInfo>(dirs);
+        long                t1        = System.currentTimeMillis();
+        List<Entry>         entries   = new ArrayList<Entry>();
+        List<Entry>         needToAdd = new ArrayList<Entry>();
+        List<HarvesterFile> tmpDirs   = new ArrayList<HarvesterFile>(dirs);
         entryCnt    = 0;
         newEntryCnt = 0;
 
@@ -846,7 +847,7 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
         //Iterate by size because we can add new dirs to the list
         for (int fileIdx = 0; fileIdx < tmpDirs.size(); fileIdx++) {
             printTab = "\t";
-            FileInfo dirInfo = tmpDirs.get(fileIdx);
+            HarvesterFile dirInfo = tmpDirs.get(fileIdx);
             if ( !dirInfo.exists()) {
                 logHarvesterInfo("Directory:" + dirInfo.getFile()
                                  + " * does not exist *");
@@ -1186,7 +1187,8 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
      *
      * @throws Exception _more_
      */
-    public Entry processFile(FileInfo fileInfo, File f) throws Exception {
+    public Entry processFile(HarvesterFile fileInfo, File f)
+            throws Exception {
 
         //check if its a hidden file
         boolean isPlaceholder = f.getName().equals(FILE_PLACEHOLDER);
@@ -1243,7 +1245,7 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
      *
      * @throws Exception _more_
      */
-    public Entry harvestFile(FileInfo fileInfo, File f, Matcher matcher)
+    public Entry harvestFile(HarvesterFile fileInfo, File f, Matcher matcher)
             throws Exception {
 
         boolean isPlaceholder = f.getName().equals(FILE_PLACEHOLDER);
@@ -1600,8 +1602,8 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
      *
      * @return _more_
      */
-    public Entry initializeNewEntry(FileInfo fileInfo, File originalFile,
-                                    Entry entry) {
+    public Entry initializeNewEntry(HarvesterFile fileInfo,
+                                    File originalFile, Entry entry) {
         return entry;
     }
 
@@ -1631,7 +1633,7 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
         }
         File f = new File(filepath);
 
-        return processFile(new FileInfo(f.getParentFile()), f);
+        return processFile(new HarvesterFile(f.getParentFile()), f);
     }
 
 
