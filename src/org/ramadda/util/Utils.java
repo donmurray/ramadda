@@ -1500,4 +1500,57 @@ public class Utils {
     }
 
 
+    /**
+     * look for ... -arg value ...  in list
+     *
+     * @param arg _more_
+     * @param args _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
+    public static int getArg(String arg, List<String> args, int dflt) {
+        for (int i = 0; i < args.size(); i++) {
+            if (args.get(i).equals(arg)) {
+                i++;
+                if (i < args.size()) {
+                    return new Integer(args.get(i)).intValue();
+                }
+
+                throw new IllegalArgumentException("Error: argument " + arg
+                        + " needs a value specified");
+            }
+        }
+
+        return dflt;
+    }
+
+
+    /**
+     * look for ... -arg value ...  in list
+     *
+     * @param arg _more_
+     * @param args _more_
+     * @param dflt _more_
+     *
+     * @return _more_
+     */
+    public static String getArg(String arg, List<String> args, String dflt) {
+        for (int i = 0; i < args.size(); i++) {
+            if (args.get(i).equals(arg)) {
+                i++;
+                if (i < args.size()) {
+                    return args.get(i);
+                }
+
+                throw new IllegalArgumentException("Error: argument " + arg
+                        + " needs a value specified");
+            }
+        }
+
+        return dflt;
+    }
+
+
+
 }

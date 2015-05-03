@@ -278,27 +278,6 @@ public class TabularOutputHandler extends OutputHandler {
     }
 
 
-    /**
-     * _more_
-     *
-     * @param arg _more_
-     * @param args _more_
-     * @param dflt _more_
-     *
-     * @return _more_
-     */
-    private static int getArg(String arg, List<String> args, int dflt) {
-        for (int i = 0; i < args.size(); i++) {
-            if (args.get(i).equals(arg)) {
-                i++;
-                if (i < args.size()) {
-                    return new Integer(args.get(i)).intValue();
-                }
-            }
-        }
-
-        return dflt;
-    }
 
     /**
      * _more_
@@ -315,14 +294,14 @@ public class TabularOutputHandler extends OutputHandler {
                             List<String> args, final StringBuilder sb)
             throws Exception {
 
-        final int      startCol       = getArg("-startcol", args, 0);
-        final int      endCol         = getArg("-endcol", args, 1000);
-        final int      maxCols        = getArg("-maxcols", args, 100);
+        final int      startCol       = Utils.getArg("-startcol", args, 0);
+        final int      endCol         = Utils.getArg("-endcol", args, 1000);
+        final int      maxCols        = Utils.getArg("-maxcols", args, 100);
 
-        final int      startRow       = getArg("-startrow", args, 0);
-        final int      endRow         = getArg("-endrow", args, 1000);
-        final int      maxRows        = getArg("-maxrows", args, 1000);
-        final int      colWidth       = getArg("-colwidth", args, 20);
+        final int      startRow       = Utils.getArg("-startrow", args, 0);
+        final int      endRow         = Utils.getArg("-endrow", args, 1000);
+        final int      maxRows        = Utils.getArg("-maxrows", args, 1000);
+        final int      colWidth       = Utils.getArg("-colwidth", args, 20);
 
 
         TabularVisitor tabularVisitor = new TabularVisitor() {
