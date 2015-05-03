@@ -6,22 +6,6 @@
 
 package org.ramadda.plugins.slack;
 
-
-import org.apache.http.HttpEntity;
-import org.apache.http.client.methods.CloseableHttpResponse;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.ContentType;
-import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.util.EntityUtils;
-
-import org.json.*;
-
-
-
 import org.ramadda.repository.*;
 import org.ramadda.repository.auth.*;
 import org.ramadda.repository.harvester.*;
@@ -30,8 +14,10 @@ import org.ramadda.repository.type.*;
 
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Json;
+import org.ramadda.util.FileInfo;
 import org.ramadda.util.Utils;
 
+import org.json.*;
 
 
 import org.w3c.dom.*;
@@ -63,6 +49,17 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Properties;
 
+
+import org.apache.http.HttpEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 
 
 
@@ -572,8 +569,8 @@ public class SlackHarvester extends Harvester {
         sb.append("```");
         sb.append("Entry: " + entry.getName() + "\n");
         int len = sb.length();
-        entry.getTypeHandler().addEncoding(request, entry, "slack.view",
-                                           args.getArgs(), sb);
+        List<FileInfo> files = new ArrayList<FileInfo>();
+        entry.getTypeHandler().addEncoding(request, entry, "slack.view", args.getArgs(), sb, files);
         if (sb.length() == len) {
             if (entry.getResource().isImage()) {
                 File file = new File(entry.getResource().getPath());

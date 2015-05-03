@@ -30,6 +30,7 @@ import org.ramadda.sql.Clause;
 import org.ramadda.sql.SqlUtil;
 import org.ramadda.util.FormInfo;
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.FileInfo;
 import org.ramadda.util.JQuery;
 import org.ramadda.util.Json;
 import org.ramadda.util.SelectionRectangle;
@@ -2011,7 +2012,7 @@ public class TypeHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public void addEncoding(Request request, Entry entry, String fromWhere,
-                            List<String> args, StringBuilder sb)
+                            List<String> args, Appendable sb, List<FileInfo> files)
             throws Exception {}
 
 

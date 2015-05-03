@@ -23,6 +23,7 @@ import org.ramadda.repository.auth.*;
 import org.ramadda.repository.output.*;
 
 import org.ramadda.service.*;
+import org.ramadda.util.FileInfo;
 import org.ramadda.util.GoogleChart;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Json;
@@ -287,11 +288,13 @@ public class TabularOutputHandler extends OutputHandler {
      * @param fromWhere _more_
      * @param args _more_
      * @param sb _more_
+     * @param files _more_
      *
      * @throws Exception _more_
      */
     public void addEncoding(Request request, Entry entry, String fromWhere,
-                            List<String> args, final StringBuilder sb)
+                            List<String> args, final Appendable sb,
+                            List<FileInfo> files)
             throws Exception {
 
         final int      startCol       = Utils.getArg("-startcol", args, 0);
@@ -308,6 +311,19 @@ public class TabularOutputHandler extends OutputHandler {
             @Override
             public boolean visit(Visitor info, String sheet,
                                  List<List<Object>> rows) {
+                try {
+                    return visitInner(info, sheet, rows);
+                } catch(Exception exc) {
+                    throw new RuntimeException(exc);
+                }
+            }
+
+
+            private boolean visitInner(Visitor info, String sheet,
+                            List<List<Object>> rows) throws Exception {
+
+
+
                 System.err.println("visit: #rows=" + rows.size());
                 int maxWidth   = 800;
                 int padMaxCols = 1;

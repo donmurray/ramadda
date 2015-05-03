@@ -89,30 +89,29 @@ public class QuicktimeTypeHandler extends GenericTypeHandler {
   <source src="movie.mp4" type="video/mp4">
   <source src="movie.ogg" type="video/ogg">
 Your browser does not support the video tag.
-</video> 
+</video>
         */
 
 
 
-      sb.append(HtmlUtils.tag("video",
-                                HtmlUtils.attrs(new String[] {
-                                        HtmlUtils.ATTR_SRC, url, 
-                                        HtmlUtils.ATTR_CLASS,
-                                        "ramadda-video-embed", HtmlUtils.ATTR_WIDTH, width,
-                                        HtmlUtils.ATTR_HEIGHT, height, "autoplay", "false"
-                                    })+" controls ",
-                              HtmlUtils.tag("source", HtmlUtils.attrs(new String[] {HtmlUtils.ATTR_SRC, url}))
-                              ));
+        sb.append(HtmlUtils.tag("video", HtmlUtils.attrs(new String[] {
+            HtmlUtils.ATTR_SRC, url, HtmlUtils.ATTR_CLASS,
+            "ramadda-video-embed", HtmlUtils.ATTR_WIDTH, width,
+            HtmlUtils.ATTR_HEIGHT, height, "autoplay", "false"
+        }) + " controls ", HtmlUtils.tag("source",
+                                         HtmlUtils.attrs(new String[] {
+                                             HtmlUtils.ATTR_SRC,
+                                             url }))));
 
-       /*
-      sb.append(HtmlUtils.tag(HtmlUtils.TAG_EMBED,
-                                HtmlUtils.attrs(new String[] {
-                                        HtmlUtils.ATTR_SRC, url, 
-                                        HtmlUtils.ATTR_CLASS,
-                                        "ramadda-video-embed", HtmlUtils.ATTR_WIDTH, width,
-                                        HtmlUtils.ATTR_HEIGHT, height, "autoplay", "false", "controls",""
-                                    })));
-        */
+        /*
+       sb.append(HtmlUtils.tag(HtmlUtils.TAG_EMBED,
+                                 HtmlUtils.attrs(new String[] {
+                                         HtmlUtils.ATTR_SRC, url,
+                                         HtmlUtils.ATTR_CLASS,
+                                         "ramadda-video-embed", HtmlUtils.ATTR_WIDTH, width,
+                                         HtmlUtils.ATTR_HEIGHT, height, "autoplay", "false", "controls",""
+                                     })));
+         */
         return sb.toString();
 
     }

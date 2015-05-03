@@ -10,6 +10,7 @@ package org.ramadda.plugins.media;
 import org.ramadda.repository.*;
 import org.ramadda.repository.metadata.*;
 import org.ramadda.repository.type.*;
+import org.ramadda.util.FileInfo;
 import org.ramadda.util.HtmlUtils;
 
 import org.ramadda.util.Json;
@@ -130,14 +131,27 @@ public class TabularTypeHandler extends MsDocTypeHandler {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param fromWhere _more_
+     * @param args _more_
+     * @param sb _more_
+     * @param files _more_
+     *
+     * @throws Exception _more_
+     */
     @Override
-    public void addEncoding(Request request, Entry entry,
-                            String fromWhere, 
-                            List<String> args,
-                            StringBuilder sb)  throws Exception {
-        super.addEncoding(request, entry, fromWhere, args, sb);
+    public void addEncoding(Request request, Entry entry, String fromWhere,
+                            List<String> args, Appendable sb,
+                            List<FileInfo> files)
+            throws Exception {
+        super.addEncoding(request, entry, fromWhere, args, sb, files);
 
-        getTabularOutputHandler().addEncoding(request, entry, fromWhere, args, sb);
+        getTabularOutputHandler().addEncoding(request, entry, fromWhere,
+                args, sb, files);
     }
 
     /**

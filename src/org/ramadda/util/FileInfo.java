@@ -25,6 +25,12 @@ public class FileInfo {
     private File file;
 
     /** _more_ */
+    private String title;
+
+    /** _more_ */
+    private String description;
+
+    /** _more_ */
     private long time;
 
     /** _more_ */
@@ -176,6 +182,42 @@ public class FileInfo {
      */
     public boolean exists() {
         return file.exists();
+    }
+
+    /**
+     * Set the Description property.
+     *
+     * @param value The new value for Description
+     */
+    public void setDescription(String value) {
+        description = value;
+    }
+
+    /**
+     * Get the Description property.
+     *
+     * @return The Description
+     */
+    public String getDescription() {
+        return description;
+    }
+
+    /**
+     * Set the Title property.
+     *
+     * @param value The new value for Title
+     */
+    public void setTitle(String value) {
+        title = value;
+    }
+
+    /**
+     * Get the Title property.
+     *
+     * @return The Title
+     */
+    public String getTitle() {
+        return title;
     }
 
 
