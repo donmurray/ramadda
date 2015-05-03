@@ -213,7 +213,7 @@ public abstract class RecordCollectionHarvester extends PatternHarvester {
      * @throws Exception on badness
      */
     @Override
-    public Entry harvestFile(FileInfo fileInfo, File f, Matcher matcher)
+    public Entry harvestFile(HarvesterFile fileInfo, File f, Matcher matcher)
             throws Exception {
         if (f.toString().endsWith(".properties")) {
             return null;
@@ -235,7 +235,7 @@ public abstract class RecordCollectionHarvester extends PatternHarvester {
      * @return The entry
      */
     @Override
-    public Entry initializeNewEntry(FileInfo fileInfo, File originalFile,
+    public Entry initializeNewEntry(HarvesterFile fileInfo, File originalFile,
                                     Entry entry) {
         try {
             getRepository().getLogManager().logInfo(
