@@ -219,7 +219,7 @@ public class GridAggregationHarvester extends PatternHarvester {
      *
      * @return _more_
      */
-    public Entry initializeNewEntry(FileInfo fileInfo, File originalFile,
+    public Entry initializeNewEntry(HarvesterFile fileInfo, File originalFile,
                                     Entry entry) {
         try {
             /*
