@@ -722,24 +722,18 @@ public class ServiceOutputHandler extends OutputHandler {
 
         }
 
-
-
         extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_NEWDIRECTORY, "true",
-                request.get(ARG_NEWDIRECTORY, false),
+                request.get(ARG_NEWDIRECTORY, true),
                 msg("Create new processing folder") + extraDirHtml));
-
         extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_GOTOPRODUCTS, "true",
                 request.get(ARG_GOTOPRODUCTS, haveAnyOutputs),
                 "Go to products page"));
         extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_WRITEWORKFLOW, "true",
                 request.get(ARG_WRITEWORKFLOW, false), "Write workflow"));
-
         extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_SHOWCOMMAND, "true",
                 request.get(ARG_SHOWCOMMAND, false), "Show command"));
-
         extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_TOXML, "true",
                 request.get(ARG_TOXML, false), msg("Export full XML")));
-
         if (haveAnyOutputs) {
             extraSubmit.add(HtmlUtils.labeledCheckbox(ARG_ASYNCH, "true",
                     request.get(ARG_ASYNCH, false), msg("Asynchronous")));

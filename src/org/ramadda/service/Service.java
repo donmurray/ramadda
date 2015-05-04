@@ -1098,7 +1098,9 @@ public class Service extends RepositoryManager {
 
                     argValue = arg.getValue();
                     argValue = argValue.replace("${entry.file}", filePath);
-                    values.add(argValue);
+                    if (arg.getInclude()) {
+                        values.add(argValue);
+                    }
                 }
             } else {
                 argValue = getRequestValue(request, input, argPrefix,
@@ -1216,6 +1218,7 @@ public class Service extends RepositoryManager {
                                         workDir, value,
                                         input.getForDisplay(), arg.getMap());
                     valueMap.put(arg.getName(), value);
+
                     if ( !arg.getInclude()) {
                         continue;
                     }
@@ -1231,6 +1234,7 @@ public class Service extends RepositoryManager {
                         + arg.getLabel());
             }
         }
+
 
         addExtraArgs(request, input, commands, false);
 
