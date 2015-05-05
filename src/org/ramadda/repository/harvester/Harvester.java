@@ -504,7 +504,7 @@ public abstract class Harvester extends RepositoryManager {
         this.addShortMetadata = XmlUtil.getAttribute(element,
                 ATTR_ADDSHORTMETADATA, addShortMetadata);
         this.activeOnStart = XmlUtil.getAttribute(element,
-                ATTR_ACTIVEONSTART, activeOnStart);
+                ATTR_ACTIVEONSTART, getDefaultActiveOnStart());
 
         this.generateMd5 = XmlUtil.getAttribute(element, ATTR_GENERATEMD5,
                 generateMd5);
@@ -518,6 +518,15 @@ public abstract class Harvester extends RepositoryManager {
         this.sleepMinutes = XmlUtil.getAttribute(element, ATTR_SLEEP,
                 sleepMinutes);
 
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean getDefaultActiveOnStart() {
+        return false;
     }
 
     /**
@@ -659,28 +668,37 @@ public abstract class Harvester extends RepositoryManager {
 
 
         StringBuffer runWidgets = new StringBuffer();
-        runWidgets.append(HtmlUtils.checkbox(ATTR_TESTMODE, "true", testMode)
-                          + HtmlUtils.space(1) + msg("Test mode"));
-        runWidgets.append(HtmlUtils.space(3) + msgLabel("Count")
-                          + HtmlUtils.input(ATTR_TESTCOUNT, "" + testCount,
-                                            HtmlUtils.SIZE_5));
-        runWidgets.append(HtmlUtils.br());
-        runWidgets.append(
-            HtmlUtils.checkbox(ATTR_ACTIVEONSTART, "true", activeOnStart)
-            + HtmlUtils.space(1) + msg("Active on startup"));
-        runWidgets.append(HtmlUtils.br());
-        runWidgets.append(HtmlUtils.checkbox(ATTR_MONITOR, "true", monitor)
-                          + HtmlUtils.space(1) + msg("Run continually"));
+        if (showWidget(ATTR_TESTMODE)) {
+            runWidgets.append(HtmlUtils.checkbox(ATTR_TESTMODE, "true",
+                    testMode) + HtmlUtils.space(1) + msg("Test mode"));
+            runWidgets.append(HtmlUtils.space(3) + msgLabel("Count")
+                              + HtmlUtils.input(ATTR_TESTCOUNT,
+                                  "" + testCount, HtmlUtils.SIZE_5));
+            runWidgets.append(HtmlUtils.br());
+        }
+        if (showWidget(ATTR_ACTIVEONSTART)) {
+            runWidgets.append(HtmlUtils.checkbox(ATTR_ACTIVEONSTART, "true",
+                    activeOnStart) + HtmlUtils.space(1)
+                                   + msg("Active on startup"));
+            runWidgets.append(HtmlUtils.br());
+        }
 
-        runWidgets.append(HtmlUtils.br() + HtmlUtils.space(5));
-        runWidgets.append(
-            msgLabel("Every") + HtmlUtils.space(1)
-            + HtmlUtils.input(ATTR_SLEEP, "" + minutes, HtmlUtils.SIZE_5)
-            + HtmlUtils.space(1) + sleepType + sleepLbl);
-        runWidgets.append(HtmlUtils.br());
-        runWidgets.append(
-            HtmlUtils.checkbox(ATTR_GENERATEMD5, "true", generateMd5)
-            + HtmlUtils.space(1) + msg("Generate MD5 Checksum"));
+        if (showWidget(ATTR_MONITOR)) {
+            runWidgets.append(HtmlUtils.checkbox(ATTR_MONITOR, "true",
+                    monitor) + HtmlUtils.space(1) + msg("Run continually"));
+
+            runWidgets.append(HtmlUtils.br() + HtmlUtils.space(5));
+            runWidgets.append(msgLabel("Every") + HtmlUtils.space(1)
+                              + HtmlUtils.input(ATTR_SLEEP, "" + minutes,
+                                  HtmlUtils.SIZE_5) + HtmlUtils.space(1)
+                                      + sleepType + sleepLbl);
+            runWidgets.append(HtmlUtils.br());
+        }
+        if (showWidget(ATTR_GENERATEMD5)) {
+            runWidgets.append(HtmlUtils.checkbox(ATTR_GENERATEMD5, "true",
+                    generateMd5) + HtmlUtils.space(1)
+                                 + msg("Generate MD5 Checksum"));
+        }
 
         sb.append(
             HtmlUtils.formEntryTop(
@@ -689,6 +707,17 @@ public abstract class Harvester extends RepositoryManager {
                     msg("Run Settings"), runWidgets.toString(), false)));
     }
 
+
+    /**
+     * _more_
+     *
+     * @param arg _more_
+     *
+     * @return _more_
+     */
+    public boolean showWidget(String arg) {
+        return true;
+    }
 
     /**
      * _more_
