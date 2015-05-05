@@ -1389,6 +1389,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                     sql.append("int");
                 } else if (type == ColumnInfo.TYPE_CLOB) {
                     sql.append(convertType("clob", column.getSize()));
+                } else if (type == ColumnInfo.TYPE_BLOB) {
+                    sql.append(convertType("blob", column.getSize()));
                 } else {
                     throw new IllegalStateException("Unknown column type:"
                             + type);
@@ -1464,6 +1466,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                     } else if (type == ColumnInfo.TYPE_DOUBLE) {
                         values[colCnt++] = new Double(dis.readDouble());
                     } else if (type == ColumnInfo.TYPE_CLOB) {
+                        values[colCnt++] = readString(dis);
+                    } else if (type == ColumnInfo.TYPE_BLOB) {
                         values[colCnt++] = readString(dis);
                     } else if (type == ColumnInfo.TYPE_BIGINT) {
                         long v = dis.readLong();
@@ -1718,6 +1722,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                         } else if (type == ColumnInfo.TYPE_DOUBLE) {
                             writeDouble(dos, (Double) results.getObject(i));
                         } else if (type == ColumnInfo.TYPE_CLOB) {
+                            writeString(dos, results.getString(i));
+                        } else if (type == ColumnInfo.TYPE_BLOB) {
                             writeString(dos, results.getString(i));
                         } else if (type == ColumnInfo.TYPE_BIGINT) {
                             writeLong(dos, results.getLong(i));

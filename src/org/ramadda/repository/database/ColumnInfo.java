@@ -42,6 +42,8 @@ public class ColumnInfo {
     /** _more_ */
     public static final int TYPE_TIME = 9;
 
+    public static final int TYPE_BLOB = 10;
+
     /** _more_ */
     private String name;
 
@@ -108,6 +110,8 @@ public class ColumnInfo {
             return TYPE_DOUBLE;
         } else if (type == java.sql.Types.CLOB) {
             return TYPE_CLOB;
+        } else if (type == java.sql.Types.BLOB) {
+            return TYPE_BLOB;
         } else if (type == java.sql.Types.BIGINT) {
             return TYPE_BIGINT;
         } else if (type == java.sql.Types.SMALLINT) {
