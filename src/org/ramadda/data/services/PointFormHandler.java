@@ -443,7 +443,7 @@ public class PointFormHandler extends RecordFormHandler {
     public Result outputEntryForm(Request request, Entry entry,
                                   StringBuffer sb)
             throws Exception {
-        
+
         //        System.err.println ( getPointOutputHandler().getCsv(request, entry));
 
         RecordEntry recordEntry =
@@ -1546,8 +1546,9 @@ ARG_WAVEFORM_DISPLAY, waveformDisplay, ARG_WAVEFORM_NAME, waveformName
      *
      * @throws Exception _more_
      */
-    private BufferedImage makeTimeseriesImage(Request request,
-            PointEntry pointEntry, final PlotInfo plotInfo)
+    public BufferedImage makeTimeseriesImage(Request request,
+                                             PointEntry pointEntry,
+                                             final PlotInfo plotInfo)
             throws Exception {
 
         Entry entry      = pointEntry.getEntry();

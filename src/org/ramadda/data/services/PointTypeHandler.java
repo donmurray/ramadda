@@ -23,6 +23,7 @@ import org.ramadda.repository.map.*;
 import org.ramadda.repository.metadata.*;
 import org.ramadda.repository.output.*;
 import org.ramadda.repository.type.*;
+import org.ramadda.util.FileInfo;
 import org.ramadda.util.FormInfo;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Utils;
@@ -32,7 +33,10 @@ import org.ramadda.util.grid.LatLonGrid;
 
 import org.w3c.dom.*;
 
+import ucar.unidata.ui.ImageUtils;
 import ucar.unidata.util.Misc;
+
+import java.awt.image.*;
 
 
 import java.io.BufferedOutputStream;
@@ -163,6 +167,40 @@ public class PointTypeHandler extends RecordTypeHandler {
             pointEntry, metadataHarvester);
         log("initialize new entry: done");
 
+    }
+
+    /**
+     * Gets called by the slack plugin. create a time series image
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param fromWhere _more_
+     * @param args _more_
+     * @param sb _more_
+     * @param files _more_
+     *
+     * @throws Exception on badness
+     */
+    @Override
+    public void addEncoding(Request request, Entry entry, String fromWhere,
+                            final List<String> args, final Appendable sb,
+                            List<FileInfo> files)
+            throws Exception {
+        PointOutputHandler poh =
+            (PointOutputHandler) getRecordOutputHandler();
+        PointEntry pointEntry = (PointEntry) poh.doMakeEntry(request, entry);
+        File imageFile =
+            getRepository().getStorageManager().getTmpFile(request,
+                                                           entry.getName() + "_timeseries.png");
+        PointFormHandler.PlotInfo plotInfo = new PointFormHandler.PlotInfo();
+        BufferedImage newImage =
+            poh.getPointFormHandler().makeTimeseriesImage(request,
+                pointEntry, plotInfo);
+        ImageUtils.writeImageToFile(newImage, imageFile);
+        FileInfo fileInfo = new FileInfo(imageFile);
+        fileInfo.setDescription(entry.getDescription());
+        fileInfo.setTitle("Time series - " + entry.getName());
+        files.add(fileInfo);
     }
 
     /**
