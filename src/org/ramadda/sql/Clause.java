@@ -151,6 +151,7 @@ public class Clause {
      */
     public Clause(String column, String expr, Object value) {
         this.column = column;
+        if(expr.equals("!=")) expr = EXPR_NOTEQUALS;
         this.expr   = expr;
         this.value  = value;
     }

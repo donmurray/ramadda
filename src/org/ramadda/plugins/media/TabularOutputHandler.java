@@ -375,8 +375,14 @@ public class TabularOutputHandler extends OutputHandler {
         Visitor info = new Visitor();
         info.setSkip(0);
         info.setMaxRows(100);
+        for(String s: args) {
+            if(s.matches("(<|<=|>|>=|=|<>|!=)")) {
+                info.addSearchExpression(s);
+            }
+        }
+
         visit(request, entry, info, tabularVisitor);
-        System.err.println(sb);
+        //        System.err.println(sb);
     }
 
 

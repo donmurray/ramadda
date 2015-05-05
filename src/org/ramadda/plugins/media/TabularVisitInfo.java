@@ -45,6 +45,9 @@ public class TabularVisitInfo {
     /** _more_ */
     private List props = new ArrayList();
 
+
+
+
     /**
      * _more_
      *
@@ -245,6 +248,7 @@ public class TabularVisitInfo {
     public String getSearchText() {
         return searchText;
     }
+
 
 
 

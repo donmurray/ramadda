@@ -103,7 +103,7 @@ public class Visitor implements Cloneable {
     /** _more_ */
     private List<SearchField> searchFields = new ArrayList<SearchField>();
 
-
+    private List<String> searchExpressions = new ArrayList<String>();
     /**
      * _more_
      */
@@ -643,6 +643,18 @@ public class Visitor implements Cloneable {
     }
 
 
+    public void addSearchExpression(String expr) {
+        searchExpressions.add(expr);
+    }
+
+    /**
+       Get the SearchExpressions property.
+       
+       @return The SearchExpressions
+    **/
+    public List<String> getSearchExpressions () {
+        return searchExpressions;
+    }
 
 
 }
