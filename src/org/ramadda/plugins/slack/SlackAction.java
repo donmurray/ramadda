@@ -12,6 +12,7 @@ import org.ramadda.repository.auth.*;
 import org.ramadda.repository.monitor.*;
 
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Utils;
 
 
 import java.util.ArrayList;
@@ -141,8 +142,9 @@ public class SlackAction extends MonitorAction {
                                    ? "New"
                                    : "Modified") + " "
                                    + entry.getTypeHandler()
-                                       .getLabel(), entries, getWebhook(),
-                                           false);
+                                       .getLabel(), entries,
+                                           getWebhookToUse(monitor
+                                               .getRepository()), false);
         } catch (Exception exc) {
             monitor.handleError("Error posting to Monitor   ", exc);
         }
@@ -168,6 +170,25 @@ public class SlackAction extends MonitorAction {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     *
+     * @return _more_
+     */
+    public String getWebhookToUse(Repository repository) {
+        if ( !Utils.stringDefined(webhook)) {
+            return null;
+        }
+        String fromProp = repository.getProperty(webhook, (String) null);
+        if (fromProp != null) {
+            return fromProp;
+        }
+
+        return webhook;
+
+    }
 
 
 }

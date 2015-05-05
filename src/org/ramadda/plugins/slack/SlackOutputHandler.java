@@ -68,6 +68,7 @@ import java.util.zip.*;
 public class SlackOutputHandler extends OutputHandler {
 
 
+    /** _more_          */
     public static final String PROP_SLACK_API_TOKEN = "slack.api.token";
 
     /** _more_ */
@@ -107,11 +108,13 @@ public class SlackOutputHandler extends OutputHandler {
      */
     public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
-        if(!request.isAnonymous() &&
-           state.getEntry().isFile() &&  
-           getAccessManager().canDoAction(request, state.getEntry(), Permission.ACTION_EDIT) &&
-           getRepository().getProperty(PROP_SLACK_API_TOKEN, (String) null) !=null) {
-            links.add(makeLink(request, state.getEntry(),  OUTPUT_SLACK_PUBLISH));
+        if ( !request.isAnonymous() && state.getEntry().isFile()
+                && getAccessManager().canDoAction(
+                    request, state.getEntry(),
+                    Permission.ACTION_EDIT) && (getRepository().getProperty(
+                        PROP_SLACK_API_TOKEN, (String) null) != null)) {
+            links.add(makeLink(request, state.getEntry(),
+                               OUTPUT_SLACK_PUBLISH));
         }
     }
 
@@ -119,6 +122,10 @@ public class SlackOutputHandler extends OutputHandler {
     /**
      * _more_
      *
+     *
+     * @param request _more_
+     * @param outputType _more_
+     * @param entry _more_
      * @return _more_
      *
      * @throws Exception _more_
@@ -127,11 +134,14 @@ public class SlackOutputHandler extends OutputHandler {
     public Result outputEntry(Request request, OutputType outputType,
                               Entry entry)
             throws Exception {
-        if(!getAccessManager().canDoAction(request, entry, Permission.ACTION_EDIT)) {
+        if ( !getAccessManager().canDoAction(request, entry,
+                                             Permission.ACTION_EDIT)) {
             throw new IllegalArgumentException("No access");
         }
-        if(getRepository().getProperty(PROP_SLACK_API_TOKEN, (String) null) ==null) {
-            return new Result("", new StringBuilder("No Slack API token defined"));
+        if (getRepository().getProperty(PROP_SLACK_API_TOKEN, (String) null)
+                == null) {
+            return new Result(
+                "", new StringBuilder("No Slack API token defined"));
         }
 
         StringBuilder sb = new StringBuilder("slack publish stuff here");

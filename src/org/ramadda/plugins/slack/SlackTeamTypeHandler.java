@@ -72,6 +72,33 @@ public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
         super(repository, entryNode);
     }
 
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private String getToken(Request request, Entry entry) throws Exception {
+
+        String token = (String) entry.getValue(IDX_TOKEN);
+        if ( !Utils.stringDefined(token)) {
+            return null;
+        }
+        String fromProp = getRepository().getProperty(token.trim(),
+                              (String) null);
+        if (fromProp != null) {
+            return fromProp;
+        }
+
+        return token;
+    }
+
+
+
 
     /**
      * _more_
@@ -93,7 +120,7 @@ public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
         }
         */
 
-        String token = (String) entry.getValue(IDX_TOKEN);
+        String token = getToken(request, entry);
         if ( !Utils.stringDefined(token)) {
             return;
         }
@@ -145,7 +172,7 @@ public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
         if ( !Utils.stringDefined(teamId)) {
             return ids;
         }
-        String token = (String) teamEntry.getValue(IDX_TOKEN);
+        String token = getToken(request, teamEntry);
         if ( !Utils.stringDefined(token)) {
             return ids;
         }
@@ -295,7 +322,7 @@ public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
                                      String channelId, JSONObject message)
             throws Exception {
 
-        String token    = (String) teamEntry.getValue(IDX_TOKEN);
+        String token    = getToken(request, teamEntry);
         String userId   = Json.readValue(message, "user", "");
         String userName = Json.readValue(message, "username", userId);
 
@@ -371,7 +398,7 @@ public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
     public Entry makeSynthEntry(Request request, Entry teamEntry, String id)
             throws Exception {
         //        System.err.println("SlackTeam.makeSynthEntry id = " + id +" team:" + teamEntry.getName());
-        String token = (String) teamEntry.getValue(IDX_TOKEN);
+        String token = getToken(request, teamEntry);
         if ( !Utils.stringDefined(token)) {
             return null;
         }

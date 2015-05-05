@@ -6,49 +6,6 @@
 
 package org.ramadda.plugins.slack;
 
-import org.ramadda.repository.*;
-import org.ramadda.repository.auth.*;
-import org.ramadda.repository.harvester.*;
-import org.ramadda.repository.metadata.*;
-import org.ramadda.repository.type.*;
-
-import org.ramadda.util.HtmlUtils;
-import org.ramadda.util.Json;
-import org.ramadda.util.FileInfo;
-import org.ramadda.util.Utils;
-
-import org.json.*;
-
-
-import org.w3c.dom.*;
-
-import ucar.unidata.ui.HttpFormEntry;
-
-import ucar.unidata.util.IOUtil;
-
-import ucar.unidata.util.Misc;
-
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
-
-import ucar.unidata.xml.XmlUtil;
-
-import java.io.*;
-
-import java.net.*;
-
-
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.GregorianCalendar;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.Properties;
-
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -60,6 +17,43 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+
+import org.json.*;
+
+import org.ramadda.repository.*;
+import org.ramadda.repository.auth.*;
+import org.ramadda.repository.harvester.*;
+import org.ramadda.repository.metadata.*;
+import org.ramadda.repository.type.*;
+import org.ramadda.util.FileInfo;
+
+import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Json;
+import org.ramadda.util.Utils;
+
+
+import org.w3c.dom.*;
+
+import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.Misc;
+
+import ucar.unidata.util.StringUtil;
+import ucar.unidata.util.TwoFacedObject;
+import ucar.unidata.xml.XmlUtil;
+
+import java.io.*;
+
+import java.net.*;
+
+
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.GregorianCalendar;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.Properties;
 
 
 
@@ -145,6 +139,7 @@ public class SlackHarvester extends Harvester {
      */
     public SlackHarvester(Repository repository, String id) throws Exception {
         super(repository, id);
+        setActiveOnStart(true);
     }
 
 
@@ -159,6 +154,28 @@ public class SlackHarvester extends Harvester {
     public SlackHarvester(Repository repository, Element node)
             throws Exception {
         super(repository, node);
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    @Override
+    public boolean getDefaultActiveOnStart() {
+        return true;
+    }
+
+    /**
+     * _more_
+     *
+     * @param arg _more_
+     *
+     * @return _more_
+     */
+    @Override
+    public boolean showWidget(String arg) {
+        return arg.equals(ATTR_ACTIVEONSTART);
     }
 
 
@@ -291,9 +308,10 @@ public class SlackHarvester extends Harvester {
 
         sb.append(HtmlUtils.formEntry(msgLabel("Slack API Token"),
                                       HtmlUtils.password(ATTR_APITOKEN,
-                                          (apiToken == null)
+                                          (getApiToken() == null)
                                           ? ""
-                                          : apiToken, HtmlUtils.SIZE_70)));
+                                          : getApiToken(), HtmlUtils
+                                          .SIZE_70)));
 
         sb.append(
             HtmlUtils.formEntry(
@@ -315,6 +333,7 @@ public class SlackHarvester extends Harvester {
      * @throws Exception _more_
      */
     public Result handleRequest(Request request) throws Exception {
+
         if ( !Utils.stringDefined(tokens)) {
             return null;
         }
@@ -327,6 +346,13 @@ public class SlackHarvester extends Harvester {
         for (String token : StringUtil.split(tokens, "\n", true, true)) {
             if (Misc.equals(token, tokenFromSlack)) {
                 //                debug("slack token:" +tokenFromSlack +" my:" + token);
+                ok = true;
+
+                break;
+            }
+            String fromProp = getRepository().getProperty(token,
+                                  (String) null);
+            if (fromProp != null) {
                 ok = true;
 
                 break;
@@ -411,6 +437,7 @@ public class SlackHarvester extends Harvester {
 
         return getUsage(request, "Unknown command: " + textFromSlack);
 
+
     }
 
 
@@ -448,7 +475,7 @@ public class SlackHarvester extends Harvester {
 
         return Slack.makeEntryResult(getRepository(), request,
                                      "Search Results", (List<Entry>) pair[0],
-                                     webHook, false);
+                                     getWebHook(), false);
     }
 
     /**
@@ -467,17 +494,19 @@ public class SlackHarvester extends Harvester {
         List<String> toks    = StringUtil.split(text, " ", true, true);
         Slack.Args   args    = new Slack.Args(toks, null);
         String       entryId = null;
-        for (String tok : args.getArgs()) {
-            System.err.println("TOK: " + tok);
-            if (tok.equals("-l")) {
-                args.setFlag(tok);
-            } else {
-                entryId = tok;
+        for (int i = 0; i < toks.size(); i++) {
+            String tok = toks.get(i);
+            if (tok.startsWith("-") && (i < toks.size() - 1)) {
+                i++;
+
+                continue;
             }
+            entryId = tok;
         }
         if (entryId != null) {
-            Entry entry = getEntryToUse(request, entryId);
-            args.setEntry(entry);
+            args.setEntry(getEntryFromInput(request, entryId));
+        } else {
+            args.setEntry(getCurrentEntry(request));
         }
 
         return args;
@@ -509,7 +538,7 @@ public class SlackHarvester extends Harvester {
         }
 
         return Slack.makeEntryResult(getRepository(), request, desc, null,
-                                     webHook, false);
+                                     getWebHook(), false);
     }
 
 
@@ -529,7 +558,7 @@ public class SlackHarvester extends Harvester {
         if (entry == null) {
             return getUsage(request, "No current entry");
         }
-        if ( !Utils.stringDefined(apiToken)) {
+        if ( !Utils.stringDefined(getApiToken())) {
             return message("RAMADDA get command not enabled.");
         }
         if ( !entry.isFile()) {
@@ -541,7 +570,7 @@ public class SlackHarvester extends Harvester {
             return message("Sorry, for now too big of a file");
         }
 
-        return sendFile(getRepository(), file, apiToken,
+        return sendFile(getRepository(), file, getApiToken(),
                         request.getString(Slack.SLACK_CHANNEL_ID, ""),
                         entry.getName(), entry.getDescription());
 
@@ -565,32 +594,83 @@ public class SlackHarvester extends Harvester {
         if (entry == null) {
             return getUsage(request, "No current entry");
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append("```");
-        sb.append("Entry: " + entry.getName() + "\n");
-        int len = sb.length();
-        List<FileInfo> files = new ArrayList<FileInfo>();
-        entry.getTypeHandler().addEncoding(request, entry, "slack.view", args.getArgs(), sb, files);
-        if (sb.length() == len) {
+        List<FileInfo>            files = new ArrayList<FileInfo>();
+        final List<StringBuilder> sbs   = new ArrayList<StringBuilder>();
+        sbs.add(new StringBuilder());
+        final boolean[] changed    = { false };
+        Appendable      appendable = new Appendable() {
+            Appendable getAppendable() {
+                changed[0] = true;
+                StringBuilder sb = sbs.get(sbs.size() - 1);
+                if (sb.length() > Slack.MAX_MESSAGE_LENGTH) {
+                    sb = new StringBuilder();
+                    sbs.add(sb);
+                }
+
+                return sb;
+            }
+            public Appendable append(char c) throws IOException {
+                getAppendable().append(c);
+
+                return this;
+            }
+            public Appendable append(CharSequence c) throws IOException {
+                getAppendable().append(c);
+
+                return this;
+            }
+            public Appendable append(CharSequence c, int start, int end)
+                    throws IOException {
+                getAppendable().append(c, start, end);
+
+                return this;
+            }
+        };
+
+
+        entry.getTypeHandler().addEncoding(request, entry, "slack.view",
+                                           args.getArgs(), appendable, files);
+
+        Result result = null;
+
+
+        for (FileInfo file : files) {
+            String title = file.getTitle();
+            result = sendFile(getRepository(), file.getFile(), getApiToken(),
+                              request.getString(Slack.SLACK_CHANNEL_ID, ""),
+                              title, file.getDescription());
+        }
+
+        if ( !changed[0] && (files.size() == 0)) {
             if (entry.getResource().isImage()) {
                 File file = new File(entry.getResource().getPath());
 
-                return sendFile(getRepository(), file, apiToken,
+                return sendFile(getRepository(), file, getApiToken(),
                                 request.getString(Slack.SLACK_CHANNEL_ID,
                                     ""), entry.getName(),
                                          entry.getDescription());
             }
         }
 
-        sb.append("\n```");
-        System.err.println(sb);
 
-        return Slack.makeEntryResult(getRepository(), request, sb.toString(),
-                                     null, webHook, true);
+        String header = "Entry: " + entry.getName() + "\n";
+        for (StringBuilder sb : sbs) {
+            StringBuilder msg = new StringBuilder();
+            msg.append("```");
+            msg.append(header);
+            msg.append(sb);
+            msg.append("\n```");
+            result = Slack.makeEntryResult(getRepository(), request,
+                                           msg.toString(), null,
+                                           getWebHook(), true);
+            header = "Continued...\n";
+        }
 
-        //        return message(sb.toString());
+        if (result == null) {
+            result = new Result("", new StringBuilder("Hmmm, nothing here"));
+        }
 
-
+        return result;
     }
 
 
@@ -627,7 +707,8 @@ public class SlackHarvester extends Harvester {
         getEntryManager().appendText(getRequest(), entry, text);
 
         return Slack.makeEntryResult(getRepository(), request,
-                                     "Text appended", null, webHook, false);
+                                     "Text appended", null, getWebHook(),
+                                     false);
     }
 
 
@@ -681,7 +762,7 @@ public class SlackHarvester extends Harvester {
         }
 
         return Slack.makeEntryResult(getRepository(), request, "Listing",
-                                     children, webHook, false);
+                                     children, getWebHook(), false);
     }
 
 
@@ -696,18 +777,19 @@ public class SlackHarvester extends Harvester {
      *
      * @throws Exception _more_
      */
-    private Entry getEntryToUse(Request request, String text)
+    private Entry getEntryFromInput(Request request, String text)
             throws Exception {
         text = text.trim();
         //Check for an ID
-        Entry newEntry = getEntryManager().getEntry(request, text);
-        if (newEntry != null) {
-            return newEntry;
+        Entry entry = getEntryManager().getEntry(request, text);
+        if (entry != null) {
+            return entry;
         }
 
+
         Entry currentEntry = getCurrentEntry(request);
-        newEntry = getEntryManager().getRelativeEntry(request,
-                getBaseGroup(), currentEntry, text);
+        Entry newEntry = getEntryManager().getRelativeEntry(request,
+                             getBaseGroup(), currentEntry, text);
         if (newEntry != null) {
             return newEntry;
         }
@@ -744,7 +826,7 @@ public class SlackHarvester extends Harvester {
 
         return Slack.makeEntryResult(getRepository(), request,
                                      "Current entry:", toList(theEntry),
-                                     webHook, true);
+                                     getWebHook(), true);
     }
 
 
@@ -764,7 +846,7 @@ public class SlackHarvester extends Harvester {
 
         return Slack.makeEntryResult(getRepository(), request,
                                      "Current entry:", toList(entry),
-                                     webHook, true);
+                                     getWebHook(), true);
     }
 
     /**
@@ -789,7 +871,7 @@ public class SlackHarvester extends Harvester {
             if (toks.size() == 0) {
                 return getUsage(
                     request,
-                    "new <folder or blog or wiki or note> name|description");
+                    "new <folder or post or wiki or note> name|description");
             }
             type = toks.get(0);
             toks.remove(0);
@@ -805,7 +887,7 @@ public class SlackHarvester extends Harvester {
                       ? toks.get(1)
                       : "";
         desc = desc.replace("\\n", "\n");
-        String[] cmds = { "folder", "wiki", "blog", "note" };
+        String[] cmds = { "folder", "wiki", "post", "note" };
         String[] types = { TypeHandler.TYPE_GROUP, "wikipage", "blogentry",
                            "notes_note" };
         String theType = null;
@@ -819,7 +901,7 @@ public class SlackHarvester extends Harvester {
 
         if (theType == null) {
             return getUsage(request,
-                            "new <folder|blog|wiki|note> name;description");
+                            "new <folder|post|wiki|note> name;description");
         }
 
 
@@ -833,7 +915,7 @@ public class SlackHarvester extends Harvester {
         slackStates.put(getStateKey(request), new SlackState(entry));
 
         return Slack.makeEntryResult(getRepository(), request, "New entry:",
-                                     toList(entry), webHook, true);
+                                     toList(entry), getWebHook(), true);
     }
 
 
@@ -859,7 +941,7 @@ public class SlackHarvester extends Harvester {
         sb.append("Navigation:\n/ramadda ls or pwd or cd\n");
         sb.append("Search:\n/ramadda search <search text>\n");
         sb.append(
-            "New:\n/ramadda new (folder or wiki or blog ornote) Name of entry | Optional description\n");
+            "New:\n/ramadda new (folder or wiki or post or note) Name of entry | Optional description\n");
 
         return new Result("", sb);
     }
@@ -1008,8 +1090,10 @@ public class SlackHarvester extends Harvester {
                         file.getName()), ContentType.TEXT_PLAIN));
             mpe.addPart(Slack.ARG_TOKEN,
                         new StringBody(apiToken, ContentType.TEXT_PLAIN));
-            mpe.addPart(Slack.ARG_TITLE,
-                        new StringBody(title, ContentType.TEXT_PLAIN));
+            if (Utils.stringDefined(title)) {
+                mpe.addPart(Slack.ARG_TITLE,
+                            new StringBody(title, ContentType.TEXT_PLAIN));
+            }
             mpe.addPart(Slack.ARG_INITIAL_COMMENT,
                         new StringBody(desc, ContentType.TEXT_PLAIN));
             mpe.addPart(Slack.ARG_CHANNELS, new StringBody(channel));
@@ -1049,5 +1133,39 @@ public class SlackHarvester extends Harvester {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getApiToken() {
+        if ( !Utils.stringDefined(apiToken)) {
+            return null;
+        }
+        String fromProp = getRepository().getProperty(apiToken,
+                              (String) null);
+        if (fromProp != null) {
+            return fromProp;
+        }
 
+        return apiToken;
+
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getWebHook() {
+        if ( !Utils.stringDefined(webHook)) {
+            return null;
+        }
+        String fromProp = getRepository().getProperty(webHook, (String) null);
+        if (fromProp != null) {
+            return fromProp;
+        }
+
+        return webHook;
+    }
 }

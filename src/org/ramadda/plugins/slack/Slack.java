@@ -54,6 +54,9 @@ import java.util.Properties;
  */
 public class Slack {
 
+    /** _more_          */
+    public static final int MAX_MESSAGE_LENGTH = 5000;
+
     /** _more_ */
     public static boolean debug = false;
 
@@ -327,7 +330,8 @@ public class Slack {
         json.append(Json.map(map));
         List<HttpFormEntry> formEntries = new ArrayList<HttpFormEntry>();
         formEntries.add(HttpFormEntry.hidden(SLACK_PAYLOAD, json.toString()));
-        System.err.println("SlackHarvester: posting to slack:" + json);
+        System.err.println("SlackHarvester: posting to slack:" + webHook);
+        System.err.println("JSON:" + json);
         String[] result = HttpFormEntry.doPost(formEntries, webHook);
         System.err.println("SlackHarvester: results:" + result[0] + " "
                            + result[1]);
@@ -646,8 +650,6 @@ public class Slack {
 
 
 
-        /** _more_ */
-        HashSet<String> flags = new HashSet<String>();
 
         /**
          * _more_
@@ -659,27 +661,6 @@ public class Slack {
         public Args(List<String> args, Entry entry) {
             this.args  = args;
             this.entry = entry;
-        }
-
-        /**
-         * _more_
-         *
-         * @param flag _more_
-         */
-        public void setFlag(String flag) {
-            flags.add(flag);
-        }
-
-
-        /**
-         * _more_
-         *
-         * @param flag _more_
-         *
-         * @return _more_
-         */
-        public boolean isSet(String flag) {
-            return flags.contains(flag);
         }
 
         /**
