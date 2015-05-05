@@ -2513,4 +2513,31 @@ public class PointOutputHandler extends RecordOutputHandler {
         outputs.add(getPointFormHandler().getSelect(OUTPUT_LATLONALTCSV));
     }
 
+
+    /**
+     * return the csv for the given entry
+     *
+     * @param request the request
+     * @param entry the entry
+     *
+     * @return csv text
+     *
+     * @throws Exception on badness
+     */
+    public String getCsv(Request request, Entry entry) throws Exception {
+        request = request.cloneMe();
+        request.put(ARG_ASYNCH, "false");
+        request.put(ARG_PRODUCT, OUTPUT_CSV.getId());
+        ByteArrayOutputStream bos = new ByteArrayOutputStream();
+        request.setOutputStream(bos);
+        Result result = outputEntry(request, OUTPUT_PRODUCT, entry);
+        String csv    = new String(bos.toByteArray());
+        IOUtil.close(bos);
+
+        return csv;
+    }
+
+
+
+
 }

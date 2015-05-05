@@ -443,6 +443,9 @@ public class PointFormHandler extends RecordFormHandler {
     public Result outputEntryForm(Request request, Entry entry,
                                   StringBuffer sb)
             throws Exception {
+        
+        //        System.err.println ( getPointOutputHandler().getCsv(request, entry));
+
         RecordEntry recordEntry =
             getPointOutputHandler().doMakeEntry(request, entry);
         String formId = HtmlUtils.getUniqueId("form_");
