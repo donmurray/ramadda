@@ -63,8 +63,10 @@ import java.util.List;
 public class TabularOutputHandler extends OutputHandler {
 
 
+    public static final int SLACK_SCREEN_WIDTH_CHARS = 120;
+
     /** _more_ */
-    public static final int MAX_ROWS = 500;
+    public static final int MAX_ROWS = 100;
 
     /** _more_ */
     public static final int MAX_COLS = 100;
@@ -293,21 +295,26 @@ public class TabularOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public void addEncoding(Request request, Entry entry, String fromWhere,
-                            List<String> args, final Appendable sb,
+                            final List<String> args, final Appendable sb,
                             List<FileInfo> files)
             throws Exception {
 
-        final int      startCol       = Utils.getArg("-startcol", args, 0);
-        final int      endCol         = Utils.getArg("-endcol", args, 1000);
+        final boolean justHeader = args.contains("-header");
+
+        //User indexes are 1 based
+        final int      startCol       = Utils.getArg("-startcol", args, 1)-1;
+        final int      endCol         = Utils.getArg("-endcol", args, 1000)-1;
         final int      maxCols        = Utils.getArg("-maxcols", args, 100);
 
-        final int      startRow       = Utils.getArg("-startrow", args, 0);
-        final int      endRow         = Utils.getArg("-endrow", args, 1000);
+        final int      startRow       = Utils.getArg("-startrow", args, 1)-1;
+        final int      endRow         = Utils.getArg("-endrow", args, 1000)-1;
         final int      maxRows        = Utils.getArg("-maxrows", args, 1000);
-        final int      colWidth       = Utils.getArg("-colwidth", args, 20);
+        //        final int      colWidth       = -1;
 
 
         TabularVisitor tabularVisitor = new TabularVisitor() {
+            int colWidth = -1;
+            int[] colWidths;
             @Override
             public boolean visit(Visitor info, String sheet,
                                  List<List<Object>> rows) {
@@ -322,8 +329,6 @@ public class TabularOutputHandler extends OutputHandler {
             private boolean visitInner(Visitor info, String sheet,
                             List<List<Object>> rows) throws Exception {
 
-
-
                 System.err.println("visit: #rows=" + rows.size());
                 int maxWidth   = 800;
                 int padMaxCols = 1;
@@ -335,7 +340,29 @@ public class TabularOutputHandler extends OutputHandler {
                         cols.add("");
                     }
                 }
+
+
                 int rowCnt = 0;
+                int numberOfDisplayedColumns = -1;
+                for (int rowIdx = startRow;
+                     (rowIdx < rows.size()) && (rowIdx <= endRow);
+                     rowIdx++) {
+                    if (rowCnt++ > maxRows) {
+                        break;
+                    }
+                    List<Object> cols   = rows.get(rowIdx);
+                    numberOfDisplayedColumns = Math.min(endCol, Math.max(numberOfDisplayedColumns, cols.size()));
+                }
+
+                
+                if(startCol>0) numberOfDisplayedColumns -= startCol;
+                if(numberOfDisplayedColumns<=0) numberOfDisplayedColumns = 1;
+                colWidth = Utils.getArg("-colwidth", args, SLACK_SCREEN_WIDTH_CHARS/numberOfDisplayedColumns);
+                System.err.println ("Max cols: " +numberOfDisplayedColumns +"  colWidth:" + colWidth);
+
+
+                //Figure out column widths
+                rowCnt = 0;
                 for (int rowIdx = startRow;
                         (rowIdx < rows.size()) && (rowIdx <= endRow);
                         rowIdx++) {
@@ -343,7 +370,76 @@ public class TabularOutputHandler extends OutputHandler {
                         break;
                     }
                     List<Object> cols   = rows.get(rowIdx);
+                    if(colWidths == null || cols.size()>colWidths.length) {
+                        int[]tmp = new int[cols.size()];
+                        if(colWidths!=null) {
+                            System.arraycopy(tmp, 0, colWidths, 0, colWidths.length);
+                        } 
+                        colWidths = tmp;
+                    }
                     int          colCnt = 0;
+                    for (int colIdx = startCol;
+                            (colIdx < cols.size()) && (colIdx <= endCol);
+                            colIdx++) {
+                        if (colCnt++ > maxCols) {
+                            break;
+                        }
+                        Object col = cols.get(colIdx);
+                        if (col != null) {
+                            String s = col.toString();
+                            colWidths[colIdx] = Math.max(colWidths[colIdx], s.length());
+                        }
+                    }
+                    //If we have lots of columns then just use the fixed width
+                    if(colCnt>6) colWidths = null;
+                }
+
+                if(colWidths!=null) {
+                    int total = 1;
+                    int colCnt = 0;
+                    for(int v: colWidths) {
+                        if(v>0) {
+                            colCnt++;
+                            total+=v;
+                        }
+                    }
+                    double min=0.0, max=0.0;
+                    if(colCnt==2) {
+                        min = 0.30;
+                        max = 0.70;
+                    } else if(colCnt==3) {
+                        min = 0.20;
+                        max = 0.80;
+                    }
+                    for(int i=0;i<colWidths.length;i++) {
+                        double percentage =colWidths[i]/(double)total;
+                        if(percentage>0.0) {
+                            if(min>0)
+                                percentage = Math.max(min, percentage);
+                            if(max>0)
+                                percentage =Math.min(max,  percentage);
+
+                            colWidths[i] = (int)(percentage*SLACK_SCREEN_WIDTH_CHARS);
+                            System.err.println("width:" + i +" " + percentage +" " + colWidths[i]); 
+                        }
+                    }
+                }
+
+
+                System.err.println ("Doing output");
+
+                rowCnt = 0;
+                for (int rowIdx = startRow;
+                        (rowIdx < rows.size()) && (rowIdx <= endRow);
+                        rowIdx++) {
+                    if (rowCnt++ > maxRows) {
+                        break;
+                    }
+
+                    
+                    List<Object> cols   = rows.get(rowIdx);
+                    int          colCnt = 0;
+                    StringBuilder lineSB = new StringBuilder();
                     for (int colIdx = startCol;
                             (colIdx < cols.size()) && (colIdx <= endCol);
                             colIdx++) {
@@ -356,18 +452,30 @@ public class TabularOutputHandler extends OutputHandler {
                         }
                         String s = col.toString();
                         if (colCnt > 1) {
-                            sb.append(" | ");
+                            lineSB.append(" | ");
                         }
-                        if (s.length() > colWidth) {
-                            s = s.substring(0, colWidth - 1 - 3) + "...";
+                        int width = colWidth;
+                        if(colWidths!=null) {
+                            width = colWidths[colIdx];
+                        }
+                        if (s.length() > width) {
+                            s = s.substring(0, width - 1 - 3) + "...";
                         }
                         s = s.replace("&", "&amp;").replace("<",
                                       "&lt;").replace(">", "&gt;");
-                        sb.append(StringUtil.padLeft(s, colWidth));
+                        if(s.matches("[-\\+0-9\\.]+")) {
+                            lineSB.append(StringUtil.padLeft(s, width));
+                        } else {
+                            lineSB.append(StringUtil.padRight(s, width));
+                        }
                     }
+                    
+                    //Strip trailing whitespace
+                    sb.append(lineSB.toString().replaceAll("\\s+$", ""));
                     sb.append("\n");
                 }
 
+                System.err.println ("done");
                 return false;
             }
         };

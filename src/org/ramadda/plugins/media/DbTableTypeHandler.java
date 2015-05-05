@@ -165,7 +165,7 @@ public class DbTableTypeHandler extends TabularTypeHandler {
             what = StringUtil.join(",", cols);
             }*/
 
-        int          max        = TabularOutputHandler.MAX_ROWS;
+        int          max        = visitInfo.getMaxRows()>0?visitInfo.getMaxRows():TabularOutputHandler.MAX_ROWS;
 
         List<Clause> andClauses = new ArrayList<Clause>();
         List<Clause> orClauses  = new ArrayList<Clause>();
