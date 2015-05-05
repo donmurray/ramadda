@@ -559,8 +559,7 @@ public class FtpTypeHandler extends ExtensibleGroupTypeHandler {
 
             return ftpClient;
         } catch (Exception exc) {
-            System.err.println("Could not connect to ftp server:" + exc);
-
+            System.err.println("Could not connect to ftp server:" + server+"\nError:" + exc);
             return null;
         }
     }
