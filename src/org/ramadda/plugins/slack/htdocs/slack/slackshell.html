@@ -6,6 +6,9 @@
 <h2>Slack Shell</h2>
 
 The RAMADDA Slack Shell lets you access content and  data in your RAMADDA site directly from Slack. 
+<br><p>
+
+To set this up  -
 
 <ol>
 <li> Create a Slack Slash Command. In Slack go to the Integrations page for your team. Under Configured Integrations select Slash Commands and add a new Slash Commands integration. You can choose any command (I've used "/r" or "/ramadda"). 
@@ -126,6 +129,15 @@ that meets the search criteria.
 
 TBD
 
+<a name="tokens"></a>
+<h3>Handling API Tokens</h3>
+
+You may end up having a number Slack Harvesters and Slack Team imports where each requires an API token. You can simplify management of the API tokens by adding a properties file to your RAMADDA server home directory. This properties file contains an property that specifies an API token. It may be any name, e.g. 
+<pre>
+slack.api.token=&lt;tAPI token from Slack&gt;
+</pre>
+
+Instead of entering the actual API token in the Harvester or in the Team Entry you can just specify the property, e.g. "slack.api.token" 
 
 </div>
 </body>
