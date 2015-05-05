@@ -1391,9 +1391,10 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                     sql.append(convertType("clob", column.getSize()));
                 } else if (type == ColumnInfo.TYPE_BLOB) {
                     sql.append(convertType("blob", column.getSize()));
+                } else if (type == ColumnInfo.TYPE_UNKNOWN) {
+                    //                    sql.append(convertType("blob", column.getSize()));
                 } else {
-                    throw new IllegalStateException("Unknown column type:"
-                            + type);
+                    throw new IllegalStateException("Unknown column type:"  + type);
                 }
             }
             sql.append(");\n");
@@ -1475,6 +1476,8 @@ public class DatabaseManager extends RepositoryManager implements SqlUtil
                     } else if (type == ColumnInfo.TYPE_SMALLINT) {
                         short v = dis.readShort();
                         values[colCnt++] = new Short(v);
+                    } else if (type == ColumnInfo.TYPE_UNKNOWN) {
+
                     } else {
                         throw new IllegalArgumentException(
                             "Unknown type for table" + tableInfo.getName()

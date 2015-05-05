@@ -44,6 +44,8 @@ public class ColumnInfo {
 
     public static final int TYPE_BLOB = 10;
 
+    public static final int TYPE_UNKNOWN = 11;
+
     /** _more_ */
     private String name;
 
@@ -127,8 +129,9 @@ public class ColumnInfo {
         } else if (typeName.equalsIgnoreCase("text")) {
             return TYPE_CLOB;
         } else {
-            throw new IllegalArgumentException("Unknown database type:"
-                    + type + " " + typeName);
+            return TYPE_UNKNOWN;
+            //            throw new IllegalArgumentException("Unknown database type:"
+            //                    + type + " " + typeName);
             //            throw new IllegalArgumentException("Unknown sqltype:" + type);
         }
     }
