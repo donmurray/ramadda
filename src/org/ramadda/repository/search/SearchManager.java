@@ -878,6 +878,10 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
 
         }
 
+
+
+
+
         if (servers.size() > 0) {
             StringBuffer serverSB  = new StringBuffer();
             int          serverCnt = 0;
@@ -1327,30 +1331,55 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
     public List<Entry>[] doSearch(Request request,
                                   Appendable searchCriteriaSB)
             throws Exception {
+        HashSet<String> providers = new HashSet<String>();
+        
+
+        for(String arg: (List<String>)request.get("provider", new ArrayList())) {
+            providers.addAll(StringUtil.split(arg,",",true,true));
+        }
+        if(providers.size()==0) {
+            providers.add("this");
+        }
+        
+
         if (searchProviders == null) {
-            System.err.println(
-                "SearchManager.doSearch- making searchProviders");
+            //            System.err.println("SearchManager.doSearch- making searchProviders");
             List<SearchProvider> tmp = new ArrayList<SearchProvider>();
             tmp.add(
-                new SearchProvider.RamaddaSearchProvider(getRepository()));
+                    new SearchProvider.RamaddaSearchProvider(getRepository(), "this","This RAMADDA Repository"));
             tmp.addAll(pluginSearchProviders);
             searchProviders = tmp;
-
         }
+
+        System.err.println ("Providers:" + providers);
+        boolean doAll = providers.contains("all");
 
         ArrayList<Entry> folders = new ArrayList<Entry>();
         ArrayList<Entry> entries = new ArrayList<Entry>();
 
+        //TODO: parallelize this
         for (int i = 0; i < searchProviders.size(); i++) {
             SearchProvider searchProvider = searchProviders.get(i);
-            List<Entry> results = searchProvider.getEntries(request,
-                                      searchCriteriaSB);
-            for (Entry e : results) {
-                if (e.isGroup()) {
-                    folders.add(e);
-                } else {
-                    entries.add(e);
+            if(!doAll && providers != null && providers.size()>0) {
+                if(!providers.contains(searchProvider.getId())) {
+                    System.err.println("Skipping:" +searchProvider.getId());
+                    continue;
                 }
+            }
+
+
+            try {
+                System.err.println("Searching:" +searchProvider.getId());
+                List<Entry> results = searchProvider.getEntries(request, searchCriteriaSB);
+                for (Entry e : results) {
+                    if (e.isGroup()) {
+                        folders.add(e);
+                    } else {
+                        entries.add(e);
+                    }
+                }
+            } catch(Exception exc) {
+                getLogManager().logError("Searching provider:" + searchProvider, exc);
             }
         }
 

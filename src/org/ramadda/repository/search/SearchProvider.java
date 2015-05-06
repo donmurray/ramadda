@@ -18,15 +18,45 @@ import java.util.List;
  */
 public abstract class SearchProvider extends RepositoryManager {
 
+    private String id;
+
+    private String name;
+
+    public SearchProvider(Repository repository) {
+        super(repository);
+    }
+
+
     /**
      * _more_
      *
      * @param repository _more_
      */
-    public SearchProvider(Repository repository) {
-        super(repository);
+    public SearchProvider(Repository repository, String id) {
+        this(repository);
+        this.id = id;
     }
 
+    public SearchProvider(Repository repository, String id, String name) {
+        this(repository, id);
+        this.name = name;
+    }
+
+
+
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        if(name == null) return getId();
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
 
 
     /**
@@ -58,8 +88,8 @@ public abstract class SearchProvider extends RepositoryManager {
          *
          * @param repository _more_
          */
-        public RamaddaSearchProvider(Repository repository) {
-            super(repository);
+        public RamaddaSearchProvider(Repository repository, String id, String name) {
+            super(repository, id, name);
         }
 
         /**

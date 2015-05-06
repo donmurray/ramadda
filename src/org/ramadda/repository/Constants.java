@@ -1897,6 +1897,8 @@ public interface Constants {
     /** _more_ */
     public static final String MIME_XML = "text/xml";
 
+    public static final String MIME_TEXT= "text/plain";
+
 
     /** _more_ */
     public static final boolean DFLT_INHERITED = false;
