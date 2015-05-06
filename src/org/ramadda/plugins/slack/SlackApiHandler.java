@@ -99,11 +99,11 @@ public class SlackApiHandler extends RepositoryManager implements RequestHandler
                     break;
                 }
             } catch (Exception exc) {
+                exc.printStackTrace();
+
                 return new Result(
-                    "",
-                    new StringBuilder(
-                        "Oops, I did it again. An error has occurred:"
-                        + exc));
+                    "Oops, I did it again. An error has occurred:" + exc,
+                    "text");
             }
 
         }

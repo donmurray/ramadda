@@ -54,7 +54,7 @@ import java.util.Properties;
  */
 public class Slack {
 
-    /** _more_          */
+    /** _more_ */
     public static final int MAX_MESSAGE_LENGTH = 5000;
 
     /** _more_ */
@@ -331,7 +331,7 @@ public class Slack {
         List<HttpFormEntry> formEntries = new ArrayList<HttpFormEntry>();
         formEntries.add(HttpFormEntry.hidden(SLACK_PAYLOAD, json.toString()));
         System.err.println("SlackHarvester: posting to slack:" + webHook);
-        System.err.println("JSON:" + json);
+        //        System.err.println("JSON:" + json);
         String[] result = HttpFormEntry.doPost(formEntries, webHook);
         System.err.println("SlackHarvester: results:" + result[0] + " "
                            + result[1]);

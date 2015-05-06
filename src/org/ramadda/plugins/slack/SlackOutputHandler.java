@@ -68,7 +68,7 @@ import java.util.zip.*;
 public class SlackOutputHandler extends OutputHandler {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String PROP_SLACK_API_TOKEN = "slack.api.token";
 
     /** _more_ */
