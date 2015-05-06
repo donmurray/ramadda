@@ -444,6 +444,7 @@ public class PointFormHandler extends RecordFormHandler {
                                   StringBuffer sb)
             throws Exception {
 
+
         //        System.err.println ( getPointOutputHandler().getCsv(request, entry));
 
         RecordEntry recordEntry =

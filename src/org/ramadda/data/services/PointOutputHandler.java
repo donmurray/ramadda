@@ -2525,7 +2525,7 @@ public class PointOutputHandler extends RecordOutputHandler {
      * @throws Exception on badness
      */
     public String getCsv(Request request, Entry entry) throws Exception {
-        request = request.cloneMe();
+        request = new Request(request.getRepository(), request.getUser());
         request.put(ARG_ASYNCH, "false");
         request.put(ARG_PRODUCT, OUTPUT_CSV.getId());
         ByteArrayOutputStream bos = new ByteArrayOutputStream();
