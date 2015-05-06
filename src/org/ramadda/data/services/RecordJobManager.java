@@ -152,15 +152,14 @@ public class RecordJobManager extends JobManager implements RecordConstants {
         Callable<Boolean> callable = new Callable<Boolean>() {
             public Boolean call() {
                 try {
-                    System.err.println("POINT: processing started");
+                    //                    System.err.println("POINT: processing started");
                     long t1 = System.currentTimeMillis();
                     for (RecordEntry recordEntry : recordEntries) {
                         recordEntry.visit(visitor, visitInfo);
                     }
                     long t2 = System.currentTimeMillis();
                     visitor.close(visitInfo);
-                    System.err.println("POINT: processing done time:"
-                                       + (t2 - t1));
+                    //                    System.err.println("POINT: processing done time:" + (t2 - t1));
 
                     return Boolean.TRUE;
                 } catch (Exception exc) {

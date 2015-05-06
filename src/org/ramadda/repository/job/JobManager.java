@@ -577,7 +577,7 @@ public class JobManager extends RepositoryManager {
         try {
             synchronized (MUTEX) {
                 currentJobs++;
-                System.err.println("RAMADDA: job queued: " + this);
+                //                System.err.println("RAMADDA: job queued: " + this);
             }
             List<Future<Boolean>> results =
                 getExecutor().invokeAll(callables);
