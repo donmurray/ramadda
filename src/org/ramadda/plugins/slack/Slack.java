@@ -647,7 +647,7 @@ public class Slack {
         /** _more_ */
         private Entry entry;
 
-
+        private String text;
 
 
 
@@ -689,6 +689,29 @@ public class Slack {
         public void setEntry(Entry entry) {
             this.entry = entry;
         }
+
+
+
+/**
+Set the Text property.
+
+@param value The new value for Text
+**/
+public void setText (String value) {
+	text = value;
+}
+
+/**
+Get the Text property.
+
+@return The Text
+**/
+public String getText () {
+	return text;
+}
+
+
+
     }
 
 

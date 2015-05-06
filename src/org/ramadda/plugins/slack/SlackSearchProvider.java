@@ -51,7 +51,7 @@ public class SlackSearchProvider extends SearchProvider {
      * @param repository _more_
      */
     public SlackSearchProvider(Repository repository) {
-        super(repository);
+        super(repository,"slack");
     }
 
     /**

@@ -449,7 +449,7 @@ public class SlackHarvester extends Harvester {
      * @return _more_
      */
     private static Result message(String msg) {
-        return new Result("", new StringBuilder(msg));
+        return new Result(msg,Constants.MIME_TEXT);
     }
 
     /**
@@ -464,15 +464,21 @@ public class SlackHarvester extends Harvester {
      */
     private Result processSearch(Request request, String text)
             throws Exception {
-
-        text = text.trim();
-        if ( !Utils.stringDefined(text)) {
+        Slack.Args args  = parseArgs(request, text);
+        if ( !Utils.stringDefined(args.getText())) {
             return getUsage(request, "Need to specify search string");
         }
-        request.put(ARG_TEXT, text);
+        if(args.getArgs().contains("-help")) {
+            return new Result("search help", Constants.MIME_TEXT);
+        }
+        String providers = Utils.getArg("-providers",args.getArgs(),null);
+        request = request.cloneMe();
+        request.put(ARG_TEXT, args.getText());
+        if(providers!=null) {
+            request.put("provider", providers);
+        }
         List[] pair = getEntryManager().getEntries(request);
         pair[0].addAll(pair[1]);
-
         return Slack.makeEntryResult(getRepository(), request,
                                      "Search Results", (List<Entry>) pair[0],
                                      getWebHook(), false);
@@ -493,15 +499,16 @@ public class SlackHarvester extends Harvester {
         List<String> toks    = StringUtil.split(text, " ", true, true);
         Slack.Args   args    = new Slack.Args(toks, null);
         String       entryId = null;
+        StringBuilder textSB = new StringBuilder();
         for (int i = 0; i < toks.size(); i++) {
             String tok = toks.get(i);
             if (tok.startsWith("-") && (i < toks.size() - 1)) {
                 i++;
-
                 continue;
             }
-            entryId = tok;
+            textSB.append(tok);
         }
+        args.setText(textSB.toString());
 
         String tmpId = Utils.getArg("-entry", toks, (String) null);
 
@@ -654,8 +661,7 @@ public class SlackHarvester extends Harvester {
             //                });
 
             if ( !changedText[0]) {
-                //                return new Result("",new StringBuilder("File is on its way"));
-                return new Result("File is on its way", "text");
+                return new Result("File is on its way", Constants.MIME_TEXT);
             }
         }
 
@@ -684,7 +690,7 @@ public class SlackHarvester extends Harvester {
         }
 
         if (result == null) {
-            result = new Result("", new StringBuilder("Hmmm, nothing here"));
+            result = new Result("Hmmm, nothing here", Constants.MIME_TEXT);
         }
 
         return result;
