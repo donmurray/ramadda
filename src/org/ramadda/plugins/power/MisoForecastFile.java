@@ -117,8 +117,7 @@ public class MisoForecastFile extends CsvFile {
         putFields(new String[] {
             makeField(FIELD_DATE, attr("timezone", "EST"), attrType("date"),
                       attrFormat(format)),
-            makeField("hour_ending", attrType("string"),
-                      attrLabel("Hour Ending"), attrChartable()),
+            makeField("hour_ending", attrType("string"), attrLabel("Hour Ending")),
             makeField(varName, attrLabel(varLabel), attrChartable()), });
 
         return visitInfo;
