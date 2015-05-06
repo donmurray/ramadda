@@ -1235,7 +1235,6 @@ public class PointFormHandler extends RecordFormHandler {
 
 
 
-
     /**
      * _more_
      *
@@ -1561,8 +1560,8 @@ ARG_WAVEFORM_DISPLAY, waveformDisplay, ARG_WAVEFORM_NAME, waveformName
             pointEntry.isCapable(PointFile.ACTION_WAVEFORM);
         final String waveformName = request.getString(ARG_WAVEFORM_NAME, "");
 
-        final int[]          cnt            = { 0 };
-        long                 t1             = System.currentTimeMillis();
+        final int[]  cnt          = { 0 };
+        //        long                 t1             = System.currentTimeMillis();
         final List<XYSeries> series         = new ArrayList<XYSeries>();
         final XYSeries       waveformSeries = new XYSeries("");
         final List<Waveform> waveforms      = new ArrayList<Waveform>();
@@ -1631,13 +1630,17 @@ ARG_WAVEFORM_DISPLAY, waveformDisplay, ARG_WAVEFORM_NAME, waveformName
             }
         };
 
-        int skip = (int) (numRecords / numPointsToPlot);
+
+        long t1   = System.currentTimeMillis();
+        int  skip = (int) (numRecords / numPointsToPlot);
         getRecordJobManager().visitSequential(request, pointEntry, visitor,
                 new VisitInfo(skip));
+        long t2 = System.currentTimeMillis();
 
 
         JFreeChart chart = createTimeseriesChart(request, entry,
                                new XYSeriesCollection(), null);
+        long   t3                  = System.currentTimeMillis();
         XYPlot plot                = (XYPlot) chart.getPlot();
         int    lineCnt             = 0;
         int[]  colorCnt            = { 0 };
@@ -1717,6 +1720,28 @@ ARG_WAVEFORM_DISPLAY, waveformDisplay, ARG_WAVEFORM_NAME, waveformName
             lineCnt++;
         }
 
+        //Put waveform stuff here
+
+        AxisSpace axisSpace = new AxisSpace();
+        axisSpace.setRight(TIMESERIES_AXIS_WIDTHPER * numberOfAxisLegends);
+        plot.setFixedRangeAxisSpace(axisSpace);
+
+
+
+        long t4 = System.currentTimeMillis();
+        BufferedImage newImage = chart.createBufferedImage(width
+                                     + (numberOfAxisLegends
+                                        * TIMESERIES_AXIS_WIDTHPER), height);
+
+        long t5 = System.currentTimeMillis();
+        System.err.println("TIME:  cnt:" + cnt[0] + " " + (t2 - t1) + " "
+                           + (t3 - t2) + " " + (t4 - t3) + " " + (t5 - t4));
+
+        return newImage;
+    }
+
+    /*
+      waveform stuff
         final String waveformDisplay =
             request.getString(ARG_WAVEFORM_DISPLAY, "normal");
 
@@ -1809,16 +1834,9 @@ ARG_WAVEFORM_DISPLAY, waveformDisplay, ARG_WAVEFORM_NAME, waveformName
             }, false);
             lineCnt++;
         }
+    */
 
-        AxisSpace axisSpace = new AxisSpace();
-        axisSpace.setRight(TIMESERIES_AXIS_WIDTHPER * numberOfAxisLegends);
-        plot.setFixedRangeAxisSpace(axisSpace);
-        BufferedImage newImage = chart.createBufferedImage(width
-                                     + (numberOfAxisLegends
-                                        * TIMESERIES_AXIS_WIDTHPER), height);
 
-        return newImage;
-    }
 
     /**
      * make the waveform image

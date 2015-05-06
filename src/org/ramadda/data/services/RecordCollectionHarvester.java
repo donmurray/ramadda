@@ -235,8 +235,8 @@ public abstract class RecordCollectionHarvester extends PatternHarvester {
      * @return The entry
      */
     @Override
-    public Entry initializeNewEntry(HarvesterFile fileInfo, File originalFile,
-                                    Entry entry) {
+    public Entry initializeNewEntry(HarvesterFile fileInfo,
+                                    File originalFile, Entry entry) {
         try {
             getRepository().getLogManager().logInfo(
                 "RecordCollectonHarvester:initializeNewEntry:"

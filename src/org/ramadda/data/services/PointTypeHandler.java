@@ -191,14 +191,24 @@ public class PointTypeHandler extends RecordTypeHandler {
         PointEntry pointEntry = (PointEntry) poh.doMakeEntry(request, entry);
         File imageFile =
             getRepository().getStorageManager().getTmpFile(request,
-                                                           entry.getName() + "_timeseries.png");
+                entry.getName() + "_timeseries.png");
         PointFormHandler.PlotInfo plotInfo = new PointFormHandler.PlotInfo();
+        //        System.err.println ("calling makeTimeSeriesImage");
+        long t1 = System.currentTimeMillis();
         BufferedImage newImage =
             poh.getPointFormHandler().makeTimeseriesImage(request,
                 pointEntry, plotInfo);
+        //        System.err.println ("Done makeTimeSeriesImage");
+        long t2 = System.currentTimeMillis();
         ImageUtils.writeImageToFile(newImage, imageFile);
+        long t3 = System.currentTimeMillis();
+        //        System.err.println ("Done writeImageToFile:" + (t3-t2));
+
+
         FileInfo fileInfo = new FileInfo(imageFile);
-        fileInfo.setDescription(entry.getDescription());
+        if ( !isWikiText(entry.getDescription())) {
+            fileInfo.setDescription(entry.getDescription());
+        }
         fileInfo.setTitle("Time series - " + entry.getName());
         files.add(fileInfo);
     }
