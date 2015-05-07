@@ -330,7 +330,7 @@
         <unjar src="${libdir}/commons-fileupload-1.2.2.jar" dest="${tmpjardir}"/>
         <unjar src="${libdir}/commons-httpclient-3.1.jar" dest="${tmpjardir}"/>
         <unjar src="${libdir}/metadata-extractor-2.4.0-beta-1.jar" dest="${tmpjardir}"/>
-        <unjar src="${libdir}/jfreechart.jar" dest="${tmpjardir}"/>
+        <unjar src="${libdir}/jfreechart-1.0.19.jar" dest="${tmpjardir}"/>
 
         <unjar src="${libdir}/ftplet-api-1.0.3.jar" dest="${tmpjardir}"/>
         <unjar src="${libdir}/ftpserver-core-1.0.3.jar" dest="${tmpjardir}"/>
