@@ -6200,7 +6200,13 @@ public class EntryManager extends RepositoryManager {
      *     @throws Exception _more_
      */
     public Entry getParent(Request request, Entry entry) throws Exception {
-        return getEntry(request, entry.getParentEntryId());
+        Entry parent = getEntry(request, entry.getParentEntryId());
+        if(parent!=null && parent.equals(entry)) {
+            //Whoa, got a loop
+            return null;
+        }
+
+        return parent;
     }
 
 
