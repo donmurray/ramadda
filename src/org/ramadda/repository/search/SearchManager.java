@@ -124,6 +124,9 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
     /** _more_ */
     public static final String ARG_SEARCH_SUBMIT = "search.submit";
 
+    /** _more_          */
+    public static final String ARG_PROVIDER = "provider";
+
     /** _more_ */
     public static final String ARG_SEARCH_SUBSET = "search.subset";
 
@@ -786,6 +789,10 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             sb.append(buttons);
             sb.append(HtmlUtils.p());
         }
+        List<String> titles   = new ArrayList<String>();
+        List<String> contents = new ArrayList<String>();
+
+
 
         if (justText) {
             String value = (String) request.getString(ARG_TEXT, "");
@@ -822,17 +829,49 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                 request.put(ARG_RELATIVEDATE, oldValue);
             }
 
-            typeHandler.addToSearchForm(request, sb, where, true);
-
+            typeHandler.addToSearchForm(request, titles, contents, where,
+                                        true);
 
             if (includeMetadata()) {
                 StringBuffer metadataSB = new StringBuffer();
                 metadataSB.append(HtmlUtils.formTable());
                 getMetadataManager().addToSearchForm(request, metadataSB);
                 metadataSB.append(HtmlUtils.formTableClose());
-                sb.append(HtmlUtils.makeShowHideBlock(msg("Properties"),
-                        metadataSB.toString(), false));
+                titles.add(msg("Properties"));
+                contents.add(metadataSB.toString());
             }
+
+
+
+            List<SearchProvider> searchProviders = getSearchProviders();
+            if (searchProviders.size() > 1) {
+                StringBuilder providerSB = new StringBuilder();
+                providerSB.append(msg("Where do you want to search?"));
+                providerSB.append(HtmlUtils.br());
+                List<String> selectedProviders =
+                    (List<String>) request.get(ARG_PROVIDER,
+                        new ArrayList<String>());
+                for (int i = 0; i < searchProviders.size(); i++) {
+                    SearchProvider searchProvider = searchProviders.get(i);
+                    boolean        selected       = false;
+                    if (selectedProviders.size() == 0) {
+                        selected = (i == 0);
+                    } else {
+                        selected = selectedProviders.contains(
+                            searchProvider.getId());
+                    }
+                    providerSB.append(HtmlUtils.checkbox(ARG_PROVIDER,
+                            searchProvider.getId(), selected));
+                    providerSB.append(HtmlUtils.space(2));
+                    providerSB.append(searchProvider.getName());
+                    providerSB.append(HtmlUtils.br());
+                }
+
+                titles.add(msg("Search Providers"));
+                contents.add(HtmlUtils.insetDiv(providerSB.toString(), 0, 20,
+                        0, 0));
+            }
+
 
             StringBuffer outputForm = new StringBuffer(HtmlUtils.formTable());
             /* Humm, we probably don't want to include this as it screws up setting the output in the form
@@ -873,13 +912,9 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                                      request.getString(ARG_OUTPUT, ""))));
 
             outputForm.append(HtmlUtils.formTableClose());
-            sb.append(HtmlUtils.makeShowHideBlock(msg("Output"),
-                    outputForm.toString(), false));
-
+            titles.add(msg("Output"));
+            contents.add(outputForm.toString());
         }
-
-
-
 
 
         if (servers.size() > 0) {
@@ -917,22 +952,35 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                 serverSB.append(HtmlUtils.br());
             }
             /*
+            titles.add(msg("Remote Search Settings"));
+            contents.add(serverSB.toString());
             sb.append(
                 HtmlUtils.makeShowHideBlock(
                     msg("Remote Search Settings"),
                     HtmlUtils.div(
-                        serverSB.toString(),
+                    serverSB.toString(),
                         HtmlUtils.cssClass(CSS_CLASS_SERVER)), false));
             */
         }
 
 
 
+        //Pad the contents
+        List<String> tmp = new ArrayList<String>();
+        for (String c : contents) {
+            tmp.add(HtmlUtils.insetDiv(c, 5, 10, 10, 0));
+        }
+        contents = tmp;
+
+        HtmlUtils.makeAccordian(sb, titles, contents, false);
+
+
+
 
         if ( !justText) {
-            sb.append(HtmlUtils.p());
+            sb.append(HtmlUtils.br());
             sb.append(buttons);
-            sb.append(HtmlUtils.p());
+            sb.append(HtmlUtils.br());
         }
 
         sb.append("\n");
@@ -1332,45 +1380,42 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                                   Appendable searchCriteriaSB)
             throws Exception {
         HashSet<String> providers = new HashSet<String>();
-        
 
-        for(String arg: (List<String>)request.get("provider", new ArrayList())) {
-            providers.addAll(StringUtil.split(arg,",",true,true));
+
+        for (String arg :
+                (List<String>) request.get(ARG_PROVIDER, new ArrayList())) {
+            providers.addAll(StringUtil.split(arg, ",", true, true));
         }
-        if(providers.size()==0) {
+        if (providers.size() == 0) {
             providers.add("this");
         }
-        
 
-        if (searchProviders == null) {
-            //            System.err.println("SearchManager.doSearch- making searchProviders");
-            List<SearchProvider> tmp = new ArrayList<SearchProvider>();
-            tmp.add(
-                    new SearchProvider.RamaddaSearchProvider(getRepository(), "this","This RAMADDA Repository"));
-            tmp.addAll(pluginSearchProviders);
-            searchProviders = tmp;
-        }
 
-        System.err.println ("Providers:" + providers);
-        boolean doAll = providers.contains("all");
+
+
+
+        System.err.println("Providers:" + providers);
+        boolean          doAll   = providers.contains("all");
 
         ArrayList<Entry> folders = new ArrayList<Entry>();
         ArrayList<Entry> entries = new ArrayList<Entry>();
 
         //TODO: parallelize this
+        List<SearchProvider> searchProviders = getSearchProviders();
         for (int i = 0; i < searchProviders.size(); i++) {
             SearchProvider searchProvider = searchProviders.get(i);
-            if(!doAll && providers != null && providers.size()>0) {
-                if(!providers.contains(searchProvider.getId())) {
-                    System.err.println("Skipping:" +searchProvider.getId());
+            if ( !doAll && (providers != null) && (providers.size() > 0)) {
+                if ( !providers.contains(searchProvider.getId())) {
+                    //                    System.err.println("Skipping:" +searchProvider.getId());
                     continue;
                 }
             }
 
 
             try {
-                System.err.println("Searching:" +searchProvider.getId());
-                List<Entry> results = searchProvider.getEntries(request, searchCriteriaSB);
+                //                System.err.println("Searching:" +searchProvider.getId());
+                List<Entry> results = searchProvider.getEntries(request,
+                                          searchCriteriaSB);
                 for (Entry e : results) {
                     if (e.isGroup()) {
                         folders.add(e);
@@ -1378,8 +1423,9 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                         entries.add(e);
                     }
                 }
-            } catch(Exception exc) {
-                getLogManager().logError("Searching provider:" + searchProvider, exc);
+            } catch (Exception exc) {
+                getLogManager().logError("Searching provider:"
+                                         + searchProvider, exc);
             }
         }
 
@@ -1815,6 +1861,24 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
     /**
      * _more_
      *
+     * @return _more_
+     */
+    public List<SearchProvider> getSearchProviders() {
+        if (searchProviders == null) {
+            //            System.err.println("SearchManager.doSearch- making searchProviders");
+            List<SearchProvider> tmp = new ArrayList<SearchProvider>();
+            tmp.add(new SearchProvider.RamaddaSearchProvider(getRepository(),
+                    "this", "This RAMADDA Repository"));
+            tmp.addAll(pluginSearchProviders);
+            searchProviders = tmp;
+        }
+
+        return searchProviders;
+    }
+
+    /**
+     * _more_
+     *
      * @param args _more_
      *
      * @throws Exception _more_
@@ -1833,5 +1897,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             //            System.out.println("contents: " + contents);
         }
     }
+
+
 
 }

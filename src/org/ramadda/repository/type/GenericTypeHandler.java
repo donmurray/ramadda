@@ -1369,8 +1369,15 @@ public class GenericTypeHandler extends TypeHandler {
                                        HashSet<String> fieldsToShow)
             throws Exception {
         super.addToSpecialSearchForm(request, formBuffer, fieldsToShow);
-        addColumnsToSearchForm(request, formBuffer, new ArrayList<Clause>(),
-                               true, false, fieldsToShow);
+        List<String> titles   = new ArrayList<String>();
+        List<String> contents = new ArrayList<String>();
+
+        addColumnsToSearchForm(request, titles, contents,
+                               new ArrayList<Clause>(), false, fieldsToShow);
+        if (contents.size() > 0) {
+            formBuffer.append(contents.get(0));
+        }
+
     }
 
 
@@ -1379,18 +1386,21 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @param formBuffer _more_
      * @param request _more_
+     * @param titles _more_
+     * @param contents _more_
      * @param where _more_
      * @param advancedForm _more_
      *
      * @throws Exception on badness
      */
     @Override
-    public void addToSearchForm(Request request, Appendable formBuffer,
-                                List<Clause> where, boolean advancedForm)
+    public void addToSearchForm(Request request, List<String> titles,
+                                List<String> contents, List<Clause> where,
+                                boolean advancedForm)
             throws Exception {
-        super.addToSearchForm(request, formBuffer, where, advancedForm);
-        addColumnsToSearchForm(request, formBuffer, where, advancedForm,
-                               true, null);
+        super.addToSearchForm(request, titles, contents, where, advancedForm);
+        addColumnsToSearchForm(request, titles, contents, where,
+                               advancedForm, null);
     }
 
 
@@ -1399,6 +1409,8 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @param request _more_
      * @param formBuffer _more_
+     * @param titles _more_
+     * @param contents _more_
      * @param where _more_
      * @param advancedForm _more_
      * @param makeToggleBox _more_
@@ -1406,16 +1418,13 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @throws Exception on badness
      */
-    public void addColumnsToSearchForm(Request request,
-                                       Appendable formBuffer,
+    public void addColumnsToSearchForm(Request request, List<String> titles,
+                                       List<String> contents,
                                        List<Clause> where,
                                        boolean advancedForm,
-                                       boolean makeToggleBox,
                                        HashSet<String> fieldsToShow)
             throws Exception {
-        Appendable typeSB = (makeToggleBox
-                             ? new StringBuilder()
-                             : formBuffer);
+        Appendable typeSB = new StringBuilder();
         for (Column column : columns) {
             if ((fieldsToShow != null)
                     && !fieldsToShow.contains(column.getName())) {
@@ -1425,12 +1434,13 @@ public class GenericTypeHandler extends TypeHandler {
             column.addToSearchForm(request, typeSB, where);
         }
 
-        if (makeToggleBox && (typeSB.toString().length() > 0)) {
-            typeSB = new StringBuilder(HtmlUtils.formTable() + typeSB
-                                       + HtmlUtils.formTableClose());
-            formBuffer.append(HtmlUtils.p());
-            formBuffer.append(HtmlUtils.makeShowHideBlock(msg(getLabel()),
-                    typeSB.toString(), true));
+        if (typeSB.toString().length() > 0) {
+            if (advancedForm) {
+                typeSB = new StringBuilder(HtmlUtils.formTable() + typeSB
+                                           + HtmlUtils.formTableClose());
+            }
+            titles.add(msg(getLabel()));
+            contents.add(typeSB.toString());
         }
     }
 

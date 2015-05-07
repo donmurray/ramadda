@@ -28,9 +28,9 @@ import org.ramadda.service.ServiceOutput;
 
 import org.ramadda.sql.Clause;
 import org.ramadda.sql.SqlUtil;
+import org.ramadda.util.FileInfo;
 import org.ramadda.util.FormInfo;
 import org.ramadda.util.HtmlUtils;
-import org.ramadda.util.FileInfo;
 import org.ramadda.util.JQuery;
 import org.ramadda.util.Json;
 import org.ramadda.util.SelectionRectangle;
@@ -2008,11 +2008,13 @@ public class TypeHandler extends RepositoryManager {
      * @param fromWhere _more_
      * @param args _more_
      * @param sb _more_
+     * @param files _more_
      *
      * @throws Exception _more_
      */
     public void addEncoding(Request request, Entry entry, String fromWhere,
-                            List<String> args, Appendable sb, List<FileInfo> files)
+                            List<String> args, Appendable sb,
+                            List<FileInfo> files)
             throws Exception {}
 
 
@@ -4300,17 +4302,21 @@ public class TypeHandler extends RepositoryManager {
      *
      * @param formBuffer _more_
      * @param request The request
+     * @param titles _more_
+     * @param contents _more_
      * @param where _more_
      * @param advancedForm _more_
      *
      * @throws Exception _more_
      */
-    public void addToSearchForm(Request request, Appendable formBuffer,
-                                List<Clause> where, boolean advancedForm)
+    public void addToSearchForm(Request request, List<String> titles,
+                                List<String> contents, List<Clause> where,
+                                boolean advancedForm)
             throws Exception {
 
         if (parent != null) {
-            parent.addToSearchForm(request, formBuffer, where, advancedForm);
+            parent.addToSearchForm(request, titles, contents, where,
+                                   advancedForm);
 
             return;
         }
@@ -4519,10 +4525,8 @@ public class TypeHandler extends RepositoryManager {
         advancedSB.append(HtmlUtils.formTableClose());
 
 
-        formBuffer.append(HtmlUtils.makeShowHideBlock(msg("Information"),
-                basicSB.toString(), true));
-        //        formBuffer.append(HtmlUtils.makeShowHideBlock(msg("Advanced"),
-        //                advancedSB.toString(), false));
+        titles.add(msg("Search Criteria"));
+        contents.add(basicSB.toString());
 
     }
 

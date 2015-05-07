@@ -681,7 +681,6 @@ public class SpecialSearch extends RepositoryManager implements RequestHandler {
             }
         }
 
-
         typeHandler.addToSpecialSearchForm(request, formSB, fieldsToShow);
 
 
