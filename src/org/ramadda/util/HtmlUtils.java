@@ -2281,7 +2281,7 @@ public class HtmlUtils {
         /** _more_ */
         int margin = 3;
 
-        /** _more_          */
+        /** _more_ */
         int padding = 20;
 
         /** _more_ */
@@ -3984,9 +3984,12 @@ public class HtmlUtils {
             sb.append(HtmlUtils.div(content, ""));
         }
         sb.append("</div>");
+
         String args =
-            "autoHeight: false, navigation: true, collapsible: true, active: "
-            + !collapse;
+            "autoHeight: false, navigation: true, collapsible: true";
+        if ( !collapse) {
+            args += ", active: 0";
+        }
         sb.append(HtmlUtils.script("$(function() {\n$(\"#" + accordianId
                                    + "\" ).accordion({" + args + "});});\n"));
     }
