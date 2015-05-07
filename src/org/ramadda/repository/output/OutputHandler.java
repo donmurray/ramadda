@@ -1927,7 +1927,11 @@ public class OutputHandler extends RepositoryManager {
             return null;
         }
 
+
         String url = entry.getResource().getPath();
+        if(entry.getResource().isUrl()) {
+            return url;
+        }
         if (url != null) {
             if (url.startsWith("ftp:") || url.startsWith("http:")) {
                 return url;

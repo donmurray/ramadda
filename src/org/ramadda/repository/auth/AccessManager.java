@@ -498,8 +498,9 @@ public class AccessManager extends RepositoryManager {
                 }
             }
             //LOOK: make sure we pass in false here which says do not check for access control
-            entry = getEntryManager().getEntry(request,
-                    entry.getParentEntryId(), false);
+
+            //            System.err.println ("auth:" + entry.getId() +" parent:" + entry.getParentEntryId());
+            entry = getEntryManager().getParent(request, entry, false);
         }
 
         return false;

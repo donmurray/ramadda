@@ -95,8 +95,8 @@ import java.util.zip.ZipInputStream;
 public class EntryManager extends RepositoryManager {
 
     /** _more_ */
-    public static final String[] PRELOAD_CATEGORIES = {  "Documents", "General",
-                                                         "Information","Collaboration", "Database" };
+    public static final String[] PRELOAD_CATEGORIES = { "Documents",
+            "General", "Information", "Collaboration", "Database" };
 
     /** _more_ */
     public static final String ENTRYID_PROCESS = "process";
@@ -6200,9 +6200,17 @@ public class EntryManager extends RepositoryManager {
      *     @throws Exception _more_
      */
     public Entry getParent(Request request, Entry entry) throws Exception {
-        Entry parent = getEntry(request, entry.getParentEntryId());
-        if(parent!=null && parent.equals(entry)) {
+        return getParent(request, entry, true);
+    }
+
+
+    public Entry getParent(Request request, Entry entry, boolean checkAccess) throws Exception {
+
+            Entry parent = getEntry(request, entry.getParentEntryId(), checkAccess);
+        if ((parent != null) && parent.equals(entry)) {
             //Whoa, got a loop
+            System.err.println("EntryManager: got a loop:" + entry.getName() +" " + parent.getName());
+
             return null;
         }
 
@@ -9604,7 +9612,6 @@ public class EntryManager extends RepositoryManager {
      * _more_
      *
      * @param request _more_
-     * @param baseGroup _more_
      * @param base _more_
      * @param current _more_
      * @param dir _more_
@@ -9615,6 +9622,77 @@ public class EntryManager extends RepositoryManager {
      */
     public Entry getRelativeEntry(Request request, Entry base, Entry current,
                                   String dir)
+            throws Exception {
+        dir = dir.trim();
+        System.err.println("getRelativeEntry: base:" + base.getName()
+                           + " cwd:" + current.getName() + " text:" + dir);
+        List<String> toks = StringUtil.split(dir, "/", true, true);
+        if (toks.size() == 0) {
+            //Maybe return base?
+            return current;
+        }
+        Entry cwd = current;
+        if (dir.startsWith("/")) {
+            cwd = base;
+        }
+
+
+        for (String tok : toks) {
+            System.err.println("   tok:" + tok + " cwd:" + cwd.getName());
+            if (tok.equals("..")) {
+                cwd = cwd.getParentEntry();
+                if ((cwd == null) || cwd.equals(base)) {
+                    break;
+                }
+
+                continue;
+            }
+            if (tok.matches("\\d+")) {
+                int index = new Integer(tok).intValue();
+                index--;
+                List<Entry> children = getEntryManager().getChildren(request,
+                                           cwd);
+                if ((index < 0) || (index >= children.size())) {
+                    System.err.println("Did not get #child:" + dir
+                                       + " index:" + index + " cwd:"
+                                       + cwd.getName());
+
+                    return null;
+                }
+                cwd = children.get(index);
+
+                continue;
+            }
+
+            Entry child = findEntryWithName(request, cwd, tok);
+            if (child == null) {
+                System.err.println("Did not find child:" + tok + " cwd:"
+                                   + cwd.getName());
+
+                return null;
+            }
+            cwd = child;
+        }
+
+        return cwd;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param baseGroup _more_
+     * @param base _more_
+     * @param current _more_
+     * @param dir _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Entry xxxxgetRelativeEntry(Request request, Entry base,
+                                      Entry current, String dir)
             throws Exception {
         dir = dir.trim();
         if (dir.length() == 0) {
