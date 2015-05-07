@@ -140,7 +140,7 @@ public class PhotosTypeHandler extends GdataTypeHandler {
     public List<Entry> getAlbumEntries(Request request, Entry entry)
             throws Exception {
         List<Entry> entries = new ArrayList<Entry>();
-        System.err.println("getAlbumEntries from picasa");
+        //        System.err.println("getAlbumEntries from picasa");
         String userId = getUserId(entry);
         if (userId == null) {
             return entries;
@@ -154,13 +154,14 @@ public class PhotosTypeHandler extends GdataTypeHandler {
             String albumEntryId = getSynthId(entry, TYPE_ALBUM,
                                              album.getGphotoId());
             String       title    = album.getTitle().getPlainText();
-            StringBuffer desc     = new StringBuffer();
             Entry        newEntry = new Entry(albumEntryId, this, true);
+            StringBuffer desc     = new StringBuffer();
             addMetadata(newEntry, album, desc);
             entries.add(newEntry);
             newEntry.setIcon("/gdata/picasa.png");
             Date dttm = album.getDate();
             Date now  = new Date();
+            //            System.err.println ("Desc:" + desc);
             newEntry.initEntry(title, desc.toString(), entry,
                                getUserManager().getLocalFileUser(),
                                new Resource(), "", dttm.getTime(),
@@ -205,6 +206,13 @@ public class PhotosTypeHandler extends GdataTypeHandler {
         List<String> toks    = StringUtil.split(synthId, ":");
         String       type    = toks.get(0);
         String       albumId = toks.get(1);
+
+        //        System.err.println("getSynthIds:  parent:" + parentEntry +" ID:" + synthId);
+
+        if(type.equals(TYPE_PHOTO)) {
+            return ids;
+        }
+
         for (Entry photoEntry :
                 getPhotoEntries(request, mainEntry, parentEntry, albumId)) {
             ids.add(photoEntry.getId());
@@ -229,7 +237,8 @@ public class PhotosTypeHandler extends GdataTypeHandler {
     public List<Entry> getPhotoEntries(Request request, Entry mainEntry,
                                        Entry parentEntry, String albumId)
             throws Exception {
-        System.err.println("getPhotoEntries from picasa:" + albumId);
+        //        System.err.println("getPhotoEntries from picasa:" + albumId);
+        //        System.err.println("mainEntry:" + mainEntry.getName() +" parentEntry:" + parentEntry.getName());
         List<Entry> entries = new ArrayList<Entry>();
         String      userId  = getUserId(mainEntry);
         URL feedUrl = new URL(PICASA_ROOT + userId + "/albumid/" + albumId);
@@ -242,8 +251,9 @@ public class PhotosTypeHandler extends GdataTypeHandler {
                                       photo.getAlbumId() + ":"
                                       + photo.getGphotoId());
             Entry        newEntry = new Entry(newId, this);
-            StringBuffer desc     = new StringBuffer();
+            StringBuffer desc     = new StringBuffer("<wiki>\n+section label={{name}}\n{{image}}\n");
             addMetadata(newEntry, photo, desc);
+            desc.append("\n-section\n");
             entries.add(newEntry);
             //            newEntry.setIcon("/gdata/picasa.png");
             Date dttm = new Date();
@@ -255,6 +265,8 @@ public class PhotosTypeHandler extends GdataTypeHandler {
                 resource = new Resource(media.get(0).getUrl());
                 resource.setFileSize(photo.getSize());
             }
+
+
 
 
             newEntry.initEntry(name, desc.toString(), parentEntry,
@@ -336,6 +348,9 @@ public class PhotosTypeHandler extends GdataTypeHandler {
         String albumId      = toks.get(1);
         String albumEntryId = getSynthId(mainEntry, TYPE_ALBUM, albumId);
         Entry  albumEntry = getEntryManager().getEntry(request, albumEntryId);
+        
+        //        System.err.println("makeSynth: albumId:" +  albumId +" albumEntryId:" + albumEntryId +" album entry:" + albumEntry);
+
         String photoEntryId = getSynthId(mainEntry, TYPE_PHOTO,
                                          toks.get(1) + ":" + toks.get(2));
         for (Entry photoEntry :
