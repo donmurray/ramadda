@@ -668,6 +668,7 @@ public abstract class Harvester extends RepositoryManager {
 
 
         StringBuffer runWidgets = new StringBuffer();
+        int  widgetCnt = 0;
         if (showWidget(ATTR_TESTMODE)) {
             runWidgets.append(HtmlUtils.checkbox(ATTR_TESTMODE, "true",
                     testMode) + HtmlUtils.space(1) + msg("Test mode"));
@@ -675,12 +676,14 @@ public abstract class Harvester extends RepositoryManager {
                               + HtmlUtils.input(ATTR_TESTCOUNT,
                                   "" + testCount, HtmlUtils.SIZE_5));
             runWidgets.append(HtmlUtils.br());
+            widgetCnt++;
         }
         if (showWidget(ATTR_ACTIVEONSTART)) {
             runWidgets.append(HtmlUtils.checkbox(ATTR_ACTIVEONSTART, "true",
                     activeOnStart) + HtmlUtils.space(1)
                                    + msg("Active on startup"));
             runWidgets.append(HtmlUtils.br());
+            widgetCnt++;
         }
 
         if (showWidget(ATTR_MONITOR)) {
@@ -693,18 +696,18 @@ public abstract class Harvester extends RepositoryManager {
                                   HtmlUtils.SIZE_5) + HtmlUtils.space(1)
                                       + sleepType + sleepLbl);
             runWidgets.append(HtmlUtils.br());
+            widgetCnt++;
         }
         if (showWidget(ATTR_GENERATEMD5)) {
             runWidgets.append(HtmlUtils.checkbox(ATTR_GENERATEMD5, "true",
                     generateMd5) + HtmlUtils.space(1)
                                  + msg("Generate MD5 Checksum"));
+            widgetCnt++;
         }
 
-        sb.append(
-            HtmlUtils.formEntryTop(
-                "",
-                HtmlUtils.makeShowHideBlock(
-                    msg("Run Settings"), runWidgets.toString(), false)));
+        String widgetText = runWidgets.toString();
+        if(widgetCnt>2) widgetText = HtmlUtils.makeShowHideBlock(msg("Run Settings"), widgetText, false);
+        sb.append(HtmlUtils.formEntryTop("",widgetText));
     }
 
 
