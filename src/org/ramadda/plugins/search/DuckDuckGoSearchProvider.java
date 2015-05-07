@@ -28,18 +28,19 @@ import java.util.List;
  * Proxy that searches google
  *
  */
-public class GoogleSearchProvider extends SearchProvider {
+public class DuckDuckGoSearchProvider extends SearchProvider {
 
-    public static final String URL = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0";
-    public static final String SEARCH_ID ="google";
+    
+    public static final String URL = "https://api.duckduckgo.com?format=json";
+    public static final String SEARCH_ID ="duckduckgo";
 
     /**
      * _more_
      *
      * @param repository _more_
      */
-    public GoogleSearchProvider(Repository repository) {
-        super(repository,SEARCH_ID,"Google");
+    public DuckDuckGoSearchProvider(Repository repository) {
+        super(repository,SEARCH_ID,"Duck Duck Go");
     }
 
     /**
@@ -48,8 +49,8 @@ public class GoogleSearchProvider extends SearchProvider {
      * @param repository _more_
      * @param args _more_
      */
-    public GoogleSearchProvider(Repository repository, List<String> args) {
-        super(repository, SEARCH_ID, "Google");
+    public DuckDuckGoSearchProvider(Repository repository, List<String> args) {
+        super(repository, SEARCH_ID, "Duck Duck Go");
     }
 
 
@@ -74,27 +75,26 @@ public class GoogleSearchProvider extends SearchProvider {
         url += "&";
         url += HtmlUtils.arg("q",
                              HtmlUtils.urlEncode(request.getString(ARG_TEXT, "")));
-        System.err.println("google search url:" + url);
+        System.err.println(getName() +" search url:" + url);
         String json = IOUtil.readContents(url);
-        //        System.err.println("Json:" + json);
+        System.err.println("Json:" + json);
         JSONObject obj = new JSONObject(new JSONTokener(json));
-        if ( !obj.has("responseData")) {
-            System.err.println("GoogleSearchProvider: no response field in json:" + json);
+        if ( !obj.has("RelatedTopics")) {
+            System.err.println("DuckDuckGo SearchProvider: no RelatedTopics field in json:" + json);
             return entries;
         }
 
-        JSONObject response = obj.getJSONObject("responseData");
-        JSONArray searchResults = response.getJSONArray("results");
+        JSONArray searchResults = obj.getJSONArray("RelatedTopics");
         TypeHandler typeHandler = getRepository().getTypeHandler("link");
         Entry parent = getRepository().getEntryManager().getTopGroup();
         for (int i = 0; i < searchResults.length(); i++) {
             JSONObject result = searchResults.getJSONObject(i);
-            String     name    = result.getString("titleNoFormatting");
-            String     desc    = result.getString("content");
-            String     resultUrl    = result.getString("url");
+            String     name    = result.getString("Text");
+            String     desc    = result.getString("Result");
+            String     resultUrl    = result.getString("FirstURL");
             Entry        newEntry = new Entry(Repository.ID_PREFIX_SYNTH+getId()+":" + resultUrl, typeHandler);
             entries.add(newEntry);
-            newEntry.setIcon("/search/google-icon.png");
+            newEntry.setIcon("/search/duckduckgo.png");
             Date dttm  = new Date();
             newEntry.initEntry(name, desc, parent,
                                getUserManager().getLocalFileUser(),
@@ -106,6 +106,11 @@ public class GoogleSearchProvider extends SearchProvider {
         return entries;
     }
 
+    public static void main(String[]args) throws Exception {
+        String url = "https://api.duckduckgo.com/?format=json&t=ramadda&q=zoom";
+        String json = IOUtil.readContents(new URL(url));
+        System.err.println(json);
+    }
 
 
 }
