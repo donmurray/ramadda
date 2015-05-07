@@ -6204,12 +6204,26 @@ public class EntryManager extends RepositoryManager {
     }
 
 
-    public Entry getParent(Request request, Entry entry, boolean checkAccess) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param entry _more_
+     * @param checkAccess _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Entry getParent(Request request, Entry entry, boolean checkAccess)
+            throws Exception {
 
-            Entry parent = getEntry(request, entry.getParentEntryId(), checkAccess);
+        Entry parent = getEntry(request, entry.getParentEntryId(),
+                                checkAccess);
         if ((parent != null) && parent.equals(entry)) {
             //Whoa, got a loop
-            System.err.println("EntryManager: got a loop:" + entry.getName() +" " + parent.getName());
+            System.err.println("EntryManager: got a loop:" + entry.getName()
+                               + " " + parent.getName());
 
             return null;
         }
