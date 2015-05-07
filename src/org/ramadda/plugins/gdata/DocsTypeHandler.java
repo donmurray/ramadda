@@ -266,9 +266,15 @@ public class DocsTypeHandler extends GdataTypeHandler {
             newEntry.setParentEntryId(parentId);
         }
         for (Entry newEntry : newEntries) {
-            if (newEntry.getParentEntryId().equals(mainEntry.getId())) {
-                //                System.err.println ("is top level:" + newEntry.getParentEntryId() + " " + newEntry.getName());
+            if (parentEntry!=null && newEntry.getParentEntryId().equals(parentEntry.getId())) {
+                //                System.err.println ("is parent level level:" + newEntry.getParentEntryId() + " " + newEntry.getName());
                 ids.add(newEntry.getId());
+                newEntry.setParentEntry(parentEntry);
+            } else if (newEntry.getParentEntryId().equals(mainEntry.getId())) {
+                //                System.err.println ("is top level:" + newEntry.getParentEntryId() + " " + newEntry.getName());
+                if(parentEntry == null) {
+                    ids.add(newEntry.getId());
+                }
                 newEntry.setParentEntry(mainEntry);
             } else {
                 Entry tmpParentEntry =
@@ -307,7 +313,7 @@ public class DocsTypeHandler extends GdataTypeHandler {
         Hashtable<String, Entry> entryMap = new Hashtable<String, Entry>();
         getSynthIds(request, mainEntry, null, id, entryMap);
         Entry newEntry = entryMap.get(id);
-        System.err.println("newEntry:" + newEntry + " " + id);
+        //        System.err.println("newEntry:" + newEntry + " " + id);
 
         return newEntry;
     }
