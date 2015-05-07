@@ -168,10 +168,11 @@ public class FeedTypeHandler extends ExtensibleGroupTypeHandler {
             String pubDate = XmlUtil.getGrandChildText(item,
                                  RssUtil.TAG_PUBDATE, "").trim();
 
-
-
-            Entry entry = new Entry(getEntryManager().createSynthId(mainEntry, guid), this, false);
-            Date  dttm  = new Date();
+            Entry entry =
+                new Entry(getEntryManager().createSynthId(mainEntry, guid),
+                          getRepository().getTypeHandler("link"), false);
+            entry.setMasterTypeHandler(this);
+            Date dttm = new Date();
             for (SimpleDateFormat sdf : sdfs) {
                 try {
                     dttm = sdf.parse(pubDate);
@@ -257,11 +258,13 @@ public class FeedTypeHandler extends ExtensibleGroupTypeHandler {
              */
 
 
+            Entry entry =
+                new Entry(getEntryManager().createSynthId(mainEntry, guid),
+                          getRepository().getTypeHandler("link"), false);
+            entry.setMasterTypeHandler(this);
 
-
-            Entry entry = new Entry(getEntryManager().createSynthId(mainEntry, guid), this, false);
-            Date  dttm       = null;
-            Date  changeDate = null;
+            Date dttm       = null;
+            Date changeDate = null;
             for (SimpleDateFormat sdf : sdfs) {
                 try {
                     //                    dttm = sdf.parse(pubDate);
