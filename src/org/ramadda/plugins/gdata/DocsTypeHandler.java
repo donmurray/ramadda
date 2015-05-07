@@ -226,18 +226,22 @@ public class DocsTypeHandler extends GdataTypeHandler {
             boolean isFolder = docListEntry.getType().equals(TYPE_FOLDER);
             //            System.err.println(docListEntry.getType() + " " + docListEntry.getTitle().getPlainText() + " " + isFolder +" " );
             Resource resource;
+            TypeHandler entryTypeHandler = null;
             if (isFolder) {
                 resource = new Resource();
+                entryTypeHandler = getRepository().getTypeHandler("group");
             } else {
                 resource =
                     new Resource(docListEntry.getDocumentLink().getHref());
                 resource.setFileSize(
                     docListEntry.getQuotaBytesUsed().longValue());
+                entryTypeHandler = getRepository().getTypeHandler("link");
             }
             StringBuffer desc = new StringBuffer();
-            newEntry = new Entry(entryId, this, isFolder);
+            newEntry = new Entry(entryId, entryTypeHandler, isFolder);
+            newEntry.setMasterTypeHandler(this);
             newEntries.add(newEntry);
-            System.err.println("ID:" + newEntry.getId());
+            //            System.err.println("ID:" + newEntry.getId());
             entryMap.put(newEntry.getId(), newEntry);
             newEntry.addMetadata(new Metadata(getRepository().getGUID(),
                     newEntry.getId(), "gdata.lastmodifiedby", false,
