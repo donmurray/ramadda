@@ -8,7 +8,9 @@ import ucar.unidata.util.StringUtil;
 import java.io.File;
 import java.util.List;
 import java.util.Date;
+import java.util.HashSet;
 import ucar.unidata.util.DateUtil;
+import ucar.unidata.xml.XmlUtil;
 
 public class EntryXmlProcessor extends Processor.RowCollector {
 
@@ -29,15 +31,22 @@ public class EntryXmlProcessor extends Processor.RowCollector {
         List<Row> rows = getRows();
         StringBuilder sb  = new StringBuilder("<entries>\n");
 
+
+        HashSet<String> seen = new HashSet<String>();
+
         for (int i = 1;i<rows.size();i++) {
+            StringBuilder extra  = new StringBuilder("");
+            String id = "assessment" + i;
             Row row = rows.get(i);
             String  s= template;
             List values =  row.getValues();
             for(int colIdx=0;colIdx<values.size();colIdx++) {
                 Object v = values.get(colIdx);
-                s = s.replace("${" + colIdx +"}" , v.toString());
+                String sv = v.toString();
+                sv = Utils.removeNonAscii(sv);
+                s = s.replace("${" + colIdx +"}" , sv);
             }
-            StringBuilder metadata = new StringBuilder();
+            StringBuilder content = new StringBuilder();
             String date = values.get(11).toString();
             Date dttm  = null;
             if(Utils.stringDefined(date)) {
@@ -52,24 +61,40 @@ public class EntryXmlProcessor extends Processor.RowCollector {
                 attrs.append(" fromdate=\"" + fsdf.format(dttm)+"\" ");
             }               
 
+            String file = IOUtil.getFileTail(values.get(37).toString());
+
+
+            if(seen.contains(file)) {
+                //                System.err.println ("DUP:" + file);
+                file = "2_" + file;
+            }
+            seen.add(file);
+            if(!new File("files/" +file).exists()) {
+                System.err.println ("no file:" + file);
+            } else {
+                extra.append(XmlUtil.tag("entry", XmlUtil.attrs(new String[]{"name",file, "parent", id ,"file", file})));
+                extra.append("\n");
+            }
 
             String doi = values.get(8).toString();
             if(Utils.stringDefined(doi)) {
-                metadata.append("<metadata  type=\"doi_identifier\"><attr encoded=\"false\" index=\"2\"><![CDATA[" + doi +"]]></attr></metadata>\n");
+                content.append("<metadata  type=\"doi_identifier\"><attr encoded=\"false\" index=\"2\"><![CDATA[" + doi +"]]></attr></metadata>\n");
             }
 
-        //<metadata inherited="false" type="assessment_practice">      <attr index="1"><![CDATA[UmVmbGVjdGl2ZSBpbnRlcnZpZXdz]]></attr>    </metadata>
             for(String author: StringUtil.split(values.get(3).toString(),";",true,true)) {
-                metadata.append("<metadata  type=\"metadata_author\"><attr encoded=\"false\" index=\"1\"><![CDATA[" + author +"]]></attr></metadata>\n");
+                author = Utils.removeNonAscii(author);
+                content.append("<metadata  type=\"metadata_author\"><attr encoded=\"false\" index=\"1\"><![CDATA[" + author +"]]></attr></metadata>\n");
             }
 
 
 
 
-            s = s.replace("${metadata}" , metadata.toString());
+            s = s.replace("${id}" , id);
+            s = s.replace("${content}" , content.toString());
             s = s.replace("${attrs}" , attrs.toString());
 
             sb.append(s);
+            sb.append(extra);
         }
         sb.append("</entries>\n");
         System.out.println(sb);
