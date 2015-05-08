@@ -30,9 +30,15 @@ public class SlackAction extends MonitorAction {
     /** _more_ */
     public static final String ARG_WEBHOOK = "webhook";
 
+    /** _more_          */
+    public static final String ARG_PUBLISH_FILE = "publish_file";
+
 
     /** _more_ */
     private String webhook;
+
+    /** _more_          */
+    private boolean publishFile = false;
 
 
     /**
@@ -107,6 +113,12 @@ public class SlackAction extends MonitorAction {
         sb.append(HtmlUtils.formEntry("Slack Web Hook URL:",
                                       HtmlUtils.input(ARG_WEBHOOK,
                                           getWebhook(), HtmlUtils.SIZE_60)));
+        sb.append(
+            HtmlUtils.formEntry(
+                "",
+                HtmlUtils.checkbox(
+                    ARG_PUBLISH_FILE, "true", getPublishFile()) + " "
+                        + msg("Publish file to Slack")));
         sb.append(HtmlUtils.formTableClose());
     }
 
@@ -118,7 +130,8 @@ public class SlackAction extends MonitorAction {
      */
     public void applyEditForm(Request request, EntryMonitor monitor) {
         super.applyEditForm(request, monitor);
-        this.webhook = request.getString(ARG_WEBHOOK, webhook);
+        this.webhook     = request.getString(ARG_WEBHOOK, webhook);
+        this.publishFile = request.get(ARG_PUBLISH_FILE, publishFile);
     }
 
     /**
@@ -189,6 +202,26 @@ public class SlackAction extends MonitorAction {
         return webhook;
 
     }
+
+
+    /**
+     *  Set the PublishFile property.
+     *
+     *  @param value The new value for PublishFile
+     */
+    public void setPublishFile(boolean value) {
+        publishFile = value;
+    }
+
+    /**
+     *  Get the PublishFile property.
+     *
+     *  @return The PublishFile
+     */
+    public boolean getPublishFile() {
+        return publishFile;
+    }
+
 
 
 }

@@ -24,6 +24,7 @@ import org.ramadda.repository.*;
 import org.ramadda.repository.auth.*;
 import org.ramadda.repository.harvester.*;
 import org.ramadda.repository.metadata.*;
+import org.ramadda.repository.search.SearchManager;
 import org.ramadda.repository.type.*;
 import org.ramadda.util.FileInfo;
 
@@ -78,7 +79,10 @@ public class SlackHarvester extends Harvester {
     public static final String[] CMDS_SEARCH = { "search", "find" };
 
     /** _more_ */
-    public static final String[] CMDS_PWD = { "pwd", "dir" };
+    public static final String[] CMDS_PWD = { "pwd", "dir", "info" };
+
+    /** _more_          */
+    public static final String[] CMDS_HELP = { "help", "?" };
 
 
     /** _more_ */
@@ -97,7 +101,7 @@ public class SlackHarvester extends Harvester {
     public static final String[] CMDS_NEW = { "new", "create" };
 
     /** _more_ */
-    public static final String[] CMDS_GET = { "get" };
+    public static final String[] CMDS_GET = { "get", "file" };
 
     /** _more_ */
     public static final String[] CMDS_VIEW = { "view" };
@@ -155,6 +159,44 @@ public class SlackHarvester extends Harvester {
             throws Exception {
         super(repository, node);
     }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param msg _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Result getUsage(Request request, String msg) throws Exception {
+        StringBuffer sb = new StringBuffer();
+        if (Utils.stringDefined(msg)) {
+            sb.append(msg);
+            sb.append("\n");
+        }
+        sb.append("Hello RAMADDA SlackShell user\n");
+        sb.append(
+            "You can navigate around your RAMADDA, create notes and blog posts and visualize your data\n");
+        sb.append("/r ls  (list the entries)\n");
+        sb.append("\tor try /r dir or /r pwd\n");
+        sb.append(
+            "/r cd &lt;some entry number or name&gt; (change working directory)\n");
+        sb.append(
+            "/r new (folder or post or wiki or note) Title of entry | Description  \n");
+        sb.append(
+            "/r get <-entry entry#>  (get the file and add it to Slack\n");
+        sb.append("/r view <-entry entry #> <-help> (view the file\n");
+        sb.append("/r search  search terms \n");
+        sb.append("/r search  -provider google search terms \n");
+        sb.append("All commands take -entry <entry #>\n");
+
+        return new Result("", sb);
+    }
+
+
 
     /**
      * _more_
@@ -406,6 +448,8 @@ public class SlackHarvester extends Harvester {
                 result = processLs(request, text);
             } else if (isCommand(cmd, CMDS_PWD)) {
                 result = processPwd(request, text);
+            } else if (isCommand(cmd, CMDS_HELP)) {
+                result = getUsage(request, "");
             } else if (isCommand(cmd, CMDS_DESC)) {
                 result = processDesc(request, text);
             } else if (isCommand(cmd, CMDS_GET)) {
@@ -449,7 +493,7 @@ public class SlackHarvester extends Harvester {
      * @return _more_
      */
     private static Result message(String msg) {
-        return new Result(msg,Constants.MIME_TEXT);
+        return new Result(msg, Constants.MIME_TEXT);
     }
 
     /**
@@ -464,21 +508,28 @@ public class SlackHarvester extends Harvester {
      */
     private Result processSearch(Request request, String text)
             throws Exception {
-        Slack.Args args  = parseArgs(request, text);
+        Slack.Args args = parseArgs(request, text);
         if ( !Utils.stringDefined(args.getText())) {
             return getUsage(request, "Need to specify search string");
         }
-        if(args.getArgs().contains("-help")) {
-            return new Result("search help", Constants.MIME_TEXT);
+        if (args.isHelp()) {
+            //TODO: List out the search providers
+            return new Result(
+                "/r search -provider (google|all|this) search terms",
+                Constants.MIME_TEXT);
         }
-        String providers = Utils.getArg("-providers",args.getArgs(),null);
+        String provider = Utils.getArg("-provider", args.getArgs(), null);
+        System.err.println("provider:" + provider + " text:"
+                           + args.getText());
         request = request.cloneMe();
         request.put(ARG_TEXT, args.getText());
-        if(providers!=null) {
-            request.put("provider", providers);
+        if (provider != null) {
+            request.put(SearchManager.ARG_PROVIDER, provider);
         }
-        List[] pair = getEntryManager().getEntries(request);
+        List[] pair = getSearchManager().doSearch(request,
+                          new StringBuilder());
         pair[0].addAll(pair[1]);
+
         return Slack.makeEntryResult(getRepository(), request,
                                      "Search Results", (List<Entry>) pair[0],
                                      getWebHook(), false);
@@ -496,14 +547,15 @@ public class SlackHarvester extends Harvester {
      */
     public Slack.Args parseArgs(Request request, String text)
             throws Exception {
-        List<String> toks    = StringUtil.split(text, " ", true, true);
-        Slack.Args   args    = new Slack.Args(toks, null);
-        String       entryId = null;
-        StringBuilder textSB = new StringBuilder();
+        List<String>  toks    = StringUtil.split(text, " ", true, true);
+        Slack.Args    args    = new Slack.Args(toks, null);
+        String        entryId = null;
+        StringBuilder textSB  = new StringBuilder();
         for (int i = 0; i < toks.size(); i++) {
             String tok = toks.get(i);
             if (tok.startsWith("-") && (i < toks.size() - 1)) {
                 i++;
+
                 continue;
             }
             textSB.append(tok);
@@ -602,8 +654,14 @@ public class SlackHarvester extends Harvester {
      */
     private Result processView(final Request request, String text)
             throws Exception {
-        Slack.Args args  = parseArgs(request, text);
-        Entry      entry = args.getEntry();
+        Slack.Args args = parseArgs(request, text);
+        if (args.isHelp()) {
+            return new Result(
+                "For tabular data:\n\t-startcol col# -endcol col# \n\t-startrow row # -endrow row # \n\t-export\n",
+                Constants.MIME_TEXT);
+        }
+
+        Entry entry = args.getEntry();
         if (entry == null) {
             return getUsage(request, "No current entry");
         }
@@ -809,7 +867,7 @@ public class SlackHarvester extends Harvester {
             return entry;
         }
 
-
+        System.err.println("getEntryFromInput:" + text);
         Entry currentEntry = getCurrentEntry(request);
         Entry newEntry = getEntryManager().getRelativeEntry(request,
                              getBaseGroup(), currentEntry, text);
@@ -833,19 +891,26 @@ public class SlackHarvester extends Harvester {
      * @throws Exception _more_
      */
     private Result processCd(Request request, String text) throws Exception {
-        Entry parent = getCurrentEntry(request);
-        text = text.trim();
-        Entry theEntry = getEntryManager().getRelativeEntry(request,
-                             getBaseGroup(), parent, text);
-        if (theEntry == null) {
-            return message("No such entry");
+        if (text.indexOf("-help") >= 0) {
+            return new Result("/r cd <entry # or name> e.g.:\ncd 2/4; ",
+                              Constants.MIME_TEXT);
         }
-        if (text.length() == 0) {
+
+
+        Entry theEntry = null;
+        if ( !Utils.stringDefined(text)) {
             theEntry = getBaseGroup();
+        } else {
+            theEntry = getEntryFromInput(request, text);
+            //            Slack.Args args  = parseArgs(request, text);
+            //            theEntry = args.getEntry();
+        }
+
+        if (theEntry == null) {
+            return message("No such entry:" + text);
         }
 
         slackStates.put(getStateKey(request), new SlackState(theEntry));
-
 
         return Slack.makeEntryResult(getRepository(), request,
                                      "Current entry:", toList(theEntry),
@@ -943,31 +1008,6 @@ public class SlackHarvester extends Harvester {
 
 
 
-
-    /**
-     * _more_
-     *
-     * @param request _more_
-     * @param msg _more_
-     *
-     * @return _more_
-     *
-     * @throws Exception _more_
-     */
-    private Result getUsage(Request request, String msg) throws Exception {
-        StringBuffer sb = new StringBuffer();
-        if (Utils.stringDefined(msg)) {
-            sb.append(msg);
-            sb.append("\n");
-        }
-
-        sb.append("Navigation:\n/ramadda ls or pwd or cd\n");
-        sb.append("Search:\n/ramadda search <search text>\n");
-        sb.append(
-            "New:\n/ramadda new (folder or wiki or post or note) Name of entry | Optional description\n");
-
-        return new Result("", sb);
-    }
 
 
     /**
@@ -1122,7 +1162,9 @@ public class SlackHarvester extends Harvester {
                             new StringBody(desc, ContentType.TEXT_PLAIN));
 
             }
-            mpe.addPart(Slack.ARG_CHANNELS, new StringBody(channel));
+            if (channel != null) {
+                mpe.addPart(Slack.ARG_CHANNELS, new StringBody(channel));
+            }
 
             HttpEntity requestEntity = mpe.build();
             post.setEntity(requestEntity);

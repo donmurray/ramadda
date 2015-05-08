@@ -228,6 +228,7 @@ public class Slack {
 
 
 
+
     /**
      * _more_
      *
@@ -322,7 +323,7 @@ public class Slack {
         map.add(SLACK_TEXT);
         map.add(Json.quote(message + "\n"));
         map.add("username");
-        map.add(Json.quote("ramadda"));
+        map.add(Json.quote("slackshell"));
         if ((request != null) && request.defined(SLACK_CHANNEL_ID)) {
             map.add("channel");
             map.add(Json.quote(request.getString(SLACK_CHANNEL_ID, "")));
@@ -405,8 +406,14 @@ public class Slack {
                 name = "#" + cnt + " " + name;
             }
             map.add(Json.quote(name));
-            map.add("title_link");
-            map.add(Json.quote(getEntryUrl(repository, request, entry)));
+            if (repository.getEntryManager().isSynthEntry(entry.getId())
+                    && entry.getResource().isUrl()) {
+                map.add("title_link");
+                map.add(Json.quote(entry.getResource().getPath()));
+            } else {
+                map.add("title_link");
+                map.add(Json.quote(getEntryUrl(repository, request, entry)));
+            }
             map.add("fallback");
             map.add(Json.quote(entry.getName()));
             map.add("color");
@@ -647,6 +654,7 @@ public class Slack {
         /** _more_ */
         private Entry entry;
 
+        /** _more_          */
         private String text;
 
 
@@ -661,6 +669,15 @@ public class Slack {
         public Args(List<String> args, Entry entry) {
             this.args  = args;
             this.entry = entry;
+        }
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public boolean isHelp() {
+            return args.contains("-help");
         }
 
         /**
@@ -692,23 +709,23 @@ public class Slack {
 
 
 
-/**
-Set the Text property.
+        /**
+         * Set the Text property.
+         *
+         * @param value The new value for Text
+         */
+        public void setText(String value) {
+            text = value;
+        }
 
-@param value The new value for Text
-**/
-public void setText (String value) {
-	text = value;
-}
-
-/**
-Get the Text property.
-
-@return The Text
-**/
-public String getText () {
-	return text;
-}
+        /**
+         * Get the Text property.
+         *
+         * @return The Text
+         */
+        public String getText() {
+            return text;
+        }
 
 
 
