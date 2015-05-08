@@ -111,6 +111,7 @@ public class DoiMetadataHandler extends MetadataHandler {
      *
      * @throws Exception _more_
      */
+@Override
     public String[] getHtml(Request request, Entry entry, Metadata metadata)
             throws Exception {
         String type  = metadata.getAttr1();
@@ -118,7 +119,7 @@ public class DoiMetadataHandler extends MetadataHandler {
                         ? "DOI"
                         : "ARK");
 
-        return new String[] { label, getHref(metadata.getAttr2()) };
+        return new String[] { label, metadata.getAttr2() };
     }
 
     //http://n2t.net/ark:/99999/fk47h23wj
