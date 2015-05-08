@@ -118,7 +118,7 @@ public class SlackAction extends MonitorAction {
                 "",
                 HtmlUtils.checkbox(
                     ARG_PUBLISH_FILE, "true", getPublishFile()) + " "
-                        + msg("Publish file to Slack")));
+                + monitor.getRepository().msg("Publish file to Slack")));
         sb.append(HtmlUtils.formTableClose());
     }
 
