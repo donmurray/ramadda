@@ -469,6 +469,42 @@ public abstract class Processor {
     }
 
 
+    public static class Printer extends RowCollector {
+
+        private String template;
+
+        /**
+         * ctor
+         */
+        public Printer(String template) {
+            this.template = template;
+        }
+
+        /**
+         * _more_
+         *
+         * @param info _more_
+         *
+         * @throws Exception On badness
+         */
+        @Override
+        public void finish(Visitor info) throws Exception {
+            List<Row> rows = getRows();
+            for (int i = rows.size() - 1; i >= 0; i--) {
+                Row row = rows.get(i);
+                String  s= template;
+                List values =  row.getValues();
+                for(int colIdx=0;colIdx<values.size();colIdx++) {
+                    Object v = values.get(colIdx);
+                    s = s.replace("${" + colIdx +"}" , v.toString());
+                }
+                System.out.print(s);
+            }
+        }
+
+    }
+
+
 
 
 

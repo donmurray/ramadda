@@ -1,0 +1,11 @@
+<entry name="${4}" type="type_resilience_assessment" ${attrs}>
+<description><![CDATA[
+${10}
+
+${35}
+
+${36}
+]]></description>
+<url><![CDATA[${9}]]></url>
+${metadata}
+</entry>

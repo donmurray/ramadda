@@ -406,7 +406,8 @@ public class CsvUtil {
         boolean      doConcat      = false;
         boolean      doDbXml       = false;
         boolean      doHeader      = false;
-        boolean      doPoint       = true;
+        //        boolean      doPoint       = true;
+        boolean      doPoint       = false;
 
         String       iterateColumn = null;
         List<String> iterateValues = new ArrayList<String>();
@@ -540,6 +541,9 @@ public class CsvUtil {
                 continue;
             }
 
+
+
+
             if (arg.equals("-u")) {
                 info.getProcessor().addProcessor(new Processor.Uniquifier());
 
@@ -627,6 +631,22 @@ public class CsvUtil {
 
                 continue;
             }
+            if (arg.equals("-processor")) {
+                i++;
+                Class c =  Misc.findClass(args.get(i));
+                info.getProcessor().addProcessor((Processor) c.newInstance());
+                continue;
+            }                
+
+            if (arg.equals("-template")) {
+                i++;
+                String template= args.get(i);
+                if(new File(template).exists()) {
+                    template = IOUtil.readContents(new File(template));
+                }
+                info.getProcessor().addProcessor(new Processor.Printer(template));
+                continue;
+            }
 
             if (arg.equals("-columns")) {
                 i++;
@@ -634,7 +654,6 @@ public class CsvUtil {
                                         true);
                 info.setSelector(new Converter.ColumnSelector(cols));
                 info.getConverter().addConverter(info.getSelector());
-
                 continue;
             }
 
