@@ -60,6 +60,9 @@
   <type name="type_resilience_assessment"  description="Resiliency Assessment" handler="org.ramadda.repository.type.ExtensibleGroupTypeHandler" category="Community"     metadata="metadata_author,assessment_purpose,assessment_practice,assessment_sponsor,assessment_interaction,assessment_output,assessment_outcome" >
      <property name="icon" value="/community/text_list_bullets.png"/>
 
+     <property name="html.date.show" value="false"/>
+     <property name="html.type.show" value="false"/>
+     <property name="html.owner.show" value="false"/>
      <property name="form.file.show" value="true"/>
      <property name="form.url.show" value="true"/>
      <property name="form.datatype.show" value="false"/>
@@ -67,13 +70,13 @@
      <property name="form.altitude.top.show" value="false"/>
 
      <property name="search.metadatatypes" value="metadata_author,assessment_purpose,assessment_practice,assessment_sponsor,assessment_interaction,assessment_output,assessment_outcome"/>
-
 <!--
      <column name="authors"  type="string" label="Authors" size="500" cansearch="true"/>
 -->
      <column name="organization"  type="string" label="Organization" cansearch="true"/>
      <column name="country" type="enumerationplus" label="Country" values="file:/org/ramadda/plugins/community/resources/countries.txt" showinhtml="true" cansearch="true"/>
      <column name="location"  type="string" label="Location" cansearch="true"/>
+     <column name="bioregion"  type="enumerationplus" label="Bioregion" cansearch="true"/>
      <column name="assessment_type"  type="enumerationplus" label="Type" cansearch="true" values="oneoff:One-off,repeated:Repeated"/>
      <column name="resilience_definition"  type="enumeration" label="Resilience definition" cansearch="true" values="yes:Yes,no:No" default="no"/>
      <column name="theory_development"  type="enumeration" label="Theory development" cansearch="true"   values="yes:Yes,no:No" default="no"/>
@@ -86,12 +89,14 @@
 <div style="max-height: 400px; overflow-y: auto;margin:5px;">
 {{description wikify="true"}}
 </div>
+
+{{tree details="false" showtoggle="false" prefix="==Content==" message="" }}
+
 {{information}}
 
 {{properties  message="" metadata.types="metadata_author"}}
 {{properties   message="" metadata.types="!metadata_author"}}
 
-{{tree details="false" showtoggle="false" prefix="==Content==" message="" }}
 
 
 -col
