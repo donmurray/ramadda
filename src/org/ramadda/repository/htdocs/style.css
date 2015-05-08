@@ -933,6 +933,8 @@ label {
    margin-left:10px;
    padding:2px;
    color: #000000;
+   max-width: 400px;
+   overflow-x:auto;
 }
 
 .ramadda-earth-link:link {
