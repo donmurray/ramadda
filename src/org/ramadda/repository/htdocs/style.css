@@ -675,13 +675,13 @@ padding-right-rtl-source: physical;
 }
 
 .metadata-row-even {
-   margin-left: 10px;
+   margin-left: 20px;
    margin-bottom:2px;
    background-color:#ffffff;
 }
 
 .metadata-row-odd {
-   margin-left: 10px;
+   margin-left: 20px;
    margin-bottom:2px;
 //   background-color:#efefef;
 }

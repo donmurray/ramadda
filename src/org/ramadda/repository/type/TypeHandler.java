@@ -2725,7 +2725,7 @@ public class TypeHandler extends RepositoryManager {
                 }
             }
 
-            if (showCreated) {
+            if (showCreated && okToShowInHtml(entry,"owner", true)) {
                 String userSearchLink =
                     HtmlUtils
                         .href(HtmlUtils
