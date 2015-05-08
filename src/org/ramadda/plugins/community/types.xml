@@ -90,9 +90,11 @@
 {{description wikify="true"}}
 </div>
 
-{{tree details="false" showtoggle="false" prefix="==Content==" message="" }}
-
 {{information}}
+
+{{links details="false" showtoggle="false" prefix="<table><tr valign=top><td width=130 align=right><b>Files:</b></td><td><ul>" suffix="</ul></td></tr></table>" message="" linkresource="true" tagopen="<li>" }}
+</ul>
+
 
 {{properties  message="" metadata.types="metadata_author"}}
 {{properties   message="" metadata.types="!metadata_author"}}
