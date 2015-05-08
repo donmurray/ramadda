@@ -2119,6 +2119,9 @@ public interface Constants {
     /** imagewidth attribute */
     public static final String ATTR_IMAGEWIDTH = "imagewidth";
 
+    /** imageheight attribute */
+    public static final String ATTR_IMAGEHEIGHT = "imageheight";
+
     /** the alt attribute for images */
     public static final String ATTR_ALT = "alt";
 
