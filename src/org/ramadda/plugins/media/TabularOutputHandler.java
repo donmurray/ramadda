@@ -17,7 +17,6 @@ import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.apache.poi.xssf.usermodel.*;
 
-
 import org.ramadda.repository.*;
 import org.ramadda.repository.auth.*;
 import org.ramadda.repository.output.*;
@@ -39,10 +38,19 @@ import org.ramadda.util.text.Visitor;
 
 import org.w3c.dom.*;
 
+import ucar.unidata.ui.ImageUtils;
+
+
+
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
+
+import java.awt.Color;
+import java.awt.Image;
+
+import java.awt.image.*;
 
 import java.io.*;
 import java.io.File;
@@ -63,6 +71,7 @@ import java.util.List;
 public class TabularOutputHandler extends OutputHandler {
 
 
+    /** _more_          */
     public static final int SLACK_SCREEN_WIDTH_CHARS = 120;
 
     /** _more_ */
@@ -302,32 +311,41 @@ public class TabularOutputHandler extends OutputHandler {
         final boolean justHeader = args.contains("-header");
 
         //User indexes are 1 based
-        final int      startCol       = Utils.getArg("-startcol", args, 1)-1;
-        final int      endCol         = Utils.getArg("-endcol", args, 1000)-1;
-        final int      maxCols        = Utils.getArg("-maxcols", args, 100);
+        final int startCol = Utils.getArg("-startcol", args, 1) - 1;
+        final int endCol   = Utils.getArg("-endcol", args, 1000) - 1;
+        final int maxCols  = Utils.getArg("-maxcols", args, 100);
 
-        final int      startRow       = Utils.getArg("-startrow", args, 1)-1;
-        final int      endRow         = Utils.getArg("-endrow", args, 1000)-1;
-        final int      maxRows        = Utils.getArg("-maxrows", args, 1000);
+        final int startRow = Utils.getArg("-startrow", args, 1) - 1;
+        final int endRow   = Utils.getArg("-endrow", args, 1000) - 1;
+        final int maxRows  = Utils.getArg("-maxrows", args, 1000);
         //        final int      colWidth       = -1;
 
 
+        final StringBuilder html =
+            new StringBuilder("<html><body bgcolor=white color=black>");
+        html.append("<table border=1 width=100% bgcolor=white>");
+
+
+
         TabularVisitor tabularVisitor = new TabularVisitor() {
-            int colWidth = -1;
+
+            int   colWidth = -1;
             int[] colWidths;
             @Override
             public boolean visit(Visitor info, String sheet,
                                  List<List<Object>> rows) {
                 try {
                     return visitInner(info, sheet, rows);
-                } catch(Exception exc) {
+                } catch (Exception exc) {
                     throw new RuntimeException(exc);
                 }
             }
 
 
             private boolean visitInner(Visitor info, String sheet,
-                            List<List<Object>> rows) throws Exception {
+                                       List<List<Object>> rows)
+                    throws Exception {
+
 
                 System.err.println("visit: #rows=" + rows.size());
                 int maxWidth   = 800;
@@ -342,23 +360,31 @@ public class TabularOutputHandler extends OutputHandler {
                 }
 
 
-                int rowCnt = 0;
+                int rowCnt                   = 0;
                 int numberOfDisplayedColumns = -1;
                 for (int rowIdx = startRow;
-                     (rowIdx < rows.size()) && (rowIdx <= endRow);
-                     rowIdx++) {
+                        (rowIdx < rows.size()) && (rowIdx <= endRow);
+                        rowIdx++) {
                     if (rowCnt++ > maxRows) {
                         break;
                     }
-                    List<Object> cols   = rows.get(rowIdx);
-                    numberOfDisplayedColumns = Math.min(endCol, Math.max(numberOfDisplayedColumns, cols.size()));
+                    List<Object> cols = rows.get(rowIdx);
+                    numberOfDisplayedColumns = Math.min(endCol,
+                            Math.max(numberOfDisplayedColumns, cols.size()));
                 }
 
-                
-                if(startCol>0) numberOfDisplayedColumns -= startCol;
-                if(numberOfDisplayedColumns<=0) numberOfDisplayedColumns = 1;
-                colWidth = Utils.getArg("-colwidth", args, SLACK_SCREEN_WIDTH_CHARS/numberOfDisplayedColumns);
-                System.err.println ("Max cols: " +numberOfDisplayedColumns +"  colWidth:" + colWidth);
+
+                if (startCol > 0) {
+                    numberOfDisplayedColumns -= startCol;
+                }
+                if (numberOfDisplayedColumns <= 0) {
+                    numberOfDisplayedColumns = 1;
+                }
+                colWidth = Utils.getArg("-colwidth", args,
+                                        SLACK_SCREEN_WIDTH_CHARS
+                                        / numberOfDisplayedColumns);
+                System.err.println("Max cols: " + numberOfDisplayedColumns
+                                   + "  colWidth:" + colWidth);
 
 
                 //Figure out column widths
@@ -369,15 +395,17 @@ public class TabularOutputHandler extends OutputHandler {
                     if (rowCnt++ > maxRows) {
                         break;
                     }
-                    List<Object> cols   = rows.get(rowIdx);
-                    if(colWidths == null || cols.size()>colWidths.length) {
-                        int[]tmp = new int[cols.size()];
-                        if(colWidths!=null) {
-                            System.arraycopy(tmp, 0, colWidths, 0, colWidths.length);
-                        } 
+                    List<Object> cols = rows.get(rowIdx);
+                    if ((colWidths == null)
+                            || (cols.size() > colWidths.length)) {
+                        int[] tmp = new int[cols.size()];
+                        if (colWidths != null) {
+                            System.arraycopy(tmp, 0, colWidths, 0,
+                                             colWidths.length);
+                        }
                         colWidths = tmp;
                     }
-                    int          colCnt = 0;
+                    int colCnt = 0;
                     for (int colIdx = startCol;
                             (colIdx < cols.size()) && (colIdx <= endCol);
                             colIdx++) {
@@ -387,46 +415,55 @@ public class TabularOutputHandler extends OutputHandler {
                         Object col = cols.get(colIdx);
                         if (col != null) {
                             String s = col.toString();
-                            colWidths[colIdx] = Math.max(colWidths[colIdx], s.length());
+                            colWidths[colIdx] = Math.max(colWidths[colIdx],
+                                    s.length());
                         }
                     }
                     //If we have lots of columns then just use the fixed width
-                    if(colCnt>6) colWidths = null;
+                    if (colCnt > 6) {
+                        colWidths = null;
+                    }
                 }
 
-                if(colWidths!=null) {
-                    int total = 1;
+                if (colWidths != null) {
+                    int total  = 1;
                     int colCnt = 0;
-                    for(int v: colWidths) {
-                        if(v>0) {
+                    for (int v : colWidths) {
+                        if (v > 0) {
                             colCnt++;
-                            total+=v;
+                            total += v;
                         }
                     }
-                    double min=0.0, max=0.0;
-                    if(colCnt==2) {
+                    double
+                        min = 0.0,
+                        max = 0.0;
+                    if (colCnt == 2) {
                         min = 0.30;
                         max = 0.70;
-                    } else if(colCnt==3) {
+                    } else if (colCnt == 3) {
                         min = 0.20;
                         max = 0.80;
                     }
-                    for(int i=0;i<colWidths.length;i++) {
-                        double percentage =colWidths[i]/(double)total;
-                        if(percentage>0.0) {
-                            if(min>0)
+                    for (int i = 0; i < colWidths.length; i++) {
+                        double percentage = colWidths[i] / (double) total;
+                        if (percentage > 0.0) {
+                            if (min > 0) {
                                 percentage = Math.max(min, percentage);
-                            if(max>0)
-                                percentage =Math.min(max,  percentage);
+                            }
+                            if (max > 0) {
+                                percentage = Math.min(max, percentage);
+                            }
 
-                            colWidths[i] = (int)(percentage*SLACK_SCREEN_WIDTH_CHARS);
-                            System.err.println("width:" + i +" " + percentage +" " + colWidths[i]); 
+                            colWidths[i] = (int) (percentage
+                                    * SLACK_SCREEN_WIDTH_CHARS);
+                            System.err.println("width:" + i + " "
+                                    + percentage + " " + colWidths[i]);
                         }
                     }
                 }
 
 
-                System.err.println ("Doing output");
+                //                System.err.println ("Doing output");
 
                 rowCnt = 0;
                 for (int rowIdx = startRow;
@@ -436,9 +473,10 @@ public class TabularOutputHandler extends OutputHandler {
                         break;
                     }
 
-                    
-                    List<Object> cols   = rows.get(rowIdx);
-                    int          colCnt = 0;
+
+                    html.append("<tr>");
+                    List<Object>  cols   = rows.get(rowIdx);
+                    int           colCnt = 0;
                     StringBuilder lineSB = new StringBuilder();
                     for (int colIdx = startCol;
                             (colIdx < cols.size()) && (colIdx <= endCol);
@@ -455,7 +493,7 @@ public class TabularOutputHandler extends OutputHandler {
                             lineSB.append(" | ");
                         }
                         int width = colWidth;
-                        if(colWidths!=null) {
+                        if (colWidths != null) {
                             width = colWidths[colIdx];
                         }
                         if (s.length() > width) {
@@ -463,33 +501,55 @@ public class TabularOutputHandler extends OutputHandler {
                         }
                         s = s.replace("&", "&amp;").replace("<",
                                       "&lt;").replace(">", "&gt;");
-                        if(s.matches("[-\\+0-9\\.]+")) {
+                        if (s.matches("[-\\+0-9\\.]+")) {
                             lineSB.append(StringUtil.padLeft(s, width));
                         } else {
                             lineSB.append(StringUtil.padRight(s, width));
                         }
+                        html.append("<td>");
+                        html.append(s);
+                        html.append("</td>\n");
                     }
-                    
+
                     //Strip trailing whitespace
                     sb.append(lineSB.toString().replaceAll("\\s+$", ""));
                     sb.append("\n");
                 }
 
-                System.err.println ("done");
+                System.err.println("done");
+
                 return false;
             }
+
         };
 
         Visitor info = new Visitor();
         info.setSkip(0);
         info.setMaxRows(100);
-        for(String s: args) {
-            if(s.matches("(<|<=|>|>=|=|<>|!=)")) {
+        for (String s : args) {
+            if (s.matches("(<|<=|>|>=|=|<>|!=)")) {
                 info.addSearchExpression(s);
             }
         }
 
         visit(request, entry, info, tabularVisitor);
+
+
+        html.append("</table></body></html>");
+        File imageFile =
+            getRepository().getStorageManager().getTmpFile(request,
+                entry.getName() + "_table.png");
+        Image image = ImageUtils.renderHtml(html.toString(), 800, null, null);
+
+        ImageUtils.writeImageToFile(image, imageFile);
+
+        FileInfo fileInfo = new FileInfo(imageFile);
+        if ( !entry.getTypeHandler().isWikiText(entry.getDescription())) {
+            fileInfo.setDescription(entry.getDescription());
+        }
+        fileInfo.setTitle("Table - " + entry.getName());
+        files.add(fileInfo);
+
         //        System.err.println(sb);
     }
 
@@ -536,7 +596,6 @@ public class TabularOutputHandler extends OutputHandler {
      *
      * @param request _more_
      * @param entry _more_
-     * @param file _more_
      * @param visitInfo _more_
      * @param visitor _more_
      *
@@ -591,7 +650,6 @@ public class TabularOutputHandler extends OutputHandler {
      * @param request _more_
      * @param entry _more_
      * @param inputStream _more_
-     * @param visitInfo _more_
      * @param info _more_
      * @param visitor _more_
      *
@@ -1144,10 +1202,19 @@ public class TabularOutputHandler extends OutputHandler {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
-        StringBuilder tmp = new StringBuilder();
-        //        addEncoding(request, entry, "", tmp);
-        System.err.println(tmp);
+        StringBuilder html =
+            new StringBuilder("<html><body bgcolor=white color=black>");
+        html.append(
+            "<table border=1 width=100% bgcolor=white><tr><td>Col 1</td><td>Col 2</td><td>Col 3 adasd asd asdsa d</td></tr><tr><td>Col 1</td><td>Col 2</td><td>Col 3 adasd asd asdsa d</td></tr></table>\n");
+        html.append("</body></html>");
+        Image image = ImageUtils.renderHtml(html.toString(), 600, null, null);
+
+        ImageUtils.writeImageToFile(image, new File("test.png"));
+
+
+
     }
+
 
 
 }
