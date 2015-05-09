@@ -1,46 +1,22 @@
-<types supercategory="Miscellaneous" category="Business">
-
-  <type name="type_biz_quote"  description="Quote"  handler="org.ramadda.plugins.biz.QuoteTypeHandler" >
-     <property name="icon" value="/biz/money_dollar.png"/>
-
-     <property name="form.resource.show" value="false"/>
-     <column name="customer_name"   label="Customer name" type="string" cansearch="true"/>
-     <column name="material"   label="Material" type="enumerationplus" cansearch="true"/>
-     <column name="quantity"   label="Quantity" type="int" cansearch="true"/>
-     <column name="unit_cost"  type="double" label="Unit Cost" default="0"/>
-     <column name="amount"  type="double" label="Amount" default="0" showinform="false"/>
-<!--
-     <column name="status"   label="Form Type" type="enumerationplus" cansearch="true" values="quoted:Quoted,accepted:Accepted,not_accepted:Not Accepted"/>
--->
-     <wiki><![CDATA[
-{{noheading}}
-+section
-<div class="wiki-h1">Quote: {{name}}</div>
-<div style="max-height: 400px; overflow-y: auto;">
-{{description wikify="true"}}
-</div>
-<table class="formtable">
-{{field name="status" row.label="Status:"}}
-{{field name="quote_amount" row.label="Quoted Amount:"}}
-</table>
--section
-]]>
-</wiki>
-</type>
+<types supercategory="Miscellaneous">
 
 
-  <type name="type_edgar_filing"  description="SEC EDGAR Filing"  handler="org.ramadda.plugins.biz.EdgarFilingTypeHandler" category="Business">
-     <property name="icon" value="/biz/sec.png"/>
 
-     <column name="form_type"   label="Form Type" type="enumerationplus" cansearch="true" />
-     <column name="accession_number"  type="string" label="Accession Number"/>
-     <column name="company_name"   label="Company Name" type="enumerationplus" cansearch="true" />
-     <column name="cik_number"   label="CIK Number" type="enumerationplus" cansearch="true" />
-     <column name="central_index_key"  type="string" label="Central Index Key"/>
-     <column name="standard_industrial_classification"  type="enumerationplus" label="Standard Industrial Classification" cansearch="true" />
-     <column name="irs_number"  type="enumerationplus" label="IRS Number" cansearch="true" />
-     <column name="state"  type="enumerationplus" label="State of Incorporation" cansearch="true" />
 
+  <type name="type_fred_category"  description="FRED Category"  category="Business" foruser="true" handler="org.ramadda.plugins.biz.FredCategoryTypeHandler">
+     <property name="icon" value="/biz/fred.png"/>
+     <column name="category_id" type="string"  label="Category ID"  showinform="true" />
   </type>
+
+
+
+  <type name="type_fred_timeseries"  description="FRED Time Series" super="type_point" category="Business" foruser="true" handler="org.ramadda.data.services.PointTypeHandler">
+     <property name="icon" value="/biz/fred.png"/>
+     <property name="record.file.class" value="org.ramadda.plugins.biz.FredFile"/>
+     <column name="category_id" type="string"  label="Category ID"  showinform="true" />
+  </type>
+
+
+
 
 </types>
