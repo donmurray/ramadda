@@ -34,7 +34,7 @@
 {{display type="linechart" title=""  height="200" width="800" column="0" layoutHere="true"}}
 +row
 +col-md-8
-Data courtesy of the <a href="{{resource  message="" url="true"}}">Federal Reserve Economic Data</a> system.
+Data courtesy of the <a href="{{resource  url=true}}">Federal Reserve Economic Data</a> system.
 -col
 +col-md-4
 <div style="text-align:right;">
