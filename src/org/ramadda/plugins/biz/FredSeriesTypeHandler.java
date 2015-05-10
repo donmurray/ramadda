@@ -41,13 +41,16 @@ import java.util.List;
 
 /**
  */
-public class FredTimeSeriesTypeHandler extends PointTypeHandler {
+public class FredSeriesTypeHandler extends PointTypeHandler {
 
 
-    //NOTE: This starts at 1 because the point type has a number of points field
+    //NOTE: This starts at 2 because the point type has a number of points field
 
     /** _more_          */
-    public static final int IDX_SERIES_ID = 1;
+    public static final int IDX_SERIES_ID = 2;
+    public static final int IDX_FREQUENCY = 3;
+    public static final int IDX_UNITS = 4;
+    public static final int IDX_SEASONAL_ADJUSTMENT = 5;
 
 
     /**
@@ -58,7 +61,7 @@ public class FredTimeSeriesTypeHandler extends PointTypeHandler {
      *
      * @throws Exception _more_
      */
-    public FredTimeSeriesTypeHandler(Repository repository, Element entryNode)
+    public FredSeriesTypeHandler(Repository repository, Element entryNode)
             throws Exception {
         super(repository, entryNode);
     }
@@ -68,17 +71,50 @@ public class FredTimeSeriesTypeHandler extends PointTypeHandler {
     public void initializeNewEntry(Request request, Entry entry)
             throws Exception {
         super.initializeNewEntry(request, entry);
+        System.err.println("FredSeries.init");
+        initializeSeries(entry);
+    }
+
+
+    public void initializeSeries(Entry entry)
+            throws Exception {
+        //        super.initializeNewEntry(request, entry);
+
 
         FredCategoryTypeHandler fcth =
             (FredCategoryTypeHandler) getRepository().getTypeHandler(
                                                                      Fred.TYPE_CATEGORY);
         String seriesId  = (String) entry.getValue(IDX_SERIES_ID, null);
-        if(seriesId == null) return;
+        if(seriesId == null) {
+            System.err.println("No series id");
+            return;
+        }
+        entry.setResource(new Resource(new URL("https://research.stlouisfed.org/fred2/series/" + seriesId)));
+
         List<String> args = new ArrayList<String>();
         args.add(Fred.ARG_SERIES_ID);
         args.add(seriesId);
-        Element         root     = fcth.call(Fred.URL_CATEGORY_CHILDREN, args);
+        Element         root     = fcth.call(Fred.URL_SERIES, args);
         System.err.println(XmlUtil.toString(root));
+
+        Object[] values =getEntryValues(entry);
+        Element node = XmlUtil.findChild(root, Fred.TAG_SERIES);
+
+        if(node!=null) {
+            entry.setName(XmlUtil.getAttribute(node, Fred.ATTR_TITLE, entry.getName()));
+            entry.setDescription(XmlUtil.getAttribute(node, Fred.ATTR_NOTES, ""));
+            values[IDX_FREQUENCY] =  XmlUtil.getAttribute(node, Fred.ATTR_FREQUENCY_SHORT, "");
+            values[IDX_UNITS] = XmlUtil.getAttribute(node, Fred.ATTR_UNITS, "");
+            values[IDX_SEASONAL_ADJUSTMENT] = XmlUtil.getAttribute(node, Fred.ATTR_SEASONAL_ADJUSTMENT, "");
+
+        }
+
+    //ATTR_OBSERVATION_START
+
+
+
+
+
     }
 
     /**
@@ -102,10 +138,11 @@ public class FredTimeSeriesTypeHandler extends PointTypeHandler {
         List<String> args = new ArrayList<String>();
         args.add(Fred.ARG_SERIES_ID);
         args.add(id);
-        String url = fcth.makeUrl(Fred.URL_FRED_SERIES_OBSERVATIONS, args);
+        String url = fcth.makeUrl(Fred.URL_SERIES_OBSERVATIONS, args);
         System.err.println("URL:" + url);
 
         return url;
     }
+
 
 }

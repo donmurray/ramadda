@@ -391,14 +391,15 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
         ctor = Misc.findConstructor(c, new Class[] { String.class });
 
         if (ctor != null) {
-            return (RecordFile) ctor.newInstance(new Object[] {
-                entry.getResource().getPath() });
-
+            return (RecordFile) ctor.newInstance(new Object[] {getPathForEntry(entry) });
         }
 
         throw new IllegalArgumentException("Could not find constructor for "
                                            + className);
     }
+
+
+
 
 
     /**

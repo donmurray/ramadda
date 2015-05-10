@@ -39,6 +39,8 @@ import java.util.List;
  */
 public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
 
+
+
     /** _more_          */
     public static final int IDX_CATEGORY_ID = 0;
 
@@ -210,7 +212,7 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
                 continue;
             }
             seen.add(id);
-            System.err.println("category child id:" + id);
+            //            System.err.println("category child id:" + id);
             Entry entry = createCategoryEntry(mainEntry, parentEntry, id);
             ids.add(entry.getId());
         }
@@ -231,7 +233,7 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
             Element item = (Element) children.item(childIdx);
             String  id   = XmlUtil.getAttribute(item, ATTR_ID);
             String  name = XmlUtil.getAttribute(item, ATTR_TITLE);
-            System.err.println("series child id:" + id);
+            //            System.err.println("series child id:" + id);
             Entry entry = createSeriesEntry(mainEntry, parentEntry, id, name);
             ids.add(entry.getId());
         }
@@ -343,7 +345,7 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
         if (catNode != null) {
             name = XmlUtil.getAttribute(catNode, ATTR_NAME, categoryId);
         }
-             entry = new Entry(id, this);
+        entry = new Entry(id, this);
         String fredUrl = "https://research.stlouisfed.org/fred2/categories/"
                          + categoryId;
         Resource resource = new Resource(new URL(fredUrl));
@@ -387,20 +389,16 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
 
         String desc = "";
         Date   dttm = new Date();
-        TypeHandler seriesTypeHandler =
-            getRepository().getTypeHandler(Fred.TYPE_TIME_SERIES);
+        FredSeriesTypeHandler seriesTypeHandler = (FredSeriesTypeHandler)
+            getRepository().getTypeHandler(Fred.TYPE_SERIES);
         entry = new Entry(id, seriesTypeHandler);
-        String fredUrl = "https://research.stlouisfed.org/fred2/series/"
-                         + seriesId;
-        Resource resource = new Resource(new URL(fredUrl));
         Object[] values   = seriesTypeHandler.makeEntryValues(null);
-        values[FredTimeSeriesTypeHandler.IDX_SERIES_ID] = seriesId;
-      
-
+        values[FredSeriesTypeHandler.IDX_SERIES_ID] = seriesId;
 
         entry.initEntry(name, desc, parentEntry, parentEntry.getUser(),
-                        resource, "", dttm.getTime(), dttm.getTime(),
+                        new Resource(), "", dttm.getTime(), dttm.getTime(),
                         dttm.getTime(), dttm.getTime(), values);
+        seriesTypeHandler.initializeSeries(entry);
         getEntryManager().cacheEntry(entry);
 
         return entry;

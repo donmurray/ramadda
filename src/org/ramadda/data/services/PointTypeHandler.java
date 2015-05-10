@@ -123,6 +123,11 @@ public class PointTypeHandler extends RecordTypeHandler {
         }
 
 
+        if(!getProperty("point.initialize", true)) {
+            System.err.println ("Not initializing");
+            return;
+        }
+
         log("initialize new entry:" + entry.getResource());
         File file = entry.getFile();
         if ( !file.exists()) {
@@ -309,13 +314,14 @@ public class PointTypeHandler extends RecordTypeHandler {
                                    values, state, formInfo);
 
 
-
         if ((entry == null) && column.getName().equals("properties")) {
-            formBuffer.append(
-                HtmlUtils.formEntry(
-                    msgLabel("Or upload properties"),
-                    HtmlUtils.fileInput(
-                        ARG_PROPERTIES_FILE, HtmlUtils.SIZE_70)));
+            if(okToShowInForm(entry, "properties")) {
+                formBuffer.append(
+                                  HtmlUtils.formEntry(
+                                                      msgLabel("Or upload properties"),
+                                                      HtmlUtils.fileInput(
+                                                                          ARG_PROPERTIES_FILE, HtmlUtils.SIZE_70)));
+            }
         }
 
     }

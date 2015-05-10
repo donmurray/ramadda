@@ -5,15 +5,27 @@
 
   <type name="type_fred_category"  description="FRED Category"  category="Business" foruser="true" handler="org.ramadda.plugins.biz.FredCategoryTypeHandler">
      <property name="icon" value="/biz/fred.png"/>
+     <property name="form.resource.show" value="false"/>
      <column name="category_id" type="string"  label="Category ID"  showinform="true" />
   </type>
 
 
 
-  <type name="type_fred_timeseries"  description="FRED Time Series" super="type_point" category="Business" foruser="true" handler="org.ramadda.plugins.biz.FredTimeSeriesTypeHandler">
+  <type name="type_fred_series"  description="FRED Series" super="type_point" category="Business" foruser="true" handler="org.ramadda.plugins.biz.FredSeriesTypeHandler" mefirst="true">
      <property name="icon" value="/biz/fred.png"/>
      <property name="record.file.class" value="org.ramadda.plugins.biz.FredFile"/>
-     <column name="series_id" type="string"  label="Series ID"  showinform="true" />
+     <property name="form.resource.show" value="false"/>
+     <property name="form.properties.show" value="false"/>
+     <property name="point.initialize" value="false"/>
+
+     <property name="html.date.show" value="false"/>
+     <property name="html.type.show" value="false"/>
+     <property name="html.owner.show" value="false"/>
+     <property name="html.numberofpoints.show" value="false"/>
+     <column name="series_id" type="string"  label="Series ID"    />
+     <column name="frequency" type="enumeration"  label="Frequency"  values="A:Annual,M:Monthly" showinform="false"/>
+     <column name="units" type="string"  label="Units"  showinform="false"/>
+     <column name="seasonal_adjustment" type="enumeration"  values="NSA:Not Seasonally Adjusted" label="Seasonal Adjustment"  showinform="false"/>
   </type>
 
 

@@ -60,27 +60,24 @@ public class FredFile extends CsvFile {
     public InputStream doMakeInputStream(boolean buffered)
             throws IOException {
         try {
+            System.err.println("Reading FRED time series"); 
+            StringBuilder sb =  new StringBuilder();
             InputStream source = super.doMakeInputStream(buffered);
             Element     root   = XmlUtil.getRoot(source);
-            windForecast = root.getTagName().equals("WindForecastDayAhead");
 
-            StringBuffer s     = new StringBuffer("#converted stream\n");
-
-            List         nodes = XmlUtil.findChildren(root, windForecast
-                    ? "Forecast"
-                    : "instance");
+            List         nodes = XmlUtil.findChildren(root, Fred.TAG_OBSERVATION);
             for (int i = 0; i < nodes.size(); i++) {
                 Element node = (Element) nodes.get(i);
-                String dttm = XmlUtil.getGrandChildText(node, "DateTimeEST",
-                                  null);
-                String hour = XmlUtil.getGrandChildText(node,
-                                  "HourEndingEST", null);
-                String value = XmlUtil.getGrandChildText(node, "Value", null);
-                s.append(dttm + "," + hour + "," + value + "\n");
+                String value = XmlUtil.getAttribute(node, Fred.ATTR_VALUE,"").trim();
+                String dttm = XmlUtil.getAttribute(node, Fred.ATTR_DATE, (String) null);
+                if(value.equals("") || value.equals(".")) {
+                    value = "-999999.99";
+                }
+                sb.append(dttm +  "," + value + "\n");
             }
 
             ByteArrayInputStream bais =
-                new ByteArrayInputStream(s.toString().getBytes());
+                new ByteArrayInputStream(sb.toString().getBytes());
 
             return bais;
         } catch (Exception exc) {
@@ -101,26 +98,10 @@ public class FredFile extends CsvFile {
     @Override
     public VisitInfo prepareToVisit(VisitInfo visitInfo) throws Exception {
         super.prepareToVisit(visitInfo);
-        String format;
-        String varName;
-        String varLabel;
-        if (windForecast) {
-            format   = "MM/dd/yyyy h:mm a";
-            varName  = "wind_forecast";
-            varLabel = "Wind Forecast";
-        } else {
-            format   = "MMM dd yyyy h:mma";
-            varName  = "wind_generation";
-            varLabel = "Wind Generation";
-            //            <DateTimeEST>Feb 27 2014  8:00PM</DateTimeEST>
-        }
+        String format   = "yyyy-MM-dd";
         putFields(new String[] {
-            makeField(FIELD_DATE, attr("timezone", "EST"), attrType("date"),
-                      attrFormat(format)),
-            makeField("hour_ending", attrType("string"),
-                      attrLabel("Hour Ending")),
-            makeField(varName, attrLabel(varLabel), attrChartable()), });
-
+            makeField(FIELD_DATE, attrType("date"), attrFormat(format)),
+            makeField("value", attrLabel("Value"), attrChartable(), attrMissing(-999999.99)), });
         return visitInfo;
     }
 

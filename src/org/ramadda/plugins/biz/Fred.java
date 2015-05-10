@@ -49,12 +49,23 @@ public class Fred {
 
     /** _more_          */
     public static final String TAG_SERIES = "series";
+    public static final String TAG_OBSERVATION = "observation";
 
     /** _more_          */
     public static final String ATTR_ID = "id";
 
+    public static final String ATTR_VALUE = "value";
+    public static final String ATTR_DATE = "date";
+
     /** _more_          */
     public static final String ATTR_NAME = "name";
+    public static final String ATTR_NOTES = "notes";
+    public static final String ATTR_UNITS = "units";
+    public static final String ATTR_FREQUENCY_SHORT = "frequency_short";
+    public static final String ATTR_OBSERVATION_START= "observation_start";
+    public static final String ATTR_OBSERVATION_END= "observation_end";
+    public static final String ATTR_SEASONAL_ADJUSTMENT= "seasonal_adjustment";
+
 
     /** _more_          */
     public static final String ATTR_TITLE = "title";
@@ -82,22 +93,22 @@ public class Fred {
                                                       + "/category/related";
 
     /** _more_          */
-    public static final String URL_FRED_SERIES = URL_BASE + "/series";
+    public static final String URL_SERIES = URL_BASE + "/series";
 
     /** _more_          */
-    public static final String URL_FRED_SERIES_CATEGORIES =
+    public static final String URL_SERIES_CATEGORIES =
         URL_BASE + "/series/categories";
 
     /** _more_          */
-    public static final String URL_FRED_SERIES_OBSERVATIONS =
+    public static final String URL_SERIES_OBSERVATIONS =
         URL_BASE + "/series/observations";
 
     /** _more_          */
-    public static final String URL_FRED_SERIES_RELEASE =
+    public static final String URL_SERIES_RELEASE =
         URL_BASE + "/series/release";
 
     /** _more_          */
-    public static final String URL_FRED_SERIES_SEARCH =
+    public static final String URL_SERIES_SEARCH =
         URL_BASE + "/series/search";
 
     /** _more_          */
@@ -126,8 +137,9 @@ public class Fred {
     /** _more_          */
     public static final String TYPE_CATEGORY = "type_fred_category";
 
+
     /** _more_          */
-    public static final String TYPE_TIME_SERIES = "type_fred_timeseries";
+    public static final String TYPE_SERIES = "type_fred_series";
 
 
 }
