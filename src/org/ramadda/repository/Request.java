@@ -444,9 +444,11 @@ public class Request implements Constants, Cloneable {
             String name = entry.getFullName(true);
             try {
                 name = name.replace("/", "_FORWARDSLASH_");
+
                 name = java.net.URLEncoder.encode(name, "UTF-8");
                 name = name.replace("_FORWARDSLASH_", "/");
                 name = name.replace("?", "_");
+                name = name.replace(":", "-");
                 //A hack because the browser thinks this a zipped page
                 if (name.endsWith(".gz")) {
                     name = name.replace(".gz", "");
