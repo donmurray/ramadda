@@ -63,6 +63,63 @@ public class EntryXmlProcessor extends Processor.RowCollector {
 
             String file = IOUtil.getFileTail(values.get(37).toString());
 
+            String theory_development = "no";
+            String resilience_definition = "no";
+            String assessment_type = "oneoff";
+
+            String keywords =  values.get(39).toString();
+            for(String tok: StringUtil.split(keywords,";", true,true)) {
+                List<String> toks = StringUtil.splitUpTo(tok,":",2);
+                String n = toks.get(0).toLowerCase();
+                String v = (toks.size()>1?toks.get(1):"");
+                if(n.equals("one-off")) {
+                    continue;
+                } 
+                if(n.equals("theory?")) {
+                    theory_development = "yes";
+                    continue;
+                } 
+                if(n.equals("purpose")) {
+                    content.append("<metadata  type=\"assessment_purpose\"><attr encoded=\"false\" index=\"1\"><![CDATA[" + v +"]]></attr></metadata>\n");
+                    continue;
+                } 
+                if(n.equals("outcomes")) {
+                    content.append("<metadata  type=\"assessment_outcome\"><attr encoded=\"false\" index=\"1\"><![CDATA[" + v +"]]></attr></metadata>\n");
+                    continue;
+                } 
+                if(n.equals("sponsor/clients")) {
+                    content.append("<metadata  type=\"assessment_sponsor\"><attr encoded=\"false\" index=\"1\"><![CDATA[" + v +"]]></attr></metadata>\n");
+                    continue;
+                }
+                if(n.equals("interaction")) {
+                    content.append("<metadata  type=\"assessment_interaction\"><attr encoded=\"false\" index=\"1\"><![CDATA[" + v +"]]></attr></metadata>\n");
+                    continue;
+                }
+                if(n.equals("design/practices")) {
+                    content.append("<metadata  type=\"assessment_practice\"><attr encoded=\"false\" index=\"1\"><![CDATA[" + v +"]]></attr></metadata>\n");
+                    continue;
+                }
+                if(n.equals("formal outputs")) {
+                    content.append("<metadata  type=\"assessment_output\"><attr encoded=\"false\" index=\"1\"><![CDATA[" + v +"]]></attr></metadata>\n");
+                    continue;
+                }
+
+                if(n.startsWith("resilience")) {
+                    resilience_definition = v.toLowerCase();
+                    continue;
+                }
+                //                System.err.println(n +"=" + v);
+            }
+
+
+
+
+            s = s.replace("${theory_development}" , theory_development);
+            s = s.replace("${resilience_definition}" , resilience_definition);
+            s = s.replace("${assessment_type}" , assessment_type);
+
+
+
 
             if(seen.contains(file)) {
                 //                System.err.println ("DUP:" + file);
@@ -97,7 +154,7 @@ public class EntryXmlProcessor extends Processor.RowCollector {
             sb.append(extra);
         }
         sb.append("</entries>\n");
-        System.out.println(sb);
+                System.out.println(sb);
     }
 
 
