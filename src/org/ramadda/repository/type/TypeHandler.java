@@ -1292,6 +1292,9 @@ public class TypeHandler extends RepositoryManager {
      */
     public void putProperty(String name, String value) {
         properties.put(name, value);
+        if (parent != null) {
+            //            parent.putProperty(name, value);
+        }
     }
 
 
@@ -1355,6 +1358,14 @@ public class TypeHandler extends RepositoryManager {
     public boolean okToShowInHtml(Entry entry, String arg, boolean dflt) {
         String key   = "html." + arg + ".show";
         String value = getProperty(entry, key, "" + dflt);
+        /*
+        if(arg.equals("owner")) {
+            System.err.println("Type:" + type);
+            System.err.println("Props:" + properties);
+            System.err.println("Owner:" + key + " " + value);
+            System.err.println("Props:" + properties);
+        }
+        */            
 
         return value.equals("true");
     }
@@ -1916,7 +1927,7 @@ public class TypeHandler extends RepositoryManager {
                         entry, html));
             }
             sb.append(HtmlUtils.formTable());
-            sb.append(getInnerEntryContent(entry, request, output,
+            sb.append(getInnerEntryContent(entry, request, null, output,
                                            showDescription, showResource,
                                            true));
 
@@ -1960,10 +1971,18 @@ public class TypeHandler extends RepositoryManager {
      * @param entryNode _more_
      */
     protected void setProperties(Element entryNode) {
+        //        boolean debug = type.equals("type_fred_series");
+        boolean debug = false;
+
+        if(debug) 
+            System.err.println ("set Properties");
         List propertyNodes = XmlUtil.findChildren(entryNode, TAG_PROPERTY);
+
         for (int propIdx = 0; propIdx < propertyNodes.size(); propIdx++) {
             Element propertyNode = (Element) propertyNodes.get(propIdx);
             if (XmlUtil.hasAttribute(propertyNode, ATTR_VALUE)) {
+                if(debug) 
+                    System.err.println ("\t" + XmlUtil.getAttribute(propertyNode, ATTR_NAME) +"=" + XmlUtil.getAttribute(propertyNode, ATTR_NAME)); 
                 putProperty(XmlUtil.getAttribute(propertyNode, ATTR_NAME),
                             XmlUtil.getAttribute(propertyNode, ATTR_VALUE));
             } else {
@@ -2456,7 +2475,7 @@ public class TypeHandler extends RepositoryManager {
      *
      * @return _more_
      */
-    public String getPathForEntry(Entry entry) {
+    public String getPathForEntry(Entry entry) throws Exception  {
         return entry.getResource().getPath();
     }
 
@@ -2536,16 +2555,18 @@ public class TypeHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public StringBuilder getInnerEntryContent(Entry entry, Request request,
+                                              TypeHandler typeHandler,
             OutputType output, boolean showDescription, boolean showResource,
             boolean linkToDownload)
             throws Exception {
 
+        if(typeHandler == null)  typeHandler = this;
         if (parent != null) {
-            return parent.getInnerEntryContent(entry, request, output,
+            return parent.getInnerEntryContent(entry, request, typeHandler, output,
                     showDescription, showResource, linkToDownload);
         }
 
-        boolean showDate  = okToShowInHtml(entry, ARG_DATE, true);
+        boolean showDate  = typeHandler.okToShowInHtml(entry, ARG_DATE, true);
 
         boolean showImage = false;
         if (showResource && entry.getResource().isImage()) {
@@ -2705,7 +2726,7 @@ public class TypeHandler extends RepositoryManager {
             }
             //Only show the created by and type when the user is logged in
             if ( !showImage) {
-                if (okToShowInHtml(entry, ARG_TYPE, true)) {
+                if (typeHandler.okToShowInHtml(entry, ARG_TYPE, true)) {
                     sb.append(formEntry(request, msgLabel("Kind"),
                                         getFileTypeDescription(request,
                                             entry)));
@@ -2725,7 +2746,7 @@ public class TypeHandler extends RepositoryManager {
                 }
             }
 
-            if (showCreated && okToShowInHtml(entry,"owner", true)) {
+            if (showCreated && typeHandler.okToShowInHtml(entry,"owner", true)) {
                 String userSearchLink =
                     HtmlUtils
                         .href(HtmlUtils
@@ -2798,14 +2819,14 @@ public class TypeHandler extends RepositoryManager {
                     sb.append(formEntry(request, msgLabel("End Date"),
                                         endDate));
                 } else {
-                    boolean showTime     = okToShowInForm(entry, "time",
+                    boolean showTime     = typeHandler.okToShowInForm(entry, "time",
                                                true);
                     StringBuilder dateSB = new StringBuilder();
                     dateSB.append(formatDate(request, entry.getStartDate(),
                                              entry));
 
 
-                    if (okToShowInForm(entry, ARG_TODATE)
+                    if (typeHandler.okToShowInForm(entry, ARG_TODATE)
                             && (entry.getEndDate() != entry.getStartDate())) {
                         dateSB.append(" - ");
                         dateSB.append(formatDate(request, entry.getEndDate(),

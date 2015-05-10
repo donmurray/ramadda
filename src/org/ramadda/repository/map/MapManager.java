@@ -778,7 +778,7 @@ public class MapManager extends RepositoryManager {
 
         info.append("<table>");
         info.append(entry.getTypeHandler().getInnerEntryContent(entry,
-                request, OutputHandler.OUTPUT_HTML, true, false, false));
+                                                                request, null, OutputHandler.OUTPUT_HTML, true, false, false));
 
         List<String> urls = new ArrayList<String>();
         getMetadataManager().getThumbnailUrls(request, entry, urls);

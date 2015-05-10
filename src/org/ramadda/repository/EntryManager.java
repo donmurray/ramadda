@@ -452,7 +452,7 @@ public class EntryManager extends RepositoryManager {
      *
      * @return _more_
      */
-    protected Entry getEntryFromCache(String entryId) {
+    public Entry getEntryFromCache(String entryId) {
         return getEntryFromCache(entryId, true);
     }
 

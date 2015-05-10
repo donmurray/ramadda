@@ -1070,11 +1070,15 @@ public class GenericTypeHandler extends TypeHandler {
      */
     @Override
     public StringBuilder getInnerEntryContent(Entry entry, Request request,
+                                              TypeHandler typeHandler,
             OutputType output, boolean showDescription, boolean showResource,
             boolean linkToDownload)
             throws Exception {
+        if(typeHandler == null) 
+            typeHandler = this;
         StringBuilder parentBuff = super.getInnerEntryContent(entry, request,
-                                       output, showDescription, showResource,
+                                                              typeHandler,
+                                                              output, showDescription, showResource,
                                        linkToDownload);
         //        if (shouldShowInHtml(request, entry, output)) {
         if (true) {
@@ -1295,6 +1299,10 @@ public class GenericTypeHandler extends TypeHandler {
         if ( !column.getShowInForm()) {
             return;
         }
+        if(!okToShowInForm(entry, column.getName(), true)) {
+            return;
+        }
+
         if ((entry != null) && hasValue && !column.getEditable()) {
             StringBuilder tmpSb = new StringBuilder();
             column.formatValue(entry, tmpSb, Column.OUTPUT_HTML, values);

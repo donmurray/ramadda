@@ -4118,7 +4118,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             "{{display  width=\"600\"  height=\"400\"   type=\"linechart\"  name=\"\"  layoutHere=\"false\"  showMenu=\"true\"  showTitle=\"true\"  row=\"0\"  column=\"0\"  }}");
 
         if (entry.isGeoreferenced()
-                || getEntryManager().isSynthEntry(entry.getId())) {
+            /*|| getEntryManager().isSynthEntry(entry.getId())*/) {
             wiki.append(
                 "{{display  width=\"600\"  height=\"400\"   type=\"map\"  name=\"\"  layoutHere=\"false\"  showMenu=\"true\"  showTitle=\"true\"  row=\"0\"  column=\"1\"  }}");
         }
