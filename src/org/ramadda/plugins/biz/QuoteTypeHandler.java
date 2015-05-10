@@ -37,11 +37,19 @@ import javax.mail.internet.*;
 public class QuoteTypeHandler extends ExtensibleGroupTypeHandler {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_CUSTOMER_NAME = 0;
-    public static final int IDX_MATERIAL =1 ;
+
+    /** _more_          */
+    public static final int IDX_MATERIAL = 1;
+
+    /** _more_          */
     public static final int IDX_QUANTITY = 2;
+
+    /** _more_          */
     public static final int IDX_UNIT_COST = 3;
+
+    /** _more_          */
     public static final int IDX_AMOUNT = 4;
 
 
@@ -73,28 +81,28 @@ public class QuoteTypeHandler extends ExtensibleGroupTypeHandler {
     public void initializeNewEntry(Request request, Entry entry)
             throws Exception {
         super.initializeNewEntry(request, entry);
-        String   desc     = entry.getDescription();
-        String[] descHolder = new String[]{desc};
+        String   desc       = entry.getDescription();
+        String[] descHolder = new String[] { desc };
 
-        Object[] values   = getEntryValues(entry);
+        Object[] values     = getEntryValues(entry);
 
 
         String[] quantityPatterns = { "(?i)(#|quantity)\\s*:\\s*\\$?\\s*(\\d+)" };
         String quantity = findMatch(descHolder, quantityPatterns, 2);
-        if(quantity!=null) {
+        if (quantity != null) {
             int d = (int) Double.parseDouble(quantity);
             values[IDX_QUANTITY] = new Integer(d);
         }
 
         String[] materialPatterns = { "(?i)(mat|material)\\s*:\\s*\\$?\\s*([^$]+)" };
         String material = findMatch(descHolder, materialPatterns, 2);
-        if(material !=null) {
+        if (material != null) {
             values[IDX_MATERIAL] = material;
         }
 
         String[] costPatterns = { "(?i)(cost|unit)\\s*:\\s*\\$?\\s*(\\d+)" };
-        String cost = findMatch(descHolder, costPatterns, 2);
-        if(cost!=null) {
+        String   cost         = findMatch(descHolder, costPatterns, 2);
+        if (cost != null) {
             values[IDX_UNIT_COST] = new Double(cost);
         }
 
@@ -103,15 +111,26 @@ public class QuoteTypeHandler extends ExtensibleGroupTypeHandler {
 
     }
 
-    private String findMatch(String []text, String[] patterns, int idx) {
+    /**
+     * _more_
+     *
+     * @param text _more_
+     * @param patterns _more_
+     * @param idx _more_
+     *
+     * @return _more_
+     */
+    private String findMatch(String[] text, String[] patterns, int idx) {
         for (String pattern : patterns) {
             Matcher matcher = Pattern.compile(pattern).matcher(text[0]);
             if ( !matcher.find()) {
                 continue;
             }
             text[0] = text[0].replaceAll(pattern, "");
-            return  matcher.group(idx);
+
+            return matcher.group(idx);
         }
+
         return null;
 
     }

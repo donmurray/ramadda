@@ -10,10 +10,10 @@
 
 
 
-  <type name="type_fred_timeseries"  description="FRED Time Series" super="type_point" category="Business" foruser="true" handler="org.ramadda.data.services.PointTypeHandler">
+  <type name="type_fred_timeseries"  description="FRED Time Series" super="type_point" category="Business" foruser="true" handler="org.ramadda.plugins.biz.FredTimeSeriesTypeHandler">
      <property name="icon" value="/biz/fred.png"/>
      <property name="record.file.class" value="org.ramadda.plugins.biz.FredFile"/>
-     <column name="category_id" type="string"  label="Category ID"  showinform="true" />
+     <column name="series_id" type="string"  label="Series ID"  showinform="true" />
   </type>
 
 
