@@ -65,6 +65,15 @@ public class FredFile extends CsvFile {
             InputStream source = super.doMakeInputStream(buffered);
             Element     root   = XmlUtil.getRoot(source);
 
+            //            System.err.println("Root:" + XmlUtil.toString(root));
+
+            String format   = "yyyy-MM-dd";
+            String unit = XmlUtil.getAttribute(root, Fred.ATTR_UNITS,"");
+            putFields(new String[] {
+                    makeField(FIELD_DATE, attrType("date"), attrFormat(format)),
+                    makeField("value", attrUnit(unit), attrLabel("Value"), attrChartable(), attrMissing(-999999.99)), });
+
+
             List         nodes = XmlUtil.findChildren(root, Fred.TAG_OBSERVATION);
             for (int i = 0; i < nodes.size(); i++) {
                 Element node = (Element) nodes.get(i);
@@ -98,10 +107,12 @@ public class FredFile extends CsvFile {
     @Override
     public VisitInfo prepareToVisit(VisitInfo visitInfo) throws Exception {
         super.prepareToVisit(visitInfo);
-        String format   = "yyyy-MM-dd";
-        putFields(new String[] {
-            makeField(FIELD_DATE, attrType("date"), attrFormat(format)),
-            makeField("value", attrLabel("Value"), attrChartable(), attrMissing(-999999.99)), });
+        if(getProperty(PROP_FIELDS, (String)null) == null) {
+            String format   = "yyyy-MM-dd";
+            putFields(new String[] {
+                    makeField(FIELD_DATE, attrType("date"), attrFormat(format)),
+                    makeField("value", attrLabel("Value"), attrChartable(), attrMissing(-999999.99)), });
+        }
         return visitInfo;
     }
 

@@ -12,7 +12,7 @@
 
 
   <type name="type_fred_series"  description="FRED Series" super="type_point" category="Business" foruser="true" handler="org.ramadda.plugins.biz.FredSeriesTypeHandler" mefirst="true">
-     <property name="icon" value="/biz/fred.png"/>
+     <property name="icon" value="/biz/series.png"/>
      <property name="record.file.class" value="org.ramadda.plugins.biz.FredFile"/>
      <property name="form.resource.show" value="false"/>
      <property name="form.properties.show" value="false"/>
@@ -26,6 +26,29 @@
      <column name="frequency" type="enumeration"  label="Frequency"  values="A:Annual,M:Monthly" showinform="false"/>
      <column name="units" type="string"  label="Units"  showinform="false"/>
      <column name="seasonal_adjustment" type="enumeration"  values="NSA:Not Seasonally Adjusted" label="Seasonal Adjustment"  showinform="false"/>
+     <wiki_inner><![CDATA[
++section # label="FRED Time Series: {{name}}"
+<div style="margin:20px;max-height:300px;overflow-y:auto;">
+{{description wikify="true"}}
+</div>
+{{display type="linechart" title=""  height="200" width="800" column="0" layoutHere="true"}}
++row
++col-md-8
+Data courtesy of the <a href="{{resource  message="" url="true"}}">Federal Reserve Economic Data</a> system.
+-col
++col-md-4
+<div style="text-align:right;">
+<a class="btn btn-primary" role="button" href="{{root}}/entry/show?entryid={{entryid}}&output=points.product&product=points.csv&asynch=false">Download CSV</a>
+</div>
+-col
+-row
+
+-section
+
+]]>
+
+</wiki_inner>
+
   </type>
 
 

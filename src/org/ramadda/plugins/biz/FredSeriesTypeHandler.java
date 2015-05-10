@@ -71,7 +71,7 @@ public class FredSeriesTypeHandler extends PointTypeHandler {
     public void initializeNewEntry(Request request, Entry entry)
             throws Exception {
         super.initializeNewEntry(request, entry);
-        System.err.println("FredSeries.init");
+        //        System.err.println("FredSeries.init");
         initializeSeries(entry);
     }
 
@@ -95,7 +95,7 @@ public class FredSeriesTypeHandler extends PointTypeHandler {
         args.add(Fred.ARG_SERIES_ID);
         args.add(seriesId);
         Element         root     = fcth.call(Fred.URL_SERIES, args);
-        System.err.println(XmlUtil.toString(root));
+        //        System.err.println(XmlUtil.toString(root));
 
         Object[] values =getEntryValues(entry);
         Element node = XmlUtil.findChild(root, Fred.TAG_SERIES);
