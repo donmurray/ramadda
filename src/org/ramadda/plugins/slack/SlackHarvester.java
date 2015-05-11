@@ -421,6 +421,9 @@ public class SlackHarvester extends Harvester {
         for (String commandTok : commandToks) {
             //            debug("command tok:" + commandTok);
             commandTok = commandTok.trim();
+            if(commandTok.length() == 0) {
+                continue;
+            }
             if (commandTok.startsWith("/")) {
                 commandTok = commandTok.substring(1);
             }
@@ -655,11 +658,7 @@ public class SlackHarvester extends Harvester {
     private Result processView(final Request request, String text)
             throws Exception {
         Slack.Args args = parseArgs(request, text);
-        if (args.isHelp()) {
-            return new Result(
-                "For tabular data:\n\t-startcol col# -endcol col# \n\t-startrow row # -endrow row # \n\t-export\n",
-                Constants.MIME_TEXT);
-        }
+
 
         Entry entry = args.getEntry();
         if (entry == null) {
@@ -701,6 +700,10 @@ public class SlackHarvester extends Harvester {
 
         entry.getTypeHandler().addEncoding(request, entry, "slack.view",
                                            args.getArgs(), appendable, files);
+
+        if (args.isHelp()) {
+            return new Result(sbs.get(0).toString(),  Constants.MIME_TEXT);
+        }
 
         Result result = null;
 
