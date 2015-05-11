@@ -11,9 +11,9 @@
 +section # label="FRED Category: {{name}}"
 <br>
 
-{{tree details="false"}}
-
 {{description wikify="true"}}
+
+{{tree details="false"}}
 
 <p><br>
 
@@ -80,9 +80,11 @@ Data courtesy of the <a href="{{resource  url=true}}">Federal Reserve Economic D
 +section # label="EIA Category: {{name}}"
 <br>
 
+{{description wikify="true"}}
+
 {{tree details="false"}}
 
-{{description wikify="true"}}
+
 
 <p><br>
 
