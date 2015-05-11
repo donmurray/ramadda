@@ -2565,11 +2565,11 @@ a.toggleblocklabellink:visited {
 	margin: 0px;
 	margin-bottom: .3em;
 //	margin-right: 10px;
-	padding-left: 6px;
+//	padding-left: 6px;
 	padding-top: .50em;
 	padding-bottom: 0em;
-	border-bottom: 1px solid #888;
-        padding-right:10px;
+//	border-bottom: 1px solid #888;
+//        padding-right:10px;
 }
 .wiki-h1 { 
  padding-left: 2px;
@@ -2586,7 +2586,7 @@ a.toggleblocklabellink:visited {
 //	padding-bottom: 1px;
 //        font-size: 125%; 
 //	background-color: #f4f4f4;
-	border-bottom: 1px solid #eee;
+//	border-bottom: 1px solid #eee;
 }
 
 
