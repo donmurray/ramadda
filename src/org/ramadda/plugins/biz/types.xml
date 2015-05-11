@@ -28,10 +28,11 @@
      <column name="seasonal_adjustment" type="enumeration"  values="NSA:Not Seasonally Adjusted" label="Seasonal Adjustment"  showinform="false"/>
      <wiki_inner><![CDATA[
 +section # label="FRED Time Series: {{name}}"
+<br>
+{{display type="linechart" title=""  height="200" width="800" column="0" layoutHere="true"}}
 <div style="margin:20px;max-height:300px;overflow-y:auto;">
 {{description wikify="true"}}
 </div>
-{{display type="linechart" title=""  height="200" width="800" column="0" layoutHere="true"}}
 +row
 +col-md-8
 Data courtesy of the <a href="{{resource  url=true}}">Federal Reserve Economic Data</a> system.
