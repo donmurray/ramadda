@@ -7,6 +7,20 @@
      <property name="icon" value="/biz/fred.png"/>
      <property name="form.resource.show" value="false"/>
      <column name="category_id" type="string"  label="Category ID"  showinform="true" />
+     <wiki_inner><![CDATA[
++section # label="FRED Category: {{name}}"
+<br>
+
+{{tree details="false"}}
+
+{{description wikify="true"}}
+
+-section
+
+]]>
+
+</wiki_inner>
+
   </type>
 
 
