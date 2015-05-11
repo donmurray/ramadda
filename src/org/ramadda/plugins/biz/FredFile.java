@@ -33,12 +33,16 @@ import java.util.TimeZone;
 public class FredFile extends CsvFile {
 
 
+    /** _more_          */
+    private StringBuilder buffer;
+
+
     /**
-     * ctor
-     *
-     * @param filename _more_
-     *
-     * @throws IOException _more_
+     *     ctor
+     *    
+     *     @param filename _more_
+     *    
+     *     @throws IOException _more_
      */
     public FredFile(String filename) throws IOException {
         super(filename);
@@ -57,36 +61,40 @@ public class FredFile extends CsvFile {
     public InputStream doMakeInputStream(boolean buffered)
             throws IOException {
         try {
-            System.err.println("Reading FRED time series");
-            StringBuilder sb     = new StringBuilder();
-            InputStream   source = super.doMakeInputStream(buffered);
-            Element       root   = XmlUtil.getRoot(source);
+            if (buffer == null) {
+                System.err.println("Reading FRED time series");
+                StringBuilder sb     = new StringBuilder();
+                InputStream   source = super.doMakeInputStream(buffered);
+                Element       root   = XmlUtil.getRoot(source);
 
-            //            System.err.println("Root:" + XmlUtil.toString(root));
+                //            System.err.println("Root:" + XmlUtil.toString(root));
 
-            String format = "yyyy-MM-dd";
-            String unit   = XmlUtil.getAttribute(root, Fred.ATTR_UNITS, "");
-            putFields(new String[] {
-                makeField(FIELD_DATE, attrType("date"), attrFormat(format)),
-                makeField("value", attrUnit(unit), attrLabel("Value"),
-                          attrChartable(), attrMissing(-999999.99)), });
+                String format = "yyyy-MM-dd";
+                String unit = XmlUtil.getAttribute(root, Fred.ATTR_UNITS, "");
+                putFields(new String[] {
+                    makeField(FIELD_DATE, attrType("date"),
+                              attrFormat(format)),
+                    makeField("value", attrUnit(unit), attrLabel("Value"),
+                              attrChartable(), attrMissing(-999999.99)), });
 
 
-            List nodes = XmlUtil.findChildren(root, Fred.TAG_OBSERVATION);
-            for (int i = 0; i < nodes.size(); i++) {
-                Element node = (Element) nodes.get(i);
-                String value = XmlUtil.getAttribute(node, Fred.ATTR_VALUE,
-                                   "").trim();
-                String dttm = XmlUtil.getAttribute(node, Fred.ATTR_DATE,
-                                  (String) null);
-                if (value.equals("") || value.equals(".")) {
-                    value = "-999999.99";
+                List nodes = XmlUtil.findChildren(root, Fred.TAG_OBSERVATION);
+                for (int i = 0; i < nodes.size(); i++) {
+                    Element node = (Element) nodes.get(i);
+                    String value = XmlUtil.getAttribute(node,
+                                       Fred.ATTR_VALUE, "").trim();
+                    String dttm = XmlUtil.getAttribute(node, Fred.ATTR_DATE,
+                                      (String) null);
+                    if (value.equals("") || value.equals(".")) {
+                        value = "-999999.99";
+                    }
+                    sb.append(dttm + "," + value + "\n");
                 }
-                sb.append(dttm + "," + value + "\n");
+                buffer = sb;
             }
 
             ByteArrayInputStream bais =
-                new ByteArrayInputStream(sb.toString().getBytes());
+                new ByteArrayInputStream(buffer.toString().getBytes());
 
             return bais;
         } catch (Exception exc) {
