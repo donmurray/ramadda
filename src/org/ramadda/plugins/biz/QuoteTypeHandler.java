@@ -40,16 +40,16 @@ public class QuoteTypeHandler extends ExtensibleGroupTypeHandler {
     /** _more_ */
     public static final int IDX_CUSTOMER_NAME = 0;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_MATERIAL = 1;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_QUANTITY = 2;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_UNIT_COST = 3;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_AMOUNT = 4;
 
 

@@ -37,7 +37,7 @@ import java.util.List;
 
 /**
  */
-public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
+public class EiaCategoryTypeHandler extends ExtensibleGroupTypeHandler {
 
 
 
@@ -57,7 +57,7 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
      *
      * @throws Exception _more_
      */
-    public FredCategoryTypeHandler(Repository repository, Element entryNode)
+    public EiaCategoryTypeHandler(Repository repository, Element entryNode)
             throws Exception {
         super(repository, entryNode);
     }
@@ -70,7 +70,7 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
      */
     public String getApiKey() {
         if (apiKey == null) {
-            apiKey = getRepository().getProperty(Fred.PROP_API_KEY,
+            apiKey = getRepository().getProperty(Eia.PROP_API_KEY,
                     (String) null);
         }
 
@@ -104,38 +104,6 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
      * _more_
      *
      * @param request _more_
-     * @param entry _more_
-     * @param parent _more_
-     * @param newEntry _more_
-     *
-     * @throws Exception _more_
-     */
-    public void initializeEntryFromForm(Request request, Entry entry,
-                                        Entry parent, boolean newEntry)
-            throws Exception {
-        super.initializeEntryFromForm(request, entry, parent, newEntry);
-
-        if ( !getEntryManager().isSynthEntry(entry.getId())) {
-            return;
-        }
-
-        /*
-        Object[] values = entry.getTypeHandler().getEntryValues(entry);
-        values[IDX_TEAM_ID] = Json.readValue(result, "team.id", "");
-        String domain = Json.readValue(result, "team.domain", "");
-        values[IDX_TEAM_DOMAIN] = domain;
-        entry.setResource(new Resource(Slack.getTeamUrl(domain)));
-        */
-    }
-
-
-
-
-
-    /**
-     * _more_
-     *
-     * @param request _more_
      * @param mainEntry _more_
      * @param parentEntry _more_
      * @param synthId _more_
@@ -148,7 +116,7 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
                                     Entry parentEntry, String synthId)
             throws Exception {
         if ((parentEntry != null)
-                && !parentEntry.getTypeHandler().isType(Fred.TYPE_CATEGORY)) {
+                && !parentEntry.getTypeHandler().isType(Eia.TYPE_CATEGORY)) {
             return null;
         }
 
@@ -156,20 +124,22 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
         if (ids != null) {
             return ids;
         }
-        System.err.println("FredTypeHandler.getSynthIds:" + synthId
+        /*
+        System.err.println("EiaTypeHandler.getSynthIds:" + synthId
                            + " parent:" + parentEntry.getName()
                            + " mainEntry: " + mainEntry.getName());
+        */
         String categoryId = null;
 
         if (Utils.stringDefined(synthId)) {
             List<String> toks = StringUtil.split(synthId, ":", true, true);
             if (toks.size() <= 1) {
-                System.err.println("FredTypeHandler.getSynthIds: bad id:"
+                System.err.println("EiaTypeHandler.getSynthIds: bad id:"
                                    + synthId);
 
                 return null;
             }
-            if ( !toks.get(0).equals(Fred.PREFIX_CATEGORY)) {
+            if ( !toks.get(0).equals(Eia.PREFIX_CATEGORY)) {
                 return null;
             }
             categoryId = toks.get(1);
@@ -178,7 +148,7 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
 
         Object[] categoryValues = null;
         if ((parentEntry != null)
-                && parentEntry.getTypeHandler().isType(Fred.TYPE_CATEGORY)) {
+                && parentEntry.getTypeHandler().isType(Eia.TYPE_CATEGORY)) {
             categoryValues =
                 parentEntry.getTypeHandler().getEntryValues(mainEntry);
         }
@@ -197,52 +167,49 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
 
         List<String> args = new ArrayList<String>();
         if (categoryId != null) {
-            args.add(Fred.ARG_CATEGORY_ID);
+            args.add(Eia.ARG_CATEGORY_ID);
             args.add(categoryId);
         }
 
-        Element         root = call(Fred.URL_CATEGORY_CHILDREN, args);
-        NodeList children    = XmlUtil.getElements(root, Fred.TAG_CATEGORY);
-        HashSet<String> seen = new HashSet<String>();
-        for (int childIdx = 0; childIdx < children.getLength(); childIdx++) {
-            Element item = (Element) children.item(childIdx);
-            String  id   = XmlUtil.getAttribute(item, ATTR_ID);
-            if (seen.contains(id)) {
-                continue;
+        Element root     = call(Eia.URL_CATEGORY, args);
+        Element catNode  = XmlUtil.findChild(root, Eia.TAG_CATEGORY);
+        Element catsNode = XmlUtil.findChild(catNode,
+                                             Eia.TAG_CHILDCATEGORIES);
+        Element seriesNode = XmlUtil.findChild(catNode, Eia.TAG_CHILDSERIES);
+        if (catsNode != null) {
+            NodeList children = XmlUtil.getElements(catsNode, Eia.TAG_ROW);
+            for (int childIdx = 0; childIdx < children.getLength();
+                    childIdx++) {
+                Element item = (Element) children.item(childIdx);
+                String id = XmlUtil.getGrandChildText(item,
+                                Eia.TAG_CATEGORY_ID, "");
+                String name = XmlUtil.getGrandChildText(item, Eia.TAG_NAME,
+                                  "");
+                Entry entry = createCategoryEntry(mainEntry, parentEntry, id,
+                                  name);
+                ids.add(entry.getId());
             }
-            seen.add(id);
-            //            System.err.println("category child id:" + id);
-            Entry entry = createCategoryEntry(mainEntry, parentEntry, id);
-            ids.add(entry.getId());
         }
 
-
-
-        args = new ArrayList<String>();
-        if (categoryId != null) {
-            args.add(Fred.ARG_CATEGORY_ID);
-            args.add(categoryId);
-        }
-        root     = call(Fred.URL_CATEGORY_SERIES, args);
-        children = XmlUtil.getElements(root, Fred.TAG_SERIES);
-        for (int childIdx = 0; childIdx < children.getLength(); childIdx++) {
-            if (childIdx > 4) {
-                break;
+        if (seriesNode != null) {
+            NodeList children = XmlUtil.getElements(seriesNode, Eia.TAG_ROW);
+            for (int childIdx = 0; childIdx < children.getLength();
+                    childIdx++) {
+                Element item = (Element) children.item(childIdx);
+                String id = XmlUtil.getGrandChildText(item,
+                                Eia.TAG_SERIES_ID, "");
+                String name = XmlUtil.getGrandChildText(item, Eia.TAG_NAME,
+                                  "");
+                Entry entry = createSeriesEntry(mainEntry, parentEntry, id,
+                                  name);
+                ids.add(entry.getId());
             }
-            Element item = (Element) children.item(childIdx);
-            String  id   = XmlUtil.getAttribute(item, ATTR_ID);
-            String  name = XmlUtil.getAttribute(item, ATTR_TITLE);
-            //            System.err.println("series child id:" + id);
-            Entry entry = createSeriesEntry(mainEntry, parentEntry, id, name);
-            ids.add(entry.getId());
         }
-
 
         parentEntry.setChildIds(ids);
 
         return ids;
     }
-
 
 
     /** _more_ */
@@ -262,9 +229,9 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
         long t1 = System.currentTimeMillis();
         url = makeUrl(url, args);
         if (seenUrls.contains(url)) {
-            System.err.println("**** Fred URL:" + url);
+            System.err.println("**** Eia URL:" + url);
         } else {
-            System.err.println("Fred URL:" + url);
+            System.err.println("Eia URL:" + url);
             seenUrls.add(url);
         }
         String xml = IOUtil.readContents(new URL(url));
@@ -288,8 +255,10 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
      */
     public String makeUrl(String url, List<String> args) throws Exception {
         List<String> urlArgs = new ArrayList<String>();
-        urlArgs.add(Fred.ARG_API_KEY);
+        urlArgs.add(Eia.ARG_API_KEY);
         urlArgs.add(getApiKey());
+        urlArgs.add(Eia.ARG_OUT);
+        urlArgs.add("xml");
         for (String arg : args) {
             urlArgs.add(arg);
         }
@@ -300,53 +269,37 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
 
 
 
-
     /**
      * _more_
      *
      * @param mainEntry _more_
      * @param categoryEntry _more_
      * @param categoryId _more_
+     * @param name _more_
      *
      * @return _more_
      *
      * @throws Exception _more_
      */
     private Entry createCategoryEntry(Entry mainEntry, Entry categoryEntry,
-                                      String categoryId)
+                                      String categoryId, String name)
             throws Exception {
         if ( !isEnabled()) {
             return null;
         }
-        String       name = categoryId;
-        Date         dttm = new Date();
-
-        List<String> args = new ArrayList<String>();
-        if (categoryId != null) {
-            args.add(Fred.ARG_CATEGORY_ID);
-            args.add(categoryId);
-        }
-
-        String id = createSynthId(mainEntry, Fred.PREFIX_CATEGORY,
-                                  categoryId);
-        Entry entry = getEntryManager().getEntryFromCache(id);
+        Date   dttm  = new Date();
+        String id = createSynthId(mainEntry, Eia.PREFIX_CATEGORY, categoryId);
+        Entry  entry = getEntryManager().getEntryFromCache(id);
         if (entry != null) {
             return entry;
         }
 
 
-
-        String  desc    = "";
-        Element root    = call(Fred.URL_CATEGORY, args);
-        Element catNode = XmlUtil.findChild(root, Fred.TAG_CATEGORY);
-
-        if (catNode != null) {
-            name = XmlUtil.getAttribute(catNode, ATTR_NAME, categoryId);
-        }
+        String desc = "";
         entry = new Entry(id, this);
-        String fredUrl = "https://research.stlouisfed.org/fred2/categories/"
-                         + categoryId;
-        Resource resource = new Resource(new URL(fredUrl));
+        String eiaUrl = "http://www.eia.gov/beta/api/qb.cfm?category="
+                        + categoryId;
+        Resource resource = new Resource(new URL(eiaUrl));
         Object[] values   = this.makeEntryValues(null);
         values[IDX_CATEGORY_ID] = categoryId;
         entry.initEntry(name, desc, categoryEntry, categoryEntry.getUser(),
@@ -374,25 +327,23 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
     private Entry createSeriesEntry(Entry mainEntry, Entry parentEntry,
                                     String seriesId, String name)
             throws Exception {
-        String id    = createSynthId(mainEntry, Fred.PREFIX_SERIES, seriesId);
-        Entry  entry = getEntryManager().getEntryFromCache(id);
-        if (entry != null) {
-            return entry;
-        }
-
-
         if (name == null) {
             name = seriesId;
         }
 
+        String id    = createSynthId(mainEntry, Eia.PREFIX_SERIES, seriesId);
+        Entry  entry = getEntryManager().getEntryFromCache(id);
+        if (entry != null) {
+            return entry;
+        }
         String desc = "";
         Date   dttm = new Date();
-        FredSeriesTypeHandler seriesTypeHandler =
-            (FredSeriesTypeHandler) getRepository().getTypeHandler(
-                Fred.TYPE_SERIES);
+        EiaSeriesTypeHandler seriesTypeHandler =
+            (EiaSeriesTypeHandler) getRepository().getTypeHandler(
+                Eia.TYPE_SERIES);
         entry = new Entry(id, seriesTypeHandler);
         Object[] values = seriesTypeHandler.makeEntryValues(null);
-        values[FredSeriesTypeHandler.IDX_SERIES_ID] = seriesId;
+        values[EiaSeriesTypeHandler.IDX_SERIES_ID] = seriesId;
 
         entry.initEntry(name, desc, parentEntry, parentEntry.getUser(),
                         new Resource(), "", dttm.getTime(), dttm.getTime(),
@@ -430,8 +381,9 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
         }
         String type = toks.get(0);
         id = toks.get(1);
-        if (type.equals(Fred.PREFIX_CATEGORY)) {
-            return createCategoryEntry(mainEntry, mainEntry, id);
+        //TODO: get the name
+        if (type.equals(Eia.PREFIX_CATEGORY)) {
+            return createCategoryEntry(mainEntry, mainEntry, id, null);
         } else {
             return createSeriesEntry(mainEntry, mainEntry, id, null);
         }
@@ -446,19 +398,6 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
      */
     public boolean isSynthType() {
         return true;
-    }
-
-
-
-    /**
-     * _more_
-     *
-     * @param id _more_
-     *
-     * @return _more_
-     */
-    public Entry createEntry(String id) {
-        return new Entry(id, this, true);
     }
 
 

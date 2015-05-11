@@ -72,5 +72,71 @@ Data courtesy of the <a href="{{resource  url=true}}">Federal Reserve Economic D
 
 
 
+  <type name="type_eia_category"  description="EIA Category"  category="Business" foruser="true" handler="org.ramadda.plugins.biz.EiaCategoryTypeHandler">
+     <property name="icon" value="/biz/eia.png"/>
+     <property name="form.resource.show" value="false"/>
+     <column name="category_id" type="string"  label="Category ID"  showinform="true" />
+     <wiki><![CDATA[
++section # label="EIA Category: {{name}}"
+<br>
+
+{{tree details="false"}}
+
+{{description wikify="true"}}
+
+<p><br>
+
+Data courtesy of the <a href="{{resource  url=true}}">Energy Information Administration (EIA)</a>.
+
+-section
+
+]]>
+
+</wiki>
+
+  </type>
+
+
+
+  <type name="type_eia_series"  description="EIA Series" super="type_point" category="Business" foruser="true" handler="org.ramadda.plugins.biz.EiaSeriesTypeHandler" mefirst="true">
+     <property name="icon" value="/biz/series.png"/>
+     <property name="record.file.class" value="org.ramadda.plugins.biz.EiaFile"/>
+     <property name="form.resource.show" value="false"/>
+     <property name="form.properties.show" value="false"/>
+     <property name="point.initialize" value="false"/>
+
+     <property name="html.date.show" value="false"/>
+     <property name="html.type.show" value="false"/>
+     <property name="html.owner.show" value="false"/>
+     <property name="html.numberofpoints.show" value="false"/>
+     <column name="series_id" type="string"  label="Series ID"    />
+     <wiki_inner><![CDATA[
++section # label="EIA Time Series: {{name}}"
+<br>
+{{display type="linechart" title=""  height="200" width="800" column="0" layoutHere="true"}}
+<div style="margin:20px;max-height:300px;overflow-y:auto;">
+{{description wikify="true"}}
+</div>
++row
++col-md-8
+Data courtesy of the <a href="{{resource  url=true}}">Energy Information Administration (EIA)</a>.
+-col
++col-md-4
+<div style="text-align:right;">
+<a class="btn btn-primary" role="button" href="{{root}}/entry/show?entryid={{entryid}}&output=points.product&product=points.csv&asynch=false">Download CSV</a>
+</div>
+-col
+-row
+
+-section
+
+]]>
+
+</wiki_inner>
+
+  </type>
+
+
+
 
 </types>

@@ -41,7 +41,7 @@ import java.util.List;
 
 /**
  */
-public class FredSeriesTypeHandler extends PointTypeHandler {
+public class EiaSeriesTypeHandler extends PointTypeHandler {
 
 
     //NOTE: This starts at 2 because the point type has a number of points field
@@ -67,7 +67,7 @@ public class FredSeriesTypeHandler extends PointTypeHandler {
      *
      * @throws Exception _more_
      */
-    public FredSeriesTypeHandler(Repository repository, Element entryNode)
+    public EiaSeriesTypeHandler(Repository repository, Element entryNode)
             throws Exception {
         super(repository, entryNode);
     }
@@ -85,7 +85,7 @@ public class FredSeriesTypeHandler extends PointTypeHandler {
     public void initializeNewEntry(Request request, Entry entry)
             throws Exception {
         super.initializeNewEntry(request, entry);
-        //        System.err.println("FredSeries.init");
+        //        System.err.println("EiaSeries.init");
         initializeSeries(entry);
     }
 
@@ -101,50 +101,42 @@ public class FredSeriesTypeHandler extends PointTypeHandler {
         //        super.initializeNewEntry(request, entry);
 
 
-        FredCategoryTypeHandler fcth =
-            (FredCategoryTypeHandler) getRepository().getTypeHandler(
-                Fred.TYPE_CATEGORY);
+        EiaCategoryTypeHandler fcth =
+            (EiaCategoryTypeHandler) getRepository().getTypeHandler(
+                Eia.TYPE_CATEGORY);
         String seriesId = (String) entry.getValue(IDX_SERIES_ID, null);
         if (seriesId == null) {
             System.err.println("No series id");
 
             return;
         }
+
+        //TODO: get category ID
         entry.setResource(
             new Resource(
                 new URL(
-                    "https://research.stlouisfed.org/fred2/series/"
-                    + seriesId)));
+                    "http://www.eia.gov/beta/api/qb.cfm?sdid=" + seriesId)));
 
+        /*
         List<String> args = new ArrayList<String>();
-        args.add(Fred.ARG_SERIES_ID);
+        args.add(Eia.ARG_SERIES_ID);
         args.add(seriesId);
-        Element root = fcth.call(Fred.URL_SERIES, args);
+        Element root = fcth.call(Eia.URL_SERIES, args);
         //        System.err.println(XmlUtil.toString(root));
 
         Object[] values = getEntryValues(entry);
-        Element  node   = XmlUtil.findChild(root, Fred.TAG_SERIES);
-
-        if (node != null) {
-            entry.setName(XmlUtil.getAttribute(node, Fred.ATTR_TITLE,
-                    entry.getName()));
-            entry.setDescription(XmlUtil.getAttribute(node, Fred.ATTR_NOTES,
-                    ""));
-            values[IDX_FREQUENCY] = XmlUtil.getAttribute(node,
-                    Fred.ATTR_FREQUENCY_SHORT, "");
-            values[IDX_UNITS] = XmlUtil.getAttribute(node, Fred.ATTR_UNITS,
-                    "");
-            values[IDX_SEASONAL_ADJUSTMENT] = XmlUtil.getAttribute(node,
-                    Fred.ATTR_SEASONAL_ADJUSTMENT, "");
-
-        }
-
-        //ATTR_OBSERVATION_START
+        Element  node   = XmlUtil.findChild(root, Eia.TAG_SERIES);
 
 
+    if(node!=null) {
+        entry.setName(XmlUtil.getAttribute(node, Eia.ATTR_TITLE, entry.getName()));
+        entry.setDescription(XmlUtil.getAttribute(node, Eia.ATTR_NOTES, ""));
+        values[IDX_FREQUENCY] =  XmlUtil.getAttribute(node, Eia.ATTR_FREQUENCY_SHORT, "");
+        values[IDX_UNITS] = XmlUtil.getAttribute(node, Eia.ATTR_UNITS, "");
+        values[IDX_SEASONAL_ADJUSTMENT] = XmlUtil.getAttribute(node, Eia.ATTR_SEASONAL_ADJUSTMENT, "");
 
-
-
+    }
+       */
     }
 
     /**
@@ -162,14 +154,13 @@ public class FredSeriesTypeHandler extends PointTypeHandler {
         if (id == null) {
             return null;
         }
-        FredCategoryTypeHandler fcth =
-            (FredCategoryTypeHandler) getRepository().getTypeHandler(
-                Fred.TYPE_CATEGORY);
+        EiaCategoryTypeHandler fcth =
+            (EiaCategoryTypeHandler) getRepository().getTypeHandler(
+                Eia.TYPE_CATEGORY);
         List<String> args = new ArrayList<String>();
-        args.add(Fred.ARG_SERIES_ID);
+        args.add(Eia.ARG_SERIES_ID);
         args.add(id);
-        String url = fcth.makeUrl(Fred.URL_SERIES_OBSERVATIONS, args);
-        System.err.println("URL:" + url);
+        String url = fcth.makeUrl(Eia.URL_SERIES, args);
 
         return url;
     }

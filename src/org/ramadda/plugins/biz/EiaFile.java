@@ -10,6 +10,7 @@ package org.ramadda.plugins.biz;
 import org.ramadda.data.point.*;
 import org.ramadda.data.point.text.*;
 import org.ramadda.data.record.*;
+import org.ramadda.repository.Entry;
 
 
 import org.ramadda.repository.RepositoryUtil;
@@ -30,8 +31,7 @@ import java.util.TimeZone;
 
 /**
  */
-public class FredFile extends CsvFile {
-
+public class EiaFile extends CsvFile {
 
     /**
      * ctor
@@ -40,7 +40,7 @@ public class FredFile extends CsvFile {
      *
      * @throws IOException _more_
      */
-    public FredFile(String filename) throws IOException {
+    public EiaFile(String filename) throws IOException {
         super(filename);
     }
 
@@ -57,34 +57,54 @@ public class FredFile extends CsvFile {
     public InputStream doMakeInputStream(boolean buffered)
             throws IOException {
         try {
-            System.err.println("Reading FRED time series");
+            System.err.println("Reading EIA time series");
             StringBuilder sb     = new StringBuilder();
             InputStream   source = super.doMakeInputStream(buffered);
             Element       root   = XmlUtil.getRoot(source);
+            Element       series = XmlUtil.findChild(root, Eia.TAG_SERIES);
+            series = XmlUtil.findChild(series, Eia.TAG_ROW);
 
+            Element data = XmlUtil.findChild(series, Eia.TAG_DATA);
             //            System.err.println("Root:" + XmlUtil.toString(root));
+            Entry entry = (Entry) getProperty("entry");
+            String name = XmlUtil.getGrandChildText(series, Eia.TAG_NAME,
+                              "").trim();
+            String desc = XmlUtil.getGrandChildText(series,
+                              Eia.TAG_DESCRIPTION, "").trim();
+            if (entry != null) {
+                entry.setName(name);
+                entry.setDescription(desc);
+            }
 
-            String format = "yyyy-MM-dd";
-            String unit   = XmlUtil.getAttribute(root, Fred.ATTR_UNITS, "");
-            putFields(new String[] {
-                makeField(FIELD_DATE, attrType("date"), attrFormat(format)),
-                makeField("value", attrUnit(unit), attrLabel("Value"),
-                          attrChartable(), attrMissing(-999999.99)), });
-
-
-            List nodes = XmlUtil.findChildren(root, Fred.TAG_OBSERVATION);
+            String format = "yyyyMMdd";
+            String unit = XmlUtil.getGrandChildText(series, Eia.TAG_UNITS,
+                              "").trim();
+            List nodes = XmlUtil.findChildren(data, Eia.TAG_ROW);
             for (int i = 0; i < nodes.size(); i++) {
                 Element node = (Element) nodes.get(i);
-                String value = XmlUtil.getAttribute(node, Fred.ATTR_VALUE,
+                String dttm = XmlUtil.getGrandChildText(node, Eia.TAG_DATE,
+                                  "").trim();
+                if (i == 0) {
+                    if (dttm.length() == 4) {
+                        format = "yyyy";
+                    } else if (dttm.length() == 6) {
+                        format = "yyyyMM";
+                    } else if (dttm.length() == 8) {
+                        format = "yyyyMMdd";
+                    }
+                }
+                String value = XmlUtil.getGrandChildText(node, Eia.TAG_VALUE,
                                    "").trim();
-                String dttm = XmlUtil.getAttribute(node, Fred.ATTR_DATE,
-                                  (String) null);
                 if (value.equals("") || value.equals(".")) {
                     value = "-999999.99";
                 }
                 sb.append(dttm + "," + value + "\n");
             }
 
+            putFields(new String[] {
+                makeField(FIELD_DATE, attrType("date"), attrFormat(format)),
+                makeField("value", attrUnit(unit), attrLabel("Value"),
+                          attrChartable(), attrMissing(-999999.99)), });
             ByteArrayInputStream bais =
                 new ByteArrayInputStream(sb.toString().getBytes());
 
@@ -129,7 +149,7 @@ public class FredFile extends CsvFile {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
-        PointFile.test(args, FredFile.class);
+        PointFile.test(args, EiaFile.class);
     }
 
 }
