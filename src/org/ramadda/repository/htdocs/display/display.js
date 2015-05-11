@@ -869,12 +869,12 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                 }
                 
                 if(button!= "" || title!="") {
-                    html += HtmlUtil.openTag("h2");
+                    html += HtmlUtil.openTag("h3");
                     html += HtmlUtil.openTag(TAG_DIV, [ATTR_CLASS, "row"]);
                     html += HtmlUtil.div(["class","col-md-10"], HtmlUtil.tag("div", [ATTR_CLASS,"display-title",ATTR_ID,this.getDomId(ID_TITLE)], title));
                     html += HtmlUtil.div(["class","col-md-2","align", "right"], button);
                     html += HtmlUtil.closeTag(TAG_DIV);
-                    html += HtmlUtil.closeTag("h2");
+                    html += HtmlUtil.closeTag("h3");
                 }
 
                 var contents = this.getContentsDiv();
