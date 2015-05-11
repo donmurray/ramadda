@@ -14,7 +14,9 @@
 {{tree details="false"}}
 
 {{description wikify="true"}}
-<p>
+
+<p><br>
+
 Data courtesy of the <a href="{{resource  url=true}}">Federal Reserve Economic Data</a> system.
 
 -section
