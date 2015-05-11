@@ -2471,12 +2471,10 @@ public class PointOutputHandler extends RecordOutputHandler {
             Entry entry, long numRecords)
             throws Exception {
         RecordFile recordFile = (RecordFile) doMakeRecordFile(entry);
+        recordFile.putProperty("entry", entry);
         if (numRecords < 0) {
             numRecords = recordFile.getNumRecords();
         }
-
-
-
 
         if (request.defined(ARG_RECORD_SKIP)) {
             int skip = getSkip(request, 1000);
