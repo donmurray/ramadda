@@ -96,7 +96,14 @@ function RamaddaMultiChart(displayManager, id, properties) {
             },
             displayData: function() {
                 if(this.getShowTitle()) {
-                    this.setTitle(this.getTitle());
+                    var label = this.getTitle();
+                    console.log("set title:" + label);
+                    if(this.hasEntries()) {
+                        console.log("have entry");
+                        var url = this.entries[0].getEntryUrl();
+                        label= HtmlUtils.href(url, this.sourceEntry.getName());
+                    } 
+                    this.setTitle(label);
                 }
                 if(!this.hasData()) {
                     this.clearChart();

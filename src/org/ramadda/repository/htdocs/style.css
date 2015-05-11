@@ -189,6 +189,8 @@ h2 a,   h2 a:visited {
 }
 
 
+
+
 .minitron .bs-inner {
    margin-bottom: 5px;
    overflow-y: auto;
@@ -2237,6 +2239,15 @@ wiki {
    color:black;
 }
 
+h3 a {
+  color:black;
+}
+
+h3 a:visited {
+  color:black;
+}
+
+
 .hideshowblock {
    margin-top:0px;
 }
@@ -2597,7 +2608,7 @@ a.toggleblocklabellink:visited {
 //        font-weight: 500;
 	font-weight: bold;
 }
-.wiki-h3 { xfont-size: 130%; }
+.wiki-h3 { font-size: 130%; }
 .wiki-h4 { xfont-size: 110%; color: #888;}
 .wiki-h5 { xfont-size: 100%;}
 .wiki-h6 { xfont-size: 80%;}

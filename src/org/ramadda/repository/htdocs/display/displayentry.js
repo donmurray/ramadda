@@ -1493,7 +1493,10 @@ function RamaddaEntrydisplayDisplay(displayManager, id, properties) {
                 this.initUI();
                 if(this.sourceEntry!=null) {
                     this.addEntryHtml(this.sourceEntry);
-                    this.setTitle(this.sourceEntry.getName());
+                    var url = this.sourceEntry.getEntryUrl();
+                    var title = HtmlUtils.href(url, this.sourceEntry.getName());
+                    console.log("set title:" + title);
+                    this.setTitle(title);
                 } else {
                     this.addEntryHtml(this.selectedEntry);
                     this.setTitle("Entry Display");
