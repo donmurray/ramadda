@@ -954,6 +954,12 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 url   = entry.getResource().getPath();
                 label = url;
             }
+            if(Misc.getProperty(props, "url",
+                                false)) {
+                return url;
+            }
+
+
             boolean includeIcon = Misc.getProperty(props, ATTR_INCLUDEICON,
                                       false);
             if (includeIcon) {
