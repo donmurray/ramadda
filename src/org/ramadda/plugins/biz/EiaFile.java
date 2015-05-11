@@ -83,7 +83,14 @@ public class EiaFile extends CsvFile {
             for (int i = 0; i < nodes.size(); i++) {
                 Element node = (Element) nodes.get(i);
                 String dttm = XmlUtil.getGrandChildText(node, Eia.TAG_DATE,
-                                  "").trim();
+                                                        "").trim().toLowerCase();
+                if(dttm.matches("q[1-4]")) {
+                    dttm = dttm.replace("q1","01");
+                    dttm = dttm.replace("q2","04");
+                    dttm = dttm.replace("q3","07");
+                    dttm = dttm.replace("q4","10");
+                }
+
                 if (i == 0) {
                     if (dttm.length() == 4) {
                         format = "yyyy";
