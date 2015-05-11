@@ -7,7 +7,7 @@
      <property name="icon" value="/biz/fred.png"/>
      <property name="form.resource.show" value="false"/>
      <column name="category_id" type="string"  label="Category ID"  showinform="true" />
-     <wiki_inner><![CDATA[
+     <wiki><![CDATA[
 +section # label="FRED Category: {{name}}"
 <br>
 
@@ -19,7 +19,7 @@
 
 ]]>
 
-</wiki_inner>
+</wiki>
 
   </type>
 
