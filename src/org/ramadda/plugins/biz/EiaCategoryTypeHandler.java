@@ -163,7 +163,6 @@ public class EiaCategoryTypeHandler extends ExtensibleGroupTypeHandler {
                           : (String) null);
         }
 
-        ids = new ArrayList<String>();
 
         List<String> args = new ArrayList<String>();
         if (categoryId != null) {
@@ -176,6 +175,8 @@ public class EiaCategoryTypeHandler extends ExtensibleGroupTypeHandler {
         Element catsNode = XmlUtil.findChild(catNode,
                                              Eia.TAG_CHILDCATEGORIES);
         Element seriesNode = XmlUtil.findChild(catNode, Eia.TAG_CHILDSERIES);
+        List<Entry> catEntries = new ArrayList<Entry>();
+        List<Entry> seriesEntries = new ArrayList<Entry>();
         if (catsNode != null) {
             NodeList children = XmlUtil.getElements(catsNode, Eia.TAG_ROW);
             for (int childIdx = 0; childIdx < children.getLength();
@@ -187,7 +188,7 @@ public class EiaCategoryTypeHandler extends ExtensibleGroupTypeHandler {
                                   "");
                 Entry entry = createCategoryEntry(mainEntry, parentEntry, id,
                                   name);
-                ids.add(entry.getId());
+                catEntries.add(entry);
             }
         }
 
@@ -202,10 +203,16 @@ public class EiaCategoryTypeHandler extends ExtensibleGroupTypeHandler {
                                   "");
                 Entry entry = createSeriesEntry(mainEntry, parentEntry, id,
                                   name);
-                ids.add(entry.getId());
+                seriesEntries.add(entry);
             }
         }
 
+        //Sort the entries
+        catEntries = getEntryManager().getEntryUtil().sortEntriesOnName(catEntries, false);
+        seriesEntries = getEntryManager().getEntryUtil().sortEntriesOnName(seriesEntries, false);
+        ids = new ArrayList<String>();
+        for(Entry child: catEntries) ids.add(child.getId());
+        for(Entry child: seriesEntries) ids.add(child.getId());
         parentEntry.setChildIds(ids);
 
         return ids;

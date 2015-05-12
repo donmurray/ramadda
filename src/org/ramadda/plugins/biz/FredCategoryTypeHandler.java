@@ -193,7 +193,10 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
                           : (String) null);
         }
 
-        ids = new ArrayList<String>();
+
+
+        List<Entry> catEntries = new ArrayList<Entry>();
+        List<Entry> seriesEntries = new ArrayList<Entry>();
 
         List<String> args = new ArrayList<String>();
         if (categoryId != null) {
@@ -213,7 +216,7 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
             seen.add(id);
             //            System.err.println("category child id:" + id);
             Entry entry = createCategoryEntry(mainEntry, parentEntry, id);
-            ids.add(entry.getId());
+            catEntries.add(entry);
         }
 
 
@@ -234,9 +237,14 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
             String  name = XmlUtil.getAttribute(item, ATTR_TITLE);
             //            System.err.println("series child id:" + id);
             Entry entry = createSeriesEntry(mainEntry, parentEntry, id, name);
-            ids.add(entry.getId());
+            seriesEntries.add(entry);
         }
 
+        catEntries = getEntryManager().getEntryUtil().sortEntriesOnName(catEntries, false);
+        seriesEntries = getEntryManager().getEntryUtil().sortEntriesOnName(seriesEntries, false);
+        ids = new ArrayList<String>();
+        for(Entry child: catEntries) ids.add(child.getId());
+        for(Entry child: seriesEntries) ids.add(child.getId());
 
         parentEntry.setChildIds(ids);
 
