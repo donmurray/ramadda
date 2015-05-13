@@ -124,7 +124,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
     /** _more_ */
     public static final String ARG_SEARCH_SUBMIT = "search.submit";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_PROVIDER = "provider";
 
     /** _more_ */
@@ -1429,6 +1429,29 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             }
         }
 
+        if ((folders.size() == 0) && (entries.size() == 0)) {
+            if (request.defined(ARG_GROUP)) {
+                String groupId = (String) request.getString(ARG_GROUP,
+                                     "").trim();
+                Entry theGroup = getEntryManager().findGroup(request,
+                                     groupId);
+                if ((theGroup != null)
+                        && theGroup.getTypeHandler().isSynthType()) {
+                    List<Entry> children =
+                        getEntryManager().getChildrenAll(request, theGroup,
+                            null);
+                    for (Entry child : children) {
+                        if (child.isGroup()) {
+                            folders.add(child);
+                        } else {
+                            entries.add(child);
+                        }
+                    }
+                }
+            }
+        }
+
+
         return (List<Entry>[]) new List[] { folders, entries };
     }
 
@@ -1567,10 +1590,14 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
         }
 
 
+
+
+
         String s = searchCriteriaSB.toString();
         if (request.defined(ARG_TARGET)) {
             s = "";
         }
+
 
         if (s.length() > 0) {
             s = HtmlUtils.formTable() + s + HtmlUtils.formTableClose();
