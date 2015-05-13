@@ -192,8 +192,10 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
         final List<ServiceOperand> outputEntries =
             new ArrayList<ServiceOperand>();
         int     opNum      = 0;
-        int     numThreads = Math.min(input.getOperands().size(), 6);
-        boolean useThreads = (numThreads > 2) && false;
+        int     numProcs = Runtime.getRuntime().availableProcessors();
+        //System.out.println("num Ops = " + input.getOperands().size() + ", num processors = " + numProcs);
+        int     numThreads = Math.min(input.getOperands().size(), numProcs);
+        boolean useThreads = (numThreads > 2) && true;
         System.err.println("Using threads: " + useThreads);
         ThreadManager threadManager =
             new ThreadManager("CDOArealStatistics.evaluate");

@@ -8,6 +8,7 @@ package org.ramadda.geodata.model;
 
 
 import org.ramadda.data.services.NoaaPsdMonthlyClimateIndexTypeHandler;
+import org.ramadda.data.services.PointOutputHandler;
 import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
 import org.ramadda.repository.Association;
 import org.ramadda.repository.Entry;
@@ -890,10 +891,12 @@ public class CDOTimeSeriesComparison extends CDODataProcess {
     private TimeSeriesData getTimeSeriesData(Request request, Entry tsEntry)
             throws Exception {
         //String url = "http://localhost/repository/entry/show?entryid=79e642ee-dffe-4848-8aae-241e614c0c95&getdata=Get%20Data&output=points.product&product=points.csv
+        /*
         StringBuilder url = new StringBuilder();
         url.append(getRepository().getHttpProtocol());
         url.append("://");
-        url.append(request.getServerName());
+        //url.append(request.getServerName());
+        url.append("localhost");
         url.append(":");
         url.append(request.getServerPort());
         url.append(getRepository().getUrlBase());
@@ -903,6 +906,8 @@ public class CDOTimeSeriesComparison extends CDODataProcess {
             "&getdata=Get Data&output=points.product&product=points.csv");
         System.err.println(url.toString());
         String         contents = IOUtil.readContents(url.toString());
+        */
+        String         contents = getPointOutputHandler().getCsv(request, tsEntry);
         List<String>   lines    = StringUtil.split(contents, "\n", true,
                                       true);
         TimeSeriesData data     = new TimeSeriesData(tsEntry.getName());
@@ -1092,7 +1097,7 @@ public class CDOTimeSeriesComparison extends CDODataProcess {
             }
         }
         StringBuilder name = new StringBuilder();
-        name.append(tsEntry.getDescription());
+        name.append(tsEntry.getName());
         name.append(": ");
         name.append(MONTHS[requestStartMonth - 1]);
         if (requestStartMonth != requestEndMonth) {
@@ -1126,7 +1131,7 @@ public class CDOTimeSeriesComparison extends CDODataProcess {
         String newName = tsEntry.getName() + "_" + id + ".csv";
         File outFile = new File(IOUtil.joinDir(input.getProcessDir(),
                            newName));
-        OutputStream os = getStorageManager().getFileOutputStream(outFile);
+        OutputStream os = getStorageManager().getUncheckedFileOutputStream(outFile);
         os.write(csv.getBytes());
         os.flush();
         os.close();
@@ -1161,6 +1166,16 @@ public class CDOTimeSeriesComparison extends CDODataProcess {
         }
 
         return years;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public PointOutputHandler getPointOutputHandler() {
+        return (PointOutputHandler) getRepository().getOutputHandler(
+            PointOutputHandler.class);
     }
 
 

@@ -804,8 +804,10 @@ begin
         rescf@cnMinLevelValF = -0.9
         rescf@cnMaxLevelValF = 0.9
         cint = 0.1
-        ;rescf@lbLabelAlignment = "BoxCenters"
+        ;rescf@lbLabelAlignment = "ExternalEdges"
         ;rescf@lbLabelAutoStride = False
+        ;rescf@lbLabelStrings = (/"-0.9","","-0.7","","-0.5","","-0.3","","-0.1","0.1","","0.3","","0.5","","0.7","","0.9"/)
+        ;rescf@lbLabelStrings = (/"-1.0","","-0.8","","-0.6","","-0.4","","-0.2","","0.2","","0.4","","0.6","","0.8","","1.0"/)
     end if
   end if
   wks_type@wkWidth                     = 1600
@@ -916,7 +918,7 @@ begin
         if (numtitles .ge. i .and. \
             (.not. ismissing(plottitles(i))) .and. \
             (plottitles(i) .ne. "")) then
-          plottitle = plottitle + " minus ~C~" + plottitles(i)
+          plottitle = plottitle + " minus~C~" + plottitles(i)
         end if
         delete(newdata)
       end do
@@ -1334,11 +1336,11 @@ begin
   if (opts@outtype .eq. "regression") then
     corr = regCoef_n(values,ncdata,0,0)
     corr@long_name=ncVarName + " Regression"
-    plottitle = opts@titles(ncidx) + "~C~ Regression with " + opts@titles(csvidx)
+    plottitle = opts@titles(ncidx) + "~C~Regression with " + opts@titles(csvidx)
   else
     corr = escorc_n(values,ncdata,0,0)
     corr@long_name=ncVarName + " Correlation"
-    plottitle = opts@titles(ncidx) + "~C~ Correlation with " + opts@titles(csvidx)
+    plottitle = opts@titles(ncidx) + "~C~Correlation with " + opts@titles(csvidx)
   end if
   corr!0  = "lat"
   corr!1  = "lon"
