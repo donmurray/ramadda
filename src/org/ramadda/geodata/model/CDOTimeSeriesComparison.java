@@ -507,6 +507,7 @@ public class CDOTimeSeriesComparison extends CDODataProcess {
                 tsEntries.add(oneOfThem);
             }
         }
+        request = adjustRequestDates(request, input);
         for (Entry tsEntry : tsEntries) {
             outputOperands.add(processTimeSeriesData(request, input, tsEntry));
         }
@@ -1178,6 +1179,105 @@ public class CDOTimeSeriesComparison extends CDODataProcess {
             PointOutputHandler.class);
     }
 
+    private Request adjustRequestDates(Request request, ServiceInput input) throws Exception {
+        Date[] range = getCommonDateRange(request, input);
+        // find the start & end month of the request
+        int requestStartMonth =
+            request.get(CDOOutputHandler.ARG_CDO_STARTMONTH, 1);
+        int requestEndMonth = request.get(CDOOutputHandler.ARG_CDO_ENDMONTH,
+                                          1);
+        int firstDataYearMM =
+            Integer.parseInt(new DateTime(range[0]).formattedString("yyyyMM",
+                                          CalendarDateTime.DEFAULT_TIMEZONE));
+        int firstDataYear  = firstDataYearMM / 100;
+        int firstDataMonth = firstDataYearMM % 100;
+        int lastDataYearMM =
+            Integer.parseInt(new DateTime(range[1]).formattedString("yyyyMM",
+                                          CalendarDateTime.DEFAULT_TIMEZONE));
+        int           lastDataYear  = lastDataYearMM / 100;
+        int           lastDataMonth = lastDataYearMM % 100;
+        int           startYear     = 0;
+        int           endYear       = 0;
+        boolean       spanYears     = doMonthsSpanYearEnd(request, null);
+        List<Integer> years         = new ArrayList<Integer>();
+        if (spanYears) {
+            boolean haveYears =
+                request.defined(CDOOutputHandler.ARG_CDO_YEARS);
+            if (haveYears) {
+                String yearString =
+                    request.getString(CDOOutputHandler.ARG_CDO_YEARS, null);
+                if (yearString != null) {
+                    yearString = CDOOutputHandler.verifyYearsList(yearString);
+                }
+                //System.err.println("years: "+yearString);
+                List<String> yearList = StringUtil.split(yearString, ",",
+                                            true, true);
+                for (String year : yearList) {
+                    int iyear = Integer.parseInt(year);
+                    if ((iyear <= firstDataYear) || (iyear > lastDataYear)
+                            || ((iyear == lastDataYear)
+                                && (requestEndMonth > lastDataMonth))) {
+                        continue;
+                    }
+                    years.add(iyear);
+                }
+                request.put(CDOOutputHandler.ARG_CDO_YEARS, yearsListToString(years));
+                //System.err.println("new years: "+yearsListToString(years));
+            } else {
+                startYear = request.get(CDOOutputHandler.ARG_CDO_STARTYEAR,
+                                        1979);
+                endYear = request.get(CDOOutputHandler.ARG_CDO_ENDYEAR,
+                                      startYear);
+                //System.err.println("start: "+startYear+", end: "+endYear);
+                // can't go back before the beginning of data or past the last data
+                if (startYear <= firstDataYear) {
+                    startYear = firstDataYear + 1;
+                }
+                if (endYear > lastDataYear) {
+                    endYear = lastDataYear;
+                }
+                if ((endYear == lastDataYear)
+                        && (requestEndMonth > lastDataMonth)) {
+                    endYear = lastDataYear - 1;
+                }
+                request.put(CDOOutputHandler.ARG_CDO_STARTYEAR, startYear);
+                request.put(CDOOutputHandler.ARG_CDO_ENDYEAR, endYear);
+                //System.err.println("new start: "+startYear+", new end: "+endYear);
+            }
+        } else {
+            startYear = request.get(CDOOutputHandler.ARG_CDO_STARTYEAR, 1979);
+            endYear = request.get(CDOOutputHandler.ARG_CDO_ENDYEAR,
+                                  startYear);
+            //System.err.println("start: "+startYear+", end: "+endYear);
+            if ((endYear == lastDataYear)
+                    && (requestEndMonth > lastDataMonth)) {
+                endYear -= 1;
+            }
+            if (startYear < firstDataYear) {
+                startYear = firstDataYear;
+            }
+            request.put(CDOOutputHandler.ARG_CDO_STARTYEAR, startYear);
+            request.put(CDOOutputHandler.ARG_CDO_ENDYEAR, endYear);
+            //System.err.println("new start: "+startYear+", new end: "+endYear);
+        }
+        return request;
+    }
+
+    /**
+     * Create a comma separated list from the years
+     * @param l  list of years
+     * @return  comma separated list
+     */
+    private String yearsListToString(List<Integer> l) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < l.size(); i++) {
+          if (i > 0 && i < l.size()-1) {
+            sb.append(",");
+          }
+          sb.append(l.get(i).toString());
+        }
+        return sb.toString();
+    }
 
     /**
      * Class description
