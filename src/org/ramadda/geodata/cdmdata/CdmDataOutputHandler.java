@@ -132,7 +132,7 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
 
     /** OPeNDAP Output Type */
     public static final OutputType OUTPUT_OPENDAP =
-        new OutputType("OPeNDAP", "data.opendap", OutputType.TYPE_FEEDS,
+        new OutputType("OPeNDAP", "data.opendap", OutputType.TYPE_FEEDS | OutputType.TYPE_IMPORTANT,
                        OutputType.SUFFIX_NONE, ICON_OPENDAP, GROUP_DATA);
 
     /** CDL Output Type */
