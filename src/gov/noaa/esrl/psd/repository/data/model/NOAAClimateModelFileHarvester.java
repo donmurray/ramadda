@@ -16,9 +16,10 @@ package gov.noaa.esrl.psd.repository.data.model;
 
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
-import org.ramadda.repository.harvester.FileInfo;
+import org.ramadda.repository.harvester.HarvesterFile;
 import org.ramadda.repository.harvester.PatternHarvester;
 import org.ramadda.repository.type.TypeHandler;
+import org.ramadda.util.FileInfo;
 
 import org.w3c.dom.Element;
 
@@ -105,9 +106,9 @@ public class NOAAClimateModelFileHarvester extends PatternHarvester {
      * @return the new entry or null if nothing is harvested
      *
      * @throws Exception on badness
-     * @Override
      */
-    public Entry harvestFile(FileInfo fileInfo, File f, Matcher matcher)
+    @Override
+    public Entry harvestFile(HarvesterFile fileInfo, File f, Matcher matcher)
             throws Exception {
         if ( !f.toString().endsWith(".nc")) {
             return null;
@@ -129,7 +130,7 @@ public class NOAAClimateModelFileHarvester extends PatternHarvester {
      * @return The entry
      */
     @Override
-    public Entry initializeNewEntry(FileInfo fileInfo, File originalFile,
+    public Entry initializeNewEntry(HarvesterFile fileInfo, File originalFile,
                                     Entry entry) {
         try {
             //getRepository().getLogManager().logInfo(
