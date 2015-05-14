@@ -139,9 +139,6 @@ http://geodesystems.com/repository/entry/show/Home/Explore/officeRAMADDA/Documen
 http://geodesystems.com/repository/entry/show/Home/Explore/officeRAMADDA/Documents/EDGAR+SEC+Filings/11+GOOD+ENERGY+INC-0000000000-12-065126.txt?entryid=4789dc42-8a20-496e-bea6-b7e1eca2464f
 http://geodesystems.com/repository/entry/show/Home/Explore/officeRAMADDA/Documents/Office+Docs/flood.pptx?entryid=9d4621af-6d55-4bb3-b337-80521e75a8d9
 http://geodesystems.com/repository/entry/show/Home/Explore/officeRAMADDA/Documents/Office+Docs?entryid=0d18eeb0-990e-4a9d-be64-773a3d0ff479
-http://geodesystems.com/repository/entry/show/Home/Explore/officeRAMADDA/Documents/SEC+Docs/33-8250exhibita.xls?entryid=0715701f-16ce-4d1b-a382-29e29fa0beef
-http://geodesystems.com/repository/entry/show/Home/Explore/officeRAMADDA/Documents/SEC+Docs/33-8250exhibita.xls?output=media_tabular_extractsheet&entryid=0715701f-16ce-4d1b-a382-29e29fa0beef
-http://geodesystems.com/repository/entry/show/Home/Explore/officeRAMADDA/Documents/SEC+Docs/33-8250exhibita.xls?output=xls_json&entryid=0715701f-16ce-4d1b-a382-29e29fa0beef
 http://geodesystems.com/repository/entry/show/Home/Explore/officeRAMADDA/Documents/Spreadsheets/PersonalMonthlyBudget1.xls?output=xls_json&entryid=e50598b9-1998-4951-9061-590c99836c0f
 http://geodesystems.com/repository/entry/show/Home/Explore/officeRAMADDA/Documents?entryid=59324c53-f8ab-4d38-a027-3aa8d7fc0513
 http://geodesystems.com/repository/entry/show/Home/Explore/officeRAMADDA/Wiki/Home+page?entryid=bbba954e-d74c-4a66-9e3f-1370a780f662
@@ -161,7 +158,6 @@ http://geodesystems.com/repository/entry/show/Home/RAMADDA+Information/Projects/
 http://geodesystems.com/repository/entry/show/Home/RAMADDA+Information/Projects/Crtiical+Zone+Observatory+-+CZO+Examples/Example+Data?entryid=c9a67164-9fc3-4207-a888-2903f135d38c
 http://geodesystems.com/repository/entry/show/Home/RAMADDA+Information/Projects/Crtiical+Zone+Observatory+-+CZO+Examples?entryid=663a0db8-c846-4fde-b5b3-04311a125be2
 http://geodesystems.com/repository/entry/show/Home/RAMADDA+Information/Projects/Resiliency/100+Cities?entryid=d48ccf30-8db3-4892-9747-7e1bc3f204e6
-http://geodesystems.com/repository/entry/show/Home/RAMADDA+Information/Projects/Resiliency?entryid=06123678-303d-438a-9d5d-cae34213082e
 http://geodesystems.com/repository/entry/show/Home/RAMADDA+Information/Projects?entryid=8aec218f-d5ca-4439-ae0f-d41d21928d0d
 http://geodesystems.com/repository/entry/show/Home/RAMADDA+Information/Site+Content/Jeff%27s+Ramblings/North+Fork+Little+Thompson?entryid=99c29316-d728-45c9-825b-039c536da468
 http://geodesystems.com/repository/entry/show/Home/RAMADDA+Information/Site+Content/Jeff%27s+Ramblings?entryid=3ff72ce0-ba0a-4c7c-82d8-dc9cf417a2e8
