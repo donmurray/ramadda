@@ -3677,6 +3677,16 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
 
             name = name.trim();
+            String outputType = null;
+            if (name.indexOf("#") > 0) {
+                List<String> foo = StringUtil.split(name, "#");
+                name = foo.get(0);
+                if (foo.size() > 1) {
+                    outputType = foo.get(1);
+                }
+            }
+        
+        
             if (name.startsWith("Category:")) {
                 String category = name.substring("Category:".length());
                 String url =
@@ -3710,7 +3720,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             if (theEntry == null) {
                 theEntry = findWikiEntry(request, wikiUtil, name, parent);
             }
-
+            
             if (theEntry != null) {
                 addWikiLink(wikiUtil, theEntry);
                 if (label.trim().length() == 0) {
@@ -3726,8 +3736,15 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                             theEntry, label, url);
 
                 } else {
+                    String url = null;
+                    // Add output
+                    if (outputType != null) {
+                        url = HtmlUtils.url(
+                                request.entryUrl(getRepository().URL_ENTRY_SHOW, 
+                                        theEntry), ARG_OUTPUT, outputType);
+                    }
                     return getEntryManager().getTooltipLink(request,
-                            theEntry, label, null);
+                            theEntry, label, url);
                 }
             }
 
@@ -4031,7 +4048,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 if ((height > 0) && position.equals(POS_BOTTOM)) {
                     extraDiv =
                         HtmlUtils.style("overflow-y: hidden; max-height:"
-                                        + (height - 100) + "px;");
+                                        + (height - 75) + "px;");
                 }
             }
             image = HtmlUtils.div(image,
