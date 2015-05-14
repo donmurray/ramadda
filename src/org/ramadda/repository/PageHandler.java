@@ -826,6 +826,9 @@ public class PageHandler extends RepositoryManager {
      * @return _more_
      */
     public HtmlTemplate getMobileTemplate() {
+        if(!getRepository().cacheResources()) {
+            mobileTemplate = null;
+        }
         if (mobileTemplate == null) {
             for (HtmlTemplate htmlTemplate : getTemplates()) {
                 if (htmlTemplate.getId().equals("mobile")) {
