@@ -16,6 +16,37 @@
 />
      <column name="location" label="Location"   />
 
+     <wiki><![CDATA[
++section label="{{name}}"
++row
++col-md-8
+{{description wikify="true"}}
+-col
++col-md-4
+{{image src="::*" message="" width="300"}}
+{{mapentry width="300"}}
+<table class="formtable">
+{{daterange row.label="Dates:"  message=""}}
+{{field name="who" row.label="Who:"}}
+{{field name="triptype" row.label="Type:"}}
+{{field name="location" row.label="Location:"}}
+</table>
+-col
+-row
+<br>
++row
++col-md-2
+-col
++col-md-8
+{{slideshow  tag="simple"  showlink="true"  textposition="left"  width="600"  height="500"  }}
+-col
++col-md-2
+-col
+-row
+]]>
+</wiki>
+
+
   </type>
 
 
