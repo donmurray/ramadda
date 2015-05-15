@@ -862,7 +862,7 @@ public class SlackHarvester extends Harvester {
      * @throws Exception _more_
      */
     private Entry getEntryFromInput(Request request, String text)
-            throws Exception {
+        throws Exception {
         text = text.trim();
         //Check for an ID
         Entry entry = getEntryManager().getEntry(request, text);
@@ -870,13 +870,23 @@ public class SlackHarvester extends Harvester {
             return entry;
         }
 
+
         System.err.println("getEntryFromInput:" + text);
         Entry currentEntry = getCurrentEntry(request);
-        Entry newEntry = getEntryManager().getRelativeEntry(request,
-                             getBaseGroup(), currentEntry, text);
-        if (newEntry != null) {
-            return newEntry;
+        entry = getEntryManager().getRelativeEntry(request,
+                                                   getBaseGroup(), currentEntry, text);
+        if (entry != null) {
+            return entry;
         }
+
+        if(Utils.stringDefined(text)) {
+            entry  = getEntryManager().getEntryFromAlias(request, text);
+            if (entry != null) {
+                return entry;
+            }
+        }
+
+        //TODO: give an error
 
         return currentEntry;
     }
