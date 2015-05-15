@@ -82,11 +82,12 @@ public class EiaSeriesTypeHandler extends PointTypeHandler {
      *
      * @throws Exception _more_
      */
+    @Override
     public void initializeNewEntry(Request request, Entry entry)
             throws Exception {
         super.initializeNewEntry(request, entry);
         //        System.err.println("EiaSeries.init");
-        initializeSeries(entry);
+        //        initializeSeries(entry);
     }
 
 
@@ -98,16 +99,12 @@ public class EiaSeriesTypeHandler extends PointTypeHandler {
      * @throws Exception _more_
      */
     public void initializeSeries(Entry entry) throws Exception {
-        //        super.initializeNewEntry(request, entry);
-
-
         EiaCategoryTypeHandler fcth =
             (EiaCategoryTypeHandler) getRepository().getTypeHandler(
                 Eia.TYPE_CATEGORY);
         String seriesId = (String) entry.getValue(IDX_SERIES_ID, null);
         if (seriesId == null) {
             System.err.println("No series id");
-
             return;
         }
 
@@ -117,26 +114,22 @@ public class EiaSeriesTypeHandler extends PointTypeHandler {
                 new URL(
                     "http://www.eia.gov/beta/api/qb.cfm?sdid=" + seriesId)));
 
+        //Don't do this for now since it takes too long with lots of series
+
         /*
         List<String> args = new ArrayList<String>();
         args.add(Eia.ARG_SERIES_ID);
         args.add(seriesId);
+        args.add(Eia.ARG_NUM);
+        args.add("1");
         Element root = fcth.call(Eia.URL_SERIES, args);
-        //        System.err.println(XmlUtil.toString(root));
-
         Object[] values = getEntryValues(entry);
         Element  node   = XmlUtil.findChild(root, Eia.TAG_SERIES);
-
-
-    if(node!=null) {
-        entry.setName(XmlUtil.getAttribute(node, Eia.ATTR_TITLE, entry.getName()));
-        entry.setDescription(XmlUtil.getAttribute(node, Eia.ATTR_NOTES, ""));
-        values[IDX_FREQUENCY] =  XmlUtil.getAttribute(node, Eia.ATTR_FREQUENCY_SHORT, "");
-        values[IDX_UNITS] = XmlUtil.getAttribute(node, Eia.ATTR_UNITS, "");
-        values[IDX_SEASONAL_ADJUSTMENT] = XmlUtil.getAttribute(node, Eia.ATTR_SEASONAL_ADJUSTMENT, "");
-
-    }
-       */
+        if(node == null) return;
+        Element  row   = XmlUtil.findChild(node, Eia.TAG_ROW);
+        entry.setName(XmlUtil.getAttribute(node, Eia.ATTR_NAME, entry.getName()));
+        entry.setDescription(XmlUtil.getAttribute(node, Eia.ATTR_DESCRIPTION, ""));
+        */
     }
 
     /**

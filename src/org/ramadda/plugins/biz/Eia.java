@@ -77,10 +77,16 @@ public class Eia {
 
     /** _more_ */
     public static final String ARG_OUT = "out";
+    public static final String ARG_NUM = "num";
 
     /** _more_ */
     public static final String ARG_SERIES_ID = "series_id";
 
+
+
+
+    public static final String ATTR_NAME = "name";
+    public static final String ATTR_DESCRIPTION = "description";
 
 
     /** _more_ */

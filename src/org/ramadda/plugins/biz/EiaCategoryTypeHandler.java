@@ -199,10 +199,8 @@ public class EiaCategoryTypeHandler extends ExtensibleGroupTypeHandler {
                 Element item = (Element) children.item(childIdx);
                 String id = XmlUtil.getGrandChildText(item,
                                 Eia.TAG_SERIES_ID, "");
-                String name = XmlUtil.getGrandChildText(item, Eia.TAG_NAME,
-                                  "");
-                Entry entry = createSeriesEntry(mainEntry, parentEntry, id,
-                                  name);
+                String name = XmlUtil.getGrandChildText(item, Eia.TAG_NAME,(String) null);
+                Entry entry = createSeriesEntry(mainEntry, parentEntry, id, name);
                 seriesEntries.add(entry);
             }
         }
@@ -334,7 +332,8 @@ public class EiaCategoryTypeHandler extends ExtensibleGroupTypeHandler {
     private Entry createSeriesEntry(Entry mainEntry, Entry parentEntry,
                                     String seriesId, String name)
             throws Exception {
-        if (name == null) {
+
+        if (!Utils.stringDefined(name)) {
             name = seriesId;
         }
 
