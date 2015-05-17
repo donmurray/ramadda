@@ -87,10 +87,10 @@ public class AtomUtil {
 
 
     /** _more_ */
-    public static final String TAG_TIME_START = "time:start";
+    public static final String TAG_TIME_START = "time:Start";
 
     /** _more_ */
-    public static final String TAG_TIME_END = "time:end";
+    public static final String TAG_TIME_END = "time:End";
 
     /** _more_ */
     public static final String TAG_FEED = "feed";

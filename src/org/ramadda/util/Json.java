@@ -20,6 +20,8 @@ import ucar.unidata.util.StringUtil;
 import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
+import java.io.*;
+
 import java.text.StringCharacterIterator;
 
 import java.util.ArrayList;
@@ -518,8 +520,16 @@ public class Json {
      * @throws Exception _more_
      */
     public static void main(String[] args) throws Exception {
-        Element root = XmlUtil.getRoot(IOUtil.readContents(args[0], ""));
-        System.out.println(xmlToJson(root));
+        BufferedReader br =
+            new BufferedReader(new InputStreamReader(System.in));
+        StringBuilder json = new StringBuilder();
+        String        input;
+        while ((input = br.readLine()) != null) {
+            json.append(input);
+            json.append("\n");
+        }
+        JSONObject obj = new JSONObject(json.toString());
+        System.out.println(obj.toString(4));
     }
 
     /**
