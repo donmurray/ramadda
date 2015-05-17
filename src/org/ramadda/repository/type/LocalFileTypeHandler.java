@@ -113,6 +113,7 @@ public class LocalFileTypeHandler extends ExtensibleGroupTypeHandler {
      *
      * @return _more_
      */
+    @Override
     public boolean isSynthType() {
         return true;
     }
@@ -465,6 +466,7 @@ public class LocalFileTypeHandler extends ExtensibleGroupTypeHandler {
      *
      * @throws Exception _more_
      */
+    @Override
     public Entry makeSynthEntry(Request request, Entry parentEntry, String id)
             throws Exception {
 
