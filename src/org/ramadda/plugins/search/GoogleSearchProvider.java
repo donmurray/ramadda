@@ -15,6 +15,7 @@ import org.ramadda.repository.type.*;
 
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Utils;
+
 import ucar.unidata.util.IOUtil;
 
 import java.net.URL;
@@ -30,8 +31,13 @@ import java.util.List;
  */
 public class GoogleSearchProvider extends SearchProvider {
 
-    public static final String URL = "http://ajax.googleapis.com/ajax/services/search/web?v=1.0";
-    public static final String SEARCH_ID ="google";
+    /** _more_ */
+    public static final String URL =
+        "http://ajax.googleapis.com/ajax/services/search/web?v=1.0";
+
+    /** _more_ */
+    public static final String SEARCH_ID = "google";
+
 
     /**
      * _more_
@@ -39,7 +45,7 @@ public class GoogleSearchProvider extends SearchProvider {
      * @param repository _more_
      */
     public GoogleSearchProvider(Repository repository) {
-        super(repository,SEARCH_ID,"Google");
+        super(repository, SEARCH_ID, "Google");
     }
 
     /**
@@ -70,39 +76,44 @@ public class GoogleSearchProvider extends SearchProvider {
             throws Exception {
 
         List<Entry> entries = new ArrayList<Entry>();
-        String url = URL;
+        String      url     = URL;
         url += "&";
         url += HtmlUtils.arg("q",
-                             HtmlUtils.urlEncode(request.getString(ARG_TEXT, "")));
+                             HtmlUtils.urlEncode(request.getString(ARG_TEXT,
+                                 "")));
         System.err.println("google search url:" + url);
         String json = IOUtil.readContents(url);
         //        System.err.println("Json:" + json);
         JSONObject obj = new JSONObject(new JSONTokener(json));
         if ( !obj.has("responseData")) {
-            System.err.println("GoogleSearchProvider: no response field in json:" + json);
+            System.err.println(
+                "GoogleSearchProvider: no response field in json:" + json);
+
             return entries;
         }
 
-        JSONObject response = obj.getJSONObject("responseData");
-        JSONArray searchResults = response.getJSONArray("results");
-        TypeHandler typeHandler = getRepository().getTypeHandler("link");
-        Entry parent = getRepository().getEntryManager().getTopGroup();
+        JSONObject  response      = obj.getJSONObject("responseData");
+        JSONArray   searchResults = response.getJSONArray("results");
+        TypeHandler typeHandler   = getRepository().getTypeHandler("link");
+        Entry       parent        = getSynthTopLevelEntry();
         for (int i = 0; i < searchResults.length(); i++) {
-            JSONObject result = searchResults.getJSONObject(i);
-            String     name    = result.getString("titleNoFormatting");
-            String     desc    = result.getString("content");
-            String     resultUrl    = result.getString("url");
-            Entry        newEntry = new Entry(Repository.ID_PREFIX_SYNTH+getId()+":" + resultUrl, typeHandler);
+            JSONObject result    = searchResults.getJSONObject(i);
+            String     name      = result.getString("titleNoFormatting");
+            String     desc      = result.getString("content");
+            String     resultUrl = result.getString("url");
+            Entry newEntry = new Entry(Repository.ID_PREFIX_SYNTH + getId()
+                                       + ":" + resultUrl, typeHandler);
             entries.add(newEntry);
             newEntry.setIcon("/search/google-icon.png");
-            Date dttm  = new Date();
+            Date dttm = new Date();
             newEntry.initEntry(name, desc, parent,
                                getUserManager().getLocalFileUser(),
-                               new Resource(new URL(resultUrl)), "", dttm.getTime(),
+                               new Resource(new URL(resultUrl)), "",
                                dttm.getTime(), dttm.getTime(),
-                               dttm.getTime(), null);
+                               dttm.getTime(), dttm.getTime(), null);
             getEntryManager().cacheEntry(newEntry);
         }
+
         return entries;
     }
 

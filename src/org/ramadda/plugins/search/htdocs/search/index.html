@@ -1,0 +1,33 @@
+<html>
+<title>Search Integration</title>
+<body>
+<div class="ramadda-section">
+<h2>Search Integration</h2>
+
+RAMADDA can search both its own local repository as well as other sources of content - Google, DuckDuckGo, Flickr, etc. By default only the local RAMADDA is searched. You can select what other search providers to use in the Advanced Search form under Providers.
+
+===Flickr Image Search===
+To enable Flickr image search you need to get an API key from
+<a href="https://www.flickr.com/services/api/misc.api_keys.html">https://www.flickr.com/services/api/misc.api_keys.html</a> and add it to a .properties file in your RAMADDA home directory: 
+
+<pre>
+flickr.api.key=&lt;your API key&gt;
+</pre>
+
+
+===Open Search===
+To add a new search provider that uses Open Search you need to configure a "classes.txt" file in your RAMADDA plugins directory. This specifies the Java class that does the search, the id of the provider and the URL template to use. The URL template should contain a "${searchterms}" macro.
+
+<pre>
+#For open search the form is:
+#classpath;ID;opensearch URL;Label
+#The URL should have the macro: ${searchterms}
+#
+#e.g:
+org.ramadda.plugins.search.OpenSearchProvider;nasa;https://api-test.echo.nasa.gov/opensearch/datasets.atom?keyword=${searchterms};NASA Open Search
+</pre>
+
+</div>
+</body>
+</html>
+

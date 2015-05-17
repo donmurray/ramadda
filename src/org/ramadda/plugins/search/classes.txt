@@ -1,2 +1,13 @@
 org.ramadda.plugins.search.GoogleSearchProvider
-#org.ramadda.plugins.search.DuckDuckGoSearchProvider
+org.ramadda.plugins.search.DuckDuckGoSearchProvider
+org.ramadda.plugins.search.FlickrSearchProvider
+
+
+#For open search the form is:
+#classpath;ID;opensearch URL;Label
+#The URL should have the macro: ${searchterms}
+#
+org.ramadda.plugins.search.OpenSearchProvider;NASA;https://api-test.echo.nasa.gov/opensearch/datasets.atom?keyword=${searchterms};NASA Open Search
+
+#org.ramadda.plugins.search.OpenSearchProvider;nsdc;http://nsidc.org/api/opensearch/1.1/dataset?searchterms=${searchterms};NSIDC Open Search
+
