@@ -1326,6 +1326,16 @@ public class Repository extends RepositoryBase implements RequestHandler,
         Misc.run(getLocalRepositoryManager(), "initializeLocalRepositories");
 
         checkRegistration();
+
+        /****
+             Test for processdir
+        File test = getStorageManager().createProcessDir();
+        System.err.println("test:" + test);
+        String processId = test.getName();
+        String processEntryId =
+            getStorageManager().getProcessDirEntryId(processId);
+        System.err.println("id:" + processEntryId);
+        *****/
     }
 
 
