@@ -24,7 +24,9 @@ import org.ramadda.repository.*;
 import org.ramadda.repository.auth.*;
 import org.ramadda.repository.harvester.*;
 import org.ramadda.repository.metadata.*;
+
 import org.ramadda.repository.search.SearchManager;
+import org.ramadda.repository.search.SearchProvider;
 import org.ramadda.repository.type.*;
 import org.ramadda.util.FileInfo;
 
@@ -521,13 +523,23 @@ public class SlackHarvester extends Harvester {
                 "/r search -provider (google|all|this) search terms",
                 Constants.MIME_TEXT);
         }
-        String provider = Utils.getArg("-provider", args.getArgs(), null);
-        System.err.println("provider:" + provider + " text:"
-                           + args.getText());
+        String providerId = Utils.getArg("-provider", args.getArgs(), null);
+        if(providerId == null) {
+            for(SearchProvider provider: getRepository().getSearchManager().getSearchProviders()) {
+                if(args.getArgs().contains(provider.getId())) {
+                    providerId = provider.getId();
+                    break;
+                }
+            }
+            if(args.getArgs().contains("all")) {
+                providerId = "all";
+            }
+        }
+        System.err.println("provider:" + providerId + " text:"   + args.getText());
         request = request.cloneMe();
         request.put(ARG_TEXT, args.getText());
-        if (provider != null) {
-            request.put(SearchManager.ARG_PROVIDER, provider);
+        if (providerId != null) {
+            request.put(SearchManager.ARG_PROVIDER,providerId);
         }
         List[] pair = getSearchManager().doSearch(request,
                           new StringBuilder());

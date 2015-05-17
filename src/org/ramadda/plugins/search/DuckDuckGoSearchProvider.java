@@ -91,7 +91,7 @@ public class DuckDuckGoSearchProvider extends SearchProvider {
         connection.setRequestProperty("User-Agent", "ramadda");
         InputStream is   = connection.getInputStream();
         String      json = IOUtil.readContents(is);
-        System.out.println("Json:" + json);
+        //        System.out.println("Json:" + json);
         JSONObject obj = new JSONObject(new JSONTokener(json));
         if ( !obj.has("RelatedTopics")) {
             System.err.println(
