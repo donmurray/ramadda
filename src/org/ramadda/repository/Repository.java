@@ -44,6 +44,7 @@ import org.ramadda.repository.search.SearchManager;
 
 import org.ramadda.repository.type.Column;
 import org.ramadda.repository.type.GroupTypeHandler;
+import org.ramadda.repository.type.ProcessFileTypeHandler;
 import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.repository.util.ServerInfo;
 
@@ -4328,13 +4329,18 @@ public class Repository extends RepositoryBase implements RequestHandler,
                                        "Any file type"));
         addTypeHandler(TypeHandler.TYPE_GROUP,
                        groupTypeHandler = new GroupTypeHandler(this));
-        groupTypeHandler.setCategory( "Documents");
+        groupTypeHandler.setCategory("Documents");
         groupTypeHandler.putProperty("form.resource.show", "false");
         groupTypeHandler.putProperty("icon", ICON_FOLDER);
         TypeHandler typeHandler;
         addTypeHandler(TypeHandler.TYPE_FILE,
-                       typeHandler = new TypeHandler(this, "file", "File", "Documents"));
+                       typeHandler = new TypeHandler(this, "file", "File",
+                           "Documents"));
         typeHandler.putProperty("icon", ICON_FILE);
+
+        addTypeHandler(ProcessFileTypeHandler.TYPE_PROCESS,
+                       new ProcessFileTypeHandler(this));
+
     }
 
 

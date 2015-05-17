@@ -11,6 +11,7 @@ import org.python.util.PythonInterpreter;
 
 import org.ramadda.repository.auth.AccessException;
 import org.ramadda.repository.job.JobManager;
+import org.ramadda.repository.type.ProcessFileTypeHandler;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.TempDir;
 import org.ramadda.util.Utils;
@@ -1032,8 +1033,8 @@ public class StorageManager extends RepositoryManager {
      * @return _more_
      */
     public String getProcessDirEntryId(String processId) {
-        return EntryManager.ID_PREFIX_SYNTH + EntryManager.ENTRYID_PROCESS
-               + ":/" + processId;
+        return EntryManager.ID_PREFIX_SYNTH
+               + ProcessFileTypeHandler.TYPE_PROCESS + ":/" + processId;
     }
 
     /**

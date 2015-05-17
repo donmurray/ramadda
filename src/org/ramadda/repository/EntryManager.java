@@ -98,8 +98,6 @@ public class EntryManager extends RepositoryManager {
     public static final String[] PRELOAD_CATEGORIES = { "Documents",
             "General", "Information", "Collaboration", "Database" };
 
-    /** _more_ */
-    public static final String ENTRYID_PROCESS = "process";
 
     /** _more_ */
     private EntryUtil entryUtil;
@@ -6485,14 +6483,12 @@ public class EntryManager extends RepositoryManager {
                 //System.err.println("Parent:" + parentEntryId + " synth part:"
                 //                   + syntheticPart + " entryid:" + entryId);
 
-                TypeHandler typeHandler = null;
-
-                if (parentEntryId.equals(ENTRYID_PROCESS)) {
-                    parentEntry = getProcessEntry();
-                    typeHandler = parentEntry.getTypeHandler();
-                    if (syntheticPart == null) {
-                        return parentEntry;
-                    }
+                TypeHandler typeHandler = getSynthTypeHandler(parentEntryId);
+                if (typeHandler != null) {
+                    parentEntry = typeHandler.getSynthTopLevelEntry();
+                }
+                if (syntheticPart == null) {
+                    return parentEntry;
                 }
 
                 if (parentEntry == null) {
@@ -6550,6 +6546,30 @@ public class EntryManager extends RepositoryManager {
         //    }
 
     }
+
+
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public TypeHandler getSynthTypeHandler(String id) throws Exception {
+        TypeHandler typeHandler = getSearchManager().getSearchProvider(id);
+        if (typeHandler == null) {
+            typeHandler = getRepository().getTypeHandler(id);
+        }
+
+        if (typeHandler == null) {
+            typeHandler = getRepository().getTypeHandler("type_" + id);
+        }
+
+        return typeHandler;
+    }
+
 
 
     /**
@@ -7723,7 +7743,6 @@ public class EntryManager extends RepositoryManager {
      *
      * @param request _more_
      * @param group _more_
-     * @param where _more_
      * @param select _more_
      *
      * @return _more_
@@ -7751,8 +7770,10 @@ public class EntryManager extends RepositoryManager {
                 String[] pair    = getSynthId(mainEntry.getId());
                 String   entryId = pair[0];
                 synthId = pair[1];
-                if (entryId.equals(ENTRYID_PROCESS)) {
-                    mainEntry = getProcessEntry();
+
+                TypeHandler synthTypeHandler = getSynthTypeHandler(entryId);
+                if (synthTypeHandler != null) {
+                    mainEntry = synthTypeHandler.getSynthTopLevelEntry();
                 } else {
                     mainEntry = (Entry) getEntry(request, entryId, false,
                             false);
@@ -9325,6 +9346,12 @@ public class EntryManager extends RepositoryManager {
     /** _more_ */
     private Entry processEntry;
 
+
+    /** _more_          */
+    private Hashtable<String, TypeHandler> synthEntryHandlers =
+        new Hashtable<String, TypeHandler>();
+
+
     /**
      * _more_
      *
@@ -9344,6 +9371,23 @@ public class EntryManager extends RepositoryManager {
         return processFileTypeHandler;
     }
 
+
+    /*
+        public TypeHandler getSynthEntryTypeHandler(String id)
+            throws Exception {
+            TypeHandler typeHandler = synthEntryHandlers.get(id);
+            if (processFileTypeHandler == null) {
+                ProcessFileTypeHandler tmp =
+                    new ProcessFileTypeHandler(getRepository(), null);
+                tmp.setType("type_process");
+                processFileTypeHandler = tmp;
+            }
+
+            return processFileTypeHandler;
+        }
+    */
+
+
     /**
      * _more_
      *
@@ -9352,26 +9396,9 @@ public class EntryManager extends RepositoryManager {
      * @throws Exception _more_
      */
     public Entry getProcessEntry() throws Exception {
-        if (processEntry == null) {
-            TypeHandler typeHandler = getProcessFileTypeHandler();
-            //parentEntry = topGroup;
-            Entry parentEntry = new Entry(typeHandler, true);
-            parentEntry.setUser(getUserManager().getLocalFileUser());
-            parentEntry.addMetadata(new Metadata(getRepository().getGUID(),
-                    parentEntry.getId(),
-                    ContentMetadataHandler.TYPE_PAGESTYLE, true, "", "false",
-                    "", "", ""));
-
-            Entry topGroup = getTopGroup();
-            parentEntry.setName("Process Entries");
-            parentEntry.setId(ID_PREFIX_SYNTH + ENTRYID_PROCESS);
-            parentEntry.setParentEntry(topGroup);
-            processEntry = parentEntry;
-        }
-
-        return processEntry;
+        return getRepository().getTypeHandler(
+            ProcessFileTypeHandler.TYPE_PROCESS).getSynthTopLevelEntry();
     }
-
 
     /**
      * _more_
@@ -9696,7 +9723,6 @@ public class EntryManager extends RepositoryManager {
      * _more_
      *
      * @param request _more_
-     * @param baseGroup _more_
      * @param base _more_
      * @param current _more_
      * @param dir _more_

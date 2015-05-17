@@ -58,6 +58,10 @@ import java.util.Properties;
  */
 public class ProcessFileTypeHandler extends LocalFileTypeHandler {
 
+    /** _more_          */
+    public static final String TYPE_PROCESS = "type_process";
+
+
     /** _more_ */
     private String processId = "test";
 
@@ -72,6 +76,19 @@ public class ProcessFileTypeHandler extends LocalFileTypeHandler {
     public ProcessFileTypeHandler(Repository repository, Element entryNode)
             throws Exception {
         super(repository, entryNode);
+    }
+
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     *
+     * @throws Exception _more_
+     */
+    public ProcessFileTypeHandler(Repository repository) throws Exception {
+        super(repository, null);
+        setType(TYPE_PROCESS);
+        setForUser(false);
     }
 
 

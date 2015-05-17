@@ -1172,6 +1172,49 @@ public class TypeHandler extends RepositoryManager {
     }
 
 
+    /** _more_          */
+    private Entry synthTopLevelEntry;
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Entry getSynthTopLevelEntry() throws Exception {
+        if (synthTopLevelEntry == null) {
+            synthTopLevelEntry = doMakeSynthTopLevelEntry();
+        }
+
+        return synthTopLevelEntry;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public Entry doMakeSynthTopLevelEntry() throws Exception {
+        Entry parentEntry = new Entry(this, true);
+        parentEntry.setUser(getUserManager().getLocalFileUser());
+        //Add metadata to hide the menubar
+        parentEntry.addMetadata(
+            new Metadata(
+                getRepository().getGUID(), parentEntry.getId(),
+                ContentMetadataHandler.TYPE_PAGESTYLE, true, "", "false", "",
+                "", ""));
+
+        Entry topGroup = getEntryManager().getTopGroup();
+        parentEntry.setName(getLabel());
+        parentEntry.setId(ID_PREFIX_SYNTH + getType());
+        parentEntry.setParentEntry(topGroup);
+
+        return parentEntry;
+    }
+
 
     /**
      * _more_
@@ -1365,7 +1408,7 @@ public class TypeHandler extends RepositoryManager {
             System.err.println("Owner:" + key + " " + value);
             System.err.println("Props:" + properties);
         }
-        */            
+        */
 
         return value.equals("true");
     }
@@ -1974,15 +2017,20 @@ public class TypeHandler extends RepositoryManager {
         //        boolean debug = type.equals("type_fred_series");
         boolean debug = false;
 
-        if(debug) 
-            System.err.println ("set Properties");
+        if (debug) {
+            System.err.println("set Properties");
+        }
         List propertyNodes = XmlUtil.findChildren(entryNode, TAG_PROPERTY);
 
         for (int propIdx = 0; propIdx < propertyNodes.size(); propIdx++) {
             Element propertyNode = (Element) propertyNodes.get(propIdx);
             if (XmlUtil.hasAttribute(propertyNode, ATTR_VALUE)) {
-                if(debug) 
-                    System.err.println ("\t" + XmlUtil.getAttribute(propertyNode, ATTR_NAME) +"=" + XmlUtil.getAttribute(propertyNode, ATTR_NAME)); 
+                if (debug) {
+                    System.err.println(
+                        "\t" + XmlUtil.getAttribute(propertyNode, ATTR_NAME)
+                        + "="
+                        + XmlUtil.getAttribute(propertyNode, ATTR_NAME));
+                }
                 putProperty(XmlUtil.getAttribute(propertyNode, ATTR_NAME),
                             XmlUtil.getAttribute(propertyNode, ATTR_VALUE));
             } else {
@@ -2474,8 +2522,10 @@ public class TypeHandler extends RepositoryManager {
      * @param entry _more_
      *
      * @return _more_
+     *
+     * @throws Exception _more_
      */
-    public String getPathForEntry(Entry entry) throws Exception  {
+    public String getPathForEntry(Entry entry) throws Exception {
         return entry.getResource().getPath();
     }
 
@@ -2545,6 +2595,7 @@ public class TypeHandler extends RepositoryManager {
      *
      * @param entry _more_
      * @param request The request
+     * @param typeHandler _more_
      * @param output _more_
      * @param showDescription _more_
      * @param showResource _more_
@@ -2555,15 +2606,17 @@ public class TypeHandler extends RepositoryManager {
      * @throws Exception _more_
      */
     public StringBuilder getInnerEntryContent(Entry entry, Request request,
-                                              TypeHandler typeHandler,
-            OutputType output, boolean showDescription, boolean showResource,
+            TypeHandler typeHandler, OutputType output,
+            boolean showDescription, boolean showResource,
             boolean linkToDownload)
             throws Exception {
 
-        if(typeHandler == null)  typeHandler = this;
+        if (typeHandler == null) {
+            typeHandler = this;
+        }
         if (parent != null) {
-            return parent.getInnerEntryContent(entry, request, typeHandler, output,
-                    showDescription, showResource, linkToDownload);
+            return parent.getInnerEntryContent(entry, request, typeHandler,
+                    output, showDescription, showResource, linkToDownload);
         }
 
         boolean showDate  = typeHandler.okToShowInHtml(entry, ARG_DATE, true);
@@ -2746,7 +2799,8 @@ public class TypeHandler extends RepositoryManager {
                 }
             }
 
-            if (showCreated && typeHandler.okToShowInHtml(entry,"owner", true)) {
+            if (showCreated
+                    && typeHandler.okToShowInHtml(entry, "owner", true)) {
                 String userSearchLink =
                     HtmlUtils
                         .href(HtmlUtils
@@ -2819,8 +2873,8 @@ public class TypeHandler extends RepositoryManager {
                     sb.append(formEntry(request, msgLabel("End Date"),
                                         endDate));
                 } else {
-                    boolean showTime     = typeHandler.okToShowInForm(entry, "time",
-                                               true);
+                    boolean showTime = typeHandler.okToShowInForm(entry,
+                                           "time", true);
                     StringBuilder dateSB = new StringBuilder();
                     dateSB.append(formatDate(request, entry.getStartDate(),
                                              entry));
@@ -4321,7 +4375,6 @@ public class TypeHandler extends RepositoryManager {
     /**
      * _more_
      *
-     * @param formBuffer _more_
      * @param request The request
      * @param titles _more_
      * @param contents _more_
@@ -5292,7 +5345,6 @@ public class TypeHandler extends RepositoryManager {
      * @param group _more_
      * @param entries _more_
      * @param subGroups _more_
-     * @param where _more_
      * @param select _more_
      *
      * @throws Exception _more_
