@@ -72,7 +72,7 @@ import java.util.List;
 public class TabularOutputHandler extends OutputHandler {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final int SLACK_SCREEN_WIDTH_CHARS = 120;
 
     /** _more_ */
@@ -300,6 +300,7 @@ public class TabularOutputHandler extends OutputHandler {
      * @param fromWhere _more_
      * @param args _more_
      * @param sb _more_
+     * @param buffer _more_
      * @param files _more_
      *
      * @throws Exception _more_
@@ -309,38 +310,44 @@ public class TabularOutputHandler extends OutputHandler {
                             List<FileInfo> files)
             throws Exception {
 
-        
-        if(args.contains("-help")) {
-            buffer.append("For tabular data:\n\t-columns <comma separated columns to show e.g., 1,3,4,6> \n\t-startcol col# -endcol col# \n\t-startrow row # -endrow row # \n\t-file (import CSV file)\n\t-text (show text in Slack)\n");
+
+        if (args.contains("-help")) {
+            buffer.append(
+                "For tabular data:\n\t-columns <comma separated columns to show e.g., 1,3,4,6> \n\t-startcol col# -endcol col# \n\t-startrow row # -endrow row # \n\t-file (import CSV file)\n\t-text (show text in Slack)\n");
         }
 
-        final StringBuilder sb = new StringBuilder();
-        final boolean justHeader = args.contains("-header");
+        final StringBuilder sb         = new StringBuilder();
+        final boolean       justHeader = args.contains("-header");
 
-        final boolean doText = args.contains("-text");
-        final boolean doFile = args.contains("-file");
-        final boolean doImage = !doText && !doFile;
+        final boolean       doText     = args.contains("-text");
+        final boolean       doFile     = args.contains("-file");
+        final boolean       doImage    = !doText && !doFile;
 
-        List<String> columnsArg = StringUtil.split(Utils.getArg("-columns", args, ""),",",true,true);
-        final List<Integer> selectedColumns  = columnsArg.size()>0?new ArrayList<Integer>():null;
+        List<String> columnsArg = StringUtil.split(Utils.getArg("-columns",
+                                      args, ""), ",", true, true);
+        final List<Integer> selectedColumns = (columnsArg.size() > 0)
+                ? new ArrayList<Integer>()
+                : null;
 
         //User indexes are 1 based
-        if(columnsArg.size()>0) {
-            for(String col: columnsArg) {
-                if(col.indexOf("-")>=0) {
-                    List<String>toks = StringUtil.split(col,"-",true,true);
-                    if(toks.size()==2) {
+        if (columnsArg.size() > 0) {
+            for (String col : columnsArg) {
+                if (col.indexOf("-") >= 0) {
+                    List<String> toks = StringUtil.split(col, "-", true,
+                                            true);
+                    if (toks.size() == 2) {
                         int start = Integer.parseInt(toks.get(0));
-                        int end = Integer.parseInt(toks.get(1));
-                        for(int i=start;i<=end;i++) {
-                            selectedColumns.add(new Integer(i-1));
+                        int end   = Integer.parseInt(toks.get(1));
+                        for (int i = start; i <= end; i++) {
+                            selectedColumns.add(new Integer(i - 1));
                         }
                     }
                 } else {
-                    selectedColumns.add(new Integer(Integer.parseInt(col)-1));
+                    selectedColumns.add(new Integer(Integer.parseInt(col)
+                            - 1));
                 }
             }
-        } 
+        }
 
 
         final int startCol = Utils.getArg("-startcol", args, 1) - 1;
@@ -353,16 +360,20 @@ public class TabularOutputHandler extends OutputHandler {
 
 
         final StringBuilder html =
-            new StringBuilder("<html><body bgcolor=white color=black><font face=\"helvetica\" color=\"black\" size=14 >");
+            new StringBuilder(
+                "<html><body bgcolor=white color=black><font face=\"helvetica\" color=\"black\" size=14 >");
         html.append(HtmlUtils.h3(entry.getName()));
-        html.append("<table cellspacing=0 cellpadding=5 border=1 width=1000 bgcolor=white>");
+        html.append(
+            "<table cellspacing=0 cellpadding=5 border=1 width=1000 bgcolor=white>");
 
-        final String colDelimiter = doFile?",":" | ";
+        final String   colDelimiter   = doFile
+                                        ? ","
+                                        : " | ";
 
         TabularVisitor tabularVisitor = new TabularVisitor() {
 
-                private  List<Integer> dfltCols = new ArrayList<Integer>();
-            int   colWidth = -1;
+            private List<Integer> dfltCols = new ArrayList<Integer>();
+            int                   colWidth = -1;
             @Override
             public boolean visit(Visitor info, String sheet,
                                  List<List<Object>> rows) {
@@ -374,7 +385,8 @@ public class TabularOutputHandler extends OutputHandler {
             }
 
 
-            private boolean visitInner(Visitor info, String sheet,  List<List<Object>> rows)
+            private boolean visitInner(Visitor info, String sheet,
+                                       List<List<Object>> rows)
                     throws Exception {
 
                 int maxWidth   = 800;
@@ -390,7 +402,7 @@ public class TabularOutputHandler extends OutputHandler {
 
                 colWidth = Utils.getArg("-colwidth", args, 200);
 
-                int rowCnt                   = 0;
+                int rowCnt = 0;
                 for (int rowIdx = startRow;
                         (rowIdx < rows.size()) && (rowIdx <= endRow);
                         rowIdx++) {
@@ -403,11 +415,11 @@ public class TabularOutputHandler extends OutputHandler {
                     int           colCnt = 0;
                     StringBuilder lineSB = new StringBuilder();
 
-                    if(cols.size()!= dfltCols.size()) {
+                    if (cols.size() != dfltCols.size()) {
                         dfltCols = new ArrayList<Integer>();
                         for (int colIdx = startCol;
-                             (colIdx < cols.size()) && (colIdx <= endCol);
-                             colIdx++) {
+                                (colIdx < cols.size()) && (colIdx <= endCol);
+                                colIdx++) {
                             if (colCnt++ > maxCols) {
                                 break;
                             }
@@ -415,9 +427,11 @@ public class TabularOutputHandler extends OutputHandler {
                         }
                     }
                     colCnt = 0;
-                    List<Integer> columnsToUse = (selectedColumns!=null?selectedColumns:dfltCols);
-                    for (int colIdx: columnsToUse) {
-                        String s = ""+ cols.get(colIdx);
+                    List<Integer> columnsToUse = ((selectedColumns != null)
+                            ? selectedColumns
+                            : dfltCols);
+                    for (int colIdx : columnsToUse) {
+                        String s = "" + cols.get(colIdx);
                         if (colCnt++ > 1) {
                             lineSB.append(colDelimiter);
                         }
@@ -427,7 +441,7 @@ public class TabularOutputHandler extends OutputHandler {
                         }
                         s = s.replace("&", "&amp;").replace("<",
                                       "&lt;").replace(">", "&gt;");
-                        if(!doFile) {
+                        if ( !doFile) {
                             if (s.matches("[-\\+0-9\\.]+")) {
                                 lineSB.append(StringUtil.padLeft(s, width));
                             } else {
@@ -464,13 +478,14 @@ public class TabularOutputHandler extends OutputHandler {
 
 
         html.append("</table></font></body></html>");
-        if(doImage) {
+        if (doImage) {
             File imageFile =
                 getRepository().getStorageManager().getTmpFile(request,
-                                                               entry.getName() + "_table.png");
+                    entry.getName() + "_table.png");
 
             Font font = new Font("Dialog", Font.PLAIN, 12);
-            Image image = ImageUtils.renderHtml(html.toString(), 1200, null, font);
+            Image image = ImageUtils.renderHtml(html.toString(), 1200, null,
+                              font);
             ImageUtils.writeImageToFile(image, imageFile);
             FileInfo fileInfo = new FileInfo(imageFile);
 
@@ -481,21 +496,23 @@ public class TabularOutputHandler extends OutputHandler {
             files.add(fileInfo);
         }
 
-        if(doFile) {
+        if (doFile) {
             File csvFile =
                 getRepository().getStorageManager().getTmpFile(request,
-                                                               IOUtil.stripExtension(entry.getName()) + ".csv");
+                    IOUtil.stripExtension(entry.getName()) + ".csv");
             IOUtil.writeFile(csvFile.toString(), sb.toString());
             FileInfo fileInfo = new FileInfo(csvFile);
             if ( !entry.getTypeHandler().isWikiText(entry.getDescription())) {
                 fileInfo.setDescription(entry.getDescription());
             }
-            fileInfo.setTitle("Table - " + IOUtil.stripExtension(entry.getName())+".csv");
+            fileInfo.setTitle("Table - "
+                              + IOUtil.stripExtension(entry.getName())
+                              + ".csv");
             files.add(fileInfo);
         }
 
 
-        if(doText) {
+        if (doText) {
             buffer.append(sb);
         }
 

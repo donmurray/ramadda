@@ -57,7 +57,9 @@ public class FfmpegService extends Service {
     public void addExtraArgs(Request request, ServiceInput input,
                              List<String> args, boolean start)
             throws Exception {
-        if(start) return;
+        if (start) {
+            return;
+        }
         File f =
             request.getRepository().getStorageManager().getTmpFile(request,
                 "files.txt");
@@ -69,7 +71,7 @@ public class FfmpegService extends Service {
         IOUtil.writeFile(f, sb.toString());
         args.add(f.toString());
         args.add("movie.mp4");
-        
+
 
     }
 

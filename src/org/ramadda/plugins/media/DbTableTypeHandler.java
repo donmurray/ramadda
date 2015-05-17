@@ -165,7 +165,9 @@ public class DbTableTypeHandler extends TabularTypeHandler {
             what = StringUtil.join(",", cols);
             }*/
 
-        int          max        = visitInfo.getMaxRows()>0?visitInfo.getMaxRows():TabularOutputHandler.MAX_ROWS;
+        int          max        = (visitInfo.getMaxRows() > 0)
+                                  ? visitInfo.getMaxRows()
+                                  : TabularOutputHandler.MAX_ROWS;
 
         List<Clause> andClauses = new ArrayList<Clause>();
         List<Clause> orClauses  = new ArrayList<Clause>();
@@ -175,22 +177,23 @@ public class DbTableTypeHandler extends TabularTypeHandler {
 
         if (tableInfo != null) {
             Pattern pattern = Pattern.compile("(.*?)(<|<=|>|>=|=|!=)(.*?)");
-            for(String arg: visitInfo.getSearchExpressions()) {
+            for (String arg : visitInfo.getSearchExpressions()) {
                 Matcher matcher = pattern.matcher(arg);
                 if ( !matcher.find()) {
                     continue;
                 }
-                String col =  matcher.group(1).toLowerCase().trim();
-                String expr =  matcher.group(2).trim();
-                Object  value =  matcher.group(3).trim();
+                String col   = matcher.group(1).toLowerCase().trim();
+                String expr  = matcher.group(2).trim();
+                Object value = matcher.group(3).trim();
                 try {
-                    value  = new Double(value.toString());
-                } catch(Exception exc) {
-                }
-                System.err.println ("Match:" + col +":" + expr +":" + value);
+                    value = new Double(value.toString());
+                } catch (Exception exc) {}
+                System.err.println("Match:" + col + ":" + expr + ":" + value);
                 for (ColumnInfo colInfo : tableInfo.getColumns()) {
-                    if(colInfo.getName().equals(col)) {
-                        andClauses.add(new Clause(colInfo.getName(), expr, value));
+                    if (colInfo.getName().equals(col)) {
+                        andClauses.add(new Clause(colInfo.getName(), expr,
+                                value));
+
                         break;
                     }
                 }
