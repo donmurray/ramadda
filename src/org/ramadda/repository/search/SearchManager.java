@@ -223,6 +223,10 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
     /** _more_ */
     private List<SearchProvider> searchProviders = null;
 
+    /** _more_ */
+    private Hashtable<String, SearchProvider> searchProviderMap =
+        new Hashtable<String, SearchProvider>();
+
 
     /** _more_ */
     private List<SearchProvider> pluginSearchProviders =
@@ -1363,6 +1367,19 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
      */
     public void addPluginSearchProvider(SearchProvider provider) {
         pluginSearchProviders.add(provider);
+        searchProviderMap.put(provider.getType(), provider);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param id _more_
+     *
+     * @return _more_
+     */
+    public SearchProvider getSearchProvider(String id) {
+        return searchProviderMap.get(id);
     }
 
 
@@ -1390,11 +1407,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             providers.add("this");
         }
 
-
-
-
-
-        System.err.println("Providers:" + providers);
+        //        System.err.println("Providers:" + providers);
         boolean          doAll   = providers.contains("all");
 
         ArrayList<Entry> folders = new ArrayList<Entry>();
@@ -1896,7 +1909,11 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             List<SearchProvider> tmp = new ArrayList<SearchProvider>();
             tmp.add(new SearchProvider.RamaddaSearchProvider(getRepository(),
                     "this", "This RAMADDA Repository"));
-            tmp.addAll(pluginSearchProviders);
+            for (SearchProvider provider : pluginSearchProviders) {
+                if (provider.isEnabled()) {
+                    tmp.add(provider);
+                }
+            }
             searchProviders = tmp;
         }
 

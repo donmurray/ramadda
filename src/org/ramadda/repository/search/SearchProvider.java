@@ -8,6 +8,7 @@ package org.ramadda.repository.search;
 
 
 import org.ramadda.repository.*;
+import org.ramadda.repository.type.*;
 import org.ramadda.sql.Clause;
 
 import java.util.ArrayList;
@@ -16,44 +17,95 @@ import java.util.List;
 
 /**
  */
-public abstract class SearchProvider extends RepositoryManager {
+public abstract class SearchProvider extends GenericTypeHandler {
 
+    /** _more_ */
     private String id;
 
+    /** _more_ */
     private String name;
-
-    public SearchProvider(Repository repository) {
-        super(repository);
-    }
-
 
     /**
      * _more_
      *
      * @param repository _more_
      */
+    public SearchProvider(Repository repository) {
+        super(repository, "", "Search Provider");
+    }
+
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param id _more_
+     */
     public SearchProvider(Repository repository, String id) {
-        this(repository);
+        super(repository, id, "Search Provider");
         this.id = id;
     }
 
+    /**
+     * _more_
+     *
+     * @param repository _more_
+     * @param id _more_
+     * @param name _more_
+     */
     public SearchProvider(Repository repository, String id, String name) {
-        this(repository, id);
+        super(repository, id, name);
+        this.id   = id;
         this.name = name;
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public TypeHandler getLinkTypeHandler() throws Exception {
+        return getRepository().getTypeHandler("link");
+    }
 
-
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getId() {
         return id;
     }
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public boolean isEnabled() {
+        return true;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getName() {
-        if(name == null) return getId();
+        if (name == null) {
+            return getId();
+        }
+
         return name;
     }
 
+    /**
+     * _more_
+     *
+     * @param name _more_
+     */
     public void setName(String name) {
         this.name = name;
     }
@@ -87,8 +139,11 @@ public abstract class SearchProvider extends RepositoryManager {
          * _more_
          *
          * @param repository _more_
+         * @param id _more_
+         * @param name _more_
          */
-        public RamaddaSearchProvider(Repository repository, String id, String name) {
+        public RamaddaSearchProvider(Repository repository, String id,
+                                     String name) {
             super(repository, id, name);
         }
 
