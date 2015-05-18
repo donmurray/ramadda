@@ -661,12 +661,15 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     var showType = {};
                     this.types = this.types.split(",");
                     for(var i=0;i<this.types.length;i++) {
-                        showType[this.types[i]] = true;
+                        var type  = this.types[i];
+                        showType[type] = true;
                     }
                     var tmp = [];
                     for(var i=0;i<this.entryTypes.length;i++) {
                         var type  = this.entryTypes[i];
                         if(showType[type.getId()]) {
+                            tmp.push(type);
+                        } else if(type.getCategory()!=null && showType[type.getCategory()]) {
                             tmp.push(type);
                         }
                     }
