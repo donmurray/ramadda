@@ -4,11 +4,21 @@
 <div class="ramadda-section">
 <h2>Search Integration</h2>
 
-RAMADDA can search both its own local repository as well as other sources of content - Google, DuckDuckGo, Flickr, etc. By default only the local RAMADDA is searched. You can select what other search providers to use in the Advanced Search form under Providers.
+RAMADDA can search both its own local repository as well as other sources of content - Google, YoutTube, DuckDuckGo, Flickr, etc. By default only the local RAMADDA is searched. You can select what other search providers to use in the Advanced Search form under Providers.
+
+===YouTube Search===
+To enable YouTube  search you need to get an <a href="https://developers.google.com/youtube/registering_an_application">API key</a> 
+from Google. Once you have the key add it to some .properties file in your RAMADDA home or plugins directory: 
+
+<pre>
+youtube.api.key=&lt;your API key&gt;
+</pre>
+
+
 
 ===Flickr Image Search===
 To enable Flickr image search you need to get an API key from
-<a href="https://www.flickr.com/services/api/misc.api_keys.html">https://www.flickr.com/services/api/misc.api_keys.html</a> and add it to a .properties file in your RAMADDA home directory: 
+<a href="https://www.flickr.com/services/api/misc.api_keys.html">https://www.flickr.com/services/api/misc.api_keys.html</a> and add it to some .properties file in your RAMADDA home or plugins directory: 
 
 <pre>
 flickr.api.key=&lt;your API key&gt;
@@ -17,6 +27,8 @@ flickr.api.key=&lt;your API key&gt;
 
 ===Open Search===
 To add a new search provider that uses Open Search you need to configure a "classes.txt" file in your RAMADDA plugins directory. This specifies the Java class that does the search, the id of the provider and the URL template to use. The URL template should contain a "${searchterms}" macro.
+
+You classes.txt file should look like:
 
 <pre>
 #For open search the form is:
