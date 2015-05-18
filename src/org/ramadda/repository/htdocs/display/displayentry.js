@@ -1639,6 +1639,12 @@ function RamaddaRepositoriesDisplay(displayManager, id, properties) {
                 }
                 this.numberWithTypes = 0;
                 this.finishedInitDisplay = false;
+                //Check for and remove the all repositories
+                if(this.ramaddas.length>1) {
+                    if(this.ramaddas[this.ramaddas.length-1].getRoot() == "all") {
+                        this.ramaddas.splice(this.ramaddas.length-1,1);
+                    }
+                }
                 for(var i=0;i<this.ramaddas.length;i++) {
                     if(i == 0) {
                     }
