@@ -1299,33 +1299,34 @@ function RamaddaMetadataDisplay(displayManager, id, properties) {
                         for(var j=0;j<metadata.length;j++) {
                             var m = metadata[j];
                             if(m.type == mdt) {
-                                if(cell==null) {
-                                    cell = "";
-                                } else {
-                                    cell += divider;
-                                }
                                 var item = null;
                                 if(m.type == "content.thumbnail" || m.type == "content.logo") {
-                                    var url =this.getRamadda().getRoot() +"/metadata/view/" + m.attr1 +"?element=1&entryid=" + entry.getId() +"&metadata.id=" + m.id;
+                                    var url =this.getRamadda().getRoot() +"/metadata/view/" + m.value.attr1 +"?element=1&entryid=" + entry.getId() +"&metadata.id=" + m.id;
                                     item =  HtmlUtil.image(url,[ATTR_WIDTH,"100"]);
-                                } else if(m.type == "content.url") {
-                                    var label = m.attr2;
+                                } else if(m.type == "content.url" || m.type == "dif.related_url") {
+                                    var label = m.value.attr2;
                                     if(label == null || label == "") {
-                                        label = m.attr1;
+                                        label = m.value.attr1;
                                     }
-                                    item =  HtmlUtil.href(m.attr1,label);
+                                    item =  HtmlUtil.href(m.value.attr1,label);
                                 } else if(m.type == "content.attachment") {
-                                    var toks = m.attr1.split("_file_");
+                                    var toks = m.value.attr1.split("_file_");
                                     var filename = toks[1];
-                                    var url =this.getRamadda().getRoot()+"/metadata/view/" + m.attr1 +"?element=1&entryid=" + entry.getId() +"&metadata.id=" + m.id;
+                                    var url =this.getRamadda().getRoot()+"/metadata/view/" + m.value.attr1 +"?element=1&entryid=" + entry.getId() +"&metadata.id=" + m.id;
                                     item =  HtmlUtil.href(url,filename);
                                 } else {
-                                    item = m.attr1;
-                                    if(m.attr2 && m.attr2.trim().length>0) {
-                                        item += " - " + m.attr2;
+                                    item = m.value.attr1;
+                                    console.log("Item:" + item);
+                                    if(m.value.attr2 && m.value.attr2.trim().length>0) {
+                                        item += " - " + m.value.attr2;
                                     }
                                 }
                                 if(item!=null) {
+                                    if(cell==null) {
+                                        cell = "";
+                                    } else {
+                                        cell += divider;
+                                    }
                                     cell += HtmlUtil.div([ATTR_CLASS, "display-metadata-item"], item);
                                 }
                                 
@@ -1339,9 +1340,11 @@ function RamaddaMetadataDisplay(displayManager, id, properties) {
                         }
                         var add = HtmlUtil.tag(TAG_A, [ATTR_STYLE,"color:#000;", ATTR_HREF, this.getRamadda().getRoot() + "/metadata/addform?entryid=" + entry.getId() +"&metadata.type=" + mdt,
                                                      "target","_blank","alt","Add metadata",ATTR_TITLE,"Add metadata"],"+");
-                        var cellContents = add;
-                        if(cell.length>0) 
-                            cellContents = cell+divider + add;
+                        add  = HtmlUtil.div(["class","display-metadata-table-add"], add);
+                        var cellContents = add + divider;
+                        if(cell.length>0)  {
+                            cellContents +=  cell;
+                        }
                         row.push(HtmlUtil.td([ATTR_CLASS, "display-metadata-table-cell"],HtmlUtil.div([ATTR_CLASS,"display-metadata-table-cell-contents"], cellContents)));
                     }
                     html += HtmlUtil.tr(["valign", "top"],HtmlUtil.join(row,""));

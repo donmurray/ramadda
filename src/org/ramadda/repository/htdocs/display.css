@@ -354,6 +354,9 @@
 
 .display-metadata-table-cell {
      border:1px #888 solid;
+     padding: 0px;
+//     padding: 2px;
+//     padding-left: 10px;
 }
 
 .display-metadata-table-cell-contents {
@@ -363,11 +366,23 @@
 
 .display-metadata-table  th {
     background-color: #efefef;
+    padding: 2px;
 }
 
 .display-metadata-item {
-     border-bottom: 1px #ccc dotted;
      padding:2px;
+     padding-left:8px;
+}
+
+.display-metadata-table-add {
+       font-size: 75%;
+       margin:0px; 
+       padding:0px;
+       border: 0px solid red;
+}
+
+.display-metadata-divider {
+     border-bottom: 1px #ccc dotted;
 }
 
 
@@ -377,6 +392,7 @@
 
 .display-metadata-entrylink {
     max-width: 200px;
+    padding: 5px;
 }
 
 .display-metadata .display-entries-content   { 
