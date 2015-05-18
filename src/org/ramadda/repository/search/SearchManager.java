@@ -855,6 +855,12 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                 List<String> selectedProviders =
                     (List<String>) request.get(ARG_PROVIDER,
                         new ArrayList<String>());
+                providerSB.append(HtmlUtils.labeledCheckbox(ARG_PROVIDER,
+                                                            "all", selectedProviders.contains("all"),
+                                                            msg("All")));
+                providerSB.append(HtmlUtils.br());
+
+
                 for (int i = 0; i < searchProviders.size(); i++) {
                     SearchProvider searchProvider = searchProviders.get(i);
                     boolean        selected       = false;
@@ -864,10 +870,8 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                         selected = selectedProviders.contains(
                             searchProvider.getId());
                     }
-                    providerSB.append(HtmlUtils.checkbox(ARG_PROVIDER,
-                            searchProvider.getId(), selected));
-                    providerSB.append(HtmlUtils.space(2));
-                    providerSB.append(searchProvider.getName());
+                    providerSB.append(HtmlUtils.labeledCheckbox(ARG_PROVIDER,
+                                                                searchProvider.getId(), selected, searchProvider.getName()));
                     providerSB.append(HtmlUtils.br());
                 }
 
