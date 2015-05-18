@@ -315,7 +315,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 var hereBefore  =  details.attr("has-content") !=null;
                 details.attr("has-content","true");
                 if(hereBefore) {
-                    //                    detailsInner.html(HtmlUtils.image(icon_progress));
+                    //                    detailsInner.html(HtmlUtil.image(icon_progress));
                 } else {
                     if(entry.getIsGroup() && !entry.isRemote) {
                         detailsInner.html(HtmlUtil.image(icon_progress));
@@ -1494,7 +1494,7 @@ function RamaddaEntrydisplayDisplay(displayManager, id, properties) {
                 if(this.sourceEntry!=null) {
                     this.addEntryHtml(this.sourceEntry);
                     var url = this.sourceEntry.getEntryUrl();
-                    var title = HtmlUtils.href(url, this.sourceEntry.getName());
+                    var title = HtmlUtil.href(url, this.sourceEntry.getName());
                     console.log("set title:" + title);
                     this.setTitle(title);
                 } else {

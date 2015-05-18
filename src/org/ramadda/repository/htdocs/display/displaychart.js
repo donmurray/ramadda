@@ -101,7 +101,7 @@ function RamaddaMultiChart(displayManager, id, properties) {
                     if(this.hasEntries()) {
                         console.log("have entry");
                         var url = this.entries[0].getEntryUrl();
-                        label= HtmlUtils.href(url, this.sourceEntry.getName());
+                        label= HtmlUtil.href(url, this.sourceEntry.getName());
                     } 
                     this.setTitle(label);
                 }
