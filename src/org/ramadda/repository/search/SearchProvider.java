@@ -25,6 +25,10 @@ public abstract class SearchProvider extends GenericTypeHandler {
     /** _more_ */
     private String name;
 
+    /** _more_ */
+    private String apiKey;
+
+
     /**
      * _more_
      *
@@ -63,6 +67,30 @@ public abstract class SearchProvider extends GenericTypeHandler {
      * _more_
      *
      * @return _more_
+     */
+    public boolean isEnabled() {
+        return true;
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public String getApiKey() {
+        if (apiKey == null) {
+            apiKey = getRepository().getProperty(getId() + ".api.key");
+        }
+
+        return apiKey;
+    }
+
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
      *
      * @throws Exception _more_
      */
@@ -77,15 +105,6 @@ public abstract class SearchProvider extends GenericTypeHandler {
      */
     public String getId() {
         return id;
-    }
-
-    /**
-     * _more_
-     *
-     * @return _more_
-     */
-    public boolean isEnabled() {
-        return true;
     }
 
     /**
