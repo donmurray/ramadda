@@ -566,16 +566,19 @@ public class SlackHarvester extends Harvester {
         Slack.Args    args    = new Slack.Args(toks, null);
         String        entryId = null;
         StringBuilder textSB  = new StringBuilder();
+        String lastTok = null;
         for (int i = 0; i < toks.size(); i++) {
-            String tok = toks.get(i);
+        String tok = toks.get(i);
             if (tok.startsWith("-") && (i < toks.size() - 1)) {
                 i++;
-
                 continue;
             }
-            textSB.append(tok);
+            lastTok = tok;
         }
-        args.setText(textSB.toString());
+
+        if(lastTok!=null){
+            args.setText(lastTok);
+        }
 
         String tmpId = Utils.getArg("-entry", toks, (String) null);
 
