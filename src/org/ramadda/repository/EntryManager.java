@@ -6479,13 +6479,12 @@ public class EntryManager extends RepositoryManager {
                 String   parentEntryId = pair[0];
                 String   syntheticPart = pair[1];
                 Entry    parentEntry   = null;
-                //                System.err.println ("SYNTH:" + entryId);
-                //System.err.println("Parent:" + parentEntryId + " synth part:"
-                //                   + syntheticPart + " entryid:" + entryId);
+                //                System.err.println("Parent:" + parentEntryId + " synth part:" + syntheticPart);
 
                 TypeHandler typeHandler = getSynthTypeHandler(parentEntryId);
                 if (typeHandler != null) {
                     parentEntry = typeHandler.getSynthTopLevelEntry();
+                    //                    System.err.println("Got synth type handler:" + typeHandler.getType());
                 }
                 if (syntheticPart == null) {
                     return parentEntry;
@@ -6562,9 +6561,9 @@ public class EntryManager extends RepositoryManager {
             id = ProcessFileTypeHandler.TYPE_PROCESS;
         }
 
-        TypeHandler typeHandler = getRepository().getTypeHandler(id);
+        TypeHandler typeHandler = getRepository().getTypeHandler(id, false, false);
         if (typeHandler == null) {
-            typeHandler = getRepository().getTypeHandler("type_" + id);
+            typeHandler = getRepository().getTypeHandler("type_" + id, false, false);
             //            System.err.println("trying type_" +id +" " + typeHandler);
         }
         if (typeHandler == null) {
@@ -7791,7 +7790,7 @@ public class EntryManager extends RepositoryManager {
             //            System.err.println("****  Get synthids:" + mainEntry.getTypeHandler().getSynthIds(request, mainEntry,
             //                                                                                        group, synthId));
 
-            return mainEntry.getTypeHandler().getSynthIds(request, mainEntry,
+            return mainEntry.getMasterTypeHandler().getSynthIds(request, mainEntry,
                     group, synthId);
         }
 

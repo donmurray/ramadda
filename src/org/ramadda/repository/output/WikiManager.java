@@ -25,6 +25,7 @@ import org.ramadda.repository.map.MapInfo;
 import org.ramadda.repository.metadata.Metadata;
 import org.ramadda.repository.metadata.MetadataType;
 import org.ramadda.repository.search.SpecialSearch;
+import org.ramadda.repository.search.SearchManager;
 import org.ramadda.repository.type.LocalFileTypeHandler;
 import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.repository.util.DateArgument;
@@ -1366,6 +1367,9 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             String type = Misc.getProperty(props, ATTR_TYPE,
                                            Misc.getProperty(props, ATTR_ID,
                                                TypeHandler.TYPE_ANY));
+
+            String provider = Misc.getProperty(props, SearchManager.ARG_PROVIDER,
+                                               (String) null);
             TypeHandler typeHandler = getRepository().getTypeHandler(type);
 
             if (typeHandler == null) {
@@ -1374,7 +1378,11 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             String  incomingMax = request.getString(ARG_MAX, (String) null);
             Request myRequest   = copyRequest(request, props);
 
-            //Pass the wiki attribute into the request to the special search
+            if(provider!=null) {
+                myRequest.put(SearchManager.ARG_PROVIDER, provider);            
+            }
+            
+//Pass the wiki attribute into the request to the special search
             String fields = Misc.getProperty(props, ATTR_FIELDS,
                                              (String) null);
             if (fields != null) {

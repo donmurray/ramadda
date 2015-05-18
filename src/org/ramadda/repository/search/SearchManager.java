@@ -852,9 +852,12 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                 StringBuilder providerSB = new StringBuilder();
                 providerSB.append(msg("Where do you want to search?"));
                 providerSB.append(HtmlUtils.br());
-                List<String> selectedProviders =
-                    (List<String>) request.get(ARG_PROVIDER,
-                        new ArrayList<String>());
+                List<String> selectedProviders = new ArrayList<String>();
+                for(String tok: (List<String>) request.get(ARG_PROVIDER,
+                                                           new ArrayList<String>())) {
+                    selectedProviders.addAll(StringUtil.split(tok, ",",true,true));
+                }
+                        
                 providerSB.append(HtmlUtils.labeledCheckbox(ARG_PROVIDER,
                                                             "all", selectedProviders.contains("all"),
                                                             msg("All")));

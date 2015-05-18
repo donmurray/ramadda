@@ -344,6 +344,12 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     private List<Service> services = new ArrayList<Service>();
 
+    /** _more_          */
+    private Entry synthTopLevelEntry;
+
+
+
+
     /**
      * ctor
      *
@@ -1148,7 +1154,7 @@ public class TypeHandler extends RepositoryManager {
         }
 
         throw new IllegalArgumentException(
-            "getSynthIds  not implemented in class:" + getClass().getName());
+                                           "getSynthIds  not implemented for type:" + getType() +" in class:" + getClass().getName());
     }
 
     /**
@@ -1167,13 +1173,9 @@ public class TypeHandler extends RepositoryManager {
         if (parent != null) {
             return parent.makeSynthEntry(request, parentEntry, id);
         }
-
-        throw new IllegalArgumentException("makeSynthEntry  not implemented");
+        throw new IllegalArgumentException("makeSynthEntry  not implemented: type=" + getType() +" class:" + getClass().getName());
     }
 
-
-    /** _more_          */
-    private Entry synthTopLevelEntry;
 
     /**
      * _more_
@@ -1234,7 +1236,7 @@ public class TypeHandler extends RepositoryManager {
             return parent.makeSynthEntry(request, parentEntry, entryNames);
         }
 
-        throw new IllegalArgumentException("makeSynthEntry  not implemented");
+        throw new IllegalArgumentException("makeSynthEntry  not implemented:" + getType() + " " + getClass().getName());
     }
 
 
