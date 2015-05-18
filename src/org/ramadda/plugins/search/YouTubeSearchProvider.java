@@ -13,18 +13,14 @@ import org.ramadda.repository.*;
 import org.ramadda.repository.metadata.*;
 import org.ramadda.repository.search.*;
 import org.ramadda.repository.type.*;
-import org.ramadda.util.AtomUtil;
 
-import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Json;
 import org.ramadda.util.Utils;
+import org.ramadda.util.HtmlUtils;
 
 
-
-import org.w3c.dom.*;
 
 import ucar.unidata.util.DateUtil;
-
-
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
@@ -40,24 +36,24 @@ import java.util.List;
 
 
 /**
- * Proxy that searches google
+ * Proxy that searches youtube
  *
  */
-public class FlickrSearchProvider extends SearchProvider {
+public class YouTubeSearchProvider extends SearchProvider {
 
     /** _more_ */
-    private static final String ID = "flickr";
+    private static final String ID = "youtube";
 
     /** _more_ */
     private static final String URL =
-        "https://api.flickr.com/services/rest/?method=flickr.photos.search";
+        "https://www.googleapis.com/youtube/v3/search?part=snippet";
 
 
     /** _more_ */
-    private static final String ARG_API_KEY = "api_key";
+    private static final String ARG_API_KEY = "key";
 
     /** _more_ */
-    private static final String ARG_TEXT = "text";
+    private static final String ARG_Q = "q";
 
     /** _more_ */
     private static final String ARG_MIN_TAKEN_DATE = "min_taken_date";
@@ -73,15 +69,15 @@ public class FlickrSearchProvider extends SearchProvider {
 
 
 
+
     /**
      * _more_
      *
      * @param repository _more_
      */
-    public FlickrSearchProvider(Repository repository) {
-        super(repository, ID, "Flickr Image Search");
+    public YouTubeSearchProvider(Repository repository) {
+        super(repository, ID, "YouTube Search");
     }
-
 
 
     /**
@@ -92,6 +88,8 @@ public class FlickrSearchProvider extends SearchProvider {
     public boolean isEnabled() {
         return getApiKey() != null;
     }
+
+
 
 
     /**
@@ -111,58 +109,62 @@ public class FlickrSearchProvider extends SearchProvider {
 
         List<Entry> entries = new ArrayList<Entry>();
         String      url     = URL;
-        url = HtmlUtils.url(url, ARG_API_KEY, getApiKey(), ARG_TEXT,
+        url = HtmlUtils.url(url, ARG_API_KEY, getApiKey(), ARG_Q,
                             HtmlUtils.urlEncode(request.getString(ARG_TEXT,
                                 "")));
-        //        System.err.println(getName() + " search url:" + url);
+        System.err.println(getName() + " search url:" + url);
         URLConnection connection = new URL(url).openConnection();
         connection.setRequestProperty("User-Agent", "ramadda");
-        InputStream is  = connection.getInputStream();
-        String      xml = IOUtil.readContents(is);
-        //        System.out.println("xml:" + xml);
-
-        Element root   = XmlUtil.getRoot(xml);
-        Element photos = XmlUtil.findChild(root, "photos");
-        if (photos == null) {
+        InputStream is   = connection.getInputStream();
+        String      json = IOUtil.readContents(is);
+        //        System.out.println("xml:" + json);
+        JSONObject obj = new JSONObject(new JSONTokener(json));
+        if ( !obj.has("items")) {
+            System.err.println(
+                "YouTube SearchProvider: no items field in json:" + json);
             return entries;
         }
 
-        Entry       parent      = getSynthTopLevelEntry();
+        JSONArray searchResults = obj.getJSONArray("items");
+        Entry     parent        = getSynthTopLevelEntry();
         TypeHandler typeHandler =
-            getRepository().getTypeHandler("type_image");
-        NodeList children = XmlUtil.getElements(photos, "photo");
-        for (int childIdx = 0; childIdx < children.getLength(); childIdx++) {
-            Element item     = (Element) children.item(childIdx);
-            Element link     = XmlUtil.findChild(item, AtomUtil.TAG_LINK);
-            String  name     = XmlUtil.getAttribute(item, "title", "");
-            String  desc     = "";
-            String  id       = XmlUtil.getAttribute(item, "id", "");
-            String  server   = XmlUtil.getAttribute(item, "server", "");
-            String  farm     = XmlUtil.getAttribute(item, "farm", "");
-            String  secret   = XmlUtil.getAttribute(item, "secret", "");
-            Date    dttm     = new Date();
-            Date    fromDate = dttm,
-                    toDate   = dttm;
-            String urlTemplate =
-                "https://farm${farm}.staticflickr.com/${server}/${id}_${secret}_${size}.jpg";
-            String imageUrl = urlTemplate.replace("${farm}",
-                                  farm).replace("${server}",
-                                      server).replace("${id}",
-                                          id).replace("${secret}", secret);
+            getRepository().getTypeHandler("media_youtubevideo");
 
-            String itemUrl = imageUrl.replace("${size}", "b");
+        for (int i = 0; i < searchResults.length(); i++) {
+            JSONObject item    = searchResults.getJSONObject(i);
+            JSONObject snippet = item.getJSONObject("snippet");
+            String     kind    = Json.readValue(item, "id.kind", "");
+            if ( !kind.equals("youtube#video")) {
+                System.err.println("? Youtube kind:" + kind);
+
+                continue;
+            }
+            String id   = Json.readValue(item, "id.videoId", "");
+            String name = snippet.getString("title");
+            String desc = snippet.getString("description");
+
+            Date   dttm = new Date();
+            Date fromDate = DateUtil.parse(Json.readValue(snippet,
+                                "publishedAt", null));
+            Date   toDate  = fromDate;
+
+            String itemUrl = "https://www.youtube.com/watch?v=" + id;
 
             Entry newEntry = new Entry(Repository.ID_PREFIX_SYNTH + getId()
                                        + ":" + id, typeHandler);
-            newEntry.setIcon("/search/flickr.png");
             entries.add(newEntry);
 
-            Metadata thumbnailMetadata =
-                new Metadata(getRepository().getGUID(), newEntry.getId(),
-                             ContentMetadataHandler.TYPE_THUMBNAIL, false,
-                             imageUrl.replace("${size}", "t"), null, null,
-                             null, null);
-            newEntry.addMetadata(thumbnailMetadata);
+            String thumb = Json.readValue(snippet, "thumbnails.default.url",
+                                          null);
+
+            if (thumb != null) {
+                Metadata thumbnailMetadata =
+                    new Metadata(getRepository().getGUID(), newEntry.getId(),
+                                 ContentMetadataHandler.TYPE_THUMBNAIL,
+                                 false, thumb, null, null, null, null);
+                newEntry.addMetadata(thumbnailMetadata);
+            }
+
 
             newEntry.initEntry(name, desc, parent,
                                getUserManager().getLocalFileUser(),
