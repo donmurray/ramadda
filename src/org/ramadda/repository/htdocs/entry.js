@@ -124,6 +124,9 @@ function Repository(repositoryRoot) {
             getEntryTypes: function(callback) {
                 return new Array();
             },
+            getEntryType: function(typeId) {
+                return null;
+            },
             getMetadataCount: function(type, callback) {
                 //                console.log("getMetatataCount:" + type.name);
                 return 0;

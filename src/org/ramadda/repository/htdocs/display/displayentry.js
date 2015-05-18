@@ -1694,11 +1694,7 @@ function RamaddaRepositoriesDisplay(displayManager, id, properties) {
                 var cats = [];
                 for(var typeIdx =0;typeIdx<allTypes.length;typeIdx++) {
                     var type = allTypes[typeIdx];
-                    
-
                     var row = "";
-
-
                     row += "<tr>";
                     row += HtmlUtil.td([],HtmlUtil.image(type.getIcon()) +" " + type.getLabel());
                     for(var i=0;i<this.ramaddas.length;i++) {

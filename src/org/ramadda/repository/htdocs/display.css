@@ -300,12 +300,18 @@
 .display-repositories-table {
 }
 
+.display-repositories-table td {
+   padding: 2px;
+}
+
 
 .display-repositories-table-header {
+   padding: 5px;
 }
 
 
 .display-repositories-table th {
+    padding: 5px;
     background-color: #efefef;
 }
 
