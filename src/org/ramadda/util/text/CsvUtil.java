@@ -127,20 +127,22 @@ public class CsvUtil {
                 System.out.print("fields=");
             }
             for (int i = 0; i < cols.size(); i++) {
-                String col = cols.get(i);
+                String col = cols.get(i).trim();
                 if (asPoint) {
                     if (i > 0) {
                         System.out.print(", ");
                     }
-                    String label = col;
+                    String label = col.replaceAll("\\([^\\)]+\\)", "");
                     String unit = StringUtil.findPattern(col,
                                       ".*?\\(([^\\)]+)\\).*");
+                    //                    System.err.println ("COL:" + col +" unit: " + unit);
                     StringBuffer attrs = new StringBuffer();
                     attrs.append("label=\"" + label + "\" ");
-                    String id = col.replaceAll(" ", "_");
-                    id = id.replaceAll("\\([^\\)]+\\)", "");
-                    id = id.replaceAll("-", "_");
-                    id = id.toLowerCase();
+                    if(unit !=null) {
+                        attrs.append("unit=\"" + unit + "\" ");
+                        
+                    }
+                    String id = col.replaceAll("\\([^\\)]+\\)", "").replaceAll("-", "_").trim().toLowerCase().replaceAll(" ", "_").replaceAll(":","_");
                     if (id.indexOf("date") >= 0) {
                         attrs.append("type=\"date\" format=\"\" ");
                     }
@@ -444,7 +446,7 @@ public class CsvUtil {
 
             if (arg.equals("-pointheader")) {
                 doHeader = true;
-
+                doPoint = true;
                 continue;
             }
 
