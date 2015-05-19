@@ -34,12 +34,7 @@ import org.ramadda.util.SelectionRectangle;
 
 import org.w3c.dom.Element;
 
-import thredds.server.ncSubset.exception
-    .VariableNotContainedInDatasetException;
-import thredds.server.ncSubset.format.SupportedFormat;
-import thredds.server.ncSubset.params.PointDataRequestParamsBean;
-import thredds.server.ncSubset.util.NcssRequestUtils;
-import thredds.server.ncSubset.view.PointDataStream;
+import thredds.server.ncss.format.SupportedFormat;
 import thredds.server.opendap.GuardedDatasetImpl;
 
 import ucar.ma2.Array;
@@ -50,6 +45,7 @@ import ucar.ma2.StructureMembers;
 
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.NetcdfFileWriter;
+import ucar.nc2.NetcdfFileWriter.Version;
 import ucar.nc2.VariableSimpleIF;
 import ucar.nc2.dataset.CoordinateAxis1D;
 import ucar.nc2.dataset.CoordinateAxis1DTime;
@@ -59,6 +55,7 @@ import ucar.nc2.dt.GridCoordSystem;
 import ucar.nc2.dt.GridDatatype;
 import ucar.nc2.dt.TrajectoryObsDataset;
 import ucar.nc2.dt.TrajectoryObsDatatype;
+import ucar.nc2.dt.grid.CFGridWriter2;
 import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.dt.grid.NetcdfCFWriter;
 import ucar.nc2.ft.FeatureCollection;
@@ -930,11 +927,11 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
             //                System.err.println("llr:" + llr);
         }
         int   hStride = request.get(ARG_HSTRIDE, 1);
-        Range zStride = null;
+        Range zRange = null;
         if (request.defined(ARG_LEVEL)) {
             int index = request.get(ARG_LEVEL, -1);
             if (index >= 0) {
-                zStride = new Range(index, index);
+                zRange = new Range(index, index);
             }
         }
         boolean            includeLatLon = request.get(ARG_ADDLATLON, false);
@@ -988,21 +985,49 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
             sb.append(
                 getPageHandler().showDialogWarning("No variables selected"));
         } else {
-            NetcdfCFWriter writer = new NetcdfCFWriter();
             File f = getRepository().getStorageManager().getTmpFile(request,
                          "subset" + ncVersion.getSuffix());
+            System.err.println(f.getPath());
+            NetcdfFileWriter ncFileWriter = null;
+            try {
+                ncFileWriter = NetcdfFileWriter.createNew(ncVersion, f.getPath());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
 
             if (debug) {
                 System.err.println("CdmData.subset: " + " vars:" + varNames
                                    + " llr:" + llr);
             }
-
-            writer.makeFile(f.toString(), gds, varNames, llr, hStride,
-                            zStride, ((dates[0] == null)
+            // ucar.nc2.dt.GridDataset gds,
+            // List<String> gridList,
+            // LatLonRect llbb,
+            // ProjectionRect projRect,
+            // int horizStride,
+            // Range zRange,
+            // CalendarDateRange dateRange,
+            // int stride_time,
+            // boolean addLatLon,
+            // NetcdfFileWriter writer
+            
+            CFGridWriter2.writeFile(gds, varNames, llr, null, hStride, zRange,
+                            ((dates[0] == null)
                                       ? null
                                       : CalendarDateRange.of(dates[0],
-                                      dates[1])), timeStride, includeLatLon,
+                                      dates[1])), 
+                            timeStride, includeLatLon, ncFileWriter);
+
+            /*
+            writer.makeFile(f.toString(), gds, varNames, llr, hStride,
+                            zStride, 
+                            ((dates[0] == null)
+                                      ? null
+                                      : CalendarDateRange.of(dates[0],
+                                      dates[1])), 
+                                      timeStride, includeLatLon,
                                           ncVersion);
+                                          */
             getCdmManager().returnGridDataset(path, gds);
 
 

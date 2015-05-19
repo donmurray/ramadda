@@ -171,6 +171,8 @@ public class CdmManager extends RepositoryManager {
     private static final String TYPE_CLIMATE_MODEL_GRANULE =
         "climate_modelfile";
 
+    /** disk cache */
+    private DiskCache2 diskCache2 = null;
 
     /**
      * Create a new CdmManager
@@ -214,10 +216,10 @@ public class CdmManager extends RepositoryManager {
         ucar.nc2.iosp.grid.GridServiceProvider.setIndexAlwaysInCache(true);
 
         // for ncj 4.3
-        DiskCache2 dc = new DiskCache2(nj22Dir.getDir().toString(), false,
+        diskCache2 = new DiskCache2(nj22Dir.getDir().toString(), false,
                                        -1, -1);
-        dc.setAlwaysUseCache(true);
-        ucar.nc2.grib.GribCollection.setDiskCache2(dc);
+        diskCache2.setAlwaysUseCache(true);
+        ucar.nc2.grib.collection.GribCollection.setDiskCache2(diskCache2);
 
 
         dataCacheDir =
@@ -1541,6 +1543,14 @@ public class CdmManager extends RepositoryManager {
         }
 
         return entry;
+    }
+    
+    /**
+     * Get the global disk cache
+     * @return the disk cache
+     */
+    public DiskCache2 getDiskCache2() {
+        return diskCache2;
     }
 
 

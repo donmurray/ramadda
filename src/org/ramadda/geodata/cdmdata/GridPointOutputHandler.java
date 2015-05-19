@@ -37,10 +37,11 @@ import org.ramadda.util.Json;
 import org.w3c.dom.Element;
 
 
-import thredds.server.ncSubset.format.SupportedFormat;
-import thredds.server.ncSubset.params.PointDataRequestParamsBean;
-import thredds.server.ncSubset.util.NcssRequestUtils;
-import thredds.server.ncSubset.view.PointDataStream;
+import thredds.server.ncss.format.SupportedFormat;
+//import thredds.server.ncss.params.PointDataRequestParamsBean;
+import thredds.server.ncss.params.NcssParamsBean;
+import thredds.server.ncss.util.NcssRequestUtils;
+import thredds.server.ncss.view.gridaspoint.PointDataStream;
 
 import ucar.ma2.Array;
 import ucar.ma2.DataType;
@@ -74,6 +75,7 @@ import ucar.nc2.time.Calendar;
 import ucar.nc2.time.CalendarDate;
 import ucar.nc2.time.CalendarDateFormatter;
 import ucar.nc2.time.CalendarDateRange;
+import ucar.nc2.util.DiskCache2;
 
 
 import ucar.unidata.geoloc.LatLonPointImpl;
@@ -447,16 +449,16 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
         }
 
         SupportedFormat            sf   = getSupportedFormat(format);
-        PointDataRequestParamsBean pdrb = new PointDataRequestParamsBean();
+        NcssParamsBean pdrb = new NcssParamsBean();
         GridAsPointDataset gapds =
             NcssRequestUtils.buildGridAsPointDataset(gds, varNames);
         pdrb.setVar(varNames);
         // accept uses the response type
         pdrb.setAccept((format.equalsIgnoreCase(FORMAT_TIMESERIES_CHART)
                         || format.equalsIgnoreCase(FORMAT_TIMESERIES_IMAGE))
-                       ? SupportedFormat.CSV.getResponseContentType()
+                       ? SupportedFormat.CSV_STREAM.getResponseContentType()
                        : sf.getResponseContentType());
-        pdrb.setPoint(true);
+        //pdrb.setPoint(true);
         pdrb.setLatitude(llp.getLatitude());
         pdrb.setLongitude(llp.getLongitude());
         if (dates[0] != null) {
@@ -481,13 +483,13 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
         if (sf.equals(SupportedFormat.NETCDF4)) {
             suffix = SUFFIX_NC4;
         } else if (pdrb.getAccept()
-                .equals(SupportedFormat.CSV
+                .equals(SupportedFormat.CSV_STREAM
                     .getResponseContentType()) || format
                         .equals(FORMAT_TIMESERIES_CHART_DATA) || format
                         .equals(FORMAT_TIMESERIES_IMAGE)) {
             suffix = SUFFIX_CSV;
         } else if (pdrb.getAccept().equals(
-                SupportedFormat.XML.getResponseContentType())) {
+                SupportedFormat.XML_STREAM.getResponseContentType())) {
             suffix = SUFFIX_XML;
         }
 
@@ -508,8 +510,8 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
 
         OutputStream outStream =
             getStorageManager().getUncheckedFileOutputStream(tmpFile);
-        PointDataStream pds = PointDataStream.createPointDataStream(sf,
-                                  outStream);
+        DiskCache2 dc = getCdmManager().getDiskCache2();
+        PointDataStream pds = PointDataStream.factory(sf, outStream, dc);
         List<CalendarDate> wantedDates = NcssRequestUtils.wantedDates(gapds,
                                              CalendarDateRange.of(dates[0],
                                                  dates[1]), 0);
@@ -632,7 +634,7 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
 
         if (name.equalsIgnoreCase(FORMAT_TIMESERIES_CHART)
                 || name.equalsIgnoreCase(FORMAT_TIMESERIES_IMAGE)) {
-            return SupportedFormat.CSV;
+            return SupportedFormat.CSV_STREAM;
         }
         for (SupportedFormat sf : SupportedFormat.values()) {
             // check for the name
@@ -659,7 +661,7 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
      * @throws Exception _more_
      */
     private Map<String, List<String>> groupVarsByVertLevels(GridDataset gds,
-            PointDataRequestParamsBean params)
+            NcssParamsBean params)
             throws Exception {
         String       no_vert_levels = "no_vert_level";
         List<String> vars           = params.getVar();
@@ -774,11 +776,11 @@ public class GridPointOutputHandler extends OutputHandler implements CdmConstant
         } catch (UnsatisfiedLinkError e) {}
         */
         formats.add(new TwoFacedObject("Comma Separated Values (CSV)",
-                                       SupportedFormat.CSV.getFormatName()));
+                                       SupportedFormat.CSV_STREAM.getFormatName()));
         formats.add(new TwoFacedObject("Time Series Image",
                                        FORMAT_TIMESERIES));
         formats.add(new TwoFacedObject("XML",
-                                       SupportedFormat.XML.getFormatName()));
+                                       SupportedFormat.XML_STREAM.getFormatName()));
 
 
         String format = request.getString(CdmConstants.ARG_FORMAT,
