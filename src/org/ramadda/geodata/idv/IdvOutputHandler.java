@@ -1970,8 +1970,7 @@ public class IdvOutputHandler extends OutputHandler implements IdvConstants {
                     XmlUtil.attrs(
                         "id", "datasource", "url",
                         request.getAbsoluteUrl(
-                            getRepository().URL_ENTRY_SHOW
-                            + getDataOutputHandler().getOpendapUrl(entry)))));
+                            getDataOutputHandler().getOpendapUrl(entry)))));
         } else {
             isl.append(XmlUtil.openTag(ImageGenerator.TAG_DATASOURCE,
                                        XmlUtil.attrs("id", "datasource",
@@ -2563,8 +2562,7 @@ public class IdvOutputHandler extends OutputHandler implements IdvConstants {
                         XmlUtil.attrs(
                             "id", "datasource", "url",
                             request.getAbsoluteUrl(
-                                getRepository().URL_ENTRY_SHOW
-                                + getDataOutputHandler().getOpendapUrl(
+                                getDataOutputHandler().getOpendapUrl(
                                     entry)))));
             } else {
                 isl.append(XmlUtil.openTag(ImageGenerator.TAG_DATASOURCE,
