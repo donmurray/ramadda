@@ -67,6 +67,7 @@ public class FeedTypeHandler extends ExtensibleGroupTypeHandler {
      *
      * @throws Exception _more_
      */
+    @Override
     public List<String> getSynthIds(Request request, Entry mainEntry,
                                     Entry parentEntry, String synthId)
             throws Exception {
@@ -98,6 +99,7 @@ public class FeedTypeHandler extends ExtensibleGroupTypeHandler {
      *
      * @throws Exception _more_
      */
+    @Override
     public TypeHandler getTypeHandlerForCopy(Entry entry) throws Exception {
         if ( !getEntryManager().isSynthEntry(entry.getId())) {
             return getRepository().getTypeHandler(TypeHandler.TYPE_GROUP);
@@ -453,6 +455,7 @@ public class FeedTypeHandler extends ExtensibleGroupTypeHandler {
      *
      * @throws Exception _more_
      */
+    @Override
     public Entry makeSynthEntry(Request request, Entry mainEntry, String id)
             throws Exception {
         id = getEntryManager().createSynthId(mainEntry, id);
@@ -496,6 +499,7 @@ public class FeedTypeHandler extends ExtensibleGroupTypeHandler {
      *
      * @return _more_
      */
+    @Override
     public Entry createEntry(String id) {
         return new Entry(id, this, true);
     }
