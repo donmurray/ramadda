@@ -1806,7 +1806,12 @@ public class Admin extends RepositoryManager {
             getRepository().getOutputHandlers();
 
         for (OutputHandler outputHandler : outputHandlers) {
-            outputHandler.getSystemStats(outputSB);
+            try {
+                outputHandler.getSystemStats(outputSB);
+            } catch(Exception exc) {
+                outputSB.append ("Error getting stats:" + exc);
+                getLogManager().logError("Error getting stats:", exc);
+            }
         }
         outputSB.append(HtmlUtils.formTableClose());
 
