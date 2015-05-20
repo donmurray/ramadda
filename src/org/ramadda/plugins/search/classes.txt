@@ -1,6 +1,7 @@
 org.ramadda.plugins.search.GoogleSearchProvider
 org.ramadda.plugins.search.DuckDuckGoSearchProvider
 org.ramadda.plugins.search.YouTubeSearchProvider
+org.ramadda.plugins.search.TwitterSearchProvider
 org.ramadda.plugins.search.FlickrSearchProvider
 
 
