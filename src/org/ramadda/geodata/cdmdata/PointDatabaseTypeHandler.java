@@ -63,7 +63,6 @@ import ucar.nc2.dt.TrajectoryObsDatatype;
 import ucar.nc2.dt.TypedDatasetFactory;
 
 import ucar.nc2.dt.grid.GridDataset;
-import ucar.nc2.dt.grid.NetcdfCFWriter;
 import ucar.nc2.dt.trajectory.TrajectoryObsDatasetFactory;
 
 import ucar.nc2.ft.FeatureCollection;

@@ -62,7 +62,6 @@ import ucar.nc2.dt.TrajectoryObsDataset;
 import ucar.nc2.dt.TrajectoryObsDatatype;
 import ucar.nc2.dt.grid.GridAsPointDataset;
 import ucar.nc2.dt.grid.GridDataset;
-import ucar.nc2.dt.grid.NetcdfCFWriter;
 import ucar.nc2.ft.FeatureCollection;
 import ucar.nc2.ft.FeatureDatasetPoint;
 import ucar.nc2.ft.NestedPointFeatureCollection;
