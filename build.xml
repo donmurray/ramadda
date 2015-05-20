@@ -343,6 +343,7 @@
         <include name="**/*.java"/>
         <exclude name="nom/**/*.java"/>
         <exclude name="com/**/*.java"/>
+        <exclude name="org/ramadda/plugins/userguide/htdocs/**/*.java"/>
         </javac>
     </target>
 

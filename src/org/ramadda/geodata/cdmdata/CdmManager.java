@@ -7,6 +7,18 @@
 package org.ramadda.geodata.cdmdata;
 
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Formatter;
+import java.util.HashSet;
+import java.util.Hashtable;
+import java.util.List;
+import java.util.regex.Pattern;
+
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
 import org.ramadda.repository.RepositoryManager;
@@ -16,11 +28,9 @@ import org.ramadda.repository.metadata.ContentMetadataHandler;
 import org.ramadda.repository.metadata.Metadata;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.ObjectPool;
-import org.ramadda.util.TTLCache;
 import org.ramadda.util.TempDir;
 
 import thredds.servlet.ThreddsConfig;
-
 import ucar.nc2.NetcdfFile;
 import ucar.nc2.constants.FeatureType;
 import ucar.nc2.dataset.NetcdfDataset;
@@ -31,24 +41,10 @@ import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.ft.FeatureDatasetFactoryManager;
 import ucar.nc2.ft.FeatureDatasetPoint;
 import ucar.nc2.util.DiskCache2;
-
 import ucar.unidata.util.Cache;
 import ucar.unidata.util.Counter;
 import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.StringUtil;
-
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.InputStream;
-import java.io.OutputStream;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Formatter;
-import java.util.HashSet;
-import java.util.Hashtable;
-import java.util.List;
-import java.util.regex.Pattern;
 
 
 /**

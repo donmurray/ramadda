@@ -33,7 +33,7 @@
         </delete>
     </target>
     <target name="publisherplugin" depends="init,clean">
-        <property name="pluginclasspath" value="${libdir}/tika-app-1.1.jar:${libdir}/idv.jar:${libdir}/external.jar:${libdir}/local-visad.jar:${libdir}/visad.jar:${libdir}/ncIdv.jar:${libdir}/jython.jar:{libdir}/doclint.jar:${libdir}/j2h.jar:${libdir}/ramaddatds.jar:${libdir}/ramaddalib.jar:${libdir}/servlet-api.jar"/>
+        <property name="pluginclasspath" value="${libdir}/tika-app-1.1.jar:${libdir}/idv.jar:${libdir}/external.jar:${libdir}/local-visad.jar:${libdir}/visad.jar:${libdir}/jython.jar:{libdir}/doclint.jar:${libdir}/j2h.jar:${libdir}/ramaddatds.jar:${libdir}/ramaddalib.jar:${libdir}/servlet-api.jar"/>
         <javac
             verbose="false"
             classpath="${pluginclasspath}"
@@ -446,7 +446,7 @@
 <!-- TODO: Fix this -->
 
     <target name="workshopplugin" depends="init,clean">
-        <property name="pluginclasspath" value="${libdir}/idv.jar:${libdir}/external.jar:${libdir}/local-visad.jar:${libdir}/visad.jar:${libdir}/ncIdv.jar:${libdir}/jython.jar:{libdir}/doclint.jar:${libdir}/j2h.jar:${libdir}/ramaddatds.jar:${libdir}/ramaddalib.jar:${libdir}/servlet-api.jar"/>
+        <property name="pluginclasspath" value="${libdir}/idv.jar:${libdir}/external.jar:${libdir}/local-visad.jar:${libdir}/visad.jar:${libdir}/jython.jar:{libdir}/doclint.jar:${libdir}/j2h.jar:${libdir}/ramaddatds.jar:${libdir}/ramaddalib.jar:${libdir}/servlet-api.jar"/>
         <javac
             verbose="false"
             classpath="${pluginclasspath}"
