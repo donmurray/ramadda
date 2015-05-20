@@ -188,7 +188,7 @@ public class MonitorManager extends RepositoryManager implements EntryChecker {
                       }
                     */
                 }
-            } catch(Exception ignore) {
+            } catch(Throwable ignore) {
                 System.err.println ("No monitor class found: " + ignore);
             }
         }
