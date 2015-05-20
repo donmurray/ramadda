@@ -681,7 +681,7 @@ public class PatternHarvester extends Harvester /*implements EntryInitializer*/ 
             if ( !rootDir.exists()) {
                 logHarvesterInfo("Root directory does not exist:" + rootDir);
             }
-            dirs.add(new HarvesterFile(rootDir));
+            dirs.add(new HarvesterFile(rootDir, rootDir, true));
             dirs.addAll(collectDirs(rootDir, topPattern, timestamp));
             if ( !canContinueRunning(timestamp)) {
                 return;
