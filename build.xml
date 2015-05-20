@@ -115,10 +115,11 @@
 
 
     <target name="plugin" depends="init,pluginclean">
+        <property name="plugin_extra_classes" value=""/>
         <property name="plugin_destdir" value="${dist_plugins}/plugins"/>
         <mkdir dir="${plugin_destdir}"/>
         <javac
-            classpath="${classpath}"
+            classpath="${classpath}:${plugin_extra_classes}"
             verbose="false"
             debug="true"
             deprecation="false" 
