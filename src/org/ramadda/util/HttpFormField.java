@@ -6,6 +6,12 @@
 
 package org.ramadda.util;
 
+
+import org.apache.commons.httpclient.*;
+import org.apache.commons.httpclient.methods.PostMethod;
+import org.apache.commons.httpclient.methods.multipart.*;
+import org.apache.commons.httpclient.params.HttpClientParams;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -16,11 +22,6 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-
-
-import org.apache.commons.httpclient.*;
-import org.apache.commons.httpclient.methods.PostMethod;
-import org.apache.commons.httpclient.methods.multipart.*;
 
 import ucar.unidata.util.*;
 
@@ -427,12 +428,32 @@ public class HttpFormField {
      */
     public static String[] doPost(List entries, String urlPath,
                                   boolean followRedirect) {
+
+        return doPost(entries, urlPath, null, followRedirect);
+    }
+
+    /**
+     * _more_
+     *
+     * @param entries _more_
+     * @param urlPath _more_
+     * @param params _more_
+     * @param followRedirect _more_
+     *
+     * @return _more_
+     */
+    public static String[] doPost(List entries, String urlPath,
+                                  HttpClientParams params,
+                                  boolean followRedirect) {
         try {
             PostMethod postMethod = null;
             int        numTries   = 0;
             while (numTries++ < 5) {
                 postMethod = getMethod(entries, urlPath);
                 HttpClient client = new HttpClient();
+                if (params != null) {
+                    client.setParams(params);
+                }
                 client.executeMethod(postMethod);
                 if ((postMethod.getStatusCode() >= 300)
                         && (postMethod.getStatusCode() <= 399)) {
