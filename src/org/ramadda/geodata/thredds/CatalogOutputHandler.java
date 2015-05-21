@@ -661,6 +661,10 @@ public class CatalogOutputHandler extends OutputHandler {
             if(type.equals(OutputHandler.OUTPUT_HTML.getId())) {
                 continue;
             }
+            //Skip json requests
+            if(type.indexOf("json") >= 0) {
+                continue;
+            }
             cnt++;
 
             Element subDataset = createDataset(catalogInfo, entry, dataset,
