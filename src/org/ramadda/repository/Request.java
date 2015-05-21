@@ -2318,12 +2318,15 @@ public class Request implements Constants, Cloneable {
         if ( !repository.useFixedHostnameForAbsoluteUrls()) {
             try {
                 if (httpServletRequest != null) {
-                    serverName = httpServletRequest.getServerName();
+                    serverName = httpServletRequest.getHeader("HTTP_X_FORWARDED_SERVER");
+                    if (serverName == null) {
+                        serverName = httpServletRequest.getServerName();
+                    }
                 }
             } catch (Exception ignoreThis) {}
         }
         if ( !Utils.stringDefined(serverName)) {
-            serverName = repository.getHostname();
+            serverName = repository.getHostname().trim();
         }
 
         return serverName;
