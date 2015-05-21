@@ -1,7 +1,7 @@
 <types supercategory="Miscellaneous">
 
   <type name="type_edgar_filing"  description="SEC EDGAR Filing"  handler="org.ramadda.plugins.biz.EdgarFilingTypeHandler" category="Business">
-     <property name="icon" value="/edgar/sec.png"/>
+     <property name="icon" value="/biz/sec.png"/>
 
      <column name="form_type"   label="Form Type" type="enumerationplus" cansearch="true" canlist="false" />
      <column name="accession_number"  type="string" label="Accession Number"/>
