@@ -33,7 +33,7 @@ import java.util.TimeZone;
  */
 public class EiaFile extends CsvFile {
 
-    /** _more_          */
+    /** _more_ */
     private StringBuilder buffer;
 
 

@@ -77,6 +77,8 @@ public class Eia {
 
     /** _more_ */
     public static final String ARG_OUT = "out";
+
+    /** _more_          */
     public static final String ARG_NUM = "num";
 
     /** _more_ */
@@ -85,7 +87,10 @@ public class Eia {
 
 
 
+    /** _more_          */
     public static final String ATTR_NAME = "name";
+
+    /** _more_          */
     public static final String ATTR_DESCRIPTION = "description";
 
 

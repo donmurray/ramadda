@@ -115,6 +115,7 @@ public class EiaCategoryTypeHandler extends ExtensibleGroupTypeHandler {
     public List<String> getSynthIds(Request request, Entry mainEntry,
                                     Entry parentEntry, String synthId)
             throws Exception {
+
         if ((parentEntry != null)
                 && !parentEntry.getTypeHandler().isType(Eia.TYPE_CATEGORY)) {
             return null;
@@ -175,7 +176,7 @@ public class EiaCategoryTypeHandler extends ExtensibleGroupTypeHandler {
         Element catsNode = XmlUtil.findChild(catNode,
                                              Eia.TAG_CHILDCATEGORIES);
         Element seriesNode = XmlUtil.findChild(catNode, Eia.TAG_CHILDSERIES);
-        List<Entry> catEntries = new ArrayList<Entry>();
+        List<Entry> catEntries    = new ArrayList<Entry>();
         List<Entry> seriesEntries = new ArrayList<Entry>();
         if (catsNode != null) {
             NodeList children = XmlUtil.getElements(catsNode, Eia.TAG_ROW);
@@ -199,21 +200,32 @@ public class EiaCategoryTypeHandler extends ExtensibleGroupTypeHandler {
                 Element item = (Element) children.item(childIdx);
                 String id = XmlUtil.getGrandChildText(item,
                                 Eia.TAG_SERIES_ID, "");
-                String name = XmlUtil.getGrandChildText(item, Eia.TAG_NAME,(String) null);
-                Entry entry = createSeriesEntry(mainEntry, parentEntry, id, name);
+                String name = XmlUtil.getGrandChildText(item, Eia.TAG_NAME,
+                                  (String) null);
+                Entry entry = createSeriesEntry(mainEntry, parentEntry, id,
+                                  name);
                 seriesEntries.add(entry);
             }
         }
 
         //Sort the entries
-        catEntries = getEntryManager().getEntryUtil().sortEntriesOnName(catEntries, false);
-        seriesEntries = getEntryManager().getEntryUtil().sortEntriesOnName(seriesEntries, false);
+        catEntries =
+            getEntryManager().getEntryUtil().sortEntriesOnName(catEntries,
+                false);
+        seriesEntries =
+            getEntryManager().getEntryUtil().sortEntriesOnName(seriesEntries,
+                false);
         ids = new ArrayList<String>();
-        for(Entry child: catEntries) ids.add(child.getId());
-        for(Entry child: seriesEntries) ids.add(child.getId());
+        for (Entry child : catEntries) {
+            ids.add(child.getId());
+        }
+        for (Entry child : seriesEntries) {
+            ids.add(child.getId());
+        }
         parentEntry.setChildIds(ids);
 
         return ids;
+
     }
 
 
@@ -333,7 +345,7 @@ public class EiaCategoryTypeHandler extends ExtensibleGroupTypeHandler {
                                     String seriesId, String name)
             throws Exception {
 
-        if (!Utils.stringDefined(name)) {
+        if ( !Utils.stringDefined(name)) {
             name = seriesId;
         }
 

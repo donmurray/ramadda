@@ -147,6 +147,7 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
     public List<String> getSynthIds(Request request, Entry mainEntry,
                                     Entry parentEntry, String synthId)
             throws Exception {
+
         if ((parentEntry != null)
                 && !parentEntry.getTypeHandler().isType(Fred.TYPE_CATEGORY)) {
             return null;
@@ -195,10 +196,10 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
 
 
 
-        List<Entry> catEntries = new ArrayList<Entry>();
-        List<Entry> seriesEntries = new ArrayList<Entry>();
+        List<Entry>  catEntries    = new ArrayList<Entry>();
+        List<Entry>  seriesEntries = new ArrayList<Entry>();
 
-        List<String> args = new ArrayList<String>();
+        List<String> args          = new ArrayList<String>();
         if (categoryId != null) {
             args.add(Fred.ARG_CATEGORY_ID);
             args.add(categoryId);
@@ -240,15 +241,24 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
             seriesEntries.add(entry);
         }
 
-        catEntries = getEntryManager().getEntryUtil().sortEntriesOnName(catEntries, false);
-        seriesEntries = getEntryManager().getEntryUtil().sortEntriesOnName(seriesEntries, false);
+        catEntries =
+            getEntryManager().getEntryUtil().sortEntriesOnName(catEntries,
+                false);
+        seriesEntries =
+            getEntryManager().getEntryUtil().sortEntriesOnName(seriesEntries,
+                false);
         ids = new ArrayList<String>();
-        for(Entry child: catEntries) ids.add(child.getId());
-        for(Entry child: seriesEntries) ids.add(child.getId());
+        for (Entry child : catEntries) {
+            ids.add(child.getId());
+        }
+        for (Entry child : seriesEntries) {
+            ids.add(child.getId());
+        }
 
         parentEntry.setChildIds(ids);
 
         return ids;
+
     }
 
 

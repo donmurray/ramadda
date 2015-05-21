@@ -105,6 +105,7 @@ public class EiaSeriesTypeHandler extends PointTypeHandler {
         String seriesId = (String) entry.getValue(IDX_SERIES_ID, null);
         if (seriesId == null) {
             System.err.println("No series id");
+
             return;
         }
 

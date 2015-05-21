@@ -33,15 +33,15 @@ import java.util.TimeZone;
 public class FredFile extends CsvFile {
 
 
-    /** _more_          */
+    /** _more_ */
     private StringBuilder buffer;
 
 
     /**
      *     ctor
-     *    
+     *
      *     @param filename _more_
-     *    
+     *
      *     @throws IOException _more_
      */
     public FredFile(String filename) throws IOException {
