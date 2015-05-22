@@ -52,6 +52,7 @@
       <ant antfile="${src_dir}/org/ramadda/plugins/phone/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/mail/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/biz/build.xml" inheritAll="false"/>
+      <ant antfile="${src_dir}/org/ramadda/plugins/socrata/build.xml" inheritAll="false"/>
 <!--
       <ant antfile="${src_dir}/org/ramadda/plugins/dropbox/build.xml" inheritAll="false"/>
       <ant antfile="${src_dir}/org/ramadda/plugins/box/build.xml" inheritAll="false"/>

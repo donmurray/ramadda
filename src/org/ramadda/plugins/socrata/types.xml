@@ -1,0 +1,57 @@
+<types supercategory="Miscellaneous" category="Business">
+
+
+  <type name="type_socrata_site"  description="Socrata Site"   foruser="true" handler="org.ramadda.plugins.socrata.SocrataTypeHandler">
+     <property name="icon" value="/socrata/socrata.png"/>
+     <property name="form.file.show" value="false"/>
+     <wiki><![CDATA[
++section # label="Socrata Site: {{name}}"
+<br>
+
+{{description wikify="true"}}
+
+{{tree details="false"}}
+
+
+-section
+
+]]>
+
+</wiki>
+
+  </type>
+
+
+
+  <type name="type_socrata_view"  description="Socrata View"  foruser="false" xxxhandler="org.ramadda.plugins.biz.FredSeriesTypeHandler" mefirst="true">
+     <property name="icon" value="/socrata/socrata.png"/>
+     <property name="html.date.show" value="false"/>
+     <property name="html.type.show" value="false"/>
+     <property name="html.owner.show" value="false"/>
+     <xxx_wiki_inner><![CDATA[
++section # label="FRED Time Series: {{name}}"
+<br>
+{{display type="linechart" title=""  height="200" width="800" column="0" layoutHere="true"}}
+<div style="margin:20px;max-height:300px;overflow-y:auto;">
+{{description wikify="true"}}
+</div>
++row
++col-md-8
+Data courtesy of the <a href="{{resource  url=true}}">Federal Reserve Economic Data</a> system.
+-col
++col-md-4
+<div style="text-align:right;">
+<a class="btn btn-primary" role="button" href="{{root}}/entry/show?entryid={{entryid}}&output=points.product&product=points.csv&asynch=false">Download CSV</a>
+</div>
+-col
+-row
+
+-section
+
+]]>
+
+</xxx_wiki_inner>
+
+  </type>
+
+</types>
