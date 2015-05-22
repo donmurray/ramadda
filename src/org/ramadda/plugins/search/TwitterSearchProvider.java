@@ -97,9 +97,8 @@ public class TwitterSearchProvider extends SearchProvider {
 
     private static void getCredentials() throws Exception {
         
-        //        String cred = getApiKey() +":" + getRepository().getProperty("twitter.api.secret","");
-
-        String cred = "YkqdOB7mKIBaMeP8MZxI7NijP" +":" + "ERx9DIQwxWk0Sd93Ah3qmLNhQfcQPsqjPEzXPAs6HBAVP4yJVj";
+        String cred = "todo:todo";
+        //getRepository().getProperty("twitter.api.key","")+":" + getRepository().getProperty("twitter.api.secret","");
         cred = Utils.encodeBase64(cred.getBytes());
         String url = "https://api.twitter.com/oauth2/token";
         HttpClientParams params  = new HttpClientParams();
