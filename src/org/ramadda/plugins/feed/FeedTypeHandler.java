@@ -417,17 +417,17 @@ public class FeedTypeHandler extends ExtensibleGroupTypeHandler {
             return items;
         }
 
+        String xml  = "";
         Element root;
         try {
-            root = XmlUtil.getRoot(url, getClass());
+            xml  = IOUtil.readContents(url, getClass());
+            root = XmlUtil.getRoot(xml);
         } catch (Exception exc) {
-            logError("Error reading feed:" + url, exc);
-
+            logError("Error reading feed:" + url +" xml:" + xml, exc);
             return items;
         }
         if (root == null) {
-            logError("Error reading feed:" + url, null);
-
+            logError("Error reading feed - root is null. url:" + url +" xml:" + xml, null);
             return items;
         }
         if (root.getTagName().equals(RssUtil.TAG_RSS)) {
