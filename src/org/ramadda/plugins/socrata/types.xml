@@ -1,16 +1,16 @@
 <types supercategory="Miscellaneous" category="Business">
 
-
-  <type name="type_socrata_site"  description="Socrata Site"   foruser="true" handler="org.ramadda.plugins.socrata.SocrataTypeHandler">
+  <type name="type_socrata_repository"  description="SOCRATA Repository"   foruser="true" handler="org.ramadda.plugins.socrata.SocrataTypeHandler">
      <property name="icon" value="/socrata/socrata.png"/>
-     <property name="form.file.show" value="false"/>
+     <property name="form.url.show" value="false"/>
      <wiki><![CDATA[
-+section # label="Socrata Site: {{name}}"
++section # label="SOCRATA Repository: {{name}}"
 <br>
 
 {{description wikify="true"}}
 
 {{tree details="false"}}
+
 
 
 -section
@@ -23,13 +23,49 @@
 
 
 
-  <type name="type_socrata_view"  description="Socrata View"  foruser="false" xxxhandler="org.ramadda.plugins.biz.FredSeriesTypeHandler" mefirst="true">
+  <type name="type_socrata_category"  description="SOCRATA Category"   foruser="false" handler="org.ramadda.plugins.socrata.SocrataCategoryTypeHandler">
      <property name="icon" value="/socrata/socrata.png"/>
+     <property name="form.resource.show" value="false"/>
+     <column name="category_id" type="string"  label="Category ID"  showinform="true" />
+     <wiki><![CDATA[
++section # label="SOCRATA Category: {{name}}"
+<br>
+
+{{description wikify="true"}}
+
+{{tree details="false"}}
+
+
+
+<p><br>
+
+Data courtesy of the <a href="{{resource  url=true}}">Energy Information Administration (SOCRATA)</a>.
+
+-section
+
+]]>
+
+</wiki>
+
+  </type>
+
+
+
+  <type name="type_socrata_series"  description="SOCRATA Series" super="type_point"  foruser="true" handler="org.ramadda.plugins.socrata.SocrataSeriesTypeHandler" mefirst="true">
+     <property name="icon" value="/socrata/series.png"/>
+     <property name="record.file.class" value="org.ramadda.plugins.socrata.SocrataFile"/>
+     <property name="form.resource.show" value="false"/>
+     <property name="form.properties.show" value="false"/>
+     <property name="point.initialize" value="false"/>
+
      <property name="html.date.show" value="false"/>
      <property name="html.type.show" value="false"/>
      <property name="html.owner.show" value="false"/>
-     <xxx_wiki_inner><![CDATA[
-+section # label="FRED Time Series: {{name}}"
+     <property name="html.numberofpoints.show" value="false"/>
+     <column name="repository" type="string"  label="Repository Base URL"   suffix="e.g., https://data.atf.gov" />
+     <column name="series_id" type="string"  label="Series ID"    />
+     <wiki_inner><![CDATA[
++section # label="SOCRATA Time Series: {{name}}"
 <br>
 {{display type="linechart" title=""  height="200" width="800" column="0" layoutHere="true"}}
 <div style="margin:20px;max-height:300px;overflow-y:auto;">
@@ -37,7 +73,6 @@
 </div>
 +row
 +col-md-8
-Data courtesy of the <a href="{{resource  url=true}}">Federal Reserve Economic Data</a> system.
 -col
 +col-md-4
 <div style="text-align:right;">
@@ -50,8 +85,9 @@ Data courtesy of the <a href="{{resource  url=true}}">Federal Reserve Economic D
 
 ]]>
 
-</xxx_wiki_inner>
+</wiki_inner>
 
   </type>
+
 
 </types>
