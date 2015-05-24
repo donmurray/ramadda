@@ -280,11 +280,21 @@ public class FeedTypeHandler extends ExtensibleGroupTypeHandler {
             }
 
             setLocation(item, entry);
+            String resourcePath = XmlUtil.getGrandChildText(item,
+                                      "feedburner:origLink", "");
+            NodeList links = XmlUtil.getElements(item, AtomUtil.TAG_LINK);
+            for (int linkIdx = 0; linkIdx < links.getLength(); linkIdx++) {
+                Element link = (Element) links.item(linkIdx);
+                if (XmlUtil.getAttribute(link, AtomUtil.ATTR_TYPE,
+                                         "").equals("text/html")) {
+                    resourcePath = XmlUtil.getAttribute(link,
+                            AtomUtil.ATTR_HREF, "");
 
-            String link = XmlUtil.getGrandChildText(item,
-                              "feedburner:origLink", "");
-            //TODO: look through the link tags 
-            Resource resource = new Resource(link);
+                    break;
+                }
+            }
+
+            Resource resource = new Resource(resourcePath);
             entry.initEntry(title, desc, mainEntry, mainEntry.getUser(),
                             resource, "", dttm.getTime(), dttm.getTime(),
                             dttm.getTime(), dttm.getTime(), null);
@@ -417,17 +427,29 @@ public class FeedTypeHandler extends ExtensibleGroupTypeHandler {
             return items;
         }
 
-        String xml  = "";
+        String  xml = "";
         Element root;
         try {
-            xml  = IOUtil.readContents(url, getClass());
-            root = XmlUtil.getRoot(xml);
-        } catch (Exception exc) {
-            logError("Error reading feed:" + url +" xml:" + xml, exc);
-            return items;
+            xml = IOUtil.readContents(url, getClass());
+        } catch (Exception firstExc) {
+            //Sleep a bit then try again
+            ucar.unidata.util.Misc.sleepSeconds(3);
+            try {
+                xml = IOUtil.readContents(url, getClass());
+            } catch (Exception secondExc) {
+                logError("Error reading feed:" + url + " xml:" + xml,
+                         secondExc);
+
+                return items;
+            }
         }
+
+        root = XmlUtil.getRoot(xml);
+
         if (root == null) {
-            logError("Error reading feed - root is null. url:" + url +" xml:" + xml, null);
+            logError("Error reading feed - root is null. url:" + url
+                     + " xml:" + xml, null);
+
             return items;
         }
         if (root.getTagName().equals(RssUtil.TAG_RSS)) {
