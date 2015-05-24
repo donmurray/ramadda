@@ -1460,8 +1460,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
             String superType = XmlUtil.getAttribute(entryNode,
                                    TypeHandler.ATTR_SUPER, (String) null);
             if (superType != null) {
-                TypeHandler parent =
-                    getRepository().getTypeHandler(superType, false, false);
+                TypeHandler parent =  getTypeHandler(superType, false, false);
                 if (parent == null) {
                     throw new IllegalArgumentException(
                         "Cannot find parent type:" + superType);
@@ -4445,7 +4444,8 @@ public class Repository extends RepositoryBase implements RequestHandler,
      * @throws Exception _more_
      */
     public TypeHandler getTypeHandler(String type) throws Exception {
-        return getTypeHandler(type, true, true);
+        //Change  this to not create a new type handler
+        return getTypeHandler(type, false, false);
     }
 
     /**
@@ -4484,7 +4484,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
 
         if (typeHandler == null) {
             if ( !makeNewOneIfNeeded) {
-                return getTypeHandler(TypeHandler.TYPE_ANY);
+                return getTypeHandler(TypeHandler.TYPE_ANY, true, true);
             }
             typeHandler = new TypeHandler(this, type);
             typeHandler.setForUser(false);
@@ -5260,7 +5260,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
         String[] types =
             SqlUtil.readString(getDatabaseManager().getIterator(stmt), 1);
         for (int i = 0; i < types.length; i++) {
-            TypeHandler typeHandler = getTypeHandler(types[i]);
+            TypeHandler typeHandler = getTypeHandler(types[i], false, false);
 
             if (types[i].equals(TypeHandler.TYPE_ANY)) {
                 tmp.add(0, typeHandler);
