@@ -3,6 +3,7 @@ org.ramadda.plugins.search.DuckDuckGoSearchProvider
 org.ramadda.plugins.search.YouTubeSearchProvider
 org.ramadda.plugins.search.TwitterSearchProvider
 org.ramadda.plugins.search.FlickrSearchProvider
+org.ramadda.plugins.search.ArxivSearchProvider
 
 
 #For open search the form is:
