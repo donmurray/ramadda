@@ -2558,16 +2558,16 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         if (props == null) {
             props = new Hashtable();
         }
+        
+        request = request.cloneMe();
 
         //If there is a max property then clone the request and set the max
         //For some reason we are using both count and max as attrs
         int count = Misc.getProperty(props, attrPrefix + ATTR_COUNT, -1);
         int max   = Misc.getProperty(props, attrPrefix + ATTR_MAX, count);
         if (max > 0) {
-            request = request.cloneMe();
             request.put(ARG_MAX, "" + max);
         }
-
 
 
         List<Entry> entries = getEntries(request, entry, userDefinedEntries,
@@ -2898,13 +2898,13 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 if (searchProps == null) {
                     searchProps = props;
                 }
+
                 myRequest.put(ARG_AREA_MODE,
                               Misc.getProperty(searchProps, ARG_AREA_MODE,
                                   VALUE_AREA_CONTAINS));
                 myRequest.put(ARG_MAX,
                               Misc.getProperty(searchProps,
                                   PREFIX_SEARCH + ARG_MAX, "100"));
-
                 addSearchTerms(myRequest, searchProps, theBaseEntry);
 
                 if (isRemote) {
@@ -2925,10 +2925,11 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                     continue;
                 }
 
-                List<Entry>[] pair = getEntryManager().getEntries(myRequest);
+                List<Entry>[] pair =    getSearchManager().doSearch(myRequest, new StringBuilder());
+                //                if(myRequest.defined(ARG_PROVIDER)) {
+                //List<Entry>[] pair = getEntryManager().getEntries(myRequest);
                 entries.addAll(pair[0]);
                 entries.addAll(pair[1]);
-
                 continue;
             }
 

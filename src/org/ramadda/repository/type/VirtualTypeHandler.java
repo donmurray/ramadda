@@ -128,12 +128,16 @@ public class VirtualTypeHandler extends ExtensibleGroupTypeHandler {
     public List<String> getSynthIds(Request request, Entry mainEntry,
                                     Entry parentEntry, String synthId)
             throws Exception {
-        List<String> ids      = new ArrayList<String>();
-        String       idString = (String) mainEntry.getValue(0, "");
-        idString = idString.replace(",", "_COMMA_");
+
+        List<String> ids = mainEntry.getChildIds();
+        if (ids != null) {
+            return ids;
+        }
+
+        ids      = new ArrayList<String>();
+        String       idString = (String) mainEntry.getValue(0, "").replace(",", "_COMMA_");
         List<String> lines = StringUtil.split(idString, "\n", true, true);
         idString = StringUtil.join(",", lines);
-
 
         List<Entry> entries = getWikiManager().getEntries(request, mainEntry,
                                   mainEntry, idString, null, false, "");
@@ -141,6 +145,7 @@ public class VirtualTypeHandler extends ExtensibleGroupTypeHandler {
             ids.add(entry.getId());
         }
 
+        mainEntry.setChildIds(ids);
         return ids;
     }
 
