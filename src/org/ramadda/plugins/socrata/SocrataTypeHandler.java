@@ -11,9 +11,7 @@ import org.json.*;
 
 
 import org.ramadda.repository.*;
-import org.ramadda.repository.metadata.*;
 import org.ramadda.repository.type.*;
-import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Json;
 import org.ramadda.util.Utils;
 
@@ -40,10 +38,10 @@ import java.util.List;
 public class SocrataTypeHandler extends ExtensibleGroupTypeHandler {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String PREFIX_CATEGORY = "category";
 
-    /** _more_          */
+    /** _more_ */
     public static final String PREFIX_SERIES = "series";
 
     /** _more_ */
