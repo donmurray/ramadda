@@ -4813,7 +4813,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
                     msg("No documentation available")));
         }
         CategoryBuffer cats = new CategoryBuffer();
-        for(String cat: new String[]{"Basic", "Integration","Other Documentation", "Advanced"}) {
+        for(String cat: new String[]{"Basics", "Integration","Other Documentation", "Advanced"}) {
             cats.get(cat);
         }
         for (String[] url : docUrls) {
