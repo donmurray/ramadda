@@ -159,6 +159,8 @@ public class PluginManager extends RepositoryManager {
     /** _more_ */
     private List<String[]> docUrls = new ArrayList<String[]>();
 
+    private List<String[]> lastDocUrls = new ArrayList<String[]>();
+
     /** _more_ */
     private List<Class> adminHandlerClasses = new ArrayList<Class>();
 
@@ -837,6 +839,7 @@ public class PluginManager extends RepositoryManager {
 
 
 
+
             String entryName = jarEntry.getName();
             int    idx       = entryName.indexOf("htdocs/");
 
@@ -851,15 +854,16 @@ public class PluginManager extends RepositoryManager {
                         Pattern pattern =
                             Pattern.compile("(?s).*<title>(.*)</title>");
                         Matcher matcher = pattern.matcher(contents);
+                        String category = StringUtil.findPattern(contents, "<category:([^>]+)>");
                         String  title   = htpath;
                         if (matcher.find()) {
                             title = matcher.group(1);
                         }
                         String url = htpath;
                         if (htpath.startsWith("/userguide")) {
-                            docUrls.add(0, new String[] { url, title });
+                            docUrls.add(0, new String[] { url, title, category==null?"Basics":category });
                         } else {
-                            docUrls.add(new String[] { url, title });
+                            docUrls.add(new String[] { url, title, category });
                         }
                     } catch (Exception exc) {
                         throw new RuntimeException(exc);

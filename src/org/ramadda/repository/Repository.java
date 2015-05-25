@@ -42,15 +42,18 @@ import org.ramadda.repository.output.XmlOutputHandler;
 import org.ramadda.repository.output.ZipOutputHandler;
 import org.ramadda.repository.search.SearchManager;
 
+
 import org.ramadda.repository.type.Column;
 import org.ramadda.repository.type.GroupTypeHandler;
 import org.ramadda.repository.type.ProcessFileTypeHandler;
 import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.repository.util.ServerInfo;
 
+
 import org.ramadda.service.Service;
 import org.ramadda.sql.Clause;
 import org.ramadda.sql.SqlUtil;
+import org.ramadda.util.CategoryList;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Json;
 import org.ramadda.util.MyTrace;
@@ -4809,14 +4812,25 @@ public class Repository extends RepositoryBase implements RequestHandler,
                 getPageHandler().showDialogNote(
                     msg("No documentation available")));
         }
-        sb.append("<ul>");
+
+        CategoryList<String> cats = new CategoryList<String>();
         for (String[] url : docUrls) {
-            sb.append("<li>");
+            StringBuilder tmpSB = new StringBuilder();
+            tmpSB.append("<li>");
             String fullUrl = getUrlBase() + url[0];
-            sb.append(HtmlUtils.href(fullUrl, url[1]));
-            sb.append("<br>&nbsp;");
+            tmpSB.append(HtmlUtils.href(fullUrl, url[1]));
+            tmpSB.append("<br>&nbsp;");
+            cats.add(url[2]==null?"Other Documentation":url[2], tmpSB.toString());
         }
-        sb.append("</ul>");
+        for(String cat: cats.getCategories()) {
+            sb.append(HtmlUtils.h3(cat));
+            sb.append("<ul>");
+            for(String item:cats.get(cat)) {
+                sb.append(item);
+            }
+            sb.append("</ul>");
+        }
+
         sb.append(HtmlUtils.sectionClose());
 
         return new Result("Documentation", sb);

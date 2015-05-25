@@ -1212,6 +1212,27 @@ public class Request implements Constants, Cloneable {
      * _more_
      *
      * @param key _more_
+     * @param value _more_
+     */
+    public void putMultiples(Object key, Object value) {
+        Object existing = parameters.get(key);
+        if ((existing != null) && (existing instanceof List)) {
+            ((List) existing).add(value);
+        } else {
+            List l = new ArrayList();
+            if (existing != null) {
+                l.add(existing);
+            }
+            l.add(value);
+            parameters.put(key, l);
+        }
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param key _more_
      *
      * @return _more_
      */
@@ -2318,7 +2339,8 @@ public class Request implements Constants, Cloneable {
         if ( !repository.useFixedHostnameForAbsoluteUrls()) {
             try {
                 if (httpServletRequest != null) {
-                    serverName = httpServletRequest.getHeader("HTTP_X_FORWARDED_SERVER");
+                    serverName = httpServletRequest.getHeader(
+                        "HTTP_X_FORWARDED_SERVER");
                     if (serverName == null) {
                         serverName = httpServletRequest.getServerName();
                     }
