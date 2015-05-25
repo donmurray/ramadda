@@ -53,7 +53,7 @@ import org.ramadda.repository.util.ServerInfo;
 import org.ramadda.service.Service;
 import org.ramadda.sql.Clause;
 import org.ramadda.sql.SqlUtil;
-import org.ramadda.util.CategoryList;
+import org.ramadda.util.CategoryBuffer;
 import org.ramadda.util.HtmlUtils;
 import org.ramadda.util.Json;
 import org.ramadda.util.MyTrace;
@@ -4812,23 +4812,26 @@ public class Repository extends RepositoryBase implements RequestHandler,
                 getPageHandler().showDialogNote(
                     msg("No documentation available")));
         }
-
-        CategoryList<String> cats = new CategoryList<String>();
+        CategoryBuffer cats = new CategoryBuffer();
+        for(String cat: new String[]{"Basic", "Integration","Other Documentation", "Advanced"}) {
+            cats.get(cat);
+        }
         for (String[] url : docUrls) {
             StringBuilder tmpSB = new StringBuilder();
             tmpSB.append("<li>");
             String fullUrl = getUrlBase() + url[0];
             tmpSB.append(HtmlUtils.href(fullUrl, url[1]));
             tmpSB.append("<br>&nbsp;");
-            cats.add(url[2]==null?"Other Documentation":url[2], tmpSB.toString());
+            cats.get(url[2]==null?"Other Documentation":url[2]).append(tmpSB.toString());
         }
         for(String cat: cats.getCategories()) {
-            sb.append(HtmlUtils.h3(cat));
-            sb.append("<ul>");
-            for(String item:cats.get(cat)) {
-                sb.append(item);
+            StringBuffer cb = cats.get(cat);
+            if(cb.length()>0) {
+                sb.append(HtmlUtils.h3(cat));
+                sb.append("<ul>");
+                sb.append(cb);
+                sb.append("</ul>");
             }
-            sb.append("</ul>");
         }
 
         sb.append(HtmlUtils.sectionClose());
