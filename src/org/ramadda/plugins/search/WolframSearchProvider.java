@@ -286,7 +286,7 @@ public class WolframSearchProvider extends SearchProvider {
                         new Metadata(getRepository().getGUID(),
                                      newEntry.getId(),
                                      ContentMetadataHandler.TYPE_ATTACHMENT,
-                                     false, imgUrl, null, null, null, null);
+                                     false, imgUrl, "image", null, null, null);
                     newEntry.addMetadata(metadata);
                     desc.append(XmlUtil.toString(img, false));
                 }

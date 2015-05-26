@@ -41,7 +41,6 @@ import ucar.unidata.util.IOUtil;
 import ucar.unidata.util.Misc;
 
 import ucar.unidata.util.StringUtil;
-import ucar.unidata.util.TwoFacedObject;
 import ucar.unidata.xml.XmlUtil;
 
 import java.io.*;
@@ -523,24 +522,22 @@ public class SlackHarvester extends Harvester {
                 "/r search -provider (google|all|this) search terms",
                 Constants.MIME_TEXT);
         }
-        String providerId = Utils.getArg("-provider", args.getArgs(), null);
-        if(providerId == null) {
-            for(SearchProvider provider: getRepository().getSearchManager().getSearchProviders()) {
-                if(args.getArgs().contains(provider.getId())) {
-                    providerId = provider.getId();
-                    break;
-                }
-            }
-            if(args.getArgs().contains("all")) {
-                providerId = "all";
-            }
-        }
-        System.err.println("provider:" + providerId + " text:"   + args.getText());
         request = request.cloneMe();
         request.put(ARG_TEXT, args.getText());
+
+        String providerId = Utils.getArg("-provider", args.getArgs(), null);
         if (providerId != null) {
             request.put(SearchManager.ARG_PROVIDER,providerId);
+        } else {
+            //TODO: put this in a map
+            for(SearchProvider provider: getRepository().getSearchManager().getSearchProviders()) {
+                if(args.getArgs().contains("-" + provider.getId())) {
+                    request.putMultiples(SearchManager.ARG_PROVIDER,provider.getId());
+                }
+            }
         }
+
+
         List[] pair = getSearchManager().doSearch(request,
                           new StringBuilder());
         pair[0].addAll(pair[1]);
@@ -568,10 +565,15 @@ public class SlackHarvester extends Harvester {
         StringBuilder textSB  = new StringBuilder();
         String lastTok = null;
         for (int i = 0; i < toks.size(); i++) {
-        String tok = toks.get(i);
-            if (tok.startsWith("-") && (i < toks.size() - 1)) {
-                i++;
-                continue;
+            String tok = toks.get(i);
+            if (tok.startsWith("-")) {
+                if(getSearchManager().getSearchProvider(tok.substring(1))!=null) {
+                    continue;
+                }
+                if (i < toks.size() - 1) {
+                    i++;
+                    continue;
+                }
             }
             lastTok = tok;
         }

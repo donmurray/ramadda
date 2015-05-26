@@ -464,6 +464,17 @@ public class Slack {
                         .getAbsoluteUrl(request.getRepository()
                             .getHtmlOutputHandler()
                             .getImageUrl(request, entry, true))));
+            } else {
+                for(Metadata metadata: entry.getMetadata()) {
+                    if(metadata.getType().equals(ContentMetadataHandler.TYPE_ATTACHMENT) &&
+                       metadata.getAttr1().startsWith("http")) {
+                        if(Utils.isImage(metadata.getAttr1()) || Misc.equals(metadata.getAttr2(),"image")) {
+                            map.add("image_url");
+                            map.add(Json.quote(metadata.getAttr1()));
+                            break;
+                        }
+                    }
+                }
             }
             map.add("fields");
             map.add(Json.list(fields));
@@ -472,7 +483,7 @@ public class Slack {
         }
         String attachments = Json.list(maps);
 
-        //        System.err.println("attachments:" + attachments);
+        System.err.println("attachments:" + attachments);
         return attachments;
 
     }
