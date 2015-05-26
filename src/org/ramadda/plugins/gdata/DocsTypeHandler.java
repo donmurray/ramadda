@@ -134,10 +134,14 @@ public class DocsTypeHandler extends GdataTypeHandler {
     public List<String> getSynthIds(Request request, Entry mainEntry,
                                     Entry parentEntry, String synthId)
             throws Exception {
-        Hashtable<String, Entry> entryMap = new Hashtable<String, Entry>();
-
-        return getSynthIds(request, mainEntry, parentEntry, synthId,
-                           entryMap);
+        try {
+            Hashtable<String, Entry> entryMap = new Hashtable<String, Entry>();
+            return getSynthIds(request, mainEntry, parentEntry, synthId,
+                               entryMap);
+        } catch(Exception exc) {
+            getLogManager().logError("gdata.getSynthIds: " + mainEntry, exc);
+            return new ArrayList<String>();
+        }
     }
 
     /**
