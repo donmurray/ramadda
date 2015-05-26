@@ -13,10 +13,10 @@ import org.ramadda.repository.*;
 import org.ramadda.repository.metadata.*;
 import org.ramadda.repository.search.*;
 import org.ramadda.repository.type.*;
+import org.ramadda.util.HtmlUtils;
 
 import org.ramadda.util.Json;
 import org.ramadda.util.Utils;
-import org.ramadda.util.HtmlUtils;
 
 
 
@@ -113,15 +113,15 @@ public class YouTubeSearchProvider extends SearchProvider {
                             HtmlUtils.urlEncode(request.getString(ARG_TEXT,
                                 "")));
         System.err.println(getName() + " search url:" + url);
-        URLConnection connection = new URL(url).openConnection();
-        connection.setRequestProperty("User-Agent", "ramadda");
-        InputStream is   = connection.getInputStream();
+        InputStream is   = getInputStream(url);
         String      json = IOUtil.readContents(is);
+        IOUtil.close(is);
         //        System.out.println("xml:" + json);
         JSONObject obj = new JSONObject(new JSONTokener(json));
         if ( !obj.has("items")) {
             System.err.println(
                 "YouTube SearchProvider: no items field in json:" + json);
+
             return entries;
         }
 

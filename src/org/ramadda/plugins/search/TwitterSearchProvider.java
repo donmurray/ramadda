@@ -7,6 +7,9 @@
 package org.ramadda.plugins.search;
 
 
+import org.apache.commons.httpclient.params.HttpClientParams;
+
+
 
 import org.json.*;
 
@@ -14,13 +17,12 @@ import org.ramadda.repository.*;
 import org.ramadda.repository.metadata.*;
 import org.ramadda.repository.search.*;
 import org.ramadda.repository.type.*;
-
-import org.ramadda.util.Json;
-import org.ramadda.util.Utils;
 import org.ramadda.util.HtmlUtils;
 
 import org.ramadda.util.HttpFormField;
-import org.apache.commons.httpclient.params.HttpClientParams;
+
+import org.ramadda.util.Json;
+import org.ramadda.util.Utils;
 
 
 
@@ -71,7 +73,7 @@ public class TwitterSearchProvider extends SearchProvider {
     /** _more_ */
     private static final String ARG_BBOX = "bbox";
 
-    
+
 
 
 
@@ -95,24 +97,37 @@ public class TwitterSearchProvider extends SearchProvider {
     }
 
 
+    /**
+     * _more_
+     *
+     * @throws Exception _more_
+     */
     private static void getCredentials() throws Exception {
-        
+
         String cred = "todo:todo";
         //getRepository().getProperty("twitter.api.key","")+":" + getRepository().getProperty("twitter.api.secret","");
         cred = Utils.encodeBase64(cred.getBytes());
-        String url = "https://api.twitter.com/oauth2/token";
-        HttpClientParams params  = new HttpClientParams();
+        String           url    = "https://api.twitter.com/oauth2/token";
+        HttpClientParams params = new HttpClientParams();
         System.err.println("Basic " + cred);
-        params.setParameter("Authorization","Basic " + cred);
-        params.setParameter("Content-Type","application/x-www-form-urlencoded");
+        params.setParameter("Authorization", "Basic " + cred);
+        params.setParameter("Content-Type",
+                            "application/x-www-form-urlencoded");
 
         List entries = new ArrayList();
-        entries.add(HttpFormField.hidden("grant_type","client_credentials"));
-        String [] result = HttpFormField.doPost(entries, url, params, true);
-        System.err.println("result:" + result[0] +" " + result[1]);
+        entries.add(HttpFormField.hidden("grant_type", "client_credentials"));
+        String[] result = HttpFormField.doPost(entries, url, params, true);
+        System.err.println("result:" + result[0] + " " + result[1]);
     }
 
-    public static void main(String[]args) throws Exception {
+    /**
+     * _more_
+     *
+     * @param args _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void main(String[] args) throws Exception {
         getCredentials();
     }
 
@@ -146,6 +161,7 @@ public class TwitterSearchProvider extends SearchProvider {
         if ( !obj.has("items")) {
             System.err.println(
                 "YouTube SearchProvider: no items field in json:" + json);
+
             return entries;
         }
 
