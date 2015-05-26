@@ -393,6 +393,7 @@ public class Slack {
         List<String> maps = new ArrayList<String>();
 
         int          cnt  = 0;
+        int imageCnt = 0;
         for (Entry entry : entries) {
             cnt++;
             List<String> map = new ArrayList<String>();
@@ -457,23 +458,34 @@ public class Slack {
             fields.add(Json.map("title", Json.quote("From date"),
                                 "value",Json.quote(getWikiManager().formatDate(request,  new Date(entry.getCreateDate()), entry))));
             */
-            if ((request != null) && entry.getResource().isImage()) {
-                map.add("image_url");
-                map.add(Json
-                    .quote(request
-                        .getAbsoluteUrl(request.getRepository()
-                            .getHtmlOutputHandler()
-                            .getImageUrl(request, entry, true))));
-            } else {
+            String imageUrl = null;
+
+
+            if (entry.getResource().isImage()) {
+                if (entry.getResource().isUrl()) {
+                    imageUrl = entry.getResource().getPath();
+                } else if(request != null) {
+                    imageUrl = request.getAbsoluteUrl(request.getRepository().getHtmlOutputHandler().getImageUrl(request, entry, true));
+                } 
+            } 
+            if(imageUrl!=null) {
                 for(Metadata metadata: entry.getMetadata()) {
                     if(metadata.getType().equals(ContentMetadataHandler.TYPE_ATTACHMENT) &&
                        metadata.getAttr1().startsWith("http")) {
                         if(Utils.isImage(metadata.getAttr1()) || Misc.equals(metadata.getAttr2(),"image")) {
-                            map.add("image_url");
-                            map.add(Json.quote(metadata.getAttr1()));
+                            imageUrl = metadata.getAttr1();
                             break;
                         }
                     }
+                }
+            }
+
+
+            if(imageUrl!=null) {
+                //Only include images for the first 20 entries
+                if(imageCnt++<20) {
+                    map.add("image_url");
+                    map.add(Json.quote(imageUrl));
                 }
             }
             map.add("fields");
