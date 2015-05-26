@@ -7,9 +7,15 @@
 package org.ramadda.repository.search;
 
 
+
 import org.ramadda.repository.*;
 import org.ramadda.repository.type.*;
 import org.ramadda.sql.Clause;
+
+import java.io.*;
+
+import java.net.URL;
+import java.net.URLConnection;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -189,5 +195,35 @@ public abstract class SearchProvider extends GenericTypeHandler {
         }
 
     }
+
+    /**
+     * _more_
+     *
+     * @param url _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public URLConnection getConnection(String url) throws Exception {
+        URLConnection connection = new URL(url).openConnection();
+        connection.setRequestProperty("User-Agent", "ramadda");
+
+        return connection;
+    }
+
+    /**
+     * _more_
+     *
+     * @param url _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    public InputStream getInputStream(String url) throws Exception {
+        return getConnection(url).getInputStream();
+    }
+
 
 }
