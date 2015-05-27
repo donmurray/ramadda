@@ -6708,6 +6708,9 @@ public class EntryManager extends RepositoryManager {
                     //id,type,name,desc,group,user,file,createdata,fromdate,todate
                     TypeHandler localTypeHandler =
                         getRepository().getTypeHandler(results.getString(2));
+                    if(localTypeHandler==null) {
+                        continue;
+                    }
                     entry = localTypeHandler.createEntryFromDatabase(results);
                     cacheEntry(entry);
                 }
