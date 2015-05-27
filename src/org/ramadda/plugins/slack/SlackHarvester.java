@@ -548,6 +548,8 @@ public class SlackHarvester extends Harvester {
             }
         }
 
+        request.put("slack.args", args.getArgs());
+
 
         List[] pair = getSearchManager().doSearch(request,
                           new StringBuilder());

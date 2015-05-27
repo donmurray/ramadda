@@ -240,10 +240,12 @@ public class WolframSearchProvider extends SearchProvider {
                                   Appendable searchCriteriaSB)
             throws Exception {
 
+        String searchText = request.getString(ARG_TEXT, "");
         List<Entry> entries = new ArrayList<Entry>();
         String searchUrl = HtmlUtils.url(URL, ARG_APPID, getApiKey(),
                                          ARG_INPUT,
-                                         request.getString(ARG_TEXT, ""));
+                                         searchText);
+        List<String> args = request.get("slack.args", new ArrayList<String>());
         System.err.println(getName() + " search url:" + searchUrl);
         InputStream is  = getInputStream(searchUrl);
         String      xml = IOUtil.readContents(is);
@@ -253,6 +255,10 @@ public class WolframSearchProvider extends SearchProvider {
         Element     root        = XmlUtil.getRoot(xml);
         NodeList    pods        = XmlUtil.getElements(root, TAG_POD);
         TypeHandler typeHandler = getLinkTypeHandler();
+
+        boolean includeText = args.contains("-text");
+        boolean excludeMatch = args.contains("-exclude");
+
 
         for (int childIdx = 0; childIdx < pods.getLength(); childIdx++) {
             Element pod = (Element) pods.item(childIdx);
@@ -273,8 +279,9 @@ public class WolframSearchProvider extends SearchProvider {
                 String plainText = XmlUtil.getGrandChildText(subPod,
                                        TAG_PLAINTEXT);
                 if (Utils.stringDefined(plainText)) {
-                    //Not for now
-                    //                    desc.append(HtmlUtils.pre(plainText));
+                    if(includeText) {
+                        desc.append(HtmlUtils.pre(plainText));
+                    }
                 }
                 Element img = XmlUtil.findChild(subPod, TAG_IMG);
                 if (img != null) {
@@ -305,6 +312,19 @@ public class WolframSearchProvider extends SearchProvider {
                 desc.append("\n");
             }
 
+
+            if(excludeMatch) {
+                String s = searchText.toLowerCase();
+                String d = desc.toString().toLowerCase();
+                String n = name.toLowerCase();
+                //TODO - make this better
+                if(d.indexOf(s)>=0) {
+                    continue;
+                }
+                if(n.indexOf(s)>=0) {
+                    continue;
+                }
+            }
 
             Date     dttm     = new Date();
             Date     fromDate = dttm,
