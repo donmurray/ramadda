@@ -254,14 +254,14 @@ public class Slack {
                 url += "&" + args;
             }
             //            System.err.println ("Slack api call:" + url);
-            System.err.println("Slack.call:" + url);
+            System.err.println("Slack call:" + url);
             String json = IOUtil.readContents(new URL(url));
             if (json == null) {
                 return null;
             }
             JSONObject obj = new JSONObject(json);
             if (debug) {
-                System.err.println("JSON:" + json);
+                System.out.println("JSON:" + json);
             }
             if ( !Json.readValue(obj, Slack.JSON_OK,
                                  "false").equals("true")) {
@@ -416,11 +416,16 @@ public class Slack {
             if (metadataList != null) {
                 for (Metadata metadata : metadataList) {
                     //A hack for urls
-                    if (Misc.equals(metadata.getType(), ContentMetadataHandler.TYPE_THUMBNAIL)) {
+                    if (Misc.equals(metadata.getType(),
+                                    ContentMetadataHandler.TYPE_THUMBNAIL)) {
                         imageUrls.add(metadata.getAttr1());
-                    } else if (Misc.equals(metadata.getType(), ContentMetadataHandler.TYPE_ATTACHMENT) && 
-                                           metadata.getAttr1() != null && 
-                                           metadata.getAttr1().startsWith("http")) {
+                    } else if (Misc
+                            .equals(metadata.getType(),
+                                    ContentMetadataHandler
+                                        .TYPE_ATTACHMENT) && (metadata
+                                            .getAttr1() != null) && metadata
+                                                .getAttr1()
+                                                    .startsWith("http")) {
                         if (Utils.isImage(metadata.getAttr1())
                                 || Misc.equals(metadata.getAttr2(),
                                     "image")) {

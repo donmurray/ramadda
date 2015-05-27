@@ -206,26 +206,35 @@ public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
             }
         } else {
             //do message listing
+            //            Slack.debug = true;
             JSONObject result =
                 Slack.call(getRepository(), Slack.API_SEARCH_MESSAGES, token,
                            HtmlUtils.arg(Slack.ARG_QUERY,
                                          Slack.in(parentEntry.getName())));
+            Slack.debug = false;
             if (result == null) {
                 return ids;
             }
             String channelId =
                 parentEntry.getValue(SlackChannelTypeHandler.IDX_CHANNEL_ID,
                                      "");
-            JSONObject messages = result.getJSONObject("messages");
-            JSONArray  matches  = messages.getJSONArray("matches");
+            JSONObject  messages       = result.getJSONObject("messages");
+            JSONArray   matches        = messages.getJSONArray("matches");
+            List<Entry> messageEntries = new ArrayList<Entry>();
             for (int i = 0; i < matches.length(); i++) {
                 JSONObject message = matches.getJSONObject(i);
                 Entry messageEntry = createMessageEntry(request, teamEntry,
                                          channelId, message);
                 getEntryManager().cacheEntry(messageEntry);
+                messageEntries.add(messageEntry);
+            }
+            messageEntries =
+                getEntryManager().getEntryUtil().sortEntriesOnDate(
+                    messageEntries, true);
+
+            for (Entry messageEntry : messageEntries) {
                 ids.add(messageEntry.getId());
             }
-
 
         }
         parentEntry.setChildIds(ids);
@@ -334,9 +343,18 @@ public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
         if (slackUser != null) {
             userName = slackUser.getName();
         }
-        String ts    = Json.readValue(message, "ts", "");
-        Date   dttm  = Slack.getDate(ts);
-        String desc  = Json.readValue(message, "text", "");
+        String ts          = Json.readValue(message, "ts", "");
+        Date   dttm        = Slack.getDate(ts);
+        String desc        = Json.readValue(message, "text", "");
+
+        String pattern     = ".*?<([^>|]+)|([^>]+)>";
+        String embeddedUrl = StringUtil.findPattern(desc, pattern);
+        if ((embeddedUrl != null) && Utils.isImage(embeddedUrl)) {
+            //            desc = desc + HtmlUtils.br() +HtmlUtils.href(embeddedUrl, embeddedUrl);
+        }
+        //        System.err.println("desc:" + desc);
+        //xxxx
+
         String link  = Json.readValue(message, "permalink", (String) null);
         String dttms = displaySdf.format(dttm);
         String name  = userName + ": " + dttms;
@@ -515,6 +533,23 @@ public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
         String     image48 = Json.readValue(profile, "image_48", null);
 
         return new SlackUser(token, userId, name, image24, image48);
+    }
+
+    /**
+     * _more_
+     *
+     * @param args _more_
+     *
+     * @throws Exception _more_
+     */
+    public static final void main(String[] args) throws Exception {
+        String text =
+            "uplaoded file: <https://geodesystems.slack.com/files/jeffmc/F04RL38SR/real_gross_national_product_timeseries.png|Time series - Real Gross National Product> and commented: BEA Account Code: A001RL1  For more information about this series, please see <http://www.bea.gov/national/>.";
+
+        String pattern = ".*?<([^>|]+)|([^>]+)>";
+        System.err.println(StringUtil.findPattern(text, pattern));
+
+
     }
 
 

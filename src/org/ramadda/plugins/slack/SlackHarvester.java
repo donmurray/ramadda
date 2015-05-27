@@ -134,8 +134,11 @@ public class SlackHarvester extends Harvester {
 
 
 
-    public static final String[] ARGS_SINGLE = {"-help"};
-    public static final String[] ARGS_PAIR = {"-entry","-provider"};
+    /** _more_          */
+    public static final String[] ARGS_SINGLE = { "-help" };
+
+    /** _more_          */
+    public static final String[] ARGS_PAIR = { "-entry", "-provider" };
 
 
     /**
