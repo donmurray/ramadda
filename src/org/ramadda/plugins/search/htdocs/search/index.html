@@ -5,12 +5,15 @@
 <div class="ramadda-section">
 <h2>Search Integration</h2>
 
-RAMADDA can search both its own local repository as well as other sources of content - Google, YoutTube, DuckDuckGo, Flickr, etc. By default only the local RAMADDA is searched. You can select what other search providers to use in the Advanced Search form under Providers.
+RAMADDA can search both its own local repository as well as other sources of content - Google, YouTube, Wolfram/Alpha, DuckDuckGo, Flickr, etc. 
+By default only the local RAMADDA is searched. You can select what other search providers to use in the Advanced Search form under Providers.
+
+A number of these search providers require an API key. Once you get the key you will need to set a property in some 
+.properties file (e.g, keys.properties) in your RAMADDA home or plugins directory. 
 
 <h3>YouTube Search</h3>
 
-To enable YouTube  search you need to get an <a href="https://developers.google.com/youtube/registering_an_application">API key</a> 
-from Google. Once you have the key add it to some .properties file in your RAMADDA home or plugins directory: 
+Get the  API key from <a href="https://developers.google.com/youtube/registering_an_application">Google</a> and define the property:
 
 <pre>
 youtube.api.key=&lt;your API key&gt;
@@ -19,8 +22,7 @@ youtube.api.key=&lt;your API key&gt;
 
 <h3>Wolfram/Alpha Search</h3>
 
-To enable Wolfram/Alpha  search you need to get an <a href="https://developer.wolframalpha.com/portal/apisignup.html">API key</a> 
-from Wolfram. Once you have the key add it to some .properties file in your RAMADDA home or plugins directory: 
+Get the API key from <a href="https://developer.wolframalpha.com/portal/apisignup.html">Wolfram</a> and define the property:
 
 <pre>
 wolfram.api.key=&lt;your API key&gt;
@@ -28,19 +30,8 @@ wolfram.api.key=&lt;your API key&gt;
 
 
 
-<h3>Twitter Search</h3>
-TBD - 
-To enable searching on Twitter once we get it implemented you will need to get an API key and secret from <a href="https://apps.twitter.com/">Twitter Application anagement Page</a> and add it to a .properties file:
-
-<pre>
-twitter.api.key=
-twitter.api.secret=
-</pre>
-
-
 <h3>Flickr Image Search</h3>
-To enable Flickr image search you need to get an API key from
-<a href="https://www.flickr.com/services/api/misc.api_keys.html">https://www.flickr.com/services/api/misc.api_keys.html</a> and add it to some .properties file in your RAMADDA home or plugins directory: 
+Get an API key from <a href="https://www.flickr.com/services/api/misc.api_keys.html">Flickr</a> and define the property:
 
 <pre>
 flickr.api.key=&lt;your API key&gt;
@@ -62,6 +53,21 @@ org.ramadda.plugins.search.OpenSearchProvider;nasa;https://api-test.echo.nasa.go
 </pre>
 
 </div>
+
+
+
+<h3>Twitter Search</h3>
+TBD - 
+To enable searching on Twitter once we get it implemented you will need to get an API key and secret from <a href="https://apps.twitter.com/">Twitter Application anagement Page</a> and add it to a .properties file:
+
+<pre>
+twitter.api.key=
+twitter.api.secret=
+</pre>
+
+
+
+
 </body>
 </html>
 
