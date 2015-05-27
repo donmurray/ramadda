@@ -134,11 +134,16 @@ function RamaddaLabelDisplay(displayManager, id, properties) {
     RamaddaUtil.inherit(this, new RamaddaDisplay(displayManager, id, DISPLAY_LABEL, properties));
     addRamaddaDisplay(this);
     RamaddaUtil.defineMembers(this, {
-            label:"",
+            label:null,
             initDisplay: function() {
                 this.initUI();
                 var html =  this.label;
-                this.setContents(html);
+                if(html == null) {
+                    html = this.title;
+                }
+                if(html != null) {
+                    this.setContents(html);
+                }
             },
         });
 }
