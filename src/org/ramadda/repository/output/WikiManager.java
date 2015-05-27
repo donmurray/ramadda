@@ -1672,7 +1672,6 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 String content = getWikiInclude(wikiUtil, newRequest,
                                      originalEntry, child, tag, tmpProps);
 
-
                 /*
                 if ( !useDescription) {
                     Result      result      = null;
@@ -1773,7 +1772,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 }
                 //                sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV, HtmlUtils.cssClass("row")));
                 int rowCnt = 0;
-                int colCnt = 100;
+                int colCnt = 10000;
                 int weight = 12 / columns;
 
                 for (int i = 0; i < titles.size(); i++) {
@@ -1823,7 +1822,11 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                     sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
                     sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
                 }
-                sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
+
+                //Close the div if there was anything
+                if(rowCnt>0) {
+                    sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
+                }
 
                 return sb.toString();
             } else if (doingSlideshow) {
@@ -1938,6 +1941,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
                 return sb.toString();
             } else {
+                //TABS
                 return OutputHandler.makeTabs(titles, contents, true,
                         useCookies);
             }
