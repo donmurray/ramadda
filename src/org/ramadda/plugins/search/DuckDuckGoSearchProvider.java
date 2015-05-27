@@ -82,9 +82,7 @@ public class DuckDuckGoSearchProvider extends SearchProvider {
         List<Entry> entries = new ArrayList<Entry>();
         String      url     = URL;
         url += "&";
-        url += HtmlUtils.arg("q",
-                             HtmlUtils.urlEncode(request.getString(ARG_TEXT,
-                                 "")));
+        url += HtmlUtils.arg("q", request.getString(ARG_TEXT, ""));
         System.err.println(getName() + " search url:" + url);
         URLConnection connection = new URL(url).openConnection();
         //        connection.setRequestProperty("User-Agent","curl/7.37.1");

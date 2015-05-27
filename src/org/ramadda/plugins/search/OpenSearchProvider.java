@@ -78,9 +78,7 @@ public class OpenSearchProvider extends SearchProvider {
 
         List<Entry> entries = new ArrayList<Entry>();
         String      url     = baseUrl;
-        url = url.replace("${searchterms}",
-                          HtmlUtils.urlEncode(request.getString(ARG_TEXT,
-                              "")));
+        url = url.replace("${searchterms}", request.getString(ARG_TEXT, ""));
         //TODO:
         url = url.replace("${time:start}", "");
         url = url.replace("${time:end}", "");

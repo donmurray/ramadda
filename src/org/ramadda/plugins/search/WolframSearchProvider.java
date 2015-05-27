@@ -36,157 +36,157 @@ import java.util.List;
 public class WolframSearchProvider extends SearchProvider {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_QUERYRESULT = "queryresult";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_POD = "pod";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_SUBPOD = "subpod";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_PLAINTEXT = "plaintext";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_IMG = "img";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_STATES = "states";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_STATE = "state";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_INFOS = "infos";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_INFO = "info";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_LINK = "link";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_STATELIST = "statelist";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_ASSUMPTIONS = "assumptions";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_ASSUMPTION = "assumption";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_VALUE = "value";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_SOURCES = "sources";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TAG_SOURCE = "source";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_DATATYPES = "datatypes";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ERROR = "error";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_HOST = "host";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ID = "id";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_NUMPODS = "numpods";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_PARSETIMEDOUT = "parsetimedout";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_PARSETIMING = "parsetiming";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_RECALCULATE = "recalculate";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_RELATED = "related";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SERVER = "server";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SUCCESS = "success";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TIMEDOUT = "timedout";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TIMEDOUTPODS = "timedoutpods";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TIMING = "timing";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_VERSION = "version";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_NUMSUBPODS = "numsubpods";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_POSITION = "position";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SCANNER = "scanner";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TITLE = "title";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_ALT = "alt";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_HEIGHT = "height";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_SRC = "src";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_WIDTH = "width";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_PRIMARY = "primary";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_COUNT = "count";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_INPUT = "input";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_NAME = "name";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TEXT = "text";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_URL = "url";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_DELIMITERS = "delimiters";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_VALUE = "value";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TEMPLATE = "template";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_TYPE = "type";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_WORD = "word";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ATTR_DESC = "desc";
 
 
@@ -243,10 +243,9 @@ public class WolframSearchProvider extends SearchProvider {
             throws Exception {
 
         List<Entry> entries = new ArrayList<Entry>();
-        String searchUrl =
-            HtmlUtils.url(URL, ARG_APPID, getApiKey(), ARG_INPUT,
-                          HtmlUtils.urlEncode(request.getString(ARG_TEXT,
-                              "")));
+        String searchUrl = HtmlUtils.url(URL, ARG_APPID, getApiKey(),
+                                         ARG_INPUT,
+                                         request.getString(ARG_TEXT, ""));
         System.err.println(getName() + " search url:" + searchUrl);
         InputStream is  = getInputStream(searchUrl);
         String      xml = IOUtil.readContents(is);
@@ -286,7 +285,8 @@ public class WolframSearchProvider extends SearchProvider {
                         new Metadata(getRepository().getGUID(),
                                      newEntry.getId(),
                                      ContentMetadataHandler.TYPE_ATTACHMENT,
-                                     false, imgUrl, "image", null, null, null);
+                                     false, imgUrl, "image", null, null,
+                                     null);
                     newEntry.addMetadata(metadata);
                     desc.append(XmlUtil.toString(img, false));
                 }

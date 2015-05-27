@@ -112,8 +112,7 @@ public class FlickrSearchProvider extends SearchProvider {
         List<Entry> entries = new ArrayList<Entry>();
         String      url     = URL;
         url = HtmlUtils.url(url, ARG_API_KEY, getApiKey(), ARG_TEXT,
-                            HtmlUtils.urlEncode(request.getString(ARG_TEXT,
-                                "")));
+                            request.getString(ARG_TEXT, ""));
         //        System.err.println(getName() + " search url:" + url);
         URLConnection connection = new URL(url).openConnection();
         connection.setRequestProperty("User-Agent", "ramadda");
