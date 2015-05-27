@@ -16,17 +16,20 @@ There are a few things you need to figure out to install RAMADDA:
 RAMADDA  can run <a href="#standalone">stand alone</a> or under 
 a servlet container like <a href="#tomcat">Tomcat</a>. 
 
-<p>
+<br>
 
 <li> Where is RAMADDA going to store files? <br>
 RAMADDA needs a <a href="#home">home directory</a> on your server to store files, databases, etc.
 
-<p>
+<br>
+
 
 <li> What  database are you going to use? <br>
 RAMADDA comes with its own built-in  database  (Java Derby) but 
 can be easily <a href="database.html">configured</a> to use other databases.
-<p>
+
+<br>
+
 
 <li> Configure RAMADDA<br>
 <ul>
@@ -73,19 +76,20 @@ Download the latest release from the
 <p>
 <li> Unzip the file and consult the README.
 
-<p>
-<li> Or, skip reading the documentation (like everyone else does) and jump right in and start RAMADDA. 
+<br>
 
-Figure out where you want RAMADDA to store files in its <a href="#home">home directory</a> (default is <i>&lt;your home dir&gt;/.ramadda</i>). Then just run the script in the ramaddaserver directory.
+<li> Or, skip reading the documentation and jump right in and start RAMADDA.  Figure out where you want RAMADDA to store files in its <a href="#home">home directory</a> (default is <i>&lt;your home dir&gt;/.ramadda</i>). Then just run the script:
 <pre>
-   cd ramaddaserver
-   sh ramadda.sh -Dramadda_home=&lt;/ramadda/home/dir&gt;
+   sh ramaddaserver/ramadda.sh -Dramadda_home=&lt;/ramadda/home/dir&gt;
 </pre>
 
-<p>
+
+<br>
+
 
 <li> The rest of the RAMADDA configuration is done through the web at
 <a href="http://localhost:8080/repository">http://localhost:8080/repository</a>.
+<br>
 
 <li> By default the server is on port 8080.  To change the port do:<pre>
     sh ramadda.sh -Dramadda_home=&lt;/ramadda/home/dir&gt; -port &lt;some port&gt;
