@@ -5,6 +5,7 @@ Copyright 2008-2015 Geode Systems LLC
 
 var DISPLAY_FILTER = "filter";
 var DISPLAY_ANIMATION = "animation";
+var DISPLAY_LABEL = "label";
 
 addGlobalDisplayType({type:DISPLAY_FILTER , label: "Filter",requiresData:false,category:"Controls"});
 addGlobalDisplayType({type:DISPLAY_ANIMATION , label: "Animation",requiresData:false,category:"Controls"});
@@ -124,6 +125,19 @@ function RamaddaAnimationDisplay(displayManager, id, properties) {
                 html+=  HtmlUtil.onClick(get +".slower();", HtmlUtil.image(this.iconSlower,[ATTR_CLASS, "display-animation-button", ATTR_TITLE,"slower", "xwidth","32"]));
                 html+=  HtmlUtil.div([ATTR_ID, this.getDomId(ID_TIME)],"&nbsp;");
                 this.setTitle("Animation");
+                this.setContents(html);
+            },
+        });
+}
+
+function RamaddaLabelDisplay(displayManager, id, properties) {
+    RamaddaUtil.inherit(this, new RamaddaDisplay(displayManager, id, DISPLAY_LABEL, properties));
+    addRamaddaDisplay(this);
+    RamaddaUtil.defineMembers(this, {
+            label:"",
+            initDisplay: function() {
+                this.initUI();
+                var html =  this.label;
                 this.setContents(html);
             },
         });
