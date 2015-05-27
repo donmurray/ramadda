@@ -3812,7 +3812,7 @@ public class HtmlUtils {
      * @return _more_
      */
     public static String urlEncodeSpace(String s) {
-        return s.replace(" ", "+");
+        return s.replaceAll(" ", "+");
     }
 
 
