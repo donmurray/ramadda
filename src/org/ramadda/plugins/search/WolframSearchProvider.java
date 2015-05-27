@@ -225,8 +225,6 @@ public class WolframSearchProvider extends SearchProvider {
     }
 
 
-
-
     /**
      * _more_
      *
@@ -289,6 +287,7 @@ public class WolframSearchProvider extends SearchProvider {
                                      null);
                     newEntry.addMetadata(metadata);
                     desc.append(XmlUtil.toString(img, false));
+                    desc.append(HtmlUtils.br());
                 }
             }
 
