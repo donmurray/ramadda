@@ -82,7 +82,7 @@ public class SlackHarvester extends Harvester {
     /** _more_ */
     public static final String[] CMDS_PWD = { "pwd", "dir", "info" };
 
-    /** _more_          */
+    /** _more_ */
     public static final String[] CMDS_HELP = { "help", "?" };
 
 
@@ -422,7 +422,7 @@ public class SlackHarvester extends Harvester {
         for (String commandTok : commandToks) {
             //            debug("command tok:" + commandTok);
             commandTok = commandTok.trim();
-            if(commandTok.length() == 0) {
+            if (commandTok.length() == 0) {
                 continue;
             }
             if (commandTok.startsWith("/")) {
@@ -444,6 +444,7 @@ public class SlackHarvester extends Harvester {
                     text = "";
                 }
             }
+
 
             //            debug("checking command:" + cmd);
             if (isCommand(cmd, CMDS_SEARCH)) {
@@ -512,6 +513,7 @@ public class SlackHarvester extends Harvester {
      */
     private Result processSearch(Request request, String text)
             throws Exception {
+        System.err.println("Searching");
         Slack.Args args = parseArgs(request, text);
         if ( !Utils.stringDefined(args.getText())) {
             return getUsage(request, "Need to specify search string");
@@ -527,12 +529,14 @@ public class SlackHarvester extends Harvester {
 
         String providerId = Utils.getArg("-provider", args.getArgs(), null);
         if (providerId != null) {
-            request.put(SearchManager.ARG_PROVIDER,providerId);
+            request.put(SearchManager.ARG_PROVIDER, providerId);
         } else {
             //TODO: put this in a map
-            for(SearchProvider provider: getRepository().getSearchManager().getSearchProviders()) {
-                if(args.getArgs().contains("-" + provider.getId())) {
-                    request.putMultiples(SearchManager.ARG_PROVIDER,provider.getId());
+            for (SearchProvider provider :
+                    getRepository().getSearchManager().getSearchProviders()) {
+                if (args.getArgs().contains("-" + provider.getId())) {
+                    request.putMultiples(SearchManager.ARG_PROVIDER,
+                                         provider.getId());
                 }
             }
         }
@@ -541,6 +545,8 @@ public class SlackHarvester extends Harvester {
         List[] pair = getSearchManager().doSearch(request,
                           new StringBuilder());
         pair[0].addAll(pair[1]);
+
+        System.err.println("Slack: processSearch:" + pair[0]);
 
         return Slack.makeEntryResult(getRepository(), request,
                                      "Search Results", (List<Entry>) pair[0],
@@ -563,24 +569,28 @@ public class SlackHarvester extends Harvester {
         Slack.Args    args    = new Slack.Args(toks, null);
         String        entryId = null;
         StringBuilder textSB  = new StringBuilder();
-        String lastTok = null;
+        String        lastTok = null;
         for (int i = 0; i < toks.size(); i++) {
             String tok = toks.get(i);
             if (tok.startsWith("-")) {
-                if(getSearchManager().getSearchProvider(tok.substring(1))!=null) {
+                if (getSearchManager().getSearchProvider(tok.substring(1))
+                        != null) {
                     continue;
                 }
                 if (i < toks.size() - 1) {
                     i++;
+
                     continue;
                 }
             }
             lastTok = tok;
+            if (Utils.stringDefined(tok)) {
+                textSB.append(tok);
+                textSB.append(" ");
+            }
         }
 
-        if(lastTok!=null){
-            args.setText(lastTok);
-        }
+        args.setText(textSB.toString().trim());
 
         String tmpId = Utils.getArg("-entry", toks, (String) null);
 
@@ -674,10 +684,10 @@ public class SlackHarvester extends Harvester {
      */
     private Result processView(final Request request, String text)
             throws Exception {
-        Slack.Args args = parseArgs(request, text);
+        Slack.Args args  = parseArgs(request, text);
 
 
-        Entry entry = args.getEntry();
+        Entry      entry = args.getEntry();
         if (entry == null) {
             return getUsage(request, "No current entry");
         }
@@ -719,7 +729,7 @@ public class SlackHarvester extends Harvester {
                                            args.getArgs(), appendable, files);
 
         if (args.isHelp()) {
-            return new Result(sbs.get(0).toString(),  Constants.MIME_TEXT);
+            return new Result(sbs.get(0).toString(), Constants.MIME_TEXT);
         }
 
         Result result = null;
@@ -879,7 +889,7 @@ public class SlackHarvester extends Harvester {
      * @throws Exception _more_
      */
     private Entry getEntryFromInput(Request request, String text)
-        throws Exception {
+            throws Exception {
         text = text.trim();
         //Check for an ID
         Entry entry = getEntryManager().getEntry(request, text);
@@ -890,14 +900,14 @@ public class SlackHarvester extends Harvester {
 
         System.err.println("getEntryFromInput:" + text);
         Entry currentEntry = getCurrentEntry(request);
-        entry = getEntryManager().getRelativeEntry(request,
-                                                   getBaseGroup(), currentEntry, text);
+        entry = getEntryManager().getRelativeEntry(request, getBaseGroup(),
+                currentEntry, text);
         if (entry != null) {
             return entry;
         }
 
-        if(Utils.stringDefined(text)) {
-            entry  = getEntryManager().getEntryFromAlias(request, text);
+        if (Utils.stringDefined(text)) {
+            entry = getEntryManager().getEntryFromAlias(request, text);
             if (entry != null) {
                 return entry;
             }

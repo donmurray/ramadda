@@ -108,8 +108,8 @@ public class SlackOutputHandler extends OutputHandler {
      */
     public void getEntryLinks(Request request, State state, List<Link> links)
             throws Exception {
-        if (!request.isAnonymous() && state.getEntry()!=null &&
-            state.getEntry().isFile()
+        if ( !request.isAnonymous() && (state.getEntry() != null)
+                && state.getEntry().isFile()
                 && getAccessManager().canDoAction(
                     request, state.getEntry(),
                     Permission.ACTION_EDIT) && (getRepository().getProperty(

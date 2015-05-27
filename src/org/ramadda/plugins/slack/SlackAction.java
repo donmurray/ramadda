@@ -30,14 +30,14 @@ public class SlackAction extends MonitorAction {
     /** _more_ */
     public static final String ARG_WEBHOOK = "webhook";
 
-    /** _more_          */
+    /** _more_ */
     public static final String ARG_PUBLISH_FILE = "publish_file";
 
 
     /** _more_ */
     private String webhook;
 
-    /** _more_          */
+    /** _more_ */
     private boolean publishFile = false;
 
 
@@ -118,7 +118,8 @@ public class SlackAction extends MonitorAction {
                 "",
                 HtmlUtils.checkbox(
                     ARG_PUBLISH_FILE, "true", getPublishFile()) + " "
-                + monitor.getRepository().msg("Publish file to Slack")));
+                        + monitor.getRepository().msg(
+                            "Publish file to Slack")));
         sb.append(HtmlUtils.formTableClose());
     }
 

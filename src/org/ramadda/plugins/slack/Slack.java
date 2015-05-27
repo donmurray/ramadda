@@ -310,9 +310,12 @@ public class Slack {
         }
         String attachments = makeEntryLinks(repository, request, sb, entries,
                                             showChildren);
+        //        System.err.println("Attachments:" + attachments);
+
         if ( !Utils.stringDefined(webHook)) {
             return new Result("", sb);
         }
+
 
         StringBuilder json = new StringBuilder();
         List<String>  map  = new ArrayList<String>();
@@ -390,12 +393,44 @@ public class Slack {
     ]
             */
 
-        List<String> maps = new ArrayList<String>();
+        List<String> maps     = new ArrayList<String>();
 
-        int          cnt  = 0;
-        int imageCnt = 0;
+        int          cnt      = 0;
+        int          imageCnt = 0;
         for (Entry entry : entries) {
             cnt++;
+
+            List<String> imageUrls = new ArrayList<String>();
+            if (entry.getResource().isImage()) {
+                if (entry.getResource().isUrl()) {
+                    imageUrls.add(entry.getResource().getPath());
+                } else if (request != null) {
+                    imageUrls
+                        .add(request
+                            .getAbsoluteUrl(request.getRepository()
+                                .getHtmlOutputHandler()
+                                .getImageUrl(request, entry, true)));
+                }
+            }
+            List<Metadata> metadataList = entry.getMetadata();
+            if (metadataList != null) {
+                for (Metadata metadata : metadataList) {
+                    //A hack for urls
+                    if (Misc.equals(metadata.getType(), ContentMetadataHandler
+                            .TYPE_ATTACHMENT) && (metadata
+                                .getAttr1() != null) && metadata.getAttr1()
+                                    .startsWith("http")) {
+                        if (Utils.isImage(metadata.getAttr1())
+                                || Misc.equals(metadata.getAttr2(),
+                                    "image")) {
+                            imageUrls.add(metadata.getAttr1());
+                        }
+                    }
+                }
+            }
+
+
+
             List<String> map = new ArrayList<String>();
             sb.append("<" + getEntryUrl(repository, request, entry) + "|"
                       + entry.getName() + ">\n");
@@ -458,44 +493,28 @@ public class Slack {
             fields.add(Json.map("title", Json.quote("From date"),
                                 "value",Json.quote(getWikiManager().formatDate(request,  new Date(entry.getCreateDate()), entry))));
             */
-            String imageUrl = null;
-
-
-            if (entry.getResource().isImage()) {
-                if (entry.getResource().isUrl()) {
-                    imageUrl = entry.getResource().getPath();
-                } else if(request != null) {
-                    imageUrl = request.getAbsoluteUrl(request.getRepository().getHtmlOutputHandler().getImageUrl(request, entry, true));
-                } 
-            } 
-            if(imageUrl!=null) {
-                for(Metadata metadata: entry.getMetadata()) {
-                    if(metadata.getType().equals(ContentMetadataHandler.TYPE_ATTACHMENT) &&
-                       metadata.getAttr1().startsWith("http")) {
-                        if(Utils.isImage(metadata.getAttr1()) || Misc.equals(metadata.getAttr2(),"image")) {
-                            imageUrl = metadata.getAttr1();
-                            break;
-                        }
-                    }
-                }
-            }
-
-
-            if(imageUrl!=null) {
-                //Only include images for the first 20 entries
-                if(imageCnt++<20) {
-                    map.add("image_url");
-                    map.add(Json.quote(imageUrl));
-                }
-            }
             map.add("fields");
             map.add(Json.list(fields));
 
-            maps.add(Json.map(map));
+
+            if (imageUrls.size() == 0) {
+                imageUrls.add(null);
+            }
+
+            for (String imageUrl : imageUrls) {
+                if (imageUrl != null) {
+                    //Only include images for the first 20 entries
+                    if (imageCnt++ < 20) {
+                        map.add("image_url");
+                        map.add(Json.quote(imageUrl));
+                    }
+                }
+                maps.add(Json.map(map));
+            }
         }
         String attachments = Json.list(maps);
 
-        System.err.println("attachments:" + attachments);
+        //        System.err.println("attachments:" + attachments);
         return attachments;
 
     }
@@ -677,7 +696,7 @@ public class Slack {
         /** _more_ */
         private Entry entry;
 
-        /** _more_          */
+        /** _more_ */
         private String text;
 
 
