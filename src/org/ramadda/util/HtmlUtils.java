@@ -3793,7 +3793,7 @@ public class HtmlUtils {
      */
     public static String urlEncode(String s) {
         try {
-            return java.net.URLEncoder.encode(s, "UTF-8");
+            return java.net.URLEncoder.encode(urlEncodeSpace(s), "UTF-8");
         } catch (Exception exc) {
             System.err.println("error encoding arg(3):" + s + " " + exc);
             exc.printStackTrace();
