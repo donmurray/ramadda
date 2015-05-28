@@ -120,7 +120,7 @@ public class AssociationManager extends RepositoryManager {
 
         StringBuilder sb = new StringBuilder();
         getPageHandler().entrySectionOpen(request, fromEntry, sb,
-                                          msg("Add Association"), true);
+                                          msg("Add Association"), false);
         sb.append("Add association between: " + fromEntry.getLabel());
         sb.append(" and:  " + toEntry.getLabel());
         request.formPostWithAuthToken(sb,
@@ -205,7 +205,7 @@ public class AssociationManager extends RepositoryManager {
         StringBuffer hidden = new StringBuffer();
 
         getPageHandler().entrySectionOpen(request, fromEntry, sb,
-                                          msg("Delete Association"), true);
+                                          msg("Delete Association"), false);
 
         getRepository().addAuthToken(request, hidden);
         hidden.append(HtmlUtils.hidden(ARG_ASSOCIATION, associationId));
