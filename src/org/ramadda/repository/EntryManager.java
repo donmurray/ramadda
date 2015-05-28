@@ -4338,7 +4338,6 @@ public class EntryManager extends RepositoryManager {
                 || request.exists(ARG_ACTION_COPY)
                 || request.exists(ARG_ACTION_ASSOCIATE))) {
             StringBuilder sb = new StringBuilder();
-            sb.append(HtmlUtils.sectionOpen(msg("Copy/Move/Link")));
             if (entries.size() > 1) {
                 sb.append(
                     msg(
@@ -4374,11 +4373,12 @@ public class EntryManager extends RepositoryManager {
             fb.append(HtmlUtils.submit(msg("Cancel"), ARG_CANCEL));
             fb.append(HtmlUtils.formClose());
             StringBuilder contents = new StringBuilder();
+            contents.append(HtmlUtils.sectionOpen(msg("Copy/Move/Link")));
             contents.append(
                 getPageHandler().showDialogQuestion(
                     sb.toString(), fb.toString()));
 
-            sb.append(HtmlUtils.sectionClose());
+            contents.append(HtmlUtils.sectionClose());
             Result result = new Result(msg("Move confirm"), contents);
 
             return addEntryHeader(request, toEntry, result);

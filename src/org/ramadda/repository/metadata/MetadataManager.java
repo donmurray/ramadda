@@ -1417,8 +1417,7 @@ public class MetadataManager extends RepositoryManager {
         Entry         entry = getEntryManager().getEntry(request);
 
         if (request.get(ARG_METADATA_CLIPBOARD_PASTE, false)) {
-            getPageHandler().entrySectionOpen(request, entry, sb,
-                    "Add Property");
+            sb.append(HtmlUtils.sectionOpen(msg("Add Property")));
             List<Metadata> clipboard = getMetadataFromClipboard(request);
             if ((clipboard == null) || (clipboard.size() == 0)) {
                 sb.append(
@@ -1436,33 +1435,30 @@ public class MetadataManager extends RepositoryManager {
                     getPageHandler().showDialogNote(
                         "Metadata pasted from clipboard"));
             }
-
-            getPageHandler().entrySectionClose(request, entry, sb);
+            
+            sb.append(HtmlUtils.sectionClose());
 
             return processMetadataForm(request, entry, sb);
         }
 
         if ( !request.exists(ARG_METADATA_TYPE)) {
-            getPageHandler().entrySectionOpen(request, entry, sb,
-                    "Add Property");
+            sb.append(HtmlUtils.sectionOpen(msg("Add Property")));
             makeAddList(request, entry, sb);
         } else {
             String type = request.getString(ARG_METADATA_TYPE, BLANK);
-            sb.append(HtmlUtils.formTable());
             for (MetadataHandler handler : metadataHandlers) {
                 if (handler.canHandle(type)) {
                     MetadataType metadataType = handler.findType(type);
-                    getPageHandler().entrySectionOpen(request, entry, sb,
-                            msgLabel("Add") + metadataType.getLabel());
+                    sb.append(HtmlUtils.sectionOpen(msgLabel("Add Property") + metadataType.getLabel()));
+                    sb.append(HtmlUtils.formTable());
                     handler.makeAddForm(request, entry, metadataType, sb);
-
+                    sb.append(HtmlUtils.formTableClose());
                     break;
                 }
             }
-            sb.append(HtmlUtils.formTableClose());
         }
 
-        getPageHandler().entrySectionClose(request, entry, sb);
+        sb.append(HtmlUtils.sectionClose());
 
         return getEntryManager().makeEntryEditResult(request, entry,
                 msg("Add Property"), sb);
