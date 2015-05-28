@@ -853,7 +853,7 @@ public class MetadataManager extends RepositoryManager {
      * @return _more_
      * @throws Exception On badness
      */
-    public StringBuilder addToSearchForm(Request request, StringBuilder sb)
+    public Appendable addToSearchForm(Request request, Appendable sb)
             throws Exception {
         for (MetadataType type : metadataTypes) {
             if ( !type.getSearchable()) {
@@ -923,8 +923,7 @@ public class MetadataManager extends RepositoryManager {
      *
      * @throws Exception On badness
      */
-    public StringBuilder addToBrowseSearchForm(Request request,
-            StringBuilder sb)
+    public Appendable addToBrowseSearchForm(Request request,  Appendable sb)
             throws Exception {
         StringBuilder tmp      = new StringBuilder();
         List<String>  titles   = new ArrayList<String>();

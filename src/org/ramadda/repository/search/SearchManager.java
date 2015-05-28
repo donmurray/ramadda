@@ -379,7 +379,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                               Field.Index.NOT_ANALYZED));
         }
 
-        StringBuffer metadataSB = new StringBuffer();
+        StringBuilder metadataSB = new StringBuilder();
         getRepository().getMetadataManager().getTextCorpus(entry, metadataSB);
         entry.getTypeHandler().getTextCorpus(entry, metadataSB);
         doc.add(new Field(FIELD_DESCRIPTION,
@@ -837,7 +837,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                                         true);
 
             if (includeMetadata()) {
-                StringBuffer metadataSB = new StringBuffer();
+                StringBuilder metadataSB = new StringBuilder();
                 metadataSB.append(HtmlUtils.formTable());
                 getMetadataManager().addToSearchForm(request, metadataSB);
                 metadataSB.append(HtmlUtils.formTableClose());
