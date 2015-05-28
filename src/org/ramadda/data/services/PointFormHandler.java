@@ -335,8 +335,10 @@ public class PointFormHandler extends RecordFormHandler {
      */
     public Result outputGroupForm(Request request, Entry group,
                                   List<Entry> subGroups, List<Entry> entries,
-                                  StringBuffer sb)
+                                  StringBuffer msgSB)
             throws Exception {
+        StringBuilder sb = new StringBuilder(HtmlUtils.sectionOpen("Point Subset"));
+        sb.append(msgSB);
         boolean showUrl = request.get(ARG_SHOWURL, false);
 
         String  formId  = HtmlUtils.getUniqueId("form_");
@@ -378,6 +380,7 @@ public class PointFormHandler extends RecordFormHandler {
         if (recordEntries.size() == 0) {
             sb.append(getPageHandler().showDialogNote(msg("No data files")));
 
+            sb.append(HtmlUtils.sectionClose());
             return new Result("", sb);
         }
 
@@ -407,6 +410,7 @@ public class PointFormHandler extends RecordFormHandler {
                                         "[\".*OpenLayers_Control.*\"]");
         sb.append(HtmlUtils.formClose());
 
+        sb.append(HtmlUtils.sectionClose());
         return new Result("", sb);
     }
 
@@ -441,9 +445,12 @@ public class PointFormHandler extends RecordFormHandler {
      * @throws Exception on badness
      */
     public Result outputEntryForm(Request request, Entry entry,
-                                  StringBuffer sb)
+                                  Appendable msgSB)
             throws Exception {
 
+
+        StringBuilder sb = new StringBuilder(HtmlUtils.sectionOpen("Point Subset"));
+        sb.append(msgSB);
 
         //        System.err.println ( getPointOutputHandler().getCsv(request, entry));
 
@@ -462,6 +469,7 @@ public class PointFormHandler extends RecordFormHandler {
                                         "[\".*OpenLayers_Control.*\"]");
         sb.append(HtmlUtils.formClose());
 
+        sb.append(HtmlUtils.sectionClose());
         return new Result("", sb);
     }
 
@@ -477,7 +485,7 @@ public class PointFormHandler extends RecordFormHandler {
      *
      * @throws Exception _more_
      */
-    public void addToEntryForm(Request request, Entry entry, StringBuffer sb,
+    public void addToEntryForm(Request request, Entry entry, Appendable sb,
                                RecordEntry recordEntry)
             throws Exception {
         addSelectForm(request, entry, sb, false, recordEntry, "");
@@ -497,7 +505,7 @@ public class PointFormHandler extends RecordFormHandler {
      *
      * @throws Exception _more_
      */
-    public void addToGroupForm(Request request, Entry group, StringBuffer sb,
+    public void addToGroupForm(Request request, Entry group, Appendable sb,
                                List<? extends RecordEntry> recordEntries,
                                String extra)
             throws Exception {
@@ -519,7 +527,7 @@ public class PointFormHandler extends RecordFormHandler {
      * @throws Exception On badness
      */
     public void addSettingsForm(Request request, Entry entry,
-                                StringBuffer sb, RecordEntry recordEntry)
+                                Appendable sb, RecordEntry recordEntry)
             throws Exception {
 
         boolean      showUrl = request.get(ARG_SHOWURL, false);
@@ -725,7 +733,7 @@ public class PointFormHandler extends RecordFormHandler {
      *
      * @throws Exception On badness
      */
-    public void addSelectForm(Request request, Entry entry, StringBuffer sb,
+    public void addSelectForm(Request request, Entry entry, Appendable sb,
                               boolean forGroup, RecordEntry recordEntry,
                               String extraSubset)
             throws Exception {

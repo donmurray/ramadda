@@ -855,8 +855,8 @@ public class OutputHandler extends RepositoryManager {
      * @param formId _more_
      * @param skipList _more_
      */
-    public static void addUrlShowingForm(StringBuffer sb, String formId,
-                                         String skipList) {
+    public static void addUrlShowingForm(Appendable sb, String formId,
+                                         String skipList) throws Exception {
         String outputId = HtmlUtils.getUniqueId("output_");
         sb.append(HtmlUtils.div("", HtmlUtils.id(outputId)));
         sb.append(
