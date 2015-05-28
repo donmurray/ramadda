@@ -13,11 +13,11 @@ dest=/home/frs/project/r/ra/ramadda/ramadda${RAMADDA_VERSION}
 
 #scp all of the plugins over to SF
 echo "copying plugins"
-scp ~/.ramadda/plugins/nlasplugin.jar dist/plugins/coreplugins/* dist/plugins/bioplugins/* dist/plugins/geoplugins/* dist/plugins/miscplugins/* ${sfuser},ramadda@frs.sourceforge.net:${dest}/plugins
+scp ~/.ramadda/plugins/nlasplugin.jar dist/plugins/coreplugins/* dist/plugins/bioplugins/* dist/plugins/geoplugins/* dist/plugins/miscplugins/* dist/pointtools.zip  dist/plugins/coreplugins.jar dist/plugins/bioplugins.jar dist/plugins/geoplugins.jar ${sfuser},ramadda@frs.sourceforge.net:${dest}/plugins
 
 #scp the top level build products to SF
 echo "copying core"
-scp dist/ramaddainstaller.zip  dist/ramaddaserver.zip   dist/plugins/coreplugins.jar dist/plugins/bioplugins.jar dist/plugins/geoplugins.jar dist/ramaddaclient.zip dist/pointtools.zip  dist/repository.war  ${sfuser},ramadda@frs.sourceforge.net:${dest}
+scp dist/ramaddainstaller.zip  dist/ramaddaserver.zip   dist/ramaddaclient.zip   dist/repository.war  ${sfuser},ramadda@frs.sourceforge.net:${dest}
 
 
 
