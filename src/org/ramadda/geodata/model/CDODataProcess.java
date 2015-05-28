@@ -382,7 +382,7 @@ public abstract class CDODataProcess extends Service {
         stats.add(new TwoFacedObject("Anomaly", CDOOutputHandler.STAT_ANOM));
         stats.add(new TwoFacedObject("Standardized Anomaly", CDOOutputHandler.STAT_STDANOM));
         if (addPct) {
-            stats.add(new TwoFacedObject("Percent of Average", CDOOutputHandler.STAT_PCTANOM));
+            stats.add(new TwoFacedObject("Percent of Normal", CDOOutputHandler.STAT_PCTANOM));
         }
         sb.append(
             HtmlUtils.formEntry(
