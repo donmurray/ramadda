@@ -190,6 +190,12 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
     /** statistic anomaly */
     public static final String STAT_ANOM = "anomaly";
 
+    /** statistic standardized anomaly */
+    public static final String STAT_STDANOM = "stdanomaly";
+
+    /** statistic percent anomaly */
+    public static final String STAT_PCTANOM = "pctanomaly";
+
     /** statistic min */
     public static final String STAT_MIN = "min";
 
@@ -1415,7 +1421,8 @@ public class CDOOutputHandler extends OutputHandler implements ServiceProvider {
                 return;
             }
             // TODO:  Handle anomaly
-            if (stat.equals(STAT_ANOM)) {
+            if (stat.equals(STAT_ANOM) || stat.equals(STAT_STDANOM)
+                    || stat.equals(STAT_PCTANOM)) {
                 stat = STAT_MEAN;
             }
             if (period.equals(PERIOD_TIM)) {

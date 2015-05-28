@@ -7,6 +7,7 @@
 package org.ramadda.geodata.model;
 
 
+import org.ramadda.geodata.cdmdata.CdmDataOutputHandler;
 import org.ramadda.repository.Association;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
@@ -28,6 +29,7 @@ import org.ramadda.sql.Clause;
 import org.ramadda.util.HtmlUtils;
 
 import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.TwoFacedObject;
 
 
 import java.io.File;
@@ -47,7 +49,7 @@ public abstract class CDODataProcess extends Service {
         "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct",
         "Nov", "Dec"
     };
-
+    
     /** the type handler associated with this */
     private CDOOutputHandler outputHandler;
 
@@ -91,6 +93,8 @@ public abstract class CDODataProcess extends Service {
      */
     protected List<Entry> findClimatology(Request request, Entry granule)
             throws Exception {
+        return findStatisticEntry(request, granule, "clim");
+        /*
         if ( !(granule.getTypeHandler()
                 instanceof ClimateModelFileTypeHandler)) {
             return null;
@@ -129,8 +133,63 @@ public abstract class CDODataProcess extends Service {
                           clauses, ctypeHandler.getGranuleTypeHandler());
 
         return pair[1];
+        */
     }
 
+    /**
+     * Find the associated stat (e.g., clim or sprd) for the input
+     *
+     * @param request  the Request
+     * @param granule  the entry
+     * @param stat     the stat type (sprd, clim, etc)
+     *
+     * @return the stat entry or null
+     *
+     * @throws Exception  problems
+     */
+    protected List<Entry> findStatisticEntry(Request request, Entry granule, String stat)
+            throws Exception {
+        if ( !(granule.getTypeHandler()
+                instanceof ClimateModelFileTypeHandler)) {
+            return null;
+        }
+        Entry collection = GranuleTypeHandler.getCollectionEntry(request,
+                               granule);
+        CollectionTypeHandler ctypeHandler =
+            (CollectionTypeHandler) collection.getTypeHandler();
+        List<Clause>    clauses   = new ArrayList<Clause>();
+        List<Column>    columns   = ctypeHandler.getGranuleColumns();
+        HashSet<String> seenTable = new HashSet<String>();
+        Object[]        values    = granule.getValues();
+        for (int colIdx = 0; colIdx < columns.size(); colIdx++) {
+            Column column = columns.get(colIdx);
+            // first column is the collection ID
+            int    valIdx      = colIdx + 1;
+            String dbTableName = column.getTableName();
+            if ( !seenTable.contains(dbTableName)) {
+                clauses.add(Clause.eq(ctypeHandler.getCollectionIdColumn(),
+                                      collection.getId()));
+                clauses.add(Clause.join(Tables.ENTRIES.COL_ID,
+                                        dbTableName + ".id"));
+                seenTable.add(dbTableName);
+            }
+            String v = values[valIdx].toString();
+            if (column.getName().equals("ensemble")) {
+                clauses.add(Clause.eq(column.getName(), stat));
+            } else {
+                if (v.length() > 0) {
+                    clauses.add(Clause.eq(column.getName(), v));
+                }
+            }
+
+        }
+        List[] pair = outputHandler.getEntryManager().getEntries(request,
+                          clauses, ctypeHandler.getGranuleTypeHandler());
+
+        return pair[1];
+    }
+    
+    
     /**
      * Make a climatology for the given entry
      * @param request the request
@@ -145,6 +204,8 @@ public abstract class CDODataProcess extends Service {
     protected Entry makeClimatology(Request request, Entry entry,
                                     ServiceInput dpi, String tail)
             throws Exception {
+        return makeStatistic(request, entry, dpi, tail, "clim", "1981/2010");
+        /*
         String climName = IOUtil.stripExtension(tail) + "_clim.nc";
         File climFile = new File(IOUtil.joinDir(dpi.getProcessDir(),
                             climName));
@@ -163,9 +224,56 @@ public abstract class CDODataProcess extends Service {
                 climEntry.getId()));
 
         return climEntry;
-
+        */
     }
 
+    /**
+     * Make the standard deviation of the anomaly
+     * 
+     * @param request the request
+     * @param entry the entry
+     * @param dpi the input
+     * @param tail the file tail
+     * @param the years (comma list, or start/end)
+     *
+     * @return the anomaly standard deviation
+     *
+     * @throws Exception problems
+     */
+    protected Entry makeStatistic(Request request, Entry mean,
+                                    ServiceInput dpi, String tail, String stat, String selyears)
+            throws Exception {
+        String statName = IOUtil.stripExtension(tail) + "_"+stat+".nc";
+        File statFile = new File(IOUtil.joinDir(dpi.getProcessDir(),
+                            statName));
+        List<String> commands = initCDOService();
+        String statCmd = "-ymonmean";
+        if (stat.equals("sprd") || stat.equals("smegma")) {
+            statCmd = "-ymonstd";
+        }
+        commands.add(statCmd);
+        if (selyears == null) {
+            selyears = "1981/2010";
+        }
+        commands.add(CDOOutputHandler.OP_SELYEAR + "," + selyears);
+        getOutputHandler().addLevelSelectServices(request, mean,
+                    commands, CdmDataOutputHandler.ARG_LEVEL);
+        commands.add(mean.getResource().getPath());
+        commands.add(statFile.toString());
+        System.err.println("stat command: "+commands);
+        runProcess(commands, dpi.getProcessDir(), statFile);
+        Resource resource = new Resource(statFile, Resource.TYPE_LOCAL_FILE);
+        TypeHandler myHandler = getRepository().getTypeHandler("file", false,
+                                    true);
+        Entry statEntry = new Entry(myHandler, true, statFile.toString());
+        statEntry.setResource(resource);
+        statEntry.addAssociation(new Association(getRepository().getGUID(),
+                "generated product", "product generated from", mean.getId(),
+                statEntry.getId()));
+
+        return statEntry;
+
+    }
 
     /**
      * Get the output handler
@@ -255,6 +363,33 @@ public abstract class CDODataProcess extends Service {
                                        CDOOutputHandler.STAT_ANOM,
                                        false)) + HtmlUtils.space(1)
                                            + Repository.msg("Anomaly")));
+    }
+    
+    /**
+     * Add the statitics widget  - use instead of CDOOutputHandler
+     *
+     * @param request  the Request
+     * @param sb       the HTML
+     * @param addPct   true add a percent normal option
+     *
+     * @throws Exception _more_
+     */
+    public void addStatsWidget(Request request, Appendable sb, boolean addPct)
+            throws Exception {
+        
+        List<TwoFacedObject> stats = new ArrayList<TwoFacedObject>();
+        stats.add(new TwoFacedObject("Average", CDOOutputHandler.STAT_MEAN));
+        stats.add(new TwoFacedObject("Anomaly", CDOOutputHandler.STAT_ANOM));
+        stats.add(new TwoFacedObject("Standardized Anomaly", CDOOutputHandler.STAT_STDANOM));
+        if (addPct) {
+            stats.add(new TwoFacedObject("Percent of Average", CDOOutputHandler.STAT_PCTANOM));
+        }
+        sb.append(
+            HtmlUtils.formEntry(
+                Repository.msgLabel("Statistic"),
+                HtmlUtils.select(CDOOutputHandler.ARG_CDO_STAT, stats, 
+                        request.getString(CDOOutputHandler.ARG_CDO_STAT, 
+                                CDOOutputHandler.STAT_MEAN))));
     }
 
     /**

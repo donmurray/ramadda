@@ -8,6 +8,7 @@ package org.ramadda.geodata.model;
 
 
 //import org.ramadda.geodata.cdmdata.CDOOutputHandler;
+import org.ramadda.geodata.thredds.CatalogOutputHandler;
 import org.ramadda.repository.Entry;
 import org.ramadda.repository.Repository;
 import org.ramadda.repository.Request;
@@ -49,6 +50,9 @@ public class ClimateCollectionTypeHandler extends CollectionTypeHandler {
     /** NCL output handler */
     private NCLOutputHandler nclOutputHandler;
 
+    /** _more_ */
+    private CatalogOutputHandler catalogOutputHandler;
+
     /** image request id */
     public static final String REQUEST_IMAGE = "image";
 
@@ -57,6 +61,9 @@ public class ClimateCollectionTypeHandler extends CollectionTypeHandler {
 
     /** Timeseries request id */
     public static final String REQUEST_TIMESERIES = "timeseries";
+
+    /** _more_ */
+    public static final String REQUEST_THREDDSCATALOG = "threddscatalog";
 
     /**
      * Create a ClimateCollectionTypeHandler
@@ -167,11 +174,16 @@ public class ClimateCollectionTypeHandler extends CollectionTypeHandler {
                                            formId + "_do_bulkdownload", js,
                                            HtmlUtils.call(formId
                                                + ".bulkdownload", "event"));
+        String catalogButton = JQ.button("Get THREDDS Catalog",
+                                           formId + "_do_threddscatalog", js,
+                                           HtmlUtils.call(formId
+                                               + ".threddscatalog", "event"));
         selectorSB.append(HtmlUtils.formEntry("",
                 HtmlUtils.center(searchButton)));
         selectorSB.append(HtmlUtils.formEntry("",
                 HtmlUtils.center(downloadButton + HtmlUtils.space(4)
                                  + bdownloadButton)));
+//                                 + bdownloadButton + HtmlUtils.p() + catalogButton)));
         selectorSB.append(HtmlUtils.formTableClose());
 
 
@@ -289,7 +301,8 @@ JQ.button(
             return null;
         }
         if (what.equals(REQUEST_IMAGE) || what.equals(REQUEST_KMZ)
-                || what.equals(REQUEST_TIMESERIES)) {
+                || what.equals(REQUEST_TIMESERIES) ||
+                what.equals(REQUEST_THREDDSCATALOG)) {
             return processDataRequest(request, entry, what);
         }
 
@@ -399,6 +412,10 @@ JQ.button(
             return processBulkDownloadRequest(request, entry);
         }
 
+        if (type.equals(REQUEST_THREDDSCATALOG)) {
+            return processThreddsCatalogRequest(request, entry);
+        }
+
         //Make the image
         File imageFile = nclOutputHandler.processRequest(request,
                              files.get(0));
@@ -426,6 +443,44 @@ JQ.button(
     public Result processDownloadRequest(Request request, Entry entry)
             throws Exception {
         return processDataRequest(request, entry, REQUEST_DOWNLOAD);
+    }
+
+    /**
+     * Process the THREDDS catalog request
+     *
+     * @param request  the request
+     * @param entry    the entry
+     *
+     * @return the script
+     *
+     * @throws Exception problems
+     */
+    public Result processThreddsCatalogRequest(Request request, Entry entry)
+            throws Exception {
+        request.setReturnFilename(entry.getName() + "_catalog.xml");
+        request.put(ARG_LATESTOPENDAP, false);
+        StringBuilder             sb   = new StringBuilder();
+        CatalogOutputHandler coh = getCatalogOutputHandler();
+        return coh.outputGroup(request, CatalogOutputHandler.OUTPUT_CATALOG, 
+                entry, new ArrayList<Entry>(), 
+                processSearch(request, entry, true));
+
+    }
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    public CatalogOutputHandler getCatalogOutputHandler() {
+        if (catalogOutputHandler == null) {
+            catalogOutputHandler =
+                (CatalogOutputHandler) getRepository()
+                    .getOutputHandler(org.ramadda.geodata.thredds
+                        .CatalogOutputHandler.class);
+        }
+
+        return catalogOutputHandler;
     }
 
 }

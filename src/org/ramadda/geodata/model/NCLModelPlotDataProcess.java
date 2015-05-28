@@ -597,11 +597,6 @@ public class NCLModelPlotDataProcess extends Service {
             }
         }
         envMap.put("addCyclic", Boolean.toString(haveOriginalBounds));
-        String outUnits = request.getString(ARG_NCL_UNITS, null);
-        if ((outUnits != null) && !outUnits.isEmpty()) {
-            envMap.put("units", outUnits);
-        }
-
         // contours
         double   cint  = request.get(ARG_NCL_CINT, 0.);
         double   cmin  = request.get(ARG_NCL_CMIN, 0.);
@@ -632,6 +627,23 @@ public class NCLModelPlotDataProcess extends Service {
         }
 
         boolean haveAnom = fileList.toString().indexOf("anom") >= 0;
+        
+        String anomType = "anom";
+        if (fileList.toString().indexOf("pctanom") >= 0) {
+            anomType = "pctanom";
+        } else if (fileList.toString().indexOf("stdanom") >= 0) {
+            anomType = "stdanom";
+        }
+        envMap.put("anomtype", anomType);
+        
+        // gotta be a better way to do this
+        boolean shouldConvertUnits = 
+            !(anomType.equals("stdanom") || anomType.equals("pctanom"));
+        String outUnits = request.getString(ARG_NCL_UNITS, null);
+        if ((outUnits != null) && !outUnits.isEmpty() && shouldConvertUnits) {
+            envMap.put("units", outUnits);
+        }
+
         boolean isCorrelation = outputType.equals("correlation")
                                 || outputType.equals("regression");
         String colormap = request.getString(ARG_NCL_COLORMAP, "default");

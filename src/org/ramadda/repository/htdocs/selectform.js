@@ -79,6 +79,13 @@ function SelectForm (formId, entryId, arg, outputDiv, selectValues) {
         window.location.href = url;
     }
 
+    this.threddscatalog = function(event) {
+        var url = this.getUrl("threddscatalog");
+        event.preventDefault();
+        window.location.href = url;
+    }
+
+
     this.makeTimeSeries = function(event) {
         var result = "";
         var url = this.getUrl("timeseries");

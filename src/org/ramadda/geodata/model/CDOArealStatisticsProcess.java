@@ -27,6 +27,7 @@ import ucar.nc2.dt.grid.GridDataset;
 import ucar.nc2.time.Calendar;
 import ucar.nc2.time.CalendarDate;
 import ucar.nc2.time.CalendarDateRange;
+import ucar.nc2.units.SimpleUnit;
 
 import ucar.unidata.geoloc.LatLonPointImpl;
 import ucar.unidata.geoloc.LatLonRect;
@@ -146,8 +147,12 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             getOutputHandler().addVarLevelWidget(request, sb, dataset,
                     CdmDataOutputHandler.ARG_LEVEL);
         }
+        GridDatatype grid = dataset.getGrids().get(0);
+        String units = grid.getUnitsString();
+        boolean hasPrecipUnits = (SimpleUnit.isCompatible(units, "kg m-2 s-1")
+                       || SimpleUnit.isCompatible(units, "mm/day"));
 
-        addStatsWidget(request, sb);
+        addStatsWidget(request, sb, hasPrecipUnits);
 
         addTimeWidget(request, sb, input, periods);
 
@@ -303,13 +308,13 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             }
         }
         commands.add(outFile.toString());
-        System.out.println(commands);
         StringBuilder outputName = new StringBuilder();
         if (type.equals(ClimateModelApiHandler.ARG_ACTION_MULTI_COMPARE)) {
             outputName.append("Multi-Model Ensemble Mean");
         } else {
             outputName.append("Ensemble Mean");
         }
+        System.out.println("ens mean: " + commands);
         runProcess(commands, dpi.getProcessDir(), outFile);
         Resource resource = new Resource(outFile, Resource.TYPE_LOCAL_FILE);
         TypeHandler myHandler = getRepository().getTypeHandler("cdm_grid",
@@ -401,7 +406,10 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
 
         String       stat = request.getString(CDOOutputHandler.ARG_CDO_STAT);
         Entry        climEntry = null;
-        if (stat.equals(CDOOutputHandler.STAT_ANOM)) {
+        Entry        sprdEntry = null;
+        if (stat.equals(CDOOutputHandler.STAT_ANOM) || 
+                stat.equals(CDOOutputHandler.STAT_STDANOM) ||
+                stat.equals(CDOOutputHandler.STAT_PCTANOM)) {
             System.err.println("Looking for climo");
             List<Entry> climo = findClimatology(request, oneOfThem);
             if ((climo == null) || climo.isEmpty()) {
@@ -417,6 +425,23 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             }
         }
 
+        if (stat.equals(CDOOutputHandler.STAT_STDANOM)) {
+            System.err.println("Creating spread");
+            String statName = "mean";
+            String selyears = null;
+            // Find the mean
+            List<Entry> mean = findStatisticEntry(request, oneOfThem, statName);
+            if ((mean == null) || mean.isEmpty()) {
+                System.err.println("Couldn't find " + statName);
+            } else if (mean.size() > 1) {
+                System.err.println("found too many");
+            } else {
+                sprdEntry = mean.get(0);
+                System.err.println("found mean: " + sprdEntry);
+            }
+            // Now make the spread from the mean
+            sprdEntry = makeStatistic(request, sprdEntry, dpi, tail, "smegma", selyears);
+        }
         // Select order (left to right) - operations go right to left:
         //   - stats
         //   - region
@@ -505,7 +530,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                     getOutputHandler().addLevelSelectServices(newRequest,
                             oneOfThem, savedServices,
                             CdmDataOutputHandler.ARG_LEVEL);
-                    System.err.println("cmds:" + savedServices);
+                    System.err.println("years cmds:" + savedServices);
                     savedServices.add(oneOfThem.getResource().getPath());
                     savedServices.add(tmpFile.toString());
                     runProcess(savedServices, dpi.getProcessDir(), tmpFile);
@@ -558,7 +583,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                     getOutputHandler().addLevelSelectServices(newRequest,
                             oneOfThem, savedServices,
                             CdmDataOutputHandler.ARG_LEVEL);
-                    System.err.println("cmds:" + savedServices);
+                    System.err.println("split year cmds:" + savedServices);
                     savedServices.add(oneOfThem.getResource().getPath());
                     savedServices.add(tmpFile.toString());
                     runProcess(savedServices, dpi.getProcessDir(), tmpFile);
@@ -573,12 +598,14 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                 commands.add(file);
             }
             commands.add(tmpFile.toString());
+            System.err.println("merge cmds:" + commands);
             runProcess(commands, dpi.getProcessDir(), tmpFile);
             // now take the mean of the merged files
             commands = initCDOService();
             commands.add("-timmean");
             commands.add(tmpFile.toString());
             commands.add(outFile.toString());
+            System.err.println("timmean cmds:" + commands);
             runProcess(commands, dpi.getProcessDir(), outFile);
 
         } else {
@@ -615,27 +642,68 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
             getOutputHandler().addLevelSelectServices(timeRequest, climEntry,
                     commands, CdmDataOutputHandler.ARG_LEVEL);
 
-            //System.err.println("clim cmds:" + commands);
+            System.err.println("clim select cmds:" + commands);
 
             commands.add(climEntry.getResource().getPath());
             commands.add(climFile.toString());
             runProcess(commands, dpi.getProcessDir(), climFile);
 
             // now subtract them
+            String anomSuffix = "anom";
+            if (stat.equals(CDOOutputHandler.STAT_PCTANOM)) {
+                anomSuffix = "pctanom";
+            }
             String anomName = IOUtil.stripExtension(tail) + "_" + id
-                              + "_anom.nc";
+                              + "_" + anomSuffix + ".nc";
             File anomFile = new File(IOUtil.joinDir(dpi.getProcessDir(),
                                 anomName));
             commands = initCDOService();
             // We use sub instead of ymonsub because there is only one value in each file and
             // CDO sets the time of the merged files to be the last time. 
             //commands.add("-ymonsub");
+            if (stat.equals(CDOOutputHandler.STAT_PCTANOM)) {
+                commands.add("-setunit,%");
+                commands.add("-mulc,100");
+                commands.add("-div");
+            }
             commands.add("-sub");
             commands.add(outFile.toString());
             commands.add(climFile.toString());
+            if (stat.equals(CDOOutputHandler.STAT_PCTANOM)) {
+                commands.add(climFile.toString());
+            }
             commands.add(anomFile.toString());
+            System.err.println("making clim cmds:" + commands);
             runProcess(commands, dpi.getProcessDir(), anomFile);
             outFile = anomFile;
+            if (sprdEntry != null && stat.equals(CDOOutputHandler.STAT_STDANOM)) {
+                String sprdName = IOUtil.stripExtension(tail) + "_" + id
+                                  + "_stdanom.nc";
+                File sprdFile = new File(IOUtil.joinDir(dpi.getProcessDir(),
+                                    sprdName));
+                commands = initCDOService();
+                commands.add("-setunit, ");
+                commands.add("-div");
+                commands.add(anomFile.toString());
+                // Select order (left to right) - operations go right to left:
+                //   - region
+                //   - level
+                //   - month range
+                getOutputHandler().addStatServices(timeRequest, sprdEntry, commands);
+                getOutputHandler().addAreaSelectServices(timeRequest, sprdEntry,
+                        commands);
+                commands.add("-remapbil,r360x180");
+                commands.add("-selname," + varname);
+                getOutputHandler().addMonthSelectServices(timeRequest, sprdEntry,
+                        commands);
+                getOutputHandler().addLevelSelectServices(timeRequest, sprdEntry,
+                        commands, CdmDataOutputHandler.ARG_LEVEL);
+                commands.add(sprdEntry.getResource().getPath());
+                commands.add(sprdFile.toString());
+                System.err.println("std anom cmds:" + commands);
+                runProcess(commands, dpi.getProcessDir(), sprdFile);
+                outFile = sprdFile;
+            }
         }
 
         StringBuilder outputName = new StringBuilder();
@@ -824,7 +892,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
      *
      * @throws Exception problems
      */
-    public void addStatsWidget(Request request, Appendable sb)
+    public void addStatsWidget(Request request, Appendable sb, boolean usePct)
             throws Exception {
 
         sb.append(
@@ -833,7 +901,7 @@ public class CDOArealStatisticsProcess extends CDODataProcess {
                 request.getString(
                     CDOOutputHandler.ARG_CDO_PERIOD,
                     CDOOutputHandler.PERIOD_TIM)));
-        super.addStatsWidget(request, sb);
+        super.addStatsWidget(request, sb, usePct);
         /*
         sb.append(
             HtmlUtils.formEntry(
