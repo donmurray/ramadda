@@ -741,11 +741,14 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
                           + "_subset.nc";
 
         String formId = HtmlUtils.getUniqueId("form_");
+        
+        sb.append(HtmlUtils.sectionOpen("Subset Grid"));
+
         sb.append(HtmlUtils.formPost(formUrl + "/" + fileName,
                                      HtmlUtils.id(formId)));
         sb.append(HtmlUtils.br());
 
-        sb.append(HtmlUtils.submit("Subset Grid", ARG_SUBMIT));
+        sb.append(HtmlUtils.submit("Subset", ARG_SUBMIT));
         sb.append(HtmlUtils.br());
         sb.append(HtmlUtils.hidden(ARG_OUTPUT, OUTPUT_GRIDSUBSET));
         sb.append(HtmlUtils.hidden(ARG_ENTRYID, entry.getId()));
@@ -818,10 +821,13 @@ public class CdmDataOutputHandler extends OutputHandler implements CdmConstants 
         sb.append("</table>");
         sb.append("</ul>");
         sb.append(HtmlUtils.br());
-        sb.append(HtmlUtils.submit(msg("Subset Grid")));
+        sb.append(HtmlUtils.submit(msg("Subset")));
         addUrlShowingForm(sb, formId,
                           "[\".*OpenLayers_Control.*\",\".*original.*\"]");
         sb.append(HtmlUtils.formClose());
+
+        sb.append(HtmlUtils.sectionClose());
+
         getCdmManager().returnGridDataset(path, dataset);
 
         return makeLinksResult(request, msg("Grid Subset"), sb,
