@@ -275,7 +275,7 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void getTextCorpus(Entry entry, StringBuffer sb, Metadata metadata)
+    public void getTextCorpus(Entry entry, Appendable sb, Metadata metadata)
             throws Exception {
         MetadataType type = getType(metadata.getType());
         if (type == null) {
@@ -767,7 +767,7 @@ public class MetadataHandler extends RepositoryManager {
      *
      * @throws Exception _more_
      */
-    public void addToSearchForm(Request request, StringBuffer sb,
+    public void addToSearchForm(Request request, Appendable sb,
                                 MetadataType type)
             throws Exception {
         boolean doSelect = true;

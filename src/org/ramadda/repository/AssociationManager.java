@@ -118,10 +118,11 @@ public class AssociationManager extends RepositoryManager {
         }
 
 
-        StringBuffer sb = new StringBuffer();
-        sb.append(msgHeader("Add Association"));
-        sb.append("Add association between " + fromEntry.getLabel());
-        sb.append(" and  " + toEntry.getLabel());
+        StringBuilder sb = new StringBuilder();
+        getPageHandler().entrySectionOpen(request, fromEntry, sb,
+                                          msg("Add Association"), true);
+        sb.append("Add association between: " + fromEntry.getLabel());
+        sb.append(" and:  " + toEntry.getLabel());
         request.formPostWithAuthToken(sb,
                                       getRepository().URL_ASSOCIATION_ADD,
                                       BLANK);
@@ -149,6 +150,8 @@ public class AssociationManager extends RepositoryManager {
         sb.append(HtmlUtils.space(1));
         sb.append(HtmlUtils.submit(msg("Add Association")));
         sb.append(HtmlUtils.formClose());
+
+        getPageHandler().entrySectionClose(request, fromEntry, sb);
 
         return getEntryManager().addEntryHeader(request, fromEntry,
                 new Result("Add Association", sb));
@@ -200,6 +203,10 @@ public class AssociationManager extends RepositoryManager {
         }
         StringBuffer sb     = new StringBuffer();
         StringBuffer hidden = new StringBuffer();
+
+        getPageHandler().entrySectionOpen(request, fromEntry, sb,
+                                          msg("Delete Association"), true);
+
         getRepository().addAuthToken(request, hidden);
         hidden.append(HtmlUtils.hidden(ARG_ASSOCIATION, associationId));
         String form = PageHandler.makeOkCancelForm(request,
@@ -216,6 +223,7 @@ public class AssociationManager extends RepositoryManager {
         sb.append(HtmlUtils.pad(HtmlUtils.img(iconUrl(ICON_ARROW))));
         sb.append(toEntry.getLabel());
 
+        getPageHandler().entrySectionClose(request, fromEntry, sb);
         return new Result(msg("Delete Associations"), sb);
     }
 

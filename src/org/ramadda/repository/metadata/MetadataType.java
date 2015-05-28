@@ -875,7 +875,7 @@ public class MetadataType extends MetadataTypeBase {
      *
      * @throws Exception _more_
      */
-    public void getTextCorpus(Entry entry, StringBuffer sb, Metadata metadata)
+    public void getTextCorpus(Entry entry, Appendable sb, Metadata metadata)
             throws Exception {
         for (MetadataElement element : getChildren()) {
             String value = metadata.getAttr(element.getIndex());
@@ -1069,7 +1069,7 @@ public class MetadataType extends MetadataTypeBase {
         StringBuilder sb     = new StringBuilder();
 
         if ( !forEdit) {
-            sb.append(header(msgLabel("Add") + getName()));
+            //            sb.append(header(msgLabel("Add") + getName()));
         }
         String lastGroup = null;
         for (MetadataElement element : getChildren()) {
@@ -1126,7 +1126,7 @@ public class MetadataType extends MetadataTypeBase {
         }
 
         //Only show the value if its simple text
-        if (firstValue != null && firstValue.indexOf("<")<0) {
+        if ((firstValue != null) && (firstValue.indexOf("<") < 0)) {
             lbl = lbl + " " + firstValue;
         }
 

@@ -501,8 +501,7 @@ public class MetadataElement extends MetadataTypeBase implements DataTypes {
      *
      * @throws Exception _more_
      */
-    public void getTextCorpus(String value, StringBuffer sb)
-            throws Exception {
+    public void getTextCorpus(String value, Appendable sb) throws Exception {
         if ((value == null) || dataType.equals(DATATYPE_SKIP)) {
             return;
         }

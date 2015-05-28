@@ -2499,7 +2499,7 @@ a.toggleblocklabellink:visited {
   padding-top:5px;
   border : 1px black solid;
   background-color : #ffffcc;
-  max-width: 600px;
+//  max-width: 800px;
   /* Shadow effect */
   /* offset left, top, thickness, color with alpha */
   -webkit-box-shadow: 3px 3px 3px rgba(0, 0, 0, 0.5);

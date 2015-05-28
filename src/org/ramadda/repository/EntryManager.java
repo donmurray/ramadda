@@ -4338,6 +4338,7 @@ public class EntryManager extends RepositoryManager {
                 || request.exists(ARG_ACTION_COPY)
                 || request.exists(ARG_ACTION_ASSOCIATE))) {
             StringBuilder sb = new StringBuilder();
+            sb.append(HtmlUtils.sectionOpen(msg("Copy/Move/Link")));
             if (entries.size() > 1) {
                 sb.append(
                     msg(
@@ -4373,7 +4374,6 @@ public class EntryManager extends RepositoryManager {
             fb.append(HtmlUtils.submit(msg("Cancel"), ARG_CANCEL));
             fb.append(HtmlUtils.formClose());
             StringBuilder contents = new StringBuilder();
-            sb.append(HtmlUtils.sectionOpen(msg("Copy/Move/Link")));
             contents.append(
                 getPageHandler().showDialogQuestion(
                     sb.toString(), fb.toString()));
@@ -6505,7 +6505,8 @@ public class EntryManager extends RepositoryManager {
 
 
                 //                System.err.println("synth type:" + typeHandler.getClass().getName());
-                entry = typeHandler.makeSynthEntry(request, parentEntry, syntheticPart);
+                entry = typeHandler.makeSynthEntry(request, parentEntry,
+                        syntheticPart);
                 //                System.err.println("process parent:" + parentEntry);
                 //                System.err.println("process child:" + entry);
 
@@ -6557,18 +6558,21 @@ public class EntryManager extends RepositoryManager {
      */
     public TypeHandler getSynthTypeHandler(String id) throws Exception {
         //For backwards compatability
-        if(id.equals("process")) {
+        if (id.equals("process")) {
             id = ProcessFileTypeHandler.TYPE_PROCESS;
         }
 
-        TypeHandler typeHandler = getRepository().getTypeHandler(id, false, false);
+        TypeHandler typeHandler = getRepository().getTypeHandler(id, false,
+                                      false);
         if (typeHandler == null) {
-            typeHandler = getRepository().getTypeHandler("type_" + id, false, false);
+            typeHandler = getRepository().getTypeHandler("type_" + id, false,
+                    false);
             //            System.err.println("trying type_" +id +" " + typeHandler);
         }
         if (typeHandler == null) {
             typeHandler = getSearchManager().getSearchProvider(id);
         }
+
         return typeHandler;
     }
 
@@ -6708,7 +6712,7 @@ public class EntryManager extends RepositoryManager {
                     //id,type,name,desc,group,user,file,createdata,fromdate,todate
                     TypeHandler localTypeHandler =
                         getRepository().getTypeHandler(results.getString(2));
-                    if(localTypeHandler==null) {
+                    if (localTypeHandler == null) {
                         continue;
                     }
                     entry = localTypeHandler.createEntryFromDatabase(results);
@@ -7793,8 +7797,8 @@ public class EntryManager extends RepositoryManager {
             //            System.err.println("****  Get synthids:" + mainEntry.getTypeHandler().getSynthIds(request, mainEntry,
             //                                                                                        group, synthId));
 
-            return mainEntry.getMasterTypeHandler().getSynthIds(request, mainEntry,
-                    group, synthId);
+            return mainEntry.getMasterTypeHandler().getSynthIds(request,
+                    mainEntry, group, synthId);
         }
 
 
@@ -9352,7 +9356,7 @@ public class EntryManager extends RepositoryManager {
     private Entry processEntry;
 
 
-    /** _more_          */
+    /** _more_ */
     private Hashtable<String, TypeHandler> synthEntryHandlers =
         new Hashtable<String, TypeHandler>();
 
@@ -9402,7 +9406,7 @@ public class EntryManager extends RepositoryManager {
      */
     public Entry getProcessEntry() throws Exception {
         return getRepository().getTypeHandler(
-                                              ProcessFileTypeHandler.TYPE_PROCESS).getSynthTopLevelEntry();
+            ProcessFileTypeHandler.TYPE_PROCESS).getSynthTopLevelEntry();
     }
 
     /**

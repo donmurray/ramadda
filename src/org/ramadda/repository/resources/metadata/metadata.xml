@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
 <metadata>
 
-  <handler category="Tags">
+  <handler category="Basic Properties">
 <!--
 
     <type name="Test 1" id="test_it" searchable="true" browsable="true">

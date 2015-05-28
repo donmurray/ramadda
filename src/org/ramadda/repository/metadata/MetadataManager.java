@@ -289,7 +289,7 @@ public class MetadataManager extends RepositoryManager {
      *
      * @throws Exception On badness
      */
-    public void getTextCorpus(Entry entry, StringBuffer sb) throws Exception {
+    public void getTextCorpus(Entry entry, Appendable sb) throws Exception {
         for (Metadata metadata : getMetadata(entry)) {
             MetadataHandler handler = findMetadataHandler(metadata.getType());
             handler.getTextCorpus(entry, sb, metadata);
@@ -853,7 +853,7 @@ public class MetadataManager extends RepositoryManager {
      * @return _more_
      * @throws Exception On badness
      */
-    public StringBuffer addToSearchForm(Request request, StringBuffer sb)
+    public StringBuilder addToSearchForm(Request request, StringBuilder sb)
             throws Exception {
         for (MetadataType type : metadataTypes) {
             if ( !type.getSearchable()) {
@@ -923,12 +923,12 @@ public class MetadataManager extends RepositoryManager {
      *
      * @throws Exception On badness
      */
-    public StringBuffer addToBrowseSearchForm(Request request,
-            StringBuffer sb)
+    public StringBuilder addToBrowseSearchForm(Request request,
+            StringBuilder sb)
             throws Exception {
-        StringBuffer tmp      = new StringBuffer();
-        List<String> titles   = new ArrayList<String>();
-        List<String> contents = new ArrayList<String>();
+        StringBuilder tmp      = new StringBuilder();
+        List<String>  titles   = new ArrayList<String>();
+        List<String>  contents = new ArrayList<String>();
         sb.append("<ul>");
         for (MetadataType type : metadataTypes) {
             if ( !type.getBrowsable()) {
@@ -1130,7 +1130,7 @@ public class MetadataManager extends RepositoryManager {
         MetadataHandler handler = findMetadataHandler(metadataType);
         MetadataType    type    = handler.findType(metadataType);
 
-        StringBuffer    sb      = new StringBuffer();
+        StringBuilder   sb      = new StringBuilder();
         if ( !request.responseInJson()) {
             sb.append(HtmlUtils.sectionOpen(msg("Browse Metadata")));
             sb.append(HtmlUtils.center(header));
@@ -1297,8 +1297,8 @@ public class MetadataManager extends RepositoryManager {
      * @throws Exception On badness
      */
     public Result processMetadataForm(Request request) throws Exception {
-        Entry        entry = getEntryManager().getEntry(request);
-        StringBuffer sb    = new StringBuffer();
+        Entry         entry = getEntryManager().getEntry(request);
+        StringBuilder sb    = new StringBuilder();
         request.appendMessage(sb);
 
         return processMetadataForm(request, entry, sb);
@@ -1316,7 +1316,7 @@ public class MetadataManager extends RepositoryManager {
      * @throws Exception On badness
      */
     public Result processMetadataForm(Request request, Entry entry,
-                                      StringBuffer sb)
+                                      Appendable sb)
             throws Exception {
         boolean canEditParent = getAccessManager().canDoAction(request,
                                     getEntryManager().getParent(request,
@@ -1329,8 +1329,8 @@ public class MetadataManager extends RepositoryManager {
         if (metadataList.size() == 0) {
             sb.append(
                 getPageHandler().showDialogNote(
-                    msg("No metadata defined for entry")));
-            sb.append(msgLabel("Add new metadata"));
+                    msg("No properties defined for entry")));
+            sb.append(msgLabel("Add new property"));
             makeAddList(request, entry, sb);
         } else {
             request.uploadFormWithAuthToken(sb, URL_METADATA_CHANGE);
@@ -1414,13 +1414,12 @@ public class MetadataManager extends RepositoryManager {
      * @throws Exception On badness
      */
     public Result processMetadataAddForm(Request request) throws Exception {
-        StringBuffer sb    = new StringBuffer();
-        Entry        entry = getEntryManager().getEntry(request);
-        getPageHandler().entrySectionOpen(request, entry, sb, "Add Property");
-
-
+        StringBuilder sb    = new StringBuilder();
+        Entry         entry = getEntryManager().getEntry(request);
 
         if (request.get(ARG_METADATA_CLIPBOARD_PASTE, false)) {
+            getPageHandler().entrySectionOpen(request, entry, sb,
+                    "Add Property");
             List<Metadata> clipboard = getMetadataFromClipboard(request);
             if ((clipboard == null) || (clipboard.size() == 0)) {
                 sb.append(
@@ -1439,18 +1438,24 @@ public class MetadataManager extends RepositoryManager {
                         "Metadata pasted from clipboard"));
             }
 
+            getPageHandler().entrySectionClose(request, entry, sb);
+
             return processMetadataForm(request, entry, sb);
         }
 
         if ( !request.exists(ARG_METADATA_TYPE)) {
+            getPageHandler().entrySectionOpen(request, entry, sb,
+                    "Add Property");
             makeAddList(request, entry, sb);
         } else {
             String type = request.getString(ARG_METADATA_TYPE, BLANK);
             sb.append(HtmlUtils.formTable());
             for (MetadataHandler handler : metadataHandlers) {
                 if (handler.canHandle(type)) {
-                    handler.makeAddForm(request, entry,
-                                        handler.findType(type), sb);
+                    MetadataType metadataType = handler.findType(type);
+                    getPageHandler().entrySectionOpen(request, entry, sb,
+                            msgLabel("Add") + metadataType.getLabel());
+                    handler.makeAddForm(request, entry, metadataType, sb);
 
                     break;
                 }
@@ -1480,9 +1485,9 @@ public class MetadataManager extends RepositoryManager {
 
         List<Metadata> clipboard = getMetadataFromClipboard(request);
         if ((clipboard != null) && (clipboard.size() > 0)) {
-            StringBuffer clipboardSB = new StringBuffer();
-            Entry        dummyEntry  = new Entry();
-            int          cnt         = 0;
+            StringBuilder clipboardSB = new StringBuilder();
+            Entry         dummyEntry  = new Entry();
+            int           cnt         = 0;
             for (Metadata copied : clipboard) {
                 MetadataHandler handler =
                     findMetadataHandler(copied.getType());
@@ -1514,10 +1519,10 @@ public class MetadataManager extends RepositoryManager {
             if ( !type.isForEntry(entry)) {
                 continue;
             }
-            String       name    = type.getCategory();
-            StringBuffer groupSB = (StringBuffer) groupMap.get(name);
+            String        name    = type.getCategory();
+            StringBuilder groupSB = (StringBuilder) groupMap.get(name);
             if (groupSB == null) {
-                groupMap.put(name, groupSB = new StringBuffer());
+                groupMap.put(name, groupSB = new StringBuilder());
                 groups.add(name);
             }
             //            request.uploadFormWithAuthToken(groupSB, URL_METADATA_ADDFORM);
