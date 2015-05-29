@@ -158,7 +158,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
     /** _more_ */
     public final RequestUrl URL_SEARCH_TEXTFORM = new RequestUrl(this,
                                                       "/search/textform",
-                                                      "Text Search");
+                                                      "Search");
 
     /** _more_ */
     public final RequestUrl URL_SEARCH_BROWSE = new RequestUrl(this,
@@ -671,7 +671,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
      */
     public Result processEntryTextSearchForm(Request request)
             throws Exception {
-        return makeSearchForm(request, true, false);
+        return processSearchForm(request, true, false);
     }
 
 
@@ -705,11 +705,19 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
      *
      * @throws Exception _more_
      */
-    public Result makeSearchForm(Request request, boolean justText,
-                                 boolean typeSpecific)
+    public Result processSearchForm(Request request, boolean justText,
+                                    boolean typeSpecific)
             throws Exception {
-        StringBuffer sb = new StringBuffer();
-        makeSearchForm(request, justText, typeSpecific, sb);
+        StringBuilder sb = new StringBuilder();
+        sb.append(HtmlUtils.sectionOpen(null, false));
+
+        getFormOpen(request, sb);
+        makeSearchForm(request, justText, typeSpecific, sb, true);
+        sb.append(HtmlUtils.formClose());
+
+
+
+        sb.append(HtmlUtils.sectionClose());
 
         return makeResult(request, msg("Search Form"), sb);
     }
@@ -729,29 +737,87 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
      * _more_
      *
      * @param request _more_
-     * @param justText _more_
-     * @param typeSpecific _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private String getTextField(Request request) throws Exception {
+        String value = (String) request.getString(ARG_TEXT, "");
+        String textField =
+            HtmlUtils.input(ARG_TEXT, value,
+                            HtmlUtils.attr("placeholder", msg("Search text"))
+                            + HtmlUtils.SIZE_50 + " autofocus ");
+
+        return textField;
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private String getSearchButtons(Request request) throws Exception {
+        List<ServerInfo> servers =
+            getRegistryManager().getSelectedRemoteServers();
+
+        String buttons;
+        if (false && (servers.size() > 0)) {
+            buttons =
+                HtmlUtils.buttons(
+                    HtmlUtils.submit(
+                        msg("Search this Repository"),
+                        ARG_SEARCH_SUBMIT), HtmlUtils.submit(
+                            msg("Search Remote Repositories"),
+                            ARG_SEARCH_SERVERS));
+        } else {
+            buttons = HtmlUtils.submit(msg("Search"), ARG_SEARCH_SUBMIT);
+        }
+
+        return buttons;
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
      * @param sb _more_
      *
      * @throws Exception _more_
      */
-    private void makeSearchForm(Request request, boolean justText,
-                                boolean typeSpecific, StringBuffer sb)
+    private void getFormOpen(Request request, Appendable sb)
             throws Exception {
-
-        sb.append("\n");
-        sb.append(HtmlUtils.comment("form open"));
-        sb.append("\n");
-
-        TypeHandler typeHandler = getRepository().getTypeHandler(request);
-        sb.append(HtmlUtils.sectionOpen(null, false));
         sb.append(
             HtmlUtils.form(
                 getSearchUrl(request),
                 makeFormSubmitDialog(sb, msg("Searching..."))
                 + " name=\"searchform\" "));
+    }
 
-        sb.append(HtmlUtils.br());
+    /**
+     *
+     * _more_
+     *
+     * @param request _more_
+     * @param justText _more_
+     * @param typeSpecific _more_
+     * @param sb _more_
+     * @param addTextField _more_
+     *
+     * @throws Exception _more_
+     */
+    private void makeSearchForm(Request request, boolean justText,
+                                boolean typeSpecific, Appendable sb,
+                                boolean addTextField)
+            throws Exception {
+
+
+        TypeHandler typeHandler = getRepository().getTypeHandler(request);
+
         if (justText) {
             sb.append(HtmlUtils.hidden(ARG_SEARCH_TYPE, SEARCH_TYPE_TEXT));
         }
@@ -771,62 +837,14 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
         List<ServerInfo> servers =
             getRegistryManager().getSelectedRemoteServers();
 
-        String buttons;
 
-
-        if (false && (servers.size() > 0)) {
-            buttons =
-                HtmlUtils.buttons(
-                    HtmlUtils.submit(
-                        msg("Search this Repository"),
-                        ARG_SEARCH_SUBMIT), HtmlUtils.submit(
-                            msg("Search Remote Repositories"),
-                            ARG_SEARCH_SERVERS));
-        } else {
-            buttons = HtmlUtils.submit(msg("Search"), ARG_SEARCH_SUBMIT);
-        }
-
-
-        sb.append("\n");
-        sb.append(HtmlUtils.p());
-        if ( !justText) {
-            sb.append(buttons);
-            sb.append(HtmlUtils.p());
-        }
         List<String> titles   = new ArrayList<String>();
         List<String> contents = new ArrayList<String>();
 
 
 
-        if (justText) {
-            String value = (String) request.getString(ARG_TEXT, "");
-            String extra = "";
-            /*            if (getDatabaseManager().supportsRegexp()) {
-                extra = HtmlUtils.checkbox(
-                                          ARG_ISREGEXP, "true", request.get(ARG_ISREGEXP, false)) + " "
-                    + msg("Use regular expression");
-                    }*/
-            sb.append(HtmlUtils.span(msgLabel("Text"),
-                                     HtmlUtils.cssClass("formlabel")) + " "
-                                         + HtmlUtils.input(ARG_TEXT, value,
-                                             HtmlUtils.SIZE_50
-                                             + " autofocus ") + " " + extra
-                                                 + " " + buttons);
 
-            /*            sb.append(
-                "<table width=\"100%\" border=\"0\"><tr><td width=\"60\">");
-            typeHandler.addTextSearch(request, sb);
-            sb.append("</table>");
-            sb.append(HtmlUtils.p());
-            */
-
-            /*
-            sb.append(HtmlUtils.sectionClose());
-            sb.append(HtmlUtils.sectionOpen());
-            sb.append(HtmlUtils.h2(msg("Search by Type")));
-            addSearchByTypeList(request, sb);
-            */
-        } else {
+        if ( !justText) {
             Object       oldValue = request.remove(ARG_RELATIVEDATE);
             List<Clause> where    = typeHandler.assembleWhereClause(request);
             if (oldValue != null) {
@@ -834,7 +852,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             }
 
             typeHandler.addToSearchForm(request, titles, contents, where,
-                                        true);
+                                        true, false);
 
             if (includeMetadata()) {
                 StringBuilder metadataSB = new StringBuilder();
@@ -850,17 +868,19 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             List<SearchProvider> searchProviders = getSearchProviders();
             if (searchProviders.size() > 1) {
                 StringBuilder providerSB = new StringBuilder();
-                providerSB.append(msg("Where do you want to search?"));
-                providerSB.append(HtmlUtils.br());
+                //                providerSB.append(msg("Where do you want to search?"));
+                //                providerSB.append(HtmlUtils.br());
                 List<String> selectedProviders = new ArrayList<String>();
-                for(String tok: (List<String>) request.get(ARG_PROVIDER,
-                                                           new ArrayList<String>())) {
-                    selectedProviders.addAll(StringUtil.split(tok, ",",true,true));
+                for (String tok :
+                        (List<String>) request.get(ARG_PROVIDER,
+                            new ArrayList<String>())) {
+                    selectedProviders.addAll(StringUtil.split(tok, ",", true,
+                            true));
                 }
-                        
+
                 providerSB.append(HtmlUtils.labeledCheckbox(ARG_PROVIDER,
-                                                            "all", selectedProviders.contains("all"),
-                                                            msg("All")));
+                        "all", selectedProviders.contains("all"),
+                        msg("All")));
                 providerSB.append(HtmlUtils.br());
 
 
@@ -874,11 +894,12 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                             searchProvider.getId());
                     }
                     providerSB.append(HtmlUtils.labeledCheckbox(ARG_PROVIDER,
-                                                                searchProvider.getId(), selected, searchProvider.getName()));
+                            searchProvider.getId(), selected,
+                            searchProvider.getName()));
                     providerSB.append(HtmlUtils.br());
                 }
 
-                titles.add(msg("Search Providers"));
+                titles.add(msg("Where do you want to search?"));
                 contents.add(HtmlUtils.insetDiv(providerSB.toString(), 0, 20,
                         0, 0));
             }
@@ -983,23 +1004,14 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
         }
         contents = tmp;
 
-        HtmlUtils.makeAccordian(sb, titles, contents, false);
-
-
-
-
-        if ( !justText) {
-            sb.append(HtmlUtils.br());
-            sb.append(buttons);
-            sb.append(HtmlUtils.br());
+        if (addTextField) {
+            sb.append(getTextField(request) + " "
+                      + getSearchButtons(request));
         }
 
-        sb.append("\n");
-        sb.append(HtmlUtils.formClose());
-        sb.append(HtmlUtils.sectionClose());
-        sb.append("\n");
-        sb.append(HtmlUtils.comment("form close"));
-        sb.append("\n");
+        HtmlUtils.makeAccordian(sb, titles, contents, true);
+
+
     }
 
 
@@ -1131,7 +1143,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
      * @throws Exception _more_
      */
     public Result processEntrySearchForm(Request request) throws Exception {
-        return makeSearchForm(request, false, false);
+        return processSearchForm(request, false, false);
     }
 
 
@@ -1610,38 +1622,17 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
         }
 
 
-
-
-
-        String s = searchCriteriaSB.toString();
-        if (request.defined(ARG_TARGET)) {
-            s = "";
-        }
-
-
-        if (s.length() > 0) {
-            s = HtmlUtils.formTable() + s + HtmlUtils.formTableClose();
-        }
-
         //        if (s.length() > 0) {
         StringBuffer searchForm = new StringBuffer();
         request.remove(ARG_SEARCH_SUBMIT);
-        String url = request.getUrl(URL_SEARCH_FORM);
-        String searchLink =
-            HtmlUtils.href(url,
-                           HtmlUtils.img(iconUrl(ICON_SEARCH),
-                                         "Search Again"));
-
+        String  url      = request.getUrl(URL_SEARCH_FORM);
         boolean foundAny = (groups.size() > 0) || (entries.size() > 0);
         if (foundAny) {
-            String searchUrl = request.getUrl();
-            searchForm.append(HtmlUtils.href(searchUrl, msg("Search URL")));
-            searchForm.append(HtmlUtils.br());
+            //            String searchUrl = request.getUrl();
+            //            searchForm.append(HtmlUtils.href(searchUrl, msg("Search URL")));
         }
 
-
-
-        makeSearchForm(request, textSearch, true, searchForm);
+        makeSearchForm(request, textSearch, true, searchForm, false);
 
         StringBuffer header = new StringBuffer();
         getPageHandler().makeLinksHeader(request, header, getSearchUrls(),
@@ -1650,27 +1641,40 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
         header.append(HtmlUtils.sectionOpen(null, false));
         header.append(HtmlUtils.h2(msg("Search Results")));
 
-        if (foundAny) {
-            String form = HtmlUtils.makeShowHideBlock(msg("Search Again"),
-                              HtmlUtils.inset(searchForm.toString(), 0, 20,
-                                  0, 0), false);
-            header.append(form);
-            if (s.length() > 0) {
-                header.append(HtmlUtils.table(s, 5, 0));
-            }
-        } else {
-            header.append(
-                getPageHandler().showDialogNote(msg("No entries found")));
-            if (s.length() > 0) {
-                header.append(HtmlUtils.table(s, 5, 0));
-            }
-            header.append(searchForm);
+
+
+        String s = "";
+        /*        String s = searchCriteriaSB.toString();
+        if (request.defined(ARG_TARGET)) {
+            s = "";
         }
 
-        request.appendPrefixHtml(HtmlUtils.openInset());
-        request.appendPrefixHtml(header.toString());
-        request.appendSuffixHtml(HtmlUtils.closeInset());
+        if (s.length() > 0) {
+            s = HtmlUtils.formTable() + s + HtmlUtils.formTableClose();
+        }
+        */
 
+
+
+        getFormOpen(request, header);
+        header.append(getTextField(request) + " "
+                      + getSearchButtons(request));
+        String inner = HtmlUtils.insetDiv(searchForm.toString(), 0, 20, 10,
+                                          0);
+        String form = HtmlUtils.makeShowHideBlock(msg("Search Options"),
+                          inner, false);
+
+        form = HtmlUtils.insetDiv(form, 0, 0, 0, 0);
+        header.append(form);
+        header.append(HtmlUtils.formClose());
+
+
+        if ( !foundAny) {
+            header.append(
+                getPageHandler().showDialogNote(msg("Sorry, nothing found")));
+        }
+
+        request.appendPrefixHtml(header.toString());
 
         if (theGroup == null) {
             theGroup = getEntryManager().getDummyGroup();

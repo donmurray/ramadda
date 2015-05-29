@@ -1059,6 +1059,7 @@ public class GenericTypeHandler extends TypeHandler {
      *
      * @param entry _more_
      * @param request _more_
+     * @param typeHandler _more_
      * @param output _more_
      * @param showDescription on badness
      * @param showResource _more_
@@ -1070,16 +1071,16 @@ public class GenericTypeHandler extends TypeHandler {
      */
     @Override
     public StringBuilder getInnerEntryContent(Entry entry, Request request,
-                                              TypeHandler typeHandler,
-            OutputType output, boolean showDescription, boolean showResource,
+            TypeHandler typeHandler, OutputType output,
+            boolean showDescription, boolean showResource,
             boolean linkToDownload)
             throws Exception {
-        if(typeHandler == null) 
+        if (typeHandler == null) {
             typeHandler = this;
+        }
         StringBuilder parentBuff = super.getInnerEntryContent(entry, request,
-                                                              typeHandler,
-                                                              output, showDescription, showResource,
-                                       linkToDownload);
+                                       typeHandler, output, showDescription,
+                                       showResource, linkToDownload);
         //        if (shouldShowInHtml(request, entry, output)) {
         if (true) {
             StringBuilder myBuff = new StringBuilder();
@@ -1299,7 +1300,7 @@ public class GenericTypeHandler extends TypeHandler {
         if ( !column.getShowInForm()) {
             return;
         }
-        if(!okToShowInForm(entry, column.getName(), true)) {
+        if ( !okToShowInForm(entry, column.getName(), true)) {
             return;
         }
 
@@ -1398,15 +1399,17 @@ public class GenericTypeHandler extends TypeHandler {
      * @param contents _more_
      * @param where _more_
      * @param advancedForm _more_
+     * @param showText _more_
      *
      * @throws Exception on badness
      */
     @Override
     public void addToSearchForm(Request request, List<String> titles,
                                 List<String> contents, List<Clause> where,
-                                boolean advancedForm)
+                                boolean advancedForm, boolean showText)
             throws Exception {
-        super.addToSearchForm(request, titles, contents, where, advancedForm);
+        super.addToSearchForm(request, titles, contents, where, advancedForm,
+                              showText);
         addColumnsToSearchForm(request, titles, contents, where,
                                advancedForm, null);
     }

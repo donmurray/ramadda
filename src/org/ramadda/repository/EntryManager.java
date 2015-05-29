@@ -2128,7 +2128,7 @@ public class EntryManager extends RepositoryManager {
         } else {
             typeHandler =
                 getRepository().getTypeHandler(request.getString(ARG_TYPE,
-                    TypeHandler.TYPE_ANY));
+                                                                 TypeHandler.TYPE_ANY), false, true);
         }
 
         boolean     figureOutType = request.get(ARG_TYPE_GUESS, false);
@@ -3462,7 +3462,7 @@ public class EntryManager extends RepositoryManager {
                 }
 
                 TypeHandler typeHandler =
-                    getRepository().getTypeHandler(tuple[1]);
+                    getRepository().getTypeHandler(tuple[1], false, true);
                 typeHandler.deleteEntry(request, extraStmt, id);
                 if (batchCnt > 100) {
                     for (PreparedStatement stmt : statements) {
@@ -6603,7 +6603,7 @@ public class EntryManager extends RepositoryManager {
             }
             String entryType = results.getString(2);
             TypeHandler typeHandler =
-                getRepository().getTypeHandler(entryType);
+                getRepository().getTypeHandler(entryType, false, true);
             entry = typeHandler.createEntryFromDatabase(results, abbreviated);
             checkEntryFileTime(entry);
         } finally {
@@ -6711,10 +6711,7 @@ public class EntryManager extends RepositoryManager {
                 if (entry == null) {
                     //id,type,name,desc,group,user,file,createdata,fromdate,todate
                     TypeHandler localTypeHandler =
-                        getRepository().getTypeHandler(results.getString(2));
-                    if (localTypeHandler == null) {
-                        continue;
-                    }
+                        getRepository().getTypeHandler(results.getString(2), false, true);
                     entry = localTypeHandler.createEntryFromDatabase(results);
                     cacheEntry(entry);
                 }
@@ -9157,7 +9154,7 @@ public class EntryManager extends RepositoryManager {
             while ((results = iter.getNext()) != null) {
                 String entryType = results.getString(2);
                 TypeHandler typeHandler =
-                    getRepository().getTypeHandler(entryType);
+                    getRepository().getTypeHandler(entryType, false, true);
                 Entry entry =
                     (Entry) typeHandler.createEntryFromDatabase(results);
                 entries.add(entry);

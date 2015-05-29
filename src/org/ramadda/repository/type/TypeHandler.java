@@ -344,7 +344,7 @@ public class TypeHandler extends RepositoryManager {
     /** _more_ */
     private List<Service> services = new ArrayList<Service>();
 
-    /** _more_          */
+    /** _more_ */
     private Entry synthTopLevelEntry;
 
 
@@ -1154,7 +1154,8 @@ public class TypeHandler extends RepositoryManager {
         }
 
         throw new IllegalArgumentException(
-                                           "getSynthIds  not implemented for type:" + getType() +" in class:" + getClass().getName());
+            "getSynthIds  not implemented for type:" + getType()
+            + " in class:" + getClass().getName());
     }
 
     /**
@@ -1173,7 +1174,10 @@ public class TypeHandler extends RepositoryManager {
         if (parent != null) {
             return parent.makeSynthEntry(request, parentEntry, id);
         }
-        throw new IllegalArgumentException("makeSynthEntry  not implemented: type=" + getType() +" class:" + getClass().getName());
+
+        throw new IllegalArgumentException(
+            "makeSynthEntry  not implemented: type=" + getType() + " class:"
+            + getClass().getName());
     }
 
 
@@ -1236,7 +1240,9 @@ public class TypeHandler extends RepositoryManager {
             return parent.makeSynthEntry(request, parentEntry, entryNames);
         }
 
-        throw new IllegalArgumentException("makeSynthEntry  not implemented:" + getType() + " " + getClass().getName());
+        throw new IllegalArgumentException("makeSynthEntry  not implemented:"
+                                           + getType() + " "
+                                           + getClass().getName());
     }
 
 
@@ -4382,17 +4388,19 @@ public class TypeHandler extends RepositoryManager {
      * @param contents _more_
      * @param where _more_
      * @param advancedForm _more_
+     * @param showText _more_
      *
      * @throws Exception _more_
      */
     public void addToSearchForm(Request request, List<String> titles,
                                 List<String> contents, List<Clause> where,
-                                boolean advancedForm)
+                                boolean advancedForm, boolean showText)
             throws Exception {
+
 
         if (parent != null) {
             parent.addToSearchForm(request, titles, contents, where,
-                                   advancedForm);
+                                   advancedForm, showText);
 
             return;
         }
@@ -4434,7 +4442,9 @@ public class TypeHandler extends RepositoryManager {
         StringBuilder advancedSB = new StringBuilder(HtmlUtils.formTable());
 
 
-        addTextSearch(request, basicSB);
+        if (showText) {
+            addTextSearch(request, basicSB);
+        }
         if (request.defined(ARG_USER_ID)) {
             basicSB.append(formEntry(request, msgLabel("User"),
                                      HtmlUtils.input(ARG_USER_ID,
@@ -4697,9 +4707,9 @@ public class TypeHandler extends RepositoryManager {
         */
 
         basicSB.append(RepositoryManager.formEntryTop(request,
-                msgLabel("From " + arg.getLabel()), fromField));
+                msgLabel(arg.getLabel() + " - From"), fromField));
         basicSB.append(RepositoryManager.formEntryTop(request,
-                msgLabel("To " + arg.getLabel()), toField));
+                msgLabel("To"), toField));
         basicSB.append(RepositoryManager.formEntryTop(request, "",
                 dateExtra));
 

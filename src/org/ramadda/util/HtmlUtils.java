@@ -3987,9 +3987,12 @@ public class HtmlUtils {
 
         String args =
             "autoHeight: false, navigation: true, collapsible: true";
-        if ( !collapse) {
+        if ( collapse) {
+            args += ", active: false";
+        } else  {
             args += ", active: 0";
         }
+
         sb.append(HtmlUtils.script("$(function() {\n$(\"#" + accordianId
                                    + "\" ).accordion({" + args + "});});\n"));
     }
