@@ -40,7 +40,7 @@ import java.util.List;
 public class SocrataCategoryTypeHandler extends ExtensibleGroupTypeHandler {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_CATEGORY = "type_socrata_category";
 
     /** _more_ */

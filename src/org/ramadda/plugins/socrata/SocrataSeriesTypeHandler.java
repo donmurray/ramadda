@@ -44,11 +44,11 @@ import java.util.List;
 public class SocrataSeriesTypeHandler extends PointTypeHandler {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String URL_TEMPLATE =
         "${hostname}/api/views/${series_id}/rows.json?accessType=DOWNLOAD";
 
-    /** _more_          */
+    /** _more_ */
     public static final String TYPE_SERIES = "type_socrata_series";
 
     //NOTE: This starts at 2 because the point type has a number of points field
@@ -56,7 +56,7 @@ public class SocrataSeriesTypeHandler extends PointTypeHandler {
     /** _more_ */
     public static final int IDX_REPOSITORY = 2;
 
-    /** _more_          */
+    /** _more_ */
     public static final int IDX_SERIES_ID = 3;
 
 
