@@ -69,6 +69,8 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
     /** _more_ */
     public static final int IDX_PROPERTIES = 1;
 
+    public static final int IDX_LAST = IDX_PROPERTIES;
+
     /** _more_ */
     private RecordFileFactory recordFileFactory;
 

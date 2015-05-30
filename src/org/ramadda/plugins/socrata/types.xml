@@ -39,7 +39,6 @@
 
 <p><br>
 
-Data courtesy of the <a href="{{resource  url=true}}">Energy Information Administration (SOCRATA)</a>.
 
 -section
 
@@ -67,12 +66,17 @@ Data courtesy of the <a href="{{resource  url=true}}">Energy Information Adminis
      <wiki_inner><![CDATA[
 +section # label="SOCRATA Time Series: {{name}}"
 <br>
-{{display type="linechart" title=""  height="200" width="800" column="0" layoutHere="true"}}
+{{group showMenu="true"}}
+{{display type="table" title=""  height="400" xwidth="800" column="0" layoutHere="false" showMenu="true"}}
+
+
+
 <div style="margin:20px;max-height:300px;overflow-y:auto;">
 {{description wikify="true"}}
 </div>
 +row
 +col-md-8
+Data courtesy of <a href="{{resource  url=true}}"> {{field name="repository"}}</a>.
 -col
 +col-md-4
 <div style="text-align:right;">

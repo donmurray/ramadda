@@ -9,6 +9,7 @@ package org.ramadda.plugins.socrata;
 
 import org.json.*;
 
+import org.ramadda.data.services.RecordTypeHandler;
 import org.ramadda.data.services.PointTypeHandler;
 
 
@@ -53,11 +54,13 @@ public class SocrataSeriesTypeHandler extends PointTypeHandler {
 
     //NOTE: This starts at 2 because the point type has a number of points field
 
-    /** _more_ */
-    public static final int IDX_REPOSITORY = 2;
+    public static final int IDX_FIRST = RecordTypeHandler.IDX_LAST+1;
 
     /** _more_ */
-    public static final int IDX_SERIES_ID = 3;
+    public static final int IDX_REPOSITORY = IDX_FIRST;
+
+    /** _more_ */
+    public static final int IDX_SERIES_ID = IDX_FIRST+1;
 
 
     /**
@@ -90,10 +93,11 @@ public class SocrataSeriesTypeHandler extends PointTypeHandler {
         if ( !Utils.stringDefined(id) || !Utils.stringDefined(repository)) {
             return null;
         }
-        String url = URL_TEMPLATE.replace("{$hostname}",
+        String url = URL_TEMPLATE.replace("${hostname}",
                                           repository).replace("${series_id}",
                                               id);
 
+        System.err.println ("Socrata URL:" + url);
         return url;
     }
 

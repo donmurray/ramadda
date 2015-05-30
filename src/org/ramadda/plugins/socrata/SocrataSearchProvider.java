@@ -77,7 +77,8 @@ public class SocrataSearchProvider extends SearchProvider {
 
         List<Entry> entries = new ArrayList<Entry>();
         //TODO: handle limit better
-        String url = "https://" + hostname
+        String server = "https://" + hostname;
+        String url = server
                      + "/api/search/views.json?limit=50&q="
                      + HtmlUtils.urlEncode(request.getString(ARG_TEXT, ""));
         System.err.println(getName() + " search url:" + url);
@@ -95,7 +96,7 @@ public class SocrataSearchProvider extends SearchProvider {
 
         JSONArray   searchResults = obj.getJSONArray("results");
         Entry       parent        = getSynthTopLevelEntry();
-        TypeHandler typeHandler   = getLinkTypeHandler();
+        TypeHandler typeHandler   = getRepository().getTypeHandler(SocrataSeriesTypeHandler.TYPE_SERIES);
 
         for (int i = 0; i < searchResults.length(); i++) {
             JSONObject wrapper    = searchResults.getJSONObject(i);
@@ -109,13 +110,16 @@ public class SocrataSearchProvider extends SearchProvider {
             String itemUrl = "https://" + hostname +"/dataset/-/" + id;
             Entry newEntry = new Entry(Repository.ID_PREFIX_SYNTH + getId()
                                        + ":" + id, typeHandler);
+            Object[] values = typeHandler.makeEntryValues(null);
+            values[SocrataSeriesTypeHandler.IDX_REPOSITORY] = server;
+            values[SocrataSeriesTypeHandler.IDX_SERIES_ID] = id;
             newEntry.setIcon("/socrata/socrata.png");
             entries.add(newEntry);
             newEntry.initEntry(name, desc, parent,
                                getUserManager().getLocalFileUser(),
                                new Resource(new URL(itemUrl)), "",
                                dttm.getTime(), dttm.getTime(),
-                               fromDate.getTime(), toDate.getTime(), null);
+                               fromDate.getTime(), toDate.getTime(), values);
             getEntryManager().cacheEntry(newEntry);
         }
 
