@@ -113,9 +113,18 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 }
 
                 this.allFields =  this.dataCollection.getList()[0].getRecordFields();
-
-                var selectedFields = this.getSelectedFields();
+                
                 var chartType = this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
+
+                var selectedFields = this.getSelectedFields([]);
+                if(selectedFields.length == 0) {
+                    if(chartType == DISPLAY_TABLE) {
+                        selectedFields = this.allFields;
+                    } else {
+                        selectedFields = this.getSelectedFields();
+                    }
+                }
+
                 if(selectedFields.length==0) {
                     this.setContents("No fields selected");
                     return;

@@ -373,7 +373,7 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
             },
             fieldSelectionChanged: function() {
             },
-            getSelectedFields:function() {
+            getSelectedFields:function(dfltList) {
                 var df = [];
                 var dataList =  this.dataCollection.getList();
                 //If we have fixed fields then clear them after the first time
@@ -419,8 +419,13 @@ function RamaddaDisplay(argDisplayManager, argId, argType, argProperties) {
                     }
                 }
 
-                if(df.length==0 && firstField!=null) {
-                    df.push(firstField);
+                if(df.length == 0) {
+                    if(dfltList!=null) {
+                        return dfltList;
+                    }
+                    if(firstField!=null) {
+                        df.push(firstField);
+                    }
                 }
                 return df;
             },
