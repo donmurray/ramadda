@@ -3932,7 +3932,7 @@ public class HtmlUtils {
         List<String> tabs   = new ArrayList<String>();
         titles.add(title);
         tabs.add(contents);
-        makeAccordian(sb, titles, tabs, true);
+        makeAccordian(sb, titles, tabs, true, null);
     }
 
     /**
@@ -3947,8 +3947,26 @@ public class HtmlUtils {
     public static void makeAccordian(Appendable sb, List<String> titles,
                                      List<String> contents)
             throws Exception {
-        makeAccordian(sb, titles, contents, false);
+        makeAccordian(sb, titles, contents, false, null);
     }
+
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     * @param titles _more_
+     * @param contents _more_
+     * @param collapse _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void makeAccordian(Appendable sb, List<String> titles,
+                                     List<String> contents, boolean collapse)
+            throws Exception {
+        makeAccordian(sb, titles, contents, collapse, null);
+    }
+
+
 
     /**
      * Add an accordian of sections to the page
@@ -3957,11 +3975,13 @@ public class HtmlUtils {
      * @param titles    the title for each section
      * @param contents  the contents of each section
      * @param collapse  set the sections to be collapsed initially
+     * @param extraClass _more_
      *
      * @throws Exception  some problem
      */
     public static void makeAccordian(Appendable sb, List<String> titles,
-                                     List<String> contents, boolean collapse)
+                                     List<String> contents, boolean collapse,
+                                     String extraClass)
             throws Exception {
 
         String accordianId = "accordion_" + (blockCnt++);
@@ -3973,11 +3993,10 @@ public class HtmlUtils {
         for (int i = 0; i < titles.size(); i++) {
             String title   = titles.get(i);
             String content = contents.get(i);
-            sb.append(
-                HtmlUtils.open(
-                    HtmlUtils.TAG_H3,
-                    HtmlUtils.cssClass(
-                        "ui-accordion-header ui-helper-reset ui-state-active ui-corner-top")));
+            sb.append(HtmlUtils.open(HtmlUtils.TAG_H3,
+                                     HtmlUtils.cssClass(((extraClass != null)
+                    ? extraClass + " "
+                    : "") + " ui-accordion-header ui-helper-reset ui-state-active ui-corner-top")));
             sb.append("<a href=\"#\">");
             sb.append(title);
             sb.append("</a></h3>");
@@ -3987,9 +4006,9 @@ public class HtmlUtils {
 
         String args =
             "autoHeight: false, navigation: true, collapsible: true";
-        if ( collapse) {
+        if (collapse) {
             args += ", active: false";
-        } else  {
+        } else {
             args += ", active: 0";
         }
 

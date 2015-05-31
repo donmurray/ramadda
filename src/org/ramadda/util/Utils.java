@@ -1552,5 +1552,53 @@ public class Utils {
     }
 
 
+    /**
+     * _more_
+     *
+     * @param is _more_
+     * @param maxSize _more_
+     *
+     * @return _more_
+     *
+     * @throws IOException _more_
+     */
+    public static byte[] readBytes(InputStream is, int maxSize)
+            throws IOException {
+        int    totalRead = 0;
+        byte[] content   = new byte[100000];
+        try {
+            while (true) {
+                int howMany = is.read(content, totalRead,
+                                      content.length - totalRead);
+                if (howMany < 0) {
+                    break;
+                }
+                if (howMany == 0) {
+                    continue;
+                }
+                totalRead += howMany;
+                if (totalRead >= content.length) {
+                    byte[] tmp       = content;
+                    int    newLength = ((content.length < 25000000)
+                                        ? content.length * 2
+                                        : content.length + 5000000);
+                    content = new byte[newLength];
+                    System.arraycopy(tmp, 0, content, 0, totalRead);
+                }
+                if ((maxSize >= 0) && (maxSize > totalRead)) {
+                    break;
+                }
+            }
+        } finally {
+            IOUtil.close(is);
+        }
+        byte[] results = new byte[totalRead];
+        System.arraycopy(content, 0, results, 0, totalRead);
+
+        return results;
+    }
+
+
+
 
 }
