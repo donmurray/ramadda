@@ -816,6 +816,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             throws Exception {
 
 
+        sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,HtmlUtils.cssClass("ramadda-search-form")));
         TypeHandler typeHandler = getRepository().getTypeHandler(request);
 
         if (justText) {
@@ -843,8 +844,9 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
 
 
 
-
-        if ( !justText) {
+        if(justText) {
+            addSearchProviders(request, contents, titles);
+        } else {
             Object       oldValue = request.remove(ARG_RELATIVEDATE);
             List<Clause> where    = typeHandler.assembleWhereClause(request);
             if (oldValue != null) {
@@ -859,60 +861,10 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                 metadataSB.append(HtmlUtils.formTable());
                 getMetadataManager().addToSearchForm(request, metadataSB);
                 metadataSB.append(HtmlUtils.formTableClose());
-                titles.add(msg("Properties"));
+                titles.add(msg("More search criteria"));
                 contents.add(metadataSB.toString());
             }
-
-
-
-            List<SearchProvider> searchProviders = getSearchProviders();
-            if (searchProviders.size() > 1) {
-                StringBuilder  providerSB = new StringBuilder();
-                CategoryBuffer cats       = new CategoryBuffer();
-                //                providerSB.append(msg("Where do you want to search?"));
-                //                providerSB.append(HtmlUtils.br());
-                List<String> selectedProviders = new ArrayList<String>();
-                for (String tok :
-                        (List<String>) request.get(ARG_PROVIDER,
-                            new ArrayList<String>())) {
-                    selectedProviders.addAll(StringUtil.split(tok, ",", true,
-                            true));
-                }
-
-
-                for (int i = 0; i < searchProviders.size(); i++) {
-                    SearchProvider searchProvider = searchProviders.get(i);
-                    boolean        selected       = false;
-                    if (selectedProviders.size() == 0) {
-                        selected = (i == 0);
-                    } else {
-                        selected = selectedProviders.contains(
-                            searchProvider.getId());
-                    }
-                    cats.get(searchProvider.getCategory()).append(
-                        HtmlUtils.labeledCheckbox(
-                            ARG_PROVIDER, searchProvider.getId(), selected,
-                            searchProvider.getName()));
-                    cats.get(searchProvider.getCategory()).append(
-                        HtmlUtils.br());
-                }
-
-                for (String cat : cats.getCategories()) {
-                    Appendable buff = cats.get(cat);
-                    if (cat.length() == 0) {
-                        buff.append(HtmlUtils.labeledCheckbox(ARG_PROVIDER,
-                                "all", selectedProviders.contains("all"),
-                                msg("All")));
-                    } else {
-                        providerSB.append(HtmlUtils.h3(cat));
-                    }
-                    providerSB.append(buff);
-                }
-                titles.add(msg("Where do you want to search?"));
-                contents.add(HtmlUtils.insetDiv(providerSB.toString(), 0, 20,
-                        0, 0));
-            }
-
+            addSearchProviders(request, contents, titles);
 
             StringBuffer outputForm = new StringBuffer(HtmlUtils.formTable());
             /* Humm, we probably don't want to include this as it screws up setting the output in the form
@@ -955,8 +907,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             outputForm.append(HtmlUtils.formTableClose());
             titles.add(msg("Output"));
             contents.add(outputForm.toString());
-        }
-
+        } 
 
         if (servers.size() > 0) {
             StringBuffer serverSB  = new StringBuffer();
@@ -1002,7 +953,9 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                     serverSB.toString(),
                         HtmlUtils.cssClass(CSS_CLASS_SERVER)), false));
             */
-        }
+        } 
+
+        
 
 
 
@@ -1018,9 +971,71 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                       + getSearchButtons(request));
         }
 
-        HtmlUtils.makeAccordian(sb, titles, contents, true);
+        StringBuilder formSB = new StringBuilder();
+        HtmlUtils.makeAccordian(formSB, titles, contents, true,"ramadda-search-accordian");
+        sb.append(formSB.toString());
+        sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
+    }
 
 
+    private void addSearchProviders(Request request, List<String>contents, List<String>titles) throws Exception {
+        List<SearchProvider> searchProviders = getSearchProviders();
+        if (searchProviders.size() <= 1) {
+            return;
+        }
+        StringBuilder  providerSB = new StringBuilder();
+        CategoryBuffer cats       = new CategoryBuffer();
+        List<String> selectedProviders = new ArrayList<String>();
+        for (String tok :
+                 (List<String>) request.get(ARG_PROVIDER,
+                                            new ArrayList<String>())) {
+            selectedProviders.addAll(StringUtil.split(tok, ",", true,
+                                                      true));
+        }
+
+
+        StringBuilder extra = new StringBuilder();
+        for (int i = 0; i < searchProviders.size(); i++) {
+            SearchProvider searchProvider = searchProviders.get(i);
+            boolean        selected       = false;
+            if (selectedProviders.size() == 0) {
+                selected = (i == 0);
+            } else {
+                selected = selectedProviders.contains(
+                                                      searchProvider.getId());
+                if(selected) {
+                    if(extra.length()>0) {
+                        extra.append(", ");
+                    }
+                    extra.append(searchProvider.getName());
+                }
+            }
+            cats.get(searchProvider.getCategory()).append(
+                                                          HtmlUtils.labeledCheckbox(
+                                                                                    ARG_PROVIDER, searchProvider.getId(), selected,
+                                                                                    searchProvider.getName()));
+            cats.get(searchProvider.getCategory()).append(
+                                                          HtmlUtils.br());
+        }
+
+        for (String cat : cats.getCategories()) {
+            Appendable buff = cats.get(cat);
+            if (cat.length() == 0) {
+                buff.append(HtmlUtils.labeledCheckbox(ARG_PROVIDER,
+                                                      "all", selectedProviders.contains("all"),
+                                                      msg("All Search Providers")));
+            } else {
+                providerSB.append(HtmlUtils.h3(cat));
+            }
+            providerSB.append(buff);
+        }
+        String title = msg("Where do you want to search?");
+        if(extra.length()>0) {
+            title+= HtmlUtils.space(4) + msgLabel("Currently") + extra;
+        }
+        titles.add(title);
+        contents.add(HtmlUtils.insetDiv(providerSB.toString(), 0, 20,
+                                        0, 0));
     }
 
 

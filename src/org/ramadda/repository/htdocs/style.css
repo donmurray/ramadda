@@ -543,18 +543,17 @@ td.entry-table-block {
 }
 
 
+.ramadda-search-accordian {
+  border: 0px #fff solid;
+  background: none;
+}
 
+.ramadda-search-accordian:hover {
+}
 
-
-
-
-
-
-
-
-
-.ui-accordion .ui-accordion-content {
-         padding:0px;
+.ramadda-search-form .ui-accordion .ui-accordion-content {
+    padding: 0px;
+    border: 0px #fff solid;
 }
 
 .ui-accordion .ui-accordion-header a {
@@ -1693,6 +1692,7 @@ snippet {
     overflow-x: automatic;
     background-color:white;
 }
+
 
 
 

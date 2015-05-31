@@ -4610,7 +4610,6 @@ public class TypeHandler extends RepositoryManager {
         basicSB.append(HtmlUtils.formTableClose());
         advancedSB.append(HtmlUtils.formTableClose());
 
-
         titles.add(msg("Search Criteria"));
         contents.add(basicSB.toString());
 
