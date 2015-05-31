@@ -11,6 +11,9 @@ import org.ramadda.data.point.*;
 
 
 import org.ramadda.data.record.*;
+import org.ramadda.data.services.*;
+import org.ramadda.repository.*;
+import org.ramadda.repository.metadata.*;
 import org.ramadda.util.Utils;
 
 import ucar.ma2.DataType;
@@ -84,6 +87,59 @@ public class NetcdfPointFile extends PointFile {
     }
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private String getFileToUse() throws Exception {
+        String      filename = getFilename();
+        RecordEntry entry    = (RecordEntry) getProperty("prop.recordentry");
+        if (entry == null) {
+            return filename;
+        }
+        Repository repository =
+            entry.getEntry().getTypeHandler().getRepository();
+
+        List<Metadata> metadataList =
+            repository.getMetadataManager().findMetadata(
+                repository.getTmpRequest(), entry.getEntry(),
+                ContentMetadataHandler.TYPE_ATTACHMENT, true);
+        if (metadataList == null) {
+            return filename;
+        }
+        for (Metadata metadata : metadataList) {
+            String fileAttachment = metadata.getAttr1();
+            if ( !fileAttachment.endsWith(".ncml")) {
+                continue;
+            }
+            File templateNcmlFile =
+                new File(
+                    IOUtil.joinDir(
+                        repository.getStorageManager().getEntryDir(
+                            metadata.getEntryId(),
+                            false), metadata.getAttr1()));
+            String ncml = repository.getStorageManager().readSystemResource(
+                              templateNcmlFile).replace(
+                              "${location}", filename);
+            String dttm = templateNcmlFile.lastModified() + "";
+            String fileName = dttm + "_" + entry.getEntry().getId() + "_"
+                              + metadata.getId() + ".ncml";
+            File ncmlFile =
+                repository.getStorageManager().getScratchFile(fileName);
+            IOUtil.writeBytes(ncmlFile, ncml.getBytes());
+            filename = ncmlFile.toString();
+
+            break;
+        }
+
+        return filename;
+    }
+
+
+
 
     /**
      * _more_
@@ -119,7 +175,8 @@ public class NetcdfPointFile extends PointFile {
             dateField.setType(dateField.TYPE_DATE);
             fields.add(dateField);
 
-            FeatureDatasetPoint pod  = getDataset(getFilename());
+
+            FeatureDatasetPoint pod  = getDataset(getFileToUse());
             List                vars = pod.getDataVariables();
             for (VariableSimpleIF var : (List<VariableSimpleIF>) vars) {
                 String label = var.getDescription();
@@ -238,7 +295,7 @@ public class NetcdfPointFile extends PointFile {
      */
     public Record doMakeRecord(VisitInfo visitInfo) {
         try {
-            FeatureDatasetPoint  pod          = getDataset(getFilename());
+            FeatureDatasetPoint  pod          = getDataset(getFileToUse());
             PointFeatureIterator dataIterator = getPointIterator(pod);
             NetcdfRecord record = new NetcdfRecord(this, getFields(),
                                       dataIterator);
@@ -292,7 +349,8 @@ public class NetcdfPointFile extends PointFile {
     public VisitInfo prepareToVisit(VisitInfo visitInfo) throws Exception {
         visitInfo.setRecordIO(readHeader(visitInfo.getRecordIO()));
 
-        NetcdfDataset   dataset  = NetcdfDataset.openDataset(getFilename());
+
+        NetcdfDataset   dataset  = NetcdfDataset.openDataset(getFileToUse());
         String          platform = "";
 
         List<Attribute> attrs    = dataset.getGlobalAttributes();
@@ -375,6 +433,7 @@ public class NetcdfPointFile extends PointFile {
      * @throws Exception _more_
      */
     private FeatureDatasetPoint getDataset(String path) throws Exception {
+        System.err.println("Opening:" + path);
         Formatter buf = new Formatter();
         FeatureDatasetPoint pods =
             (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(

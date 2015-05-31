@@ -101,7 +101,10 @@ public class NetcdfRecord extends DataRecord {
         int cnt = 0;
         values[cnt++] = el.getLongitude();
         values[cnt++] = el.getLatitude();
-        Date dttm = po.getNominalTimeAsDate();
+        //        Date dttm = po.getNominalTimeAsDate();
+        CalendarDate cdttm = po.getNominalTimeAsCalendarDate();
+        Date         dttm  = new Date(cdttm.getMillis());
+
         objectValues[cnt++] = dttm;
         setRecordTime(dttm.getTime());
 

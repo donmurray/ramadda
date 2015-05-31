@@ -68,7 +68,7 @@ public class SocrataFile extends CsvFile {
             throws IOException {
         try {
             if (buffer == null) {
-                System.err.println("Reading SOCRATA time series");
+                //System.err.println("Reading SOCRATA time series");
                 buffer = new StringBuilder();
 
                 InputStream source = super.doMakeInputStream(buffered);
@@ -92,23 +92,28 @@ public class SocrataFile extends CsvFile {
                     }
 
                     StringBuilder sb = new StringBuilder();
-                    sb.append(id);
-                    sb.append("[");
-
-                    sb.append(attrLabel(name));
-                    if(type.equals("text")) {
-                        sb.append(attrType(TYPE_STRING));
-                    } else if(type.equals("number")) {
-                        sb.append(attrChartable());
-                    } else if(type.equals("percent")) {
-                        sb.append(attrChartable());
-                        sb.append(attrUnit("%"));
+                    if(type.equals("location")) {
+                        sb.append("latitude[label=Latitude],longitude[label=Longitude]");
+                    } else {
+                        sb.append(id);
+                        sb.append("[");
+                        sb.append(attrLabel(name));
+                        if(type.equals("text")) {
+                            sb.append(attrType(TYPE_STRING));
+                        } else if(type.equals("number")) {
+                            sb.append(attrChartable());
+                        } else if(type.equals("percent")) {
+                            sb.append(attrChartable());
+                            sb.append(attrUnit("%"));
+                        }
+                        sb.append("]");
                     }
-                    sb.append("]");
                     fields.add(sb.toString());
                 }
                 System.err.println(makeFields(fields));
                 putProperty(PROP_FIELDS, makeFields(fields));
+                putProperty("output.latlon","false");
+                //                putProperty("output.time","false");
                 
                 for (int i = 0; i < data.length(); i++) {
                     JSONArray row    = data.getJSONArray(i);
@@ -120,24 +125,31 @@ public class SocrataFile extends CsvFile {
                         }
                         String v = null;
                         if(type.equals("location")) {
-                            v = "0";
+                            JSONArray tuple = row.getJSONArray(j);
+                            
+                            v = tuple.get(1).toString() +"," + tuple.get(2).toString();
+                            if(colCnt>0) buffer.append(",");
+                            buffer.append(v);
+                            System.err.println("location:" + v);
+                            colCnt+=2;
+
                         } else {
                             v = row.get(j).toString();
-                        }
-                        if(v!=null) {
-                            v = v.replaceAll("\n", " ");
-                            if(colCnt>0) buffer.append(",");
-                            boolean wrap = v.indexOf(",")>=0;
-                            if(wrap) buffer.append("\"");
-                            buffer.append(v);
-                            if(wrap) buffer.append("\"");
-                            colCnt++;
+                            if(v!=null) {
+                                v = v.replaceAll("\n", " ");
+                                if(colCnt>0) buffer.append(",");
+                                boolean wrap = v.indexOf(",")>=0;
+                                if(wrap) buffer.append("\"");
+                                buffer.append(v);
+                                if(wrap) buffer.append("\"");
+                                colCnt++;
+                            }
                         }
                     }
                     buffer.append("\n");
                 }
             }
-            System.err.println(buffer);
+
             ByteArrayInputStream bais =
                 new ByteArrayInputStream(buffer.toString().getBytes());
 

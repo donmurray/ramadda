@@ -635,7 +635,7 @@ var RecordUtil = {
         if(records!=null) {
             for(j=0;j<records.length;j++) { 
                 var record = records[j];
-                if(!isNaN(record.getLatitude())) { 
+                if(!isNaN(record.getLatitude()) && !isNaN(record.getLongitude())) { 
                     if(j == 0) {
                         north  =  record.getLatitude();
                         south  = record.getLatitude();
@@ -645,7 +645,7 @@ var RecordUtil = {
                         north  = Math.max(north, record.getLatitude());
                         south  = Math.min(south, record.getLatitude());
                         west  = Math.min(west, record.getLongitude());
-                        east  = Math.min(east, record.getLongitude());
+                        east  = Math.max(east, record.getLongitude());
                     }
                     points.push(new OpenLayers.Geometry.Point(record.getLongitude(),record.getLatitude()));
                 }

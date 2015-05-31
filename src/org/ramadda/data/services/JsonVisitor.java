@@ -80,9 +80,6 @@ import java.util.zip.*;
  */
 public class JsonVisitor extends BridgeRecordVisitor {
 
-    /** _more_ */
-    public static final boolean doNewEncoding = true;
-    //    public static final boolean doNewEncoding = false;
 
     /** _more_ */
     private static final String COMMA = ",\n";
@@ -130,13 +127,15 @@ public class JsonVisitor extends BridgeRecordVisitor {
             return false;
         }
         PointRecord pointRecord = (PointRecord) record;
+        boolean addGeo = file.getProperty("output.latlon", true) && pointRecord.isValidPosition();
+        boolean addTime = file.getProperty("output.time", true) && pointRecord.hasRecordTime();
         if (fields == null) {
             pw     = getThePrintWriter();
             fields = record.getFields();
             RecordField.addJsonHeader(
                 pw, mainEntry.getName(), fields,
-                doNewEncoding && pointRecord.isValidPosition(),
-                doNewEncoding && pointRecord.hasRecordTime());
+                addGeo,
+                addTime);
         }
 
         int fieldCnt = 0;
@@ -145,23 +144,6 @@ public class JsonVisitor extends BridgeRecordVisitor {
         }
 
         pw.append(Json.mapOpen());
-
-
-
-        if ( !doNewEncoding && pointRecord.isValidPosition()) {
-            Json.addGeolocation(pw, pointRecord.getLatitude(),
-                                pointRecord.getLongitude(),
-                                pointRecord.getAltitude());
-            pw.append(COMMA);
-        }
-        if ( !doNewEncoding && pointRecord.hasRecordTime()) {
-            pw.append(Json.attr(Json.FIELD_DATE,
-                                pointRecord.getRecordTime()));
-            pw.append(COMMA);
-        } else {
-            //            pw.append(Json.attr(Json.FIELD_DATE, Json.NULL, false));
-        }
-
 
         pw.append(Json.mapKey(Json.FIELD_VALUES));
         pw.append(Json.listOpen());
@@ -201,8 +183,7 @@ public class JsonVisitor extends BridgeRecordVisitor {
         }
 
 
-        if (doNewEncoding) {
-            if (pointRecord.isValidPosition()) {
+            if (addGeo) {
                 pw.append(COMMA);
                 pw.append(Json.formatNumber(pointRecord.getLatitude()));
                 pw.append(COMMA);
@@ -210,13 +191,14 @@ public class JsonVisitor extends BridgeRecordVisitor {
                 pw.append(COMMA);
                 pw.append(Json.formatNumber(pointRecord.getAltitude()));
             }
-            if (pointRecord.hasRecordTime()) {
+            if (addTime) {
                 pw.append(COMMA);
                 //                pw.append(Json.quote(DateUtil.getTimeAsISO8601(pointRecord.getRecordTime())));
                 //Just use the milliseconds
                 pw.append(Json.formatNumber(pointRecord.getRecordTime()));
             }
-        }
+
+
 
         pw.append(Json.listClose());
         pw.append(Json.mapClose());

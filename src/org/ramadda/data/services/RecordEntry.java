@@ -267,7 +267,9 @@ public class RecordEntry implements Runnable, Callable<Boolean> {
      */
     public void visit(RecordVisitor visitor, VisitInfo visitInfo)
             throws Exception {
-        getRecordFile().visit(visitor, visitInfo, getFilter());
+        RecordFile recordFile = getRecordFile();
+        recordFile.putProperty("prop.recordentry", this);
+        recordFile.visit(visitor, visitInfo, getFilter());
     }
 
 
