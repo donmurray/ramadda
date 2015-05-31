@@ -101,6 +101,9 @@ public class ArxivSearchProvider extends SearchProvider {
             fth.processAtom(request, parent, entries, root);
         }
 
+        for(Entry entry: entries) {
+            entry.setIcon("/search/arxiv.png");
+        }
         return entries;
     }
 
