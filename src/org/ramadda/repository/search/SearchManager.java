@@ -1021,9 +1021,11 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
         for (String cat : cats.getCategories()) {
             Appendable buff = cats.get(cat);
             if (cat.length() == 0) {
+                /*
                 buff.append(HtmlUtils.labeledCheckbox(ARG_PROVIDER,
                                                       "all", selectedProviders.contains("all"),
                                                       msg("All Search Providers")));
+                */
             } else {
                 providerSB.append(HtmlUtils.h3(cat));
             }

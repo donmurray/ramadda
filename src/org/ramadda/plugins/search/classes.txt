@@ -11,7 +11,7 @@ org.ramadda.plugins.search.ArxivSearchProvider
 #classpath;ID;opensearch URL;Label
 #The URL should have the macro: ${searchterms}
 #
-org.ramadda.plugins.search.OpenSearchProvider;nasa;https://api-test.echo.nasa.gov/opensearch/datasets.atom?keyword=${searchterms};NASA Open Search
+org.ramadda.plugins.search.OpenSearchProvider;nasa;https://api-test.echo.nasa.gov/opensearch/datasets.atom?keyword=${searchterms};NASA Open Search;/search/nasa.png
 
 #org.ramadda.plugins.search.OpenSearchProvider;nsdc;http://nsidc.org/api/opensearch/1.1/dataset?searchterms=${searchterms};NSIDC Open Search
 

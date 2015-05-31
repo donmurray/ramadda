@@ -47,6 +47,7 @@ public class OpenSearchProvider extends SearchProvider {
     /** _more_ */
     private String baseUrl;
 
+    private String icon;
 
     /**
      * _more_
@@ -57,6 +58,9 @@ public class OpenSearchProvider extends SearchProvider {
     public OpenSearchProvider(Repository repository, List<String> args) {
         super(repository, args.get(0), args.get(2));
         baseUrl = args.get(1);
+        if(args.size()>3) {
+            icon = args.get(3);
+        }
     }
 
 
@@ -164,6 +168,10 @@ public class OpenSearchProvider extends SearchProvider {
                                  "");
             Entry newEntry = new Entry(Repository.ID_PREFIX_SYNTH + getId()
                                        + ":" + id, typeHandler);
+
+            if(icon!=null) {
+                newEntry.setIcon(icon);
+            }
             entries.add(newEntry);
 
             newEntry.initEntry(name, desc, parent,
