@@ -1585,7 +1585,7 @@ public class Utils {
                     content = new byte[newLength];
                     System.arraycopy(tmp, 0, content, 0, totalRead);
                 }
-                if ((maxSize >= 0) && (maxSize > totalRead)) {
+                if ((maxSize >= 0) && (totalRead >= maxSize)) {
                     break;
                 }
             }
