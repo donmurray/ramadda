@@ -2,12 +2,17 @@
 #org.ramadda.plugins.socrata.SocrataSearchProvider;<socrata host name>;<server name>
 
 
-org.ramadda.plugins.socrata.SocrataSearchProvider;www.opendatanyc.com;City of New York City Comptroller
-org.ramadda.plugins.socrata.SocrataSearchProvider;data.colorado.gov;Colorado
+org.ramadda.plugins.socrata.SocrataSearchProvider;finances.worldbank.org;World Bank
 org.ramadda.plugins.socrata.SocrataSearchProvider;data.cdc.gov;Center for Disease Control and Prevention
+org.ramadda.plugins.socrata.SocrataSearchProvider;data.colorado.gov;Colorado Open Data
+org.ramadda.plugins.socrata.SocrataSearchProvider;www.opendatanyc.com;City of New York City Comptroller
+org.ramadda.plugins.socrata.SocrataSearchProvider;data.ny.gov;New York State Office of ITS
 
 
-##list of Socrata servers from https://opendata.socrata.com/dataset/Socrata-Customer-Spotlights/6wk3-4ija
+
+
+# List of Socrata servers from 
+# https://opendata.socrata.com/dataset/Socrata-Customer-Spotlights/6wk3-4ija
 #org.ramadda.plugins.socrata.SocrataSearchProvider;data.act.gov.au;ACT Government
 #org.ramadda.plugins.socrata.SocrataSearchProvider;wfp.demo.socrata.com;AERC Africa
 #org.ramadda.plugins.socrata.SocrataSearchProvider;data.acgov.org;Alameda County

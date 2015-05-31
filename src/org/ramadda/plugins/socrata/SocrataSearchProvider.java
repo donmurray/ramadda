@@ -14,6 +14,7 @@ import org.ramadda.repository.metadata.*;
 import org.ramadda.repository.search.*;
 import org.ramadda.repository.type.*;
 import org.ramadda.util.HtmlUtils;
+import org.ramadda.util.Utils;
 
 import org.ramadda.util.Json;
 import org.ramadda.util.Utils;
@@ -87,9 +88,9 @@ public class SocrataSearchProvider extends SearchProvider {
                      + "/api/search/views.json?limit=50&q="
                      + HtmlUtils.urlEncode(request.getString(ARG_TEXT, ""));
         System.err.println(getName() + " search url:" + url);
-        InputStream is   = getInputStream(url);
-        String      json = IOUtil.readContents(is);
-        IOUtil.close(is);
+
+        //Max out at 2 mb
+        String      json = new String(Utils.readBytes(getInputStream(url), 2*1000000));
         //        System.out.println("json:" + json);
         JSONObject obj = new JSONObject(new JSONTokener(json));
         if ( !obj.has("results")) {
