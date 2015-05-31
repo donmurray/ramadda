@@ -59,6 +59,11 @@ public class SocrataSearchProvider extends SearchProvider {
     }
 
 
+    @Override
+    public String getCategory() {
+        return "Socrata Search Providers";
+    }
+
 
     /**
      * _more_

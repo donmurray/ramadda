@@ -1,6 +1,9 @@
 ##
 #org.ramadda.plugins.socrata.SocrataSearchProvider;<socrata host name>;<server name>
 
+
+org.ramadda.plugins.socrata.SocrataSearchProvider;www.opendatanyc.com;City of New York City Comptroller
+org.ramadda.plugins.socrata.SocrataSearchProvider;data.colorado.gov;Colorado
 org.ramadda.plugins.socrata.SocrataSearchProvider;data.cdc.gov;Center for Disease Control and Prevention
 
 

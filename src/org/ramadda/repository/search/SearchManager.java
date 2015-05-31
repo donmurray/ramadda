@@ -867,7 +867,8 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
 
             List<SearchProvider> searchProviders = getSearchProviders();
             if (searchProviders.size() > 1) {
-                StringBuilder providerSB = new StringBuilder();
+                StringBuilder  providerSB = new StringBuilder();
+                CategoryBuffer cats       = new CategoryBuffer();
                 //                providerSB.append(msg("Where do you want to search?"));
                 //                providerSB.append(HtmlUtils.br());
                 List<String> selectedProviders = new ArrayList<String>();
@@ -877,11 +878,6 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                     selectedProviders.addAll(StringUtil.split(tok, ",", true,
                             true));
                 }
-
-                providerSB.append(HtmlUtils.labeledCheckbox(ARG_PROVIDER,
-                        "all", selectedProviders.contains("all"),
-                        msg("All")));
-                providerSB.append(HtmlUtils.br());
 
 
                 for (int i = 0; i < searchProviders.size(); i++) {
@@ -893,12 +889,25 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                         selected = selectedProviders.contains(
                             searchProvider.getId());
                     }
-                    providerSB.append(HtmlUtils.labeledCheckbox(ARG_PROVIDER,
-                            searchProvider.getId(), selected,
+                    cats.get(searchProvider.getCategory()).append(
+                        HtmlUtils.labeledCheckbox(
+                            ARG_PROVIDER, searchProvider.getId(), selected,
                             searchProvider.getName()));
-                    providerSB.append(HtmlUtils.br());
+                    cats.get(searchProvider.getCategory()).append(
+                        HtmlUtils.br());
                 }
 
+                for (String cat : cats.getCategories()) {
+                    Appendable buff = cats.get(cat);
+                    if (cat.length() == 0) {
+                        buff.append(HtmlUtils.labeledCheckbox(ARG_PROVIDER,
+                                "all", selectedProviders.contains("all"),
+                                msg("All")));
+                    } else {
+                        providerSB.append(HtmlUtils.h3(cat));
+                    }
+                    providerSB.append(buff);
+                }
                 titles.add(msg("Where do you want to search?"));
                 contents.add(HtmlUtils.insetDiv(providerSB.toString(), 0, 20,
                         0, 0));

@@ -64,6 +64,20 @@ public class OpenSearchProvider extends SearchProvider {
     /**
      * _more_
      *
+     * @return _more_
+     */
+    @Override
+    public String getCategory() {
+        return "Science Search Providers";
+    }
+
+
+
+
+
+    /**
+     * _more_
+     *
      * @param request _more_
      * @param searchCriteriaSB _more_
      *

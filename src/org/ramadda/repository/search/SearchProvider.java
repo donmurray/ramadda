@@ -118,6 +118,16 @@ public abstract class SearchProvider extends GenericTypeHandler {
      *
      * @return _more_
      */
+    public String getCategory() {
+        return "External Search Providers";
+    }
+
+
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
     public String getName() {
         if (name == null) {
             return getId();
@@ -171,6 +181,18 @@ public abstract class SearchProvider extends GenericTypeHandler {
                                      String name) {
             super(repository, id, name);
         }
+
+
+        /**
+         * _more_
+         *
+         * @return _more_
+         */
+        public String getCategory() {
+            return "";
+        }
+
+
 
         /**
          * _more_

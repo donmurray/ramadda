@@ -58,6 +58,16 @@ public class ArxivSearchProvider extends SearchProvider {
 
 
 
+    /**
+     * _more_
+     *
+     * @return _more_
+     */
+    @Override
+    public String getCategory() {
+        return "Science Search Providers";
+    }
+
 
     /**
      * _more_
