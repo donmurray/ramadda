@@ -24,8 +24,8 @@ import org.ramadda.repository.Result;
 import org.ramadda.repository.map.MapInfo;
 import org.ramadda.repository.metadata.Metadata;
 import org.ramadda.repository.metadata.MetadataType;
-import org.ramadda.repository.search.SpecialSearch;
 import org.ramadda.repository.search.SearchManager;
+import org.ramadda.repository.search.SpecialSearch;
 import org.ramadda.repository.type.LocalFileTypeHandler;
 import org.ramadda.repository.type.TypeHandler;
 import org.ramadda.repository.util.DateArgument;
@@ -52,6 +52,8 @@ import java.net.URL;
 import java.text.SimpleDateFormat;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.GregorianCalendar;
@@ -105,7 +107,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                                              ATTR_DETAILS, "true")), 
                             new WikiTag(WIKI_TAG_TREEVIEW, attrs(ATTR_WIDTH,"750", ATTR_HEIGHT,"500")), 
                             new WikiTag(WIKI_TAG_ACCORDIAN, attrs(
-                                                                 ATTR_TAG, WIKI_TAG_HTML, ATTR_SHOWLINK, "true", ATTR_INCLUDEICON, "false") + ATTRS_LAYOUT), 
+                                                                  ATTR_TAG, WIKI_TAG_HTML, ATTR_COLLAPSE, "false", "border", "0", ATTR_SHOWLINK, "true", ATTR_INCLUDEICON, "false") + ATTRS_LAYOUT), 
                             //                            new WikiTag(WIKI_TAG_GRID), 
                             new WikiTag(WIKI_TAG_TABLE), 
                             new WikiTag(WIKI_TAG_RECENT, attrs(
@@ -955,8 +957,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 url   = entry.getResource().getPath();
                 label = url;
             }
-            if(Misc.getProperty(props, "url",
-                                false)) {
+            if (Misc.getProperty(props, "url", false)) {
                 return url;
             }
 
@@ -1368,8 +1369,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                                            Misc.getProperty(props, ATTR_ID,
                                                TypeHandler.TYPE_ANY));
 
-            String provider = Misc.getProperty(props, SearchManager.ARG_PROVIDER,
-                                               (String) null);
+            String provider = Misc.getProperty(props,
+                                  SearchManager.ARG_PROVIDER, (String) null);
             TypeHandler typeHandler = getRepository().getTypeHandler(type);
 
             if (typeHandler == null) {
@@ -1378,11 +1379,11 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             String  incomingMax = request.getString(ARG_MAX, (String) null);
             Request myRequest   = copyRequest(request, props);
 
-            if(provider!=null) {
-                myRequest.put(SearchManager.ARG_PROVIDER, provider);            
+            if (provider != null) {
+                myRequest.put(SearchManager.ARG_PROVIDER, provider);
             }
-            
-//Pass the wiki attribute into the request to the special search
+
+            //Pass the wiki attribute into the request to the special search
             String fields = Misc.getProperty(props, ATTR_FIELDS,
                                              (String) null);
             if (fields != null) {
@@ -1587,9 +1588,12 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 sb.append(OutputHandler.makeTabs(titles, contents, true,
                         false));
             } else if (layout.equals("accordian")) {
-                boolean doBorder = Misc.getProperty(props,  APPLY_PREFIX + "border", false);
-                boolean collapse = Misc.getProperty(props,  APPLY_PREFIX + "collapse", false);
-                HtmlUtils.makeAccordian(sb, titles, contents, collapse,(!doBorder?"ramadda-accordian":null),null);
+                int     showBorder = Misc.getProperty(props, "border", 0);
+                boolean collapse = Misc.getProperty(props, "collapse", false);
+                HtmlUtils.makeAccordian(sb, titles, contents, collapse,
+                                        ((showBorder == 0)
+                                         ? "ramadda-accordian"
+                                         : null), null);
             } else {
                 throw new IllegalArgumentException("Unknown layout:"
                         + layout);
@@ -1740,9 +1744,14 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
 
             if (theTag.equals(WIKI_TAG_ACCORDIAN)) {
-                boolean doBorder = Misc.getProperty(props,  APPLY_PREFIX + "border", false);
-                boolean collapse = Misc.getProperty(props,  APPLY_PREFIX + "collapse", false);
-                HtmlUtils.makeAccordian(sb, titles, contents, collapse,(!doBorder?"ramadda-accordian":null),null);
+                int border = Misc.getProperty(props, ATTR_BORDER, 0);
+                boolean collapse = Misc.getProperty(props, ATTR_COLLAPSE,
+                                       false);
+                HtmlUtils.makeAccordian(sb, titles, contents, collapse,
+                                        ((border == 0)
+                                         ? "ramadda-accordian"
+                                         : null), null);
+
                 return sb.toString();
             } else if (doingGrid) {
                 List<String> weights = null;
@@ -1827,7 +1836,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 }
 
                 //Close the div if there was anything
-                if(rowCnt>0) {
+                if (rowCnt > 0) {
                     sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
                 }
 
@@ -2565,7 +2574,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         if (props == null) {
             props = new Hashtable();
         }
-        
+
         request = request.cloneMe();
 
         //If there is a max property then clone the request and set the max
@@ -2932,11 +2941,13 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                     continue;
                 }
 
-                List<Entry>[] pair =    getSearchManager().doSearch(myRequest, new StringBuilder());
+                List<Entry>[] pair = getSearchManager().doSearch(myRequest,
+                                         new StringBuilder());
                 //                if(myRequest.defined(ARG_PROVIDER)) {
                 //List<Entry>[] pair = getEntryManager().getEntries(myRequest);
                 entries.addAll(pair[0]);
                 entries.addAll(pair[1]);
+
                 continue;
             }
 
@@ -3088,8 +3099,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             ARG_TEXT, ARG_TYPE, ARG_GROUP, ARG_FILESUFFIX, ARG_BBOX,
             ARG_BBOX + ".north", ARG_BBOX + ".west", ARG_BBOX + ".south",
             ARG_BBOX + ".east", DateArgument.ARG_DATA.getFrom(),
-            SearchManager.ARG_PROVIDER,
-            DateArgument.ARG_DATA.getTo(),
+            SearchManager.ARG_PROVIDER, DateArgument.ARG_DATA.getTo(),
             DateArgument.ARG_DATA.getRelative(),
             DateArgument.ARG_CREATE.getFrom(),
             DateArgument.ARG_CREATE.getTo(),
@@ -3687,6 +3697,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
      * @return  the wiki link
      */
     public String getWikiLink(WikiUtil wikiUtil, String name, String label) {
+
         try {
             Entry   entry   = (Entry) wikiUtil.getProperty(ATTR_ENTRY);
             Request request = (Request) wikiUtil.getProperty(ATTR_REQUEST);
@@ -3702,8 +3713,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                     outputType = foo.get(1);
                 }
             }
-        
-        
+
+
             if (name.startsWith("Category:")) {
                 String category = name.substring("Category:".length());
                 String url =
@@ -3737,7 +3748,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             if (theEntry == null) {
                 theEntry = findWikiEntry(request, wikiUtil, name, parent);
             }
-            
+
             if (theEntry != null) {
                 addWikiLink(wikiUtil, theEntry);
                 if (label.trim().length() == 0) {
@@ -3757,9 +3768,11 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                     // Add output
                     if (outputType != null) {
                         url = HtmlUtils.url(
-                                request.entryUrl(getRepository().URL_ENTRY_SHOW, 
-                                        theEntry), ARG_OUTPUT, outputType);
+                            request.entryUrl(
+                                getRepository().URL_ENTRY_SHOW,
+                                theEntry), ARG_OUTPUT, outputType);
                     }
+
                     return getEntryManager().getTooltipLink(request,
                             theEntry, label, url);
                 }
@@ -3788,6 +3801,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         } catch (Exception exc) {
             throw new RuntimeException(exc);
         }
+
     }
 
 
@@ -4158,7 +4172,8 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             "{{display  width=\"600\"  height=\"400\"   type=\"linechart\"  name=\"\"  layoutHere=\"false\"  showMenu=\"true\"  showTitle=\"true\"  row=\"0\"  column=\"0\"  }}");
 
         if (entry.isGeoreferenced()
-            /*|| getEntryManager().isSynthEntry(entry.getId())*/) {
+        /*|| getEntryManager().isSynthEntry(entry.getId())*/
+        ) {
             wiki.append(
                 "{{display  width=\"600\"  height=\"400\"   type=\"map\"  name=\"\"  layoutHere=\"false\"  showMenu=\"true\"  showTitle=\"true\"  row=\"0\"  column=\"1\"  }}");
         }
@@ -4574,10 +4589,17 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
          *
          * @param c _more_
          * @param tags _more_
+         * @param tagArgs _more_
          */
-        WikiTagCategory(String c, WikiTag... tags) {
+        WikiTagCategory(String c, WikiTag... tagArgs) {
             this.category = c;
-            this.tags     = tags;
+            Comparator comp = new Comparator() {
+                public int compare(Object o1, Object o2) {
+                    return ((WikiTag) o1).tag.compareTo(((WikiTag) o2).tag);
+                }
+            };
+            Arrays.sort(tagArgs, comp);
+            tags = tagArgs;
         }
     }
 

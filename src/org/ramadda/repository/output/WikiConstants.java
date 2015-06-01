@@ -22,6 +22,8 @@ public interface WikiConstants {
     /** _more_ */
     public static final String ATTR_ALIGN = "align";
 
+    public static final String ATTR_COLLAPSE  = "collapse";
+
     /** _more_          */
     public static final String ATTR_ANNOTATE = "annotate";
 
