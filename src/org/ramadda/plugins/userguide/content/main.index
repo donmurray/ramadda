@@ -13,6 +13,7 @@ index.html
 -examples/README.INSTALLER
 -map.html
 >overview.html
+>faq.html
 >user.html
 >newentry.html
 >download.html
@@ -20,7 +21,6 @@ index.html
 >entries.html
 >access.html
 >configuration.html
->faq.html
 -exampletemplate.html.txt
 -exampletemplate.jar
 
