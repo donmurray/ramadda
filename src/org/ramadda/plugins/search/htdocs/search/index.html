@@ -6,10 +6,13 @@
 <h2>Search Integration</h2>
 
 RAMADDA can search both its own local repository as well as other sources of content - Google, YouTube, Wolfram/Alpha, DuckDuckGo, Flickr, etc. 
-By default only the local RAMADDA is searched. You can select what other search providers to use in the Advanced Search form under Providers.
+By default only the local RAMADDA is searched. You can select what other search providers to use in the  Search form under the "Where do you want to search?" tab.
 
-A number of these search providers require an API key. Once you get the key you will need to set a property in some 
+To configure your RAMADDA to use a search provider you will need to install the Search plugin from the latest <a href="https://geodesystems.com/repository/userguide/releasenotes.html">release</a>.
+
+Once installed, a number of the search providers require an API key. To enable the provider retrieve the the key and add it to some 
 .properties file (e.g, keys.properties) in your RAMADDA home or plugins directory. 
+
 
 <h3>YouTube Search</h3>
 
@@ -53,6 +56,7 @@ org.ramadda.plugins.search.OpenSearchProvider;nasa;https://api-test.echo.nasa.go
 </pre>
 
 
+<a name="socrata"></a>
 <h3>Socrata Search</h3>
 You can add any number of  <a href="http://socrata.com">Socrata</a> repositories. In some classes.txt file (e.g., searchclasses.txt) add the line:
 <pre>
