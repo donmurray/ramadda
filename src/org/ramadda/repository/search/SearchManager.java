@@ -816,7 +816,8 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             throws Exception {
 
 
-        sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,HtmlUtils.cssClass("ramadda-search-form")));
+        sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
+                                 HtmlUtils.cssClass("ramadda-search-form")));
         TypeHandler typeHandler = getRepository().getTypeHandler(request);
 
         if (justText) {
@@ -844,7 +845,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
 
 
 
-        if(justText) {
+        if (justText) {
             addSearchProviders(request, contents, titles);
         } else {
             Object       oldValue = request.remove(ARG_RELATIVEDATE);
@@ -907,7 +908,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             outputForm.append(HtmlUtils.formTableClose());
             titles.add(msg("Output"));
             contents.add(outputForm.toString());
-        } 
+        }
 
         if (servers.size() > 0) {
             StringBuffer serverSB  = new StringBuffer();
@@ -953,9 +954,9 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                     serverSB.toString(),
                         HtmlUtils.cssClass(CSS_CLASS_SERVER)), false));
             */
-        } 
+        }
 
-        
+
 
 
 
@@ -972,25 +973,36 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
         }
 
         StringBuilder formSB = new StringBuilder();
-        HtmlUtils.makeAccordian(formSB, titles, contents, true,"ramadda-search-accordian");
+        HtmlUtils.makeAccordian(formSB, titles, contents, true,
+                                "ramadda-accordian", null);
         sb.append(formSB.toString());
         sb.append(HtmlUtils.close(HtmlUtils.TAG_DIV));
     }
 
 
-    private void addSearchProviders(Request request, List<String>contents, List<String>titles) throws Exception {
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param contents _more_
+     * @param titles _more_
+     *
+     * @throws Exception _more_
+     */
+    private void addSearchProviders(Request request, List<String> contents,
+                                    List<String> titles)
+            throws Exception {
         List<SearchProvider> searchProviders = getSearchProviders();
         if (searchProviders.size() <= 1) {
             return;
         }
-        StringBuilder  providerSB = new StringBuilder();
-        CategoryBuffer cats       = new CategoryBuffer();
-        List<String> selectedProviders = new ArrayList<String>();
+        StringBuilder  providerSB        = new StringBuilder();
+        CategoryBuffer cats              = new CategoryBuffer();
+        List<String>   selectedProviders = new ArrayList<String>();
         for (String tok :
-                 (List<String>) request.get(ARG_PROVIDER,
-                                            new ArrayList<String>())) {
-            selectedProviders.addAll(StringUtil.split(tok, ",", true,
-                                                      true));
+                (List<String>) request.get(ARG_PROVIDER,
+                                           new ArrayList<String>())) {
+            selectedProviders.addAll(StringUtil.split(tok, ",", true, true));
         }
 
 
@@ -1001,21 +1013,19 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             if (selectedProviders.size() == 0) {
                 selected = (i == 0);
             } else {
-                selected = selectedProviders.contains(
-                                                      searchProvider.getId());
-                if(selected) {
-                    if(extra.length()>0) {
+                selected = selectedProviders.contains(searchProvider.getId());
+                if (selected) {
+                    if (extra.length() > 0) {
                         extra.append(", ");
                     }
                     extra.append(searchProvider.getName());
                 }
             }
             cats.get(searchProvider.getCategory()).append(
-                                                          HtmlUtils.labeledCheckbox(
-                                                                                    ARG_PROVIDER, searchProvider.getId(), selected,
-                                                                                    searchProvider.getName()));
-            cats.get(searchProvider.getCategory()).append(
-                                                          HtmlUtils.br());
+                HtmlUtils.labeledCheckbox(
+                    ARG_PROVIDER, searchProvider.getId(), selected,
+                    searchProvider.getName()));
+            cats.get(searchProvider.getCategory()).append(HtmlUtils.br());
         }
 
         for (String cat : cats.getCategories()) {
@@ -1032,12 +1042,11 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             providerSB.append(buff);
         }
         String title = msg("Where do you want to search?");
-        if(extra.length()>0) {
-            title+= HtmlUtils.space(4) + msgLabel("Currently") + extra;
+        if (extra.length() > 0) {
+            title += HtmlUtils.space(4) + msgLabel("Currently") + extra;
         }
         titles.add(title);
-        contents.add(HtmlUtils.insetDiv(providerSB.toString(), 0, 20,
-                                        0, 0));
+        contents.add(HtmlUtils.insetDiv(providerSB.toString(), 0, 20, 0, 0));
     }
 
 
@@ -1687,11 +1696,12 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                       + getSearchButtons(request));
         String inner = HtmlUtils.insetDiv(searchForm.toString(), 0, 20, 10,
                                           0);
-        String form = HtmlUtils.makeShowHideBlock(msg("Search Options"),
-                          inner, false);
+        //        String form = HtmlUtils.makeShowHideBlock(msg("Search Options"),                inner, false);
+        StringBuilder formSB = new StringBuilder();
+        HtmlUtils.makeAccordian(formSB, msg("Search Options"), inner,
+                                "ramadda-accordian", null);
 
-        form = HtmlUtils.insetDiv(form, 0, 0, 0, 0);
-        header.append(form);
+        header.append(HtmlUtils.insetDiv(formSB.toString(), 0, 0, 0, 0));
         header.append(HtmlUtils.formClose());
 
 

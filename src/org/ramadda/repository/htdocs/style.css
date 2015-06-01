@@ -543,24 +543,26 @@ td.entry-table-block {
 }
 
 
-.ramadda-search-accordian {
+.ramadda-accordian .ui-accordian-header, .ramadda-accordian .ui-state-default, .ramadda-accordian .ui-state-active {
   border: 0px #fff solid;
   background: none;
 }
 
-.ramadda-search-accordian:hover {
+.ramadda-accordian .ui-accordion-content {
+    border: none;
+    padding: 0px;
+    padding-left: 10px;
 }
 
-.ramadda-search-form .ui-accordion .ui-accordion-content {
-    padding: 0px;
-    border: 0px #fff solid;
+.ui-accordion-icons .ui-accordion-header a {
+   padding:1.8em;
 }
 
 .ui-accordion .ui-accordion-header a {
 padding-top: 0.2em;
 padding-right-value: 0.5em;
 padding-bottom: 0.2em;
-padding-left-value: 0.2em;
+padding-left-value: 0.0em;
 padding-left-ltr-source: physical;
 padding-left-rtl-source: physical;
 padding-right-ltr-source: physical;

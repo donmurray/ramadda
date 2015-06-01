@@ -1587,7 +1587,9 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
                 sb.append(OutputHandler.makeTabs(titles, contents, true,
                         false));
             } else if (layout.equals("accordian")) {
-                HtmlUtils.makeAccordian(sb, titles, contents);
+                boolean doBorder = Misc.getProperty(props,  APPLY_PREFIX + "border", false);
+                boolean collapse = Misc.getProperty(props,  APPLY_PREFIX + "collapse", false);
+                HtmlUtils.makeAccordian(sb, titles, contents, collapse,(!doBorder?"ramadda-accordian":null),null);
             } else {
                 throw new IllegalArgumentException("Unknown layout:"
                         + layout);
@@ -1738,8 +1740,9 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
 
             if (theTag.equals(WIKI_TAG_ACCORDIAN)) {
-                HtmlUtils.makeAccordian(sb, titles, contents);
-
+                boolean doBorder = Misc.getProperty(props,  APPLY_PREFIX + "border", false);
+                boolean collapse = Misc.getProperty(props,  APPLY_PREFIX + "collapse", false);
+                HtmlUtils.makeAccordian(sb, titles, contents, collapse,(!doBorder?"ramadda-accordian":null),null);
                 return sb.toString();
             } else if (doingGrid) {
                 List<String> weights = null;

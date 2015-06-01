@@ -3928,11 +3928,30 @@ public class HtmlUtils {
     public static void makeAccordian(Appendable sb, String title,
                                      String contents)
             throws Exception {
+
+        makeAccordian(sb, title, contents, null, null);
+    }
+
+    /**
+     * _more_
+     *
+     * @param sb _more_
+     * @param title _more_
+     * @param contents _more_
+     * @param wrapperClass _more_
+     * @param headerClass _more_
+     *
+     * @throws Exception _more_
+     */
+    public static void makeAccordian(Appendable sb, String title,
+                                     String contents, String wrapperClass,
+                                     String headerClass)
+            throws Exception {
         List<String> titles = new ArrayList<String>();
         List<String> tabs   = new ArrayList<String>();
         titles.add(title);
         tabs.add(contents);
-        makeAccordian(sb, titles, tabs, true, null);
+        makeAccordian(sb, titles, tabs, true, wrapperClass, headerClass);
     }
 
     /**
@@ -3947,7 +3966,7 @@ public class HtmlUtils {
     public static void makeAccordian(Appendable sb, List<String> titles,
                                      List<String> contents)
             throws Exception {
-        makeAccordian(sb, titles, contents, false, null);
+        makeAccordian(sb, titles, contents, false, null, null);
     }
 
     /**
@@ -3963,7 +3982,7 @@ public class HtmlUtils {
     public static void makeAccordian(Appendable sb, List<String> titles,
                                      List<String> contents, boolean collapse)
             throws Exception {
-        makeAccordian(sb, titles, contents, collapse, null);
+        makeAccordian(sb, titles, contents, collapse, null, null);
     }
 
 
@@ -3975,27 +3994,28 @@ public class HtmlUtils {
      * @param titles    the title for each section
      * @param contents  the contents of each section
      * @param collapse  set the sections to be collapsed initially
-     * @param extraClass _more_
+     * @param wrapperClass _more_
+     * @param headerClass _more_
      *
      * @throws Exception  some problem
      */
     public static void makeAccordian(Appendable sb, List<String> titles,
                                      List<String> contents, boolean collapse,
-                                     String extraClass)
+                                     String wrapperClass, String headerClass)
             throws Exception {
 
         String accordianId = "accordion_" + (blockCnt++);
-        sb.append(
-            HtmlUtils.open(
-                HtmlUtils.TAG_DIV,
-                HtmlUtils.cssClass("ui-accordion ui-widget ui-helper-reset")
-                + HtmlUtils.id(accordianId)));
+        sb.append(HtmlUtils.open(HtmlUtils.TAG_DIV,
+                                 HtmlUtils.cssClass(((wrapperClass != null)
+                ? wrapperClass
+                : "") + " ui-accordion ui-widget ui-helper-reset") + HtmlUtils
+                    .id(accordianId)));
         for (int i = 0; i < titles.size(); i++) {
             String title   = titles.get(i);
             String content = contents.get(i);
             sb.append(HtmlUtils.open(HtmlUtils.TAG_H3,
-                                     HtmlUtils.cssClass(((extraClass != null)
-                    ? extraClass + " "
+                                     HtmlUtils.cssClass(((headerClass != null)
+                    ? headerClass + " "
                     : "") + " ui-accordion-header ui-helper-reset ui-state-active ui-corner-top")));
             sb.append("<a href=\"#\">");
             sb.append(title);
