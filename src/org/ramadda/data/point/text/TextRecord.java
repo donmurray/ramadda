@@ -266,22 +266,22 @@ public class TextRecord extends DataRecord {
                 tokens[i] = "";
             }
 
-            List<String> toks = Utils.tokenizeColumns(line,",");
+            if (fixedWidth != null) {
+                if ( !split(recordIO, line, fields)) {
+                    //throw new IllegalArgumentException("Could not tokenize line:" + line);
+                    return ReadStatus.SKIP;
+                }
+            } else {
+                List<String> toks = Utils.tokenizeColumns(line,",");
+                if(bePickyAboutTokens && toks.size()!= tokens.length) {
+                    throw new IllegalArgumentException("Bad token count:" + tokens.length +" toks:" + toks.size() +" " + toks);
+                }
+                for(int i=0;i<toks.size() && i < tokens.length;i++) {
+                    tokens[i] = toks.get(i);
+                }
+            }
 
-            //            System.err.println("toks:" + toks);
-            if(bePickyAboutTokens && toks.size()!= tokens.length) {
-                throw new IllegalArgumentException("Bad token count:" + tokens.length +" toks:" + toks.size() +" " + toks);
-            }
-            for(int i=0;i<toks.size();i++) {
-                tokens[i] = toks.get(i);
-            }
 
-            /*
-            if ( !split(recordIO, line, fields)) {
-                //throw new IllegalArgumentException("Could not tokenize line:" + line);
-                return ReadStatus.SKIP;
-            }
-            */
 
             String tok      = null;
             int    tokenCnt = 0;
