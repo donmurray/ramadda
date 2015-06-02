@@ -77,14 +77,16 @@ public class SocrataFile extends CsvFile {
 
                 InputStream source = super.doMakeInputStream(buffered);
                 int         MAX    = 2 * 1000000;
+                String contents    = new String(Utils.readBytes(source, MAX));
+
                 String      json   = new String(Utils.readBytes(source, MAX));
                 if (json.length() >= MAX) {
                     throw new IllegalArgumentException(
                         "Too big reading from Socrata");
                 }
+                JSONObject obj  = new JSONObject(new JSONTokener(json));
+                JSONObject view = Json.readObject(obj, "meta.view");
                 //                System.out.println (json);
-                JSONObject   obj    = new JSONObject(new JSONTokener(json));
-                JSONObject   view   = Json.readObject(obj, "meta.view");
                 JSONArray    cols   = view.getJSONArray("columns");
                 JSONArray    data   = obj.getJSONArray("data");
 
@@ -127,7 +129,7 @@ public class SocrataFile extends CsvFile {
                     }
                     fields.add(sb.toString());
                 }
-                System.err.println(makeFields(fields));
+                System.err.println("Fields:" + makeFields(fields));
                 putProperty(PROP_FIELDS, makeFields(fields));
                 putProperty("output.latlon", "false");
                 //                putProperty("output.time","false");
@@ -150,17 +152,20 @@ public class SocrataFile extends CsvFile {
                                 buffer.append(",");
                             }
                             buffer.append(v);
-                            System.err.println("location:" + v);
+                            //                            System.err.println("location:" + v);
                             colCnt += 2;
 
                         } else {
                             v = row.get(j).toString();
                             if (v != null) {
                                 v = v.replaceAll("\n", " ");
+                                boolean wrap = v.indexOf(",") >= 0;
+                                if (wrap && v.startsWith("\"")) {
+                                    wrap = false;
+                                }
                                 if (colCnt > 0) {
                                     buffer.append(",");
                                 }
-                                boolean wrap = v.indexOf(",") >= 0;
                                 if (wrap) {
                                     buffer.append("\"");
                                 }
