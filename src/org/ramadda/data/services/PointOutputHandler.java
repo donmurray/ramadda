@@ -2470,7 +2470,7 @@ public class PointOutputHandler extends RecordOutputHandler {
     public RecordFile createAndInitializeRecordFile(Request request,
             Entry entry, long numRecords)
             throws Exception {
-        RecordFile recordFile = (RecordFile) doMakeRecordFile(entry);
+        RecordFile recordFile = (RecordFile) doMakeRecordFile(request, entry);
         recordFile.putProperty("entry", entry);
         if (numRecords < 0) {
             numRecords = recordFile.getNumRecords();

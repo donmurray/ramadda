@@ -159,8 +159,7 @@ public class JsonVisitor extends BridgeRecordVisitor {
             if (getter == null) {
                 if (field.isTypeString()) {
                     svalue = record.getStringValue(field.getParamId());
-                    svalue = svalue.replaceAll("\"", "'");
-                    svalue = HtmlUtils.quote(svalue);
+                    svalue = Json.quote(svalue);
                 } else {
                     double value = record.getValue(field.getParamId());
                     svalue = Json.formatNumber(value);
@@ -168,11 +167,9 @@ public class JsonVisitor extends BridgeRecordVisitor {
             } else {
                 if (field.isTypeString()) {
                     svalue = getter.getStringValue(record, field, visitInfo);
-                    svalue = svalue.replaceAll("\"", "'");
-                    svalue = HtmlUtils.quote(svalue);
+                    svalue = Json.quote(svalue);
                 } else {
-                    svalue = Json.formatNumber(getter.getValue(record, field,
-                            visitInfo));
+                    svalue = Json.formatNumber(getter.getValue(record, field, visitInfo));
                 }
             }
             if (fieldCnt > 0) {

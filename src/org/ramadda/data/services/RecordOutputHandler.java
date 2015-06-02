@@ -827,10 +827,10 @@ public class RecordOutputHandler extends OutputHandler implements RecordConstant
      *
      * @throws Exception on badness
      */
-    public RecordFile doMakeRecordFile(Entry entry) throws Exception {
+    public RecordFile doMakeRecordFile(Request request, Entry entry) throws Exception {
         RecordTypeHandler type = (RecordTypeHandler) entry.getTypeHandler();
 
-        RecordFile file =  (RecordFile) type.doMakeRecordFile(entry);
+        RecordFile file =  (RecordFile) type.doMakeRecordFile(request, entry);
         file.putProperty("entry", entry);
         return file;
     }

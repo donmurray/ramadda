@@ -353,7 +353,9 @@ public class DataRecord extends PointRecord {
     @Override
     public long getRecordTime() {
         if (idxTime >= 0) {
-            return ((Date) objectValues[idxTime]).getTime();
+            Object obj = objectValues[idxTime];
+            if(obj == null) return super.getRecordTime();
+            return ((Date)obj ).getTime();
         }
 
         return super.getRecordTime();

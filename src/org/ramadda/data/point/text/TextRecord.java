@@ -12,6 +12,8 @@ import org.ramadda.data.point.*;
 import org.ramadda.data.record.*;
 
 import org.ramadda.util.Station;
+import org.ramadda.util.text.*;
+import org.ramadda.util.Utils;
 
 import ucar.unidata.util.StringUtil;
 
@@ -47,6 +49,8 @@ public class TextRecord extends DataRecord {
 
     /** _more_ */
     private String[] tokens;
+
+    private Visitor visitor;
 
     /** _more_ */
     private int[] fixedWidth = null;
@@ -192,26 +196,35 @@ public class TextRecord extends DataRecord {
      * @throws IOException _more_
      */
     public String readNextLine(RecordIO recordIO) throws IOException {
-        while (true) {
-            if (firstDataLine != null) {
-                currentLine   = firstDataLine;
-                firstDataLine = null;
-            } else {
-                currentLine = recordIO.readLine();
+        try {
+            if(visitor == null) {
+                visitor = new Visitor();
+                visitor.setReader(recordIO.getBufferedReader());
             }
-            if (currentLine == null) {
-                return null;
+            while (true) {
+                if (firstDataLine != null) {
+                    currentLine   = firstDataLine;
+                    firstDataLine = null;
+                } else {
+                    //                    currentLine = recordIO.readLine();
+                    currentLine = visitor.readLine();
+                }
+                if (currentLine == null) {
+                    return null;
+                }
+                currentLine = currentLine.trim();
+                if ( !lineOk(currentLine)) {
+                    continue;
+                }
+                return currentLine;
             }
-            currentLine = currentLine.trim();
-            if ( !lineOk(currentLine)) {
-                continue;
-            }
-
-            return currentLine;
+        } catch(Exception exc) {
+            throw new RuntimeException(exc);
         }
+
     }
 
-    /**
+        /**
      * _more_
      *
      * @param line _more_
@@ -233,7 +246,6 @@ public class TextRecord extends DataRecord {
      */
     @Override
     public ReadStatus read(RecordIO recordIO) throws Exception {
-
         String line = null;
         try {
             int fieldCnt;
@@ -242,19 +254,35 @@ public class TextRecord extends DataRecord {
                 if (line == null) {
                     return ReadStatus.EOF;
                 }
+                //                System.err.println("LINE:" + line);
                 if (isLineValidData(line)) {
                     break;
                 }
             }
 
+            //            System.err.println("LINE:" + line);
 
             for (int i = 0; i < tokens.length; i++) {
                 tokens[i] = "";
             }
-            if ( !split(line, fields)) {
+
+            List<String> toks = Utils.tokenizeColumns(line,",");
+
+            //            System.err.println("toks:" + toks);
+            if(bePickyAboutTokens && toks.size()!= tokens.length) {
+                throw new IllegalArgumentException("Bad token count:" + tokens.length +" toks:" + toks.size() +" " + toks);
+            }
+            for(int i=0;i<toks.size();i++) {
+                tokens[i] = toks.get(i);
+            }
+
+            /*
+            if ( !split(recordIO, line, fields)) {
                 //throw new IllegalArgumentException("Could not tokenize line:" + line);
                 return ReadStatus.SKIP;
             }
+            */
+
             String tok      = null;
             int    tokenCnt = 0;
             for (fieldCnt = 0; fieldCnt < fields.size(); fieldCnt++) {
@@ -288,8 +316,8 @@ public class TextRecord extends DataRecord {
 
                     continue;
                 }
-                if (field.isTypeDate()) {
-                    tok                    = tok.replaceAll("\"", "");
+                if (field.isTypeDate()) { 
+                   tok                    = tok.replaceAll("\"", "");
                     objectValues[fieldCnt] = parseDate(field, tok);
 
                     continue;
@@ -305,6 +333,11 @@ public class TextRecord extends DataRecord {
                     if ((idxX == fieldCnt) || (idxY == fieldCnt)) {
                         dValue = ucar.unidata.util.Misc.decodeLatLon(tok);
                     } else {
+                        if(tok.endsWith("%")) {
+                            tok = tok.substring(0,tok.length()-1);
+                        } else if(tok.startsWith("$")) {
+                            tok = tok.substring(1);
+                        }
                         dValue = Double.parseDouble(tok);
                     }
                     values[fieldCnt] = field.convertValue(dValue);
@@ -333,9 +366,10 @@ public class TextRecord extends DataRecord {
             throw exc;
         }
 
-
-
     }
+
+
+
 
     /**
      * _more_
@@ -448,20 +482,20 @@ public class TextRecord extends DataRecord {
      *
      * @return _more_
      */
-    public boolean split(String sourceString, List<RecordField> fields) {
+    public boolean split(RecordIO recordIO, String sourceString, List<RecordField> fields) throws Exception {
 
         if (tokens == null) {
             testing = true;
             tokens  = new String[10];
         }
-        int length        = 1;
+        int delimLength        = 1;
         int fullTokenCnt  = 0;
         int numTokensRead = 0;
         int fromIndex     = 0;
         int sourceLength  = sourceString.length();
         //        System.err.println ("line:" + sourceString);
         boolean inQuotes = sourceString.startsWith("\"");
-        int     idx;
+
         /*
         //            10,"text column",20,"another text column"
         0
@@ -478,14 +512,24 @@ public class TextRecord extends DataRecord {
                 //                System.err.println(" tok:" + theString);
             }
         } else {
+            int     idx;
             while (true) {
                 if (inQuotes) {
                     idx = sourceString.indexOf("\"", fromIndex + 1);
+                    int maxLines = 10;
+                    while(idx<0 && maxLines-->0) {
+                        String extraLine = readNextLine(recordIO);
+                        if(extraLine == null) {
+                            break;
+                        }
+                        sourceString = sourceString + extraLine;
+                        idx = sourceString.indexOf("\"", fromIndex + 1);
+                    }
                     idx++;
                 } else {
                     idx = sourceString.indexOf(delimiter, fromIndex);
                 }
-                //            System.err.println ("\tidx:" + idx +" delimiter:" + delimiter +":  str:" + sourceString);
+                System.err.println("inquote:" + inQuotes +" from:" + fromIndex +" idx:" + idx);
                 String theString;
                 if (idx < 0) {
                     theString = sourceString.substring(fromIndex);
@@ -498,7 +542,7 @@ public class TextRecord extends DataRecord {
                         }
                         fromIndex = idx;
                     } else {
-                        fromIndex = idx + length;
+                        fromIndex = idx + delimLength;
                     }
                 }
 
@@ -507,13 +551,17 @@ public class TextRecord extends DataRecord {
                     theString = theString.substring(1,
                             theString.length() - 1);
                 }
-                //            System.err.println ("\ttokens[" + numTokensRead +"] = " + theString);
+                System.err.println ("\ttokens[" + numTokensRead +"] = " + theString);
                 tokens[numTokensRead++] = theString;
 
                 if ((idx < 0) || (numTokensRead == tokens.length)) {
                     break;
                 }
                 if (fromIndex >= sourceLength) {
+                    if(fromIndex == sourceLength && sourceString.endsWith(delimiter)) {
+                        //pad out
+                        tokens[numTokensRead++] = "";
+                    }
                     break;
                 }
                 if (fromIndex < sourceLength) {
@@ -584,12 +632,12 @@ public class TextRecord extends DataRecord {
      *
      * @param args _more_
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws Exception {
         TextRecord record = new TextRecord();
         record.setDelimiter(",");
         record.testing = true;
         for (String line : args) {
-            record.split(line, null);
+            record.split(null, line, null);
         }
     }
 

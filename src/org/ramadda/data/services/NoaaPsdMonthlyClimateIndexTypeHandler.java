@@ -86,7 +86,8 @@ public class NoaaPsdMonthlyClimateIndexTypeHandler extends PointTypeHandler {
      *
      * @throws Exception On badness
      */
-    public RecordFile doMakeRecordFile(Entry entry) throws Exception {
+    @Override
+    public RecordFile doMakeRecordFile(Request request, Entry entry) throws Exception {
         String name        = entry.getName();
         String loc         = entry.getResource().getPath();
         String description = entry.getDescription();

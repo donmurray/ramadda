@@ -312,7 +312,7 @@ public abstract class RecordTypeHandler extends GenericTypeHandler implements Re
      *
      * @throws Exception On badness
      */
-    public RecordFile doMakeRecordFile(Entry entry) throws Exception {
+    public RecordFile doMakeRecordFile(Request request, Entry entry) throws Exception {
         Hashtable  properties = getRecordProperties(entry);
         RecordFile recordFile = doMakeRecordFile(entry, properties);
         //Explicitly set the properties to force a call to initProperties
