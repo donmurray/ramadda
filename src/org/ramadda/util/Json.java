@@ -442,6 +442,8 @@ public class Json {
                 return NULL;
             }
             s = cleanString(s);
+            s = s.replaceAll("\n", "\\n");
+            s = s.replaceAll("\r", "\\r");
             s = s.replaceAll("\"", "\\\\\"");
             if (s.equals("true") || s.equals("false")) {
                 return s;

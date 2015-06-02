@@ -45,6 +45,9 @@ public class Visitor implements Cloneable {
     /** _more_ */
     private InputStream input;
 
+    private BufferedReader reader;
+
+
     /** _more_ */
     private OutputStream output;
 
@@ -176,8 +179,9 @@ public class Visitor implements Cloneable {
                 c        = nextChar;
                 nextChar = -1;
             } else {
-                c = getInput().read();
+                c = getReader().read();
             }
+            //            System.err.println("c:" + c);
             if (c == -1) {
                 break;
             }
@@ -190,7 +194,7 @@ public class Visitor implements Cloneable {
             } else if (c == CARRIAGE_RETURN) {
                 //                sb.append("\t ***** cr:" + inQuote + "\n");
                 if ( !inQuote) {
-                    nextChar = getInput().read();
+                    nextChar = getReader().read();
                     //                    sb.append("read next char:" + nextChar);
                     if (nextChar == -1) {
                         break;
@@ -211,7 +215,7 @@ public class Visitor implements Cloneable {
                     //                    sb.append("\tinto quote\n");
                     inQuote = true;
                 } else {
-                    nextChar = getInput().read();
+                    nextChar = getReader().read();
                     if (nextChar == -1) {
                         break;
                     }
@@ -237,7 +241,6 @@ public class Visitor implements Cloneable {
 
 
         String line = lb.toString();
-        //        System.err.println("LINE:" + line);
         if (line.length() == 0) {
             return null;
         }
@@ -438,6 +441,17 @@ public class Visitor implements Cloneable {
      */
     public InputStream getInput() {
         return input;
+    }
+
+    public BufferedReader getReader() {
+        if( reader == null) {
+            reader = new BufferedReader(new InputStreamReader(getInput()));
+        }
+        return reader;
+    }
+
+    public void setReader(BufferedReader reader) {
+        this.reader = reader;
     }
 
     /**
