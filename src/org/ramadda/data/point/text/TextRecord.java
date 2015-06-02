@@ -348,6 +348,10 @@ public class TextRecord extends DataRecord {
      * @throws Exception _more_
      */
     private Date parseDate(RecordField field, String tok) throws Exception {
+        tok = tok.trim();
+        if(tok.equals("") || tok.equals("null")) {
+            return null;
+        }
         Date date   = null;
         int  offset = field.getUtcOffset();
         try {
