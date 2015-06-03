@@ -3087,8 +3087,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
             }
             //Sleep a second to slow the google bot down
             if (request.getUserAgent().indexOf("www.majestic12.co.uk") >= 0) {
-                System.err.println("Sleeping for the bad bot:" + request
-                                   + " " + request.getUserAgent());
+                System.err.println("Sleeping for the bad bot:" + request    + " " + request.getUserAgent());
                 Misc.sleepSeconds(30);
             } else {
                 //Slow the googlebot down
@@ -4123,9 +4122,6 @@ public class Repository extends RepositoryBase implements RequestHandler,
         if ((prop == null) || prop.equals("true")) {
             return true;
         }
-        System.err.println("isOutputTypeOK: output type not ok:"
-                           + outputType);
-
         return false;
     }
 
@@ -4615,7 +4611,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
             throw new IllegalArgumentException("URL not in whitelist:" + url);
         }
 
-        System.out.println("proxy: " + url);
+        //        System.out.println("proxy: " + url);
         URLConnection connection = new URL(url).openConnection();
         InputStream   is         = connection.getInputStream();
 
@@ -4625,7 +4621,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
             contents = contents.trim();
             IOUtil.close(is);
             contents = Json.xmlToJson(XmlUtil.getRoot(contents));
-            System.out.println(contents);
+            //            System.out.println(contents);
 
             return new Result(new ByteArrayInputStream(contents.getBytes()),
                               "application/json");

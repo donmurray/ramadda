@@ -51,6 +51,10 @@ this gets it from the type_point super class
      <column  name="datalogger_model"  type="enumerationplus" label="Data Logger Model" cansearch="true"/>
      <column  name="datalogger_serial"  type="enumerationplus" label="Data Logger Serial" cansearch="true"/>
 
+ <property name="record.properties">
+picky=false
+</property>
+
   </type>
 
 </types>

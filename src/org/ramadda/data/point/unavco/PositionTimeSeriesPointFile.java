@@ -78,6 +78,7 @@ public class PositionTimeSeriesPointFile extends CsvFile {
         putProperty(PROP_DELIMITER, isPos
                                     ? " "
                                     : ",");
+        putProperty("picky","false");
         putProperty(PROP_SKIPLINES, isPos
                                     ? "37"
                                     : "9");
