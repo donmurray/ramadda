@@ -110,14 +110,17 @@ public abstract class RecordFile {
     private StringBuffer dttm = new StringBuffer();
 
     /** _more_ */
-    private SimpleDateFormat sdf;
+    private SimpleDateFormat[] mySdfs;
+
 
     /** _more_ */
-    private static SimpleDateFormat[] sdfs = new SimpleDateFormat[] {
-        makeDateFormat("yyyy"), makeDateFormat("yyyy-MM"),
-        makeDateFormat("yyyy-MM-dd"), makeDateFormat("yyyy-MM-dd-HH"),
-        makeDateFormat("yyyy-MM-dd-HH-mm"),
-        makeDateFormat("yyyy-MM-dd-HH-mm-ss"),
+    private static SimpleDateFormat[][] SDFS = {
+        { makeDateFormat("yyyy") },
+        { makeDateFormat("yyyy-MM"), makeDateFormat("yyyy-MMM"),
+          makeDateFormat("yyyy-MMMM"), }, { makeDateFormat("yyyy-MM-dd") },
+        { makeDateFormat("yyyy-MM-dd-HH") },
+        { makeDateFormat("yyyy-MM-dd-HH-mm") },
+        { makeDateFormat("yyyy-MM-dd-HH-mm-ss") },
     };
 
 
@@ -930,7 +933,7 @@ public abstract class RecordFile {
     public void setYMDHMSIndices(int[] indices) {
         ymdhmsIndices = indices;
         if (ymdhmsIndices != null) {
-            sdf = getDateFormat(ymdhmsIndices);
+            mySdfs = getDateFormat(ymdhmsIndices);
         }
     }
 
@@ -948,8 +951,8 @@ public abstract class RecordFile {
     public boolean processAfterReading(VisitInfo visitInfo, Record record)
             throws Exception {
         if (ymdhmsIndices != null) {
-            setDateFromYMDHMS(record, ymdhmsIndices, sdf);
-        } else if ((sdf != null)
+            setDateFromYMDHMS(record, ymdhmsIndices);
+        } else if ((mySdfs != null)
                    && ((dateIndex != -1) || (timeIndex != -1))) {
             setDateFromDateAndTimeIndex(record);
 
@@ -1339,7 +1342,7 @@ public abstract class RecordFile {
      *
      * @return _more_
      */
-    private SimpleDateFormat getDateFormat(int[] ymdhmsIndices) {
+    private SimpleDateFormat[] getDateFormat(int[] ymdhmsIndices) {
         int goodCnt = 0;
         for (int i = 0; i < ymdhmsIndices.length; i++) {
             if (ymdhmsIndices[i] < 0) {
@@ -1351,7 +1354,7 @@ public abstract class RecordFile {
             return null;
         }
 
-        return sdfs[goodCnt - 1];
+        return SDFS[goodCnt - 1];
     }
 
 
@@ -1369,8 +1372,7 @@ public abstract class RecordFile {
      *
      * @throws Exception On badness
      */
-    private void setDateFromYMDHMS(Record record, int[] indices,
-                                   SimpleDateFormat sdf)
+    private void setDateFromYMDHMS(Record record, int[] indices)
             throws Exception {
         dttm.setLength(0);
         for (int i = 0; i < indices.length; i++) {
@@ -1382,10 +1384,7 @@ public abstract class RecordFile {
             }
             dttm.append(getString(record, indices[i]));
         }
-
-        //        Date date = makeDateFormat("yyyy-MM-dd-HH").parse("2012-01-14-02");
-        Date date = sdf.parse(dttm.toString());
-        record.setRecordTime(date.getTime());
+        setDate(record, dttm.toString());
     }
 
 
@@ -1400,9 +1399,36 @@ public abstract class RecordFile {
     public void setDateFromDateAndTimeIndex(Record record) throws Exception {
         dttm.setLength(0);
         getDateTimeString(record, dttm, dateIndex, timeIndex);
-        Date date = sdf.parse(dttm.toString());
-        record.setRecordTime(date.getTime());
+        setDate(record, dttm.toString());
     }
+
+    /**
+     * _more_
+     *
+     * @param record _more_
+     * @param dttm _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Date setDate(Record record, String dttm) throws Exception {
+        if (mySdfs != null) {
+            for (SimpleDateFormat sdf : mySdfs) {
+                try {
+                    Date date = sdf.parse(dttm);
+                    record.setRecordTime(date.getTime());
+                    return date;
+                } catch (Exception exc) {
+                    //                    System.err.println("Bad date:" + dttm + " " + exc);
+                }
+            }
+        }
+
+        return null;
+    }
+
+
 
     /**
      * _more_
@@ -1532,7 +1558,8 @@ public abstract class RecordFile {
         if (timeIndex >= 0) {
             pattern += " HHmm";
         }
-        sdf = makeDateFormat(getProperty(PROP_DATEFORMAT, pattern));
+        mySdfs = new SimpleDateFormat[] {
+            makeDateFormat(getProperty(PROP_DATEFORMAT, pattern)) };
 
 
     }
@@ -1545,7 +1572,7 @@ public abstract class RecordFile {
      * @param value The new value for Sdf
      */
     public void setSdf(SimpleDateFormat value) {
-        sdf = value;
+        mySdfs = new SimpleDateFormat[] { value };
     }
 
     /**
@@ -1553,8 +1580,8 @@ public abstract class RecordFile {
      *
      * @return The Sdf
      */
-    public SimpleDateFormat getSdf() {
-        return sdf;
+    public SimpleDateFormat[] getSdf() {
+        return mySdfs;
     }
 
     /**
