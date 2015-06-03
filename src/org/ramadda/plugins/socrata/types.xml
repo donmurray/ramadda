@@ -66,7 +66,7 @@
      <column name="repository" type="string"  label="Repository Base URL"   suffix="e.g., https://data.atf.gov" />
      <column name="series_id" type="string"  label="Series ID"    />
      <wiki_inner><![CDATA[
-+section # label="SOCRATA Time Series: {{name}}"
++section # label="SOCRATA Data: {{name}}"
 <br>
 {{group showMenu="true"}}
 {{display type="table" title=""  height="400" xwidth="800" column="0" layoutHere="false" showMenu="true"}}
