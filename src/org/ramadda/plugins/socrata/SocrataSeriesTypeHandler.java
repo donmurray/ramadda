@@ -49,17 +49,17 @@ import java.util.List;
 public class SocrataSeriesTypeHandler extends PointTypeHandler {
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String URL_METADATA =
         "${hostname}/api/views/${series_id}.json";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String URL_CSV =
-        "${hostname}/resource/${series_id}.csv?$limit=${limit}&$offset=${offset}&$order=:id";
+        "${hostname}/resource/${series_id}.csv?$limit=${limit}&$offset=${offset}";
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String URL_TEMPLATE =
         "${hostname}/api/views/${series_id}/rows.json?accessType=DOWNLOAD";
 

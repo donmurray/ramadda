@@ -61,6 +61,8 @@
      <property name="html.type.show" value="false"/>
      <property name="html.owner.show" value="false"/>
      <property name="html.numberofpoints.show" value="false"/>
+     <property name="point.initialize" value="false"/>
+
      <column name="repository" type="string"  label="Repository Base URL"   suffix="e.g., https://data.atf.gov" />
      <column name="series_id" type="string"  label="Series ID"    />
      <wiki_inner><![CDATA[
