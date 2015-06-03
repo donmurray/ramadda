@@ -83,6 +83,9 @@ public class SlackHarvester extends Harvester {
     public static final String[] CMDS_PWD = { "pwd", "dir", "info" };
 
     /** _more_ */
+    public static final String[] CMDS_CLEAR = { "clear" };
+
+    /** _more_ */
     public static final String[] CMDS_HELP = { "help", "?" };
 
 
@@ -134,10 +137,10 @@ public class SlackHarvester extends Harvester {
 
 
 
-    /** _more_          */
+    /** _more_ */
     public static final String[] ARGS_SINGLE = { "-help" };
 
-    /** _more_          */
+    /** _more_ */
     public static final String[] ARGS_PAIR = { "-entry", "-provider" };
 
 
@@ -460,6 +463,8 @@ public class SlackHarvester extends Harvester {
                 result = processLs(request, text);
             } else if (isCommand(cmd, CMDS_PWD)) {
                 result = processPwd(request, text);
+            } else if (isCommand(cmd, CMDS_CLEAR)) {
+                result = processClear(request, text);
             } else if (isCommand(cmd, CMDS_HELP)) {
                 result = getUsage(request, "");
             } else if (isCommand(cmd, CMDS_DESC)) {
@@ -550,16 +555,23 @@ public class SlackHarvester extends Harvester {
 
         request.put("slack.args", args.getArgs());
 
-
         List[] pair = getSearchManager().doSearch(request,
                           new StringBuilder());
         pair[0].addAll(pair[1]);
 
-        System.err.println("Slack: processSearch:" + pair[0]);
+        List<Entry>  entries = (List<Entry>) pair[0];
+        List<String> ids     = new ArrayList<String>();
+        for (Entry entry : entries) {
+            ids.add(entry.getId());
+        }
+        if (ids.size() > 0) {
+            getState(request, null, true).list = ids;
+        }
 
+        //        System.err.println("Slack: processSearch:" + pair[0]);
         return Slack.makeEntryResult(getRepository(), request,
-                                     "Search Results", (List<Entry>) pair[0],
-                                     getWebHook(), false);
+                                     "Search Results", entries, getWebHook(),
+                                     false);
     }
 
     /**
@@ -837,17 +849,84 @@ public class SlackHarvester extends Harvester {
      *
      * @param request _more_
      *
+     * @throws Exception _more_
+     */
+    private void clearState(Request request) throws Exception {
+        slackStates.remove(getStateKey(request));
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private SlackState getState(Request request) throws Exception {
+        return getState(request, null, false);
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param theEntry _more_
+     * @param createIfNeeded _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private SlackState getState(Request request, Entry theEntry,
+                                boolean createIfNeeded)
+            throws Exception {
+        SlackState state = slackStates.get(getStateKey(request));
+        if ((state == null) && createIfNeeded) {
+            slackStates.put(getStateKey(request),
+                            state = new SlackState(theEntry));
+        }
+
+        return state;
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
      * @return _more_
      *
      * @throws Exception _more_
      */
     private Entry getCurrentEntry(Request request) throws Exception {
-        SlackState state = slackStates.get(getStateKey(request));
+        SlackState state = getState(request);
         if (state == null) {
             return getBaseGroup();
         }
 
         return state.entry;
+    }
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private List<String> getCurrentList(Request request) throws Exception {
+        SlackState state = getState(request);
+        if (state == null) {
+            return null;
+        }
+
+        return state.list;
     }
 
     /**
@@ -899,7 +978,24 @@ public class SlackHarvester extends Harvester {
      */
     private Entry getEntryFromInput(Request request, String text)
             throws Exception {
+
+
+
         text = text.trim();
+
+        System.err.println("getEntryFromInput:" + text);
+        Entry currentEntry = getCurrentEntry(request);
+        if (text.matches("\\d+")) {
+            List<String> list = getCurrentList(request);
+            if (list != null) {
+                int index = new Integer(text).intValue();
+                if ((index >= 0) && (index < list.size())) {
+                    text = list.get(index);
+                }
+            }
+
+        }
+
         //Check for an ID
         Entry entry = getEntryManager().getEntry(request, text);
         if (entry != null) {
@@ -907,8 +1003,6 @@ public class SlackHarvester extends Harvester {
         }
 
 
-        System.err.println("getEntryFromInput:" + text);
-        Entry currentEntry = getCurrentEntry(request);
         entry = getEntryManager().getRelativeEntry(request, getBaseGroup(),
                 currentEntry, text);
         if (entry != null) {
@@ -959,7 +1053,8 @@ public class SlackHarvester extends Harvester {
             return message("No such entry:" + text);
         }
 
-        slackStates.put(getStateKey(request), new SlackState(theEntry));
+        SlackState state = getState(request, theEntry, true);
+        state.list = theEntry.getChildIds();
 
         return Slack.makeEntryResult(getRepository(), request,
                                      "Current entry:", toList(theEntry),
@@ -984,6 +1079,24 @@ public class SlackHarvester extends Harvester {
         return Slack.makeEntryResult(getRepository(), request,
                                      "Current entry:", toList(entry),
                                      getWebHook(), true);
+    }
+
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param text _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Result processClear(Request request, String text)
+            throws Exception {
+        clearState(request);
+
+        return processCd(request, "");
     }
 
     /**
@@ -1049,7 +1162,7 @@ public class SlackHarvester extends Harvester {
         if (entry == null) {
             return getUsage(request, msg.toString());
         }
-        slackStates.put(getStateKey(request), new SlackState(entry));
+        getState(request, entry, true);
 
         return Slack.makeEntryResult(getRepository(), request, "New entry:",
                                      toList(entry), getWebHook(), true);
@@ -1157,6 +1270,10 @@ public class SlackHarvester extends Harvester {
         /** _more_ */
         private Entry entry;
 
+        /** _more_          */
+        private List<String> list;
+
+
         /**
          * _more_
          *
@@ -1165,6 +1282,9 @@ public class SlackHarvester extends Harvester {
         public SlackState(Entry entry) {
             this.entry = entry;
         }
+
+
+
     }
 
     /**
