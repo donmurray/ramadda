@@ -27,8 +27,8 @@ for {set i 0} {$i <5} {incr i} {
             }
         }
         if {[catch {exec curl -silent -f test.out $url} err]} {
-            puts "Error: $err"
-            puts "$url"
+            puts "*********************\n\tError: $err"
+            puts "\t$url"
             incr errors
             if {$errors>10} {
                 puts "Too many errors"
