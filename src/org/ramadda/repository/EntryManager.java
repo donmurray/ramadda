@@ -9692,7 +9692,7 @@ public class EntryManager extends RepositoryManager {
 
 
         for (String tok : toks) {
-            System.err.println("   tok:" + tok + " cwd:" + cwd.getName());
+            //            System.err.println("   tok:" + tok + " cwd:" + cwd.getName());
             if (tok.equals("..")) {
                 cwd = cwd.getParentEntry();
                 if ((cwd == null) || cwd.equals(base)) {
