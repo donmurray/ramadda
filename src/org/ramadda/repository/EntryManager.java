@@ -9671,8 +9671,7 @@ public class EntryManager extends RepositoryManager {
                                   String dir)
             throws Exception {
         dir = dir.trim();
-        System.err.println("getRelativeEntry: base:" + base.getName()
-                           + " cwd:" + current.getName() + " text:" + dir);
+        //        System.err.println("getRelativeEntry: base:" + base.getName()  + " cwd:" + current.getName() + " text:" + dir);
         List<String> toks = StringUtil.split(dir, "/", true, true);
         if (toks.size() == 0) {
             //Maybe return base?
