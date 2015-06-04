@@ -2128,7 +2128,7 @@ public class EntryManager extends RepositoryManager {
         } else {
             typeHandler =
                 getRepository().getTypeHandler(request.getString(ARG_TYPE,
-                                                                 TypeHandler.TYPE_ANY), false, true);
+                    TypeHandler.TYPE_ANY), false, true);
         }
 
         boolean     figureOutType = request.get(ARG_TYPE_GUESS, false);
@@ -6711,7 +6711,8 @@ public class EntryManager extends RepositoryManager {
                 if (entry == null) {
                     //id,type,name,desc,group,user,file,createdata,fromdate,todate
                     TypeHandler localTypeHandler =
-                        getRepository().getTypeHandler(results.getString(2), false, true);
+                        getRepository().getTypeHandler(results.getString(2),
+                            false, true);
                     entry = localTypeHandler.createEntryFromDatabase(results);
                     cacheEntry(entry);
                 }
@@ -7794,8 +7795,15 @@ public class EntryManager extends RepositoryManager {
             //            System.err.println("****  Get synthids:" + mainEntry.getTypeHandler().getSynthIds(request, mainEntry,
             //                                                                                        group, synthId));
 
-            return mainEntry.getMasterTypeHandler().getSynthIds(request,
-                    mainEntry, group, synthId);
+            try {
+                return mainEntry.getMasterTypeHandler().getSynthIds(request,
+                        mainEntry, group, synthId);
+            } catch (Exception exc) {
+                getLogManager().logError("Error getting synthIds from:"
+                                         + mainEntry, exc);
+
+                return new ArrayList<String>();
+            }
         }
 
 
