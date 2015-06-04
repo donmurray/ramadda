@@ -65,7 +65,7 @@ public abstract class SearchProvider extends GenericTypeHandler {
     public SearchProvider(Repository repository, String id, String name) {
         super(repository, id, name);
         this.id   = id;
-        this.name = name;
+        this.name = (name==null?id:name);
     }
 
 
