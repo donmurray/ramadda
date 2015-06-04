@@ -180,6 +180,9 @@ public class Entry implements Cloneable {
     /** the chillens ids */
     private List<String> childIds;
 
+    /** _more_          */
+    private List<Entry> children;
+
 
     /**
      * Default constructor
@@ -1994,6 +1997,24 @@ public class Entry implements Cloneable {
         return isDummy;
     }
 
+
+    /**
+     *  Set the Children property.
+     *
+     *  @param value The new value for Children
+     */
+    public void setChildren(List<Entry> value) {
+        children = value;
+    }
+
+    /**
+     *  Get the Children property.
+     *
+     *  @return The Children
+     */
+    public List<Entry> getChildren() {
+        return children;
+    }
 
 
 
