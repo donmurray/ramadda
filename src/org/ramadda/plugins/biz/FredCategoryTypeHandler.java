@@ -157,16 +157,15 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
         if (ids != null) {
             return ids;
         }
-        System.err.println("FredTypeHandler.getSynthIds:" + synthId
-                           + " parent:" + parentEntry.getName()
-                           + " mainEntry: " + mainEntry.getName());
+        //        System.err.println("FredTypeHandler.getSynthIds:" + synthId
+        //                           + " parent:" + parentEntry.getName()
+        //                           + " mainEntry: " + mainEntry.getName());
         String categoryId = null;
 
         if (Utils.stringDefined(synthId)) {
             List<String> toks = StringUtil.split(synthId, ":", true, true);
             if (toks.size() <= 1) {
-                System.err.println("FredTypeHandler.getSynthIds: bad id:"
-                                   + synthId);
+                System.err.println("FredTypeHandler.getSynthIds: bad id:" + synthId);
 
                 return null;
             }
@@ -280,9 +279,9 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
         long t1 = System.currentTimeMillis();
         url = makeUrl(url, args);
         if (seenUrls.contains(url)) {
-            System.err.println("**** Fred URL:" + url);
+            //            System.err.println("**** Fred URL:" + url);
         } else {
-            System.err.println("Fred URL:" + url);
+            //            System.err.println("Fred URL:" + url);
             seenUrls.add(url);
         }
         String xml = IOUtil.readContents(new URL(url));

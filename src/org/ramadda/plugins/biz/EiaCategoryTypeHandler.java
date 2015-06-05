@@ -135,8 +135,7 @@ public class EiaCategoryTypeHandler extends ExtensibleGroupTypeHandler {
         if (Utils.stringDefined(synthId)) {
             List<String> toks = StringUtil.split(synthId, ":", true, true);
             if (toks.size() <= 1) {
-                System.err.println("EiaTypeHandler.getSynthIds: bad id:"
-                                   + synthId);
+                System.err.println("EiaTypeHandler.getSynthIds: bad id:"   + synthId);
 
                 return null;
             }
@@ -246,9 +245,9 @@ public class EiaCategoryTypeHandler extends ExtensibleGroupTypeHandler {
         long t1 = System.currentTimeMillis();
         url = makeUrl(url, args);
         if (seenUrls.contains(url)) {
-            System.err.println("**** Eia URL:" + url);
+            //            System.err.println("**** Eia URL:" + url);
         } else {
-            System.err.println("Eia URL:" + url);
+            //            System.err.println("Eia URL:" + url);
             seenUrls.add(url);
         }
         String xml = IOUtil.readContents(new URL(url));
