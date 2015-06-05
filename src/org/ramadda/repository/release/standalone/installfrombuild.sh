@@ -26,6 +26,9 @@ sh ${VERSION}/ramaddainit.sh stop
 #Copy the misc plugins  - the ones that aren't in core/geo/bio
 cp ${DIST}/miscplugins/* ${RAMADDA_HOME}/plugins
 
+#Copy the dev plugins
+cp ${DIST}/devplugins/* ${RAMADDA_HOME}/plugins
+
 rm -r -f $VERSION
 cp -r ${DIST}/$VERSION .
 chmod 755 $VERSION/*.sh

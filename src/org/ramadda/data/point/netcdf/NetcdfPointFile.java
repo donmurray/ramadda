@@ -433,7 +433,7 @@ public class NetcdfPointFile extends PointFile {
      * @throws Exception _more_
      */
     private FeatureDatasetPoint getDataset(String path) throws Exception {
-        System.err.println("Opening:" + path);
+        //        System.err.println("Opening:" + path);
         Formatter buf = new Formatter();
         FeatureDatasetPoint pods =
             (FeatureDatasetPoint) FeatureDatasetFactoryManager.open(

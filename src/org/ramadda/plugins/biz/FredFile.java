@@ -62,7 +62,7 @@ public class FredFile extends CsvFile {
             throws IOException {
         try {
             if (buffer == null) {
-                System.err.println("Reading FRED time series");
+                //                System.err.println("Reading FRED time series");
                 StringBuilder sb     = new StringBuilder();
                 InputStream   source = super.doMakeInputStream(buffered);
                 Element       root   = XmlUtil.getRoot(source);

@@ -106,8 +106,7 @@ public class FredSeriesTypeHandler extends PointTypeHandler {
                 Fred.TYPE_CATEGORY);
         String seriesId = (String) entry.getValue(IDX_SERIES_ID, null);
         if (seriesId == null) {
-            System.err.println("No series id");
-
+            System.err.println("FredSeries: No series id found");
             return;
         }
         entry.setResource(
@@ -169,8 +168,7 @@ public class FredSeriesTypeHandler extends PointTypeHandler {
         args.add(Fred.ARG_SERIES_ID);
         args.add(id);
         String url = fcth.makeUrl(Fred.URL_SERIES_OBSERVATIONS, args);
-        System.err.println("URL:" + url);
-
+        //        System.err.println("FredSeries: URL:" + url);
         return url;
     }
 

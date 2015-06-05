@@ -3088,9 +3088,9 @@ public class Repository extends RepositoryBase implements RequestHandler,
             //Sleep a second to slow the google bot down
             if (request.getUserAgent().indexOf("www.majestic12.co.uk") >= 0) {
                 System.err.println("Sleeping for the bad bot:" + request    + " " + request.getUserAgent());
-                Misc.sleepSeconds(30);
+                Misc.sleepSeconds(60);
             } else {
-                //Slow the googlebot down
+                //Slow other bots down
                 Misc.sleepSeconds(1);
             }
         }
@@ -3531,6 +3531,7 @@ public class Repository extends RepositoryBase implements RequestHandler,
                 } else if (path.endsWith(".html")) {
                     String html = IOUtil.readInputStream(inputStream);
                     html = html.replace("${urlroot}", urlBase);
+                    html = html.replace("${version}", getProperty(PROP_BUILD_VERSION, "1.0"));
                     html = html.replace("${hostname}",
                                         request.getServerName());
 
