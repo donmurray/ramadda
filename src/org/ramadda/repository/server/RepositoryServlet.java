@@ -387,7 +387,7 @@ public class RepositoryServlet extends HttpServlet implements Constants {
                             output.write(repositoryResult.getContent());
                         } catch (java.net.SocketException se) {
                             //ignore
-                        } catch (java.net.IOException se) {
+                        } catch (IOException se) {
                             //ignore
                         } finally {
                             IOUtil.close(output);
