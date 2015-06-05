@@ -916,9 +916,6 @@ public class StorageManager extends RepositoryManager {
             if (filesToScour.size() > 0) {
                 logInfo("StorageManager: scouring " + filesToScour.size()
                         + " files from:" + tmpDir.getDir().getName());
-                System.out.println("StorageManager: scouring "
-                                   + filesToScour.size() + " files from:"
-                                   + tmpDir);
             }
 
 

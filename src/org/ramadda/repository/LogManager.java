@@ -468,19 +468,24 @@ public class LogManager extends RepositoryManager {
      * @param exc _more_
      */
     public void logError(Logger log, String message, Throwable exc) {
-        System.err.println("LOG ERROR:" + exc);
         message = encode(message);
         Throwable thr = null;
         if (exc != null) {
             thr = LogUtil.getInnerException(exc);
         }
 
+        StringBuffer trace = new StringBuffer();
         String stackTrace = ((thr != null)
                              ? LogUtil.getStackTrace(thr)
                              : "");
+        List<String> lines = StringUtil.split(stackTrace,"\n",true,true);
+        for(int i=0;i<lines.size() && i< 20;i++) {
+            trace.append(lines.get(i));
+            trace.append("\n");
+        }
         if (log == null) {
             System.err.println("RAMADDA ERROR:" + message + " " + thr);
-            System.err.println(stackTrace);
+            System.err.println(trace);
         } else if (thr != null) {
             if ((thr instanceof RepositoryUtil.MissingEntryException)
                     || (thr instanceof AccessException)) {
@@ -489,7 +494,7 @@ public class LogManager extends RepositoryManager {
                 log.error(message + "\n<stack>\n" + thr + "\n" + stackTrace
                           + "\n</stack>");
                 System.err.println("RAMADDA ERROR:" + message);
-                System.err.println(stackTrace);
+                System.err.println(trace);
                 if (thr instanceof SQLException) {
                     SQLException sqlException = (SQLException) thr;
                     while ((sqlException = sqlException.getNextException())

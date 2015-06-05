@@ -263,7 +263,7 @@ public class RepositoryServlet extends HttpServlet implements Constants {
             } catch (Exception e) {
                 logException(e, request);
                 response.sendError(response.SC_INTERNAL_SERVER_ERROR,
-                                   "An error has occurred:" + e.getMessage());
+                                   "Error:" + e.getMessage());
 
                 return;
             }
@@ -386,6 +386,8 @@ public class RepositoryServlet extends HttpServlet implements Constants {
                         try {
                             output.write(repositoryResult.getContent());
                         } catch (java.net.SocketException se) {
+                            //ignore
+                        } catch (java.net.IOException se) {
                             //ignore
                         } finally {
                             IOUtil.close(output);
@@ -640,7 +642,6 @@ public class RepositoryServlet extends HttpServlet implements Constants {
             if (repository != null) {
                 repository.getLogManager().logError(
                     "Error in RepositoryServlet address=" + address, exc);
-
                 return;
             }
             System.err.println("Exception: " + exc);
