@@ -1,0 +1,25 @@
+<html>
+<title>Socrata Integration</title>
+<category:Integration>
+<body>
+<div class="ramadda-section">
+<h2>Socrata Integration</h2>
+
+<a href="http://socrata.com">Socrata</a> provides a large number of open data repositories for governments. The Socrata RAMADDA plugin allows you to search and access and display data from Socrata. You will need to install the  <a href="http://sourceforge.net/projects/ramadda/files/ramadda${version}/plugins/socrataplugin.jar ">socrataplugin.jar</a>.
+The plugin comes with a number of Socrata repositories pre-defined. You can add other repositories by adding a classes.txt file to your RAMADDA plugins directory. Add any number of lines:
+<pre>
+#org.ramadda.plugins.socrata.SocrataSearchProvider;&lt;hostname&gt;;&lt;name&gt;
+org.ramadda.plugins.socrata.SocrataSearchProvider;data.cdc.gov;Center for Disease Control and Prevention
+</pre>
+
+Socrata maintains a list of <a href="https://opendata.socrata.com/dataset/Socrata-Customer-Spotlights/6wk3-4ija">available servers</a>.
+
+Note: This is available as a development plugin. 
+
+
+
+</div>
+
+</body>
+</html>
+
