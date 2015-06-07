@@ -21,7 +21,7 @@ DIST=../source/ramadda-code/dist
 
 
 #Stop the server
-sh ${VERSION}/ramaddainit.sh stop
+sh ${VERSION}/ramaddaService.sh stop
 
 #Copy the misc plugins  - the ones that aren't in core/geo/bio
 cp ${DIST}/miscplugins/* ${RAMADDA_HOME}/plugins
@@ -32,6 +32,6 @@ cp ${DIST}/devplugins/* ${RAMADDA_HOME}/plugins
 rm -r -f $VERSION
 cp -r ${DIST}/$VERSION .
 chmod 755 $VERSION/*.sh
-sh ${VERSION}/ramaddainit.sh start
+sh ${VERSION}/ramaddaService.sh start
 
 

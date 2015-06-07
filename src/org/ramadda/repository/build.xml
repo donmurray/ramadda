@@ -32,7 +32,7 @@
                 <filter token="RELEASE_VERSION" value="${release_version}"/>
             </filterset>
        </copy>
-        
+       
     </target>
 
     <target name="init" depends="initbasic,initcore,initfull">
@@ -160,7 +160,33 @@
 
 
     <target name="installer" depends="init,clean">
-        <copy overwrite="true" file="${ramadda_dir}/release/installer/installer.sh" tofile="${dist_dir}/installer.sh">
+        <property name="installer_dir" value="${dist_dir}/ramaddainstaller" />
+        <mkdir dir="${installer_dir}"/>
+        <copy overwrite="true" file="${ramadda_dir}/release/installer/installer.sh" todir="${installer_dir}">
+            <filterset>
+                <filter token="DATE" value="${date}"/>
+                <filter token="VERSION" value="${version}"/>
+                <filter token="RELEASE_VERSION" value="${release_version}"/>
+            </filterset>
+
+          </copy>
+        <copy overwrite="true" file="${ramadda_dir}/release/installer/aws.sh" todir="${installer_dir}">
+            <filterset>
+                <filter token="DATE" value="${date}"/>
+                <filter token="VERSION" value="${version}"/>
+                <filter token="RELEASE_VERSION" value="${release_version}"/>
+            </filterset>
+
+          </copy>
+        <copy overwrite="true" file="${ramadda_dir}/release/installer/README" todir="${installer_dir}">
+            <filterset>
+                <filter token="DATE" value="${date}"/>
+                <filter token="VERSION" value="${version}"/>
+                <filter token="RELEASE_VERSION" value="${release_version}"/>
+            </filterset>
+
+          </copy>
+        <copy overwrite="true" file="${ramadda_dir}/release/installer/README_AWS" todir="${installer_dir}">
             <filterset>
                 <filter token="DATE" value="${date}"/>
                 <filter token="VERSION" value="${version}"/>
@@ -169,9 +195,7 @@
 
           </copy>
         <zip destfile="${dist_dir}/ramaddainstaller.zip">
-         <zipfileset dir="${ramadda_dir}/release/installer" includes="README" fullpath="ramaddainstaller/README"/>
-         <zipfileset dir="${dist_dir}" includes="installer.sh" fullpath="ramaddainstaller/installer.sh">
-            </zipfileset>
+         <zipfileset dir="${installer_dir}" includes="*" prefix="ramaddainstaller"/>
         </zip>
     </target>
 
