@@ -132,8 +132,6 @@ http://geodesystems.com/repository/entry/show/Home/Explore/officeRAMADDA/Data/MI
 http://geodesystems.com/repository/entry/show/Home/Explore/officeRAMADDA/Data/MISO+Data+Examples?entryid=c8a7436b-8e64-474d-bfcb-fc5f0b54aa8e
 http://geodesystems.com/repository/entry/show/Home/Explore/officeRAMADDA/Data/Status+Board?entryid=19397bfb-775d-4b3c-8ee3-3a65b0022640
 http://geodesystems.com/repository/entry/show/Home/Explore/officeRAMADDA/Data?entryid=dc70197f-63b8-47ed-b62b-5b0a1b79d543
-http://geodesystems.com/repository/entry/show/Home/Explore/officeRAMADDA/Database+Integration/test?entryid=c4a8739b-e1ea-4569-b832-d3e84dbc8549&template=empty
-http://geodesystems.com/repository/entry/show/Home/Explore/officeRAMADDA/Database+Integration/test?output=xls_json&entryid=c4a8739b-e1ea-4569-b832-d3e84dbc8549
 http://geodesystems.com/repository/entry/show/Home/Explore/officeRAMADDA/Database+Integration?entryid=d36db5d7-a007-4554-8e15-1b339e55d117
 http://geodesystems.com/repository/entry/show/Home/Explore/officeRAMADDA/Documents/Company+Calendar?entryid=6fab4d84-ea4d-40d2-8df1-934d87961b86
 http://geodesystems.com/repository/entry/show/Home/Explore/officeRAMADDA/Documents/EDGAR+SEC+Filings/11+GOOD+ENERGY+INC-0000000000-12-065126.txt?entryid=4789dc42-8a20-496e-bea6-b7e1eca2464f
