@@ -279,6 +279,9 @@ public class RepositoryFtplet extends DefaultFtplet {
             //            System.err.println("        done:" + ftpRequest.getCommand());
             return result;
             //          return FtpletResult.SKIP;
+        } catch (java.net.ConnectException cexc) {
+            //TODO: Maybe log once in a while?
+            return FtpletResult.SKIP;
         } catch (Exception exc) {
             ftpManager.logError("Error handling ftp request:"
                                 + ftpRequest.getCommand() + " arg:"
