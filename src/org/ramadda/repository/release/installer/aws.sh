@@ -1,14 +1,16 @@
 #!/bin/sh
 
-ramaddaVersion=2.1b
+#This script uses the Amazon Command Line Interface (CLI) to create and configure an AWS instance for RAMADDA
+#Install the CLI from:
+#http://aws.amazon.com/cli/
 
+ramaddaVersion=@VERSION@
 
 downloadUrl="http://downloads.sourceforge.net/project/ramadda/ramadda${ramaddaVersion}/ramaddainstaller.zip"
 securityGroup="ramadda"
 imageId="ami-55a7ea65"
 instanceType="t1.micro"
 keyPair="ramadda"
-keyPairFile=""
 volumeSize="100"
 
 
@@ -103,7 +105,7 @@ echo "Do you want to create the instance with:\n\timage: ${imageId}\n\ttype: ${i
 read -p "Enter [y|n]: " tmp
 case $tmp in
     ""|"y")
-        echo "Creating instance... ";
+        echo "Creating instance ${instanceName} ... ";
         if [ ${volumeSize} == 0 ]; then
             device="[]"
         else
@@ -157,7 +159,7 @@ printf "Your instance will be ready to access in a minute or two. You will be ab
 
 
 if [ "$instanceName" != "" ]; then
-    aws ec2 create-tags --resources ${instanceId} --tags Key=Name,Value=$tmp
+    aws ec2 create-tags --resources ${instanceId} --tags Key=Name,Value=$instanceName
 fi
 
 
@@ -180,31 +182,28 @@ done
 
 echo "We'll keep trying to ssh to the instance and update the OS "
 echo "This may take some time while the instance is coming up so have patience "
-echo "Once you are connected you will see a 'The authenticity of host ...' message. Enter 'yes' and then the yum update will run"
+echo "Once you are connected you will see a 'The authenticity of host ...' message. Enter 'yes' and then the update will run"
 echo "trying: ssh -i ${pemFile} -t  ec2-user@${ipAddress} \"sudo yum update -y\" "
 keepGoing=1;
-while [ 1  ]; do
-    result=`ssh   -i ${pemFile} -t  ec2-user@${ipAddress} "sudo yum update -y" 2> /dev/null`
+while [ $keepGoing == 1  ]; do
+    result=`ssh   -i ${pemFile} -t  ec2-user@${ipAddress} "pwd -y" 2> /dev/null`
     case ${result} in
         "") 
             echo "Instance isn't ready yet. We'll sleep a bit and then try again";
             sleep 10;
             ;;
         *) 
-            echo "${result}"
+#Now do the update
+            ssh   -i ${pemFile} -t  ec2-user@${ipAddress} "sudo yum update -y" 
             echo "Instance is ready and updated"
             keepGoing=0;
             ;;
     esac
-    echo "Keep going: $keepGoing"
-    if [  $keepGoing  == 0 ]; then
-        echo "DONE"
-        break;
-    fi
 done
 
+
         
-readit  "Download and install RAMADDA? [y|n]: " tmp  "OK, now we will ssh to the new instance, download and run the RAMADDA installer"
+readit  "Download and install RAMADDA? [y|n]: " tmp  "OK, we will now ssh to the new instance, download and run the RAMADDA installer"
 case $tmp in
     ""|"y")
         ssh  -i ${pemFile} -t  ec2-user@${ipAddress} "wget ${downloadUrl}"
@@ -215,7 +214,6 @@ esac
 
 
 
-printf "\nFinish configuration of the RAMADDA repository at https://$ipAddress/repository\n"
-
+printf "Access your instance via:   ssh -i ${keyPair}.pem ec2-user@${ipAddress}\n"
 
 
