@@ -611,7 +611,9 @@ public class RepositoryServlet extends HttpServlet implements Constants {
                     headerNames.hasMoreElements(); ) {
                 String name  = (String) headerNames.nextElement();
                 String value = request.getHeader(name);
-                httpArgs.put(name, value);
+                if(value !=null) {
+                    httpArgs.put(name, value);
+                }
             }
         }
 
