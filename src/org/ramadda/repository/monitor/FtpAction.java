@@ -222,7 +222,7 @@ public class FtpAction extends MonitorAction {
 
                 return;
             }
-            ftpClient.setFileType(FTP.IMAGE_FILE_TYPE);
+            ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
             ftpClient.enterLocalPassiveMode();
             if (directory.length() > 0) {
                 ftpClient.changeWorkingDirectory(directory);

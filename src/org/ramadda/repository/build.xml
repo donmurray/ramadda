@@ -21,7 +21,8 @@
 
         <property name="tika_jar" value="tika-app-1.4.jar" />
         <property name="jfreechart_jar" value="jfreechart-1.0.19.jar" />
-        
+        <property name="unidata_jar" value="idv.jar" />
+
         <property name="clientbase" value="ramaddaclient" />
 
         <mkdir dir="${dist_dir}"/>
@@ -48,8 +49,8 @@
     </target>
 
     <target name="initfull">
-       <property name="classpath" value="${lib_dir}/ramaddalib.jar:${lib_dir}/idv.jar:${lib_dir}/${tika_jar}:${lib_dir}/ramaddatds.jar:${lib_dir}/servlet-api.jar:${lib_dir}/jetty.jar"/>
-       <property name="manifestjars" value="idv.jar ${tika_jar}  ${jfreechart_jar} ramaddalib.jar   ramaddatds.jar servlet-api.jar jetty.jar allplugins_classes.jar" />
+       <property name="classpath" value="${lib_dir}/ramaddalib.jar:${lib_dir}/${unidata_jar}:${lib_dir}/${tika_jar}:${lib_dir}/ramaddatds.jar:${lib_dir}/servlet-api.jar:${lib_dir}/jetty.jar"/>
+       <property name="manifestjars" value="${unidata_jar} ${tika_jar}  ${jfreechart_jar} ramaddalib.jar   ramaddatds.jar servlet-api.jar jetty.jar allplugins_classes.jar" />
        <property name="lib1" value="${lib_dir}/visad.jar" />
        <property name="lib2" value="${lib_dir}/ncIdv.jar"/>
     </target>
@@ -283,7 +284,7 @@
         </delete>
         <mkdir dir="${release_dir}/lib"/>
         <copy  file="${dist_dir}/${ramadda_jar}" todir="${release_dir}/lib" overwrite="true" />
-        <copy  file="${lib_dir}/idv.jar" todir="${release_dir}/lib" overwrite="true" />
+        <copy  file="${lib_dir}/${unidata_jar}" todir="${release_dir}/lib" overwrite="true" />
         <copy  file="${lib_dir}/ramaddalib.jar" todir="${release_dir}/lib" overwrite="true" />
         <copy  file="${lib_dir}/${tika_jar}" todir="${release_dir}/lib" overwrite="true" />
         <copy  todir="${release_dir}" overwrite="true">
@@ -321,7 +322,7 @@
           <lib file="${dist_dir}/${ramadda_jar}"/>
           <lib file="${lib_dir}/ramaddalib.jar"/>
           <lib file="${lib_dir}/ramaddatds.jar"/>
-          <lib file="${lib_dir}/idv.jar"/>
+          <lib file="${lib_dir}/${unidata_jar}"/>
           <lib file="${lib_dir}/${tika_jar}"/>
       </war>
     </target>
@@ -333,14 +334,19 @@
             <fileset dir="${tmpjar_dir}" includes="**/*"/>
 
         </delete>
-        <unjar src="${lib_dir}/idvmaps.jar" dest="${tmpjar_dir}"/>
+
+
         <unjar src="${lib_dir}/extra.jar" dest="${tmpjar_dir}"/>
-        <unjar src="${lib_dir}/ezid.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/json.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/jython.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/gdata.jar" dest="${tmpjar_dir}"/>
+<!--
+        <unjar src="${lib_dir}/idvmaps.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/external.jar" dest="${tmpjar_dir}"/>
-        <unjar src="${lib_dir}/twitter4j-1.1.4.jar" dest="${tmpjar_dir}"/>
+-->
+
+
+        <unjar src="${lib_dir}/javax.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/jmapproj.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/lucene-core-3.0.3.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/mail.jar" dest="${tmpjar_dir}"/>
@@ -353,15 +359,13 @@
         <unjar src="${lib_dir}/derby.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/derbytools.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/commons-lang3-3.1.jar" dest="${tmpjar_dir}"/>
+        <unjar src="${lib_dir}/commons-net-3.3.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/commons-io-1.4.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/commons-dbcp2-2.0.1.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/commons-pool2-2.2.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/commons-fileupload-1.2.2.jar" dest="${tmpjar_dir}"/>
-<!--
+
         <unjar src="${lib_dir}/commons-httpclient-3.1.jar" dest="${tmpjar_dir}"/>
-        <unjar src="${lib_dir}/httpclient-4.2.1.jar" dest="${tmpjar_dir}"/>
-        <unjar src="${lib_dir}/httpcore-4.2.2.jar" dest="${tmpjar_dir}"/>
--->
         <unjar src="${lib_dir}/httpclient-4.4.1.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/httpcore-4.4.1.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/httpmime-4.4.1.jar" dest="${tmpjar_dir}"/>
@@ -381,8 +385,6 @@
 
         <unjar src="${lib_dir}/slf4j-api-1.6.4.jar" dest="${tmpjar_dir}"/>
         <unjar src="${lib_dir}/slf4j-simple-1.6.4.jar" dest="${tmpjar_dir}"/>
-
-        <unjar src="${lib_dir}/jsbeautify.jar" dest="${tmpjar_dir}"/>
 
 <!--
         <unjar src="${lib_dir}/jetty.jar" dest="${tmpjar_dir}"/>

@@ -1273,7 +1273,7 @@ public class Utils {
 
             return null;
         }
-        ftpClient.setFileType(FTP.IMAGE_FILE_TYPE);
+        ftpClient.setFileType(FTP.BINARY_FILE_TYPE);
         ftpClient.enterLocalPassiveMode();
 
         return ftpClient;

@@ -5,7 +5,8 @@ Note: for now I (jeffmc) fixed s ticky bug in AbstractXYItemRenderer where it pa
 NaN coordinates. This caused some JVMs to never return from the java2d draw call.
 I will submit the fix to the jfreechart folks but for now we're good (I think)
 
-
+javax.jar:
+This was some old javax components that were originally in the giant IDV external.jar
 
 ramaddalib.jar:
   This holds all of the 3rd party libs  used by ramadda. It is made

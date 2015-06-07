@@ -7,10 +7,6 @@
 package org.ramadda.repository;
 
 
-import org.apache.commons.httpclient.Credentials;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.UsernamePasswordCredentials;
-import org.apache.commons.httpclient.auth.AuthScope;
 
 import org.ramadda.repository.admin.Admin;
 import org.ramadda.repository.admin.AdminHandler;
@@ -68,6 +64,16 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import org.w3c.dom.NodeList;
+
+import org.apache.http.HttpHost;
+import org.apache.http.auth.Credentials;
+import org.apache.http.client.HttpClient;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.impl.client.HttpClientBuilder;
+
 
 import ucar.unidata.util.CacheManager;
 import ucar.unidata.util.Counter;
@@ -1189,13 +1195,14 @@ public class Repository extends RepositoryBase implements RequestHandler,
         //The default value is the system property 
         String proxyHost = getProperty(PROP_PROXY_HOST,
                                        getProperty("http.proxyHost",
-                                           (String) null));
+                                                   (String) null));
         String proxyPort = getProperty(PROP_PROXY_PORT,
                                        getProperty("http.proxyPort", "8080"));
         final String proxyUser = getProperty(PROP_PROXY_USER, (String) null);
         final String proxyPass = getProperty(PROP_PROXY_PASSWORD,
                                              (String) null);
-        httpClient = new HttpClient();
+        HttpClientBuilder builder = HttpClients.custom();
+        //        httpClient = new HttpClient();
         if (proxyHost != null) {
             getLogManager().logInfoAndPrint("Setting proxy server to:"
                                             + proxyHost + ":" + proxyPort);
@@ -1203,30 +1210,38 @@ public class Repository extends RepositoryBase implements RequestHandler,
             System.setProperty("http.proxyPort", proxyPort);
             System.setProperty("ftp.proxyHost", proxyHost);
             System.setProperty("ftp.proxyPort", proxyPort);
-            httpClient.getHostConfiguration().setProxy(proxyHost,
-                    Integer.parseInt(proxyPort));
+            builder.setProxy(new HttpHost(proxyHost,   Integer.parseInt(proxyPort)));
+
             // Just if proxy has authentication credentials
             if (proxyUser != null) {
-                getLogManager().logInfoAndPrint("Setting proxy user to:"
-                        + proxyUser);
-                httpClient.getParams().setAuthenticationPreemptive(true);
+                /**
+                   !!!!TODO: This was from the old library. need to implement it
+                getLogManager().logInfoAndPrint("Setting proxy user to:" + proxyUser);
+                //                httpClient.getParams().setAuthenticationPreemptive(true);
                 Credentials defaultcreds =
                     new UsernamePasswordCredentials(proxyUser, proxyPass);
                 httpClient.getState().setProxyCredentials(
-                    new AuthScope(
-                        proxyHost, Integer.parseInt(proxyPort),
-                        AuthScope.ANY_REALM), defaultcreds);
+                                                          new AuthScope(
+                                                                        proxyHost, Integer.parseInt(proxyPort),
+                                                                        AuthScope.ANY_REALM), defaultcreds);
                 Authenticator.setDefault(new Authenticator() {
-                    public PasswordAuthentication getPasswordAuthentication() {
-                        return new PasswordAuthentication(proxyUser,
-                                proxyPass.toCharArray());
-                    }
-                });
+                        public PasswordAuthentication getPasswordAuthentication() {
+                            return new PasswordAuthentication(proxyUser,
+                                                              proxyPass.toCharArray());
+                        }
+                    });
+                */
             }
+
+            httpClient = builder.build();
+
+
         }
 
-
     }
+
+
+
 
 
     /**
