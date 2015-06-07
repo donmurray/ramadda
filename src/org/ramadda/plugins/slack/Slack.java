@@ -54,6 +54,8 @@ import java.util.Properties;
  */
 public class Slack {
 
+    public static final String DFLT_USER_NAME = "slackshell";
+
     /** _more_ */
     public static final int MAX_MESSAGE_LENGTH = 5000;
 
@@ -254,7 +256,7 @@ public class Slack {
                 url += "&" + args;
             }
             //            System.err.println ("Slack api call:" + url);
-            System.err.println("Slack call:" + url);
+            //            System.err.println("Slack call:" + url);
             String json = IOUtil.readContents(new URL(url));
             if (json == null) {
                 return null;
@@ -326,7 +328,7 @@ public class Slack {
         map.add(SLACK_TEXT);
         map.add(Json.quote(message + "\n"));
         map.add("username");
-        map.add(Json.quote("slackshell"));
+        map.add(Json.quote(DFLT_USER_NAME));
         if ((request != null) && request.defined(SLACK_CHANNEL_ID)) {
             map.add("channel");
             map.add(Json.quote(request.getString(SLACK_CHANNEL_ID, "")));
