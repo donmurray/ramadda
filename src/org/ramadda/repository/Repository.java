@@ -1003,6 +1003,10 @@ public class Repository extends RepositoryBase implements RequestHandler,
                 } else {
                     cmdLineProperties.put(toks.get(0), toks.get(1));
                 }
+            } else if (args[i].equals("-help")) {
+                //For command line use
+                System.err.println(USAGE_MESSAGE);
+                System.exit(0);
             } else {
                 usage("Unknown argument: " + args[i]);
             }
@@ -2391,15 +2395,15 @@ public class Repository extends RepositoryBase implements RequestHandler,
 
 
 
+    private static final String USAGE_MESSAGE = "\nUsage: repository\n\t-admin <admin name> <admin password>\n\t-port <http port>\n\t-Dname=value (e.g., -Dramadda_home=/path/to/home/dir)";
+
     /**
      * _more_
      *
      * @param message _more_
      */
     protected void usage(String message) {
-        throw new IllegalArgumentException(
-            message
-            + "\nusage: repository\n\t-admin <admin name> <admin password>\n\t-port <http port>\n\t-Dname=value (e.g., -Dramadda.db=derby to specify the derby database)");
+        throw new IllegalArgumentException( message +"\n" + USAGE_MESSAGE);
     }
 
 
