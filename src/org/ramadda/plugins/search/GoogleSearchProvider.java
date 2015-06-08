@@ -79,7 +79,7 @@ public class GoogleSearchProvider extends SearchProvider {
         String      url     = URL;
         url += "&";
         url += HtmlUtils.arg("q", request.getString(ARG_TEXT, ""));
-        System.err.println("google search url:" + url);
+        //        System.err.println("google search url:" + url);
         String json = IOUtil.readContents(url);
         //        System.err.println("Json:" + json);
         JSONObject obj = new JSONObject(new JSONTokener(json));
