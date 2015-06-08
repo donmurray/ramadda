@@ -41,8 +41,7 @@ var Utils = {
         return v2;
     },
     cleanId: function(id) {
-        id = id.replace(/:/g,"_");
-        id =  id.replace(/=/g,"_");
+        id = id.replace(/:/g,"_").replace(/\./g,"_").replace(/=/g,"_").replace(/\//g,"_");
         return id;
     }
 };

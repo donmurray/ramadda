@@ -62,6 +62,7 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
      RamaddaUtil.defineMembers(this, {
              searchSettings: new EntrySearchSettings({
                          parent: properties.entryParent,
+                         provider: properties.provider,
                          text: properties.entryText,
                          entryType: properties.entryType,
              }),

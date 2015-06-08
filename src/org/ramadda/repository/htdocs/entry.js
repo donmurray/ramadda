@@ -313,8 +313,10 @@ function Ramadda(repositoryRoot) {
                     var type = settings.types[i];
                     url += "&type=" + type;
                 }
-                if(settings.parent!=null&& settings.parent.length>0) 
+                if(settings.parent!=null&& settings.parent.length>0)  
                     url += "&group=" + settings.parent;
+                if(settings.provider!=null&& settings.provider.length>0)  
+                    url += "&provider=" + settings.provider;
                 if(settings.text!=null&& settings.text.length>0) 
                     url += "&text=" + settings.text;
                 if(settings.name!=null&& settings.name.length>0) 
