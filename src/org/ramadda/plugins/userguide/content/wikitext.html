@@ -475,10 +475,16 @@ Show the menu actions in a popup:
 There is a set of new "display" wiki tags that allow you to develop rich 
 integrated and interactive search, map and charting wiki pages.
 
-There are numerous examples of this facility available at <a href="http://ramadda.org/repository/alias/displays">ramadda.org</a>.
+There are numerous examples of this facility available at <a href="http://ramadda.org/repository/alias/displays">ramadda.org</a>. You can always see the underlying wiki text from the Information or Wiki Text entry menu item.
+
+
 
 The idea is that there is a new <i>group</i> tag that can manage a number of children displays. Each child display
 may be located in a fixed location (using layoutHere=false) in the web page or the group can manage the layout of the children displays.
+
+
+
+
 
 
 The group is defined as:
@@ -487,6 +493,24 @@ The group is defined as:
 
 And the displays are defined as:
 [wiki::tagdef display {type="display type"   layoutHere="true"  ...}]
+
+Where type may be one of:
+<ul>
+<li> <i>entrylist</i> A search form and a list of entries. 
+
+Specify alternative search providers with the <i>provider</i> argument, e.g.:
+<pre>
+provider=google,arxiv,wolfram
+</pre>
+
+<li> <i>linechart</i> A line chart
+
+<li> <i>barchart</i> A bar chart
+
+<li> <i>map</i> A map
+
+</pre>
+
 
 If you have a wiki page that does not have a group but only one or more display tags then a group will be
 added automatically.
@@ -543,7 +567,7 @@ Likewise, the group has a divid=maindiv which corresponds to the div at the bott
 
 <div id=maindiv></div>
 
-{{displaygroup  layoutType="table"  layoutColumns="1" divid="maindiv"}}
+{{group  layoutType="table"  layoutColumns="1" divid="maindiv"}}
 
 {{display   type="entrylist"   divid="listdiv" }}
 
