@@ -29,18 +29,14 @@ readit() {
 }
 
 
-read -p "Do you want to enter your Amazon authentication (only needed one time)? [y|n]: " tmp
-case $tmp in
-    ""|"y")
-        aws configure
-;;
-esac
+if [ ! -f ~/.aws/credentials ]; then
+    printf "Enter your Amazon authentication  - only needed one time\n"
+    aws configure
+fi
 
 
 
-
-
-readit  "Enter the image id [${imageId}]: " tmp "Enter machine info and disk size. Note: the installer only works on Amazon Linux AMIs"
+readit  "Enter the image id [${imageId}]: " tmp "Enter machine info. Note: the installer only works on Amazon Linux AMIs"
 
 if [ "$tmp" != "" ]; then
     imageId=$tmp
