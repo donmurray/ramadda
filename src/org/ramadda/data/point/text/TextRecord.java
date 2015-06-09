@@ -109,14 +109,15 @@ public class TextRecord extends DataRecord {
         super.initFields(fields);
         tokens  = new String[numDataFields];
         indices = new int[numDataFields];
+        int idx = 0;
         for (int i = 0; i < fields.size(); i++) {
             RecordField field = fields.get(i);
-            indices[i] = field.getIndex();
             //            System.err.println("Field:" + field.getName() +" index:" + indices[i]);
             if (field.getSynthetic() || field.hasDefaultValue()
                     || field.getSkip()) {
                 continue;
             }
+            indices[idx++] = field.getIndex();
             if (field.getColumnWidth() > 0) {
                 fixedWidth = new int[tokens.length];
                 int widthIdx = 0;
