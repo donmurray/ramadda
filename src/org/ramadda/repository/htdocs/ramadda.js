@@ -471,7 +471,7 @@ function EntryRow (entryId, rowId, cbxId,cbxWrapperId, showDetails) {
         text = getChildText(xmlDoc);
         var leftSide  = entryRow.getRow().offset().left;
         var offset = entryRow.lastClick-leftSide;
-        getTooltip().html("<div class=tooltip-inner><div id=\"tooltipwrapper\" ><table><tr valign=top><img width=\"16\" onmousedown=\"hideEntryPopup();\" id=\"tooltipclose\"  src=" + icon_close +"></td><td>" + text+"</table></div></div>");
+        getTooltip().html("<div class=ramadda-tooltip-inner><div id=\"tooltipwrapper\" ><table><tr valign=top><img width=\"16\" onmousedown=\"hideEntryPopup();\" id=\"tooltipclose\"  src=" + icon_close +"></td><td>" + text+"</table></div></div>");
         checkTabs(text);
 
         var pos = entryRow.getRow().offset();    
