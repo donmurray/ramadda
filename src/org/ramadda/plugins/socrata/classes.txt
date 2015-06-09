@@ -2,7 +2,7 @@
 
 
 #This searches all Socrata sites
-#org.ramadda.plugins.socrata.SocrataSearchProvider
+org.ramadda.plugins.socrata.SocrataSearchProvider
 
 #To specify a specific  Socrata site add - 
 #org.ramadda.plugins.socrata.SocrataSearchProvider;<socrata domain>;<server name>

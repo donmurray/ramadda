@@ -30,6 +30,7 @@ import org.w3c.dom.*;
 
 import ucar.unidata.util.DateUtil;
 import ucar.unidata.util.IOUtil;
+import ucar.unidata.util.Misc;
 import ucar.unidata.util.StringUtil;
 import ucar.unidata.xml.XmlUtil;
 
@@ -103,6 +104,7 @@ public class SocrataSeriesTypeHandler extends PointTypeHandler {
     @Override
     public RecordFile doMakeRecordFile(Request request, Entry entry)
             throws Exception {
+
         String repository = entry.getValue(IDX_REPOSITORY, (String) null);
         String seriesId   = entry.getValue(IDX_SERIES_ID, (String) null);
         if ( !Utils.stringDefined(seriesId)
@@ -132,14 +134,39 @@ public class SocrataSeriesTypeHandler extends PointTypeHandler {
             JSONArray    cols      = view.getJSONArray("columns");
             List<String> types     = new ArrayList<String>();
             List<String> fieldList = new ArrayList<String>();
+            List<String> names     = new ArrayList<String>();
             for (int i = 0; i < cols.length(); i++) {
-                JSONObject col  = cols.getJSONObject(i);
-                String     name = col.get("name").toString();
+                JSONObject col = cols.getJSONObject(i);
+                String     id  = col.get("fieldName").toString();
+                names.add(id);
+            }
+
+            Hashtable<String, Integer> indexMap = new Hashtable<String,
+                                                      Integer>();
+
+
+            int idx = 0;
+            for (String name : (List<String>) Misc.sort(names)) {
+                if (name.startsWith(":")) {
+                    continue;
+                }
+                indexMap.put(name, new Integer(idx));
+                idx++;
+            }
+
+            for (int i = 0; i < cols.length(); i++) {
+                JSONObject col = cols.getJSONObject(i);
+                String     id  = col.get("fieldName").toString();
+                if (id.startsWith(":")) {
+                    continue;
+                }
+
+                String name = col.get("name").toString();
                 name = name.replaceAll(",", " ");
                 name = name.replaceAll("\"", "'");
-                String id   = col.get("fieldName").toString();
+                Integer index = indexMap.get(id);
 
-                String type = col.get("dataTypeName").toString();
+                String  type  = col.get("dataTypeName").toString();
                 if (type.equals("meta_data")) {
                     continue;
                 }
@@ -154,6 +181,7 @@ public class SocrataSeriesTypeHandler extends PointTypeHandler {
                     sb.append(id);
                     sb.append("[");
                     sb.append(file.attrLabel(name));
+                    sb.append(file.attr("index", index.toString()));
                     if (type.equals("text")) {
                         sb.append(file.attrType(file.TYPE_STRING));
                     } else if (type.equals("location")) {
@@ -168,8 +196,8 @@ public class SocrataSeriesTypeHandler extends PointTypeHandler {
                         sb.append(file.attrChartable());
                     } else if (type.equals("calendar_date")) {
                         sb.append(file.attrType(file.TYPE_DATE));
-                        //                        sb.append(file.attrFormat("yyyy-MM-dd'T'HH:mm:ss"));
-                        sb.append(file.attrFormat("MM/dd/yyyy"));
+                        sb.append(file.attrFormat("yyyy-MM-dd'T'HH:mm:ss"));
+                        //                        sb.append(file.attrFormat("MM/dd/yyyy"));
                     } else {
                         sb.append(file.attrType(file.TYPE_STRING));
                     }
@@ -178,6 +206,7 @@ public class SocrataSeriesTypeHandler extends PointTypeHandler {
                 //                System.err.println("Field:" + sb);
                 fieldList.add(sb.toString());
             }
+            //            System.err.println("Fields:" + fieldList);
             fields = file.makeFields(fieldList);
             entry.putProperty("socrata.fields", fields);
         }
@@ -188,6 +217,7 @@ public class SocrataSeriesTypeHandler extends PointTypeHandler {
         file.putProperty("output.latlon", "false");
 
         return file;
+
 
     }
 

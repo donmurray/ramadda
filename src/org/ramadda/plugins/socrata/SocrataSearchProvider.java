@@ -42,10 +42,10 @@ import java.util.List;
  */
 public class SocrataSearchProvider extends SearchProvider {
 
-    /** _more_          */
+    /** _more_ */
     private static final String SOCRATA_ID = "socrata";
 
-    /** _more_          */
+    /** _more_ */
     private static final String URL_ALL =
         "http://api.us.socrata.com/api/catalog/v1?";
 
@@ -109,7 +109,7 @@ public class SocrataSearchProvider extends SearchProvider {
                                   Appendable searchCriteriaSB)
             throws Exception {
 
-        if (hostname == null /* || true*/) {
+        if ((hostname == null) || true) {
             return doSearchAll(request, searchCriteriaSB);
         }
 
