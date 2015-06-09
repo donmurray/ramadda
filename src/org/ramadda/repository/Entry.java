@@ -180,7 +180,7 @@ public class Entry implements Cloneable {
     /** the chillens ids */
     private List<String> childIds;
 
-    /** _more_          */
+    /** _more_ */
     private List<Entry> children;
 
 
@@ -514,9 +514,9 @@ public class Entry implements Cloneable {
                           long createDate, long changeDate, long startDate,
                           long endDate, Object[] values) {
         //        super.init(name, description, parentEntry, user, createDate,changeDate);
-        this.id          = id;
-        this.name        = name;
-        this.description = description;
+        this.id = id;
+        setName(name);
+        setDescription(description);
         this.parentEntry = parentEntry;
         this.user        = user;
 
@@ -1537,8 +1537,8 @@ public class Entry implements Cloneable {
      */
     public void init(String name, String description, Entry parentEntry,
                      User user, long createDate, long changeDate) {
-        this.name        = name;
-        this.description = description;
+        setName(name);
+        setDescription(description);
         this.parentEntry = parentEntry;
         this.user        = user;
         setCreateDate(createDate);
