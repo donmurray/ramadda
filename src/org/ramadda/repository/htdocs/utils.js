@@ -344,6 +344,16 @@ var HtmlUtil =  {
         return HtmlUtil.div(["style", style], html);
 
     },
+    makeAccordian: function(id) {
+        $(function() {
+                $(id).accordion(
+                       {
+                           autoHeight: false, navigation: true, collapsible: true, active: false
+                       });
+                $(id).show();
+            }
+            );
+    },
     hbox : function() {
         var row = HtmlUtil.openTag("tr",["valign","top"]);
         row += "<td>";

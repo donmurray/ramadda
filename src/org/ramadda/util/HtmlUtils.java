@@ -4018,7 +4018,7 @@ public class HtmlUtils {
             sb.append("<a href=\"#\">");
             sb.append(title);
             sb.append("</a></h3>");
-            sb.append(HtmlUtils.div(content, ""));
+            sb.append(HtmlUtils.div(content, HtmlUtils.cssClass("ramadda-accordian-contents")));
         }
         sb.append("</div>");
 
@@ -4030,8 +4030,10 @@ public class HtmlUtils {
             args += ", active: 0";
         }
 
-        sb.append(HtmlUtils.script("$(function() {\n$(\"#" + accordianId
-                                   + "\" ).accordion({" + args + "});});\n"));
+        //        sb.append(HtmlUtils.script("$(function() {\n$(\"#" + accordianId
+        //                                   + "\" ).accordion({" + args + "});});\n"));
+
+        sb.append(HtmlUtils.script("HtmlUtil.makeAccordian(\"#" + accordianId+ "\" );\n"));
     }
 
 

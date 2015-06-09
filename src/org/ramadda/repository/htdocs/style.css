@@ -554,6 +554,11 @@ td.entry-table-block {
     padding-left: 10px;
 }
 
+.ramadda-accordian-contents {
+   display:none;
+}
+
+
 .ui-accordion-icons .ui-accordion-header a {
    padding:1.8em;
 }
