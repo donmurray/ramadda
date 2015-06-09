@@ -50,6 +50,9 @@ public class TextRecord extends DataRecord {
     /** _more_ */
     private String[] tokens;
 
+    /** _more_          */
+    private int[] indices;
+
     /** _more_ */
     private Visitor visitor;
 
@@ -79,7 +82,8 @@ public class TextRecord extends DataRecord {
      */
     public TextRecord(TextRecord that) {
         super(that);
-        tokens = null;
+        tokens  = null;
+        indices = null;
     }
 
 
@@ -103,9 +107,12 @@ public class TextRecord extends DataRecord {
     @Override
     public void initFields(List<RecordField> fields) {
         super.initFields(fields);
-        tokens = new String[numDataFields];
+        tokens  = new String[numDataFields];
+        indices = new int[numDataFields];
         for (int i = 0; i < fields.size(); i++) {
             RecordField field = fields.get(i);
+            indices[i] = field.getIndex();
+            //            System.err.println("Field:" + field.getName() +" index:" + indices[i]);
             if (field.getSynthetic() || field.hasDefaultValue()
                     || field.getSkip()) {
                 continue;
@@ -316,7 +323,15 @@ public class TextRecord extends DataRecord {
                 }
 
 
-                tok = tokens[tokenCnt++];
+                if (indices[tokenCnt] >= 0) {
+                    tok = tokens[indices[tokenCnt]];
+                } else {
+                    tok = tokens[tokenCnt];
+                }
+                //                System.err.println("field: " + field.getName() + " tok:" + tok +" index:" + indices[tokenCnt]);
+                tokenCnt++;
+
+
                 if (field.isTypeString()) {
                     objectValues[fieldCnt] = tok;
 

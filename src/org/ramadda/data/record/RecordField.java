@@ -100,6 +100,8 @@ public class RecordField {
     /** _more_ */
     private int sortOrder = 0;
 
+    private int index = -1;
+
     /** _more_ */
     private int columnWidth = 0;
 
@@ -1209,6 +1211,24 @@ public class RecordField {
      */
     public int getColumnWidth() {
         return columnWidth;
+    }
+
+    /**
+       Set the Index property.
+
+       @param value The new value for Index
+    **/
+    public void setIndex (int value) {
+	index = value;
+    }
+
+    /**
+       Get the Index property.
+
+       @return The Index
+    **/
+    public int getIndex () {
+	return index;
     }
 
 
