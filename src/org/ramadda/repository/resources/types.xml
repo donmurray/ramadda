@@ -29,13 +29,13 @@
   </type>
 -->
 
-<!--
-  <type name="contribution"  description="Contribution" >
+
+  <type name="contribution"  description="Contribution"  foruser="false">
      <property name="form.date.show" value="false"/>
      <property name="form.area.show" value="false"/>
      <property name="form.datatype.show" value="false"/>
   </type>
--->
+
 
 
 

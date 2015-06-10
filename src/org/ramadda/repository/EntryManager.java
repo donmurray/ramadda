@@ -3657,7 +3657,8 @@ public class EntryManager extends RepositoryManager {
      */
     public Result processEntryUpload(Request request) throws Exception {
         TypeHandler typeHandler =
-            getRepository().getTypeHandler(TypeHandler.TYPE_CONTRIBUTION);
+            getRepository().getTypeHandler(TypeHandler.TYPE_CONTRIBUTION, true, false);
+
         Entry         group = findGroup(request);
         StringBuilder sb    = new StringBuilder();
         if ( !request.exists(ARG_CONTRIBUTION_FROMNAME)) {
