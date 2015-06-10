@@ -2654,3 +2654,53 @@ a.wiki-link-noexist {
 #treeview_header {
  font-size: 120%;  
 }
+
+/* JQuery overrides */
+/*jeffmc: added these*/
+.ui-datepicker .ui-datepicker-header {
+  background: #cccccc url(images/ui-bg_highlight-soft_75_cccccc_1x100.png) 50% 50% repeat-x; 
+}
+.ui-datepicker { 
+  border: 1px solid #aaaaaa;
+}
+
+/* for tabs */
+.ui-tabs .ui-tabs-nav .ui-tabs-anchor {
+/*jeffmc: changed padding*/
+/*padding: .5em 1em; */
+  padding-left: .5em;
+  padding-right: .5em;
+  padding-top: .2em;
+  padding-bottom: .0em;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-tabs-active {
+  /*jeffmc: added bold*/
+  font-weight: bold;
+}
+
+.ui-tabs .ui-tabs-panel {
+/*jeffmc: border-width: 0;*/
+        border: 1px solid #aaaaaa;
+}
+
+.ui-widget-content {
+/*jeffmc  border: 1px solid #aaaaaa; */
+  border: none;
+}
+
+.ui-widget-header {
+/*jeffmc: border: 1px solid #aaaaaa; */
+/*jeffmc: background: #cccccc url(images/ui-bg_highlight-soft_75_cccccc_1x100.png) 50% 50% repeat-x; */
+  border: none;
+  background: none;
+}
+
+/*jeffmc:*/
+.ui-dialog {
+  -webkit-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
+  -moz-box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
+  box-shadow: 5px 5px 5px rgba(0, 0, 0, 0.5);
+  filter:progid:DXImageTransform.Microsoft.dropshadow(OffX=5, OffY=5, Color='gray');
+  -ms-filter:"progid:DXImageTransform.Microsoft.dropshadow(OffX=5, OffY=5, Color='gray')";
+}
