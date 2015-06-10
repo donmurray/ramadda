@@ -2157,8 +2157,10 @@ public class PointOutputHandler extends RecordOutputHandler {
             if (tuple.length >= 5) {
                 extraArgs = tuple[4];
             }
+            String serviceFilename = getServiceFilename(entry)+suffix;
+
             url = HtmlUtils.url(getRepository().URL_ENTRY_SHOW + "/"
-                                + entry.getName() + suffix, new String[] {
+                                + serviceFilename, new String[] {
                 ARG_ENTRYID, entry.getId(), ARG_OUTPUT,
                 OUTPUT_PRODUCT.getId(), ARG_PRODUCT, product,
                 //ARG_ASYNCH, "false", 
