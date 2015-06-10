@@ -1879,7 +1879,7 @@ public class HtmlOutputHandler extends OutputHandler {
                 }
             }
 
-            showNext(request, subGroups, entries, sb);
+            //            showNext(request, subGroups, entries, sb);
             List<Entry> allEntries = new ArrayList<Entry>();
             allEntries.addAll(subGroups);
             allEntries.addAll(entries);

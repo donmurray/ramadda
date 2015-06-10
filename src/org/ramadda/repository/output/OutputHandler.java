@@ -315,6 +315,7 @@ public class OutputHandler extends RepositoryManager {
     public void showNext(Request request, int cnt, Appendable sb)
             throws Exception {
 
+        //        Misc.printStack("Show next", 10);
         int max = request.get(ARG_MAX, VIEW_MAX_ROWS);
         if ((cnt > 0) && ((cnt == max) || request.defined(ARG_SKIP))) {
             int skip = Math.max(0, request.get(ARG_SKIP, 0));
@@ -854,9 +855,12 @@ public class OutputHandler extends RepositoryManager {
      * @param sb _more_
      * @param formId _more_
      * @param skipList _more_
+     *
+     * @throws Exception _more_
      */
     public static void addUrlShowingForm(Appendable sb, String formId,
-                                         String skipList) throws Exception {
+                                         String skipList)
+            throws Exception {
         String outputId = HtmlUtils.getUniqueId("output_");
         sb.append(HtmlUtils.div("", HtmlUtils.id(outputId)));
         sb.append(
@@ -1929,7 +1933,7 @@ public class OutputHandler extends RepositoryManager {
 
 
         String url = entry.getResource().getPath();
-        if(entry.getResource().isUrl()) {
+        if (entry.getResource().isUrl()) {
             return url;
         }
         if (url != null) {
@@ -2354,6 +2358,17 @@ public class OutputHandler extends RepositoryManager {
         return theProductDir;
     }
 
+
+    /**
+     * _more_
+     *
+     * @param entry _more_
+     *
+     * @return _more_
+     */
+    public String getServiceFilename(Entry entry) {
+        return entry.getName().replace(" ", "_").replace(":", "_");
+    }
 
 
 }
