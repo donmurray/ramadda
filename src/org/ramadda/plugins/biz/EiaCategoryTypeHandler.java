@@ -95,7 +95,7 @@ public class EiaCategoryTypeHandler extends ExtensibleGroupTypeHandler {
      *
      * @return _more_
      */
-    private String createSynthId(Entry mainEntry, String type, String id) {
+    public String createSynthId(Entry mainEntry, String type, String id) {
         return getEntryManager().createSynthId(mainEntry, type + ":" + id);
     }
 
@@ -135,7 +135,8 @@ public class EiaCategoryTypeHandler extends ExtensibleGroupTypeHandler {
         if (Utils.stringDefined(synthId)) {
             List<String> toks = StringUtil.split(synthId, ":", true, true);
             if (toks.size() <= 1) {
-                System.err.println("EiaTypeHandler.getSynthIds: bad id:"   + synthId);
+                System.err.println("EiaTypeHandler.getSynthIds: bad id:"
+                                   + synthId);
 
                 return null;
             }
@@ -244,6 +245,7 @@ public class EiaCategoryTypeHandler extends ExtensibleGroupTypeHandler {
     public Element call(String url, List<String> args) throws Exception {
         long t1 = System.currentTimeMillis();
         url = makeUrl(url, args);
+        System.err.println("Eia URL:" + url);
         if (seenUrls.contains(url)) {
             //            System.err.println("**** Eia URL:" + url);
         } else {

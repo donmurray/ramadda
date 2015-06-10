@@ -1,0 +1,3 @@
+org.ramadda.plugins.biz.FredSearchProvider
+org.ramadda.plugins.biz.EiaSearchProvider
+

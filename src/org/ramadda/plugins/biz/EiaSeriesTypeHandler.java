@@ -86,8 +86,6 @@ public class EiaSeriesTypeHandler extends PointTypeHandler {
     public void initializeNewEntry(Request request, Entry entry)
             throws Exception {
         super.initializeNewEntry(request, entry);
-        //        System.err.println("EiaSeries.init");
-        //        initializeSeries(entry);
     }
 
 
@@ -104,8 +102,6 @@ public class EiaSeriesTypeHandler extends PointTypeHandler {
                 Eia.TYPE_CATEGORY);
         String seriesId = (String) entry.getValue(IDX_SERIES_ID, null);
         if (seriesId == null) {
-            System.err.println("No series id");
-
             return;
         }
 

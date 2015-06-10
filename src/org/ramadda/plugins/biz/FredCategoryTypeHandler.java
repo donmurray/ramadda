@@ -165,7 +165,8 @@ public class FredCategoryTypeHandler extends ExtensibleGroupTypeHandler {
         if (Utils.stringDefined(synthId)) {
             List<String> toks = StringUtil.split(synthId, ":", true, true);
             if (toks.size() <= 1) {
-                System.err.println("FredTypeHandler.getSynthIds: bad id:" + synthId);
+                System.err.println("FredTypeHandler.getSynthIds: bad id:"
+                                   + synthId);
 
                 return null;
             }
