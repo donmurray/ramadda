@@ -329,7 +329,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
 
             String entryId = (String) props.get(ATTR_ENTRY);
             if (entryId != null) {
-                theEntry = findEntryFromId(request, entry, wikiUtil, entryId);
+                theEntry = findEntryFromId(request, entry, wikiUtil, entryId.trim());
                 if (theEntry == null) {
                     return getMessage(props, "Unknown entry:" + entryId);
                 }
