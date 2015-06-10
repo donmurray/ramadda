@@ -16,6 +16,7 @@ var ID_RESULTS = "results";
 var ID_ENTRIES = "entries";
 var ID_DETAILS = "details";
 var ID_DETAILS_INNER = "detailsinner";
+var ID_PROVIDERS = "providers";
 var ID_DETAILS_MAIN = "detailsmain";
 
 
@@ -69,6 +70,14 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
              entryList: null,
              entryMap: {},
              getSearchSettings: function() {
+                 if(this.providers!=null) {
+                     var provider = this.searchSettings.provider;
+                     var fromSelect =  this.jq(ID_PROVIDERS).val();
+                     if(fromSelect !=null) {
+                         provider = fromSelect;
+                     } 
+                     this.searchSettings.provider = provider;
+                 }
                  return this.searchSettings;
              },
             getEntries: function() {
@@ -107,7 +116,7 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
 
                  toolbarItems.push(entryMenuButton);
                  return HtmlUtil.div([ATTR_CLASS,"display-entry-toolbar",ATTR_ID,
-                                      this.getEntryToolbarId(entry.getId())],
+                                      this.getEntryToolbarId(entry.getIdForDom())],
                                      HtmlUtil.join(toolbarItems,""));
              },
              getEntryToolbarId: function(entryId) {
@@ -134,6 +143,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
     var ID_SEARCH = "search";
     var ID_FORM = "form";
     var ID_COLUMN = "column";
+
 
     RamaddaUtil.initMembers(this, {
             showForm: true,            
@@ -405,19 +415,26 @@ function RamaddaSearcher(displayManager, id, type, properties) {
         },
         submitSearchForm: function() {
               this.haveSearched = true;
-              this.searchSettings.text = this.getFieldValue(this.getDomId(ID_TEXT_FIELD), this.searchSettings.text);
-              if(this.haveTypes) {
-                  this.searchSettings.entryType  = this.getFieldValue(this.getDomId(ID_TYPE_FIELD), this.searchSettings.entryType);
+              var settings = this.getSearchSettings();
+              settings.text = this.getFieldValue(this.getDomId(ID_TEXT_FIELD), settings.text);
+
+              if(this.textRequired && (settings.text==null || settings.text.trim().length==0)) {
+                  this.writeHtml(ID_ENTRIES, this.getMessage("Enter text to search"));
+                  return;
               }
-              this.searchSettings.clearAndAddType(this.searchSettings.entryType);
+
+              if(this.haveTypes) {
+                  settings.entryType  = this.getFieldValue(this.getDomId(ID_TYPE_FIELD), settings.entryType);
+              }
+              settings.clearAndAddType(settings.entryType);
                 
               if(this.areaWidget) {
-                  this.areaWidget.setSearchSettings(this.searchSettings);
+                  this.areaWidget.setSearchSettings(settings);
               }
               if(this.dateRangeWidget) {
-                  this.dateRangeWidget.setSearchSettings(this.searchSettings);
+                  this.dateRangeWidget.setSearchSettings(settings);
               }
-              this.searchSettings.metadata = [];
+              settings.metadata = [];
               for(var i=0;i<this.metadataTypeList.length;i++) {
                     var metadataType  = this.metadataTypeList[i];
                     var value = metadataType.getValue();
@@ -425,7 +442,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                         value = this.getFieldValue(this.getMetadataFieldId(metadataType), null);
                     }
                     if(value!=null) {
-                        this.searchSettings.metadata.push({type:metadataType.getType(),value:value});
+                        settings.metadata.push({type:metadataType.getType(),value:value});
                     }
                 }
 
@@ -465,10 +482,14 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 //alert("There was an error performing the search\n" + msg);
             },
             updateForSearching: function(jsonUrl) {
-                var outputs = this.getRamadda().getSearchLinks(this.searchSettings);
+                var outputs = this.getRamadda().getSearchLinks(this.getSearchSettings());
                 this.footerRight  = outputs == null?"":"Links: " + HtmlUtil.join(outputs," - "); 
                 this.writeHtml(ID_FOOTER_RIGHT, this.footerRight);
-                this.writeHtml(ID_RESULTS, this.getRamadda().getSearchMessage());
+                var msg = this.searchMessage;
+                if(msg == null) {
+                    msg  = this.getRamadda().getSearchMessage();
+                }
+                this.writeHtml(ID_RESULTS, msg);
                 this.writeHtml(ID_ENTRIES, HtmlUtil.div([ATTR_STYLE,"margin:20px;"], this.getWaitImage()));
                 this.hideEntryDetails();
             },
@@ -493,16 +514,16 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     if(value == null || value.length == 0)continue;
                     extra+= "&" + col.getSearchArg() +"=" + encodeURI(value);
                 }
-                this.searchSettings.setExtra(extra);
-                var jsonUrl = repository.getSearchUrl(this.searchSettings, OUTPUT_JSON);
+                this.getSearchSettings().setExtra(extra);
+                var jsonUrl = repository.getSearchUrl(this.getSearchSettings(), OUTPUT_JSON);
                 return jsonUrl;
             },
             makeSearchForm: function() {
                 var form =  HtmlUtil.openTag("form",[ATTR_ID,this.getDomId(ID_FORM),"action","#"]);
                 var extra = "";
-                var text = this.searchSettings.text;
+                var text = this.getSearchSettings().text;
                 if(text == null) text = "";
-                var textField =  HtmlUtil.input("", text, ["placeholder","search text",ATTR_CLASS, "display-search-input", ATTR_SIZE,"8",ATTR_ID,  this.getDomId(ID_TEXT_FIELD)]);
+                var textField =  HtmlUtil.input("", text, ["placeholder","search text",ATTR_CLASS, "display-search-input", ATTR_SIZE,"15",ATTR_ID,  this.getDomId(ID_TEXT_FIELD)]);
 
                 var buttonLabel =  HtmlUtil.image(ramaddaBaseUrl +"/icons/magnifier.png",[ATTR_BORDER,"0",ATTR_TITLE,"Search"]);
                 var topItems = [];
@@ -532,6 +553,18 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     topItems.push(select);
                 }
 
+
+                if(this.providers!=null) {
+                    var options = "";
+                    var toks = this.providers.split(",");
+                    for(var i=0;i<toks.length;i++) {
+                        var tuple = toks[i].split(":");
+                        var id = tuple[0];
+                        var label = tuple.length>1?tuple[1]:id;
+                        options += "<option value=\"" + id +"\">" + label+"</option>\n";
+                    }
+                    topItems.push("  Search at: " + "<select id=\"" + this.getDomId(ID_PROVIDERS)+"\">" + options +"</select>");
+                }
 
                 if(this.showType) {
                     topItems.push(HtmlUtil.span([ATTR_ID, this.getDomId(ID_TYPE_DIV)],HtmlUtil.span([ATTR_CLASS, "display-loading"], "Loading types...")));
@@ -594,10 +627,11 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 if(this.areaWidget) this.areaWidget.handleEventMapBoundsChanged (source,  bounds);
             },
             typeChanged: function() {
-                this.searchSettings.skip=0;
-                this.searchSettings.max=50;
-                this.searchSettings.entryType  = this.getFieldValue(this.getDomId(ID_TYPE_FIELD), this.searchSettings.entryType);
-                this.searchSettings.clearAndAddType(this.searchSettings.entryType);
+                var settings = this.getSearchSettings();
+                settings.skip=0;
+                settings.max=50;
+                settings.entryType  = this.getFieldValue(this.getDomId(ID_TYPE_FIELD), settings.entryType);
+                settings.clearAndAddType(settings.entryType);
                 this.addExtraForm();
                 this.submitSearchForm();
             },
@@ -694,7 +728,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     var optionAttrs  = [ATTR_TITLE,type.getLabel(),ATTR_VALUE,type.getId(),ATTR_CLASS, "display-typelist-type",
                                         //                                        ATTR_STYLE, style,
                                         "data-iconurl",icon];
-                    var selected =  this.searchSettings.hasType(type.getId());
+                    var selected =  this.getSearchSettings().hasType(type.getId());
                     if(selected) {
                         optionAttrs.push("selected");
                         optionAttrs.push(null);
@@ -723,7 +757,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 if(this.entryTypes == null) return null;
                 for(var i = 0;i< this.entryTypes.length;i++) {
                     var type = this.entryTypes[i];
-                    if(this.searchSettings.hasType(type.getId())) {
+                    if(this.getSearchSettings().hasType(type.getId())) {
                         return type;
                     }
                 }
@@ -801,21 +835,21 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 return  this.entryList.getEntries();
             },
             loadNextUrl: function() {
-                this.searchSettings.skip+= this.searchSettings.max;
+                this.getSearchSettings().skip+= this.getSearchSettings().max;
                 this.submitSearchForm();
             },
             loadMore: function() {
-                this.searchSettings.max = this.searchSettings.max+=50;
+                this.getSearchSettings().max = this.getSearchSettings().max+=50;
                 this.submitSearchForm();
             },
             loadLess: function() {
-                var max = this.searchSettings.max;
+                var max = this.getSearchSettings().max;
                 max = parseInt(0.75*max);
-                this.searchSettings.max = Math.max(1, max);
+                this.getSearchSettings().max = Math.max(1, max);
                 this.submitSearchForm();
             },
             loadPrevUrl: function() {
-                this.searchSettings.skip = Math.max(0, this.searchSettings.skip-this.searchSettings.max);
+                this.getSearchSettings().skip = Math.max(0, this.getSearchSettings().skip-this.getSearchSettings().max);
                 this.submitSearchForm();
             },
             entryListChanged: function(entryList) {
@@ -880,8 +914,8 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 var entries = this.entryList.getEntries();
 
                 if(entries.length==0) {
-                    this.searchSettings.skip=0;
-                    this.searchSettings.max=50;
+                    this.getSearchSettings().skip=0;
+                    this.getSearchSettings().max=50;
                     var msg = "Nothing found";
                     if(this.multiSearch) {
                         if(this.multiSearch.count>0) {

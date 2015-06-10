@@ -519,6 +519,7 @@ var HtmlUtil =  {
         return html;
     },
 
+
     handleFormChangeShowUrl: function(formId, outputId, skip) {
         if(skip == null) {
             skip = [".*OpenLayers_Control.*","authtoken"];

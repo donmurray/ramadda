@@ -682,7 +682,8 @@ function Entry(props) {
             },
             getEntryUrl : function (extraArgs) {
                 if(this.remoteUrl) return this.remoteUrl;
-                if(this.url) return this.url;
+                //Don't do this as we really want the url to the entry
+                //if(this.url) return this.url;
                 return this.getRamadda().getEntryUrl(this, extraArgs);
             },
             getFilename : function () {
