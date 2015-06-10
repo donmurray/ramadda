@@ -3662,6 +3662,8 @@ public class EntryManager extends RepositoryManager {
         Entry         group = findGroup(request);
         StringBuilder sb    = new StringBuilder();
         if ( !request.exists(ARG_CONTRIBUTION_FROMNAME)) {
+            getPageHandler().entrySectionOpen(request, group, sb,
+                                              "Upload a File");
             sb.append(request.uploadForm(getRepository().URL_ENTRY_UPLOAD,
                                          HtmlUtils.attr("name",
                                              "entryform")));
@@ -3673,6 +3675,7 @@ public class EntryManager extends RepositoryManager {
             sb.append(HtmlUtils.formTableClose());
             sb.append(HtmlUtils.submit(msg("Upload")));
             sb.append(HtmlUtils.formClose());
+            getPageHandler().entrySectionClose(request, group, sb);
         } else {
             return doProcessEntryChange(request, true, null);
         }

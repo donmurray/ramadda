@@ -98,6 +98,10 @@ function RamaddaEntryDisplay(displayManager, id, type, properties) {
                  var jsonUrl = this.getPointUrl(entry);
                  if(jsonUrl!=null) {
                      toolbarItems.push(HtmlUtil.tag(TAG_A, ["onclick", get+".createDisplay(" + HtmlUtil.sqt(entry.getFullId()) +"," +
+                                                            HtmlUtil.sqt("table") +"," + HtmlUtil.sqt(jsonUrl)+");"],
+                                                            HtmlUtil.image(ramaddaBaseUrl +"/icons/table.png",["border",0,ATTR_TITLE,"Create Chart"])));
+
+                     toolbarItems.push(HtmlUtil.tag(TAG_A, ["onclick", get+".createDisplay(" + HtmlUtil.sqt(entry.getFullId()) +"," +
                                                             HtmlUtil.sqt("linechart") +"," + HtmlUtil.sqt(jsonUrl)+");"],
                                                             HtmlUtil.image(ramaddaBaseUrl +"/icons/chart_line_add.png",["border",0,ATTR_TITLE,"Create Chart"])));
                  }

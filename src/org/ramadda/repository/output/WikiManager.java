@@ -4287,6 +4287,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
         if (mainDivId == null) {
             mainDivId = HtmlUtils.getUniqueId("displaydiv");
         }
+        mainDivId  = mainDivId.replace("$entryid", entry.getId());
 
         if (tag.equals(WIKI_TAG_GROUP) || tag.equals(WIKI_TAG_GROUP_OLD)) {
             for (Enumeration keys = props.keys(); keys.hasMoreElements(); ) {
@@ -4328,6 +4329,7 @@ public class WikiManager extends RepositoryManager implements WikiConstants,
             if (anotherDivId == null) {
                 anotherDivId = HtmlUtils.getUniqueId("displaydiv");
             }
+            anotherDivId  = anotherDivId.replace("$entryid", entry.getId());
             sb.append(HtmlUtils.div("", HtmlUtils.id(anotherDivId)));
             propList.add("divid");
             propList.add(Json.quote(anotherDivId));
