@@ -12,6 +12,15 @@ Make sure to give it the absolute path. This will walk you through a number of i
 To start and stop RAMADDA do:
 sudo sh ramaddaserver/ramaddaService.sh stop|start|restart
 
+To update an installation use update.sh.
+Get the latest version of the ramaddaserver.zip from 
+    https://sourceforge.net/projects/ramadda/files/
+and copy it into this ramaddainstall directory. 
+
+Run update.sh with the full path, e.g.:
+   sudo sh /home/ec2-user/ramaddainstaller/update.sh
+
+
 
 ##### aws.sh #####
 
