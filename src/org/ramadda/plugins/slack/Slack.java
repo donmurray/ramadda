@@ -54,6 +54,7 @@ import java.util.Properties;
  */
 public class Slack {
 
+    /** _more_          */
     public static final String DFLT_USER_NAME = "slackshell";
 
     /** _more_ */
@@ -475,9 +476,10 @@ public class Slack {
             desc.append(makeDownloadLink(request, entry));
             if (showChildren) {
                 int childCnt = 0;
-                for (Entry child :
-                        repository.getEntryManager().getChildren(request,
-                            entry)) {
+                List<Entry> children =
+                    repository.getEntryManager().getChildren(request, entry);
+                entry.setChildren(children);
+                for (Entry child : children) {
                     if (childCnt == 0) {
                         //                        desc.append(":\n");
                     }

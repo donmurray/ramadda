@@ -518,12 +518,10 @@ public class SlackTeamTypeHandler extends ExtensibleGroupTypeHandler {
 
 
         JSONObject result = null;
-        if(!userId.equals(Slack.DFLT_USER_NAME)) {
-            result = Slack.call(getRepository(), Slack.API_USERS_INFO,
-                                       token,
-                                       HtmlUtils.args(new String[] {
-                                           Slack.ARG_USER,
-                                           userId }));
+        if ( !userId.equals(Slack.DFLT_USER_NAME)) {
+            result = Slack.call(getRepository(), Slack.API_USERS_INFO, token,
+                                HtmlUtils.args(new String[] { Slack.ARG_USER,
+                    userId }));
         }
         if (result == null) {
             return new SlackUser(token, userId, userName, null, null);
