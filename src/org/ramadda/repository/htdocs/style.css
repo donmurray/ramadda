@@ -543,10 +543,24 @@ td.entry-table-block {
 }
 
 
+
+/* jquery resets */
+.ui-widget {
+        font-family: Helvetica Neue, Arial, Helvetica, sans-serif;
+        font-size:11pt;
+}
+
+.ui-widget .ui-widget {
+        font-size:11pt;
+}
+
+
+
 .ramadda-accordian .ui-accordian-header, .ramadda-accordian .ui-state-default, .ramadda-accordian .ui-state-active {
   border: 0px #fff solid;
   background: none;
 }
+
 
 .ramadda-accordian .ui-accordion-content {
     border: none;
