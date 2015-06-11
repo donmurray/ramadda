@@ -493,6 +493,18 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 if(msg == null) {
                     msg  = this.getRamadda().getSearchMessage();
                 }
+                var provider = this.getSearchSettings().provider;
+                if(provider!=null) {
+                    msg = null;
+                    if(this.providerMap!=null) {
+                        msg  = this.providerMap[provider];
+                    }
+                    if(msg == null) {
+                        msg = provider;
+                    }
+                    msg = "Searching " + msg;
+                }
+
                 this.writeHtml(ID_RESULTS, msg);
                 this.writeHtml(ID_ENTRIES, HtmlUtil.div([ATTR_STYLE,"margin:20px;"], this.getWaitImage()));
                 this.hideEntryDetails();
@@ -558,6 +570,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 }
 
 
+                this.providerMap = {};
                 if(this.providers!=null) {
                     var options = "";
                     var toks = this.providers.split(",");
@@ -565,6 +578,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                         var tuple = toks[i].split(":");
                         var id = tuple[0];
                         var label = tuple.length>1?tuple[1]:id;
+                        this.providerMap[id] = label;
                         options += "<option value=\"" + id +"\">" + label+"</option>\n";
                     }
                     topItems.push("  Search at: " + "<select id=\"" + this.getDomId(ID_PROVIDERS)+"\">" + options +"</select>");
