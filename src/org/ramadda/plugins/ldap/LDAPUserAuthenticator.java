@@ -76,7 +76,7 @@ public class LDAPUserAuthenticator extends UserAuthenticatorImpl {
      * constructor.
      */
     public LDAPUserAuthenticator() {
-        LDAPManager.log("LDAPUserAuthenticator created");
+        //        LDAPManager.log("LDAPUserAuthenticator created");
     }
 
     /**
@@ -86,7 +86,7 @@ public class LDAPUserAuthenticator extends UserAuthenticatorImpl {
      */
     public LDAPUserAuthenticator(Repository repository) {
         super(repository);
-        LDAPManager.log("LDAPUserAuthenticator created");
+        //        LDAPManager.log("LDAPUserAuthenticator created");
     }
 
     //    public String toString() {
