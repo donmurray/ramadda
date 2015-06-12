@@ -68,6 +68,8 @@ import java.io.PrintWriter;
 
 import java.net.URL;
 import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Path;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -9469,7 +9471,10 @@ public class EntryManager extends RepositoryManager {
         }
 
         File f = entry.getResource().getTheFile();
-        if (f.exists()) {
+//        if (f.exists()) {
+        // Maybe handle linked files better
+        Path p = f.toPath();
+        if (Files.exists(p)) {
             return entry;
         }
 
