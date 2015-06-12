@@ -546,7 +546,7 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                     text = "";
                 }
 
-                var textField =  HtmlUtil.input("", text, ["placeholder","search text",ATTR_CLASS, "display-search-input", ATTR_SIZE,"15",ATTR_ID,  this.getDomId(ID_TEXT_FIELD)]);
+                var textField =  HtmlUtil.input("", text, ["placeholder","search text",ATTR_CLASS, "display-search-input", ATTR_SIZE,"30",ATTR_ID,  this.getDomId(ID_TEXT_FIELD)]);
 
                 var buttonLabel =  HtmlUtil.image(ramaddaBaseUrl +"/icons/magnifier.png",[ATTR_BORDER,"0",ATTR_TITLE,"Search"]);
                 var topItems = [];
