@@ -538,7 +538,14 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 var form =  HtmlUtil.openTag("form",[ATTR_ID,this.getDomId(ID_FORM),"action","#"]);
                 var extra = "";
                 var text = this.getSearchSettings().text;
-                if(text == null) text = "";
+                if(text == null) {
+                    var args = Utils.getUrlArgs(document.location.search);
+                    text  =  args.text;
+                }
+                if(text == null) {
+                    text = "";
+                }
+
                 var textField =  HtmlUtil.input("", text, ["placeholder","search text",ATTR_CLASS, "display-search-input", ATTR_SIZE,"15",ATTR_ID,  this.getDomId(ID_TEXT_FIELD)]);
 
                 var buttonLabel =  HtmlUtil.image(ramaddaBaseUrl +"/icons/magnifier.png",[ATTR_BORDER,"0",ATTR_TITLE,"Search"]);
@@ -573,16 +580,22 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 this.providerMap = {};
                 if(this.providers!=null) {
                     var options = "";
+                    var selected = Utils.getUrlArgs(document.location.search).provider;
                     var toks = this.providers.split(",");
                     for(var i=0;i<toks.length;i++) {
                         var tuple = toks[i].split(":");
                         var id = tuple[0];
                         var label = tuple.length>1?tuple[1]:id;
                         this.providerMap[id] = label;
-                        options += "<option value=\"" + id +"\">" + label+"</option>\n";
+                        var extra = "";
+                        if(id == selected) {
+                            extra += " selected ";
+                        }
+                        options += "<option " + extra +" value=\"" + id +"\">" + label+"</option>\n";
                     }
-                    topItems.push("  Search at: " + "<select id=\"" + this.getDomId(ID_PROVIDERS)+"\">" + options +"</select>");
+                    topItems.push(" Search: " + "<select id=\"" + this.getDomId(ID_PROVIDERS)+"\">" + options +"</select>");
                 }
+
 
                 if(this.showType) {
                     topItems.push(HtmlUtil.span([ATTR_ID, this.getDomId(ID_TYPE_DIV)],HtmlUtil.span([ATTR_CLASS, "display-loading"], "Loading types...")));
@@ -768,6 +781,8 @@ function RamaddaSearcher(displayManager, id, type, properties) {
                 //                this.writeHtml(ID_TYPE_FIELD, "# " + entryTypes.length);
                 //                this.writeHtml(ID_TYPE_FIELD, select);
                 this.writeHtml(ID_TYPE_DIV, select);
+
+
                 this.jq(ID_TYPE_FIELD).selectBoxIt({});
                 this.addExtraForm();
            },
@@ -901,6 +916,8 @@ function RamaddaEntrylistDisplay(displayManager, id, properties) {
                 if(this.entryList!=null && this.entryList.haveLoaded) {
                     this.entryListChanged(this.entryList);
                 }
+                console.log("Selecting probiders");
+                this.jq(ID_PROVIDERS).selectBoxIt({});
             },
             handleEventEntrySelection: function(source, args) {
                 this.selectEntry(args.entry, args.selected);

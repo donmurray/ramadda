@@ -117,7 +117,7 @@ function DisplayThing(argId, argProperties) {
                 return HtmlUtil.getUniqueId(base);
         },
         handleError: function(code, message) {
-                alert("An error has occurred:" + message);
+                GuiUtils.handleError("An error has occurred:" + message, true, true);
         },
         toString: function() {
                 return "DisplayThing:" + this.getId();

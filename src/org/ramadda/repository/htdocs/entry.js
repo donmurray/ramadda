@@ -269,7 +269,7 @@ function Ramadda(repositoryRoot) {
                             if(error && error.length>0) {
                                 err += ":  " + error;
                             }
-                            GuiUtils.handleError("An error has occurred reading entry types" + err, "URL:" + url);
+                            GuiUtils.handleError("An error has occurred reading entry types" + err, "URL:" + url, false);
                             });
                 }
                 return this.entryTypes;
@@ -285,7 +285,7 @@ function Ramadda(repositoryRoot) {
                     })
                     .fail(function(jqxhr, textStatus, error) {
                             var err = textStatus + ", " + error;
-                            GuiUtils.handleError("entry error 2:" +err, url);
+                            GuiUtils.handleError("Error getting metadata count:" +err, url, false);
                         });
                 return null;
             },
@@ -379,7 +379,7 @@ function Ramadda(repositoryRoot) {
                     })
                     .fail(function(jqxhr, textStatus, error) {
                             var err = textStatus + ", " + error;
-                            GuiUtils.handleError("entry error 3:" +err, jsonUrl);
+                            GuiUtils.handleError("Error getting entry information:" +err, jsonUrl, false);
                         });
                 return null;
             }
@@ -764,7 +764,7 @@ function EntryList(repository, jsonUrl, listener, doSearch) {
                         _this.createEntries(data, listener);
                     })
                     .fail(function(jqxhr, textStatus, error) {
-                            GuiUtils.handleError("An error occurred doing search:" +error, _this.url);
+                            GuiUtils.handleError("An error occurred doing search:" +error, _this.url, true);
                             console.log("listener:" + listener.handleSearchError);
                             if(listener.handleSearchError) {
                                 listener.handleSearchError(_this.url,error);

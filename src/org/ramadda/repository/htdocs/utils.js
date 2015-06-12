@@ -43,7 +43,23 @@ var Utils = {
     cleanId: function(id) {
         id = id.replace(/:/g,"_").replace(/\./g,"_").replace(/=/g,"_").replace(/\//g,"_");
         return id;
+    },
+    getUrlArgs: function(qs) {
+        //http://stackoverflow.com/questions/979975/how-to-get-the-value-from-the-url-parameter
+        qs = qs.split('+').join(' ');
+        var params = {},
+        tokens,
+        re = /[?&]?([^=]+)=([^&]*)/g;
+
+        while (tokens = re.exec(qs)) {
+            params[decodeURIComponent(tokens[1])] = decodeURIComponent(tokens[2]);
+        }
+        return params;
     }
+
+
+
+
 };
 
 var GuiUtils = {
@@ -54,7 +70,7 @@ var GuiUtils = {
 
     showingError: false,
     pageUnloading: false,
-    handleError: function(error, extra) {
+    handleError: function(error, extra, showAlert) {
         if(this.pageUnloading) {
             return;
         }
@@ -66,20 +82,22 @@ var GuiUtils = {
         if(this.showingError) {
             return;
         }
-        this.showingError = true;
-        alert(error);
-        this.showingError = false;
+        if(showAlert) {
+            this.showingError = true;
+            alert(error);
+            this.showingError = false;
+        }
         closeFormLoadingDialog ();
     },
     isJsonError: function(data) {
         if(data == null) {
-            this.handleError("Null JSON data");
+            this.handleError("Null JSON data", null, false);
             return true;
         }
         if(data.error!=null) {
             var code = data.errorcode;
             if(code == null) code = "error";
-            this.handleError("Error 2:" + data.error);
+            this.handleError("Error in Utils.isJsonError:" + data.error, null, false);
             return true;
         }
         return false;
