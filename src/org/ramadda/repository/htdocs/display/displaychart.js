@@ -117,6 +117,12 @@ function RamaddaMultiChart(displayManager, id, properties) {
                 var chartType = this.getProperty(PROP_CHART_TYPE,DISPLAY_LINECHART);
 
                 var selectedFields = this.getSelectedFields([]);
+
+                if(selectedFields.length==0 && this.lastSelectedFields!=null) { 
+                    console.log("setting to last Selected");
+                    selectedFields = this.lastSelectedFields;
+                }
+
                 if(selectedFields.length == 0) {
                     if(chartType == DISPLAY_TABLE) {
                         selectedFields = this.allFields;
@@ -124,17 +130,21 @@ function RamaddaMultiChart(displayManager, id, properties) {
                         selectedFields = this.getSelectedFields();
                     }
                 }
-
+                        
                 if(selectedFields.length==0) {
                     this.setContents("No fields selected");
                     return;
                 }
+                this.lastSelectedFields= selectedFields;
+
                 var props = {
                     includeIndex: true
                 };
                 if(chartType == DISPLAY_TABLE) {
                     props.includeIndex = false;
                 }
+
+
                 var dataList = this.getStandardData(selectedFields, props);
             
                 if(dataList.length==0) {
