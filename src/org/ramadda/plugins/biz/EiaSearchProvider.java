@@ -43,8 +43,7 @@ public class EiaSearchProvider extends SearchProvider {
     private static final String ID = "eia";
 
     /** _more_ */
-    private static final String URL = "http://api.eia.gov/search";
-
+    private static final String BASE_URL = "http://api.eia.gov/search/";
 
 
     /** _more_ */
@@ -93,13 +92,13 @@ public class EiaSearchProvider extends SearchProvider {
             return entries;
         }
 
-        String url  = URL;
+
         int    max  = request.get(ARG_MAX, 100);
         int    skip = request.get(ARG_SKIP, 0);
-        url = HtmlUtils.url(url, ARG_SEARCH_TERM, "name", ARG_SEARCH_VALUE,
+        String url  =  HtmlUtils.url(BASE_URL, ARG_SEARCH_TERM, "name", ARG_SEARCH_VALUE,
                             text, ARG_ROWS_PER_PAGE, "" + max, ARG_PAGE_NUM,
                             "" + ((int) (skip / max)));
-        //        System.err.println(getName() + " search url:" + url);
+        System.err.println(getName() + " search url:" + url);
         URLConnection connection = new URL(url).openConnection();
         connection.setRequestProperty("User-Agent", "ramadda");
         InputStream is   = connection.getInputStream();
