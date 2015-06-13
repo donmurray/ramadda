@@ -4018,7 +4018,9 @@ public class HtmlUtils {
             sb.append("<a href=\"#\">");
             sb.append(title);
             sb.append("</a></h3>");
-            sb.append(HtmlUtils.div(content, HtmlUtils.cssClass("ramadda-accordian-contents")));
+            String contentsId = "accordion_contents_" + (blockCnt++);
+            content = HtmlUtils.div(content, HtmlUtils.id(contentsId) + HtmlUtils.cssClass("ramadda-accordian-contents"));
+            sb.append(HtmlUtils.div(content));
         }
         sb.append("</div>");
 

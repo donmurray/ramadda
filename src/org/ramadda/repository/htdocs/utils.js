@@ -364,11 +364,19 @@ var HtmlUtil =  {
     },
     makeAccordian: function(id) {
         $(function() {
+                //We initially hide the accordian contents
+                //Show all contents
+                var contents = $(".ramadda-accordian-contents");
+                contents.css("display","block");
                 $(id).accordion(
                        {
-                           autoHeight: false, navigation: true, collapsible: true, active: false
+                           autoHeight: false, 
+                               navigation: true, 
+                               collapsible: true, 
+                               active: false,
+                               heightStyle: "content"
                        });
-                $(id).show();
+
             }
             );
     },
