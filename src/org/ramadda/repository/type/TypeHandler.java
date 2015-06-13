@@ -95,6 +95,8 @@ public class TypeHandler extends RepositoryManager {
 
 
 
+    public static final String ID_DELIMITER = ":";
+
     /** _more_ */
     public static final String TARGET_ATTACHMENT = "attachment";
 
@@ -4525,7 +4527,7 @@ public class TypeHandler extends RepositoryManager {
 
 
         for (DateArgument arg : DateArgument.SEARCH_ARGS) {
-            addDateSearch(getRepository(), request, basicSB, arg, true);
+            addDateSearch(getRepository(), request, basicSB, arg, false);
         }
 
 
@@ -4598,7 +4600,7 @@ public class TypeHandler extends RepositoryManager {
         }
 
 
-
+        basicSB.append(getSearchManager().makeOutputSettings(request));
 
         /*
         if (collection != null) {
@@ -4610,7 +4612,7 @@ public class TypeHandler extends RepositoryManager {
         basicSB.append(HtmlUtils.formTableClose());
         advancedSB.append(HtmlUtils.formTableClose());
 
-        titles.add(msg("Search Criteria"));
+        titles.add(msg("What to search for"));
         contents.add(basicSB.toString());
 
     }

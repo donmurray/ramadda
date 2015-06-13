@@ -105,7 +105,7 @@ public class TwitterSearchProvider extends SearchProvider {
     private static void getCredentials() throws Exception {
 
         String cred = "todo:todo";
-        //getRepository().getProperty("twitter.api.key","")+":" + getRepository().getProperty("twitter.api.secret","");
+        //getRepository().getProperty("twitter.api.key","")+TypeHandler.ID_DELIMITER + getRepository().getProperty("twitter.api.secret","");
         cred = Utils.encodeBase64(cred.getBytes());
         String           url    = "https://api.twitter.com/oauth2/token";
         HttpClientParams params = new HttpClientParams();
@@ -190,7 +190,7 @@ public class TwitterSearchProvider extends SearchProvider {
             String itemUrl = "https://www.youtube.com/watch?v=" + id;
 
             Entry newEntry = new Entry(Repository.ID_PREFIX_SYNTH + getId()
-                                       + ":" + id, typeHandler);
+                                       + TypeHandler.ID_DELIMITER + id, typeHandler);
             entries.add(newEntry);
 
             String thumb = Json.readValue(snippet, "thumbnails.default.url",

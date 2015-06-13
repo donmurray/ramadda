@@ -10,11 +10,27 @@ org.ramadda.plugins.socrata.SocrataSearchProvider
 #Some examples - 
 org.ramadda.plugins.socrata.SocrataSearchProvider;finances.worldbank.org;World Bank
 org.ramadda.plugins.socrata.SocrataSearchProvider;data.cdc.gov;Center for Disease Control and Prevention
+org.ramadda.plugins.socrata.SocrataSearchProvider;cdph.data.ca.gov;California Department of Public Health
+org.ramadda.plugins.socrata.SocrataSearchProvider;bythenumbers.sco.ca.gov;California State Controller's Office
 org.ramadda.plugins.socrata.SocrataSearchProvider;data.colorado.gov;Colorado Open Data
-org.ramadda.plugins.socrata.SocrataSearchProvider;www.opendatanyc.com;City of New York City Comptroller
+org.ramadda.plugins.socrata.SocrataSearchProvider;data.ct.gov;State of Connecticut
+org.ramadda.plugins.socrata.SocrataSearchProvider;data.hawaii.gov;State of Hawaii
+org.ramadda.plugins.socrata.SocrataSearchProvider;data.illinois.gov;State of Illinois
+org.ramadda.plugins.socrata.SocrataSearchProvider;data.datamontana.us;State of Montana
 org.ramadda.plugins.socrata.SocrataSearchProvider;data.ny.gov;New York State Office of ITS
-
-
+org.ramadda.plugins.socrata.SocrataSearchProvider;data.oregon.gov;State of Oregon
+org.ramadda.plugins.socrata.SocrataSearchProvider;opendata.utah.gov;Utah Open Data
+org.ramadda.plugins.socrata.SocrataSearchProvider;data.wa.gov;State of Washington
+org.ramadda.plugins.socrata.SocrataSearchProvider;www.opendatanyc.com;City of New York City Comptroller
+org.ramadda.plugins.socrata.SocrataSearchProvider;data.maryland.gov;State of Maryland
+org.ramadda.plugins.socrata.SocrataSearchProvider;data.michigan.gov;State of Michigan
+org.ramadda.plugins.socrata.SocrataSearchProvider;data.mo.gov;State of Missouri
+org.ramadda.plugins.socrata.SocrataSearchProvider;data.nj.gov;State of New Jersey
+org.ramadda.plugins.socrata.SocrataSearchProvider;healthdata.nj.gov;State of New Jersey - Department of Health
+org.ramadda.plugins.socrata.SocrataSearchProvider;data.ny.gov;State of New York
+org.ramadda.plugins.socrata.SocrataSearchProvider;health.data.ny.gov;State of New York Department of Health
+org.ramadda.plugins.socrata.SocrataSearchProvider;data.ok.gov;State of Oklahoma
+org.ramadda.plugins.socrata.SocrataSearchProvider;data.vermont.gov;State of Vermont
 
 
 #
@@ -29,10 +45,6 @@ org.ramadda.plugins.socrata.SocrataSearchProvider;data.ny.gov;New York State Off
 #org.ramadda.plugins.socrata.SocrataSearchProvider;bmgf.demo.socrata.com;Bill and Melinda Gates Foundation
 #org.ramadda.plugins.socrata.SocrataSearchProvider;bristol.azure-westeurope-prod.socrata.com;Bristol City Council
 #org.ramadda.plugins.socrata.SocrataSearchProvider;data.cacs.org;California Common Sense
-#org.ramadda.plugins.socrata.SocrataSearchProvider;cdph.data.ca.gov;California Department of Public Health
-#org.ramadda.plugins.socrata.SocrataSearchProvider;bythenumbers.sco.ca.gov;California State Controller's Office
-#org.ramadda.plugins.socrata.SocrataSearchProvider;bythenumbers.sco.ca.gov;California State Controller's Office
-#org.ramadda.plugins.socrata.SocrataSearchProvider;data.cdc.gov;Center for Disease Control and Prevention
 #org.ramadda.plugins.socrata.SocrataSearchProvider;data.cms.hhs.gov;Centers for Medicare and Medicaid Services
 #org.ramadda.plugins.socrata.SocrataSearchProvider;www.consumerfinance.gov;CFPB
 #org.ramadda.plugins.socrata.SocrataSearchProvider;data.albanyny.gov;City of Albany
@@ -110,12 +122,10 @@ org.ramadda.plugins.socrata.SocrataSearchProvider;data.ny.gov;New York State Off
 #org.ramadda.plugins.socrata.SocrataSearchProvider;data.medicare.gov;Medicare
 #org.ramadda.plugins.socrata.SocrataSearchProvider;www.metrochicagodata.com;MetroChicagoData.com
 #org.ramadda.plugins.socrata.SocrataSearchProvider;nats.demo.socrata.com;Mexico - SCT
-#org.ramadda.plugins.socrata.SocrataSearchProvider;data.mo.gov;Missouri
 #org.ramadda.plugins.socrata.SocrataSearchProvider;data.montgomerycountymd.gov;Montgomery County
 #org.ramadda.plugins.socrata.SocrataSearchProvider;data.nfpa.org;National Fire Protection Associations (NFPA)
 #org.ramadda.plugins.socrata.SocrataSearchProvider;nycopendata.socrata.com;New York City
 #org.ramadda.plugins.socrata.SocrataSearchProvider;www.opendatanyc.com;New York City Comptroller
-#org.ramadda.plugins.socrata.SocrataSearchProvider;data.ny.gov;New York State Office of ITS
 #org.ramadda.plugins.socrata.SocrataSearchProvider;nmfs.socrata.com;NOAA
 #org.ramadda.plugins.socrata.SocrataSearchProvider;data.ok.gov;OK NIC
 #org.ramadda.plugins.socrata.SocrataSearchProvider;data.oregon.gov;OR NIC
@@ -123,22 +133,11 @@ org.ramadda.plugins.socrata.SocrataSearchProvider;data.ny.gov;New York State Off
 #org.ramadda.plugins.socrata.SocrataSearchProvider;rdw.azure-westeurope-prod.socrata.com;RDW
 #org.ramadda.plugins.socrata.SocrataSearchProvider;www.dati.friuliveneziagiulia.it;Regione Autonoma Friuli Venezia Giulia
 #org.ramadda.plugins.socrata.SocrataSearchProvider;data.snostat.org;Snohomish County
-#org.ramadda.plugins.socrata.SocrataSearchProvider;data.colorado.gov;State of Colorado
-#org.ramadda.plugins.socrata.SocrataSearchProvider;data.ct.gov;State of Connecticut
-#org.ramadda.plugins.socrata.SocrataSearchProvider;data.hawaii.gov;State of Hawaii
-#org.ramadda.plugins.socrata.SocrataSearchProvider;data.illinois.gov;State of Illinois
-#org.ramadda.plugins.socrata.SocrataSearchProvider;data.maryland.gov;State of Maryland
-#org.ramadda.plugins.socrata.SocrataSearchProvider;data.michigan.gov;State of Michigan
-#org.ramadda.plugins.socrata.SocrataSearchProvider;data.mo.gov;State of Missouri
-#org.ramadda.plugins.socrata.SocrataSearchProvider;data.datamontana.us;State of Montana
-#org.ramadda.plugins.socrata.SocrataSearchProvider;data.nj.gov;State of New Jersey
+
 #org.ramadda.plugins.socrata.SocrataSearchProvider;healthdata.nj.gov;State of New Jersey - Department of Health
-#org.ramadda.plugins.socrata.SocrataSearchProvider;data.ny.gov;State of New York
 #org.ramadda.plugins.socrata.SocrataSearchProvider;health.data.ny.gov;State of New York Department of Health
-#org.ramadda.plugins.socrata.SocrataSearchProvider;data.ok.gov;State of Oklahoma
-#org.ramadda.plugins.socrata.SocrataSearchProvider;data.oregon.gov;State of Oregon
-#org.ramadda.plugins.socrata.SocrataSearchProvider;data.vermont.gov;State of Vermont
-#org.ramadda.plugins.socrata.SocrataSearchProvider;data.wa.gov;State of Washington
+
+
 #org.ramadda.plugins.socrata.SocrataSearchProvider;info.samhsa.gov;Substance Abuse and Mental Health Services Administration (SAMHSA)
 #org.ramadda.plugins.socrata.SocrataSearchProvider;data.taxpayer.net;Taxpayers for Common Sense
 #org.ramadda.plugins.socrata.SocrataSearchProvider;data.austintexas.gov;Travis County
@@ -147,4 +146,4 @@ org.ramadda.plugins.socrata.SocrataSearchProvider;data.ny.gov;New York State Off
 #org.ramadda.plugins.socrata.SocrataSearchProvider;www.usaid.gov;USAID
 #org.ramadda.plugins.socrata.SocrataSearchProvider;open.whitehouse.gov;White House
 #org.ramadda.plugins.socrata.SocrataSearchProvider;data.wokingham.gov.uk;Wokingham Borough Council
-#org.ramadda.plugins.socrata.SocrataSearchProvider;finances.worldbank.org;World Bank
+

@@ -265,7 +265,7 @@ public class WolframSearchProvider extends SearchProvider {
 
             String  id  = XmlUtil.getAttribute(pod, "id", "");
             Entry newEntry = new Entry(Repository.ID_PREFIX_SYNTH + getId()
-                                       + ":" + id, typeHandler);
+                                       + TypeHandler.ID_DELIMITER + id, typeHandler);
             newEntry.setIcon("/search/wolfram.png");
             entries.add(newEntry);
 

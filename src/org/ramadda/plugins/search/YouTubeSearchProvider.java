@@ -150,7 +150,7 @@ public class YouTubeSearchProvider extends SearchProvider {
             String itemUrl = "https://www.youtube.com/watch?v=" + id;
 
             Entry newEntry = new Entry(Repository.ID_PREFIX_SYNTH + getId()
-                                       + ":" + id, typeHandler);
+                                       + TypeHandler.ID_DELIMITER + id, typeHandler);
             entries.add(newEntry);
 
             String thumb = Json.readValue(snippet, "thumbnails.default.url",

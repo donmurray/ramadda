@@ -100,7 +100,7 @@ public class GoogleSearchProvider extends SearchProvider {
             String     desc      = result.getString("content");
             String     resultUrl = result.getString("url");
             Entry newEntry = new Entry(Repository.ID_PREFIX_SYNTH + getId()
-                                       + ":" + resultUrl, typeHandler);
+                                       + TypeHandler.ID_DELIMITER + resultUrl, typeHandler);
             entries.add(newEntry);
             newEntry.setIcon("/search/google-icon.png");
             Date dttm = new Date();

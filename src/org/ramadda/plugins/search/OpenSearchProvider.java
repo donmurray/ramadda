@@ -167,7 +167,7 @@ public class OpenSearchProvider extends SearchProvider {
             String itemUrl = XmlUtil.getAttribute(link, AtomUtil.ATTR_HREF,
                                  "");
             Entry newEntry = new Entry(Repository.ID_PREFIX_SYNTH + getId()
-                                       + ":" + id, typeHandler);
+                                       + TypeHandler.ID_DELIMITER + id, typeHandler);
 
             if(icon!=null) {
                 newEntry.setIcon(icon);

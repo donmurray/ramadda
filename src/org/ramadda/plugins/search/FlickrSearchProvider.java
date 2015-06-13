@@ -152,7 +152,7 @@ public class FlickrSearchProvider extends SearchProvider {
             String itemUrl = imageUrl.replace("${size}", "b");
 
             Entry newEntry = new Entry(Repository.ID_PREFIX_SYNTH + getId()
-                                       + ":" + id, typeHandler);
+                                       + TypeHandler.ID_DELIMITER + id, typeHandler);
             newEntry.setIcon("/search/flickr.png");
             entries.add(newEntry);
 

@@ -72,7 +72,7 @@ public class SocrataTypeHandler extends ExtensibleGroupTypeHandler {
      * @return _more_
      */
     private String createSynthId(Entry mainEntry, String type, String id) {
-        return getEntryManager().createSynthId(mainEntry, type + ":" + id);
+        return getEntryManager().createSynthId(mainEntry, type + TypeHandler.ID_DELIMITER + id);
     }
 
 
@@ -110,7 +110,7 @@ public class SocrataTypeHandler extends ExtensibleGroupTypeHandler {
         String categoryId = null;
 
         if (Utils.stringDefined(synthId)) {
-            List<String> toks = StringUtil.split(synthId, ":", true, true);
+            List<String> toks = StringUtil.split(synthId, TypeHandler.ID_DELIMITER, true, true);
             if (toks.size() <= 1) {
                 System.err.println("SocrataTypeHandler.getSynthIds: bad id:"
                                    + synthId);
@@ -205,7 +205,6 @@ public class SocrataTypeHandler extends ExtensibleGroupTypeHandler {
 
         String desc = "";
         entry = new Entry(id, this);
-        //TODO: https://data.atf.gov/FFL/FFL-Number-of-new-license-applicants-per-year/5hy9-2fhu?
         String socrataUrl =
             "http://www.socrata.gov/beta/api/qb.cfm?category=" + categoryId;
         Resource resource = new Resource(new URL(socrataUrl));
@@ -285,7 +284,7 @@ public class SocrataTypeHandler extends ExtensibleGroupTypeHandler {
             return entry;
         }
 
-        List<String> toks = StringUtil.split(id, ":", true, true);
+        List<String> toks = StringUtil.split(id, TypeHandler.ID_DELIMITER, true, true);
         if (toks.size() <= 1) {
             return null;
         }

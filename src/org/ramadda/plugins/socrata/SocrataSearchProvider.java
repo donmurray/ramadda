@@ -42,6 +42,9 @@ import java.util.List;
  */
 public class SocrataSearchProvider extends SearchProvider {
 
+    /** _more_          */
+    private static final String SOCRATA_TYPE_DATASET = "dataset";
+
     /** _more_ */
     private static final String SOCRATA_ID = "socrata";
 
@@ -161,7 +164,7 @@ public class SocrataSearchProvider extends SearchProvider {
             String      itemUrl = "https://" + hostname + "/dataset/-/" + id;
             Resource    resource    = new Resource(new URL(itemUrl));
             Entry newEntry = new Entry(Repository.ID_PREFIX_SYNTH + getId()
-                                       + ":" + id, typeHandler);
+                                       + TypeHandler.ID_DELIMITER + id, typeHandler);
             Object[] values = typeHandler.makeEntryValues(null);
             if (viewType.equals("tabular")) {
                 values[SocrataSeriesTypeHandler.IDX_REPOSITORY] = server;
@@ -190,6 +193,28 @@ public class SocrataSearchProvider extends SearchProvider {
         return entries;
     }
 
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param parentEntry _more_
+     * @param id _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    @Override
+    public Entry makeSynthEntry(Request request, Entry parentEntry, String id)
+            throws Exception {
+        List<String> toks     = StringUtil.splitUpTo(id, TypeHandler.ID_DELIMITER, 3);
+        String       domain     = toks.get(0);
+        String       type     = toks.get(1);
+        String       seriesId = toks.get(2);
+        String       name = seriesId;
+        return  createEntry(request, domain, seriesId, name,   "", type);
+    }
 
     /**
      * _more_
@@ -231,11 +256,9 @@ public class SocrataSearchProvider extends SearchProvider {
 
         JSONArray searchResults = obj.getJSONArray("results");
         Entry     parent        = getSynthTopLevelEntry();
-        TypeHandler seriesTypeHandler =
-            getRepository().getTypeHandler(
-                SocrataSeriesTypeHandler.TYPE_SERIES);
-        TypeHandler fileTypeHandler =
-            getRepository().getTypeHandler(TypeHandler.TYPE_FILE);
+
+
+
 
         for (int i = 0; i < searchResults.length(); i++) {
             JSONObject   wrapper    = searchResults.getJSONObject(i);
@@ -248,58 +271,83 @@ public class SocrataSearchProvider extends SearchProvider {
             String       domainName = (tmp.size() > 1)
                                       ? tmp.get(1)
                                       : domain;
-            name += " - " + domainName;
+            name += " - " + domain;
 
             StringBuilder desc = new StringBuilder(Json.readValue(item,
                                      "description", ""));
-            String      type        = Json.readValue(item, "type", "");
-
-            String      itemUrl     = Json.readValue(wrapper, "link", "");
-            TypeHandler typeHandler = (type.equals("dataset")
-                                       ? seriesTypeHandler
-                                       : fileTypeHandler);
-
-
-
-
-            Date        dttm        = new Date();
-            Date        fromDate    = dttm,
-                        toDate      = dttm;
-            Resource    resource    = new Resource(new URL(itemUrl));
-            Entry newEntry = new Entry(Repository.ID_PREFIX_SYNTH + getId()
-                                       + ":" + domain + ":"
-                                       + id, typeHandler);
-            Object[] values = typeHandler.makeEntryValues(null);
-            if (type.equals("dataset")) {
-                values[SocrataSeriesTypeHandler.IDX_REPOSITORY] = server;
-                values[SocrataSeriesTypeHandler.IDX_SERIES_ID]  = id;
-            } else if (true || type.equals("blobby")) {
-                System.err.println("Socrata - new Type:" + type);
-                /*
-                String mimeType = StringUtil.splitUpTo(Json.readValue(item,
-                                      "blobMimeType", ";"), ";",
-                                          2).get(0).trim();
-                String fileUrl = "https://" + domain + "/download/" + id
-                                 + "/" + mimeType;
-                resource = new Resource(new URL(fileUrl));
-                //            https://www.opendatanyc.com/download/ewq6-p8b6/application/pdf
-                desc.append(HtmlUtils.br());
-                desc.append(HtmlUtils.href(itemUrl, "View file at Socrata"));
-                */
-            }
-
-            newEntry.setIcon("/socrata/socrata.png");
+            String type = Json.readValue(item, "type", "");
+            Entry newEntry = createEntry(request, domain, id, name,
+                                         desc.toString(), type);
             entries.add(newEntry);
-            newEntry.initEntry(name, desc.toString(), parent,
-                               getUserManager().getLocalFileUser(), resource,
-                               "", dttm.getTime(), dttm.getTime(),
-                               fromDate.getTime(), toDate.getTime(), values);
-            getEntryManager().cacheEntry(newEntry);
         }
 
         return entries;
     }
 
 
+
+    /**
+     * _more_
+     *
+     * @param request _more_
+     * @param domain _more_
+     * @param id _more_
+     * @param name _more_
+     * @param desc _more_
+     * @param type _more_
+     *
+     * @return _more_
+     *
+     * @throws Exception _more_
+     */
+    private Entry createEntry(Request request, String domain, String id,
+                              String name, String desc, String type)
+            throws Exception {
+
+        TypeHandler typeHandler =
+            getRepository().getTypeHandler(type.equals(SOCRATA_TYPE_DATASET)
+                                           ? SocrataSeriesTypeHandler
+                                               .TYPE_SERIES
+                                           : TypeHandler.TYPE_FILE);
+
+
+        Date     dttm     = new Date();
+        Date     fromDate = dttm,
+                 toDate   = dttm;
+        String   itemUrl  = "https://" + domain + "/-/-/" + id;
+
+        Resource resource = new Resource(new URL(itemUrl));
+        Entry newEntry = new Entry(Repository.ID_PREFIX_SYNTH + getId() + TypeHandler.ID_DELIMITER +
+                                   domain + TypeHandler.ID_DELIMITER + type + TypeHandler.ID_DELIMITER + id, typeHandler);
+        Object[] values = typeHandler.makeEntryValues(null);
+        if (type.equals(SOCRATA_TYPE_DATASET)) {
+            values[SocrataSeriesTypeHandler.IDX_REPOSITORY] = domain;
+            values[SocrataSeriesTypeHandler.IDX_SERIES_ID]  = id;
+        } else if (true || type.equals("blobby")) {
+            System.err.println("Socrata - new Type:" + type);
+            /*
+            String mimeType = StringUtil.splitUpTo(Json.readValue(item,
+                                  "blobMimeType", ";"), ";",
+                                      2).get(0).trim();
+            String fileUrl = "https://" + domain + "/download/" + id
+                             + "/" + mimeType;
+            resource = new Resource(new URL(fileUrl));
+            //            https://www.opendatanyc.com/download/ewq6-p8b6/application/pdf
+            desc.append(HtmlUtils.br());
+            desc.append(HtmlUtils.href(itemUrl, "View file at Socrata"));
+            */
+        }
+
+        newEntry.setIcon("/socrata/socrata.png");
+        Entry parent = getSynthTopLevelEntry();
+        newEntry.initEntry(name, desc, parent,
+                           getUserManager().getLocalFileUser(), resource, "",
+                           dttm.getTime(), dttm.getTime(),
+                           fromDate.getTime(), toDate.getTime(), values);
+        getEntryManager().cacheEntry(newEntry);
+
+        return newEntry;
+
+    }
 
 }

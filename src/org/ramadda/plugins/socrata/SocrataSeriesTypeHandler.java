@@ -52,17 +52,17 @@ public class SocrataSeriesTypeHandler extends PointTypeHandler {
 
     /** _more_ */
     public static final String URL_METADATA =
-        "${hostname}/api/views/${series_id}.json";
+        "https://${hostname}/api/views/${series_id}.json";
 
 
     /** _more_ */
     public static final String URL_CSV =
-        "${hostname}/resource/${series_id}.csv?$limit=${limit}&$offset=${offset}";
+        "https://${hostname}/resource/${series_id}.csv?$limit=${limit}&$offset=${offset}";
 
 
     /** _more_ */
     public static final String URL_TEMPLATE =
-        "${hostname}/api/views/${series_id}/rows.json?accessType=DOWNLOAD";
+        "https://${hostname}/api/views/${series_id}/rows.json?accessType=DOWNLOAD";
 
     /** _more_ */
     public static final String TYPE_SERIES = "type_socrata_series";

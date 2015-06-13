@@ -6339,7 +6339,7 @@ public class EntryManager extends RepositoryManager {
      */
     public String getRemoteEntryId(String server, String id) {
         return ID_PREFIX_REMOTE
-               + RepositoryUtil.encodeBase64(server.getBytes()) + ":" + id;
+               + RepositoryUtil.encodeBase64(server.getBytes()) + TypeHandler.ID_DELIMITER + id;
     }
 
 
@@ -6355,7 +6355,7 @@ public class EntryManager extends RepositoryManager {
             return new String[] { "", "" };
         }
         id = id.substring(ID_PREFIX_REMOTE.length());
-        String[] pair = StringUtil.split(id, ":", 2);
+        String[] pair = StringUtil.split(id, TypeHandler.ID_DELIMITER, 2);
         if (pair == null) {
             return new String[] { "", "" };
         }
@@ -6774,7 +6774,7 @@ public class EntryManager extends RepositoryManager {
      */
     public String[] getSynthId(String id) {
         id = id.substring(ID_PREFIX_SYNTH.length());
-        String[] pair = StringUtil.split(id, ":", 2);
+        String[] pair = StringUtil.split(id, TypeHandler.ID_DELIMITER, 2);
         if (pair == null) {
             return new String[] { id, null };
         }
@@ -6793,7 +6793,7 @@ public class EntryManager extends RepositoryManager {
      * @return _more_
      */
     public String createSynthId(Entry parentEntry, String subId) {
-        return Repository.ID_PREFIX_SYNTH + parentEntry.getId() + ":" + subId;
+        return Repository.ID_PREFIX_SYNTH + parentEntry.getId() + TypeHandler.ID_DELIMITER + subId;
     }
 
 

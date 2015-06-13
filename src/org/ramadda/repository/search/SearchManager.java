@@ -845,9 +845,8 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
 
 
 
-        if (justText) {
-            addSearchProviders(request, contents, titles);
-        } else {
+        addSearchProviders(request, contents, titles);
+        if (!justText) {
             Object       oldValue = request.remove(ARG_RELATIVEDATE);
             List<Clause> where    = typeHandler.assembleWhereClause(request);
             if (oldValue != null) {
@@ -862,52 +861,19 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
                 metadataSB.append(HtmlUtils.formTable());
                 getMetadataManager().addToSearchForm(request, metadataSB);
                 metadataSB.append(HtmlUtils.formTableClose());
-                titles.add(msg("More search criteria"));
+                titles.add(msg("Advanced search options"));
                 contents.add(metadataSB.toString());
             }
-            addSearchProviders(request, contents, titles);
 
-            StringBuffer outputForm = new StringBuffer(HtmlUtils.formTable());
-            /* Humm, we probably don't want to include this as it screws up setting the output in the form
-            if (request.isOutputDefined(ARG_OUTPUT)) {
 
-                OutputType output = request.getOutput(BLANK);
-                outputForm.append(HtmlUtils.hidden(ARG_OUTPUT,
-                        output.getId().toString()));
-            }
+            /*            StringBuffer outputForm = new StringBuffer(HtmlUtils.formTable());
+            String output = makeOutputSettings(request);
+            outputForm.append(output);
+            outputForm.append(HtmlUtils.formTableClose());
+            contents.add(outputForm.toString());
+            titles.add(msg("Output"));
             */
 
-            List orderByList = new ArrayList();
-            orderByList.add(new TwoFacedObject(msg("None"), "none"));
-            orderByList.add(new TwoFacedObject(msg("From Date"),
-                    SORTBY_FROMDATE));
-            orderByList.add(new TwoFacedObject(msg("To Date"),
-                    SORTBY_TODATE));
-            orderByList.add(new TwoFacedObject(msg("Create Date"),
-                    SORTBY_CREATEDATE));
-            orderByList.add(new TwoFacedObject(msg("Name"), SORTBY_NAME));
-            orderByList.add(new TwoFacedObject(msg("Size"), SORTBY_SIZE));
-
-            String orderBy = HtmlUtils.select(
-                                 ARG_ORDERBY, orderByList,
-                                 request.getString(
-                                     ARG_ORDERBY,
-                                     "none")) + HtmlUtils.checkbox(
-                                         ARG_ASCENDING, "true",
-                                         request.get(
-                                             ARG_ASCENDING,
-                                             false)) + HtmlUtils.space(1)
-                                                 + msg("ascending");
-            outputForm.append(HtmlUtils.formEntry(msgLabel("Order By"),
-                    orderBy));
-            outputForm.append(HtmlUtils.formEntry(msgLabel("Output"),
-                    HtmlUtils.select(ARG_OUTPUT,
-                                     getOutputHandlerSelectList(),
-                                     request.getString(ARG_OUTPUT, ""))));
-
-            outputForm.append(HtmlUtils.formTableClose());
-            titles.add(msg("Output"));
-            contents.add(outputForm.toString());
         }
 
         if (servers.size() > 0) {
@@ -980,6 +946,41 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
     }
 
 
+    
+    public String  makeOutputSettings(Request request) throws Exception {
+        Appendable outputForm = new StringBuilder();
+        List orderByList = new ArrayList();
+        orderByList.add(new TwoFacedObject(msg("None"), "none"));
+        orderByList.add(new TwoFacedObject(msg("From Date"),
+                                           SORTBY_FROMDATE));
+        orderByList.add(new TwoFacedObject(msg("To Date"),
+                                           SORTBY_TODATE));
+        orderByList.add(new TwoFacedObject(msg("Create Date"),
+                                           SORTBY_CREATEDATE));
+        orderByList.add(new TwoFacedObject(msg("Name"), SORTBY_NAME));
+        orderByList.add(new TwoFacedObject(msg("Size"), SORTBY_SIZE));
+
+        String orderBy = HtmlUtils.select(
+                                          ARG_ORDERBY, orderByList,
+                                          request.getString(
+                                                            ARG_ORDERBY,
+                                                            "none")) + HtmlUtils.checkbox(
+                                                                                          ARG_ASCENDING, "true",
+                                                                                          request.get(
+                                                                                                      ARG_ASCENDING,
+                                                                                                      false)) + HtmlUtils.space(1)
+            + msg("ascending");
+        outputForm.append(HtmlUtils.formEntry(msgLabel("Order By"),
+                                              orderBy));
+        outputForm.append(HtmlUtils.formEntry(msgLabel("Output"),
+                                              HtmlUtils.select(ARG_OUTPUT,
+                                                               getOutputHandlerSelectList(),
+                                                               request.getString(ARG_OUTPUT, ""))));
+
+        return outputForm.toString();
+    }
+
+
     /**
      * _more_
      *
@@ -1041,7 +1042,7 @@ public class SearchManager extends RepositoryManager implements EntryChecker,
             }
             providerSB.append(buff);
         }
-        String title = msg("Where do you want to search?");
+        String title = msg("Where to search");
         if (extra.length() > 0) {
             title += HtmlUtils.space(4) + msgLabel("Currently") + extra;
         }
