@@ -212,7 +212,10 @@ public class SocrataSearchProvider extends SearchProvider {
         String       domain     = toks.get(0);
         String       type     = toks.get(1);
         String       seriesId = toks.get(2);
-        String       name = seriesId;
+        String url = "https://" + domain +"/api/views/" + seriesId +".json";
+        String json = new String(IOUtil.readBytes(getInputStream(url)));
+        JSONObject obj = new JSONObject(new JSONTokener(json));
+        String       name = obj.getString("name");
         return  createEntry(request, domain, seriesId, name,   "", type);
     }
 

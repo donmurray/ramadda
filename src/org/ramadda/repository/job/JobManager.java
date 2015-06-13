@@ -277,10 +277,11 @@ public class JobManager extends RepositoryManager {
                 }
                 //NOTE: for now set this to 1 
                 numThreads = 1;
-
+                /*
                 System.err.println(
                     "RAMADDA: #threads: " + numThreads + " available cores:"
                     + Runtime.getRuntime().availableProcessors());
+                */
                 executor = Executors.newFixedThreadPool(numThreads);
             }
         }
@@ -598,8 +599,7 @@ public class JobManager extends RepositoryManager {
                 long t2 = System.currentTimeMillis();
                 currentJobs--;
                 totalJobs++;
-                System.err.println("RAMADDA: job end time:" + (t2 - t1)
-                                   + ": " + this);
+                //                System.err.println("RAMADDA: job end time:" + (t2 - t1)+ ": " + this);
             }
         }
     }

@@ -28,7 +28,7 @@ addGlobalDisplayType({type: DISPLAY_ENTRY_GALLERY, label:"Entry Gallery",require
 //addGlobalDisplayType({type: DISPLAY_OPERANDS, label:"Operands",requiresData:false,category:"Entry Displays"});
 addGlobalDisplayType({type: DISPLAY_METADATA, label:"Metadata Table",requiresData:false,category:"Entry Displays"});
 
-addGlobalDisplayType({type: DISPLAY_TIMELINE, label:"Timeline",requiresData:false,category:"Test"});
+//addGlobalDisplayType({type: DISPLAY_TIMELINE, label:"Timeline",requiresData:false,category:"Test"});
 
 
 function RamaddaEntryDisplay(displayManager, id, type, properties) {

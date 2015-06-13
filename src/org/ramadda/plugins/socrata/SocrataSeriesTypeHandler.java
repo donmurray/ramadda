@@ -118,7 +118,7 @@ public class SocrataSeriesTypeHandler extends PointTypeHandler {
                                          seriesId).replace("${limit}",
                                              "" + max).replace("${offset}",
                                                  "0");
-        System.err.println("Socrata data URL: " + url);
+        //        System.err.println("Socrata data URL: " + url);
         CsvFile file   = new CsvFile(url);
 
 
@@ -127,7 +127,7 @@ public class SocrataSeriesTypeHandler extends PointTypeHandler {
             String metadataUrl = URL_METADATA.replace("${hostname}",
                                      repository).replace("${series_id}",
                                          seriesId);
-            System.err.println("Socrata metadata URL: " + metadataUrl);
+            //            System.err.println("Socrata metadata URL: " + metadataUrl);
             String       json      = IOUtil.readContents(metadataUrl);
             JSONObject   view      = new JSONObject(new JSONTokener(json));
 
