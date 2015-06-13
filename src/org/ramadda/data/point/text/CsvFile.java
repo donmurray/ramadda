@@ -183,12 +183,13 @@ public class CsvFile extends TextFile {
      * @param visitInfo _more_
      * @return _more_
      */
+    @Override
     public Record doMakeRecord(VisitInfo visitInfo) {
         TextRecord record = new TextRecord(this, getFields());
         record.setFirstDataLine(firstDataLine);
         record.setDelimiter(getDelimiter());
         record.setBePickyAboutTokens(getProperty("picky", true));
-
+        record.setMatchUpColumns(getProperty("matchupColumns", false));
         return record;
     }
 

@@ -120,8 +120,6 @@ public class SocrataSeriesTypeHandler extends PointTypeHandler {
                                                  "0");
         //        System.err.println("Socrata data URL: " + url);
         CsvFile file   = new CsvFile(url);
-
-
         String  fields = (String) entry.getProperty("socrata.fields");
         if (fields == null) {
             String metadataUrl = URL_METADATA.replace("${hostname}",
@@ -145,11 +143,15 @@ public class SocrataSeriesTypeHandler extends PointTypeHandler {
                                                       Integer>();
 
 
+
+
             int idx = 0;
+            idx = 0;
             for (String name : (List<String>) Misc.sort(names)) {
                 if (name.startsWith(":")) {
                     continue;
                 }
+                //                System.err.println("name:" + name +" index:" + idx);
                 indexMap.put(name, new Integer(idx));
                 idx++;
             }
@@ -210,10 +212,16 @@ public class SocrataSeriesTypeHandler extends PointTypeHandler {
             fields = file.makeFields(fieldList);
             entry.putProperty("socrata.fields", fields);
         }
+
+        //fieldToIndex
+
+
         //        System.err.println("Fields:" + fields);
         file.putProperty("fields", fields);
         file.putProperty("picky", "false");
-        file.putProperty("skiplines", "1");
+        //        file.putProperty("skiplines", "1");
+        file.putProperty("matchupColumns", "true");
+        file.putProperty("skiplines", "0");
         file.putProperty("output.latlon", "false");
 
         return file;

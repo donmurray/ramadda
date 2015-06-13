@@ -25,6 +25,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
+import java.util.Hashtable;
 import java.util.List;
 
 
@@ -53,6 +54,9 @@ public class TextRecord extends DataRecord {
     /** _more_          */
     private int[] indices;
 
+    private boolean[] rawOK;
+
+
     /** _more_ */
     private Visitor visitor;
 
@@ -64,6 +68,9 @@ public class TextRecord extends DataRecord {
 
     /** _more_ */
     private boolean bePickyAboutTokens = true;
+
+    private boolean matchUpColumns= false;
+
 
 
     /** _more_ */
@@ -98,6 +105,18 @@ public class TextRecord extends DataRecord {
         initFields(fields);
 
     }
+
+
+    /**
+     * _more_
+     *
+     * @param file _more_
+     */
+    public TextRecord(RecordFile file) {
+        super(file);
+    }
+
+
 
     /**
      * _more_
@@ -135,15 +154,6 @@ public class TextRecord extends DataRecord {
         }
     }
 
-
-    /**
-     * _more_
-     *
-     * @param file _more_
-     */
-    public TextRecord(RecordFile file) {
-        super(file);
-    }
 
 
 
@@ -266,10 +276,28 @@ public class TextRecord extends DataRecord {
                     return ReadStatus.EOF;
                 }
                 //                System.err.println("LINE:" + line);
+                if(matchUpColumns && rawOK == null) {
+                    List<String> toks = Utils.tokenizeColumns(line, delimiter);
+                    rawOK = new boolean[toks.size()];
+                    HashSet<String> seen  = new HashSet<String>();
+                    for(RecordField field: fields) {
+                        seen.add(field.getName());
+                    }
+                    //                    System.err.println("match up");
+                    for(int idx=0;idx< toks.size();idx++) {
+                        rawOK[idx] = seen.contains(toks.get(idx));
+                        //                        System.err.println(toks.get(idx) +" " + rawOK[idx]);
+                    }
+                    continue;
+                }
+
+
+
                 if (isLineValidData(line)) {
                     break;
                 }
             }
+
 
             //            System.err.println("LINE:" + line);
 
@@ -289,9 +317,14 @@ public class TextRecord extends DataRecord {
                             + tokens.length + " toks:" + toks.size() + " "
                             + toks);
                 }
+                int targetIdx = 0;
+
                 for (int i = 0; (i < toks.size()) && (i < tokens.length);
                         i++) {
-                    tokens[i] = toks.get(i);
+                    if(rawOK!=null && !rawOK[i]) {
+                        continue;
+                    }
+                    tokens[targetIdx++] = toks.get(i);
                 }
             }
 
@@ -755,5 +788,8 @@ public class TextRecord extends DataRecord {
         firstDataLine = line;
     }
 
+    public void setMatchUpColumns(boolean v) {
+        matchUpColumns = v;
+    }
 
 }
